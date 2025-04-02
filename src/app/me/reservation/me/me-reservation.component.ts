@@ -62,7 +62,7 @@ import { MatListOption } from '@angular/material/list';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { IOffice } from '../../../interfaces/office';
 import { IStep, Step } from '../../../interfaces/step';
-import { TimeZoneSnackBarComponent } from '../../../shared/snak/time-zone/time-zone-snack-bar.component';
+import { TimeZoneSnackBarComponent } from '../../../shared/snack/time-zone/time-zone-snack-bar.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../../interfaces/token';
 import { IUser } from '../../../interfaces/user';
@@ -353,7 +353,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  triggerClick = (event: StepperSelectionEvent): void => getStepCall(this.steps, event.selectedIndex - 1)
+  triggerClick = (event: StepperSelectionEvent): void => getStepCall(this.steps, event.selectedIndex - 1);
 
   callStepTwo = (goNext: boolean): void => {
     if (this.roomForm.invalid) {
@@ -365,7 +365,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.setTypes();
     this.getTreatmentList();
     completeAndNext(this.steps, this.myStepper, goNext, this.analytic);
-  }
+  };
 
   callStepThree = (goNext: boolean): void => {
     if (this.treatmentForm.invalid) {
@@ -375,7 +375,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.treatmentId = this.treatment.value.id;
     this.getAdditionalList();
     completeAndNext(this.steps, this.myStepper, goNext, this.analytic);
-  }
+  };
 
   callStepFour = (goNext: boolean): void => {
     if (this.treatmentForm.invalid) {
@@ -399,7 +399,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       })
     );
     completeAndNext(this.steps, this.myStepper, goNext, this.analytic);
-  }
+  };
 
   callStepFive = (goNext: boolean): void => {
     if (this.eventGroup.invalid) {
@@ -413,7 +413,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
     this.isPayment = true;
     completeAndNext(this.steps, this.myStepper, goNext, this.analytic);
-  }
+  };
 
   callStepSix = (goNext: boolean): void => {
     if (this.typeForm.invalid) {
@@ -422,7 +422,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
 
     this.isPreview = true;
     completeAndNext(this.steps, this.myStepper, goNext, this.analytic);
-  }
+  };
 
   getStepName = (index: number): string => getStepName(this.steps, index);
 
@@ -455,7 +455,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   selectDate = (datetime: any): void => {
     this.event.setValue(datetime.date);
     this.time = datetime.time;
-  }
+  };
 
   areEquals = (datetime: any): boolean => {
     let result = false;
@@ -463,9 +463,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       result = isEqual(this.event.value, datetime.date) && this.time === datetime.time;
     }
     return result;
-  }
+  };
 
-  sortDate = (a: any, b: any): number => newDate(a.key).getTime() - newDate(b.key).getTime()
+  sortDate = (a: any, b: any): number => newDate(a.key).getTime() - newDate(b.key).getTime();
 
   formatKey = (key: string): string => {
     const date = newDate(key);
@@ -473,9 +473,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       : formatDateName(date, this.translate.currentLang, this.measure);
 
     return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
-  }
+  };
 
-  sortTime = (data: any): any => data.sort((a: any, b: any) => newDate(a.date).getTime() - newDate(b.date).getTime())
+  sortTime = (data: any): any => data.sort((a: any, b: any) => newDate(a.date).getTime() - newDate(b.date).getTime());
 
   setDistance = ($event: number): void => {
     this.distance = $event > 999 ?
@@ -483,36 +483,36 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
         { distance: round($event / 1000) }) :
       this.translate.instant('ME.RESERVATION.ROOM.ADDRESS.DISTANCE.M',
         { distance: round($event) });
-  }
+  };
 
   keyDownHandler = (event: any, form: UntypedFormControl): void => {
     if (event.code === 'Backspace') {
       form.setValue('');
     }
-  }
+  };
 
   keyDownGroup = (event: any): void => {
     this.treatmentList = undefined;
     this.keyDownHandler(event, this.treatment);
     this.keyDownHandler(event, this.group);
-  }
+  };
 
   keyDownOffice = (event: any): void => {
     this.roomList = undefined;
     this.keyDownHandler(event, this.room);
     this.keyDownHandler(event, this.office);
-  }
+  };
 
   onChange = (options: MatListOption[]): void => {
     this.additionalSelected = options.map(o => o.value);
     this.price = newAdditional(this.price, this.additionalSelected, this.treatmentDiscount);
-  }
+  };
 
-  isSelected = (it: IAdditionalAll): boolean => this.additionalSelected.filter(el => el.id === it.id).length > 0
+  isSelected = (it: IAdditionalAll): boolean => this.additionalSelected.filter(el => el.id === it.id).length > 0;
 
   getPercentage = (percentage: number): void => {
     this.price = newPercentage(this.price, percentage);
-  }
+  };
 
   private getReservation = (id: string): void => this.store.dispatch(
     new fromActionsReservation.ReservationFind({ id, edit: true })
@@ -548,7 +548,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       phone: this.phone
     });
     this.valueChange();
-  }
+  };
 
   private valueChange = (): void => {
     this.office.valueChanges.subscribe(value => {
@@ -641,7 +641,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
         this.price = removeDiscount(this.price);
       }
     });
-  }
+  };
 
   private createFilter = (): void => {
     this.filteredGroup = this.group.valueChanges.pipe(startWith(''),
@@ -670,7 +670,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       map(addressName => addressName ? this.filterProfessional(addressName) : this.professionalList
         ? this.professionalList.slice() : this.professionalList)
     );
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsReservation.Clean());
 
@@ -689,7 +689,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       this.clean();
       this.router.navigate([this.language, 'me', 'reservations']);
     });
-  }
+  };
 
   private setSelectedIndex = (): void => {
     let i = 0;
@@ -701,7 +701,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
         }
         i++;
       });
-  }
+  };
 
   private filterGroup = (name: string): IGroupService[] | undefined => this.groups?.filter(
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
@@ -751,7 +751,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       }
       completeAndNext(this.steps, this.myStepper, true, this.analytic);
     }
-  }
+  };
 
   private setTypes = (): void => {
     const types = this.room.value.paymentTypes.filter(
@@ -761,7 +761,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     } else {
       this.options = getPaymentOptions(this.translate, types);
     }
-  }
+  };
 
   private cleanTreatment = (): void => {
     this.price = new Price();
@@ -770,7 +770,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.showDiscount = false;
     this.treatmentList = undefined;
     this.event.setValue(undefined);
-  }
+  };
 
   private getOptions = (): void => this.store.dispatch(new fromActionsReservation.PaymentOptions());
 
@@ -901,5 +901,5 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
         this.options = getPayNlOptions(state.paymentOptions);
       }
     });
-  }
+  };
 }

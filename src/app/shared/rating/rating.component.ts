@@ -40,12 +40,12 @@ export class RatingComponent implements OnInit {
   onClick = (rating: number): void => {
     this.rating = this.rating === rating ? -1 : rating;
     this.ratingUpdated.emit(this.rating);
-  }
+  };
 
   onHover = (hover: number): void => {
     this.hover = hover;
     this.ratingHover.emit(this.hover);
-  }
+  };
 
   fontSet = (
     i: number

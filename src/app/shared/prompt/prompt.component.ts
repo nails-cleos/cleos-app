@@ -19,10 +19,10 @@ export class PromptComponent {
   installPwa = (): void => {
     this.data.promptEvent.prompt();
     this.close();
-  }
+  };
 
   close = (): void => {
     this.cookieService.set(NOT_INSTALL_PWA, 'true');
     this.bottomSheetRef.dismiss();
-  }
+  };
 }

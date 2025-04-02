@@ -10,5 +10,5 @@ export class DurationTimePipe implements PipeTransform {
   transform = (
     duration?: string,
     locale: string = API_LOCALE
-  ): string => duration ? formatDuration(duration, locale) : ''
+  ): string => duration ? formatDuration(duration, locale) : '';
 }

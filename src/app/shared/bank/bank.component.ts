@@ -40,7 +40,7 @@ export class BankComponent implements AfterViewInit {
     if (event.code === 'Backspace') {
       this.formGroup.get('bank')?.setValue('');
     }
-  }
+  };
 
   private formChanges = (): void => {
     this.formGroup.get('percentage')?.setValue('TOTAL');
@@ -89,7 +89,7 @@ export class BankComponent implements AfterViewInit {
       }
       this.percentageEmitter.emit(percentage);
     });
-  }
+  };
 
   private createFilter = (): void => {
     this.filteredBank = this.formGroup.get('bank')?.valueChanges.pipe(startWith(''),
@@ -99,7 +99,7 @@ export class BankComponent implements AfterViewInit {
     if (this.firstTime && this.options?.length === 1) {
       this.formGroup.get('type')?.setValue(this.options[0]);
     }
-  }
+  };
 
   private filterBank = (name: string): IPaymentOption[] | undefined => this.bankList?.filter(
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);

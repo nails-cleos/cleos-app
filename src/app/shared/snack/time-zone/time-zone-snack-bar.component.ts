@@ -31,5 +31,5 @@ export class TimeZoneSnackBarComponent {
   private getDateTime = (
     reservationDate: Date,
     timeZone?: string
-  ): string => localeTimeZoneDate(this.translate.currentLang, reservationDate, timeZone)
+  ): string => localeTimeZoneDate(this.translate.currentLang, reservationDate, timeZone);
 }

@@ -16,7 +16,7 @@ export class PaginatorI18n {
     paginatorIntl.getRangeLabel = this.getRangeLabel.bind(this);
 
     return paginatorIntl;
-  }
+  };
 
   private getRangeLabel = (page: number, pageSize: number, length: number): string => {
     if (length === 0 || pageSize === 0) {
@@ -28,5 +28,5 @@ export class PaginatorI18n {
 
     return this.translate.instant('COMMON.PAGINATOR.RANGE_PAGE_LABEL_2',
       { startIndex: startIndex + 1, endIndex, length });
-  }
+  };
 }

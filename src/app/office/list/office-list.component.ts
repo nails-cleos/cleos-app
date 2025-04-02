@@ -83,7 +83,7 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     });
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsOffice.Clean());
 
@@ -95,7 +95,7 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getOffices(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
-  }
+  };
 
   private getOffices = (page: number = 0): void => this.store.dispatch(
     new fromActionsOffice.GetAll({
@@ -118,5 +118,5 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
         this.createPageSubscriptions();
       }
     });
-  }
+  };
 }

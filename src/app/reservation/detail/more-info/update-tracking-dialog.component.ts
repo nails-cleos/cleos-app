@@ -18,8 +18,8 @@ export class UpdateTrackingDialogComponent implements OnInit {
   completedDate: FormControl<Date | null> = new FormControl(null);
   completedTime: FormControl<any | null> = new FormControl('');
 
-  private readonly startedDateTime?: Date
-  private readonly completedDateTime?: Date
+  private readonly startedDateTime?: Date;
+  private readonly completedDateTime?: Date;
 
   constructor(public dialogRef: MatDialogRef<UpdateTrackingDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
               private formBuilder: UntypedFormBuilder) {
@@ -44,7 +44,7 @@ export class UpdateTrackingDialogComponent implements OnInit {
       started = this.startedDate.value?.toLocaleString(API_LOCALE);
     }
     if (this.completedDateTime?.getTime() !== this.completedDate.value?.getTime()) {
-      completed = this.completedDate.value?.toLocaleString(API_LOCALE)
+      completed = this.completedDate.value?.toLocaleString(API_LOCALE);
     }
     if (started || completed) {
       return this.dialogRef.close({ started, completed });
@@ -60,7 +60,7 @@ export class UpdateTrackingDialogComponent implements OnInit {
   timeChange = ($event: string, dateForm: FormControl): void => {
     const time = getTimeNumber($event);
     dateForm.value.setHours(time?.hour || 0, time?.minute || 0);
-  }
+  };
 
   private createForm = (): void => {
     this.trackingForm = this.formBuilder.group({
@@ -69,5 +69,5 @@ export class UpdateTrackingDialogComponent implements OnInit {
       completedDate: this.completedDate,
       completedTime: this.completedTime
     });
-  }
+  };
 }

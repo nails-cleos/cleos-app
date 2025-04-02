@@ -32,5 +32,5 @@ export const errorInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn)
     }
 
     return throwError(err);
-  }))
-}
+  }));
+};

@@ -180,7 +180,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         });
     }
-  }
+  };
 
   openInfoWindow = (marker: MapAdvancedMarker): void => this.infoWindow?.open(marker);
 
@@ -197,7 +197,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
       google.maps.event.addListener(autocomplete, 'place_changed', () => this.setAddress(autocomplete.getPlace()));
     }
-  }
+  };
 
   private setCurrentPosition = (): void => {
     if (this.latitudeMarker && this.longitudeMarker) {
@@ -229,7 +229,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
     }
-  }
+  };
 
   private setAddress = (place: PlaceResult): void => {
     if (place.geometry && place.geometry.location) {
@@ -251,7 +251,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.markerOptions = { gmpDraggable: this.isDraggable };
       this.addressEmitter.emit(place);
     }
-  }
+  };
 
   private mockResponse = (): void => {
     if (!this.addressFormGroup?.get('address')?.value) {
@@ -283,12 +283,12 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.addressFormGroup?.get('address')?.setValue(value.formatted_address);
       this.addressEmitter.emit(value);
     }
-  }
+  };
 
   // .toFixed() returns string, so ' * 1' is a trick to convert to number
   private getRandomInRange = (
     from: number,
     to: number,
     fixed: number = 3
-  ): number => Number((Math.random() * (to - from) + from).toFixed(fixed)) * 1
+  ): number => Number((Math.random() * (to - from) + from).toFixed(fixed)) * 1;
 }

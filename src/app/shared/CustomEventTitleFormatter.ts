@@ -28,7 +28,7 @@ export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
       return `<b>${ start }${ end }</b> ${ event.title }`;
     }
     return event.title;
-  }
+  };
 
   month = (event: CalendarEvent): string => {
     const meta: IMeta = event.meta;
@@ -40,7 +40,7 @@ export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
     } else {
       return event.title;
     }
-  }
+  };
 
   week = (event: CalendarEvent): string => {
     let result = CustomEventTitleFormatter.eventTitle(event, this.translate.currentLang);
@@ -50,7 +50,7 @@ export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
       </div>&nbsp; ${ result }`;
     }
     return result;
-  }
+  };
 
   day = (event: CalendarEvent): string => CustomEventTitleFormatter.eventTitle(event, this.translate.currentLang);
 }

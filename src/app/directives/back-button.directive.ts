@@ -32,5 +32,5 @@ export class BackButtonDirective {
     } else {
       this.navigation.back(this.date, this.step);
     }
-  }
+  };
 }

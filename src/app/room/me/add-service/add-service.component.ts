@@ -89,7 +89,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
     }
-  }
+  };
 
   changePrice = (service: IService): void => {
     const dialogRef = this.dialog.open(PriceDialogComponent, {
@@ -115,7 +115,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     });
-  }
+  };
 
   private getServices = (): void => {
     this.route.params.subscribe((routeParams) => {
@@ -124,7 +124,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
         new fromActionsRoom.GetMyServices({ id: this.roomId })
       );
     });
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
@@ -147,7 +147,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
         this.getServices();
       }
     });
-  }
+  };
 }
 
 @Component({

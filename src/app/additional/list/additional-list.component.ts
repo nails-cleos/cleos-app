@@ -84,7 +84,7 @@ export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy
         );
       }
     });
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsAdditional.Clean());
 
@@ -96,7 +96,7 @@ export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy
     this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getAdditionalList(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
-  }
+  };
 
   private getAdditionalList = (page: number = 0): void => this.store.dispatch(
     new fromActionsAdditional.GetAll({
@@ -126,5 +126,5 @@ export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy
         this.createPageSubscriptions();
       }
     });
-  }
+  };
 }

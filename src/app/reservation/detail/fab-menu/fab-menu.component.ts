@@ -30,10 +30,10 @@ export class FabMenuComponent {
     if (!this.elementRef.nativeElement.contains(event.target)) {
       this.menuOpen = false;
     }
-  }
+  };
 
   handleMenuItemClick = (item: any): void => {
     this.menuOpen = false;
     this.fabMenuItemSelected.emit(item.id);
-  }
+  };
 }

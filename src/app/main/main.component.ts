@@ -32,19 +32,19 @@ import { SharedModule } from '../shared/shared.module';
 export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('bodySection', { static: true }) bodySection?: ElementRef<HTMLElement>;
 
-  private breakpointObserver: BreakpointObserver = inject(BreakpointObserver)
-  private store: Store<AppState> = inject(Store<AppState>)
-  private router: Router = inject(Router)
-  private translate: TranslateService = inject(TranslateService)
-  private overlayContainer: OverlayContainer = inject(OverlayContainer)
-  private cookieService: CookieService = inject(CookieService)
-  private themeService: ThemeService = inject(ThemeService)
-  private auth: Auth = inject(Auth)
-  private authUserService: AuthUserService = inject(AuthUserService)
-  private mainContent: MainContentService = inject(MainContentService)
-  private tokenService: TokenService = inject(TokenService)
-  private navigationService: NavigationService = inject(NavigationService)
-  private route: ActivatedRoute = inject(ActivatedRoute)
+  private breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private store: Store<AppState> = inject(Store<AppState>);
+  private router: Router = inject(Router);
+  private translate: TranslateService = inject(TranslateService);
+  private overlayContainer: OverlayContainer = inject(OverlayContainer);
+  private cookieService: CookieService = inject(CookieService);
+  private themeService: ThemeService = inject(ThemeService);
+  private auth: Auth = inject(Auth);
+  private authUserService: AuthUserService = inject(AuthUserService);
+  private mainContent: MainContentService = inject(MainContentService);
+  private tokenService: TokenService = inject(TokenService);
+  private navigationService: NavigationService = inject(NavigationService);
+  private route: ActivatedRoute = inject(ActivatedRoute);
 
   navigationState: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('close');
 
@@ -126,17 +126,17 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
       this.navigationAnimation();
       goTo(element);
     }, 100));
-  }
+  };
 
   private resetTheme = (theme?: Theme): void => {
     this.cssClass = resetTheme(theme, this.cssClass, this.overlayContainer, this.cookieService, this.themeService);
     this.authUserService.updateMode(isDarkMode(theme));
     this.backgroundColor = this.isDarkMode ? '126, 119, 105' : '169, 163, 151';
-  }
+  };
 
   private navigationAnimation = (): void => {
     this.navigationObserve?.disconnect();
     this.firstSection = window.document.getElementById('slider');
     this.navigationObserve = observeElement(this.navigationState, this.firstSection, true, 0.1);
-  }
+  };
 }

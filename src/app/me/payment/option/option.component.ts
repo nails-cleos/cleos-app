@@ -106,7 +106,7 @@ export class OptionComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  triggerClick = (event: StepperSelectionEvent): void => getStepCall(this.steps, event.selectedIndex - 1)
+  triggerClick = (event: StepperSelectionEvent): void => getStepCall(this.steps, event.selectedIndex - 1);
 
   callStepTwo = (goNext: boolean): void => {
     if (this.typeForm.invalid) {
@@ -114,7 +114,7 @@ export class OptionComponent implements OnInit, OnDestroy {
     }
 
     completeAndNext(this.steps, this.myStepper, goNext);
-  }
+  };
 
   getStepName = (index: number): string => getStepName(this.steps, index);
 
@@ -122,7 +122,7 @@ export class OptionComponent implements OnInit, OnDestroy {
 
   getPercentage = (percentage: number): void => {
     this.price = newPercentage(this.price, percentage);
-  }
+  };
 
   private getPaymentFindByReservationId = (): void => {
     this.store.dispatch(
@@ -131,7 +131,7 @@ export class OptionComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsReservation.ReservationFind({ id: this.reservationId })
     );
-  }
+  };
 
   private getOptions = (): void => this.store.dispatch(new fromActionsPayment.PaymentOptions());
 
@@ -175,5 +175,5 @@ export class OptionComponent implements OnInit, OnDestroy {
         this.options = getPayNlOptions(state.data);
       }
     });
-  }
+  };
 }

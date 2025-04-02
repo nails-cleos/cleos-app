@@ -12,8 +12,8 @@ import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
   imports: [SharedModule, CurrencySymbolPipe]
 })
 export class PriceExtrasComponent {
-  @Input('key') key!: string;
-  @Input('extras') extras?: IAdditionalAll[] | IExtras[];
-  @Input('total') total: number = 0;
-  @Input('currency') currency!: ICurrencyAll;
+  @Input() key!: string;
+  @Input() extras?: IAdditionalAll[] | IExtras[];
+  @Input() total: number = 0;
+  @Input() currency!: ICurrencyAll;
 }

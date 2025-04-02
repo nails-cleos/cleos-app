@@ -12,14 +12,14 @@ export class DragDropDirective {
     evt.preventDefault();
     evt.stopPropagation();
     this.fileOver = true;
-  }
+  };
 
   // Dragleave listener
   @HostListener('dragleave', ['$event']) public onDragLeave = (evt: any): void => {
     evt.preventDefault();
     evt.stopPropagation();
     this.fileOver = false;
-  }
+  };
 
   // Drop listener
   @HostListener('drop', ['$event']) public ondrop = (evt: any): void => {
@@ -30,5 +30,5 @@ export class DragDropDirective {
     if (files.length > 0) {
       this.fileDropped.emit(files);
     }
-  }
+  };
 }

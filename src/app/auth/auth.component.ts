@@ -63,7 +63,7 @@ export class AuthComponent implements OnInit, OnDestroy {
       const { email, password, displayName } = this.loginForm.value;
       if (displayName) {
         createUserWithEmailAndPassword(this.auth, email, password).catch(err => {
-          console.error('An error happen trying to createUserWithEmailAndPassword', err)
+          console.error('An error happen trying to createUserWithEmailAndPassword', err);
           switch (err.code) {
             case 'auth/invalid-email':
               this.loginForm.get('email')?.setErrors({ email: true });
@@ -78,7 +78,7 @@ export class AuthComponent implements OnInit, OnDestroy {
         });
       } else {
         signInWithEmailAndPassword(this.auth, email, password).catch(err => {
-          console.error('An error happen trying to signInWithEmailAndPassword', err)
+          console.error('An error happen trying to signInWithEmailAndPassword', err);
           if (err.code === 'auth/wrong-password') {
             this.loginForm.get('password')?.setErrors({ wrong: true });
           } else {
@@ -189,5 +189,5 @@ export class AuthComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
+  };
 }

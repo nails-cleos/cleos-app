@@ -134,19 +134,19 @@ export class CatalogueComponent implements OnInit, OnDestroy {
     if (event.code === 'Backspace') {
       this.getForm.group.setValue('');
     }
-  }
+  };
 
   onFileDropped = (files: any): void => {
     files[0].progress = 0;
     this.file = files[0];
     this.uploadFilesSimulator();
-  }
+  };
 
   fileBrowseHandler = ($event: any): void => {
     $event.target.files[0].progress = 0;
     this.file = $event.target.files[0];
     this.uploadFilesSimulator();
-  }
+  };
 
   formatBytes = (bytes: any, decimals: number): string => formatBytes(bytes, decimals);
 
@@ -163,7 +163,7 @@ export class CatalogueComponent implements OnInit, OnDestroy {
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups)
     );
-  }
+  };
 
   private filterGroup = (name: string): IGroupService[] | undefined => this.groups?.filter(
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0
@@ -193,14 +193,14 @@ export class CatalogueComponent implements OnInit, OnDestroy {
         }
       }, interval); // Use calculated interval
     }, 1000);
-  }
+  };
 
   private processImage = (img: HTMLImageElement): void => {
     this.resizedImageDataUrl = resizeImage(img, this.canvas?.nativeElement || this.canvasXs?.nativeElement);
     if (this.resizedImage) {
       this.resizedImage.nativeElement.src = this.resizedImageDataUrl;
     }
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsCatalogue.Clean());
 
@@ -213,7 +213,7 @@ export class CatalogueComponent implements OnInit, OnDestroy {
         new fromActionsCatalogue.CatalogueFind(id)
       );
     }
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
@@ -242,5 +242,5 @@ export class CatalogueComponent implements OnInit, OnDestroy {
         this.router.navigate([this.language, 'catalogues']);
       }
     });
-  }
+  };
 }

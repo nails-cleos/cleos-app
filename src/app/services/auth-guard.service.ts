@@ -28,7 +28,7 @@ export class PermissionsService {
   }
 
   private static hasRole = (route: ActivatedRouteSnapshot, user: IUser): boolean => route.data.roles &&
-  user.authorities ? user.authorities.some(au => route.data.roles.includes(au.authority)) : false
+  user.authorities ? user.authorities.some(au => route.data.roles.includes(au.authority)) : false;
 
   canActivate = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean => {
     if (this.currentUser) {
@@ -55,7 +55,7 @@ export class PermissionsService {
     this.router.navigate([this.translate.currentLang, 'auth'], { queryParams: { state: queryParams } });
 
     return false;
-  }
+  };
 }
 
 export const authGuard: CanActivateFn = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean =>

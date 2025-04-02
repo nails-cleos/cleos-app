@@ -83,5 +83,5 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
         this.router.navigate([this.language, 'me', 'transaction', this.id, 'payment']);
       }
     });
-  }
+  };
 }

@@ -58,7 +58,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     this.form = this.formBuilder.group({
       email: ['', Validators.required]
     });
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {
@@ -73,5 +73,5 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
+  };
 }

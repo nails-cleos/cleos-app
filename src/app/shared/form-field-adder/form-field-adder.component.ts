@@ -69,7 +69,7 @@ export class FormFieldAdderComponent implements OnInit {
     this.dataSource.data.splice(index, 1);
     this.formArray.removeAt(index);
     this.emitRowChange();
-  }
+  };
 
   getFormGroup = (index: number): FormGroup => this.formArray.at(index) as FormGroup;
 
@@ -85,7 +85,7 @@ export class FormFieldAdderComponent implements OnInit {
       description: ['', Validators.required],
       price: ['', Validators.required]
     });
-  }
+  };
 
   private emitRowChange = (): void => {
     if (!this.formGroup.invalid) {
@@ -96,7 +96,7 @@ export class FormFieldAdderComponent implements OnInit {
     } else {
       this.isValid.emit(this.total === this.toPaid && !this.formGroup.invalid);
     }
-  }
+  };
 
   private subscribeToFormChanges = (): void => {
     this.formArray.controls.forEach((control, index) => {
@@ -122,7 +122,7 @@ export class FormFieldAdderComponent implements OnInit {
           this.emitRowChange();
         });
     });
-  }
+  };
 
   private get formArray(): FormArray {
     return this.formGroup.get('items') as FormArray;

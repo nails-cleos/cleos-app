@@ -56,7 +56,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
         new fromActionsNotification.NotificationRead(notification)
       );
     }
-  }
+  };
 
   getNotifications = (): void => this.store.dispatch(
     new fromActionsNotification.GetAllPaged({
@@ -81,7 +81,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       this.page = -1;
       this.getNotifications();
     }
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsNotification.Clean());
 
@@ -105,5 +105,5 @@ export class NotificationsComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
+  };
 }

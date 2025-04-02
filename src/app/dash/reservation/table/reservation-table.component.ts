@@ -104,7 +104,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
   openDialog = (reservation: IReservationAll): void => {
     const time = newDateTimestamp(reservation.timestamp);
     openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
-  }
+  };
 
   delete = (reservation: IReservation): void => {
     const title = this.translate.instant('RESERVATION.DELETED.TITLE');
@@ -118,7 +118,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
         );
       }
     });
-  }
+  };
 
   private getReservations = (page: number = 0): void => this.store.dispatch(
     new fromActionsReservation.GetAllPage({
@@ -140,7 +140,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
     this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getReservations(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
@@ -153,5 +153,5 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
         }
       }
     });
-  }
+  };
 }

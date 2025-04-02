@@ -129,7 +129,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
         new fromActionsUser.UserOverview(id)
       );
     }
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {
@@ -158,5 +158,5 @@ export class OverviewComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
+  };
 }

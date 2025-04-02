@@ -46,19 +46,19 @@ export class SelectProfessionalDialogComponent implements OnInit {
     this.createFilters();
   }
 
-  displayFnUser = (user: IUser): string => user?.displayName ? user.displayName : ''
+  displayFnUser = (user: IUser): string => user?.displayName ? user.displayName : '';
 
   keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
       this.professional.setValue('');
     }
-  }
+  };
 
   private createForm = (): void => {
     this.professionalForm = this.formBuilder.group({
       professional: this.professional
     });
-  }
+  };
 
   private createFilters = (): void => {
     this.filteredProfessional = this.professional.valueChanges.pipe(
@@ -67,8 +67,8 @@ export class SelectProfessionalDialogComponent implements OnInit {
       map(name => name ? this.filterProfessional(
         name) : this.professionals ? this.professionals.slice() : this.professionals)
     );
-  }
+  };
 
   private filterProfessional = (name: string): IUser[] | undefined => this.professionals?.filter(
-    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0)
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 }

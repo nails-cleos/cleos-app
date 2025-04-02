@@ -68,5 +68,5 @@ export class PaymentService {
       case 'transaction':
         return this.transactionUrlV1;
     }
-  }
+  };
 }

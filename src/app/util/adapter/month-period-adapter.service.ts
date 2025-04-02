@@ -25,5 +25,5 @@ export class MonthPeriodAdapter<D> implements MatDateRangeSelectionStrategy<D> {
     }
 
     return new DateRange<D>(null, null);
-  }
+  };
 }

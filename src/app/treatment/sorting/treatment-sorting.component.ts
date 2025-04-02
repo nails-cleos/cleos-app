@@ -46,7 +46,7 @@ export class TreatmentSortingComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsTreatment.TreatmentUpdateSort(sorted)
     );
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsTreatment.Clean());
 
@@ -57,7 +57,7 @@ export class TreatmentSortingComponent implements OnInit, OnDestroy {
         new fromActionsTreatment.TreatmentFind({ id, path: 'sorting' })
       );
     }
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
@@ -68,5 +68,5 @@ export class TreatmentSortingComponent implements OnInit, OnDestroy {
       this.items =
         state.selected?.treatments?.map((group: ITreatmentAll) => new ItemSorting(group.id, group.name, group.order));
     });
-  }
+  };
 }

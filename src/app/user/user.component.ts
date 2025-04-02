@@ -124,7 +124,7 @@ export class UserComponent implements OnInit, OnDestroy {
     this.geometry = placeResult.geometry;
     this.formattedAddress = placeResult.formatted_address;
     this.addressUpdated = true;
-  }
+  };
 
   private createForm = (): void => {
     this.form = this.formBuilder.group({
@@ -170,7 +170,7 @@ export class UserComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
 
@@ -180,7 +180,7 @@ export class UserComponent implements OnInit, OnDestroy {
         new fromActionsUser.FindUser(this.id)
       );
     }
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
@@ -218,5 +218,5 @@ export class UserComponent implements OnInit, OnDestroy {
         this.router.navigate([this.translate.currentLang, 'users']);
       }
     });
-  }
+  };
 }

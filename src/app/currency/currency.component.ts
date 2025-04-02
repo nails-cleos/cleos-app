@@ -96,7 +96,7 @@ export class CurrencyComponent implements OnInit, OnDestroy {
       code: ['', [Validators.required]],
       icon: ['']
     });
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsCurrency.Clean());
 
@@ -106,7 +106,7 @@ export class CurrencyComponent implements OnInit, OnDestroy {
         new fromActionsCurrency.CurrencyFind(this.id)
       );
     }
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
@@ -128,5 +128,5 @@ export class CurrencyComponent implements OnInit, OnDestroy {
         this.router.navigate([this.language, 'currency']);
       }
     });
-  }
+  };
 }

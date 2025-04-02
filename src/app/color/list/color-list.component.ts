@@ -81,7 +81,7 @@ export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     });
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsColor.Clean());
 
@@ -93,7 +93,7 @@ export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getColorList(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
-  }
+  };
 
   private getColorList = (page: number = 0): void => this.store.dispatch(
     new fromActionsColor.GetAll({
@@ -116,5 +116,5 @@ export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
         this.createPageSubscriptions();
       }
     });
-  }
+  };
 }

@@ -48,5 +48,5 @@ export class ChartComponent implements OnChanges, OnDestroy {
     }
     this.error = undefined;
     this.chart = createChart(this.chartSummary, this.currency, this.isDarkMode, this.locale, this.timeZone);
-  }
+  };
 }

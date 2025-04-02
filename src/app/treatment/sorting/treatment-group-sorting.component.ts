@@ -55,5 +55,5 @@ export class TreatmentGroupSortingComponent implements OnInit, OnDestroy {
         group.id, group.name, group.order)
       );
     });
-  }
+  };
 }

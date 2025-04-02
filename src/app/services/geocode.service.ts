@@ -33,7 +33,7 @@ export class GeocodeService {
         );
     }
     return new Observable((observer) => observer.next(MapStatus.notAvailable));
-  }
+  };
 
   geocodeAddress = (
     lat: number,
@@ -56,5 +56,5 @@ export class GeocodeService {
       const results = response.results;
       observer.next({ address: results[0] });
     });
-  })
+  });
 }

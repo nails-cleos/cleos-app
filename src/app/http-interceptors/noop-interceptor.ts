@@ -9,4 +9,4 @@ export const noopInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn):
     return next(req.clone({ url: `${ environment.baseUrl }/${ req.url }` }));
   }
   return next(req);
-}
+};

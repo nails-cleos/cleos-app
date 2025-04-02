@@ -192,23 +192,23 @@ export class DashComponent implements OnInit, OnDestroy {
     error: {
       status: message
     }
-  })
+  });
 
   private static completedByMonth = (
     event: CalendarEvent,
     viewDate: Date
-  ): boolean => event.meta.state === States.completed && isSameMonth(event.start, viewDate)
+  ): boolean => event.meta.state === States.completed && isSameMonth(event.start, viewDate);
 
   private static upcomingByMonth = (
     event: CalendarEvent,
     viewDate: Date
   ): boolean => isSameMonth(event.start, viewDate) && event.meta.state
-    && [States.created, States.approved, States.partiallyPaid, States.paid].includes(event.meta.state)
+    && [States.created, States.approved, States.partiallyPaid, States.paid].includes(event.meta.state);
 
   private static transactionByMonth = (
     event: CalendarEvent,
     viewDate: Date
-  ): boolean => event.meta.state === 'TRANSACTION' && isSameMonth(event.start, viewDate)
+  ): boolean => event.meta.state === 'TRANSACTION' && isSameMonth(event.start, viewDate);
 
   ngOnInit(): void {
     this.clean();
@@ -233,7 +233,7 @@ export class DashComponent implements OnInit, OnDestroy {
 
   handleEvent = (event: CalendarEvent): void => {
     this.router.navigate(event.meta.route);
-  }
+  };
 
   dayClicked = ({ date, events }: { date: Date; events: CalendarEvent[] }): void => {
     if (isSameMonth(date, this.viewDate)) {
@@ -244,12 +244,12 @@ export class DashComponent implements OnInit, OnDestroy {
       const room = { id: this.roomId };
       this.segmentClick(date, room);
     }
-  }
+  };
 
   cellClick = (date: any): void => {
     const room = { id: this.roomId };
     this.segmentClick(date, room);
-  }
+  };
 
   beforeMonthViewRender = ({ body, period }: { body: CalendarMonthViewDay<IMeta>[]; period: any }): void => {
     // month view has a different UX from the week and day view, so we only really need to group by the type
@@ -268,10 +268,10 @@ export class DashComponent implements OnInit, OnDestroy {
       // @ts-expect-error
       cell.eventGroups = Object.entries(groups);
     });
-  }
+  };
 
   sortBy = (eventGroups: CalendarEvent<IMeta>[]): any => eventGroups.sort(
-    (a: any, b: any) => getStateOrder(a[0]) - getStateOrder(b[0]))
+    (a: any, b: any) => getStateOrder(a[0]) - getStateOrder(b[0]));
 
   private segmentClick = (date: Date, room?: IRoom): void => {
     const data = { date };
@@ -282,7 +282,7 @@ export class DashComponent implements OnInit, OnDestroy {
         }
       });
     }
-  }
+  };
 
   private createDashboards = (): void => {
     if (this.selectedDash) {
@@ -334,7 +334,7 @@ export class DashComponent implements OnInit, OnDestroy {
         }
       }
     }
-  }
+  };
 
   private clean = (): void => {
     this.store.dispatch(
@@ -343,7 +343,7 @@ export class DashComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsDashboard.Clean()
     );
-  }
+  };
 
   private miniCardError = (error: string): void => {
     const revenue = DashComponent.createErrorMiniCard('TOTAL_TREATMENT_SALES', error);
@@ -354,7 +354,7 @@ export class DashComponent implements OnInit, OnDestroy {
 
     const customer = DashComponent.createErrorMiniCard('NEW_CUSTOMERS_RESERVATION', error);
     this.miniCardData = [revenue, treatments, totalTreatments, customer];
-  }
+  };
 
   private createEvents = (darkMode: boolean = false): void => {
     this.events = [];
@@ -449,14 +449,14 @@ export class DashComponent implements OnInit, OnDestroy {
       this.isCalendarLoading = false;
     }
     this.events = this.events.slice().sort((a, b) => a.start.getTime() - b.start.getTime());
-  }
+  };
 
   private createNoteEvent = (note: ICalendarNote, date: Date, darkMode: boolean): void => {
     const color = findStateColor('NOTE', darkMode);
     const event = allDayEvent(note.title, color, date, darkMode, `${ this.language }/notes/${ note.noteId }`,
       new Meta(false, this.timeZone, 'NOTE', [this.language, 'notes', note.noteId]));
     this.events = [...this.events, event];
-  }
+  };
 
   private getSummaries = (): void => {
     this.getEvents();
@@ -464,7 +464,7 @@ export class DashComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsDashboard.GetCards(this.viewDate)
     );
-  }
+  };
 
   private getEvents = (): void => {
     this.events = [];
@@ -472,7 +472,7 @@ export class DashComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsDashboard.GetEvents(this.viewDate)
     );
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
@@ -495,5 +495,5 @@ export class DashComponent implements OnInit, OnDestroy {
         });
       }
     });
-  }
+  };
 }

@@ -66,13 +66,13 @@ export class ChangeColorDialogComponent implements OnInit, OnDestroy {
     if (event.code === 'Backspace') {
       this.color.setValue('');
     }
-  }
+  };
 
   private createForm = (): void => {
     this.colorForm = this.formBuilder.group({
       color: this.color
     });
-  }
+  };
 
   private createFilters = (): void => {
     this.filteredColor = this.color.valueChanges.pipe(
@@ -80,10 +80,10 @@ export class ChangeColorDialogComponent implements OnInit, OnDestroy {
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filterColor(name) : this.colors ? this.colors.slice() : this.colors)
     );
-  }
+  };
 
   private filterColor = (name: string): IColorAll[] | undefined => this.colors?.filter(
-    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0)
+    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
   private getColors = (): void => this.store.dispatch(
     new fromActionsReservation.GetAllColorsByTreatmentId(this.treatmentId)
@@ -94,5 +94,5 @@ export class ChangeColorDialogComponent implements OnInit, OnDestroy {
       this.colors = state.colors;
       this.color.setValue(this.colors?.find(color => color.id === this.data.colorId));
     });
-  }
+  };
 }

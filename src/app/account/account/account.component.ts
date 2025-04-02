@@ -86,19 +86,19 @@ export class AccountComponent implements OnInit, OnDestroy {
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  displayCurrencyFn = (currency: ICurrencyAll): string => currency ? currency.code : ''
+  displayCurrencyFn = (currency: ICurrencyAll): string => currency ? currency.code : '';
 
   keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
       this.getForm.currency.setValue('');
     }
-  }
+  };
 
   keyDownNumberHandler = (event: any): void => {
     if (event.code !== 'Backspace' && !event.key.match(/\d+/)) {
       event.preventDefault();
     }
-  }
+  };
 
   private getAccount = (): void => this.store.dispatch(new fromActionsAccount.AccountFindByCustomer(this.customerId));
 
@@ -113,11 +113,11 @@ export class AccountComponent implements OnInit, OnDestroy {
       map((name: string) => name ? this.filterCurrency(name) :
         this.account?.currencies ? this.account?.currencies.slice() : this.account?.currencies)
     );
-  }
+  };
 
   private filterCurrency = (name: string): ICurrency[] | undefined => this.account?.currencies?.filter(
     option => option.code?.toLowerCase().indexOf(name.toLowerCase()) === 0
-  )
+  );
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
@@ -138,5 +138,5 @@ export class AccountComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
+  };
 }

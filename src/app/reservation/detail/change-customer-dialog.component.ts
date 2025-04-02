@@ -66,13 +66,13 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
     if (event.code === 'Backspace') {
       this.customer.setValue('');
     }
-  }
+  };
 
   private createForm = (): void => {
     this.customerForm = this.formBuilder.group({
       customer: this.customer
     });
-  }
+  };
 
   private createFilters = (): void => {
     this.filteredCustomer = this.customer.valueChanges.pipe(
@@ -80,10 +80,10 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers)
     );
-  }
+  };
 
   private filterCustomer = (name: string): IUser[] | undefined => this.customers?.filter(
-    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0)
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
   private getCustomers = (): void => this.store.dispatch(new fromActionsUser.GetAllCustomers());
 
@@ -94,6 +94,6 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
       this.customers = state.data;
       this.customer.setValue(this.customers?.find(customer => customer.id === this.data.customerId));
     });
-  }
+  };
 
 }

@@ -70,5 +70,5 @@ export class MonthComponent implements AfterViewInit {
     }
     this.router.navigate([this.language, 'dashboard', 'monthly', 'summary'],
       { state: { date: `${ month }-${ this.year }`, step } });
-  }
+  };
 }

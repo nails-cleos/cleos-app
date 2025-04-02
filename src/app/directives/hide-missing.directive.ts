@@ -11,5 +11,5 @@ export class HideMissingDirective {
   @HostListener('error')
   onError = (): void => {
     this.el.nativeElement.style.display = 'none';
-  }
+  };
 }

@@ -123,13 +123,13 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getProfessionals();
   }
 
-  displayFn = (user: IUser): string => user?.displayName ? user.displayName : ''
+  displayFn = (user: IUser): string => user?.displayName ? user.displayName : '';
 
   keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
       this.getForm.professional.setValue('');
     }
-  }
+  };
 
   private createForm = (): void => {
     this.form = this.formBuilder.group({
@@ -143,10 +143,10 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals)
     );
-  }
+  };
 
   private filter = (name: string): IUser[] | undefined => this.professionals?.filter(
-    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0)
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
   private clean = (): void => this.store.dispatch(new fromActionsNote.Clean());
 
@@ -171,5 +171,5 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
         this.router.navigate([this.language, 'reservation', 'calendar']);
       }
     });
-  }
+  };
 }

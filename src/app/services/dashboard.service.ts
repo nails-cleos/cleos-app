@@ -24,7 +24,7 @@ export class DashboardService {
   ): Observable<IRoomEvents> => this.http.patch<IRoomEvents>(
     toUrl(this.urlV1, 'me', 'events', reservation.id!),
     reservation
-  )
+  );
 
   getSummary = (date: string): Observable<any> => this.http.get<any>(toUrl(this.urlV1, 'summaries', date));
 

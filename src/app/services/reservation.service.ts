@@ -36,7 +36,7 @@ export class ReservationService {
     }
 
     return this.http.get<IReservation[]>(`${ baseUrl }/pages`, { params });
-  }
+  };
 
   getCustomerReservations = (
     sort: string,
@@ -53,7 +53,7 @@ export class ReservationService {
     }
 
     return this.http.get<ICustomerReservation>(toUrl(this.urlV1, 'customer'), { params });
-  }
+  };
 
   getAllFilterReservationsPage = (
     sort: string,
@@ -80,7 +80,7 @@ export class ReservationService {
     }
 
     return this.http.get<IReservation[]>(toUrl(this.urlV1, 'filter'), { params });
-  }
+  };
 
   getAllGroupingByRoom = (
     days: number,
@@ -93,7 +93,7 @@ export class ReservationService {
       params = params.append('professionalId', professionalId);
     }
     return this.http.get<IRoomReservation[]>(toUrl(this.urlV1, 'rooms', roomId), { params });
-  }
+  };
 
   search = (
     roomId: string,
@@ -110,7 +110,7 @@ export class ReservationService {
       params = params.append('professionalId', professionalId);
     }
     return this.http.get<IRoomReservation[]>(toUrl(this.urlV1, 'rooms', roomId), { params });
-  }
+  };
 
   customerSearch = (
     roomId: string,
@@ -130,7 +130,7 @@ export class ReservationService {
     params = params.append('professionalId', professionalId);
 
     return this.http.get<IRoomReservation>(toUrl(this.urlV1, 'search'), { params });
-  }
+  };
 
   getById = (id: string, edit?: boolean): Observable<IReservation | undefined> => {
     let url = toUrl(this.urlV1, id);
@@ -138,7 +138,7 @@ export class ReservationService {
       url += '/edit';
     }
     return this.http.get<IReservation>(url);
-  }
+  };
 
   findHistory = (id: string): Observable<IReservation | undefined> => this.http.get<IReservation>(
     toUrl(this.urlV1, id, 'history')

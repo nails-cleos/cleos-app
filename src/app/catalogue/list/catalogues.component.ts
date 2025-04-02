@@ -86,7 +86,7 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     });
-  }
+  };
 
   private clean = (): void => this.store.dispatch(new fromActionsCatalogue.Clean());
 
@@ -108,5 +108,5 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.getCatalogues();
       }
     });
-  }
+  };
 }

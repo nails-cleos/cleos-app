@@ -74,5 +74,5 @@ export class TokenService {
     this._token$.next(null);
     this.myUser = undefined;
     this.router.navigate(['/', this.translate.currentLang, 'login']);
-  }
+  };
 }

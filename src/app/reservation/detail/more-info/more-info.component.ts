@@ -98,7 +98,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
         duration: 5000
       });
     }
-  }
+  };
 
   private getInformation = (): void => {
     if (!this.tracking) {
@@ -119,7 +119,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
         new fromActionsReservation.ReservationFind({ id: this.reservationId })
       );
     }
-  }
+  };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
@@ -137,5 +137,5 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
         this.getInformation();
       }
     });
-  }
+  };
 }

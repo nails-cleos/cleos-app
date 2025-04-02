@@ -36,7 +36,7 @@ export class QuarterComponent {
 
   goToQuarter = (quarter: number): void => {
     this.router.navigate([this.language, 'dashboard', 'quarter', 'summary'], { state: { year: this.year, quarter } });
-  }
+  };
 
   goToMonth = (month: number, type?: string): void => {
     let step = 0;
@@ -53,5 +53,5 @@ export class QuarterComponent {
     }
     this.router.navigate([this.language, 'dashboard', 'monthly', 'summary'],
       { state: { date: `${ month }-${ this.year }`, step } });
-  }
+  };
 }
