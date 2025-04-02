@@ -775,7 +775,3 @@ export const searchDates = (allDay: boolean, start: Date, duration: IDuration): 
 
   return [startSearch, endSearch];
 };
-
-export const eventFormatDate = (date: Date, locale: string = 'en') => date.toLocaleString(locale,
-  { month: 'short', day: 'numeric' }
-);

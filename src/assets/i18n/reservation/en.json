@@ -122,7 +122,6 @@
         "CONTENT": "The new reservation is overlapping with <div>{{data}}</div> Are you sure to add reservation?",
         "ERROR": "The new reservation is overlapping with <div>{{data}}</div>"
       },
-      "ALREADY_SELECTED": "Drag and drop the event at {{data}}",
       "DETAIL": "<div class='detail'><b>{{professionalName}}</b></div><div class='detail'>{{customerName}}</div>{{treatments}}",
       "TITLE": "Add new reservation",
       "CONTENT": "Are you sure to add reservation on {{date}}?",

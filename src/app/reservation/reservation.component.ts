@@ -17,7 +17,7 @@ import {
   UntypedFormGroup,
   Validators
 } from '@angular/forms';
-import { map, startWith } from 'rxjs/operators';
+import { map, shareReplay, startWith } from 'rxjs/operators';
 import { IUser, IUserAll } from '../interfaces/user';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -52,7 +52,6 @@ import {
   dateToTimestamp,
   dateToUTC,
   Duration,
-  eventFormatDate,
   filterDateRoom,
   formatTime,
   getAvailability,
@@ -122,8 +121,6 @@ import { DurationTimePipe } from '../pipes/durationTime.pipe';
 import { PricePreviewComponent } from '../shared/price-preview/price-preview.component';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { GoogleMapComponent } from '../shared/google-map/google-map.component';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { SnackbarComponent } from '../shared/snack/snackbar/snackbar.component';
 import PlaceResult = google.maps.places.PlaceResult;
 
 @Component({
@@ -139,8 +136,16 @@ import PlaceResult = google.maps.places.PlaceResult;
 })
 export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly dialog = inject(MatDialog);
-  private snackBar: MatSnackBar = inject(MatSnackBar);
-  private sanitizer: DomSanitizer = inject(DomSanitizer);
+  private readonly snackBar: MatSnackBar = inject(MatSnackBar);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly store: Store<AppState> = inject(Store<AppState>);
+  private readonly formBuilder: UntypedFormBuilder = inject(UntypedFormBuilder);
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly router: Router = inject(Router);
+  private readonly route: ActivatedRoute = inject(ActivatedRoute);
+  private readonly cdRef: ChangeDetectorRef = inject(ChangeDetectorRef);
+
+  private authUserService: AuthUserService = inject(AuthUserService);
 
   @Input() dataEvents: Map<string, IDataEvent> = new Map();
   @ViewChild('stepper') myStepper!: MatStepper;
@@ -170,7 +175,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   discounts?: IUserDiscount[];
   discount = new UntypedFormControl();
   showDiscount = false;
-  price: IPrice;
+  price: IPrice = new Price();
 
   officeForm!: UntypedFormGroup;
   offices?: IOffice[];
@@ -206,10 +211,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   daysInWeek = 7;
   weekendDays: number[] = [0, 6];
-  day: IDay;
+  day: IDay = new Day();
   refresh: Subject<any> = new Subject();
 
-  dateFormat: string;
+  dateFormat: string = this.translate.currentLang;
   smallScreen?: boolean;
   isPreview = false;
   totalDurationFormatted?: string;
@@ -220,50 +225,56 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   minDate: string = '';
   maxDate: string = '';
-  maxCalendarDate: Date;
+  maxCalendarDate: Date = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
   types: string[] = [PaymentType.cash, PaymentType.transfer];
+
+  handset$: Observable<{
+    smallScreen: boolean;
+    daysInWeek: number;
+    lessDays: number;
+  }> = this.breakpointObserver.observe([
+    Breakpoints.XSmall,
+    Breakpoints.Small
+  ]).pipe(
+    map(result => ({
+      smallScreen: result.matches,
+      daysInWeek: result.matches ? 3 : 7,
+      lessDays: result.matches ? 1 : 3
+    })),
+    shareReplay()
+  );
 
   private treatmentId?: string;
   private roomId?: string;
   private professionalId?: string;
   private additionalIds?: string[];
-  private skip: boolean;
+  private skip: boolean = false;
   private isDarkMode = false;
   private lessDays = 3;
   private reservation?: IReservationAll;
-  private getState: Observable<any>;
+  private getState: Observable<any> = this.store.select(selectReservationState);
   private subscription?: Subscription;
-  private authUserServiceSubscription: Subscription;
+  private handsetSubscription: Subscription =
+    this.handset$.subscribe(({ smallScreen, daysInWeek, lessDays }) => {
+      this.smallScreen = smallScreen;
+      this.daysInWeek = daysInWeek;
+      this.lessDays = lessDays;
+    });
+  private authUserServiceSubscription: Subscription = this.authUserService.authUser.subscribe(value => {
+    this.isAdmin = value.isAdmin;
+    this.isDarkMode = value.isDarkMode;
+  });
   private steps: IStep[];
   private dismiss = false;
   private treatmentDiscount?: IDiscount;
   private totalDuration: IDuration = new Duration();
+  private alreadyCreated = false;
   private readonly groupId?: string;
   private readonly isDashboard = false;
-  private readonly extras: any;
-  private readonly language: string;
-  private alreadyCreated = false;
+  private readonly extras: any = this.router.getCurrentNavigation()?.extras.state;
+  private readonly language: string = this.translate.currentLang;
 
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>,
-              private formBuilder: UntypedFormBuilder, breakpointObserver: BreakpointObserver, private router: Router,
-              private route: ActivatedRoute, private cdRef: ChangeDetectorRef,
-              private authUserService: AuthUserService) {
-    this.price = new Price();
-    this.day = new Day();
-    this.getState = this.store.select(selectReservationState);
-    this.dateFormat = this.translate.currentLang;
-    this.skip = false;
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small
-    ]).subscribe(result => {
-      this.smallScreen = result.matches;
-      if (this.smallScreen) {
-        this.daysInWeek = 3;
-        this.lessDays = 1;
-      }
-    });
-    this.extras = this.router.getCurrentNavigation()?.extras.state;
+  constructor() {
     if (this.extras) {
       this.customer.setValue(this.extras.customer);
       this.isDashboard = this.extras.isDashboard;
@@ -274,11 +285,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.skip = this.extras.skip;
       this.additionalIds = this.extras.additionalIds;
     }
-    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
-      this.isAdmin = value.isAdmin;
-      this.isDarkMode = value.isDarkMode;
-    });
-    this.maxCalendarDate = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
     const preview = new Step(6, 'preview', () => this.create);
     const book = new Step(5, 'book_online', (goNext: boolean) => this.callStepSeven(goNext), preview);
     const settings = new Step(4, 'settings', (goNext: boolean) => this.callStepSix(goNext), book);
@@ -287,7 +293,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const room = new Step(1, 'room', (goNext: boolean) => this.callStepThree(goNext), treatment);
     const customer = new Step(0, 'person_search', (goNext: boolean) => this.callStepTwo(goNext), room);
     this.steps = [customer, room, treatment, additional, settings, book, preview];
-    this.language = this.translate.currentLang;
   }
 
   get dateTimeList(): FormArray {
@@ -438,6 +443,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
     this.authUserServiceSubscription.unsubscribe();
+    this.handsetSubscription.unsubscribe();
   }
 
   triggerClick = (event: StepperSelectionEvent): void => getStepCall(this.steps, event.selectedIndex - 1);
@@ -607,21 +613,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const eventData = this.dataEvents.get(eventKey);
     if (eventData) {
       if (!this.dateIsValid(date)) {
-        return;
-      }
-      const currentEvent = this.events.at(eventData?.index)?.get('event')?.value;
-      if (currentEvent && !this.alreadyCreated) {
-        eventData.addClass(currentEvent, 'highlighted-event');
-        const date = eventFormatDate(currentEvent.start, this.dateFormat);
-        const startTime = getTime(currentEvent.start, this.dateFormat);
-        const endTime = getTime(currentEvent.end, this.dateFormat);
-        const dateTime = `<span><span class="bold">${ date } </span>${ startTime } - ${ endTime }</span>`;
-
-        const safeHtml: SafeHtml = this.sanitizer.bypassSecurityTrustHtml(
-          this.translate.instant('RESERVATION.EVENT.ALREADY_SELECTED', { data: dateTime }));
-
-        const snackBarRef = this.snackBar.openFromComponent(SnackbarComponent, { data: safeHtml, duration: 5000 });
-        snackBarRef.afterDismissed().subscribe(() => eventData.addClass(currentEvent, ''));
         return;
       }
       this.dataEvents.delete(eventKey);

@@ -195,8 +195,6 @@ export interface IDataEvent {
   getOverlapEvent(eventStartDay: Date, eventEndDay: Date, professionalId?: string): CalendarEvent[]
 
   sameDayEvent(recurring: any, event: CalendarEvent): boolean;
-
-  addClass(currentEvent: CalendarEvent, cssClass: string): void;
 }
 
 export class DataEvent implements IDataEvent {
@@ -232,10 +230,9 @@ export class DataEvent implements IDataEvent {
 
   removeEvent = (event: CalendarEvent, deleteCount: number = 1): void => {
     const i = this.calendarEvents.indexOf(event);
-    if (i === -1) {
-      return;
+    if (i !== -1) {
+      this.calendarEvents.splice(i, deleteCount);
     }
-    this.calendarEvents = this.calendarEvents.slice(i, deleteCount);
   };
 
   filterEvent = (event: CalendarEvent): void => {
@@ -251,15 +248,15 @@ export class DataEvent implements IDataEvent {
     eventEndDay: Date,
     professionalId?: string
   ): CalendarEvent[] => {
-    const events = [...this.calendarEvents];
     if (professionalId) {
-      return events.filter((eventA: CalendarEvent) => ((eventA.meta?.professionalId === professionalId) && (
-        (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
-        || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
-        || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
-      )));
+      return this.calendarEvents.filter(
+        (eventA: CalendarEvent) => ((eventA.meta?.professionalId === professionalId) && (
+          (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
+          || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
+          || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
+        )));
     }
-    return events.filter(
+    return this.calendarEvents.filter(
       (eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
         || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
         || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
@@ -268,13 +265,6 @@ export class DataEvent implements IDataEvent {
 
   sameDayEvent = (recurring: any, event: CalendarEvent): boolean => !this.calendarEvents
     .find(ce => ce.id === recurring.path && isSameDay(event.start, ce.start));
-
-  addClass(currentEvent: CalendarEvent, cssClass: string): void {
-    this.calendarEvents = this.calendarEvents.map(event => ({
-      ...event,
-      cssClass: event.id === currentEvent.id ? cssClass : ''
-    }));
-  }
 }
 
 export class Reservation implements IReservation {

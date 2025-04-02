@@ -122,7 +122,6 @@
         "CONTENT": "La nueva reserva se superpone con <div>{{data}}</div> ¿Está seguro de agregar la reserva?",
         "ERROR": "La nueva reserva se superpone con <div>{{data}}</div>"
       },
-      "ALREADY_SELECTED": "Arrastra y suelta el evento el día {{data}}",
       "DETAIL": "<div class='detail'><b>{{professionalName}}</b></div><div class='detail'>{{customerName}}</div>{{treatments}}",
       "TITLE": "Agregar nueva reserva",
       "CONTENT": "¿Estás segura de añadir la reserva el {{date}}?",

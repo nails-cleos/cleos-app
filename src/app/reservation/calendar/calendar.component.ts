@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
 import { Observable, Subject, Subscription } from 'rxjs';
@@ -56,6 +56,25 @@ import { Role } from '../../interfaces/token';
 import { SharedModule } from '../../shared/shared.module';
 import { RoomNamePipe } from '../../pipes/room-name.pipe';
 
+const CALENDAR_RESPONSIVE = {
+  xsmall: {
+    breakpoint: '(max-width: 576px)',
+    daysInWeek: 1
+  },
+  small: {
+    breakpoint: '(max-width: 768px)',
+    daysInWeek: 2
+  },
+  medium: {
+    breakpoint: '(max-width: 960px)',
+    daysInWeek: 3
+  },
+  large: {
+    breakpoint: '(max-width: 1280px)',
+    daysInWeek: 5
+  }
+};
+
 @Component({
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
@@ -63,14 +82,23 @@ import { RoomNamePipe } from '../../pipes/room-name.pipe';
   imports: [SharedModule, RoomNamePipe, CalendarModule]
 })
 export class CalendarComponent implements OnInit, OnDestroy {
+  readonly dialog = inject(MatDialog);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly store: Store<AppState> = inject(Store<AppState>);
+  private readonly router: Router = inject(Router);
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly cdRef: ChangeDetectorRef = inject(ChangeDetectorRef);
+  private readonly formBuilder: UntypedFormBuilder = inject(UntypedFormBuilder);
+  private readonly authUserService: AuthUserService = inject(AuthUserService);
+
   @ViewChild('picker') picker: any;
 
   data?: IRoomReservation;
   calendar?: IDataEvent;
   hourSegments = 4;
   viewDate: Date = getNowTimeZone();
-  locale: string;
-  language: string;
+  locale: string = this.translate.currentLang;
+  language: string = this.translate.currentLang;
   professionalId?: string;
 
   officeForm!: UntypedFormGroup;
@@ -91,44 +119,30 @@ export class CalendarComponent implements OnInit, OnDestroy {
   ]);
 
   refresh: Subject<any> = new Subject();
-  maxDate: Date;
-  minDate: Date;
-  daysInWeek: number;
+  maxDate: Date = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
+  minDate: Date = new Date(2023, 0, 1);
+  daysInWeek: number = 7;
 
   isDarkMode?: boolean;
   private selectView: CalendarPeriod = 'day';
-  private getState: Observable<any>;
+  private getState: Observable<any> = this.store.select(selectReservationState);
   private destroy$ = new Subject();
   private subscription = new Subject();
-  private authUserServiceSubscription: Subscription;
+  private authUserServiceSubscription: Subscription = this.authUserService.authUser.subscribe(value => {
+    this.professionalId = value.professionalId;
+    const darkMode: boolean = value.isDarkMode;
+    if (this.isDarkMode !== undefined && darkMode !== this.isDarkMode) {
+      this.fillData(darkMode);
+    }
+    this.isDarkMode = darkMode;
+    this.isRoomAdmin = value.isRoomAdmin;
+  });
   private roomId?: string;
   private professionalSelectedId?: string;
   private today: Date = createNewDate(getNowTimeZone());
   private isRoomAdmin = false;
 
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private router: Router, private breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef,
-              private formBuilder: UntypedFormBuilder, private authUserService: AuthUserService) {
-    this.getState = this.store.select(selectReservationState);
-    this.daysInWeek = 7;
-    const CALENDAR_RESPONSIVE = {
-      xsmall: {
-        breakpoint: '(max-width: 576px)',
-        daysInWeek: 1
-      },
-      small: {
-        breakpoint: '(max-width: 768px)',
-        daysInWeek: 2
-      },
-      medium: {
-        breakpoint: '(max-width: 960px)',
-        daysInWeek: 3
-      },
-      large: {
-        breakpoint: '(max-width: 1280px)',
-        daysInWeek: 5
-      }
-    };
+  constructor() {
     this.breakpointObserver.observe(Object.values(CALENDAR_RESPONSIVE).map(({ breakpoint }) => breakpoint))
       .pipe(takeUntil(this.destroy$)).subscribe((state: BreakpointState) => {
       const foundBreakpoint = Object.values(CALENDAR_RESPONSIVE)
@@ -140,20 +154,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
       }
       this.cdRef.markForCheck();
     });
-    this.locale = this.translate.currentLang;
-    this.language = this.translate.currentLang;
-
-    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
-      this.professionalId = value.professionalId;
-      const darkMode: boolean = value.isDarkMode;
-      if (this.isDarkMode !== undefined && darkMode !== this.isDarkMode) {
-        this.fillData(darkMode);
-      }
-      this.isDarkMode = darkMode;
-      this.isRoomAdmin = value.isRoomAdmin;
-    });
-    this.maxDate = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
-    this.minDate = new Date(2023, 0, 1);
   }
 
   get search(): void {
