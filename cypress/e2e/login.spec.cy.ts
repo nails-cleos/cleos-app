@@ -3,15 +3,14 @@ import { Role } from "../../src/app/interfaces/token";
 import { dayViewTitle, monthViewTitle } from "../../src/app/util/dates";
 
 describe('Register user', () => {
-  const email = 'mockuser@example.com';
-  const displayName = 'Mock User';
+  const email = 'Kdvek@jevfm';
+  const displayName = 'Customer 1';
 
   beforeEach(() => {
     cy.visit('en-GB/auth');
     cy.mockFirebaseAppCheck();
     cy.mockFirebase(email);
     cy.mockNotifications();
-    cy.contains('Got it!').click();
     cy.mockLogin(email, displayName, 'ROLE_CUSTOMER');
     cy.mockCreateAuthUri(false, []);
     cy.mockCustomerReservations();
@@ -45,32 +44,32 @@ describe('Register user', () => {
     cy.url().should('include', '/me/reservations');
     cy.get('mat-card-title').contains('No upcoming reservations');
     cy.get('tr').contains('No reservations');
+    cy.logout();
   });
 });
 
 describe('Login with existing user', () => {
-  const email = 'mockuser@example.com';
   const displayName = 'Mock User';
   const today = new Date();
 
   beforeEach(() => {
     cy.visit('en-GB/auth');
     cy.mockFirebaseAppCheck();
-    cy.mockFirebase(email);
     cy.mockNotifications();
-    cy.contains('Got it!').click();
   });
   const mapRole = new Map([
-    [Role.customer, { url: '/me/reservations', mocks: [() => cy.mockCustomerReservations()] }],
-    [Role.admin, { url: '/dashboard', mocks: [() => cy.mockAdminDashboard(today, displayName)] }],
-    [Role.roomAdmin, { url: '/events', mocks: [() => cy.mockRoomAdminDashboard(today, displayName)] }]
+    [Role.customer, { email: 'Kdvek@jevfm', url: '/me/reservations', mocks: [() => cy.mockCustomerReservations()] }],
+    [Role.admin, { email: 'nails.cleos@gmail.com', url: '/dashboard', mocks: [() => cy.mockAdminDashboard(today, displayName)] }],
+    [Role.roomAdmin, { email: 'Jsbaj@nebeje',  url: '/events', mocks: [() => cy.mockRoomAdminDashboard(today, displayName)] }]
   ]);
 
   beforeEach(() => cy.mockCreateAuthUri(true, ['password']));
 
   mapRole.forEach((value, role) => {
     context(`Login with role: ${ role }`, () => {
+      const email = value.email;
       beforeEach(() => {
+        cy.mockFirebase(email);
         cy.mockLogin(email, displayName, role);
         value.mocks.forEach(fn => fn());
       });
@@ -108,6 +107,7 @@ describe('Login with existing user', () => {
             cy.get('h2').contains(`Room is not open ${ date }`);
             break;
         }
+        cy.logout();
       });
     });
   });

@@ -925,24 +925,6 @@
       color: white !important;
     }
   }
-
-  @keyframes flash {
-    @if $isDark {
-      0%, 100% {
-        background-color: rgba(0, 0, 0, 0.7);
-      }
-      50% {
-        background-color: rgba(0, 0, 0, 0);
-      }
-    } @else {
-      0%, 100% {
-        background-color: rgba(255, 255, 255, 0.7);
-      }
-      50% {
-        background-color: rgba(255, 255, 255, 0);
-      }
-    }
-  }
 }
 
 @mixin theme($theme) {

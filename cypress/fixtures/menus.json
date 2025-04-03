@@ -1,0 +1,419 @@
+[
+  {
+    "role": "admin",
+    "ROLE_CUSTOMER": [
+      {
+        "name": "My reservations",
+        "path": "me/reservations",
+        "icon": "book_online",
+        "order": 20
+      },
+      {
+        "name": "Overview",
+        "path": "me/overview",
+        "icon": "analytics",
+        "order": 21
+      },
+      {
+        "name": "Referrals",
+        "path": "me/referrals",
+        "icon": "group_add",
+        "order": 22
+      },
+      {
+        "name": "Discounts",
+        "path": "me/discounts",
+        "icon": "local_offer",
+        "order": 23
+      }
+    ]
+  },
+  {
+    "role": "ROLE_ROOM_ADMIN",
+    "menu": [
+      {
+        "name": "Dashboard",
+        "path": "dashboard",
+        "icon": "dashboard",
+        "order": 0
+      },
+      {
+        "name": "App",
+        "icon": "apps",
+        "order": 1,
+        "subMenus": [
+          {
+            "name": "Calendar",
+            "path": "reservation/calendar",
+            "icon": "event",
+            "order": 1
+          },
+          {
+            "name": "Search",
+            "path": "reservation/search",
+            "icon": "find_in_page",
+            "order": 2
+          },
+          {
+            "name": "Notes",
+            "path": "notes/add",
+            "icon": "note_add",
+            "order": 3
+          },
+          {
+            "name": "Block agenda",
+            "path": "unavailable/block-agenda/add",
+            "icon": "event_busy",
+            "order": 4
+          },
+          {
+            "name": "Unavailable",
+            "path": "unavailable",
+            "icon": "web_asset_off",
+            "order": 5
+          },
+          {
+            "name": "Year summary",
+            "path": "dashboard/year/summary",
+            "icon": "data_exploration",
+            "order": 6
+          }
+        ]
+      },
+      {
+        "name": "Room settings",
+        "icon": "room_preferences",
+        "order": 10,
+        "subMenus": [
+          {
+            "name": "Nails Cleos - EUR",
+            "icon": "room",
+            "order": -1,
+            "subMenus": [
+              {
+                "name": "Rooms",
+                "path": "rooms/me/c18629ee-40c8-4bf4-b182-b2fea79dd881",
+                "icon": "living",
+                "order": 1
+              },
+              {
+                "name": "Expenses",
+                "path": "rooms/c18629ee-40c8-4bf4-b182-b2fea79dd881/expenses",
+                "icon": "shopping_cart",
+                "order": 3
+              },
+              {
+                "name": "Price",
+                "path": "rooms/c18629ee-40c8-4bf4-b182-b2fea79dd881/services",
+                "icon": "price_change",
+                "order": 2
+              },
+              {
+                "name": "Customer not returning",
+                "path": "rooms/c18629ee-40c8-4bf4-b182-b2fea79dd881/customers",
+                "icon": "sync_disabled",
+                "order": 4
+              }
+            ],
+            "tooltip": "Mock full address name",
+            "subName": "Address name"
+          }
+        ]
+      },
+      {
+        "name": "App settings",
+        "icon": "settings_applications",
+        "order": 80,
+        "subMenus": [
+          {
+            "name": "Users",
+            "path": "users",
+            "icon": "person_pin",
+            "order": 1
+          },
+          {
+            "name": "Offices",
+            "path": "offices",
+            "icon": "store",
+            "order": 2
+          },
+          {
+            "name": "Rooms",
+            "path": "rooms",
+            "icon": "living",
+            "order": 3
+          },
+          {
+            "name": "Colors",
+            "path": "colors",
+            "icon": "palette",
+            "order": 4
+          }
+        ]
+      },
+      {
+        "name": "Admin settings",
+        "icon": "admin_panel_settings",
+        "order": 90,
+        "subMenus": [
+          {
+            "name": "Catalogues",
+            "path": "catalogues",
+            "icon": "photo_library",
+            "order": 1
+          },
+          {
+            "name": "Discounts",
+            "path": "discounts",
+            "icon": "local_offer",
+            "order": 2
+          },
+          {
+            "name": "Currency",
+            "path": "currency",
+            "icon": "currency_exchange",
+            "order": 3
+          },
+          {
+            "name": "Invoices",
+            "path": "invoices",
+            "icon": "receipt_long",
+            "order": 4
+          }
+        ]
+      },
+      {
+        "name": "Treatments",
+        "icon": "spa",
+        "order": 100,
+        "subMenus": [
+          {
+            "name": "Treatments",
+            "path": "treatments",
+            "icon": "spa",
+            "order": 1
+          },
+          {
+            "name": "Sorting",
+            "path": "treatments/sorting",
+            "icon": "sort",
+            "order": 2
+          }
+        ]
+      },
+      {
+        "name": "Additional",
+        "icon": "post_add",
+        "order": 100,
+        "subMenus": [
+          {
+            "name": "Additional",
+            "path": "additional",
+            "icon": "post_add",
+            "order": 1
+          },
+          {
+            "name": "Sorting",
+            "path": "additional/sorting",
+            "icon": "sort",
+            "order": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "role": "ROLE_ADMIN",
+    "menu": [
+      {
+        "name": "Dashboard",
+        "path": "dashboard",
+        "icon": "dashboard",
+        "order": 0
+      },
+      {
+        "name": "App",
+        "icon": "apps",
+        "order": 1,
+        "subMenus": [
+          {
+            "name": "Calendar",
+            "path": "reservation/calendar",
+            "icon": "event",
+            "order": 1
+          },
+          {
+            "name": "Search",
+            "path": "reservation/search",
+            "icon": "find_in_page",
+            "order": 2
+          },
+          {
+            "name": "Notes",
+            "path": "notes/add",
+            "icon": "note_add",
+            "order": 3
+          },
+          {
+            "name": "Block agenda",
+            "path": "unavailable/block-agenda/add",
+            "icon": "event_busy",
+            "order": 4
+          },
+          {
+            "name": "Unavailable",
+            "path": "unavailable",
+            "icon": "web_asset_off",
+            "order": 5
+          },
+          {
+            "name": "Year summary",
+            "path": "dashboard/year/summary",
+            "icon": "data_exploration",
+            "order": 6
+          }
+        ]
+      },
+      {
+        "name": "Room settings",
+        "icon": "room_preferences",
+        "order": 10,
+        "subMenus": [
+          {
+            "name": "Nails Cleos - EUR",
+            "icon": "room",
+            "order": -1,
+            "subMenus": [
+              {
+                "name": "Rooms",
+                "path": "rooms/me/c18629ee-40c8-4bf4-b182-b2fea79dd881",
+                "icon": "living",
+                "order": 1
+              },
+              {
+                "name": "Expenses",
+                "path": "rooms/c18629ee-40c8-4bf4-b182-b2fea79dd881/expenses",
+                "icon": "shopping_cart",
+                "order": 3
+              },
+              {
+                "name": "Price",
+                "path": "rooms/c18629ee-40c8-4bf4-b182-b2fea79dd881/services",
+                "icon": "price_change",
+                "order": 2
+              },
+              {
+                "name": "Customer not returning",
+                "path": "rooms/c18629ee-40c8-4bf4-b182-b2fea79dd881/customers",
+                "icon": "sync_disabled",
+                "order": 4
+              }
+            ],
+            "tooltip": "Mock full address name",
+            "subName": "Address name"
+          }
+        ]
+      },
+      {
+        "name": "App settings",
+        "icon": "settings_applications",
+        "order": 80,
+        "subMenus": [
+          {
+            "name": "Users",
+            "path": "users",
+            "icon": "person_pin",
+            "order": 1
+          },
+          {
+            "name": "Offices",
+            "path": "offices",
+            "icon": "store",
+            "order": 2
+          },
+          {
+            "name": "Rooms",
+            "path": "rooms",
+            "icon": "living",
+            "order": 3
+          },
+          {
+            "name": "Colors",
+            "path": "colors",
+            "icon": "palette",
+            "order": 4
+          }
+        ]
+      },
+      {
+        "name": "Admin settings",
+        "icon": "admin_panel_settings",
+        "order": 90,
+        "subMenus": [
+          {
+            "name": "Catalogues",
+            "path": "catalogues",
+            "icon": "photo_library",
+            "order": 1
+          },
+          {
+            "name": "Discounts",
+            "path": "discounts",
+            "icon": "local_offer",
+            "order": 2
+          },
+          {
+            "name": "Currency",
+            "path": "currency",
+            "icon": "currency_exchange",
+            "order": 3
+          },
+          {
+            "name": "Invoices",
+            "path": "invoices",
+            "icon": "receipt_long",
+            "order": 4
+          }
+        ]
+      },
+      {
+        "name": "Treatments",
+        "icon": "spa",
+        "order": 100,
+        "subMenus": [
+          {
+            "name": "Treatments",
+            "path": "treatments",
+            "icon": "spa",
+            "order": 1
+          },
+          {
+            "name": "Sorting",
+            "path": "treatments/sorting",
+            "icon": "sort",
+            "order": 2
+          }
+        ]
+      },
+      {
+        "name": "Additional",
+        "icon": "post_add",
+        "order": 100,
+        "subMenus": [
+          {
+            "name": "Additional",
+            "path": "additional",
+            "icon": "post_add",
+            "order": 1
+          },
+          {
+            "name": "Sorting",
+            "path": "additional/sorting",
+            "icon": "sort",
+            "order": 2
+          }
+        ]
+      }
+    ]
+  }
+]

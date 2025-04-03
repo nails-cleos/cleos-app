@@ -52,5 +52,5 @@ Thumbs.db
 *debug.log
 
 # Cypress
-screenshots/**
-test-results.xml
+cypress/screenshots/**
+cypress/reports/**

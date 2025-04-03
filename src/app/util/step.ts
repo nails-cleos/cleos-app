@@ -69,12 +69,15 @@ export const getBackIndex = (steps: IStep[], current: number): number => {
   return index;
 };
 
-export const enableStep = (steps: IStep[], name: string, enable: boolean = true): void => {
+export const enableStep = (steps: IStep[], name: string, enable: boolean = true): number | undefined => {
+  let index;
   const step = steps.find(it => it.name === name);
   if (step) {
     step.enable = enable;
     steps[step.order] = step;
+    index = step.order;
   }
+  return index;
 };
 
 const getStep = (steps: IStep[], index: number): IStep | undefined => steps.find(s => s.order === index);

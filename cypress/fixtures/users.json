@@ -1,0 +1,203 @@
+[
+  {
+    "createdAt": "2023-04-11T12:49:32.827592",
+    "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "modifiedAt": "2023-04-11T12:51:44.470645",
+    "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "deleted": false,
+    "id": "4c27715c-21a3-4255-97ac-9263d9f177e7",
+    "enabled": true,
+    "verified": false,
+    "email": "lujboncarla@gmail.com",
+    "displayName": "Carla Lujan",
+    "locale": "en_GB",
+    "phone": "+123456789",
+    "dob": "1993-03-26",
+    "authorities": [
+      {
+        "id": 5,
+        "authority": "ROLE_CUSTOMER"
+      }
+    ],
+    "referralMax": 5,
+    "completed": false
+  },
+  {
+    "createdAt": "2023-04-12T11:14:59.074918",
+    "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "modifiedAt": "2023-04-12T11:14:59.074918",
+    "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "deleted": false,
+    "id": "bf534229-f2e2-4417-af4a-6021a5593947",
+    "enabled": false,
+    "verified": false,
+    "email": "Nabaja@jsbab",
+    "displayName": "Patricia Torres",
+    "locale": "en_GB",
+    "phone": "+123456789",
+    "dob": "1999-10-10",
+    "authorities": [
+      {
+        "id": 6,
+        "authority": "ROLE_CUSTOMER"
+      }
+    ],
+    "referralMax": 5,
+    "completed": false
+  },
+  {
+    "createdAt": "2023-04-12T11:38:12.724053",
+    "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "modifiedAt": "2023-04-12T11:38:12.724053",
+    "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "deleted": false,
+    "id": "ce76bc87-40de-471c-a433-0fcbc3b906ac",
+    "enabled": false,
+    "verified": false,
+    "email": "Jdhdj@jdhdn",
+    "displayName": "Valerie Merien",
+    "locale": "en_GB",
+    "phone": "+123456789",
+    "authorities": [
+      {
+        "id": 7,
+        "authority": "ROLE_CUSTOMER"
+      }
+    ],
+    "referralMax": 5,
+    "completed": false
+  },
+  {
+    "createdAt": "2023-04-12T11:39:13.912231",
+    "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "modifiedAt": "2023-04-12T11:39:13.912231",
+    "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "deleted": false,
+    "id": "ae35b46a-d3ae-4e23-a0e4-a26dab9924aa",
+    "enabled": false,
+    "verified": false,
+    "email": "Kevek@kevrn",
+    "displayName": "Daphne Schuit",
+    "locale": "en_GB",
+    "phone": "+123456789",
+    "authorities": [
+      {
+        "id": 8,
+        "authority": "ROLE_CUSTOMER"
+      }
+    ],
+    "referralMax": 5,
+    "completed": false
+  },
+  {
+    "createdAt": "2023-04-12T11:40:40.533756",
+    "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "modifiedAt": "2023-04-12T11:40:40.533756",
+    "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "deleted": false,
+    "id": "1c27715c-21a3-4255-97ac-9263d9f177e7",
+    "enabled": false,
+    "verified": false,
+    "email": "Kdvek@jevfm",
+    "displayName": "Customer 1",
+    "locale": "en_GB",
+    "phone": "+123456789",
+    "authorities": [
+      {
+        "id": 9,
+        "authority": "ROLE_CUSTOMER"
+      }
+    ],
+    "referralMax": 5,
+    "completed": false
+  },
+  {
+    "createdAt": "2023-04-12T11:47:07.555311",
+    "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "modifiedAt": "2023-04-12T11:47:07.555311",
+    "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "deleted": false,
+    "id": "64cfac74-d99a-48f3-b34a-579dc0388737",
+    "enabled": false,
+    "verified": false,
+    "email": "Jsbaj@nebeje",
+    "displayName": "User 1",
+    "locale": "en_GB",
+    "phone": "+123456789",
+    "authorities": [
+      {
+        "id": 10,
+        "authority": "ROLE_ROOM_ADMIN"
+      }
+    ],
+    "referralMax": 5,
+    "completed": false
+  },
+  {
+    "createdAt": "2023-04-12T11:48:05.035613",
+    "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "modifiedAt": "2023-04-12T11:48:05.035613",
+    "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "deleted": false,
+    "id": "0a701cb5-673b-4512-aaf1-cdc61c76a3fa",
+    "enabled": false,
+    "verified": false,
+    "email": "Jsvak@msvsj",
+    "displayName": "Ellen Van Maurik",
+    "locale": "en_GB",
+    "phone": "+123456789",
+    "authorities": [
+      {
+        "id": 11,
+        "authority": "ROLE_CUSTOMER"
+      }
+    ],
+    "referralMax": 5,
+    "completed": false
+  },
+  {
+    "createdAt": "2023-04-08T18:25:34.534018",
+    "createdBy": "anonymousUser",
+    "modifiedAt": "2024-05-24T17:54:55.967111",
+    "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "deleted": false,
+    "id": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "enabled": true,
+    "verified": true,
+    "email": "nails.cleos@gmail.com",
+    "displayName": "Nails Cleos",
+    "locale": "en_GB",
+    "phone": "+123456789",
+    "dob": "1993-03-26",
+    "theme": "light-theme",
+    "authorities": [
+      {
+        "id": 3,
+        "authority": "ROLE_PROFESSIONAL"
+      },
+      {
+        "id": 1,
+        "authority": "ROLE_ADMIN"
+      },
+      {
+        "id": 2,
+        "authority": "ROLE_MANAGER"
+      }
+    ],
+    "providerId": "106910793904944698612",
+    "imageUrl": "https://customer-photo.com",
+    "lightColor": "#a5ada3",
+    "darkColor": "#e8e742",
+    "referralMax": 5,
+    "showCash": true,
+    "address": {
+      "name": "Mock address",
+      "location": {
+        "x": 1,
+        "y": 2
+      },
+      "id": 6
+    },
+    "completed": true
+  }
+]

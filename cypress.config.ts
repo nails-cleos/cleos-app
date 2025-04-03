@@ -12,6 +12,10 @@ export default defineConfig({
       bundler: 'webpack',
     },
     specPattern: '**/*.cy.ts'
-  }
+  },
 
+  reporter: "mocha-multi-reporters",
+  reporterOptions: {
+    configFile: "multi-reporter-config.json",
+  }
 })
