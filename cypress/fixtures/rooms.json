@@ -1,0 +1,217 @@
+[
+  {
+    "createdAt": "2024-01-11T08:21:43.334482",
+    "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "modifiedAt": "2024-01-11T08:21:43.334482",
+    "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "deleted": false,
+    "id": "c18629ee-40c8-4bf4-b182-b2fea79dd881",
+    "currency": {
+      "createdAt": "2023-04-11T12:35:06.023872",
+      "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+      "modifiedAt": "2023-04-11T12:35:06.023872",
+      "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+      "deleted": false,
+      "id": "e5fa4fd7-74bb-4a02-bf11-fc30ad9fb358",
+      "name": "Euro",
+      "code": "EUR",
+      "icon": "euro"
+    },
+    "office": {
+      "createdAt": "2023-04-11T12:32:49.002092",
+      "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+      "modifiedAt": "2024-05-06T18:59:27.397102",
+      "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+      "deleted": false,
+      "id": "10212009-0922-44fb-9bc1-8e9f49764aa9",
+      "name": "Nails Cleos",
+      "subject": "NAILS CLEOS",
+      "kvk": "123456",
+      "account": "NL123456789",
+      "btw": "NL123123123B01",
+      "billingAddress": "Mock address",
+      "lastInvoiceNumber": 839.00,
+      "manager": {
+        "createdAt": "2023-04-08T18:25:34.534018",
+        "createdBy": "anonymousUser",
+        "modifiedAt": "2024-05-24T17:54:55.967111",
+        "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+        "deleted": false,
+        "id": "57ceebd2-a012-42a3-af9a-5d546c193200",
+        "uid": "58whKT7TQaZdDHvWGPkk1GEpHwJ3",
+        "enabled": true,
+        "verified": true,
+        "email": "nails.cleos@gmail.com",
+        "displayName": "Nails Cleos",
+        "locale": "en_GB",
+        "phone": "+1234567890",
+        "dob": "1993-03-26",
+        "theme": "light-theme",
+        "authorities": [
+          {
+            "id": 3,
+            "authority": "ROLE_PROFESSIONAL"
+          },
+          {
+            "id": 1,
+            "authority": "ROLE_ADMIN"
+          },
+          {
+            "id": 2,
+            "authority": "ROLE_MANAGER"
+          }
+        ],
+        "providerId": "123123123213",
+        "imageUrl": "https://example-photo.com",
+        "lightColor": "#a5ada3",
+        "darkColor": "#e8e742",
+        "referralMax": 5,
+        "showCash": true,
+        "address": {
+          "name": "Mock address",
+          "location": {
+            "x": 4.5868771,
+            "y": 51.9231509
+          },
+          "id": 6
+        },
+        "completed": false
+      }
+    },
+    "administrator": {
+      "createdAt": "2024-01-11T08:21:43.189125",
+      "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+      "modifiedAt": "2024-01-11T08:21:43.189125",
+      "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+      "deleted": false,
+      "id": "00314449-d7f4-4b6b-94e4-e618e1c729ba",
+      "enabled": false,
+      "verified": false,
+      "email": "a8e2afd8-42c2-408d-8f42-fb767b10bb29@gmail.com",
+      "displayName": "Mock address",
+      "locale": "en_GB",
+      "dob": "2024-01-11",
+      "timeZone": "Europe/Berlin",
+      "authorities": [
+        {
+          "id": 83,
+          "authority": "ROLE_ROOM_ADMIN"
+        }
+      ],
+      "referralMax": 5,
+      "address": {
+        "name": "Mock address",
+        "location": {
+          "x": 4.5868771,
+          "y": 51.9231509
+        },
+        "id": 3
+      },
+      "completed": false
+    },
+    "professionals": [
+      {
+        "createdAt": "2023-04-08T18:25:34.534018",
+        "createdBy": "anonymousUser",
+        "modifiedAt": "2024-05-24T17:54:55.967111",
+        "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+        "deleted": false,
+        "id": "57ceebd2-a012-42a3-af9a-5d546c193200",
+        "uid": "58whKT7TQaZdDHvWGPkk1GEpHwJ3",
+        "enabled": true,
+        "verified": true,
+        "email": "nails.cleos@gmail.com",
+        "displayName": "Nails Cleos",
+        "locale": "en_GB",
+        "phone": "+1234567890",
+        "dob": "1993-03-26",
+        "theme": "light-theme",
+        "authorities": [
+          {
+            "id": 3,
+            "authority": "ROLE_PROFESSIONAL"
+          },
+          {
+            "id": 1,
+            "authority": "ROLE_ADMIN"
+          },
+          {
+            "id": 2,
+            "authority": "ROLE_MANAGER"
+          }
+        ],
+        "providerId": "123123123213",
+        "imageUrl": "https://example-photo.com",
+        "lightColor": "#a5ada3",
+        "darkColor": "#e8e742",
+        "referralMax": 5,
+        "showCash": true,
+        "address": {
+          "name": "Mock address",
+          "location": {
+            "x": 4.5868771,
+            "y": 51.9231509
+          },
+          "id": 6
+        },
+        "completed": false
+      }
+    ],
+    "availabilities": [
+      {
+        "id": 43,
+        "day": "FRIDAY",
+        "start": "10:00",
+        "end": "20:00",
+        "startLunch": "12:30",
+        "endLunch": "13:00"
+      },
+      {
+        "id": 44,
+        "day": "TUESDAY",
+        "start": "08:00",
+        "end": "20:00",
+        "startLunch": "12:30",
+        "endLunch": "13:00"
+      },
+      {
+        "id": 40,
+        "day": "WEDNESDAY",
+        "start": "10:00",
+        "end": "20:00",
+        "startLunch": "12:30",
+        "endLunch": "13:00"
+      },
+      {
+        "id": 42,
+        "day": "THURSDAY",
+        "start": "08:00",
+        "end": "20:00",
+        "startLunch": "12:30",
+        "endLunch": "13:00"
+      },
+      {
+        "id": 41,
+        "day": "MONDAY",
+        "start": "10:00",
+        "end": "20:00",
+        "startLunch": "12:30",
+        "endLunch": "13:00"
+      }
+    ],
+    "address": {
+      "name": "Mock address",
+      "location": {
+        "x": 1,
+        "y": 2
+      },
+      "id": 4
+    },
+    "paymentTypes": [
+      "CASH",
+      "PAY_NL"
+    ],
+    "timeZone": "Europe/Berlin",
+    "primary": true
+  }
+]

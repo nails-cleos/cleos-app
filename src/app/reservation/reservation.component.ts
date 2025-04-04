@@ -197,7 +197,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   additionalList: IAdditionalAll[] = [];
   additionalSelected: IAdditionalAll[] = [];
-  customerAdditionalIds: string[] = [];
+  customerAdditionalIds?: string[];
 
   configurationForm!: UntypedFormGroup;
   customerChange: UntypedFormControl = new UntypedFormControl();
@@ -1229,12 +1229,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   };
 
-  private setAdditional = (treatmentIndex?: number): void => {
+  private setAdditional = (): void => {
     if (this.additionalList && this.additionalList.length) {
-      enableStep(this.steps, 'post_add');
+      const additionalIndex = enableStep(this.steps, 'post_add');
       if (this.customerAdditionalIds?.length && !this.additionalSelected.length && this.myStepper.selectedIndex ===
-        treatmentIndex) {
-        this.additionalSelected = this.additionalList.filter(ad => this.customerAdditionalIds.includes(ad.id))
+        additionalIndex) {
+        this.additionalSelected = this.additionalList.filter(ad => this.customerAdditionalIds?.includes(ad.id))
           .map(ad => Object.assign({}, ad, { id: ad.id }));
         this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discountCustomer);
       }
@@ -1270,7 +1270,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.setOffice();
       const treatment = getIndex(this.steps, 'spa');
       this.setCustomerInfo(treatment);
-      this.setAdditional(treatment);
+      this.setAdditional();
       if (!this.groups && state.treatmentDiscount?.treatments) {
         this.groups = Array.from(
           createTreatmentGroupService(new Map<string, IGroupService>(), state.treatmentDiscount.treatments,

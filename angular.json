@@ -161,8 +161,7 @@
               ],
               "serviceWorker": "ngsw-config.json"
             },
-            "development": {
-            }
+            "development": {}
           },
           "defaultConfiguration": "production"
         },
@@ -231,26 +230,50 @@
             ]
           }
         },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
+        "cypress-run": {
+          "builder": "@cypress/schematic:cypress",
           "options": {
-            "protractorConfig": "e2e/protractor.conf.js"
+            "devServerTarget": "cleos:serve"
           },
           "configurations": {
             "production": {
               "devServerTarget": "cleos:serve:production"
-            },
-            "staging": {
-              "devServerTarget": "cleos:serve:staging"
-            },
-            "pwa": {
-              "devServerTarget": "cleos:serve:pwa"
-            },
+            }
+          }
+        },
+        "cypress-open": {
+          "builder": "@cypress/schematic:cypress",
+          "options": {
+            "watch": true,
+            "headless": false
+          }
+        },
+        "ct": {
+          "builder": "@cypress/schematic:cypress",
+          "options": {
+            "devServerTarget": "cleos:serve",
+            "watch": true,
+            "headless": false,
+            "testingType": "component"
+          },
+          "configurations": {
             "development": {
               "devServerTarget": "cleos:serve:development"
             }
+          }
+        },
+        "e2e": {
+          "builder": "@cypress/schematic:cypress",
+          "options": {
+            "devServerTarget": "cleos:serve",
+            "watch": true,
+            "headless": false
           },
-          "defaultConfiguration": "development"
+          "configurations": {
+            "production": {
+              "devServerTarget": "cleos:serve:production"
+            }
+          }
         }
       }
     }
@@ -264,6 +287,10 @@
     }
   },
   "cli": {
-    "analytics": false
+    "analytics": false,
+    "schematicCollections": [
+      "@cypress/schematic",
+      "@schematics/angular"
+    ]
   }
 }

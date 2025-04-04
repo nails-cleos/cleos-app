@@ -6,7 +6,7 @@
         <mat-form-field appearance="outline">
           <mat-label>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</mat-label>
           <input (keydown)="keyDownHandler($event, customer)" formControlName="customer"
-                 [matAutocomplete]="autoCustomer"
+                 [matAutocomplete]="autoCustomer" name="customer"
                  autocomplete="off" matInput required type="text">
           <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
             @for (customer of filteredCustomer | async; track customer) {
@@ -128,7 +128,7 @@
                   <mat-form-field appearance="outline" class="date-field">
                     <mat-label>{{ 'RESERVATION.DATE.FIELD' | translate }}</mat-label>
                     <input (focus)="picker.open()" formControlName="date" [matDatepickerFilter]="myFilter"
-                           [matDatepicker]="picker" [max]="maxCalendarDate" matInput required>
+                           [matDatepicker]="picker" [max]="maxCalendarDate" matInput required name="date">
                     <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
                     <mat-datepicker #picker touchUi></mat-datepicker>
                     @if (dateGroup.get('date')?.hasError('invalid')) {
@@ -141,8 +141,7 @@
                   <mat-form-field appearance="outline" class="time-field">
                     <mat-label>{{ 'RESERVATION.START.FIELD' | translate }}</mat-label>
                     <input formControlName="start" [format]="24" [max]="maxDate" [min]="minDate"
-                           [ngxTimepicker]="tStart"
-                           matInput name="start" readonly/>
+                           [ngxTimepicker]="tStart" matInput name="start" readonly/>
                     <span matPrefix><mat-icon (click)="tStart.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
                     <ngx-material-timepicker #tStart (timeSet)="timeChange($event, i)"
                                              [minutesGap]="15"></ngx-material-timepicker>
@@ -368,11 +367,7 @@
         [locale]="dateFormat"
         [refresh]="refresh"
         [viewDate]="dataEvent.value.viewDate"
-        [weekendDays]="weekendDays"
-        [eventTitleTemplate]="eventTitleTemplate"></mwl-calendar-week-view>
-      <ng-template #eventTitleTemplate let-event="event">
-        <div [ngClass]="event.cssClass" [innerHTML]="event.title"></div>
-      </ng-template>
+        [weekendDays]="weekendDays"></mwl-calendar-week-view>
       @if (errors['schedule']?.length && errors['schedule'][dataEvent.value.index]) {
         <mat-error [innerHTML]="'RESERVATION.SCHEDULE.REQUIRED' | translate" class="divider"></mat-error>
       }
@@ -615,7 +610,7 @@
             </button>
           }
           <button type="button" (click)="callStepFour(true)" [disabled]="treatmentForm.invalid || isAddButtonDisabled"
-                  color="primary" class="icon-button" mat-fab>
+                  color="primary" class="icon-button" mat-fab name="toStepFour">
             <mat-icon>arrow_downward</mat-icon>
           </button>
         </div>
@@ -628,7 +623,8 @@
           <button type="button" (click)="back" color="accent" class="icon-button" mat-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
-          <button type="button" (click)="callStepFive(true)" color="primary" class="icon-button" mat-fab>
+          <button type="button" (click)="callStepFive(true)" color="primary" class="icon-button" mat-fab
+                  name="toStepFive">
             <mat-icon>arrow_downward</mat-icon>
           </button>
         </div>
@@ -644,7 +640,7 @@
             <mat-icon>arrow_upward</mat-icon>
           </button>
           <button type="button" (click)="callStepSix(true)" [disabled]="configurationForm.invalid" color="primary"
-                  class="icon-button" mat-fab>
+                  class="icon-button" mat-fab name="toStepSix">
             <mat-icon>arrow_downward</mat-icon>
           </button>
         </div>
@@ -658,7 +654,7 @@
             <mat-icon>arrow_upward</mat-icon>
           </button>
           <button type="button" (click)="callStepSeven(true)" [disabled]="eventGroup.invalid" color="primary"
-                  class="icon-button" mat-fab>
+                  class="icon-button" mat-fab name="toStepSeven">
             <mat-icon>arrow_downward</mat-icon>
           </button>
         </div>
@@ -671,7 +667,7 @@
           <button type="button" (click)="back" color="accent" class="icon-button" mat-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
-          <button type="button" (click)="create" color="primary" class="icon-button" mat-fab>
+          <button type="button" (click)="create" color="primary" class="icon-button" mat-fab name="create">
             <mat-icon>add_task</mat-icon>
           </button>
         </div>
@@ -785,7 +781,7 @@
             </button>
           }
           <button type="button" (click)="callStepFour(true)" [disabled]="treatmentForm.invalid || isAddButtonDisabled"
-                  color="primary" mat-fab extended class="icon-button">
+                  color="primary" mat-fab extended class="icon-button" name="toStepFour">
             <mat-icon>arrow_forward</mat-icon>
             {{ 'COMMON.BUTTON.NEXT' | translate }}
           </button>
@@ -800,7 +796,8 @@
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
-          <button type="button" (click)="callStepFive(true)" color="primary" mat-fab extended class="icon-button">
+          <button type="button" (click)="callStepFive(true)" color="primary" mat-fab extended class="icon-button"
+                  name="toStepFive">
             <mat-icon>arrow_forward</mat-icon>
             {{ 'COMMON.BUTTON.NEXT' | translate }}
           </button>
@@ -818,7 +815,7 @@
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
           <button type="button" (click)="callStepSix(true)" [disabled]="configurationForm.invalid" color="primary"
-                  mat-fab extended class="icon-button">
+                  mat-fab extended class="icon-button" name="toStepSix">
             <mat-icon>arrow_forward</mat-icon>
             {{ 'COMMON.BUTTON.NEXT' | translate }}
           </button>
@@ -834,7 +831,7 @@
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
           <button type="button" (click)="callStepSeven(true)" [disabled]="eventGroup.invalid" color="primary"
-                  mat-fab extended class="icon-button">
+                  mat-fab extended class="icon-button" name="toStepSeven">
             <mat-icon>arrow_forward</mat-icon>
             {{ 'COMMON.BUTTON.NEXT' | translate }}
           </button>
@@ -849,7 +846,7 @@
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
-          <button (click)="create" color="primary" mat-fab extended class="icon-button" type="button">
+          <button (click)="create" color="primary" mat-fab extended class="icon-button" type="button" name="create">
             <mat-icon>add_task</mat-icon>
             {{ 'COMMON.BUTTON.BOOK' | translate }}
           </button>
