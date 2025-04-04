@@ -38,6 +38,8 @@ export class RedirectComponent {
           } else {
             redirectUrl = [lang, 'me', 'reservations'];
           }
+        } else {
+          redirectUrl = [lang, 'home'];
         }
         this.navigateService.reload(redirectUrl);
       }
