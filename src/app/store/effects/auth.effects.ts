@@ -59,7 +59,7 @@ export class LoginEffects {
       signOut(this.auth).then(() => {
         this.authUserService.reloadUser();
         localStorage.removeItem('auth');
-        window.location.href = `/${ getLocale(this.translate.currentLang).language }`;
+        window.location.href = `/${ getLocale(this.translate.currentLang).language }/home`;
       }).catch((error) => {
         console.error('sign out error: ' + error);
       });

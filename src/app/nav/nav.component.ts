@@ -113,7 +113,7 @@ export class NavComponent implements OnInit, OnDestroy {
   }
 
   get goToHome(): void {
-    this.router.navigate([this.language]);
+    this.router.navigate([this.language, 'home']);
     return;
   }
 
@@ -292,7 +292,7 @@ export class NavComponent implements OnInit, OnDestroy {
             new fromActionsLogin.Redirect()
           );
         } else {
-          this.router.navigate(['/', this.language]);
+          this.router.navigate(['/', this.language, 'home']);
         }
       }
     });
