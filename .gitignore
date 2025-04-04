@@ -53,4 +53,4 @@ Thumbs.db
 
 # Cypress
 cypress/screenshots/**
-cypress/reports/**
+cypress/results/**

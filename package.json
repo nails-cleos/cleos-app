@@ -8,7 +8,7 @@
   "scripts": {
     "ng": "ng",
     "start": "node server.js",
-    "start:dev": "ng serve --port 4300 ",
+    "start:dev": "ng serve --port 4300",
     "start:pwa": "http-server -p 4300 -c-1 dist/cleos -P http://localhost:4300\\?",
     "build": "ng build --configuration=production",
     "build-pwa": "ng build --configuration=pwa",
@@ -20,7 +20,8 @@
     "lint": "ng lint",
     "lint-fix": "ng lint --fix",
     "eslint": "eslint src --fix",
-    "e2e": "npm run start:dev & npx wait-on http://localhost:4300 && npx cypress run --headless --reporter junit --reporter-options 'mochaFile=cypress/results/test-results.xml'",
+    "e2e": "start-server-and-test serve http://localhost:4300 'cypress run --headless --reporter junit --reporter-options mochaFile=cypress/results/test-results.xml'",
+    "serve": "ng serve --port 4300 --host 0.0.0.0 --no-hmr",
     "e2e-html-report": "npm run start:dev & npx wait-on http://localhost:4300 && npx cypress run --headless; exit_code=$?; npm run report:merge && npm run report:generate; exit $exit_code",
     "report:merge": "npx mochawesome-merge cypress/reports/mochawesome/*.json > cypress/reports/mochawesome/report.json",
     "report:generate": "npx marge cypress/reports/mochawesome/report.json -o cypress/reports/mochawesome",
@@ -118,6 +119,7 @@
     "mochawesome-merge": "^5.0.0",
     "mochawesome-report-generator": "^6.2.0",
     "ng2-charts-schematics": "^0.1.7",
+    "start-server-and-test": "^2.0.11",
     "ts-node": "~10.9.2",
     "wait-on": "^8.0.3"
   }
