@@ -36,12 +36,12 @@
           <mat-card-content>
             <mat-nav-list>
               @if (isHandset$ | async) {
-                <mat-list-item (click)="drawer.toggle()" [routerLink]="['/', language]">
+                <mat-list-item (click)="drawer.toggle()" [routerLink]="['/', language, 'home']">
                   <mat-icon matListItemIcon>home</mat-icon>
                   <div matListItemTitle>{{ 'COMMON.DASHBOARD.HOME' | translate }}</div>
                 </mat-list-item>
               } @else {
-                <mat-list-item [routerLinkActive]="['active-link']" [routerLink]="['/', language]">
+                <mat-list-item [routerLinkActive]="['active-link']" [routerLink]="['/', language, 'home']">
                   <mat-icon matListItemIcon>home</mat-icon>
                   <div matListItemTitle>{{ 'COMMON.DASHBOARD.HOME' | translate }}</div>
                 </mat-list-item>
@@ -141,7 +141,7 @@
           </button>
           <mat-menu #menuLogged="matMenu">
             <mat-nav-list>
-              <mat-list-item [routerLinkActive]="['active']" [routerLink]="['/', language]">
+              <mat-list-item [routerLinkActive]="['active']" [routerLink]="['/', language, 'home']">
                 <mat-icon matListItemIcon>home</mat-icon>
                 <div matListItemTitle>{{ 'COMMON.DASHBOARD.HOME' | translate }}</div>
               </mat-list-item>
@@ -171,12 +171,12 @@
           </mat-menu>
         </div>
       } @else if ((isHandset$ | async) === false) {
-        <button color="accent" mat-fab extended [routerLink]="['/', language]">
+        <button color="accent" mat-fab extended [routerLink]="['/', language, 'home']">
           <mat-icon>home</mat-icon>
           <span>{{ 'COMMON.DASHBOARD.HOME' | translate }}</span>
         </button>
       } @else {
-        <button color="accent" mat-fab [routerLink]="['/', language]">
+        <button color="accent" mat-fab [routerLink]="['/', language, 'home']">
           <mat-icon>home</mat-icon>
         </button>
       }
