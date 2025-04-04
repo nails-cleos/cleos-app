@@ -79,11 +79,11 @@
 </div>
 
 @if (data && calendar) {
-  @if (inProgress) {
-    <div class="spinner-parent-center">
-      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
-    </div>
-  } @else {
+<!--  @if (inProgress) {-->
+<!--    <div class="spinner-parent-center">-->
+<!--      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>-->
+<!--    </div>-->
+<!--  } @else {-->
     <div class="divider card-actions">
       <button class="hide-gt-xs" (click)="decrement" color="accent" mat-fab>
         <mat-icon>navigate_before</mat-icon>
@@ -138,12 +138,12 @@
           [dayStartHour]="calendar.day!.dayStartHour"
           [dayStartMinute]="calendar.day!.dayStartMinute"
           [daysInWeek]="totalDays"
-          [events]="calendar.events"
+          [events]="calendar.calendarEvents"
           [hourSegments]="hourSegments"
           [locale]="locale"
           [viewDate]="viewDate"
           [weekendDays]="[]"></mwl-calendar-week-view>
       </div>
     </div>
-  }
+<!--  }-->
 }

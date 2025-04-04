@@ -9,8 +9,7 @@ export class TranslationLoaderResolver {
   constructor(private translate: TranslateService) {
   }
 
-  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
-    return this.translate.get('APP.TITTLE');
-  }
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  resolve = (_route: ActivatedRouteSnapshot, _state: RouterStateSnapshot): Observable<any> =>
+    this.translate.get('APP.TITTLE');
 }

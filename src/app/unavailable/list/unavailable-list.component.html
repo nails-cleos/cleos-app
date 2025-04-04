@@ -5,10 +5,11 @@
     <ng-container matColumnDef="position">
       <th *matHeaderCellDef mat-header-cell>#</th>
       <td *matCellDef="let unavailable; let i = dataIndex;" mat-cell>
-        <div *ngIf="unavailable.id; else skeleton">{{ (paginator.pageIndex * pageSize) + i + 1 }}</div>
-        <ng-template #skeleton>
+        @if (unavailable.id) {
+          <div>{{ (paginator.pageIndex * pageSize) + i + 1 }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
@@ -17,10 +18,11 @@
           mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.PROFESSIONAL' | translate }}
       </th>
       <td *matCellDef="let unavailable" class="hide-xs" mat-cell>
-        <div *ngIf="unavailable.id; else skeleton">{{ unavailable?.professional?.displayName }}</div>
-        <ng-template #skeleton>
+        @if (unavailable.id) {
+          <div>{{ unavailable.professional?.displayName }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
@@ -29,10 +31,11 @@
           mat-sort-header>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}
       </th>
       <td *matCellDef="let unavailable" class="hide-xs" mat-cell>
-        <div *ngIf="unavailable.id; else skeleton">{{ unavailable.description }}</div>
-        <ng-template #skeleton>
+        @if (unavailable.id) {
+          <div>{{ unavailable.description }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
@@ -41,15 +44,17 @@
           mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.START' | translate }}
       </th>
       <td *matCellDef="let unavailable" mat-cell>
-        <div *ngIf="unavailable.id; else skeleton">
-          {{ unavailable.timestamp | timeDetail | date:'short':unavailable.timeZone:dateFormat }}
-          <button (click)="openDialog(unavailable)" *ngIf="showTimeZone(unavailable)" mat-icon-button type="button">
-            <mat-icon>info_outline</mat-icon>
-          </button>
-        </div>
-        <ng-template #skeleton>
+        @if (unavailable.id) {
+          <div>{{ unavailable.timestamp | timeDetail | date:'short':unavailable.timeZone:dateFormat }}
+            @if (showTimeZone(unavailable)) {
+              <button (click)="openDialog(unavailable)" mat-icon-button type="button">
+                <mat-icon>info_outline</mat-icon>
+              </button>
+            }
+          </div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
@@ -58,19 +63,15 @@
           mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.DURATION' | translate }}
       </th>
       <td *matCellDef="let unavailable" class="column-large-text hide-xs" mat-cell>
-        <div *ngIf="unavailable.id; else skeleton">
-          <div *ngIf="!unavailable.allDay; else allDay">
-            <mat-icon matPrefix>timer</mat-icon>&nbsp;
-            {{ unavailable.duration | durationTime }}
-          </div>
-          <ng-template #allDay>
-            <mat-icon matPrefix>timer</mat-icon>&nbsp;
-            {{ 'COMMON.ALL_DAY.CHECK' | translate }}
-          </ng-template>
-        </div>
-        <ng-template #skeleton>
+        @if (unavailable.id) {
+          @if (!unavailable.allDay) {
+            <mat-icon matPrefix>timer</mat-icon>&nbsp;{{ unavailable.duration | durationTime }}
+          } @else {
+            <mat-icon matPrefix>timer</mat-icon>&nbsp;{{ 'COMMON.ALL_DAY.CHECK' | translate }}
+          }
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
@@ -79,31 +80,31 @@
           mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.REPEAT' | translate }}
       </th>
       <td *matCellDef="let unavailable" class="column-large-text hide-xs" mat-cell>
-        <div *ngIf="unavailable.id; else skeleton">
+        @if (unavailable.id) {
           {{ 'COMMON.REPEAT.' + unavailable.repeat | translate }}
-        </div>
-        <ng-template #skeleton>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="actions">
       <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
       <td *matCellDef="let unavailable" class="hide-xs" mat-cell>
-        <div *ngIf="unavailable.id; else skeleton">
-          <button (click)="edit(unavailable)" *ngIf="!unavailable.deleted" mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
-            <mat-icon color="primary">edit</mat-icon>
-          </button>
-          <button (click)="delete(unavailable)" *ngIf="!unavailable.deleted" mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
-            <mat-icon color="warn">delete</mat-icon>
-          </button>
-        </div>
-        <ng-template #skeleton>
+        @if (unavailable.id) {
+          @if (!unavailable.deleted) {
+            <button (click)="edit(unavailable)" mat-icon-button matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}"
+                    matTooltipPosition="left">
+              <mat-icon color="primary">edit</mat-icon>
+            </button>
+            <button (click)="delete(unavailable)" mat-icon-button matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}"
+                    matTooltipPosition="right">
+              <mat-icon color="warn">delete</mat-icon>
+            </button>
+          }
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
@@ -116,24 +117,23 @@
               <div class="hide-gt-xs" matListItemTitle>{{ 'UNAVAILABLE.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
               <div matListItemLine>{{ unavailable?.professional?.displayName }}</div>
             </mat-list-item>
-            <mat-list-item *ngIf="unavailable.description" class="hide-gt-xs" role="list">
-              <div *ngIf="unavailable.description" class="hide-gt-xs"
-                   matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}
-              </div>
-              <div matListItemLine>{{ unavailable.description }}</div>
-            </mat-list-item>
+            @if (unavailable.description) {
+              <mat-list-item class="hide-gt-xs" role="list">
+                <div class="hide-gt-xs" matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
+                <div matListItemLine>{{ unavailable.description }}</div>
+              </mat-list-item>
+            }
             <mat-list-item class="hide-gt-xs" role="list">
               <div class="hide-gt-xs" matListItemTitle>{{ 'UNAVAILABLE.LIST.COLUMN.DURATION' | translate }}</div>
-              <div *ngIf="!unavailable.allDay; else allDay" matListItemLine>
-                <mat-icon matPrefix>timer</mat-icon>&nbsp;
-                {{ unavailable.duration | durationTime }}
-              </div>
-              <ng-template #allDay>
+              @if (!unavailable.allDay) {
                 <div matListItemLine>
-                  <mat-icon matPrefix>timer</mat-icon>&nbsp;
-                  {{ 'COMMON.ALL_DAY.CHECK' | translate }}
+                  <mat-icon matPrefix>timer</mat-icon>&nbsp;{{ unavailable.duration | durationTime }}
                 </div>
-              </ng-template>
+              } @else {
+                <div matListItemLine>
+                  <mat-icon matPrefix>timer</mat-icon>&nbsp;{{ 'COMMON.ALL_DAY.CHECK' | translate }}
+                </div>
+              }
             </mat-list-item>
             <mat-list-item class="hide-gt-xs" role="list">
               <div class="hide-gt-xs" matListItemTitle>{{ 'UNAVAILABLE.LIST.COLUMN.REPEAT' | translate }}</div>
@@ -141,12 +141,14 @@
             </mat-list-item>
             <div class="hide-gt-xs" mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
             <mat-list-item class="hide-gt-xs">
-              <button (click)="edit(unavailable)" *ngIf="!unavailable.deleted" mat-icon-button>
-                <mat-icon matListItemIcon color="primary">edit</mat-icon>
-              </button>
-              <button (click)="delete(unavailable)" *ngIf="!unavailable.deleted" mat-icon-button>
-                <mat-icon matListItemIcon color="warn">delete</mat-icon>
-              </button>
+              @if (!unavailable.deleted) {
+                <button (click)="edit(unavailable)" mat-icon-button>
+                  <mat-icon matListItemIcon color="primary">edit</mat-icon>
+                </button>
+                <button (click)="delete(unavailable)" mat-icon-button>
+                  <mat-icon matListItemIcon color="warn">delete</mat-icon>
+                </button>
+              }
             </mat-list-item>
           </mat-list>
         </div>
@@ -167,7 +169,9 @@
 
     <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
   </table>
-  <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+  @if (resultsLength) {
+    <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+  }
 
   <button color="accent" id="add-button" mat-fab matTooltip="{{ 'UNAVAILABLE.TITLE' | translate }}"
           [routerLink]="['/', language, 'unavailable', 'add']">

@@ -90,7 +90,7 @@
       </mat-card-footer>
     </mat-card>
 
-    <ng-template [ngIf]="showCash">
+    @if (showCash) {
       <mat-card appearance="outlined" class="bottom">
         <mat-card-content>
           <mat-list>
@@ -154,6 +154,6 @@
           </mat-list>
         </mat-card-footer>
       </mat-card>
-    </ng-template>
+    }
   </mat-card-content>
 </mat-card>

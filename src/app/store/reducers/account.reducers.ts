@@ -50,7 +50,10 @@ export const reducer = (state = initialState, action: All): State => {
     case AccountActionTypes.accountFindTransactions: {
       return {
         ...state,
-        data: { transactions: { content: [{}, {}, {}], totalElements: 3 } as Pagination<ITransaction>, account: undefined },
+        data: {
+          transactions: { content: [{}, {}, {}], totalElements: 3 } as Pagination<ITransaction>,
+          account: undefined
+        },
         errorMessage: null,
         subErrors: null,
         message: null

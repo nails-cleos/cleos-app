@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { INote } from '../interfaces/note';
+import { toUrl } from '../util/helper';
 
 @Injectable({
   providedIn: 'root'
@@ -11,26 +12,15 @@ export class NoteService {
   private url = 'notes';
   private urlV1 = `v1/${ this.url }`;
 
-  constructor(private http: HttpClient) {
-  }
+  private http: HttpClient = inject(HttpClient);
 
-  public getById(id: string | null): Observable<INote | undefined> {
-    return this.http.get<INote>(`${ this.urlV1 }/${ id }`);
-  }
+  getById = (id: string): Observable<INote | undefined> => this.http.get<INote>(toUrl(this.urlV1, id));
 
-  public add(note: INote): Observable<INote> {
-    return this.http.post<INote>(this.urlV1, note);
-  }
+  add = (note: INote): Observable<INote> => this.http.post<INote>(this.urlV1, note);
 
-  public delete(id: string | null): Observable<INote> {
-    return this.http.delete<INote>(`${ this.urlV1 }/${ id }`);
-  }
+  delete = (id: string): Observable<INote> => this.http.delete<INote>(toUrl(this.urlV1, id));
 
-  public update(note: INote): Observable<INote> {
-    return this.http.patch<INote>(`${ this.urlV1 }/${ note.id }`, note);
-  }
+  update = (note: INote): Observable<INote> => this.http.patch<INote>(toUrl(this.urlV1, note.id!), note);
 
-  public complete(id: string | null): Observable<INote> {
-    return this.http.patch<INote>(`${ this.urlV1 }/${ id }/complete`, null);
-  }
+  complete = (id: string): Observable<INote> => this.http.patch<INote>(toUrl(this.urlV1, id, 'complete'), null);
 }

@@ -1,19 +1,24 @@
-<mat-toolbar *ngIf="data.mobileType === 'android'" color="primary" class="android-prompt">
-  <button mat-button class="icon-button" (click)="installPwa()">
-    <mat-icon [svgIcon]="'CLEOS'"></mat-icon>
-    <span>{{'COMMON.INSTALL.ANDROID' | translate}}</span>
-  </button>
-  <button mat-icon-button (click)="close()">
-    <mat-icon>close</mat-icon>
-  </button>
-</mat-toolbar>
-
-<div *ngIf="data.mobileType === 'ios'" class="ios-prompt">
-  <button class="close-ios-inv" mat-button color="primary" (click)="close()">
-    <mat-icon>close</mat-icon>
-  </button>
-  <div>{{'COMMON.INSTALL.IOS' | translate}}</div>
-  <div><img src="./assets/ios-menu-btn.png" alt="ios-menu-btn">
-    <mat-icon>navigate_next</mat-icon>
-    <img src="./assets/ios-add-btn.png" alt="ios-add-btn"></div>
-</div>
+@switch (data.mobileType) {
+  @case ('android') {
+    <mat-toolbar color="primary" class="android-prompt">
+      <button mat-button class="icon-button" (click)="installPwa()">
+        <mat-icon [svgIcon]="'CLEOS'"></mat-icon>
+        <span>{{ 'COMMON.INSTALL.ANDROID' | translate }}</span>
+      </button>
+      <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-toolbar>
+  }
+  @case ('ios') {
+    <div class="ios-prompt">
+      <button class="close-ios-inv" mat-button color="primary" (click)="close()">
+        <mat-icon>close</mat-icon>
+      </button>
+      <div>{{ 'COMMON.INSTALL.IOS' | translate }}</div>
+      <div><img src="./assets/ios-menu-btn.png" alt="ios-menu-btn">
+        <mat-icon>navigate_next</mat-icon>
+        <img src="./assets/ios-add-btn.png" alt="ios-add-btn"></div>
+    </div>
+  }
+}

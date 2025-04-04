@@ -1,9 +1,10 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { ControlContainer, NgForm, UntypedFormGroup } from '@angular/forms';
 import { GeocodeService, MapStatus } from '../../services/geocode.service';
-import { MapInfoWindow, MapMarker } from '@angular/google-maps';
+import { GoogleMap, MapAdvancedMarker, MapInfoWindow } from '@angular/google-maps';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Subscription } from 'rxjs';
+import { SharedModule } from '../shared.module';
 import PlaceResult = google.maps.places.PlaceResult;
 import MapMouseEvent = google.maps.MapMouseEvent;
 
@@ -11,7 +12,8 @@ import MapMouseEvent = google.maps.MapMouseEvent;
   selector: 'app-google-map',
   templateUrl: './google-map.component.html',
   styleUrls: ['./google-map.component.scss'],
-  viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
+  viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
+  imports: [SharedModule, GoogleMap, MapInfoWindow, MapAdvancedMarker]
 })
 export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MapInfoWindow) infoWindow?: MapInfoWindow;
@@ -56,7 +58,8 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.zoom = 10;
     this.types = [];
     this.isDarkMode = false;
-    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => this.isDarkMode = value.isDarkMode);
+    this.authUserServiceSubscription =
+      this.authUserService.authUser.subscribe(value => this.isDarkMode = value.isDarkMode);
   }
 
   ngOnInit(): void {
@@ -167,7 +170,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  markerDragEnd($event: MapMouseEvent): void {
+  markerDragEnd = ($event: MapMouseEvent): void => {
     if ($event.latLng) {
       this.geocodeService.geocodeAddress($event.latLng.lat(), $event.latLng.lng(), this.showDistance)
         .subscribe(value => {
@@ -177,13 +180,11 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         });
     }
-  }
+  };
 
-  openInfoWindow(marker: MapMarker): void {
-    this.infoWindow?.open(marker);
-  }
+  openInfoWindow = (marker: MapAdvancedMarker): void => this.infoWindow?.open(marker);
 
-  private setAutocomplete(): void {
+  private setAutocomplete = (): void => {
     if (this.addressText?.nativeElement) {
       const options = {
         componentRestrictions: { country: 'nl' },
@@ -196,9 +197,9 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
       google.maps.event.addListener(autocomplete, 'place_changed', () => this.setAddress(autocomplete.getPlace()));
     }
-  }
+  };
 
-  private setCurrentPosition(): void {
+  private setCurrentPosition = (): void => {
     if (this.latitudeMarker && this.longitudeMarker) {
       this.center = { lat: this.latitudeMarker, lng: this.longitudeMarker };
       this.markerPosition = { lat: this.latitudeMarker, lng: this.longitudeMarker };
@@ -207,14 +208,15 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.markerOptions = { gmpDraggable: this.isDraggable };
 
       if (this.showDistance) {
-        this.geocodeService.geocodeAddress(this.latitudeMarker, this.longitudeMarker, this.showDistance).subscribe(value => {
-          if (value.distance) {
-            this.distanceEmitter.emit(value.distance);
-          }
-          if (value.address) {
-            this.setAddress(value.address);
-          }
-        });
+        this.geocodeService.geocodeAddress(this.latitudeMarker, this.longitudeMarker, this.showDistance)
+          .subscribe(value => {
+            if (value.distance) {
+              this.distanceEmitter.emit(value.distance);
+            }
+            if (value.address) {
+              this.setAddress(value.address);
+            }
+          });
       } else if (!this.info) {
         this.info = this.markInfo;
       }
@@ -227,9 +229,9 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
     }
-  }
+  };
 
-  private setAddress(place: PlaceResult): void {
+  private setAddress = (place: PlaceResult): void => {
     if (place.geometry && place.geometry.location) {
       this.latitudeMarker = this.latitude = place.geometry.location.lat();
       this.longitudeMarker = this.longitude = place.geometry.location.lng();
@@ -249,9 +251,9 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.markerOptions = { gmpDraggable: this.isDraggable };
       this.addressEmitter.emit(place);
     }
-  }
+  };
 
-  private mockResponse(): void {
+  private mockResponse = (): void => {
     if (!this.addressFormGroup?.get('address')?.value) {
       const value = {
         // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -281,10 +283,12 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.addressFormGroup?.get('address')?.setValue(value.formatted_address);
       this.addressEmitter.emit(value);
     }
-  }
+  };
 
-  private getRandomInRange(from: number, to: number, fixed: number = 3): number {
-    return Number((Math.random() * (to - from) + from).toFixed(fixed)) * 1;
-    // .toFixed() returns string, so ' * 1' is a trick to convert to number
-  }
+  // .toFixed() returns string, so ' * 1' is a trick to convert to number
+  private getRandomInRange = (
+    from: number,
+    to: number,
+    fixed: number = 3
+  ): number => Number((Math.random() * (to - from) + from).toFixed(fixed)) * 1;
 }

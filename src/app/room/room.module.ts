@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../shared/shared.module';
 import { RoomRoutingModule } from './room-routing.module';
 
 import { RoomsComponent } from './list/rooms.component';
@@ -21,18 +20,15 @@ import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
 
 @NgModule({
-  declarations: [
+  imports: [
     RoomsComponent,
     RoomComponent,
     AvailabilityComponent,
     AddServiceComponent,
     PriceDialogComponent,
     ExpensesComponent,
-    ExpenseComponent
-  ],
-  imports: [
+    ExpenseComponent,
     RoomRoutingModule,
-    SharedModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,

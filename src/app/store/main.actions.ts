@@ -4,7 +4,7 @@ export enum MainActionTypes {
   getAllCatalogue = '[Main] Get all',
   getAllTreatments = '[Main] Get all treatments',
   sendMessage = '[Main] Send message',
-  updateUser = '[Main] Send message',
+  updateUser = '[Main] Update user',
   catalogueSuccess = '[Main] Catalogue Success',
   treatmentSuccess = '[Main] Treatment success',
   requestSuccess = '[Main] Success',

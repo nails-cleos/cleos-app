@@ -18,15 +18,25 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
             "allowedCommonJsDependencies": [
-              "chart.js"
+              "chart.js",
+              "deepmerge",
+              "exceljs",
+              "google-libphonenumber",
+              "file-saver",
+              "timezones-list",
+              "rgbcolor",
+              "core-js",
+              "raf",
+              "pdfmake"
             ],
             "crossOrigin": "anonymous",
-            "outputPath": "dist/cleos",
+            "outputPath": {
+              "base": "dist/cleos"
+            },
             "index": "src/index.html",
-            "main": "src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -42,19 +52,23 @@
               "src/robots.txt"
             ],
             "styles": [
-              "node_modules/angular-calendar/css/angular-calendar.css",
               "node_modules/cookieconsent/build/cookieconsent.min.css",
               "src/styles.scss"
             ],
             "scripts": [
               "node_modules/cookieconsent/build/cookieconsent.min.js"
             ],
-            "vendorChunk": true,
             "extractLicenses": false,
-            "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "browser": "src/main.ts",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src",
+                "node_modules"
+              ]
+            }
           },
           "configurations": {
             "production": {
@@ -73,8 +87,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -87,8 +99,7 @@
                   "maximumError": "6kb"
                 }
               ],
-              "serviceWorker": true,
-              "ngswConfigPath": "ngsw-config.json"
+              "serviceWorker": "ngsw-config.json"
             },
             "staging": {
               "index": {
@@ -106,8 +117,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -120,8 +129,7 @@
                   "maximumError": "6kb"
                 }
               ],
-              "serviceWorker": true,
-              "ngswConfigPath": "ngsw-config.json"
+              "serviceWorker": "ngsw-config.json"
             },
             "pwa": {
               "index": {
@@ -139,8 +147,6 @@
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -153,11 +159,9 @@
                   "maximumError": "6kb"
                 }
               ],
-              "serviceWorker": true,
-              "ngswConfigPath": "ngsw-config.json"
+              "serviceWorker": "ngsw-config.json"
             },
-            "development": {
-            }
+            "development": {}
           },
           "defaultConfiguration": "production"
         },
@@ -209,7 +213,6 @@
               "src/robots.txt"
             ],
             "styles": [
-              "node_modules/angular-calendar/css/angular-calendar.css",
               "node_modules/cookieconsent/build/cookieconsent.min.css",
               "src/styles.scss"
             ],
@@ -227,26 +230,50 @@
             ]
           }
         },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
+        "cypress-run": {
+          "builder": "@cypress/schematic:cypress",
           "options": {
-            "protractorConfig": "e2e/protractor.conf.js"
+            "devServerTarget": "cleos:serve"
           },
           "configurations": {
             "production": {
               "devServerTarget": "cleos:serve:production"
-            },
-            "staging": {
-              "devServerTarget": "cleos:serve:staging"
-            },
-            "pwa": {
-              "devServerTarget": "cleos:serve:pwa"
-            },
+            }
+          }
+        },
+        "cypress-open": {
+          "builder": "@cypress/schematic:cypress",
+          "options": {
+            "watch": true,
+            "headless": false
+          }
+        },
+        "ct": {
+          "builder": "@cypress/schematic:cypress",
+          "options": {
+            "devServerTarget": "cleos:serve",
+            "watch": true,
+            "headless": false,
+            "testingType": "component"
+          },
+          "configurations": {
             "development": {
               "devServerTarget": "cleos:serve:development"
             }
+          }
+        },
+        "e2e": {
+          "builder": "@cypress/schematic:cypress",
+          "options": {
+            "devServerTarget": "cleos:serve",
+            "watch": true,
+            "headless": false
           },
-          "defaultConfiguration": "development"
+          "configurations": {
+            "production": {
+              "devServerTarget": "cleos:serve:production"
+            }
+          }
         }
       }
     }
@@ -260,6 +287,10 @@
     }
   },
   "cli": {
-    "analytics": false
+    "analytics": false,
+    "schematicCollections": [
+      "@cypress/schematic",
+      "@schematics/angular"
+    ]
   }
 }

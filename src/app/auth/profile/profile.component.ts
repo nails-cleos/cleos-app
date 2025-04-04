@@ -1,9 +1,9 @@
-import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import { IUser, User } from '../../interfaces/user';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import * as fromActionsUser from '../../store/user.actions';
 import { fieldChange, valueChange } from '../../util/validators';
 import { findFlag, flags, IFlag } from '../../util/flags';
@@ -12,19 +12,29 @@ import { backendFormatDate, createDateFromString, newDate } from '../../util/dat
 import { lightenDarkenColor } from '../../util/color';
 import { Role } from '../../interfaces/token';
 import { TranslateService } from '@ngx-translate/core';
-import { validColorValidator } from 'ngx-colors';
+import { NgxColorsModule, validColorValidator } from 'ngx-colors';
 import { resizeImage } from '../../util/file';
+import { SharedModule } from '../../shared/shared.module';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
+import { GoogleMapComponent } from '../../shared/google-map/google-map.component';
+import { BackButtonDirective } from '../../directives/back-button.directive';
+import { NgxMaterialIntlTelInputComponent, TextLabels } from 'ngx-material-intl-tel-input';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.scss']
+  styleUrls: ['./profile.component.scss'],
+  imports: [SharedModule, NgxMaterialIntlTelInputComponent, NgxColorsModule, GoogleMapComponent, BackButtonDirective]
 })
 export class ProfileComponent implements OnInit, OnDestroy {
   @ViewChild('canvas', { static: false }) canvas?: ElementRef<HTMLCanvasElement>;
   @ViewChild('resizedImage', { static: false }) resizedImage?: ElementRef<HTMLImageElement>;
+
+  private store: Store<AppState> = inject(Store<AppState>);
+  private formBuilder: UntypedFormBuilder = inject(UntypedFormBuilder);
+  private cdRef: ChangeDetectorRef = inject(ChangeDetectorRef);
+  private translate: TranslateService = inject(TranslateService);
 
   form!: UntypedFormGroup;
   errors: any = [];
@@ -37,7 +47,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   ]);
 
   displayName: UntypedFormControl = new UntypedFormControl();
-  phone: UntypedFormControl = new UntypedFormControl('', [Validators.required]);
+  phone: FormControl = new FormControl('', [Validators.required]);
   dob: UntypedFormControl = new UntypedFormControl();
   darkColor: UntypedFormControl = new UntypedFormControl(undefined, [validColorValidator()]);
   darkColorPicker: UntypedFormControl = new UntypedFormControl();
@@ -49,21 +59,24 @@ export class ProfileComponent implements OnInit, OnDestroy {
   showColors = false;
 
   flagList: IFlag[] = flags();
-  isDarkMode = false;
-  isAdmin: boolean;
-  showCash: boolean;
+  isDarkMode: boolean = false;
+  isAdmin: boolean = false;
+  showCash: boolean = false;
+  labels: TextLabels = {
+    mainLabel: '',
+    codePlaceholder: '',
+    searchPlaceholderLabel: '',
+    noEntriesFoundLabel: '',
+    nationalNumberLabel: '',
+    hintLabel: '',
+    invalidNumberError: '',
+    requiredError: ''
+  };
 
-  private getState: Observable<any>;
+  private getState: Observable<any> = this.store.select(selectUserState);
   private subscription?: Subscription;
   private geometry?: PlaceGeometry;
   private formattedAddress?: string;
-
-  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private cdRef: ChangeDetectorRef,
-              private translate: TranslateService) {
-    this.showCash = false;
-    this.isAdmin = false;
-    this.getState = this.store.select(selectUserState);
-  }
 
   get update(): void {
     if (this.form.invalid) {
@@ -99,6 +112,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.clean();
     this.findMe();
     this.subscribe();
+    this.loadLabels();
+    this.translate.onLangChange.subscribe(() => this.loadLabels());
     this.cdRef.detectChanges();
   }
 
@@ -106,7 +121,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  onSelectFile(target: any): void {
+  onSelectFile = (target: any): void => {
     if (target.files && target.files[0]) {
       const file = target.files[0];
       const reader = new FileReader();
@@ -128,24 +143,33 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
       reader.readAsDataURL(file);
     }
-  }
+  };
 
-  lightenDarkenColor(color: string, isDark: boolean): string {
-    return lightenDarkenColor(color, isDark ? 50 : -50);
-  }
+  lightenDarkenColor = (color: string, isDark: boolean): string => lightenDarkenColor(color, isDark ? 50 : -50);
 
-  getAddress(placeResult: PlaceResult): void {
+  getAddress = (placeResult: PlaceResult): void => {
     this.geometry = placeResult.geometry;
     this.formattedAddress = placeResult.formatted_address;
-  }
+  };
 
-  private findMe(): void {
-    this.store.dispatch(
-      new fromActionsUser.FindMe()
-    );
-  }
+  private loadLabels = () => {
+    const phoneTranslations = this.translate.instant('COMMON.USER.PHONE');
 
-  private createForm(): void {
+    this.labels = {
+      mainLabel: '',
+      codePlaceholder: '',
+      searchPlaceholderLabel: phoneTranslations.SEARCH || '',
+      noEntriesFoundLabel: phoneTranslations.COUNTRY_NOT_FOUND || '',
+      nationalNumberLabel: phoneTranslations.FIELD || '',
+      hintLabel: '',
+      invalidNumberError: phoneTranslations.INVALID || '',
+      requiredError: phoneTranslations.REQUIRED || ''
+    };
+  };
+
+  private findMe = (): void => this.store.dispatch(new fromActionsUser.FindMe());
+
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
         langValue: this.langValue,
         displayName: this.displayName,
@@ -176,15 +200,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.lightColorPicker.valueChanges.subscribe((color) =>
       this.lightColor.setValue(color, { emitEvent: false })
     );
-  }
+  };
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsUser.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
 
-  private resizeImageFromUrl(url?: string): void {
+  private resizeImageFromUrl = (url?: string): void => {
     if (url) {
       const img = new Image();
       img.crossOrigin = 'anonymous';
@@ -193,15 +213,15 @@ export class ProfileComponent implements OnInit, OnDestroy {
           const dataUrl = resizeImage(img, this.canvas.nativeElement);
           if (this.resizedImage) {
             this.resizedImage.nativeElement.src = dataUrl;
-            this.cdRef.detectChanges()
+            this.cdRef.detectChanges();
           }
         }
       };
       img.src = url;
     }
-  }
+  };
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
         const user = state.selected;
@@ -241,5 +261,5 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.findMe();
       }
     });
-  }
+  };
 }

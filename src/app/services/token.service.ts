@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { Observable, Subject, Subscription, timer } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, Subject, Subscription, timer } from 'rxjs';
 import { shareReplay, switchMap, takeUntil } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { IUserAll } from '../interfaces/user';
@@ -8,20 +8,18 @@ import { User } from '@firebase/auth';
 import { getNowTimeZone, newDate, plusMinutes } from '../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class TokenService {
   private myTokenCache?: Observable<User | null>;
-  private readonly cacheSize: number;
-  private readonly refreshInterval: number;
-  private myToken?: string;
+  private readonly cacheSize: number = 1;
+  private readonly refreshInterval: number = 55 * 60 * 1000; // 5 min;
   private myUser: any;
   private myTokenSubscription?: Subscription;
   private stopTimer?: Subject<boolean>;
-
-  constructor(private readonly translate: TranslateService, private router: Router, private auth: Auth) {
-    this.cacheSize = 1;
-    this.refreshInterval = 55 * 60 * 1000; // 5 min
-  }
+  private _token$: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
+  private translate: TranslateService = inject(TranslateService);
+  private router: Router = inject(Router);
+  private auth: Auth = inject(Auth);
 
   get user(): IUserAll {
     return this.myUser;
@@ -31,12 +29,12 @@ export class TokenService {
     this.myUser = myUser;
   }
 
-  get token(): string {
-    return this.myToken ? this.myToken : '';
+  get token(): string | null {
+    return this._token$.value;
   }
 
   set token(token: string) {
-    this.myToken = token;
+    this._token$.next(token);
     if (token && !this.myTokenCache) {
       const myStopTimer = new Subject<boolean>();
       this.stopTimer = myStopTimer;
@@ -44,21 +42,27 @@ export class TokenService {
       this.myTokenCache = myTimer.pipe(
         takeUntil(myStopTimer),
         switchMap(() => user(this.auth)),
-        shareReplay(this.cacheSize));
+        shareReplay(this.cacheSize)
+      );
+
       this.myTokenSubscription = this.myTokenCache.subscribe({
-        next: (firebaseUser) => firebaseUser?.getIdTokenResult().then(tokenResult => {
-          const expirationTime = plusMinutes(newDate(tokenResult.expirationTime), -10);
-          if (getNowTimeZone() >= expirationTime) {
-            firebaseUser.getIdToken(true).then(newToken => this.myToken = newToken);
-          }
-        }),
+        next: (firebaseUser) => {
+          firebaseUser?.getIdTokenResult().then(tokenResult => {
+            const expirationTime = plusMinutes(newDate(tokenResult.expirationTime), -10);
+            if (getNowTimeZone() >= expirationTime) {
+              firebaseUser.getIdToken(true).then(newToken => {
+                this._token$.next(newToken);
+              });
+            }
+          });
+        },
         error: () => this.clear(),
         complete: () => this.clear()
       });
     }
   }
 
-  public clear(): void {
+  clear = (): void => {
     if (this.myTokenSubscription) {
       this.myTokenSubscription.unsubscribe();
     }
@@ -67,9 +71,8 @@ export class TokenService {
       this.stopTimer = undefined;
     }
     this.myTokenCache = undefined;
-    this.myToken = undefined;
+    this._token$.next(null);
     this.myUser = undefined;
     this.router.navigate(['/', this.translate.currentLang, 'login']);
-  }
+  };
 }
-

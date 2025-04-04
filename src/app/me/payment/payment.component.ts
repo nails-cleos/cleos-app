@@ -8,11 +8,14 @@ import * as fromActionsPayment from '../../store/payment.actions';
 import { MatTableDataSource } from '@angular/material/table';
 import { Pagination } from '../../interfaces/pagination';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from '../../shared/shared.module';
+import { BackButtonDirective } from '../../directives/back-button.directive';
 
 @Component({
   selector: 'app-payment',
   templateUrl: './payment.component.html',
-  styleUrls: ['./payment.component.scss']
+  styleUrls: ['./payment.component.scss'],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class PaymentComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['position', 'description', 'type', 'amount', 'status', 'actions'];
@@ -27,7 +30,8 @@ export class PaymentComponent implements OnInit, OnDestroy {
   private id: any;
   private path: any;
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private router: Router, private translate: TranslateService) {
+  constructor(private route: ActivatedRoute, private store: Store<AppState>, private router: Router,
+              translate: TranslateService) {
     this.getState = this.store.select(selectPaymentState);
     this.language = translate.currentLang;
   }
@@ -50,15 +54,15 @@ export class PaymentComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  pay(payment: IPaymentAll): void {
+  pay = (payment: IPaymentAll): void => {
     if (payment.link || payment.paymentURL) {
       this.store.dispatch(
         new fromActionsPayment.PaymentSend(payment.link || payment.paymentURL)
       );
     }
-  }
+  };
 
-  notify(payment: IPayment): void {
+  notify = (payment: IPayment): void => {
     this.store.dispatch(
       new fromActionsPayment.PaymentNotify({
         id: payment.id, resourceId: this.id,
@@ -67,9 +71,9 @@ export class PaymentComponent implements OnInit, OnDestroy {
         type: payment.type
       })
     );
-  }
+  };
 
-  getCurrency(payment: IPaymentAll): string {
+  getCurrency = (payment: IPaymentAll): string => {
     let icon = 'euro';
     if (payment.reservation) {
       icon = payment.reservation.room.currency.icon;
@@ -77,9 +81,19 @@ export class PaymentComponent implements OnInit, OnDestroy {
       icon = payment.transaction.account.currency.icon;
     }
     return icon;
-  }
+  };
 
-  private subscribe(): void {
+  private getPayments = (): void => {
+    if (!this.dataSource) {
+      this.store.dispatch(
+        new fromActionsPayment.PaymentFindByResourceId({ id: this.id, path: this.path, redirect: true })
+      );
+    }
+  };
+
+  private clean = (): void => this.store.dispatch(new fromActionsPayment.Clean());
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.dataSource = state.selected;
       const paths = state.paths;
@@ -91,19 +105,5 @@ export class PaymentComponent implements OnInit, OnDestroy {
         this.errorMessage = state.subErrors;
       }
     });
-  }
-
-  private getPayments(): void {
-    if (!this.dataSource) {
-      this.store.dispatch(
-        new fromActionsPayment.PaymentFindByResourceId({ id: this.id, path: this.path, redirect: true })
-      );
-    }
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsPayment.Clean()
-    );
-  }
+  };
 }

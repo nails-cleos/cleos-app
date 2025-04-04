@@ -1,10 +1,8 @@
 import { NgModule } from '@angular/core';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../shared/shared.module';
 import { NotificationRoutingModule } from './notification-routing.module';
 
 import { NotificationsComponent } from './notifications.component';
-import { MatRippleModule } from '@angular/material/core';
 import { EffectsModule } from '@ngrx/effects';
 import { NotificationEffects } from '../store/effects/notification.effects';
 import { NotificationService } from '../services/notification.service';
@@ -14,13 +12,9 @@ import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
 
 @NgModule({
-  declarations: [
-    NotificationsComponent
-  ],
   imports: [
+    NotificationsComponent,
     NotificationRoutingModule,
-    SharedModule,
-    MatRippleModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,

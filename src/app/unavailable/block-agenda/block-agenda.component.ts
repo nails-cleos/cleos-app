@@ -38,11 +38,14 @@ import { closest } from '../../util/numbers';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
+import { SharedModule } from '../../shared/shared.module';
+import { BackButtonDirective } from '../../directives/back-button.directive';
 
 @Component({
   selector: 'app-block-agenda',
   templateUrl: './block-agenda.component.html',
-  styleUrls: ['./block-agenda.component.scss']
+  styleUrls: ['./block-agenda.component.scss'],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() unavailable?: IUnavailable;
@@ -115,7 +118,8 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
       const day = date.getDay();
       const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, date, this.rooms);
 
-      this.setValues(startDate, startTime, getTime(minDate), getTime(maxDate), this.showDuration, this.durationMax, roomAvailability);
+      this.setValues(startDate, startTime, getTime(minDate), getTime(maxDate), this.showDuration, this.durationMax,
+        roomAvailability);
     }
     return;
   }
@@ -170,27 +174,21 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscription?.unsubscribe();
   }
 
-  displayFn(user: IUser): string {
-    return user?.displayName ? user.displayName : '';
-  }
+  displayFn = (user: IUser): string => user?.displayName ? user.displayName : '';
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.roomAvailability);
 
-  getRoom(user: IUser): void {
-    this.store.dispatch(
-      new fromActionsUnavailable.GetRoom(user.id)
-    );
-  }
+  getRoom = (user: IUser): void => this.store.dispatch(new fromActionsUnavailable.GetRoom(user.id));
 
-  keyDownHandler(event: any): void {
+  keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
       this.getForm.professional.setValue('');
       this.setValues();
     }
-  }
+  };
 
-  private setValues(startDate?: any, startTime?: any, minTime?: string, maxTime?: string, showDuration: boolean = false,
-                    durationMax?: any, roomAvailability?: IRoomAll): void {
+  private setValues = (startDate?: any, startTime?: any, minTime?: string, maxTime?: string,
+                       showDuration: boolean = false, durationMax?: any, roomAvailability?: IRoomAll): void => {
     this.getForm.startDate.setValue(startDate);
     this.getForm.startTime.setValue(startTime);
     this.minTime = minTime;
@@ -199,9 +197,9 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
     this.durationMax = durationMax;
     this.roomAvailability = roomAvailability;
     this.getForm.duration.setValue(undefined);
-  }
+  };
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       professional: ['', Validators.required, requireMatchAsync],
       description: [''],
@@ -215,9 +213,9 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
       map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals)
     );
     this.valueChange();
-  }
+  };
 
-  private valueChange(): void {
+  private valueChange = (): void => {
     this.getForm.startDate.valueChanges.subscribe(value => {
       if (value) {
         if (this.rooms.length) {
@@ -243,9 +241,9 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
         this.getRoom(value);
       }
     });
-  }
+  };
 
-  private setMaxMin(startDate: Date, rooms: IRoomAll[]): void {
+  private setMaxMin = (startDate: Date, rooms: IRoomAll[]): void => {
     const day = startDate.getDay();
     const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, startDate, rooms);
     const availability = roomAvailability;
@@ -254,9 +252,9 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
     this.maxTime = getTime(maxDate);
     this.calculateMaxDuration(startDate);
     this.roomAvailability = availability;
-  }
+  };
 
-  private calculateMaxDuration(date: Date): void {
+  private calculateMaxDuration = (date: Date): void => {
     const max = getTimeNumber(this.maxTime);
     if (max) {
       const maxHour = max.hour;
@@ -269,21 +267,13 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
         this.getForm.duration.setValue(undefined);
       }
     }
-  }
+  };
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsUnavailable.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsUnavailable.Clean());
 
-  private getProfessionals(): void {
-    return this.store.dispatch(
-      new fromActionsUnavailable.GetAllProfessional()
-    );
-  }
+  private getProfessionals = (): void => this.store.dispatch(new fromActionsUnavailable.GetAllProfessional());
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.professionals) {
         this.professionals = state.professionals;
@@ -318,19 +308,16 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
         this.router.navigate([this.translate.currentLang, 'unavailable']);
       }
     });
-  }
+  };
 
-  private filter(name: string): IUser[] | undefined {
-    const filterValue = name.toLowerCase();
+  private filter = (name: string): IUser[] | undefined => this.professionals?.filter(
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-    return this.professionals?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private getBlockAgenda(): void {
+  private getBlockAgenda = (): void => {
     if (!this.unavailable) {
       this.store.dispatch(
         new fromActionsUnavailable.UnavailableFind(this.id)
       );
     }
-  }
+  };
 }

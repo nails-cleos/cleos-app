@@ -11,10 +11,11 @@
     <ng-container matColumnDef="position">
       <th *matHeaderCellDef mat-header-cell>#</th>
       <td *matCellDef="let transaction; let i = dataIndex;" mat-cell>
-        <div *ngIf="transaction.id; else skeleton">{{ (paginator.pageIndex * pageSize) + i + 1 }}</div>
-        <ng-template #skeleton>
+        @if (transaction.id) {
+          <div>{{ (paginator.pageIndex * pageSize) + i + 1 }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
@@ -23,10 +24,11 @@
           mat-sort-header>{{ 'ACCOUNT.TRANSACTION.LIST.COLUMN.DATE' | translate }}
       </th>
       <td *matCellDef="let transaction" mat-cell>
-        <div *ngIf="transaction.id; else skeleton">{{ transaction.date | date:'short':undefined:dateFormat }}</div>
-        <ng-template #skeleton>
+        @if (transaction.id) {
+          <div>{{ transaction.date | date:'short':undefined:dateFormat }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
@@ -35,12 +37,11 @@
           mat-sort-header>{{ 'COMMON.COLUMN.AMOUNT' | translate }}
       </th>
       <td *matCellDef="let transaction" class="hide-xs" mat-cell>
-        <div *ngIf="transaction.id; else skeleton">
-          {{ transaction.amount | number:'1.2-2'| currency: account?.currency?.code }}
-        </div>
-        <ng-template #skeleton>
+        @if (transaction.id) {
+          <div>{{ transaction.amount | number:'1.2-2'| currency: account?.currency?.code }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
@@ -49,52 +50,50 @@
           mat-sort-header>{{ 'ACCOUNT.TRANSACTION.LIST.COLUMN.AMOUNT_GIFTED' | translate }}
       </th>
       <td *matCellDef="let transaction" class="hide-xs" mat-cell>
-        <div *ngIf="transaction.id; else skeleton">
-          {{ transaction.amountGifted | number:'1.2-2'| currency: account?.currency?.code }}
-        </div>
-        <ng-template #skeleton>
+        @if (transaction.id) {
+          <div>{{ transaction.amountGifted | number:'1.2-2'| currency: account?.currency?.code }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="payment.status">
       <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
       <td *matCellDef="let transaction" class="hide-xs" mat-cell>
-        <div *ngIf="transaction.id; else skeleton">
-          {{ 'COMMON.STATUS.PAYMENT.' + (transaction.payment?.status || 'NONE') | translate }}
-        </div>
-        <ng-template #skeleton>
+        @if (transaction.id) {
+          <div>{{ 'COMMON.STATUS.PAYMENT.' + (transaction.payment?.status || 'NONE') | translate }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="payment.type">
       <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
       <td *matCellDef="let transaction" class="hide-xs" mat-cell>
-        <div *ngIf="transaction.id; else skeleton">{{ transaction.payment.type }}</div>
-        <ng-template #skeleton>
+        @if (transaction.id) {
+          <div>{{ transaction.payment.type }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="actions">
       <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
       <td *matCellDef="let transaction" class="hide-xs" mat-cell>
-        <div *ngIf="transaction.id; else skeleton">
-          <ng-template [ngIf]="!transaction.deleted">
+        @if (transaction.id) {
+          @if (!transaction.deleted) {
             <button mat-icon-button
                     [routerLink]="['/', language, 'accounts', account?.id, 'transactions', transaction.id]"
                     matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
               <mat-icon color="primary">receipt</mat-icon>
             </button>
-          </ng-template>
-        </div>
-        <ng-template #skeleton>
+          }
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
@@ -103,38 +102,45 @@
         <div [@detailExpand]="transaction === expandedTransaction ? 'expanded' : 'collapsed'"
              class="detail hide-gt-xs">
           <mat-list>
-            <div *ngIf="transaction?.description" matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
-            <mat-list-item *ngIf="transaction?.description" role="list">
-              <div matListItemLine>{{ transaction.description }}</div>
-            </mat-list-item>
-            <div *ngIf="transaction.amount" matListItemTitle>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</div>
-            <mat-list-item *ngIf="transaction.amount">
-              {{ transaction.amount | number:'1.2-2' | currency: account?.currency?.code }}
-            </mat-list-item>
-            <div *ngIf="transaction.amountGifted" matListItemTitle>
-              {{ 'ACCOUNT.TRANSACTION.LIST.COLUMN.AMOUNT_GIFTED' | translate }}
-            </div>
-            <mat-list-item *ngIf="transaction.amountGifted">
-              {{ transaction.amountGifted | number:'1.2-2' | currency: account?.currency?.code }}
-            </mat-list-item>
-            <div *ngIf="transaction.payment?.status" matListItemTitle>{{ 'COMMON.COLUMN.STATUS' | translate }}</div>
-            <mat-list-item *ngIf="transaction.payment?.status">
-              {{ 'COMMON.STATUS.PAYMENT.' + (transaction.payment?.status || 'NONE') | translate }}
-            </mat-list-item>
-            <div *ngIf="transaction.payment?.type" matListItemTitle>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
-            <mat-list-item *ngIf="transaction.payment?.type">
-              {{ 'COMMON.PAYMENT.TYPE.' + (transaction.payment?.type || 'NONE') | translate }}
-            </mat-list-item>
-            <ng-template [ngIf]="!transaction.deleted">
+            @if (transaction.description) {
+              <div matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
+              <mat-list-item role="list">
+                <div matListItemLine>{{ transaction.description }}</div>
+              </mat-list-item>
+            }
+            @if (transaction.amount) {
+              <div matListItemTitle>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</div>
+              <mat-list-item>
+                {{ transaction.amount | number:'1.2-2' | currency: account?.currency?.code }}
+              </mat-list-item>
+            }
+            @if (transaction.amountGifted) {
+              <div matListItemTitle>{{ 'ACCOUNT.TRANSACTION.LIST.COLUMN.AMOUNT_GIFTED' | translate }}</div>
+              <mat-list-item>
+                {{ transaction.amountGifted | number:'1.2-2' | currency: account?.currency?.code }}
+              </mat-list-item>
+            }
+            @if (transaction.payment?.status) {
+              <div matListItemTitle>{{ 'COMMON.COLUMN.STATUS' | translate }}</div>
+              <mat-list-item>
+                {{ 'COMMON.STATUS.PAYMENT.' + (transaction.payment?.status || 'NONE') | translate }}
+              </mat-list-item>
+            }
+            @if (transaction.payment?.type) {
+              <div matListItemTitle>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
+              <mat-list-item>
+                {{ 'COMMON.PAYMENT.TYPE.' + (transaction.payment?.type || 'NONE') | translate }}
+              </mat-list-item>
+            }
+            @if (!transaction.deleted) {
               <div matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
               <mat-list-item role="list">
                 <button [routerLink]="['/', language, 'accounts', account?.id, 'transactions', transaction.id]"
-                        color="primary"
-                        mat-icon-button>
+                        color="primary" mat-icon-button>
                   <mat-icon matListItemIcon>receipt</mat-icon>
                 </button>
               </mat-list-item>
-            </ng-template>
+            }
           </mat-list>
         </div>
       </td>
@@ -153,5 +159,7 @@
 
     <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
   </table>
-  <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+  @if (resultsLength) {
+    <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+  }
 </div>

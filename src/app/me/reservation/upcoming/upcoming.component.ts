@@ -6,12 +6,16 @@ import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { createNewDate, isSameTimeZone, newDateTimestamp, reservationDuration } from '../../../util/dates';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { SharedModule } from '../../../shared/shared.module';
+import { RoomNamePipe } from '../../../pipes/room-name.pipe';
+import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
 
 @Component({
   selector: 'app-upcoming',
   animations: [transitionAnimation, stampAnimation],
   templateUrl: './upcoming.component.html',
-  styleUrls: ['./upcoming.component.scss']
+  styleUrls: ['./upcoming.component.scss'],
+  imports: [SharedModule, RoomNamePipe, CurrencySymbolPipe]
 })
 export class UpcomingComponent implements OnChanges {
   @Input() upcoming: IUpcomingAll | undefined;
@@ -31,24 +35,26 @@ export class UpcomingComponent implements OnChanges {
 
   get edit(): void {
     if (this.upcoming && !this.upcoming.canEdit) {
-      return customerEditDialog(this.dialog, this.router, this.upcoming.id, this.upcoming.room.currency, this.small, this.language,
+      return customerEditDialog(this.dialog, this.router, this.upcoming.id, this.upcoming.room.currency, this.small,
+        this.language,
         this.upcoming.price);
     }
     this.router.navigate([this.language, 'me', 'reservation', this.upcoming?.id]);
     return;
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ngOnChanges(_changes: SimpleChanges): void {
     this.loadUpcoming();
   }
 
-  openDialog(reservationDate: Date): void {
+  openDialog = (reservationDate: Date): void => {
     if (this.upcoming) {
       openDialog(this.upcoming.room, this.dateFormat, this.translate, this.dialog, reservationDate);
     }
-  }
+  };
 
-  private loadUpcoming(): void {
+  private loadUpcoming = (): void => {
     if (this.upcoming && this.upcoming.id) {
       let rowSpan = 0;
       if (this.upcoming.additional) {
@@ -68,5 +74,5 @@ export class UpcomingComponent implements OnChanges {
 
       this.upcoming = Object.assign({}, this.upcoming, { rowSpan, price, end, start });
     }
-  }
+  };
 }

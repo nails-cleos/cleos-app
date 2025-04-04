@@ -1,15 +1,13 @@
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-
-import { NoopInterceptor } from './noop-interceptor';
-import { AuthInterceptor } from './auth-interceptor';
-import { ErrorInterceptor } from './error-interceptor';
-import { RequestOptionInterceptor } from './request-option-interceptor';
+import { noopInterceptor } from './noop-interceptor';
+import { authInterceptor } from './auth-interceptor';
+import { errorInterceptor } from './error-interceptor';
+import { requestOptionInterceptor } from './request-option-interceptor';
 
 export const httpInterceptorProviders = [
-  { provide: HTTP_INTERCEPTORS, useClass: NoopInterceptor, multi: true },
-  { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-  { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
-  { provide: HTTP_INTERCEPTORS, useClass: RequestOptionInterceptor, multi: true }
+  noopInterceptor,
+  authInterceptor,
+  errorInterceptor,
+  requestOptionInterceptor,
 ];
 
 export const isExternalUrl = (url: string): boolean =>

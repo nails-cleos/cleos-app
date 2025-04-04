@@ -9,11 +9,14 @@ import { Router } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
 import { sendPasswordResetEmail } from '@firebase/auth';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from '../../shared/shared.module';
+import { BackButtonDirective } from '../../directives/back-button.directive';
 
 @Component({
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
-  styleUrls: ['./forgot-password.component.scss']
+  styleUrls: ['./forgot-password.component.scss'],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class ForgotPasswordComponent implements OnInit, OnDestroy {
 
@@ -49,19 +52,15 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsLogin.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsLogin.Clean());
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       email: ['', Validators.required]
     });
-  }
+  };
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {
       if (state.errorMessage || state.message) {
         const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
@@ -74,5 +73,5 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
+  };
 }

@@ -12,30 +12,25 @@ import * as fromActionsLogin from '../store/auth.actions';
   providedIn: 'root'
 })
 export class PermissionsService {
+  private snackBar: MatSnackBar = inject(MatSnackBar);
+  private router: Router = inject(Router);
+  private store: Store<AppState> = inject(Store<AppState>);
+  private translate: TranslateService = inject(TranslateService);
 
-  getState: Observable<any>;
-  currentUser!: IUser;
+  getState: Observable<any> = this.store.select(selectAuthState);
+  currentUser?: IUser;
   token!: string;
 
-  private readonly data: any;
+  private readonly data: any = this.router.getCurrentNavigation()?.extras?.state;
 
-  constructor(private snackBar: MatSnackBar, private router: Router, private store: Store<AppState>, private translate: TranslateService) {
-    this.getState = this.store.select(selectAuthState);
-    this.getState.subscribe((state) => {
-      this.currentUser = state.user;
-    });
-    this.data = this.router.getCurrentNavigation()?.extras.state;
+  constructor() {
+    this.getState.subscribe((state) => this.currentUser = state.user);
   }
 
-  private static hasRole(route: ActivatedRouteSnapshot, user: IUser): boolean {
-    if (route.data.roles && user.authorities) {
-      return user.authorities.some(au => route.data.roles.includes(au.authority));
-    }
+  private static hasRole = (route: ActivatedRouteSnapshot, user: IUser): boolean => route.data.roles &&
+  user.authorities ? user.authorities.some(au => route.data.roles.includes(au.authority)) : false;
 
-    return false;
-  }
-
-  public canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+  canActivate = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean => {
     if (this.currentUser) {
       if (PermissionsService.hasRole(route, this.currentUser)) {
         return true;
@@ -60,7 +55,7 @@ export class PermissionsService {
     this.router.navigate([this.translate.currentLang, 'auth'], { queryParams: { state: queryParams } });
 
     return false;
-  }
+  };
 }
 
 export const authGuard: CanActivateFn = (next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean =>

@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 
 import { CurrencyRoutingModule } from './currency-routing.module';
 import { CurrencyComponent } from './currency.component';
-import { SharedModule } from '../shared/shared.module';
 import { CurrencyListComponent } from './list/currency-list.component';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EffectsModule } from '@ngrx/effects';
@@ -14,13 +13,10 @@ import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
 
 @NgModule({
-  declarations: [
-    CurrencyComponent,
-    CurrencyListComponent
-  ],
   imports: [
+    CurrencyComponent,
+    CurrencyListComponent,
     CurrencyRoutingModule,
-    SharedModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,

@@ -1,3 +1,5 @@
+import packageJson from '../../package.json';
+
 export const environment = {
   production: true,
   useEmulators: false,
@@ -8,7 +10,7 @@ export const environment = {
   appDomain: 'nailscleos.nl',
   appServer: 'https://www.nailscleos.nl',
   title: 'Cleos',
-  version: require('../../package.json').version,
+  version: packageJson.version,
   baseUrl: 'https://api.nailscleos.nl/api',
   googleClientId: '174727853234-3pdb4doq776uuklfr7jsfp5ll33ork6c.apps.googleusercontent.com',
   facebookClientId: '523962545388946',

@@ -1,17 +1,23 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { SharedModule } from '../../shared/shared.module';
+import {
+  ReactiveFormsModule,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators
+} from '@angular/forms';
 import { ChangeCustomerDialogComponent } from './change-customer-dialog.component';
 import { filterDateRoom, getAvailability, getNowTimeZone, getStartEndDay, getTime } from '../../util/dates';
 import { addMonths } from 'date-fns';
 import { MAX_RESERVATION_MONTH } from '../../interfaces/reservation';
+import { AppMaterialModule } from '../../util/app-material.module';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-reservation-clone-dialog',
-  standalone: true,
-  imports: [SharedModule],
-  templateUrl: './reservation-clone-dialog.component.html'
+  templateUrl: './reservation-clone-dialog.component.html',
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe]
 })
 export class ReservationCloneDialogComponent {
   form!: UntypedFormGroup;
@@ -41,7 +47,7 @@ export class ReservationCloneDialogComponent {
     if (max) {
       this.maxDate = getTime(max);
     }
-    this.time.setValue(this.minDate)
+    this.time.setValue(this.minDate);
   }
 
   get onNoClick(): void {
@@ -54,10 +60,10 @@ export class ReservationCloneDialogComponent {
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.data.room);
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       date: this.date,
       start: this.time
     });
-  }
+  };
 }

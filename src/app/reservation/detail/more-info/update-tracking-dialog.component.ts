@@ -1,17 +1,15 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { FormControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { SharedModule } from '../../../shared/shared.module';
+import { FormControl, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { API_LOCALE, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
+import { AppMaterialModule } from '../../../util/app-material.module';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
-  selector: 'app-update-tracking-dialog',
-  standalone: true,
-  imports: [
-    SharedModule
-  ],
-  templateUrl: './update-tracking-dialog.component.html',
-  styleUrl: './update-tracking-dialog.component.scss',
+    selector: 'app-update-tracking-dialog',
+    templateUrl: './update-tracking-dialog.component.html',
+    styleUrl: './update-tracking-dialog.component.scss',
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe]
 })
 export class UpdateTrackingDialogComponent implements OnInit {
   trackingForm!: UntypedFormGroup;
@@ -20,8 +18,8 @@ export class UpdateTrackingDialogComponent implements OnInit {
   completedDate: FormControl<Date | null> = new FormControl(null);
   completedTime: FormControl<any | null> = new FormControl('');
 
-  private readonly startedDateTime?: Date
-  private readonly completedDateTime?: Date
+  private readonly startedDateTime?: Date;
+  private readonly completedDateTime?: Date;
 
   constructor(public dialogRef: MatDialogRef<UpdateTrackingDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
               private formBuilder: UntypedFormBuilder) {
@@ -46,7 +44,7 @@ export class UpdateTrackingDialogComponent implements OnInit {
       started = this.startedDate.value?.toLocaleString(API_LOCALE);
     }
     if (this.completedDateTime?.getTime() !== this.completedDate.value?.getTime()) {
-      completed = this.completedDate.value?.toLocaleString(API_LOCALE)
+      completed = this.completedDate.value?.toLocaleString(API_LOCALE);
     }
     if (started || completed) {
       return this.dialogRef.close({ started, completed });
@@ -59,17 +57,17 @@ export class UpdateTrackingDialogComponent implements OnInit {
     this.createForm();
   }
 
-  timeChange($event: string, dateForm: FormControl): void {
+  timeChange = ($event: string, dateForm: FormControl): void => {
     const time = getTimeNumber($event);
     dateForm.value.setHours(time?.hour || 0, time?.minute || 0);
-  }
+  };
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.trackingForm = this.formBuilder.group({
       startedDate: this.startedDate,
       startedTime: this.startedTime,
       completedDate: this.completedDate,
       completedTime: this.completedTime
     });
-  }
+  };
 }

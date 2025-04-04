@@ -6,11 +6,13 @@ import { ITreatmentAll } from '../../interfaces/treatment';
 import { DEFAULT_LENGTH, PAGE_SIZE } from '../../interfaces/pagination';
 import { convertDuration } from '../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from '../../shared/shared.module';
 
 @Component({
   selector: 'app-treatment-table',
   templateUrl: './treatment-table.component.html',
-  styleUrls: ['./treatment-table.component.scss']
+  styleUrls: ['./treatment-table.component.scss'],
+  imports: [SharedModule]
 })
 export class TreatmentTableComponent implements AfterViewInit, OnChanges {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -32,12 +34,13 @@ export class TreatmentTableComponent implements AfterViewInit, OnChanges {
     this.dataSource.paginator = this.paginator;
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ngOnChanges(_changes: SimpleChanges): void {
     this.dataSource = this.treatment?.map(p => {
       if (p.duration) {
         const duration = convertDuration(p.duration);
 
-        return Object.assign({}, p, {hour: duration.hour, minute: duration.minute});
+        return Object.assign({}, p, { hour: duration.hour, minute: duration.minute });
       }
       return p;
     });

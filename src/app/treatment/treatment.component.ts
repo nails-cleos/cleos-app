@@ -1,5 +1,12 @@
 import { ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
+import {
+  AbstractControl,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators,
+  ɵTypedOrUntyped
+} from '@angular/forms';
 import * as fromActionsTreatment from '../store/treatment.actions';
 import { AppState, selectTreatmentState } from '../store/app.states';
 import { Store } from '@ngrx/store';
@@ -13,11 +20,14 @@ import { map, startWith } from 'rxjs/operators';
 import { fieldChange } from '../util/validators';
 import { areEquals } from '../util/helper';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from '../shared/shared.module';
+import { BackButtonDirective } from '../directives/back-button.directive';
 
 @Component({
   selector: 'app-treatment',
   templateUrl: './treatment.component.html',
-  styleUrls: ['./treatment.component.scss']
+  styleUrls: ['./treatment.component.scss'],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class TreatmentComponent implements OnInit, OnDestroy {
   @ViewChild('inputName') inputName: ElementRef<HTMLInputElement> | undefined;
@@ -123,56 +133,45 @@ export class TreatmentComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  removeTab(index: number): void {
+  removeTab = (index: number): void => {
     this.treatments.splice(index, 1);
-  }
+  };
 
-  setValue(treatment: ITreatment, attribute: string, $event: any): void {
-    // @ts-ignore
+  setValue = (treatment: ITreatment, attribute: string, $event: any): void => {
+    // @ts-expect-error assign value in treatment[attribute]
     treatment[attribute] = $event.target.value;
-  }
+  };
 
-  setTime(treatment: ITreatment, $event: any): void {
+  setTime = (treatment: ITreatment, $event: any): void => {
     const time = getTimeNumber($event);
     const date = createNewDate(getNowTimeZone(), time?.hour, time?.minute);
     treatment.time = getTime(date);
-  }
+  };
 
-  setPrimary(tab: ITreatment): void {
-    this.treatments = this.treatments.map(t => {
-      t.primary = false;
-      return t;
-    });
-
-    tab.primary = true;
-  }
-
-  remove(color: IColorAll): void {
+  remove = (color: IColorAll): void => {
     const index = this.colors.indexOf(color);
     if (index >= 0) {
       this.colors.splice(index, 1);
       this.allColors?.push(color);
       this.getForm.color.setValue(null);
     }
-  }
+  };
 
-  selectedColor(event: MatAutocompleteSelectedEvent): void {
+  selectedColor = (event: MatAutocompleteSelectedEvent): void => {
     const color = event.option.value;
     this.colors.push(color);
     this.allColors = this.allColors?.filter(c => c.id !== color.id);
     this.colorInput.nativeElement.value = '';
     this.getForm.color.setValue(null);
-  }
+  };
 
-  sortColors(data: any): IColorAll[] {
-    return data.sort((a: any, b: any) => {
-      const aName = a.name.toUpperCase();
-      const bName = b.name.toUpperCase();
-      return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
-    });
-  }
+  sortColors = (data: any): IColorAll[] => data.sort((a: any, b: any) => {
+    const aName = a.name.toUpperCase();
+    const bName = b.name.toUpperCase();
+    return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
+  });
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       name: ['', Validators.required],
       description: [''],
@@ -186,9 +185,24 @@ export class TreatmentComponent implements OnInit, OnDestroy {
       map(
         name => name ? this.filter(name) : (this.allColors ? this.allColors.slice() : this.allColors))
     );
-  }
+  };
 
-  private subscribe(): void {
+  private filter = (name: string): IColorAll[] | undefined => this.allColors?.filter(
+    option => option?.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+
+  private getColors = (): void => this.store.dispatch(new fromActionsTreatment.GetColors());
+
+  private clean = (): void => this.store.dispatch(new fromActionsTreatment.Clean());
+
+  private getTreatment = (): void => {
+    if (!this.group) {
+      this.store.dispatch(
+        new fromActionsTreatment.TreatmentFind({ id: this.id, path: 'edit' })
+      );
+    }
+  };
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.allColors = state.colors;
       if (state.selected) {
@@ -220,31 +234,5 @@ export class TreatmentComponent implements OnInit, OnDestroy {
         this.router.navigate([this.translate.currentLang, 'treatments']);
       }
     });
-  }
-
-  private filter(name: string): IColorAll[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.allColors?.filter(option => option?.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private getColors(): void {
-    this.store.dispatch(
-      new fromActionsTreatment.GetColors()
-    );
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsTreatment.Clean()
-    );
-  }
-
-  private getTreatment(): void {
-    if (!this.group) {
-      this.store.dispatch(
-        new fromActionsTreatment.TreatmentFind({ id: this.id, path: 'edit' })
-      );
-    }
-  }
+  };
 }

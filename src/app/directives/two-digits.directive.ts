@@ -1,23 +1,20 @@
-import { Directive, ElementRef, HostListener, Input } from '@angular/core';
+import { Directive, ElementRef, HostListener, inject, Input } from '@angular/core';
 
 @Directive({
-  selector: '[appTwoDigits]'
+  selector: '[appTwoDigits]',
 })
 export class TwoDigitsDirective {
-  @Input() allowNegatives: boolean;
+  @Input() allowNegatives: boolean = false;
 
-  private regex: RegExp;
+  private el: ElementRef = inject(ElementRef);
+
+  private regex: RegExp = new RegExp(/^\d*\.?\d{0,2}$/g);
   // Allow key codes for special events. Reflect :
   // Backspace, tab, end, home
   private specialKeys: Array<string> = ['Backspace', 'Tab', 'End', 'Home', 'ArrowLeft', 'ArrowRight', 'Del', 'Delete'];
 
-  constructor(private el: ElementRef) {
-    this.allowNegatives = false;
-    this.regex = new RegExp(/^\d*\.?\d{0,2}$/g);
-  }
-
   @HostListener('keydown', ['$event'])
-  onKeyDown(event: KeyboardEvent): void {
+  onKeyDown = (event: KeyboardEvent): void => {
     // Allow Backspace, tab, end, and home keys
     if (this.specialKeys.indexOf(event.key) !== -1) {
       return;
@@ -29,9 +26,10 @@ export class TwoDigitsDirective {
 
     const current: string = this.el.nativeElement.value;
     const position = this.el.nativeElement.selectionStart;
-    const next: string = [current.slice(0, position), event.key === 'Decimal' ? '.' : event.key, current.slice(position)].join('');
+    const next: string = [current.slice(0, position), event.key === 'Decimal' ? '.' : event.key,
+      current.slice(position)].join('');
     if (next && !String(next).match(this.regex) || String(next).match(new RegExp(/^0[0-9]$/g))) {
       event.preventDefault();
     }
-  }
+  };
 }

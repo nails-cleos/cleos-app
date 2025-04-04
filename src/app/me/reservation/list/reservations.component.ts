@@ -20,12 +20,18 @@ import { isToday } from 'date-fns';
 import { Router } from '@angular/router';
 import { IPayment } from '../../../interfaces/payment';
 import { Analytics, logEvent } from '@angular/fire/analytics';
+import { SharedModule } from '../../../shared/shared.module';
+import { UpcomingComponent } from '../upcoming/upcoming.component';
+import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
+import { ReservationIconPipe } from '../../../pipes/reservation-icon.pipe';
+import { ErrorComponent } from '../../../shared/error/error.component';
 
 @Component({
   selector: 'app-reservations',
   animations: [transitionAnimation, stampAnimation],
   templateUrl: './reservations.component.html',
-  styleUrls: ['./reservations.component.scss']
+  styleUrls: ['./reservations.component.scss'],
+  imports: [SharedModule, UpcomingComponent, TimeDetailPipe, ReservationIconPipe, ErrorComponent]
 })
 export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -73,10 +79,6 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
-  showTimeZone(reservation: IReservationAll): boolean {
-    return !isSameTimeZone(reservation.room.timeZone);
-  }
-
   ngOnInit(): void {
     this.clean();
     this.subscribe();
@@ -98,8 +100,10 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  onRatingChanged(reservation: IReservationAll): void {
-    executeDialogNoWidth(this.dialog, ReviewDialogComponent, reservation, result => {
+  showTimeZone = (reservation: IReservationAll): boolean => !isSameTimeZone(reservation.room.timeZone);
+
+  onRatingChanged = (reservation: IReservationAll): void => executeDialogNoWidth(
+    this.dialog, ReviewDialogComponent, reservation, result => {
       if (result && result.rating) {
         const review: IReview = new Review(result.rating);
         review.reservationId = reservation?.id;
@@ -108,33 +112,26 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
           new fromActionsReservation.ReservationReview(review)
         );
       }
-    });
-  }
+    }
+  );
 
-  openDialog(reservation: IReservationAll): void {
+  openDialog = (reservation: IReservationAll): void => {
     const time = newDateTimestamp(reservation.timestamp);
     openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
-  }
+  };
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsReservation.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsReservation.Clean());
 
-  private getReservations(page: number = 0): void {
-    const payload = {
+  private getReservations = (page: number = 0): void => this.store.dispatch(
+    new fromActionsReservation.GetCustomerReservations({
       active: this.sort.active,
       direction: this.sort.direction,
       size: this.pageSize,
       page
-    };
-    this.store.dispatch(
-      new fromActionsReservation.GetCustomerReservations(payload)
-    );
-  }
+    })
+  );
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.error = state.error;
       this.data = state.customerReservation;
@@ -183,5 +180,5 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
         }
       }
     });
-  }
+  };
 }

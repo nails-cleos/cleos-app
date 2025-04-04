@@ -2,7 +2,14 @@ import { ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, Vie
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectAdditionalState } from '../store/app.states';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
+import {
+  AbstractControl,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators,
+  ɵTypedOrUntyped
+} from '@angular/forms';
 import { Additional, IAdditional } from '../interfaces/additional';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as fromActionsAdditional from '../store/additional.actions';
@@ -13,11 +20,14 @@ import { formatDuration } from '../util/dates';
 import { areEquals } from '../util/helper';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from '../shared/shared.module';
+import { BackButtonDirective } from '../directives/back-button.directive';
 
 @Component({
   selector: 'app-additional',
   templateUrl: './additional.component.html',
-  styleUrls: ['./additional.component.scss']
+  styleUrls: ['./additional.component.scss'],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class AdditionalComponent implements OnInit, OnDestroy {
   @Input() additional?: IAdditional;
@@ -93,32 +103,30 @@ export class AdditionalComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  remove(group: IGroupService): void {
+  remove = (group: IGroupService): void => {
     const index = this.groups.indexOf(group);
     if (index >= 0) {
       this.groups.splice(index, 1);
       this.allGroups?.push(group);
       this.getForm.group.setValue(null);
     }
-  }
+  };
 
-  selectedGroup(event: MatAutocompleteSelectedEvent): void {
+  selectedGroup = (event: MatAutocompleteSelectedEvent): void => {
     const group = event.option.value;
     this.groups.push(group);
     this.allGroups = this.allGroups?.filter(c => c.id !== group.id);
     this.groupInput.nativeElement.value = '';
     this.getForm.group.setValue(null);
-  }
+  };
 
-  sortGroups(data: any): IGroupService[] {
-    return data.sort((a: any, b: any) => {
-      const aName = a.name.toUpperCase();
-      const bName = b.name.toUpperCase();
-      return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
-    });
-  }
+  sortGroups = (data: any): IGroupService[] => data.sort((a: any, b: any) => {
+    const aName = a.name.toUpperCase();
+    const bName = b.name.toUpperCase();
+    return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
+  });
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       description: [''],
       name: ['', Validators.required],
@@ -132,35 +140,24 @@ export class AdditionalComponent implements OnInit, OnDestroy {
       map(
         name => name ? this.filterGroup(name) : (this.allGroups ? this.allGroups.slice() : this.allGroups))
     );
-  }
+  };
 
-  private filterGroup(name: string): IGroupService[] | undefined {
-    const filterValue = name.toLowerCase();
+  private filterGroup = (name: string): IGroupService[] | undefined => this.allGroups?.filter(
+    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-    return this.allGroups?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
+  private findGroups = (): void => this.store.dispatch(new fromActionsAdditional.FindGroups());
 
-  private findGroups(): void {
-    this.store.dispatch(
-      new fromActionsAdditional.FindGroups()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsAdditional.Clean());
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsAdditional.Clean()
-    );
-  }
-
-  private getAdditional(): void {
+  private getAdditional = (): void => {
     if (!this.additional) {
       this.store.dispatch(
         new fromActionsAdditional.AdditionalFind(this.id)
       );
     }
-  }
+  };
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.allGroups = state.groups;
       if (state.selected) {
@@ -188,5 +185,5 @@ export class AdditionalComponent implements OnInit, OnDestroy {
         this.router.navigate([this.language, 'additional']);
       }
     });
-  }
+  };
 }

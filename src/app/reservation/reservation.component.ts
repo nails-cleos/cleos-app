@@ -1,7 +1,23 @@
-import { AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { STEPPER_GLOBAL_OPTIONS, StepperSelectionEvent } from '@angular/cdk/stepper';
-import { FormArray, FormGroup, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { map, startWith } from 'rxjs/operators';
+import {
+  FormArray,
+  FormGroup,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators
+} from '@angular/forms';
+import { map, shareReplay, startWith } from 'rxjs/operators';
 import { IUser, IUserAll } from '../interfaces/user';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -23,7 +39,7 @@ import {
   MAX_RESERVATION_MONTH,
   Reservation
 } from '../interfaces/reservation';
-import { CalendarEvent, CalendarEventTimesChangedEvent } from 'angular-calendar';
+import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarModule } from 'angular-calendar';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
@@ -54,10 +70,9 @@ import {
   newDateTimestamp,
   plusDays,
   reservationDuration,
-  searchDates,
   totalDuration
 } from '../util/dates';
-import { createBullet, fillNotAvailable, getFrequency, getOverlapEvent, Meta, newEvent } from '../util/event';
+import { createBullet, fillNotAvailable, getFrequency, Meta, newEvent } from '../util/event';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Role } from '../interfaces/token';
 import { IUnavailableAll } from '../interfaces/unavailable';
@@ -72,16 +87,17 @@ import {
   newPrice,
   openDialog,
   removeDiscount,
-  roomDetail
+  roomDetail,
+  validateUnavailableEvent
 } from '../util/helper';
 import { transitionAnimation } from '../util/animation';
-import { addDays, addMonths, isEqual, isSameDay } from 'date-fns';
+import { addDays, addMonths, isEqual } from 'date-fns';
 import { findStateColor } from '../util/theme';
 import { IAdditionalAll } from '../interfaces/additional';
 import { MatListOption } from '@angular/material/list';
 import { IOffice } from '../interfaces/office';
 import { IStep, Step } from '../interfaces/step';
-import { TimeZoneSnackBarComponent } from '../shared/snak/time-zone/time-zone-snack-bar.component';
+import { TimeZoneSnackBarComponent } from '../shared/snack/time-zone/time-zone-snack-bar.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SelectProfessionalDialogComponent } from './select-professional-dialog.component';
 import { AuthUserService } from '../services/auth-user.service';
@@ -97,6 +113,14 @@ import {
   getStepOptional
 } from '../util/step';
 import { PaymentType } from '../interfaces/payment';
+import { SharedModule } from '../shared/shared.module';
+import { RoomNamePipe } from '../pipes/room-name.pipe';
+import { SortByPipe } from '../pipes/sort-by.pipe';
+import { CurrencySymbolPipe } from '../pipes/currency-symbol.pipe';
+import { DurationTimePipe } from '../pipes/durationTime.pipe';
+import { PricePreviewComponent } from '../shared/price-preview/price-preview.component';
+import { BackButtonDirective } from '../directives/back-button.directive';
+import { GoogleMapComponent } from '../shared/google-map/google-map.component';
 import PlaceResult = google.maps.places.PlaceResult;
 
 @Component({
@@ -106,9 +130,23 @@ import PlaceResult = google.maps.places.PlaceResult;
   styleUrls: ['./reservation.component.scss'],
   providers: [{
     provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false }
-  }]
+  }],
+  imports: [SharedModule, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe, PricePreviewComponent,
+    CalendarModule, BackButtonDirective, GoogleMapComponent]
 })
 export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
+  readonly dialog = inject(MatDialog);
+  private readonly snackBar: MatSnackBar = inject(MatSnackBar);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly store: Store<AppState> = inject(Store<AppState>);
+  private readonly formBuilder: UntypedFormBuilder = inject(UntypedFormBuilder);
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly router: Router = inject(Router);
+  private readonly route: ActivatedRoute = inject(ActivatedRoute);
+  private readonly cdRef: ChangeDetectorRef = inject(ChangeDetectorRef);
+
+  private authUserService: AuthUserService = inject(AuthUserService);
+
   @Input() dataEvents: Map<string, IDataEvent> = new Map();
   @ViewChild('stepper') myStepper!: MatStepper;
 
@@ -137,7 +175,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   discounts?: IUserDiscount[];
   discount = new UntypedFormControl();
   showDiscount = false;
-  price: IPrice;
+  price: IPrice = new Price();
 
   officeForm!: UntypedFormGroup;
   offices?: IOffice[];
@@ -159,7 +197,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   additionalList: IAdditionalAll[] = [];
   additionalSelected: IAdditionalAll[] = [];
-  customerAdditionalIds: string[] = [];
+  customerAdditionalIds?: string[];
 
   configurationForm!: UntypedFormGroup;
   customerChange: UntypedFormControl = new UntypedFormControl();
@@ -173,10 +211,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   daysInWeek = 7;
   weekendDays: number[] = [0, 6];
-  day: IDay;
+  day: IDay = new Day();
   refresh: Subject<any> = new Subject();
 
-  dateFormat: string;
+  dateFormat: string = this.translate.currentLang;
   smallScreen?: boolean;
   isPreview = false;
   totalDurationFormatted?: string;
@@ -187,49 +225,56 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   minDate: string = '';
   maxDate: string = '';
-  maxCalendarDate: Date;
+  maxCalendarDate: Date = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
   types: string[] = [PaymentType.cash, PaymentType.transfer];
+
+  handset$: Observable<{
+    smallScreen: boolean;
+    daysInWeek: number;
+    lessDays: number;
+  }> = this.breakpointObserver.observe([
+    Breakpoints.XSmall,
+    Breakpoints.Small
+  ]).pipe(
+    map(result => ({
+      smallScreen: result.matches,
+      daysInWeek: result.matches ? 3 : 7,
+      lessDays: result.matches ? 1 : 3
+    })),
+    shareReplay()
+  );
 
   private treatmentId?: string;
   private roomId?: string;
   private professionalId?: string;
   private additionalIds?: string[];
-  private skip: boolean;
+  private skip: boolean = false;
   private isDarkMode = false;
   private lessDays = 3;
   private reservation?: IReservationAll;
-  private getState: Observable<any>;
+  private getState: Observable<any> = this.store.select(selectReservationState);
   private subscription?: Subscription;
-  private authUserServiceSubscription: Subscription;
+  private handsetSubscription: Subscription =
+    this.handset$.subscribe(({ smallScreen, daysInWeek, lessDays }) => {
+      this.smallScreen = smallScreen;
+      this.daysInWeek = daysInWeek;
+      this.lessDays = lessDays;
+    });
+  private authUserServiceSubscription: Subscription = this.authUserService.authUser.subscribe(value => {
+    this.isAdmin = value.isAdmin;
+    this.isDarkMode = value.isDarkMode;
+  });
   private steps: IStep[];
   private dismiss = false;
   private treatmentDiscount?: IDiscount;
   private totalDuration: IDuration = new Duration();
+  private alreadyCreated = false;
   private readonly groupId?: string;
   private readonly isDashboard = false;
-  private readonly extras: any;
-  private readonly language: string;
+  private readonly extras: any = this.router.getCurrentNavigation()?.extras.state;
+  private readonly language: string = this.translate.currentLang;
 
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private formBuilder: UntypedFormBuilder, breakpointObserver: BreakpointObserver, private router: Router,
-              private route: ActivatedRoute, private cdRef: ChangeDetectorRef, private snackBar: MatSnackBar,
-              private authUserService: AuthUserService) {
-    this.price = new Price();
-    this.day = new Day();
-    this.getState = this.store.select(selectReservationState);
-    this.dateFormat = this.translate.currentLang;
-    this.skip = false;
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small
-    ]).subscribe(result => {
-      this.smallScreen = result.matches;
-      if (this.smallScreen) {
-        this.daysInWeek = 3;
-        this.lessDays = 1;
-      }
-    });
-    this.extras = this.router.getCurrentNavigation()?.extras.state;
+  constructor() {
     if (this.extras) {
       this.customer.setValue(this.extras.customer);
       this.isDashboard = this.extras.isDashboard;
@@ -240,11 +285,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.skip = this.extras.skip;
       this.additionalIds = this.extras.additionalIds;
     }
-    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
-      this.isAdmin = value.isAdmin;
-      this.isDarkMode = value.isDarkMode;
-    });
-    this.maxCalendarDate = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
     const preview = new Step(6, 'preview', () => this.create);
     const book = new Step(5, 'book_online', (goNext: boolean) => this.callStepSeven(goNext), preview);
     const settings = new Step(4, 'settings', (goNext: boolean) => this.callStepSix(goNext), book);
@@ -253,7 +293,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const room = new Step(1, 'room', (goNext: boolean) => this.callStepThree(goNext), treatment);
     const customer = new Step(0, 'person_search', (goNext: boolean) => this.callStepTwo(goNext), room);
     this.steps = [customer, room, treatment, additional, settings, book, preview];
-    this.language = this.translate.currentLang;
   }
 
   get dateTimeList(): FormArray {
@@ -278,6 +317,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   get back(): void {
     if (this.isPreview) {
       this.isPreview = false;
+      this.alreadyCreated = true;
     } else {
       this.cleanEvent();
     }
@@ -289,7 +329,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   get create(): void {
     const reservation: IReservation = new Reservation();
     reservation.customerId = this.customer.value.id;
-    const dates: string[] = this.events.value?.map((calendarEvent: any) => calendarEvent.event.start.toLocaleString(API_LOCALE)) ?? [];
+    const dates: string[] = this.events.value?.map(
+      (calendarEvent: any) => calendarEvent.event.start.toLocaleString(API_LOCALE)) ?? [];
     if (dates.length) {
       reservation.start = dates.shift();
       reservation.moreStart = dates;
@@ -402,13 +443,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
     this.authUserServiceSubscription.unsubscribe();
+    this.handsetSubscription.unsubscribe();
   }
 
-  triggerClick(event: StepperSelectionEvent): void {
-    return getStepCall(this.steps, event.selectedIndex - 1);
-  }
+  triggerClick = (event: StepperSelectionEvent): void => getStepCall(this.steps, event.selectedIndex - 1);
 
-  callStepTwo(goNext: boolean): void {
+  callStepTwo = (goNext: boolean): void => {
     if (this.customerForm.invalid) {
       return;
     }
@@ -418,9 +458,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.cleanEvent();
     }
     completeAndNext(this.steps, this.myStepper, goNext);
-  }
+  };
 
-  callStepThree(goNext: boolean): void {
+  callStepThree = (goNext: boolean): void => {
     if (this.officeForm.invalid) {
       return;
     }
@@ -430,9 +470,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.cleanEvent();
     }
     completeAndNext(this.steps, this.myStepper, goNext);
-  }
+  };
 
-  callStepFour(goNext: boolean): void {
+  callStepFour = (goNext: boolean): void => {
     if (this.treatmentForm.invalid) {
       return;
     }
@@ -442,17 +482,17 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.cleanEvent();
     }
     completeAndNext(this.steps, this.myStepper, goNext);
-  }
+  };
 
-  callStepFive(goNext: boolean): void {
+  callStepFive = (goNext: boolean): void => {
     if (!goNext) {
       this.isPreview = false;
       this.cleanEvent();
     }
     completeAndNext(this.steps, this.myStepper, goNext);
-  }
+  };
 
-  callStepSix(goNext: boolean): void {
+  callStepSix = (goNext: boolean): void => {
     if (this.configurationForm.invalid) {
       return;
     }
@@ -496,7 +536,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           eventData.addEvents(events);
           eventData.updateLength(eventData.calendarEvents.length);
         } else {
-          this.dataEvents.set(dateValue, new DataEvent(events, i, date, events.length));
+          this.dataEvents.set(dateValue, new DataEvent(events, i, date, events.length, this.room.value));
         }
         dates.push(value.date);
       });
@@ -511,18 +551,25 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       );
     }
     completeAndNext(this.steps, this.myStepper, goNext);
-  }
+  };
 
-  callStepSeven(goNext: boolean): void {
+  callStepSeven = (goNext: boolean): void => {
     this.errors.schedule = [];
     this.errors.overlapping = false;
     if (!this.eventGroup.invalid) {
       for (const dataEvent of this.dataEvents.values()) {
-        const missingEvent = this.events.value.some((calendarEvent: {
-          event: CalendarEvent
-        }) => !dataEvent.calendarEvents.includes(calendarEvent.event));
+        let eventFound = false;
 
-        if (missingEvent) {
+        for (const eventData of this.events.value) {
+          const eventToCheck = eventData.event;
+
+          if (dataEvent.calendarEvents.some(calendarEvent => calendarEvent.id === eventToCheck.id)) {
+            eventFound = true;
+            break;
+          }
+        }
+
+        if (!eventFound) {
           this.errors.schedule[dataEvent.index] = true;
         }
       }
@@ -534,107 +581,95 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.isPreview = true;
     }
     completeAndNext(this.steps, this.myStepper, goNext);
-  }
+  };
 
-  getStepName(index: number): string {
-    return getStepName(this.steps, index);
-  }
+  getStepName = (index: number): string => getStepName(this.steps, index);
 
-  getStepEnabled(index: number): boolean {
-    return getStepEnabled(this.steps, index);
-  }
+  getStepEnabled = (index: number): boolean => getStepEnabled(this.steps, index);
 
-  getStepOptional(index: number): boolean {
-    return getStepOptional(this.steps, index);
-  }
+  getStepOptional = (index: number): boolean => getStepOptional(this.steps, index);
 
-  getStepCompleted(index: number): boolean {
-    return getStepCompleted(this.steps, index);
-  }
+  getStepCompleted = (index: number): boolean => getStepCompleted(this.steps, index);
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.room.value);
 
-  displayFnUser(user: IUser): string {
-    return user?.displayName ? user.displayName : '';
-  }
+  displayFnUser = (user: IUser): string => user?.displayName ? user.displayName : '';
 
-  displayFnGroup(group: ITreatmentGroup): string {
-    return group ? `${ group.name }` : '';
-  }
+  displayFnGroup = (group: ITreatmentGroup): string => group ? `${ group.name }` : '';
 
-  displayFnTreatment(treatment: ITreatment): string {
-    return treatment ? `${ treatment.name }` : '';
-  }
+  displayFnTreatment = (treatment: ITreatment): string => treatment ? `${ treatment.name }` : '';
 
-  displayFnOffice(office: IOffice): string {
-    return office ? `${ office.name }` : '';
-  }
+  displayFnOffice = (office: IOffice): string => office ? `${ office.name }` : '';
 
-  displayFnRoom(room: IRoom): string {
-    return room.address ? room.address.name : '';
-  }
+  displayFnRoom = (room: IRoom): string => room.address ? room.address.name : '';
 
-  displayFnProfessional(professional: IUser): string {
-    return professional?.displayName ? professional.displayName : '';
-  }
+  displayFnProfessional = (professional: IUser): string => professional?.displayName ? professional.displayName : '';
 
-  openDialog(reservationDate?: Date): void {
-    openDialog(this.room.value, this.dateFormat, this.translate, this.dialog, reservationDate);
-  }
+  openDialog = (reservationDate?: Date): void => openDialog(
+    this.room.value, this.dateFormat, this.translate, this.dialog, reservationDate
+  );
 
-  segmentClick(date: Date, state: string, eventKey: string, id?: string): void {
-    if (!this.dateIsValid(date)) {
-      return;
+  segmentClick = (date: Date, state: string, eventKey: string, id: string = `${ Math.random() }`): void => {
+    const eventData = this.dataEvents.get(eventKey);
+    if (eventData) {
+      if (!this.dateIsValid(date)) {
+        return;
+      }
+      this.dataEvents.delete(eventKey);
+      this.dataEvents.set(date.toISOString().split('T')[0], eventData);
+      if (this.errors.schedule) {
+        this.errors.schedule[eventData.index] = false;
+      }
+      if (!this.professionalId) {
+        const data = {
+          professionals: this.professionalList,
+          small: this.smallScreen
+        };
+
+        executeDialogNoWidth(this.dialog, SelectProfessionalDialogComponent, data, result => {
+          if (result) {
+            this.professional.setValue(result.professional);
+            this.createEvent(eventData, date, state, id);
+          }
+        }, true);
+      } else {
+        this.createEvent(eventData, date, state, id);
+      }
     }
-    if (!this.professionalId) {
-      const data = {
-        professionals: this.professionalList,
-        small: this.smallScreen
-      };
+  };
 
-      executeDialogNoWidth(this.dialog, SelectProfessionalDialogComponent, data, result => {
-        if (result) {
-          this.professional.setValue(result.professional);
-          this.createEvent(eventKey, date, state, id);
-        }
-      }, true);
-    } else {
-      this.createEvent(eventKey, date, state, id || `${Math.random()}`);
-    }
-  }
-
-  getAddress($event: PlaceResult): void {
+  getAddress = ($event: PlaceResult): void => {
     this.address = $event.formatted_address;
-  }
+  };
 
-  timeChange($event: string, index: number): void {
+  timeChange = ($event: string, index: number): void => {
     const dateGroup = this.dateTimeList.at(index) as FormGroup;
     const time = getTimeNumber($event);
     dateGroup.get('date')?.value.setHours(time?.hour || 0, time?.minute || 0);
-  }
+  };
 
-  keyDownHandler(event: any, form: UntypedFormControl): void {
+  keyDownHandler = (event: any, form: UntypedFormControl): void => {
     if (event.code === 'Backspace') {
       form.setValue('');
     }
-  }
+  };
 
-  keyDownGroup(event: any): void {
+  keyDownGroup = (event: any): void => {
     this.treatmentList = undefined;
     this.keyDownHandler(event, this.treatment);
     this.keyDownHandler(event, this.group);
     this.errors = this.errors.filter((it: any) => it !== 'treatment');
     this.errors = this.errors.filter((it: any) => it !== 'group');
     this.errors = this.errors.filter((it: any) => it !== 'start');
-  }
+  };
 
-  keyDownOffice(event: any): void {
+  keyDownOffice = (event: any): void => {
     this.keyDownRoom(event);
     this.keyDownHandler(event, this.office);
     this.errors = this.errors.filter((it: any) => it !== 'office');
-  }
+  };
 
-  keyDownRoom(event: any): void {
+  keyDownRoom = (event: any): void => {
     if (event.code === 'Backspace') {
       this.keyDownHandler(event, this.professional);
       this.keyDownHandler(event, this.room);
@@ -644,108 +679,92 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.errors = this.errors.filter((it: any) => it !== 'room');
       this.errors = this.errors.filter((it: any) => it !== 'professional');
     }
-  }
+  };
 
-  beforeMonthViewRender({ header }: any): void {
+  beforeMonthViewRender = ({ header }: any): void => {
     header.forEach((day: any) => {
       if (!this.dateIsValid(day.date)) {
         day.cssClass = 'cal-disabled';
       }
     });
-  }
+  };
 
-  eventTimesChanged({ event, newStart, newEnd }: CalendarEventTimesChangedEvent, eventData: IDataEvent): void {
+  eventTimesChanged = ({ event, newStart, newEnd }: CalendarEventTimesChangedEvent, eventData: IDataEvent): void => {
     event.start = newStart;
     event.end = newEnd;
     this.refresh.next(event);
     const dateTimeForm = this.dateTimeList.at(eventData.index);
     dateTimeForm.get('date')?.setValue(newStart);
     dateTimeForm.get('start')?.setValue(getTime(newStart));
-  }
+  };
 
-  onChange(options: MatListOption[]): void {
+  onChange = (options: MatListOption[]): void => {
     this.additionalSelected = options.map(o => o.value);
     this.price = newAdditional(this.price, this.additionalSelected, this.treatmentDiscount);
     this.cleanEvent();
-  }
+  };
 
-  isSelected(it: IAdditionalAll): boolean {
-    return this.additionalSelected.filter(el => el.id === it.id).length > 0;
-  }
+  isSelected = (it: IAdditionalAll): boolean => this.additionalSelected.filter(el => el.id === it.id).length > 0;
 
-  addDate(dateValue?: Date, startTime?: string): void {
+  addDate = (dateValue?: Date, startTime?: string): void => {
     this.dateTimeList.push(this.createDate(dateValue, startTime));
     this.events.push(this.createEventForm());
-  }
+  };
 
-  removeDate(index: number): void {
+  removeDate = (index: number): void => {
     this.dateTimeList.removeAt(index);
     this.events.removeAt(index);
-  }
+  };
 
-  private createEvent(eventKey: string, date: Date, state: string, id?: string): void {
+  private createEvent = (eventData: IDataEvent, date: Date, state: string, id?: string): void => {
     this.errors.overlapping = false;
 
-    const eventData = this.dataEvents.get(eventKey);
-    if (eventData) {
-      this.dataEvents.delete(eventKey);
-      this.dataEvents.set(date.toISOString().split('T')[0], eventData);
-      if (this.errors.schedule) {
-        this.errors.schedule[eventData.index] = false;
-      }
-      const dateGroup = this.dateTimeList.at(eventData.index) as FormGroup;
-      dateGroup.get('date')?.setValue(date);
-      dateGroup.get('start')?.setValue(getTime(date, this.dateFormat));
+    const dateGroup = this.dateTimeList.at(eventData.index) as FormGroup;
+    dateGroup.get('date')?.setValue(date);
+    dateGroup.get('start')?.setValue(getTime(date, this.dateFormat));
 
-      const nowTime = getTimeNumber(date);
+    const nowTime = getTimeNumber(date);
 
-      const start = createNewDate(date, nowTime?.hour, nowTime?.minute);
-      const end = createNewDate(start, start.getHours() + this.totalDuration.hour,
-        start.getMinutes() + this.totalDuration.minute);
-      const event = this.createNewEvent(start, end, state, this.room.value.timeZone, id);
+    const start = createNewDate(date, nowTime?.hour, nowTime?.minute);
+    const end = createNewDate(start, start.getHours() + this.totalDuration.hour,
+      start.getMinutes() + this.totalDuration.minute);
+    const event = this.createNewEvent(start, end, state, this.room.value.timeZone, id);
 
-      if (event) {
-        let title;
-        let content;
-        const selectedEvent = this.events.at(eventData.index)?.get('event')?.value;
-        const eventsOverlapping = getOverlapEvent(eventData.calendarEvents, start, end, this.professionalId);
-        if (eventsOverlapping.length && eventsOverlapping[0] !== selectedEvent) {
-          let message = '';
-          eventsOverlapping.forEach(e => {
-            message += `<div>${ e.title }</div>`;
-          });
-          title = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.TITLE');
-          content = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.CONTENT', { data: message });
+    if (event) {
+      let title;
+      let content;
+      const selectedEvent = this.events.at(eventData.index)?.get('event')?.value;
+      const eventsOverlapping = eventData.getOverlapEvent(start, end, this.professionalId);
+      if (eventsOverlapping.length && eventsOverlapping[0] !== selectedEvent) {
+        let message = '';
+        eventsOverlapping.forEach(e => {
+          message += `<div>${ e.title }</div>`;
+        });
+        title = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.TITLE');
+        content = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.CONTENT', { data: message });
+      } else {
+        if (!selectedEvent && !id) {
+          title = this.translate.instant('RESERVATION.EVENT.TITLE');
+          content = this.translate.instant('RESERVATION.EVENT.CONTENT', { date: start.toLocaleString(API_LOCALE) });
         } else {
-          if (!selectedEvent && !id) {
-            title = this.translate.instant('RESERVATION.EVENT.TITLE');
-            content = this.translate.instant('RESERVATION.EVENT.CONTENT', { date: start.toLocaleString(API_LOCALE) });
-          } else {
-            title = this.translate.instant('RESERVATION.EVENT.CHANGE.TITLE');
-            content = this.translate.instant('RESERVATION.EVENT.CHANGE.CONTENT',
-              { date: start.toLocaleString(API_LOCALE) });
-          }
+          title = this.translate.instant('RESERVATION.EVENT.CHANGE.TITLE');
+          content = this.translate.instant('RESERVATION.EVENT.CHANGE.CONTENT',
+            { date: start.toLocaleString(API_LOCALE) });
         }
-        this.createSelectEvent(title, content, event, eventData);
       }
+      this.createSelectEvent(title, content, event, eventData);
     }
-  }
+  };
 
-  private createDate(dateValue?: Date, startTime?: string): FormGroup {
-    return this.formBuilder.group({
-      date: [dateValue, [Validators.required]],
-      start: [startTime || this.minDate]
-    });
-  }
+  private createDate = (dateValue?: Date, startTime?: string): FormGroup => this.formBuilder.group({
+    date: [dateValue, [Validators.required]],
+    start: [startTime || this.minDate]
+  });
 
-  private createEventForm(): FormGroup {
-    return this.formBuilder.group({
-      event: ['', Validators.required],
-    });
-  }
+  private createEventForm = (): FormGroup => this.formBuilder.group({ event: ['', Validators.required], });
 
-  private createNewEvent(start: Date, end: Date, state: string, timeZone: string = getCurrentTimeZone(),
-                         id?: string): CalendarEvent | undefined {
+  private createNewEvent = (start: Date, end: Date, state: string, timeZone: string = getCurrentTimeZone(),
+                            id?: string): CalendarEvent | undefined => {
     let treatments = createBullet(this.treatment.value.name);
     treatments += this.additionalSelected.map(additional => createBullet(additional.name));
 
@@ -757,13 +776,11 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const meta = new Meta(true, timeZone, undefined, undefined, this.professional.value.id);
     return newEvent(detail, findStateColor(state, this.isDarkMode), start, this.isDarkMode, end, id, meta, true);
-  }
+  };
 
-  private dateIsValid(date: Date): boolean {
-    return isBetween(getNowTimeZone(), this.maxCalendarDate, date);
-  }
+  private dateIsValid = (date: Date): boolean => isBetween(getNowTimeZone(), this.maxCalendarDate, date);
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.customerForm = this.formBuilder.group({
       customer: this.customer
     });
@@ -790,9 +807,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       events: this.formBuilder.array([this.createEventForm()])
     });
     this.valueChanges();
-  }
+  };
 
-  private valueChanges(): void {
+  private valueChanges = (): void => {
     this.customer.valueChanges.subscribe((value) => {
       this.customerInfo = undefined;
       if (value && value.id && !this.isEditing) {
@@ -936,9 +953,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dateTimeList.valueChanges.subscribe(() => {
       this.dateTimeList.updateValueAndValidity({ onlySelf: true, emitEvent: false });
     });
-  }
+  };
 
-  private cleanTreatment(): void {
+  private cleanTreatment = (): void => {
     if (!this.skip) {
       this.price = new Price();
       this.discount.setValue(undefined);
@@ -950,9 +967,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.additionalSelected = [];
       this.cleanEvent();
     }
-  }
+  };
 
-  private createFilters(): void {
+  private createFilters = (): void => {
     this.filteredCustomer = this.customer.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
@@ -965,7 +982,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filteredTreatment = this.treatment?.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterTreatment(name) : this.treatmentList ? this.treatmentList.slice() : this.treatmentList)
+      map(name => name ? this.filterTreatment(name) :
+        this.treatmentList ? this.treatmentList.slice() : this.treatmentList)
     );
     this.filteredOffice = this.office.valueChanges.pipe(startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
@@ -983,37 +1001,36 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       map(addressName => addressName ? this.filterProfessional(addressName) : this.professionalList
         ? this.professionalList.slice() : this.professionalList)
     );
-  }
+  };
 
-  private addReservations(reservations: IReservationAll[]): CalendarEvent[] {
-    return reservations.map(it => {
-      if (it.id !== this.reservationId) {
-        if (it.treatment.duration) {
-          if (it.timestamp >= dateToTimestamp()) {
-            const timeZone = it.room.timeZone;
-            const start = newDateTimestamp(it.timestamp);
-            const duration = reservationDuration(it);
-            const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
-            let treatments = createBullet(it.treatment.name);
-            treatments += it.additional?.map(additional => createBullet(additional.name));
+  private addReservations = (reservations: IReservationAll[]): CalendarEvent[] => reservations.map(it => {
+    if (it.id !== this.reservationId) {
+      if (it.treatment.duration) {
+        if (it.timestamp >= dateToTimestamp()) {
+          const timeZone = it.room.timeZone;
+          const start = newDateTimestamp(it.timestamp);
+          const duration = reservationDuration(it);
+          const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
+          let treatments = createBullet(it.treatment.name);
+          treatments += it.additional?.map(additional => createBullet(additional.name));
 
-            const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
-              customerName: it.customer.displayName,
-              professionalName: it.professional.displayName,
-              treatments
-            });
+          const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
+            customerName: it.customer.displayName,
+            professionalName: it.professional.displayName,
+            treatments
+          });
 
-            const color = findStateColor(it.state, this.isDarkMode);
-            const meta = new Meta(true, timeZone, undefined, undefined, it.professional.id);
-            return newEvent(detail, color, start, this.isDarkMode, end, it.id, meta);
-          }
+          const color = findStateColor(it.state, this.isDarkMode);
+          const meta = new Meta(true, timeZone, undefined, undefined, it.professional.id);
+          meta.isReservation = true;
+          return newEvent(detail, color, start, this.isDarkMode, end, it.id, meta);
         }
       }
-      return undefined;
-    }).filter((item): item is CalendarEvent => item !== undefined) ?? [];
-  }
+    }
+    return undefined;
+  }).filter((item): item is CalendarEvent => item !== undefined) ?? [];
 
-  private addUnavailableList(dataEvent: IDataEvent, unavailableList: IUnavailableAll[]) {
+  private addUnavailableList = (dataEvent: IDataEvent, unavailableList: IUnavailableAll[]) => {
     let recurringEvents: any[] = [];
     unavailableList.forEach(it => {
       if (it.duration || it.allDay) {
@@ -1034,108 +1051,79 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         if (it.repeat === 'NONE') {
           if (!greaterOrEqualsThan(start, this.maxCalendarDate)) {
             const data = { id, allDay, title, path, duration, professionalId };
-            this.validateUnavailableEvent(start, data, dataEvent);
+            this.validateUnavailable(start, data, dataEvent);
           }
         } else {
           const calendarStart = greaterOrEqualsThan(dataEvent.viewDate, start) ? dataEvent.viewDate : start;
-          recurringEvents = [...recurringEvents, getFrequency(it.repeat, calendarStart, it.id, title, this.daysInWeek, 'UNAVAILABLE',
-            'unavailable', it.end, getDurationOrUndefined(it.duration), it.allDay, professionalId)];
+          recurringEvents =
+            [...recurringEvents, getFrequency(it.repeat, calendarStart, it.id, title, this.daysInWeek, 'UNAVAILABLE',
+              'unavailable', it.end, getDurationOrUndefined(it.duration), it.allDay, professionalId)];
         }
       }
     });
 
     recurringEvents.forEach(recurring =>
-      recurring.rule.all()?.forEach((date: Date) => this.validateUnavailableEvent(date, recurring, dataEvent))
+      recurring.rule.all()?.forEach((date: Date) => this.validateUnavailable(date, recurring, dataEvent))
     );
-  }
+  };
 
-  private validateUnavailableEvent(start: Date, recurring: any, dataEvent: IDataEvent): void {
-    const [startSearch, endSearch] = searchDates(recurring.allDay, start, recurring.duration);
-    const overlapEvent = getOverlapEvent(dataEvent.calendarEvents, startSearch, endSearch);
-    if (overlapEvent.length > 0) {
-      overlapEvent.forEach(value => {
-        if (value.id !== 'NOT_WORKING_ALL_DAY') {
-          dataEvent.filterEvent(value);
-          if (value.end) {
-            if (startSearch < value.start && endSearch < value.end) {
-              value.start = endSearch;
-              dataEvent.addEvent(value);
-            } else if (startSearch > value.start && endSearch > value.end) {
-              value.end = startSearch;
-              dataEvent.addEvent(value);
-            }
-          }
-          if (!dataEvent.calendarEvents.find(ce => ce.id === recurring.path && isSameDay(value.start, ce.start))) {
-            this.createUnavailableEvent(recurring, startSearch, endSearch, dataEvent);
-          }
-        }
-      });
-    } else {
-      this.createUnavailableEvent(recurring, startSearch, endSearch, dataEvent);
-    }
-  }
+  private validateUnavailable = (start: Date, recurring: any, dataEvent: IDataEvent): void => {
+    validateUnavailableEvent(start, recurring, dataEvent,
+      (startSearch, endSearch, dataEvent) => this.createUnavailableEvent(recurring, startSearch, endSearch, dataEvent));
+  };
 
-  private createUnavailableEvent(recurring: any, start: Date, end: Date, dataEvent: IDataEvent): void {
+  private createUnavailableEvent = (recurring: any, start: Date, end: Date, dataEvent: IDataEvent): void => {
     const color = findStateColor('DEFAULT', this.isDarkMode);
     const meta = new Meta(!recurring.allDay, this.room.value.timeZone, undefined, undefined, recurring.professionalId);
     const event = newEvent(recurring.title, color, start, this.isDarkMode, end, recurring.path, meta);
     dataEvent.addEvent(event);
-  }
+  };
 
-  private createSelectEvent(title: string, content: string, event: CalendarEvent, eventData: IDataEvent): void {
-    const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: event }
-    });
+  private createSelectEvent = (title: string, content: string, event: CalendarEvent, eventData: IDataEvent): void => {
+    if (this.alreadyCreated) {
+      this.createSelectedEvent(eventData, event);
+      this.alreadyCreated = false;
+    } else {
+      const dialogRef = this.dialog.open(DialogComponent, {
+        data: { title, content, value: event }
+      });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        const selectedEvent = this.events.at(eventData.index)?.get('event');
-        if (selectedEvent?.value) {
-          eventData.removeEvent(selectedEvent.value);
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.createSelectedEvent(eventData, event);
         }
-        selectedEvent?.setValue(event);
-        eventData.addEvent(event);
-      }
-    });
-  }
+      });
+    }
+  };
 
-  private filterCustomer(name: string): IUser[] | undefined {
-    const filterValue = name.toLowerCase();
+  private createSelectedEvent = (eventData: IDataEvent, event: CalendarEvent): void => {
+    const selectedEvent = this.events.at(eventData.index)?.get('event');
+    if (selectedEvent?.value) {
+      eventData.removeEvent(selectedEvent.value);
+    }
+    selectedEvent?.setValue(event);
+    eventData.addEvent(event);
+  };
 
-    return this.customers?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
-  }
+  private filterCustomer = (name: string): IUser[] | undefined => this.customers?.filter(
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private filterGroup(name: string): IGroupService[] | undefined {
-    const filterValue = name.toLowerCase();
+  private filterGroup = (name: string): IGroupService[] | undefined => this.groups?.filter(
+    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-    return this.groups?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
+  private filterTreatment = (name: string): IService[] | undefined => this.treatmentList?.filter(
+    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private filterTreatment(name: string): IService[] | undefined {
-    const filterValue = name.toLowerCase();
+  private filterOffice = (name: string): IOffice[] | undefined => this.offices?.filter(
+    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-    return this.treatmentList?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
+  private filterRoom = (addressName: string): IRoom[] | undefined => this.roomList?.filter(
+    option => option.address?.name?.toLowerCase().indexOf(addressName.toLowerCase()) === 0);
 
-  private filterOffice(name: string): IOffice[] | undefined {
-    const filterValue = name.toLowerCase();
+  private filterProfessional = (name: string): IUser[] | undefined => this.professionalList?.filter(
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-    return this.offices?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private filterRoom(addressName: string): IRoom[] | undefined {
-    const filterValue = addressName.toLowerCase();
-
-    return this.roomList?.filter(option => option.address?.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private filterProfessional(name: string): IUser[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.professionalList?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private setData(reservation: IReservationAll): void {
+  private setData = (reservation: IReservationAll): void => {
     if (!this.reservation) {
       this.reservation = reservation;
       this.treatmentDiscount = this.reservation.treatment.discountCustomer;
@@ -1170,9 +1158,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       completeAndNext(this.steps, this.myStepper, true);
     }
-  }
+  };
 
-  private cleanEvent(): void {
+  private cleanEvent = (): void => {
+    this.alreadyCreated = false;
     for (const dataEvent of this.dataEvents.values()) {
       const event = this.events.at(dataEvent.index)?.get('event');
       if (event) {
@@ -1180,30 +1169,24 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         event.setValue(null);
       }
     }
-  }
+  };
 
-  private getReservation(id: string | null): void {
-    this.store.dispatch(
-      new fromActionsReservation.ReservationFind({ id })
-    );
-  }
+  private getReservation = (id: string | null): void => this.store.dispatch(
+    new fromActionsReservation.ReservationFind({ id }));
 
-  private getRoomList(): void {
-    this.store.dispatch(
-      new fromActionsReservation.GetAllRooms({ customerId: this.customer?.value?.id })
-    );
-  }
+  private getRoomList = (): void => this.store.dispatch(
+    new fromActionsReservation.GetAllRooms({ customerId: this.customer?.value?.id }));
 
-  private getTreatmentList(): void {
+  private getTreatmentList = (): void => {
     const roomId = this.room?.value?.id || this.roomId;
     if (roomId) {
       this.store.dispatch(
         new fromActionsReservation.GetAllTreatments({ roomId, customerId: this.customer.value?.id })
       );
     }
-  }
+  };
 
-  private getAdditionalList(): void {
+  private getAdditionalList = (): void => {
     const roomId = this.room?.value?.id || this.roomId;
     const groupId = this.group?.value?.id || this.groupId;
     if (roomId) {
@@ -1211,21 +1194,13 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         new fromActionsReservation.GetAllAdditional({ roomId, groupId })
       );
     }
-  }
+  };
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsReservation.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsReservation.Clean());
 
-  private getCustomers(): void {
-    this.store.dispatch(
-      new fromActionsReservation.GetAllCustomers()
-    );
-  }
+  private getCustomers = (): void => this.store.dispatch(new fromActionsReservation.GetAllCustomers());
 
-  private setOffice(): void {
+  private setOffice = (): void => {
     let office;
     if (this.offices && this.roomId && !this.office.value) {
       office = this.offices?.find(office => office.rooms?.find(o => o.id === this.roomId) ? office : undefined);
@@ -1245,20 +1220,21 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         setTimeout(() => getStepCall(this.steps, 1, true), 300);
       }
     }
-  }
+  };
 
-  private setCustomerInfo(treatmentIndex?: number): void {
+  private setCustomerInfo = (treatmentIndex?: number): void => {
     if (this.customerInfo && this.myStepper.selectedIndex === treatmentIndex) {
       this.treatmentId = this.treatmentId || this.customerInfo.treatment.key;
       this.customerAdditionalIds = this.customerAdditionalIds || this.customerInfo.additionalIds;
     }
-  }
+  };
 
-  private setAdditional(treatmentIndex?: number): void {
+  private setAdditional = (): void => {
     if (this.additionalList && this.additionalList.length) {
-      enableStep(this.steps, 'post_add');
-      if (this.customerAdditionalIds?.length && !this.additionalSelected.length && this.myStepper.selectedIndex === treatmentIndex) {
-        this.additionalSelected = this.additionalList.filter(ad => this.customerAdditionalIds.includes(ad.id))
+      const additionalIndex = enableStep(this.steps, 'post_add');
+      if (this.customerAdditionalIds?.length && !this.additionalSelected.length && this.myStepper.selectedIndex ===
+        additionalIndex) {
+        this.additionalSelected = this.additionalList.filter(ad => this.customerAdditionalIds?.includes(ad.id))
           .map(ad => Object.assign({}, ad, { id: ad.id }));
         this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discountCustomer);
       }
@@ -1268,7 +1244,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         const newList = this.additionalList.filter(al => selectIds.includes(al.id));
         if (newList.length !== this.additionalSelected.length) {
           this.additionalSelected = newList;
-          this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discountCustomer);
+          this.price =
+            newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discountCustomer);
         }
       }
       if (this.additionalIds?.length) {
@@ -1277,13 +1254,14 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         if (newList.length !== this.additionalSelected.length) {
           this.additionalSelected = newList;
           this.additionalIds = [];
-          this.price = newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discountCustomer);
+          this.price =
+            newAdditional(this.price, this.additionalSelected, this.reservation?.treatment?.discountCustomer);
         }
       }
     }
-  }
+  };
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.offices = Array.from(createRoomOffice(state.rooms)?.values() || []);
       this.customerInfo = state.customer;
@@ -1292,7 +1270,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.setOffice();
       const treatment = getIndex(this.steps, 'spa');
       this.setCustomerInfo(treatment);
-      this.setAdditional(treatment);
+      this.setAdditional();
       if (!this.groups && state.treatmentDiscount?.treatments) {
         this.groups = Array.from(
           createTreatmentGroupService(new Map<string, IGroupService>(), state.treatmentDiscount.treatments,
@@ -1318,7 +1296,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         this.setData(state.selected);
       }
 
-      if (this.skip && !this.customerForm.invalid && !this.officeForm.invalid && !this.treatmentForm.invalid && !this.configurationForm.invalid) {
+      if (this.skip && !this.customerForm.invalid && !this.officeForm.invalid && !this.treatmentForm.invalid &&
+        !this.configurationForm.invalid) {
         for (let i = 0; i < 5; i++) {
           setTimeout(() => getStepCall(this.steps, i, true), 300);
         }
@@ -1358,8 +1337,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
                 } else {
                   this.segmentClick(date, 'EDITING', data.date, this.reservation.id);
                 }
-              } else if ((this.extras?.date || start && this.myStepper.selectedIndex === bookOrder) &&
-                !this.events.at(eventData.index)?.get('event')?.value) {
+              } else if ((this.extras?.date || start && this.myStepper.selectedIndex === bookOrder)) {
                 this.segmentClick(dateValue, 'CREATED', data.date);
               }
             }, 50);
@@ -1384,14 +1362,14 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           this.officeForm.controls[value.field]?.setErrors({ incorrect: true });
           this.cleanEvent();
           setTimeout(() => {
-            const nameInputField = document.querySelector(`input[formControlName="${ value.field }"]`) as HTMLInputElement;
-            if (nameInputField) {
-              nameInputField.focus();
-              nameInputField.blur();
+            const inputField = document.querySelector(`input[formControlName="${ value.field }"]`) as HTMLInputElement;
+            if (inputField) {
+              inputField.focus();
+              inputField.blur();
             }
           }, 100);
         });
       }
     });
-  }
+  };
 }

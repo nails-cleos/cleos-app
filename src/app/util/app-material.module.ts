@@ -32,6 +32,8 @@ import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatBadgeModule } from '@angular/material/badge';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { MatProgressBar } from '@angular/material/progress-bar';
+import { MatStep, MatStepLabel, MatStepper } from '@angular/material/stepper';
 
 const materialModules = [
   NgxMaterialTimepickerModule,
@@ -65,7 +67,11 @@ const materialModules = [
   MatBottomSheetModule,
   MatToolbarModule,
   MatBadgeModule,
-  DragDropModule
+  DragDropModule,
+  MatProgressBar,
+  MatStepper,
+  MatStep,
+  MatStepLabel
 ];
 
 @NgModule({
@@ -73,7 +79,7 @@ const materialModules = [
   exports: [...materialModules]
 })
 export class AppMaterialModule {
-  constructor(private matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer) {
+  constructor(matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer) {
     matIconRegistry.addSvgIcon('CLEOS', this.getUrl('assets/icons/safari-pinned-tab.svg'));
     matIconRegistry.addSvgIcon('CLEOS-COLOR', this.getUrl('assets/icons/icon.svg'));
     matIconRegistry.addSvgIcon('MANICURE', this.getUrl('assets/treatment.svg'));
@@ -106,7 +112,5 @@ export class AppMaterialModule {
     matIconRegistry.addSvgIcon('MOYONL21', this.getUrl('assets/issuers/MOYONL21.svg'));
   }
 
-  private getUrl(path: string): SafeResourceUrl {
-    return this.domSanitizer.bypassSecurityTrustResourceUrl(path);
-  }
+  private getUrl = (path: string): SafeResourceUrl => this.domSanitizer.bypassSecurityTrustResourceUrl(path);
 }

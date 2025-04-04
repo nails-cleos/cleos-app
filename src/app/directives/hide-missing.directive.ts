@@ -1,7 +1,7 @@
 import { Directive, ElementRef, HostListener } from '@angular/core';
 
 @Directive({
-  selector: '[appHideMissing]'
+  selector: '[appHideMissing]',
 })
 export class HideMissingDirective {
 
@@ -9,7 +9,7 @@ export class HideMissingDirective {
   }
 
   @HostListener('error')
-  private onError(): void {
+  onError = (): void => {
     this.el.nativeElement.style.display = 'none';
-  }
+  };
 }

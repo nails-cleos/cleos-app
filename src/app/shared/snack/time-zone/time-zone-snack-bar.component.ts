@@ -2,6 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from '@angular/material/snack-bar';
 import { localeTimeZoneDate } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from '../../shared.module';
 
 interface ITimeZone {
   date: Date;
@@ -11,7 +12,8 @@ interface ITimeZone {
 @Component({
   selector: 'app-time-zone-snack-bar',
   templateUrl: './time-zone-snack-bar.component.html',
-  styleUrls: ['./time-zone-snack-bar.component.scss']
+  styleUrls: ['./time-zone-snack-bar.component.scss'],
+  imports: [SharedModule]
 })
 export class TimeZoneSnackBarComponent {
 
@@ -26,7 +28,8 @@ export class TimeZoneSnackBarComponent {
     this.action = this.translate.instant('COMMON.TIME_ZONE.ACTION');
   }
 
-  private getDateTime(reservationDate: Date, timeZone?: string): string {
-    return localeTimeZoneDate(this.translate.currentLang, reservationDate, timeZone);
-  }
+  private getDateTime = (
+    reservationDate: Date,
+    timeZone?: string
+  ): string => localeTimeZoneDate(this.translate.currentLang, reservationDate, timeZone);
 }

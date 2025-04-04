@@ -24,27 +24,27 @@
       <ng-container matColumnDef="position">
         <th *matHeaderCellDef mat-header-cell>#</th>
         <td *matCellDef="let expense; let i = dataIndex;" mat-cell>
-          <div *ngIf="expense.id; else skeleton">{{ (paginator.pageIndex * pageSize) + i + 1 }}</div>
-          <ng-template #skeleton>
+          @if (expense.id) {
+            <div>{{ (paginator.pageIndex * pageSize) + i + 1 }}</div>
+          } @else {
             <div class="ssc-line"></div>
-          </ng-template>
+          }
         </td>
       </ng-container>
 
       <ng-container matColumnDef="timestamp">
         <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.DATE' | translate }}</th>
         <td *matCellDef="let expense" mat-cell>
-          <div *ngIf="expense.id; else skeleton">
-            {{ expense.timestamp | timeDetail | date:'mediumDate':expense.room.timeZone:dateFormat }}
-            <ng-template [ngIf]="showTimeZone(expense)">
+          @if (expense.id) {
+            <div>{{ expense.timestamp | timeDetail | date:'mediumDate':expense.room.timeZone:dateFormat }}</div>
+            @if (showTimeZone(expense)) {
               <button (click)="openDialog(expense)" mat-icon-button type="button">
                 <mat-icon>info_outline</mat-icon>
               </button>
-            </ng-template>
-          </div>
-          <ng-template #skeleton>
+            }
+          } @else {
             <div class="ssc-line"></div>
-          </ng-template>
+          }
         </td>
       </ng-container>
 
@@ -53,10 +53,11 @@
             mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.INVOICE' | translate }}
         </th>
         <td *matCellDef="let expense" class="hide-xs" mat-cell>
-          <div *ngIf="expense.id; else skeleton">{{ expense.invoice }}</div>
-          <ng-template #skeleton>
+          @if (expense.id) {
+            <div>{{ expense.invoice }}</div>
+          } @else {
             <div class="ssc-line"></div>
-          </ng-template>
+          }
         </td>
       </ng-container>
 
@@ -65,10 +66,11 @@
             mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.SUPPLY_STORE' | translate }}
         </th>
         <td *matCellDef="let expense" class="hide-xs" mat-cell>
-          <div *ngIf="expense.id; else skeleton">{{ expense.supplyStore.name }}</div>
-          <ng-template #skeleton>
+          @if (expense.id) {
+            <div>{{ expense.supplyStore.name }}</div>
+          } @else {
             <div class="ssc-line"></div>
-          </ng-template>
+          }
         </td>
       </ng-container>
 
@@ -77,15 +79,14 @@
             mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.GROSS' | translate }}
         </th>
         <td *matCellDef="let expense" class="hide-xs" mat-cell>
-          <div *ngIf="expense.id; else skeleton">
+          @if (expense.id) {
             <mat-list-item>
               <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
               <div matListItemTitle>{{ expense.totalGross | number:'1.2-2' }}</div>
             </mat-list-item>
-          </div>
-          <ng-template #skeleton>
+          } @else {
             <div class="ssc-line"></div>
-          </ng-template>
+          }
         </td>
       </ng-container>
 
@@ -94,49 +95,48 @@
             mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.BTW' | translate }}
         </th>
         <td *matCellDef="let expense" class="hide-xs" mat-cell>
-          <div *ngIf="expense.id; else skeleton">
+          @if (expense.id) {
             <mat-list-item>
               <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
               <div matListItemTitle>{{ (expense.totalGross - expense.totalNet) | number:'1.2-2' }}</div>
             </mat-list-item>
-          </div>
-          <ng-template #skeleton>
+          } @else {
             <div class="ssc-line"></div>
-          </ng-template>
+          }
         </td>
       </ng-container>
 
       <ng-container matColumnDef="totalNet">
         <th *matHeaderCellDef mat-header-cell>{{ 'EXPENSE.LIST.COLUMN.NET' | translate }}</th>
         <td *matCellDef="let expense" mat-cell>
-          <div *ngIf="expense.id; else skeleton">
+          @if (expense.id) {
             <mat-list-item>
               <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
               <div matListItemTitle>{{ expense.totalNet | number:'1.2-2' }}</div>
             </mat-list-item>
-          </div>
-          <ng-template #skeleton>
+          } @else {
             <div class="ssc-line"></div>
-          </ng-template>
+          }
         </td>
       </ng-container>
 
       <ng-container matColumnDef="actions">
         <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
         <td *matCellDef="let expense" class="hide-xs" mat-cell>
-          <div *ngIf="expense.id; else skeleton">
-            <button [routerLink]="['/', language, 'rooms', roomId, 'expenses', expense.id]" *ngIf="!expense.deleted"
-                    mat-icon-button matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
-              <mat-icon color="primary">edit</mat-icon>
-            </button>
-            <button (click)="delete(expense)" *ngIf="!expense.deleted" mat-icon-button
-                    matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
-              <mat-icon color="warn">delete</mat-icon>
-            </button>
-          </div>
-          <ng-template #skeleton>
+          @if (expense.id) {
+            @if (!expense.deleted) {
+              <button [routerLink]="['/', language, 'rooms', roomId, 'expenses', expense.id]" mat-icon-button
+                      matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+                <mat-icon color="primary">edit</mat-icon>
+              </button>
+              <button (click)="delete(expense)" mat-icon-button matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}"
+                      matTooltipPosition="right">
+                <mat-icon color="warn">delete</mat-icon>
+              </button>
+            }
+          } @else {
             <div class="ssc-line"></div>
-          </ng-template>
+          }
         </td>
       </ng-container>
 
@@ -156,29 +156,31 @@
                 <div matListItemTitle>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
                 <div matListItemLine>{{ 'COMMON.EXPENSE.TYPE.' + expense.type | translate }}</div>
               </mat-list-item>
-              <ng-template [ngIf]="expense.gross">
+              @if (expense.gross) {
                 <div mat-subheader>{{ 'EXPENSE.LIST.COLUMN.GROSS' | translate }}</div>
                 <mat-list-item role="list">
                   <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
                   <div matListItemTitle>{{ expense.gross | number:'1.2-2' }}</div>
                 </mat-list-item>
-              </ng-template>
-              <ng-template [ngIf]="expense.btw">
+              }
+              @if (expense.btw) {
                 <div mat-subheader>{{ 'EXPENSE.LIST.COLUMN.BTW' | translate }}</div>
                 <mat-list-item role="list">
                   <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
                   <div matListItemTitle>{{ (expense.gross - expense.net) | number:'1.2-2' }}</div>
                 </mat-list-item>
-              </ng-template>
+              }
               <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
               <mat-list-item role="list">
-                <button [routerLink]="['/', language, 'rooms', roomId, 'expenses', expense.id]" *ngIf="!expense.deleted"
-                        color="primary" mat-icon-button>
-                  <mat-icon matListItemIcon>edit</mat-icon>
-                </button>
-                <button (click)="delete(expense)" *ngIf="!expense.deleted" color="warn" mat-icon-button>
-                  <mat-icon matListItemIcon>delete</mat-icon>
-                </button>
+                @if (!expense.deleted) {
+                  <button [routerLink]="['/', language, 'rooms', roomId, 'expenses', expense.id]" color="primary"
+                          mat-icon-button>
+                    <mat-icon matListItemIcon>edit</mat-icon>
+                  </button>
+                  <button (click)="delete(expense)" color="warn" mat-icon-button>
+                    <mat-icon matListItemIcon>delete</mat-icon>
+                  </button>
+                }
               </mat-list-item>
             </mat-list>
           </div>
@@ -198,7 +200,9 @@
 
       <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
     </table>
-    <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+    @if (resultsLength) {
+      <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+    }
 
     <button color="accent" id="add-button" mat-fab matTooltip="{{ 'EXPENSE.TITLE' | translate }}"
             [routerLink]="['/', language, 'rooms', roomId, 'expenses', 'add']">

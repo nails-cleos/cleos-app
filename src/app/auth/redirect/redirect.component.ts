@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { IAuthority, IUserAll } from '../../interfaces/user';
 import { Role } from '../../interfaces/token';
 import { Store } from '@ngrx/store';
@@ -7,18 +7,24 @@ import { TokenService } from '../../services/token.service';
 import { getLocale, hasRoomAdmin } from '../../util/helper';
 import { NavigationService } from '../../services/navigation.service';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from '../../shared/shared.module';
 
 @Component({
   selector: 'app-redirect',
   templateUrl: './redirect.component.html',
-  styleUrls: ['./redirect.component.scss']
+  styleUrls: ['./redirect.component.scss'],
+  imports: [SharedModule]
 })
 export class RedirectComponent {
 
-  constructor(private store: Store<AppState>, private tokenService: TokenService,
-              private navigateService: NavigationService, translate: TranslateService) {
+  private store: Store<AppState> = inject(Store<AppState>);
+  private tokenService: TokenService = inject(TokenService);
+  private navigateService: NavigationService = inject(NavigationService);
+  private translate: TranslateService = inject(TranslateService);
+
+  constructor() {
     this.store.select(selectAuthState).subscribe((state: any) => {
-      const lang = getLocale(translate.currentLang).language;
+      const lang = getLocale(this.translate.currentLang).language;
       let redirectUrl = ['/', lang];
       if (state.redirect) {
         if (state.isAuthenticated) {
@@ -38,8 +44,8 @@ export class RedirectComponent {
     });
   }
 
-  private static hasRoomOrAdmin(authorities?: IAuthority[]): boolean {
-    return !!authorities && authorities.length > 0 &&
-      authorities.some(u => (u.authority === Role.professional || u.authority === Role.manager || u.authority === Role.admin));
-  }
+  private static hasRoomOrAdmin = (authorities?: IAuthority[]): boolean =>
+    !!authorities && authorities.length > 0 && authorities.some(
+      u => (u.authority === Role.professional || u.authority === Role.manager || u.authority === Role.admin)
+    );
 }

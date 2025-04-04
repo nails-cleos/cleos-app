@@ -1,5 +1,5 @@
 import { Pagination } from '../../interfaces/pagination';
-import { All, AdditionalActionTypes } from '../additional.actions';
+import { AdditionalActionTypes, All } from '../additional.actions';
 import { IAdditional } from '../../interfaces/additional';
 import { ITreatmentGroup } from '../../interfaces/treatment';
 
@@ -30,8 +30,7 @@ export const reducer = (state = initialState, action: All): State => {
     case AdditionalActionTypes.getAll: {
       return {
         ...state,
-        // @ts-ignore
-        data: {content: [{}, {}, {}], totalElements: 3},
+        data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IAdditional>,
         errorMessage: null,
         subErrors: null,
         selected: null,

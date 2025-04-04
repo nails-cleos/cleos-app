@@ -14,12 +14,14 @@ import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { detailExpandAnimation } from '../../util/animation';
 import { executeDialogNoWidth } from '../../util/helper';
+import { SharedModule } from '../../shared/shared.module';
 
 @Component({
   selector: 'app-currency-list',
   templateUrl: './currency-list.component.html',
   styleUrls: ['./currency-list.component.scss'],
-  animations: [detailExpandAnimation]
+  animations: [detailExpandAnimation],
+  imports: [SharedModule]
 })
 export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -65,13 +67,9 @@ export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
   }
 
-  edit(currency: ICurrency): void {
-    this.store.dispatch(
-      new fromActionsCurrency.CurrencySelected(currency)
-    );
-  }
+  edit = (currency: ICurrency): void => this.store.dispatch(new fromActionsCurrency.CurrencySelected(currency));
 
-  delete(currency: ICurrency): void {
+  delete = (currency: ICurrency): void => {
     const title = this.translate.instant('CURRENCY.DELETED.TITLE');
     const content = this.translate.instant('CURRENCY.DELETED.CONTENT', { code: currency.code });
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: currency }, result => {
@@ -81,9 +79,30 @@ export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     });
-  }
+  };
 
-  private subscribe(): void {
+  private clean = (): void => this.store.dispatch(new fromActionsCurrency.Clean());
+
+  private createPageSubscriptions = (): void => {
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getCurrency();
+    });
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getCurrency(this.paginator.pageIndex));
+
+    this.cdRef.detectChanges();
+  };
+
+  private getCurrency = (page: number = 0): void => this.store.dispatch(
+    new fromActionsCurrency.GetAll({
+      active: this.sort.active,
+      direction: this.sort.direction,
+      size: this.pageSize,
+      page
+    })
+  );
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.message) {
         this.clean();
@@ -95,33 +114,5 @@ export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
         this.createPageSubscriptions();
       }
     });
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsCurrency.Clean()
-    );
-  }
-
-  private createPageSubscriptions(): void {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getCurrency();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getCurrency(this.paginator.pageIndex));
-
-    this.cdRef.detectChanges();
-  }
-
-  private getCurrency(page: number = 0): void {
-    const payload = {
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    };
-    this.store.dispatch(
-      new fromActionsCurrency.GetAll(payload)
-    );
-  }
+  };
 }

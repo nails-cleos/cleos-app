@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IAccount, ITransaction } from '../interfaces/account';
 import { createFilter } from '../util/service-helper';
 import { PAGE_SIZE } from '../interfaces/pagination';
+import { toUrl } from '../util/helper';
 
 @Injectable({
   providedIn: 'root'
@@ -12,38 +13,36 @@ export class AccountService {
   private url = 'accounts';
   private urlV1 = `v1/${ this.url }`;
 
-  constructor(private http: HttpClient) {
-  }
+  private http: HttpClient = inject(HttpClient);
 
-  public getAllTransactions(accountId: string, page: number, sort?: string, direction?: string,
-                            size: number = PAGE_SIZE): Observable<ITransaction[]> {
-    const params = createFilter(page, size, sort, direction);
-    return this.http.get<ITransaction[]>(`${ this.urlV1 }/${ accountId }/transactions`, { params });
-  }
+  getAllTransactions = (
+    accountId: string,
+    page: number,
+    sort?: string,
+    direction?: string,
+    size: number = PAGE_SIZE
+  ): Observable<ITransaction[]> => this.http.get<ITransaction[]>(
+    toUrl(this.urlV1, accountId, 'transactions'),
+    { params: createFilter(page, size, sort, direction) }
+  );
 
-  public getById(id: string | null): Observable<IAccount | undefined> {
-    return this.http.get<IAccount>(`${ this.urlV1 }/${ id }`);
-  }
+  getById = (id: string): Observable<IAccount | undefined> => this.http.get<IAccount>(toUrl(this.urlV1, id));
 
-  public findTransaction(id: string, transactionId: string): Observable<ITransaction | undefined> {
-    return this.http.get<ITransaction>(`${ this.urlV1 }/${ id }/transactions/${ transactionId }`);
-  }
+  findTransaction = (
+    id: string,
+    transactionId: string
+  ): Observable<ITransaction | undefined> => this.http.get<ITransaction>(
+    toUrl(this.urlV1, id, 'transactions', transactionId));
 
-  public findByCustomer(customerId: string): Observable<IAccount | undefined> {
-    return this.http.get<IAccount>(`${ this.urlV1 }/customers/${ customerId }`);
-  }
+  findByCustomer = (
+    customerId: string
+  ): Observable<IAccount | undefined> => this.http.get<IAccount>(toUrl(this.urlV1, 'customers', customerId));
 
-  public add(transaction: ITransaction, accountId: string): Observable<IAccount> {
-    return this.http.post<IAccount>(`${ this.urlV1 }/${ accountId }/transactions`, transaction);
-  }
+  add = (transaction: ITransaction, accountId: string): Observable<IAccount> => this.http.post<IAccount>(
+    toUrl(this.urlV1, accountId, 'transactions'), transaction);
 
-  public delete(id: string | null): Observable<IAccount> {
-    const url = `${ this.urlV1 }/${ id }`;
-    return this.http.delete<IAccount>(url);
-  }
+  delete = (id: string): Observable<IAccount> => this.http.delete<IAccount>(toUrl(this.urlV1, id));
 
-  public update(transaction: ITransaction): Observable<IAccount> {
-    const url = `${ this.urlV1 }/${ transaction.accountId }`;
-    return this.http.patch<IAccount>(url, transaction);
-  }
+  update = (transaction: ITransaction): Observable<IAccount> => this.http.patch<IAccount>(
+    toUrl(this.urlV1, transaction.accountId!), transaction);
 }

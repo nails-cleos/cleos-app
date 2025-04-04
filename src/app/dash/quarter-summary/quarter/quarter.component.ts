@@ -4,11 +4,14 @@ import { ICurrencyAll } from '../../../interfaces/currency';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { dateMonthYear, monthTitle } from '../../../util/dates';
+import { SharedModule } from '../../../shared/shared.module';
+import { MonthComponent } from '../../month-summary/month/month.component';
 
 @Component({
   selector: 'app-quarter',
   templateUrl: './quarter.component.html',
-  styleUrls: ['./quarter.component.scss']
+  styleUrls: ['./quarter.component.scss'],
+  imports: [SharedModule, MonthComponent]
 })
 export class QuarterComponent {
   @Input() monthSummaries?: IMonthSummary[];
@@ -29,15 +32,13 @@ export class QuarterComponent {
     this.showCash = false;
   }
 
-  getMonth(month: number): string {
-    return monthTitle(dateMonthYear(month - 1, this.year), this.dateFormat, this.measure);
-  }
+  getMonth = (month: number): string => monthTitle(dateMonthYear(month - 1, this.year), this.dateFormat, this.measure);
 
-  goToQuarter(quarter: number): void {
+  goToQuarter = (quarter: number): void => {
     this.router.navigate([this.language, 'dashboard', 'quarter', 'summary'], { state: { year: this.year, quarter } });
-  }
+  };
 
-  goToMonth(month: number, type?: string): void {
+  goToMonth = (month: number, type?: string): void => {
     let step = 0;
     switch (type) {
       case 'INCOME':
@@ -50,6 +51,7 @@ export class QuarterComponent {
         step = 2;
         break;
     }
-    this.router.navigate([this.language, 'dashboard', 'monthly', 'summary'], { state: { date: `${ month }-${ this.year }`, step } });
-  }
+    this.router.navigate([this.language, 'dashboard', 'monthly', 'summary'],
+      { state: { date: `${ month }-${ this.year }`, step } });
+  };
 }

@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-import { SharedModule } from '../shared/shared.module';
 import { InvoiceRoutingModule } from './invoice-routing.module';
 import { InvoiceComponent } from './invoice.component';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -13,12 +12,9 @@ import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
 
 @NgModule({
-  declarations: [
-    InvoiceComponent
-  ],
   imports: [
+    InvoiceComponent,
     InvoiceRoutingModule,
-    SharedModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,

@@ -4,11 +4,12 @@ import { currencySymbol } from '../util/helper';
 import { ICurrency } from '../interfaces/currency';
 
 @Pipe({
-  name: 'discount'
+  name: 'discount',
+  standalone: true
 })
 export class DiscountPipe implements PipeTransform {
 
-  transform(type?: DiscountType, value?: number, currency?: string | ICurrency): string {
+  transform = (type?: DiscountType, value?: number, currency?: string | ICurrency): string => {
     switch (type) {
       case DiscountType.percentage:
         return `${ value }%`;
@@ -16,5 +17,5 @@ export class DiscountPipe implements PipeTransform {
         return `${ currencySymbol(currency) } ${ value }`;
     }
     return value ? `${ value }` : '';
-  }
+  };
 }

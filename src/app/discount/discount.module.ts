@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../shared/shared.module';
 import { DiscountRoutingModule } from './discount-routing.module';
 
 import { DiscountComponent } from './discount.component';
@@ -17,14 +16,11 @@ import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
 
 @NgModule({
-  declarations: [
+  imports: [
     DiscountComponent,
     DiscountsComponent,
-    DiscountDialogComponent
-  ],
-  imports: [
+    DiscountDialogComponent,
     DiscountRoutingModule,
-    SharedModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,

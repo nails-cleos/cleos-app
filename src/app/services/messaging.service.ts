@@ -1,4 +1,4 @@
-import { Injectable, Optional } from '@angular/core';
+import { inject, Injectable, Optional } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
 import { AppState } from '../store/app.states';
 import { Store } from '@ngrx/store';
@@ -13,11 +13,13 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class MessagingService {
-  message$: Observable<any> = EMPTY;
+  private store: Store<AppState> = inject(Store<AppState>);
+  @Optional() private messaging: Messaging = inject(Messaging);
+  @Optional() private auth: Auth = inject(Auth);
+  private database: Database = inject(Database);
+  private appCheck: AppCheck = inject(AppCheck);
 
-  constructor(private store: Store<AppState>, @Optional() private messaging: Messaging, @Optional() private auth: Auth,
-              private database: Database, private appCheck: AppCheck) {
-  }
+  message$: Observable<any> = EMPTY;
 
   /**
    * update token in firebase database
@@ -25,32 +27,32 @@ export class MessagingService {
    * @param user user as a key
    * @param token the new token generated
    */
-  updateToken(user: any, token: string): void {
+  updateToken = (user: any, token: string): void => {
     if (this.auth.currentUser) {
       this.store.dispatch(
         new fromActionsNotification.NotificationSubscribe(token)
       );
       const data = {};
-      // @ts-ignore
+      // @ts-expect-error assign value in data[user.id]
       data[user.id] = token;
       const collection = ref(this.database, 'fcmTokens/');
-      update(collection, data);
+      update(collection, data).then(() => console.info('DB updated'));
     }
-  }
+  };
 
   /**
    * hook method when new notification received in foreground
    */
-  receiveMessage(): void {
+  receiveMessage = (): void => {
     this.message$ = new Observable(sub => onMessage(this.messaging, it => sub.next(it)));
-  }
+  };
 
   /**
    * request permission for notification from firebase cloud messaging
    *
    * @param user user
    */
-  requestPermission(user: any): void {
+  requestPermission = (user: any): void => {
     getTokenAppCheck(this.appCheck).then(appCheckToken => {
       if (appCheckToken) {
         Notification.requestPermission().then(value => {
@@ -68,5 +70,5 @@ export class MessagingService {
         });
       }
     });
-  }
+  };
 }

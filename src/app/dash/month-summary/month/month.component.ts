@@ -3,11 +3,13 @@ import { IMonthSummary, ISummaryTotal, Total } from '../../../interfaces/dashboa
 import { ICurrencyAll } from '../../../interfaces/currency';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from '../../../shared/shared.module';
 
 @Component({
   selector: 'app-month',
   templateUrl: './month.component.html',
-  styleUrls: ['./month.component.scss']
+  styleUrls: ['./month.component.scss'],
+  imports: [SharedModule]
 })
 export class MonthComponent implements AfterViewInit {
   @Input() month!: IMonthSummary;
@@ -53,7 +55,7 @@ export class MonthComponent implements AfterViewInit {
     this.cash = cash;
   }
 
-  goToMonth(month: number, type?: string): void {
+  goToMonth = (month: number, type?: string): void => {
     let step = 0;
     switch (type) {
       case 'INCOME':
@@ -66,6 +68,7 @@ export class MonthComponent implements AfterViewInit {
         step = 2;
         break;
     }
-    this.router.navigate([this.language, 'dashboard', 'monthly', 'summary'], { state: { date: `${ month }-${ this.year }`, step } });
-  }
+    this.router.navigate([this.language, 'dashboard', 'monthly', 'summary'],
+      { state: { date: `${ month }-${ this.year }`, step } });
+  };
 }

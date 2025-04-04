@@ -1,5 +1,12 @@
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
+import {
+  AbstractControl,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators,
+  ɵTypedOrUntyped
+} from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectColorState } from '../store/app.states';
@@ -8,12 +15,14 @@ import { Color, IColor } from '../interfaces/color';
 import * as fromActionsColor from '../store/color.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { fieldChange, valueChange } from '../util/validators';
-import * as fromActionsOffice from '../store/office.actions';
+import { SharedModule } from '../shared/shared.module';
+import { BackButtonDirective } from '../directives/back-button.directive';
 
 @Component({
   selector: 'app-colors',
   templateUrl: './color.component.html',
-  styleUrls: ['./color.component.scss']
+  styleUrls: ['./color.component.scss'],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class ColorComponent implements OnInit, OnDestroy {
   @Input() color?: IColor;
@@ -78,28 +87,24 @@ export class ColorComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       name: ['', [Validators.required]],
       description: ['']
     });
-  }
+  };
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsColor.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsColor.Clean());
 
-  private getColor(): void {
+  private getColor = (): void => {
     if (!this.color) {
       this.store.dispatch(
         new fromActionsColor.ColorFind(this.id)
       );
     }
-  }
+  };
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
         this.color = {
@@ -118,5 +123,5 @@ export class ColorComponent implements OnInit, OnDestroy {
         this.router.navigate([this.language, 'colors']);
       }
     });
-  }
+  };
 }

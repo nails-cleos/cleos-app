@@ -1,7 +1,7 @@
 import { NativeDateAdapter } from '@angular/material/core';
 
 export abstract class DateAdapter extends NativeDateAdapter {
-  parse(value: any): Date | null {
+  parse = (value: any): Date | null => {
     if ((typeof value === 'string') && (value.indexOf('/') > -1)) {
       const str = value.split('/');
 
@@ -13,7 +13,7 @@ export abstract class DateAdapter extends NativeDateAdapter {
     }
     const timestamp = typeof value === 'number' ? value : Date.parse(value);
     return isNaN(timestamp) ? null : new Date(timestamp);
-  }
+  };
 
   formatDate(date: Date, displayFormat: any): string {
     date = new Date(Date.UTC(

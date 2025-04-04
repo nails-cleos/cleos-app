@@ -3,11 +3,13 @@ import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } 
 import { Availability, IAvailability, IAvailabilityDate } from '../../interfaces/room';
 import { createDate, getCurrentTimeZone, getTime } from '../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from '../../shared/shared.module';
 
 @Component({
   selector: 'app-availability',
   templateUrl: './availability.component.html',
-  styleUrls: ['./availability.component.scss']
+  styleUrls: ['./availability.component.scss'],
+  imports: [SharedModule]
 })
 export class AvailabilityComponent implements OnChanges {
   @Input() dates?: IAvailabilityDate;
@@ -56,7 +58,8 @@ export class AvailabilityComponent implements OnChanges {
     return this.availability.emit(availability);
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ngOnChanges(_changes: SimpleChanges): void {
     const timeZone = getCurrentTimeZone();
     const start = this.dates?.startDate || createDate(timeZone, 9, 0);
     const end = this.dates?.endDate || createDate(timeZone, 18, 0);

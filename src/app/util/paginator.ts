@@ -6,7 +6,7 @@ export class PaginatorI18n {
   constructor(private readonly translate: TranslateService) {
   }
 
-  getPaginatorIntl(): MatPaginatorIntl {
+  getPaginatorIntl = (): MatPaginatorIntl => {
     const paginatorIntl = new MatPaginatorIntl();
     paginatorIntl.itemsPerPageLabel = this.translate.instant('COMMON.PAGINATOR.ITEMS_PER_PAGE_LABEL');
     paginatorIntl.nextPageLabel = this.translate.instant('COMMON.PAGINATOR.NEXT_PAGE_LABEL');
@@ -16,16 +16,17 @@ export class PaginatorI18n {
     paginatorIntl.getRangeLabel = this.getRangeLabel.bind(this);
 
     return paginatorIntl;
-  }
+  };
 
-  private getRangeLabel(page: number, pageSize: number, length: number): string {
+  private getRangeLabel = (page: number, pageSize: number, length: number): string => {
     if (length === 0 || pageSize === 0) {
-      return this.translate.instant('COMMON.PAGINATOR.RANGE_PAGE_LABEL_1', {length});
+      return this.translate.instant('COMMON.PAGINATOR.RANGE_PAGE_LABEL_1', { length });
     }
     length = Math.max(length, 0);
     const startIndex = page * pageSize;
     const endIndex = startIndex < length ? Math.min(startIndex + pageSize, length) : startIndex + pageSize;
 
-    return this.translate.instant('COMMON.PAGINATOR.RANGE_PAGE_LABEL_2', {startIndex: startIndex + 1, endIndex, length});
-  }
+    return this.translate.instant('COMMON.PAGINATOR.RANGE_PAGE_LABEL_2',
+      { startIndex: startIndex + 1, endIndex, length });
+  };
 }

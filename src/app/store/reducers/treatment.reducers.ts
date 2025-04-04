@@ -1,7 +1,7 @@
 import { Pagination } from '../../interfaces/pagination';
 import { All, TreatmentActionTypes } from '../treatment.actions';
 import { ITreatmentAll, ITreatmentGroup } from '../../interfaces/treatment';
-import { IColor, IColorAll } from '../../interfaces/color';
+import { IColorAll } from '../../interfaces/color';
 
 export interface State {
   data: ITreatmentGroup | Pagination<ITreatmentGroup> | null;
@@ -32,8 +32,7 @@ export const reducer = (state = initialState, action: All): State => {
     case TreatmentActionTypes.getAll: {
       return {
         ...state,
-        // @ts-ignore
-        data: { content: [{}, {}, {}], totalElements: 3 },
+        data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<ITreatmentGroup>,
         errorMessage: null,
         subErrors: null,
         selected: null,

@@ -8,8 +8,8 @@ describe('TreatmentGroupSortingComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TreatmentGroupSortingComponent ]
-    })
+    imports: [TreatmentGroupSortingComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(TreatmentGroupSortingComponent);

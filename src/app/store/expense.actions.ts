@@ -22,7 +22,6 @@ export class GetAll implements Action {
   }
 }
 
-
 export class GetExpenseInfo implements Action {
   readonly type = ExpenseActionTypes.getExpenseInfo;
 

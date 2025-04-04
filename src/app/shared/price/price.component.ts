@@ -3,11 +3,17 @@ import { IPrice } from '../../interfaces/treatment';
 import { ICurrency } from '../../interfaces/currency';
 import { UntypedFormGroup } from '@angular/forms';
 import { IPaymentOption } from '../../interfaces/payment';
+import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
+import { BankComponent } from '../bank/bank.component';
+import { TranslatePipe } from '@ngx-translate/core';
+import { DecimalPipe } from '@angular/common';
+import { MatDivider } from '@angular/material/divider';
 
 @Component({
   selector: 'app-price',
   templateUrl: './price.component.html',
-  styleUrls: ['./price.component.scss']
+  styleUrls: ['./price.component.scss'],
+  imports: [CurrencySymbolPipe, BankComponent, TranslatePipe, DecimalPipe, MatDivider]
 })
 export class PriceComponent {
   @Input() typeForm!: UntypedFormGroup;
@@ -26,7 +32,5 @@ export class PriceComponent {
     this.showPenalty = false;
   }
 
-  emitter(percentage: number): void {
-    this.percentageEmitter.emit(percentage);
-  }
+  emitter = (percentage: number): void => this.percentageEmitter.emit(percentage);
 }

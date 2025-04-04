@@ -17,23 +17,24 @@ export class OfficeEffects {
     switchMap((payload: any) => this.officeService.getAll(payload.active, payload.direction, payload.page,
       payload.size).pipe(
       switchMap((response: any) => of(new fromActionsOffice.OfficeSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({error: err.error})))
+      catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({ error: err.error })))
     ))
   ));
 
-  getAllManager$ = createEffect(() => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.getAllManager)).pipe(
-    map((action: any) => action.payload),
-    switchMap(() => this.userService.getAllManagers().pipe(
-      switchMap((response: any) => of(new fromActionsOffice.OfficeSuccess(response ? response : []))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({error: err.error})))
-    ))
-  ));
+  getAllManager$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.getAllManager)).pipe(
+      map((action: any) => action.payload),
+      switchMap(() => this.userService.getAllManagers().pipe(
+        switchMap((response: any) => of(new fromActionsOffice.OfficeSuccess(response ? response : []))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({ error: err.error })))
+      ))
+    ));
 
   findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.officeFind)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.officeService.getById(payload).pipe(
-      switchMap((office: any) => of(new fromActionsOffice.OfficeSelected({office}))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({error: err.error})))
+      switchMap((office: any) => of(new fromActionsOffice.OfficeSelected({ office }))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({ error: err.error })))
     ))
   ));
 
@@ -41,9 +42,9 @@ export class OfficeEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.officeService.add(payload).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('OFFICE.CREATED', {name: response.name});
-        return of(new fromActionsOffice.OfficeSaveSuccess({message}));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({error: err.error})))
+        const message = this.translate.instant('OFFICE.CREATED', { name: response.name });
+        return of(new fromActionsOffice.OfficeSaveSuccess({ message }));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({ error: err.error })))
     ))
   ));
 
@@ -51,9 +52,9 @@ export class OfficeEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.officeService.update(payload).pipe(
       switchMap((response: any) => {
-        const message = this.translate.instant('OFFICE.UPDATED.MESSAGE', {name: response.name});
-        return of(new fromActionsOffice.OfficeSaveSuccess({message}));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({error: err.error})))
+        const message = this.translate.instant('OFFICE.UPDATED.MESSAGE', { name: response.name });
+        return of(new fromActionsOffice.OfficeSaveSuccess({ message }));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({ error: err.error })))
     ))
   ));
 
@@ -61,24 +62,24 @@ export class OfficeEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.officeService.delete(payload.id).pipe(
       switchMap(() => {
-        const message = this.translate.instant('OFFICE.DELETED.MESSAGE', {name: payload.name});
-        return of(new fromActionsOffice.OfficeSaveSuccess({message}));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({error: err.error})))
+        const message = this.translate.instant('OFFICE.DELETED.MESSAGE', { name: payload.name });
+        return of(new fromActionsOffice.OfficeSaveSuccess({ message }));
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({ error: err.error })))
     ))
   ));
 
   selectedData$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsOffice.OfficeActionTypes.officeSelected),
     tap((data: any) => this.router.navigate([this.translate.currentLang, 'offices', data.payload.office.id]))
-  ), {dispatch: false});
+  ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsOffice.OfficeActionTypes.officeSuccess)
-  ), {dispatch: false});
+  ), { dispatch: false });
 
   saveSuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsOffice.OfficeActionTypes.officeSaveSuccess)
-  ), {dispatch: false});
+  ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions,
               private officeService: OfficeService, private userService: UserService, private router: Router) {

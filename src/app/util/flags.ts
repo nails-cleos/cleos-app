@@ -40,7 +40,9 @@ export const findFlag = (flagList: IFlag[], lang: string): IFlag => {
     const locale = getLocale(lang).flag;
     value = flagList.find(flag => flag.value === locale);
     if (!value) {
-      value = flagList.find(flag => flag.value.startsWith(navigator.language) || navigator.language.startsWith(flag.value));
+      value = flagList.find(
+        flag => flag.value.startsWith(navigator.language) || navigator.language.startsWith(flag.value)
+      );
     }
   }
   return value ? value : findFlag(flagList, 'en');

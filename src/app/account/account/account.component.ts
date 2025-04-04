@@ -7,16 +7,20 @@ import * as fromActionsAccount from '../../store/account.actions';
 import { IAccountAll, ITransaction, Transaction } from '../../interfaces/account';
 import { ICurrency, ICurrencyAll } from '../../interfaces/currency';
 import { map, startWith } from 'rxjs/operators';
-import { FormBuilder, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
+import { AbstractControl, FormBuilder, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
 import { requireMatch, valueChange } from '../../util/validators';
 import { AuthUserService } from '../../services/auth-user.service';
 import { getLocale } from '../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from '../../shared/shared.module';
+import { BalanceComponent } from '../balance/balance.component';
+import { BackButtonDirective } from '../../directives/back-button.directive';
 
 @Component({
   selector: 'app-account',
   templateUrl: './account.component.html',
-  styleUrls: ['./account.component.scss']
+  styleUrls: ['./account.component.scss'],
+  imports: [SharedModule, BalanceComponent, BackButtonDirective]
 })
 export class AccountComponent implements OnInit, OnDestroy {
   form!: UntypedFormGroup;
@@ -47,7 +51,7 @@ export class AccountComponent implements OnInit, OnDestroy {
     this.language = getLocale(this.translate.currentLang).language;
   }
 
-  get getForm(): ɵTypedOrUntyped<any, any, any> {
+  get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
     return this.form.controls;
   }
 
@@ -82,29 +86,23 @@ export class AccountComponent implements OnInit, OnDestroy {
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  displayCurrencyFn(currency: ICurrencyAll): string {
-    return currency ? currency.code : '';
-  }
+  displayCurrencyFn = (currency: ICurrencyAll): string => currency ? currency.code : '';
 
-  keyDownHandler(event: any): void {
+  keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
       this.getForm.currency.setValue('');
     }
-  }
+  };
 
-  keyDownNumberHandler(event: any): void {
+  keyDownNumberHandler = (event: any): void => {
     if (event.code !== 'Backspace' && !event.key.match(/\d+/)) {
       event.preventDefault();
     }
-  }
+  };
 
-  private getAccount(): void {
-    this.store.dispatch(
-      new fromActionsAccount.AccountFindByCustomer(this.customerId)
-    );
-  }
+  private getAccount = (): void => this.store.dispatch(new fromActionsAccount.AccountFindByCustomer(this.customerId));
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       currency: ['', [Validators.required, requireMatch]],
       gift: ['', Validators.required]
@@ -115,15 +113,13 @@ export class AccountComponent implements OnInit, OnDestroy {
       map((name: string) => name ? this.filterCurrency(name) :
         this.account?.currencies ? this.account?.currencies.slice() : this.account?.currencies)
     );
-  }
+  };
 
-  private filterCurrency(name: string): ICurrency[] | undefined {
-    const filterValue = name.toLowerCase();
+  private filterCurrency = (name: string): ICurrency[] | undefined => this.account?.currencies?.filter(
+    option => option.code?.toLowerCase().indexOf(name.toLowerCase()) === 0
+  );
 
-    return this.account?.currencies?.filter(option => option.code?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected && !this.account) {
         this.account = state.selected;
@@ -142,5 +138,5 @@ export class AccountComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
+  };
 }

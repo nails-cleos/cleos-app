@@ -4,11 +4,13 @@ import { UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch } from '../../util/validators';
 import { map, startWith } from 'rxjs/operators';
 import { IPaymentOption } from '../../interfaces/payment';
+import { SharedModule } from '../shared.module';
 
 @Component({
   selector: 'app-bank',
   templateUrl: './bank.component.html',
-  styleUrls: ['./bank.component.scss']
+  styleUrls: ['./bank.component.scss'],
+  imports: [SharedModule]
 })
 export class BankComponent implements AfterViewInit {
   @Input() formGroup!: UntypedFormGroup;
@@ -32,17 +34,15 @@ export class BankComponent implements AfterViewInit {
     this.createFilter();
   }
 
-  displayFnBank(bank: IPaymentOption): string {
-    return bank ? `${ bank.name }` : '';
-  }
+  displayFnBank = (bank: IPaymentOption): string => bank ? `${ bank.name }` : '';
 
-  keyDownHandler(event: any): void {
+  keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
       this.formGroup.get('bank')?.setValue('');
     }
-  }
+  };
 
-  private formChanges(): void {
+  private formChanges = (): void => {
     this.formGroup.get('percentage')?.setValue('TOTAL');
     if (this.firstTime) {
       this.formGroup.get('type')?.setValidators([Validators.required]);
@@ -89,9 +89,9 @@ export class BankComponent implements AfterViewInit {
       }
       this.percentageEmitter.emit(percentage);
     });
-  }
+  };
 
-  private createFilter(): void {
+  private createFilter = (): void => {
     this.filteredBank = this.formGroup.get('bank')?.valueChanges.pipe(startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filterBank(name) : this.bankList ? this.bankList.slice() : this.bankList));
@@ -99,11 +99,8 @@ export class BankComponent implements AfterViewInit {
     if (this.firstTime && this.options?.length === 1) {
       this.formGroup.get('type')?.setValue(this.options[0]);
     }
-  }
+  };
 
-  private filterBank(name: string): IPaymentOption[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.bankList?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
+  private filterBank = (name: string): IPaymentOption[] | undefined => this.bankList?.filter(
+    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 }

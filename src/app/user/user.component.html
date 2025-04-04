@@ -47,8 +47,9 @@
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.USER.LANG.FIELD' | translate }}</mat-label>
-                  @if (select.value) {
-                    <span [class]="'fi  fis fi-' + select.value.icon" class="margin-right-eight" matPrefix></span>
+                  @let flag = select.value;
+                  @if (flag) {
+                    <span [class]="'fi  fis fi-' + flag.icon" class="margin-right-eight" matPrefix></span>
                   }
                   <mat-select #select formControlName="lang" required>
                     @for (lang of flagList; track lang) {
@@ -70,8 +71,8 @@
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.USER.PHONE.FIELD' | translate }}</mat-label>
-                  <ngx-mat-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true" formControlName="phone"
-                                          [preferredCountries]="['nl']" name="phone"></ngx-mat-intl-tel-input>
+                  <ngx-material-intl-tel-input [enablePlaceholder]="true" [enableSearch]="true" formControlName="phone"
+                                          [preferredCountries]="['nl']" name="phone"></ngx-material-intl-tel-input>
                   @if (getForm.phone.hasError('validatePhoneNumber')) {
                     <mat-error [innerHTML]="'COMMON.USER.PHONE.INVALID' | translate"></mat-error>
                   } @else if (errors['phone']) {
@@ -85,8 +86,9 @@
                   </button>
                   <input (focus)="picker.open()" formControlName="dob" [matDatepicker]="picker" matInput>
                   <mat-datepicker #picker startView="multi-year" touchUi></mat-datepicker>
-                  @if (errors['dob']) {
-                    <mat-error>{{ errors['dob'] }}</mat-error>
+                  @let dobError = errors['dob'];
+                  @if (dobError) {
+                    <mat-error>{{ dobError }}</mat-error>
                   }
                 </mat-form-field>
                 <app-google-map [addressFormGroup]="form" (addressEmitter)="getAddress($event)"

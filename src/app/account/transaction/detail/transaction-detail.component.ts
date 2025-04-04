@@ -8,11 +8,14 @@ import * as fromActionsAccount from '../../../store/account.actions';
 import { TranslateService } from '@ngx-translate/core';
 import * as fromActionsPayment from '../../../store/payment.actions';
 import { newDateTimestamp } from '../../../util/dates';
+import { SharedModule } from '../../../shared/shared.module';
+import { BackButtonDirective } from '../../../directives/back-button.directive';
 
 @Component({
   selector: 'app-transaction-detail',
   templateUrl: './transaction-detail.component.html',
-  styleUrls: ['./transaction-detail.component.scss']
+  styleUrls: ['./transaction-detail.component.scss'],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class TransactionDetailComponent implements OnInit, OnDestroy {
 
@@ -26,7 +29,8 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
   private id: string | null = null;
   private transactionId: string | null = null;
 
-  constructor(private store: Store<AppState>, private route: ActivatedRoute, private translate: TranslateService, private router: Router) {
+  constructor(private store: Store<AppState>, private route: ActivatedRoute, private translate: TranslateService,
+              private router: Router) {
     this.getState = this.store.select(selectAccountState);
     this.dateFormat = this.translate.currentLang;
     this.step = this.router.getCurrentNavigation()?.extras.state?.step;
@@ -62,16 +66,16 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  private getTransaction(): void {
-    this.store.dispatch(
-      new fromActionsAccount.TransactionDetail({ id: this.id, transactionId: this.transactionId })
-    );
-  }
+  private getTransaction = (): void => this.store.dispatch(
+    new fromActionsAccount.TransactionDetail({ id: this.id, transactionId: this.transactionId })
+  );
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
-        this.transaction = Object.assign({}, state.selected, { date: newDateTimestamp(state.selected.payment.timestamp) });
+        this.transaction = Object.assign(
+          {}, state.selected, { date: newDateTimestamp(state.selected.payment.timestamp) }
+        );
       }
       if (state.paths) {
         this.router.navigate([this.language].concat(state.paths));
@@ -79,5 +83,5 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
         this.router.navigate([this.language, 'me', 'transaction', this.id, 'payment']);
       }
     });
-  }
+  };
 }

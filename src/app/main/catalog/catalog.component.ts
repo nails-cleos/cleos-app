@@ -8,11 +8,13 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
 import { MainContentService } from '../main-content.service';
 import { getImage } from '../../util/file';
+import { SharedModule } from '../../shared/shared.module';
 
 @Component({
   selector: 'app-catalog',
   templateUrl: './catalog.component.html',
-  styleUrls: ['./catalog.component.scss']
+  styleUrls: ['./catalog.component.scss'],
+  imports: [SharedModule]
 })
 export class CatalogComponent implements OnInit, OnDestroy {
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
@@ -26,7 +28,8 @@ export class CatalogComponent implements OnInit, OnDestroy {
 
   catalogues: ICatalogueAll[] = [];
 
-  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>, private mainContent: MainContentService) {
+  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
+              private mainContent: MainContentService) {
     this.getState = this.store.select(selectCatalogueState);
   }
 
@@ -40,19 +43,11 @@ export class CatalogComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsCatalogue.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsCatalogue.Clean());
 
-  private getCatalogs(): void {
-    this.store.dispatch(
-      new fromActionsCatalogue.GetAllCatalogs()
-    );
-  }
+  private getCatalogs = (): void => this.store.dispatch(new fromActionsCatalogue.GetAllCatalogs());
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {
       if (state.data) {
         state.data.forEach((it?: ICatalogueAll) => {
@@ -66,6 +61,6 @@ export class CatalogComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
+  };
 }
 

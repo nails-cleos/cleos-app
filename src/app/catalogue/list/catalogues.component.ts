@@ -12,11 +12,13 @@ import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { executeDialogNoWidth } from '../../util/helper';
+import { SharedModule } from '../../shared/shared.module';
 
 @Component({
   selector: 'app-catalogue-list',
   templateUrl: './catalogues.component.html',
-  styleUrls: ['./catalogues.component.scss']
+  styleUrls: ['./catalogues.component.scss'],
+  imports: [SharedModule]
 })
 export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChildren(CdkDropList) dropsQuery!: QueryList<CdkDropList>;
@@ -66,17 +68,15 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  drop(event: CdkDragDrop<{ title: string; poster: string }[]>): void {
-    moveItemInArray(this.catalogues, event.previousIndex, event.currentIndex);
-  }
+  drop = (event: CdkDragDrop<{ title: string; poster: string }[]>): void => moveItemInArray(
+    this.catalogues, event.previousIndex, event.currentIndex
+  );
 
-  edit(catalogue: ICatalogueAll): void {
-    this.store.dispatch(
-      new fromActionsCatalogue.CatalogueSelected(catalogue)
-    );
-  }
+  edit = (catalogue: ICatalogueAll): void => this.store.dispatch(
+    new fromActionsCatalogue.CatalogueSelected(catalogue)
+  );
 
-  delete(catalogue: ICatalogueAll): void {
+  delete = (catalogue: ICatalogueAll): void => {
     const title = this.translate.instant('CATALOGUE.DELETED.TITLE');
     const content = this.translate.instant('CATALOGUE.DELETED.CONTENT', { name: catalogue.name });
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: catalogue }, result => {
@@ -86,21 +86,13 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     });
-  }
+  };
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsCatalogue.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsCatalogue.Clean());
 
-  private getCatalogues(): void {
-    this.store.dispatch(
-      new fromActionsCatalogue.GetAll()
-    );
-  }
+  private getCatalogues = (): void => this.store.dispatch(new fromActionsCatalogue.GetAll());
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {
       if (state.data) {
         this.catalogues = state.data.map((it: ICatalogueAll) => {
@@ -116,5 +108,5 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.getCatalogues();
       }
     });
-  }
+  };
 }

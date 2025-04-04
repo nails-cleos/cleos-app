@@ -15,12 +15,14 @@ import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { convertDuration } from '../../util/dates';
 import { detailExpandAnimation } from '../../util/animation';
 import { executeDialogNoWidth } from '../../util/helper';
+import { SharedModule } from '../../shared/shared.module';
 
 @Component({
   selector: 'app-additional-list',
   templateUrl: './additional-list.component.html',
   styleUrls: ['./additional-list.component.scss'],
-  animations: [detailExpandAnimation]
+  animations: [detailExpandAnimation],
+  imports: [SharedModule]
 })
 export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -67,13 +69,11 @@ export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy
     this.paginatorSubscription?.unsubscribe();
   }
 
-  edit(additional: IAdditional): void {
-    this.store.dispatch(
-      new fromActionsAdditional.AdditionalSelected(additional)
-    );
-  }
+  edit = (additional: IAdditional): void => this.store.dispatch(
+    new fromActionsAdditional.AdditionalSelected(additional)
+  );
 
-  delete(additional: IAdditional): void {
+  delete = (additional: IAdditional): void => {
     const title = this.translate.instant('ADDITIONAL.DELETED.TITLE');
     const content = this.translate.instant('ADDITIONAL.DELETED.CONTENT', { name: additional.name });
 
@@ -84,9 +84,30 @@ export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy
         );
       }
     });
-  }
+  };
 
-  private subscribe(): void {
+  private clean = (): void => this.store.dispatch(new fromActionsAdditional.Clean());
+
+  private createPageSubscriptions = (): void => {
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getAdditionalList();
+    });
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getAdditionalList(this.paginator.pageIndex));
+
+    this.cdRef.detectChanges();
+  };
+
+  private getAdditionalList = (page: number = 0): void => this.store.dispatch(
+    new fromActionsAdditional.GetAll({
+      active: this.sort.active,
+      direction: this.sort.direction,
+      size: this.pageSize,
+      page
+    })
+  );
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {
       if (state.message) {
         this.clean();
@@ -105,33 +126,5 @@ export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy
         this.createPageSubscriptions();
       }
     });
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsAdditional.Clean()
-    );
-  }
-
-  private createPageSubscriptions(): void {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getAdditionalList();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getAdditionalList(this.paginator.pageIndex));
-
-    this.cdRef.detectChanges();
-  }
-
-  private getAdditionalList(page: number = 0): void {
-    const payload = {
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    };
-    this.store.dispatch(
-      new fromActionsAdditional.GetAll(payload)
-    );
-  }
+  };
 }

@@ -1,5 +1,11 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators
+} from '@angular/forms';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { Observable, Subscription } from 'rxjs';
 import { requireMatch } from '../../util/validators';
@@ -8,11 +14,15 @@ import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import { map, startWith } from 'rxjs/operators';
 import * as fromActionsUser from '../../store/user.actions';
+import { AppMaterialModule } from '../../util/app-material.module';
+import { TranslatePipe } from '@ngx-translate/core';
+import { AsyncPipe } from '@angular/common';
 
 
 @Component({
   selector: 'app-change-customer-dialog-component',
-  templateUrl: './change-customer-dialog.component.html'
+  templateUrl: './change-customer-dialog.component.html',
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe, AsyncPipe]
 })
 export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
   customerForm!: UntypedFormGroup;
@@ -50,52 +60,40 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  displayFnUser(user: IUser): string {
-    return user?.displayName ? user.displayName : '';
-  }
+  displayFnUser = (user: IUser): string => user?.displayName ? user.displayName : '';
 
-  keyDownHandler(event: any): void {
+  keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
       this.customer.setValue('');
     }
-  }
+  };
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.customerForm = this.formBuilder.group({
       customer: this.customer
     });
-  }
+  };
 
-  private createFilters(): void {
+  private createFilters = (): void => {
     this.filteredCustomer = this.customer.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers)
     );
-  }
+  };
 
-  private filterCustomer(name: string): IUser[] | undefined {
-    const filterValue = name.toLowerCase();
+  private filterCustomer = (name: string): IUser[] | undefined => this.customers?.filter(
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-    return this.customers?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
-  }
+  private getCustomers = (): void => this.store.dispatch(new fromActionsUser.GetAllCustomers());
 
-  private getCustomers(): void {
-    this.store.dispatch(
-      new fromActionsUser.GetAllCustomers()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.customers = state.data;
       this.customer.setValue(this.customers?.find(customer => customer.id === this.data.customerId));
     });
-  }
+  };
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsUser.Clean()
-    );
-  }
 }

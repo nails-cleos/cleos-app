@@ -1,5 +1,12 @@
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
+import {
+  AbstractControl,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators,
+  ɵTypedOrUntyped
+} from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectCurrencyState } from '../store/app.states';
@@ -8,11 +15,14 @@ import { Currency, ICurrency } from '../interfaces/currency';
 import * as fromActionsCurrency from '../store/currency.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { fieldChange } from '../util/validators';
+import { SharedModule } from '../shared/shared.module';
+import { BackButtonDirective } from '../directives/back-button.directive';
 
 @Component({
   selector: 'app-currency',
   templateUrl: './currency.component.html',
-  styleUrls: ['./currency.component.scss']
+  styleUrls: ['./currency.component.scss'],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class CurrencyComponent implements OnInit, OnDestroy {
   @Input() currency?: ICurrency;
@@ -28,8 +38,9 @@ export class CurrencyComponent implements OnInit, OnDestroy {
   private subscription: Subscription | undefined;
   private readonly language: string;
 
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
-              private router: Router, private route: ActivatedRoute, private cdRef: ChangeDetectorRef) {
+  constructor(private readonly translate: TranslateService, private store: Store<AppState>,
+              private formBuilder: UntypedFormBuilder, private router: Router, private route: ActivatedRoute,
+              private cdRef: ChangeDetectorRef) {
     this.isAddMode = true;
     this.getState = this.store.select(selectCurrencyState);
     this.language = this.translate.currentLang;
@@ -79,29 +90,25 @@ export class CurrencyComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       name: [''],
       code: ['', [Validators.required]],
       icon: ['']
     });
-  }
+  };
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsCurrency.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsCurrency.Clean());
 
-  private getCurrency(): void {
+  private getCurrency = (): void => {
     if (!this.currency) {
       this.store.dispatch(
         new fromActionsCurrency.CurrencyFind(this.id)
       );
     }
-  }
+  };
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
         this.currency = {
@@ -121,5 +128,5 @@ export class CurrencyComponent implements OnInit, OnDestroy {
         this.router.navigate([this.language, 'currency']);
       }
     });
-  }
+  };
 }

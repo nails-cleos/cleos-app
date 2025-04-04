@@ -16,11 +16,23 @@ import { IOffice, IOfficeAll } from '../interfaces/office';
 import { MatListOption } from '@angular/material/list';
 import { IPaymentType, paymentOptions } from '../interfaces/payment';
 import timezones from 'timezones-list';
-import { API_LOCALE, createDate, createDateFromString, createNewDate, getCurrentTimeZone, getTimeNumber, getTimeZone } from '../util/dates';
+import {
+  API_LOCALE,
+  createDate,
+  createDateFromString,
+  createNewDate,
+  getCurrentTimeZone,
+  getTimeNumber,
+  getTimeZone
+} from '../util/dates';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { goTo } from '../util/animation';
 import { areEquals, createAddress } from '../util/helper';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from '../shared/shared.module';
+import { AvailabilityComponent } from './availability/availability.component';
+import { GoogleMapComponent } from '../shared/google-map/google-map.component';
+import { BackButtonDirective } from '../directives/back-button.directive';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 
@@ -37,7 +49,8 @@ export interface IIcon {
 @Component({
   selector: 'app-room',
   templateUrl: './room.component.html',
-  styleUrls: ['./room.component.scss']
+  styleUrls: ['./room.component.scss'],
+  imports: [SharedModule, AvailabilityComponent, GoogleMapComponent, BackButtonDirective]
 })
 export class RoomComponent implements OnInit, OnDestroy {
   @ViewChild('professionalInput') professionalInput!: ElementRef<HTMLInputElement>;
@@ -97,8 +110,8 @@ export class RoomComponent implements OnInit, OnDestroy {
   private currentProfessionalIds: string[] = [];
   private readonly language: string;
 
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>, private route: ActivatedRoute,
-              private formBuilder: UntypedFormBuilder, private router: Router) {
+  constructor(private readonly translate: TranslateService, private store: Store<AppState>,
+              private route: ActivatedRoute, private formBuilder: UntypedFormBuilder, private router: Router) {
     this.isAddMode = true;
     this.primary = false;
     this.today = createDate();
@@ -133,7 +146,8 @@ export class RoomComponent implements OnInit, OnDestroy {
       room.availabilities = this.availabilities;
     }
 
-    room.address = createAddress(this.formattedAddress, this.geometry?.location, this.room?.address, this.getForm.addressDescription.value);
+    room.address = createAddress(this.formattedAddress, this.geometry?.location, this.room?.address,
+      this.getForm.addressDescription.value);
 
     if (this.getForm.closeDate.value) {
       room.closeDateString = createNewDate(this.getForm.closeDate.value).toLocaleString(API_LOCALE);
@@ -164,13 +178,13 @@ export class RoomComponent implements OnInit, OnDestroy {
     return;
   }
 
-  private static createAv(date?: string, timeZone?: string): Date | undefined {
+  private static createAv = (date?: string, timeZone?: string): Date | undefined => {
     if (date) {
       const startTime = getTimeNumber(date);
       return createDate(timeZone, startTime?.hour, startTime?.minute);
     }
     return undefined;
-  }
+  };
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(param => {
@@ -193,29 +207,23 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  setStep(index: number): void {
+  setStep = (index: number): void => {
     this.step = index;
-  }
+  };
 
-  displayCurrencyFn(currency: ICurrencyAll): string {
-    return currency ? currency.code : '';
-  }
+  displayCurrencyFn = (currency: ICurrencyAll): string => currency ? currency.code : '';
 
-  displayOfficeFn(office: IOfficeAll): string {
-    return office ? office.name : '';
-  }
+  displayOfficeFn = (office: IOfficeAll): string => office ? office.name : '';
 
-  displayTimeZoneFn(timeZone: any): string {
-    return timeZone ? timeZone.label : '';
-  }
+  displayTimeZoneFn = (timeZone: any): string => timeZone ? timeZone.label : '';
 
-  keyDownHandler(event: any, form: AbstractControl): void {
+  keyDownHandler = (event: any, form: AbstractControl): void => {
     if (event.code === 'Backspace') {
       form.setValue('');
     }
-  }
+  };
 
-  addAvailability(availability: IAvailability, step: number): void {
+  addAvailability = (availability: IAvailability, step: number): void => {
     this.setIcon(availability.day, RoomIconName.eventAvailable);
     const index = this.availabilities.findIndex((e) => e.day === availability.day);
 
@@ -225,56 +233,52 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.availabilities = [...this.availabilities, availability];
 
     this.step = step;
-  }
+  };
 
-  ignore(day: string, step: number): void {
+  ignore = (day: string, step: number): void => {
     this.setIcon(day, RoomIconName.eventBusy);
     const index = this.availabilities.findIndex((e) => e.day === day);
     if (index > -1) {
       this.availabilities.splice(index, 1);
     }
     this.step = step;
-  }
+  };
 
-  onChange(options: MatListOption[]): void {
+  onChange = (options: MatListOption[]): void => {
     this.paymentTypes = options.map(o => o.value);
-  }
+  };
 
-  isSelected(it: IPaymentType): boolean {
-    return it.checked || this.paymentTypes.includes(it.name);
-  }
+  isSelected = (it: IPaymentType): boolean => it.checked || this.paymentTypes.includes(it.name);
 
-  remove(professional: IUserAll): void {
+  remove = (professional: IUserAll): void => {
     const index = this.professionals.indexOf(professional);
     if (index >= 0) {
       this.professionals.splice(index, 1);
       this.allProfessional?.push(professional);
       this.getForm.professional.setValue(null);
     }
-  }
+  };
 
-  selected(event: MatAutocompleteSelectedEvent): void {
+  selected = (event: MatAutocompleteSelectedEvent): void => {
     const professional = event.option.value;
     this.professionals.push(professional);
     this.allProfessional = this.allProfessional?.filter(c => c.id !== professional.id);
     this.professionalInput.nativeElement.value = '';
     this.getForm.professional.setValue(null);
-  }
+  };
 
-  sortProfessionals(data: any): IUser[] {
-    return data.sort((a: any, b: any) => {
-      const aName = a.displayName.toUpperCase();
-      const bName = b.displayName.toUpperCase();
-      return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
-    });
-  }
+  sortProfessionals = (data: any): IUser[] => data.sort((a: any, b: any) => {
+    const aName = a.displayName.toUpperCase();
+    const bName = b.displayName.toUpperCase();
+    return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
+  });
 
-  getAddress(placeResult: PlaceResult): void {
+  getAddress = (placeResult: PlaceResult): void => {
     this.geometry = placeResult.geometry;
     this.formattedAddress = placeResult.formatted_address;
-  }
+  };
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       professional: [''],
       currency: ['', [Validators.required, requireMatch]],
@@ -285,12 +289,14 @@ export class RoomComponent implements OnInit, OnDestroy {
       closeDate: ['']
     });
     const currentTimeZone = getCurrentTimeZone().toLowerCase();
-    this.getForm.timeZone.setValue(this.timeZoneList.find(timeZone => timeZone.label.toLowerCase().indexOf(currentTimeZone) === 0));
+    this.getForm.timeZone.setValue(
+      this.timeZoneList.find(timeZone => timeZone.label.toLowerCase().indexOf(currentTimeZone) === 0));
     this.today = createDate(this.getForm.timeZone.value.tzCode);
     this.filteredProfessionals = this.getForm.professional.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value ? value.name : ''),
-      map(name => name ? this.filter(name) : (this.allProfessional ? this.allProfessional.slice() : this.allProfessional))
+      map(
+        name => name ? this.filter(name) : (this.allProfessional ? this.allProfessional.slice() : this.allProfessional))
     );
     this.filteredCurrencyOptions = this.getForm.currency.valueChanges.pipe(
       startWith(''),
@@ -307,21 +313,13 @@ export class RoomComponent implements OnInit, OnDestroy {
       map(value => typeof value === 'string' ? value : value.label),
       map(name => name ? this.filterTimeZone(name) : this.timeZoneList ? this.timeZoneList.slice() : this.timeZoneList)
     );
-  }
+  };
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsRoom.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsRoom.Clean());
 
-  private getRoomInfo(): void {
-    this.store.dispatch(
-      new fromActionsRoom.GetRoomInfo()
-    );
-  }
+  private getRoomInfo = (): void => this.store.dispatch(new fromActionsRoom.GetRoomInfo());
 
-  private setIcon(day: string, icon: RoomIconName): void {
+  private setIcon = (day: string, icon: RoomIconName): void => {
     switch (day) {
       case 'MONDAY':
         this.icons.monday = icon;
@@ -345,46 +343,44 @@ export class RoomComponent implements OnInit, OnDestroy {
         this.icons.sunday = icon;
         break;
     }
-  }
+  };
 
-  private getAvailabilities(availabilities: IAvailability[]): void {
-    availabilities.forEach((av: IAvailability) => {
-      this.currentAvailabilities = [...this.currentAvailabilities, av];
-      this.addAvailability(av, 0);
+  private getAvailabilities = (availabilities: IAvailability[]): void => availabilities.forEach((av: IAvailability) => {
+    this.currentAvailabilities = [...this.currentAvailabilities, av];
+    this.addAvailability(av, 0);
 
-      const availability: IAvailabilityDate = new AvailabilityDate();
-      const timeZone = this.getForm.timeZone.value.tzCode;
-      availability.startDate = RoomComponent.createAv(av.start, timeZone);
-      availability.endDate = RoomComponent.createAv(av.end, timeZone);
-      availability.startLunchDate = RoomComponent.createAv(av.startLunch, timeZone);
-      availability.endLunchDate = RoomComponent.createAv(av.endLunch, timeZone);
+    const availability: IAvailabilityDate = new AvailabilityDate();
+    const timeZone = this.getForm.timeZone.value.tzCode;
+    availability.startDate = RoomComponent.createAv(av.start, timeZone);
+    availability.endDate = RoomComponent.createAv(av.end, timeZone);
+    availability.startLunchDate = RoomComponent.createAv(av.startLunch, timeZone);
+    availability.endLunchDate = RoomComponent.createAv(av.endLunch, timeZone);
 
-      switch (av.day) {
-        case 'MONDAY':
-          this.monDate = availability;
-          break;
-        case 'TUESDAY':
-          this.tueDate = availability;
-          break;
-        case 'WEDNESDAY':
-          this.wedDate = availability;
-          break;
-        case 'THURSDAY':
-          this.thuDate = availability;
-          break;
-        case 'FRIDAY':
-          this.friDate = availability;
-          break;
-        case 'SATURDAY':
-          this.satDate = availability;
-          break;
-        case 'SUNDAY':
-          this.sunDate = availability;
-      }
-    });
-  }
+    switch (av.day) {
+      case 'MONDAY':
+        this.monDate = availability;
+        break;
+      case 'TUESDAY':
+        this.tueDate = availability;
+        break;
+      case 'WEDNESDAY':
+        this.wedDate = availability;
+        break;
+      case 'THURSDAY':
+        this.thuDate = availability;
+        break;
+      case 'FRIDAY':
+        this.friDate = availability;
+        break;
+      case 'SATURDAY':
+        this.satDate = availability;
+        break;
+      case 'SUNDAY':
+        this.sunDate = availability;
+    }
+  });
 
-  private validate(): boolean {
+  private validate = (): boolean => {
     if (this.form.invalid) {
       goTo('fields');
       return false;
@@ -436,40 +432,28 @@ export class RoomComponent implements OnInit, OnDestroy {
     }
 
     return true;
-  }
+  };
 
-  private filter(name: string): IUserAll[] | undefined {
-    const filterValue = name.toLowerCase();
+  private filter = (name: string): IUserAll[] | undefined => this.allProfessional?.filter(
+    option => option.displayName?.toLowerCase().indexOf(name.toString()) === 0);
 
-    return this.allProfessional?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
-  }
+  private filterCurrency = (name: string): ICurrency[] | undefined => this.currencies?.filter(
+    option => option.code?.toLowerCase().indexOf(name.toString()) === 0);
 
-  private filterCurrency(name: string): ICurrency[] | undefined {
-    const filterValue = name.toLowerCase();
+  private filterOffice = (name: string): IOffice[] | undefined => this.offices?.filter(
+    option => option.name?.toLowerCase().indexOf(name.toString()) === 0);
 
-    return this.currencies?.filter(option => option.code?.toLowerCase().indexOf(filterValue) === 0);
-  }
+  private filterTimeZone = (name: string): any[] | undefined => this.timeZoneList?.filter(
+    option => option.label?.toLowerCase().indexOf(name.toString()) >= 0);
 
-  private filterOffice(name: string): IOffice[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.offices?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private filterTimeZone(name: string): any[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.timeZoneList?.filter(option => option.label?.toLowerCase().indexOf(filterValue) >= 0);
-  }
-
-  private getRoom(): void {
+  private getRoom = (): void => {
     const id = this.route.snapshot.paramMap.get('id');
     this.store.dispatch(
       new fromActionsRoom.RoomFind({ id, redirect: true })
     );
-  }
+  };
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.allProfessional = state.professionals;
       this.currencies = state.currencies;
@@ -510,5 +494,5 @@ export class RoomComponent implements OnInit, OnDestroy {
         this.router.navigate([this.language, 'rooms']);
       }
     });
-  }
+  };
 }

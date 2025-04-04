@@ -138,9 +138,9 @@ export class ColorEvent implements EventColor {
 }
 
 export enum SummaryType {
-  payment = "PAYMENT",
-  expense = "EXPENSE",
-  cash = "CASH"
+  payment = 'PAYMENT',
+  expense = 'EXPENSE',
+  cash = 'CASH'
 }
 
 export enum ExpenseType {
@@ -185,7 +185,7 @@ export class TotalType implements ITotalType {
     });
   }
 
-  withTotal(gross: number, net: number, btw: number, size: number, subType?: string): ITotalType {
+  withTotal = (gross: number, net: number, btw: number, size: number, subType?: string): ITotalType => {
     const type = subType ?? this.type.toString();
     let total = this.totals.get(type);
     if (total) {
@@ -193,9 +193,9 @@ export class TotalType implements ITotalType {
       this.totals.set(type, total);
     }
     return this;
-  }
+  };
 
-  reset(subTypes: string[] = []): ITotalType {
+  reset = (subTypes: string[] = []): ITotalType => {
     if (!subTypes.length) {
       subTypes = [this.type.toString()];
     }
@@ -203,7 +203,7 @@ export class TotalType implements ITotalType {
       this.totals.set(it, new Total());
     });
     return this;
-  }
+  };
 
 }
 

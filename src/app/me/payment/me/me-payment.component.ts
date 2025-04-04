@@ -5,14 +5,25 @@ import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute } from '@angular/router';
 import * as fromActionsPayment from '../../../store/payment.actions';
-import { getPaymentOptions, getPayNlOptions, IPaymentAll, IPaymentOption, PaymentType } from '../../../interfaces/payment';
+import {
+  getPaymentOptions,
+  getPayNlOptions,
+  IPaymentAll,
+  IPaymentOption,
+  PaymentType
+} from '../../../interfaces/payment';
 import { Analytics, logEvent } from '@angular/fire/analytics';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from '../../../shared/shared.module';
+import { BankComponent } from '../../../shared/bank/bank.component';
+import { BackButtonDirective } from '../../../directives/back-button.directive';
+import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
 
 @Component({
   selector: 'app-me-payment',
   templateUrl: './me-payment.component.html',
-  styleUrls: ['./me-payment.component.scss']
+  styleUrls: ['./me-payment.component.scss'],
+  imports: [SharedModule, BankComponent, BackButtonDirective, CurrencySymbolPipe]
 })
 export class MePaymentComponent implements OnInit, OnDestroy {
 
@@ -77,12 +88,19 @@ export class MePaymentComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  private subscribe(): void {
+  private getPayment = (paymentId: string): void => this.store.dispatch(new fromActionsPayment.PaymentFind(paymentId));
+
+  private getOptions = (): void => this.store.dispatch(new fromActionsPayment.PaymentOptions());
+
+  private clean = (): void => this.store.dispatch(new fromActionsPayment.Clean());
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
         this.payment = state.selected;
         const reservation = this.payment?.reservation;
-        const types = reservation?.room?.paymentTypes.filter(p => ![PaymentType.cash, PaymentType.transfer].includes(p));
+        const types = reservation?.room?.paymentTypes.filter(
+          p => ![PaymentType.cash, PaymentType.transfer].includes(p));
         if (types?.includes(PaymentType.paynl)) {
           this.getOptions();
         } else {
@@ -93,23 +111,5 @@ export class MePaymentComponent implements OnInit, OnDestroy {
         this.options = getPayNlOptions(state.data);
       }
     });
-  }
-
-  private getPayment(paymentId: string): void {
-    this.store.dispatch(
-      new fromActionsPayment.PaymentFind(paymentId)
-    );
-  }
-
-  private getOptions(): void {
-    this.store.dispatch(
-      new fromActionsPayment.PaymentOptions()
-    );
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsPayment.Clean()
-    );
-  }
+  };
 }

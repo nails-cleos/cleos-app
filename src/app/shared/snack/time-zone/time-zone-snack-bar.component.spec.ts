@@ -8,8 +8,8 @@ describe('TimeZoneSnackBarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TimeZoneSnackBarComponent ]
-    })
+    imports: [TimeZoneSnackBarComponent]
+})
     .compileComponents();
   });
 

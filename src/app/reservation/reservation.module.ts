@@ -1,10 +1,6 @@
 import { NgModule } from '@angular/core';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { MatStepperModule } from '@angular/material/stepper';
 import { EffectsModule } from '@ngrx/effects';
-import { CalendarModule } from 'angular-calendar';
-
-import { SharedModule } from '../shared/shared.module';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { ReservationRoutingModule } from './reservation-routing.module';
 
@@ -38,11 +34,10 @@ import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
 import { FabMenuComponent } from './detail/fab-menu/fab-menu.component';
-import { PriceExtrasComponent } from '../shared/price-extras/price-extras.component';
 import { FormFieldAdderComponent } from '../shared/form-field-adder/form-field-adder.component';
 
 @NgModule({
-  declarations: [
+  imports: [
     SearchComponent,
     ReservationComponent,
     ReservationDetailComponent,
@@ -54,14 +49,9 @@ import { FormFieldAdderComponent } from '../shared/form-field-adder/form-field-a
     SelectProfessionalDialogComponent,
     AddNoteDialogComponent,
     AddDiscountDialogComponent,
-    FabMenuComponent
-  ],
-  imports: [
+    FabMenuComponent,
+    FormFieldAdderComponent,
     ReservationRoutingModule,
-    SharedModule,
-    PriceExtrasComponent,
-    CalendarModule,
-    MatStepperModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
@@ -74,8 +64,7 @@ import { FormFieldAdderComponent } from '../shared/form-field-adder/form-field-a
       isolate: false,
       extend: true
     }),
-    EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects]),
-    FormFieldAdderComponent
+    EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects])
   ],
   providers: [
     ReservationService,

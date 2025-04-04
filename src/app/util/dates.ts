@@ -61,7 +61,6 @@ export const daysOfWeek: string[] = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY',
 
 export const findDayOfWeek = (day: string): number => daysOfWeek.findIndex(x => x === day);
 
-
 export const getDuration = (allDay: boolean, duration?: string): IDuration =>
   allDay || !duration ? new Duration(23, 59) : convertDuration(duration);
 
@@ -432,9 +431,13 @@ export const createDateFromString = (stringDate: string): Date => {
   return new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]));
 };
 
-export const createDate = (timeZone?: string, hour: number = 0, minute: number = 0, second: number = 0,
-                           milli: number = 0): Date => createNewDate(getNowTimeZone(timeZone), hour, minute, second,
-  milli);
+export const createDate = (
+  timeZone?: string,
+  hour: number = 0,
+  minute: number = 0,
+  second: number = 0,
+  milli: number = 0
+): Date => createNewDate(getNowTimeZone(timeZone), hour, minute, second, milli);
 
 export const createEndDate = (stringDate: string): Date => {
   const d = stringDate.split('-');
@@ -464,12 +467,22 @@ export const zoneDateToDate = (value: number = 0, timeZone: string = getCurrentT
 
 export const dateToUTC = (date: Date, timeZone: string = getCurrentTimeZone()): Date => fromZonedTime(date, timeZone);
 
-export const createNewDateZonedTime = (date: string | Date | number, timeZone: string = getCurrentTimeZone(),
-                                       hour: number = 0,
-                                       minute: number = 0, second: number = 0, milli: number = 0): Date =>
-  toZonedTime(createNewDate(newDateTimestamp(date), hour, minute, second, milli), timeZone);
-export const createNewDate = (date: Date, hour: number = 0, minute: number = 0, second: number = 0,
-                              milli: number = 0): Date => {
+export const createNewDateZonedTime = (
+  date: string | Date | number,
+  timeZone: string = getCurrentTimeZone(),
+  hour: number = 0,
+  minute: number = 0,
+  second: number = 0,
+  milli: number = 0
+): Date => toZonedTime(createNewDate(newDateTimestamp(date), hour, minute, second, milli), timeZone);
+
+export const createNewDate = (
+  date: Date,
+  hour: number = 0,
+  minute: number = 0,
+  second: number = 0,
+  milli: number = 0
+): Date => {
   const d = new Date(date);
   d.setHours(hour, minute, second, milli);
 
@@ -523,6 +536,7 @@ export const plusMonthDate = (date: Date, plus: number, day: number): Date => {
 };
 
 export const plusDays = (date: Date, plus: number): Date => addDays(new Date(date), plus);
+
 export const plusMinutes = (date: Date, plus: number): Date => addMinutes(date, plus);
 
 export const greaterOrEqualsThan = (date1: Date, date2: Date): boolean => date1 >= date2;

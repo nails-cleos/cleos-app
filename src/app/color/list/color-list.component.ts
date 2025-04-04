@@ -14,12 +14,14 @@ import * as fromActionsColor from '../../store/color.actions';
 import { executeDialogNoWidth } from '../../util/helper';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { detailExpandAnimation } from '../../util/animation';
+import { SharedModule } from '../../shared/shared.module';
 
 @Component({
   selector: 'app-color-list',
   templateUrl: './color-list.component.html',
   styleUrls: ['./color-list.component.scss'],
-  animations: [detailExpandAnimation]
+  animations: [detailExpandAnimation],
+  imports: [SharedModule]
 })
 export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -66,13 +68,9 @@ export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
   }
 
-  edit(color: IColor): void {
-    this.store.dispatch(
-      new fromActionsColor.ColorSelected(color)
-    );
-  }
+  edit = (color: IColor): void => this.store.dispatch(new fromActionsColor.ColorSelected(color));
 
-  delete(color: IColor): void {
+  delete = (color: IColor): void => {
     const title = this.translate.instant('COLOR.DELETED.TITLE');
     const content = this.translate.instant('COLOR.DELETED.CONTENT', { name: color.name });
 
@@ -83,9 +81,30 @@ export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     });
-  }
+  };
 
-  private subscribe(): void {
+  private clean = (): void => this.store.dispatch(new fromActionsColor.Clean());
+
+  private createPageSubscriptions = (): void => {
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getColorList();
+    });
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getColorList(this.paginator.pageIndex));
+
+    this.cdRef.detectChanges();
+  };
+
+  private getColorList = (page: number = 0): void => this.store.dispatch(
+    new fromActionsColor.GetAll({
+      active: this.sort.active,
+      direction: this.sort.direction,
+      size: this.pageSize,
+      page
+    })
+  );
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {
       if (state.message) {
         this.clean();
@@ -97,33 +116,5 @@ export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
         this.createPageSubscriptions();
       }
     });
-  }
-
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsColor.Clean()
-    );
-  }
-
-  private createPageSubscriptions(): void {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getColorList();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getColorList(this.paginator.pageIndex));
-
-    this.cdRef.detectChanges();
-  }
-
-  private getColorList(page: number = 0): void {
-    const payload = {
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    };
-    this.store.dispatch(
-      new fromActionsColor.GetAll(payload)
-    );
-  }
+  };
 }

@@ -1,20 +1,20 @@
-<div *ngIf="!isLoading; else box" class="chartContainer">
-  <div *ngIf="chart && !error; else errorBox">
-    <div>
-      <canvas [type]="chart.type"
-              [datasets]="chart.charData.datasets"
-              [labels]="chart.labels"
-              [legend]="true"
-              [options]="chart.options"
-              baseChart class="block">
-      </canvas>
-    </div>
+@if (!isLoading) {
+  <div class="chartContainer">
+    @if (chart && !error) {
+      <div>
+        <canvas [type]="chart.type"
+                [datasets]="chart.charData.datasets"
+                [labels]="chart.labels"
+                [legend]="true"
+                [options]="chart.options"
+                baseChart class="block">
+        </canvas>
+      </div>
+    } @else {
+      <app-error [error]="error" [isCard]="true"></app-error>
+    }
   </div>
-  <ng-template #errorBox>
-    <app-error [error]="error" [isCard]="true"></app-error>
-  </ng-template>
-</div>
-<ng-template #box>
+} @else {
   <div class="ssc-square"></div>
   <div class="ssc-square"></div>
-</ng-template>
+}

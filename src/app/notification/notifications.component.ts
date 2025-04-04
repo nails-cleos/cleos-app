@@ -9,12 +9,15 @@ import { TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../services/navigation.service';
 import { zoneDateToDate } from '../util/dates';
 import { addRemoveItemList, insertItemList } from '../util/animation';
+import { SharedModule } from '../shared/shared.module';
+import { MatRipple } from '@angular/material/core';
 
 @Component({
   selector: 'app-notifications',
   templateUrl: './notifications.component.html',
   styleUrls: ['./notifications.component.scss'],
-  animations: [insertItemList, addRemoveItemList]
+  animations: [insertItemList, addRemoveItemList],
+  imports: [SharedModule, MatRipple]
 })
 export class NotificationsComponent implements OnInit, OnDestroy {
   notifications: INotification[] = [];
@@ -44,7 +47,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  notification(notification: INotification): void {
+  notification = (notification: INotification): void => {
     if (notification.read) {
       this.router.navigate([notification.navigation]);
     } else {
@@ -53,21 +56,17 @@ export class NotificationsComponent implements OnInit, OnDestroy {
         new fromActionsNotification.NotificationRead(notification)
       );
     }
-  }
+  };
 
-  getNotifications(): void {
-    ++this.page;
-    const payload = {
+  getNotifications = (): void => this.store.dispatch(
+    new fromActionsNotification.GetAllPaged({
       active: 'date',
       direction: 'desc',
-      page: this.page
-    };
-    this.store.dispatch(
-      new fromActionsNotification.GetAllPaged(payload)
-    );
-  }
+      page: ++this.page
+    })
+  );
 
-  remove(index: number): void {
+  remove = (index: number): void => {
     if (!this.notifications.length) {
       return;
     }
@@ -82,15 +81,11 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       this.page = -1;
       this.getNotifications();
     }
-  }
+  };
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsNotification.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsNotification.Clean());
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.data) {
         if (state.data.page?.content?.length) {
@@ -110,5 +105,5 @@ export class NotificationsComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
+  };
 }

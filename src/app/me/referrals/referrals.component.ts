@@ -12,11 +12,14 @@ import { IUserDiscount } from '../../interfaces/discount';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Analytics, logEvent } from '@angular/fire/analytics';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { SharedModule } from '../../shared/shared.module';
+import { ShareButtonsComponent } from './share-buttons/share-buttons.component';
 
 @Component({
   selector: 'app-referrals',
   templateUrl: './referrals.component.html',
-  styleUrls: ['./referrals.component.scss']
+  styleUrls: ['./referrals.component.scss'],
+  imports: [SharedModule]
 })
 export class ReferralsComponent implements OnInit, OnDestroy {
   userId?: string;
@@ -81,13 +84,11 @@ export class ReferralsComponent implements OnInit, OnDestroy {
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsDiscount.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
 
-  private subscribe(): void {
+  private getReferrals = (): void => this.store.dispatch(new fromActionsDiscount.GetReferrals());
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.referrals) {
         const referrals: IUserDiscount[] = state.referrals;
@@ -97,18 +98,13 @@ export class ReferralsComponent implements OnInit, OnDestroy {
         this.showShare = this.referralMax ? this.referrals < this.referralMax : true;
       }
     });
-  }
-
-  private getReferrals(): void {
-    this.store.dispatch(
-      new fromActionsDiscount.GetReferrals()
-    );
-  }
+  };
 }
 
 @Component({
   selector: 'app-bottom-sheet-share',
-  templateUrl: 'bottom-sheet-share.component.html'
+  templateUrl: 'bottom-sheet-share.component.html',
+  imports: [SharedModule, ShareButtonsComponent]
 })
 export class BottomSheetShareComponent {
   message: any;
@@ -139,7 +135,8 @@ export class BottomSheetShareComponent {
 @Component({
   selector: 'app-bottom-sheet-referral',
   templateUrl: 'bottom-sheet-referral.component.html',
-  styleUrls: ['./bottom-sheet-referral.component.scss']
+  styleUrls: ['./bottom-sheet-referral.component.scss'],
+  imports: [SharedModule]
 })
 export class BottomSheetReferralComponent {
   referralMax = 5;
@@ -152,7 +149,7 @@ export class BottomSheetReferralComponent {
     this.delay(data, 0, max);
   }
 
-  private delay(data: any, count: number, max: number): void {
+  private delay = (data: any, count: number, max: number): void => {
     setTimeout(() => {
       count++;
       this.referrals = count > data.referrals ? data.referrals : count;
@@ -161,5 +158,5 @@ export class BottomSheetReferralComponent {
         this.delay(data, count, max);
       }
     }, 500);
-  }
+  };
 }

@@ -1,0 +1,8 @@
+<mat-list-item>
+  <div class="fields-container" [ngClass]="{ 'result': isResult }" matListItemTitle>
+    <div>{{ label }}</div>
+    <div class="currency">
+      {{ value | currency: currencyCode: 'symbol': '1.2-2' }}
+    </div>
+  </div>
+</mat-list-item>

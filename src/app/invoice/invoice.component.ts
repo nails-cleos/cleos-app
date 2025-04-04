@@ -23,6 +23,8 @@ import { requireMatch } from '../util/validators';
 import { MonthPeriodAdapter } from '../util/adapter/month-period-adapter.service';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
+import { SharedModule } from '../shared/shared.module';
+import { TimeDetailPipe } from '../pipes/time-detail.pipe';
 
 pdfMake.fonts = {
   EBGaramond: {
@@ -43,7 +45,8 @@ pdfMake.fonts = {
       provide: MAT_DATE_RANGE_SELECTION_STRATEGY,
       useClass: MonthPeriodAdapter,
     },
-  ]
+  ],
+  imports: [SharedModule, TimeDetailPipe]
 })
 export class InvoiceComponent implements OnInit, OnDestroy {
   @ViewChild('pdfTable') pdfTable!: ElementRef;
@@ -82,7 +85,8 @@ export class InvoiceComponent implements OnInit, OnDestroy {
   private allPaymentTypes: string[] = Object.keys(PaymentType);
   private offices?: IOfficeAll[];
 
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>, private formBuilder: FormBuilder,
+  constructor(private readonly translate: TranslateService, private store: Store<AppState>,
+              private formBuilder: FormBuilder,
               private router: Router, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
@@ -128,26 +132,24 @@ export class InvoiceComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  keyDownHandler(event: any): void {
+  keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
       this.office.setValue(null);
     }
-  }
+  };
 
-  displayFnOffice(office: IOfficeAll): string {
-    return office ? office.name : '';
-  }
+  displayFnOffice = (office: IOfficeAll): string => office ? office.name : '';
 
-  selected(event: MatAutocompleteSelectedEvent): void {
+  selected = (event: MatAutocompleteSelectedEvent): void => {
     const type = PaymentType[event.option.value as PaymentTypeKey];
     this.types = [...this.types, type];
     this.allPaymentTypes = this.allPaymentTypes.filter(s => PaymentType[s as PaymentTypeKey] !== type);
     this.typeInput.nativeElement.value = '';
     this.type.setValue(null);
     this.findInvoices();
-  }
+  };
 
-  remove(type: string): void {
+  remove = (type: string): void => {
     const index = this.types.indexOf(type);
 
     if (index >= 0) {
@@ -157,31 +159,29 @@ export class InvoiceComponent implements OnInit, OnDestroy {
       this.type.setValue(null);
       this.findInvoices();
     }
-  }
+  };
 
-  isAllSelected(): boolean {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
-    return numSelected === numRows;
-  }
+  // numSelected === numRows
+  isAllSelected = (): boolean => this.selection.selected.length === this.dataSource.data.length;
 
-  toggleAllRows(): void {
+  toggleAllRows = (): void => {
     if (this.isAllSelected()) {
       this.selection.clear();
       return;
     }
 
     this.selection.select(...this.dataSource.data);
-  }
+  };
 
-  checkboxLabel(row?: any): string {
-    if (!row) {
-      return `${ this.isAllSelected() ? 'deselect' : 'select' } all`;
-    }
-    return `${ this.selection.isSelected(row) ? 'deselect' : 'select' } row ${ row.position + 1 }`;
-  }
+  checkboxLabel = (row?: any): string =>
+    !row ? `${ this.isAllSelected() ? 'deselect' : 'select' } all` :
+      `${ this.selection.isSelected(row) ? 'deselect' : 'select' } row ${ row.position + 1 }`;
 
-  private createForm(): void {
+  goToPath = (invoice: IInvoice): void => {
+    this.router.navigate(invoice.paths);
+  };
+
+  private createForm = (): void => {
     this.dateRange = this.formBuilder.group({
       startDate: this.startDate,
       endDate: this.endDate
@@ -199,9 +199,9 @@ export class InvoiceComponent implements OnInit, OnDestroy {
     );
 
     this.valueChanges();
-  }
+  };
 
-  private valueChanges(): void {
+  private valueChanges = (): void => {
     this.dateRange.valueChanges.subscribe(value => {
       if (value?.startDate && value?.endDate && this.office.value.id) {
         this.findInvoices();
@@ -215,21 +215,16 @@ export class InvoiceComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
+  };
 
-  private filterTypes(value: string): string[] {
-    const filterValue = value.toLowerCase();
+  private filterTypes = (
+    value: string
+  ): string[] => this.allPaymentTypes.filter(state => state.toLowerCase().indexOf(value.toLowerCase()) === 0);
 
-    return this.allPaymentTypes.filter(state => state.toLowerCase().indexOf(filterValue) === 0);
-  }
+  private filterOffice = (name: string): IOfficeAll[] | undefined => this.offices?.filter(
+    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private filterOffice(name: string): IOfficeAll[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.offices?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private findInvoices(): void {
+  private findInvoices = (): void => {
     if (this.startDate.value && this.endDate.value) {
       this.selection.clear();
       const payload = {
@@ -242,21 +237,13 @@ export class InvoiceComponent implements OnInit, OnDestroy {
         new fromActionsInvoice.InvoiceFind(payload)
       );
     }
-  }
+  };
 
-  private findOffices(): void {
-    this.store.dispatch(
-      new fromActionsInvoice.FindMyOffices()
-    );
-  }
+  private findOffices = (): void => this.store.dispatch(new fromActionsInvoice.FindMyOffices());
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsInvoice.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsInvoice.Clean());
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.offices = state.offices;
       if (this.offices?.length === 1) {
@@ -281,9 +268,5 @@ export class InvoiceComponent implements OnInit, OnDestroy {
         this.dataSource = new MatTableDataSource(this.invoices);
       }
     });
-  }
-
-  goToPath(invoice: IInvoice): void {
-    this.router.navigate(invoice.paths)
-  }
+  };
 }

@@ -1,40 +1,41 @@
 <mat-card appearance="outlined" class="style-card">
-  <mat-card-header *ngIf="account; else skeletonTitle">
-    <mat-card-title style="font-size: 2em">{{'ACCOUNT.BALANCE' | translate}}</mat-card-title>
-    <mat-card-subtitle>{{'ACCOUNT.TITLE' | translate}} {{account.id}}</mat-card-subtitle>
-    <div class="spacer"></div>
-    <ng-template [ngIf]="showAdd">
-      <button mat-icon-button [color]="'primary'" [routerLink]="['/', language, 'accounts', account.id, 'transactions', 'add']">
-        <mat-icon>add</mat-icon>
-      </button>
-    </ng-template>
-    <ng-template [ngIf]="showView">
-      <button mat-icon-button [color]="'primary'" [routerLink]="['/', language, 'accounts', account.id, 'transactions', 'view']">
-        <mat-icon>account_balance</mat-icon>
-      </button>
-    </ng-template>
-    <ng-template [ngIf]="showUser">
-      <button mat-icon-button [color]="'primary'" [routerLink]="['/', language, 'accounts', 'customers', account.customer.id]">
-        <mat-icon>account_circle</mat-icon>
-      </button>
-    </ng-template>
-  </mat-card-header>
-  <ng-template #skeletonTitle>
+  @if (account) {
+    <mat-card-header>
+      <mat-card-title style="font-size: 2em">{{ 'ACCOUNT.BALANCE' | translate }}</mat-card-title>
+      <mat-card-subtitle>{{ 'ACCOUNT.TITLE' | translate }} {{ account.id }}</mat-card-subtitle>
+      <div class="spacer"></div>
+      @if (showAdd) {
+        <button mat-icon-button [color]="'primary'"
+                [routerLink]="['/', language, 'accounts', account.id, 'transactions', 'add']">
+          <mat-icon>add</mat-icon>
+        </button>
+      }
+      @if (showView) {
+        <button mat-icon-button [color]="'primary'"
+                [routerLink]="['/', language, 'accounts', account.id, 'transactions', 'view']">
+          <mat-icon>account_balance</mat-icon>
+        </button>
+      }
+      @if (showUser) {
+        <button mat-icon-button [color]="'primary'"
+                [routerLink]="['/', language, 'accounts', 'customers', account.customer.id]">
+          <mat-icon>account_circle</mat-icon>
+        </button>
+      }
+    </mat-card-header>
+  } @else {
     <div class="card-margin ssc-head-line"></div>
-  </ng-template>
+  }
   <mat-card-content>
-    <div *ngIf="account && account.currency; else box">
+    @if (account && account.currency) {
       <div id="account-spinner" class="spinner-parent-center">
-        <mat-progress-spinner [color]="'primary'" [mode]="'determinate'" [value]="balancePercentage"
-                              [diameter]="200">
-        </mat-progress-spinner>
+        <mat-progress-spinner [color]="'primary'" [mode]="'determinate'" [value]="balancePercentage" [diameter]="200"/>
       </div>
       <div class="spinner-text-inside">
-        <h1>{{account.balance | currency: account.currency.code: 'symbol': '1.2-2'}}</h1>
+        <h1>{{ account.balance | currency: account.currency.code: 'symbol': '1.2-2' }}</h1>
       </div>
-    </div>
-    <ng-template #box>
+    } @else {
       <div style="height: 80px" class="ssc-square mb"></div>
-    </ng-template>
+    }
   </mat-card-content>
 </mat-card>

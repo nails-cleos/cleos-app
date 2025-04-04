@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 
 import { OfficeRoutingModule } from './office-routing.module';
 import { OfficeComponent } from './office.component';
-import { SharedModule } from '../shared/shared.module';
 import { OfficeListComponent } from './list/office-list.component';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { EffectsModule } from '@ngrx/effects';
@@ -15,13 +14,10 @@ import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
 
 @NgModule({
-  declarations: [
-    OfficeComponent,
-    OfficeListComponent
-  ],
   imports: [
+    OfficeComponent,
+    OfficeListComponent,
     OfficeRoutingModule,
-    SharedModule,
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,

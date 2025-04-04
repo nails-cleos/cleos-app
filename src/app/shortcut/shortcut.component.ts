@@ -3,6 +3,7 @@ import { AuthUserService } from '../services/auth-user.service';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from '../shared/shared.module';
 
 enum ShortcutEnum {
   dashboard,
@@ -13,14 +14,15 @@ enum ShortcutEnum {
 @Component({
   selector: 'app-shortcut',
   templateUrl: './shortcut.component.html',
-  styleUrls: ['./shortcut.component.scss']
+  styleUrls: ['./shortcut.component.scss'],
+  imports: [SharedModule]
 })
 export class ShortcutComponent implements OnDestroy {
 
   private authUserServiceSubscription: Subscription;
 
-  constructor(private readonly translate: TranslateService, private authUserService: AuthUserService, private route: ActivatedRoute,
-              private router: Router) {
+  constructor(private readonly translate: TranslateService, private authUserService: AuthUserService,
+              private route: ActivatedRoute, private router: Router) {
     const key = this.route.snapshot.paramMap.get('key') as keyof typeof ShortcutEnum;
     const shortcut = ShortcutEnum[key];
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {

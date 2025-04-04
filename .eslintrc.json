@@ -6,6 +6,10 @@
   "plugins": [
     "@angular-eslint"
   ],
+  "rules": {
+    "quotes": ["error", "single"],
+    "semi": [1, "always"]
+  },
   "overrides": [
     {
       "files": [

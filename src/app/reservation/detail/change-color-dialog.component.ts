@@ -1,5 +1,11 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators
+} from '@angular/forms';
 import { IColorAll } from '../../interfaces/color';
 import { Observable, Subscription } from 'rxjs';
 import { requireMatch } from '../../util/validators';
@@ -8,10 +14,14 @@ import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
 import { map, startWith } from 'rxjs/operators';
 import * as fromActionsReservation from '../../store/reservation.actions';
+import { AppMaterialModule } from '../../util/app-material.module';
+import { TranslatePipe } from '@ngx-translate/core';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-change-color-dialog-component',
-  templateUrl: './change-color-dialog.component.html'
+  templateUrl: './change-color-dialog.component.html',
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe, AsyncPipe]
 })
 export class ChangeColorDialogComponent implements OnInit, OnDestroy {
   colorForm!: UntypedFormGroup;
@@ -50,46 +60,39 @@ export class ChangeColorDialogComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  displayFnColor(color: IColorAll): string {
-    return color ? color.name : '';
-  }
+  displayFnColor = (color: IColorAll): string => color ? color.name : '';
 
-  keyDownHandler(event: any): void {
+  keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
       this.color.setValue('');
     }
-  }
+  };
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.colorForm = this.formBuilder.group({
       color: this.color
     });
-  }
+  };
 
-  private createFilters(): void {
+  private createFilters = (): void => {
     this.filteredColor = this.color.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filterColor(name) : this.colors ? this.colors.slice() : this.colors)
     );
-  }
+  };
 
-  private filterColor(name: string): IColorAll[] | undefined {
-    const filterValue = name.toLowerCase();
+  private filterColor = (name: string): IColorAll[] | undefined => this.colors?.filter(
+    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-    return this.colors?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
+  private getColors = (): void => this.store.dispatch(
+    new fromActionsReservation.GetAllColorsByTreatmentId(this.treatmentId)
+  );
 
-  private getColors(): void {
-    this.store.dispatch(
-      new fromActionsReservation.GetAllColorsByTreatmentId(this.treatmentId)
-    );
-  }
-
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.colors = state.colors;
       this.color.setValue(this.colors?.find(color => color.id === this.data.colorId));
     });
-  }
+  };
 }

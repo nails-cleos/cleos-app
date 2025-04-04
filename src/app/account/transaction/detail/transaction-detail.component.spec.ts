@@ -8,8 +8,8 @@ describe('TransactionDetailComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TransactionDetailComponent ]
-    })
+    imports: [TransactionDetailComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(TransactionDetailComponent);

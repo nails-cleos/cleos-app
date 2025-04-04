@@ -5,13 +5,17 @@ import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectTreatmentState } from '../../store/app.states';
 import * as fromActionsTreatment from '../../store/treatment.actions';
-import { TranslateService } from '@ngx-translate/core';
 import { IColorAll } from '../../interfaces/color';
+import { SharedModule } from '../../shared/shared.module';
+import { DurationTimePipe } from '../../pipes/durationTime.pipe';
+import { TreatmentTableComponent } from '../table/treatment-table.component';
+import { BackButtonDirective } from '../../directives/back-button.directive';
 
 @Component({
   selector: 'app-treatment-view',
   templateUrl: './treatment-view.component.html',
-  styleUrls: ['./treatment-view.component.scss']
+  styleUrls: ['./treatment-view.component.scss'],
+  imports: [SharedModule, DurationTimePipe, TreatmentTableComponent, BackButtonDirective]
 })
 export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy {
   group?: ITreatmentGroup;
@@ -21,7 +25,7 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
   private getState: Observable<any>;
   private treatmentId?: string;
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private translate: TranslateService) {
+  constructor(private route: ActivatedRoute, private store: Store<AppState>) {
     this.getState = this.store.select(selectTreatmentState);
   }
 
@@ -43,14 +47,23 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
     this.getTreatment();
   }
 
-  getHistory(treatmentId?: string): void {
+  getHistory = (treatmentId?: string): void => {
     this.treatmentId = treatmentId;
     this.store.dispatch(
       new fromActionsTreatment.TreatmentHistory({ id: this.group?.id, treatmentId })
     );
-  }
+  };
 
-  private subscribe(): void {
+  private getTreatment = (): void => {
+    if (!this.group) {
+      const id = this.route.snapshot.paramMap.get('id');
+      this.store.dispatch(
+        new fromActionsTreatment.TreatmentFind({ id, path: 'view' })
+      );
+    }
+  };
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
         const treatments = [...state.selected.treatments];
@@ -77,15 +90,6 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
         }
       }
     });
-  }
-
-  private getTreatment(): void {
-    if (!this.group) {
-      const id = this.route.snapshot.paramMap.get('id');
-      this.store.dispatch(
-        new fromActionsTreatment.TreatmentFind({ id, path: 'view' })
-      );
-    }
-  }
+  };
 }
 

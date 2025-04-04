@@ -19,7 +19,7 @@
           @if (isInfinity) {
             <span [ngClass]="{ 'green-text': isIncrease, 'red-text': !isIncrease }">
               {{ isIncrease ? '+' : '-' }}∞
-              @if(isIncrease) {
+              @if (isIncrease) {
                 <mat-icon class="trending" matSuffix>trending_up</mat-icon>
               } @else {
                 <mat-icon class="trending" matSuffix>trending_down</mat-icon>
@@ -28,7 +28,7 @@
           } @else {
             <span [ngClass]="{ 'green-text': isIncrease, 'red-text': !isIncrease }">
               {{ previousPeriodValue }}
-              @if(isIncrease) {
+              @if (isIncrease) {
                 <mat-icon class="trending" matSuffix>trending_up</mat-icon>
               } @else {
                 <mat-icon class="trending" matSuffix>trending_down</mat-icon>

@@ -10,11 +10,16 @@ import { IAccountAll } from '../../interfaces/account';
 import { getPayNlOptions, IPaymentOption, PaymentOption, PaymentType } from '../../interfaces/payment';
 import { currencySymbol } from '../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from '../../shared/shared.module';
+import { BalanceComponent } from '../balance/balance.component';
+import { BackButtonDirective } from '../../directives/back-button.directive';
+import { BankComponent } from '../../shared/bank/bank.component';
 
 @Component({
   selector: 'app-transaction',
   templateUrl: './transaction.component.html',
-  styleUrls: ['./transaction.component.scss']
+  styleUrls: ['./transaction.component.scss'],
+  imports: [SharedModule, BalanceComponent, BackButtonDirective, BankComponent]
 })
 export class TransactionComponent implements OnInit, OnDestroy {
   form!: UntypedFormGroup;
@@ -83,7 +88,9 @@ export class TransactionComponent implements OnInit, OnDestroy {
       paymentRequest: { type, paymentOptionId, transfer, bic }
     };
     return this.store.dispatch(
-      new fromActionsAccount.AccountSave({ transaction: payload, accountId: this.accountId, hasAdminRole: this.hasAdminRole })
+      new fromActionsAccount.AccountSave({
+        transaction: payload, accountId: this.accountId, hasAdminRole: this.hasAdminRole
+      })
     );
   }
 
@@ -102,30 +109,26 @@ export class TransactionComponent implements OnInit, OnDestroy {
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       amount: ['', [Validators.required, Validators.min(this.amountMin)]],
       type: ['', Validators.required],
       transfer: [''],
       bank: ['']
     });
-  }
+  };
 
-  private getAccount(): void {
+  private getAccount = (): void => {
     if (!this.account) {
       this.store.dispatch(
         new fromActionsAccount.AccountFind(this.accountId)
       );
     }
-  }
+  };
 
-  private getOptions(): void {
-    this.store.dispatch(
-      new fromActionsAccount.PaymentOptions()
-    );
-  }
+  private getOptions = (): void => this.store.dispatch(new fromActionsAccount.PaymentOptions());
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
         this.account = state.selected;
@@ -146,5 +149,5 @@ export class TransactionComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
+  };
 }

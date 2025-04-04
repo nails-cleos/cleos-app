@@ -8,13 +8,25 @@ import * as fromActionsRoom from '../../../store/room.actions';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { IService, IServicePrice, ServicePrice, ServiceType } from '../../../interfaces/room';
 import { IGroupService } from '../../../interfaces/treatment';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators
+} from '@angular/forms';
 import { createTreatmentGroupService, executeDialogNoWidth } from '../../../util/helper';
+import { SharedModule } from '../../../shared/shared.module';
+import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
+import { BackButtonDirective } from '../../../directives/back-button.directive';
+import { TranslatePipe } from '@ngx-translate/core';
+import { AppMaterialModule } from '../../../util/app-material.module';
 
 @Component({
   selector: 'app-add-service',
   templateUrl: './add-service.component.html',
-  styleUrls: ['./add-service.component.scss']
+  styleUrls: ['./add-service.component.scss'],
+  imports: [SharedModule, CurrencySymbolPipe, BackButtonDirective]
 })
 export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -60,24 +72,26 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getServices();
   }
 
-  drop(event: CdkDragDrop<IService[]>, showDialog: boolean): void {
+  drop = (event: CdkDragDrop<IService[]>, showDialog: boolean): void => {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else if (showDialog) {
       const selectedItem = event.previousContainer.data[event.previousIndex];
-      executeDialogNoWidth(this.dialog, PriceDialogComponent, { name: selectedItem.name, type: selectedItem.type }, s => {
-        if (s) {
-          const price = s.price;
-          event.previousContainer.data[event.previousIndex] = Object.assign({}, selectedItem, { price });
-          transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
-        }
-      });
+      executeDialogNoWidth(this.dialog, PriceDialogComponent, { name: selectedItem.name, type: selectedItem.type },
+        s => {
+          if (s) {
+            const price = s.price;
+            event.previousContainer.data[event.previousIndex] = Object.assign({}, selectedItem, { price });
+            transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex,
+              event.currentIndex);
+          }
+        });
     } else {
       transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
     }
-  }
+  };
 
-  changePrice(service: IService): void {
+  changePrice = (service: IService): void => {
     const dialogRef = this.dialog.open(PriceDialogComponent, {
       data: { name: service.name, type: service.type, currentPrice: service.price }
     });
@@ -101,9 +115,18 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     });
-  }
+  };
 
-  private subscribe(): void {
+  private getServices = (): void => {
+    this.route.params.subscribe((routeParams) => {
+      this.roomId = routeParams.id;
+      this.store.dispatch(
+        new fromActionsRoom.GetMyServices({ id: this.roomId })
+      );
+    });
+  };
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.services) {
         const currency = state.services.currency.code;
@@ -124,21 +147,13 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
         this.getServices();
       }
     });
-  }
-
-  private getServices(): void {
-    this.route.params.subscribe((routeParams) => {
-      this.roomId = routeParams.id;
-      this.store.dispatch(
-        new fromActionsRoom.GetMyServices({ id: this.roomId })
-      );
-    });
-  }
+  };
 }
 
 @Component({
   selector: 'app-price-dialog',
-  templateUrl: 'price-dialog.html'
+  templateUrl: 'price-dialog.html',
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe]
 })
 export class PriceDialogComponent implements OnInit {
 

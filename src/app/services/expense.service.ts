@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
@@ -8,40 +8,41 @@ import { createFilter } from '../util/service-helper';
 @Injectable()
 export class ExpenseService {
 
-  private urlV1 = `v1/rooms/{roomId}/expenses`;
+  private urlV1 = 'v1/rooms/{roomId}/expenses';
 
-  constructor(private http: HttpClient) {
-  }
+  private http: HttpClient = inject(HttpClient);
 
-  public getAll(roomId: string, sort: string, direction: string, page: number, size: number = PAGE_SIZE,
-                filter?: string, dateFilter?: string): Observable<IExpense[]> {
+  public getAll = (roomId: string, sort: string, direction: string, page: number, size: number = PAGE_SIZE,
+                   filter?: string, dateFilter?: string): Observable<IExpense[]> => {
     let params = createFilter(page, size, sort, direction, filter);
     if (dateFilter) {
       params = params.append('date', dateFilter);
     }
 
     return this.http.get<IExpense[]>(this.updatePathVariable(roomId, ['pages']), { params });
-  }
+  };
 
-  public getExpenseInfo(roomId: string): Observable<IExpenseInfo> {
-    return this.http.get<IExpenseInfo>(this.updatePathVariable(roomId, ['info']));
-  }
+  getExpenseInfo = (roomId: string): Observable<IExpenseInfo> => this.http.get<IExpenseInfo>(
+    this.updatePathVariable(roomId, ['info'])
+  );
 
-  public getById(roomId: string, id: string): Observable<IExpense | undefined> {
-    return this.http.get<IExpense>(this.updatePathVariable(roomId, [id]));
-  }
+  getById = (roomId: string, id: string): Observable<IExpense | undefined> => this.http.get<IExpense>(
+    this.updatePathVariable(roomId, [id])
+  );
 
-  public add(roomId: string, expense: IExpense): Observable<IExpense> {
-    return this.http.post<IExpense>(this.updatePathVariable(roomId), expense);
-  }
+  add = (roomId: string, expense: IExpense): Observable<IExpense> => this.http.post<IExpense>(
+    this.updatePathVariable(roomId),
+    expense
+  );
 
-  public delete(roomId: string, id: string): Observable<IExpense> {
-    return this.http.delete<IExpense>(this.updatePathVariable(roomId, [id]));
-  }
+  delete = (roomId: string, id: string): Observable<IExpense> => this.http.delete<IExpense>(
+    this.updatePathVariable(roomId, [id])
+  );
 
-  public update(roomId: string, expense: IExpense): Observable<IExpense> {
-    return this.http.patch<IExpense>(this.updatePathVariable(roomId, [expense.id]), expense);
-  }
+  update = (roomId: string, expense: IExpense): Observable<IExpense> => this.http.patch<IExpense>(
+    this.updatePathVariable(roomId, [expense.id]),
+    expense
+  );
 
   private updatePathVariable(roomId: string, args?: (string | null | undefined)[]): string {
     let url = this.urlV1;

@@ -19,11 +19,15 @@ import * as fromActionsExpense from '../../../store/expense.actions';
 import { API_LOCALE, createNewDateZonedTime, getNowTimeZone } from '../../../util/dates';
 import { fieldChange, noDuplicateDatesValidator } from '../../../util/validators';
 import { map, startWith } from 'rxjs/operators';
+import { SharedModule } from '../../../shared/shared.module';
+import { TwoDigitsDirective } from '../../../directives/two-digits.directive';
+import { BackButtonDirective } from '../../../directives/back-button.directive';
 
 @Component({
   selector: 'app-expense',
   templateUrl: './expense.component.html',
-  styleUrls: ['./expense.component.scss']
+  styleUrls: ['./expense.component.scss'],
+  imports: [SharedModule, TwoDigitsDirective, BackButtonDirective]
 })
 export class ExpenseComponent implements OnInit, OnDestroy {
   @Input() expense?: IExpenseAll;
@@ -136,11 +140,9 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  displayFnSupplyStore(supplyStore: ISupplyStore): string {
-    return supplyStore ? `${ supplyStore.name }` : '';
-  }
+  displayFnSupplyStore = (supplyStore: ISupplyStore): string => supplyStore ? `${ supplyStore.name }` : '';
 
-  validateInputValue(input: HTMLInputElement, index: number, min?: number, max?: number): void {
+  validateInputValue = (input: HTMLInputElement, index: number, min?: number, max?: number): void => {
     const id = input.id.replace(`${ index }`, '');
     const expense = this.totals.at(index)?.get(id);
     if (input.value) {
@@ -179,17 +181,13 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     } else {
       expense?.setValue(null);
     }
-  }
+  };
 
-  addDate(): void {
-    this.totals.push(this.createTotals());
-  }
+  addDate = (): void => this.totals.push(this.createTotals());
 
-  removeExpense(index: number): void {
-    this.totals.removeAt(index);
-  }
+  removeExpense = (index: number): void => this.totals.removeAt(index);
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       invoice: ['', Validators.required],
       supplyStore: ['', Validators.required],
@@ -202,45 +200,37 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       map(
         name => name ? this.filterSupplyStore(name) : this.supplyStores ? this.supplyStores.slice() : this.supplyStores)
     );
-  }
+  };
 
-  private createTotals(type: string = '', gross: string = '', btw: string = '', description: string = ''): FormGroup {
+  private createTotals = (type: string = '', gross: string = '', btw: string = '',
+                          description: string = ''): FormGroup => {
     return this.formBuilder.group({
       type: [type, Validators.required],
       gross: [gross, Validators.required],
       description: [description],
       btw: [btw]
     });
-  }
+  };
 
-  private filterSupplyStore(name: string): ISupplyStore[] | undefined {
-    const filterValue = name.toLowerCase();
+  private filterSupplyStore = (name: string): ISupplyStore[] | undefined => this.supplyStores?.filter(
+    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-    return this.supplyStores?.filter(option => option.name?.toLowerCase().indexOf(filterValue) === 0);
-  }
+  private getExpenseInfo = (): void => this.store.dispatch(new fromActionsExpense.GetExpenseInfo(this.roomId));
 
-  private getExpenseInfo(): void {
-    this.store.dispatch(
-      new fromActionsExpense.GetExpenseInfo(this.roomId)
-    );
-  }
+  private getExpense = (): void => this.store.dispatch(
+    new fromActionsExpense.ExpenseFind({ roomId: this.roomId, id: this.id })
+  );
 
-  private getExpense(): void {
-    this.store.dispatch(
-      new fromActionsExpense.ExpenseFind({ roomId: this.roomId, id: this.id })
-    );
-  }
-
-  private clean(): void {
+  private clean = (): void => {
     for (let i = this.totals.length - 1; i >= 0; i--) {
       this.removeExpense(i);
     }
     this.store.dispatch(
       new fromActionsExpense.Clean()
     );
-  }
+  };
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.supplyStores = state.info?.supplyStores;
       this.types = state.info?.types;
@@ -275,5 +265,5 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         this.router.navigate([this.language, 'rooms', this.roomId, 'expenses']);
       }
     });
-  }
+  };
 }

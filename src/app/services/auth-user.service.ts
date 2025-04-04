@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { IUserAll } from '../interfaces/user';
 import { isDarkMode, Theme } from '../util/theme';
 import { hasRoomAdmin } from '../util/helper';
@@ -50,13 +50,10 @@ const initialAuthUser: IAuthUser = {
 
 @Injectable()
 export class AuthUserService {
-
+  private cookieConsentService: NgcCookieConsentService = inject(NgcCookieConsentService);
   public authUser: BehaviorSubject<IAuthUser> = new BehaviorSubject<IAuthUser>(initialAuthUser);
 
-  constructor(private cookieConsentService: NgcCookieConsentService) {
-  }
-
-  reloadUser(user?: IUserAll): IAuthUser {
+  reloadUser = (user?: IUserAll): IAuthUser => {
     let authUser = initialAuthUser;
     if (user) {
       const isProfessional = user.authorities.some(u => u.authority === Role.professional);
@@ -87,17 +84,17 @@ export class AuthUserService {
     }
     this.authUser.next(authUser);
     return authUser;
-  }
+  };
 
-  updateMode(isDark: boolean): IAuthUser {
+  updateMode = (isDark: boolean): IAuthUser => {
     const authUser = this.authUser.getValue();
     authUser.isDarkMode = isDark;
 
     this.authUser.next(authUser);
     return authUser;
-  }
+  };
 
-  cookieConsent(translate: TranslateService): void {
+  cookieConsent = (translate: TranslateService): void => {
     const data = translate.instant('COOKIE');
     const content = this.cookieConsentService.getConfig().content || {} as NgcContentOptions;
     content.header = data.HEADER;
@@ -111,5 +108,5 @@ export class AuthUserService {
     this.cookieConsentService.getConfig().content = content;
     this.cookieConsentService.destroy();
     this.cookieConsentService.init(this.cookieConsentService.getConfig());
-  }
+  };
 }

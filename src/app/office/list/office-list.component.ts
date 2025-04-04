@@ -13,12 +13,14 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import * as fromActionsOffice from '../../store/office.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { detailExpandAnimation } from '../../util/animation';
+import { SharedModule } from '../../shared/shared.module';
 
 @Component({
   selector: 'app-office-list',
   templateUrl: './office-list.component.html',
   styleUrls: ['./office-list.component.scss'],
-  animations: [detailExpandAnimation]
+  animations: [detailExpandAnimation],
+  imports: [SharedModule]
 })
 export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -37,7 +39,7 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
   private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small
@@ -64,27 +66,10 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
   }
 
-  subscribe(): void {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.message) {
-        this.clean();
-        this.getOffices();
-      }
-      this.dataSource = state.data?.content;
-      this.resultsLength = state.data?.totalElements;
-      if (!this.paginatorSubscription && this.resultsLength) {
-        this.createPageSubscriptions();
-      }
-    });
-  }
+  edit = (office: IOffice): void => this.store.dispatch(
+    new fromActionsOffice.OfficeSelected({ office, redirect: true }));
 
-  edit(office: IOffice): void {
-    this.store.dispatch(
-      new fromActionsOffice.OfficeSelected({ office, redirect: true })
-    );
-  }
-
-  delete(office: IOffice): void {
+  delete = (office: IOffice): void => {
     const title = this.translate.instant('OFFICE.DELETED.TITLE');
     const content = this.translate.instant('OFFICE.DELETED.CONTENT', { name: office.name });
     const dialogRef = this.dialog.open(DialogComponent, {
@@ -98,15 +83,11 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       }
     });
-  }
+  };
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsOffice.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsOffice.Clean());
 
-  private createPageSubscriptions(): void {
+  private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
       this.getOffices();
@@ -114,17 +95,28 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getOffices(this.paginator.pageIndex));
 
     this.cdRef.detectChanges();
-  }
+  };
 
-  private getOffices(page: number = 0): void {
-    const payload = {
+  private getOffices = (page: number = 0): void => this.store.dispatch(
+    new fromActionsOffice.GetAll({
       active: this.sort.active,
       direction: this.sort.direction,
       size: this.pageSize,
       page
-    };
-    this.store.dispatch(
-      new fromActionsOffice.GetAll(payload)
-    );
-  }
+    })
+  );
+
+  private subscribe = (): void => {
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.message) {
+        this.clean();
+        this.getOffices();
+      }
+      this.dataSource = state.data?.content;
+      this.resultsLength = state.data?.totalElements;
+      if (!this.paginatorSubscription && this.resultsLength) {
+        this.createPageSubscriptions();
+      }
+    });
+  };
 }

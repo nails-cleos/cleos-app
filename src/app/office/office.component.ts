@@ -1,6 +1,13 @@
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
+import {
+  AbstractControl,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators,
+  ɵTypedOrUntyped
+} from '@angular/forms';
 import { IUser, IUserAll } from '../interfaces/user';
 import { fieldChange, requireMatch } from '../util/validators';
 import { TranslateService } from '@ngx-translate/core';
@@ -11,11 +18,14 @@ import * as fromActionsOffice from '../store/office.actions';
 import { Role } from '../interfaces/token';
 import { map, startWith } from 'rxjs/operators';
 import { IOffice, Office } from '../interfaces/office';
+import { SharedModule } from '../shared/shared.module';
+import { BackButtonDirective } from '../directives/back-button.directive';
 
 @Component({
   selector: 'app-office',
   templateUrl: './office.component.html',
-  styleUrls: ['./office.component.scss']
+  styleUrls: ['./office.component.scss'],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class OfficeComponent implements OnInit, OnDestroy {
   @Input() office?: IOffice;
@@ -32,8 +42,9 @@ export class OfficeComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   private readonly language: string;
 
-  constructor(private translate: TranslateService, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
-              private router: Router, private route: ActivatedRoute, private cdRef: ChangeDetectorRef) {
+  constructor(private translate: TranslateService, private store: Store<AppState>,
+              private formBuilder: UntypedFormBuilder, private router: Router, private route: ActivatedRoute,
+              private cdRef: ChangeDetectorRef) {
     this.isAddMode = true;
     this.getState = this.store.select(selectOfficeState);
     this.language = this.translate.currentLang;
@@ -94,11 +105,9 @@ export class OfficeComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  displayFn(user: IUser): string {
-    return user?.displayName ? user.displayName : '';
-  }
+  displayFn = (user: IUser): string => user?.displayName ? user.displayName : '';
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       name: ['', [Validators.required]],
       manager: ['', [Validators.required, requireMatch]],
@@ -113,35 +122,24 @@ export class OfficeComponent implements OnInit, OnDestroy {
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filter(name) : this.managers ? this.managers.slice() : this.managers)
     );
-  }
+  };
 
-  private filter(name: string): IUser[] | undefined {
-    const filterValue = name.toLowerCase();
+  private filter = (name: string): IUser[] | undefined => this.managers?.filter(
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-    return this.managers?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsOffice.Clean());
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsOffice.Clean()
-    );
-  }
+  private getManagers = (): void => this.store.dispatch(new fromActionsOffice.GetAllManagers());
 
-  private getManagers(): void {
-    this.store.dispatch(
-      new fromActionsOffice.GetAllManagers()
-    );
-  }
-
-  private getOffice(): void {
+  private getOffice = (): void => {
     if (!this.office) {
       this.store.dispatch(
         new fromActionsOffice.OfficeFind(this.id)
       );
     }
-  }
+  };
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.managers) {
         this.managers = state.managers;
@@ -170,6 +168,6 @@ export class OfficeComponent implements OnInit, OnDestroy {
         this.router.navigate([this.language, 'offices']);
       }
     });
-  }
+  };
 }
 

@@ -1,10 +1,35 @@
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Injectable, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { CalendarUtils, CalendarWeekViewComponent, DateAdapter, getWeekViewPeriod } from 'angular-calendar';
-import { CalendarEvent, EventColor, GetWeekViewArgs, WeekView, WeekViewAllDayEvent, WeekViewTimeEvent } from 'calendar-utils';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Injectable,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges
+} from '@angular/core';
+import {
+  CalendarModule,
+  CalendarUtils,
+  CalendarWeekViewComponent,
+  DateAdapter,
+  getWeekViewPeriod
+} from 'angular-calendar';
+import {
+  CalendarEvent,
+  EventColor,
+  GetWeekViewArgs,
+  WeekView,
+  WeekViewAllDayEvent,
+  WeekViewTimeEvent
+} from 'calendar-utils';
 import { DragEndEvent, DragMoveEvent } from 'angular-draggable-droppable';
 import { TranslateService } from '@ngx-translate/core';
 import { Day } from '../interfaces/reservation';
 import { getNowTimeZone } from '../util/dates';
+import { SharedModule } from '../shared/shared.module';
+import { ConvertHMPipe } from '../pipes/convert-hm.pipe';
 
 export interface IProfessional {
   id: string;
@@ -43,8 +68,8 @@ interface GetWeekViewArgsWithProfessionals extends GetWeekViewArgs {
 
 @Injectable()
 export class DayViewSchedulerCalendarUtils extends CalendarUtils {
-  getWeekView(args: GetWeekViewArgsWithProfessionals): DayViewScheduler {
-    const {period} = super.getWeekView(args);
+  getWeekView = (args: GetWeekViewArgsWithProfessionals): DayViewScheduler => {
+    const { period } = super.getWeekView(args);
     const view: DayViewScheduler = {
       period,
       allDayEventRows: [],
@@ -59,7 +84,7 @@ export class DayViewSchedulerCalendarUtils extends CalendarUtils {
         events
       });
       view.hourColumns.push(columnView.hourColumns[0]);
-      columnView.allDayEventRows.forEach(({row}, rowIndex) => {
+      columnView.allDayEventRows.forEach(({ row }, rowIndex) => {
         view.allDayEventRows[rowIndex] = view.allDayEventRows[rowIndex] || {
           row: []
         };
@@ -72,14 +97,15 @@ export class DayViewSchedulerCalendarUtils extends CalendarUtils {
     });
 
     return view;
-  }
+  };
 }
 
 @Component({
   selector: 'app-mwl-day-view-scheduler',
   templateUrl: './day-view-scheduler.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  providers: [DayViewSchedulerCalendarUtils]
+  providers: [DayViewSchedulerCalendarUtils],
+  imports: [SharedModule, CalendarModule, ConvertHMPipe]
 })
 export class DayViewSchedulerComponent extends CalendarWeekViewComponent implements OnChanges {
   @Input() professionals: IProfessional[] = [];
@@ -90,8 +116,7 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent impleme
   @Output() professionalChanged = new EventEmitter();
   @Output() segmentClicked: EventEmitter<{ date: Date; professionalId: string; }> = new EventEmitter();
 
-  // @ts-ignore
-  view: DayViewScheduler;
+  view!: DayViewScheduler;
 
   daysInWeek = 1;
 
@@ -101,7 +126,7 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent impleme
     super(cdr, utils, translateService.currentLang, dateAdapter, element);
   }
 
-  trackByProfessionalId = (index: number, row: IProfessional) => row.id;
+  trackByProfessionalId = (_: number, row: IProfessional) => row.id;
 
   ngOnChanges(changes: SimpleChanges): void {
     super.ngOnChanges(changes);
@@ -112,28 +137,32 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent impleme
     }
   }
 
-  getDayColumnWidth(eventRowContainer: HTMLElement): number {
-    return Math.floor(eventRowContainer.offsetWidth / this.professionals.length);
-  }
+  getDayColumnWidth = (
+    eventRowContainer: HTMLElement
+  ): number => Math.floor(eventRowContainer.offsetWidth / this.professionals.length);
 
-  dragMove(dayEvent: WeekViewTimeEvent, dragEvent: DragMoveEvent): void {
+  dragMove = (dayEvent: WeekViewTimeEvent, dragEvent: DragMoveEvent): void => {
     if (this.snapDraggedEvents) {
       const professional = this.getDraggedProfessionalColumn(dayEvent, dragEvent.x);
-      const newEventTimes = this.getDragMovedEventTimes(dayEvent, {...dragEvent, x: 0}, this.dayColumnWidth, true);
+      const newEventTimes = this.getDragMovedEventTimes(dayEvent, { ...dragEvent, x: 0 }, this.dayColumnWidth, true);
       const originalEvent = dayEvent.event;
       const adjustedEvent = {
         ...originalEvent,
         ...newEventTimes,
-        meta: {...originalEvent.meta, professional}
+        meta: { ...originalEvent.meta, professional }
       };
       const tempEvents = this.events.map((event) => event === originalEvent ? adjustedEvent : event);
       this.restoreOriginalEvents(tempEvents, new Map([[adjustedEvent, originalEvent]]));
     }
     this.dragAlreadyMoved = true;
-  }
+  };
 
-  dragEnded(weekEvent: WeekViewAllDayEvent | WeekViewTimeEvent, dragEndEvent: DragEndEvent, dayWidth: number,
-            useY = false): void {
+  dragEnded = (
+    weekEvent: WeekViewAllDayEvent | WeekViewTimeEvent,
+    dragEndEvent: DragEndEvent,
+    dayWidth: number,
+    useY = false
+  ): void => {
     super.dragEnded(weekEvent,
       {
         ...dragEndEvent,
@@ -141,16 +170,16 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent impleme
       }, dayWidth, useY);
     const newProfessional = this.getDraggedProfessionalColumn(weekEvent, dragEndEvent.x);
     if (newProfessional && newProfessional !== weekEvent.event.meta.professional) {
-      this.professionalChanged.emit({event: weekEvent.event, newProfessional});
+      this.professionalChanged.emit({ event: weekEvent.event, newProfessional });
     }
-  }
+  };
 
-  segmentClick(date: Date, index: number): void {
+  segmentClick = (date: Date, index: number): void => {
     const professionalId = this.view.professionals[index].id;
-    this.segmentClicked.emit({date, professionalId});
-  }
+    this.segmentClicked.emit({ date, professionalId });
+  };
 
-  protected getWeekView(events: CalendarEvent[]): DayViewScheduler {
+  protected getWeekView = (events: CalendarEvent[]): DayViewScheduler => {
     this.dayStartHour = this.day.dayStartHour;
     this.dayStartMinute = this.day.dayStartMinute;
     this.dayEndHour = this.day.dayEndHour;
@@ -183,13 +212,16 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent impleme
         this.daysInWeek
       )
     });
-  }
+  };
 
-  private getDraggedProfessionalColumn(dayEvent: WeekViewTimeEvent | WeekViewAllDayEvent, xPixels: number): IProfessional {
+  private getDraggedProfessionalColumn = (
+    dayEvent: WeekViewTimeEvent | WeekViewAllDayEvent,
+    xPixels: number
+  ): IProfessional => {
     const columnsMoved = Math.round(xPixels / this.dayColumnWidth);
     const currentColumnIndex = this.view.professionals
       .findIndex((professional) => professional === dayEvent.event.meta.professional);
     const newIndex = currentColumnIndex + columnsMoved;
     return this.view.professionals[newIndex];
-  }
+  };
 }

@@ -1,11 +1,14 @@
 import { Component, Input } from '@angular/core';
 import { IQuarterSummary } from '../../../interfaces/dashboard';
 import { ICurrencyAll } from '../../../interfaces/currency';
+import { SharedModule } from '../../../shared/shared.module';
+import { QuarterComponent } from '../../quarter-summary/quarter/quarter.component';
 
 @Component({
   selector: 'app-year',
   templateUrl: './year.component.html',
-  styleUrls: ['./year.component.scss']
+  styleUrls: ['./year.component.scss'],
+  imports: [SharedModule, QuarterComponent]
 })
 export class YearComponent {
   @Input() quarterSummaries?: IQuarterSummary[];

@@ -41,8 +41,8 @@ export class RoomEffects {
   findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.roomFind)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.roomService.getById(payload.id).pipe(
-      switchMap((roomInfo: any) => of(new fromActionsRoom.RoomSelected({roomInfo, redirect: payload.redirect}))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({error: err.error})))
+      switchMap((roomInfo: any) => of(new fromActionsRoom.RoomSelected({ roomInfo, redirect: payload.redirect }))),
+      catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({ error: err.error })))
     ))
   ));
 
@@ -86,13 +86,14 @@ export class RoomEffects {
     ))
   ));
 
-  getCustomerInfo$ = createEffect(() => this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.getCustomerInfo)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.roomService.getCustomerInfo(payload.id).pipe(
-      switchMap((response: any) => of(new fromActionsRoom.CustomerInfoSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({ error: err.error })))
-    ))
-  ));
+  getCustomerInfo$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsRoom.RoomActionTypes.getCustomerInfo)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.roomService.getCustomerInfo(payload.id).pipe(
+        switchMap((response: any) => of(new fromActionsRoom.CustomerInfoSuccess(response))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsRoom.RoomFailure({ error: err.error })))
+      ))
+    ));
 
   selectedData$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsRoom.RoomActionTypes.roomSelected),

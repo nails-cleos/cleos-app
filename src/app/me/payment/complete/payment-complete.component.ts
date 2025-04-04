@@ -6,11 +6,13 @@ import { Store } from '@ngrx/store';
 import * as fromActionsPayment from '../../../store/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { PaymentStatus, PaymentType } from '../../../interfaces/payment';
+import { SharedModule } from '../../../shared/shared.module';
 
 @Component({
   selector: 'app-payment-complete',
   templateUrl: './payment-complete.component.html',
-  styleUrls: ['./payment-complete.component.scss']
+  styleUrls: ['./payment-complete.component.scss'],
+  imports: [SharedModule]
 })
 export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewInit {
   private subscription?: Subscription;
@@ -95,7 +97,7 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
     }, 500);
   }
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.paths) {
         this.router.navigate([this.language].concat(state.paths));
@@ -103,5 +105,5 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
         this.router.navigate([this.language, 'me', this.path, this.id, 'payment']);
       }
     });
-  }
+  };
 }

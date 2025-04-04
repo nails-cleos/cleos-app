@@ -10,11 +10,10 @@ import { PaymentType } from '../../interfaces/payment';
 
 @Component({
   selector: 'app-form-field-adder',
-  standalone: true,
-  imports: [SharedModule],
   templateUrl: './form-field-adder.component.html',
   styleUrl: './form-field-adder.component.scss',
-  animations: [detailExpandAnimation]
+  animations: [detailExpandAnimation],
+  imports: [SharedModule]
 })
 export class FormFieldAdderComponent implements OnInit {
   @Input() key!: string;
@@ -66,17 +65,15 @@ export class FormFieldAdderComponent implements OnInit {
     this.displayedColumns = [...this.displayedColumns, 'actions'];
   }
 
-  deleteRow(index: number): void {
+  deleteRow = (index: number): void => {
     this.dataSource.data.splice(index, 1);
     this.formArray.removeAt(index);
     this.emitRowChange();
-  }
+  };
 
-  getFormGroup(index: number): FormGroup {
-    return this.formArray.at(index) as FormGroup;
-  }
+  getFormGroup = (index: number): FormGroup => this.formArray.at(index) as FormGroup;
 
-  private createItemFormGroup(): FormGroup {
+  private createItemFormGroup = (): FormGroup => {
     if (this.split) {
       return this.formBuilder.group({
         description: ['', Validators.required],
@@ -88,9 +85,9 @@ export class FormFieldAdderComponent implements OnInit {
       description: ['', Validators.required],
       price: ['', Validators.required]
     });
-  }
+  };
 
-  private emitRowChange(): void {
+  private emitRowChange = (): void => {
     if (!this.formGroup.invalid) {
       this.onChange.emit(this.dataSource.data);
     }
@@ -99,9 +96,9 @@ export class FormFieldAdderComponent implements OnInit {
     } else {
       this.isValid.emit(this.total === this.toPaid && !this.formGroup.invalid);
     }
-  }
+  };
 
-  private subscribeToFormChanges(): void {
+  private subscribeToFormChanges = (): void => {
     this.formArray.controls.forEach((control, index) => {
       control.get('description')?.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe((newValue) => {
         const newData = [...this.dataSource.data];
@@ -117,14 +114,15 @@ export class FormFieldAdderComponent implements OnInit {
         this.emitRowChange();
       });
 
-      control.get('paymentType')?.valueChanges?.pipe(debounceTime(300), distinctUntilChanged())?.subscribe((newValue) => {
-        const newData = [...this.dataSource.data];
-        newData[index].paymentType = newValue;
-        this.dataSource = new MatTableDataSource<IExtras>(newData);
-        this.emitRowChange();
-      });
+      control.get('paymentType')?.valueChanges?.pipe(debounceTime(300), distinctUntilChanged())
+        ?.subscribe((newValue) => {
+          const newData = [...this.dataSource.data];
+          newData[index].paymentType = newValue;
+          this.dataSource = new MatTableDataSource<IExtras>(newData);
+          this.emitRowChange();
+        });
     });
-  }
+  };
 
   private get formArray(): FormArray {
     return this.formGroup.get('items') as FormArray;

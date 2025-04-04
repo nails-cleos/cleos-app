@@ -1,5 +1,12 @@
 import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
+import {
+  AbstractControl,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators,
+  ɵTypedOrUntyped
+} from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -12,15 +19,20 @@ import { backendFormatDate, createDateFromString, newDate } from '../util/dates'
 import { fieldChange, valueChange } from '../util/validators';
 import { createAddress } from '../util/helper';
 import { TranslateService } from '@ngx-translate/core';
-import { validColorValidator } from 'ngx-colors';
+import { NgxColorsModule, validColorValidator } from 'ngx-colors';
 import { Role } from '../interfaces/token';
+import { SharedModule } from '../shared/shared.module';
+import { GoogleMapComponent } from '../shared/google-map/google-map.component';
+import { BackButtonDirective } from '../directives/back-button.directive';
+import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 import PlaceResult = google.maps.places.PlaceResult;
 
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
-  styleUrls: ['./user.component.scss']
+  styleUrls: ['./user.component.scss'],
+  imports: [SharedModule, NgxMaterialIntlTelInputComponent, GoogleMapComponent, NgxColorsModule, BackButtonDirective]
 })
 export class UserComponent implements OnInit, OnDestroy {
   @Input() user?: IUser;
@@ -38,8 +50,9 @@ export class UserComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   private readonly extras: any;
 
-  constructor(private readonly translate: TranslateService, private route: ActivatedRoute, private store: Store<AppState>,
-              private formBuilder: UntypedFormBuilder, private router: Router, private cdRef: ChangeDetectorRef) {
+  constructor(private readonly translate: TranslateService, private route: ActivatedRoute,
+              private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
+              private cdRef: ChangeDetectorRef) {
     this.isAddMode = true;
     this.isProfessionalOrManager = false;
     this.getState = this.store.select(selectUserState);
@@ -105,17 +118,15 @@ export class UserComponent implements OnInit, OnDestroy {
     this.cdRef.detectChanges();
   }
 
-  lightenDarkenColor(color: string, isDark: boolean): string {
-    return lightenDarkenColor(color, isDark ? 50 : -50);
-  }
+  lightenDarkenColor = (color: string, isDark: boolean): string => lightenDarkenColor(color, isDark ? 50 : -50);
 
-  getAddress(placeResult: PlaceResult): void {
+  getAddress = (placeResult: PlaceResult): void => {
     this.geometry = placeResult.geometry;
     this.formattedAddress = placeResult.formatted_address;
     this.addressUpdated = true;
-  }
+  };
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       role: ['', Validators.required],
       displayName: ['', Validators.required],
@@ -159,15 +170,19 @@ export class UserComponent implements OnInit, OnDestroy {
         }
       }
     });
-  }
+  };
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsUser.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
 
-  private subscribe(): void {
+  private getUser = (): void => {
+    if (!this.user) {
+      this.store.dispatch(
+        new fromActionsUser.FindUser(this.id)
+      );
+    }
+  };
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
         this.user = state.selected;
@@ -203,13 +218,5 @@ export class UserComponent implements OnInit, OnDestroy {
         this.router.navigate([this.translate.currentLang, 'users']);
       }
     });
-  }
-
-  private getUser(): void {
-    if (!this.user) {
-      this.store.dispatch(
-        new fromActionsUser.FindUser(this.id)
-      );
-    }
-  }
+  };
 }

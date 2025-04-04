@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { CalendarEvent } from 'angular-calendar';
+import { CalendarEvent, CalendarModule } from 'angular-calendar';
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectDashboardState } from '../store/app.states';
 import {
@@ -12,11 +12,11 @@ import {
   getDurationOrUndefined,
   getEnd,
   getMinutesBetweenTimesABS,
+  getNowTimeZone,
   getRoomStartEndDay,
   isBetween,
   newDate,
   newDateTimestamp,
-  getNowTimeZone,
   startOfPeriod,
   subPeriod
 } from '../util/dates';
@@ -25,7 +25,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { IProfessionalEvent, IRoomEvents } from '../interfaces/dashboard';
 import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
-import { IProfessional, Professional } from './day-view-scheduler.component';
+import { DayViewSchedulerComponent, IProfessional, Professional } from './day-view-scheduler.component';
 import { EventColor } from 'calendar-utils';
 import { getFrequency } from '../util/event';
 import { Day, IReservation, MAX_RESERVATION_MONTH, States } from '../interfaces/reservation';
@@ -36,11 +36,14 @@ import { getProfessionalColor } from '../util/color';
 import { CalendarDialogComponent } from '../shared/dialog/calendar/calendar-dialog.component';
 import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { AuthUserService } from '../services/auth-user.service';
+import { SharedModule } from '../shared/shared.module';
+import { CounterComponent } from '../util/counter/counter.component';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
+  imports: [SharedModule, CalendarModule, DayViewSchedulerComponent, CounterComponent]
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild('picker') picker: any;
@@ -109,7 +112,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return this.picker.select(subPeriod('day', this.viewDate, 1));
   }
 
-  private static getProfessionalImage(professional: IProfessionalEvent): string {
+  private static getProfessionalImage = (professional: IProfessionalEvent): string => {
     let image;
     if (professional && professional.imageUrl) {
       if (professional.imageUrl.indexOf('http') >= 0) {
@@ -120,11 +123,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     return image || 'assets/icons/icon-512x512.png';
-  }
+  };
 
-  private static getColor(professional: IProfessionalEvent, isDark: boolean): EventColor {
-    return getProfessionalColor(isDark, professional.darkColor, professional.lightColor);
-  }
+  private static getColor = (
+    professional: IProfessionalEvent,
+    isDark: boolean
+  ): EventColor => getProfessionalColor(isDark, professional.darkColor, professional.lightColor);
 
   ngOnInit(): void {
     this.clean();
@@ -137,19 +141,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  selectDate(event: any): void {
+  selectDate = (event: any): void => {
     this.changeDate(newDate(event.value));
     this.getEvents();
-  }
+  };
 
-  eventTimesChanged({ event, newStart, newEnd }: any): void {
+  eventTimesChanged = ({ event, newStart, newEnd }: any): void => {
     event.start = newStart;
     event.end = newEnd;
     this.events = [...this.events];
     this.updateEvent(event.id, event.start);
-  }
+  };
 
-  professionalChanged({ event, newProfessional }: any): void {
+  professionalChanged = ({ event, newProfessional }: any): void => {
     const endTime = event.end ? event.end.getTime() / 1000 : 0;
     const startTime = event.start.getTime() / 1000;
     const time = Math.abs(endTime - startTime);
@@ -170,18 +174,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
     event.meta.professional = newProfessional;
     this.events = [...this.events];
     setTimeout(() => this.updateEvent(event.id, undefined, newProfessional.id), 500);
-  }
+  };
 
-  refreshViewDate(now: Date): void {
+  refreshViewDate = (now: Date): void => {
     if (isSameDay(now, this.viewDate)) {
       if (now.getSeconds() === 0) {
         this.events = this.events.map((event: CalendarEvent) => this.createTitle(event));
       }
       this.viewDate = now;
     }
-  }
+  };
 
-  segmentClick(date: Date, professionalId: string): void {
+  segmentClick = (date: Date, professionalId: string): void => {
     const data = { date, professionalId, isDashboard: true };
     if (date && professionalId && this.dateIsValid(date)) {
       executeDialogNoWidth(this.dialog, CalendarDialogComponent, null, result => {
@@ -190,9 +194,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
       });
     }
-  }
+  };
 
-  private createTitle(calendarEvent: CalendarEvent, now: Date = getNowTimeZone()): CalendarEvent {
+  private createTitle = (calendarEvent: CalendarEvent, now: Date = getNowTimeZone()): CalendarEvent => {
     const matcher = calendarEvent.title.match(/(?<=<b>\s*).*?(?=\s*<\/b>)/gs);
     const title = matcher ? `<b>${ matcher[0] }</b>` : calendarEvent.title;
 
@@ -293,9 +297,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     return calendarEvent;
-  }
+  };
 
-  private updateEvent(id: string, dateStart?: Date, professionalId?: string): void {
+  private updateEvent = (id: string, dateStart?: Date, professionalId?: string): void => {
     const reservation: IReservation = { id };
     if (dateStart) {
       const start = dateStart.toLocaleString(API_LOCALE);
@@ -309,16 +313,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsDashboard.UpdateEvent(reservation)
     );
-  }
+  };
 
-  private changeDate(date: Date): void {
+  private changeDate = (date: Date): void => {
     this.viewDate = createNewDate(date, this.viewDate.getHours(), this.viewDate.getMinutes());
     this.endDate = createNewDate(date, this.endDate.getHours(), this.endDate.getMinutes());
     this.startDate = createNewDate(date, this.startDate.getHours(), this.startDate.getMinutes());
     this.dateOrViewChanged();
-  }
+  };
 
-  private dateOrViewChanged(): void {
+  private dateOrViewChanged = (): void => {
     this.prevBtnDisabled = !this.dateIsValid(
       endOfPeriod('day', subPeriod('day', this.viewDate, 1))
     );
@@ -330,20 +334,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     } else if (this.viewDate > this.maxDate) {
       this.changeDate(this.maxDate);
     }
-  }
+  };
 
-  private dateIsValid(date: Date): boolean {
-    return isBetween(this.today, this.maxDate, date);
-  }
+  private dateIsValid = (date: Date): boolean => isBetween(this.today, this.maxDate, date);
 
-  private subscribe(): void {
-    this.subscription = this.getState.subscribe(state => {
-      this.dashboard = state.dashboard;
-      this.createEvents(this.isDarkMode);
-    });
-  }
-
-  private createEvents(darkMode: boolean = false): void {
+  private createEvents = (darkMode: boolean = false): void => {
     this.events = [];
     this.professionals = [];
     if (this.dashboard?.professionals) {
@@ -424,22 +419,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
         );
       });
     }
-  }
+  };
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsDashboard.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsDashboard.Clean());
 
-  private getEvents(): void {
+  private getEvents = (): void => {
     this.events = [];
     this.store.dispatch(
       new fromActionsDashboard.GetDashboardEvents(this.viewDate)
     );
-  }
+  };
 
-  private eventClick(event: CalendarEvent, type: string): void {
+  private eventClick = (event: CalendarEvent, type: string): void => {
     const reservationId = event.id;
     switch (type) {
       case 'VIEW':
@@ -471,5 +462,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       case 'MORE_INFO':
         this.router.navigate([this.language, 'reservation', reservationId, 'more-info']);
     }
-  }
+  };
+
+  private subscribe = (): void => {
+    this.subscription = this.getState.subscribe(state => {
+      this.dashboard = state.dashboard;
+      this.createEvents(this.isDarkMode);
+    });
+  };
 }

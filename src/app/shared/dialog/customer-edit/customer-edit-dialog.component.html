@@ -1,21 +1,19 @@
-<h1 mat-dialog-title>{{'COMMON.RESERVATION.EDIT.TITLE' | translate }}</h1>
+<h1 mat-dialog-title>{{ 'COMMON.RESERVATION.EDIT.TITLE' | translate }}</h1>
 <div mat-dialog-content>
-  <p>{{'COMMON.RESERVATION.EDIT.TEXT' | translate: {penalty: penalty} }}</p>
+  <p>{{ 'COMMON.RESERVATION.EDIT.TEXT' | translate: { penalty: penalty } }}</p>
   <app-price [price]="price" [currency]="currency" [showPenalty]="true" [showBank]="false"></app-price>
 </div>
 <div mat-dialog-actions class="card-actions">
   <div class="spacer"></div>
-  <ng-template [ngIf]="data.small" [ngIfElse]="largeButton">
+  @if (data.small) {
     <button (click)="onNoClick" mat-fab>
       <mat-icon>clear</mat-icon>
     </button>
     <button (click)="doAction" cdkFocusInitial color="primary" mat-fab>
       <mat-icon>forward</mat-icon>
     </button>
-  </ng-template>
-  <ng-template #largeButton>
+  } @else {
     <button (click)="onNoClick" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
-    <button (click)="doAction" cdkFocusInitial color="primary" mat-fab extended class="icon-button">Ok
-    </button>
-  </ng-template>
+    <button (click)="doAction" cdkFocusInitial color="primary" mat-fab extended class="icon-button">Ok</button>
+  }
 </div>

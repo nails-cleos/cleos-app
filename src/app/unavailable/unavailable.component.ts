@@ -1,6 +1,13 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
+import {
+  AbstractControl,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators,
+  ɵTypedOrUntyped
+} from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../store/app.states';
 import { IUnavailable, Unavailable } from '../interfaces/unavailable';
@@ -32,11 +39,14 @@ import { fieldChange, requireMatchAsync, valueChange } from '../util/validators'
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
+import { SharedModule } from '../shared/shared.module';
+import { BackButtonDirective } from '../directives/back-button.directive';
 
 @Component({
   selector: 'app-unavailable',
   templateUrl: './unavailable.component.html',
-  styleUrls: ['./unavailable.component.scss']
+  styleUrls: ['./unavailable.component.scss'],
+  imports: [SharedModule, BackButtonDirective]
 })
 export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() unavailable?: IUnavailable;
@@ -134,12 +144,14 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
   get focusin(): void {
     if (this.rooms.length && this.getForm.startTime.value) {
       const time = getTimeNumber(this.getForm.startTime.value);
-      const date = createNewDate(this.getForm.startDate.value ? newDate(this.getForm.startDate.value) : getNowTimeZone(), time?.hour,
+      const date = createNewDate(
+        this.getForm.startDate.value ? newDate(this.getForm.startDate.value) : getNowTimeZone(), time?.hour,
         time?.minute);
       const day = date.getDay();
       const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, date, this.rooms);
 
-      this.setValues(this.getForm.startDate.value, this.getForm.startTime.value, getTime(minDate), getTime(maxDate), this.showDuration,
+      this.setValues(this.getForm.startDate.value, this.getForm.startTime.value, getTime(minDate), getTime(maxDate),
+        this.showDuration,
         this.durationMax, roomAvailability);
     }
     return;
@@ -181,27 +193,21 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  displayFn(user: IUser): string {
-    return user?.displayName ? user.displayName : '';
-  }
+  displayFn = (user: IUser): string => user?.displayName ? user.displayName : '';
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.roomAvailability);
 
-  getRoom(user: IUser): void {
-    this.store.dispatch(
-      new fromActionsUnavailable.GetRoom(user.id)
-    );
-  }
+  getRoom = (user: IUser): void => this.store.dispatch(new fromActionsUnavailable.GetRoom(user.id));
 
-  keyDownHandler(event: any): void {
+  keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
       this.getForm.professional.setValue('');
       this.setValues();
     }
-  }
+  };
 
-  private setValues(startDate?: any, startTime?: any, minTime?: string, maxTime?: string, showDuration: boolean = false,
-                    durationMax?: any, roomAvailability?: IRoomAll): void {
+  private setValues = (startDate?: any, startTime?: any, minTime?: string, maxTime?: string,
+                       showDuration: boolean = false, durationMax?: any, roomAvailability?: IRoomAll): void => {
     this.getForm.startDate.setValue(startDate);
     this.getForm.startTime.setValue(startTime);
     this.minTime = minTime;
@@ -214,9 +220,9 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getForm.repeat.setValue(undefined);
     this.getForm.allDay.setValue(startDate ? this.getForm.allDay.value : false);
     this.showEnd = false;
-  }
+  };
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       professional: ['', Validators.required, requireMatchAsync],
       description: [''],
@@ -233,9 +239,9 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
       map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals)
     );
     this.formValueChange();
-  }
+  };
 
-  private formValueChange(): void {
+  private formValueChange = (): void => {
     this.getForm.allDay.valueChanges.subscribe(value => {
       if (value) {
         this.getForm.duration.clearValidators();
@@ -286,9 +292,9 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
         this.getRoom(value);
       }
     });
-  }
+  };
 
-  private setMaxMin(startDate: Date, rooms: IRoomAll[]): void {
+  private setMaxMin = (startDate: Date, rooms: IRoomAll[]): void => {
     const day = startDate.getDay();
     const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, startDate, rooms);
     const availability = roomAvailability;
@@ -297,9 +303,9 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
     this.maxTime = getTime(maxDate);
     this.calculateMaxDuration(startDate);
     this.roomAvailability = availability;
-  }
+  };
 
-  private calculateMaxDuration(date: Date): void {
+  private calculateMaxDuration = (date: Date): void => {
     const max = getTimeNumber(this.maxTime);
     if (max) {
       const maxHour = max.hour;
@@ -312,21 +318,25 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
         this.getForm.duration.setValue(undefined);
       }
     }
-  }
+  };
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsUnavailable.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsUnavailable.Clean());
 
-  private getProfessionals(): void {
-    this.store.dispatch(
-      new fromActionsUnavailable.GetAllProfessional()
-    );
-  }
+  private getProfessionals = (): void => this.store.dispatch(new fromActionsUnavailable.GetAllProfessional());
 
-  private subscribe(): void {
+  private filter = (name: string): IUser[] | undefined => this.professionals?.filter(
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0
+  );
+
+  private getUnavailable = (): void => {
+    if (!this.unavailable) {
+      this.store.dispatch(
+        new fromActionsUnavailable.UnavailableFind(this.id)
+      );
+    }
+  };
+
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.professionals) {
         this.professionals = state.professionals;
@@ -368,19 +378,5 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
         this.router.navigate([this.translate.currentLang, 'unavailable']);
       }
     });
-  }
-
-  private filter(name: string): IUser[] | undefined {
-    const filterValue = name.toLowerCase();
-
-    return this.professionals?.filter(option => option.displayName?.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-  private getUnavailable(): void {
-    if (!this.unavailable) {
-      this.store.dispatch(
-        new fromActionsUnavailable.UnavailableFind(this.id)
-      );
-    }
-  }
+  };
 }

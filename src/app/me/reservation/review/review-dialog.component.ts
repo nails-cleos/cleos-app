@@ -1,20 +1,25 @@
 import { Component, Inject } from '@angular/core';
-import { newDateTimestamp, createNewDate, reservationDuration } from '../../../util/dates';
+import { createNewDate, newDateTimestamp, reservationDuration } from '../../../util/dates';
 import { getPrice } from '../../../util/helper';
 import { IReview } from '../../../interfaces/review';
 import { IReservationAll } from '../../../interfaces/reservation';
 import { IPrice } from '../../../interfaces/treatment';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { UntypedFormControl } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
+import { ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { transitionAnimation } from '../../../util/animation';
 import { Analytics, logEvent } from '@angular/fire/analytics';
+import { RoomNamePipe } from '../../../pipes/room-name.pipe';
+import { RatingComponent } from '../../../shared/rating/rating.component';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { AppMaterialModule } from '../../../util/app-material.module';
 
 @Component({
   selector: 'app-review-dialog',
   templateUrl: './review-dialog.component.html',
   animations: [transitionAnimation],
-  styleUrls: ['./review-dialog.component.scss']
+  styleUrls: ['./review-dialog.component.scss'],
+  imports: [RoomNamePipe, RatingComponent, AppMaterialModule, TranslatePipe, DatePipe, DecimalPipe, ReactiveFormsModule]
 })
 export class ReviewDialogComponent {
   reservation?: IReservationAll;
@@ -30,8 +35,9 @@ export class ReviewDialogComponent {
 
   detail = new UntypedFormControl();
 
-  constructor(public dialogRef: MatDialogRef<ReviewDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: IReservationAll,
-              private translate: TranslateService, private analytic: Analytics) {
+  constructor(public dialogRef: MatDialogRef<ReviewDialogComponent>,
+              @Inject(MAT_DIALOG_DATA) public data: IReservationAll, private translate: TranslateService,
+              private analytic: Analytics) {
     const start = newDateTimestamp(data.timestamp, data.room.timeZone);
     this.reservation = Object.assign({}, data, { start });
     this.price = getPrice(data);
@@ -55,11 +61,11 @@ export class ReviewDialogComponent {
     return this.dialogRef.close({ rating: this.rating, detail: this.detail.value });
   }
 
-  onRatingHover(hover: number): void {
+  onRatingHover = (hover: number): void => {
     this.hover = hover;
-  }
+  };
 
-  onRatingChanged(rating: number): void {
+  onRatingChanged = (rating: number): void => {
     this.rating = rating;
-  }
+  };
 }

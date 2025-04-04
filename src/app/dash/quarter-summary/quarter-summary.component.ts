@@ -26,6 +26,9 @@ import { ICurrencyAll } from '../../interfaces/currency';
 import { createQuarterSummary } from '../../util/report';
 import fs from 'file-saver';
 import { TranslateService } from '@ngx-translate/core';
+import { SharedModule } from '../../shared/shared.module';
+import { QuarterComponent } from './quarter/quarter.component';
+import { TotalSummaryComponent } from '../total-summary/total-summary.component';
 
 @Component({
   selector: 'app-quarter-summary',
@@ -33,7 +36,8 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['./quarter-summary.component.scss'],
   providers: [
     { provide: DateAdapter, useClass: YearAdapter }
-  ]
+  ],
+  imports: [SharedModule, QuarterComponent, TotalSummaryComponent]
 })
 export class QuarterSummaryComponent implements OnInit, OnDestroy {
 
@@ -102,16 +106,16 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  setYear(normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void {
+  setYear = (normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void => {
     const ctrlValue = this.date.value;
     ctrlValue?.setFullYear(normalizedMonthAndYear.getFullYear());
 
     this.date.setValue(ctrlValue);
 
     datepicker.close();
-  }
+  };
 
-  exportQuarterSummary(): void {
+  exportQuarterSummary = (): void => {
     if (this.monthSummaries?.length) {
       const now = getNowTimeZone();
       const quarter = this.selectedQuarter.value || getDateQuarter(getNowTimeZone());
@@ -130,9 +134,9 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
         fs.saveAs(blob, `Report_Q${ this.selectedQuarter.value }_${ year }.xlsx`);
       });
     }
-  }
+  };
 
-  private valueChange(): void {
+  private valueChange = (): void => {
     this.selectedRoom.valueChanges.subscribe(value => {
       if (value) {
         this.createData();
@@ -148,9 +152,9 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
         this.getSummary(value.getFullYear(), this.selectedQuarter.value);
       }
     });
-  }
+  };
 
-  private createData(): void {
+  private createData = (): void => {
     const room = this.selectedRoom.value;
     if (room) {
       if (room === 'All' && this.quarterSummaryMap) {
@@ -199,9 +203,9 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
             this.quarterSummaryTotals.cash, totalsWithoutCash, totals);
       });
     }
-  }
+  };
 
-  private getAllMonthSummaries(quarterSummaries: IMonthSummary[], result: IMonthSummary[]): IMonthSummary[] {
+  private getAllMonthSummaries = (quarterSummaries: IMonthSummary[], result: IMonthSummary[]): IMonthSummary[] => {
     return result.map(m => {
       const month = quarterSummaries?.find(it => it.month === m.month);
       return new MonthSummary(m.month, m.total.map(t => {
@@ -213,9 +217,9 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
         return { type, net, btw, gross } as ISummaryTotal;
       }));
     });
-  }
+  };
 
-  private getSummary(year: number, quarter: number): void {
+  private getSummary = (year: number, quarter: number): void => {
     this.reset();
     this.year = year;
     this.quarter = quarter;
@@ -223,20 +227,16 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       new fromActionsDashboard.GetQuarterSummary({ year, quarter })
     );
-  }
+  };
 
-  private reset(): void {
+  private reset = (): void => {
     this.monthSummaries = undefined;
     this.quarterSummaryTotals = new SummaryTotals();
-  }
+  };
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsDashboard.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsDashboard.Clean());
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.quarterSummaryMap = state.quarterSummaryMap;
       if (this.quarterSummaryMap) {
@@ -256,5 +256,5 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
         this.isLoading = false;
       }
     });
-  }
+  };
 }

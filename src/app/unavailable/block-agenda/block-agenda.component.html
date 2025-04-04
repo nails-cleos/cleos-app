@@ -70,7 +70,7 @@
                   </div>
                 }
                 @if (showDuration) {
-                  <mat-form-field *ngIf="showDuration" appearance="outline">
+                  <mat-form-field appearance="outline">
                     <mat-label>{{ 'UNAVAILABLE.DURATION.FIELD' | translate }}</mat-label>
                     <input formControlName="duration" [format]="24" [max]="durationMax" [ngxTimepicker]="t" matInput
                            name="duration" readonly/>
@@ -95,7 +95,8 @@
                   {{ 'COMMON.BUTTON.CREATE' | translate }}
                 </button>
               } @else {
-                <button [disabled]="form.invalid || form.pristine" color="primary" mat-fab extended class="icon-button" type="submit">
+                <button [disabled]="form.invalid || form.pristine" color="primary" mat-fab extended class="icon-button"
+                        type="submit">
                   {{ 'COMMON.BUTTON.UPDATE' | translate }}
                 </button>
                 <button (click)="delete" color="warn" mat-fab extended class="icon-button" type="button">

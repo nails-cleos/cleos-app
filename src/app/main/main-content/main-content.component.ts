@@ -30,12 +30,15 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MainContentService } from '../main-content.service';
 import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { Router } from '@angular/router';
+import { SharedModule } from '../../shared/shared.module';
+import { AnimateDirective } from '../../directives/animate.directive';
 
 @Component({
   selector: 'app-main-content',
   templateUrl: './main-content.component.html',
   styleUrls: ['./main-content.component.scss'],
-  animations: [bottomTop, leftRight, slideInX, slideInY, fadeInOut, slideAnimation]
+  animations: [bottomTop, leftRight, slideInX, slideInY, fadeInOut, slideAnimation],
+  imports: [SharedModule, AnimateDirective]
 })
 export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -101,9 +104,9 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   private getState: Observable<any>;
 
   constructor(private store: Store<AppState>, private cdRef: ChangeDetectorRef, private formBuilder: UntypedFormBuilder,
-              private snackBar: MatSnackBar, private authUserService: AuthUserService, breakpointObserver: BreakpointObserver,
-              private mainContent: MainContentService, private bottomSheet: MatBottomSheet, private translate: TranslateService,
-              private router: Router) {
+              private snackBar: MatSnackBar, private authUserService: AuthUserService,
+              breakpointObserver: BreakpointObserver, private mainContent: MainContentService,
+              private bottomSheet: MatBottomSheet, private translate: TranslateService, private router: Router) {
     this.currentIndex = 0;
     this.isSmall = isMobile();
     this.isDark = false;
@@ -196,46 +199,42 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.authUserServiceSubscription.unsubscribe();
   }
 
-  isCurrentSlideIndex(index: number): boolean {
-    return this.currentIndex === index;
-  }
+  isCurrentSlideIndex = (index: number): boolean => this.currentIndex === index;
 
-  setTreatmentAnimation(i: number): AnimationSequenceMetadata {
-    return scaleIn(`${ i * (this.isSmall ? 0 : 300) }ms`);
-  }
+  setTreatmentAnimation = (i: number): AnimationSequenceMetadata => scaleIn(`${ i * (this.isSmall ? 0 : 300) }ms`);
 
-  goToTreatment(name?: string): void {
+  goToTreatment = (name?: string): void => {
     if (name === 'biab') {
       goTo('home');
       this.router.navigate([this.translate.currentLang, name, 'treatment']);
     }
-  }
+  };
 
-  onHover(social: ISocialLink, enter: boolean): void {
+  onHover = (social: ISocialLink, enter: boolean): void => {
     const suffix = enter ? '' : '-NO-COLOR';
     social.svgIcon = `${ social.name }${ suffix }`;
-  }
+  };
 
-  filterBy(group?: ITreatmentGroup): void {
+  filterBy = (group?: ITreatmentGroup): void => {
     this.works = [];
     this.filter?.next(group);
-  }
+  };
 
-  private createForm(): void {
+  private createForm = (): void => {
     this.form = this.formBuilder.group({
       name: this.name,
       email: this.email,
       subject: this.subject,
       body: this.body
     });
-  }
+  };
 
-  private automateSlider(): void {
+  private automateSlider = (): void => {
     // let forward = true;
     this.sliderSubscription = interval(3000).subscribe(() => this.moveForwardSlide());
-  }
+  };
 
-  private moveForwardSlide(): void {
+  private moveForwardSlide = (): void => {
     if (this.slides?.length) {
       // Fade in
       if (this.currentIndex === this.slides.length - 1) {
@@ -267,10 +266,10 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
       //   this.currentIndex++;
       // }
     }
-  }
+  };
 
-  private allSocialLinks(): ISocialLink[] {
-    return [{
+  private allSocialLinks = (): ISocialLink[] => [
+    {
       name: 'WHATSAPP',
       delay: '1000ms',
       href: 'https://api.whatsapp.com/send?phone=',
@@ -288,11 +287,11 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
       delay: '1200ms',
       href: 'https://www.facebook.com/carlanailscleos.nl/',
       svgIcon: 'FACEBOOK-NO-COLOR'
-    }];
-  }
+    }
+  ];
 
-  private allStories(): IStory[] {
-    return [{
+  private allStories = (): IStory[] => [
+    {
       id: 'storyItem1',
       state: new BehaviorSubject<'open' | 'close'>('open'),
       delay: '100ms',
@@ -317,11 +316,11 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
       state: new BehaviorSubject<'open' | 'close'>('open'),
       delay: '500ms',
       text: 'MAIN.STORY.TEXT_5'
-    }];
-  }
+    }
+  ];
 
-  private allExperience(): IExperience[] {
-    return [{
+  private allExperience = (): IExperience[] => [
+    {
       id: 'experienceItem1',
       state: new BehaviorSubject<'open' | 'close'>('open'),
       delay: '0ms',
@@ -353,16 +352,12 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
       icon: 'mood',
       position: '4°',
       text: 'MAIN.EXPERIENCE.TEXT_4'
-    }];
-  }
+    }
+  ];
 
-  private clean(): void {
-    this.store.dispatch(
-      new fromActionsMain.Clean()
-    );
-  }
+  private clean = (): void => this.store.dispatch(new fromActionsMain.Clean());
 
-  private subscribe(): void {
+  private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.errorMessage || state.message) {
         this.snackBar.open(state.errorMessage || state.message, 'OK', {
@@ -370,18 +365,20 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       }
     });
-  }
+  };
 }
 
 @Component({
   selector: 'app-bottom-sheet-book-appointment',
   templateUrl: 'bottom-sheet-book-appointment.html',
+  imports: [SharedModule]
 })
 export class BottomSheetBookAppointmentComponent {
-  constructor(private bottomSheetRef: MatBottomSheetRef<BottomSheetBookAppointmentComponent>, private translate: TranslateService) {
+  constructor(private bottomSheetRef: MatBottomSheetRef<BottomSheetBookAppointmentComponent>,
+              private translate: TranslateService) {
   }
 
-  openLink(event: MouseEvent, key: 'whatsapp' | 'instagram' | 'facebook' | 'phone' | 'email'): void {
+  openLink = (event: MouseEvent, key: 'whatsapp' | 'instagram' | 'facebook' | 'phone' | 'email'): void => {
     this.bottomSheetRef.dismiss();
     event.preventDefault();
     setTimeout(() => {
@@ -410,5 +407,5 @@ export class BottomSheetBookAppointmentComponent {
       }
       window.open(url, '_blank');
     }, 500);
-  }
+  };
 }

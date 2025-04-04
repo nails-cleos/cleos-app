@@ -3,22 +3,26 @@
     <div class="card-content">
       <mat-card appearance="outlined">
         <mat-card-header>
-          <mat-card-title>{{title}}</mat-card-title>
+          <mat-card-title>{{ title }}</mat-card-title>
         </mat-card-header>
         <mat-card-content>
           <div cdkDropList class="sorting-item-list" (cdkDropListDropped)="drop($event)">
-            <div class="sorting-item-box" *ngFor="let item of items" cdkDrag>
-              <div class="sorting-item-placeholder" *cdkDragPlaceholder></div>
-              {{item.order}} - {{item.name}}
-            </div>
+            @for (item of items; track item) {
+              <div class="sorting-item-box" cdkDrag>
+                <div class="sorting-item-placeholder" *cdkDragPlaceholder></div>
+                {{ item.order }} - {{ item.name }}
+              </div>
+            }
           </div>
         </mat-card-content>
         <mat-card-actions class="card-actions">
           <div class="spacer"></div>
           <button appBackButton color="accent" mat-fab extended class="icon-button"
-                  type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
+                  type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
+          </button>
           <button color="primary" mat-fab extended class="icon-button"
-                  (click)="sort">{{ 'COMMON.BUTTON.UPDATE' | translate }}</button>
+                  (click)="sort">{{ 'COMMON.BUTTON.UPDATE' | translate }}
+          </button>
         </mat-card-actions>
       </mat-card>
     </div>

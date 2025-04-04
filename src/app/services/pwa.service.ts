@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Platform } from '@angular/cdk/platform';
 import { take, timer } from 'rxjs';
@@ -11,9 +11,14 @@ export const NOT_INSTALL_PWA = 'not_install_pwa';
 
 @Injectable({ providedIn: 'root' })
 export class PwaService {
+  private bottomSheet: MatBottomSheet = inject(MatBottomSheet);
+  private platform: Platform = inject(Platform);
+  private cookieService: CookieService = inject(CookieService);
+
   private promptEvent: any;
 
-  constructor(private bottomSheet: MatBottomSheet, private platform: Platform, swUpdate: SwUpdate, private cookieService: CookieService) {
+  constructor() {
+    const swUpdate: SwUpdate = inject(SwUpdate);
     if (swUpdate.isEnabled) {
       swUpdate.versionUpdates
         .pipe(filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY'))
@@ -21,7 +26,7 @@ export class PwaService {
     }
   }
 
-  public initPwaPrompt(): void {
+  initPwaPrompt = (): void => {
     if (!this.cookieService.get(NOT_INSTALL_PWA)) {
       if (this.platform.ANDROID) {
         window.addEventListener('beforeinstallprompt', (event: any) => {
@@ -37,11 +42,11 @@ export class PwaService {
         }
       }
     }
-  }
+  };
 
-  private openPromptComponent(mobileType: 'ios' | 'android'): void {
+  private openPromptComponent = (mobileType: 'ios' | 'android'): void => {
     timer(3000)
       .pipe(take(1))
       .subscribe(() => this.bottomSheet.open(PromptComponent, { data: { mobileType, promptEvent: this.promptEvent } }));
-  }
+  };
 }

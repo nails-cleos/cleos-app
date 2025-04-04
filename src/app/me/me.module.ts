@@ -1,17 +1,18 @@
 import { NgModule } from '@angular/core';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../shared/shared.module';
 import { MeRoutingModule } from './me-routing.module';
 
 import { ReservationsComponent } from './reservation/list/reservations.component';
 import { MeReservationComponent } from './reservation/me/me-reservation.component';
 import { PaymentComponent } from './payment/payment.component';
 import { PaymentCompleteComponent } from './payment/complete/payment-complete.component';
-import { BottomSheetReferralComponent, BottomSheetShareComponent, ReferralsComponent } from './referrals/referrals.component';
+import {
+  BottomSheetReferralComponent,
+  BottomSheetShareComponent,
+  ReferralsComponent
+} from './referrals/referrals.component';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { ReviewDialogComponent } from './reservation/review/review-dialog.component';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatStepperModule } from '@angular/material/stepper';
 import { UpcomingComponent } from './reservation/upcoming/upcoming.component';
 import { EffectsModule } from '@ngrx/effects';
 import { PaymentEffects } from '../store/effects/payment.effects';
@@ -35,10 +36,9 @@ import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
 import { ShareButtonsComponent } from './referrals/share-buttons/share-buttons.component';
-import { NgxMatIntlTelInputComponent } from 'ngx-mat-intl-tel-input';
 
 @NgModule({
-  declarations: [
+  imports: [
     ReservationsComponent,
     MeReservationComponent,
     PaymentComponent,
@@ -51,28 +51,22 @@ import { NgxMatIntlTelInputComponent } from 'ngx-mat-intl-tel-input';
     UpcomingComponent,
     OptionComponent,
     MePaymentComponent,
-    ShareButtonsComponent
+    ShareButtonsComponent,
+    MeRoutingModule,
+    TranslateModule.forChild({
+      loader: {
+        provide: TranslateLoader,
+        useClass: TranslateLoaderFactory.forModule('me')
+      },
+      missingTranslationHandler: {
+        provide: MissingTranslationHandler,
+        useClass: MissingTranslateHandler,
+      },
+      isolate: false,
+      extend: true
+    }),
+    EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects, CurrencyEffects]),
   ],
-    imports: [
-        MeRoutingModule,
-        SharedModule,
-        MatProgressBarModule,
-        MatStepperModule,
-        TranslateModule.forChild({
-            loader: {
-                provide: TranslateLoader,
-                useClass: TranslateLoaderFactory.forModule('me')
-            },
-            missingTranslationHandler: {
-                provide: MissingTranslationHandler,
-                useClass: MissingTranslateHandler,
-            },
-            isolate: false,
-            extend: true
-        }),
-        EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects, CurrencyEffects]),
-        NgxMatIntlTelInputComponent
-    ],
   providers: [
     ReservationService,
     PaymentService,

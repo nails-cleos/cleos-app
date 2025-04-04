@@ -4,60 +4,66 @@
     <ng-container matColumnDef="position">
       <th *matHeaderCellDef mat-header-cell>#</th>
       <td *matCellDef="let office; let i = dataIndex;" mat-cell>
-        <div *ngIf="office.id; else skeleton">{{(paginator.pageIndex * pageSize) + i + 1}} </div>
-        <ng-template #skeleton>
+        @if (office.id) {
+          <div>{{ (paginator.pageIndex * pageSize) + i + 1 }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="name">
       <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
       <td *matCellDef="let office" mat-cell>
-        <div *ngIf="office.id; else skeleton">{{office.name}}</div>
-        <ng-template #skeleton>
+        @if (office.id) {
+          <div>{{ office.name }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="manager">
       <th *matHeaderCellDef class="hide-xs" mat-header-cell
-          mat-sort-header>{{ 'OFFICE.LIST.COLUMN.MANAGER' | translate }}</th>
+          mat-sort-header>{{ 'OFFICE.LIST.COLUMN.MANAGER' | translate }}
+      </th>
       <td *matCellDef="let office" class="hide-xs" mat-cell>
-        <div *ngIf="office.id; else skeleton">{{office?.manager?.displayName}}</div>
-        <ng-template #skeleton>
+        @if (office.id) {
+          <div>{{ office.manager?.displayName }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="subject">
       <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'OFFICE.SUBJECT.FIELD' | translate }}</th>
       <td *matCellDef="let office" mat-cell>
-        <div *ngIf="office.id; else skeleton">{{office.subject}}</div>
-        <ng-template #skeleton>
+        @if (office.id) {
+          <div>{{ office.subject }}</div>
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
     <ng-container matColumnDef="actions">
       <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
       <td *matCellDef="let office" class="hide-xs" mat-cell>
-        <div *ngIf="office.id; else skeleton">
-          <button (click)="edit(office)" *ngIf="!office.deleted" mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
-            <mat-icon color="primary">edit</mat-icon>
-          </button>
-          <button (click)="delete(office)" *ngIf="!office.deleted" mat-icon-button
-                  matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
-            <mat-icon color="warn">delete</mat-icon>
-          </button>
-        </div>
-        <ng-template #skeleton>
+        @if (office.id) {
+          @if (!office.deleted) {
+            <button (click)="edit(office)" mat-icon-button
+                    matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+              <mat-icon color="primary">edit</mat-icon>
+            </button>
+            <button (click)="delete(office)" mat-icon-button
+                    matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
+              <mat-icon color="warn">delete</mat-icon>
+            </button>
+          }
+        } @else {
           <div class="ssc-line"></div>
-        </ng-template>
+        }
       </td>
     </ng-container>
 
@@ -67,16 +73,18 @@
           <mat-list>
             <mat-list-item role="list">
               <div matListItemTitle>{{ 'OFFICE.LIST.COLUMN.MANAGER' | translate }}</div>
-              <div matListItemLine>{{office?.manager?.displayName}}</div>
+              <div matListItemLine>{{ office?.manager?.displayName }}</div>
             </mat-list-item>
             <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
             <mat-list-item role="list">
-              <button (click)="edit(office)" *ngIf="!office.deleted" color="primary" mat-icon-button>
-                <mat-icon matListItemIcon>edit</mat-icon>
-              </button>
-              <button (click)="delete(office)" *ngIf="!office.deleted" color="warn" mat-icon-button>
-                <mat-icon matListItemIcon>delete</mat-icon>
-              </button>
+              @if (!office.deleted) {
+                <button (click)="edit(office)" color="primary" mat-icon-button>
+                  <mat-icon matListItemIcon>edit</mat-icon>
+                </button>
+                <button (click)="delete(office)" color="warn" mat-icon-button>
+                  <mat-icon matListItemIcon>delete</mat-icon>
+                </button>
+              }
             </mat-list-item>
           </mat-list>
         </div>
@@ -85,7 +93,8 @@
 
     <ng-container matColumnDef="noContent">
       <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-        {{ 'OFFICE.LIST.ERROR.NO_CONTENT' | translate }}</td>
+        {{ 'OFFICE.LIST.ERROR.NO_CONTENT' | translate }}
+      </td>
     </ng-container>
 
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
@@ -95,7 +104,9 @@
 
     <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
   </table>
-  <mat-paginator *ngIf="resultsLength" [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+  @if (resultsLength) {
+    <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+  }
 
   <button color="accent" id="add-button" mat-fab matTooltip="{{ 'OFFICE.TITLE' | translate }}"
           [routerLink]="['/', language, 'offices', 'add']">

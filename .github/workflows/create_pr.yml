@@ -16,7 +16,7 @@ jobs:
       - name: Get Issue Number
         id: extract_issue
         run: |
-          ISSUE_NUMBER=$(echo "${GITHUB_REF#refs/heads/}" | grep -oE '[0-9]+')
+          ISSUE_NUMBER=$(echo "${GITHUB_REF#refs/heads/}" | grep -oE '[0-9]+' | head -n 1)
           echo "Extracted ISSUE_NUMBER: $ISSUE_NUMBER"
           echo "ISSUE_NUMBER=$ISSUE_NUMBER" >> $GITHUB_ENV
 
