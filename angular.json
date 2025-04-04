@@ -49,7 +49,12 @@
               "src/styles.scss",
               "src/sitemap.xml",
               "src/browserconfig.xml",
-              "src/robots.txt"
+              "src/robots.txt",
+              {
+                "glob": "*.txt",
+                "input": "src/.well-known/pki-validation",
+                "output": ".well-known/pki-validation"
+              }
             ],
             "styles": [
               "node_modules/cookieconsent/build/cookieconsent.min.css",
@@ -210,7 +215,12 @@
               "src/styles.scss",
               "src/sitemap.xml",
               "src/browserconfig.xml",
-              "src/robots.txt"
+              "src/robots.txt",
+              {
+                "glob": "*.txt",
+                "input": "src/.well-known/pki-validation",
+                "output": ".well-known/pki-validation"
+              }
             ],
             "styles": [
               "node_modules/cookieconsent/build/cookieconsent.min.css",
