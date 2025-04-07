@@ -1,37 +1,44 @@
 import { getLocale } from './helper';
+import { flagEs, flagGb } from '@ng-icons/flag-icons';
 
 export interface IFlag {
   icon: string;
   value: string;
   text: string;
+  flag: string;
 }
 
 export const flags = (): IFlag[] => [
   // {
   //   icon: 'ar',
   //   value: 'es_AR',
-  //   text: 'ES'
+  //   text: 'ES',
+  //   flag: flagAr
   // },
   {
     icon: 'es',
     value: 'es',
-    text: 'ES'
+    text: 'ES',
+    flag: flagEs
   },
   {
     icon: 'gb',
     value: 'en_GB',
-    text: 'EN'
-  },
+    text: 'EN',
+    flag: flagGb
+  // },
   // {
   //   icon: 'nl',
   //   value: 'nl',
-  //   text: 'NL'
+  //   text: 'NL',
+  //   flag: flagNl
   // },
   // {
   //   icon: 'us',
   //   value: 'en',
-  //   text: 'EN'
-  // }
+  //   text: 'EN',
+  //   flag: flagUs
+  }
 ];
 
 export const findFlag = (flagList: IFlag[], lang: string): IFlag => {

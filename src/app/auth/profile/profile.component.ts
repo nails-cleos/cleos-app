@@ -20,12 +20,14 @@ import PlaceGeometry = google.maps.places.PlaceGeometry;
 import { GoogleMapComponent } from '../../shared/google-map/google-map.component';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { NgxMaterialIntlTelInputComponent, TextLabels } from 'ngx-material-intl-tel-input';
+import { NgIcon } from '@ng-icons/core';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
-  imports: [SharedModule, NgxMaterialIntlTelInputComponent, NgxColorsModule, GoogleMapComponent, BackButtonDirective]
+  imports: [SharedModule, NgxMaterialIntlTelInputComponent, NgxColorsModule, GoogleMapComponent, BackButtonDirective,
+    NgIcon]
 })
 export class ProfileComponent implements OnInit, OnDestroy {
   @ViewChild('canvas', { static: false }) canvas?: ElementRef<HTMLCanvasElement>;
