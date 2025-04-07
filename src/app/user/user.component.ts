@@ -24,7 +24,8 @@ import { Role } from '../interfaces/token';
 import { SharedModule } from '../shared/shared.module';
 import { GoogleMapComponent } from '../shared/google-map/google-map.component';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
+import { NgxMaterialIntlTelInputComponent, TextLabels } from 'ngx-material-intl-tel-input';
+import { NgIcon } from '@ng-icons/core';
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 import PlaceResult = google.maps.places.PlaceResult;
 
@@ -32,7 +33,8 @@ import PlaceResult = google.maps.places.PlaceResult;
   selector: 'app-user',
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss'],
-  imports: [SharedModule, NgxMaterialIntlTelInputComponent, GoogleMapComponent, NgxColorsModule, BackButtonDirective]
+  imports: [SharedModule, NgxMaterialIntlTelInputComponent, GoogleMapComponent, NgxColorsModule, BackButtonDirective,
+    NgIcon]
 })
 export class UserComponent implements OnInit, OnDestroy {
   @Input() user?: IUser;
@@ -45,6 +47,16 @@ export class UserComponent implements OnInit, OnDestroy {
   addressUpdated = false;
   formattedAddress?: string;
   isProfessionalOrManager: boolean;
+  labels: TextLabels = {
+    mainLabel: '',
+    codePlaceholder: '',
+    searchPlaceholderLabel: '',
+    noEntriesFoundLabel: '',
+    nationalNumberLabel: '',
+    hintLabel: '',
+    invalidNumberError: '',
+    requiredError: ''
+  };
 
   private getState: Observable<any>;
   private subscription?: Subscription;
@@ -115,6 +127,8 @@ export class UserComponent implements OnInit, OnDestroy {
     if (this.extras) {
       this.getForm.role.setValue(this.extras.role);
     }
+    this.loadLabels();
+    this.translate.onLangChange.subscribe(() => this.loadLabels());
     this.cdRef.detectChanges();
   }
 
@@ -180,6 +194,21 @@ export class UserComponent implements OnInit, OnDestroy {
         new fromActionsUser.FindUser(this.id)
       );
     }
+  };
+
+  private loadLabels = () => {
+    const phoneTranslations = this.translate.instant('COMMON.USER.PHONE');
+
+    this.labels = {
+      mainLabel: '',
+      codePlaceholder: '',
+      searchPlaceholderLabel: phoneTranslations.SEARCH || '',
+      noEntriesFoundLabel: phoneTranslations.COUNTRY_NOT_FOUND || '',
+      nationalNumberLabel: phoneTranslations.FIELD || '',
+      hintLabel: '',
+      invalidNumberError: phoneTranslations.INVALID || '',
+      requiredError: phoneTranslations.REQUIRED || ''
+    };
   };
 
   private subscribe = (): void => {

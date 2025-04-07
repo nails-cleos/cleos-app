@@ -25,14 +25,9 @@
     <google-map [zoom]="zoom" class="divider" [center]="center" [height]="height" [width]="width" [options]="options"
                 style="display: flex; justify-content: center;">
       @if (markerPosition) {
-        <map-advanced-marker
-          #marker="mapAdvancedMarker"
-          [position]="markerPosition"
-          [title]="'Your Location'"
-          [options]="markerOptions"
-          (mapDragend)="markerDragEnd($event)"
-          (mapClick)="openInfoWindow(marker)">
-        </map-advanced-marker>
+        <map-marker #marker="mapMarker" [position]="markerPosition"
+                    [options]="markerOptions" (mapDragend)="markerDragEnd($event)"
+                    (mapClick)="openInfoWindow(marker)"></map-marker>
       }
       <map-info-window class="map-info" [innerHTML]="info"></map-info-window>
     </google-map>
