@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { ControlContainer, NgForm, UntypedFormGroup } from '@angular/forms';
 import { GeocodeService, MapStatus } from '../../services/geocode.service';
-import { GoogleMap, MapAdvancedMarker, MapInfoWindow } from '@angular/google-maps';
+import { GoogleMap, MapInfoWindow, MapMarker } from '@angular/google-maps';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Subscription } from 'rxjs';
 import { SharedModule } from '../shared.module';
@@ -13,7 +13,7 @@ import MapMouseEvent = google.maps.MapMouseEvent;
   templateUrl: './google-map.component.html',
   styleUrls: ['./google-map.component.scss'],
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
-  imports: [SharedModule, GoogleMap, MapInfoWindow, MapAdvancedMarker]
+  imports: [SharedModule, GoogleMap, MapInfoWindow, MapMarker]
 })
 export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MapInfoWindow) infoWindow?: MapInfoWindow;
@@ -182,7 +182,7 @@ export class GoogleMapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   };
 
-  openInfoWindow = (marker: MapAdvancedMarker): void => this.infoWindow?.open(marker);
+  openInfoWindow = (marker: MapMarker): void => this.infoWindow?.open(marker);
 
   private setAutocomplete = (): void => {
     if (this.addressText?.nativeElement) {

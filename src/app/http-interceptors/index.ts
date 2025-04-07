@@ -11,4 +11,4 @@ export const httpInterceptorProviders = [
 ];
 
 export const isExternalUrl = (url: string): boolean =>
-  url.includes('maps.googleapis.com') || url.includes('paypalobjects.com') || url.includes('assets');
+  url.includes('maps.googleapis.com') || url.includes('paypalobjects.com') || url.includes('assets') || url.includes('ipapi.co');
