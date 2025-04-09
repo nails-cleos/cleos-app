@@ -28,10 +28,8 @@ import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../in
 import { MatStepper } from '@angular/material/stepper';
 import { IRoom, IService } from '../interfaces/room';
 import {
-  DataEvent,
   Day,
   ICustomerLastReservation,
-  IDataEvent,
   IDay,
   IReservation,
   IReservationAll,
@@ -68,11 +66,10 @@ import {
   isSameTimeZone,
   newDate,
   newDateTimestamp,
-  plusDays,
   reservationDuration,
   totalDuration
 } from '../util/dates';
-import { createBullet, fillNotAvailable, getFrequency, Meta, newEvent } from '../util/event';
+import { createBullet, DataEvent, IDataEvent, Meta, newEvent } from '../util/event';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Role } from '../interfaces/token';
 import { IUnavailableAll } from '../interfaces/unavailable';
@@ -506,15 +503,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       const timeZone = this.room.value.timeZone;
       const now = dateToUTC(createDate(timeZone), timeZone);
 
-      const { monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude } = getAvailability(
-        this.room.value);
-      this.weekendDays = exclude;
-      const { min, max } = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday, timeZone);
-      this.day = new Day(min, max, getNowTimeZone(), exclude, 1);
-      const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
-      const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
-      const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
-
       const dates: string[] = [];
       this.dateTimeList.value.forEach((value: any, i: number) => {
         const timeValue = getTimeNumber(value.start || this.minDate);
@@ -527,16 +515,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         if (date < createFullDate(now)) {
           date = now;
         }
-        const events = fillNotAvailable(unavailable, lunch, notWorking,
-          date, sunday, saturday, friday, thursday, wednesday, tuesday, monday, this.isDarkMode,
-          plusDays(date, this.daysInWeek), timeZone);
-
         const eventData = this.dataEvents.get(dateValue);
-        if (eventData) {
-          eventData.addEvents(events);
-          eventData.updateLength(eventData.calendarEvents.length);
-        } else {
-          this.dataEvents.set(dateValue, new DataEvent(events, i, date, events.length, this.room.value));
+        if (!eventData) {
+          this.dataEvents.set(dateValue, new DataEvent([], i, date, 0));
         }
         dates.push(value.date);
       });
@@ -681,7 +662,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   };
 
-  beforeMonthViewRender = ({ header }: any): void => {
+  beforeMonthViewRender = ({ header, period }: any, dataEvent: IDataEvent): void => {
+    dataEvent.calendarEnd = period.end;
+    dataEvent.calendarStart = period.start;
+    dataEvent.createRecurring();
     header.forEach((day: any) => {
       if (!this.dateIsValid(day.date)) {
         day.cssClass = 'cal-disabled';
@@ -1003,6 +987,24 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   };
 
+  private addNotAvailable = (eventData: IDataEvent) => {
+    const timeZone = this.room.value.timeZone;
+
+    const { monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude } = getAvailability(
+      this.room.value);
+    this.weekendDays = exclude;
+    const { min, max } = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday, timeZone);
+    this.day = new Day(min, max, getNowTimeZone(), exclude, 1);
+
+    const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
+    const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
+    const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
+
+    eventData.recurringEvent?.addNotAvailableRecurring(eventData, unavailable, lunch, notWorking, sunday, saturday,
+      friday,
+      thursday, wednesday, tuesday, monday, this.isDarkMode, timeZone);
+  };
+
   private addReservations = (reservations: IReservationAll[]): CalendarEvent[] => reservations.map(it => {
     if (it.id !== this.reservationId) {
       if (it.treatment.duration) {
@@ -1031,7 +1033,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }).filter((item): item is CalendarEvent => item !== undefined) ?? [];
 
   private addUnavailableList = (dataEvent: IDataEvent, unavailableList: IUnavailableAll[]) => {
-    let recurringEvents: any[] = [];
     unavailableList.forEach(it => {
       if (it.duration || it.allDay) {
         const startDate = newDateTimestamp(it.timestamp, this.room.value.timeZone);
@@ -1054,17 +1055,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
             this.validateUnavailable(start, data, dataEvent);
           }
         } else {
-          const calendarStart = greaterOrEqualsThan(dataEvent.viewDate, start) ? dataEvent.viewDate : start;
-          recurringEvents =
-            [...recurringEvents, getFrequency(it.repeat, calendarStart, it.id, title, this.daysInWeek, 'UNAVAILABLE',
-              'unavailable', it.end, getDurationOrUndefined(it.duration), it.allDay, professionalId)];
+          dataEvent.recurringEvent?.addFrequency(it.repeat, start, it.id, title, 'UNAVAILABLE', path,
+            (date, recurring) => this.validateUnavailable(date, recurring, dataEvent),
+            getDurationOrUndefined(it.duration), professionalId, it.allDay);
         }
       }
     });
-
-    recurringEvents.forEach(recurring =>
-      recurring.rule.all()?.forEach((date: Date) => this.validateUnavailable(date, recurring, dataEvent))
-    );
   };
 
   private validateUnavailable = (start: Date, recurring: any, dataEvent: IDataEvent): void => {
@@ -1307,13 +1303,15 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       if (state.data && (Array.isArray(state.data) && (Array.isArray(state.data[0].reservations) || Array.isArray(
         state.data[0].unavailableList))) && !state.isLoading) {
         state.data.forEach((data: any) => {
-          const eventData = this.dataEvents.get(data.date);
-          if (eventData && eventData.calendarEvents.length === eventData.unavailableEventLength) {
-            eventData.addEvents(this.addReservations(data.reservations));
-            this.addUnavailableList(eventData, data.unavailableList);
+          const dataEvent = this.dataEvents.get(data.date);
+          if (dataEvent && dataEvent.calendarEvents.length === dataEvent.unavailableEventLength) {
+            this.addNotAvailable(dataEvent);
+            dataEvent.addEvents(this.addReservations(data.reservations));
+            this.addUnavailableList(dataEvent, data.unavailableList);
+            dataEvent.recurringEvent?.execute();
             const bookOrder = getIndex(this.steps, 'book_online');
             setTimeout(() => {
-              const dateTime = this.dateTimeList.at(eventData.index);
+              const dateTime = this.dateTimeList.at(dataEvent.index);
               const start = dateTime.get('start')?.value;
               const dateValue = dateTime?.get('date')?.value;
               if (this.reservationId && this.reservation && dateValue && this.myStepper.selectedIndex === bookOrder) {
@@ -1331,8 +1329,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
                   const event = this.createNewEvent(date, end, 'EDITING', this.reservation.room.timeZone,
                     this.reservation.id);
                   if (event) {
-                    this.events.at(eventData.index)?.get('event')?.setValue(event);
-                    eventData.addEvent(event);
+                    this.events.at(dataEvent.index)?.get('event')?.setValue(event);
+                    dataEvent.addEvent(event);
                   }
                 } else {
                   this.segmentClick(date, 'EDITING', data.date, this.reservation.id);

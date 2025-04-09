@@ -2,7 +2,6 @@ import { IAvailability } from '../interfaces/room';
 import { CalendarEvent } from 'angular-calendar';
 import {
   createDate,
-  createEndDate,
   createNewDate,
   dateToUTC,
   daysOfWeek,
@@ -10,16 +9,15 @@ import {
   getNowTimeZone,
   getTimeNumber,
   getWeekDay,
-  greaterOrEqualsThan,
   greaterOrEqualsThanToday,
-  IDuration,
-  plusDays
+  IDuration
 } from './dates';
 import { findStateColor } from './theme';
 import { ByWeekday, Frequency, RRule } from 'rrule';
-import { isToday } from 'date-fns';
+import { isSameDay, isToday } from 'date-fns';
 import { createEventColor } from './color';
 import { FrequencyEnum } from './helper';
+import { IDay } from '../interfaces/reservation';
 
 export interface IMeta {
   time?: boolean;
@@ -51,44 +49,182 @@ export class Meta implements IMeta {
   }
 }
 
-export const getFrequency = (repeat: string, start: Date, id: any, title: string, daysInWeek: number, state: string,
-                             path: string, endDate?: string, duration?: IDuration, allDay: boolean = false,
-                             professionalId?: string, calendarStart?: Date): any => {
-  let calendarEnd = plusDays(calendarStart ?? start, daysInWeek);
-  if (endDate) {
-    const end = createEndDate(endDate);
-    if (greaterOrEqualsThan(calendarEnd, end)) {
-      calendarEnd = end;
-    }
-  }
-  return {
-    id,
-    title,
-    duration,
-    state,
-    path,
-    allDay,
-    professionalId,
-    rule: createRule(repeat, start, calendarEnd, start.getDate(), getWeekDay(start.getDay()))
-  };
-};
+export interface IDataEvent {
+  calendarEvents: CalendarEvent[];
+  unavailableEventLength: number;
+  index: number;
+  viewDate: Date;
+  process: boolean;
+  day?: IDay;
+  calendarEnd?: Date;
+  calendarStart?: Date;
+  recurringEvent?: RecurringEvent;
 
-export const fillNotAvailable = (unavailable: string, lunch: string, notWorking: string,
-                                 selectDate: Date, sunday: IAvailability, saturday: IAvailability,
-                                 friday: IAvailability, thursday: IAvailability, wednesday: IAvailability,
-                                 tuesday: IAvailability, monday: IAvailability, isDark: boolean = false, maxDate: Date,
-                                 timeZone: string = getCurrentTimeZone()): CalendarEvent[] => {
-  const recurring = [{
-    availabilityList: [monday, tuesday, wednesday, thursday, friday, saturday, sunday],
-    rule: new RRule({
-      freq: RRule.WEEKLY,
-      byweekday: [RRule.SU, RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR, RRule.SA],
-      dtstart: selectDate,
-      until: maxDate
-    })
-  }];
-  return recurringEvent(recurring, notWorking, unavailable, lunch, isDark, timeZone);
-};
+  addEvents(events: CalendarEvent[]): void;
+
+  addEvent(event?: CalendarEvent): void;
+
+  removeEvent(event: CalendarEvent, deleteCount?: number): void;
+
+  filterEvent(event: CalendarEvent): void;
+
+  updateLength(length: number): void;
+
+  getOverlapEvent(eventStartDay: Date, eventEndDay: Date, professionalId?: string): CalendarEvent[]
+
+  sameDayEvent(recurring: any, event: CalendarEvent): boolean;
+
+  sortEvents(): void;
+
+  resetEvents(): void;
+
+  refresh(): void;
+
+  createRecurring(): void;
+}
+
+export class DataEvent implements IDataEvent {
+  calendarEvents: CalendarEvent[];
+  unavailableEventLength: number;
+  index: number;
+  viewDate: Date;
+  process: boolean;
+  day?: IDay;
+  calendarEnd?: Date;
+  calendarStart?: Date;
+  recurringEvent?: RecurringEvent;
+
+  constructor(events: CalendarEvent[], index: number, viewDate: Date, unavailableEventLength: number,
+              process: boolean = false, day?: IDay) {
+    this.calendarEvents = events;
+    this.unavailableEventLength = unavailableEventLength;
+    this.index = index;
+    this.viewDate = viewDate;
+    this.process = process;
+    this.day = day;
+  }
+
+  addEvents = (events: CalendarEvent[]): void => {
+    events.forEach(event => this.addEvent(event));
+  };
+
+  addEvent = (event?: CalendarEvent): void => {
+    if (event) {
+      if (event.id === undefined || !this.calendarEvents.some(e => e.id === event.id && e.start === event.start)) {
+        if (!((this.calendarEnd && event.end && event.end > this.calendarEnd) ||
+          (this.calendarStart && event.start < this.calendarStart))) {
+          this.calendarEvents = [...this.calendarEvents, event];
+        }
+      }
+    }
+  };
+
+  removeEvent = (event: CalendarEvent, deleteCount: number = 1): void => {
+    const i = this.calendarEvents.indexOf(event);
+    if (i !== -1) {
+      this.calendarEvents.splice(i, deleteCount);
+    }
+  };
+
+  filterEvent = (event: CalendarEvent): void => {
+    this.calendarEvents = this.calendarEvents.filter(ev => ev !== event);
+  };
+
+  updateLength = (length: number): void => {
+    this.unavailableEventLength = length;
+  };
+
+  getOverlapEvent = (
+    eventStartDay: Date,
+    eventEndDay: Date,
+    professionalId?: string
+  ): CalendarEvent[] => {
+    if (professionalId) {
+      return this.calendarEvents.filter(
+        (eventA: CalendarEvent) => ((eventA.meta?.professionalId === professionalId) && (
+          (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
+          || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
+          || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
+        )));
+    }
+    return this.calendarEvents.filter(
+      (eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
+        || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
+        || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
+    );
+  };
+
+  sameDayEvent = (recurring: any, event: CalendarEvent): boolean => !this.calendarEvents
+    .find(ce => ce.id === recurring.path && isSameDay(event.start, ce.start));
+
+  resetEvents(): void {
+    this.calendarEvents = [];
+  }
+
+  sortEvents(): void {
+    this.calendarEvents = this.calendarEvents.slice().sort((a, b) => a.start.getTime() - b.start.getTime());
+  }
+
+  refresh(): void {
+    this.calendarEvents = [...this.calendarEvents];
+  }
+
+  createRecurring(): void {
+    this.recurringEvent = new RecurringEvent(this.calendarEnd!, this.calendarStart);
+  }
+}
+
+class RecurringEvent {
+  recurring: any[] = [];
+  calendarEnd: Date;
+  calendarStart?: Date;
+
+  constructor(calendarEnd: Date, calendarStart?: Date) {
+    this.calendarEnd = calendarEnd;
+    this.calendarStart = calendarStart;
+  }
+
+  addFrequency = (repeat: string, start: Date, id: any, title: string, state: string, path: string,
+                  onEachDate: (date: Date, recurring: any) => void, duration?: IDuration, professionalId?: string,
+                  allDay: boolean = false) => {
+    this.recurring = [...this.recurring, {
+      id: id,
+      title: title,
+      duration: duration,
+      state: state,
+      path: path,
+      allDay: allDay,
+      professionalId: professionalId,
+      onEachDate: onEachDate,
+      rule: createRule(repeat, start, this.calendarEnd, start.getDate(), getWeekDay(start.getDay()))
+    }];
+  };
+
+  addNotAvailableRecurring = (
+    calendar: IDataEvent, unavailable: string, lunch: string, notWorking: string, sunday: IAvailability,
+    saturday: IAvailability,
+    friday: IAvailability, thursday: IAvailability, wednesday: IAvailability,
+    tuesday: IAvailability, monday: IAvailability, isDark: boolean = false,
+    timeZone: string = getCurrentTimeZone()
+  ) => {
+    this.recurring = [...this.recurring, {
+      availabilityList: [monday, tuesday, wednesday, thursday, friday, saturday, sunday],
+      rule: new RRule({
+        freq: RRule.WEEKLY,
+        byweekday: [RRule.SU, RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR, RRule.SA],
+        dtstart: this.calendarStart,
+        until: this.calendarEnd
+      }),
+      onEachDate: (date: Date, recurring: any) => createRecurringEvent(date, recurring, calendar, notWorking,
+        unavailable, lunch, isDark, timeZone)
+    }];
+  };
+
+  execute(): void {
+    this.recurring.forEach(recurring => recurring.rule.all()
+      .forEach((date: Date) => recurring.onEachDate(date, recurring)));
+  }
+}
 
 export const newEvent = (
   title: string,
@@ -170,44 +306,20 @@ export const monthEvent = (
   allDay
 } as unknown as CalendarEvent);
 
-// private isAnOverlapEvent(eventStartDay: Date, eventEndDay: Date): CalendarEvent | undefined {
-//   return this.events.find((eventA: CalendarEvent) => {
-//     if (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end) {
-//       console.info('start-time in between any of the events');
-//       return eventA;
-//     }
-//     if (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end) {
-//       console.info('end-time in between any of the events');
-//       return eventA;
-//     }
-//     if (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end) {
-//       console.info('any of the events in between/on the start-time and end-time');
-//       return eventA;
-//     }
-//     return null;
-//   });
-// }
 
-const recurringEvent = (
-  recurring: any[],
+const createRecurringEvent = (
+  date: Date,
+  recurring: any,
+  calendar: IDataEvent,
   notWorking: string,
   unavailable: string,
   lunch: string,
   isDark: boolean,
   timeZone: string
-): CalendarEvent[] => {
-  let events: CalendarEvent[] = [];
-
-  recurring.forEach(r =>
-    r.rule.all().forEach((date: Date) => {
-      const availability = r.availabilityList.find((a: IAvailability) => a?.day === daysOfWeek[date.getDay()]);
-      const event = createEvent(date, notWorking, unavailable, lunch, isDark, timeZone, availability);
-      if (event) {
-        events = events.concat(event);
-      }
-    }));
-
-  return events;
+) => {
+  const availability = recurring.availabilityList.find((a: IAvailability) => a?.day === daysOfWeek[date.getDay()]);
+  const events = createEvent(date, notWorking, unavailable, lunch, isDark, timeZone, availability);
+  calendar.addEvents(events);
 };
 
 const createEvent = (date: Date, notWorking: string, unavailable: string,

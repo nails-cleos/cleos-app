@@ -74,7 +74,8 @@
                                (mwlClick)="cellClick(viewDate)"
                                [cellTemplate]="customCellTemplate"
                                (beforeViewRender)="beforeMonthViewRender($event)"
-                               [activeDayIsOpen]="activeDayIsOpen" [events]="events" [locale]="dateFormat"
+                               [activeDayIsOpen]="activeDayIsOpen" [events]="calendar.calendarEvents"
+                               [locale]="dateFormat"
                                [viewDate]="viewDate"></mwl-calendar-month-view>
     </mat-card-content>
     <mat-card-actions>

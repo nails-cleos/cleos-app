@@ -130,7 +130,7 @@
         <mwl-calendar-week-view
           (beforeViewRender)="beforeMonthViewRender($event)"
           (eventClicked)="view($event.event)"
-          (hourSegmentClicked)="segmentClick($event.date, calendar.room)"
+          (hourSegmentClicked)="segmentClick($event.date)"
           (eventTimesChanged)="eventTimesChanged($event)"
           [refresh]="refresh"
           [dayEndHour]="calendar.day!.dayEndHour"

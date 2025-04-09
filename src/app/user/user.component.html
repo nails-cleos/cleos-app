@@ -69,10 +69,10 @@
                     <mat-error>{{ errors['displayName'] }}</mat-error>
                   }
                 </mat-form-field>
-                <ngx-material-intl-tel-input style="margin-bottom: 22px !important;"
-                                             [enablePlaceholder]="true" [enableSearch]="true"
+                <ngx-material-intl-tel-input style="margin-bottom: 22px !important;" [includeDialCode]="true"
+                                             [emojiFlags]="true" [enablePlaceholder]="true" [enableSearch]="true"
                                              [required]="true" [preferredCountries]="['nl']" fieldControlName="phone"
-                                             appearance="outline" [textLabels]="labels">
+                                             [appearance]="'outline'" [textLabels]="labels" [autoSelectCountry]="false">
                 </ngx-material-intl-tel-input>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.USER.DOB.FIELD' | translate }}</mat-label>

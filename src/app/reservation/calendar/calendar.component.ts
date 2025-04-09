@@ -4,9 +4,7 @@ import { AppState, selectReservationState } from '../../store/app.states';
 import { Observable, Subject, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
 import {
-  DataEvent,
   Day,
-  IDataEvent,
   IRoomReservation,
   MAX_RESERVATION_MONTH,
   States
@@ -24,18 +22,16 @@ import {
   getDuration,
   getDurationOrUndefined,
   getNowTimeZone,
-  getPreviousSunday,
   getStartEndDay,
   greaterOrEqualsThan,
   isBetween,
   newDate,
   newDateTimestamp,
-  plusDays,
   reservationDuration,
   subPeriod
 } from '../../util/dates';
 import { IRoom, IRoomAll } from '../../interfaces/room';
-import { allDayEvent, calendarEvent, createBullet, fillNotAvailable, getFrequency, Meta } from '../../util/event';
+import { allDayEvent, calendarEvent, createBullet, DataEvent, IDataEvent, Meta } from '../../util/event';
 import { Router } from '@angular/router';
 import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarModule } from 'angular-calendar';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
@@ -94,9 +90,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
   @ViewChild('picker') picker: any;
 
   data?: IRoomReservation;
-  calendar?: IDataEvent;
   hourSegments = 4;
   viewDate: Date = getNowTimeZone();
+  calendar: IDataEvent = new DataEvent([], 0, this.viewDate, 0, false);
   locale: string = this.translate.currentLang;
   language: string = this.translate.currentLang;
   professionalId?: string;
@@ -132,7 +128,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.professionalId = value.professionalId;
     const darkMode: boolean = value.isDarkMode;
     if (this.isDarkMode !== undefined && darkMode !== this.isDarkMode) {
-      this.fillData(darkMode);
+      this.tryFillData(darkMode);
     }
     this.isDarkMode = darkMode;
     this.isRoomAdmin = value.isRoomAdmin;
@@ -141,6 +137,10 @@ export class CalendarComponent implements OnInit, OnDestroy {
   private professionalSelectedId?: string;
   private today: Date = createNewDate(getNowTimeZone());
   private isRoomAdmin = false;
+  private calendarStart: Date = addDays(this.today, -Math.floor(this.daysInWeek / 2));
+  private calendarEnd: Date = addDays(this.today, this.daysInWeek);
+  private dataReady = false;
+  private calendarReady = false;
 
   constructor() {
     this.breakpointObserver.observe(Object.values(CALENDAR_RESPONSIVE).map(({ breakpoint }) => breakpoint))
@@ -257,7 +257,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
     }
   };
 
-  segmentClick = (date: Date, room?: IRoom): void => {
+  segmentClick = (date: Date): void => {
+    const room = this.data?.room;
     const data = { date, room, professional: this.professional.value };
     if (date && room && this.dateIsValid(date)) {
       executeDialogNoWidth(this.dialog, CalendarDialogComponent, null, result => {
@@ -273,7 +274,16 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.getReservations();
   };
 
-  beforeMonthViewRender = ({ header }: any): void => {
+  beforeMonthViewRender = ({ header, period }: any): void => {
+    this.calendarStart = period.start;
+    this.calendarEnd = period.end;
+    if (this.calendar) {
+      this.calendar.calendarStart = period.start;
+      this.calendar.calendarEnd = period.end;
+      this.calendar.createRecurring();
+      this.calendarReady = true;
+      this.tryFillData();
+    }
     header.forEach((day: any) => {
       if (!this.dateIsValid(day.date)) {
         day.cssClass = 'cal-disabled';
@@ -423,7 +433,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   private addUnavailableList = (rr: IRoomReservation, darkMode: boolean): void => {
     const unavailableList: IUnavailableAll[] = rr.unavailableList;
-    let recurringEvents: any[] = [];
     unavailableList.forEach(it => {
       if (it.duration || it.allDay) {
         const startDate = newDateTimestamp(it.timestamp, rr.room.timeZone);
@@ -446,17 +455,12 @@ export class CalendarComponent implements OnInit, OnDestroy {
             this.validateUnavailable(rr.room, start, data, darkMode);
           }
         } else {
-          const sundayViewDate = getPreviousSunday(this.viewDate);
-          const calendarStart = greaterOrEqualsThan(sundayViewDate, start) ? sundayViewDate : start;
-          recurringEvents =
-            [...recurringEvents, getFrequency(it.repeat, start, it.id, title, this.daysInWeek, 'UNAVAILABLE',
-              'unavailable', it.end, getDurationOrUndefined(it.duration), it.allDay, professionalId, calendarStart)];
+          this.calendar.recurringEvent?.addFrequency(it.repeat, start, id, title, 'UNAVAILABLE', path,
+            (date, recurring) => this.validateUnavailable(rr.room, date, recurring, darkMode),
+            getDurationOrUndefined(it.duration), professionalId, it.allDay);
         }
       }
     });
-
-    recurringEvents.forEach(recurring => recurring.rule.all().forEach((date: Date) =>
-      this.validateUnavailable(rr.room, date, recurring, darkMode)));
   };
 
   private addBirthdays = (rr: IRoomReservation, darkMode: boolean): void => {
@@ -477,7 +481,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   private addNotes = (rr: IRoomReservation, darkMode: boolean): void => {
     const notes: INoteAll[] = rr.notes;
-    let recurringEvents: any[] = [];
     notes.forEach(it => {
       const title = this.translate.instant('RESERVATION.EVENT.NOTE', {
         note: it.description
@@ -488,14 +491,10 @@ export class CalendarComponent implements OnInit, OnDestroy {
       if (it.repeat === FrequencyEnum.none) {
         this.createNoteEvent(title, state, path, startDate, darkMode);
       } else {
-        recurringEvents =
-          [...recurringEvents, getFrequency(it.repeat, startDate, it.id, title, this.daysInWeek, state, path)];
+        this.calendar.recurringEvent?.addFrequency(it.repeat, startDate, it.id, title, state, path,
+          (date, recurring) => this.createNoteEvent(recurring.title, recurring.state, recurring.path, date, darkMode));
       }
     });
-
-    recurringEvents.forEach(
-      recurring => recurring.rule.all().forEach((date: Date) => this.createNoteEvent(recurring.title,
-        recurring.state, recurring.path, date, darkMode)));
   };
 
   private createNoteEvent = (title: string, state: string, path: string, date: Date, darkMode: boolean): void => {
@@ -532,24 +531,20 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   private fillData(darkMode: boolean = false): void {
     if (this.data) {
-      this.calendar = new DataEvent([], 0, this.viewDate, 0, this.data.room, false);
       this.calendar.addEvents(this.addReservations(this.data, darkMode));
-      const timeZone = this.calendar.room.timeZone;
-      const { monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude } = getAvailability(
-        this.calendar.room);
-      const { min, max } = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday, timeZone);
-      this.calendar.day = new Day(min, max, getNowTimeZone(), exclude, 1);
+      const timeZone = this.data.room.timeZone;
+      const { monday, tuesday, wednesday, thursday, friday, saturday, sunday } = getAvailability(
+        this.data.room);
       const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
       const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
       const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
-      const date = this.dateIsValid(this.searchDate) ? this.searchDate : this.viewDate;
-      const startDate = addDays(date, -Math.floor(this.daysInWeek / 2));
-      this.calendar.addEvents(fillNotAvailable(unavailable, lunch, notWorking, startDate,
-        sunday, saturday, friday, thursday, wednesday, tuesday, monday, darkMode,
-        plusDays(startDate, this.daysInWeek), timeZone));
+      this.calendar.recurringEvent?.addNotAvailableRecurring(this.calendar, unavailable, lunch, notWorking, sunday, saturday, friday,
+        thursday, wednesday, tuesday, monday, darkMode, timeZone);
       this.addUnavailableList(this.data, darkMode);
       this.addBirthdays(this.data, darkMode);
       this.addNotes(this.data, darkMode);
+
+      this.calendar.recurringEvent?.execute();
     }
   }
 
@@ -563,7 +558,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
   private clean = (): void => {
-    this.calendar = undefined;
+    this.calendar.resetEvents();
     this.store.dispatch(
       new fromActionsReservation.Clean()
     );
@@ -580,6 +575,14 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   private getRoomList = (): void => this.store.dispatch(new fromActionsReservation.FindRooms());
 
+  private tryFillData = (darkMode = this.isDarkMode): void => {
+    if (this.dataReady && this.calendarReady) {
+      this.fillData(darkMode);
+      this.calendarReady = false;
+      this.dataReady = false;
+    }
+  };
+
   private subscribe = (): void => {
     this.getState.pipe(takeUntil(this.subscription)).subscribe((state) => {
       this.offices = Array.from(createRoomOffice(state.rooms)?.values() || []);
@@ -591,7 +594,15 @@ export class CalendarComponent implements OnInit, OnDestroy {
       }
       if (state.data && state.data.room && state.data.reservations) {
         this.data = state.data;
-        this.fillData(this.isDarkMode);
+        if (this.data) {
+          const timeZone = this.data.room.timeZone;
+          const { monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude } = getAvailability(
+            this.data.room);
+          const { min, max } = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday, timeZone);
+          this.calendar.day = new Day(min, max, getNowTimeZone(), exclude, 1);
+        }
+        this.dataReady = true;
+        this.tryFillData();
       }
     });
   };

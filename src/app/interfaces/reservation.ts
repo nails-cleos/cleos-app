@@ -1,7 +1,6 @@
 import { IUser, IUserAll } from './user';
 import { IPrice, ITreatment, ITreatmentAll } from './treatment';
 import { IRoom, IRoomAll } from './room';
-import { CalendarEvent } from 'angular-calendar';
 import { ThemePalette } from '@angular/material/core';
 import { IUnavailableAll } from './unavailable';
 import { Pagination } from './pagination';
@@ -171,100 +170,6 @@ export interface ICustomerLastReservation {
   days: number;
   professionalName: string;
   additionalIds: string[];
-}
-
-export interface IDataEvent {
-  calendarEvents: CalendarEvent[];
-  unavailableEventLength: number;
-  index: number;
-  viewDate: Date;
-  process: boolean;
-  room: IRoomAll;
-  day?: IDay;
-
-  addEvents(events: CalendarEvent[]): void;
-
-  addEvent(event?: CalendarEvent): void;
-
-  removeEvent(event: CalendarEvent, deleteCount?: number): void;
-
-  filterEvent(event: CalendarEvent): void;
-
-  updateLength(length: number): void;
-
-  getOverlapEvent(eventStartDay: Date, eventEndDay: Date, professionalId?: string): CalendarEvent[]
-
-  sameDayEvent(recurring: any, event: CalendarEvent): boolean;
-}
-
-export class DataEvent implements IDataEvent {
-  calendarEvents: CalendarEvent[];
-  unavailableEventLength: number;
-  index: number;
-  viewDate: Date;
-  process: boolean;
-  room: IRoomAll;
-  day?: IDay;
-
-  constructor(events: CalendarEvent[], index: number, viewDate: Date, unavailableEventLength: number,
-              room: IRoomAll, process: boolean = false, day?: IDay) {
-    this.calendarEvents = events;
-    this.unavailableEventLength = unavailableEventLength;
-    this.index = index;
-    this.viewDate = viewDate;
-    this.room = room;
-    this.process = process;
-    this.day = day;
-  }
-
-  addEvents = (events: CalendarEvent[]): void => {
-    events.forEach(event => this.addEvent(event));
-  };
-
-  addEvent = (event?: CalendarEvent): void => {
-    if (event) {
-      if (event.id === undefined || !this.calendarEvents.some(e => e.id === event.id))
-        this.calendarEvents = [...this.calendarEvents, event];
-    }
-  };
-
-  removeEvent = (event: CalendarEvent, deleteCount: number = 1): void => {
-    const i = this.calendarEvents.indexOf(event);
-    if (i !== -1) {
-      this.calendarEvents.splice(i, deleteCount);
-    }
-  };
-
-  filterEvent = (event: CalendarEvent): void => {
-    this.calendarEvents = this.calendarEvents.filter(ev => ev !== event);
-  };
-
-  updateLength = (length: number): void => {
-    this.unavailableEventLength = length;
-  };
-
-  getOverlapEvent = (
-    eventStartDay: Date,
-    eventEndDay: Date,
-    professionalId?: string
-  ): CalendarEvent[] => {
-    if (professionalId) {
-      return this.calendarEvents.filter(
-        (eventA: CalendarEvent) => ((eventA.meta?.professionalId === professionalId) && (
-          (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
-          || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
-          || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
-        )));
-    }
-    return this.calendarEvents.filter(
-      (eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
-        || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
-        || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
-    );
-  };
-
-  sameDayEvent = (recurring: any, event: CalendarEvent): boolean => !this.calendarEvents
-    .find(ce => ce.id === recurring.path && isSameDay(event.start, ce.start));
 }
 
 export class Reservation implements IReservation {
