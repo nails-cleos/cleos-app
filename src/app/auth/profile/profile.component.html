@@ -55,16 +55,18 @@
                   <mat-select #select [formControl]="langValue" required>
                     @for (lang of flagList; track lang) {
                       <mat-option [value]="lang">
-                        <ng-icon [svg]="lang.flag" class="icon-margin"/>{{ 'COMMON.LANG.' + lang.text | translate }}
+                        <ng-icon [svg]="lang.flag" class="icon-margin"/>
+                        {{ 'COMMON.LANG.' + lang.text | translate }}
                       </mat-option>
                     }
                   </mat-select>
                   <mat-error [innerHTML]="'COMMON.USER.LANG.REQUIRED' | translate"></mat-error>
                 </mat-form-field>
-                <ngx-material-intl-tel-input style="margin-bottom: 22px !important;"
-                                             [enablePlaceholder]="true" [enableSearch]="true" [fieldControl]="phone"
-                                             [required]="true" [preferredCountries]="['nl']" fieldControlName="phone"
-                                             appearance="outline" [textLabels]="labels">
+                <ngx-material-intl-tel-input style="margin-bottom: 22px !important;" [includeDialCode]="true"
+                                             [emojiFlags]="true" [enablePlaceholder]="true" [enableSearch]="true"
+                                             [fieldControl]="phone" [required]="true" [preferredCountries]="['nl']"
+                                             fieldControlName="phone" [appearance]="'outline'" [textLabels]="labels"
+                                             [autoSelectCountry]="false">
                 </ngx-material-intl-tel-input>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.USER.DOB.FIELD' | translate }}</mat-label>

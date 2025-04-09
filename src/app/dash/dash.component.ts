@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectDashboardState } from '../store/app.states';
 import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
-import { DataEvent, IDataEvent, IReservationSummary, States } from '../interfaces/reservation';
+import { IReservationSummary, States } from '../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
 import {
   getDurationOrUndefined,
@@ -18,7 +18,7 @@ import {
 } from '../util/dates';
 import { CalendarEvent, CalendarModule, CalendarMonthViewDay, CalendarView } from 'angular-calendar';
 import { findStateColor, getStateOrder } from '../util/theme';
-import { allDayEvent, IMeta, Meta, monthEvent, RecurringEvent } from '../util/event';
+import { allDayEvent, DataEvent, IDataEvent, IMeta, Meta, monthEvent } from '../util/event';
 import { Router } from '@angular/router';
 import { isSameDay, isSameMonth } from 'date-fns';
 import { ICalendarNote, ICalendarSummary, IChart, IDashboard } from '../interfaces/dashboard';
@@ -54,7 +54,6 @@ export class DashComponent implements OnInit, OnDestroy {
   viewDate: Date;
   activeDayIsOpen: boolean;
   dateFormat: string;
-  // events: CalendarEvent[] = [];
   calendar: IDataEvent;
   isCalendarLoading = true;
   isLoading: any;
@@ -263,6 +262,9 @@ export class DashComponent implements OnInit, OnDestroy {
   beforeMonthViewRender = ({ body, period }: { body: CalendarMonthViewDay<IMeta>[]; period: any }): void => {
     this.periodStart = period.start;
     this.calendarEnd = period.end;
+    this.calendar.calendarStart = period.start;
+    this.calendar.calendarEnd = period.end;
+    this.calendar.createRecurring();
     body.forEach((cell) => {
       const groups = {};
       cell.events.forEach((event: CalendarEvent<IMeta>) => {
@@ -380,7 +382,6 @@ export class DashComponent implements OnInit, OnDestroy {
             it.total), darkMode);
         this.calendar.addEvent(event);
       });
-      const recurringEvent = new RecurringEvent(this.calendarEnd);
       calendarSummary.unavailable?.forEach(it => {
         if (it.type === 'BLOCK_AGENDA') {
           return;
@@ -399,7 +400,7 @@ export class DashComponent implements OnInit, OnDestroy {
             this.calendar.addEvent(event);
           }
         } else {
-          recurringEvent.addFrequency(it.repeat, start, it.unavailableId, title, 'UNAVAILABLE',
+          this.calendar.recurringEvent?.addFrequency(it.repeat, start, it.unavailableId, title, 'UNAVAILABLE',
             `${ this.language }/unavailable/`, (date, recurring) => this.createEvent(date, recurring, darkMode),
             getDurationOrUndefined(it.duration), undefined, it.allDay);
         }
@@ -437,13 +438,14 @@ export class DashComponent implements OnInit, OnDestroy {
           } else {
             repeatDate = startDate;
           }
-          recurringEvent.addFrequency(it.repeat, repeatDate, it.noteId, it.title, 'NOTE', `${ this.language }/notes/`,
+          this.calendar.recurringEvent?.addFrequency(it.repeat, repeatDate, it.noteId, it.title, 'NOTE',
+            `${ this.language }/notes/`,
             (date, recurring) => this.createEvent(date, recurring, darkMode), undefined, undefined, true);
         }
       });
 
       this.isCalendarLoading = false;
-      recurringEvent.execute();
+      this.calendar.recurringEvent?.execute();
     }
     this.calendar.sortEvents();
   };

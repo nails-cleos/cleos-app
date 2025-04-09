@@ -10,7 +10,8 @@ import {
   endOfPeriod,
   getCurrentTimeZone,
   getDurationOrUndefined,
-  getEnd, getEndWithDuration,
+  getEnd,
+  getEndWithDuration,
   getMinutesBetweenTimesABS,
   getNowTimeZone,
   getRoomStartEndDay,
@@ -27,8 +28,7 @@ import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
 import { DayViewSchedulerComponent, IProfessional, Professional } from './day-view-scheduler.component';
 import { EventColor } from 'calendar-utils';
-import { RecurringEvent } from '../util/event';
-import { DataEvent, Day, IDataEvent, IReservation, MAX_RESERVATION_MONTH, States } from '../interfaces/reservation';
+import { Day, IReservation, MAX_RESERVATION_MONTH, States } from '../interfaces/reservation';
 import { addMonths, isSameDay, isToday } from 'date-fns';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -39,6 +39,7 @@ import { AuthUserService } from '../services/auth-user.service';
 import { SharedModule } from '../shared/shared.module';
 import { CounterComponent } from '../util/counter/counter.component';
 import { findStateColor } from '../util/theme';
+import { DataEvent, IDataEvent } from '../util/event';
 
 @Component({
   selector: 'app-dashboard',
@@ -79,6 +80,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private getState: Observable<any>;
   private subscription?: Subscription;
   private authUserServiceSubscription: Subscription;
+  private calendarStart: Date = this.viewDate;
   private calendarEnd: Date = this.viewDate;
   private dashboardReady = false;
   private calendarReady = false;
@@ -146,7 +148,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   beforeMonthViewRender = ({ period }: any): void => {
+    this.calendarStart = period.start;
     this.calendarEnd = period.end;
+    this.calendar.calendarStart = period.start;
+    this.calendar.calendarEnd = period.end;
+    this.calendar.createRecurring();
     this.calendarReady = true;
     this.tryCreateEvents();
   };
@@ -353,7 +359,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.calendar.resetEvents();
     this.professionals = [];
     if (this.dashboard?.professionals) {
-      const recurringEvent = new RecurringEvent(this.calendarEnd);
       const { min, max } = getRoomStartEndDay(this.dashboard.availability, this.dashboard.timeZone, this.viewDate);
       this.day = new Day(min, max, this.viewDate, []);
       this.endDate = createNewDate(this.endDate, this.day.dayEndHour, this.day.dayEndMinute);
@@ -413,13 +418,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
             this.calendar.addEvent(event);
           } else {
-            recurringEvent.addFrequency(it.repeat, start, it.unavailableId, title, 'UNAVAILABLE', path,
+            this.calendar.recurringEvent?.addFrequency(it.repeat, start, it.unavailableId, title, 'UNAVAILABLE', path,
               (date, recurring) => this.createUnavailableEvent(date, recurring, professional, darkMode),
               getDurationOrUndefined(it.duration));
           }
         });
       });
-      recurringEvent.execute();
+      this.calendar.recurringEvent?.execute();
     }
   };
 
