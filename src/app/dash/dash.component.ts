@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectDashboardState } from '../store/app.states';
 import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
-import { IReservationSummary, States } from '../interfaces/reservation';
+import { DataEvent, IDataEvent, IReservationSummary, States } from '../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
 import {
   getDurationOrUndefined,
@@ -18,9 +18,9 @@ import {
 } from '../util/dates';
 import { CalendarEvent, CalendarModule, CalendarMonthViewDay, CalendarView } from 'angular-calendar';
 import { findStateColor, getStateOrder } from '../util/theme';
-import { allDayEvent, getFrequency, IMeta, Meta, monthEvent } from '../util/event';
+import { allDayEvent, IMeta, Meta, monthEvent, RecurringEvent } from '../util/event';
 import { Router } from '@angular/router';
-import { addDays, isSameDay, isSameMonth, startOfMonth } from 'date-fns';
+import { isSameDay, isSameMonth } from 'date-fns';
 import { ICalendarNote, ICalendarSummary, IChart, IDashboard } from '../interfaces/dashboard';
 import { UntypedFormControl } from '@angular/forms';
 import { IRoom } from '../interfaces/room';
@@ -54,7 +54,8 @@ export class DashComponent implements OnInit, OnDestroy {
   viewDate: Date;
   activeDayIsOpen: boolean;
   dateFormat: string;
-  events: CalendarEvent[] = [];
+  // events: CalendarEvent[] = [];
+  calendar: IDataEvent;
   isCalendarLoading = true;
   isLoading: any;
   totalReservation: number;
@@ -86,6 +87,7 @@ export class DashComponent implements OnInit, OnDestroy {
   private isDarkMode?: boolean;
   private periodStart?: Date;
   private readonly language: string;
+  private calendarEnd: Date = new Date();
 
   constructor(public dialog: MatDialog, private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
               private readonly translate: TranslateService, private router: Router,
@@ -139,6 +141,7 @@ export class DashComponent implements OnInit, OnDestroy {
       this.viewDate = getNowTimeZone(this.timeZone);
       this.activeDayIsOpen = false;
     }
+    this.calendar = new DataEvent([], 0, this.viewDate, 0, false);
     this.dateFormat = this.translate.currentLang;
     this.language = this.translate.currentLang;
     this.totalReservation = 0;
@@ -146,33 +149,39 @@ export class DashComponent implements OnInit, OnDestroy {
   }
 
   get completed(): number {
-    return this.events?.filter((event: CalendarEvent) => DashComponent.completedByMonth(event, this.viewDate)).length;
+    return this.calendar.calendarEvents?.filter(
+      (event: CalendarEvent) => DashComponent.completedByMonth(event, this.viewDate)).length ?? 0;
   }
 
   get completedTotal(): string {
-    const total = this.events?.filter((event: CalendarEvent) => DashComponent.completedByMonth(event, this.viewDate))
+    const total = this.calendar.calendarEvents?.filter(
+      (event: CalendarEvent) => DashComponent.completedByMonth(event, this.viewDate))
       .reduce((a, b) => a + b.meta.total || 0, 0);
 
     return numberFormat(total, this.currency, this.dateFormat);
   }
 
   get upcoming(): number {
-    return this.events?.filter((event: CalendarEvent) => DashComponent.upcomingByMonth(event, this.viewDate)).length;
+    return this.calendar.calendarEvents?.filter(
+      (event: CalendarEvent) => DashComponent.upcomingByMonth(event, this.viewDate)).length;
   }
 
   get upcomingTotal(): string {
-    const total = this.events?.filter((event: CalendarEvent) => DashComponent.upcomingByMonth(event, this.viewDate))
+    const total = this.calendar.calendarEvents?.filter(
+      (event: CalendarEvent) => DashComponent.upcomingByMonth(event, this.viewDate))
       .reduce((a, b) => a + b.meta.total || 0, 0);
 
     return numberFormat(total, this.currency, this.dateFormat);
   }
 
   get transaction(): number {
-    return this.events?.filter((event: CalendarEvent) => DashComponent.transactionByMonth(event, this.viewDate)).length;
+    return this.calendar.calendarEvents?.filter(
+      (event: CalendarEvent) => DashComponent.transactionByMonth(event, this.viewDate)).length;
   }
 
   get transactionTotal(): string {
-    const total = this.events?.filter((event: CalendarEvent) => DashComponent.transactionByMonth(event, this.viewDate))
+    const total = this.calendar.calendarEvents?.filter(
+      (event: CalendarEvent) => DashComponent.transactionByMonth(event, this.viewDate))
       .reduce((a, b) => a + b.meta.total || 0, 0);
 
     return numberFormat(total, this.currency, this.dateFormat);
@@ -252,8 +261,8 @@ export class DashComponent implements OnInit, OnDestroy {
   };
 
   beforeMonthViewRender = ({ body, period }: { body: CalendarMonthViewDay<IMeta>[]; period: any }): void => {
-    // month view has a different UX from the week and day view, so we only really need to group by the type
     this.periodStart = period.start;
+    this.calendarEnd = period.end;
     body.forEach((cell) => {
       const groups = {};
       cell.events.forEach((event: CalendarEvent<IMeta>) => {
@@ -357,7 +366,7 @@ export class DashComponent implements OnInit, OnDestroy {
   };
 
   private createEvents = (darkMode: boolean = false): void => {
-    this.events = [];
+    this.calendar.resetEvents();
     if (this.state.calendarSummary) {
       const calendarSummary: ICalendarSummary = this.state.calendarSummary;
       calendarSummary.reservations?.forEach(it => {
@@ -369,12 +378,9 @@ export class DashComponent implements OnInit, OnDestroy {
         const event = monthEvent(it.title, start, end, it.reservationId, findStateColor(it.state, darkMode),
           new Meta(true, this.timeZone, it.state, [this.language, 'reservation', it.reservationId], undefined,
             it.total), darkMode);
-        if (event) {
-          this.events = [...this.events, event];
-        }
+        this.calendar.addEvent(event);
       });
-      let recurring: any[] = [];
-      const calendarStart = addDays(startOfMonth(this.viewDate), -7);
+      const recurringEvent = new RecurringEvent(this.calendarEnd);
       calendarSummary.unavailable?.forEach(it => {
         if (it.type === 'BLOCK_AGENDA') {
           return;
@@ -390,12 +396,12 @@ export class DashComponent implements OnInit, OnDestroy {
             new Meta(!!it.duration, this.timeZone, 'UNAVAILABLE', [this.language, 'unavailable', it.unavailableId]),
             darkMode);
           if (event) {
-            this.events = [...this.events, event];
+            this.calendar.addEvent(event);
           }
         } else {
-          recurring = [...recurring, getFrequency(it.repeat, start, it.unavailableId, title, 45, 'UNAVAILABLE',
-            `${ this.language }/unavailable`, it.end, getDurationOrUndefined(it.duration), it.allDay, undefined,
-            calendarStart)];
+          recurringEvent.addFrequency(it.repeat, start, it.unavailableId, title, 'UNAVAILABLE',
+            `${ this.language }/unavailable/`, (date, recurring) => this.createEvent(date, recurring, darkMode),
+            getDurationOrUndefined(it.duration), undefined, it.allDay);
         }
       });
 
@@ -405,7 +411,7 @@ export class DashComponent implements OnInit, OnDestroy {
         const color = findStateColor('BIRTHDAY', darkMode);
         const event = allDayEvent(it.title, color, startDate, darkMode, `${ this.language }/users/${ it.userId }`,
           new Meta(false, this.timeZone, 'BIRTHDAY', [this.language, 'users', it.userId]));
-        this.events = [...this.events, event];
+        this.calendar.addEvent(event);
       });
 
       calendarSummary.transactions?.forEach(it => {
@@ -416,7 +422,7 @@ export class DashComponent implements OnInit, OnDestroy {
           `${ this.language }/accounts/${ it.accountId }/transactions/ ${ it.transactionId }`,
           new Meta(false, this.timeZone, 'TRANSACTION',
             [this.language, 'accounts', it.accountId, 'transactions', it.transactionId], undefined, it.total));
-        this.events = [...this.events, event];
+        this.calendar.addEvent(event);
       });
 
       calendarSummary.notes.forEach(it => {
@@ -431,31 +437,29 @@ export class DashComponent implements OnInit, OnDestroy {
           } else {
             repeatDate = startDate;
           }
-          recurring = [...recurring, getFrequency(it.repeat, repeatDate, it.noteId, it.title, 45, 'NOTE',
-            `${ this.language }/notes`, undefined, undefined, true, undefined, calendarStart)];
+          recurringEvent.addFrequency(it.repeat, repeatDate, it.noteId, it.title, 'NOTE', `${ this.language }/notes/`,
+            (date, recurring) => this.createEvent(date, recurring, darkMode), undefined, undefined, true);
         }
       });
 
-      recurring.forEach(r =>
-        r.rule.all().forEach((date: Date) => {
-          const end = getEndWithDuration(date, r.duration);
-          const event = monthEvent(r.title, date, end, r.id, findStateColor(r.state, darkMode),
-            new Meta(!!r.duration, this.timeZone, r.state, [r.path, r.id]), darkMode);
-          if (event) {
-            this.events = [...this.events, event];
-          }
-        }));
-
       this.isCalendarLoading = false;
+      recurringEvent.execute();
     }
-    this.events = this.events.slice().sort((a, b) => a.start.getTime() - b.start.getTime());
+    this.calendar.sortEvents();
+  };
+
+  private createEvent = (date: Date, recurring: any, darkMode: boolean) => {
+    const end = getEndWithDuration(date, recurring.duration);
+    const event = monthEvent(recurring.title, date, end, recurring.id, findStateColor(recurring.state, darkMode),
+      new Meta(!!recurring.duration, this.timeZone, recurring.state, [recurring.path, recurring.id]), darkMode);
+    this.calendar.addEvent(event);
   };
 
   private createNoteEvent = (note: ICalendarNote, date: Date, darkMode: boolean): void => {
     const color = findStateColor('NOTE', darkMode);
     const event = allDayEvent(note.title, color, date, darkMode, `${ this.language }/notes/${ note.noteId }`,
       new Meta(false, this.timeZone, 'NOTE', [this.language, 'notes', note.noteId]));
-    this.events = [...this.events, event];
+    this.calendar.addEvent(event);
   };
 
   private getSummaries = (): void => {
@@ -467,7 +471,7 @@ export class DashComponent implements OnInit, OnDestroy {
   };
 
   private getEvents = (): void => {
-    this.events = [];
+    this.calendar.resetEvents();
     this.isCalendarLoading = true;
     this.store.dispatch(
       new fromActionsDashboard.GetEvents(this.viewDate)

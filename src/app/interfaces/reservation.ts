@@ -179,8 +179,8 @@ export interface IDataEvent {
   index: number;
   viewDate: Date;
   process: boolean;
-  room: IRoomAll;
   day?: IDay;
+  calendarEnd?: Date;
 
   addEvents(events: CalendarEvent[]): void;
 
@@ -195,6 +195,12 @@ export interface IDataEvent {
   getOverlapEvent(eventStartDay: Date, eventEndDay: Date, professionalId?: string): CalendarEvent[]
 
   sameDayEvent(recurring: any, event: CalendarEvent): boolean;
+
+  sortEvents(): void;
+
+  resetEvents(): void;
+
+  refresh(): void;
 }
 
 export class DataEvent implements IDataEvent {
@@ -203,16 +209,15 @@ export class DataEvent implements IDataEvent {
   index: number;
   viewDate: Date;
   process: boolean;
-  room: IRoomAll;
   day?: IDay;
+  calendarEnd?: Date;
 
   constructor(events: CalendarEvent[], index: number, viewDate: Date, unavailableEventLength: number,
-              room: IRoomAll, process: boolean = false, day?: IDay) {
+              process: boolean = false, day?: IDay) {
     this.calendarEvents = events;
     this.unavailableEventLength = unavailableEventLength;
     this.index = index;
     this.viewDate = viewDate;
-    this.room = room;
     this.process = process;
     this.day = day;
   }
@@ -223,7 +228,7 @@ export class DataEvent implements IDataEvent {
 
   addEvent = (event?: CalendarEvent): void => {
     if (event) {
-      if (event.id === undefined || !this.calendarEvents.some(e => e.id === event.id))
+      if (event.id === undefined || !this.calendarEvents.some(e => e.id === event.id && e.start === event.start))
         this.calendarEvents = [...this.calendarEvents, event];
     }
   };
@@ -265,6 +270,18 @@ export class DataEvent implements IDataEvent {
 
   sameDayEvent = (recurring: any, event: CalendarEvent): boolean => !this.calendarEvents
     .find(ce => ce.id === recurring.path && isSameDay(event.start, ce.start));
+
+  resetEvents(): void {
+    this.calendarEvents = [];
+  }
+
+  sortEvents(): void {
+    this.calendarEvents = this.calendarEvents.slice().sort((a, b) => a.start.getTime() - b.start.getTime());
+  }
+
+  refresh(): void {
+    this.calendarEvents = [...this.calendarEvents];
+  }
 }
 
 export class Reservation implements IReservation {

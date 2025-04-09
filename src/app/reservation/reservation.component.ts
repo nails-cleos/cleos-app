@@ -72,7 +72,7 @@ import {
   reservationDuration,
   totalDuration
 } from '../util/dates';
-import { createBullet, fillNotAvailable, getFrequency, Meta, newEvent } from '../util/event';
+import { createBullet, fillNotAvailable, Meta, newEvent, RecurringEvent } from '../util/event';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Role } from '../interfaces/token';
 import { IUnavailableAll } from '../interfaces/unavailable';
@@ -536,7 +536,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           eventData.addEvents(events);
           eventData.updateLength(eventData.calendarEvents.length);
         } else {
-          this.dataEvents.set(dateValue, new DataEvent(events, i, date, events.length, this.room.value));
+          this.dataEvents.set(dateValue, new DataEvent(events, i, date, events.length));
         }
         dates.push(value.date);
       });
@@ -681,7 +681,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   };
 
-  beforeMonthViewRender = ({ header }: any): void => {
+  beforeMonthViewRender = ({ header, period }: any, dataEvent: IDataEvent): void => {
+    dataEvent.calendarEnd = period.end;
     header.forEach((day: any) => {
       if (!this.dateIsValid(day.date)) {
         day.cssClass = 'cal-disabled';
@@ -1031,7 +1032,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   }).filter((item): item is CalendarEvent => item !== undefined) ?? [];
 
   private addUnavailableList = (dataEvent: IDataEvent, unavailableList: IUnavailableAll[]) => {
-    let recurringEvents: any[] = [];
+    const recurringEvent = new RecurringEvent(dataEvent.calendarEnd!);
     unavailableList.forEach(it => {
       if (it.duration || it.allDay) {
         const startDate = newDateTimestamp(it.timestamp, this.room.value.timeZone);
@@ -1054,17 +1055,14 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
             this.validateUnavailable(start, data, dataEvent);
           }
         } else {
-          const calendarStart = greaterOrEqualsThan(dataEvent.viewDate, start) ? dataEvent.viewDate : start;
-          recurringEvents =
-            [...recurringEvents, getFrequency(it.repeat, calendarStart, it.id, title, this.daysInWeek, 'UNAVAILABLE',
-              'unavailable', it.end, getDurationOrUndefined(it.duration), it.allDay, professionalId)];
+          recurringEvent.addFrequency(it.repeat, start, it.id, title, 'UNAVAILABLE', path,
+            (date, recurring) => this.validateUnavailable(date, recurring, dataEvent),
+            getDurationOrUndefined(it.duration), professionalId, it.allDay);
         }
       }
     });
 
-    recurringEvents.forEach(recurring =>
-      recurring.rule.all()?.forEach((date: Date) => this.validateUnavailable(date, recurring, dataEvent))
-    );
+    recurringEvent.execute();
   };
 
   private validateUnavailable = (start: Date, recurring: any, dataEvent: IDataEvent): void => {

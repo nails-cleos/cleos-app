@@ -354,7 +354,7 @@
   <ng-template #stepSix>
     @for (dataEvent of dataEvents | keyvalue; track dataEvent; let last = $last) {
       <mwl-calendar-week-view
-        (beforeViewRender)="beforeMonthViewRender($event)"
+        (beforeViewRender)="beforeMonthViewRender($event, dataEvent.value)"
         (eventTimesChanged)="eventTimesChanged($event, dataEvent.value)"
         (hourSegmentClicked)="segmentClick($event.date, 'CREATED', dataEvent.key)"
         [dayEndHour]="day.dayEndHour"

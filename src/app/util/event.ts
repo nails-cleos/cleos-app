@@ -2,7 +2,6 @@ import { IAvailability } from '../interfaces/room';
 import { CalendarEvent } from 'angular-calendar';
 import {
   createDate,
-  createEndDate,
   createNewDate,
   dateToUTC,
   daysOfWeek,
@@ -10,10 +9,8 @@ import {
   getNowTimeZone,
   getTimeNumber,
   getWeekDay,
-  greaterOrEqualsThan,
   greaterOrEqualsThanToday,
-  IDuration,
-  plusDays
+  IDuration
 } from './dates';
 import { findStateColor } from './theme';
 import { ByWeekday, Frequency, RRule } from 'rrule';
@@ -51,27 +48,35 @@ export class Meta implements IMeta {
   }
 }
 
-export const getFrequency = (repeat: string, start: Date, id: any, title: string, daysInWeek: number, state: string,
-                             path: string, endDate?: string, duration?: IDuration, allDay: boolean = false,
-                             professionalId?: string, calendarStart?: Date): any => {
-  let calendarEnd = plusDays(calendarStart ?? start, daysInWeek);
-  if (endDate) {
-    const end = createEndDate(endDate);
-    if (greaterOrEqualsThan(calendarEnd, end)) {
-      calendarEnd = end;
-    }
+export class RecurringEvent {
+  recurring: any[] = [];
+  calendarEnd: Date;
+
+  constructor(calendarEnd: Date) {
+    this.calendarEnd = calendarEnd;
   }
-  return {
-    id,
-    title,
-    duration,
-    state,
-    path,
-    allDay,
-    professionalId,
-    rule: createRule(repeat, start, calendarEnd, start.getDate(), getWeekDay(start.getDay()))
-  };
-};
+
+  addFrequency(repeat: string, start: Date, id: any, title: string, state: string, path: string,
+               onEachDate: (date: Date, recurring: any) => void, duration?: IDuration,
+               professionalId?: string, allDay: boolean = false): any {
+    this.recurring = [...this.recurring, {
+      id: id,
+      title: title,
+      duration: duration,
+      state: state,
+      path: path,
+      allDay: allDay,
+      professionalId: professionalId,
+      onEachDate: onEachDate,
+      rule: createRule(repeat, start, this.calendarEnd, start.getDate(), getWeekDay(start.getDay()))
+    }];
+  }
+
+  execute(): void {
+    this.recurring.forEach(recurring => recurring.rule.all()
+      .forEach((date: Date) => recurring.onEachDate(date, recurring)));
+  }
+}
 
 export const fillNotAvailable = (unavailable: string, lunch: string, notWorking: string,
                                  selectDate: Date, sunday: IAvailability, saturday: IAvailability,

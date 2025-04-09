@@ -746,22 +746,6 @@ export const datesInSameWeek = (date1: Date, date2: Date): boolean => {
     Math.ceil(dayDiff1 / 7) === Math.ceil(dayDiff2 / 7);
 };
 
-export const getPreviousSunday = (date: Date): Date => {
-  // Create a new Date object based on the input date to avoid modifying the original date
-  const previousSunday = new Date(date);
-
-  // Get the current day of the week (0-6, where 0 is Sunday)
-  const dayOfWeek = previousSunday.getDay();
-
-  // Calculate the difference in days to the previous Sunday
-  const diff = dayOfWeek === 0 ? 0 : dayOfWeek;
-
-  // Subtract the difference in days from the current date
-  previousSunday.setDate(previousSunday.getDate() - diff);
-
-  return previousSunday;
-};
-
 export const searchDates = (allDay: boolean, start: Date, duration: IDuration): [Date, Date] => {
   let startSearch;
   let endSearch;

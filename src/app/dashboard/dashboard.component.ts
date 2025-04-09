@@ -10,7 +10,7 @@ import {
   endOfPeriod,
   getCurrentTimeZone,
   getDurationOrUndefined,
-  getEnd,
+  getEnd, getEndWithDuration,
   getMinutesBetweenTimesABS,
   getNowTimeZone,
   getRoomStartEndDay,
@@ -27,17 +27,18 @@ import * as fromActionsDashboard from '../store/dashboard.actions';
 import * as fromActionsReservation from '../store/reservation.actions';
 import { DayViewSchedulerComponent, IProfessional, Professional } from './day-view-scheduler.component';
 import { EventColor } from 'calendar-utils';
-import { getFrequency } from '../util/event';
-import { Day, IReservation, MAX_RESERVATION_MONTH, States } from '../interfaces/reservation';
+import { RecurringEvent } from '../util/event';
+import { DataEvent, Day, IDataEvent, IReservation, MAX_RESERVATION_MONTH, States } from '../interfaces/reservation';
 import { addMonths, isSameDay, isToday } from 'date-fns';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { getProfessionalColor } from '../util/color';
+import { createEventColor, getProfessionalColor } from '../util/color';
 import { CalendarDialogComponent } from '../shared/dialog/calendar/calendar-dialog.component';
 import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { AuthUserService } from '../services/auth-user.service';
 import { SharedModule } from '../shared/shared.module';
 import { CounterComponent } from '../util/counter/counter.component';
+import { findStateColor } from '../util/theme';
 
 @Component({
   selector: 'app-dashboard',
@@ -57,7 +58,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   dashboard?: IRoomEvents;
 
   professionals: IProfessional[] = [];
-  events: CalendarEvent[] = [];
+  calendar: IDataEvent = new DataEvent([], 0, this.viewDate, 0, false);
 
   isDarkMode?: boolean;
   locale: string;
@@ -73,11 +74,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private readonly startedText: string;
   private readonly elapsedText: string;
   private readonly finishInText: string;
+  private readonly language: string;
 
   private getState: Observable<any>;
   private subscription?: Subscription;
   private authUserServiceSubscription: Subscription;
-  private readonly language: string;
+  private calendarEnd: Date = this.viewDate;
+  private dashboardReady = false;
+  private calendarReady = false;
 
   constructor(private store: Store<AppState>, private readonly translate: TranslateService, private router: Router,
               public dialog: MatDialog, private authUserService: AuthUserService) {
@@ -85,7 +89,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
       const darkMode: boolean = value.isDarkMode;
       if (this.isDarkMode !== undefined && darkMode !== this.isDarkMode) {
-        this.createEvents(darkMode);
+        this.tryCreateEvents(darkMode);
       }
       this.isDarkMode = darkMode;
     });
@@ -132,8 +136,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.clean();
-    this.subscribe();
     this.getEvents();
+    this.subscribe();
   }
 
   ngOnDestroy(): void {
@@ -141,6 +145,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.authUserServiceSubscription.unsubscribe();
   }
 
+  beforeMonthViewRender = ({ period }: any): void => {
+    this.calendarEnd = period.end;
+    this.calendarReady = true;
+    this.tryCreateEvents();
+  };
   selectDate = (event: any): void => {
     this.changeDate(newDate(event.value));
     this.getEvents();
@@ -149,7 +158,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   eventTimesChanged = ({ event, newStart, newEnd }: any): void => {
     event.start = newStart;
     event.end = newEnd;
-    this.events = [...this.events];
+    this.calendar.refresh();
     this.updateEvent(event.id, event.start);
   };
 
@@ -172,14 +181,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.professionals = [...this.professionals];
     event.color = newProfessional.color;
     event.meta.professional = newProfessional;
-    this.events = [...this.events];
+    this.calendar.refresh();
     setTimeout(() => this.updateEvent(event.id, undefined, newProfessional.id), 500);
   };
 
   refreshViewDate = (now: Date): void => {
     if (isSameDay(now, this.viewDate)) {
       if (now.getSeconds() === 0) {
-        this.events = this.events.map((event: CalendarEvent) => this.createTitle(event));
+        const newEvents = this.calendar.calendarEvents.map((event: CalendarEvent) => this.createTitle(event));
+        this.calendar.resetEvents();
+        this.calendar.addEvents(newEvents);
       }
       this.viewDate = now;
     }
@@ -339,9 +350,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private dateIsValid = (date: Date): boolean => isBetween(this.today, this.maxDate, date);
 
   private createEvents = (darkMode: boolean = false): void => {
-    this.events = [];
+    this.calendar.resetEvents();
     this.professionals = [];
     if (this.dashboard?.professionals) {
+      const recurringEvent = new RecurringEvent(this.calendarEnd);
       const { min, max } = getRoomStartEndDay(this.dashboard.availability, this.dashboard.timeZone, this.viewDate);
       this.day = new Day(min, max, this.viewDate, []);
       this.endDate = createNewDate(this.endDate, this.day.dayEndHour, this.day.dayEndMinute);
@@ -378,17 +390,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
             resizable: { beforeStart: true, afterEnd: true }
           } as CalendarEvent;
 
-          this.events = [...this.events, this.createTitle(event)];
+          this.calendar.addEvent(this.createTitle(event));
         });
         professional.reservations = reservations;
         professional.time = seconds;
         this.professionals = [...this.professionals, professional];
 
-        let recurring: any[] = [];
         professionalEvent.calendarSummary.unavailable?.forEach(it => {
           const start = newDateTimestamp(it.start);
           const title = it.duration ? it.title : `${ this.translate.instant('COMMON.ALL_DAY.CHECK') } - ${ it.title }`;
 
+          let path = 'unavailable/';
+          if (it.type === 'BLOCK_AGENDA') {
+            path += 'block-agenda/';
+          }
           if (it.repeat === FrequencyEnum.none) {
             const end = getEnd(start, it.duration);
             const event = {
@@ -396,35 +411,38 @@ export class DashboardComponent implements OnInit, OnDestroy {
               meta: { professional, time: true }, resizable: { beforeStart: true, afterEnd: true }
             } as CalendarEvent;
 
-            this.events = [...this.events, event];
+            this.calendar.addEvent(event);
           } else {
-            recurring = [...recurring, getFrequency(it.repeat, start, it.unavailableId, title, 45, 'UNAVAILABLE',
-              'unavailable', it.end, getDurationOrUndefined(it.duration))];
+            recurringEvent.addFrequency(it.repeat, start, it.unavailableId, title, 'UNAVAILABLE', path,
+              (date, recurring) => this.createUnavailableEvent(date, recurring, professional, darkMode),
+              getDurationOrUndefined(it.duration));
           }
         });
-        recurring.forEach(r =>
-          r.rule.all().forEach((start: Date) => {
-            const end = getEnd(start, r.duration);
-            const event = {
-              start, end,
-              title: r.title,
-              id: r.id,
-              color: professional.color,
-              draggable: true,
-              meta: { professional, time: true },
-              resizable: { beforeStart: true, afterEnd: true }
-            } as CalendarEvent;
-            this.events = [...this.events, event];
-          })
-        );
       });
+      recurringEvent.execute();
     }
+  };
+
+  private createUnavailableEvent = (start: Date, recurring: any, professional: Professional, darkMode: boolean) => {
+    const end = getEndWithDuration(start, recurring.duration);
+    const color = findStateColor(recurring.state, darkMode);
+    const event = {
+      start,
+      end,
+      title: recurring.title,
+      id: recurring.id,
+      color: createEventColor(color, darkMode),
+      draggable: true,
+      meta: { professional, time: true },
+      resizable: { beforeStart: true, afterEnd: true }
+    } as CalendarEvent;
+    this.calendar.addEvent(event);
   };
 
   private clean = (): void => this.store.dispatch(new fromActionsDashboard.Clean());
 
   private getEvents = (): void => {
-    this.events = [];
+    this.calendar.resetEvents();
     this.store.dispatch(
       new fromActionsDashboard.GetDashboardEvents(this.viewDate)
     );
@@ -437,15 +455,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.router.navigate([this.language, 'reservation', reservationId]);
         break;
       case 'APPROVE':
-        this.events = this.events.filter(ev => ev.id !== event.id);
+        this.calendar.filterEvent(event);
         this.store.dispatch(
           new fromActionsReservation.Approve(reservationId)
         );
         event.meta.state = States.approved;
-        setTimeout(() => this.events = [...this.events, event], 1);
+        setTimeout(() => this.calendar.addEvent(event), 1);
         break;
       case 'START':
-        this.events = this.events.filter(ev => ev.id !== event.id);
+        this.calendar.filterEvent(event);
         this.store.dispatch(
           new fromActionsReservation.Start(reservationId)
         );
@@ -453,7 +471,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         event.meta.started = dateToTimestamp();
         event.draggable = false;
         event.actions = undefined;
-        setTimeout(() => this.events = [...this.events, this.createTitle(event)], 1);
+        setTimeout(() => this.calendar.addEvent(this.createTitle(event)), 1);
         break;
       case 'COMPLETE':
         this.router.navigate([this.language, 'reservation', reservationId, 'rooms', this.dashboard?.roomId,
@@ -464,10 +482,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   };
 
+  private tryCreateEvents = (darkMode = this.isDarkMode): void => {
+    if (this.dashboardReady && this.calendarReady) {
+      this.createEvents(darkMode);
+      this.calendarReady = false;
+      this.dashboardReady = false;
+    }
+  };
+
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       this.dashboard = state.dashboard;
-      this.createEvents(this.isDarkMode);
+      this.dashboardReady = true;
+      this.tryCreateEvents();
     });
   };
 }
