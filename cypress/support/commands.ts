@@ -30,9 +30,9 @@ declare namespace Cypress {
 
     mockCustomersData(customerId: string, treatmentId: string): Chainable<any>;
 
-    mockRoomData(customerId: string, roomId: string): Chainable<any>;
+    mockRoomData(customerId: string): Chainable<any>;
 
-    mockTreatments(customerId: string, roomId: string, treatmentId: string, groupId: string): Chainable<any>;
+    mockTreatments(customerId: string, roomId: string, groupId: string): Chainable<any>;
 
     mockSearch(roomId: string, professionalId: string, date: Date): Chainable<any>;
 
@@ -144,8 +144,14 @@ const addDays = (date: Date, plusDays: number = 0) => {
   return newDate;
 }
 
-const createUnavailable = (professional: any, description: string, timestamp: number, end: string,
-                           repeat: string, duration?: number, allDay: boolean = false,
+const addMonths = (date: Date, plusMonths: number = 0) => {
+  const newDate = new Date(date);
+  newDate.setMonth(newDate.getMonth() + plusMonths);
+  return newDate;
+}
+
+const createUnavailable = (professional: any, description: string, timestamp: number,
+                           repeat: string, end?: string, duration?: number, allDay: boolean = false,
                            type: string = 'UNAVAILABLE') => ({
   createdAt: '2025-01-31T11:54:00',
   createdBy: '57ceebd2-a012-42a3-af9a-5d546c193200',
@@ -389,7 +395,7 @@ Cypress.Commands.add('mockCustomersData', (customerId: string, treatmentId: stri
   });
 });
 
-Cypress.Commands.add('mockRoomData', (customerId: string, roomId: string) => {
+Cypress.Commands.add('mockRoomData', (customerId: string) => {
   cy.fixture('rooms').then((roomData) => {
     cy.intercept(
       'GET',
@@ -402,7 +408,7 @@ Cypress.Commands.add('mockRoomData', (customerId: string, roomId: string) => {
   });
 });
 
-Cypress.Commands.add('mockTreatments', (customerId: string, roomId: string, treatmentId: string, groupId: string) => {
+Cypress.Commands.add('mockTreatments', (customerId: string, roomId: string, groupId: string) => {
   cy.fixture('treatments').then((treatments) => {
     cy.intercept(
       'GET',
@@ -493,16 +499,14 @@ Cypress.Commands.add('mockSearch', (roomId: string, professionalId: string, date
                     }
                   ],
                   unavailableList: [
-                    createUnavailable(professional, 'Cena Arg', createTimestamp(date, 2, 17, 30), '2026-01-01',
-                      'ONCE_A_MONTH',
-                      3600),
-                    createUnavailable(professional, 'Merienda', createTimestamp(date, 0, 16, 45), '2026-01-01',
-                      'EVERY_DAY',
-                      1800), // TODO check
-                    createUnavailable(professional, 'Magda', createTimestamp(date, 2, 10, 0),
-                      addDays(date, 1).toISOString().slice(0, 10), 'NONE', 1800),
-                    // createUnavailable(professional, 'Unavailable', createTimestamp(date, 1, 10, 0),
-                    //   addDays(date, 1).toISOString().slice(0, 10), 'NONE', undefined, true), // TODO check
+                    createUnavailable(professional, 'Once a month', createTimestamp(date, 2, 17, 30),
+                      'ONCE_A_MONTH', addMonths(date, 2).toISOString().slice(0, 10), 3600),
+                    createUnavailable(professional, 'Every day', createTimestamp(date, -5, 16, 45),
+                      'EVERY_DAY', addDays(date, 5).toISOString().slice(0, 10), 1800),
+                    createUnavailable(professional, 'None', createTimestamp(date, 2, 10, 0),
+                      'NONE', addDays(date, 1).toISOString().slice(0, 10), 1800),
+                    createUnavailable(professional, 'All day', createTimestamp(date, 1, 10, 0),
+                      'NONE', undefined, undefined, true),
                   ],
                   birthdays: [
                     {

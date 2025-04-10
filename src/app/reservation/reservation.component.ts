@@ -67,6 +67,7 @@ import {
   newDate,
   newDateTimestamp,
   reservationDuration,
+  searchDates,
   totalDuration
 } from '../util/dates';
 import { createBullet, DataEvent, IDataEvent, Meta, newEvent } from '../util/event';
@@ -84,8 +85,7 @@ import {
   newPrice,
   openDialog,
   removeDiscount,
-  roomDetail,
-  validateUnavailableEvent
+  roomDetail
 } from '../util/helper';
 import { transitionAnimation } from '../util/animation';
 import { addDays, addMonths, isEqual } from 'date-fns';
@@ -1064,8 +1064,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private validateUnavailable = (start: Date, recurring: any, dataEvent: IDataEvent): void => {
-    validateUnavailableEvent(start, recurring, dataEvent,
-      (startSearch, endSearch, dataEvent) => this.createUnavailableEvent(recurring, startSearch, endSearch, dataEvent));
+    const [startSearch, endSearch] = searchDates(recurring.allDay, start, recurring.duration);
+    this.createUnavailableEvent(recurring, startSearch, endSearch, dataEvent);
   };
 
   private createUnavailableEvent = (recurring: any, start: Date, end: Date, dataEvent: IDataEvent): void => {
