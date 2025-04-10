@@ -8,9 +8,9 @@ describe('ReviewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [ReviewDialogComponent]
-})
-    .compileComponents();
+      imports: [ReviewDialogComponent],
+    })
+      .compileComponents();
   });
 
   beforeEach(() => {

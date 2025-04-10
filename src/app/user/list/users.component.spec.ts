@@ -8,9 +8,9 @@ describe('UsersComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [UsersComponent]
-})
-    .compileComponents();
+      imports: [UsersComponent],
+    })
+      .compileComponents();
   });
 
   beforeEach(() => {

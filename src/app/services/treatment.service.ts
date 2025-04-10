@@ -19,14 +19,14 @@ export class TreatmentService {
     sort: string,
     direction: string,
     page: number,
-    size: number = PAGE_SIZE
+    size: number = PAGE_SIZE,
   ): Observable<ITreatmentGroup[]> => this.http.get<ITreatmentGroup[]>(
     toUrl(this.urlV1, 'pages'),
-    { params: createFilter(page, size, sort, direction) }
+    { params: createFilter(page, size, sort, direction) },
   );
 
   getAllTreatmentGroup = (): Observable<ITreatmentGroup[]> => this.http.get<ITreatmentGroup[]>(
-    toUrl(this.urlV1, 'groups')
+    toUrl(this.urlV1, 'groups'),
   );
 
   getAllTreatments = (roomId: string, customerId?: string): Observable<ITreatmentDiscountDTO[]> => {
@@ -40,33 +40,33 @@ export class TreatmentService {
   getTreatmentList = (): Observable<ITreatmentGroup[]> => this.http.get<ITreatmentGroup[]>(toUrl(this.urlV1, 'list'));
 
   getById = (
-    id: string
+    id: string,
   ): Observable<ITreatmentGroup | undefined> => this.http.get<ITreatmentGroup>(toUrl(this.urlV1, id));
 
   add = (
-    treatment: ITreatmentGroup
+    treatment: ITreatmentGroup,
   ): Observable<ITreatmentGroup> => this.http.post<ITreatmentGroup>(this.urlV1, treatment);
 
   delete = (
-    id: string
+    id: string,
   ): Observable<ITreatmentGroup> => this.http.delete<ITreatmentGroup>(toUrl(this.urlV1, id));
 
   update = (
-    treatment: ITreatmentGroup
+    treatment: ITreatmentGroup,
   ): Observable<ITreatmentGroup> => this.http.patch<ITreatmentGroup>(toUrl(this.urlV1, treatment.id!), treatment);
 
   updateSort = (
-    treatments: ISorted[]
+    treatments: ISorted[],
   ): Observable<ITreatment[]> => this.http.patch<ITreatment[]>(toUrl(this.urlV1, 'sort'), treatments);
 
   updateGroupSort = (
-    groups: ISorted[]
+    groups: ISorted[],
   ): Observable<ITreatmentGroup[]> => this.http.patch<ITreatmentGroup[]>(toUrl(this.urlV1, 'groups', 'sort'), groups);
 
   getHistory = (
     groupId: string,
-    treatmentId: string
+    treatmentId: string,
   ): Observable<ITreatmentAll[] | undefined> => this.http.get<ITreatmentAll[]>(
-    toUrl(this.urlV1, groupId, 'treatments', treatmentId, 'histories')
+    toUrl(this.urlV1, groupId, 'treatments', treatmentId, 'histories'),
   );
 }

@@ -31,7 +31,7 @@ import { ErrorComponent } from '../../../shared/error/error.component';
   animations: [transitionAnimation, stampAnimation],
   templateUrl: './reservations.component.html',
   styleUrls: ['./reservations.component.scss'],
-  imports: [SharedModule, UpcomingComponent, TimeDetailPipe, ReservationIconPipe, ErrorComponent]
+  imports: [SharedModule, UpcomingComponent, TimeDetailPipe, ReservationIconPipe, ErrorComponent],
 })
 export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -59,126 +59,127 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private router: Router, breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef,
               private analytic: Analytics) {
-    this.getState = this.store.select(selectReservationState);
-    this.dateFormat = this.translate.currentLang;
-    this.language = this.translate.currentLang;
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.small = true;
-        this.pageSize = MOBILE_PAGE_SIZE;
-      }
-    });
-    logEvent(this.analytic, 'screen_view', {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      firebase_screen: 'Main reservation page',
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      firebase_screen_class: 'ReservationsComponent'
-    });
+  	this.getState = this.store.select(selectReservationState);
+  	this.dateFormat = this.translate.currentLang;
+  	this.language = this.translate.currentLang;
+  	breakpointObserver.observe([
+  		Breakpoints.XSmall,
+  		Breakpoints.Small,
+  	]).subscribe(result => {
+  		if (result.matches) {
+  			this.small = true;
+  			this.pageSize = MOBILE_PAGE_SIZE;
+  		}
+  	});
+  	logEvent(this.analytic, 'screen_view', {
+  		// eslint-disable-next-line camelcase
+  		firebase_screen: 'Main reservation page',
+  		// eslint-disable-next-line camelcase
+  		firebase_screen_class: 'ReservationsComponent',
+  	});
   }
 
   ngOnInit(): void {
-    this.clean();
-    this.subscribe();
+  	this.clean();
+  	this.subscribe();
   }
 
   ngAfterViewInit(): void {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getReservations();
-    });
+  	this.sort.sortChange.subscribe(() => {
+  		this.paginator.pageIndex = 0;
+  		this.getReservations();
+  	});
 
-    this.paginator?.page.subscribe(() => this.getReservations(this.paginator.pageIndex));
+  	this.paginator?.page.subscribe(() => this.getReservations(this.paginator.pageIndex));
 
-    this.getReservations();
-    this.cdRef.detectChanges();
+  	this.getReservations();
+  	this.cdRef.detectChanges();
   }
 
   ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+  	this.subscription?.unsubscribe();
   }
 
   showTimeZone = (reservation: IReservationAll): boolean => !isSameTimeZone(reservation.room.timeZone);
 
   onRatingChanged = (reservation: IReservationAll): void => executeDialogNoWidth(
-    this.dialog, ReviewDialogComponent, reservation, result => {
-      if (result && result.rating) {
-        const review: IReview = new Review(result.rating);
-        review.reservationId = reservation?.id;
-        review.detail = result.detail ? result.detail : this.translate.instant(`ME.REVIEW.RATING.${ result.rating }`);
-        this.store.dispatch(
-          new fromActionsReservation.ReservationReview(review)
-        );
-      }
-    }
+  	this.dialog, ReviewDialogComponent, reservation, result => {
+  		if (result && result.rating) {
+  			const review: IReview = new Review(result.rating);
+  			review.reservationId = reservation?.id;
+  			review.detail = result.detail ? result.detail :
+          this.translate.instant(`ME.REVIEW.RATING.${ result.rating }`);
+  			this.store.dispatch(
+  				new fromActionsReservation.ReservationReview(review),
+  			);
+  		}
+  	},
   );
 
   openDialog = (reservation: IReservationAll): void => {
-    const time = newDateTimestamp(reservation.timestamp);
-    openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
+  	const time = newDateTimestamp(reservation.timestamp);
+  	openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
   };
 
   private clean = (): void => this.store.dispatch(new fromActionsReservation.Clean());
 
   private getReservations = (page: number = 0): void => this.store.dispatch(
-    new fromActionsReservation.GetCustomerReservations({
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    })
+  	new fromActionsReservation.GetCustomerReservations({
+  		active: this.sort.active,
+  		direction: this.sort.direction,
+  		size: this.pageSize,
+  		page,
+  	}),
   );
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
-      this.error = state.error;
-      this.data = state.customerReservation;
-      if (this.data) {
-        this.noContent = !this.data.upcoming || !this.data.upcoming.length;
-        if (this.data.reservations) {
-          this.data.upcoming.forEach(u => {
-            if (u.state === States.cancelledPaymentRequired) {
-              let link = null;
-              let paymentId = null;
-              let pending = false;
-              u.payments.forEach((payment: IPayment) => {
-                if (payment.link && payment.status === 'CREATED') {
-                  link = payment.link;
-                  return;
-                } else if (payment.status === 'CREATED' && !payment.type) {
-                  paymentId = payment.id;
-                  return;
-                } else if (payment.status === 'PENDING') {
-                  pending = true;
-                  return;
-                }
-              });
-              if (link) {
-                window.open(link, '_self');
-              } else if (paymentId) {
-                this.router.navigate([this.language, 'me', 'payment', paymentId]);
-              } else if (!pending) {
-                this.router.navigate(['/', this.language, 'me', 'reservation', u.id, 'payment', 'option']);
-              }
-            }
-          });
-          this.dataSource = this.data.reservations.content?.map((reservation: IReservationAll) => {
-            if (this.showReview && reservation.state === States.completed
+  	this.subscription = this.getState.subscribe(state => {
+  		this.error = state.error;
+  		this.data = state.customerReservation;
+  		if (this.data) {
+  			this.noContent = !this.data.upcoming || !this.data.upcoming.length;
+  			if (this.data.reservations) {
+  				this.data.upcoming.forEach(u => {
+  					if (u.state === States.cancelledPaymentRequired) {
+  						let link = null;
+  						let paymentId = null;
+  						let pending = false;
+  						u.payments.forEach((payment: IPayment) => {
+  							if (payment.link && payment.status === 'CREATED') {
+  								link = payment.link;
+  								return;
+  							} else if (payment.status === 'CREATED' && !payment.type) {
+  								paymentId = payment.id;
+  								return;
+  							} else if (payment.status === 'PENDING') {
+  								pending = true;
+  								return;
+  							}
+  						});
+  						if (link) {
+  							window.open(link, '_self');
+  						} else if (paymentId) {
+  							this.router.navigate([this.language, 'me', 'payment', paymentId]);
+  						} else if (!pending) {
+  							this.router.navigate(['/', this.language, 'me', 'reservation', u.id, 'payment', 'option']);
+  						}
+  					}
+  				});
+  				this.dataSource = this.data.reservations.content?.map((reservation: IReservationAll) => {
+  					if (this.showReview && reservation.state === States.completed
               && isToday(newDateTimestamp(reservation.timestamp, reservation.room.timeZone))
               && !reservation.review) {
-              this.onRatingChanged(reservation);
-              this.showReview = false;
-            }
-            return reservation;
-          });
-        }
-        this.resultsLength = this.data.reservations?.totalElements;
-        if (this.data.upcoming && this.data.upcoming.length) {
-          this.upcoming = this.data.upcoming;
-        }
-      }
-    });
+  						this.onRatingChanged(reservation);
+  						this.showReview = false;
+  					}
+  					return reservation;
+  				});
+  			}
+  			this.resultsLength = this.data.reservations?.totalElements;
+  			if (this.data.upcoming && this.data.upcoming.length) {
+  				this.upcoming = this.data.upcoming;
+  			}
+  		}
+  	});
   };
 }

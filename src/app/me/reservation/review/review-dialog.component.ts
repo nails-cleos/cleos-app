@@ -19,7 +19,8 @@ import { AppMaterialModule } from '../../../util/app-material.module';
   templateUrl: './review-dialog.component.html',
   animations: [transitionAnimation],
   styleUrls: ['./review-dialog.component.scss'],
-  imports: [RoomNamePipe, RatingComponent, AppMaterialModule, TranslatePipe, DatePipe, DecimalPipe, ReactiveFormsModule]
+  imports: [RoomNamePipe, RatingComponent, AppMaterialModule, TranslatePipe, DatePipe, DecimalPipe,
+    ReactiveFormsModule],
 })
 export class ReviewDialogComponent {
   reservation?: IReservationAll;
@@ -46,10 +47,10 @@ export class ReviewDialogComponent {
     this.review = data.review;
     this.dateFormat = this.translate.currentLang;
     logEvent(this.analytic, 'screen_view', {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
+      // eslint-disable-next-line camelcase
       firebase_screen: 'Review page',
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      firebase_screen_class: 'ReviewDialogComponent'
+      // eslint-disable-next-line camelcase
+      firebase_screen_class: 'ReviewDialogComponent',
     });
   }
 

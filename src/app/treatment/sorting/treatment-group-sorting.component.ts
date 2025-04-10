@@ -3,7 +3,7 @@ import {
   DragDropSortingComponent,
   ISorted,
   ISorting,
-  ItemSorting
+  ItemSorting,
 } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -16,7 +16,7 @@ import { SharedModule } from '../../shared/shared.module';
   selector: 'app-treatment-group-sorting',
   templateUrl: './treatment-sorting.component.html',
   styleUrls: ['./treatment-group-sorting.component.scss'],
-  imports: [SharedModule, DragDropSortingComponent]
+  imports: [SharedModule, DragDropSortingComponent],
 })
 export class TreatmentGroupSortingComponent implements OnInit, OnDestroy {
 
@@ -52,7 +52,7 @@ export class TreatmentGroupSortingComponent implements OnInit, OnDestroy {
         this.getTreatments();
       }
       this.items = stateValue?.data?.map((group: ITreatmentGroupAll) => new ItemSorting(
-        group.id, group.name, group.order)
+        group.id, group.name, group.order),
       );
     });
   };

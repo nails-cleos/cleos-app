@@ -12,7 +12,7 @@ import { SharedModule } from '../../../shared/shared.module';
   selector: 'app-payment-complete',
   templateUrl: './payment-complete.component.html',
   styleUrls: ['./payment-complete.component.scss'],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewInit {
   private subscription?: Subscription;
@@ -85,14 +85,14 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
       if (!type || !referenceId) {
         const message = this.translate.instant('ME.PAYMENT.ERROR', { reason: 'incomplete' });
         this.store.dispatch(
-          new fromActionsPayment.PaymentNotComplete({ message })
+          new fromActionsPayment.PaymentNotComplete({ message }),
         );
         // this.router.navigate([this.language, 'me', this.path, this.id, 'payment']);
         return;
       }
       const paymentStatus = new PaymentStatus(this.paymentId, type, referenceId, this.reason);
       this.store.dispatch(
-        new fromActionsPayment.PaymentSave({ id: this.id, path: this.path, status, paymentStatus })
+        new fromActionsPayment.PaymentSave({ id: this.id, path: this.path, status, paymentStatus }),
       );
     }, 500);
   }

@@ -13,7 +13,7 @@ import { PaymentType } from '../../interfaces/payment';
   templateUrl: './form-field-adder.component.html',
   styleUrl: './form-field-adder.component.scss',
   animations: [detailExpandAnimation],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class FormFieldAdderComponent implements OnInit {
   @Input() key!: string;
@@ -57,7 +57,7 @@ export class FormFieldAdderComponent implements OnInit {
 
   ngOnInit(): void {
     this.formGroup = this.formBuilder.group({
-      items: this.formBuilder.array([])
+      items: this.formBuilder.array([]),
     });
     if (this.split) {
       this.displayedColumns = [...this.displayedColumns, 'paymentType'];
@@ -78,12 +78,12 @@ export class FormFieldAdderComponent implements OnInit {
       return this.formBuilder.group({
         description: ['', Validators.required],
         price: ['', Validators.required],
-        paymentType: ['', Validators.required]
+        paymentType: ['', Validators.required],
       });
     }
     return this.formBuilder.group({
       description: ['', Validators.required],
-      price: ['', Validators.required]
+      price: ['', Validators.required],
     });
   };
 
@@ -100,12 +100,13 @@ export class FormFieldAdderComponent implements OnInit {
 
   private subscribeToFormChanges = (): void => {
     this.formArray.controls.forEach((control, index) => {
-      control.get('description')?.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe((newValue) => {
-        const newData = [...this.dataSource.data];
-        newData[index].description = newValue;
-        this.dataSource = new MatTableDataSource<IExtras>(newData);
-        this.emitRowChange();
-      });
+      control.get('description')?.valueChanges.pipe(debounceTime(300), distinctUntilChanged())
+        .subscribe((newValue) => {
+          const newData = [...this.dataSource.data];
+          newData[index].description = newValue;
+          this.dataSource = new MatTableDataSource<IExtras>(newData);
+          this.emitRowChange();
+        });
 
       control.get('price')?.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe((newValue) => {
         const newData = [...this.dataSource.data];

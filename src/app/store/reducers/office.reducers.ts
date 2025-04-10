@@ -22,7 +22,7 @@ export const initialState: State = {
   subErrors: null,
   selected: null,
   message: null,
-  isLoading: false
+  isLoading: false,
 };
 
 export const reducer = (state = initialState, action: All): State => {
@@ -34,7 +34,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case OfficeActionTypes.getAllManager: {
@@ -44,7 +44,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case OfficeActionTypes.officeFind: {
@@ -54,7 +54,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case OfficeActionTypes.officeSuccess: {
@@ -64,7 +64,7 @@ export const reducer = (state = initialState, action: All): State => {
         managers: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case OfficeActionTypes.officeSaveSuccess: {
@@ -74,7 +74,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: null,
         errorMessage: null,
         subErrors: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case OfficeActionTypes.officeSelected: {
@@ -83,7 +83,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case OfficeActionTypes.officeFailure: {
@@ -93,7 +93,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: action.payload.error,
         subErrors: action.payload.error.subErrors,
         message: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case OfficeActionTypes.officeUpdate:
@@ -104,7 +104,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         message: null,
-        isLoading: true
+        isLoading: true,
       };
     }
     case OfficeActionTypes.clean: {

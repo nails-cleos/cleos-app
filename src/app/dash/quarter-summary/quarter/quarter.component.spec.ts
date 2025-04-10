@@ -8,9 +8,9 @@ describe('QuarterComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [QuarterComponent]
-})
-    .compileComponents();
+      imports: [QuarterComponent],
+    })
+      .compileComponents();
 
     fixture = TestBed.createComponent(QuarterComponent);
     component = fixture.componentInstance;

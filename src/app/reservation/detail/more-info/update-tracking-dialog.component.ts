@@ -6,10 +6,10 @@ import { AppMaterialModule } from '../../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
-    selector: 'app-update-tracking-dialog',
-    templateUrl: './update-tracking-dialog.component.html',
-    styleUrl: './update-tracking-dialog.component.scss',
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe]
+  selector: 'app-update-tracking-dialog',
+  templateUrl: './update-tracking-dialog.component.html',
+  styleUrl: './update-tracking-dialog.component.scss',
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
 })
 export class UpdateTrackingDialogComponent implements OnInit {
   trackingForm!: UntypedFormGroup;
@@ -67,7 +67,7 @@ export class UpdateTrackingDialogComponent implements OnInit {
       startedDate: this.startedDate,
       startedTime: this.startedTime,
       completedDate: this.completedDate,
-      completedTime: this.completedTime
+      completedTime: this.completedTime,
     });
   };
 }

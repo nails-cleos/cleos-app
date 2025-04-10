@@ -19,7 +19,7 @@ import { ShareButtonsComponent } from './share-buttons/share-buttons.component';
   selector: 'app-referrals',
   templateUrl: './referrals.component.html',
   styleUrls: ['./referrals.component.scss'],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class ReferralsComponent implements OnInit, OnDestroy {
   userId?: string;
@@ -42,10 +42,10 @@ export class ReferralsComponent implements OnInit, OnDestroy {
     });
     this.getState = this.store.select(selectDiscountState);
     logEvent(this.analytic, 'screen_view', {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
+      // eslint-disable-next-line camelcase
       firebase_screen: 'Referral page',
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      firebase_screen_class: 'ReferralsComponent'
+      // eslint-disable-next-line camelcase
+      firebase_screen_class: 'ReferralsComponent',
     });
   }
 
@@ -53,7 +53,7 @@ export class ReferralsComponent implements OnInit, OnDestroy {
     if (this.userId) {
       this.clipboard.copy(this.userId);
       this.snackBar.open(this.translate.instant('ME.REFERRAL.COPY'), 'OK', {
-        duration: 5000
+        duration: 5000,
       });
     }
     return;
@@ -61,14 +61,14 @@ export class ReferralsComponent implements OnInit, OnDestroy {
 
   get openBottomSheetShare(): void {
     this.bottomSheet.open(BottomSheetShareComponent, {
-      data: { code: this.userId }
+      data: { code: this.userId },
     });
     return;
   }
 
   get openBottomSheetReferral(): void {
     this.bottomSheet.open(BottomSheetReferralComponent, {
-      data: { referralMax: this.referralMax, referrals: this.referrals, referralsUsed: this.referralsUsed }
+      data: { referralMax: this.referralMax, referrals: this.referrals, referralsUsed: this.referralsUsed },
     });
     return;
   }
@@ -104,7 +104,7 @@ export class ReferralsComponent implements OnInit, OnDestroy {
 @Component({
   selector: 'app-bottom-sheet-share',
   templateUrl: 'bottom-sheet-share.component.html',
-  imports: [SharedModule, ShareButtonsComponent]
+  imports: [SharedModule, ShareButtonsComponent],
 })
 export class BottomSheetShareComponent {
   message: any;
@@ -114,11 +114,11 @@ export class BottomSheetShareComponent {
   show: number;
 
   constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public data: { code: string }, private translate: TranslateService,
-              breakpointObserver: BreakpointObserver) {
+    breakpointObserver: BreakpointObserver) {
     this.show = 7;
     breakpointObserver.observe([
       Breakpoints.XSmall,
-      Breakpoints.Small
+      Breakpoints.Small,
     ]).subscribe(result => {
       if (result.matches) {
         this.show = 5;
@@ -127,7 +127,7 @@ export class BottomSheetShareComponent {
     this.code = `${ this.url }/auth?code=${ data.code }`;
     this.message = this.translate.instant('ME.REFERRAL.LINK', {
       code: data.code,
-      url: this.code
+      url: this.code,
     });
   }
 }
@@ -136,7 +136,7 @@ export class BottomSheetShareComponent {
   selector: 'app-bottom-sheet-referral',
   templateUrl: 'bottom-sheet-referral.component.html',
   styleUrls: ['./bottom-sheet-referral.component.scss'],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class BottomSheetReferralComponent {
   referralMax = 5;

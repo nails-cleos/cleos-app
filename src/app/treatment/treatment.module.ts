@@ -32,21 +32,21 @@ import { TreatmentSortingComponent } from './sorting/treatment-sorting.component
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('treatment')
+        useClass: TranslateLoaderFactory.forModule('treatment'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
-    EffectsModule.forFeature([TreatmentEffects])
+    EffectsModule.forFeature([TreatmentEffects]),
   ],
   providers: [
     TreatmentService,
-    ColorService
-  ]
+    ColorService,
+  ],
 })
 export class TreatmentModule {
   constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {

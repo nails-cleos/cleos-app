@@ -17,24 +17,24 @@ export class ExpenseEffects {
       (payload: any) => this.expenseService.getAll(payload.roomId, payload.active, payload.direction, payload.page,
         payload.size, payload.filter, payload.dateFilter).pipe(
         switchMap((response: any) => of(new fromActionsExpense.ExpenseSuccess(response))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsExpense.ExpenseFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsExpense.ExpenseFailure({ error: err.error }))),
+      )),
   ));
 
   findOne$ = createEffect(() => this.actions.pipe(ofType(fromActionsExpense.ExpenseActionTypes.expenseFind)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.expenseService.getById(payload.roomId, payload.id).pipe(
       switchMap((expense: any) => of(new fromActionsExpense.ExpenseSelected({ expense }))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsExpense.ExpenseFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsExpense.ExpenseFailure({ error: err.error }))),
+    )),
   ));
 
   getInfo$ = createEffect(() => this.actions.pipe(ofType(fromActionsExpense.ExpenseActionTypes.getExpenseInfo)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.expenseService.getExpenseInfo(payload).pipe(
       switchMap((expense: any) => of(new fromActionsExpense.ExpenseInfoSuccess(expense))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsExpense.ExpenseFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsExpense.ExpenseFailure({ error: err.error }))),
+    )),
   ));
 
   save$ = createEffect(() => this.actions.pipe(ofType(fromActionsExpense.ExpenseActionTypes.expenseSave)).pipe(
@@ -43,8 +43,8 @@ export class ExpenseEffects {
       switchMap((response: any) => {
         const message = this.translate.instant('EXPENSE.CREATED', { invoice: response.invoice });
         return of(new fromActionsExpense.ExpenseSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsExpense.ExpenseFailure({ error: err.error })))
-    ))
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsExpense.ExpenseFailure({ error: err.error }))),
+    )),
   ));
 
   update = createEffect(() => this.actions.pipe(ofType(fromActionsExpense.ExpenseActionTypes.expenseUpdate)).pipe(
@@ -53,8 +53,8 @@ export class ExpenseEffects {
       switchMap((response: any) => {
         const message = this.translate.instant('EXPENSE.UPDATED.MESSAGE', { invoice: response.invoice });
         return of(new fromActionsExpense.ExpenseSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsExpense.ExpenseFailure({ error: err.error })))
-    ))
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsExpense.ExpenseFailure({ error: err.error }))),
+    )),
   ));
 
   delete$ = createEffect(() => this.actions.pipe(ofType(fromActionsExpense.ExpenseActionTypes.expenseDelete)).pipe(
@@ -63,27 +63,27 @@ export class ExpenseEffects {
       switchMap(() => {
         const message = this.translate.instant('EXPENSE.DELETED.MESSAGE', { invoice: payload.invoice });
         return of(new fromActionsExpense.ExpenseSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsExpense.ExpenseFailure({ error: err.error })))
-    ))
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsExpense.ExpenseFailure({ error: err.error }))),
+    )),
   ));
 
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(fromActionsExpense.ExpenseActionTypes.expenseSelected),
     tap((data: any) => this.router.navigate(
       [this.translate.currentLang, 'rooms', data.payload.expense.room.id, 'expenses',
-        data.payload.expense.id]))
+        data.payload.expense.id])),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(fromActionsExpense.ExpenseActionTypes.expenseSuccess)
+    ofType(fromActionsExpense.ExpenseActionTypes.expenseSuccess),
   ), { dispatch: false });
 
   infoSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(fromActionsExpense.ExpenseActionTypes.expenseInfoSuccess)
+    ofType(fromActionsExpense.ExpenseActionTypes.expenseInfoSuccess),
   ), { dispatch: false });
 
   saveSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(fromActionsExpense.ExpenseActionTypes.expenseSaveSuccess)
+    ofType(fromActionsExpense.ExpenseActionTypes.expenseSaveSuccess),
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions: Actions,

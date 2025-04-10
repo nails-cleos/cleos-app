@@ -209,7 +209,7 @@ export const newPercentage = (price: IPrice, percentage: number): IPrice => new 
   price.priceWithExtras, price.priceWithAdditional, percentage, price.balance);
 
 export const createTreatmentGroupService = (groups: Map<string, GroupService>, list: ITreatmentAll[], currency: string,
-                                            isSelected: boolean = false): Map<string, GroupService> => {
+  isSelected: boolean = false): Map<string, GroupService> => {
   list.forEach((treatment: ITreatmentAll) => {
     const groupId = treatment.group.id;
     const mapGroup = groups.get(groupId);
@@ -299,13 +299,13 @@ export const currencySymbol = (currency?: ICurrency | string): string => {
 };
 
 export const openDialog = (myRoom: IRoomAll, locale: string, translate: TranslateService,
-                           dialog: MatDialog, time?: Date): void => {
+  dialog: MatDialog, time?: Date): void => {
   const room = roomName(myRoom);
   createDialog('ROOM_INFO', room, locale, translate, dialog, myRoom.timeZone, time);
 };
 
 export const createDialog = (key: string, value: string, locale: string, translate: TranslateService,
-                             dialog: MatDialog, timeZone?: string, time?: Date): void => {
+  dialog: MatDialog, timeZone?: string, time?: Date): void => {
   const localDate = new Date(localeTimeZoneDate('en-US', time));
   const date = new Date(localeTimeZoneDate('en-US', time, timeZone));
 
@@ -324,7 +324,7 @@ export const createDialog = (key: string, value: string, locale: string, transla
   const title = translate.instant('COMMON.TIME_ZONE.TITLE');
   const content = translate.instant(`COMMON.TIME_ZONE.${ key }`, { localTime, timeZoneTime, value, arg });
   dialog.open(DialogComponent, {
-    data: { title, content, hideNoButton: true, hideOkButton: true }
+    data: { title, content, hideNoButton: true, hideOkButton: true },
   });
 };
 
@@ -338,8 +338,8 @@ export const totalPaid = (payments: IPayment[] | undefined): number => payments?
 
 export const areEquals = (array1: any[], array2: any[]): boolean => (array1.length === array2.length &&
   array1.every((element1) => array2.some((element2) =>
-      Object.keys(element1).every((key) => element1[key] === element2[key])
-    )
+  	Object.keys(element1).every((key) => element1[key] === element2[key]),
+  ),
   )
 );
 
@@ -376,7 +376,7 @@ export const openCancel = (
   afterClose: (result: any) => void,
   showPenalty?: boolean,
   price?: IPrice,
-  paymentOptions?: IPaymentOption[]
+  paymentOptions?: IPaymentOption[],
 ): void => {
   const currency = room.currency;
   const data = {
@@ -385,7 +385,7 @@ export const openCancel = (
     price,
     paymentOptions,
     currency,
-    showPenalty
+    showPenalty,
   };
 
   executeDialog(dialog, CancelDialogComponent, data, afterClose, true);
@@ -398,12 +398,12 @@ export const customerEditDialog = (
   currency: ICurrencyAll,
   small: boolean,
   language: string,
-  price?: IPrice
+  price?: IPrice,
 ): void => {
   const data = {
     small,
     price,
-    currency
+    currency,
   };
   executeDialog(dialog, CustomerEditDialogComponent, data, result => {
     if (result) {
@@ -417,22 +417,22 @@ export const executeDialogNoWidth = (
   dialogComponent: any,
   data: any,
   afterClose: (result: any) => void,
-  disableClose: boolean = false
+  disableClose: boolean = false,
 ): void => {
   const dialogRef = dialog.open(dialogComponent, {
     disableClose,
-    data
+    data,
   });
 
   dialogRef.afterClosed().subscribe(afterClose);
 };
 
 export const executeDialog = (dialog: MatDialog, dialogComponent: any, data: any, afterClose: (result: any) => void,
-                              disableClose: boolean = false, width: string = '70vw'): void => {
+  disableClose: boolean = false, width: string = '70vw'): void => {
   const dialogRef = dialog.open(dialogComponent, {
     width,
     disableClose,
-    data
+    data,
   });
 
   dialogRef.afterClosed().subscribe(afterClose);
@@ -468,7 +468,7 @@ export enum FrequencyEnum {
 }
 
 export const createAddress = (formattedAddress?: string, location?: google.maps.LatLng,
-                              address?: IAddress, description?: string): IAddress | undefined => {
+  address?: IAddress, description?: string): IAddress | undefined => {
   if (location || address) {
     return {
       id: address?.id,
@@ -476,8 +476,8 @@ export const createAddress = (formattedAddress?: string, location?: google.maps.
       description: description || address?.description,
       location: {
         x: location?.lng() || address?.location?.x,
-        y: location?.lat() || address?.location?.y
-      } as ILocation
+        y: location?.lat() || address?.location?.y,
+      } as ILocation,
     } as IAddress;
   }
   return undefined;

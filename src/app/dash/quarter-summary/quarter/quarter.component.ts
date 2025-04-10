@@ -11,7 +11,7 @@ import { MonthComponent } from '../../month-summary/month/month.component';
   selector: 'app-quarter',
   templateUrl: './quarter.component.html',
   styleUrls: ['./quarter.component.scss'],
-  imports: [SharedModule, MonthComponent]
+  imports: [SharedModule, MonthComponent],
 })
 export class QuarterComponent {
   @Input() monthSummaries?: IMonthSummary[];
@@ -26,32 +26,32 @@ export class QuarterComponent {
   private readonly language: string;
 
   constructor(private readonly translate: TranslateService, private router: Router) {
-    this.dateFormat = this.translate.currentLang;
-    this.language = this.translate.currentLang;
-    this.margin = false;
-    this.showCash = false;
+  	this.dateFormat = this.translate.currentLang;
+  	this.language = this.translate.currentLang;
+  	this.margin = false;
+  	this.showCash = false;
   }
 
   getMonth = (month: number): string => monthTitle(dateMonthYear(month - 1, this.year), this.dateFormat, this.measure);
 
   goToQuarter = (quarter: number): void => {
-    this.router.navigate([this.language, 'dashboard', 'quarter', 'summary'], { state: { year: this.year, quarter } });
+  	this.router.navigate([this.language, 'dashboard', 'quarter', 'summary'], { state: { year: this.year, quarter } });
   };
 
   goToMonth = (month: number, type?: string): void => {
-    let step = 0;
-    switch (type) {
-      case 'INCOME':
-        step = 0;
-        break;
-      case 'EXPENSE':
-        step = 1;
-        break;
-      case 'CASH':
-        step = 2;
-        break;
-    }
-    this.router.navigate([this.language, 'dashboard', 'monthly', 'summary'],
-      { state: { date: `${ month }-${ this.year }`, step } });
+  	let step = 0;
+  	switch (type) {
+  	case 'INCOME':
+  		step = 0;
+  		break;
+  	case 'EXPENSE':
+  		step = 1;
+  		break;
+  	case 'CASH':
+  		step = 2;
+  		break;
+  	}
+  	this.router.navigate([this.language, 'dashboard', 'monthly', 'summary'],
+  		{ state: { date: `${ month }-${ this.year }`, step } });
   };
 }

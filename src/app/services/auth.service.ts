@@ -13,6 +13,6 @@ export class AuthService {
   private http: HttpClient = inject(HttpClient);
 
   login = (token: string, code?: string | null, theme?: string): Observable<Token> => this.http.post<Token>(
-    toUrl(this.urlV1, 'login'), { token, code, theme }
+    toUrl(this.urlV1, 'login'), { token, code, theme },
   );
 }

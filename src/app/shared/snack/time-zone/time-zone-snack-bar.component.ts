@@ -13,7 +13,7 @@ interface ITimeZone {
   selector: 'app-time-zone-snack-bar',
   templateUrl: './time-zone-snack-bar.component.html',
   styleUrls: ['./time-zone-snack-bar.component.scss'],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class TimeZoneSnackBarComponent {
 
@@ -30,6 +30,6 @@ export class TimeZoneSnackBarComponent {
 
   private getDateTime = (
     reservationDate: Date,
-    timeZone?: string
+    timeZone?: string,
   ): string => localeTimeZoneDate(this.translate.currentLang, reservationDate, timeZone);
 }

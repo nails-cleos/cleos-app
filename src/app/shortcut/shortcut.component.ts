@@ -15,7 +15,7 @@ enum ShortcutEnum {
   selector: 'app-shortcut',
   templateUrl: './shortcut.component.html',
   styleUrls: ['./shortcut.component.scss'],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class ShortcutComponent implements OnDestroy {
 

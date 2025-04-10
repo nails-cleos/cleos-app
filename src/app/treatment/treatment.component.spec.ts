@@ -9,11 +9,11 @@ describe('TreatmentComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    imports: [
+      imports: [
         NoopAnimationsModule,
-        TreatmentComponent
-    ]
-}).compileComponents();
+        TreatmentComponent,
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

@@ -17,7 +17,7 @@ export const initialState: State = {
   errorMessage: null,
   error: null,
   message: null,
-  isLoading: false
+  isLoading: false,
 };
 
 export const reducer = (state = initialState, action: All): State => {
@@ -28,7 +28,7 @@ export const reducer = (state = initialState, action: All): State => {
         catalogue: [{}, {}, {}],
         errorMessage: null,
         message: null,
-        isLoading: true
+        isLoading: true,
       };
     }
     case MainActionTypes.getAllTreatments: {
@@ -37,7 +37,7 @@ export const reducer = (state = initialState, action: All): State => {
         groups: null,
         errorMessage: null,
         message: null,
-        isLoading: true
+        isLoading: true,
       };
     }
     case MainActionTypes.updateUser:
@@ -46,7 +46,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         errorMessage: null,
         message: null,
-        isLoading: true
+        isLoading: true,
       };
     }
     case MainActionTypes.catalogueSuccess: {
@@ -55,7 +55,7 @@ export const reducer = (state = initialState, action: All): State => {
         catalogue: action.payload,
         errorMessage: null,
         message: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case MainActionTypes.treatmentSuccess: {
@@ -64,7 +64,7 @@ export const reducer = (state = initialState, action: All): State => {
         groups: action.payload,
         errorMessage: null,
         message: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case MainActionTypes.requestSuccess: {
@@ -72,7 +72,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         message: action.payload.message,
         errorMessage: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case MainActionTypes.requestFailure: {
@@ -81,7 +81,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: action.payload.error.message,
         error: action.payload.error,
         message: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case MainActionTypes.clean: {

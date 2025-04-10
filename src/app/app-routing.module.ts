@@ -4,14 +4,14 @@ import { TranslationLoaderResolver } from './util/translation.resolver';
 
 const routes: Routes = [
   { path: ':lang', loadChildren: () => import('./nav/nav.module').then(m => m.NavModule) },
-  { path: '**', redirectTo: '/en-GB', pathMatch: 'full', resolve: { model: TranslationLoaderResolver } }
+  { path: '**', redirectTo: '/en-GB', pathMatch: 'full', resolve: { model: TranslationLoaderResolver } },
 ];
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, { anchorScrolling: 'enabled' })
+    RouterModule.forRoot(routes, { anchorScrolling: 'enabled' }),
   ],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class AppRoutingModule {
 }

@@ -8,9 +8,9 @@ describe('ShareButtonsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [ShareButtonsComponent]
-})
-    .compileComponents();
+      imports: [ShareButtonsComponent],
+    })
+      .compileComponents();
 
     fixture = TestBed.createComponent(ShareButtonsComponent);
     component = fixture.componentInstance;

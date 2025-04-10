@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 
 export const createFilter = (page: number, size: number, sort?: string, direction?: string,
-                             filter?: string): HttpParams => {
+  filter?: string): HttpParams => {
   let params = new HttpParams().set('page', String(page)).set('size', String(size));
   if (sort) {
     params = params.append('sort', sort);

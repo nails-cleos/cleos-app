@@ -7,7 +7,7 @@ import { TotalSummaryItemComponent } from '../total-summary-item/total-summary-i
   selector: 'app-result-summary',
   templateUrl: './result-summary.component.html',
   styleUrl: './result-summary.component.scss',
-  imports: [SharedModule, TotalSummaryItemComponent]
+  imports: [SharedModule, TotalSummaryItemComponent],
 })
 export class ResultSummaryComponent {
   @Input() summaryTotals!: any;
@@ -16,7 +16,7 @@ export class ResultSummaryComponent {
   @Input() currency?: ICurrencyAll;
 
   calculateAmount = (
-    type: 'gross' | 'btw' | 'net'
+  	type: 'gross' | 'btw' | 'net',
   ): number => this.summaryType ? this.summaryTotals[this.summaryType][type] :
-    this.summaryTotals.income[type] - this.summaryTotals.expense[type];
+  	this.summaryTotals.income[type] - this.summaryTotals.expense[type];
 }

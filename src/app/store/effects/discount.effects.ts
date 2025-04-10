@@ -17,8 +17,8 @@ export class DiscountEffects {
     switchMap((payload: any) => this.discountService.getAll(payload.active, payload.direction, payload.page, 'pages',
       payload.size).pipe(
       switchMap((response: any) => of(new fromActionsDiscount.DiscountSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error }))),
+    )),
   ));
 
   getMyDiscounts$ = createEffect(
@@ -27,8 +27,8 @@ export class DiscountEffects {
       switchMap((payload: any) => this.discountService.getAll(payload.active, payload.direction, payload.page, 'me',
         payload.size).pipe(
         switchMap((response: any) => of(new fromActionsDiscount.DiscountSuccess(response))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error }))),
+      )),
     ));
 
   getMyReferrals$ = createEffect(
@@ -36,8 +36,8 @@ export class DiscountEffects {
       map((action: any) => action.payload),
       switchMap(() => this.discountService.getReferrals().pipe(
         switchMap((response: any) => of(new fromActionsDiscount.ReferralSuccess(response))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error }))),
+      )),
     ));
 
   getCurrencies = createEffect(
@@ -45,16 +45,16 @@ export class DiscountEffects {
       map((action: any) => action.payload),
       switchMap(() => this.currencyService.getAllCurrency().pipe(
         switchMap((response: any) => of(new fromActionsDiscount.CurrencySuccess(response))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error }))),
+      )),
     ));
 
   findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDiscount.DiscountActionTypes.discountFind)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.discountService.getById(payload).pipe(
       switchMap((discount: any) => of(new fromActionsDiscount.DiscountSelected(discount))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error }))),
+    )),
   ));
 
   findByCustomer$ = createEffect(
@@ -62,8 +62,8 @@ export class DiscountEffects {
       map((action: any) => action.payload),
       switchMap((payload: any) => this.discountService.findByCustomerId(payload).pipe(
         switchMap((discount: any) => of(new fromActionsDiscount.DiscountSuccess(discount))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error }))),
+      )),
     ));
 
   addDiscount$ = createEffect(
@@ -73,8 +73,8 @@ export class DiscountEffects {
         switchMap((response: any) => {
           const message = this.translate.instant('DISCOUNT.SEND', { name: response.name });
           return of(new fromActionsDiscount.DiscountSaveSuccess({ message }));
-        }), catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error })))
-      ))
+        }), catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error }))),
+      )),
     ));
 
   save$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDiscount.DiscountActionTypes.discountSave)).pipe(
@@ -83,8 +83,8 @@ export class DiscountEffects {
       switchMap((response: any) => {
         const message = this.translate.instant('DISCOUNT.CREATED', { name: response.name });
         return of(new fromActionsDiscount.DiscountSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error })))
-    ))
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error }))),
+    )),
   ));
 
   update = createEffect(() => this.actions$.pipe(ofType(fromActionsDiscount.DiscountActionTypes.discountUpdate)).pipe(
@@ -93,8 +93,8 @@ export class DiscountEffects {
       switchMap((response: any) => {
         const message = this.translate.instant('DISCOUNT.UPDATED.MESSAGE', { name: response.name });
         return of(new fromActionsDiscount.DiscountSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error })))
-    ))
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error }))),
+    )),
   ));
 
   delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDiscount.DiscountActionTypes.discountDelete)).pipe(
@@ -103,21 +103,21 @@ export class DiscountEffects {
       switchMap(() => {
         const message = this.translate.instant('DISCOUNT.DELETED.MESSAGE', { name: payload.name });
         return of(new fromActionsDiscount.DiscountSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error })))
-    ))
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsDiscount.DiscountFailure({ error: err.error }))),
+    )),
   ));
 
   selectedData$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsDiscount.DiscountActionTypes.discountSelected),
-    tap((data: any) => this.router.navigate([this.translate.currentLang, 'discounts', data.payload.id]))
+    tap((data: any) => this.router.navigate([this.translate.currentLang, 'discounts', data.payload.id])),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsDiscount.DiscountActionTypes.discountSuccess)
+    ofType(fromActionsDiscount.DiscountActionTypes.discountSuccess),
   ), { dispatch: false });
 
   saveSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsDiscount.DiscountActionTypes.discountSaveSuccess)
+    ofType(fromActionsDiscount.DiscountActionTypes.discountSaveSuccess),
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions,

@@ -24,22 +24,22 @@ import { Observable } from 'rxjs';
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('discount')
+        useClass: TranslateLoaderFactory.forModule('discount'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
-    EffectsModule.forFeature([DiscountEffects, UserEffects])
+    EffectsModule.forFeature([DiscountEffects, UserEffects]),
   ],
   providers: [
     DiscountService,
     UserService,
-    CurrencyService
-  ]
+    CurrencyService,
+  ],
 })
 export class DiscountModule {
   constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {

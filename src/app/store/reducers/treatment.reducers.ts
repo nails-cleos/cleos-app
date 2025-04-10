@@ -24,7 +24,7 @@ export const initialState: State = {
   subErrors: null,
   selected: null,
   message: null,
-  isLoading: false
+  isLoading: false,
 };
 
 export const reducer = (state = initialState, action: All): State => {
@@ -36,7 +36,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case TreatmentActionTypes.getAllGroup: {
@@ -46,7 +46,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case TreatmentActionTypes.getColors: {
@@ -55,7 +55,7 @@ export const reducer = (state = initialState, action: All): State => {
         colors: null,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case TreatmentActionTypes.treatmentFind: {
@@ -65,7 +65,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case TreatmentActionTypes.treatmentSuccess: {
@@ -74,7 +74,7 @@ export const reducer = (state = initialState, action: All): State => {
         data: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case TreatmentActionTypes.colorSuccess: {
@@ -83,7 +83,7 @@ export const reducer = (state = initialState, action: All): State => {
         colors: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case TreatmentActionTypes.treatmentSaveSuccess: {
@@ -93,7 +93,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         selected: null,
         subErrors: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case TreatmentActionTypes.treatmentSelected: {
@@ -102,7 +102,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: action.payload.treatment,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case TreatmentActionTypes.treatmentFailure: {
@@ -112,7 +112,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: action.payload.error,
         subErrors: action.payload.error.subErrors,
         message: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case TreatmentActionTypes.treatmentUpdate:
@@ -124,7 +124,7 @@ export const reducer = (state = initialState, action: All): State => {
         subErrors: null,
         message: null,
         selected: null,
-        isLoading: true
+        isLoading: true,
       };
     }
     case TreatmentActionTypes.treatmentHistory: {
@@ -134,7 +134,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case TreatmentActionTypes.treatmentHistorySuccess: {
@@ -143,7 +143,7 @@ export const reducer = (state = initialState, action: All): State => {
         history: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case TreatmentActionTypes.clean: {

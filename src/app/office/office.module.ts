@@ -21,21 +21,21 @@ import { Observable } from 'rxjs';
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('office')
+        useClass: TranslateLoaderFactory.forModule('office'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
-    EffectsModule.forFeature([OfficeEffects])
+    EffectsModule.forFeature([OfficeEffects]),
   ],
   providers: [
     OfficeService,
-    UserService
-  ]
+    UserService,
+  ],
 })
 export class OfficeModule {
   constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {

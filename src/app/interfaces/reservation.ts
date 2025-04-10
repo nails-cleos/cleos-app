@@ -15,7 +15,8 @@ export interface IFabMenu {
   tooltip: string;
   icon: string;
   id: string;
-  color?: 'primary' | 'accent' | 'warn' | 'blue' | 'gray'; // To add a new color need to create a new theme class for .mat-{colorName}
+  // To add a new color need to create a new theme class for .mat-{colorName}
+  color?: 'primary' | 'accent' | 'warn' | 'blue' | 'gray';
 }
 
 export interface IExtras {
@@ -185,7 +186,7 @@ export class Day implements IDay {
   excludeDays: number[];
 
   constructor(startDate: Date = createNewDate(getNowTimeZone(), 9), endDate: Date = createNewDate(getNowTimeZone(), 18),
-              today: Date = getNowTimeZone(), excludeDays: number[] = [], plusHour: number = 0) {
+    today: Date = getNowTimeZone(), excludeDays: number[] = [], plusHour: number = 0) {
     const startView = addHours(startDate, -plusHour);
     const endView = addHours(endDate, plusHour);
     this.dayStartHour = startView.getHours();

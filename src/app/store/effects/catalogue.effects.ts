@@ -16,8 +16,8 @@ export class CatalogueEffects {
     map((action: any) => action.payload),
     switchMap(() => this.catalogueService.getAll().pipe(
       switchMap((response: any) => of(new fromActionsCatalogue.CatalogueSuccess(response ? response : []))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({ error: err.error }))),
+    )),
   ));
 
   getAllCatalogs$ = createEffect(
@@ -25,8 +25,8 @@ export class CatalogueEffects {
       map((action: any) => action.payload),
       switchMap(() => this.catalogueService.getAllCatalogs().pipe(
         switchMap((response: any) => of(new fromActionsCatalogue.CatalogueSuccess(response ? response : []))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({ error: err.error }))),
+      )),
     ));
 
   findOne$ = createEffect(
@@ -34,8 +34,8 @@ export class CatalogueEffects {
       map((action: any) => action.payload),
       switchMap((payload: any) => this.catalogueService.getById(payload).pipe(
         switchMap((catalogue: any) => of(new fromActionsCatalogue.CatalogueSelected(catalogue))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({ error: err.error }))),
+      )),
     ));
 
   save$ = createEffect(() => this.actions$.pipe(ofType(fromActionsCatalogue.CatalogueActionTypes.catalogueSave)).pipe(
@@ -44,8 +44,8 @@ export class CatalogueEffects {
       switchMap((response: any) => {
         const message = this.translate.instant('CATALOGUE.CREATED', { name: response.name });
         return of(new fromActionsCatalogue.CatalogueSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({ error: err.error })))
-    ))
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({ error: err.error }))),
+    )),
   ));
 
   update$ = createEffect(
@@ -55,8 +55,8 @@ export class CatalogueEffects {
         switchMap((response: any) => {
           const message = this.translate.instant('CATALOGUE.UPDATED.MESSAGE', { name: response.name });
           return of(new fromActionsCatalogue.CatalogueSaveSuccess({ message }));
-        }), catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({ error: err.error })))
-      ))
+        }), catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({ error: err.error }))),
+      )),
     ));
 
   updateAll$ = createEffect(
@@ -66,8 +66,8 @@ export class CatalogueEffects {
         switchMap(() => {
           const message = this.translate.instant('CATALOGUE.UPDATED.ALL.MESSAGE');
           return of(new fromActionsCatalogue.CatalogueSaveSuccess({ message }));
-        }), catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({ error: err.error })))
-      ))
+        }), catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({ error: err.error }))),
+      )),
     ));
 
   delete$ = createEffect(
@@ -77,8 +77,8 @@ export class CatalogueEffects {
         switchMap(() => {
           const message = this.translate.instant('CATALOGUE.DELETED.MESSAGE', { name: payload.name });
           return of(new fromActionsCatalogue.CatalogueSaveSuccess({ message }));
-        }), catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({ error: err.error })))
-      ))
+        }), catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({ error: err.error }))),
+      )),
     ));
 
   findGroups$ = createEffect(
@@ -86,21 +86,21 @@ export class CatalogueEffects {
       map((action: any) => action.payload),
       switchMap(() => this.treatmentService.getAllTreatmentGroup().pipe(
         switchMap((response: any) => of(new fromActionsCatalogue.FindGroupsSuccess(response))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({ error: err.error }))),
+      )),
     ));
 
   selectedData$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsCatalogue.CatalogueActionTypes.catalogueSelected),
-    tap((data: any) => this.router.navigate([this.translate.currentLang, 'catalogues', data.payload.id]))
+    tap((data: any) => this.router.navigate([this.translate.currentLang, 'catalogues', data.payload.id])),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsCatalogue.CatalogueActionTypes.catalogueSuccess)
+    ofType(fromActionsCatalogue.CatalogueActionTypes.catalogueSuccess),
   ), { dispatch: false });
 
   saveSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsCatalogue.CatalogueActionTypes.catalogueSaveSuccess)
+    ofType(fromActionsCatalogue.CatalogueActionTypes.catalogueSaveSuccess),
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions,

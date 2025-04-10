@@ -49,16 +49,16 @@ import { TotalSummaryItemComponent } from './total-summary-item/total-summary-it
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('dashboard')
+        useClass: TranslateLoaderFactory.forModule('dashboard'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
-    EffectsModule.forFeature([DashboardEffects, ReservationEffects])
+    EffectsModule.forFeature([DashboardEffects, ReservationEffects]),
   ],
   providers: [
     DashboardService,
@@ -69,8 +69,8 @@ import { TotalSummaryItemComponent } from './total-summary-item/total-summary-it
     UserService,
     AdditionalService,
     TrackingService,
-    ColorService
-  ]
+    ColorService,
+  ],
 })
 export class DashModule {
 

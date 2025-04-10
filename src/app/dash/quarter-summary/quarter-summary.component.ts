@@ -8,7 +8,7 @@ import {
   ISummaryTotals,
   MonthSummary,
   SummaryTotals,
-  Total
+  Total,
 } from '../../interfaces/dashboard';
 import { Observable, Subscription } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -35,9 +35,9 @@ import { TotalSummaryComponent } from '../total-summary/total-summary.component'
   templateUrl: './quarter-summary.component.html',
   styleUrls: ['./quarter-summary.component.scss'],
   providers: [
-    { provide: DateAdapter, useClass: YearAdapter }
+    { provide: DateAdapter, useClass: YearAdapter },
   ],
-  imports: [SharedModule, QuarterComponent, TotalSummaryComponent]
+  imports: [SharedModule, QuarterComponent, TotalSummaryComponent],
 })
 export class QuarterSummaryComponent implements OnInit, OnDestroy {
 
@@ -59,7 +59,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
   isHandset$: Observable<boolean> = this.breakpointObserver.observe([
     Breakpoints.XSmall,
     Breakpoints.Small,
-    Breakpoints.Medium
+    Breakpoints.Medium,
   ]).pipe(map(result => result.matches), shareReplay());
 
   private getState: Observable<any>;
@@ -196,11 +196,11 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
           totals.net + value.totalNet);
         totalsWithoutCash =
           new Total(totalsWithoutCash.gross + value.totalWithoutGross, totalsWithoutCash.btw + value.totalWithoutBTW,
-            totalsWithoutCash.net + value.totalWithoutNet);
+          	totalsWithoutCash.net + value.totalWithoutNet);
 
         this.quarterSummaryTotals =
           new SummaryTotals(this.quarterSummaryTotals.income, this.quarterSummaryTotals.expense,
-            this.quarterSummaryTotals.cash, totalsWithoutCash, totals);
+          	this.quarterSummaryTotals.cash, totalsWithoutCash, totals);
       });
     }
   };
@@ -225,7 +225,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     this.quarter = quarter;
     this.isLoading = true;
     this.store.dispatch(
-      new fromActionsDashboard.GetQuarterSummary({ year, quarter })
+      new fromActionsDashboard.GetQuarterSummary({ year, quarter }),
     );
   };
 

@@ -8,9 +8,9 @@ describe('CounterComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [CounterComponent]
-})
-    .compileComponents();
+      imports: [CounterComponent],
+    })
+      .compileComponents();
   });
 
   beforeEach(() => {

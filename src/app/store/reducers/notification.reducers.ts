@@ -19,7 +19,7 @@ export const initialState: State = {
   error: null,
   subErrors: null,
   message: null,
-  isLoading: false
+  isLoading: false,
 };
 
 export const reducer = (state = initialState, action: All): State => {
@@ -31,7 +31,7 @@ export const reducer = (state = initialState, action: All): State => {
         dataDeleted: null,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case NotificationActionTypes.notificationSuccess: {
@@ -40,7 +40,7 @@ export const reducer = (state = initialState, action: All): State => {
         data: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case NotificationActionTypes.notificationReadSuccess: {
@@ -48,7 +48,7 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         errorMessage: null,
         subErrors: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case NotificationActionTypes.notificationFailure: {
@@ -58,7 +58,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: action.payload.error,
         subErrors: action.payload.error?.subErrors,
         message: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case NotificationActionTypes.notificationRead: {
@@ -68,7 +68,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         message: null,
-        isLoading: true
+        isLoading: true,
       };
     }
     case NotificationActionTypes.notificationDelete: {
@@ -79,7 +79,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         message: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case NotificationActionTypes.notificationDeleteSuccess: {
@@ -88,7 +88,7 @@ export const reducer = (state = initialState, action: All): State => {
         dataDeleted: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case NotificationActionTypes.clean: {

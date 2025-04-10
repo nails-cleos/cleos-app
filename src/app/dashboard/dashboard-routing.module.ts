@@ -7,14 +7,14 @@ import { DashboardComponent } from './dashboard.component';
 const routes: Routes = [
   {
     path: '', component: DashboardComponent, canActivate: [authGuard], data: {
-      roles: [Role.roomAdmin]
-    }
-  }
+      roles: [Role.roomAdmin],
+    },
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class DashboardRoutingModule {
 }

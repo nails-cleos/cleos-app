@@ -7,7 +7,7 @@ import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class OfficeService {
 
@@ -20,10 +20,10 @@ export class OfficeService {
     sort: string,
     direction: string,
     page: number,
-    size: number = PAGE_SIZE
+    size: number = PAGE_SIZE,
   ): Observable<IOffice[]> => this.http.get<IOffice[]>(
     toUrl(this.urlV1, 'pages'),
-    { params: createFilter(page, size, sort, direction) }
+    { params: createFilter(page, size, sort, direction) },
   );
 
   getById = (id: string): Observable<IOffice | undefined> => this.http.get<IOffice>(toUrl(this.urlV1, id));

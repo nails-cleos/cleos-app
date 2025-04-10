@@ -13,7 +13,7 @@ import { BaseChartDirective } from 'ng2-charts';
   selector: 'app-card',
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.scss'],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class CardComponent implements OnDestroy {
   @Input() title: string | undefined;
@@ -27,36 +27,36 @@ export class CardComponent implements OnDestroy {
   private isDarkMode: boolean;
 
   constructor(public dialog: MatDialog, private authUserService: AuthUserService) {
-    this.isDarkMode = false;
-    this.authUserServiceSubscription =
+  	this.isDarkMode = false;
+  	this.authUserServiceSubscription =
       this.authUserService.authUser.subscribe(value => this.isDarkMode = value.isDarkMode);
   }
 
   get onClick(): void {
-    if (this.chart) {
-      const chart = createChart(this.chart, this.currency, this.isDarkMode, this.locale, this.timeZone);
-      this.dialog.open(CardChartComponent, {
-        height: '85vh',
-        width: '70vw',
-        data: {
-          chart,
-          title: this.title
-        }
-      });
-    }
-    return;
+  	if (this.chart) {
+  		const chart = createChart(this.chart, this.currency, this.isDarkMode, this.locale, this.timeZone);
+  		this.dialog.open(CardChartComponent, {
+  			height: '85vh',
+  			width: '70vw',
+  			data: {
+  				chart,
+  				title: this.title,
+  			},
+  		});
+  	}
+  	return;
   }
 
   ngOnDestroy(): void {
-    this.authUserServiceSubscription.unsubscribe();
+  	this.authUserServiceSubscription.unsubscribe();
   }
 }
 
 @Component({
-    selector: 'app-card-chart-component',
-    templateUrl: './card-chart-component.html',
-    styleUrls: ['./card-chart-component.scss'],
-  imports: [AppMaterialModule, BaseChartDirective]
+  selector: 'app-card-chart-component',
+  templateUrl: './card-chart-component.html',
+  styleUrls: ['./card-chart-component.scss'],
+  imports: [AppMaterialModule, BaseChartDirective],
 })
 export class CardChartComponent {
   constructor(

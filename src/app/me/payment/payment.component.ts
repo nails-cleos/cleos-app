@@ -15,7 +15,7 @@ import { BackButtonDirective } from '../../directives/back-button.directive';
   selector: 'app-payment',
   templateUrl: './payment.component.html',
   styleUrls: ['./payment.component.scss'],
-  imports: [SharedModule, BackButtonDirective]
+  imports: [SharedModule, BackButtonDirective],
 })
 export class PaymentComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['position', 'description', 'type', 'amount', 'status', 'actions'];
@@ -31,7 +31,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
   private path: any;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private router: Router,
-              translate: TranslateService) {
+    translate: TranslateService) {
     this.getState = this.store.select(selectPaymentState);
     this.language = translate.currentLang;
   }
@@ -57,7 +57,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
   pay = (payment: IPaymentAll): void => {
     if (payment.link || payment.paymentURL) {
       this.store.dispatch(
-        new fromActionsPayment.PaymentSend(payment.link || payment.paymentURL)
+        new fromActionsPayment.PaymentSend(payment.link || payment.paymentURL),
       );
     }
   };
@@ -68,8 +68,8 @@ export class PaymentComponent implements OnInit, OnDestroy {
         id: payment.id, resourceId: this.id,
         path: this.path,
         preferenceId: payment.preferenceId,
-        type: payment.type
-      })
+        type: payment.type,
+      }),
     );
   };
 
@@ -86,7 +86,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
   private getPayments = (): void => {
     if (!this.dataSource) {
       this.store.dispatch(
-        new fromActionsPayment.PaymentFindByResourceId({ id: this.id, path: this.path, redirect: true })
+        new fromActionsPayment.PaymentFindByResourceId({ id: this.id, path: this.path, redirect: true }),
       );
     }
   };

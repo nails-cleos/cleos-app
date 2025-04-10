@@ -10,7 +10,7 @@ import {
   getTimeNumber,
   getWeekDay,
   greaterOrEqualsThanToday,
-  IDuration
+  IDuration,
 } from './dates';
 import { findStateColor } from './theme';
 import { ByWeekday, Frequency, RRule } from 'rrule';
@@ -38,7 +38,7 @@ export class Meta implements IMeta {
   isReservation?: boolean;
 
   constructor(time?: boolean, timeZone?: string, state?: string, route?: string[], professionalId?: string,
-              total?: number, id?: string) {
+    total?: number, id?: string) {
     this.time = time;
     this.timeZone = timeZone;
     this.state = state;
@@ -95,7 +95,7 @@ export class DataEvent implements IDataEvent {
   recurringEvent?: RecurringEvent;
 
   constructor(events: CalendarEvent[], index: number, viewDate: Date, unavailableEventLength: number,
-              process: boolean = false, day?: IDay) {
+    process: boolean = false, day?: IDay) {
     this.calendarEvents = events;
     this.unavailableEventLength = unavailableEventLength;
     this.index = index;
@@ -137,7 +137,7 @@ export class DataEvent implements IDataEvent {
   getOverlapEvent = (
     eventStartDay: Date,
     eventEndDay: Date,
-    professionalId?: string
+    professionalId?: string,
   ): CalendarEvent[] => {
     if (professionalId) {
       return this.calendarEvents.filter(
@@ -150,7 +150,7 @@ export class DataEvent implements IDataEvent {
     return this.calendarEvents.filter(
       (eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
         || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
-        || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
+        || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end),
     );
   };
 
@@ -185,8 +185,8 @@ class RecurringEvent {
   }
 
   addFrequency = (repeat: string, start: Date, id: any, title: string, state: string, path: string,
-                  onEachDate: (date: Date, recurring: any) => void, duration?: IDuration, professionalId?: string,
-                  allDay: boolean = false) => {
+    onEachDate: (date: Date, recurring: any) => void, duration?: IDuration, professionalId?: string,
+    allDay: boolean = false) => {
     this.recurring = [...this.recurring, {
       id: id,
       title: title,
@@ -196,7 +196,7 @@ class RecurringEvent {
       allDay: allDay,
       professionalId: professionalId,
       onEachDate: onEachDate,
-      rule: createRule(repeat, start, this.calendarEnd, start.getDate(), getWeekDay(start.getDay()))
+      rule: createRule(repeat, start, this.calendarEnd, start.getDate(), getWeekDay(start.getDay())),
     }];
   };
 
@@ -205,7 +205,7 @@ class RecurringEvent {
     saturday: IAvailability,
     friday: IAvailability, thursday: IAvailability, wednesday: IAvailability,
     tuesday: IAvailability, monday: IAvailability, isDark: boolean = false,
-    timeZone: string = getCurrentTimeZone()
+    timeZone: string = getCurrentTimeZone(),
   ) => {
     this.recurring = [...this.recurring, {
       availabilityList: [monday, tuesday, wednesday, thursday, friday, saturday, sunday],
@@ -213,10 +213,10 @@ class RecurringEvent {
         freq: RRule.WEEKLY,
         byweekday: [RRule.SU, RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR, RRule.SA],
         dtstart: this.calendarStart,
-        until: this.calendarEnd
+        until: this.calendarEnd,
       }),
       onEachDate: (date: Date, recurring: any) => createRecurringEvent(date, recurring, calendar, notWorking,
-        unavailable, lunch, isDark, timeZone)
+        unavailable, lunch, isDark, timeZone),
     }];
   };
 
@@ -234,7 +234,7 @@ export const newEvent = (
   end?: Date,
   id?: string,
   meta: IMeta = new Meta(),
-  draggable: boolean = false
+  draggable: boolean = false,
 ): CalendarEvent | undefined => {
   if (greaterOrEqualsThanToday(start, meta.timeZone)) {
     return {
@@ -244,7 +244,7 @@ export const newEvent = (
       title,
       draggable,
       color: createEventColor(color, isDarkMode),
-      meta
+      meta,
     } as unknown as CalendarEvent;
   }
   return undefined;
@@ -258,7 +258,7 @@ export const calendarEvent = (
   end?: Date,
   id?: string,
   meta: IMeta = new Meta(),
-  draggable: boolean = false
+  draggable: boolean = false,
 ): CalendarEvent => ({
   id,
   start,
@@ -266,7 +266,7 @@ export const calendarEvent = (
   title,
   draggable,
   color: createEventColor(color, isDarkMode),
-  meta
+  meta,
 } as unknown as CalendarEvent);
 
 export const allDayEvent = (
@@ -275,14 +275,14 @@ export const allDayEvent = (
   start: Date,
   isDarkMode: boolean,
   id?: string,
-  meta: IMeta = new Meta()
+  meta: IMeta = new Meta(),
 ): CalendarEvent => ({
   id,
   start,
   title,
   color: createEventColor(color, isDarkMode),
   meta,
-  allDay: true
+  allDay: true,
 } as unknown as CalendarEvent);
 
 export const monthEvent = (
@@ -294,7 +294,7 @@ export const monthEvent = (
   meta: Meta,
   isDarkMode: boolean,
   allDay: boolean = false,
-  draggable: boolean = false
+  draggable: boolean = false,
 ): CalendarEvent | undefined => ({
   id,
   start,
@@ -303,7 +303,7 @@ export const monthEvent = (
   color: createEventColor(color, isDarkMode),
   meta,
   draggable,
-  allDay
+  allDay,
 } as unknown as CalendarEvent);
 
 
@@ -315,7 +315,7 @@ const createRecurringEvent = (
   unavailable: string,
   lunch: string,
   isDark: boolean,
-  timeZone: string
+  timeZone: string,
 ) => {
   const availability = recurring.availabilityList.find((a: IAvailability) => a?.day === daysOfWeek[date.getDay()]);
   const events = createEvent(date, notWorking, unavailable, lunch, isDark, timeZone, availability);
@@ -323,7 +323,7 @@ const createRecurringEvent = (
 };
 
 const createEvent = (date: Date, notWorking: string, unavailable: string,
-                     lunch: string, isDarkMode: boolean, timeZone: string, it?: IAvailability): CalendarEvent[] => {
+  lunch: string, isDarkMode: boolean, timeZone: string, it?: IAvailability): CalendarEvent[] => {
   let events: CalendarEvent[] = [];
   const newDate = dateToUTC(createNewDate(date), timeZone);
   if (!it) {
@@ -368,7 +368,7 @@ const createEvent = (date: Date, notWorking: string, unavailable: string,
 };
 
 const createLunchEvent = (it: IAvailability, date: Date, unavailable: string, lunch: string,
-                          isDarkMode: boolean, timeZone: string): CalendarEvent | undefined => {
+  isDarkMode: boolean, timeZone: string): CalendarEvent | undefined => {
   const now = getNowTimeZone();
   const nowTime = getTimeNumber(now)!;
   let hour = nowTime.hour;
@@ -404,8 +404,8 @@ const createLunchEvent = (it: IAvailability, date: Date, unavailable: string, lu
 };
 
 const lunchEvent = (hour: number, lunchStartHour: number, minute: number, lunchStartMinute: number,
-                    lunchEndHour: number, lunchEndMinute: number, date: Date, lunch: string, isDarkMode: boolean,
-                    timeZone: string): CalendarEvent | undefined => {
+  lunchEndHour: number, lunchEndMinute: number, date: Date, lunch: string, isDarkMode: boolean,
+  timeZone: string): CalendarEvent | undefined => {
   let lunchHour;
   let lunchMinute;
   if (hour < lunchStartHour || (hour === lunchStartHour && minute < lunchStartMinute)) {
@@ -451,8 +451,10 @@ const createRule = (repeat: string, dtstart: Date, until: Date, monthDay: number
     bymonthday,
     byweekday,
     dtstart,
-    until
+    until,
   });
 };
 
-export const createBullet = (name: string): string => `<div class='detail'>\uD83D\uDC85\uD83C\uDFFB&nbsp;${ name }</div>`;
+export const createBullet = (
+  name: string,
+): string => `<div class='detail'>\uD83D\uDC85\uD83C\uDFFB&nbsp;${ name }</div>`;

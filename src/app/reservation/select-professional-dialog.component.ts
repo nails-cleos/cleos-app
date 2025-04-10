@@ -4,7 +4,7 @@ import {
   UntypedFormBuilder,
   UntypedFormControl,
   UntypedFormGroup,
-  Validators
+  Validators,
 } from '@angular/forms';
 import { IUser } from '../interfaces/user';
 import { Observable } from 'rxjs';
@@ -18,14 +18,14 @@ import { AppMaterialModule } from '../util/app-material.module';
 @Component({
   selector: 'app-select-professional-dialog-component',
   templateUrl: './select-professional-dialog.component.html',
-  imports: [AppMaterialModule, AsyncPipe, TranslatePipe, ReactiveFormsModule]
+  imports: [AppMaterialModule, AsyncPipe, TranslatePipe, ReactiveFormsModule],
 })
 export class SelectProfessionalDialogComponent implements OnInit {
   professionalForm!: UntypedFormGroup;
   professionals?: IUser[];
   filteredProfessional?: Observable<IUser[] | undefined>;
   professional: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch
+    Validators.required, requireMatch,
   ]);
 
   constructor(public dialogRef: MatDialogRef<SelectProfessionalDialogComponent>,
@@ -56,7 +56,7 @@ export class SelectProfessionalDialogComponent implements OnInit {
 
   private createForm = (): void => {
     this.professionalForm = this.formBuilder.group({
-      professional: this.professional
+      professional: this.professional,
     });
   };
 
@@ -65,7 +65,7 @@ export class SelectProfessionalDialogComponent implements OnInit {
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
       map(name => name ? this.filterProfessional(
-        name) : this.professionals ? this.professionals.slice() : this.professionals)
+        name) : this.professionals ? this.professionals.slice() : this.professionals),
     );
   };
 

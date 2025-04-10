@@ -8,24 +8,24 @@ import { OfficeListComponent } from './list/office-list.component';
 const routes: Routes = [
   {
     path: '', component: OfficeListComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin]
-    }
+      roles: [Role.admin],
+    },
   },
   {
     path: 'add', component: OfficeComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin]
-    }
+      roles: [Role.admin],
+    },
   },
   {
     path: ':id', component: OfficeComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin]
-    }
-  }
+      roles: [Role.admin],
+    },
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class OfficeRoutingModule {
 }

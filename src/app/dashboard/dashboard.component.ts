@@ -19,7 +19,7 @@ import {
   newDate,
   newDateTimestamp,
   startOfPeriod,
-  subPeriod
+  subPeriod,
 } from '../util/dates';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
@@ -45,7 +45,7 @@ import { DataEvent, IDataEvent } from '../util/event';
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  imports: [SharedModule, CalendarModule, DayViewSchedulerComponent, CounterComponent]
+  imports: [SharedModule, CalendarModule, DayViewSchedulerComponent, CounterComponent],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild('picker') picker: any;
@@ -133,7 +133,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private static getColor = (
     professional: IProfessionalEvent,
-    isDark: boolean
+    isDark: boolean,
   ): EventColor => getProfessionalColor(isDark, professional.darkColor, professional.lightColor);
 
   ngOnInit(): void {
@@ -274,41 +274,41 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     if (!calendarEvent.actions) {
       calendarEvent.actions = [{
-        label: `<div class="mat-raised-button"><div class="custom-material-icons material-icons">visibility</div>&nbsp;${ this.viewText }</div>`,
+        label: this.createLabel('visibility', this.viewText),
         onClick: ({ event }: { event: CalendarEvent }): void => {
           this.eventClick(event, 'VIEW');
-        }
+        },
       }, {
-        label: `<div class="mat-raised-button"><div class="custom-material-icons material-icons">read_more</div>&nbsp;${ this.moreText }</div>`,
+        label: this.createLabel('read_more', this.moreText),
         onClick: ({ event }: { event: CalendarEvent }): void => {
           this.eventClick(event, 'MORE_INFO');
-        }
+        },
       }];
 
       if (showApprove) {
         calendarEvent.actions = [{
-          label: `<div class="mat-raised-button"><div class="custom-material-icons material-icons">done</div>&nbsp;${ this.approveText }</div>`,
+          label: this.createLabel('check_circle', this.approveText),
           onClick: ({ event }: { event: CalendarEvent }): void => {
             this.eventClick(event, 'APPROVE');
-          }
+          },
         }, ...calendarEvent.actions];
       }
 
       if (showStart) {
         calendarEvent.actions = [{
-          label: `<div class="mat-raised-button"><div class="custom-material-icons material-icons">play_arrow</div>&nbsp;${ this.startText }</div>`,
+          label: this.createLabel('play_arrow', this.startText),
           onClick: ({ event }: { event: CalendarEvent }): void => {
             this.eventClick(event, 'START');
-          }
+          },
         }, ...calendarEvent.actions];
       }
 
       if (showComplete) {
         calendarEvent.actions = [{
-          label: `<div class="mat-raised-button"><div class="custom-material-icons material-icons">done_all</div>&nbsp;${ this.completeText }</div>`,
+          label: this.createLabel('done_all', this.completeText),
           onClick: ({ event }: { event: CalendarEvent }): void => {
             this.eventClick(event, 'COMPLETE');
-          }
+          },
         }, ...calendarEvent.actions];
       }
     }
@@ -328,7 +328,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       reservation.professionalId = professionalId;
     }
     this.store.dispatch(
-      new fromActionsDashboard.UpdateEvent(reservation)
+      new fromActionsDashboard.UpdateEvent(reservation),
     );
   };
 
@@ -341,10 +341,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private dateOrViewChanged = (): void => {
     this.prevBtnDisabled = !this.dateIsValid(
-      endOfPeriod('day', subPeriod('day', this.viewDate, 1))
+      endOfPeriod('day', subPeriod('day', this.viewDate, 1)),
     );
     this.nextBtnDisabled = !this.dateIsValid(
-      startOfPeriod('day', addPeriod('day', this.viewDate, 1))
+      startOfPeriod('day', addPeriod('day', this.viewDate, 1)),
     );
     if (this.viewDate < this.today) {
       this.changeDate(this.today);
@@ -377,7 +377,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
             reservations++;
             seconds += Math.abs(it.end - it.start);
           }
-          const draggable = ![States.completed, States.started, States.cancelled].some(state => state === it.state);
+          const draggable = ![States.completed, States.started, States.cancelled]
+            .some(state => state === it.state);
           const start = newDateTimestamp(it.start);
           const end = it.end ? newDateTimestamp(it.end) : null;
           const started = it.started ? newDateTimestamp(it.started) : null;
@@ -390,9 +391,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
               time: true,
               customerId: it.customerId,
               state: it.state,
-              viewDate: this.viewDate
+              viewDate: this.viewDate,
             },
-            resizable: { beforeStart: true, afterEnd: true }
+            resizable: { beforeStart: true, afterEnd: true },
           } as CalendarEvent;
 
           this.calendar.addEvent(this.createTitle(event));
@@ -403,7 +404,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
         professionalEvent.calendarSummary.unavailable?.forEach(it => {
           const start = newDateTimestamp(it.start);
-          const title = it.duration ? it.title : `${ this.translate.instant('COMMON.ALL_DAY.CHECK') } - ${ it.title }`;
+          const title = it.duration ?
+            it.title : `${ this.translate.instant('COMMON.ALL_DAY.CHECK') } - ${ it.title }`;
 
           let path = 'unavailable/';
           if (it.type === 'BLOCK_AGENDA') {
@@ -413,13 +415,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
             const end = getEnd(start, it.duration);
             const event = {
               start, end, title: it.title, id: it.unavailableId, color: professional.color, draggable: true,
-              meta: { professional, time: true }, resizable: { beforeStart: true, afterEnd: true }
+              meta: { professional, time: true }, resizable: { beforeStart: true, afterEnd: true },
             } as CalendarEvent;
 
             this.calendar.addEvent(event);
           } else {
-            this.calendar.recurringEvent?.addFrequency(it.repeat, start, it.unavailableId, title, 'UNAVAILABLE', path,
-              (date, recurring) => this.createUnavailableEvent(date, recurring, professional, darkMode),
+            this.calendar.recurringEvent?.addFrequency(it.repeat, start, it.unavailableId, title, 'UNAVAILABLE',
+              path, (date, recurring) => this.createUnavailableEvent(date, recurring, professional, darkMode),
               getDurationOrUndefined(it.duration));
           }
         });
@@ -427,6 +429,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.calendar.recurringEvent?.execute();
     }
   };
+
+  private createLabel = (icon: string, text: string) => `<div class="mat-raised-button">
+                   <div class="custom-material-icons material-icons">${ icon }</div>&nbsp;${ text }
+               </div>`;
 
   private createUnavailableEvent = (start: Date, recurring: any, professional: Professional, darkMode: boolean) => {
     const end = getEndWithDuration(start, recurring.duration);
@@ -439,7 +445,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       color: createEventColor(color, darkMode),
       draggable: true,
       meta: { professional, time: true },
-      resizable: { beforeStart: true, afterEnd: true }
+      resizable: { beforeStart: true, afterEnd: true },
     } as CalendarEvent;
     this.calendar.addEvent(event);
   };
@@ -449,7 +455,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private getEvents = (): void => {
     this.calendar.resetEvents();
     this.store.dispatch(
-      new fromActionsDashboard.GetDashboardEvents(this.viewDate)
+      new fromActionsDashboard.GetDashboardEvents(this.viewDate),
     );
   };
 
@@ -462,7 +468,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       case 'APPROVE':
         this.calendar.filterEvent(event);
         this.store.dispatch(
-          new fromActionsReservation.Approve(reservationId)
+          new fromActionsReservation.Approve(reservationId),
         );
         event.meta.state = States.approved;
         setTimeout(() => this.calendar.addEvent(event), 1);
@@ -470,7 +476,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       case 'START':
         this.calendar.filterEvent(event);
         this.store.dispatch(
-          new fromActionsReservation.Start(reservationId)
+          new fromActionsReservation.Start(reservationId),
         );
         event.meta.state = States.started;
         event.meta.started = dateToTimestamp();

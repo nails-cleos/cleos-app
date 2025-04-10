@@ -19,14 +19,14 @@ export class AdditionalService {
     sort: string,
     direction: string,
     page: number,
-    size: number = PAGE_SIZE
+    size: number = PAGE_SIZE,
   ): Observable<IAdditional[]> => this.http.get<IAdditional[]>(
-    toUrl(this.urlV1, 'pages'), { params: createFilter(page, size, sort, direction) }
+    toUrl(this.urlV1, 'pages'), { params: createFilter(page, size, sort, direction) },
   );
 
   getAllAdditional = (roomId: string, groupId: string): Observable<IAdditional[]> =>
     this.http.get<IAdditional[]>(toUrl(this.urlV1, 'groups'),
-      { params: new HttpParams().set('roomId', roomId).set('groupId', groupId) }
+      { params: new HttpParams().set('roomId', roomId).set('groupId', groupId) },
     );
 
   getAdditionalList = (): Observable<IAdditionalAll[]> => this.http.get<IAdditionalAll[]>(this.urlV1);
@@ -38,10 +38,10 @@ export class AdditionalService {
   delete = (id: string): Observable<IAdditional> => this.http.delete<IAdditional>(toUrl(this.urlV1, id));
 
   update = (additional: IAdditional): Observable<IAdditional> => this.http.patch<IAdditional>(
-    toUrl(this.urlV1, additional.id!), additional
+    toUrl(this.urlV1, additional.id!), additional,
   );
 
   updateSort = (additionalList: ISorted[]): Observable<IAdditionalAll[]> => this.http.patch<IAdditionalAll[]>(
-    this.urlV1, additionalList
+    this.urlV1, additionalList,
   );
 }

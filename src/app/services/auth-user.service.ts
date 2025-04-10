@@ -45,7 +45,7 @@ const initialAuthUser: IAuthUser = {
   professionalId: undefined,
   customerId: undefined,
   userId: undefined,
-  theme: undefined
+  theme: undefined,
 };
 
 @Injectable()
@@ -79,7 +79,7 @@ export class AuthUserService {
         professionalId: isProfessional ? user.id : undefined,
         customerId: isCustomer ? user.id : undefined,
         userId: user.id,
-        theme: user.theme
+        theme: user.theme,
       };
     }
     this.authUser.next(authUser);

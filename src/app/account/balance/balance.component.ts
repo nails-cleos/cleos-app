@@ -6,7 +6,7 @@ import { SharedModule } from '../../shared/shared.module';
   selector: 'app-balance',
   templateUrl: './balance.component.html',
   styleUrls: ['./balance.component.scss'],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class BalanceComponent {
   @Input() account?: IAccountAll;
@@ -16,12 +16,12 @@ export class BalanceComponent {
   @Input() language!: string;
 
   get balancePercentage(): number {
-    if (this.account) {
-      if (this.account.balance > 2000) {
-        return 100;
-      }
-      return this.account.balance * 100 / 2000;
-    }
-    return 0;
+  	if (this.account) {
+  		if (this.account.balance > 2000) {
+  			return 100;
+  		}
+  		return this.account.balance * 100 / 2000;
+  	}
+  	return 0;
   }
 }

@@ -18,10 +18,10 @@ export class CurrencyService {
     sort: string,
     direction: string,
     page: number,
-    size: number = PAGE_SIZE
+    size: number = PAGE_SIZE,
   ): Observable<ICurrency[]> => this.http.get<ICurrency[]>(
     toUrl(this.urlV1, 'pages'),
-    { params: createFilter(page, size, sort, direction) }
+    { params: createFilter(page, size, sort, direction) },
   );
 
   getAllCurrency = (): Observable<ICurrency[]> => this.http.get<ICurrency[]>(this.urlV1);
@@ -33,6 +33,6 @@ export class CurrencyService {
   delete = (id: string): Observable<ICurrency> => this.http.delete<ICurrency>(toUrl(this.urlV1, id));
 
   update = (currency: ICurrency): Observable<ICurrency> => this.http.patch<ICurrency>(
-    toUrl(this.urlV1, currency.id!), currency
+    toUrl(this.urlV1, currency.id!), currency,
   );
 }

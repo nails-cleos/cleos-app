@@ -12,54 +12,54 @@ import { CustomersComponent } from './me/customers/customers.component';
 const routes: Routes = [
   {
     path: '', component: RoomsComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager]
-    }
+      roles: [Role.admin, Role.manager],
+    },
   },
   {
     path: 'add', component: RoomComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager]
-    }
+      roles: [Role.admin, Role.manager],
+    },
   },
   {
     path: ':id/services', component: AddServiceComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager]
-    }
+      roles: [Role.admin, Role.manager],
+    },
   },
   {
     path: ':id/expenses', component: ExpensesComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager]
-    }
+      roles: [Role.admin, Role.manager],
+    },
   },
   {
     path: ':id/expenses/add', component: ExpenseComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager]
-    }
+      roles: [Role.admin, Role.manager],
+    },
   },
   {
     path: ':id/expenses/:expenseId', component: ExpenseComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager]
-    }
+      roles: [Role.admin, Role.manager],
+    },
   },
   {
     path: 'me/:id', component: RoomComponent, canActivate: [authGuard], data: {
-      roles: [Role.professional, Role.manager] // TODO is not working
-    }
+      roles: [Role.professional, Role.manager], // TODO is not working
+    },
   },
   {
     path: ':id', component: RoomComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager]
-    }
+      roles: [Role.admin, Role.manager],
+    },
   },
   {
     path: ':id/customers', component: CustomersComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager]
-    }
-  }
+      roles: [Role.admin, Role.manager],
+    },
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class RoomRoutingModule {
 }

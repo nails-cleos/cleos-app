@@ -22,9 +22,9 @@ import { RouterOutlet } from '@angular/router';
   styleUrls: ['./app.component.scss'],
   providers: [{
     provide: DateAdapter,
-    useClass: YearMonthDateAdapter
+    useClass: YearMonthDateAdapter,
   }],
-  imports: [RouterOutlet]
+  imports: [RouterOutlet],
 })
 export class AppComponent implements OnInit, OnDestroy {
 

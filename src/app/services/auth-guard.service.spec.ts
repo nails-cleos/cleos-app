@@ -18,8 +18,8 @@ beforeEach(() => {
       { provide: MatSnackBar, useValue: {} },
       { provide: Router, useValue: { navigate: jasmine.createSpy('navigate') } },
       { provide: Store, useValue: { select: () => of({ user: { authorities: [{ authority: 'ROLE_USER' }] } }) } },
-      { provide: TranslateService, useValue: { currentLang: 'en' } }
-    ]
+      { provide: TranslateService, useValue: { currentLang: 'en' } },
+    ],
   });
   injector = getTestBed();
   service = injector.inject(PermissionsService);

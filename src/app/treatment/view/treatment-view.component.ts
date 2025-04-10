@@ -15,7 +15,7 @@ import { BackButtonDirective } from '../../directives/back-button.directive';
   selector: 'app-treatment-view',
   templateUrl: './treatment-view.component.html',
   styleUrls: ['./treatment-view.component.scss'],
-  imports: [SharedModule, DurationTimePipe, TreatmentTableComponent, BackButtonDirective]
+  imports: [SharedModule, DurationTimePipe, TreatmentTableComponent, BackButtonDirective],
 })
 export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy {
   group?: ITreatmentGroup;
@@ -31,7 +31,7 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
 
   get edit(): void {
     return this.store.dispatch(
-      new fromActionsTreatment.TreatmentSelected({ treatment: this.group, path: 'edit' })
+      new fromActionsTreatment.TreatmentSelected({ treatment: this.group, path: 'edit' }),
     );
   }
 
@@ -50,7 +50,7 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
   getHistory = (treatmentId?: string): void => {
     this.treatmentId = treatmentId;
     this.store.dispatch(
-      new fromActionsTreatment.TreatmentHistory({ id: this.group?.id, treatmentId })
+      new fromActionsTreatment.TreatmentHistory({ id: this.group?.id, treatmentId }),
     );
   };
 
@@ -58,7 +58,7 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
     if (!this.group) {
       const id = this.route.snapshot.paramMap.get('id');
       this.store.dispatch(
-        new fromActionsTreatment.TreatmentFind({ id, path: 'view' })
+        new fromActionsTreatment.TreatmentFind({ id, path: 'view' }),
       );
     }
   };
@@ -73,7 +73,7 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
           description: state.selected.description,
           priceFrom: state.priceFrom,
           colors: state.selected.colors,
-          treatments
+          treatments,
         } as ITreatmentGroup;
         this.colors = state.selected.colors;
       }

@@ -17,40 +17,40 @@ export class NoteEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.noteService.getById(payload).pipe(
       switchMap((note: any) => of(new fromActionsNote.NoteSelected(note))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error }))),
+    )),
   ));
 
   save$ = createEffect(() => this.actions.pipe(ofType(fromActionsNote.NoteActionTypes.noteSave)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.noteService.add(payload).pipe(
       switchMap((response: any) => this.success('CREATED', response.description)),
-      catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error }))),
+    )),
   ));
 
   update = createEffect(() => this.actions.pipe(ofType(fromActionsNote.NoteActionTypes.noteUpdate)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.noteService.update(payload).pipe(
       switchMap((response: any) => this.success('UPDATED', response.description)),
-      catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error }))),
+    )),
   ));
 
   delete$ = createEffect(() => this.actions.pipe(ofType(fromActionsNote.NoteActionTypes.noteDelete)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.noteService.delete(payload.id).pipe(
       switchMap(() => this.success('DELETED', payload.description)),
-      catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error }))),
+    )),
   ));
 
   complete$ = createEffect(() => this.actions.pipe(ofType(fromActionsNote.NoteActionTypes.noteComplete)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.noteService.complete(payload).pipe(
       switchMap((response: any) => this.success('COMPLETED', response.description)),
-      catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error }))),
+    )),
   ));
 
   getAllProfessional$ = createEffect(
@@ -58,21 +58,21 @@ export class NoteEffects {
       map((action: any) => action.payload),
       switchMap(() => this.userService.getAllProfessionals().pipe(
         switchMap((response: any) => of(new fromActionsNote.NoteSuccess(response))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error }))),
+      )),
     ));
 
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(fromActionsNote.NoteActionTypes.noteSelected),
-    tap((data: any) => this.router.navigate([this.translate.currentLang, 'notes', data.payload.id]))
+    tap((data: any) => this.router.navigate([this.translate.currentLang, 'notes', data.payload.id])),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(fromActionsNote.NoteActionTypes.noteSuccess)
+    ofType(fromActionsNote.NoteActionTypes.noteSuccess),
   ), { dispatch: false });
 
   saveSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(fromActionsNote.NoteActionTypes.noteSaveSuccess)
+    ofType(fromActionsNote.NoteActionTypes.noteSaveSuccess),
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions: Actions,

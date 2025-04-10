@@ -6,7 +6,7 @@ import { ShortcutRoutingModule } from './shortcut-routing.module';
   imports: [
     ShortcutComponent,
     ShortcutRoutingModule,
-  ]
+  ],
 })
 export class ShortcutModule {
 }

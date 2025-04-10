@@ -9,29 +9,29 @@ import { AdditionalSortingComponent } from './sorting/additional-sorting.compone
 const routes: Routes = [
   {
     path: '', component: AdditionalListComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin]
-    }
+      roles: [Role.admin],
+    },
   },
   {
     path: 'sorting', component: AdditionalSortingComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin]
-    }
+      roles: [Role.admin],
+    },
   },
   {
     path: 'add', component: AdditionalComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin]
-    }
+      roles: [Role.admin],
+    },
   },
   {
     path: ':id', component: AdditionalComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin]
-    }
-  }
+      roles: [Role.admin],
+    },
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class AdditionalRoutingModule {
 }

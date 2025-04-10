@@ -40,7 +40,7 @@ export class ItemSorting implements ISorting {
   selector: 'app-drag-drop-sorting',
   templateUrl: './drag-drop-sorting.component.html',
   styleUrls: ['./drag-drop-sorting.component.scss'],
-  imports: [SharedModule, BackButtonDirective]
+  imports: [SharedModule, BackButtonDirective],
 })
 export class DragDropSortingComponent {
   @Input() title!: string;
@@ -48,8 +48,8 @@ export class DragDropSortingComponent {
   @Output() sorted = new EventEmitter<Sorted[]>();
 
   get sort(): void {
-    const sorted = this.items.map((item, i) => new Sorted(i + 1, item.key));
-    return this.sorted.emit(sorted);
+  	const sorted = this.items.map((item, i) => new Sorted(i + 1, item.key));
+  	return this.sorted.emit(sorted);
   }
 
   drop = (event: CdkDragDrop<ISorting[]>): void => moveItemInArray(this.items, event.previousIndex, event.currentIndex);

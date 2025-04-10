@@ -27,7 +27,7 @@ import { SharedModule } from '../shared/shared.module';
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.scss'],
   animations: [fade, bottomTop, colorChange, colorChangeChild],
-  imports: [SharedModule, RouterOutlet, RouterLinkActive]
+  imports: [SharedModule, RouterOutlet, RouterLinkActive],
 })
 export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('bodySection', { static: true }) bodySection?: ElementRef<HTMLElement>;
@@ -60,83 +60,83 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   language: string = this.translate.currentLang;
   showArrow: boolean = false;
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
-    .pipe(map(result => result.matches), shareReplay());
+  	.pipe(map(result => result.matches), shareReplay());
 
   private authUserServiceSubscription: Subscription = user(this.auth).subscribe(response => {
-    response?.getIdToken().then(idToken => this.tokenService.token = idToken);
-    this.isAuthenticated = response !== null;
+  	response?.getIdToken().then(idToken => this.tokenService.token = idToken);
+  	this.isAuthenticated = response !== null;
   });
   private mainContentSubscription: Subscription = this.mainContent.data$.subscribe(it => {
-    this.showLoader = it.showPreload;
-    this.navigationState.next(it.navigationHeader);
-    this.showArrow = it.showArrow;
+  	this.showLoader = it.showPreload;
+  	this.navigationState.next(it.navigationHeader);
+  	this.showArrow = it.showArrow;
   });
 
   private navigationObserve?: IntersectionObserver;
 
   constructor() {
-    this.authUserService.updateMode(this.isDarkMode);
+  	this.authUserService.updateMode(this.isDarkMode);
   }
 
   get changeTheme(): void {
-    this.isDarkMode = !this.isDarkMode;
-    const theme: Theme = getThemeName(this.isDarkMode);
-    this.resetTheme(theme);
-    if (this.isAuthenticated) {
-      const authenticatedUser: IUser = new User();
-      authenticatedUser.theme = theme;
-      const redirectUrl = this.router.url;
-      const message = this.translate.instant(
-        `COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode.toString().toUpperCase() }`);
-      this.store.dispatch(
-        new fromActionsMain.UpdateUser({ user: authenticatedUser, redirectUrl, message })
-      );
-    }
-    return;
+  	this.isDarkMode = !this.isDarkMode;
+  	const theme: Theme = getThemeName(this.isDarkMode);
+  	this.resetTheme(theme);
+  	if (this.isAuthenticated) {
+  		const authenticatedUser: IUser = new User();
+  		authenticatedUser.theme = theme;
+  		const redirectUrl = this.router.url;
+  		const message = this.translate.instant(
+  			`COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode.toString().toUpperCase() }`);
+  		this.store.dispatch(
+  			new fromActionsMain.UpdateUser({ user: authenticatedUser, redirectUrl, message }),
+  		);
+  	}
+  	return;
   }
 
   get redirect(): void {
-    return this.store.dispatch(
-      new fromActionsLogin.Redirect()
-    );
+  	return this.store.dispatch(
+  		new fromActionsLogin.Redirect(),
+  	);
   }
 
   get treatment(): void {
-    goTo('home');
-    this.router.navigate([this.translate.currentLang, 'biab', 'treatment']);
-    return;
+  	goTo('home');
+  	this.router.navigate([this.translate.currentLang, 'biab', 'treatment']);
+  	return;
   }
 
   ngOnInit(): void {
-    this.authUserService.cookieConsent(this.translate);
-    this.language = this.navigationService.attachLang(this.route.snapshot.paramMap.get('lang'));
+  	this.authUserService.cookieConsent(this.translate);
+  	this.language = this.navigationService.attachLang(this.route.snapshot.paramMap.get('lang'));
   }
 
   ngAfterViewInit(): void {
-    this.navigationAnimation();
+  	this.navigationAnimation();
   }
 
   ngOnDestroy(): void {
-    this.authUserServiceSubscription.unsubscribe();
-    this.mainContentSubscription.unsubscribe();
+  	this.authUserServiceSubscription.unsubscribe();
+  	this.mainContentSubscription.unsubscribe();
   }
 
   scrollToElement = (element: HTMLElement | string): void => {
-    this.router.navigate(['/', this.language]).then(() => setTimeout(() => {
-      this.navigationAnimation();
-      goTo(element);
-    }, 100));
+  	this.router.navigate(['/', this.language]).then(() => setTimeout(() => {
+  		this.navigationAnimation();
+  		goTo(element);
+  	}, 100));
   };
 
   private resetTheme = (theme?: Theme): void => {
-    this.cssClass = resetTheme(theme, this.cssClass, this.overlayContainer, this.cookieService, this.themeService);
-    this.authUserService.updateMode(isDarkMode(theme));
-    this.backgroundColor = this.isDarkMode ? '126, 119, 105' : '169, 163, 151';
+  	this.cssClass = resetTheme(theme, this.cssClass, this.overlayContainer, this.cookieService, this.themeService);
+  	this.authUserService.updateMode(isDarkMode(theme));
+  	this.backgroundColor = this.isDarkMode ? '126, 119, 105' : '169, 163, 151';
   };
 
   private navigationAnimation = (): void => {
-    this.navigationObserve?.disconnect();
-    this.firstSection = window.document.getElementById('slider');
-    this.navigationObserve = observeElement(this.navigationState, this.firstSection, true, 0.1);
+  	this.navigationObserve?.disconnect();
+  	this.firstSection = window.document.getElementById('slider');
+  	this.navigationObserve = observeElement(this.navigationState, this.firstSection, true, 0.1);
   };
 }

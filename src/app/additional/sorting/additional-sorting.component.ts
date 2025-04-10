@@ -3,7 +3,7 @@ import {
   DragDropSortingComponent,
   ISorted,
   ISorting,
-  ItemSorting
+  ItemSorting,
 } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -16,7 +16,7 @@ import { SharedModule } from '../../shared/shared.module';
   selector: 'app-sorting',
   templateUrl: './additional-sorting.component.html',
   styleUrls: ['./additional-sorting.component.scss'],
-  imports: [SharedModule, DragDropSortingComponent]
+  imports: [SharedModule, DragDropSortingComponent],
 })
 export class AdditionalSortingComponent implements OnInit, OnDestroy {
 
@@ -52,7 +52,7 @@ export class AdditionalSortingComponent implements OnInit, OnDestroy {
         this.getAdditionalList();
       }
       this.items = stateValue?.data?.map((iAdditionalAll: IAdditionalAll) => new ItemSorting(
-        iAdditionalAll.id, iAdditionalAll.name, iAdditionalAll.order)
+        iAdditionalAll.id, iAdditionalAll.name, iAdditionalAll.order),
       );
     });
   };

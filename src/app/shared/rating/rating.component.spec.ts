@@ -8,9 +8,9 @@ describe('RatingComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [RatingComponent]
-})
-    .compileComponents();
+      imports: [RatingComponent],
+    })
+      .compileComponents();
   });
 
   beforeEach(() => {

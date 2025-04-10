@@ -15,16 +15,16 @@ export class PaymentEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.paymentService.getById(payload).pipe(
       switchMap((payment: any) => of(new fromActionsPayment.PaymentSelected({ payment, redirect: false }))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error }))),
+    )),
   ));
 
   options$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentOptions)).pipe(
     map((action: any) => action.payload),
     switchMap(() => this.paymentService.paymentOptions().pipe(
       switchMap((payment: any) => of(new fromActionsPayment.PaymentSuccess(payment))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error }))),
+    )),
   ));
 
   findByReservation$ = createEffect(
@@ -33,8 +33,8 @@ export class PaymentEffects {
       switchMap((payload: any) => this.paymentService.findByResourceId(payload.id, payload.path).pipe(
         switchMap(
           (payment: any) => of(new fromActionsPayment.PaymentSelected({ payment, redirect: payload.redirect }))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error }))),
+      )),
     ));
 
   createOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentCreate)).pipe(
@@ -43,8 +43,8 @@ export class PaymentEffects {
       switchMap((payment: any) => {
         return of(new fromActionsPayment.PaymentSend(payment.link || payment.paymentURL));
       }),
-      catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error }))),
+    )),
   ));
 
   save$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentSave)).pipe(
@@ -56,20 +56,20 @@ export class PaymentEffects {
           switch (response.status) {
             case 'approved':
               return of(new fromActionsPayment.PaymentSaveSuccess({
-                message: this.translate.instant('COMMON.PAYMENT.SUCCESS'), paths
+                message: this.translate.instant('COMMON.PAYMENT.SUCCESS'), paths,
               }));
             case 'pending':
               return of(new fromActionsPayment.PaymentSaveSuccess({
-                message: this.translate.instant('COMMON.PAYMENT.PENDING'), paths
+                message: this.translate.instant('COMMON.PAYMENT.PENDING'), paths,
               }));
             default:
               const message = this.translate.instant('ME.PAYMENT.ERROR', { reason: response.message });
               return of(new fromActionsPayment.PaymentNotComplete({
-                message, paths
+                message, paths,
               }));
           }
-        }), catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
-      ))
+        }), catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error }))),
+      )),
   ));
 
   update$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentUpdate)).pipe(
@@ -77,10 +77,10 @@ export class PaymentEffects {
     switchMap((payload: any) => this.paymentService.update(payload).pipe(
       switchMap(() => of(new fromActionsPayment.PaymentSaveSuccess({
         message: this.translate.instant('COMMON.PAYMENT.SUCCESS'),
-        reload: true
+        reload: true,
       }))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error }))),
+    )),
   ));
 
   updateLink$ = createEffect(
@@ -88,8 +88,8 @@ export class PaymentEffects {
       map((action: any) => action.payload),
       switchMap((payload: any) => this.paymentService.updateLink(payload.id, payload.payment).pipe(
         switchMap((payment: any) => of(new fromActionsPayment.PaymentSend(payment.link || payment.paymentURL))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error }))),
+      )),
     ));
 
   recreate$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentRecreate)).pipe(
@@ -97,8 +97,8 @@ export class PaymentEffects {
     switchMap((payload: any) => this.paymentService.recreate(payload.id, payload.paymentType).pipe(
       switchMap(
         () => of(new fromActionsPayment.PaymentSaveSuccess({ message: this.translate.instant('PAYMENT.RECREATE') }))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error }))),
+    )),
   ));
 
   notify$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentNotify)).pipe(
@@ -106,21 +106,23 @@ export class PaymentEffects {
     switchMap(
       (payload: any) => this.paymentService.notify(payload.id, payload.path, payload.resourceId, payload.preferenceId,
         payload.type).pipe(switchMap((response: any) => {
-          switch (response.status) {
-            case 'approved':
-              return of(new fromActionsPayment.PaymentSaveSuccess({
-                message: this.translate.instant('COMMON.PAYMENT.SUCCESS'),
-                reload: true
-              }));
-            case 'pending':
-              return of(
-                new fromActionsPayment.PaymentSaveSuccess({ message: this.translate.instant('COMMON.PAYMENT.PENDING') }));
-            default:
-              const message = this.translate.instant('COMMON.PAYMENT.ERROR', { reason: response.message });
-              return of(new fromActionsPayment.PaymentNotComplete({ message }));
-          }
-        }), catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error })))
-      ))
+        switch (response.status) {
+          case 'approved':
+            return of(new fromActionsPayment.PaymentSaveSuccess({
+              message: this.translate.instant('COMMON.PAYMENT.SUCCESS'),
+              reload: true,
+            }));
+          case 'pending':
+            return of(
+              new fromActionsPayment.PaymentSaveSuccess(
+                { message: this.translate.instant('COMMON.PAYMENT.PENDING') }),
+            );
+          default:
+            const message = this.translate.instant('COMMON.PAYMENT.ERROR', { reason: response.message });
+            return of(new fromActionsPayment.PaymentNotComplete({ message }));
+        }
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error }))),
+      )),
   ));
 
   selectedData$ = createEffect(() => this.actions$.pipe(
@@ -136,16 +138,16 @@ export class PaymentEffects {
             payment[0].reservationId || payment[0].reservation.id, 'payment']);
         }
       }
-    })
+    }),
   ), { dispatch: false });
 
   send$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsPayment.PaymentActionTypes.paymentSend),
-    tap((data: any) => window.open(data.payload, '_self'))
+    tap((data: any) => window.open(data.payload, '_self')),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsPayment.PaymentActionTypes.paymentSuccess)
+    ofType(fromActionsPayment.PaymentActionTypes.paymentSuccess),
   ), { dispatch: false });
 
   saveSuccess$ = createEffect(() => this.actions$.pipe(

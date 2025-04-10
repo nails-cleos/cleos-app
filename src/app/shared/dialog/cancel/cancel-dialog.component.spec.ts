@@ -8,9 +8,9 @@ describe('CancelDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [CancelDialogComponent]
-})
-    .compileComponents();
+      imports: [CancelDialogComponent],
+    })
+      .compileComponents();
 
     fixture = TestBed.createComponent(CancelDialogComponent);
     component = fixture.componentInstance;

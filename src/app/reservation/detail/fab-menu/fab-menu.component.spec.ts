@@ -8,9 +8,9 @@ describe('FabMenuComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [FabMenuComponent]
-})
-    .compileComponents();
+      imports: [FabMenuComponent],
+    })
+      .compileComponents();
 
     fixture = TestBed.createComponent(FabMenuComponent);
     component = fixture.componentInstance;

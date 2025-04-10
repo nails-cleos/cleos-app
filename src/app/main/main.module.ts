@@ -35,14 +35,14 @@ import { Observable } from 'rxjs';
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('main')
+        useClass: TranslateLoaderFactory.forModule('main'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
     EffectsModule.forFeature([MainEffects, CatalogueEffects, UserEffects, LoginEffects]),
   ],
@@ -54,9 +54,9 @@ import { Observable } from 'rxjs';
     AuthService,
     {
       provide: LocationStrategy,
-      useClass: HashLocationStrategy
-    }
-  ]
+      useClass: HashLocationStrategy,
+    },
+  ],
 })
 export class MainModule {
   constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {

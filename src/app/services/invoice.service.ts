@@ -7,7 +7,7 @@ import { IInvoice } from '../interfaces/invoice';
 import { toUrl } from '../util/helper';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class InvoiceService {
 
@@ -22,7 +22,7 @@ export class InvoiceService {
     officeId: string,
     start: string,
     end: string,
-    types?: string[]
+    types?: string[],
   ): Observable<IReservation[]> => {
     let params = new HttpParams().set('start', start).set('end', end);
     if (types && types.length) {

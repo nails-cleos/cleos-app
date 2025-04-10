@@ -8,9 +8,9 @@ describe('ColorListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [ColorListComponent]
-})
-    .compileComponents();
+      imports: [ColorListComponent],
+    })
+      .compileComponents();
 
     fixture = TestBed.createComponent(ColorListComponent);
     component = fixture.componentInstance;

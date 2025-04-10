@@ -17,7 +17,7 @@ import { MatRipple } from '@angular/material/core';
   templateUrl: './notifications.component.html',
   styleUrls: ['./notifications.component.scss'],
   animations: [insertItemList, addRemoveItemList],
-  imports: [SharedModule, MatRipple]
+  imports: [SharedModule, MatRipple],
 })
 export class NotificationsComponent implements OnInit, OnDestroy {
   notifications: INotification[] = [];
@@ -53,7 +53,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     } else {
       this.navigationService.reload(this.router.url.split('/'));
       this.store.dispatch(
-        new fromActionsNotification.NotificationRead(notification)
+        new fromActionsNotification.NotificationRead(notification),
       );
     }
   };
@@ -62,8 +62,8 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     new fromActionsNotification.GetAllPaged({
       active: 'date',
       direction: 'desc',
-      page: ++this.page
-    })
+      page: ++this.page,
+    }),
   );
 
   remove = (index: number): void => {
@@ -72,7 +72,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     }
     const notification = this.notifications.splice(index, 1)[0];
     this.store.dispatch(
-      new fromActionsNotification.NotificationDelete(Object.assign({}, notification, { deleted: true }))
+      new fromActionsNotification.NotificationDelete(Object.assign({}, notification, { deleted: true })),
     );
     if (!notification.read) {
       --this.badge;

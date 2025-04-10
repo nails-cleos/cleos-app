@@ -22,7 +22,7 @@ import {
   scaleIn,
   slideAnimation,
   slideInX,
-  slideInY
+  slideInY,
 } from '../../util/animation';
 import { AnimationAnimateMetadata, AnimationSequenceMetadata } from '@angular/animations';
 import { isMobile } from '../../util/helper';
@@ -38,7 +38,7 @@ import { AnimateDirective } from '../../directives/animate.directive';
   templateUrl: './main-content.component.html',
   styleUrls: ['./main-content.component.scss'],
   animations: [bottomTop, leftRight, slideInX, slideInY, fadeInOut, slideAnimation],
-  imports: [SharedModule, AnimateDirective]
+  imports: [SharedModule, AnimateDirective],
 })
 export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -70,23 +70,23 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   groups: ITreatmentGroup[] = [];
 
   name: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
+  	Validators.required,
   ]);
   email: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, Validators.email
+  	Validators.required, Validators.email,
   ]);
   subject: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
+  	Validators.required,
   ]);
   body: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
+  	Validators.required,
   ]);
 
   // Images 768x1024
   slides: ISlide[] = [
-    { id: 'c7ae73b1-c6be-4848-9f84-cbf451e8ee59', image: 'assets/home_page/img/b1.webp', order: 0 },
-    { id: '3e989461-81b2-4723-9fa3-746c05fd69a2', image: 'assets/home_page/img/b2.webp', order: 1 },
-    { id: '25e33d58-34c3-4e55-b4e4-885f177fb570', image: 'assets/home_page/img/b3.webp', order: 2 },
+  	{ id: 'c7ae73b1-c6be-4848-9f84-cbf451e8ee59', image: 'assets/home_page/img/b1.webp', order: 0 },
+  	{ id: '3e989461-81b2-4723-9fa3-746c05fd69a2', image: 'assets/home_page/img/b2.webp', order: 1 },
+  	{ id: '25e33d58-34c3-4e55-b4e4-885f177fb570', image: 'assets/home_page/img/b3.webp', order: 2 },
   ];
   socialLinks: ISocialLink[];
   works: IWork[] = [];
@@ -107,96 +107,96 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
               private snackBar: MatSnackBar, private authUserService: AuthUserService,
               breakpointObserver: BreakpointObserver, private mainContent: MainContentService,
               private bottomSheet: MatBottomSheet, private translate: TranslateService, private router: Router) {
-    this.currentIndex = 0;
-    this.isSmall = isMobile();
-    this.isDark = false;
-    this.socialLinks = this.allSocialLinks();
-    this.stories = this.allStories();
-    this.experiences = this.allExperience();
-    this.filter = new BehaviorSubject<ITreatmentGroup | undefined>(undefined);
+  	this.currentIndex = 0;
+  	this.isSmall = isMobile();
+  	this.isDark = false;
+  	this.socialLinks = this.allSocialLinks();
+  	this.stories = this.allStories();
+  	this.experiences = this.allExperience();
+  	this.filter = new BehaviorSubject<ITreatmentGroup | undefined>(undefined);
 
-    this.treatmentTitle = bounceInDownAnimation('500ms');
-    this.storyTitle = fadeInUpDown('20px', '700ms');
-    this.workText = gelatine;
-    this.experienceTitle = rubberBand;
-    this.treatmentItemState = new BehaviorSubject<'open' | 'close'>('open');
-    this.storyDescriptionState = new BehaviorSubject<'open' | 'close'>('open');
-    this.storyMemberState = new BehaviorSubject<'open' | 'close'>('open');
-    this.contactItem1State = new BehaviorSubject<'open' | 'close'>('open');
-    this.contactItem2State = new BehaviorSubject<'open' | 'close'>('open');
-    this.contactItem3State = new BehaviorSubject<'open' | 'close'>('open');
-    this.contactText = rubberBand;
-    this.contactTitle = fadeInUpDown('20px', '500ms');
-    this.contactMap = bounceInDownAnimation('500ms');
-    this.faqTitle = bounceInDownAnimation('500ms');
+  	this.treatmentTitle = bounceInDownAnimation('500ms');
+  	this.storyTitle = fadeInUpDown('20px', '700ms');
+  	this.workText = gelatine;
+  	this.experienceTitle = rubberBand;
+  	this.treatmentItemState = new BehaviorSubject<'open' | 'close'>('open');
+  	this.storyDescriptionState = new BehaviorSubject<'open' | 'close'>('open');
+  	this.storyMemberState = new BehaviorSubject<'open' | 'close'>('open');
+  	this.contactItem1State = new BehaviorSubject<'open' | 'close'>('open');
+  	this.contactItem2State = new BehaviorSubject<'open' | 'close'>('open');
+  	this.contactItem3State = new BehaviorSubject<'open' | 'close'>('open');
+  	this.contactText = rubberBand;
+  	this.contactTitle = fadeInUpDown('20px', '500ms');
+  	this.contactMap = bounceInDownAnimation('500ms');
+  	this.faqTitle = bounceInDownAnimation('500ms');
 
-    this.getState = this.store.select(selectMainState);
-    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
-      this.isAuthenticated = value.isAuthenticated;
-      if (this.isAuthenticated) {
-        this.email.setValue(value.email);
-        this.name.setValue(value.displayName);
-      }
-      this.isDark = value.isDarkMode;
-    });
+  	this.getState = this.store.select(selectMainState);
+  	this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
+  		this.isAuthenticated = value.isAuthenticated;
+  		if (this.isAuthenticated) {
+  			this.email.setValue(value.email);
+  			this.name.setValue(value.displayName);
+  		}
+  		this.isDark = value.isDarkMode;
+  	});
 
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small
-    ]).subscribe(result => this.isSmall = result.matches);
+  	breakpointObserver.observe([
+  		Breakpoints.XSmall,
+  		Breakpoints.Small,
+  	]).subscribe(result => this.isSmall = result.matches);
   }
 
   get openBottomSheet(): void {
-    this.bottomSheet.open(BottomSheetBookAppointmentComponent);
-    return;
+  	this.bottomSheet.open(BottomSheetBookAppointmentComponent);
+  	return;
   }
 
   get sendEmail(): void {
-    if (this.form.invalid) {
-      return;
-    }
-    return this.store.dispatch(
-      new fromActionsMain.SendMessage(this.form.value)
-    );
+  	if (!this.form.invalid) {
+  		this.store.dispatch(
+  			new fromActionsMain.SendMessage(this.form.value),
+  		);
+  	}
+  	return;
   }
 
   ngOnInit(): void {
-    this.clean();
-    this.createForm();
-    this.subscribe();
-    this.cdRef.detectChanges();
-    this.filterSubscription = this.filter.subscribe(group => {
-      setTimeout(() => {
-        if (group) {
-          this.works = this.allWorks.filter(p => p.group.id === group.id);
-        } else {
-          this.works = this.allWorks;
-        }
-      }, 500);
-    });
-    this.groups = this.translate.instant('TREATMENTS');
+  	this.clean();
+  	this.createForm();
+  	this.subscribe();
+  	this.cdRef.detectChanges();
+  	this.filterSubscription = this.filter.subscribe(group => {
+  		setTimeout(() => {
+  			if (group) {
+  				this.works = this.allWorks.filter(p => p.group.id === group.id);
+  			} else {
+  				this.works = this.allWorks;
+  			}
+  		}, 500);
+  	});
+  	this.groups = this.translate.instant('TREATMENTS');
   }
 
   ngAfterViewInit(): void {
-    observeElement(this.treatmentItemState, this.serviceItem?.nativeElement, !this.isSmall);
-    observeElement(this.storyDescriptionState, this.storyDescription?.nativeElement, !this.isSmall, 0.1);
-    observeElement(this.storyMemberState, this.storyItem6?.nativeElement, !this.isSmall, 0.1);
-    observeElement(this.contactItem1State, this.contactItem1?.nativeElement, !this.isSmall);
-    observeElement(this.contactItem2State, this.contactItem2?.nativeElement, !this.isSmall);
-    observeElement(this.contactItem3State, this.contactItem3?.nativeElement, !this.isSmall);
+  	observeElement(this.treatmentItemState, this.serviceItem?.nativeElement, !this.isSmall);
+  	observeElement(this.storyDescriptionState, this.storyDescription?.nativeElement, !this.isSmall, 0.1);
+  	observeElement(this.storyMemberState, this.storyItem6?.nativeElement, !this.isSmall, 0.1);
+  	observeElement(this.contactItem1State, this.contactItem1?.nativeElement, !this.isSmall);
+  	observeElement(this.contactItem2State, this.contactItem2?.nativeElement, !this.isSmall);
+  	observeElement(this.contactItem3State, this.contactItem3?.nativeElement, !this.isSmall);
 
-    this.experiences.forEach(it => observeElement(it.state, document.getElementById(it.id), !this.isSmall));
-    this.stories.forEach(it => observeElement(it.state, document.getElementById(it.id), !this.isSmall));
+  	this.experiences.forEach(it => observeElement(it.state, document.getElementById(it.id), !this.isSmall));
+  	this.stories.forEach(it => observeElement(it.state, document.getElementById(it.id), !this.isSmall));
 
-    this.automateSlider();
-    this.mainContent.configure(false, 'close', true);
+  	this.automateSlider();
+  	this.mainContent.configure(false, 'close', true);
   }
 
   ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.sliderSubscription?.unsubscribe();
-    this.filterSubscription?.unsubscribe();
-    this.authUserServiceSubscription.unsubscribe();
+  	this.subscription?.unsubscribe();
+  	this.sliderSubscription?.unsubscribe();
+  	this.filterSubscription?.unsubscribe();
+  	this.authUserServiceSubscription.unsubscribe();
   }
 
   isCurrentSlideIndex = (index: number): boolean => this.currentIndex === index;
@@ -204,174 +204,174 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   setTreatmentAnimation = (i: number): AnimationSequenceMetadata => scaleIn(`${ i * (this.isSmall ? 0 : 300) }ms`);
 
   goToTreatment = (name?: string): void => {
-    if (name === 'biab') {
-      goTo('home');
-      this.router.navigate([this.translate.currentLang, name, 'treatment']);
-    }
+  	if (name === 'biab') {
+  		goTo('home');
+  		this.router.navigate([this.translate.currentLang, name, 'treatment']);
+  	}
   };
 
   onHover = (social: ISocialLink, enter: boolean): void => {
-    const suffix = enter ? '' : '-NO-COLOR';
-    social.svgIcon = `${ social.name }${ suffix }`;
+  	const suffix = enter ? '' : '-NO-COLOR';
+  	social.svgIcon = `${ social.name }${ suffix }`;
   };
 
   filterBy = (group?: ITreatmentGroup): void => {
-    this.works = [];
-    this.filter?.next(group);
+  	this.works = [];
+  	this.filter?.next(group);
   };
 
   private createForm = (): void => {
-    this.form = this.formBuilder.group({
-      name: this.name,
-      email: this.email,
-      subject: this.subject,
-      body: this.body
-    });
+  	this.form = this.formBuilder.group({
+  		name: this.name,
+  		email: this.email,
+  		subject: this.subject,
+  		body: this.body,
+  	});
   };
 
   private automateSlider = (): void => {
-    // let forward = true;
-    this.sliderSubscription = interval(3000).subscribe(() => this.moveForwardSlide());
+  	// let forward = true;
+  	this.sliderSubscription = interval(3000).subscribe(() => this.moveForwardSlide());
   };
 
   private moveForwardSlide = (): void => {
-    if (this.slides?.length) {
-      // Fade in
-      if (this.currentIndex === this.slides.length - 1) {
-        this.currentIndex = 0;
-      } else {
-        this.currentIndex++;
-      }
+  	if (this.slides?.length) {
+  		// Fade in
+  		if (this.currentIndex === this.slides.length - 1) {
+  			this.currentIndex = 0;
+  		} else {
+  			this.currentIndex++;
+  		}
 
-      // Forward and backward
-      // if (this.currentIndex === this.slides.length - 1) {
-      //   forward = false;
-      // }
-      // if (this.currentIndex === 0 && !forward) {
-      //   forward = true;
-      // }
-      // this.currentIndex = this.currentIndex + (forward ? +1 : -1);
+  		// Forward and backward
+  		// if (this.currentIndex === this.slides.length - 1) {
+  		//   forward = false;
+  		// }
+  		// if (this.currentIndex === 0 && !forward) {
+  		//   forward = true;
+  		// }
+  		// this.currentIndex = this.currentIndex + (forward ? +1 : -1);
 
-      // Forward
-      // if (this.currentIndex === this.slides.length - 1) {
-      //   this.sliderSubscription?.unsubscribe();
-      //   const back = interval(100).subscribe(() => {
-      //     this.currentIndex--;
-      //     if (this.currentIndex === 0) {
-      //       back.unsubscribe();
-      //       this.automateSlider();
-      //     }
-      //   });
-      // } else {
-      //   this.currentIndex++;
-      // }
-    }
+  		// Forward
+  		// if (this.currentIndex === this.slides.length - 1) {
+  		//   this.sliderSubscription?.unsubscribe();
+  		//   const back = interval(100).subscribe(() => {
+  		//     this.currentIndex--;
+  		//     if (this.currentIndex === 0) {
+  		//       back.unsubscribe();
+  		//       this.automateSlider();
+  		//     }
+  		//   });
+  		// } else {
+  		//   this.currentIndex++;
+  		// }
+  	}
   };
 
   private allSocialLinks = (): ISocialLink[] => [
-    {
-      name: 'WHATSAPP',
-      delay: '1000ms',
-      href: 'https://api.whatsapp.com/send?phone=',
-      svgIcon: 'WHATSAPP-NO-COLOR',
-      phone: 'MAIN.CONTACT.SEND.PHONE',
-      phoneKey: '&text=',
-      phoneText: 'MAIN.CONTACT.SEND.HELLO'
-    }, {
-      name: 'INSTAGRAM',
-      delay: '1100ms',
-      href: 'https://www.instagram.com/carlanailscleos.nl/',
-      svgIcon: 'INSTAGRAM-NO-COLOR'
-    }, {
-      name: 'FACEBOOK',
-      delay: '1200ms',
-      href: 'https://www.facebook.com/carlanailscleos.nl/',
-      svgIcon: 'FACEBOOK-NO-COLOR'
-    }
+  	{
+  		name: 'WHATSAPP',
+  		delay: '1000ms',
+  		href: 'https://api.whatsapp.com/send?phone=',
+  		svgIcon: 'WHATSAPP-NO-COLOR',
+  		phone: 'MAIN.CONTACT.SEND.PHONE',
+  		phoneKey: '&text=',
+  		phoneText: 'MAIN.CONTACT.SEND.HELLO',
+  	}, {
+  		name: 'INSTAGRAM',
+  		delay: '1100ms',
+  		href: 'https://www.instagram.com/carlanailscleos.nl/',
+  		svgIcon: 'INSTAGRAM-NO-COLOR',
+  	}, {
+  		name: 'FACEBOOK',
+  		delay: '1200ms',
+  		href: 'https://www.facebook.com/carlanailscleos.nl/',
+  		svgIcon: 'FACEBOOK-NO-COLOR',
+  	},
   ];
 
   private allStories = (): IStory[] => [
-    {
-      id: 'storyItem1',
-      state: new BehaviorSubject<'open' | 'close'>('open'),
-      delay: '100ms',
-      text: 'MAIN.STORY.TEXT_1'
-    }, {
-      id: 'storyItem2',
-      state: new BehaviorSubject<'open' | 'close'>('open'),
-      delay: '200ms',
-      text: 'MAIN.STORY.TEXT_2'
-    }, {
-      id: 'storyItem3',
-      state: new BehaviorSubject<'open' | 'close'>('open'),
-      delay: '300ms',
-      text: 'MAIN.STORY.TEXT_3'
-    }, {
-      id: 'storyItem4',
-      state: new BehaviorSubject<'open' | 'close'>('open'),
-      delay: '400ms',
-      text: 'MAIN.STORY.TEXT_4'
-    }, {
-      id: 'storyItem5',
-      state: new BehaviorSubject<'open' | 'close'>('open'),
-      delay: '500ms',
-      text: 'MAIN.STORY.TEXT_5'
-    }
+  	{
+  		id: 'storyItem1',
+  		state: new BehaviorSubject<'open' | 'close'>('open'),
+  		delay: '100ms',
+  		text: 'MAIN.STORY.TEXT_1',
+  	}, {
+  		id: 'storyItem2',
+  		state: new BehaviorSubject<'open' | 'close'>('open'),
+  		delay: '200ms',
+  		text: 'MAIN.STORY.TEXT_2',
+  	}, {
+  		id: 'storyItem3',
+  		state: new BehaviorSubject<'open' | 'close'>('open'),
+  		delay: '300ms',
+  		text: 'MAIN.STORY.TEXT_3',
+  	}, {
+  		id: 'storyItem4',
+  		state: new BehaviorSubject<'open' | 'close'>('open'),
+  		delay: '400ms',
+  		text: 'MAIN.STORY.TEXT_4',
+  	}, {
+  		id: 'storyItem5',
+  		state: new BehaviorSubject<'open' | 'close'>('open'),
+  		delay: '500ms',
+  		text: 'MAIN.STORY.TEXT_5',
+  	},
   ];
 
   private allExperience = (): IExperience[] => [
-    {
-      id: 'experienceItem1',
-      state: new BehaviorSubject<'open' | 'close'>('open'),
-      delay: '0ms',
-      delayOut: '900ms',
-      icon: 'waving_hand',
-      position: '1°',
-      text: 'MAIN.EXPERIENCE.TEXT_1'
-    }, {
-      id: 'experienceItem2',
-      state: new BehaviorSubject<'open' | 'close'>('open'),
-      delay: this.isSmall ? '0ms' : '300ms',
-      delayOut: '600ms',
-      icon: 'coffee',
-      position: '2°',
-      text: 'MAIN.EXPERIENCE.TEXT_2'
-    }, {
-      id: 'experienceItem3',
-      state: new BehaviorSubject<'open' | 'close'>('open'),
-      delay: this.isSmall ? '0ms' : '600ms',
-      delayOut: '300ms',
-      icon: 'palette',
-      position: '3°',
-      text: 'MAIN.EXPERIENCE.TEXT_3'
-    }, {
-      id: 'experienceItem4',
-      state: new BehaviorSubject<'open' | 'close'>('open'),
-      delay: this.isSmall ? '0ms' : '900ms',
-      delayOut: '0ms',
-      icon: 'mood',
-      position: '4°',
-      text: 'MAIN.EXPERIENCE.TEXT_4'
-    }
+  	{
+  		id: 'experienceItem1',
+  		state: new BehaviorSubject<'open' | 'close'>('open'),
+  		delay: '0ms',
+  		delayOut: '900ms',
+  		icon: 'waving_hand',
+  		position: '1°',
+  		text: 'MAIN.EXPERIENCE.TEXT_1',
+  	}, {
+  		id: 'experienceItem2',
+  		state: new BehaviorSubject<'open' | 'close'>('open'),
+  		delay: this.isSmall ? '0ms' : '300ms',
+  		delayOut: '600ms',
+  		icon: 'coffee',
+  		position: '2°',
+  		text: 'MAIN.EXPERIENCE.TEXT_2',
+  	}, {
+  		id: 'experienceItem3',
+  		state: new BehaviorSubject<'open' | 'close'>('open'),
+  		delay: this.isSmall ? '0ms' : '600ms',
+  		delayOut: '300ms',
+  		icon: 'palette',
+  		position: '3°',
+  		text: 'MAIN.EXPERIENCE.TEXT_3',
+  	}, {
+  		id: 'experienceItem4',
+  		state: new BehaviorSubject<'open' | 'close'>('open'),
+  		delay: this.isSmall ? '0ms' : '900ms',
+  		delayOut: '0ms',
+  		icon: 'mood',
+  		position: '4°',
+  		text: 'MAIN.EXPERIENCE.TEXT_4',
+  	},
   ];
 
   private clean = (): void => this.store.dispatch(new fromActionsMain.Clean());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
-      if (state.errorMessage || state.message) {
-        this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-      }
-    });
+  	this.subscription = this.getState.subscribe(state => {
+  		if (state.errorMessage || state.message) {
+  			this.snackBar.open(state.errorMessage || state.message, 'OK', {
+  				duration: 5000,
+  			});
+  		}
+  	});
   };
 }
 
 @Component({
   selector: 'app-bottom-sheet-book-appointment',
   templateUrl: 'bottom-sheet-book-appointment.html',
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class BottomSheetBookAppointmentComponent {
   constructor(private bottomSheetRef: MatBottomSheetRef<BottomSheetBookAppointmentComponent>,

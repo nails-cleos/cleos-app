@@ -13,7 +13,7 @@ import { MatDivider } from '@angular/material/divider';
   selector: 'app-price',
   templateUrl: './price.component.html',
   styleUrls: ['./price.component.scss'],
-  imports: [CurrencySymbolPipe, BankComponent, TranslatePipe, DecimalPipe, MatDivider]
+  imports: [CurrencySymbolPipe, BankComponent, TranslatePipe, DecimalPipe, MatDivider],
 })
 export class PriceComponent {
   @Input() typeForm!: UntypedFormGroup;
@@ -27,9 +27,9 @@ export class PriceComponent {
   @Output() percentageEmitter = new EventEmitter<number>();
 
   constructor() {
-    this.firstTime = false;
-    this.showBank = false;
-    this.showPenalty = false;
+  	this.firstTime = false;
+  	this.showBank = false;
+  	this.showPenalty = false;
   }
 
   emitter = (percentage: number): void => this.percentageEmitter.emit(percentage);

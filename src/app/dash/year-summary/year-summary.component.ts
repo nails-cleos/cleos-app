@@ -18,7 +18,7 @@ import {
   MonthSummary,
   QuarterSummary,
   SummaryTotals,
-  Total
+  Total,
 } from '../../interfaces/dashboard';
 import * as fromActionsDashboard from '../../store/dashboard.actions';
 import { Router } from '@angular/router';
@@ -37,9 +37,9 @@ import { TotalSummaryComponent } from '../total-summary/total-summary.component'
   templateUrl: './year-summary.component.html',
   styleUrls: ['./year-summary.component.scss'],
   providers: [
-    { provide: DateAdapter, useClass: YearAdapter }
+    { provide: DateAdapter, useClass: YearAdapter },
   ],
-  imports: [SharedModule, YearComponent, TotalSummaryComponent]
+  imports: [SharedModule, YearComponent, TotalSummaryComponent],
 })
 export class YearSummaryComponent implements OnInit, OnDestroy {
   date = new FormControl<Date | null>(null);
@@ -62,7 +62,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
   isHandset$: Observable<boolean> = this.breakpointObserver.observe([
     Breakpoints.XSmall,
     Breakpoints.Small,
-    Breakpoints.Medium
+    Breakpoints.Medium,
   ]).pipe(map(result => result.matches), shareReplay());
 
   private getState: Observable<any>;
@@ -175,8 +175,8 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
             this.yearSummaryTotals.totals.btw + value.totalBTW, this.yearSummaryTotals.totals.net + value.totalNet);
           this.yearSummaryTotals.totalsWithoutCash =
             new Total(this.yearSummaryTotals.totalsWithoutCash.gross + value.totalWithoutGross,
-              this.yearSummaryTotals.totalsWithoutCash.btw + value.totalWithoutBTW,
-              this.yearSummaryTotals.totalsWithoutCash.net + value.totalWithoutNet);
+            	this.yearSummaryTotals.totalsWithoutCash.btw + value.totalWithoutBTW,
+            	this.yearSummaryTotals.totalsWithoutCash.net + value.totalWithoutNet);
         });
       });
     }
@@ -184,7 +184,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
 
   private getAllQuarterSummaries = (
     quarterSummaries: IQuarterSummary[],
-    result: IQuarterSummary[]
+    result: IQuarterSummary[],
   ): IQuarterSummary[] => result.map(q => {
     const quarter = quarterSummaries.find(it => it.quarter === q.quarter);
     return new QuarterSummary(q.quarter, q.monthSummaries.map(m => {
@@ -217,7 +217,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
                 month,
                 saleSummary: [...saleSummary],
                 expenseSummary: [...expenseSummary],
-                cashSummary: [...cashSummary]
+                cashSummary: [...cashSummary],
               });
             }
           });
@@ -271,14 +271,14 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     this.reset();
     this.isLoading = true;
     this.store.dispatch(
-      new fromActionsDashboard.GetYearSummary(year)
+      new fromActionsDashboard.GetYearSummary(year),
     );
   };
 
   private getExportData = (year: number): void => {
     this.isExportLoading = true;
     this.store.dispatch(
-      new fromActionsDashboard.GetYearExport(year)
+      new fromActionsDashboard.GetYearExport(year),
     );
   };
 

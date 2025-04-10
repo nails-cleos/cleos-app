@@ -12,12 +12,12 @@ import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-add-discount-dialog-component',
   templateUrl: './add-discount-dialog.component.html',
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe]
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
 })
 export class AddDiscountDialogComponent implements OnInit, OnDestroy {
   discountForm!: UntypedFormGroup;
   discount: FormControl<string | null> = new FormControl('', [
-    Validators.required
+    Validators.required,
   ]);
 
   customerId: string;
@@ -54,7 +54,7 @@ export class AddDiscountDialogComponent implements OnInit, OnDestroy {
 
   private createForm = (): void => {
     this.discountForm = this.formBuilder.group({
-      discount: this.discount
+      discount: this.discount,
     });
   };
 

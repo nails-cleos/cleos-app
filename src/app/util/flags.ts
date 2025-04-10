@@ -19,26 +19,26 @@ export const flags = (): IFlag[] => [
     icon: 'es',
     value: 'es',
     text: 'ES',
-    flag: flagEs
+    flag: flagEs,
   },
   {
     icon: 'gb',
     value: 'en_GB',
     text: 'EN',
-    flag: flagGb
-  // },
-  // {
-  //   icon: 'nl',
-  //   value: 'nl',
-  //   text: 'NL',
-  //   flag: flagNl
-  // },
-  // {
-  //   icon: 'us',
-  //   value: 'en',
-  //   text: 'EN',
-  //   flag: flagUs
-  }
+    flag: flagGb,
+    // },
+    // {
+    //   icon: 'nl',
+    //   value: 'nl',
+    //   text: 'NL',
+    //   flag: flagNl
+    // },
+    // {
+    //   icon: 'us',
+    //   value: 'en',
+    //   text: 'EN',
+    //   flag: flagUs
+  },
 ];
 
 export const findFlag = (flagList: IFlag[], lang: string): IFlag => {
@@ -48,7 +48,7 @@ export const findFlag = (flagList: IFlag[], lang: string): IFlag => {
     value = flagList.find(flag => flag.value === locale);
     if (!value) {
       value = flagList.find(
-        flag => flag.value.startsWith(navigator.language) || navigator.language.startsWith(flag.value)
+        flag => flag.value.startsWith(navigator.language) || navigator.language.startsWith(flag.value),
       );
     }
   }

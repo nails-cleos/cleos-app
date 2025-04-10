@@ -22,7 +22,7 @@ import {
   selectRoomState,
   selectTreatmentState,
   selectUnavailableState,
-  selectUserState
+  selectUserState,
 } from '../store/app.states';
 import { IMenu, IUser, IUserAll, User } from '../interfaces/user';
 import * as fromActionsLogin from '../store/auth.actions';
@@ -52,7 +52,7 @@ import { MatRipple } from '@angular/material/core';
   selector: 'app-nav',
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.scss'],
-  imports: [SharedModule, MenuItemComponent, RouterLinkActive, RouterOutlet, ErrorComponent, MatRipple]
+  imports: [SharedModule, MenuItemComponent, RouterLinkActive, RouterOutlet, ErrorComponent, MatRipple],
 })
 export class NavComponent implements OnInit, OnDestroy {
   private tokenService: TokenService = inject(TokenService);
@@ -74,7 +74,7 @@ export class NavComponent implements OnInit, OnDestroy {
   isHandset$: Observable<boolean> = this.breakpointObserver.observe([
     Breakpoints.XSmall,
     Breakpoints.Small,
-    Breakpoints.Medium
+    Breakpoints.Medium,
   ]).pipe(map(result => result.matches), shareReplay());
   menuItems: IMenu[] = [];
   notifications: INotification[] = [];
@@ -119,7 +119,7 @@ export class NavComponent implements OnInit, OnDestroy {
 
   get logout(): void {
     return this.store.dispatch(
-      new fromActionsLogin.LogOut()
+      new fromActionsLogin.LogOut(),
     );
   }
 
@@ -133,7 +133,7 @@ export class NavComponent implements OnInit, OnDestroy {
     const message = this.translate.instant(
       `COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode.toString().toUpperCase() }`);
     return this.store.dispatch(
-      new fromActionsUser.UpdateUser({ user, redirectUrl, message })
+      new fromActionsUser.UpdateUser({ user, redirectUrl, message }),
     );
   }
 
@@ -169,7 +169,7 @@ export class NavComponent implements OnInit, OnDestroy {
         return value;
       });
       this.store.dispatch(
-        new fromActionsNotification.NotificationRead(notification)
+        new fromActionsNotification.NotificationRead(notification),
       );
     }
   };
@@ -187,14 +187,14 @@ export class NavComponent implements OnInit, OnDestroy {
         this.error = state.error;
         if (state.errorMessage || state.message) {
           const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
-            duration: 5000
+            duration: 5000,
           });
           if (state.reload) {
             snackBarRef.afterDismissed().subscribe(() => this.navigationService.reload(this.router.url.split('/')));
           }
         }
       }
-    })
+    }),
   );
 
   private updateCount = (): void => {
@@ -221,10 +221,10 @@ export class NavComponent implements OnInit, OnDestroy {
       const payload = {
         active: 'date',
         direction: 'desc',
-        page: 0
+        page: 0,
       };
       this.store.dispatch(
-        new fromActionsNotification.GetAllPaged(payload)
+        new fromActionsNotification.GetAllPaged(payload),
       );
     }
   };
@@ -270,7 +270,7 @@ export class NavComponent implements OnInit, OnDestroy {
               message: value.notification.title,
               date: value.data.date,
               navigation: value.data.navigation,
-              read: false
+              read: false,
             } as INotification;
 
             this.notifications = [notification].concat(this.notifications);
@@ -289,7 +289,7 @@ export class NavComponent implements OnInit, OnDestroy {
       if (this.router.url === `/${ this.language }`) {
         if (this.isAuthorized && !state.redirect) {
           this.store.dispatch(
-            new fromActionsLogin.Redirect()
+            new fromActionsLogin.Redirect(),
           );
         } else {
           this.router.navigate(['/', this.language, 'home']);

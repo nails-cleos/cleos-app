@@ -15,7 +15,7 @@ import { BackButtonDirective } from '../../../directives/back-button.directive';
   selector: 'app-transaction-detail',
   templateUrl: './transaction-detail.component.html',
   styleUrls: ['./transaction-detail.component.scss'],
-  imports: [SharedModule, BackButtonDirective]
+  imports: [SharedModule, BackButtonDirective],
 })
 export class TransactionDetailComponent implements OnInit, OnDestroy {
 
@@ -39,7 +39,7 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
 
   get pay(): void {
     return this.store.dispatch(
-      new fromActionsPayment.PaymentSend(this.transaction?.payment?.paymentURL)
+      new fromActionsPayment.PaymentSend(this.transaction?.payment?.paymentURL),
     );
   }
 
@@ -50,8 +50,8 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
         resourceId: this.transaction?.id,
         path: 'transaction',
         preferenceId: this.transaction?.payment?.preferenceId,
-        type: this.transaction?.payment?.type
-      })
+        type: this.transaction?.payment?.type,
+      }),
     );
   }
 
@@ -67,14 +67,14 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
   }
 
   private getTransaction = (): void => this.store.dispatch(
-    new fromActionsAccount.TransactionDetail({ id: this.id, transactionId: this.transactionId })
+    new fromActionsAccount.TransactionDetail({ id: this.id, transactionId: this.transactionId }),
   );
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {
       if (state.selected) {
         this.transaction = Object.assign(
-          {}, state.selected, { date: newDateTimestamp(state.selected.payment.timestamp) }
+          {}, state.selected, { date: newDateTimestamp(state.selected.payment.timestamp) },
         );
       }
       if (state.paths) {

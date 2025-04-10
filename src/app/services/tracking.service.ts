@@ -15,19 +15,19 @@ export class TrackingService {
   getAll = (): Observable<ITracking[]> => this.http.get<ITracking[]>(this.urlV1);
 
   findByReservationId = (
-    reservationId: string
+    reservationId: string,
   ): Observable<ITracking> => this.http.get<ITracking>(toUrl(this.urlV1, 'reservations', reservationId));
 
   executeByReservationId = (
-    reservationId: string
+    reservationId: string,
   ): Observable<ITracking> => this.http.post<ITracking>(toUrl(this.urlV1, 'reservations', reservationId), {});
 
   updateByReservationId = (
     reservationId: string,
     started?: string,
-    completed?: string
+    completed?: string,
   ): Observable<ITracking> => this.http.patch<ITracking>(
     toUrl(this.urlV1, 'reservations', reservationId),
-    { started, completed }
+    { started, completed },
   );
 }

@@ -8,7 +8,7 @@ import { ErrorComponent } from '../../shared/error/error.component';
   selector: 'app-mini-card',
   templateUrl: './mini-card.component.html',
   styleUrls: ['./mini-card.component.scss'],
-  imports: [SharedModule, ErrorComponent]
+  imports: [SharedModule, ErrorComponent],
 })
 export class MiniCardComponent implements OnInit {
   @Input() icon?: string;
@@ -31,7 +31,7 @@ export class MiniCardComponent implements OnInit {
   locale: string;
 
   constructor(private translate: TranslateService) {
-    this.locale = this.translate.currentLang;
+  	this.locale = this.translate.currentLang;
   }
 
   ngOnInit(): void {

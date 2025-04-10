@@ -20,53 +20,53 @@ export class AnimateDirective implements OnInit, AfterViewInit, OnDestroy {
   private player?: AnimationPlayer;
 
   constructor(private el: ElementRef, private animationBuilder: AnimationBuilder) {
-    this.animating = false;
-    this.stopAnimation = false;
-    this.threshold = 0.1;
+  	this.animating = false;
+  	this.stopAnimation = false;
+  	this.threshold = 0.1;
   }
 
   ngOnInit(): void {
-    this.player = this.initialize();
-    this.player?.init();
+  	this.player = this.initialize();
+  	this.player?.init();
   }
 
   ngAfterViewInit(): void {
-    const rootMargin = '0px';
-    const observer = new IntersectionObserver(
-      (entries) => entries.forEach((entry) => {
-        this.animate(entry.isIntersecting);
-        if (entry.isIntersecting && this.stopAnimation) {
-          observer.disconnect();
-        }
-      }),
-      { threshold: this.threshold, rootMargin }
-    );
-    observer.observe(this.el.nativeElement);
+  	const rootMargin = '0px';
+  	const observer = new IntersectionObserver(
+  		(entries) => entries.forEach((entry) => {
+  			this.animate(entry.isIntersecting);
+  			if (entry.isIntersecting && this.stopAnimation) {
+  				observer.disconnect();
+  			}
+  		}),
+  		{ threshold: this.threshold, rootMargin },
+  	);
+  	observer.observe(this.el.nativeElement);
   }
 
   ngOnDestroy(): void {
-    this.player?.destroy();
+  	this.player?.destroy();
   }
 
   private initialize = (): AnimationPlayer | undefined => {
-    let animation: AnimationFactory | undefined;
-    if (this.animateInAnimation) {
-      animation = this.animationBuilder.build(this.animateInAnimation);
-    }
+  	let animation: AnimationFactory | undefined;
+  	if (this.animateInAnimation) {
+  		animation = this.animationBuilder.build(this.animateInAnimation);
+  	}
 
-    return animation?.create(this.el.nativeElement);
+  	return animation?.create(this.el.nativeElement);
   };
 
   private animate = (inView: boolean): void => {
-    if (!inView) {
-      this.animating = false;
-    }
+  	if (!inView) {
+  		this.animating = false;
+  	}
 
-    if (!inView || this.animating) {
-      return;
-    }
+  	if (!inView || this.animating) {
+  		return;
+  	}
 
-    this.player?.play();
-    this.animating = true;
+  	this.player?.play();
+  	this.animating = true;
   };
 }

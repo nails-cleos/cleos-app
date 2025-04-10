@@ -19,7 +19,7 @@ import { SharedModule } from '../../../shared/shared.module';
   selector: 'app-me-discount',
   templateUrl: './me-discount.component.html',
   styleUrls: ['./me-discount.component.scss'],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -39,89 +39,89 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(private translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private router: Router, private cdRef: ChangeDetectorRef, private analytic: Analytics,
               breakpointObserver: BreakpointObserver) {
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.pageSize = MOBILE_PAGE_SIZE;
-      }
-    });
-    this.getState = this.store.select(selectDiscountState);
-    logEvent(this.analytic, 'screen_view', {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      firebase_screen: 'Referral page',
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      firebase_screen_class: 'ReferralsComponent'
-    });
-    this.language = this.translate.currentLang;
+  	breakpointObserver.observe([
+  		Breakpoints.XSmall,
+  		Breakpoints.Small,
+  	]).subscribe(result => {
+  		if (result.matches) {
+  			this.pageSize = MOBILE_PAGE_SIZE;
+  		}
+  	});
+  	this.getState = this.store.select(selectDiscountState);
+  	logEvent(this.analytic, 'screen_view', {
+  		// eslint-disable-next-line camelcase
+  		firebase_screen: 'Referral page',
+  		// eslint-disable-next-line camelcase
+  		firebase_screen_class: 'ReferralsComponent',
+  	});
+  	this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {
-    this.getDiscounts();
+  	this.getDiscounts();
   }
 
   ngOnInit(): void {
-    this.clean();
-    this.subscribe();
+  	this.clean();
+  	this.subscribe();
   }
 
   ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.paginatorSubscription?.unsubscribe();
+  	this.subscription?.unsubscribe();
+  	this.paginatorSubscription?.unsubscribe();
   }
 
   useDiscount = (discount: IUserDiscount): void => {
-    const data = { discount };
-    this.router.navigate([this.language, 'me', 'reservation'], { state: data });
+  	const data = { discount };
+  	this.router.navigate([this.language, 'me', 'reservation'], { state: data });
   };
 
   private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
 
   private createPageSubscriptions = (): void => {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getDiscounts();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getDiscounts(this.paginator.pageIndex));
+  	this.sort.sortChange.subscribe(() => {
+  		this.paginator.pageIndex = 0;
+  		this.getDiscounts();
+  	});
+  	this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getDiscounts(this.paginator.pageIndex));
 
-    this.cdRef.detectChanges();
+  	this.cdRef.detectChanges();
   };
 
   private getDiscounts = (page: number = 0): void => this.store.dispatch(
-    new fromActionsDiscount.GetMyDiscounts({
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    })
+  	new fromActionsDiscount.GetMyDiscounts({
+  		active: this.sort.active,
+  		direction: this.sort.direction,
+  		size: this.pageSize,
+  		page,
+  	}),
   );
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
-      if (state.message) {
-        this.clean();
-        this.getDiscounts();
-      }
-      this.dataSource = state.data?.content?.map((ud: IUserDiscount) => {
-        if (ud && ud.discountCustomer) {
-          let symbol;
-          switch (ud.discountCustomer.type) {
-            case DiscountType.money:
-              symbol = `$ ${ ud.discountCustomer.amount }`;
-              break;
-            case DiscountType.percentage:
-              symbol = `${ ud.discountCustomer.amount } %`;
-              break;
-          }
-          return Object.assign({}, ud, { symbol });
-        }
-        return ud;
-      });
-      this.resultsLength = state.data?.totalElements;
-      if (!this.paginatorSubscription && this.resultsLength) {
-        this.createPageSubscriptions();
-      }
-    });
+  	this.subscription = this.getState.subscribe(state => {
+  		if (state.message) {
+  			this.clean();
+  			this.getDiscounts();
+  		}
+  		this.dataSource = state.data?.content?.map((ud: IUserDiscount) => {
+  			if (ud && ud.discountCustomer) {
+  				let symbol;
+  				switch (ud.discountCustomer.type) {
+  				case DiscountType.money:
+  					symbol = `$ ${ ud.discountCustomer.amount }`;
+  					break;
+  				case DiscountType.percentage:
+  					symbol = `${ ud.discountCustomer.amount } %`;
+  					break;
+  				}
+  				return Object.assign({}, ud, { symbol });
+  			}
+  			return ud;
+  		});
+  		this.resultsLength = state.data?.totalElements;
+  		if (!this.paginatorSubscription && this.resultsLength) {
+  			this.createPageSubscriptions();
+  		}
+  	});
   };
 }

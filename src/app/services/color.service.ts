@@ -18,13 +18,13 @@ export class ColorService {
     sort: string,
     direction: string,
     page: number,
-    size: number = PAGE_SIZE
+    size: number = PAGE_SIZE,
   ): Observable<IColor[]> => this.http.get<IColor[]>(toUrl(this.urlV1, 'pages'),
-    { params: createFilter(page, size, sort, direction) }
+    { params: createFilter(page, size, sort, direction) },
   );
 
   getAllByTreatmentId = (treatmentId: string): Observable<IColor[]> => this.http.get<IColor[]>(
-    toUrl(this.urlV1, 'treatments', treatmentId)
+    toUrl(this.urlV1, 'treatments', treatmentId),
   );
 
   getAllColors = (): Observable<IColor[]> => this.http.get<IColor[]>(this.urlV1);

@@ -18,8 +18,8 @@ export class UnavailableEffects {
     switchMap((payload: any) => this.unavailableService.getAll(payload.active, payload.direction, payload.page,
       payload.size).pipe(
       switchMap((response: any) => of(new fromActionsUnavailable.UnavailableSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error }))),
+    )),
   ));
 
   getAllProfessional$ = createEffect(() =>
@@ -27,16 +27,16 @@ export class UnavailableEffects {
       map((action: any) => action.payload),
       switchMap(() => this.userService.getAllProfessionals().pipe(
         switchMap((response: any) => of(new fromActionsUnavailable.UnavailableSuccess(response))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error }))),
+      )),
     ));
 
   getRoom$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.getRoom)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.userService.getRoomByProfessionalId(payload).pipe(
       switchMap((response: any) => of(new fromActionsUnavailable.RoomSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error }))),
+    )),
   ));
 
   findOne$ = createEffect(
@@ -44,8 +44,8 @@ export class UnavailableEffects {
       map((action: any) => action.payload),
       switchMap((payload: any) => this.unavailableService.getById(payload).pipe(
         switchMap((unavailable: any) => of(new fromActionsUnavailable.UnavailableSelected(unavailable))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error }))),
+      )),
     ));
 
   save$ = createEffect(
@@ -56,8 +56,8 @@ export class UnavailableEffects {
           const message = this.translate.instant('UNAVAILABLE.CREATED', { date: newDateTimestamp(response.timestamp) });
           return of(new fromActionsUnavailable.UnavailableSaveSuccess({ message }));
         }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error }))),
+      )),
     ));
 
   blockAgenda$ = createEffect(
@@ -68,8 +68,8 @@ export class UnavailableEffects {
           const message = this.translate.instant('UNAVAILABLE.CREATED', { date: newDateTimestamp(response.timestamp) });
           return of(new fromActionsUnavailable.UnavailableSaveSuccess({ message }));
         }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error }))),
+      )),
     ));
 
   update = createEffect(
@@ -81,8 +81,8 @@ export class UnavailableEffects {
             { date: newDateTimestamp(response.timestamp) });
           return of(new fromActionsUnavailable.UnavailableSaveSuccess({ message }));
         }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error }))),
+      )),
     ));
 
   delete$ = createEffect(
@@ -94,8 +94,8 @@ export class UnavailableEffects {
             { date: newDateTimestamp(payload.timestamp) });
           return of(new fromActionsUnavailable.UnavailableSaveSuccess({ message }));
         }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error }))),
+      )),
     ));
 
   selectedData$ = createEffect(() => this.actions$.pipe(
@@ -106,19 +106,19 @@ export class UnavailableEffects {
         path = [...path, 'block-agenda'];
       }
       this.router.navigate([...path, data.payload.id]);
-    })
+    }),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableSuccess)
+    ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableSuccess),
   ), { dispatch: false });
 
   roomSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsUnavailable.UnavailableActionTypes.roomSuccess)
+    ofType(fromActionsUnavailable.UnavailableActionTypes.roomSuccess),
   ), { dispatch: false });
 
   saveSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableSaveSuccess)
+    ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableSaveSuccess),
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions,

@@ -13,7 +13,7 @@ import {
   UntypedFormBuilder,
   UntypedFormControl,
   UntypedFormGroup,
-  Validators
+  Validators,
 } from '@angular/forms';
 import { createTreatmentGroupService, executeDialogNoWidth } from '../../../util/helper';
 import { SharedModule } from '../../../shared/shared.module';
@@ -26,7 +26,7 @@ import { AppMaterialModule } from '../../../util/app-material.module';
   selector: 'app-add-service',
   templateUrl: './add-service.component.html',
   styleUrls: ['./add-service.component.scss'],
-  imports: [SharedModule, CurrencySymbolPipe, BackButtonDirective]
+  imports: [SharedModule, CurrencySymbolPipe, BackButtonDirective],
 })
 export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -56,7 +56,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     }
     return this.store.dispatch(
-      new fromActionsRoom.UpdateMyServices({ id: this.roomId, prices })
+      new fromActionsRoom.UpdateMyServices({ id: this.roomId, prices }),
     );
   }
 
@@ -93,7 +93,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
 
   changePrice = (service: IService): void => {
     const dialogRef = this.dialog.open(PriceDialogComponent, {
-      data: { name: service.name, type: service.type, currentPrice: service.price }
+      data: { name: service.name, type: service.type, currentPrice: service.price },
     });
     dialogRef.afterClosed().subscribe(s => {
       if (s) {
@@ -121,7 +121,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
     this.route.params.subscribe((routeParams) => {
       this.roomId = routeParams.id;
       this.store.dispatch(
-        new fromActionsRoom.GetMyServices({ id: this.roomId })
+        new fromActionsRoom.GetMyServices({ id: this.roomId }),
       );
     });
   };
@@ -153,13 +153,13 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
 @Component({
   selector: 'app-price-dialog',
   templateUrl: 'price-dialog.html',
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe]
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
 })
 export class PriceDialogComponent implements OnInit {
 
   form!: UntypedFormGroup;
   price: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
+    Validators.required,
   ]);
 
   constructor(public dialogRef: MatDialogRef<PriceDialogComponent>, private formBuilder: UntypedFormBuilder,
@@ -177,7 +177,7 @@ export class PriceDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.formBuilder.group({
-      price: this.price
+      price: this.price,
     });
 
     if (this.data.currentPrice) {

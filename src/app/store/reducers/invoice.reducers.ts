@@ -21,7 +21,7 @@ export const initialState: State = {
   offices: null,
   message: null,
   isLoading: false,
-  changes: true
+  changes: true,
 };
 
 export const reducer = (state = initialState, action: All): State => {
@@ -34,7 +34,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         message: null,
-        changes: true
+        changes: true,
       };
     }
     case InvoiceActionTypes.invoiceSuccess: {
@@ -45,7 +45,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         message: null,
-        changes: true
+        changes: true,
       };
     }
     case InvoiceActionTypes.invoiceFindMyOffices: {
@@ -56,7 +56,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         message: null,
-        changes: false
+        changes: false,
       };
     }
     case InvoiceActionTypes.invoiceOfficesSuccess: {
@@ -67,7 +67,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         message: null,
-        changes: false
+        changes: false,
       };
     }
     case InvoiceActionTypes.invoiceFailure: {
@@ -77,7 +77,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: action.payload.error,
         subErrors: action.payload.error.subErrors,
         message: null,
-        changes: false
+        changes: false,
       };
     }
     case InvoiceActionTypes.invoiceUpdateOffice: {
@@ -87,7 +87,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         message: null,
-        changes: false
+        changes: false,
       };
     }
     case InvoiceActionTypes.clean: {

@@ -13,7 +13,7 @@ export enum MapStatus {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GeocodeService {
 
@@ -22,9 +22,9 @@ export class GeocodeService {
   createMap = (): Observable<MapStatus> => {
     const showMap = environment.showMap;
     if (showMap) {
+      const mapUrl = 'https://maps.googleapis.com/maps/api/js';
       return this.http.jsonp(
-        `https://maps.googleapis.com/maps/api/js?libraries=geometry,places&key=${ environment.googleMapKey }&sensor=false`,
-        'callback')
+        `${ mapUrl }?libraries=geometry,places&key=${ environment.googleMapKey }&sensor=false`, 'callback')
         .pipe(map(() => MapStatus.ready),
           catchError((e) => {
             console.error(e);
@@ -38,7 +38,7 @@ export class GeocodeService {
   geocodeAddress = (
     lat: number,
     lng: number,
-    showDistance: boolean | undefined
+    showDistance: boolean | undefined,
   ): Observable<any> => new Observable((observer) => {
     const latLng = new google.maps.LatLng(lat, lng);
     if (showDistance) {

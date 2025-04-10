@@ -21,7 +21,7 @@ import { SharedModule } from '../../shared/shared.module';
   templateUrl: './color-list.component.html',
   styleUrls: ['./color-list.component.scss'],
   animations: [detailExpandAnimation],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -42,79 +42,79 @@ export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.pageSize = MOBILE_PAGE_SIZE;
-      }
-    });
-    this.getState = this.store.select(selectColorState);
-    this.language = this.translate.currentLang;
+  	breakpointObserver.observe([
+  		Breakpoints.XSmall,
+  		Breakpoints.Small,
+  	]).subscribe(result => {
+  		if (result.matches) {
+  			this.pageSize = MOBILE_PAGE_SIZE;
+  		}
+  	});
+  	this.getState = this.store.select(selectColorState);
+  	this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {
-    this.getColorList();
+  	this.getColorList();
   }
 
   ngOnInit(): void {
-    this.clean();
-    this.subscribe();
+  	this.clean();
+  	this.subscribe();
   }
 
   ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.paginatorSubscription?.unsubscribe();
+  	this.subscription?.unsubscribe();
+  	this.paginatorSubscription?.unsubscribe();
   }
 
   edit = (color: IColor): void => this.store.dispatch(new fromActionsColor.ColorSelected(color));
 
   delete = (color: IColor): void => {
-    const title = this.translate.instant('COLOR.DELETED.TITLE');
-    const content = this.translate.instant('COLOR.DELETED.CONTENT', { name: color.name });
+  	const title = this.translate.instant('COLOR.DELETED.TITLE');
+  	const content = this.translate.instant('COLOR.DELETED.CONTENT', { name: color.name });
 
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: color }, result => {
-      if (result) {
-        this.store.dispatch(
-          new fromActionsColor.DeleteColor(result)
-        );
-      }
-    });
+  	executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: color }, result => {
+  		if (result) {
+  			this.store.dispatch(
+  				new fromActionsColor.DeleteColor(result),
+  			);
+  		}
+  	});
   };
 
   private clean = (): void => this.store.dispatch(new fromActionsColor.Clean());
 
   private createPageSubscriptions = (): void => {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getColorList();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getColorList(this.paginator.pageIndex));
+  	this.sort.sortChange.subscribe(() => {
+  		this.paginator.pageIndex = 0;
+  		this.getColorList();
+  	});
+  	this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getColorList(this.paginator.pageIndex));
 
-    this.cdRef.detectChanges();
+  	this.cdRef.detectChanges();
   };
 
   private getColorList = (page: number = 0): void => this.store.dispatch(
-    new fromActionsColor.GetAll({
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    })
+  	new fromActionsColor.GetAll({
+  		active: this.sort.active,
+  		direction: this.sort.direction,
+  		size: this.pageSize,
+  		page,
+  	}),
   );
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.message) {
-        this.clean();
-        this.getColorList();
-      }
-      this.dataSource = state.data?.content;
-      this.resultsLength = state.data?.totalElements;
-      if (!this.paginatorSubscription && this.resultsLength) {
-        this.createPageSubscriptions();
-      }
-    });
+  	this.subscription = this.getState.subscribe((state) => {
+  		if (state.message) {
+  			this.clean();
+  			this.getColorList();
+  		}
+  		this.dataSource = state.data?.content;
+  		this.resultsLength = state.data?.totalElements;
+  		if (!this.paginatorSubscription && this.resultsLength) {
+  			this.createPageSubscriptions();
+  		}
+  	});
   };
 }

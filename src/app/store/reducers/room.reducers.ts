@@ -31,7 +31,7 @@ export const initialState: State = {
   subErrors: null,
   selected: null,
   message: null,
-  isLoading: false
+  isLoading: false,
 };
 
 export const reducer = (state = initialState, action: All): State => {
@@ -45,7 +45,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case RoomActionTypes.getRoomInfo: {
@@ -57,7 +57,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case RoomActionTypes.roomFind: {
@@ -67,7 +67,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case RoomActionTypes.getMyService: {
@@ -78,12 +78,12 @@ export const reducer = (state = initialState, action: All): State => {
           treatments: [],
           selectedTreatments: [],
           additionalList: [],
-          selectedAdditionalList: []
+          selectedAdditionalList: [],
         } as IRoomService,
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case RoomActionTypes.roomInfoSuccess: {
@@ -94,7 +94,7 @@ export const reducer = (state = initialState, action: All): State => {
         currencies: action.payload.currencies,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case RoomActionTypes.roomSuccess: {
@@ -103,7 +103,7 @@ export const reducer = (state = initialState, action: All): State => {
         data: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case RoomActionTypes.roomSaveSuccess: {
@@ -113,7 +113,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         selected: null,
         subErrors: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case RoomActionTypes.roomSelected: {
@@ -122,7 +122,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: action.payload.roomInfo,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case RoomActionTypes.roomServiceSelected: {
@@ -131,7 +131,7 @@ export const reducer = (state = initialState, action: All): State => {
         services: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case RoomActionTypes.roomFailure: {
@@ -141,7 +141,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: action.payload.error,
         subErrors: action.payload.error.subErrors,
         message: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case RoomActionTypes.roomServiceUpdate:
@@ -154,7 +154,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         message: null,
-        isLoading: true
+        isLoading: true,
       };
     }
     case RoomActionTypes.getCustomerInfo: {
@@ -164,7 +164,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case RoomActionTypes.customerInfoSuccess: {
@@ -173,7 +173,7 @@ export const reducer = (state = initialState, action: All): State => {
         customers: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case RoomActionTypes.clean: {

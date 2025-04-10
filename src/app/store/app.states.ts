@@ -66,7 +66,7 @@ export const reducers = {
   expense: expense.reducer,
   note: note.reducer,
   account: account.reducer,
-  i18n: i18n.reducer
+  i18n: i18n.reducer,
 };
 
 export const selectAuthState = createFeatureSelector<AppState>('auth');

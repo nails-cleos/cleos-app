@@ -9,7 +9,7 @@ import { Store } from '@ngrx/store';
 import * as fromActionsI18n from '../store/i18n.actions';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NavigationService {
 
@@ -63,7 +63,7 @@ export class NavigationService {
       this.store.dispatch(new fromActionsI18n.SetLanguage(language));
       if (userLanguage?.language !== language) {
         this.store.dispatch(
-          new fromActionsUser.UpdateUser({ user, redirectUrl })
+          new fromActionsUser.UpdateUser({ user, redirectUrl }),
         );
       }
     }

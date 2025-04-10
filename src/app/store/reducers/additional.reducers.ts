@@ -22,7 +22,7 @@ export const initialState: State = {
   subErrors: null,
   selected: null,
   message: null,
-  isLoading: false
+  isLoading: false,
 };
 
 export const reducer = (state = initialState, action: All): State => {
@@ -34,7 +34,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case AdditionalActionTypes.getAdditionalList: {
@@ -43,7 +43,7 @@ export const reducer = (state = initialState, action: All): State => {
         data: null,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case AdditionalActionTypes.additionalFind: {
@@ -53,7 +53,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case AdditionalActionTypes.additionalSuccess: {
@@ -62,7 +62,7 @@ export const reducer = (state = initialState, action: All): State => {
         data: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case AdditionalActionTypes.additionalSaveSuccess: {
@@ -72,7 +72,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: null,
         errorMessage: null,
         subErrors: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case AdditionalActionTypes.additionalSelected: {
@@ -81,7 +81,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case AdditionalActionTypes.additionalFailure: {
@@ -91,7 +91,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: action.payload.error,
         subErrors: action.payload.error.subErrors,
         message: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case AdditionalActionTypes.additionalUpdate:
@@ -102,7 +102,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         message: null,
-        isLoading: true
+        isLoading: true,
       };
     }
     case AdditionalActionTypes.findGroups: {
@@ -111,7 +111,7 @@ export const reducer = (state = initialState, action: All): State => {
         groups: null,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case AdditionalActionTypes.findGroupsSuccess: {
@@ -120,7 +120,7 @@ export const reducer = (state = initialState, action: All): State => {
         groups: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case AdditionalActionTypes.clean: {

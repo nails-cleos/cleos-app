@@ -8,9 +8,9 @@ describe('PaymentPreviewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [PaymentPreviewComponent]
-})
-    .compileComponents();
+      imports: [PaymentPreviewComponent],
+    })
+      .compileComponents();
 
     fixture = TestBed.createComponent(PaymentPreviewComponent);
     component = fixture.componentInstance;

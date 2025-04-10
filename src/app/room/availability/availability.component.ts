@@ -9,7 +9,7 @@ import { SharedModule } from '../../shared/shared.module';
   selector: 'app-availability',
   templateUrl: './availability.component.html',
   styleUrls: ['./availability.component.scss'],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class AvailabilityComponent implements OnChanges {
   @Input() dates?: IAvailabilityDate;
@@ -25,54 +25,54 @@ export class AvailabilityComponent implements OnChanges {
   checked!: boolean;
 
   constructor(private formBuilder: UntypedFormBuilder, private translate: TranslateService) {
-    this.start = new UntypedFormControl('', [
-      Validators.required
-    ]);
+  	this.start = new UntypedFormControl('', [
+  		Validators.required,
+  	]);
 
-    this.end = new UntypedFormControl('', [
-      Validators.required
-    ]);
+  	this.end = new UntypedFormControl('', [
+  		Validators.required,
+  	]);
 
-    this.startLunch = new UntypedFormControl();
-    this.endLunch = new UntypedFormControl();
+  	this.startLunch = new UntypedFormControl();
+  	this.endLunch = new UntypedFormControl();
 
-    this.availabilityForm = this.formBuilder.group({
-      start: this.start,
-      end: this.end,
-      startLunch: this.startLunch,
-      endLunch: this.endLunch
-    });
+  	this.availabilityForm = this.formBuilder.group({
+  		start: this.start,
+  		end: this.end,
+  		startLunch: this.startLunch,
+  		endLunch: this.endLunch,
+  	});
   }
 
   get create(): void {
-    const availability: IAvailability = new Availability();
-    availability.day = this.day;
-    availability.start = this.start.value;
-    availability.end = this.end.value;
+  	const availability: IAvailability = new Availability();
+  	availability.day = this.day;
+  	availability.start = this.start.value;
+  	availability.end = this.end.value;
 
-    if (this.checked) {
-      availability.startLunch = this.startLunch.value;
-      availability.endLunch = this.endLunch.value;
-    }
+  	if (this.checked) {
+  		availability.startLunch = this.startLunch.value;
+  		availability.endLunch = this.endLunch.value;
+  	}
 
-    return this.availability.emit(availability);
+  	return this.availability.emit(availability);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ngOnChanges(_changes: SimpleChanges): void {
-    const timeZone = getCurrentTimeZone();
-    const start = this.dates?.startDate || createDate(timeZone, 9, 0);
-    const end = this.dates?.endDate || createDate(timeZone, 18, 0);
-    const startLunch = this.dates?.startLunchDate || createDate(timeZone, 13, 0);
-    const endLunch = this.dates?.endLunchDate || createDate(timeZone, 14, 0);
+  	const timeZone = getCurrentTimeZone();
+  	const start = this.dates?.startDate || createDate(timeZone, 9, 0);
+  	const end = this.dates?.endDate || createDate(timeZone, 18, 0);
+  	const startLunch = this.dates?.startLunchDate || createDate(timeZone, 13, 0);
+  	const endLunch = this.dates?.endLunchDate || createDate(timeZone, 14, 0);
 
-    this.start.setValue(getTime(start, 'es'));
-    this.end.setValue(getTime(end, 'es'));
+  	this.start.setValue(getTime(start, 'es'));
+  	this.end.setValue(getTime(end, 'es'));
 
-    if (this.dates?.startLunchDate && this.dates?.endLunchDate) {
-      this.checked = true;
-      this.startLunch.setValue(getTime(startLunch, 'es'));
-      this.endLunch.setValue(getTime(endLunch, 'es'));
-    }
+  	if (this.dates?.startLunchDate && this.dates?.endLunchDate) {
+  		this.checked = true;
+  		this.startLunch.setValue(getTime(startLunch, 'es'));
+  		this.endLunch.setValue(getTime(endLunch, 'es'));
+  	}
   }
 }

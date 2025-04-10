@@ -25,29 +25,29 @@ const importExport = [
 @NgModule({
   imports: [
     CalendarModule.forRoot({
-      provide: DateAdapter, useFactory: adapterFactory
+      provide: DateAdapter, useFactory: adapterFactory,
     }),
     CalendarModule.forRoot({
       provide: DateAdapter,
-      useFactory: adapterFactory
+      useFactory: adapterFactory,
     }, {
       dateFormatter: {
         provide: CalendarDateFormatter,
-        useClass: CustomDateFormatter
+        useClass: CustomDateFormatter,
       }, eventTitleFormatter: {
         provide: CalendarEventTitleFormatter,
-        useClass: CustomEventTitleFormatter
-      }
+        useClass: CustomEventTitleFormatter,
+      },
     }),
     GoogleMapsModule,
-    ...importExport
+    ...importExport,
   ],
   exports: [
     ...importExport,
   ],
   providers: [
-    GeocodeService
-  ]
+    GeocodeService,
+  ],
 })
 export class SharedModule {
 }

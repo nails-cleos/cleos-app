@@ -13,12 +13,12 @@ describe('UpdateTrackingDialogComponent', () => {
     dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
 
     await TestBed.configureTestingModule({
-    imports: [SharedModule, ReactiveFormsModule, UpdateTrackingDialogComponent],
-    providers: [
+      imports: [SharedModule, ReactiveFormsModule, UpdateTrackingDialogComponent],
+      providers: [
         { provide: MatDialogRef, useValue: dialogRefSpy },
-        { provide: MAT_DIALOG_DATA, useValue: { startedTimestamp: Date.now(), completedTimestamp: Date.now() } }
-    ]
-}).compileComponents();
+        { provide: MAT_DIALOG_DATA, useValue: { startedTimestamp: Date.now(), completedTimestamp: Date.now() } },
+      ],
+    }).compileComponents();
   });
 
   beforeEach(() => {
@@ -44,7 +44,7 @@ describe('UpdateTrackingDialogComponent', () => {
     component.doAction;
     expect(dialogRefSpy.close).toHaveBeenCalledWith(jasmine.objectContaining({
       started: jasmine.any(String),
-      completed: jasmine.any(String)
+      completed: jasmine.any(String),
     }));
   });
 });

@@ -7,9 +7,48 @@
     "@angular-eslint"
   ],
   "rules": {
-    "quotes": ["error", "single"],
-    "semi": [1, "always"],
-    "no-console": ["error", { "allow": ["warn", "error"] }]
+    "quotes": [
+      "error",
+      "single"
+    ],
+    "semi": [
+      1,
+      "always"
+    ],
+    "no-console": [
+      "error",
+      {
+        "allow": [
+          "warn",
+          "error"
+        ]
+      }
+    ],
+    "eqeqeq": "error",
+    "curly": [
+      "error",
+      "all"
+    ],
+    "no-unused-vars": "error",
+    "no-undef": "error",
+    "camelcase": "error",
+    "prefer-const": "error",
+    "consistent-return": "error",
+    "no-debugger": "error",
+    "no-alert": "error",
+    "no-shadow": "error",
+    "comma-dangle": [
+      "error",
+      "always-multiline"
+    ],
+    "object-curly-spacing": [
+      "error",
+      "always"
+    ],
+    "array-bracket-spacing": [
+      "error",
+      "never"
+    ]
   },
   "overrides": [
     {
@@ -45,7 +84,20 @@
             "style": "camelCase"
           }
         ],
-        "no-shadow": "off"
+        "no-shadow": "off",
+        "indent": [
+          "error",
+          2,
+          {
+            "SwitchCase": 1
+          }
+        ],
+        "max-len": [
+          "error",
+          {
+            "code": 120
+          }
+        ]
       }
     },
     {

@@ -23,7 +23,7 @@ export const initialState: State = {
   message: null,
   paths: null,
   reload: false,
-  isLoading: false
+  isLoading: false,
 };
 
 export const reducer = (state = initialState, action: All): State => {
@@ -34,7 +34,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: [{}, {}, {}],
-        message: null
+        message: null,
       };
     }
     case PaymentActionTypes.paymentCreate:
@@ -45,7 +45,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case PaymentActionTypes.paymentOptions: {
@@ -56,7 +56,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case PaymentActionTypes.paymentSuccess: {
@@ -66,7 +66,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case PaymentActionTypes.paymentSaveSuccess: {
@@ -78,7 +78,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         selected: null,
         subErrors: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case PaymentActionTypes.paymentNotComplete: {
@@ -88,7 +88,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: action.payload.message,
         paths: action.payload.paths,
-        isLoading: false
+        isLoading: false,
       };
     }
     case PaymentActionTypes.paymentSelected: {
@@ -97,7 +97,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: action.payload.payment,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case PaymentActionTypes.paymentFailure: {
@@ -107,7 +107,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: action.payload.error,
         subErrors: action.payload.error.subErrors,
         message: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case PaymentActionTypes.paymentUpdate:
@@ -121,7 +121,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         message: null,
-        isLoading: true
+        isLoading: true,
       };
     }
     case PaymentActionTypes.clean: {

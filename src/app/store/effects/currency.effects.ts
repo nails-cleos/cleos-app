@@ -16,16 +16,16 @@ export class CurrencyEffects {
     switchMap((payload: any) => this.currencyService.getAll(payload.active, payload.direction, payload.page,
       payload.size).pipe(
       switchMap((response: any) => of(new fromActionsCurrency.CurrencySuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsCurrency.CurrencyFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsCurrency.CurrencyFailure({ error: err.error }))),
+    )),
   ));
 
   findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsCurrency.CurrencyActionTypes.currencyFind)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.currencyService.getById(payload).pipe(
       switchMap((currency: any) => of(new fromActionsCurrency.CurrencySelected(currency))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsCurrency.CurrencyFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsCurrency.CurrencyFailure({ error: err.error }))),
+    )),
   ));
 
   save$ = createEffect(() => this.actions$.pipe(ofType(fromActionsCurrency.CurrencyActionTypes.currencySave)).pipe(
@@ -34,8 +34,8 @@ export class CurrencyEffects {
       switchMap((response: any) => {
         const message = this.translate.instant('CURRENCY.CREATED', { code: response.code });
         return of(new fromActionsCurrency.CurrencySaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsCurrency.CurrencyFailure({ error: err.error })))
-    ))
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsCurrency.CurrencyFailure({ error: err.error }))),
+    )),
   ));
 
   update = createEffect(() => this.actions$.pipe(ofType(fromActionsCurrency.CurrencyActionTypes.currencyUpdate)).pipe(
@@ -44,8 +44,8 @@ export class CurrencyEffects {
       switchMap((response: any) => {
         const message = this.translate.instant('CURRENCY.UPDATED.MESSAGE', { code: response.code });
         return of(new fromActionsCurrency.CurrencySaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsCurrency.CurrencyFailure({ error: err.error })))
-    ))
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsCurrency.CurrencyFailure({ error: err.error }))),
+    )),
   ));
 
   delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsCurrency.CurrencyActionTypes.currencyDelete)).pipe(
@@ -54,21 +54,21 @@ export class CurrencyEffects {
       switchMap(() => {
         const message = this.translate.instant('CURRENCY.DELETED.MESSAGE', { code: payload.code });
         return of(new fromActionsCurrency.CurrencySaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsCurrency.CurrencyFailure({ error: err.error })))
-    ))
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsCurrency.CurrencyFailure({ error: err.error }))),
+    )),
   ));
 
   selectedData$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsCurrency.CurrencyActionTypes.currencySelected),
-    tap((data: any) => this.router.navigate([this.translate.currentLang, 'currency', data.payload.id]))
+    tap((data: any) => this.router.navigate([this.translate.currentLang, 'currency', data.payload.id])),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsCurrency.CurrencyActionTypes.currencySuccess)
+    ofType(fromActionsCurrency.CurrencyActionTypes.currencySuccess),
   ), { dispatch: false });
 
   saveSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsCurrency.CurrencyActionTypes.currencySaveSuccess)
+    ofType(fromActionsCurrency.CurrencyActionTypes.currencySaveSuccess),
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions,

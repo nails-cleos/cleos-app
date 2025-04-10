@@ -8,9 +8,9 @@ describe('AdditionalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [AdditionalComponent]
-})
-    .compileComponents();
+      imports: [AdditionalComponent],
+    })
+      .compileComponents();
   });
 
   beforeEach(() => {

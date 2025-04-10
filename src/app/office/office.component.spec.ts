@@ -8,9 +8,9 @@ describe('OfficeComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [OfficeComponent]
-})
-    .compileComponents();
+      imports: [OfficeComponent],
+    })
+      .compileComponents();
   });
 
   beforeEach(() => {
