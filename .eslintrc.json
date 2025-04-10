@@ -8,7 +8,8 @@
   ],
   "rules": {
     "quotes": ["error", "single"],
-    "semi": [1, "always"]
+    "semi": [1, "always"],
+    "no-console": ["error", { "allow": ["warn", "error"] }]
   },
   "overrides": [
     {

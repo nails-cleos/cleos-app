@@ -34,7 +34,7 @@ declare namespace Cypress {
 
     mockTreatments(customerId: string, roomId: string, groupId: string): Chainable<any>;
 
-    mockSearch(roomId: string, professionalId: string, date: Date): Chainable<any>;
+    mockSearch(roomId: string, professionalId: string, date: Date, days: number): Chainable<any>;
 
     mockCreateReservation(reservationId: string, customerId: string, date: Date, professionalId: string, roomId: string,
                           treatmentId: string, additionalList?: string[]): Chainable<any>;
@@ -49,6 +49,7 @@ Cypress.Commands.add('randomUUID', () => cy.wrap('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxx
 Cypress.Commands.add('logout', () => {
   cy.get('button[name="settings"]').click();
   cy.get('mat-list-item').contains('Sign out').click();
+  cy.url().should('include', 'home');
 });
 
 Cypress.Commands.add('checkAppDialog', (title: string, message: string, buttonClick: string) => {
@@ -296,7 +297,7 @@ Cypress.Commands.add('mockCreateAuthUri', (registered: boolean, methods: string[
 Cypress.Commands.add('mockNotifications', () => {
   cy.intercept(
     'GET',
-    '**/api/v1/notifications/pages?page=0&size=10&sort=date&direction=desc',
+    new RegExp('/api/v1/notifications/pages\\?page=0&size=\\d+&sort=date&direction=desc'),
     {
       statusCode: 204,
       body: null,
@@ -307,7 +308,7 @@ Cypress.Commands.add('mockNotifications', () => {
 Cypress.Commands.add('mockCustomerReservations', () => {
   cy.intercept(
     'GET',
-    '**/api/v1/reservations/customer?page=0&size=10&sort=timestamp&direction=desc',
+    new RegExp('/api/v1/reservations/customer\\?page=0&size=\\d+&sort=timestamp&direction=desc'),
     {
       statusCode: 200,
       body: {
@@ -435,7 +436,7 @@ Cypress.Commands.add('mockTreatments', (customerId: string, roomId: string, grou
   });
 });
 
-Cypress.Commands.add('mockSearch', (roomId: string, professionalId: string, date: Date) => {
+Cypress.Commands.add('mockSearch', (roomId: string, professionalId: string, date: Date, days: number) => {
   const dateFormatted = date.toISOString().slice(0, 10);
   cy.fixture('rooms').then((roomData) => {
     cy.log(roomData)
@@ -449,7 +450,7 @@ Cypress.Commands.add('mockSearch', (roomId: string, professionalId: string, date
           const professional = usersData.find((user: { id: string; }) => user.id === professionalId);
           cy.intercept(
             'GET',
-            `**/api/v1/reservations/rooms/${ roomId }?days=7&dates=${ dateFormatted }&professionalId=${ professionalId }`,
+            `**/api/v1/reservations/rooms/${ roomId }?days=${days}&dates=${ dateFormatted }&professionalId=${ professionalId }`,
             {
               statusCode: 200,
               body: [

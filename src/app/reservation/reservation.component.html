@@ -538,7 +538,7 @@
               <mat-icon>keyboard_return</mat-icon>
             </button>
             <button type="button" (click)="callStepTwo(true)" [disabled]="customerForm.invalid" color="primary"
-                    class="icon-button" mat-fab>
+                    class="icon-button" mat-fab name="toStepTwo">
               <mat-icon>arrow_downward</mat-icon>
             </button>
           </div>
@@ -697,7 +697,7 @@
                 {{ 'COMMON.BUTTON.BACK' | translate }}
               </button>
               <button type="button" (click)="callStepTwo(true)" [disabled]="customerForm.invalid" color="primary"
-                      class="icon-button" mat-fab extended>
+                      class="icon-button" mat-fab extended name="toStepTwo">
                 <mat-icon>arrow_forward</mat-icon>
                 {{ 'COMMON.BUTTON.NEXT' | translate }}
               </button>
