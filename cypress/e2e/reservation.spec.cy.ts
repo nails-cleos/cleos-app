@@ -16,8 +16,8 @@ describe('Reservation', () => {
     cy.mockFirebaseAppCheck();
     cy.mockNotifications();
     cy.mockCustomersData(customerId, treatmentId);
-    cy.mockRoomData(customerId, roomId);
-    cy.mockTreatments(customerId, roomId, treatmentId, groupId);
+    cy.mockRoomData(customerId);
+    cy.mockTreatments(customerId, roomId, groupId);
   });
 
   it('should create a reservation', () => {
@@ -90,16 +90,14 @@ describe('Reservation', () => {
     cy.wait(50);
 
     // Sunday
-    validateCalendar(0, [{ text: 'Out of work', length: 1 }]);
+    validateCalendar(0, [{ text: 'Out of work', length: 1 }, { text: '16:45 - 17:15', length: 1 }]);
     // Monday
     validateCalendar(1, [
-      { text: 'Out of work', length: 2 },
-      { text: 'Lunch time', length: 1 }
+      { text: 'Out of work', length: 2 }, { text: 'Lunch time', length: 1 }, { text: '16:45 - 17:15', length: 1 }
     ]);
     // Tuesday
     validateCalendar(2, [
-      { text: 'Out of work', length: 2 },
-      { text: 'Lunch time', length: 1 }
+      { text: 'Out of work', length: 2 }, { text: 'Lunch time', length: 1 }, { text: '16:45 - 17:15', length: 1 }
     ]);
     // Wednesday
     validateCalendar(3, [
@@ -107,22 +105,26 @@ describe('Reservation', () => {
       { text: 'Lunch time', length: 1 },
       { text: '10:00 - 11:30', length: 1 },
       { text: '15:30 - 17:00', length: 1 },
-      { text: `${ hour }:${ minute } - 15:30`, length: 1 }
+      { text: `${ hour }:${ minute } - 15:30`, length: 1 },
+      { text: '16:45 - 17:15', length: 1 }
     ]);
     // Thursday
     validateCalendar(4, [
       { text: 'Out of work', length: 2 },
-      { text: 'Lunch time', length: 1 }
+      { text: 'Lunch time', length: 1 },
+      { text: '16:45 - 17:15', length: 1 },
+      { text: 'All day', length: 1 }
     ]);
     // Friday
     validateCalendar(5, [
       { text: 'Out of work', length: 2 },
       { text: 'Lunch time', length: 1 },
       { text: '10:00 - 10:30', length: 1 },
-      { text: '17:30 - 18:30', length: 1 }
+      { text: '17:30 - 18:30', length: 1 },
+      { text: '16:45 - 17:15', length: 1 }
     ]);
     // Saturday
-    validateCalendar(6, [{ text: 'Out of work', length: 1 }]);
+    validateCalendar(6, [{ text: 'Out of work', length: 1 }, { text: '16:45 - 17:15', length: 1 }]);
 
     cy.get('button[name="toStepSeven"]').contains('Next').click();
 

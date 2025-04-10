@@ -8,7 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { IAddress, ILocation, IRoom, IRoomAll, ServiceType } from '../interfaces/room';
 import { IOffice } from '../interfaces/office';
 import { ICurrency, ICurrencyAll } from '../interfaces/currency';
-import { getTime, getTimeZone, localeTimeZoneDate, searchDates } from './dates';
+import { getTime, getTimeZone, localeTimeZoneDate } from './dates';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { isSameDay } from 'date-fns';
@@ -16,7 +16,6 @@ import { Role } from '../interfaces/token';
 import { CancelDialogComponent } from '../shared/dialog/cancel/cancel-dialog.component';
 import { Router } from '@angular/router';
 import { CustomerEditDialogComponent } from '../shared/dialog/customer-edit/customer-edit-dialog.component';
-import { IDataEvent } from './event';
 
 export const VERIFICATION_EMAIL = 'verification_email';
 
@@ -485,35 +484,3 @@ export const createAddress = (formattedAddress?: string, location?: google.maps.
 };
 
 export const toUrl = (...url: string[]): string => url.join('/');
-
-export const validateUnavailableEvent = (
-  start: Date,
-  recurring: any,
-  dataEvent: IDataEvent,
-  createUnavailableEvent: (start: Date, end: Date, dataEvent: IDataEvent) => void
-): void => {
-  const [startSearch, endSearch] = searchDates(recurring.allDay, start, recurring.duration);
-  const overlapEvent = dataEvent.getOverlapEvent(startSearch, endSearch);
-
-  if (overlapEvent.length > 0) {
-    overlapEvent.forEach(value => {
-      if (value.id !== 'NOT_WORKING_ALL_DAY' && !value.meta.isReservation) {
-        dataEvent.filterEvent(value);
-        if (value.end) {
-          if (startSearch < value.start && endSearch < value.end) {
-            value.start = endSearch;
-            dataEvent.addEvent(value);
-          } else if (startSearch > value.start && endSearch > value.end) {
-            value.end = startSearch;
-            dataEvent.addEvent(value);
-          }
-        }
-      }
-      if (dataEvent.sameDayEvent(recurring, value)) {
-        createUnavailableEvent(startSearch, endSearch, dataEvent);
-      }
-    });
-  } else {
-    createUnavailableEvent(startSearch, endSearch, dataEvent);
-  }
-};

@@ -3,12 +3,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
 import { Observable, Subject, Subscription } from 'rxjs';
 import * as fromActionsReservation from '../../store/reservation.actions';
-import {
-  Day,
-  IRoomReservation,
-  MAX_RESERVATION_MONTH,
-  States
-} from '../../interfaces/reservation';
+import { Day, IRoomReservation, MAX_RESERVATION_MONTH, States } from '../../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import {
@@ -28,6 +23,7 @@ import {
   newDate,
   newDateTimestamp,
   reservationDuration,
+  searchDates,
   subPeriod
 } from '../../util/dates';
 import { IRoom, IRoomAll } from '../../interfaces/room';
@@ -37,7 +33,7 @@ import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarModule } from 'a
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
-import { createRoomOffice, executeDialogNoWidth, FrequencyEnum, validateUnavailableEvent } from '../../util/helper';
+import { createRoomOffice, executeDialogNoWidth, FrequencyEnum } from '../../util/helper';
 import { addDays, addMonths, isEqual } from 'date-fns';
 import { findStateColor } from '../../util/theme';
 import { map, startWith, takeUntil } from 'rxjs/operators';
@@ -137,8 +133,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
   private professionalSelectedId?: string;
   private today: Date = createNewDate(getNowTimeZone());
   private isRoomAdmin = false;
-  private calendarStart: Date = addDays(this.today, -Math.floor(this.daysInWeek / 2));
-  private calendarEnd: Date = addDays(this.today, this.daysInWeek);
   private dataReady = false;
   private calendarReady = false;
 
@@ -275,8 +269,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
   };
 
   beforeMonthViewRender = ({ header, period }: any): void => {
-    this.calendarStart = period.start;
-    this.calendarEnd = period.end;
     if (this.calendar) {
       this.calendar.calendarStart = period.start;
       this.calendar.calendarEnd = period.end;
@@ -506,9 +498,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
   private validateUnavailable = (room: IRoomAll, start: Date, recurring: any, darkMode: boolean): void => {
     const dataEvent = this.calendar;
     if (dataEvent) {
-      validateUnavailableEvent(start, recurring, dataEvent,
-        (startSearch, endSearch, dataEvent) => this.createUnavailableEvent(room, dataEvent.day, recurring, startSearch,
-          endSearch, darkMode, dataEvent));
+      const [startSearch, endSearch] = searchDates(recurring.allDay, start, recurring.duration);
+      this.createUnavailableEvent(room, dataEvent.day, recurring, startSearch,
+        endSearch, darkMode, dataEvent);
     }
   };
 
@@ -538,8 +530,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
       const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
       const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
       const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
-      this.calendar.recurringEvent?.addNotAvailableRecurring(this.calendar, unavailable, lunch, notWorking, sunday, saturday, friday,
-        thursday, wednesday, tuesday, monday, darkMode, timeZone);
+      this.calendar.recurringEvent?.addNotAvailableRecurring(this.calendar, unavailable, lunch, notWorking, sunday,
+        saturday, friday, thursday, wednesday, tuesday, monday, darkMode, timeZone);
       this.addUnavailableList(this.data, darkMode);
       this.addBirthdays(this.data, darkMode);
       this.addNotes(this.data, darkMode);
@@ -564,14 +556,17 @@ export class CalendarComponent implements OnInit, OnDestroy {
     );
   };
 
-  private getReservations = (): void => this.store.dispatch(
-    new fromActionsReservation.GetAllGroupingByRoom({
-      days: this.daysInWeek,
-      date: this.searchDate,
-      roomId: this.roomId,
-      professionalId: this.professionalSelectedId
-    })
-  );
+  private getReservations = (): void => {
+    this.calendar.resetEvents();
+    this.store.dispatch(
+      new fromActionsReservation.GetAllGroupingByRoom({
+        days: this.daysInWeek,
+        date: this.searchDate,
+        roomId: this.roomId,
+        professionalId: this.professionalSelectedId
+      })
+    );
+  };
 
   private getRoomList = (): void => this.store.dispatch(new fromActionsReservation.FindRooms());
 
