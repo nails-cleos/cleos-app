@@ -58,7 +58,6 @@ devices.forEach(({ name, width, height }) => {
         cy.url().should('include', '/me/reservations');
         cy.get('mat-card-title').contains('No upcoming reservations');
         cy.get('tr').contains('No reservations');
-        cy.logout();
       });
     });
 
@@ -105,9 +104,9 @@ devices.forEach(({ name, width, height }) => {
               cy.get('h2').contains(`Room is not open ${ date }`);
               break;
           }
-          cy.logout();
         });
       });
     });
+    afterEach(() => cy.logout());
   });
 });

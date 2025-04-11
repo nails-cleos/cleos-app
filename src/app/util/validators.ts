@@ -60,3 +60,14 @@ export function noDuplicateDatesValidator(key: string = 'date'): ValidatorFn {
     return null; // No errors
   };
 }
+
+export const validColorValidator = (): ValidatorFn  => {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+
+    // Simple HEX color regex (e.g. #fff or #ffffff)
+    const isValid = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value);
+
+    return isValid ? null : { invalidColor: true };
+  };
+};

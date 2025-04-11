@@ -8,6 +8,10 @@ declare namespace Cypress {
 
     checkMatList(title?: string, icon?: string, ...details: string[]): Chainable<any>;
 
+    openMenu(breakpoint: string, menus: string[]): Chainable<any>;
+
+    selectOption(id: string, option: string): Chainable<any>;
+
     mockAuthentication(email: string, role: string): Chainable<any>;
 
     mockLogin(email: string, displayName: string, role: string): Chainable<any>;
@@ -36,8 +40,10 @@ declare namespace Cypress {
 
     mockSearch(roomId: string, professionalId: string, date: Date, days: number): Chainable<any>;
 
-    mockCreateReservation(reservationId: string, customerId: string, date: Date, professionalId: string, roomId: string,
-                          treatmentId: string, additionalList?: string[]): Chainable<any>;
+    mockCreateReservation(reservationId: string, customerId: string, date: Date, professionalId: string,
+                          roomId: string, treatmentId: string, additionalList?: string[]): Chainable<any>;
+
+    mockUsers(total?: number): Chainable<any>;
   }
 }
 
@@ -79,6 +85,23 @@ Cypress.Commands.add('checkMatList', (title?: string, icon?: string, ...details:
   }
 
   details.forEach(detail => cy.get('mat-list-item').find('div[matListItemLine]').contains(detail).should('exist'));
+});
+
+Cypress.Commands.add('openMenu', (breakpoint: string, menus: string[]) => {
+  if (['XSmall', 'Small', 'Medium'].includes(breakpoint)) {
+    cy.get('button[name="cleosMenu"]').click();
+  }
+  menus.forEach(menu => {
+    cy.get('mat-list-item').contains(menu).click();
+  });
+});
+
+Cypress.Commands.add('selectOption', (id: string, option: string) => {
+  cy.get(`#${ id }`).should('be.visible');
+  cy.get(`#${ id }`).click();
+
+  cy.get('mat-option').should('exist').and('be.visible');
+  cy.get('mat-option').contains(option).click();
 });
 
 const firebaseUser = (email: string, displayName?: string, kind?: string) => ({
@@ -450,7 +473,7 @@ Cypress.Commands.add('mockSearch', (roomId: string, professionalId: string, date
           const professional = usersData.find((user: { id: string; }) => user.id === professionalId);
           cy.intercept(
             'GET',
-            `**/api/v1/reservations/rooms/${ roomId }?days=${days}&dates=${ dateFormatted }&professionalId=${ professionalId }`,
+            `**/api/v1/reservations/rooms/${ roomId }?days=${ days }&dates=${ dateFormatted }&professionalId=${ professionalId }`,
             {
               statusCode: 200,
               body: [
@@ -545,31 +568,16 @@ Cypress.Commands.add('mockCreateReservation', (
           cy.intercept(
             'POST',
             '**/api/v1/reservations',
-            {
-              statusCode: 201,
-              body: [
-                {
-                  createdAt: new Date().toLocaleDateString('en-GB'),
-                  createdBy: '57ceebd2-a012-42a3-af9a-5d546c193200',
-                  deleted: false,
+            (req) => {
+              req.alias = 'createReservation';
+              req.reply({
+                statusCode: 201,
+                body: [{
                   id: reservationId,
-                  customer: usersData.find((user: { id: string; }) => user.id === customerId),
-                  professional: usersData.find((user: { id: string; }) => user.id === professionalId),
-                  room: roomData.find((room: { id: string; }) => room.id === roomId),
-                  treatment: createReservationTreatment(
-                    treatmentData.find((it: { id: string; }) => it.id === treatmentId)),
-                  additional: additionalList?.map(additionalId => createReservationAdditional(
-                    additionalData.find((it: { id: string; }) => it.id === additionalId))),
-                  extras: [],
-                  timestamp: createTimestamp(date),
-                  state: 'APPROVED',
-                  customerCreated: false,
-                  accepted: true,
-                  version: 0
-                }
-              ]
-            }
-          ).as('createReservation');
+                  ...req.body
+                }]
+              });
+            });
           cy.intercept(
             'GET',
             `**/api/v1/reservations/${ reservationId }`,
@@ -618,4 +626,17 @@ Cypress.Commands.add('mockCreateReservation', (
       });
     });
   });
-})
+});
+
+Cypress.Commands.add('mockUsers', (total?: number) => {
+  cy.fixture('users').then((userData) => {
+    cy.intercept(
+      'GET',
+      new RegExp('/api/v1/users/pages\\?page=0&size=\\d+&sort=displayName&direction=asc'),
+      {
+        statusCode: 200,
+        body: userData.slice(0, total ?? userData.length)
+      }
+    ).as('getUsers');
+  });
+});

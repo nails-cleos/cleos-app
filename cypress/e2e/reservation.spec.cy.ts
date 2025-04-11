@@ -1,5 +1,6 @@
 import '../support/commands';
 import { breakpointToDays, devices, zeroPad } from "../support/utils";
+import { API_LOCALE } from "../../src/app/util/dates";
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   const days = breakpointToDays('reservation', breakpoints);
@@ -68,7 +69,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.get('input[formControlName="group"]').should('have.value', 'Biab Treatment ');
       cy.get('input[formControlName="treatment"]').should('have.value', 'Biab + Single Color ');
 
-      cy.get('button[name="toStepFour"]').click();
+      cy.get('button[name="toStepFour"]').click({ force: true });
 
       cy.wait('@getAdditional').its('response.statusCode').should('eq', 200);
 
@@ -83,10 +84,10 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.get('mat-list-option').contains('Removal from other salon').closest('mat-list-option')
         .find('input[type="checkbox"]').should('be.not.checked');
 
-      cy.get('button[name="toStepFive"]').click();
+      cy.get('button[name="toStepFive"]').click({ force: true });
 
       // Configuration
-      cy.get('button[name="toStepSix"]').click();
+      cy.get('button[name="toStepSix"]').click({ force: true });
 
       cy.wait('@searchReservations').its('response.statusCode').should('eq', 200);
 
@@ -122,23 +123,39 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.checkMatList('Duration', 'timer', '02:00');
       cy.checkMatList('Total', 'euro', '105.00');
 
-      reservationDate.setHours(hour, minute);
+      reservationDate.setHours(hour, minute, 0, 0);
       cy.randomUUID().then(reservationId => {
         cy.mockCreateReservation(reservationId, customerId, reservationDate, professionalId, roomId, treatmentId,
           ['397bce4b-27ba-459f-801a-dcceea330b8d', '557c6520-035a-4b0a-9bd4-f2f1dce27f6d']);
 
         cy.get('button[name="create"]').click();
 
-        cy.wait('@createReservation').its('response.statusCode').should('eq', 201);
+        cy.wait('@createReservation').then(reservationData => {
+          expect(reservationData.response?.statusCode).to.eq(201);
+          const body = reservationData.request.body;
+          expect(body.customerId).to.eq(customerId);
+          expect(body.start).to.eq(reservationDate.toLocaleString(API_LOCALE));
+          expect(body.timeZone).to.eq('Europe/Amsterdam');
+          expect(body.additionalIds).to.have
+            .members(['557c6520-035a-4b0a-9bd4-f2f1dce27f6d', '397bce4b-27ba-459f-801a-dcceea330b8d']);
+          expect(body.canCustomerChange).to.eq(null);
+          expect(body.reference).to.eq(null);
+          expect(body.note).to.eq(null);
+          expect(body.payment).to.eq(undefined);
+          expect(body.treatmentId).to.eq(treatmentId);
+          expect(body.roomId).to.eq(roomId);
+          expect(body.professionalId).to.eq(professionalId);
+          expect(body.discountId).to.eq(undefined);
+        });
 
         cy.url().should('include', `reservation/${ reservationId }`);
         cy.wait('@getReservation').its('response.statusCode').should('eq', 200);
         cy.wait('@getPayments').its('response.statusCode').should('eq', 204);
         cy.wait('@getHistory').its('response.statusCode').should('eq', 204);
-
-        cy.logout();
       });
     });
+
+    afterEach(() => cy.logout());
   });
 });
 

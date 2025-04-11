@@ -84,7 +84,7 @@
         <button mat-icon-button (click)="changeTheme" aria-label="Change theme">
           <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
         </button>
-        <button [matMenuTriggerFor]="menuLogged" mat-icon-button aria-label="Open menu">
+        <button [matMenuTriggerFor]="menuLogged" mat-icon-button aria-label="Open menu" name="menu">
           <mat-icon>menu</mat-icon>
         </button>
         <mat-menu #menuLogged="matMenu">
