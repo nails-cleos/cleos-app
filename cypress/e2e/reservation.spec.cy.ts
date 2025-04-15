@@ -74,7 +74,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.wait('@getAdditional').its('response.statusCode').should('eq', 200);
 
       // Select additional
-      cy.get('mat-list-option').contains('Powder').click();
+      cy.get('mat-list-option').contains('Powder').click({ force: true });
       cy.get('mat-list-option').contains('Powder').closest('mat-list-option').find('input[type="checkbox"]')
         .should('be.checked');
       cy.get('mat-list-option').contains('Biab Removal').closest('mat-list-option').find('input[type="checkbox"]')

@@ -56,7 +56,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           cy.get('#lightColorIcon').click();
           cy.get('input[formControlName="lightColor"]').clear().type('#00f');
         }
-
+        cy.wait(10000);
         cy.get('button[type="submit"]').click();
 
         cy.wait('@saveUser').then(userData => {

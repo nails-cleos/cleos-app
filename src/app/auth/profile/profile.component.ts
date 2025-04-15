@@ -51,10 +51,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
   displayName: UntypedFormControl = new UntypedFormControl();
   phone: FormControl = new FormControl('', [Validators.required]);
   dob: UntypedFormControl = new UntypedFormControl();
-  darkColor: UntypedFormControl = new UntypedFormControl(undefined, [validColorValidator()]);
-  darkColorPicker: UntypedFormControl = new UntypedFormControl();
-  lightColor: UntypedFormControl = new UntypedFormControl(undefined, [validColorValidator()]);
-  lightColorPicker: UntypedFormControl = new UntypedFormControl();
+  darkColor: UntypedFormControl = new UntypedFormControl();
+  lightColor: UntypedFormControl = new UntypedFormControl();
 
   address: UntypedFormControl = new UntypedFormControl();
 
@@ -179,30 +177,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
       phone: this.phone,
       dob: this.dob,
       darkColor: this.darkColor,
-      darkColorPicker: this.darkColorPicker,
       lightColor: this.lightColor,
-      lightColorPicker: this.lightColorPicker,
       address: this.address,
-    },
-    );
-
-    this.darkColor.valueChanges.subscribe((color) => {
-      if (this.darkColorPicker.valid) {
-        this.darkColorPicker.setValue(color, { emitEvent: false });
-      }
     });
-    this.darkColorPicker.valueChanges.subscribe((color) =>
-      this.darkColor.setValue(color, { emitEvent: false }),
-    );
-
-    this.lightColor.valueChanges.subscribe((color) => {
-      if (this.lightColorPicker.valid) {
-        this.lightColorPicker.setValue(color, { emitEvent: false });
-      }
-    });
-    this.lightColorPicker.valueChanges.subscribe((color) =>
-      this.lightColor.setValue(color, { emitEvent: false }),
-    );
   };
 
   private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
@@ -239,11 +216,17 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.showColors = state.selected.authorities?.some((au: any) => roles.includes(au.authority));
         this.isAdmin = state.selected.authorities?.some((u: any) => u.authority === Role.admin);
 
-        if (state.selected.lightColor) {
-          this.lightColorPicker.setValue(state.selected.lightColor);
-        }
-        if (state.selected.darkColor) {
-          this.darkColorPicker.setValue(state.selected.darkColor);
+        if (this.showColors) {
+          if (state.selected.lightColor) {
+            this.lightColor.setValue(state.selected.lightColor);
+          }
+          if (state.selected.darkColor) {
+            this.darkColor.setValue(state.selected.darkColor);
+          }
+          this.lightColor.setValidators([Validators.required, validColorValidator()]);
+          this.darkColor.setValidators([Validators.required, validColorValidator()]);
+          this.lightColor.updateValueAndValidity();
+          this.darkColor.updateValueAndValidity();
         }
         if (state.selected.dob) {
           this.dob.setValue(createDateFromString(state.selected.dob));

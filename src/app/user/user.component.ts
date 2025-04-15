@@ -149,41 +149,30 @@ export class UserComponent implements OnInit, OnDestroy {
       lang: ['', Validators.required],
       phone: [''],
       dob: [''],
-      darkColor: ['', [validColorValidator()]],
-      darkColorPicker: [''],
-      lightColor: ['', [validColorValidator()]],
-      lightColorPicker: [''],
+      darkColor: [''],
+      lightColor: [''],
       address: [''],
     });
-
-    this.getForm.darkColor.valueChanges.subscribe(color => {
-      if (this.getForm.darkColorPicker.valid) {
-        this.getForm.darkColorPicker.setValue(color, { emitEvent: false });
-      }
-    });
-    this.getForm.darkColorPicker.valueChanges.subscribe(color =>
-      this.getForm.darkColor.setValue(color, { emitEvent: false }),
-    );
-
-    this.getForm.lightColor.valueChanges.subscribe(color => {
-      if (this.getForm.lightColorPicker.valid) {
-        this.getForm.lightColorPicker.setValue(color, { emitEvent: false });
-      }
-    });
-    this.getForm.lightColorPicker.valueChanges.subscribe(color =>
-      this.getForm.lightColor.setValue(color, { emitEvent: false }),
-    );
 
     this.getForm.role.valueChanges.subscribe(role => {
       this.isProfessionalOrManager = [Role.manager, Role.professional].indexOf(role) > -1;
       if (this.isProfessionalOrManager) {
+        this.getForm.lightColor.setValidators([validColorValidator()]);
         if (!this.getForm.lightColor.value) {
           this.getForm.lightColor.setValue(randomColor(false));
         }
+        this.getForm.darkColor.setValidators([validColorValidator()]);
         if (!this.getForm.darkColor.value) {
           this.getForm.darkColor.setValue(randomColor(true));
         }
+      } else {
+        this.getForm.lightColor?.setValue('');
+        this.getForm.lightColor?.clearValidators();
+        this.getForm.darkColor?.setValue('');
+        this.getForm.darkColor?.clearValidators();
       }
+      this.getForm.lightColor.updateValueAndValidity();
+      this.getForm.darkColor.updateValueAndValidity();
     });
   };
 
