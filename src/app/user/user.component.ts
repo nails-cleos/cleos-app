@@ -87,12 +87,14 @@ export class UserComponent implements OnInit, OnDestroy {
     user.dob = fieldChange(this.getForm.dob as UntypedFormControl, this.user?.dob);
     user.dob = user.dob ? backendFormatDate(newDate(user.dob)) : user.dob;
 
-    if (this.isProfessionalOrManager && this.getForm.lightColor.value) {
-      user.lightColor = this.getForm.lightColor.value;
-    }
+    if (this.isProfessionalOrManager) {
+      if (this.getForm.lightColor.value) {
+        user.lightColor = this.getForm.lightColor.value;
+      }
 
-    if (this.isProfessionalOrManager && this.getForm.darkColor.value) {
-      user.darkColor = this.getForm.darkColor.value;
+      if (this.getForm.darkColor.value) {
+        user.darkColor = this.getForm.darkColor.value;
+      }
     }
 
     user.address = createAddress(this.formattedAddress, this.geometry?.location, this.user?.address);

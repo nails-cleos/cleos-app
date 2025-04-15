@@ -1,6 +1,6 @@
 import '../support/commands';
-import { breakpointToDays, devices, zeroPad } from "../support/utils";
-import { API_LOCALE } from "../../src/app/util/dates";
+import { breakpointToDays, devices, zeroPad } from '../support/utils';
+import { API_LOCALE } from '../../src/app/util/dates';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   const days = breakpointToDays('reservation', breakpoints);
@@ -8,7 +8,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
     beforeEach(() => cy.viewport(width, height));
     const email = 'nails.cleos@gmail.com';
     const customerId = '1c27715c-21a3-4255-97ac-9263d9f177e7';
-    const customerName = 'Customer 1'
+    const customerName = 'Customer 1';
     const roomId = 'c18629ee-40c8-4bf4-b182-b2fea79dd881';
     const professionalId = '57ceebd2-a012-42a3-af9a-5d546c193200';
     const treatmentId = '34c3e5ff-b59c-41c1-9321-4d8a25a9fed1';
@@ -32,7 +32,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.wait('@getCustomers').its('response.statusCode').should('eq', 200);
       // Select a customer
       cy.get('input[name="customer"]').should('be.visible');
-      cy.get('input[name="customer"]').type("c");
+      cy.get('input[name="customer"]').type('c');
 
       cy.get('mat-option').contains(customerName).should('be.visible');
       cy.get('mat-option').contains('Carla Lujan').should('be.visible');

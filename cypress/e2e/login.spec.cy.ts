@@ -1,7 +1,7 @@
 import '../support/commands';
-import { Role } from "../../src/app/interfaces/token";
-import { dayViewTitle, monthViewTitle } from "../../src/app/util/dates";
-import { devices } from "../support/utils";
+import { Role } from '../../src/app/interfaces/token';
+import { dayViewTitle, monthViewTitle } from '../../src/app/util/dates';
+import { devices } from '../support/utils';
 
 const displayName = 'Customer 1';
 const today = new Date();
@@ -68,7 +68,7 @@ devices.forEach(({ name, width, height }) => {
           cy.visit('en-GB/auth');
           cy.mockFirebaseAppCheck();
           cy.mockNotifications();
-          cy.mockCreateAuthUri(true, ['password'])
+          cy.mockCreateAuthUri(true, ['password']);
           cy.mockFirebase(email);
           cy.mockLogin(email, displayName, role);
           value.mocks.forEach(fn => fn());
