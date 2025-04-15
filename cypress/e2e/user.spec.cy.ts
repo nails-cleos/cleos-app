@@ -30,7 +30,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         cy.get('tr').contains('No users');
         cy.get('button[id="add-button"]').click()
         cy.get('mat-card-title').contains('Add user');
-        // cy.get('form').within(() => {
         cy.selectOption('select-role', role);
 
         cy.get('input[formControlName="email"]').should('be.visible');
@@ -56,7 +55,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           cy.get('#lightColorIcon').click();
           cy.get('input[formControlName="lightColor"]').clear().type('#00f');
         }
-        cy.wait(10000);
+
         cy.get('button[type="submit"]').click();
 
         cy.wait('@saveUser').then(userData => {
