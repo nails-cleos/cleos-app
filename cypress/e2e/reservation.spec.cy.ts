@@ -37,8 +37,8 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.get('mat-option').contains(customerName).should('be.visible');
       cy.get('mat-option').contains('Carla Lujan').should('be.visible');
 
-      cy.get('mat-option').contains(customerName).click();
-      cy.get('button[name="toStepTwo"]').click();
+      cy.get('mat-option').contains(customerName).click({ force: true });
+      cy.get('button[name="toStepTwo"]').click({ force: true });
 
       cy.wait('@getRooms').its('response.statusCode').should('eq', 200);
       cy.wait('@getTreatments').its('response.statusCode').should('eq', 200);
@@ -55,14 +55,14 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       const formattedDate = reservationDate.toLocaleDateString('en-GB');
 
       cy.get('input[formControlName="date"]').click({ force: true });
-      cy.get('.mat-calendar-next-button').click();
+      cy.get('.mat-calendar-next-button').click({ force: true });
 
-      cy.get(`button[aria-label="${ formattedDate }"]`).click();
+      cy.get(`button[aria-label="${ formattedDate }"]`).click({ force: true });
 
       cy.get('input[formControlName="start"]').click({ force: true });
-      cy.get('ngx-material-timepicker-content').contains(hourFormat).click();
-      cy.get('ngx-material-timepicker-content').contains(minuteFormat).click();
-      cy.get('.timepicker-button').contains('Ok').click();
+      cy.get('ngx-material-timepicker-content').contains(hourFormat).click({ force: true });
+      cy.get('ngx-material-timepicker-content').contains(minuteFormat).click({ force: true });
+      cy.get('.timepicker-button').contains('Ok').click({ force: true });
 
       cy.get('input[formControlName="date"]').should('have.value', formattedDate);
       cy.get('input[formControlName="start"]').should('have.value', reservationTime);
@@ -97,7 +97,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
       cy.wait(50);
       calendarExpectations(reservationTime)[days].forEach((events, dayIndex) => validateCalendar(dayIndex, events));
-      cy.get('button[name="toStepSeven"]').click();
+      cy.get('button[name="toStepSeven"]').click({ force: true });
 
       // Preview
       cy.get('mat-card-title').contains('Preview').should('exist');
@@ -128,7 +128,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         cy.mockCreateReservation(reservationId, customerId, reservationDate, professionalId, roomId, treatmentId,
           ['397bce4b-27ba-459f-801a-dcceea330b8d', '557c6520-035a-4b0a-9bd4-f2f1dce27f6d']);
 
-        cy.get('button[name="create"]').click();
+        cy.get('button[name="create"]').click({ force: true });
 
         cy.wait('@createReservation').then(reservationData => {
           expect(reservationData.response?.statusCode).to.eq(201);

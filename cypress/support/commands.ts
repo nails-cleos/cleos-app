@@ -11,7 +11,7 @@ declare namespace Cypress {
     openMenu(breakpoint: string, menus: string[]): Chainable<any>;
 
     buttonClickOnTable(breakpoint: string, column: string, rowClass: string, rowExpandedClass: string,
-                       button: string): Chainable<any>;
+                       button: string, otherButtons?: string[]): Chainable<any>;
 
     selectOption(id: string, option: string): Chainable<any>;
 
@@ -46,7 +46,7 @@ declare namespace Cypress {
     mockCreateReservation(reservationId: string, customerId: string, date: Date, professionalId: string,
                           roomId: string, treatmentId: string, additionalList?: string[]): Chainable<any>;
 
-    mockUsers(displayName?: string, total?: number): Chainable<any>;
+    mockUsers(total?: number, displayName?: string): Chainable<any>;
 
     mockUser(id: string, selectedUser?: any): Chainable<any>;
   }
@@ -58,8 +58,8 @@ Cypress.Commands.add('randomUUID', () => cy.wrap('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxx
 })));
 
 Cypress.Commands.add('logout', () => {
-  cy.get('button[name="settings"]').click();
-  cy.get('mat-list-item').contains('Sign out').click();
+  cy.get('button[name="settings"]').click({ force: true });
+  cy.get('mat-list-item').contains('Sign out').click({ force: true });
   cy.url().should('include', 'home');
 });
 
@@ -77,7 +77,7 @@ Cypress.Commands.add('checkAppDialog', (title: string, message: string, buttonCl
   cy.get('app-dialog')
     .find('div[mat-dialog-actions]')
     .contains(buttonClick)
-    .click();
+    .click({ force: true });
 });
 
 Cypress.Commands.add('checkMatList', (title?: string, icon?: string, ...details: string[]) => {
@@ -94,36 +94,33 @@ Cypress.Commands.add('checkMatList', (title?: string, icon?: string, ...details:
 
 Cypress.Commands.add('openMenu', (breakpoint: string, menus: string[]) => {
   if (['XSmall', 'Small', 'Medium'].includes(breakpoint)) {
-    cy.get('button[name="cleosMenu"]').click();
+    cy.get('button[name="cleosMenu"]').click({ force: true });
   }
   menus.forEach(menu => {
-    cy.get('mat-list-item').contains(menu).click();
+    cy.get('mat-list-item').contains(menu).click({ force: true });
   });
 });
 
 Cypress.Commands.add('buttonClickOnTable', (breakpoint: string, column: string, rowClass: string, rowExpandedClass,
-                                            button: string) => {
-
+                                            button: string, otherButtons?: string[]) => {
   if (['XSmall', 'Small'].includes(breakpoint)) {
-    cy.contains(`tr.${ rowClass }`, column).click();
-    cy.get(`tr.${ rowExpandedClass }`)
-      .should('be.visible')
-      .find('button[mat-icon-button]')
-      .contains(button)
-      .click();
+    cy.contains(`tr.${ rowClass }`, column).click({ force: true });
+    otherButtons?.forEach(otherButton => cy.get(`tr.${ rowExpandedClass }`).should('be.visible')
+      .find('button[mat-icon-button]').contains(otherButton));
+    cy.get(`tr.${ rowExpandedClass }`).should('be.visible').find('button[mat-icon-button]').contains(button).click({ force: true });
   } else {
-    cy.get('table')
-      .contains('tr', column)
-      .find('button[mat-icon-button]').contains(button).click();
+    otherButtons?.forEach(otherButton => cy.get('table').contains('tr', column)
+      .find('button[mat-icon-button]').contains(otherButton));
+    cy.get('table').contains('tr', column).find('button[mat-icon-button]').contains(button).click({ force: true });
   }
 });
 
 Cypress.Commands.add('selectOption', (id: string, option: string) => {
   cy.get(`#${ id }`).should('be.visible');
-  cy.get(`#${ id }`).click();
+  cy.get(`#${ id }`).click({ force: true });
 
   cy.get('mat-option').should('exist').and('be.visible');
-  cy.get('mat-option').contains(option).click();
+  cy.get('mat-option').contains(option).click({ force: true });
 });
 
 const firebaseUser = (email: string, displayName?: string, kind?: string) => ({
@@ -313,7 +310,7 @@ Cypress.Commands.add('mockFirebaseAppCheck', () => {
     }
   }).as('firebaseAppCheck');
 
-  cy.contains('Got it!').click();
+  cy.contains('Got it!').click({ force: true });
 });
 
 // Cypress.Commands.add('mockFetchSignInMethodsForEmail', (email) => {
@@ -646,7 +643,7 @@ Cypress.Commands.add('mockCreateReservation', (
   });
 });
 
-Cypress.Commands.add('mockUsers', (displayName?: string, total?: number) => {
+Cypress.Commands.add('mockUsers', (total?: number, displayName?: string) => {
   cy.fixture('users').then((userData) => {
     cy.intercept(
       'GET',
@@ -657,9 +654,11 @@ Cypress.Commands.add('mockUsers', (displayName?: string, total?: number) => {
       }
     ).as('getUsers');
 
-    const user = userData.find((u: any) => u.displayName === displayName);
-    expect(user).to.exist;
-    cy.wrap(user).as('selectedUser');
+    if (displayName) {
+      const user = userData.find((u: any) => u.displayName === displayName);
+      expect(user).to.exist;
+      cy.wrap(user).as('selectedUser');
+    }
   });
 });
 

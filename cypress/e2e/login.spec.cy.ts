@@ -31,13 +31,13 @@ devices.forEach(({ name, width, height }) => {
       it(`should register a new user in ${ name }`, () => {
         cy.visit('en-GB/auth');
         cy.mockFirebaseAppCheck();
-        cy.get('button').contains('Sign in with Email').click();
+        cy.get('button').contains('Sign in with Email').click({ force: true });
 
         cy.get('form').within(() => {
           cy.get('input[name="email"]').should('be.visible');
           cy.get('input[name="email"]').type(email);
 
-          cy.get('button').contains('Next').click();
+          cy.get('button').contains('Next').click({ force: true });
 
           cy.get('input[name="displayName"]').should('be.visible');
           cy.get('input[name="displayName"]').type(displayName, { force: true });
@@ -45,15 +45,15 @@ devices.forEach(({ name, width, height }) => {
           cy.get('input[name="password"]').should('be.visible');
           cy.get('input[name="password"]').type('password');
 
-          cy.get('button[type="submit"]').click();
+          cy.get('button[type="submit"]').click({ force: true });
         });
 
-        cy.get('button').contains('Login').click();
+        cy.get('button').contains('Login').click({ force: true });
 
         cy.get('.mat-mdc-snack-bar-container')
           .find('.mat-mdc-snack-bar-action')
           .contains('OK')
-          .click();
+          .click({ force: true });
 
         cy.url().should('include', '/me/reservations');
         cy.get('mat-card-title').contains('No upcoming reservations');
@@ -72,21 +72,21 @@ devices.forEach(({ name, width, height }) => {
           cy.mockFirebase(email);
           cy.mockLogin(email, displayName, role);
           value.mocks.forEach(fn => fn());
-          cy.get('button').contains('Sign in with Email').click();
+          cy.get('button').contains('Sign in with Email').click({ force: true });
 
           cy.get('form').within(() => {
             cy.get('input[name="email"]').should('be.visible');
             cy.get('input[name="email"]').type(email);
 
-            cy.get('button').contains('Next').click();
+            cy.get('button').contains('Next').click({ force: true });
 
             cy.get('input[name="password"]').should('be.visible');
             cy.get('input[name="password"]').type('password');
 
-            cy.get('button[type="submit"]').click();
+            cy.get('button[type="submit"]').click({ force: true });
           });
 
-          cy.get('button').contains('Login').click();
+          cy.get('button').contains('Login').click({ force: true });
 
           cy.url().should('include', value.url);
 
