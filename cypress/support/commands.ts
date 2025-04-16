@@ -107,7 +107,8 @@ Cypress.Commands.add('buttonClickOnTable', (breakpoint: string, column: string, 
     cy.contains(`tr.${ rowClass }`, column).click({ force: true });
     otherButtons?.forEach(otherButton => cy.get(`tr.${ rowExpandedClass }`).should('be.visible')
       .find('button[mat-icon-button]').contains(otherButton));
-    cy.get(`tr.${ rowExpandedClass }`).should('be.visible').find('button[mat-icon-button]').contains(button).click({ force: true });
+    cy.get(`tr.${ rowExpandedClass }`).should('be.visible').find('button[mat-icon-button]').contains(button)
+      .click({ force: true });
   } else {
     otherButtons?.forEach(otherButton => cy.get('table').contains('tr', column)
       .find('button[mat-icon-button]').contains(otherButton));
