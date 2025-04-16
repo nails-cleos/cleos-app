@@ -10,7 +10,7 @@ import { AppCheck, getToken as getTokenAppCheck } from '@angular/fire/app-check'
 import { environment } from '../../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MessagingService {
   private store: Store<AppState> = inject(Store<AppState>);
@@ -28,23 +28,23 @@ export class MessagingService {
    * @param token the new token generated
    */
   updateToken = (user: any, token: string): void => {
-    if (this.auth.currentUser) {
-      this.store.dispatch(
-        new fromActionsNotification.NotificationSubscribe(token)
-      );
-      const data = {};
-      // @ts-expect-error assign value in data[user.id]
-      data[user.id] = token;
-      const collection = ref(this.database, 'fcmTokens/');
-      update(collection, data).then(() => console.info('DB updated'));
-    }
+  	if (this.auth.currentUser) {
+  		this.store.dispatch(
+  			new fromActionsNotification.NotificationSubscribe(token),
+  		);
+  		const data = {};
+  		// @ts-expect-error assign value in data[user.id]
+  		data[user.id] = token;
+  		const collection = ref(this.database, 'fcmTokens/');
+  		update(collection, data).then(() => console.warn('DB updated'));
+  	}
   };
 
   /**
    * hook method when new notification received in foreground
    */
   receiveMessage = (): void => {
-    this.message$ = new Observable(sub => onMessage(this.messaging, it => sub.next(it)));
+  	this.message$ = new Observable(sub => onMessage(this.messaging, it => sub.next(it)));
   };
 
   /**
@@ -53,22 +53,22 @@ export class MessagingService {
    * @param user user
    */
   requestPermission = (user: any): void => {
-    getTokenAppCheck(this.appCheck).then(appCheckToken => {
-      if (appCheckToken) {
-        Notification.requestPermission().then(value => {
-          if (value === 'granted') {
-            navigator.serviceWorker.register(environment.firebaseMessaging, { type: 'module', scope: '__' })
-              .then(serviceWorkerRegistration =>
-                getToken(this.messaging, {
-                  serviceWorkerRegistration,
-                  vapidKey: environment.firebase.vapidKey,
-                }).then(token => {
-                  this.updateToken(user, token);
-                })
-              );
-          }
-        });
-      }
-    });
+  	getTokenAppCheck(this.appCheck).then(appCheckToken => {
+  		if (appCheckToken) {
+  			Notification.requestPermission().then(value => {
+  				if (value === 'granted') {
+  					navigator.serviceWorker.register(environment.firebaseMessaging, { type: 'module', scope: '__' })
+  						.then(serviceWorkerRegistration =>
+  							getToken(this.messaging, {
+  								serviceWorkerRegistration,
+  								vapidKey: environment.firebase.vapidKey,
+  							}).then(token => {
+  								this.updateToken(user, token);
+  							}),
+  						);
+  				}
+  			});
+  		}
+  	});
   };
 }

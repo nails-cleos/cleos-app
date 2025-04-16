@@ -21,7 +21,7 @@ import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
   templateUrl: './treatments.component.html',
   styleUrls: ['./treatments.component.scss'],
   animations: [detailExpandAnimation],
-  imports: [SharedModule, CurrencySymbolPipe]
+  imports: [SharedModule, CurrencySymbolPipe],
 })
 export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -43,81 +43,81 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.pageSize = MOBILE_PAGE_SIZE;
-      }
-    });
-    this.dateFormat = this.translate.currentLang;
-    this.language = this.translate.currentLang;
-    this.getState = this.store.select(selectTreatmentState);
+  	breakpointObserver.observe([
+  		Breakpoints.XSmall,
+  		Breakpoints.Small,
+  	]).subscribe(result => {
+  		if (result.matches) {
+  			this.pageSize = MOBILE_PAGE_SIZE;
+  		}
+  	});
+  	this.dateFormat = this.translate.currentLang;
+  	this.language = this.translate.currentLang;
+  	this.getState = this.store.select(selectTreatmentState);
   }
 
   ngAfterViewInit(): void {
-    this.getTreatments();
+  	this.getTreatments();
   }
 
   ngOnInit(): void {
-    this.clean();
-    this.subscribe();
+  	this.clean();
+  	this.subscribe();
   }
 
   ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.paginatorSubscription?.unsubscribe();
+  	this.subscription?.unsubscribe();
+  	this.paginatorSubscription?.unsubscribe();
   }
 
   delete = (treatment: ITreatment): void => {
-    const title = this.translate.instant('TREATMENT.DELETED.TITLE');
-    const content = this.translate.instant('TREATMENT.DELETED.CONTENT', { name: treatment.name });
-    const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: treatment }
-    });
+  	const title = this.translate.instant('TREATMENT.DELETED.TITLE');
+  	const content = this.translate.instant('TREATMENT.DELETED.CONTENT', { name: treatment.name });
+  	const dialogRef = this.dialog.open(DialogComponent, {
+  		data: { title, content, value: treatment },
+  	});
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.store.dispatch(
-          new fromActionsTreatment.DeleteTreatment(result)
-        );
-      }
-    });
+  	dialogRef.afterClosed().subscribe(result => {
+  		if (result) {
+  			this.store.dispatch(
+  				new fromActionsTreatment.DeleteTreatment(result),
+  			);
+  		}
+  	});
   };
 
   private createPageSubscriptions = (): void => {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getTreatments();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getTreatments(this.paginator.pageIndex));
+  	this.sort.sortChange.subscribe(() => {
+  		this.paginator.pageIndex = 0;
+  		this.getTreatments();
+  	});
+  	this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getTreatments(this.paginator.pageIndex));
 
-    this.cdRef.detectChanges();
+  	this.cdRef.detectChanges();
   };
 
   private clean = (): void => this.store.dispatch(new fromActionsTreatment.Clean());
 
   private getTreatments = (page: number = 0): void => this.store.dispatch(
-    new fromActionsTreatment.GetAll({
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    })
+  	new fromActionsTreatment.GetAll({
+  		active: this.sort.active,
+  		direction: this.sort.direction,
+  		size: this.pageSize,
+  		page,
+  	}),
   );
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((stateValue) => {
-      if (stateValue.message) {
-        this.clean();
-        this.getTreatments();
-      }
-      this.dataSource = stateValue.data?.content;
-      this.resultsLength = stateValue.data?.totalElements;
-      if (!this.paginatorSubscription && this.resultsLength) {
-        this.createPageSubscriptions();
-      }
-    });
+  	this.subscription = this.getState.subscribe((stateValue) => {
+  		if (stateValue.message) {
+  			this.clean();
+  			this.getTreatments();
+  		}
+  		this.dataSource = stateValue.data?.content;
+  		this.resultsLength = stateValue.data?.totalElements;
+  		if (!this.paginatorSubscription && this.resultsLength) {
+  			this.createPageSubscriptions();
+  		}
+  	});
   };
 }

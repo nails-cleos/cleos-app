@@ -12,6 +12,6 @@ export class YearMonthDateAdapter extends DateAdapter {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   format = (date: Date, _displayFormat: any): string => super.formatDate(
     date,
-    { year: 'numeric', month: '2-digit', day: '2-digit' }
+    { year: 'numeric', month: '2-digit', day: '2-digit' },
   );
 }

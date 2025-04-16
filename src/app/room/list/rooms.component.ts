@@ -23,7 +23,7 @@ import { SortByPipe } from '../../pipes/sort-by.pipe';
   templateUrl: './rooms.component.html',
   styleUrls: ['./rooms.component.scss'],
   animations: [detailExpandAnimation],
-  imports: [SharedModule, SortByPipe]
+  imports: [SharedModule, SortByPipe],
 })
 export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -43,30 +43,30 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.pageSize = MOBILE_PAGE_SIZE;
-      }
-    });
-    this.getState = this.store.select(selectRoomState);
-    this.language = this.translate.currentLang;
+  	breakpointObserver.observe([
+  		Breakpoints.XSmall,
+  		Breakpoints.Small,
+  	]).subscribe(result => {
+  		if (result.matches) {
+  			this.pageSize = MOBILE_PAGE_SIZE;
+  		}
+  	});
+  	this.getState = this.store.select(selectRoomState);
+  	this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {
-    this.getRooms();
+  	this.getRooms();
   }
 
   ngOnInit(): void {
-    this.clean();
-    this.subscribe();
+  	this.clean();
+  	this.subscribe();
   }
 
   ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.paginatorSubscription?.unsubscribe();
+  	this.subscription?.unsubscribe();
+  	this.paginatorSubscription?.unsubscribe();
   }
 
   getTimeZone = (timeZone?: string): ITimeZone => getTimeZone(timeZone);
@@ -74,70 +74,70 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
   getGMT = (timeZone?: string): string => this.getTimeZone(timeZone).gmt;
 
   edit = (room: IRoom): void => this.store.dispatch(
-    new fromActionsRoom.RoomSelected({ roomInfo: { room }, redirect: true }));
+  	new fromActionsRoom.RoomSelected({ roomInfo: { room }, redirect: true }));
 
   delete = (room: IRoom): void => {
-    const title = this.translate.instant('ROOM.DELETED.TITLE');
-    const content = this.translate.instant('ROOM.DELETED.CONTENT', { name: room.address?.name });
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: room }, result => {
-      if (result) {
-        this.store.dispatch(
-          new fromActionsRoom.DeleteRoom(result)
-        );
-      }
-    });
+  	const title = this.translate.instant('ROOM.DELETED.TITLE');
+  	const content = this.translate.instant('ROOM.DELETED.CONTENT', { name: room.address?.name });
+  	executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: room }, result => {
+  		if (result) {
+  			this.store.dispatch(
+  				new fromActionsRoom.DeleteRoom(result),
+  			);
+  		}
+  	});
   };
 
   private clean = (): void => this.store.dispatch(new fromActionsRoom.Clean());
 
   private createPageSubscriptions = (): void => {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getRooms();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getRooms(this.paginator.pageIndex));
+  	this.sort.sortChange.subscribe(() => {
+  		this.paginator.pageIndex = 0;
+  		this.getRooms();
+  	});
+  	this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getRooms(this.paginator.pageIndex));
 
-    this.cdRef.detectChanges();
+  	this.cdRef.detectChanges();
   };
 
   private getRooms = (page: number = 0): void => this.store.dispatch(
-    new fromActionsRoom.GetAll({
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    })
+  	new fromActionsRoom.GetAll({
+  		active: this.sort.active,
+  		direction: this.sort.direction,
+  		size: this.pageSize,
+  		page,
+  	}),
   );
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((stateValue) => {
-      if (stateValue.message) {
-        this.clean();
-        this.getRooms();
-      }
-      this.dataSource = stateValue.data?.content?.map((r: IRoom) => {
-        if (r && r.availabilities && r.availabilities.length) {
-          const availabilities = r.availabilities.map((i: IAvailability) =>
-            Object.assign({}, i, { order: findDayOfWeek(i.day) }));
-          return Object.assign({}, r, { availabilities });
-        }
-        return r;
-      });
-      // this.dataSource = stateValue.data?.content?.map((r: any) => {
-      //   const map = new Map<string, string[]>();
-      //   r.availabilities?.reduce((group: any, item: IAvailabilityAll) => {
-      //     const key = `${item.start} - ${item.end}`;
-      //     let day: any = group.get(key) || [];
-      //     day = [...day, item.day];
-      //     group.set(key, day);
-      //     return group;
-      //   }, map)
-      //   return Object.assign({}, r, {times: map})
-      // });
-      this.resultsLength = stateValue.data?.totalElements;
-      if (!this.paginatorSubscription && this.resultsLength) {
-        this.createPageSubscriptions();
-      }
-    });
+  	this.subscription = this.getState.subscribe((stateValue) => {
+  		if (stateValue.message) {
+  			this.clean();
+  			this.getRooms();
+  		}
+  		this.dataSource = stateValue.data?.content?.map((r: IRoom) => {
+  			if (r && r.availabilities && r.availabilities.length) {
+  				const availabilities = r.availabilities.map((i: IAvailability) =>
+  					Object.assign({}, i, { order: findDayOfWeek(i.day) }));
+  				return Object.assign({}, r, { availabilities });
+  			}
+  			return r;
+  		});
+  		// this.dataSource = stateValue.data?.content?.map((r: any) => {
+  		//   const map = new Map<string, string[]>();
+  		//   r.availabilities?.reduce((group: any, item: IAvailabilityAll) => {
+  		//     const key = `${item.start} - ${item.end}`;
+  		//     let day: any = group.get(key) || [];
+  		//     day = [...day, item.day];
+  		//     group.set(key, day);
+  		//     return group;
+  		//   }, map)
+  		//   return Object.assign({}, r, {times: map})
+  		// });
+  		this.resultsLength = stateValue.data?.totalElements;
+  		if (!this.paginatorSubscription && this.resultsLength) {
+  			this.createPageSubscriptions();
+  		}
+  	});
   };
 }

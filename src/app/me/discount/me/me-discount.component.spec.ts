@@ -8,9 +8,9 @@ describe('MeDiscountComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [MeDiscountComponent]
-})
-    .compileComponents();
+      imports: [MeDiscountComponent],
+    })
+      .compileComponents();
   });
 
   beforeEach(() => {

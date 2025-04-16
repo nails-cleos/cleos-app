@@ -7,13 +7,13 @@ import { InvoiceComponent } from './invoice.component';
 const routes: Routes = [
   {
     path: '', component: InvoiceComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager, Role.roomAdmin]
-    }
+      roles: [Role.admin, Role.manager, Role.roomAdmin],
+    },
   }];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class InvoiceRoutingModule {
 }

@@ -19,8 +19,8 @@ export class MainEffects {
       map((action: any) => action.payload),
       switchMap(() => this.catalogueService.getAllHome().pipe(
         switchMap((response: any) => of(new fromActionsMain.CatalogueSuccess(response))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({ error: err.error }))),
+      )),
     ));
 
   getAllTreatments$ = createEffect(
@@ -28,8 +28,8 @@ export class MainEffects {
       map((action: any) => action.payload),
       switchMap(() => this.treatmentService.getTreatmentList().pipe(
         switchMap((response: any) => of(new fromActionsMain.TreatmentsSuccess(response))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({ error: err.error }))),
+      )),
     ));
 
   sendMessage$ = createEffect(() => this.actions$.pipe(ofType(fromActionsMain.MainActionTypes.sendMessage)).pipe(
@@ -39,8 +39,8 @@ export class MainEffects {
         const message = this.translate.instant('MAIN.CONTACT.SEND.MESSAGE');
         return of(new fromActionsMain.RequestSuccess({ message }));
       }),
-      catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({ error: err.error }))),
+    )),
   ));
 
   update$ = createEffect(() => this.actions$.pipe(ofType(fromActionsMain.MainActionTypes.updateUser)).pipe(
@@ -51,23 +51,23 @@ export class MainEffects {
           { displayName: response.user.displayName });
         return of(new LoginSuccess({
           response, queryParams: {
-            state: btoa(JSON.stringify({ returnUrl: payload.redirectUrl }))
-          }
+            state: btoa(JSON.stringify({ returnUrl: payload.redirectUrl })),
+          },
         }), new fromActionsMain.RequestSuccess({ message: payload.message ? payload.message : message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({ error: err.error })))
-    ))
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({ error: err.error }))),
+    )),
   ));
 
   catalogueSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsMain.MainActionTypes.catalogueSuccess)
+    ofType(fromActionsMain.MainActionTypes.catalogueSuccess),
   ), { dispatch: false });
 
   treatmentDataSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsMain.MainActionTypes.treatmentSuccess)
+    ofType(fromActionsMain.MainActionTypes.treatmentSuccess),
   ), { dispatch: false });
 
   requestSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsMain.MainActionTypes.requestSuccess)
+    ofType(fromActionsMain.MainActionTypes.requestSuccess),
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private mainService: MainService,

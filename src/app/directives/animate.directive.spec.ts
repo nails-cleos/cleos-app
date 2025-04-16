@@ -5,13 +5,13 @@ import { Router } from '@angular/router';
 import { TestBed } from '@angular/core/testing';
 
 const mockRouter = {
-  getCurrentNavigation: () => ({ extras: { state: { key: 'value' } } })
+  getCurrentNavigation: () => ({ extras: { state: { key: 'value' } } }),
 };
 
 TestBed.configureTestingModule({
   providers: [
-    { provide: Router, useValue: mockRouter }
-  ]
+    { provide: Router, useValue: mockRouter },
+  ],
 });
 
 describe('AnimateDirective', () => {

@@ -8,9 +8,9 @@ describe('TreatmentSortingComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [TreatmentSortingComponent]
-})
-    .compileComponents();
+      imports: [TreatmentSortingComponent],
+    })
+      .compileComponents();
 
     fixture = TestBed.createComponent(TreatmentSortingComponent);
     component = fixture.componentInstance;

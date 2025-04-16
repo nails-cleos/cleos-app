@@ -12,7 +12,7 @@ import { SharedModule } from '../../shared/shared.module';
   selector: 'app-treatment-table',
   templateUrl: './treatment-table.component.html',
   styleUrls: ['./treatment-table.component.scss'],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class TreatmentTableComponent implements AfterViewInit, OnChanges {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -27,23 +27,23 @@ export class TreatmentTableComponent implements AfterViewInit, OnChanges {
   dateFormat: string;
 
   constructor(protected translate: TranslateService) {
-    this.dateFormat = this.translate.currentLang;
+  	this.dateFormat = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
+  	this.dataSource.paginator = this.paginator;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ngOnChanges(_changes: SimpleChanges): void {
-    this.dataSource = this.treatment?.map(p => {
-      if (p.duration) {
-        const duration = convertDuration(p.duration);
+  	this.dataSource = this.treatment?.map(p => {
+  		if (p.duration) {
+  			const duration = convertDuration(p.duration);
 
-        return Object.assign({}, p, { hour: duration.hour, minute: duration.minute });
-      }
-      return p;
-    });
-    this.resultsLength = this.treatment.length;
+  			return Object.assign({}, p, { hour: duration.hour, minute: duration.minute });
+  		}
+  		return p;
+  	});
+  	this.resultsLength = this.treatment.length;
   }
 }

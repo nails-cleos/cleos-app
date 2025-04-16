@@ -20,7 +20,7 @@ import { BackButtonDirective } from '../../directives/back-button.directive';
   selector: 'app-account',
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.scss'],
-  imports: [SharedModule, BalanceComponent, BackButtonDirective]
+  imports: [SharedModule, BalanceComponent, BackButtonDirective],
 })
 export class AccountComponent implements OnInit, OnDestroy {
   form!: UntypedFormGroup;
@@ -65,9 +65,10 @@ export class AccountComponent implements OnInit, OnDestroy {
     transaction.customerId = this.customerId;
     transaction.currencyId = valueChange(this.getForm.currency.value, this.account?.currency)?.id;
     transaction.gift = this.getForm.gift.value;
-    return this.store.dispatch(
-      new fromActionsAccount.AccountUpdate(transaction)
+    this.store.dispatch(
+      new fromActionsAccount.AccountUpdate(transaction),
     );
+    return;
   }
 
   ngOnInit(): void {
@@ -105,18 +106,18 @@ export class AccountComponent implements OnInit, OnDestroy {
   private createForm = (): void => {
     this.form = this.formBuilder.group({
       currency: ['', [Validators.required, requireMatch]],
-      gift: ['', Validators.required]
+      gift: ['', Validators.required],
     });
     this.filteredCurrencyOptions = this.getForm.currency.valueChanges?.pipe(
       startWith(''),
       map((value: any) => typeof value === 'string' ? value : value.code),
       map((name: string) => name ? this.filterCurrency(name) :
-        this.account?.currencies ? this.account?.currencies.slice() : this.account?.currencies)
+        this.account?.currencies ? this.account?.currencies.slice() : this.account?.currencies),
     );
   };
 
   private filterCurrency = (name: string): ICurrency[] | undefined => this.account?.currencies?.filter(
-    option => option.code?.toLowerCase().indexOf(name.toLowerCase()) === 0
+    option => option.code?.toLowerCase().indexOf(name.toLowerCase()) === 0,
   );
 
   private subscribe = (): void => {

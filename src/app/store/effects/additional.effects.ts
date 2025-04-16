@@ -17,8 +17,8 @@ export class AdditionalEffects {
     switchMap((payload: any) => this.additionalService.getAll(payload.active, payload.direction, payload.page,
       payload.size).pipe(
       switchMap((response: any) => of(new fromActionsAdditional.AdditionalSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error }))),
+    )),
   ));
 
   findAdditionalList$ = createEffect(
@@ -26,8 +26,8 @@ export class AdditionalEffects {
       .pipe(map((action: any) => action.payload),
         switchMap(() => this.additionalService.getAdditionalList().pipe(
           switchMap((response: any) => of(new fromActionsAdditional.AdditionalSuccess(response))),
-          catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error })))
-        ))
+          catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error }))),
+        )),
       ));
 
   findOne$ = createEffect(
@@ -35,8 +35,8 @@ export class AdditionalEffects {
       map((action: any) => action.payload),
       switchMap((payload: any) => this.additionalService.getById(payload).pipe(
         switchMap((additional: any) => of(new fromActionsAdditional.AdditionalSelected(additional))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error }))),
+      )),
     ));
 
   save$ = createEffect(
@@ -47,8 +47,8 @@ export class AdditionalEffects {
           const message = this.translate.instant('ADDITIONAL.CREATED', { name: response.name });
           return of(new fromActionsAdditional.AdditionalSaveSuccess({ message }));
         }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error }))),
+      )),
     ));
 
   update$ = createEffect(
@@ -59,8 +59,8 @@ export class AdditionalEffects {
           const message = this.translate.instant('ADDITIONAL.UPDATED.MESSAGE', { name: response.name });
           return of(new fromActionsAdditional.AdditionalSaveSuccess({ message }));
         }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error }))),
+      )),
     ));
 
   updateSort$ = createEffect(
@@ -69,9 +69,10 @@ export class AdditionalEffects {
       switchMap((payload: any) => this.additionalService.updateSort(payload).pipe(
         switchMap(() =>
           of(new fromActionsAdditional.AdditionalSaveSuccess(
-            { message: this.translate.instant('ADDITIONAL.SORTED.MESSAGE') }))
-        ), catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error })))
-      ))
+            { message: this.translate.instant('ADDITIONAL.SORTED.MESSAGE') })),
+        ),
+        catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error }))),
+      )),
     ));
 
   delete$ = createEffect(
@@ -82,8 +83,8 @@ export class AdditionalEffects {
           const message = this.translate.instant('ADDITIONAL.DELETED.MESSAGE', { name: payload.name });
           return of(new fromActionsAdditional.AdditionalSaveSuccess({ message }));
         }),
-        catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error }))),
+      )),
     ));
 
   findGroups$ = createEffect(
@@ -91,21 +92,21 @@ export class AdditionalEffects {
       map((action: any) => action.payload),
       switchMap(() => this.treatmentService.getAllTreatmentGroup().pipe(
         switchMap((response: any) => of(new fromActionsAdditional.FindGroupsSuccess(response))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error }))),
+      )),
     ));
 
   selectedData$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsAdditional.AdditionalActionTypes.additionalSelected),
-    tap((data: any) => this.router.navigate([this.translate.currentLang, 'additional', data.payload.id]))
+    tap((data: any) => this.router.navigate([this.translate.currentLang, 'additional', data.payload.id])),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsAdditional.AdditionalActionTypes.additionalSuccess)
+    ofType(fromActionsAdditional.AdditionalActionTypes.additionalSuccess),
   ), { dispatch: false });
 
   saveSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsAdditional.AdditionalActionTypes.additionalSaveSuccess)
+    ofType(fromActionsAdditional.AdditionalActionTypes.additionalSaveSuccess),
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions,

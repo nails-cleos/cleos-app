@@ -8,7 +8,7 @@ import { SharedModule } from '../shared.module';
   selector: 'app-prompt-component',
   templateUrl: './prompt.component.html',
   styleUrls: ['./prompt.component.scss'],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class PromptComponent {
 

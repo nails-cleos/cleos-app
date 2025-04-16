@@ -16,16 +16,16 @@ export class ColorEffects {
     switchMap((payload: any) => this.colorService.getAll(payload.active, payload.direction, payload.page,
       payload.size).pipe(
       switchMap((response: any) => of(new fromActionsColor.ColorSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsColor.ColorFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsColor.ColorFailure({ error: err.error }))),
+    )),
   ));
 
   findOne$ = createEffect(() => this.actions.pipe(ofType(fromActionsColor.ColorActionTypes.colorFind)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.colorService.getById(payload).pipe(
       switchMap((color: any) => of(new fromActionsColor.ColorSelected(color))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsColor.ColorFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsColor.ColorFailure({ error: err.error }))),
+    )),
   ));
 
   save$ = createEffect(() => this.actions.pipe(ofType(fromActionsColor.ColorActionTypes.colorSave)).pipe(
@@ -34,8 +34,8 @@ export class ColorEffects {
       switchMap(() => {
         const message = this.translate.instant('COLOR.CREATED', { name: payload.name });
         return of(new fromActionsColor.ColorSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsColor.ColorFailure({ error: err.error })))
-    ))
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsColor.ColorFailure({ error: err.error }))),
+    )),
   ));
 
   update = createEffect(() => this.actions.pipe(ofType(fromActionsColor.ColorActionTypes.colorUpdate)).pipe(
@@ -44,8 +44,8 @@ export class ColorEffects {
       switchMap(() => {
         const message = this.translate.instant('COLOR.UPDATED.MESSAGE', { name: payload.name });
         return of(new fromActionsColor.ColorSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsColor.ColorFailure({ error: err.error })))
-    ))
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsColor.ColorFailure({ error: err.error }))),
+    )),
   ));
 
   delete$ = createEffect(() => this.actions.pipe(ofType(fromActionsColor.ColorActionTypes.colorDelete)).pipe(
@@ -54,21 +54,21 @@ export class ColorEffects {
       switchMap(() => {
         const message = this.translate.instant('COLOR.DELETED.MESSAGE', { name: payload.name });
         return of(new fromActionsColor.ColorSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsColor.ColorFailure({ error: err.error })))
-    ))
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsColor.ColorFailure({ error: err.error }))),
+    )),
   ));
 
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(fromActionsColor.ColorActionTypes.colorSelected),
-    tap((data: any) => this.router.navigate([this.translate.currentLang, 'colors', data.payload.id]))
+    tap((data: any) => this.router.navigate([this.translate.currentLang, 'colors', data.payload.id])),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(fromActionsColor.ColorActionTypes.colorSuccess)
+    ofType(fromActionsColor.ColorActionTypes.colorSuccess),
   ), { dispatch: false });
 
   saveSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(fromActionsColor.ColorActionTypes.colorSaveSuccess)
+    ofType(fromActionsColor.ColorActionTypes.colorSaveSuccess),
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions: Actions,

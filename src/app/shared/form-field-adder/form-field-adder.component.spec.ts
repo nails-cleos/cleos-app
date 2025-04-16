@@ -8,9 +8,9 @@ describe('FormFieldAdderComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FormFieldAdderComponent]
+      imports: [FormFieldAdderComponent],
     })
-    .compileComponents();
+      .compileComponents();
     
     fixture = TestBed.createComponent(FormFieldAdderComponent);
     component = fixture.componentInstance;

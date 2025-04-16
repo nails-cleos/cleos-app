@@ -8,9 +8,9 @@ describe('PaymentsChartComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [OverviewChartComponent]
-})
-    .compileComponents();
+      imports: [OverviewChartComponent],
+    })
+      .compileComponents();
   });
 
   beforeEach(() => {

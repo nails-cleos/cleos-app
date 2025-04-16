@@ -19,7 +19,7 @@ export const initialState: State = {
   subErrors: null,
   selected: null,
   message: null,
-  isLoading: false
+  isLoading: false,
 };
 
 export const reducer = (state = initialState, action: All): State => {
@@ -31,7 +31,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case CurrencyActionTypes.currencyFind: {
@@ -41,7 +41,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case CurrencyActionTypes.currencySuccess: {
@@ -50,7 +50,7 @@ export const reducer = (state = initialState, action: All): State => {
         data: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case CurrencyActionTypes.currencySaveSuccess: {
@@ -60,7 +60,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: null,
         errorMessage: null,
         subErrors: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case CurrencyActionTypes.currencySelected: {
@@ -69,7 +69,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case CurrencyActionTypes.currencyFailure: {
@@ -79,7 +79,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: action.payload.error,
         subErrors: action.payload.error.subErrors,
         message: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case CurrencyActionTypes.currencyUpdate:
@@ -90,7 +90,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         message: null,
-        isLoading: true
+        isLoading: true,
       };
     }
     case CurrencyActionTypes.clean: {

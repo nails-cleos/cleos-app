@@ -21,7 +21,7 @@ export const initialState: State = {
   subErrors: null,
   selected: null,
   message: null,
-  isLoading: false
+  isLoading: false,
 };
 
 export const reducer = (state = initialState, action: All): State => {
@@ -33,7 +33,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case ExpenseActionTypes.getExpenseInfo: {
@@ -43,7 +43,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case ExpenseActionTypes.expenseFind: {
@@ -52,7 +52,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: {} as IExpense,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case ExpenseActionTypes.expenseSuccess: {
@@ -61,7 +61,7 @@ export const reducer = (state = initialState, action: All): State => {
         data: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case ExpenseActionTypes.expenseInfoSuccess: {
@@ -70,7 +70,7 @@ export const reducer = (state = initialState, action: All): State => {
         info: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case ExpenseActionTypes.expenseSaveSuccess: {
@@ -80,7 +80,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: null,
         errorMessage: null,
         subErrors: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case ExpenseActionTypes.expenseSelected: {
@@ -89,7 +89,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: action.payload.expense,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case ExpenseActionTypes.expenseFailure: {
@@ -99,7 +99,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: action.payload.error,
         subErrors: action.payload.error.subErrors,
         message: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case ExpenseActionTypes.expenseUpdate:
@@ -110,7 +110,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         message: null,
-        isLoading: true
+        isLoading: true,
       };
     }
     case ExpenseActionTypes.clean: {

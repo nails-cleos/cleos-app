@@ -8,9 +8,9 @@ describe('LegalsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [PrivacyComponent]
-})
-    .compileComponents();
+      imports: [PrivacyComponent],
+    })
+      .compileComponents();
   });
 
   beforeEach(() => {

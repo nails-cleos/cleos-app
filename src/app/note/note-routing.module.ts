@@ -7,19 +7,19 @@ import { NoteComponent } from './note.component';
 const routes: Routes = [
   {
     path: 'add', component: NoteComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager, Role.professional, Role.roomAdmin]
-    }
+      roles: [Role.admin, Role.manager, Role.professional, Role.roomAdmin],
+    },
   },
   {
     path: ':id', component: NoteComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager, Role.professional, Role.roomAdmin]
-    }
-  }
+      roles: [Role.admin, Role.manager, Role.professional, Role.roomAdmin],
+    },
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class NoteRoutingModule {
 }

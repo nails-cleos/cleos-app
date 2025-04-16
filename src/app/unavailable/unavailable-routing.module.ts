@@ -9,34 +9,34 @@ import { BlockAgendaComponent } from './block-agenda/block-agenda.component';
 const routes: Routes = [
   {
     path: '', component: UnavailableListComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.professional]
-    }
+      roles: [Role.admin, Role.professional],
+    },
   },
   {
     path: 'add', component: UnavailableComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.professional]
-    }
+      roles: [Role.admin, Role.professional],
+    },
   },
   {
     path: ':id', component: UnavailableComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.professional]
-    }
+      roles: [Role.admin, Role.professional],
+    },
   },
   {
     path: 'block-agenda/add', component: BlockAgendaComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.professional]
-    }
+      roles: [Role.admin, Role.professional],
+    },
   },
   {
     path: 'block-agenda/:id', component: BlockAgendaComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.professional]
-    }
-  }
+      roles: [Role.admin, Role.professional],
+    },
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class UnavailableRoutingModule {
 }

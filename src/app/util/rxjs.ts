@@ -3,7 +3,7 @@ import { throwError, timer } from 'rxjs';
 export const genericRetryStrategy = (
   {
     scalingDuration = 1000,
-    excludedStatusCodes = [0, 400, 401, 403, 404, 409, 412]
+    excludedStatusCodes = [0, 400, 401, 403, 404, 409, 412],
   }: {
     maxRetryAttempts?: number;
     scalingDuration?: number;

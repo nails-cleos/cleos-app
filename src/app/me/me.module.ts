@@ -9,7 +9,7 @@ import { PaymentCompleteComponent } from './payment/complete/payment-complete.co
 import {
   BottomSheetReferralComponent,
   BottomSheetShareComponent,
-  ReferralsComponent
+  ReferralsComponent,
 } from './referrals/referrals.component';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { ReviewDialogComponent } from './reservation/review/review-dialog.component';
@@ -56,14 +56,14 @@ import { ShareButtonsComponent } from './referrals/share-buttons/share-buttons.c
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('me')
+        useClass: TranslateLoaderFactory.forModule('me'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
     EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects, CurrencyEffects]),
   ],
@@ -77,8 +77,8 @@ import { ShareButtonsComponent } from './referrals/share-buttons/share-buttons.c
     TrackingService,
     DiscountService,
     CurrencyService,
-    ColorService
-  ]
+    ColorService,
+  ],
 })
 export class MeModule {
   constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {

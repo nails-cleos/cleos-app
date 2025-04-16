@@ -6,7 +6,7 @@ import { SharedModule } from '../shared.module';
   selector: 'app-rating',
   templateUrl: './rating.component.html',
   styleUrls: ['./rating.component.scss'],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class RatingComponent implements OnInit {
 
@@ -23,34 +23,34 @@ export class RatingComponent implements OnInit {
   ratingArr: Array<number> = [];
 
   constructor() {
-    this.rating = -1;
-    this.hover = -1;
-    this.starCount = 5;
-    this.color = 'accent';
-    this.rate = 'REVIEW.YOUR_RATE';
-    this.canEdit = false;
+  	this.rating = -1;
+  	this.hover = -1;
+  	this.starCount = 5;
+  	this.color = 'accent';
+  	this.rate = 'REVIEW.YOUR_RATE';
+  	this.canEdit = false;
   }
 
   ngOnInit(): void {
-    for (let index = 1; index <= this.starCount; index++) {
-      this.ratingArr.push(index);
-    }
+  	for (let index = 1; index <= this.starCount; index++) {
+  		this.ratingArr.push(index);
+  	}
   }
 
   onClick = (rating: number): void => {
-    this.rating = this.rating === rating ? -1 : rating;
-    this.ratingUpdated.emit(this.rating);
+  	this.rating = this.rating === rating ? -1 : rating;
+  	this.ratingUpdated.emit(this.rating);
   };
 
   onHover = (hover: number): void => {
-    this.hover = hover;
-    this.ratingHover.emit(this.hover);
+  	this.hover = hover;
+  	this.ratingHover.emit(this.hover);
   };
 
   fontSet = (
-    i: number
+  	i: number,
   ): 'material-icons' | 'material-symbols-outlined' => this.hover >= i + 1 || this.rating >= i + 1 ? 'material-icons' :
-    'material-symbols-outlined';
+  	'material-symbols-outlined';
 
   setColor = (i: number): ThemePalette => this.hover >= i + 1 || this.rating >= i + 1 ? this.color : undefined;
 }

@@ -10,7 +10,7 @@ import {
   getNowTimeZone,
   getWeeksInMonth,
   monthViewTitle,
-  newDateTimestamp
+  newDateTimestamp,
 } from '../../util/dates';
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectDashboardState } from '../../store/app.states';
@@ -28,7 +28,7 @@ import {
   ISummaryTotal,
   ITotalType,
   SummaryType,
-  TotalType
+  TotalType,
 } from '../../interfaces/dashboard';
 import { YearMonthAdapter } from '../../util/adapter/year-month.adapter';
 import { allElementsHaveSameKeyFilterValue, currencySymbol, titleCase } from '../../util/helper';
@@ -47,9 +47,9 @@ import { TwoDigitsDirective } from '../../directives/two-digits.directive';
   templateUrl: './month-summary.component.html',
   styleUrls: ['./month-summary.component.scss'],
   providers: [
-    { provide: DateAdapter, useClass: YearMonthAdapter }
+    { provide: DateAdapter, useClass: YearMonthAdapter },
   ],
-  imports: [SharedModule, FilterByPipe, TimeDetailPipe, TwoDigitsDirective]
+  imports: [SharedModule, FilterByPipe, TimeDetailPipe, TwoDigitsDirective],
 })
 export class MonthSummaryComponent implements OnInit, OnDestroy {
   date = new FormControl<Date | null>(null);
@@ -131,7 +131,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
             gross: total.gross,
             btw: total.btw,
             net: total.net,
-            payments: []
+            payments: [],
           };
           group.push(newItem);
           grouped.set(key, group);
@@ -184,7 +184,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     id: string,
     gross: number,
     btw: number,
-    summaries: IMonthlySummaryRequest[]
+    summaries: IMonthlySummaryRequest[],
   ): IMonthlySummaryRequest[] => {
     const newSummary = { id, gross, btw };
     const exist = summaries.find(ms => ms.id === id);
@@ -200,7 +200,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     id: string,
     gross: number = 0,
     net: number = 0,
-    btw: number = 0
+    btw: number = 0,
   ): { monthlySummary: IMonthlySummary; newSummaries: IMonthlySummaryRequest[] } => {
     newSummaries = MonthSummaryComponent.addSummary(id, gross, btw, newSummaries);
     if (summary.total.payments?.length) {
@@ -218,7 +218,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     } else {
       return {
         monthlySummary: Object.assign({}, summary, { total: { ...summary.total, gross, net, btw } }),
-        newSummaries
+        newSummaries,
       };
     }
   };
@@ -240,7 +240,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     summaryRequests: IMonthlySummaryRequest[],
     input: HTMLInputElement,
     index: number,
-    id: string
+    id: string,
   ): { monthlySummaries: IMonthlySummary[]; newSummaries: IMonthlySummaryRequest[] } {
     const objIndex = summaries.findIndex((obj => obj.position === index));
     const isInvalidInput = MonthSummaryComponent.isInvalidInput(input.value);
@@ -373,7 +373,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     title: string,
     totalTypes: ITotalType,
     values: IMonthlySummaryRequest[],
-    data?: IMonthlySummary[]
+    data?: IMonthlySummary[],
   ): void => {
     if (data?.length) {
       const workbookName = `${ titleCase(totalTypes.type) }-${ getDateFormat(this.date.value) }`;
@@ -427,7 +427,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
       case SummaryType.expense:
         totals = Array.from(totalTypes.totals, ([key, value]) => ({
           expenseType: key,
-          ...value
+          ...value,
         }));
         break;
     }
@@ -439,9 +439,9 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
           totals,
           type: totalTypes.type,
           summaries,
-          step: this.step
-        }
-      )
+          step: this.step,
+        },
+      ),
     );
   };
 
@@ -449,7 +449,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     if (this.summaryReservations) {
       const {
         monthlySummaries,
-        newSummaries
+        newSummaries,
       } = MonthSummaryComponent.updateAmounts(this.summaryReservations, this.monthlySummaryPayment, input, index, id);
       this.summaryReservations = monthlySummaries;
       this.monthlySummaryPayment = newSummaries;
@@ -460,7 +460,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     if (this.summaryExpenses) {
       const {
         monthlySummaries,
-        newSummaries
+        newSummaries,
       } = MonthSummaryComponent.updateAmounts(this.summaryExpenses, this.monthlySummaryExpense, input, index, id);
       this.summaryExpenses = monthlySummaries;
       this.monthlySummaryExpense = newSummaries;
@@ -471,7 +471,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     if (this.summaryCash) {
       const {
         monthlySummaries,
-        newSummaries
+        newSummaries,
       } = MonthSummaryComponent.updateAmounts(this.summaryCash, this.monthlySummaryCash, input, index, id);
       this.summaryCash = monthlySummaries;
       this.monthlySummaryCash = newSummaries;
@@ -506,7 +506,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     this.expenseMonth = new TotalType(SummaryType.expense, Object.values(ExpenseType));
     this.cashMonth = new TotalType(SummaryType.cash);
     this.store.dispatch(
-      new fromActionsDashboard.GetMonthlySummary(date)
+      new fromActionsDashboard.GetMonthlySummary(date),
     );
   };
 
@@ -603,7 +603,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
         this.monthlySummaryMap?.set(key, {
           summarySale: value.summarySale.map(s => this.getNewObject(s)),
           summaryExpenses: value.summaryExpenses.map(s => this.getNewObject(s)),
-          summaryCashSale: value.summaryCashSale.map(s => this.getNewObject(s))
+          summaryCashSale: value.summaryCashSale.map(s => this.getNewObject(s)),
         });
       });
       if (this.monthlySummaryMap) {

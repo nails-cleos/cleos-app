@@ -8,9 +8,9 @@ describe('AdditionalListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [AdditionalListComponent]
-})
-    .compileComponents();
+      imports: [AdditionalListComponent],
+    })
+      .compileComponents();
   });
 
   beforeEach(() => {

@@ -25,29 +25,29 @@ export class PaymentService {
     id: string,
     path: 'reservation' | 'transaction',
     status: string,
-    paymentStatus: IPaymentStatus
+    paymentStatus: IPaymentStatus,
   ): Observable<IPayment> => this.http.post<IPayment>(toUrl(this.getKey(path), id, this.url, status), paymentStatus);
 
   create = (reservationId: string, payment: IReservationPayment): Observable<IPayment> => this.http.post<IPayment>(
     toUrl(this.urlV1, 'reservations', reservationId),
-    payment
+    payment,
   );
 
   update = (payment: IReservationPayment[]): Observable<void> => this.http.patch<void>(this.urlV1, payment);
 
   updateLink = (id: string, payment: IReservationPayment): Observable<IPayment> => this.http.patch<IPayment>(
     toUrl(this.urlV1, id),
-    payment
+    payment,
   );
 
   recreate = (id: string, paymentType: string): Observable<IPayment> => this.http.patch<IPayment>(
     toUrl(this.urlV1, id, 'types', paymentType),
-    null
+    null,
   );
 
   findByResourceId = (
     id: string,
-    path: 'reservation' | 'transaction'
+    path: 'reservation' | 'transaction',
   ): Observable<IPayment[]> => this.http.get<IPayment[]>(toUrl(this.getKey(path), id, this.url));
 
   public notify = (
@@ -55,18 +55,22 @@ export class PaymentService {
     path: 'reservation' | 'transaction',
     resourceId: string,
     preferenceId: string,
-    paymentType: string
+    paymentType: string,
   ): Observable<IPayment> => this.http.patch<IPayment>(
     toUrl(this.getKey(path), resourceId, this.url, id),
-    { preferenceId, paymentType }
+    { preferenceId, paymentType },
   );
 
   private getKey = (path: 'reservation' | 'transaction'): string => {
+    let url = '';
     switch (path) {
       case 'reservation':
-        return this.reservationUrlV1;
+        url = this.reservationUrlV1;
+        break;
       case 'transaction':
-        return this.transactionUrlV1;
+        url = this.transactionUrlV1;
+        break;
     }
+    return url;
   };
 }

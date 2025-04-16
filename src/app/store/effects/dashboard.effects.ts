@@ -17,8 +17,8 @@ export class DashboardEffects {
       map((action: any) => action.payload),
       switchMap((payload: any) => this.dashboardService.getEvents(payload).pipe(
         switchMap((response: any) => of(new fromActionsDashboard.DashSuccess(response ? response : []))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error }))),
+      )),
     ));
 
   getEvents$ = createEffect(
@@ -26,8 +26,8 @@ export class DashboardEffects {
       map((action: any) => action.payload),
       switchMap((payload: any) => this.dashboardService.meEvents(payload).pipe(
         switchMap((response: any) => of(new fromActionsDashboard.EventSuccess(response ? response : []))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error }))),
+      )),
     ));
 
   updateEvent$ = createEffect(
@@ -35,16 +35,16 @@ export class DashboardEffects {
       map((action: any) => action.payload),
       mergeMap((payload: any) => this.dashboardService.updateEvent(payload).pipe(
         switchMap(() => NEVER),
-        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error }))),
+      )),
     ));
 
   getCards$ = createEffect(() => this.actions$.pipe(ofType(fromActionsDashboard.DashboardActionTypes.dashCards)).pipe(
     map((action: any) => action.payload),
     switchMap((payload: any) => this.dashboardService.getCards(payload).pipe(
       switchMap((response: any) => of(new fromActionsDashboard.DashSuccess(response ? response : []))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error }))),
+    )),
   ));
 
   getSummary$ = createEffect(
@@ -52,8 +52,8 @@ export class DashboardEffects {
       map((action: any) => action.payload),
       switchMap((payload: any) => this.dashboardService.getSummary(payload).pipe(
         switchMap((response: any) => of(new fromActionsDashboard.MonthlySummarySuccess(response ? response : []))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error }))),
+      )),
     ));
 
   saveMonthlySummary$ = createEffect(
@@ -64,10 +64,10 @@ export class DashboardEffects {
         switchMap(() => of(new fromActionsDashboard.UpdateMonthlySummarySuccess({
           date: payload.date,
           step: payload.step,
-          message: this.translate.instant('SUMMARY.UPDATED')
+          message: this.translate.instant('SUMMARY.UPDATED'),
         }))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error }))),
+      )),
     ));
 
   getYearSummary$ = createEffect(
@@ -75,8 +75,8 @@ export class DashboardEffects {
       map((action: any) => action.payload),
       switchMap((payload: any) => this.dashboardService.getYearSummary(payload).pipe(
         switchMap((response: any) => of(new fromActionsDashboard.YearSummarySuccess(response ? response : []))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error }))),
+      )),
     ));
 
   getYearExport$ = createEffect(
@@ -84,8 +84,8 @@ export class DashboardEffects {
       map((action: any) => action.payload),
       switchMap((payload: any) => this.dashboardService.getYearExport(payload).pipe(
         switchMap((response: any) => of(new fromActionsDashboard.YearExportSuccess(response ? response : []))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error }))),
+      )),
     ));
 
   getQuarterSummary$ = createEffect(
@@ -93,22 +93,22 @@ export class DashboardEffects {
       map((action: any) => action.payload),
       switchMap((payload: any) => this.dashboardService.getQuarterSummary(payload.year, payload.quarter).pipe(
         switchMap((response: any) => of(new fromActionsDashboard.QuarterSummarySuccess(response ? response : []))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsDashboard.DashFailure({ error: err.error }))),
+      )),
     ));
 
   dataSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsDashboard.DashboardActionTypes.dashSuccess)
+    ofType(fromActionsDashboard.DashboardActionTypes.dashSuccess),
   ), { dispatch: false });
 
   eventSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsDashboard.DashboardActionTypes.eventSuccess)
+    ofType(fromActionsDashboard.DashboardActionTypes.eventSuccess),
   ), { dispatch: false });
 
   saveMonthlySummarySuccess$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsDashboard.DashboardActionTypes.saveMonthlySummarySuccess),
     tap((data: any) => this.navigationService.reload(this.router.url.split('/'),
-      { date: data.payload.date, step: data.payload.step }, null, '/dashboard/quarter/summary'))
+      { date: data.payload.date, step: data.payload.step }, null, '/dashboard/quarter/summary')),
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private router: Router,

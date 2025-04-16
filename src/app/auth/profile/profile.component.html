@@ -92,22 +92,34 @@
                 @if (showColors) {
                   <mat-form-field appearance="outline">
                     <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.DARK.FIELD' | translate }}</mat-label>
-                    <input matInput [formControl]="darkColor"/>
-                    <div matSuffix ngx-colors-trigger [formControl]="darkColorPicker" [style.color]="darkColor.value"
-                         [format]="'hex'" [colorsAnimation]="'popup'" style="margin: 5px">
-                      <mat-icon aria-hidden="false" aria-label="Example palette icon" fontIcon="palette"></mat-icon>
-                    </div>
+                    <input matInput [cpOutputFormat]="'hex'" [colorPicker]="darkColor.value"
+                           (colorPickerChange)="darkColor.setValue($event)"
+                           [style.background]="darkColor.value" [style.color]="'#000'"
+                           formControlName="darkColor" #darkColorInput [cpPosition]="'top'"
+                           style="margin-right: 5px"/>
+
+                    <mat-icon matSuffix style="cursor: pointer" (click)="darkColorPicker.openDialog(darkColorInput)"
+                              id="darkColorIcon">
+                      palette
+                    </mat-icon>
+                    <color-picker #darkColorPicker></color-picker>
                     @if (darkColor.hasError('invalidColor')) {
                       <mat-error>{{ 'COMMON.PROFESSIONAL.COLOR.INVALID' | translate }}</mat-error>
                     }
                   </mat-form-field>
                   <mat-form-field appearance="outline">
                     <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.LIGHT.FIELD' | translate }}</mat-label>
-                    <input matInput [formControl]="lightColor"/>
-                    <div matSuffix ngx-colors-trigger [formControl]="lightColorPicker" [style.color]="lightColor.value"
-                         [format]="'hex'" [colorsAnimation]="'popup'" style="margin: 5px">
-                      <mat-icon aria-hidden="false" aria-label="Example palette icon" fontIcon="palette"></mat-icon>
-                    </div>
+                    <input matInput [cpOutputFormat]="'hex'" [colorPicker]="lightColor.value"
+                           (colorPickerChange)="lightColor.setValue($event)"
+                           [style.background]="lightColor.value" [style.color]="'#fff'"
+                           formControlName="lightColor" #lightColorInput [cpPosition]="'top'"
+                           style="margin-right: 5px"/>
+
+                    <mat-icon matSuffix style="cursor: pointer" (click)="lightColorPicker.openDialog(lightColorInput)"
+                              id="lightColorIcon">
+                      palette
+                    </mat-icon>
+                    <color-picker #lightColorPicker></color-picker>
                     @if (lightColor.hasError('invalidColor')) {
                       <mat-error>{{ 'COMMON.PROFESSIONAL.COLOR.INVALID' | translate }}</mat-error>
                     }

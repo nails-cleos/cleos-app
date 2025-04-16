@@ -8,9 +8,9 @@ describe('AddServiceComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [AddServiceComponent]
-})
-    .compileComponents();
+      imports: [AddServiceComponent],
+    })
+      .compileComponents();
   });
 
   beforeEach(() => {

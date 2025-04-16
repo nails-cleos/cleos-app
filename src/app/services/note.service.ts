@@ -5,7 +5,7 @@ import { INote } from '../interfaces/note';
 import { toUrl } from '../util/helper';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NoteService {
 

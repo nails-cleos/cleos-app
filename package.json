@@ -64,7 +64,7 @@
     "luxon": "^3.5.0",
     "ng2-charts": "^8.0.0",
     "ngrx-store-localstorage": "^19.0.0",
-    "ngx-colors": "^3.6.0",
+    "ngx-color-picker": "^19.0.0",
     "ngx-cookie-service": "^19.1.2",
     "ngx-cookieconsent": "^8.0.0",
     "ngx-material-intl-tel-input": "^19.2.1",

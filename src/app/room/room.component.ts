@@ -23,7 +23,7 @@ import {
   createNewDate,
   getCurrentTimeZone,
   getTimeNumber,
-  getTimeZone
+  getTimeZone,
 } from '../util/dates';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { goTo } from '../util/animation';
@@ -50,7 +50,7 @@ export interface IIcon {
   selector: 'app-room',
   templateUrl: './room.component.html',
   styleUrls: ['./room.component.scss'],
-  imports: [SharedModule, AvailabilityComponent, GoogleMapComponent, BackButtonDirective]
+  imports: [SharedModule, AvailabilityComponent, GoogleMapComponent, BackButtonDirective],
 })
 export class RoomComponent implements OnInit, OnDestroy {
   @ViewChild('professionalInput') professionalInput!: ElementRef<HTMLInputElement>;
@@ -70,7 +70,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     thursday: RoomIconName.calendarToday,
     friday: RoomIconName.calendarToday,
     saturday: RoomIconName.calendarToday,
-    sunday: RoomIconName.calendarToday
+    sunday: RoomIconName.calendarToday,
   };
 
   monDate?: IAvailabilityDate;
@@ -154,13 +154,14 @@ export class RoomComponent implements OnInit, OnDestroy {
     }
 
     if (this.isAddMode) {
-      return this.store.dispatch(
-        new fromActionsRoom.RoomSave(room)
+      this.store.dispatch(
+        new fromActionsRoom.RoomSave(room),
       );
     } else {
       room.id = this.id;
       this.store.dispatch(new fromActionsRoom.RoomUpdate(room));
     }
+    return;
   }
 
   get addProfessional(): void {
@@ -286,7 +287,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       timeZone: ['', [Validators.required, requireMatch]],
       address: ['', Validators.required],
       addressDescription: [''],
-      closeDate: ['']
+      closeDate: [''],
     });
     const currentTimeZone = getCurrentTimeZone().toLowerCase();
     this.getForm.timeZone.setValue(
@@ -295,23 +296,25 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.filteredProfessionals = this.getForm.professional.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value ? value.name : ''),
-      map(
-        name => name ? this.filter(name) : (this.allProfessional ? this.allProfessional.slice() : this.allProfessional))
+      map(name => name ? this.filter(name) :
+        (this.allProfessional ? this.allProfessional.slice() : this.allProfessional)),
     );
     this.filteredCurrencyOptions = this.getForm.currency.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.code),
-      map(name => name ? this.filterCurrency(name) : this.currencies ? this.currencies.slice() : this.currencies)
+      map(name => name ? this.filterCurrency(name) : this.currencies ? this.currencies.slice() : this.currencies),
     );
     this.filteredOfficeOptions = this.getForm.office.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.namme),
-      map(name => name ? this.filterOffice(name) : this.offices ? this.offices.slice() : this.offices)
+      map(name => name ? this.filterOffice(name) : this.offices ? this.offices.slice() : this.offices),
     );
     this.filteredTimeZoneOptions = this.getForm.timeZone.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.label),
-      map(name => name ? this.filterTimeZone(name) : this.timeZoneList ? this.timeZoneList.slice() : this.timeZoneList)
+      map(
+        name => name ? this.filterTimeZone(name) : this.timeZoneList ? this.timeZoneList.slice() : this.timeZoneList,
+      ),
     );
   };
 
@@ -449,7 +452,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   private getRoom = (): void => {
     const id = this.route.snapshot.paramMap.get('id');
     this.store.dispatch(
-      new fromActionsRoom.RoomFind({ id, redirect: true })
+      new fromActionsRoom.RoomFind({ id, redirect: true }),
     );
   };
 
@@ -465,7 +468,7 @@ export class RoomComponent implements OnInit, OnDestroy {
           address: state.selected.room.address,
           currency: state.selected.room.currency,
           office: state.selected.room.office,
-          timeZone: roomTimeZone.label
+          timeZone: roomTimeZone.label,
         } as IRoomAll;
         if (state.selected.room.closeDate) {
           this.room.closeDate = createDateFromString(state.selected.room.closeDate);

@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SeoService {
   private meta: Meta = inject(Meta);

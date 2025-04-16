@@ -1,6 +1,6 @@
 <div class="flex-container">
   <div class="card-container">
-    <div class="card-content">
+    <div class="card-content" style="width: 80%">
       <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
         <mat-card appearance="outlined">
           @if (isAddMode) {
@@ -23,7 +23,7 @@
                 @if (isAddMode) {
                   <mat-form-field appearance="outline">
                     <mat-label>{{ 'USER.ROLE.FIELD' | translate }}</mat-label>
-                    <mat-select formControlName="role" required>
+                    <mat-select formControlName="role" required id="select-role">
                       <mat-option value="ROLE_CUSTOMER">{{ 'COMMON.ROLES.ROLE_CUSTOMER' | translate }}</mat-option>
                       <mat-option
                         value="ROLE_PROFESSIONAL">{{ 'COMMON.ROLES.ROLE_PROFESSIONAL' | translate }}
@@ -50,7 +50,7 @@
                   @if (select.value) {
                     <ng-icon [svg]="select.value.flag" class="icon-margin" matPrefix/>
                   }
-                  <mat-select #select formControlName="lang" required>
+                  <mat-select #select formControlName="lang" required id="select-lang">
                     @for (lang of flagList; track lang) {
                       <mat-option [value]="lang">
                         <ng-icon [svg]="lang.flag" class="icon-margin"/>
@@ -69,7 +69,7 @@
                     <mat-error>{{ errors['displayName'] }}</mat-error>
                   }
                 </mat-form-field>
-                <ngx-material-intl-tel-input style="margin-bottom: 22px !important;" [includeDialCode]="true"
+                <ngx-material-intl-tel-input id="phone" style="margin-bottom: 22px !important;" [includeDialCode]="true"
                                              [emojiFlags]="true" [enablePlaceholder]="true" [enableSearch]="true"
                                              [required]="true" [preferredCountries]="['nl']" fieldControlName="phone"
                                              [appearance]="'outline'" [textLabels]="labels" [autoSelectCountry]="false">
@@ -94,11 +94,17 @@
                 @if (isProfessionalOrManager) {
                   <mat-form-field appearance="outline">
                     <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.DARK.FIELD' | translate }}</mat-label>
-                    <input matInput formControlName="darkColor"/>
-                    <div matSuffix ngx-colors-trigger formControlName="darkColorPicker" style="margin: 5px"
-                         [style.color]="getForm.darkColor.value" [format]="'hex'" [colorsAnimation]="'popup'">
-                      <mat-icon aria-hidden="false" aria-label="Example palette icon" fontIcon="palette"></mat-icon>
-                    </div>
+                    <input matInput [cpOutputFormat]="'hex'" [colorPicker]="getForm.darkColor.value"
+                           (colorPickerChange)="getForm.darkColor.setValue($event)"
+                           [style.background]="getForm.darkColor.value" [style.color]="'#000'"
+                           formControlName="darkColor" #darkColorInput [cpPosition]="'top'"
+                           style="margin-right: 5px"/>
+
+                    <mat-icon matSuffix style="cursor: pointer" (click)="darkColorPicker.openDialog(darkColorInput)"
+                              id="darkColorIcon">
+                      palette
+                    </mat-icon>
+                    <color-picker #darkColorPicker></color-picker>
                     @if (getForm.darkColor.hasError('invalidColor')) {
                       <mat-error>
                         {{ 'COMMON.PROFESSIONAL.COLOR.INVALID' | translate }}
@@ -107,12 +113,17 @@
                   </mat-form-field>
                   <mat-form-field appearance="outline">
                     <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.LIGHT.FIELD' | translate }}</mat-label>
-                    <input matInput formControlName="lightColor"/>
-                    <div matSuffix ngx-colors-trigger formControlName="lightColorPicker"
-                         [style.color]="getForm.lightColor.value"
-                         [format]="'hex'" [colorsAnimation]="'popup'" style="margin: 5px">
-                      <mat-icon aria-hidden="false" aria-label="Example palette icon" fontIcon="palette"></mat-icon>
-                    </div>
+                    <input matInput [cpOutputFormat]="'hex'" [colorPicker]="getForm.lightColor.value"
+                           (colorPickerChange)="getForm.lightColor.setValue($event)"
+                           [style.background]="getForm.lightColor.value" [style.color]="'#fff'"
+                           formControlName="lightColor" #lightColorInput [cpPosition]="'top'"
+                           style="margin-right: 5px"/>
+
+                    <mat-icon matSuffix style="cursor: pointer" (click)="lightColorPicker.openDialog(lightColorInput)"
+                              id="lightColorIcon">
+                      palette
+                    </mat-icon>
+                    <color-picker #lightColorPicker></color-picker>
                     @if (getForm.lightColor.hasError('invalidColor')) {
                       <mat-error>
                         {{ 'COMMON.PROFESSIONAL.COLOR.INVALID' | translate }}

@@ -5,20 +5,20 @@ export interface State {
 }
 
 export const initialState: State = {
-  data: null
+  data: null,
 };
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
     case I18nActionTypes.getLanguage: {
       return {
-        ...state
+        ...state,
       };
     }
     case I18nActionTypes.setLanguage: {
       return {
         ...state,
-        data: action.payload
+        data: action.payload,
       };
     }
     default: {

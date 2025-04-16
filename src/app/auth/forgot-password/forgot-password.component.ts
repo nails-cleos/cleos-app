@@ -16,7 +16,7 @@ import { BackButtonDirective } from '../../directives/back-button.directive';
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],
-  imports: [SharedModule, BackButtonDirective]
+  imports: [SharedModule, BackButtonDirective],
 })
 export class ForgotPasswordComponent implements OnInit, OnDestroy {
 
@@ -36,7 +36,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     sendPasswordResetEmail(this.auth, this.form.get('email')?.value.trim()).then(() => {
       const message = this.translate.instant('AUTH.FORGOT_PASSWORD.MESSAGE');
       this.store.dispatch(
-        new fromActionsLogin.SignUpSuccess({ message })
+        new fromActionsLogin.SignUpSuccess({ message }),
       );
     }).catch(e => console.error(`Error sending reset password. ${ e }`));
     return;
@@ -56,7 +56,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
 
   private createForm = (): void => {
     this.form = this.formBuilder.group({
-      email: ['', Validators.required]
+      email: ['', Validators.required],
     });
   };
 
@@ -64,7 +64,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     this.subscription = this.getState.subscribe((state) => {
       if (state.errorMessage || state.message) {
         const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
+          duration: 5000,
         });
         if (state.message) {
           snackBarRef.afterDismissed().subscribe(() => {

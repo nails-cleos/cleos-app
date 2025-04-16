@@ -6,7 +6,7 @@ import { IUserAll } from '../interfaces/user';
 import { isExternalUrl } from './index';
 
 export const requestOptionInterceptor = (req: HttpRequest<unknown>,
-                                         next: HttpHandlerFn): Observable<HttpEvent<unknown>> => {
+  next: HttpHandlerFn): Observable<HttpEvent<unknown>> => {
   if (!isExternalUrl(req.url)) {
     if (!req.headers.has('Content-Type') && !req.headers.has('Upload')) {
       req = req.clone({ headers: req.headers.set('Content-Type', 'application/json') });

@@ -18,21 +18,21 @@ import { Observable } from 'rxjs';
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('note')
+        useClass: TranslateLoaderFactory.forModule('note'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
-    EffectsModule.forFeature([NoteEffects])
+    EffectsModule.forFeature([NoteEffects]),
   ],
   providers: [
     NoteService,
-    UserService
-  ]
+    UserService,
+  ],
 })
 export class NoteModule {
   constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {

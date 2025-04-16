@@ -26,7 +26,7 @@ import { BackButtonDirective } from '../../../directives/back-button.directive';
   selector: 'app-option',
   templateUrl: './option.component.html',
   styleUrls: ['./option.component.scss'],
-  imports: [SharedModule, BankComponent, DurationTimePipe, PaymentPreviewComponent, BackButtonDirective]
+  imports: [SharedModule, BankComponent, DurationTimePipe, PaymentPreviewComponent, BackButtonDirective],
 })
 export class OptionComponent implements OnInit, OnDestroy {
   @ViewChild('stepper') myStepper!: MatStepper;
@@ -51,69 +51,69 @@ export class OptionComponent implements OnInit, OnDestroy {
   private readonly language: string;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
-              breakpointObserver: BreakpointObserver, private router: Router, private translate: TranslateService) {
-    this.getState = this.store.select(selectPaymentState);
-    breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small])
-      .subscribe(result => this.smallScreen = result.matches);
-    const preview = new Step(1, 'preview', () => this.pay);
-    const type = new Step(0, 'type', (goNext: boolean) => this.callStepTwo(goNext), preview);
-    this.steps = [type, preview];
-    this.typeForm = this.formBuilder.group({
-      type: new UntypedFormControl(undefined),
-      bank: new UntypedFormControl('')
-    });
-    this.price = new Price();
-    this.language = this.translate.currentLang;
+  	breakpointObserver: BreakpointObserver, private router: Router, private translate: TranslateService) {
+  	this.getState = this.store.select(selectPaymentState);
+  	breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small])
+  		.subscribe(result => this.smallScreen = result.matches);
+  	const preview = new Step(1, 'preview', () => this.pay);
+  	const type = new Step(0, 'type', (goNext: boolean) => this.callStepTwo(goNext), preview);
+  	this.steps = [type, preview];
+  	this.typeForm = this.formBuilder.group({
+  		type: new UntypedFormControl(undefined),
+  		bank: new UntypedFormControl(''),
+  	});
+  	this.price = new Price();
+  	this.language = this.translate.currentLang;
   }
 
   get back(): void {
-    this.myStepper.selectedIndex = getBackIndex(this.steps, this.myStepper.selectedIndex);
-    return;
+  	this.myStepper.selectedIndex = getBackIndex(this.steps, this.myStepper.selectedIndex);
+  	return;
   }
 
   get pay(): void {
-    const option: IPaymentOption = this.typeForm.get('type')?.value;
-    const type = option.type;
-    const paymentOptionId = option.bic;
-    const percentage = this.typeForm.get('percentage')?.value || 'TOTAL';
-    const payload = {
-      reservationId: this.reservationId,
-      payment: { type, paymentOptionId, percentage, bic: undefined }
-    };
-    if (option.subTypes.length) {
-      payload.payment.bic = this.typeForm.get('bank')?.value?.bic;
-    }
-    return this.store.dispatch(
-      new fromActionsPayment.PaymentCreate(payload)
-    );
+  	const option: IPaymentOption = this.typeForm.get('type')?.value;
+  	const type = option.type;
+  	const paymentOptionId = option.bic;
+  	const percentage = this.typeForm.get('percentage')?.value || 'TOTAL';
+  	const payload = {
+  		reservationId: this.reservationId,
+  		payment: { type, paymentOptionId, percentage, bic: undefined },
+  	};
+  	if (option.subTypes.length) {
+  		payload.payment.bic = this.typeForm.get('bank')?.value?.bic;
+  	}
+  	return this.store.dispatch(
+  		new fromActionsPayment.PaymentCreate(payload),
+  	);
   }
 
   get professionalName(): string {
-    const displayName = this.reservation?.professional?.displayName;
-    return displayName ? displayName : '';
+  	const displayName = this.reservation?.professional?.displayName;
+  	return displayName ? displayName : '';
   }
 
   ngOnInit(): void {
-    this.subscribe();
-    this.clean();
-    this.route.params.subscribe(routeParams => {
-      this.reservationId = routeParams.id;
-      this.getPaymentFindByReservationId();
-    });
+  	this.subscribe();
+  	this.clean();
+  	this.route.params.subscribe(routeParams => {
+  		this.reservationId = routeParams.id;
+  		this.getPaymentFindByReservationId();
+  	});
   }
 
   ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+  	this.subscription?.unsubscribe();
   }
 
   triggerClick = (event: StepperSelectionEvent): void => getStepCall(this.steps, event.selectedIndex - 1);
 
   callStepTwo = (goNext: boolean): void => {
-    if (this.typeForm.invalid) {
-      return;
-    }
+  	if (this.typeForm.invalid) {
+  		return;
+  	}
 
-    completeAndNext(this.steps, this.myStepper, goNext);
+  	completeAndNext(this.steps, this.myStepper, goNext);
   };
 
   getStepName = (index: number): string => getStepName(this.steps, index);
@@ -121,16 +121,16 @@ export class OptionComponent implements OnInit, OnDestroy {
   getStepCompleted = (index: number): boolean => getStepCompleted(this.steps, index);
 
   getPercentage = (percentage: number): void => {
-    this.price = newPercentage(this.price, percentage);
+  	this.price = newPercentage(this.price, percentage);
   };
 
   private getPaymentFindByReservationId = (): void => {
-    this.store.dispatch(
-      new fromActionsPayment.PaymentFindByResourceId({ id: this.reservationId, path: 'reservation' })
-    );
-    this.store.dispatch(
-      new fromActionsReservation.ReservationFind({ id: this.reservationId })
-    );
+  	this.store.dispatch(
+  		new fromActionsPayment.PaymentFindByResourceId({ id: this.reservationId, path: 'reservation' }),
+  	);
+  	this.store.dispatch(
+  		new fromActionsReservation.ReservationFind({ id: this.reservationId }),
+  	);
   };
 
   private getOptions = (): void => this.store.dispatch(new fromActionsPayment.PaymentOptions());
@@ -138,42 +138,42 @@ export class OptionComponent implements OnInit, OnDestroy {
   private clean = (): void => this.store.dispatch(new fromActionsPayment.Clean());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
-      if (state.selected) {
-        const reservation = state.selected[0].reservation;
-        if (reservation) {
-          if ((!this.options || this.options.length === 0)) {
-            const types = reservation.room.paymentTypes.filter(
-              (p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
-            if (types?.includes(PaymentType.paynl)) {
-              this.getOptions();
-            } else {
-              this.options = getPaymentOptions(this.translate, types);
-            }
-          }
-          this.price = getPrice(reservation, state.selected);
-          if (this.price.isPaid) {
-            this.router.navigate(['/', this.language, 'reservation', reservation.id]);
-          } else {
-            if (reservation.state !== 'CANCELLED_PAYMENT_REQUIRED') {
-              if (this.price?.totalPaid === 0) {
-                this.typeForm = this.formBuilder.group({
-                  bank: new UntypedFormControl(''),
-                  percentage: new UntypedFormControl(undefined),
-                  type: new UntypedFormControl(undefined)
-                });
-              }
-              this.first = this.price.totalPaid === 0;
-            } else {
-              this.price = new Price(0, 0, 0, 0, 0, state.selected[state.selected.length - 1].amount);
-            }
-            this.reservation = reservation;
-          }
-        }
-      }
-      if (state.data) {
-        this.options = getPayNlOptions(state.data);
-      }
-    });
+  	this.subscription = this.getState.subscribe(state => {
+  		if (state.selected) {
+  			const reservation = state.selected[0].reservation;
+  			if (reservation) {
+  				if ((!this.options || this.options.length === 0)) {
+  					const types = reservation.room.paymentTypes.filter(
+  						(p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
+  					if (types?.includes(PaymentType.paynl)) {
+  						this.getOptions();
+  					} else {
+  						this.options = getPaymentOptions(this.translate, types);
+  					}
+  				}
+  				this.price = getPrice(reservation, state.selected);
+  				if (this.price.isPaid) {
+  					this.router.navigate(['/', this.language, 'reservation', reservation.id]);
+  				} else {
+  					if (reservation.state !== 'CANCELLED_PAYMENT_REQUIRED') {
+  						if (this.price?.totalPaid === 0) {
+  							this.typeForm = this.formBuilder.group({
+  								bank: new UntypedFormControl(''),
+  								percentage: new UntypedFormControl(undefined),
+  								type: new UntypedFormControl(undefined),
+  							});
+  						}
+  						this.first = this.price.totalPaid === 0;
+  					} else {
+  						this.price = new Price(0, 0, 0, 0, 0, state.selected[state.selected.length - 1].amount);
+  					}
+  					this.reservation = reservation;
+  				}
+  			}
+  		}
+  		if (state.data) {
+  			this.options = getPayNlOptions(state.data);
+  		}
+  	});
   };
 }

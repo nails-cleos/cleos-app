@@ -17,18 +17,20 @@ export class NotificationService {
     sort: string,
     direction: string,
     page: number,
-    size: number = PAGE_SIZE
+    size: number = PAGE_SIZE,
   ): Observable<INotification[]> => this.http.get<INotification[]>(toUrl(this.urlV1, 'pages'),
-    { params: createFilter(page, size, sort, direction) }
+    { params: createFilter(page, size, sort, direction) },
   );
 
   readNotification = (notificationId: string): Observable<INotification | undefined> => this.http.post<INotification>(
     toUrl(this.urlV1, notificationId),
-    null
+    null,
   );
 
-  deleteNotification = (notificationId: string): Observable<INotification | undefined> => this.http.delete<INotification>(
-    toUrl(this.urlV1, notificationId)
+  deleteNotification = (
+    notificationId: string,
+  ): Observable<INotification | undefined> => this.http.delete<INotification>(
+    toUrl(this.urlV1, notificationId),
   );
 
   subscribe = (token: string): Observable<any> => this.http.post(toUrl(this.urlV1, 'subscribe'), { token });

@@ -8,9 +8,9 @@ describe('ViewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [TreatmentViewComponent]
-})
-    .compileComponents();
+      imports: [TreatmentViewComponent],
+    })
+      .compileComponents();
   });
 
   beforeEach(() => {

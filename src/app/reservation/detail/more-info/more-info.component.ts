@@ -23,7 +23,7 @@ import { BackButtonDirective } from '../../../directives/back-button.directive';
   selector: 'app-more-info',
   templateUrl: './more-info.component.html',
   styleUrls: ['./more-info.component.scss'],
-  imports: [SharedModule, TimeDetailPipe, RatingComponent, BackButtonDirective]
+  imports: [SharedModule, TimeDetailPipe, RatingComponent, BackButtonDirective],
 })
 export class MoreInfoComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['position', 'description', 'amount', 'type', 'status', 'actions'];
@@ -52,14 +52,14 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
   get execute(): void {
     this.tracking = undefined;
     return this.store.dispatch(
-      new fromActionsReservation.ExecuteTracking({ reservationId: this.reservationId })
+      new fromActionsReservation.ExecuteTracking({ reservationId: this.reservationId }),
     );
   }
 
   get update(): void {
     return executeDialog(this.dialog, UpdateTrackingDialogComponent, {
       startedTimestamp: this.tracking?.startedTimestamp,
-      completedTimestamp: this.tracking?.completedTimestamp
+      completedTimestamp: this.tracking?.completedTimestamp,
     }, result => {
       if (result) {
         this.tracking = undefined;
@@ -67,8 +67,8 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
           new fromActionsReservation.UpdateTracking({
             reservationId: this.reservationId,
             started: result.started,
-            completed: result.completed
-          })
+            completed: result.completed,
+          }),
         );
       }
     }, true);
@@ -88,14 +88,14 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
   }
 
   resend = (payment: IPaymentAll): void => this.store.dispatch(
-    new fromActionsPayment.PaymentRecreate({ id: payment.id, paymentType: payment.type })
+    new fromActionsPayment.PaymentRecreate({ id: payment.id, paymentType: payment.type }),
   );
 
   copy = (payment: IPaymentAll): void => {
     if (payment.link) {
       this.clipboard.copy(payment.link);
       this.snackBar.open(this.translate.instant('PAYMENT.COPY'), 'OK', {
-        duration: 5000
+        duration: 5000,
       });
     }
   };
@@ -104,19 +104,19 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
     if (!this.tracking) {
       this.tracking = undefined;
       this.store.dispatch(
-        new fromActionsReservation.FindTracking({ reservationId: this.reservationId })
+        new fromActionsReservation.FindTracking({ reservationId: this.reservationId }),
       );
     }
     if (!this.payments) {
       this.payments = undefined;
       this.store.dispatch(
-        new fromActionsReservation.ReservationFindPayments(this.reservationId)
+        new fromActionsReservation.ReservationFindPayments(this.reservationId),
       );
     }
     if (!this.reservation) {
       this.reservation = undefined;
       this.store.dispatch(
-        new fromActionsReservation.ReservationFind({ id: this.reservationId })
+        new fromActionsReservation.ReservationFind({ id: this.reservationId }),
       );
     }
   };

@@ -15,7 +15,7 @@ import {
   getPrice,
   newAdditional,
   newExtra,
-  newPrice
+  newPrice,
 } from '../../../util/helper';
 import { API_LOCALE, getDiffTime, getNowTimeZone, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
@@ -41,7 +41,7 @@ import { BackButtonDirective } from '../../../directives/back-button.directive';
   styleUrls: ['./reservation-complete.component.scss'],
   animations: [transitionAnimation],
   imports: [SharedModule, TimeDetailPipe, CurrencySymbolPipe, DurationTimePipe, FormFieldAdderComponent,
-    PricePreviewComponent, BackButtonDirective]
+    PricePreviewComponent, BackButtonDirective],
 })
 export class ReservationCompleteComponent implements OnInit, OnDestroy {
   reservation?: IReservationAll;
@@ -53,24 +53,24 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   groups?: IGroupService[];
   filteredGroup?: Observable<IGroupService[] | undefined>;
   group: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch
+    Validators.required, requireMatch,
   ]);
   treatments?: IService[];
   filteredTreatment?: Observable<IService[] | undefined>;
   treatment: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch
+    Validators.required, requireMatch,
   ]);
 
   startDate: Date;
 
   startTime: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
+    Validators.required,
   ]);
 
   endDate: Date;
 
   endTime: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
+    Validators.required,
   ]);
 
   type: UntypedFormControl = new UntypedFormControl();
@@ -121,7 +121,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       const title = this.translate.instant('COMMON.COMPLETE.TITLE');
       const content = this.translate.instant('COMMON.COMPLETE.CONTENT');
       const dialogRef = this.dialog.open(DialogComponent, {
-        data: { title, content, value: this.reservation }
+        data: { title, content, value: this.reservation },
       });
 
       dialogRef.afterClosed().subscribe(event => {
@@ -129,10 +129,10 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
           this.completeReservation();
         }
       });
-      return;
     } else {
-      return this.completeReservation();
+      this.completeReservation();
     }
+    return;
   }
 
   ngOnInit(): void {
@@ -215,7 +215,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
       transfer: this.transfer,
       startTime: this.startTime,
       endTime: this.endTime,
-      formFields: this.formBuilder.array([])
+      formFields: this.formBuilder.array([]),
     });
     this.valueChange();
   };
@@ -253,25 +253,25 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     this.filteredGroup = this.group.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups)
+      map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups),
     );
     this.filteredTreatment = this.treatment.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterTreatment(name) : this.treatments ? this.treatments.slice() : this.treatments)
+      map(name => name ? this.filterTreatment(name) : this.treatments ? this.treatments.slice() : this.treatments),
     );
     this.filteredColor = this.color.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value ? value.name : ''),
       map(
-        name => name ? this.filterColor(name) : (this.colors ? this.colors.slice() : this.colors))
+        name => name ? this.filterColor(name) : (this.colors ? this.colors.slice() : this.colors)),
     );
   };
 
   private getTreatments = (): void => {
     if (this.roomId) {
       this.store.dispatch(
-        new fromActionsReservation.GetAllTreatments({ roomId: this.roomId, customerId: this.customerId })
+        new fromActionsReservation.GetAllTreatments({ roomId: this.roomId, customerId: this.customerId }),
       );
     }
   };
@@ -280,7 +280,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     if (this.groupId !== groupId && this.roomId) {
       this.groupId = groupId;
       this.store.dispatch(
-        new fromActionsReservation.GetAllAdditional({ roomId: this.roomId, groupId })
+        new fromActionsReservation.GetAllAdditional({ roomId: this.roomId, groupId }),
       );
     }
   };
@@ -308,10 +308,10 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
             startDateTime: this.startDate.toLocaleString(API_LOCALE),
             endDateTime: this.endDate.toLocaleString(API_LOCALE),
             extras: this.currentExtraData,
-            split: this.currentSplitData
+            split: this.currentSplitData,
           },
-          isDashboard: this.isDashboard
-        })
+          isDashboard: this.isDashboard,
+        }),
       );
     }
   };
@@ -320,13 +320,13 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     if (!this.payments) {
       this.payments = undefined;
       this.store.dispatch(
-        new fromActionsReservation.ReservationFindPayments(this.reservationId)
+        new fromActionsReservation.ReservationFindPayments(this.reservationId),
       );
     }
     if (!this.reservation) {
       this.reservation = undefined;
       this.store.dispatch(
-        new fromActionsReservation.ReservationFind({ id: this.reservationId })
+        new fromActionsReservation.ReservationFind({ id: this.reservationId }),
       );
     }
   };
@@ -363,7 +363,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
         if (newList.length !== this.additionalSelected.length) {
           this.additionalSelected = newList;
           this.price = newAdditional(
-            this.price, this.additionalSelected, this.reservation?.treatment?.discountCustomer
+            this.price, this.additionalSelected, this.reservation?.treatment?.discountCustomer,
           );
         }
       }
@@ -372,8 +372,8 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
           const treatmentId = this.reservation.treatment.key;
           this.groups = Array.from(
             createTreatmentGroupService(
-              new Map<string, IGroupService>(), state.treatmentDiscount.treatments, this.reservation.room.currency.code
-            ).values()
+              new Map<string, IGroupService>(), state.treatmentDiscount.treatments, this.reservation.room.currency.code,
+            ).values(),
           );
           this.group.setValue(this.groups?.find(group => {
             if (group.treatments?.find(treatment => treatment.id === treatmentId)) {

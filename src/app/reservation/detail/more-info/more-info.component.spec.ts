@@ -8,9 +8,9 @@ describe('MoreInfoComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [MoreInfoComponent]
-})
-    .compileComponents();
+      imports: [MoreInfoComponent],
+    })
+      .compileComponents();
   });
 
   beforeEach(() => {

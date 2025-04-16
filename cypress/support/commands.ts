@@ -8,6 +8,13 @@ declare namespace Cypress {
 
     checkMatList(title?: string, icon?: string, ...details: string[]): Chainable<any>;
 
+    openMenu(breakpoint: string, menus: string[]): Chainable<any>;
+
+    buttonClickOnTable(breakpoint: string, column: string, rowClass: string, rowExpandedClass: string,
+                       button: string, otherButtons?: string[]): Chainable<any>;
+
+    selectOption(id: string, option: string): Chainable<any>;
+
     mockAuthentication(email: string, role: string): Chainable<any>;
 
     mockLogin(email: string, displayName: string, role: string): Chainable<any>;
@@ -34,10 +41,14 @@ declare namespace Cypress {
 
     mockTreatments(customerId: string, roomId: string, groupId: string): Chainable<any>;
 
-    mockSearch(roomId: string, professionalId: string, date: Date): Chainable<any>;
+    mockSearch(roomId: string, professionalId: string, date: Date, days: number): Chainable<any>;
 
-    mockCreateReservation(reservationId: string, customerId: string, date: Date, professionalId: string, roomId: string,
-                          treatmentId: string, additionalList?: string[]): Chainable<any>;
+    mockCreateReservation(reservationId: string, customerId: string, date: Date, professionalId: string,
+                          roomId: string, treatmentId: string, additionalList?: string[]): Chainable<any>;
+
+    mockUsers(total?: number, displayName?: string): Chainable<any>;
+
+    mockUser(id: string, selectedUser?: any): Chainable<any>;
   }
 }
 
@@ -49,6 +60,7 @@ Cypress.Commands.add('randomUUID', () => cy.wrap('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxx
 Cypress.Commands.add('logout', () => {
   cy.get('button[name="settings"]').click();
   cy.get('mat-list-item').contains('Sign out').click();
+  cy.url().should('include', 'home');
 });
 
 Cypress.Commands.add('checkAppDialog', (title: string, message: string, buttonClick: string) => {
@@ -65,7 +77,7 @@ Cypress.Commands.add('checkAppDialog', (title: string, message: string, buttonCl
   cy.get('app-dialog')
     .find('div[mat-dialog-actions]')
     .contains(buttonClick)
-    .click();
+    .click({ force: true });
 });
 
 Cypress.Commands.add('checkMatList', (title?: string, icon?: string, ...details: string[]) => {
@@ -78,6 +90,38 @@ Cypress.Commands.add('checkMatList', (title?: string, icon?: string, ...details:
   }
 
   details.forEach(detail => cy.get('mat-list-item').find('div[matListItemLine]').contains(detail).should('exist'));
+});
+
+Cypress.Commands.add('openMenu', (breakpoint: string, menus: string[]) => {
+  if (['XSmall', 'Small', 'Medium'].includes(breakpoint)) {
+    cy.get('button[name="cleosMenu"]').click();
+  }
+  menus.forEach(menu => {
+    cy.get('mat-list-item').contains(menu).click();
+  });
+});
+
+Cypress.Commands.add('buttonClickOnTable', (breakpoint: string, column: string, rowClass: string, rowExpandedClass,
+                                            button: string, otherButtons?: string[]) => {
+  if (['XSmall', 'Small'].includes(breakpoint)) {
+    cy.contains(`tr.${ rowClass }`, column).click({ force: true });
+    otherButtons?.forEach(otherButton => cy.get(`tr.${ rowExpandedClass }`).should('be.visible')
+      .find('button[mat-icon-button]').contains(otherButton));
+    cy.get(`tr.${ rowExpandedClass }`).should('be.visible').find('button[mat-icon-button]').contains(button)
+      .click({ force: true });
+  } else {
+    otherButtons?.forEach(otherButton => cy.get('table').contains('tr', column)
+      .find('button[mat-icon-button]').contains(otherButton));
+    cy.get('table').contains('tr', column).find('button[mat-icon-button]').contains(button).click({ force: true });
+  }
+});
+
+Cypress.Commands.add('selectOption', (id: string, option: string) => {
+  cy.get(`#${ id }`).should('be.visible');
+  cy.get(`#${ id }`).click({ force: true });
+
+  cy.get('mat-option').should('exist').and('be.visible');
+  cy.get('mat-option').contains(option).click({ force: true });
 });
 
 const firebaseUser = (email: string, displayName?: string, kind?: string) => ({
@@ -135,20 +179,20 @@ const createTimestamp = (date: Date, plusDays?: number, hour?: number, minute?: 
   if (hour) {
     newDate.setHours(hour, minute ?? 0);
   }
-  return Math.floor(newDate.getTime() / 1000)
-}
+  return Math.floor(newDate.getTime() / 1000);
+};
 
 const addDays = (date: Date, plusDays: number = 0) => {
   const newDate = new Date(date);
   newDate.setDate(newDate.getDate() + plusDays);
   return newDate;
-}
+};
 
 const addMonths = (date: Date, plusMonths: number = 0) => {
   const newDate = new Date(date);
   newDate.setMonth(newDate.getMonth() + plusMonths);
   return newDate;
-}
+};
 
 const createUnavailable = (professional: any, description: string, timestamp: number,
                            repeat: string, end?: string, duration?: number, allDay: boolean = false,
@@ -190,7 +234,7 @@ Cypress.Commands.add('mockAuthentication', (email: string, role: string) => {
         token: 'mockToken',
         menus: menuData.find((menu: { role: string; }) => menu.role === role)?.menu,
         queryParams: {}
-      }
+      };
       localStorage.setItem('auth', JSON.stringify(userAuth));
     });
   });
@@ -267,7 +311,7 @@ Cypress.Commands.add('mockFirebaseAppCheck', () => {
     }
   }).as('firebaseAppCheck');
 
-  cy.contains('Got it!').click();
+  cy.contains('Got it!').click({ force: true });
 });
 
 // Cypress.Commands.add('mockFetchSignInMethodsForEmail', (email) => {
@@ -296,7 +340,7 @@ Cypress.Commands.add('mockCreateAuthUri', (registered: boolean, methods: string[
 Cypress.Commands.add('mockNotifications', () => {
   cy.intercept(
     'GET',
-    '**/api/v1/notifications/pages?page=0&size=10&sort=date&direction=desc',
+    new RegExp('/api/v1/notifications/pages\\?page=0&size=\\d+&sort=date&direction=desc'),
     {
       statusCode: 204,
       body: null,
@@ -307,7 +351,7 @@ Cypress.Commands.add('mockNotifications', () => {
 Cypress.Commands.add('mockCustomerReservations', () => {
   cy.intercept(
     'GET',
-    '**/api/v1/reservations/customer?page=0&size=10&sort=timestamp&direction=desc',
+    new RegExp('/api/v1/reservations/customer\\?page=0&size=\\d+&sort=timestamp&direction=desc'),
     {
       statusCode: 200,
       body: {
@@ -435,21 +479,17 @@ Cypress.Commands.add('mockTreatments', (customerId: string, roomId: string, grou
   });
 });
 
-Cypress.Commands.add('mockSearch', (roomId: string, professionalId: string, date: Date) => {
+Cypress.Commands.add('mockSearch', (roomId: string, professionalId: string, date: Date, days: number) => {
   const dateFormatted = date.toISOString().slice(0, 10);
   cy.fixture('rooms').then((roomData) => {
-    cy.log(roomData)
     cy.fixture('users').then((usersData) => {
-      cy.log(usersData)
       cy.fixture('treatments').then((treatmentData) => {
-        cy.log(treatmentData)
         cy.fixture('additional').then((additionalData) => {
-          cy.log(additionalData)
           const room = roomData.find((room: { id: string; }) => room.id === roomId);
           const professional = usersData.find((user: { id: string; }) => user.id === professionalId);
           cy.intercept(
             'GET',
-            `**/api/v1/reservations/rooms/${ roomId }?days=7&dates=${ dateFormatted }&professionalId=${ professionalId }`,
+            `**/api/v1/reservations/rooms/${ roomId }?days=${ days }&dates=${ dateFormatted }&professionalId=${ professionalId }`,
             {
               statusCode: 200,
               body: [
@@ -544,31 +584,16 @@ Cypress.Commands.add('mockCreateReservation', (
           cy.intercept(
             'POST',
             '**/api/v1/reservations',
-            {
-              statusCode: 201,
-              body: [
-                {
-                  createdAt: new Date().toLocaleDateString('en-GB'),
-                  createdBy: '57ceebd2-a012-42a3-af9a-5d546c193200',
-                  deleted: false,
+            (req) => {
+              req.alias = 'createReservation';
+              req.reply({
+                statusCode: 201,
+                body: [{
                   id: reservationId,
-                  customer: usersData.find((user: { id: string; }) => user.id === customerId),
-                  professional: usersData.find((user: { id: string; }) => user.id === professionalId),
-                  room: roomData.find((room: { id: string; }) => room.id === roomId),
-                  treatment: createReservationTreatment(
-                    treatmentData.find((it: { id: string; }) => it.id === treatmentId)),
-                  additional: additionalList?.map(additionalId => createReservationAdditional(
-                    additionalData.find((it: { id: string; }) => it.id === additionalId))),
-                  extras: [],
-                  timestamp: createTimestamp(date),
-                  state: 'APPROVED',
-                  customerCreated: false,
-                  accepted: true,
-                  version: 0
-                }
-              ]
-            }
-          ).as('createReservation');
+                  ...req.body
+                }]
+              });
+            });
           cy.intercept(
             'GET',
             `**/api/v1/reservations/${ reservationId }`,
@@ -617,4 +642,36 @@ Cypress.Commands.add('mockCreateReservation', (
       });
     });
   });
-})
+});
+
+Cypress.Commands.add('mockUsers', (total?: number, displayName?: string) => {
+  cy.fixture('users').then((userData) => {
+    cy.intercept(
+      'GET',
+      new RegExp('/api/v1/users/pages\\?page=0&size=\\d+&sort=displayName&direction=asc'),
+      {
+        statusCode: 200,
+        body: { content: userData.slice(0, total ?? userData.length), totalElements: total ?? userData.length }
+      }
+    ).as('getUsers');
+
+    if (displayName) {
+      const user = userData.find((u: any) => u.displayName === displayName);
+      expect(user).to.exist;
+      cy.wrap(user).as('selectedUser');
+    }
+  });
+});
+
+Cypress.Commands.add('mockUser', (id: string, selectedUser?: any) => {
+  cy.fixture('users').then((userData) => {
+    cy.intercept(
+      'GET',
+      `**/api/v1/users/${ selectedUser?.id ?? id }`,
+      {
+        statusCode: 200,
+        body: selectedUser ?? userData.find((u: any) => u.id === id)
+      }
+    ).as('getUser');
+  });
+});

@@ -5,7 +5,7 @@ import {
   UntypedFormBuilder,
   UntypedFormControl,
   UntypedFormGroup,
-  Validators
+  Validators,
 } from '@angular/forms';
 import { ChangeCustomerDialogComponent } from './change-customer-dialog.component';
 import { filterDateRoom, getAvailability, getNowTimeZone, getStartEndDay, getTime } from '../../util/dates';
@@ -17,13 +17,13 @@ import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-reservation-clone-dialog',
   templateUrl: './reservation-clone-dialog.component.html',
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe]
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
 })
 export class ReservationCloneDialogComponent {
   form!: UntypedFormGroup;
 
   date: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
+    Validators.required,
   ]);
 
   time: UntypedFormControl = new UntypedFormControl('');
@@ -39,7 +39,7 @@ export class ReservationCloneDialogComponent {
     const { monday, tuesday, wednesday, thursday, friday, saturday, sunday } = getAvailability(this.data.room);
     const {
       min,
-      max
+      max,
     } = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday, this.data.room.timeZone);
     if (min) {
       this.minDate = getTime(min);
@@ -63,7 +63,7 @@ export class ReservationCloneDialogComponent {
   private createForm = (): void => {
     this.form = this.formBuilder.group({
       date: this.date,
-      start: this.time
+      start: this.time,
     });
   };
 }

@@ -25,21 +25,21 @@ import { Observable } from 'rxjs';
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('additional')
+        useClass: TranslateLoaderFactory.forModule('additional'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
-    EffectsModule.forFeature([AdditionalEffects])
+    EffectsModule.forFeature([AdditionalEffects]),
   ],
   providers: [
     AdditionalService,
-    TreatmentService
-  ]
+    TreatmentService,
+  ],
 })
 export class AdditionalModule {
   constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {

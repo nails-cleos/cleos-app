@@ -5,7 +5,7 @@ import {
   UntypedFormControl,
   UntypedFormGroup,
   Validators,
-  ɵTypedOrUntyped
+  ɵTypedOrUntyped,
 } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -16,16 +16,16 @@ import { IUser, User } from '../interfaces/user';
 import { findFlag, flags, IFlag } from '../util/flags';
 import { lightenDarkenColor, randomColor } from '../util/color';
 import { backendFormatDate, createDateFromString, newDate } from '../util/dates';
-import { fieldChange, valueChange } from '../util/validators';
+import { fieldChange, validColorValidator, valueChange } from '../util/validators';
 import { createAddress } from '../util/helper';
 import { TranslateService } from '@ngx-translate/core';
-import { NgxColorsModule, validColorValidator } from 'ngx-colors';
 import { Role } from '../interfaces/token';
 import { SharedModule } from '../shared/shared.module';
 import { GoogleMapComponent } from '../shared/google-map/google-map.component';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { NgxMaterialIntlTelInputComponent, TextLabels } from 'ngx-material-intl-tel-input';
 import { NgIcon } from '@ng-icons/core';
+import { ColorPickerComponent, ColorPickerDirective } from 'ngx-color-picker';
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 import PlaceResult = google.maps.places.PlaceResult;
 
@@ -33,8 +33,8 @@ import PlaceResult = google.maps.places.PlaceResult;
   selector: 'app-user',
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss'],
-  imports: [SharedModule, NgxMaterialIntlTelInputComponent, GoogleMapComponent, NgxColorsModule, BackButtonDirective,
-    NgIcon]
+  imports: [SharedModule, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective,
+    NgIcon, ColorPickerDirective, ColorPickerComponent],
 })
 export class UserComponent implements OnInit, OnDestroy {
   @Input() user?: IUser;
@@ -55,7 +55,7 @@ export class UserComponent implements OnInit, OnDestroy {
     nationalNumberLabel: '',
     hintLabel: '',
     invalidNumberError: '',
-    requiredError: ''
+    requiredError: '',
   };
 
   private getState: Observable<any>;
@@ -87,25 +87,28 @@ export class UserComponent implements OnInit, OnDestroy {
     user.dob = fieldChange(this.getForm.dob as UntypedFormControl, this.user?.dob);
     user.dob = user.dob ? backendFormatDate(newDate(user.dob)) : user.dob;
 
-    if (this.isProfessionalOrManager && this.getForm.lightColor.value) {
-      user.lightColor = this.getForm.lightColor.value;
-    }
+    if (this.isProfessionalOrManager) {
+      if (this.getForm.lightColor.value) {
+        user.lightColor = this.getForm.lightColor.value;
+      }
 
-    if (this.isProfessionalOrManager && this.getForm.darkColor.value) {
-      user.darkColor = this.getForm.darkColor.value;
+      if (this.getForm.darkColor.value) {
+        user.darkColor = this.getForm.darkColor.value;
+      }
     }
 
     user.address = createAddress(this.formattedAddress, this.geometry?.location, this.user?.address);
 
     if (this.isAddMode) {
-      return this.store.dispatch(
-        new fromActionsUser.SaveUser({ user, role: this.getForm.role.value })
+      this.store.dispatch(
+        new fromActionsUser.SaveUser({ user, role: this.getForm.role.value }),
       );
     } else {
       user.id = this.id;
       this.user = undefined;
-      return this.store.dispatch(new fromActionsUser.SaveUser({ user }));
+      this.store.dispatch(new fromActionsUser.SaveUser({ user }));
     }
+    return;
   }
 
   ngOnDestroy(): void {
@@ -148,41 +151,30 @@ export class UserComponent implements OnInit, OnDestroy {
       lang: ['', Validators.required],
       phone: [''],
       dob: [''],
-      darkColor: ['', [validColorValidator()]],
-      darkColorPicker: [''],
-      lightColor: ['', [validColorValidator()]],
-      lightColorPicker: [''],
-      address: ['']
+      darkColor: [''],
+      lightColor: [''],
+      address: [''],
     });
-
-    this.getForm.darkColor.valueChanges.subscribe(color => {
-      if (this.getForm.darkColorPicker.valid) {
-        this.getForm.darkColorPicker.setValue(color, { emitEvent: false });
-      }
-    });
-    this.getForm.darkColorPicker.valueChanges.subscribe(color =>
-      this.getForm.darkColor.setValue(color, { emitEvent: false })
-    );
-
-    this.getForm.lightColor.valueChanges.subscribe(color => {
-      if (this.getForm.lightColorPicker.valid) {
-        this.getForm.lightColorPicker.setValue(color, { emitEvent: false });
-      }
-    });
-    this.getForm.lightColorPicker.valueChanges.subscribe(color =>
-      this.getForm.lightColor.setValue(color, { emitEvent: false })
-    );
 
     this.getForm.role.valueChanges.subscribe(role => {
       this.isProfessionalOrManager = [Role.manager, Role.professional].indexOf(role) > -1;
       if (this.isProfessionalOrManager) {
+        this.getForm.lightColor.setValidators([validColorValidator()]);
         if (!this.getForm.lightColor.value) {
           this.getForm.lightColor.setValue(randomColor(false));
         }
+        this.getForm.darkColor.setValidators([validColorValidator()]);
         if (!this.getForm.darkColor.value) {
           this.getForm.darkColor.setValue(randomColor(true));
         }
+      } else {
+        this.getForm.lightColor?.setValue('');
+        this.getForm.lightColor?.clearValidators();
+        this.getForm.darkColor?.setValue('');
+        this.getForm.darkColor?.clearValidators();
       }
+      this.getForm.lightColor.updateValueAndValidity();
+      this.getForm.darkColor.updateValueAndValidity();
     });
   };
 
@@ -191,7 +183,7 @@ export class UserComponent implements OnInit, OnDestroy {
   private getUser = (): void => {
     if (!this.user) {
       this.store.dispatch(
-        new fromActionsUser.FindUser(this.id)
+        new fromActionsUser.FindUser(this.id),
       );
     }
   };
@@ -207,7 +199,7 @@ export class UserComponent implements OnInit, OnDestroy {
       nationalNumberLabel: phoneTranslations.FIELD || '',
       hintLabel: '',
       invalidNumberError: phoneTranslations.INVALID || '',
-      requiredError: phoneTranslations.REQUIRED || ''
+      requiredError: phoneTranslations.REQUIRED || '',
     };
   };
 

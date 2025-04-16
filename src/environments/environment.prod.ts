@@ -5,7 +5,7 @@ export const environment = {
   useEmulators: false,
   firebaseMessaging: 'firebase-messaging-sw.js',
   recaptcha: {
-    siteKey: '6LcJf10nAAAAAFDvt_OLXZQ5J9tOwwxjhtW3McoY'
+    siteKey: '6LcJf10nAAAAAFDvt_OLXZQ5J9tOwwxjhtW3McoY',
   },
   appDomain: 'nailscleos.nl',
   appServer: 'https://www.nailscleos.nl',
@@ -23,8 +23,8 @@ export const environment = {
     appId: '1:174727853234:web:6cf02667f8d913be34c5ab',
     measurementId: 'G-X9XEEDVFN4',
     vapidKey: 'BKiso9gE3_8fIrVVtY1pKS2vC6a93hAYOGMPlqVUBBUCVmuAtEtDw98El0Z-YQFIpEL_VsCbwYGiz05xzJnaWJY',
-    databaseURL: 'https://nails-cleos-default-rtdb.europe-west1.firebasedatabase.app/'
+    databaseURL: 'https://nails-cleos-default-rtdb.europe-west1.firebasedatabase.app/',
   },
   googleMapKey: 'AIzaSyDI-kCD_XD9jNJ3tNcDVmkMuwCqljzudJg',
-  showMap: true
+  showMap: true,
 };

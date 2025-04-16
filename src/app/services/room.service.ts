@@ -18,10 +18,10 @@ export class RoomService {
     sort: string,
     direction: string,
     page: number,
-    size: number = PAGE_SIZE
+    size: number = PAGE_SIZE,
   ): Observable<IRoom[]> => this.http.get<IRoom[]>(
     toUrl(this.urlV1, 'pages'),
-    { params: createFilter(page, size, sort, direction) }
+    { params: createFilter(page, size, sort, direction) },
   );
 
   getAllRooms = (customerId?: string): Observable<IRoom[]> => {
@@ -33,7 +33,7 @@ export class RoomService {
   };
 
   getMyService = (
-    id: string
+    id: string,
   ): Observable<IRoomService> => this.http.get<IRoomService>(toUrl(this.urlV1, id, 'services'));
 
   getRoomInfo = (): Observable<IRoomInfo> => this.http.get<IRoomInfo>(toUrl(this.urlV1, 'info'));
@@ -48,10 +48,10 @@ export class RoomService {
 
   updateService = (
     id: string,
-    prices: IServicePrice[]
+    prices: IServicePrice[],
   ): Observable<IServicePrice[]> => this.http.patch<IServicePrice[]>(toUrl(this.urlV1, id, 'services'), prices);
 
   getCustomerInfo = (
-    id: string
+    id: string,
   ): Observable<IRoomCustomer[]> => this.http.get<IRoomCustomer[]>(toUrl(this.urlV1, id, 'customers', 'info'));
 }

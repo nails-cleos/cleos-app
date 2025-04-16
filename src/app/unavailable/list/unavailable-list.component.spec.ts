@@ -8,9 +8,9 @@ describe('UnavailableListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [UnavailableListComponent]
-})
-    .compileComponents();
+      imports: [UnavailableListComponent],
+    })
+      .compileComponents();
   });
 
   beforeEach(() => {

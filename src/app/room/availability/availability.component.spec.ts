@@ -8,9 +8,9 @@ describe('AvailabilityComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [AvailabilityComponent]
-})
-    .compileComponents();
+      imports: [AvailabilityComponent],
+    })
+      .compileComponents();
   });
 
   beforeEach(() => {

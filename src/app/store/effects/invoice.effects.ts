@@ -17,8 +17,8 @@ export class InvoiceEffects {
       switchMap((payload: any) =>
         this.invoiceService.findInvoiceReservation(payload.officeId, payload.start, payload.end, payload.types).pipe(
           switchMap((response) => of(new fromActionsInvoice.InvoiceSuccess(response ? response : []))),
-          catchError((err: HttpErrorResponse) => of(new fromActionsInvoice.InvoiceFailure({ error: err.error })))
-        ))
+          catchError((err: HttpErrorResponse) => of(new fromActionsInvoice.InvoiceFailure({ error: err.error }))),
+        )),
     ));
 
   findMyOffices$ = createEffect(
@@ -26,8 +26,8 @@ export class InvoiceEffects {
       map((action: any) => action.payload),
       switchMap(() => this.invoiceService.getAllMeOffice().pipe(
         switchMap((response) => of(new fromActionsInvoice.OfficesSuccess(response ? response : []))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsInvoice.InvoiceFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsInvoice.InvoiceFailure({ error: err.error }))),
+      )),
     ));
 
   updateOffices$ = createEffect(
@@ -35,16 +35,16 @@ export class InvoiceEffects {
       map((action: any) => action.payload),
       switchMap((payload: any) => this.officeService.update(payload).pipe(
         switchMap((response) => of(new fromActionsInvoice.UpdateOfficesSuccess(response))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsInvoice.InvoiceFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsInvoice.InvoiceFailure({ error: err.error }))),
+      )),
     ));
 
   officesSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(fromActionsInvoice.InvoiceActionTypes.invoiceOfficesSuccess)
+    ofType(fromActionsInvoice.InvoiceActionTypes.invoiceOfficesSuccess),
   ), { dispatch: false });
 
   updateOfficesSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(fromActionsInvoice.InvoiceActionTypes.invoiceUpdateOfficeSuccess)
+    ofType(fromActionsInvoice.InvoiceActionTypes.invoiceUpdateOfficeSuccess),
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions: Actions,

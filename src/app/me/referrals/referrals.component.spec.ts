@@ -8,9 +8,9 @@ describe('ReferralsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [ReferralsComponent]
-})
-    .compileComponents();
+      imports: [ReferralsComponent],
+    })
+      .compileComponents();
   });
 
   beforeEach(() => {

@@ -4,7 +4,7 @@ import {
   UntypedFormBuilder,
   UntypedFormControl,
   UntypedFormGroup,
-  Validators
+  Validators,
 } from '@angular/forms';
 import { IColorAll } from '../../interfaces/color';
 import { Observable, Subscription } from 'rxjs';
@@ -21,14 +21,14 @@ import { AsyncPipe } from '@angular/common';
 @Component({
   selector: 'app-change-color-dialog-component',
   templateUrl: './change-color-dialog.component.html',
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe, AsyncPipe]
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe, AsyncPipe],
 })
 export class ChangeColorDialogComponent implements OnInit, OnDestroy {
   colorForm!: UntypedFormGroup;
   colors?: IColorAll[];
   filteredColor?: Observable<IColorAll[] | undefined>;
   color: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch
+    Validators.required, requireMatch,
   ]);
 
   private getState: Observable<any>;
@@ -70,7 +70,7 @@ export class ChangeColorDialogComponent implements OnInit, OnDestroy {
 
   private createForm = (): void => {
     this.colorForm = this.formBuilder.group({
-      color: this.color
+      color: this.color,
     });
   };
 
@@ -78,7 +78,7 @@ export class ChangeColorDialogComponent implements OnInit, OnDestroy {
     this.filteredColor = this.color.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterColor(name) : this.colors ? this.colors.slice() : this.colors)
+      map(name => name ? this.filterColor(name) : this.colors ? this.colors.slice() : this.colors),
     );
   };
 
@@ -86,7 +86,7 @@ export class ChangeColorDialogComponent implements OnInit, OnDestroy {
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
   private getColors = (): void => this.store.dispatch(
-    new fromActionsReservation.GetAllColorsByTreatmentId(this.treatmentId)
+    new fromActionsReservation.GetAllColorsByTreatmentId(this.treatmentId),
   );
 
   private subscribe = (): void => {

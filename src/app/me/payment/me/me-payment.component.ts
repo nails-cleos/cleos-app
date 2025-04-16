@@ -10,7 +10,7 @@ import {
   getPayNlOptions,
   IPaymentAll,
   IPaymentOption,
-  PaymentType
+  PaymentType,
 } from '../../../interfaces/payment';
 import { Analytics, logEvent } from '@angular/fire/analytics';
 import { TranslateService } from '@ngx-translate/core';
@@ -23,7 +23,7 @@ import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
   selector: 'app-me-payment',
   templateUrl: './me-payment.component.html',
   styleUrls: ['./me-payment.component.scss'],
-  imports: [SharedModule, BankComponent, BackButtonDirective, CurrencySymbolPipe]
+  imports: [SharedModule, BankComponent, BackButtonDirective, CurrencySymbolPipe],
 })
 export class MePaymentComponent implements OnInit, OnDestroy {
 
@@ -56,15 +56,16 @@ export class MePaymentComponent implements OnInit, OnDestroy {
     const paymentOptionId = option.bic;
     const payload = {
       id: this.payment?.id,
-      payment: { type, paymentOptionId, bic: undefined }
+      payment: { type, paymentOptionId, bic: undefined },
     };
     if (option.subTypes.length) {
       payload.payment.bic = this.typeForm.get('bank')?.value?.bic;
     }
 
-    return this.store.dispatch(
-      new fromActionsPayment.PaymentUpdateLink(payload)
+    this.store.dispatch(
+      new fromActionsPayment.PaymentUpdateLink(payload),
     );
+    return;
   }
 
   ngOnInit(): void {
@@ -74,10 +75,10 @@ export class MePaymentComponent implements OnInit, OnDestroy {
       const paymentId = routeParams.id;
       if (paymentId) {
         logEvent(this.analytic, 'screen_view', {
-          // eslint-disable-next-line @typescript-eslint/naming-convention
+          // eslint-disable-next-line camelcase
           firebase_screen: `Customer missing payment ${ paymentId }`,
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          firebase_screen_class: 'MePaymentComponent'
+          // eslint-disable-next-line camelcase
+          firebase_screen_class: 'MePaymentComponent',
         });
         this.getPayment(paymentId);
       }

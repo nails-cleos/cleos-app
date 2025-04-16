@@ -20,20 +20,20 @@ import { Observable } from 'rxjs';
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('color')
+        useClass: TranslateLoaderFactory.forModule('color'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
-    EffectsModule.forFeature([ColorEffects])
+    EffectsModule.forFeature([ColorEffects]),
   ],
   providers: [
-    ColorService
-  ]
+    ColorService,
+  ],
 })
 export class ColorModule {
   constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {

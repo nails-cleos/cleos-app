@@ -21,7 +21,7 @@ export const initialState: State = {
   subErrors: null,
   selected: null,
   message: null,
-  isLoading: false
+  isLoading: false,
 };
 
 export const reducer = (state = initialState, action: All): State => {
@@ -33,7 +33,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         selected: null,
-        message: null
+        message: null,
       };
     }
     case NoteActionTypes.getAllProfessional: {
@@ -42,7 +42,7 @@ export const reducer = (state = initialState, action: All): State => {
         professionals: null,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case NoteActionTypes.noteSuccess: {
@@ -52,7 +52,7 @@ export const reducer = (state = initialState, action: All): State => {
         professionals: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case NoteActionTypes.noteSaveSuccess: {
@@ -62,7 +62,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: null,
         errorMessage: null,
         subErrors: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case NoteActionTypes.noteSelected: {
@@ -71,7 +71,7 @@ export const reducer = (state = initialState, action: All): State => {
         selected: action.payload,
         errorMessage: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case NoteActionTypes.noteFailure: {
@@ -81,7 +81,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: action.payload.error,
         subErrors: action.payload.error.subErrors,
         message: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case NoteActionTypes.noteUpdate:
@@ -93,7 +93,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         subErrors: null,
         message: null,
-        isLoading: true
+        isLoading: true,
       };
     }
     case NoteActionTypes.clean: {

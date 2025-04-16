@@ -12,19 +12,19 @@ const routes: Routes = [
   { path: 'forgot-password', component: ForgotPasswordComponent },
   {
     path: 'profile', component: ProfileComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager, Role.professional, Role.customer, Role.roomAdmin]
-    }
+      roles: [Role.admin, Role.manager, Role.professional, Role.customer, Role.roomAdmin],
+    },
   },
   {
     path: 'redirect', component: RedirectComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager, Role.professional, Role.customer, Role.roomAdmin]
-    }
-  }
+      roles: [Role.admin, Role.manager, Role.professional, Role.customer, Role.roomAdmin],
+    },
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class AuthRoutingModule {
 }

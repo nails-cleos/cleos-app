@@ -7,8 +7,8 @@ describe('TotalSummaryComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [TotalSummaryComponent]
-})
+      imports: [TotalSummaryComponent],
+    })
       .compileComponents();
 
     fixture = TestBed.createComponent(TotalSummaryComponent);

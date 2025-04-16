@@ -8,9 +8,9 @@ describe('MiniCardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [MiniCardComponent]
-})
-    .compileComponents();
+      imports: [MiniCardComponent],
+    })
+      .compileComponents();
   });
 
   beforeEach(() => {

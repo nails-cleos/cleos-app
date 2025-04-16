@@ -8,9 +8,9 @@ describe('DragDropSortingComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [DragDropSortingComponent]
-})
-    .compileComponents();
+      imports: [DragDropSortingComponent],
+    })
+      .compileComponents();
 
     fixture = TestBed.createComponent(DragDropSortingComponent);
     component = fixture.componentInstance;

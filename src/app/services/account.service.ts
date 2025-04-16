@@ -7,7 +7,7 @@ import { PAGE_SIZE } from '../interfaces/pagination';
 import { toUrl } from '../util/helper';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AccountService {
   private url = 'accounts';
@@ -20,22 +20,22 @@ export class AccountService {
     page: number,
     sort?: string,
     direction?: string,
-    size: number = PAGE_SIZE
+    size: number = PAGE_SIZE,
   ): Observable<ITransaction[]> => this.http.get<ITransaction[]>(
     toUrl(this.urlV1, accountId, 'transactions'),
-    { params: createFilter(page, size, sort, direction) }
+    { params: createFilter(page, size, sort, direction) },
   );
 
   getById = (id: string): Observable<IAccount | undefined> => this.http.get<IAccount>(toUrl(this.urlV1, id));
 
   findTransaction = (
     id: string,
-    transactionId: string
+    transactionId: string,
   ): Observable<ITransaction | undefined> => this.http.get<ITransaction>(
     toUrl(this.urlV1, id, 'transactions', transactionId));
 
   findByCustomer = (
-    customerId: string
+    customerId: string,
   ): Observable<IAccount | undefined> => this.http.get<IAccount>(toUrl(this.urlV1, 'customers', customerId));
 
   add = (transaction: ITransaction, accountId: string): Observable<IAccount> => this.http.post<IAccount>(

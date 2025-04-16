@@ -7,14 +7,14 @@ import { Role } from '../interfaces/token';
 const routes: Routes = [
   {
     path: '', component: NotificationsComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.professional, Role.customer]
-    }
-  }
+      roles: [Role.admin, Role.professional, Role.customer],
+    },
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class NotificationRoutingModule {
 }

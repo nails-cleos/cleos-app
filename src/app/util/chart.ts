@@ -16,7 +16,7 @@ export const createChart = (
   currency?: ICurrency,
   isDark?: boolean,
   locale?: string,
-  timeZone?: string
+  timeZone?: string,
 ): IChartUtil => {
   let colors: any[];
   switch (chart.colors) {
@@ -75,26 +75,26 @@ export const createChart = (
         pointHoverBackgroundColor: color.pointHoverBackgroundColor,
         pointHoverBorderColor: color.pointHoverBorderColor,
         tension: 0.5,
-        fill: false
+        fill: false,
       }];
     });
   }
 
   const charData: ChartConfiguration['data'] = {
     labels: chart.labels || [],
-    datasets: dataSet
+    datasets: dataSet,
   };
 
   return {
     labels: chart.labels || [],
     type: chart.type || 'bar',
     charData,
-    options
+    options,
   };
 };
 
 const defaultOptions = (): ChartOptions => ({
-  responsive: true
+  responsive: true,
 });
 
 const radarChartDefaultOptions = (isDark?: boolean): ChartOptions<'radar'> => {
@@ -105,24 +105,24 @@ const radarChartDefaultOptions = (isDark?: boolean): ChartOptions<'radar'> => {
       scales: {
         r: {
           grid: {
-            color: 'rgba(0, 0, 0, 0.1)'
+            color: 'rgba(0, 0, 0, 0.1)',
           },
           angleLines: {
             display: true,
-            color: 'white'
+            color: 'white',
           },
           suggestedMin: 0,
           pointLabels: {
-            color: 'white'
+            color: 'white',
           },
           ticks: {
             // stepSize: 1,
             display: true,
             color: 'white',
-            backdropColor: '#424242'
-          }
-        }
-      }
+            backdropColor: '#424242',
+          },
+        },
+      },
     };
   } else {
     options = {
@@ -131,22 +131,22 @@ const radarChartDefaultOptions = (isDark?: boolean): ChartOptions<'radar'> => {
         r: {
           angleLines: {
             display: true,
-            color: 'black'
+            color: 'black',
           },
           suggestedMin: 0,
           ticks: {
             stepSize: 1,
-            display: true
-          }
-        }
-      }
+            display: true,
+          },
+        },
+      },
     };
   }
   return options;
 };
 
 const barChartDefaultOptions = (sum?: boolean, isDark?: boolean, locale?: string, timeZone?: string,
-                                currency?: ICurrency): ChartOptions<'bar'> => {
+  currency?: ICurrency): ChartOptions<'bar'> => {
   let options: ChartOptions<'bar'>;
   if (isDark) {
     options = {
@@ -159,17 +159,17 @@ const barChartDefaultOptions = (sum?: boolean, isDark?: boolean, locale?: string
         y: {
           ticks: {
             color: 'white',
-            callback: (value) => numberFormat(value, currency, locale)
+            callback: (value) => numberFormat(value, currency, locale),
           },
           grid: { color: 'rgba(255,255,255,0.1)' },
           beginAtZero: true,
-          stacked: true
+          stacked: true,
         },
         x: {
           ticks: { color: 'white' },
           grid: { color: 'rgba(255,255,255,0.1)' },
-          stacked: true
-        }
+          stacked: true,
+        },
       },
       plugins: {
         legend: {
@@ -179,9 +179,9 @@ const barChartDefaultOptions = (sum?: boolean, isDark?: boolean, locale?: string
           callbacks: {
             label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale, timeZone),
             footer: (tooltipItems: any) => footer(tooltipItems, currency, sum, locale),
-          }
-        }
-      }
+          },
+        },
+      },
     };
   } else {
     options = {
@@ -193,14 +193,14 @@ const barChartDefaultOptions = (sum?: boolean, isDark?: boolean, locale?: string
       scales: {
         y: {
           ticks: {
-            callback: (value) => numberFormat(value, currency, locale)
+            callback: (value) => numberFormat(value, currency, locale),
           },
           beginAtZero: true,
-          stacked: true
+          stacked: true,
         },
         x: {
-          stacked: true
-        }
+          stacked: true,
+        },
       },
       plugins: {
         legend: {
@@ -210,9 +210,9 @@ const barChartDefaultOptions = (sum?: boolean, isDark?: boolean, locale?: string
           callbacks: {
             label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale, timeZone),
             footer: (tooltipItems: any) => footer(tooltipItems, currency, sum, locale),
-          }
-        }
-      }
+          },
+        },
+      },
     };
   }
   return options;
@@ -224,7 +224,7 @@ const lineChartDefaultOptions = (
   locale?: string,
   timeZone?: string,
   currency?: ICurrency,
-  footerTitle?: string
+  footerTitle?: string,
 ): ChartOptions<'bar'> => {
   let options: ChartOptions<'bar'>;
   if (isDark) {
@@ -238,54 +238,54 @@ const lineChartDefaultOptions = (
         y: {
           ticks: {
             color: 'white',
-            callback: (value) => numberFormat(value, currency, locale)
+            callback: (value) => numberFormat(value, currency, locale),
           },
           grid: { color: 'rgba(255,255,255,0.1)' },
-          beginAtZero: true
+          beginAtZero: true,
         },
         x: {
           ticks: { color: 'white' },
-          grid: { color: 'rgba(255,255,255,0.1)' }
-        }
+          grid: { color: 'rgba(255,255,255,0.1)' },
+        },
       },
       plugins: {
         legend: {
-          display: true
+          display: true,
         },
         tooltip: {
           callbacks: {
             label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale, timeZone),
-            footer: (tooltipItems: any) => footer(tooltipItems, currency, sum, locale, footerTitle)
-          }
-        }
-      }
+            footer: (tooltipItems: any) => footer(tooltipItems, currency, sum, locale, footerTitle),
+          },
+        },
+      },
     };
   } else {
     options = {
       responsive: true,
       interaction: {
         intersect: false,
-        mode: 'index'
+        mode: 'index',
       },
       scales: {
         y: {
           ticks: {
-            callback: (value) => numberFormat(value, currency, locale)
+            callback: (value) => numberFormat(value, currency, locale),
           },
           beginAtZero: true,
-        }
+        },
       },
       plugins: {
         legend: {
-          display: true
+          display: true,
         },
         tooltip: {
           callbacks: {
             label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale, timeZone),
-            footer: (tooltipItems) => footer(tooltipItems, currency, sum, locale, footerTitle)
-          }
-        }
-      }
+            footer: (tooltipItems) => footer(tooltipItems, currency, sum, locale, footerTitle),
+          },
+        },
+      },
     };
   }
   return options;
@@ -322,44 +322,44 @@ const barChartNoLabelOptions = (isDark?: boolean): ChartOptions<'bar'> => {
         y: {
           ticks: { color: 'white' },
           grid: { color: 'rgba(255,255,255,0.1)' },
-          beginAtZero: true
+          beginAtZero: true,
         },
         x: {
           ticks: {
             color: 'white',
-            callback: () => ''
+            callback: () => '',
           },
-          grid: { color: 'rgba(255,255,255,0.1)' }
-        }
+          grid: { color: 'rgba(255,255,255,0.1)' },
+        },
       },
       plugins: {
         tooltip: {
           enabled: false,
           position: 'nearest',
-          external: externalTooltipHandler
-        }
-      }
+          external: externalTooltipHandler,
+        },
+      },
     };
   } else {
     options = {
       responsive: true,
       scales: {
         y: {
-          beginAtZero: true
+          beginAtZero: true,
         },
         x: {
           ticks: {
-            callback: () => ''
-          }
-        }
+            callback: () => '',
+          },
+        },
       },
       plugins: {
         tooltip: {
           enabled: false,
           position: 'nearest',
-          external: externalTooltipHandler
-        }
-      }
+          external: externalTooltipHandler,
+        },
+      },
     };
   }
 
@@ -483,23 +483,23 @@ const barChartTimeOptions = (isDark?: boolean, timeZone?: string): ChartOptions<
           ticks: {
             callback: (v: any) => formatSecsAsHourMin(v, timeZone),
             stepSize: 1800,
-            color: 'white'
-          }
+            color: 'white',
+          },
         },
         x: {
           ticks: { color: 'white' },
-          grid: { color: 'rgba(255,255,255,0.1)' }
-        }
+          grid: { color: 'rgba(255,255,255,0.1)' },
+        },
       },
       plugins: {
         tooltip: {
           mode: 'index',
           intersect: false,
           callbacks: {
-            label: (tooltipItem: any) => barChatTimeLabel(tooltipItem, timeZone)
-          }
-        }
-      }
+            label: (tooltipItem: any) => barChatTimeLabel(tooltipItem, timeZone),
+          },
+        },
+      },
     };
   } else {
     options = {
@@ -509,19 +509,19 @@ const barChartTimeOptions = (isDark?: boolean, timeZone?: string): ChartOptions<
           beginAtZero: true,
           ticks: {
             callback: (v: any) => formatSecsAsHourMin(v, timeZone),
-            stepSize: 1800
-          }
-        }
+            stepSize: 1800,
+          },
+        },
       },
       plugins: {
         tooltip: {
           mode: 'index',
           intersect: false,
           callbacks: {
-            label: (tooltipItem: any) => barChatTimeLabel(tooltipItem, timeZone)
-          }
-        }
-      }
+            label: (tooltipItem: any) => barChatTimeLabel(tooltipItem, timeZone),
+          },
+        },
+      },
     };
   }
 
@@ -533,10 +533,10 @@ const pieChartPercentageOptions = (): ChartOptions<'pie'> => ({
   plugins: {
     tooltip: {
       callbacks: {
-        label: (tooltipItem) => pieChatPercentageLabel(tooltipItem)
-      }
-    }
-  }
+        label: (tooltipItem) => pieChatPercentageLabel(tooltipItem),
+      },
+    },
+  },
 });
 
 const pieChatPercentageLabel = (tooltipItem: TooltipItem<'pie'>): string => {
@@ -568,20 +568,20 @@ const chartArrayColors = (): any[] => ([{
     'rgba(176, 171, 202, 0.8)', 'rgba(226, 169, 190, 0.8)', 'rgba(163, 214, 212, 0.8)'],
   hoverBorderColor: ['rgb(254, 205, 190)', 'rgb(152, 109, 142)', 'rgb(95, 147, 154)',
     'rgb(161, 202, 226)', 'rgb(242, 213, 239)', 'rgb(203, 239, 227)', 'rgb(194, 213, 167)',
-    'rgb(176, 171, 202)', 'rgb(226, 169, 190)', 'rgb(163, 214, 212)']
+    'rgb(176, 171, 202)', 'rgb(226, 169, 190)', 'rgb(163, 214, 212)'],
 },
-  {
-    hoverBackgroundColor: ['rgba(254, 205, 190, 0.2)', 'rgba(152, 109, 142, 0.2)', 'rgba(95, 147, 154, 0.2)',
-      'rgba(161, 202, 226, 0.2)', 'rgba(242, 213, 239, 0.2)', 'rgba(203, 239, 227, 0.2)', 'rgba(194, 213, 167, 0.2)',
-      'rgba(176, 171, 202, 0.2)', 'rgba(226, 169, 190, 0.2)', 'rgba(163, 214, 212, 0.2)'],
-    borderColor: ['#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff'],
-    backgroundColor: ['rgba(254, 205, 190, 0.4)', 'rgba(152, 109, 142, 0.4)', 'rgba(95, 147, 154, 0.4)',
-      'rgba(161, 202, 226, 0.4)', 'rgba(242, 213, 239, 0.4)', 'rgba(203, 239, 227, 0.4)', 'rgba(194, 213, 167, 0.4)',
-      'rgba(176, 171, 202, 0.4)', 'rgba(226, 169, 190, 0.4)', 'rgba(163, 214, 212, 0.4)'],
-    hoverBorderColor: ['rgba(254, 205, 190, 0.6)', 'rgba(152, 109, 142, 0.6)', 'rgba(95, 147, 154, 0.6)',
-      'rgba(161, 202, 226, 0.6)', 'rgba(242, 213, 239, 0.6)', 'rgba(203, 239, 227, 0.6)', 'rgba(194, 213, 167, 0.6)',
-      'rgba(176, 171, 202, 0.6)', 'rgba(226, 169, 190, 0.6)', 'rgba(163, 214, 212, 0.6)']
-  }]);
+{
+  hoverBackgroundColor: ['rgba(254, 205, 190, 0.2)', 'rgba(152, 109, 142, 0.2)', 'rgba(95, 147, 154, 0.2)',
+    'rgba(161, 202, 226, 0.2)', 'rgba(242, 213, 239, 0.2)', 'rgba(203, 239, 227, 0.2)', 'rgba(194, 213, 167, 0.2)',
+    'rgba(176, 171, 202, 0.2)', 'rgba(226, 169, 190, 0.2)', 'rgba(163, 214, 212, 0.2)'],
+  borderColor: ['#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff'],
+  backgroundColor: ['rgba(254, 205, 190, 0.4)', 'rgba(152, 109, 142, 0.4)', 'rgba(95, 147, 154, 0.4)',
+    'rgba(161, 202, 226, 0.4)', 'rgba(242, 213, 239, 0.4)', 'rgba(203, 239, 227, 0.4)', 'rgba(194, 213, 167, 0.4)',
+    'rgba(176, 171, 202, 0.4)', 'rgba(226, 169, 190, 0.4)', 'rgba(163, 214, 212, 0.4)'],
+  hoverBorderColor: ['rgba(254, 205, 190, 0.6)', 'rgba(152, 109, 142, 0.6)', 'rgba(95, 147, 154, 0.6)',
+    'rgba(161, 202, 226, 0.6)', 'rgba(242, 213, 239, 0.6)', 'rgba(203, 239, 227, 0.6)', 'rgba(194, 213, 167, 0.6)',
+    'rgba(176, 171, 202, 0.6)', 'rgba(226, 169, 190, 0.6)', 'rgba(163, 214, 212, 0.6)'],
+}]);
 
 const chartColors = (): any[] => ([{
   backgroundColor: 'rgba(254, 205, 190, 0.6)',
@@ -591,7 +591,7 @@ const chartColors = (): any[] => ([{
   pointHoverBackgroundColor: '#fff',
   pointHoverBorderColor: 'rgba(254, 205, 190, 0.8)',
   hoverBackgroundColor: 'rgba(254, 205, 190, 0.8)',
-  hoverBorderColor: 'rgba(254, 205, 190, 1)'
+  hoverBorderColor: 'rgba(254, 205, 190, 1)',
 }, {
   backgroundColor: 'rgba(152, 109, 142, 0.6)',
   borderColor: 'rgba(152, 109, 142, 1)',
@@ -600,7 +600,7 @@ const chartColors = (): any[] => ([{
   pointHoverBackgroundColor: '#fff',
   pointHoverBorderColor: 'rgba(152, 109, 142, 0.8)',
   hoverBackgroundColor: 'rgba(152, 109, 142, 0.8)',
-  hoverBorderColor: 'rgba(152, 109, 142, 1)'
+  hoverBorderColor: 'rgba(152, 109, 142, 1)',
 }, {
   backgroundColor: 'rgba(95, 147, 154, 0.6)',
   borderColor: 'rgba(95, 147, 154, 1)',
@@ -609,7 +609,7 @@ const chartColors = (): any[] => ([{
   pointHoverBackgroundColor: '#fff',
   pointHoverBorderColor: 'rgba(95, 147, 154, 0.8)',
   hoverBackgroundColor: 'rgba(95, 147, 154, 0.8)',
-  hoverBorderColor: 'rgba(95, 147, 154, 1)'
+  hoverBorderColor: 'rgba(95, 147, 154, 1)',
 }, {
   backgroundColor: 'rgba(161, 202, 226, 0.6)',
   borderColor: 'rgba(161, 202, 226, 1)',
@@ -618,5 +618,5 @@ const chartColors = (): any[] => ([{
   pointHoverBackgroundColor: '#fff',
   pointHoverBorderColor: 'rgba(161, 202, 226, 0.8)',
   hoverBackgroundColor: 'rgba(161, 202, 226, 0.8)',
-  hoverBorderColor: 'rgba(161, 202, 226, 1)'
+  hoverBorderColor: 'rgba(161, 202, 226, 1)',
 }]);

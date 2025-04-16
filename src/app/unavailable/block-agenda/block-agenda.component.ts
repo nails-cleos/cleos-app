@@ -5,7 +5,7 @@ import {
   UntypedFormControl,
   UntypedFormGroup,
   Validators,
-  ɵTypedOrUntyped
+  ɵTypedOrUntyped,
 } from '@angular/forms';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { IRoomAll } from '../../interfaces/room';
@@ -29,7 +29,7 @@ import {
   getTime,
   getTimeNumber,
   newDate,
-  zoneDateToDate
+  zoneDateToDate,
 } from '../../util/dates';
 import * as fromActionsUnavailable from '../../store/unavailable.actions';
 import { executeDialogNoWidth } from '../../util/helper';
@@ -45,7 +45,7 @@ import { BackButtonDirective } from '../../directives/back-button.directive';
   selector: 'app-block-agenda',
   templateUrl: './block-agenda.component.html',
   styleUrls: ['./block-agenda.component.scss'],
-  imports: [SharedModule, BackButtonDirective]
+  imports: [SharedModule, BackButtonDirective],
 })
 export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() unavailable?: IUnavailable;
@@ -72,106 +72,107 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
               private route: ActivatedRoute, private translate: TranslateService, public dialog: MatDialog) {
-    this.isAddMode = true;
-    this.getState = this.store.select(selectUnavailableState);
-    this.extras = this.router.getCurrentNavigation()?.extras.state;
-    this.timeZone = getCurrentTimeZone();
+  	this.isAddMode = true;
+  	this.getState = this.store.select(selectUnavailableState);
+  	this.extras = this.router.getCurrentNavigation()?.extras.state;
+  	this.timeZone = getCurrentTimeZone();
   }
 
   get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
-    return this.form.controls;
+  	return this.form.controls;
   }
 
   get submit(): void {
-    if (this.form.invalid) {
-      return;
-    }
+  	if (this.form.invalid) {
+  		return;
+  	}
 
-    const time = getTimeNumber(this.getForm.startTime.value);
-    const date = createNewDate(this.getForm.startDate.value, time?.hour, time?.minute);
+  	const time = getTimeNumber(this.getForm.startTime.value);
+  	const date = createNewDate(this.getForm.startDate.value, time?.hour, time?.minute);
 
-    const unavailable: IUnavailable = new Unavailable();
-    unavailable.professionalId = valueChange(this.getForm.professional.value, this.unavailable?.professional)?.id;
-    unavailable.start = date.toLocaleString(API_LOCALE);
-    unavailable.timeZone = this.timeZone;
-    unavailable.time = fieldChange(this.getForm.duration as UntypedFormControl, this.unavailable?.duration);
+  	const unavailable: IUnavailable = new Unavailable();
+  	unavailable.professionalId = valueChange(this.getForm.professional.value, this.unavailable?.professional)?.id;
+  	unavailable.start = date.toLocaleString(API_LOCALE);
+  	unavailable.timeZone = this.timeZone;
+  	unavailable.time = fieldChange(this.getForm.duration as UntypedFormControl, this.unavailable?.duration);
 
-    if (this.isAddMode) {
-      return this.store.dispatch(
-        new fromActionsUnavailable.BlockAgenda(unavailable)
-      );
-    } else {
-      unavailable.id = this.id;
-      this.unavailable = undefined;
-      return this.store.dispatch(
-        new fromActionsUnavailable.UnavailableUpdate(unavailable)
-      );
-    }
+  	if (this.isAddMode) {
+  		this.store.dispatch(
+  			new fromActionsUnavailable.BlockAgenda(unavailable),
+  		);
+  	} else {
+  		unavailable.id = this.id;
+  		this.unavailable = undefined;
+  		this.store.dispatch(
+  			new fromActionsUnavailable.UnavailableUpdate(unavailable),
+  		);
+  	}
+  	return;
   }
 
   get focusin(): void {
-    const startTime = this.getForm.startTime.value;
-    if (this.rooms.length && startTime) {
-      const startDate = this.getForm.startDate.value;
-      const time = getTimeNumber(startTime);
-      const date = createNewDate(startDate ? newDate(startDate) : getNowTimeZone(), time?.hour, time?.minute);
-      const day = date.getDay();
-      const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, date, this.rooms);
+  	const startTime = this.getForm.startTime.value;
+  	if (this.rooms.length && startTime) {
+  		const startDate = this.getForm.startDate.value;
+  		const time = getTimeNumber(startTime);
+  		const date = createNewDate(startDate ? newDate(startDate) : getNowTimeZone(), time?.hour, time?.minute);
+  		const day = date.getDay();
+  		const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, date, this.rooms);
 
-      this.setValues(startDate, startTime, getTime(minDate), getTime(maxDate), this.showDuration, this.durationMax,
-        roomAvailability);
-    }
-    return;
+  		this.setValues(startDate, startTime, getTime(minDate), getTime(maxDate), this.showDuration, this.durationMax,
+  			roomAvailability);
+  	}
+  	return;
   }
 
   get delete(): void {
-    const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
-    const date = this.unavailable?.startDate ? formatFullDate(this.unavailable.startDate, this.translate.currentLang)
-      : this.unavailable?.start;
-    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', { date });
+  	const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
+  	const date = this.unavailable?.startDate ? formatFullDate(this.unavailable.startDate, this.translate.currentLang)
+  		: this.unavailable?.start;
+  	const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', { date });
 
-    return executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: this.unavailable }, result => {
-      if (result) {
-        this.store.dispatch(
-          new fromActionsUnavailable.DeleteUnavailable(result)
-        );
-      }
-    });
+  	return executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: this.unavailable }, result => {
+  		if (result) {
+  			this.store.dispatch(
+  				new fromActionsUnavailable.DeleteUnavailable(result),
+  			);
+  		}
+  	});
   }
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.id = id;
-    }
-    this.clean();
-    this.createForm();
-    this.subscribe();
-    this.isAddMode = !this.id;
-    if (this.extras) {
-      let startTime;
-      if (this.extras.room) {
-        this.rooms = [this.extras.room];
-        this.getForm.professional.setValue(this.extras.room.professional);
-        this.showDuration = true;
-        const time = getTimeNumber(this.extras.date);
-        const hour = time ? `${ time.hour }`.padStart(2, '0') : '12';
-        const minute = time ? `${ closest(time.minute) }`.padStart(2, '0') : '00';
-        startTime = `${ hour }:${ minute }`;
-      }
-      this.setValues(this.extras.date, startTime);
-    }
-    if (!this.isAddMode) {
-      this.getBlockAgenda();
-    }
+  	const id = this.route.snapshot.paramMap.get('id');
+  	if (id) {
+  		this.id = id;
+  	}
+  	this.clean();
+  	this.createForm();
+  	this.subscribe();
+  	this.isAddMode = !this.id;
+  	if (this.extras) {
+  		let startTime;
+  		if (this.extras.room) {
+  			this.rooms = [this.extras.room];
+  			this.getForm.professional.setValue(this.extras.room.professional);
+  			this.showDuration = true;
+  			const time = getTimeNumber(this.extras.date);
+  			const hour = time ? `${ time.hour }`.padStart(2, '0') : '12';
+  			const minute = time ? `${ closest(time.minute) }`.padStart(2, '0') : '00';
+  			startTime = `${ hour }:${ minute }`;
+  		}
+  		this.setValues(this.extras.date, startTime);
+  	}
+  	if (!this.isAddMode) {
+  		this.getBlockAgenda();
+  	}
   }
 
   ngAfterViewInit(): void {
-    this.getProfessionals();
+  	this.getProfessionals();
   }
 
   ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+  	this.subscription?.unsubscribe();
   }
 
   displayFn = (user: IUser): string => user?.displayName ? user.displayName : '';
@@ -181,92 +182,92 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
   getRoom = (user: IUser): void => this.store.dispatch(new fromActionsUnavailable.GetRoom(user.id));
 
   keyDownHandler = (event: any): void => {
-    if (event.code === 'Backspace') {
-      this.getForm.professional.setValue('');
-      this.setValues();
-    }
+  	if (event.code === 'Backspace') {
+  		this.getForm.professional.setValue('');
+  		this.setValues();
+  	}
   };
 
   private setValues = (startDate?: any, startTime?: any, minTime?: string, maxTime?: string,
-                       showDuration: boolean = false, durationMax?: any, roomAvailability?: IRoomAll): void => {
-    this.getForm.startDate.setValue(startDate);
-    this.getForm.startTime.setValue(startTime);
-    this.minTime = minTime;
-    this.maxTime = maxTime;
-    this.showDuration = showDuration;
-    this.durationMax = durationMax;
-    this.roomAvailability = roomAvailability;
-    this.getForm.duration.setValue(undefined);
+  	showDuration: boolean = false, durationMax?: any, roomAvailability?: IRoomAll): void => {
+  	this.getForm.startDate.setValue(startDate);
+  	this.getForm.startTime.setValue(startTime);
+  	this.minTime = minTime;
+  	this.maxTime = maxTime;
+  	this.showDuration = showDuration;
+  	this.durationMax = durationMax;
+  	this.roomAvailability = roomAvailability;
+  	this.getForm.duration.setValue(undefined);
   };
 
   private createForm = (): void => {
-    this.form = this.formBuilder.group({
-      professional: ['', Validators.required, requireMatchAsync],
-      description: [''],
-      startDate: ['', Validators.required],
-      startTime: ['', Validators.required],
-      duration: ['', Validators.required],
-    });
-    this.filteredOptions = this.getForm.professional.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals)
-    );
-    this.valueChange();
+  	this.form = this.formBuilder.group({
+  		professional: ['', Validators.required, requireMatchAsync],
+  		description: [''],
+  		startDate: ['', Validators.required],
+  		startTime: ['', Validators.required],
+  		duration: ['', Validators.required],
+  	});
+  	this.filteredOptions = this.getForm.professional.valueChanges.pipe(
+  		startWith(''),
+  		map(value => typeof value === 'string' ? value : value.name),
+  		map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals),
+  	);
+  	this.valueChange();
   };
 
   private valueChange = (): void => {
-    this.getForm.startDate.valueChanges.subscribe(value => {
-      if (value) {
-        if (this.rooms.length) {
-          this.setMaxMin(value, this.rooms);
-        }
-        this.getForm.startTime.setValue(undefined);
-        this.getForm.duration.setValue(undefined);
-      }
-    });
+  	this.getForm.startDate.valueChanges.subscribe(value => {
+  		if (value) {
+  			if (this.rooms.length) {
+  				this.setMaxMin(value, this.rooms);
+  			}
+  			this.getForm.startTime.setValue(undefined);
+  			this.getForm.duration.setValue(undefined);
+  		}
+  	});
 
-    this.getForm.startTime.valueChanges.subscribe(value => {
-      if (value) {
-        const startDate = this.getForm.startDate.value;
-        const time = getTimeNumber(value);
-        const date = createNewDate(startDate ? newDate(startDate) : getNowTimeZone(), time?.hour, time?.minute);
+  	this.getForm.startTime.valueChanges.subscribe(value => {
+  		if (value) {
+  			const startDate = this.getForm.startDate.value;
+  			const time = getTimeNumber(value);
+  			const date = createNewDate(startDate ? newDate(startDate) : getNowTimeZone(), time?.hour, time?.minute);
 
-        this.calculateMaxDuration(date);
-      }
-    });
+  			this.calculateMaxDuration(date);
+  		}
+  	});
 
-    this.getForm.professional.valueChanges.subscribe(value => {
-      if (!this.rooms?.length && value) {
-        this.getRoom(value);
-      }
-    });
+  	this.getForm.professional.valueChanges.subscribe(value => {
+  		if (!this.rooms?.length && value) {
+  			this.getRoom(value);
+  		}
+  	});
   };
 
   private setMaxMin = (startDate: Date, rooms: IRoomAll[]): void => {
-    const day = startDate.getDay();
-    const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, startDate, rooms);
-    const availability = roomAvailability;
+  	const day = startDate.getDay();
+  	const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, startDate, rooms);
+  	const availability = roomAvailability;
 
-    this.minTime = getTime(minDate);
-    this.maxTime = getTime(maxDate);
-    this.calculateMaxDuration(startDate);
-    this.roomAvailability = availability;
+  	this.minTime = getTime(minDate);
+  	this.maxTime = getTime(maxDate);
+  	this.calculateMaxDuration(startDate);
+  	this.roomAvailability = availability;
   };
 
   private calculateMaxDuration = (date: Date): void => {
-    const max = getTimeNumber(this.maxTime);
-    if (max) {
-      const maxHour = max.hour;
-      const diffMin = max.minute;
+  	const max = getTimeNumber(this.maxTime);
+  	if (max) {
+  		const maxHour = max.hour;
+  		const diffMin = max.minute;
 
-      const d = diffTime(date, this.timeZone, Number(maxHour), Number(diffMin));
-      this.showDuration = true;
-      this.durationMax = formatTime(d, this.timeZone);
-      if (this.isAddMode) {
-        this.getForm.duration.setValue(undefined);
-      }
-    }
+  		const d = diffTime(date, this.timeZone, Number(maxHour), Number(diffMin));
+  		this.showDuration = true;
+  		this.durationMax = formatTime(d, this.timeZone);
+  		if (this.isAddMode) {
+  			this.getForm.duration.setValue(undefined);
+  		}
+  	}
   };
 
   private clean = (): void => this.store.dispatch(new fromActionsUnavailable.Clean());
@@ -274,50 +275,50 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
   private getProfessionals = (): void => this.store.dispatch(new fromActionsUnavailable.GetAllProfessional());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
-      if (state.professionals) {
-        this.professionals = state.professionals;
-        if (this.isAddMode && this.professionals?.length === 1 && !this.getForm.professional.value) {
-          this.getForm.professional.setValue(this.professionals[0]);
-        }
-      }
-      if (state.room && !this.rooms?.length) {
-        this.rooms = state.room;
-        const startDate = this.getForm.startDate.value;
-        if (startDate) {
-          this.setMaxMin(startDate, state.room);
-        }
-      }
-      if (state.selected && !this.unavailable) {
-        const date = zoneDateToDate(state.selected.timestamp);
-        this.unavailable = {
-          id: state.selected.id,
-          professional: state.selected.professional,
-          startDate: date,
-          startTime: getTime(date),
-          duration: state.selected.duration ? formatDuration(state.selected.duration) : ''
-        } as IUnavailable;
-        this.form.patchValue(this.unavailable);
-      }
-      if (state.subErrors) {
-        state.subErrors.forEach((value: any) => {
-          this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({ incorrect: true });
-        });
-      } else if (state.message) {
-        this.router.navigate([this.translate.currentLang, 'unavailable']);
-      }
-    });
+  	this.subscription = this.getState.subscribe(state => {
+  		if (state.professionals) {
+  			this.professionals = state.professionals;
+  			if (this.isAddMode && this.professionals?.length === 1 && !this.getForm.professional.value) {
+  				this.getForm.professional.setValue(this.professionals[0]);
+  			}
+  		}
+  		if (state.room && !this.rooms?.length) {
+  			this.rooms = state.room;
+  			const startDate = this.getForm.startDate.value;
+  			if (startDate) {
+  				this.setMaxMin(startDate, state.room);
+  			}
+  		}
+  		if (state.selected && !this.unavailable) {
+  			const date = zoneDateToDate(state.selected.timestamp);
+  			this.unavailable = {
+  				id: state.selected.id,
+  				professional: state.selected.professional,
+  				startDate: date,
+  				startTime: getTime(date),
+  				duration: state.selected.duration ? formatDuration(state.selected.duration) : '',
+  			} as IUnavailable;
+  			this.form.patchValue(this.unavailable);
+  		}
+  		if (state.subErrors) {
+  			state.subErrors.forEach((value: any) => {
+  				this.errors[value.field] = value.message;
+  				this.form.controls[value.field].setErrors({ incorrect: true });
+  			});
+  		} else if (state.message) {
+  			this.router.navigate([this.translate.currentLang, 'unavailable']);
+  		}
+  	});
   };
 
   private filter = (name: string): IUser[] | undefined => this.professionals?.filter(
-    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+  	option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
   private getBlockAgenda = (): void => {
-    if (!this.unavailable) {
-      this.store.dispatch(
-        new fromActionsUnavailable.UnavailableFind(this.id)
-      );
-    }
+  	if (!this.unavailable) {
+  		this.store.dispatch(
+  			new fromActionsUnavailable.UnavailableFind(this.id),
+  		);
+  	}
   };
 }

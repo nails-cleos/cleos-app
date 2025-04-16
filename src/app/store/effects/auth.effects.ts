@@ -19,12 +19,12 @@ export class LoginEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.authService.login(payload.idToken, payload.code, payload.theme)
       .pipe(switchMap((response: any) => of(new LoginSuccess({
-          response,
-          queryParams: payload.queryParams,
-          redirect: true
-        }))),
-        catchError((err: HttpErrorResponse) => of(new LoginFailure({ error: err.error })))
-      ))
+        response,
+        queryParams: payload.queryParams,
+        redirect: true,
+      }))),
+      catchError((err: HttpErrorResponse) => of(new LoginFailure({ error: err.error }))),
+      )),
   ));
 
   loginSuccess$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.loginSuccess),
@@ -48,10 +48,10 @@ export class LoginEffects {
       } else {
         this.navigationService.reload(redirectUrl);
       }
-    })
+    }),
   ), { dispatch: false });
 
-  logInFailure$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.loginFailure)
+  logInFailure$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.loginFailure),
   ), { dispatch: false });
 
   logOut$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.logout),
@@ -63,18 +63,18 @@ export class LoginEffects {
       }).catch((error) => {
         console.error('sign out error: ' + error);
       });
-    })
+    }),
   ), { dispatch: false });
 
   reLogin$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.reLogin),
     tap(() => {
       localStorage.removeItem('auth');
       window.location.href = `/${ this.translate.currentLang }/auth`;
-    })
+    }),
   ), { dispatch: false });
 
   redirect$ = createEffect(() => this.actions$.pipe(ofType(AuthActionTypes.redirect),
-    tap(() => this.router.navigate([this.translate.currentLang, 'auth', 'redirect']))
+    tap(() => this.router.navigate([this.translate.currentLang, 'auth', 'redirect'])),
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions$: Actions, private authService: AuthService,

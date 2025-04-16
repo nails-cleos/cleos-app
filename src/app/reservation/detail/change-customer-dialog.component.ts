@@ -4,7 +4,7 @@ import {
   UntypedFormBuilder,
   UntypedFormControl,
   UntypedFormGroup,
-  Validators
+  Validators,
 } from '@angular/forms';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { Observable, Subscription } from 'rxjs';
@@ -22,14 +22,14 @@ import { AsyncPipe } from '@angular/common';
 @Component({
   selector: 'app-change-customer-dialog-component',
   templateUrl: './change-customer-dialog.component.html',
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe, AsyncPipe]
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe, AsyncPipe],
 })
 export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
   customerForm!: UntypedFormGroup;
   customers?: IUserAll[];
   filteredCustomer?: Observable<IUser[] | undefined>;
   customer: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch
+    Validators.required, requireMatch,
   ]);
 
   private getState: Observable<any>;
@@ -70,7 +70,7 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
 
   private createForm = (): void => {
     this.customerForm = this.formBuilder.group({
-      customer: this.customer
+      customer: this.customer,
     });
   };
 
@@ -78,7 +78,7 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
     this.filteredCustomer = this.customer.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers)
+      map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers),
     );
   };
 

@@ -19,14 +19,14 @@ export class DiscountService {
     direction: string,
     page: number,
     path: string,
-    size: number = PAGE_SIZE
+    size: number = PAGE_SIZE,
   ): Observable<IDiscount[]> => this.http.get<IDiscount[]>(
     toUrl(this.urlV1, path),
-    { params: createFilter(page, size, sort, direction) }
+    { params: createFilter(page, size, sort, direction) },
   );
 
   getReferrals = (): Observable<IUserDiscount[]> => this.http.get<IUserDiscount[]>(
-    toUrl(this.urlV1, 'me', 'referrals')
+    toUrl(this.urlV1, 'me', 'referrals'),
   );
 
   getById = (id: string): Observable<IDiscount | undefined> => this.http.get<IDiscount>(toUrl(this.urlV1, id));
@@ -35,17 +35,17 @@ export class DiscountService {
 
   send = (id: string, customersDiscount: string[]): Observable<IDiscount> => this.http.post<IDiscount>(
     toUrl(this.urlV1, id, 'customers'),
-    customersDiscount
+    customersDiscount,
   );
 
   delete = (id: string): Observable<IDiscount> => this.http.delete<IDiscount>(toUrl(this.urlV1, id));
 
   update = (discount: IDiscount): Observable<IDiscount> => this.http.patch<IDiscount>(
     toUrl(this.urlV1, discount.id!),
-    discount
+    discount,
   );
 
   findByCustomerId = (customerId: string): Observable<IUserDiscount[]> => this.http.get<IUserDiscount[]>(
-    toUrl(this.urlV1, 'customers', customerId)
+    toUrl(this.urlV1, 'customers', customerId),
   );
 }

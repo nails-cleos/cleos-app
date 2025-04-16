@@ -42,7 +42,7 @@ export class PaymentOption implements IPaymentOption {
   icon?: string;
 
   constructor(name: string, type: PaymentType, svgIcon: string, bic?: string, subTypes?: IPaymentOption[],
-              hidePercentage: boolean = false) {
+    hidePercentage: boolean = false) {
     this.name = name;
     this.type = type;
     this.svgIcon = svgIcon;
@@ -54,7 +54,7 @@ export class PaymentOption implements IPaymentOption {
 
 export const getPaymentOptions = (
   translate: TranslateService,
-  types?: PaymentType[]
+  types?: PaymentType[],
 ): IPaymentOption[] => types?.map((it: any) => {
   let subTypes: IPaymentOption[] = [];
   if (it === PaymentType.ideal) {
@@ -75,10 +75,10 @@ export const getPaymentOptions = (
 }) || [];
 
 export const getPayNlOptions = (
-  options?: IPaymentOption[]
+  options?: IPaymentOption[],
 ): PaymentOption[] => options?.map((it: any) => new PaymentOption(
   it.name, PaymentType.paynl, it.image, it.id,
-  it.paymentOptionSubList?.map((sub: any) => new PaymentOption(sub.name, PaymentType.paynl, sub.image, sub.id, [])))
+  it.paymentOptionSubList?.map((sub: any) => new PaymentOption(sub.name, PaymentType.paynl, sub.image, sub.id, []))),
 ) || [];
 
 export const iDealBanks = (): IPaymentOption[] => [
@@ -92,7 +92,7 @@ export const iDealBanks = (): IPaymentOption[] => [
   { subTypes: [], type: PaymentType.ideal, name: 'Van Lanschot Bankiers', bic: 'FVLBNL22', svgIcon: '/issuers/11.svg' },
   { subTypes: [], type: PaymentType.ideal, name: 'Knab', bic: 'KNABNL2H', svgIcon: '/issuers/12.svg' },
   { subTypes: [], type: PaymentType.ideal, name: 'Bunq', bic: 'BUNQNL2A', svgIcon: '/issuers/5080.svg' },
-  { subTypes: [], type: PaymentType.ideal, name: 'Moneyou', bic: 'MOYONL21', svgIcon: 'MOYONL21' }
+  { subTypes: [], type: PaymentType.ideal, name: 'Moneyou', bic: 'MOYONL21', svgIcon: 'MOYONL21' },
 ];
 
 export const accountCredit = (name: string): IPaymentOption[] => [
@@ -102,8 +102,8 @@ export const accountCredit = (name: string): IPaymentOption[] => [
     name,
     icon: 'account_balance',
     hidePercentage: true,
-    svgIcon: 'account_balance'
-  }
+    svgIcon: 'account_balance',
+  },
 ];
 
 export enum PaymentPercentage {
@@ -114,23 +114,23 @@ export enum PaymentPercentage {
 export const paymentOptions = (): IPaymentType[] => [{
   name: PaymentType.cash,
   disabled: true,
-  checked: true
+  checked: true,
 }, {
   name: PaymentType.ml,
   disabled: false,
-  checked: false
+  checked: false,
 }, {
   name: PaymentType.paypal,
   disabled: false,
-  checked: false
+  checked: false,
 }, {
   name: PaymentType.ideal,
   disabled: false,
-  checked: false
+  checked: false,
 }, {
   name: PaymentType.paynl,
   disabled: false,
-  checked: false
+  checked: false,
 }];
 
 export interface IPaymentStatus {

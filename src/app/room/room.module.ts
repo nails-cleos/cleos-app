@@ -32,22 +32,22 @@ import { Observable } from 'rxjs';
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('room')
+        useClass: TranslateLoaderFactory.forModule('room'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
-    EffectsModule.forFeature([RoomEffects, ExpenseEffects])
+    EffectsModule.forFeature([RoomEffects, ExpenseEffects]),
   ],
   providers: [
     RoomService,
     UserService,
-    ExpenseService
-  ]
+    ExpenseService,
+  ],
 })
 export class RoomModule {
   constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {

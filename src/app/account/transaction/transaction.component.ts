@@ -19,7 +19,7 @@ import { BankComponent } from '../../shared/bank/bank.component';
   selector: 'app-transaction',
   templateUrl: './transaction.component.html',
   styleUrls: ['./transaction.component.scss'],
-  imports: [SharedModule, BalanceComponent, BackButtonDirective, BankComponent]
+  imports: [SharedModule, BalanceComponent, BackButtonDirective, BankComponent],
 })
 export class TransactionComponent implements OnInit, OnDestroy {
   form!: UntypedFormGroup;
@@ -85,13 +85,14 @@ export class TransactionComponent implements OnInit, OnDestroy {
     const payload = {
       customerId,
       amount,
-      paymentRequest: { type, paymentOptionId, transfer, bic }
+      paymentRequest: { type, paymentOptionId, transfer, bic },
     };
-    return this.store.dispatch(
+    this.store.dispatch(
       new fromActionsAccount.AccountSave({
-        transaction: payload, accountId: this.accountId, hasAdminRole: this.hasAdminRole
-      })
+        transaction: payload, accountId: this.accountId, hasAdminRole: this.hasAdminRole,
+      }),
     );
+    return;
   }
 
   ngOnInit(): void {
@@ -114,14 +115,14 @@ export class TransactionComponent implements OnInit, OnDestroy {
       amount: ['', [Validators.required, Validators.min(this.amountMin)]],
       type: ['', Validators.required],
       transfer: [''],
-      bank: ['']
+      bank: [''],
     });
   };
 
   private getAccount = (): void => {
     if (!this.account) {
       this.store.dispatch(
-        new fromActionsAccount.AccountFind(this.accountId)
+        new fromActionsAccount.AccountFind(this.accountId),
       );
     }
   };

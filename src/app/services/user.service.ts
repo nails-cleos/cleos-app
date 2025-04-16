@@ -30,20 +30,20 @@ export class UserService {
     direction: string,
     page: number,
     size: number = PAGE_SIZE,
-    filter: string
+    filter: string,
   ): Observable<IUser[]> => this.http.get<IUser[]>(
     toUrl(this.userUrlV1, 'pages'),
-    { params: createFilter(page, size, sort, direction, filter) }
+    { params: createFilter(page, size, sort, direction, filter) },
   );
 
   getById = (
-    id: string
+    id: string,
   ): Observable<IUser | undefined> => this.http.get<IUser>(toUrl(this.userUrlV1, id));
 
   getMe = (): Observable<IUser | undefined> => this.http.get<IUser>(toUrl(this.userUrlV1, 'me'));
 
   update = (
-    user: IUser
+    user: IUser,
   ): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, user.id!), user);
 
   updateMe = (user: IUser): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, 'me'), user);
@@ -61,7 +61,7 @@ export class UserService {
   addCustomer = (user: IUser): Observable<IUser> => this.http.post(this.customerUrlV1, user);
 
   getOverview = (
-    id: string | null
+    id: string | null,
   ): Observable<IUser | undefined> => this.http.get<IUser>(toUrl(this.customerUrlV1, id ? id : 'me', 'reservations'));
 
   addProfessional = (user: IUser): Observable<IUser> => this.http.post(this.professionalUrlV1, user);
@@ -80,9 +80,10 @@ export class UserService {
 
   getAllCustomers = (): Observable<IUser[]> => this.http.get<IUser[]>(this.customerUrlV1);
 
-  getCustomerInformation = (id: string): Observable<ICustomerLastReservation[]> => this.http.get<ICustomerLastReservation[]>(
-    toUrl(this.customerUrlV1, id, 'info')
-  );
+  getCustomerInformation = (
+    id: string,
+  ): Observable<ICustomerLastReservation[]> => this.http.get<ICustomerLastReservation[]>(
+    toUrl(this.customerUrlV1, id, 'info'));
 
   setRole = (userId: string, role: Role): Observable<IUser> => {
     let roleName;
@@ -105,12 +106,12 @@ export class UserService {
   };
 
   getRoomByProfessionalId = (
-    id: string
+    id: string,
   ): Observable<IRoom> => this.http.get<IRoom>(`${ this.professionalUrlV1 }/${ id }/rooms`);
 
   getAllDisableUsers = (): Observable<IUser[]> => this.http.get<IUser[]>(this.userUrlV1);
 
   mergeUsers = (
-    mergeUserRequest: any
+    mergeUserRequest: any,
   ): Observable<IUser> => this.http.post<IUser>(`${ this.userUrlV1 }/merge`, mergeUserRequest);
 }

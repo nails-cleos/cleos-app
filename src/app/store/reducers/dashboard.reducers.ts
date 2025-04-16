@@ -14,7 +14,7 @@ import {
   IYearRoomExport,
   IYearRoomSummary,
   MonthSummary,
-  QuarterSummary
+  QuarterSummary,
 } from '../../interfaces/dashboard';
 import { getMonth } from '../../util/dates';
 
@@ -48,7 +48,7 @@ const initialState: State = {
   error: null,
   subErrors: null,
   message: null,
-  isLoading: false
+  isLoading: false,
 };
 
 const getMap = (a: Map<string, IDashboard>, b: IDashboard): Map<string, IDashboard> => {
@@ -95,11 +95,11 @@ const monthSummaryMap = (summaries: IMonthlyRoomSummary[]) => summaries.reduce((
     roomName: summary.roomName,
     currency: summary.currency,
     timeZone: summary.timeZone,
-    primary: summary.primary
+    primary: summary.primary,
   }, {
     summarySale: summary.saleSummary,
     summaryExpenses: summary.expenseSummary,
-    summaryCashSale: summary.cashSaleSummary
+    summaryCashSale: summary.cashSaleSummary,
   });
   return map;
 }, new Map<ISummaryRoom, {
@@ -114,9 +114,9 @@ const yearExportMap = (summaries: IYearRoomExport[]) => summaries.reduce((map, s
     roomName: summary.roomName,
     currency: summary.currency,
     timeZone: summary.timeZone,
-    primary: summary.primary
+    primary: summary.primary,
   }, {
-    monthlyExport: summary.monthExport
+    monthlyExport: summary.monthExport,
   });
   return map;
 }, new Map<ISummaryRoom, {
@@ -165,9 +165,9 @@ const yearSummaryMap = (summaries: IYearRoomSummary[]) => summaries.reduce((map,
     roomName: summary.roomName,
     currency: summary.currency,
     timeZone: summary.timeZone,
-    primary: summary.primary
+    primary: summary.primary,
   }, {
-    quarterSummaries: fullYear(summary.quarterSummaries)
+    quarterSummaries: fullYear(summary.quarterSummaries),
   });
   return map;
 }, new Map<ISummaryRoom, { quarterSummaries: IQuarterSummary[] }>());
@@ -178,9 +178,9 @@ const quarterSummaryMap = (summaries: IQuarterRoomSummary[]) => summaries.reduce
     roomName: summary.roomName,
     currency: summary.currency,
     timeZone: summary.timeZone,
-    primary: summary.primary
+    primary: summary.primary,
   }, {
-    monthSummaries: fullQuarter(summary.monthSummaries, summary.quarter)
+    monthSummaries: fullQuarter(summary.monthSummaries, summary.quarter),
   });
   return map;
 }, new Map<ISummaryRoom, { monthSummaries: IMonthSummary[] }>());
@@ -194,7 +194,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case DashboardActionTypes.dashboardEvents: {
@@ -206,7 +206,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case DashboardActionTypes.dashCards: {
@@ -216,7 +216,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case DashboardActionTypes.dashSuccess: {
@@ -227,7 +227,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         message: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case DashboardActionTypes.eventSuccess: {
@@ -238,7 +238,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: null,
         subErrors: null,
         message: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case DashboardActionTypes.dashFailure: {
@@ -248,7 +248,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: action.payload.error,
         subErrors: action.payload.error?.subErrors,
         message: null,
-        isLoading: false
+        isLoading: false,
       };
     }
     case DashboardActionTypes.monthlySummary: {
@@ -258,7 +258,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case DashboardActionTypes.monthlySummarySuccess: {
@@ -268,7 +268,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case DashboardActionTypes.saveMonthlySummary: {
@@ -278,7 +278,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case DashboardActionTypes.saveMonthlySummarySuccess: {
@@ -287,7 +287,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: action.payload.message
+        message: action.payload.message,
       };
     }
     case DashboardActionTypes.yearSummary: {
@@ -298,7 +298,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case DashboardActionTypes.yearSummarySuccess: {
@@ -308,7 +308,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case DashboardActionTypes.yearExport: {
@@ -318,7 +318,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case DashboardActionTypes.yearExportSuccess: {
@@ -328,7 +328,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case DashboardActionTypes.quarterSummary: {
@@ -338,7 +338,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case DashboardActionTypes.quarterSummarySuccess: {
@@ -348,7 +348,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         error: null,
         subErrors: null,
-        message: null
+        message: null,
       };
     }
     case DashboardActionTypes.clean: {

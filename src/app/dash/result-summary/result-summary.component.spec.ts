@@ -8,9 +8,9 @@ describe('ResultSummaryComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ResultSummaryComponent]
+      imports: [ResultSummaryComponent],
     })
-    .compileComponents();
+      .compileComponents();
     
     fixture = TestBed.createComponent(ResultSummaryComponent);
     component = fixture.componentInstance;

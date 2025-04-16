@@ -18,21 +18,21 @@ import { Observable } from 'rxjs';
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('invoice')
+        useClass: TranslateLoaderFactory.forModule('invoice'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
-    EffectsModule.forFeature([InvoiceEffects])
+    EffectsModule.forFeature([InvoiceEffects]),
   ],
   providers: [
     InvoiceService,
-    OfficeService
-  ]
+    OfficeService,
+  ],
 })
 export class InvoiceModule {
   constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {

@@ -8,9 +8,9 @@ describe('BlockAgendaComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [BlockAgendaComponent]
-})
-    .compileComponents();
+      imports: [BlockAgendaComponent],
+    })
+      .compileComponents();
 
     fixture = TestBed.createComponent(BlockAgendaComponent);
     component = fixture.componentInstance;

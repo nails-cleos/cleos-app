@@ -21,7 +21,7 @@ import { SharedModule } from '../../shared/shared.module';
   templateUrl: './currency-list.component.html',
   styleUrls: ['./currency-list.component.scss'],
   animations: [detailExpandAnimation],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -41,78 +41,78 @@ export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>, public dialog: MatDialog,
               private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.pageSize = MOBILE_PAGE_SIZE;
-      }
-    });
-    this.getState = this.store.select(selectCurrencyState);
-    this.language = this.translate.currentLang;
+  	breakpointObserver.observe([
+  		Breakpoints.XSmall,
+  		Breakpoints.Small,
+  	]).subscribe(result => {
+  		if (result.matches) {
+  			this.pageSize = MOBILE_PAGE_SIZE;
+  		}
+  	});
+  	this.getState = this.store.select(selectCurrencyState);
+  	this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {
-    this.getCurrency();
+  	this.getCurrency();
   }
 
   ngOnInit(): void {
-    this.clean();
-    this.subscribe();
+  	this.clean();
+  	this.subscribe();
   }
 
   ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.paginatorSubscription?.unsubscribe();
+  	this.subscription?.unsubscribe();
+  	this.paginatorSubscription?.unsubscribe();
   }
 
   edit = (currency: ICurrency): void => this.store.dispatch(new fromActionsCurrency.CurrencySelected(currency));
 
   delete = (currency: ICurrency): void => {
-    const title = this.translate.instant('CURRENCY.DELETED.TITLE');
-    const content = this.translate.instant('CURRENCY.DELETED.CONTENT', { code: currency.code });
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: currency }, result => {
-      if (result) {
-        this.store.dispatch(
-          new fromActionsCurrency.DeleteCurrency(result)
-        );
-      }
-    });
+  	const title = this.translate.instant('CURRENCY.DELETED.TITLE');
+  	const content = this.translate.instant('CURRENCY.DELETED.CONTENT', { code: currency.code });
+  	executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: currency }, result => {
+  		if (result) {
+  			this.store.dispatch(
+  				new fromActionsCurrency.DeleteCurrency(result),
+  			);
+  		}
+  	});
   };
 
   private clean = (): void => this.store.dispatch(new fromActionsCurrency.Clean());
 
   private createPageSubscriptions = (): void => {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getCurrency();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getCurrency(this.paginator.pageIndex));
+  	this.sort.sortChange.subscribe(() => {
+  		this.paginator.pageIndex = 0;
+  		this.getCurrency();
+  	});
+  	this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getCurrency(this.paginator.pageIndex));
 
-    this.cdRef.detectChanges();
+  	this.cdRef.detectChanges();
   };
 
   private getCurrency = (page: number = 0): void => this.store.dispatch(
-    new fromActionsCurrency.GetAll({
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    })
+  	new fromActionsCurrency.GetAll({
+  		active: this.sort.active,
+  		direction: this.sort.direction,
+  		size: this.pageSize,
+  		page,
+  	}),
   );
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
-      if (state.message) {
-        this.clean();
-        this.getCurrency();
-      }
-      this.dataSource = state.data?.content;
-      this.resultsLength = state.data?.totalElements;
-      if (!this.paginatorSubscription && this.resultsLength) {
-        this.createPageSubscriptions();
-      }
-    });
+  	this.subscription = this.getState.subscribe(state => {
+  		if (state.message) {
+  			this.clean();
+  			this.getCurrency();
+  		}
+  		this.dataSource = state.data?.content;
+  		this.resultsLength = state.data?.totalElements;
+  		if (!this.paginatorSubscription && this.resultsLength) {
+  			this.createPageSubscriptions();
+  		}
+  	});
   };
 }

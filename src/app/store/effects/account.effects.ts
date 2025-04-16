@@ -15,8 +15,8 @@ export class AccountEffects {
     map((action: any) => action.payload),
     switchMap((payload: any) => this.accountService.getById(payload).pipe(
       switchMap((account: any) => of(new fromActionsAccount.AccountSelected(account))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error })))
-    ))
+      catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error }))),
+    )),
   ));
 
   findTransaction$ = createEffect(
@@ -24,8 +24,8 @@ export class AccountEffects {
       map((action: any) => action.payload),
       switchMap((payload: any) => this.accountService.findTransaction(payload.id, payload.transactionId).pipe(
         switchMap((account: any) => of(new fromActionsAccount.AccountSelected(account))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error }))),
+      )),
     ));
 
   paymentOptions$ = createEffect(
@@ -33,8 +33,8 @@ export class AccountEffects {
       map((action: any) => action.payload),
       switchMap(() => this.paymentService.paymentOptions().pipe(
         switchMap((response: any) => of(new fromActionsAccount.PaymentOptionsSuccess(response))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error }))),
+      )),
     ));
 
   findAllTransaction$ = createEffect(
@@ -44,8 +44,8 @@ export class AccountEffects {
         (payload: any) => this.accountService.getAllTransactions(payload.accountId, payload.page, payload.active,
           payload.direction, payload.size).pipe(
           switchMap((transactions: any) => of(new fromActionsAccount.AccountSuccess(transactions))),
-          catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error })))
-        ))
+          catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error }))),
+        )),
     ));
 
   findByCustomer$ = createEffect(
@@ -53,8 +53,8 @@ export class AccountEffects {
       map((action: any) => action.payload),
       switchMap((payload: any) => this.accountService.findByCustomer(payload).pipe(
         switchMap((account: any) => of(new fromActionsAccount.AccountSelected(account))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error })))
-      ))
+        catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error }))),
+      )),
     ));
 
   save$ = createEffect(() => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.accountSave)).pipe(
@@ -67,8 +67,8 @@ export class AccountEffects {
           const message = this.translate.instant('ACCOUNT.MONEY_ADDED', { id: response.account.id });
           return of(new fromActionsAccount.AccountSaveSuccess({ message }));
         }
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error })))
-    ))
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error }))),
+    )),
   ));
 
   update = createEffect(() => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.accountUpdate)).pipe(
@@ -77,25 +77,25 @@ export class AccountEffects {
       switchMap((response: any) => {
         const message = this.translate.instant('ACCOUNT.UPDATED', { id: response.id });
         return of(new fromActionsAccount.AccountSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error })))
-    ))
+      }), catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error }))),
+    )),
   ));
 
   selectedData$ = createEffect(() => this.actions.pipe(
-    ofType(fromActionsAccount.AccountActionTypes.accountSelected)
+    ofType(fromActionsAccount.AccountActionTypes.accountSelected),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(fromActionsAccount.AccountActionTypes.accountSuccess)
+    ofType(fromActionsAccount.AccountActionTypes.accountSuccess),
   ), { dispatch: false });
 
   saveSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(fromActionsAccount.AccountActionTypes.accountSaveSuccess)
+    ofType(fromActionsAccount.AccountActionTypes.accountSaveSuccess),
   ), { dispatch: false });
 
   send$ = createEffect(() => this.actions.pipe(
     ofType(fromActionsAccount.AccountActionTypes.paymentSend),
-    tap((data: any) => window.open(data.payload, '_self'))
+    tap((data: any) => window.open(data.payload, '_self')),
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions: Actions,

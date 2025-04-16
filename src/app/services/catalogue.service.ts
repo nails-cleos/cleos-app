@@ -51,7 +51,7 @@ export class CatalogueService {
     catalogues.map((value, index) => {
       const catalogue = {
         id: value.id,
-        order: index
+        order: index,
       } as ICatalogue;
       data = [...data, catalogue];
     });
@@ -61,6 +61,6 @@ export class CatalogueService {
 
   private getCatalogue = (key: string) => this.http.get<ICatalogue[]>(
     this.urlV1,
-    { params: new HttpParams().set(key, String(true)) }
+    { params: new HttpParams().set(key, String(true)) },
   );
 }

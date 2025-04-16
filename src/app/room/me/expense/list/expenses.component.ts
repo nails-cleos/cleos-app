@@ -29,16 +29,16 @@ import { TimeDetailPipe } from '../../../../pipes/time-detail.pipe';
   styleUrls: ['./expenses.component.scss'],
   animations: [detailExpandAnimation],
   providers: [
-    { provide: DateAdapter, useClass: YearMonthAdapter }
+    { provide: DateAdapter, useClass: YearMonthAdapter },
   ],
-  imports: [SharedModule, TimeDetailPipe]
+  imports: [SharedModule, TimeDetailPipe],
 })
 export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   displayedColumns: string[] = ['position', 'invoice', 'supplyStore.name', 'timestamp', 'totalGross', 'totalBtw',
-    'totalNet', 'actions'];
+  	'totalNet', 'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IExpense>>();
   expanded?: IExpense;
 
@@ -57,131 +57,131 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver, private route: ActivatedRoute) {
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.pageSize = MOBILE_PAGE_SIZE;
-      }
-    });
-    this.getState = this.store.select(selectExpenseState);
-    this.dateFormat = this.translate.currentLang;
-    this.language = this.translate.currentLang;
+  	breakpointObserver.observe([
+  		Breakpoints.XSmall,
+  		Breakpoints.Small,
+  	]).subscribe(result => {
+  		if (result.matches) {
+  			this.pageSize = MOBILE_PAGE_SIZE;
+  		}
+  	});
+  	this.getState = this.store.select(selectExpenseState);
+  	this.dateFormat = this.translate.currentLang;
+  	this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {
-    this.route.paramMap.subscribe(param => {
-      this.roomId = param.get('id');
-      this.getExpenses();
-    });
+  	this.route.paramMap.subscribe(param => {
+  		this.roomId = param.get('id');
+  		this.getExpenses();
+  	});
   }
 
   ngOnInit(): void {
-    this.clean();
-    this.subscribe();
-    this.valueChange();
+  	this.clean();
+  	this.subscribe();
+  	this.valueChange();
   }
 
   ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.paginatorSubscription?.unsubscribe();
+  	this.subscription?.unsubscribe();
+  	this.paginatorSubscription?.unsubscribe();
   }
 
   applyFilter = (event: Event): void => {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.filter = filterValue.trim().toLowerCase();
-    this.getExpenses(0);
+  	const filterValue = (event.target as HTMLInputElement).value;
+  	this.filter = filterValue.trim().toLowerCase();
+  	this.getExpenses(0);
   };
 
   showTimeZone = (expense: IExpenseAll): boolean => !isSameTimeZone(expense.room.timeZone);
 
   setMonthAndYear = (normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void => {
-    const ctrlValue = this.date.value || getNowTimeZone();
+  	const ctrlValue = this.date.value || getNowTimeZone();
 
-    ctrlValue.setMonth(normalizedMonthAndYear.getMonth());
-    ctrlValue.setFullYear(normalizedMonthAndYear.getFullYear());
+  	ctrlValue.setMonth(normalizedMonthAndYear.getMonth());
+  	ctrlValue.setFullYear(normalizedMonthAndYear.getFullYear());
 
-    this.date.setValue(ctrlValue);
+  	this.date.setValue(ctrlValue);
 
-    datepicker.close();
+  	datepicker.close();
   };
 
   keyDownHandler = (event: any): void => {
-    if (event.code === 'Backspace') {
-      this.date.setValue(null);
-    }
+  	if (event.code === 'Backspace') {
+  		this.date.setValue(null);
+  	}
   };
 
   openDialog = (expense: IExpenseAll): void => openDialog(
-    expense.room, this.dateFormat, this.translate, this.dialog, newDateTimestamp(expense.timestamp)
+  	expense.room, this.dateFormat, this.translate, this.dialog, newDateTimestamp(expense.timestamp),
   );
 
   delete = (expense: IExpense): void => {
-    const title = this.translate.instant('EXPENSE.DELETED.TITLE');
-    const content = this.translate.instant('EXPENSE.DELETED.CONTENT', { invoice: expense.invoice });
-    const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: expense }
-    });
+  	const title = this.translate.instant('EXPENSE.DELETED.TITLE');
+  	const content = this.translate.instant('EXPENSE.DELETED.CONTENT', { invoice: expense.invoice });
+  	const dialogRef = this.dialog.open(DialogComponent, {
+  		data: { title, content, value: expense },
+  	});
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.store.dispatch(
-          new fromActionsExpense.DeleteExpense({ roomId: this.roomId, id: result.id, invoice: result.invoice })
-        );
-      }
-    });
+  	dialogRef.afterClosed().subscribe(result => {
+  		if (result) {
+  			this.store.dispatch(
+  				new fromActionsExpense.DeleteExpense({ roomId: this.roomId, id: result.id, invoice: result.invoice }),
+  			);
+  		}
+  	});
   };
 
   private valueChange = (): void => {
-    this.date.valueChanges.subscribe(value => {
-      this.dateFilter = value ? getDateFormat(value) : value;
-      this.getExpenses(0);
-    });
+  	this.date.valueChanges.subscribe(value => {
+  		this.dateFilter = value ? getDateFormat(value) : value;
+  		this.getExpenses(0);
+  	});
   };
 
   private clean = (): void => this.store.dispatch(new fromActionsExpense.Clean());
 
   private createPageSubscriptions = (): void => {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getExpenses();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getExpenses(this.paginator.pageIndex));
+  	this.sort.sortChange.subscribe(() => {
+  		this.paginator.pageIndex = 0;
+  		this.getExpenses();
+  	});
+  	this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getExpenses(this.paginator.pageIndex));
 
-    this.cdRef.detectChanges();
+  	this.cdRef.detectChanges();
   };
 
   private getExpenses = (page: number = 0): void => {
-    this.paginatorSubscription?.unsubscribe();
-    this.paginatorSubscription = undefined;
-    this.store.dispatch(
-      new fromActionsExpense.GetAll({
-        roomId: this.roomId,
-        active: this.sort.active,
-        direction: this.sort.direction,
-        size: this.pageSize,
-        filter: this.filter,
-        dateFilter: this.dateFilter,
-        page
-      })
-    );
+  	this.paginatorSubscription?.unsubscribe();
+  	this.paginatorSubscription = undefined;
+  	this.store.dispatch(
+  		new fromActionsExpense.GetAll({
+  			roomId: this.roomId,
+  			active: this.sort.active,
+  			direction: this.sort.direction,
+  			size: this.pageSize,
+  			filter: this.filter,
+  			dateFilter: this.dateFilter,
+  			page,
+  		}),
+  	);
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.message) {
-        this.clean();
-        this.getExpenses();
-      }
-      this.dataSource = state.data?.content.map((expense: IExpenseAll) => {
-        const totalBtw = expense.totalGross - expense.totalNet;
-        return Object.assign({}, expense, { totalBtw });
-      });
-      this.resultsLength = state.data?.totalElements;
-      if (!this.paginatorSubscription && this.resultsLength) {
-        this.createPageSubscriptions();
-      }
-    });
+  	this.subscription = this.getState.subscribe((state) => {
+  		if (state.message) {
+  			this.clean();
+  			this.getExpenses();
+  		}
+  		this.dataSource = state.data?.content.map((expense: IExpenseAll) => {
+  			const totalBtw = expense.totalGross - expense.totalNet;
+  			return Object.assign({}, expense, { totalBtw });
+  		});
+  		this.resultsLength = state.data?.totalElements;
+  		if (!this.paginatorSubscription && this.resultsLength) {
+  			this.createPageSubscriptions();
+  		}
+  	});
   };
 }

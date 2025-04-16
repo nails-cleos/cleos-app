@@ -20,17 +20,17 @@ export class BackButtonDirective {
 
   @HostListener('click')
   @HostListener('window:popstate')
-  onClick = (): void => {
-    if (this.form && !this.form.pristine) {
-      const title = this.translate.instant('COMMON.BACK.TITLE');
-      const content = this.translate.instant('COMMON.BACK.CONTENT');
-      executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: this.form }, result => {
-        if (result) {
-          this.navigation.back(this.date, this.step);
-        }
-      });
-    } else {
-      this.navigation.back(this.date, this.step);
-    }
-  };
+  	onClick = (): void => {
+  		if (this.form && !this.form.pristine) {
+  			const title = this.translate.instant('COMMON.BACK.TITLE');
+  			const content = this.translate.instant('COMMON.BACK.CONTENT');
+  			executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: this.form }, result => {
+  				if (result) {
+  					this.navigation.back(this.date, this.step);
+  				}
+  			});
+  		} else {
+  			this.navigation.back(this.date, this.step);
+  		}
+  	};
 }

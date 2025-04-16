@@ -8,7 +8,7 @@ import { AppMaterialModule } from '../../../util/app-material.module';
   selector: 'app-calendar-dialog',
   templateUrl: './calendar-dialog.component.html',
   styleUrls: ['./calendar-dialog.component.scss'],
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslateModule]
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslateModule],
 })
 export class CalendarDialogComponent {
   readonly dialogRef = inject(MatDialogRef<CalendarDialogComponent>);

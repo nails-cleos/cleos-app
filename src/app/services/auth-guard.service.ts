@@ -9,7 +9,7 @@ import { TranslateService } from '@ngx-translate/core';
 import * as fromActionsLogin from '../store/auth.actions';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PermissionsService {
   private snackBar: MatSnackBar = inject(MatSnackBar);
@@ -42,10 +42,10 @@ export class PermissionsService {
           message = 'User not have the necessary permissions';
         }
         this.snackBar.open(message, 'OK', {
-          duration: 5000
+          duration: 5000,
         });
         this.store.dispatch(
-          new fromActionsLogin.Redirect()
+          new fromActionsLogin.Redirect(),
         );
         return false;
       }

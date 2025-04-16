@@ -14,7 +14,7 @@ import {
   getEndWithDuration,
   getNowTimeZone,
   greaterOrEqualsThan,
-  newDateTimestamp
+  newDateTimestamp,
 } from '../util/dates';
 import { CalendarEvent, CalendarModule, CalendarMonthViewDay, CalendarView } from 'angular-calendar';
 import { findStateColor, getStateOrder } from '../util/theme';
@@ -40,7 +40,7 @@ import { ChartComponent } from '../shared/chart/chart.component';
   selector: 'app-dash',
   templateUrl: './dash.component.html',
   styleUrls: ['./dash.component.scss'],
-  imports: [SharedModule, CalendarModule, MiniCardComponent, ReservationTableComponent, CardComponent, ChartComponent]
+  imports: [SharedModule, CalendarModule, MiniCardComponent, ReservationTableComponent, CardComponent, ChartComponent],
 })
 export class DashComponent implements OnInit, OnDestroy {
   state: any;
@@ -76,7 +76,7 @@ export class DashComponent implements OnInit, OnDestroy {
     miniCard: { cols: 1, rows: 1 },
     calendar: { cols: 2, rows: 4 },
     chart: { cols: 2, rows: 2 },
-    table: { cols: 2, rows: 4 }
+    table: { cols: 2, rows: 4 },
   };
 
   private destroy$ = new Subject();
@@ -102,35 +102,35 @@ export class DashComponent implements OnInit, OnDestroy {
       const miniCard = isAdminOrManager ? { cols: 1, rows: 1 } : { cols: 0, rows: 0 };
       this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium])
         .pipe(takeUntil(this.destroy$)).subscribe((breakpointState: BreakpointState) => {
-        if (breakpointState.breakpoints[Breakpoints.Medium]) {
-          this.cardLayout = {
-            columns: 2,
-            rowHeight: '250px',
-            miniCard,
-            calendar: { cols: 2, rows: 4 },
-            chart: { cols: 2, rows: 2 },
-            table: { cols: 2, rows: 4 }
-          };
-        } else if (breakpointState.matches) {
-          this.cardLayout = {
-            columns: 1,
-            rowHeight: '250px',
-            miniCard,
-            calendar: { cols: 1, rows: 4 },
-            chart: { cols: 1, rows: 1.5 },
-            table: { cols: 1, rows: 4.5 }
-          };
-        } else {
-          this.cardLayout = {
-            columns: 4,
-            rowHeight: '250px',
-            miniCard,
-            calendar: { cols: 4, rows: 4 },
-            chart: { cols: 2, rows: 2 },
-            table: { cols: 4, rows: 4 }
-          };
-        }
-      });
+          if (breakpointState.breakpoints[Breakpoints.Medium]) {
+            this.cardLayout = {
+              columns: 2,
+              rowHeight: '250px',
+              miniCard,
+              calendar: { cols: 2, rows: 4 },
+              chart: { cols: 2, rows: 2 },
+              table: { cols: 2, rows: 4 },
+            };
+          } else if (breakpointState.matches) {
+            this.cardLayout = {
+              columns: 1,
+              rowHeight: '250px',
+              miniCard,
+              calendar: { cols: 1, rows: 4 },
+              chart: { cols: 1, rows: 1.5 },
+              table: { cols: 1, rows: 4.5 },
+            };
+          } else {
+            this.cardLayout = {
+              columns: 4,
+              rowHeight: '250px',
+              miniCard,
+              calendar: { cols: 4, rows: 4 },
+              chart: { cols: 2, rows: 2 },
+              table: { cols: 4, rows: 4 },
+            };
+          }
+        });
     });
     const extras = this.router.getCurrentNavigation()?.extras.state;
     if (extras?.date) {
@@ -198,24 +198,24 @@ export class DashComponent implements OnInit, OnDestroy {
   private static createErrorMiniCard = (title: string, message: string): IReservationSummary => ({
     title: `DASHBOARD.MINI_CARD.${ title }`,
     error: {
-      status: message
-    }
+      status: message,
+    },
   });
 
   private static completedByMonth = (
     event: CalendarEvent,
-    viewDate: Date
+    viewDate: Date,
   ): boolean => event.meta.state === States.completed && isSameMonth(event.start, viewDate);
 
   private static upcomingByMonth = (
     event: CalendarEvent,
-    viewDate: Date
+    viewDate: Date,
   ): boolean => isSameMonth(event.start, viewDate) && event.meta.state
     && [States.created, States.approved, States.partiallyPaid, States.paid].includes(event.meta.state);
 
   private static transactionByMonth = (
     event: CalendarEvent,
-    viewDate: Date
+    viewDate: Date,
   ): boolean => event.meta.state === 'TRANSACTION' && isSameMonth(event.start, viewDate);
 
   ngOnInit(): void {
@@ -349,10 +349,10 @@ export class DashComponent implements OnInit, OnDestroy {
 
   private clean = (): void => {
     this.store.dispatch(
-      new fromActionsReservation.Clean()
+      new fromActionsReservation.Clean(),
     );
     this.store.dispatch(
-      new fromActionsDashboard.Clean()
+      new fromActionsDashboard.Clean(),
     );
   };
 
@@ -468,7 +468,7 @@ export class DashComponent implements OnInit, OnDestroy {
     this.getEvents();
     this.isLoading = true;
     this.store.dispatch(
-      new fromActionsDashboard.GetCards(this.viewDate)
+      new fromActionsDashboard.GetCards(this.viewDate),
     );
   };
 
@@ -476,7 +476,7 @@ export class DashComponent implements OnInit, OnDestroy {
     this.calendar.resetEvents();
     this.isCalendarLoading = true;
     this.store.dispatch(
-      new fromActionsDashboard.GetEvents(this.viewDate)
+      new fromActionsDashboard.GetEvents(this.viewDate),
     );
   };
 

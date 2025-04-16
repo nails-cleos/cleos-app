@@ -9,7 +9,7 @@ import * as fromActionsTreatment from '../../store/treatment.actions';
 import {
   DragDropSortingComponent,
   ISorted,
-  ItemSorting
+  ItemSorting,
 } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
 import { SharedModule } from '../../shared/shared.module';
 
@@ -17,7 +17,7 @@ import { SharedModule } from '../../shared/shared.module';
   selector: 'app-treatment-sorting',
   templateUrl: './treatment-sorting.component.html',
   styleUrls: ['./treatment-sorting.component.scss'],
-  imports: [SharedModule, DragDropSortingComponent]
+  imports: [SharedModule, DragDropSortingComponent],
 })
 export class TreatmentSortingComponent implements OnInit, OnDestroy {
 
@@ -44,7 +44,7 @@ export class TreatmentSortingComponent implements OnInit, OnDestroy {
   sorted = (sorted: ISorted[]): void => {
     this.items = undefined;
     this.store.dispatch(
-      new fromActionsTreatment.TreatmentUpdateSort(sorted)
+      new fromActionsTreatment.TreatmentUpdateSort(sorted),
     );
   };
 
@@ -54,7 +54,7 @@ export class TreatmentSortingComponent implements OnInit, OnDestroy {
     if (!this.items) {
       const id = this.route.snapshot.paramMap.get('id');
       this.store.dispatch(
-        new fromActionsTreatment.TreatmentFind({ id, path: 'sorting' })
+        new fromActionsTreatment.TreatmentFind({ id, path: 'sorting' }),
       );
     }
   };

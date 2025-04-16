@@ -14,7 +14,7 @@ export const errorInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn)
   const store = inject(Store<AppState>);
   return next(req).pipe(retry({
     count: 3,
-    delay: genericRetryStrategy({})
+    delay: genericRetryStrategy({}),
   }), catchError(err => {
     if ([0].indexOf(err.status) !== -1) {
       const message = err?.error?.message || err.statusText;
@@ -27,7 +27,7 @@ export const errorInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn)
             store.dispatch(new fromActionsLogin.ReLogin());
           }
           return throwError(err);
-        })
+        }),
       );
     }
 

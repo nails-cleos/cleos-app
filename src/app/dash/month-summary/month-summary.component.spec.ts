@@ -8,9 +8,9 @@ describe('MonthSummaryComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [MonthSummaryComponent]
-})
-    .compileComponents();
+      imports: [MonthSummaryComponent],
+    })
+      .compileComponents();
 
     fixture = TestBed.createComponent(MonthSummaryComponent);
     component = fixture.componentInstance;

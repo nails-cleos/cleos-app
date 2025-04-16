@@ -27,21 +27,21 @@ import { Observable } from 'rxjs';
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('account')
+        useClass: TranslateLoaderFactory.forModule('account'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
-    EffectsModule.forFeature([AccountEffects, PaymentEffects])
+    EffectsModule.forFeature([AccountEffects, PaymentEffects]),
   ],
   providers: [
     AccountService,
-    PaymentService
-  ]
+    PaymentService,
+  ],
 })
 export class AccountModule {
 

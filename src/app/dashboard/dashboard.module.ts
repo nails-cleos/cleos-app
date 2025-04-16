@@ -28,16 +28,16 @@ import { Observable } from 'rxjs';
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('dashboard')
+        useClass: TranslateLoaderFactory.forModule('dashboard'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
-    EffectsModule.forFeature([DashboardEffects, ReservationEffects])
+    EffectsModule.forFeature([DashboardEffects, ReservationEffects]),
   ],
   providers: [
     DashboardService,
@@ -48,8 +48,8 @@ import { Observable } from 'rxjs';
     UserService,
     AdditionalService,
     TrackingService,
-    ColorService
-  ]
+    ColorService,
+  ],
 })
 export class DashboardModule {
   constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {

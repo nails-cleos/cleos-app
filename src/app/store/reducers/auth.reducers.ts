@@ -26,7 +26,7 @@ export const initialState: State = {
   error: null,
   message: null,
   subErrors: null,
-  queryParams: {}
+  queryParams: {},
 };
 
 export const reducer = (state = initialState, action: All): State => {
@@ -39,7 +39,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
         subErrors: null,
         isLoading: true,
-        redirect: false
+        redirect: false,
       };
     }
     case AuthActionTypes.loginFailure:
@@ -51,7 +51,7 @@ export const reducer = (state = initialState, action: All): State => {
         error: action.payload.error,
         message: null,
         subErrors: action.payload.error.subErrors,
-        redirect: false
+        redirect: false,
       };
     }
     case AuthActionTypes.loginSuccess: {
@@ -66,20 +66,20 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
         subErrors: null,
         queryParams: action.payload.queryParams,
-        redirect: false
+        redirect: false,
       };
     }
     case AuthActionTypes.refreshToken: {
       return {
         ...state,
         token: action.payload.refreshToken,
-        redirect: false
+        redirect: false,
       };
     }
     case AuthActionTypes.redirect: {
       return {
         ...state,
-        redirect: true
+        redirect: true,
       };
     }
     case AuthActionTypes.signupSuccess: {
@@ -90,7 +90,7 @@ export const reducer = (state = initialState, action: All): State => {
         errorMessage: null,
         message: action.payload.message,
         subErrors: null,
-        redirect: false
+        redirect: false,
       };
     }
     case AuthActionTypes.clean: {
@@ -101,7 +101,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
         subErrors: null,
         queryParams: null,
-        redirect: false
+        redirect: false,
       };
     }
     case AuthActionTypes.reLogin:

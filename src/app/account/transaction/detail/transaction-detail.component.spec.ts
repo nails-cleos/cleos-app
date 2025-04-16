@@ -8,9 +8,9 @@ describe('TransactionDetailComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [TransactionDetailComponent]
-})
-    .compileComponents();
+      imports: [TransactionDetailComponent],
+    })
+      .compileComponents();
 
     fixture = TestBed.createComponent(TransactionDetailComponent);
     component = fixture.componentInstance;
