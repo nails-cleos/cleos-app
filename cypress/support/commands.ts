@@ -58,8 +58,8 @@ Cypress.Commands.add('randomUUID', () => cy.wrap('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxx
 })));
 
 Cypress.Commands.add('logout', () => {
-  cy.get('button[name="settings"]').click({ force: true });
-  cy.get('mat-list-item').contains('Sign out').click({ force: true });
+  cy.get('button[name="settings"]').click();
+  cy.get('mat-list-item').contains('Sign out').click();
   cy.url().should('include', 'home');
 });
 
@@ -94,10 +94,10 @@ Cypress.Commands.add('checkMatList', (title?: string, icon?: string, ...details:
 
 Cypress.Commands.add('openMenu', (breakpoint: string, menus: string[]) => {
   if (['XSmall', 'Small', 'Medium'].includes(breakpoint)) {
-    cy.get('button[name="cleosMenu"]').click({ force: true });
+    cy.get('button[name="cleosMenu"]').click();
   }
   menus.forEach(menu => {
-    cy.get('mat-list-item').contains(menu).click({ force: true });
+    cy.get('mat-list-item').contains(menu).click();
   });
 });
 
