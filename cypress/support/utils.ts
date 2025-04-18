@@ -38,13 +38,18 @@ export const breakpointToDays = (page: Page, breakpoint: Breakpoint): number => 
 
 export const zeroPad = (n: number) => n.toString().padStart(2, '0');
 
-export const breakpointToButtons = (breakpoint: Breakpoint, others: string[] = []): string[] => {
+export const breakpointToButtons = (
+  breakpoint: Breakpoint,
+  smallButtons: string[],
+  additionalLargeButtons: string[] = [],
+  others: string[] = []
+): string[] => {
   const config: Record<Breakpoint, string[]> & { default: string[] } = {
-    [Breakpoints.XSmall]: ['analytics', 'today', 'delete'],
-    [Breakpoints.Small]: ['analytics', 'today', 'delete'],
-    [Breakpoints.Medium]: ['analytics', 'today', 'account_circle', 'delete'],
-    [Breakpoints.Large]: ['analytics', 'today', 'account_circle', 'delete'],
-    [Breakpoints.XLarge]: ['analytics', 'today', 'account_circle', 'delete'],
+    [Breakpoints.XSmall]: smallButtons,
+    [Breakpoints.Small]: smallButtons,
+    [Breakpoints.Medium]: [...smallButtons, ...additionalLargeButtons],
+    [Breakpoints.Large]: [...smallButtons, ...additionalLargeButtons],
+    [Breakpoints.XLarge]: [...smallButtons, ...additionalLargeButtons],
     default: []
   };
 

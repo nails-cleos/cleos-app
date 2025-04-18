@@ -18,6 +18,12 @@ devices.forEach(({ name, width, height, breakpoints }) => {
     const minute = 30;
     const minuteFormat = zeroPad(minute);
     const reservationTime = `${ hourFormat }:${ minuteFormat }`;
+
+    const reservationDate = new Date();
+    reservationDate.setMonth(reservationDate.getMonth() + 1);
+    reservationDate.setDate(15);
+    // Next Wednesday
+    reservationDate.setDate(reservationDate.getDate() + ((10 - reservationDate.getDay()) % 7 || 7));
     beforeEach(() => {
       cy.mockAuthentication(email, 'ROLE_ADMIN');
       cy.visit('en-GB/reservation');
@@ -25,7 +31,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockNotifications();
       cy.mockCustomersData(customerId, treatmentId);
       cy.mockRoomData(customerId);
-      cy.mockTreatments(customerId, roomId, groupId);
+      cy.mockSearch(customerId, roomId, groupId, professionalId, reservationDate, days);
     });
 
     it('should create a reservation', () => {
@@ -41,22 +47,15 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.get('button[name="toStepTwo"]').click({ force: true });
 
       cy.wait('@getRooms').its('response.statusCode').should('eq', 200);
-      cy.wait('@getTreatments').its('response.statusCode').should('eq', 200);
+      cy.wait('@getTreatmentSearch').its('response.statusCode').should('eq', 200);
 
       // Select treatment and date time
-      const reservationDate = new Date();
-      reservationDate.setMonth(reservationDate.getMonth() + 1);
-      reservationDate.setDate(15);
-      // Next Wednesday
-      reservationDate.setDate(reservationDate.getDate() + ((10 - reservationDate.getDay()) % 7 || 7));
-
-      cy.mockSearch(roomId, professionalId, reservationDate, days);
-
       const formattedDate = reservationDate.toLocaleDateString('en-GB');
 
       cy.get('input[formControlName="date"]').click({ force: true });
       cy.get('.mat-calendar-next-button').click({ force: true });
 
+      cy.wait(50);
       cy.get(`button[aria-label="${ formattedDate }"]`).click({ force: true });
 
       cy.get('input[formControlName="start"]').click({ force: true });

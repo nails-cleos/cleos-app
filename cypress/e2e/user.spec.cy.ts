@@ -32,13 +32,9 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         cy.get('mat-card-title').contains('Add user');
         cy.selectOption('select-role', role);
 
-        cy.get('input[formControlName="email"]').should('be.visible');
-        cy.get('input[formControlName="email"]').type(`${ role }@email.com`);
-
+        cy.formControlType('email', `${ role }@email.com`);
         cy.selectOption('select-lang', 'English');
-
-        cy.get('input[formControlName="displayName"]').should('be.visible');
-        cy.get('input[formControlName="displayName"]').type(`${ role } Name`);
+        cy.formControlType('displayName', `${ role } Name`);
 
         cy.get('#phone').should('be.visible');
         cy.get('#phone').type('+310625250787');
@@ -71,7 +67,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           }
         });
 
-        cy.url().should('include', '/users');
+        cy.url().should('include', '/users/add');
       });
 
       it(`should edit a ${ role }`, () => {
@@ -84,7 +80,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           cy.mockUser(user.id, user);
 
           cy.buttonClickOnTable(breakpoints, user.displayName, 'user-row', 'user-detail-row.user-expanded-row', 'edit',
-            breakpointToButtons(breakpoints, value.otherButtons));
+            breakpointToButtons(breakpoints, ['analytics', 'today', 'delete'], ['account_circle'], value.otherButtons));
           cy.wait('@getUser');
 
           cy.get('mat-card-title').contains('Update user');
@@ -101,14 +97,17 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           }
 
           const phone = '+31 6 25251524';
-          cy.get('input[formControlName="email"]').clear().type(`${ role }@email.com`);
+          cy.formControlType('email', `${ role }@email.com`);
           cy.selectOption('select-lang', 'Spanish');
-          cy.get('input[formControlName="displayName"]').clear().type(`${ role } Name`);
+          cy.formControlType('displayName', `${ role } Name`);
           cy.get('#phone').find('input').clear().type(phone);
           cy.get('input[formControlName="dob"]').clear().click({ force: true });
           cy.get('td[data-mat-row="1"][data-mat-col="1"]').find('button').click({ force: true });
+          cy.wait(50);
           cy.get('td[data-mat-row="1"][data-mat-col="1"]').find('button').click({ force: true });
+          cy.wait(50);
           cy.get('td[data-mat-row="1"][data-mat-col="1"]').find('button').click({ force: true });
+          cy.wait(50);
 
           cy.get('button[type="submit"]').click({ force: true });
 
