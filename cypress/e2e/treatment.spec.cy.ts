@@ -69,8 +69,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           expect(body.treatments[index].primary).to.eq(index === 0);
           expect(body.treatments[index].name).to.eq(treatment.name);
           expect(body.treatments[index].description).to.eq(`${ treatment.name } Description`);
-          expect(body.treatments[index].time).to
-            .eq(`${ zeroPad(Number(treatment.hour)) }:${ zeroPad(treatment.minute) }`);
+          expect(body.treatments[index].time).to.eq(`${ zeroPad(treatment.hour) }:${ zeroPad(treatment.minute) }`);
           expect(body.treatments[index].order).to.eq(index);
         });
       });
