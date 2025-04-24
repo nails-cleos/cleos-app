@@ -36,8 +36,6 @@ export const breakpointToDays = (page: Page, breakpoint: Breakpoint): number => 
   return config[page][breakpoint] ?? config[page].default;
 };
 
-export const zeroPad = (n: number) => n.toString().padStart(2, '0');
-
 export const breakpointToButtons = (
   breakpoint: Breakpoint,
   smallButtons: string[],
@@ -55,4 +53,12 @@ export const breakpointToButtons = (
 
   const combined = [...config[breakpoint] ?? config.default, ...others];
   return Array.from(new Set(combined));
+};
+
+export const zeroPad = (n: number | string) => String(n).padStart(2, '0');
+
+export const convertSecondsToTime = (seconds: number) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  return `${ zeroPad(hours) }:${ zeroPad(minutes) }`;
 };

@@ -59,9 +59,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.get(`button[aria-label="${ formattedDate }"]`).click({ force: true });
 
       cy.get('input[formControlName="start"]').click({ force: true });
-      cy.get('ngx-material-timepicker-content').contains(hourFormat).click({ force: true });
-      cy.get('ngx-material-timepicker-content').contains(minuteFormat).click({ force: true });
-      cy.get('.timepicker-button').contains('Ok').click({ force: true });
+      cy.setTime(hourFormat, minuteFormat);
 
       cy.get('input[formControlName="date"]').should('have.value', formattedDate);
       cy.get('input[formControlName="start"]').should('have.value', reservationTime);

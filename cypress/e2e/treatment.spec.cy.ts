@@ -1,5 +1,5 @@
 import '../support/commands';
-import { breakpointToButtons, devices, zeroPad } from '../support/utils';
+import { breakpointToButtons, convertSecondsToTime, devices, zeroPad } from '../support/utils';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   describe(`Treatments with ${ name }`, () => {
@@ -38,7 +38,10 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.formControlType('description', `${ treatmentGroupName } Description`, 'textarea');
       cy.formControlType('priceFrom', priceFrom);
 
-      // TODO: select colors
+      cy.get('mat-form-field mat-chip-grid').find('input').type('Demure');
+      cy.get('div.mat-mdc-autocomplete-panel mat-option').should('have.length.greaterThan', 0);
+      cy.get('div.mat-mdc-autocomplete-panel mat-option').contains('Demure').click();
+      cy.get('mat-chip-grid').find('mat-chip-row').should('contain', 'Demure');
 
       treatments.forEach((treatment) => {
         cy.get('#add-treatment').should('be.visible');
@@ -51,13 +54,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           .type(`${ treatment.name } Description`);
 
         cy.get('mat-tab-body[aria-hidden="false"]').find('#treatment-duration').click({ force: true });
-        cy.get('ngx-material-timepicker-content', { timeout: 5000 }).should('exist').contains(treatment.hour).click();
-
-        cy.get('ngx-material-timepicker-content')
-          .contains(zeroPad(treatment.minute))
-          .click();
-
-        cy.get('.timepicker-button').contains('Ok').click({ force: true });
+        cy.setTime(treatment.hour, treatment.minute);
       });
 
       cy.get('button[type="submit"]').click({ force: true });
@@ -67,6 +64,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         expect(body.name).to.eq(treatmentGroupName);
         expect(body.description).to.eq(`${ treatmentGroupName } Description`);
         expect(body.priceFrom).to.eq(priceFrom);
+        expect(body.colorIds).to.have.deep.members(['03336843-10cd-4139-888f-77c9499fde6b']);
         treatments.forEach((treatment, index) => {
           expect(body.treatments[index].primary).to.eq(index === 0);
           expect(body.treatments[index].name).to.eq(treatment.name);
@@ -133,14 +131,13 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           hour: '1',
           minute: 0
         };
-        // TODO fix
         const newTreatmentExpected = {
-          primary: false,
           name: newTreatment.name,
+          primary: false,
           description: `${ newTreatment.name } Description`,
-          time: `${ zeroPad(Number(newTreatment.hour)) }:${ zeroPad(newTreatment.minute) }`,
           errors: {},
-          order: treatment.treatments.length
+          time: `${ zeroPad(newTreatment.hour) }:${ zeroPad(newTreatment.minute) }`,
+          order: treatment.treatments.length - 1
         };
         cy.get('#add-treatment').should('be.visible');
         cy.get('#add-treatment').clear().type(newTreatment.name);
@@ -152,14 +149,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           .type(`${ newTreatment.name } Description`);
 
         cy.get('mat-tab-body[aria-hidden="false"]').find('#treatment-duration').click({ force: true });
-        cy.get('ngx-material-timepicker-content', { timeout: 5000 }).should('exist').contains(newTreatment.hour)
-          .click();
-
-        cy.get('ngx-material-timepicker-content')
-          .contains(zeroPad(newTreatment.minute))
-          .click();
-
-        cy.get('.timepicker-button').contains('Ok').click({ force: true });
+        cy.setTime(newTreatment.hour, newTreatment.minute);
 
         cy.get('button[type="submit"]').click({ force: true });
 
@@ -173,8 +163,14 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           expect(body.colorIds).to.include.deep.members(expectedColorIds);
 
           const currentTreatment = [...treatment.treatments.filter(
-            (treatment: { name: string }) => treatment.name !== 'Biab Removal Basic '), newTreatmentExpected];
-          expect(body.treatments).to.include.deep.members(currentTreatment);
+            (treatment: { name: string }) => treatment.name !== 'Biab Removal Basic ')
+            .map((treatmentData: { order: number; duration: number; }, index: number) => ({
+              ...treatmentData,
+              order: index,
+              time: convertSecondsToTime(treatmentData.duration),
+              errors: {},
+            })), newTreatmentExpected];
+          expect(body.treatments).to.have.deep.members(currentTreatment);
         });
 
         cy.url().should('include', '/treatments');

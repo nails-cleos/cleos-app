@@ -17,6 +17,8 @@ declare namespace Cypress {
 
     formControlType(formControlName: string, value: any, type?: string): Chainable<any>;
 
+    setTime(hour: number | string, minute?: number | string): Chainable<any>;
+
     mockAuthentication(email: string, role: string): Chainable<any>;
 
     mockLogin(email: string, displayName: string, role: string): Chainable<any>;
@@ -138,6 +140,12 @@ Cypress.Commands.add('selectOption', (id: string, option: string) => {
 Cypress.Commands.add('formControlType', (formControlName: string, value: any, type: string = 'input') => {
   cy.get(`${ type }[formControlName="${ formControlName }"]`).scrollIntoView().should('be.visible');
   cy.get(`${ type }[formControlName="${ formControlName }"]`).clear().type(value);
+});
+
+Cypress.Commands.add('setTime', (hour: number | string, minute: number | string = 0) => {
+  cy.get('ngx-material-timepicker-content', { timeout: 5000 }).should('exist').contains(hour).click();
+  cy.get('ngx-material-timepicker-content').contains(minute === 0 ? '00' : minute).click();
+  cy.get('.timepicker-button').contains('Ok').click({ force: true });
 });
 
 const firebaseUser = (email: string, displayName?: string, kind?: string) => ({
