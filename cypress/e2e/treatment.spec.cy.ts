@@ -61,6 +61,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
       cy.wait('@saveTreatment').then(treatmentData => {
         const body = treatmentData.request.body;
+        cy.log(JSON.stringify(body));
         expect(body.name).to.eq(treatmentGroupName);
         expect(body.description).to.eq(`${ treatmentGroupName } Description`);
         expect(body.priceFrom).to.eq(priceFrom);
