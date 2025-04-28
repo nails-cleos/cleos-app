@@ -29,8 +29,8 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       const priceFrom = 10.00;
       const treatments = [
         { name: 'Treatment 1', hour: '1', minute: 30 },
-        { name: 'Treatment 2', hour: '2', minute: 15 },
-        { name: 'Treatment 3', hour: '00', minute: 45 },
+        { name: 'Treatment 2', hour: '2', minute: 45 },
+        { name: 'Treatment 3', hour: '00', minute: 15 },
         { name: 'Treatment 4', hour: '3', minute: 0 }
       ];
 
@@ -61,7 +61,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
       cy.wait('@saveTreatment').then(treatmentData => {
         const body = treatmentData.request.body;
-        cy.log(JSON.stringify(body));
         expect(body.name).to.eq(treatmentGroupName);
         expect(body.description).to.eq(`${ treatmentGroupName } Description`);
         expect(body.priceFrom).to.eq(priceFrom);
