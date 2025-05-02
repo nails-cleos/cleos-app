@@ -148,6 +148,7 @@ Cypress.Commands.add('setTime', (hour: number | string, minute: number | string 
   cy.get('ngx-material-timepicker-content').contains(minute === 0 ? '00' : minute).click();
   cy.wait(50);
   cy.get('.timepicker-button').contains('Ok').click({ force: true });
+  cy.wait(50);
 });
 
 const firebaseUser = (email: string, displayName?: string, kind?: string) => ({
