@@ -143,10 +143,8 @@ Cypress.Commands.add('formControlType', (formControlName: string, value: any, ty
 });
 
 Cypress.Commands.add('setTime', (hour: number | string, minute: number | string = 0) => {
-  cy.get('ngx-material-timepicker-content', { timeout: 5000 }).should('exist').contains(hour).click();
-  cy.wait(50);
-  cy.get('ngx-material-timepicker-content').contains(minute === 0 ? '00' : minute).click();
-  cy.wait(50);
+  cy.get('ngx-material-timepicker-content', { timeout: 5000 }).should('exist').contains(hour).click({ force: true });
+  cy.get('ngx-material-timepicker-content').contains(minute === 0 ? '00' : minute).click({ force: true });
   cy.get('.timepicker-button').contains('Ok').click({ force: true });
   cy.wait(50);
 });
