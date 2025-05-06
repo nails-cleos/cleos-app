@@ -4,7 +4,7 @@
     <div class="row-column-space-evenly-center">
       <mat-form-field appearance="outline">
         <mat-label>{{ 'RESERVATION.STATE.SEARCH' | translate }}</mat-label>
-        <mat-chip-grid #chipList aria-label="Fruit selection">
+        <mat-chip-grid #chipList aria-label="Status selection">
           @for (state of states; track state) {
             <mat-chip-row (removed)="remove(state)" [removable]="true" color="primary">
               {{ 'COMMON.STATUS.RESERVATION.' + state.toUpperCase() | translate }}

@@ -15,6 +15,10 @@ declare namespace Cypress {
 
     selectOption(id: string, option: string): Chainable<any>;
 
+    formControlType(formControlName: string, value: any, type?: string): Chainable<any>;
+
+    setTime(hour: number | string, minute?: number | string): Chainable<any>;
+
     mockAuthentication(email: string, role: string): Chainable<any>;
 
     mockLogin(email: string, displayName: string, role: string): Chainable<any>;
@@ -39,9 +43,8 @@ declare namespace Cypress {
 
     mockRoomData(customerId: string): Chainable<any>;
 
-    mockTreatments(customerId: string, roomId: string, groupId: string): Chainable<any>;
-
-    mockSearch(roomId: string, professionalId: string, date: Date, days: number): Chainable<any>;
+    mockSearch(customerId: string, roomId: string, groupId: string, professionalId: string, date: Date,
+               days: number): Chainable<any>;
 
     mockCreateReservation(reservationId: string, customerId: string, date: Date, professionalId: string,
                           roomId: string, treatmentId: string, additionalList?: string[]): Chainable<any>;
@@ -49,6 +52,12 @@ declare namespace Cypress {
     mockUsers(total?: number, displayName?: string): Chainable<any>;
 
     mockUser(id: string, selectedUser?: any): Chainable<any>;
+
+    mockTreatments(total?: number, id?: string): Chainable<any>;
+
+    mockTreatment(id: string, selectedTreatment?: any): Chainable<any>;
+
+    mockColors(page: boolean, total?: number, id?: string): Chainable<any>;
   }
 }
 
@@ -96,8 +105,12 @@ Cypress.Commands.add('openMenu', (breakpoint: string, menus: string[]) => {
   if (['XSmall', 'Small', 'Medium'].includes(breakpoint)) {
     cy.get('button[name="cleosMenu"]').click();
   }
-  menus.forEach(menu => {
-    cy.get('mat-list-item').contains(menu).click();
+  menus.forEach((menu, index) => {
+    if (index === 0) {
+      cy.get('mat-list-item').contains(menu).click();
+    } else {
+      cy.get('mat-list-item.sub-menu').contains(menu).click();
+    }
   });
 });
 
@@ -122,6 +135,18 @@ Cypress.Commands.add('selectOption', (id: string, option: string) => {
 
   cy.get('mat-option').should('exist').and('be.visible');
   cy.get('mat-option').contains(option).click({ force: true });
+});
+
+Cypress.Commands.add('formControlType', (formControlName: string, value: any, type: string = 'input') => {
+  cy.get(`${ type }[formControlName="${ formControlName }"]`).scrollIntoView().should('be.visible');
+  cy.get(`${ type }[formControlName="${ formControlName }"]`).clear().type(value);
+});
+
+Cypress.Commands.add('setTime', (hour: number | string, minute: number | string = 0) => {
+  cy.get('ngx-material-timepicker-content', { timeout: 5000 }).should('exist').contains(hour).click({ force: true });
+  cy.get('ngx-material-timepicker-content').contains(minute === 0 ? '00' : minute).click({ force: true });
+  cy.get('.timepicker-button').contains('Ok').click({ force: true });
+  cy.wait(50);
 });
 
 const firebaseUser = (email: string, displayName?: string, kind?: string) => ({
@@ -410,7 +435,7 @@ Cypress.Commands.add('mockCustomersData', (customerId: string, treatmentId: stri
     ).as('getCustomers');
   });
 
-  cy.fixture('treatments').then((treatments) => {
+  cy.fixture('treatmentGroups').then((treatments) => {
     const treatment = treatments.find((treatment: { id: string; }) => treatment.id === treatmentId);
     cy.intercept(
       'GET',
@@ -452,8 +477,10 @@ Cypress.Commands.add('mockRoomData', (customerId: string) => {
   });
 });
 
-Cypress.Commands.add('mockTreatments', (customerId: string, roomId: string, groupId: string) => {
-  cy.fixture('treatments').then((treatments) => {
+Cypress.Commands.add('mockSearch', (
+  customerId: string, roomId: string, groupId: string, professionalId: string, date: Date, days: number
+) => {
+  cy.fixture('treatmentSearch').then((treatments) => {
     cy.intercept(
       'GET',
       `**/api/v1/treatments?roomId=${ roomId }&customerId=${ customerId }`,
@@ -464,7 +491,7 @@ Cypress.Commands.add('mockTreatments', (customerId: string, roomId: string, grou
           treatments: treatments
         }
       }
-    ).as('getTreatments');
+    ).as('getTreatmentSearch');
   });
 
   cy.fixture('additional').then((additionalList) => {
@@ -477,13 +504,11 @@ Cypress.Commands.add('mockTreatments', (customerId: string, roomId: string, grou
       }
     ).as('getAdditional');
   });
-});
 
-Cypress.Commands.add('mockSearch', (roomId: string, professionalId: string, date: Date, days: number) => {
   const dateFormatted = date.toISOString().slice(0, 10);
   cy.fixture('rooms').then((roomData) => {
     cy.fixture('users').then((usersData) => {
-      cy.fixture('treatments').then((treatmentData) => {
+      cy.fixture('treatmentSearch').then((treatmentData) => {
         cy.fixture('additional').then((additionalData) => {
           const room = roomData.find((room: { id: string; }) => room.id === roomId);
           const professional = usersData.find((user: { id: string; }) => user.id === professionalId);
@@ -579,7 +604,7 @@ Cypress.Commands.add('mockCreateReservation', (
 ) => {
   cy.fixture('users').then((usersData) => {
     cy.fixture('rooms').then((roomData) => {
-      cy.fixture('treatments').then((treatmentData) => {
+      cy.fixture('treatmentSearch').then((treatmentData) => {
         cy.fixture('additional').then((additionalData) => {
           cy.intercept(
             'POST',
@@ -673,5 +698,67 @@ Cypress.Commands.add('mockUser', (id: string, selectedUser?: any) => {
         body: selectedUser ?? userData.find((u: any) => u.id === id)
       }
     ).as('getUser');
+  });
+});
+
+Cypress.Commands.add('mockTreatments', (total?: number, id?: string) => {
+  cy.fixture('treatmentGroups').then((treatmentGroupData) => {
+    cy.intercept(
+      'GET',
+      new RegExp('/api/v1/treatments/pages\\?page=0&size=\\d+&sort=order&direction=asc'),
+      {
+        statusCode: 200,
+        body: {
+          content: treatmentGroupData.slice(0, total ?? treatmentGroupData.length),
+          totalElements: total ?? treatmentGroupData.length
+        }
+      }
+    ).as('getTreatments');
+
+    if (id) {
+      cy.fixture('treatments').then((treatmentData) => {
+        const treatment = treatmentData.find((t: any) => t.id === id);
+        expect(treatment).to.exist;
+        cy.wrap(treatment).as('selectedTreatment');
+      });
+    }
+  });
+});
+
+Cypress.Commands.add('mockTreatment', (id: string, selectedTreatment?: any) => {
+  cy.fixture('treatments').then((treatmentData) => {
+    cy.intercept(
+      'GET',
+      `**/api/v1/treatments/${ selectedTreatment?.id ?? id }`,
+      {
+        statusCode: 200,
+        body: selectedTreatment ?? treatmentData.find((t: any) => t.id === id)
+      }
+    ).as('getTreatment');
+  });
+});
+
+Cypress.Commands.add('mockColors', (page: boolean, total?: number, id?: string) => {
+  cy.fixture('colors').then((colorData) => {
+    const url = new RegExp(page ? '/api/v1/colors/pages\\?page=0&size=\\d+&sort=name&direction=asc' : '/api/v1/colors');
+    const content = colorData.slice(0, total ?? colorData.length);
+    const body = page ? {
+      content: content,
+      totalElements: total ?? colorData.length
+    } : content;
+    cy.intercept(
+      'GET',
+      url,
+      {
+        statusCode: 200,
+        body: body
+      }
+    ).as('getColors');
+
+    if (id) {
+      const color = colorData.find((c: any) => c.id === id);
+      expect(color).to.exist;
+      cy.wrap(color).as('selectedColor');
+    }
   });
 });
