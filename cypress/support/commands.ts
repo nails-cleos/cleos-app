@@ -15,6 +15,8 @@ declare namespace Cypress {
 
     selectOption(id: string, option: string): Chainable<any>;
 
+    selectChip(chipName: string): Chainable<any>;
+
     formControlType(formControlName: string, value: any, type?: string): Chainable<any>;
 
     setTime(hour: number | string, minute?: number | string): Chainable<any>;
@@ -53,9 +55,13 @@ declare namespace Cypress {
 
     mockUser(id: string, selectedUser?: any): Chainable<any>;
 
-    mockTreatments(total?: number, id?: string): Chainable<any>;
+    mockTreatments(page: boolean, total?: number, id?: string): Chainable<any>;
+
+    mockAdditionalList(total?: number, id?: string): Chainable<any>;
 
     mockTreatment(id: string, selectedTreatment?: any): Chainable<any>;
+
+    mockAdditional(id: string, selectedAdditional?: any): Chainable<any>;
 
     mockColors(page: boolean, total?: number, id?: string): Chainable<any>;
   }
@@ -117,11 +123,18 @@ Cypress.Commands.add('openMenu', (breakpoint: string, menus: string[]) => {
 Cypress.Commands.add('buttonClickOnTable', (breakpoint: string, column: string, rowClass: string, rowExpandedClass,
                                             button: string, otherButtons?: string[]) => {
   if (['XSmall', 'Small'].includes(breakpoint)) {
-    cy.contains(`tr.${ rowClass }`, column).click({ force: true });
-    otherButtons?.forEach(otherButton => cy.get(`tr.${ rowExpandedClass }`).should('be.visible')
-      .find('button[mat-icon-button]').contains(otherButton));
-    cy.get(`tr.${ rowExpandedClass }`).should('be.visible').find('button[mat-icon-button]').contains(button)
-      .click({ force: true });
+    cy.get(`tr.${rowClass}`).contains('td', column).then($cell => {
+      const $row = $cell.closest('tr');
+      cy.wrap($row).click({ force: true });
+
+      cy.wrap($row).next(`tr.${rowExpandedClass}`).should('be.visible').within(() => {
+        otherButtons?.forEach(otherButton => {
+          cy.get('button[mat-icon-button]').contains(otherButton).should('exist');
+        });
+
+        cy.get('button[mat-icon-button]').contains(button).click({ force: true });
+      });
+    });
   } else {
     otherButtons?.forEach(otherButton => cy.get('table').contains('tr', column)
       .find('button[mat-icon-button]').contains(otherButton));
@@ -135,6 +148,13 @@ Cypress.Commands.add('selectOption', (id: string, option: string) => {
 
   cy.get('mat-option').should('exist').and('be.visible');
   cy.get('mat-option').contains(option).click({ force: true });
+});
+
+Cypress.Commands.add('selectChip', (chipName: string) => {
+  cy.get('mat-form-field mat-chip-grid').find('input').type(chipName, { force: true });
+  cy.get('div.mat-mdc-autocomplete-panel mat-option').should('have.length.greaterThan', 0);
+  cy.get('div.mat-mdc-autocomplete-panel mat-option').contains(chipName).click();
+  cy.get('mat-chip-grid').find('mat-chip-row').should('contain', chipName);
 });
 
 Cypress.Commands.add('formControlType', (formControlName: string, value: any, type: string = 'input') => {
@@ -502,7 +522,7 @@ Cypress.Commands.add('mockSearch', (
         statusCode: 200,
         body: additionalList
       }
-    ).as('getAdditional');
+    ).as('getAdditionalSearch');
   });
 
   const dateFormatted = date.toISOString().slice(0, 10);
@@ -701,19 +721,9 @@ Cypress.Commands.add('mockUser', (id: string, selectedUser?: any) => {
   });
 });
 
-Cypress.Commands.add('mockTreatments', (total?: number, id?: string) => {
+Cypress.Commands.add('mockTreatments', (page: boolean, total?: number, id?: string) => {
   cy.fixture('treatmentGroups').then((treatmentGroupData) => {
-    cy.intercept(
-      'GET',
-      new RegExp('/api/v1/treatments/pages\\?page=0&size=\\d+&sort=order&direction=asc'),
-      {
-        statusCode: 200,
-        body: {
-          content: treatmentGroupData.slice(0, total ?? treatmentGroupData.length),
-          totalElements: total ?? treatmentGroupData.length
-        }
-      }
-    ).as('getTreatments');
+    mockPage('getTreatments', page, 'order', 'asc', 'treatments/pages', 'treatments/groups', treatmentGroupData, total);
 
     if (id) {
       cy.fixture('treatments').then((treatmentData) => {
@@ -721,6 +731,28 @@ Cypress.Commands.add('mockTreatments', (total?: number, id?: string) => {
         expect(treatment).to.exist;
         cy.wrap(treatment).as('selectedTreatment');
       });
+    }
+  });
+});
+
+Cypress.Commands.add('mockAdditionalList', (total?: number, id?: string) => {
+  cy.fixture('additional').then((additionalData) => {
+    cy.intercept(
+      'GET',
+      new RegExp('/api/v1/additional/pages\\?page=0&size=\\d+&sort=order&direction=asc'),
+      {
+        statusCode: 200,
+        body: {
+          content: additionalData.slice(0, total ?? additionalData.length),
+          totalElements: total ?? additionalData.length
+        }
+      }
+    ).as('getAdditionalList');
+
+    if (id) {
+      const additional = additionalData.find((t: any) => t.id === id);
+      expect(additional).to.exist;
+      cy.wrap(additional).as('selectedAdditional');
     }
   });
 });
@@ -738,23 +770,22 @@ Cypress.Commands.add('mockTreatment', (id: string, selectedTreatment?: any) => {
   });
 });
 
-Cypress.Commands.add('mockColors', (page: boolean, total?: number, id?: string) => {
-  cy.fixture('colors').then((colorData) => {
-    const url = new RegExp(page ? '/api/v1/colors/pages\\?page=0&size=\\d+&sort=name&direction=asc' : '/api/v1/colors');
-    const content = colorData.slice(0, total ?? colorData.length);
-    const body = page ? {
-      content: content,
-      totalElements: total ?? colorData.length
-    } : content;
+Cypress.Commands.add('mockAdditional', (id: string, selectedAdditional?: any) => {
+  return cy.fixture('additional').then((additionalData) => {
     cy.intercept(
       'GET',
-      url,
+      `**/api/v1/additional/${ selectedAdditional?.id ?? id }`,
       {
         statusCode: 200,
-        body: body
+        body: selectedAdditional ?? additionalData.find((t: any) => t.id === id)
       }
-    ).as('getColors');
+    ).as('getAdditional');
+  });
+});
 
+Cypress.Commands.add('mockColors', (page: boolean, total?: number, id?: string) => {
+  cy.fixture('colors').then((colorData) => {
+    mockPage('getColors', page, 'name', 'asc', 'colors/pages', 'colors', colorData, total);
     if (id) {
       const color = colorData.find((c: any) => c.id === id);
       expect(color).to.exist;
@@ -762,3 +793,28 @@ Cypress.Commands.add('mockColors', (page: boolean, total?: number, id?: string) 
     }
   });
 });
+
+const mockPage = (
+  alias: string,
+  page: boolean,
+  sort: string,
+  direction: string,
+  pageUrl: string,
+  baseUrl: string,
+  data: any,
+  total?: number
+) => {
+  const url = new RegExp(
+    page ? `/api/v1/${ pageUrl }\\?page=0&size=\\d+&sort=${ sort }&direction=${ direction }` : `/api/v1/${ baseUrl }`);
+  const content = data.slice(0, total ?? data.length);
+  const body = page ? {
+    content: content,
+    totalElements: content.length
+  } : content;
+  cy.intercept('GET', url,
+    {
+      statusCode: 200,
+      body: body
+    }
+  ).as(alias);
+};

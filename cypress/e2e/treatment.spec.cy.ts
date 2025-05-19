@@ -16,12 +16,13 @@ devices.forEach(({ name, width, height, breakpoints }) => {
     });
 
     it(`should create a new treatment`, () => {
-      cy.mockTreatments(0);
+      cy.mockTreatments(true, 0);
       cy.intercept('POST', '**/api/v1/treatments', (req) => req.alias = 'saveTreatment');
       cy.openMenu(breakpoints, ['Treatments', 'Treatments']);
       cy.wait('@getTreatments');
       cy.get('tr').contains('No treatments');
       cy.get('button[id="add-button"]').click({ force: true });
+      cy.url().should('include', '/treatments/add');
       cy.wait('@getColors');
       cy.get('mat-card-title').contains('Add treatment');
 
@@ -38,10 +39,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.formControlType('description', `${ treatmentGroupName } Description`, 'textarea');
       cy.formControlType('priceFrom', priceFrom);
 
-      cy.get('mat-form-field mat-chip-grid').find('input').type('Demure');
-      cy.get('div.mat-mdc-autocomplete-panel mat-option').should('have.length.greaterThan', 0);
-      cy.get('div.mat-mdc-autocomplete-panel mat-option').contains('Demure').click();
-      cy.get('mat-chip-grid').find('mat-chip-row').should('contain', 'Demure');
+      cy.selectChip('Demure');
 
       treatments.forEach((treatment) => {
         cy.get('#add-treatment').should('be.visible');
@@ -72,18 +70,17 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           expect(body.treatments[index].time).to.eq(`${ zeroPad(treatment.hour) }:${ zeroPad(treatment.minute) }`);
           expect(body.treatments[index].order).to.eq(index);
         });
-      });
 
-      cy.url().should('include', '/treatments/add');
+        cy.url().should('include', '/treatments');
+      });
     });
 
     it(`should edit a treatment`, () => {
-      cy.mockTreatments(undefined, '9c44aaf0-82c0-4e09-a8f9-bcc915d23ed3');
+      cy.mockTreatments(true, undefined, '9c44aaf0-82c0-4e09-a8f9-bcc915d23ed3');
       cy.openMenu(breakpoints, ['Treatments', 'Treatments']);
       cy.wait('@getTreatments');
 
       cy.get('@selectedTreatment').then((treatment: any) => {
-        cy.log(treatment.id);
         cy.mockTreatment(treatment.id, treatment);
         cy.intercept('PATCH', `**/api/v1/treatments/${ treatment.id }`, (req) => req.alias = 'updateTreatment');
 
