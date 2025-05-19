@@ -7,7 +7,7 @@ const Breakpoints = {
 } as const;
 
 export const devices = [
-  { name: 'iPhone 16 Pro', width: 393, height: 852, breakpoints: Breakpoints.XSmall },
+  { name: 'iPhone 16 Pro', width: 393, height: 828, breakpoints: Breakpoints.XSmall },
   { name: 'iPad Air 11', width: 820, height: 1180, breakpoints: Breakpoints.Medium },
   { name: 'MacBook Pro 16', width: 1536, height: 960, breakpoints: Breakpoints.XLarge },
 ];

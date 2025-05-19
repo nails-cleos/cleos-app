@@ -68,7 +68,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
       cy.get('button[name="toStepFour"]').click({ force: true });
 
-      cy.wait('@getAdditional').its('response.statusCode').should('eq', 200);
+      cy.wait('@getAdditionalSearch').its('response.statusCode').should('eq', 200);
 
       // Select additional
       cy.get('mat-list-option').contains('Powder').click({ force: true });
