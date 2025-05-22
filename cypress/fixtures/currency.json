@@ -1,0 +1,13 @@
+[
+  {
+    "createdAt": "2023-04-11T12:35:06.023872",
+    "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "modifiedAt": "2023-04-11T12:35:06.023872",
+    "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "deleted": false,
+    "id": "e5fa4fd7-74bb-4a02-bf11-fc30ad9fb358",
+    "name": "Euro",
+    "code": "EUR",
+    "icon": "euro"
+  }
+]

@@ -59,11 +59,17 @@ declare namespace Cypress {
 
     mockAdditionalList(total?: number, id?: string): Chainable<any>;
 
+    mockColors(page: boolean, total?: number, id?: string): Chainable<any>;
+
+    mockCurrencyList(page: boolean, total?: number, id?: string): Chainable<any>;
+
     mockTreatment(id: string, selectedTreatment?: any): Chainable<any>;
 
     mockAdditional(id: string, selectedAdditional?: any): Chainable<any>;
 
-    mockColors(page: boolean, total?: number, id?: string): Chainable<any>;
+    mockColor(id: string, selectedColor?: any): Chainable<any>;
+
+    mockCurrency(id: string, selectedCurrency?: any): Chainable<any>;
   }
 }
 
@@ -123,11 +129,11 @@ Cypress.Commands.add('openMenu', (breakpoint: string, menus: string[]) => {
 Cypress.Commands.add('buttonClickOnTable', (breakpoint: string, column: string, rowClass: string, rowExpandedClass,
                                             button: string, otherButtons?: string[]) => {
   if (['XSmall', 'Small'].includes(breakpoint)) {
-    cy.get(`tr.${rowClass}`).contains('td', column).then($cell => {
+    cy.get(`tr.${ rowClass }`).contains('td', column).then($cell => {
       const $row = $cell.closest('tr');
       cy.wrap($row).click({ force: true });
 
-      cy.wrap($row).next(`tr.${rowExpandedClass}`).should('be.visible').within(() => {
+      cy.wrap($row).next(`tr.${ rowExpandedClass }`).should('be.visible').within(() => {
         otherButtons?.forEach(otherButton => {
           cy.get('button[mat-icon-button]').contains(otherButton).should('exist');
         });
@@ -757,6 +763,28 @@ Cypress.Commands.add('mockAdditionalList', (total?: number, id?: string) => {
   });
 });
 
+Cypress.Commands.add('mockColors', (page: boolean, total?: number, id?: string) => {
+  cy.fixture('colors').then((colorData) => {
+    mockPage('getColors', page, 'name', 'asc', 'colors/pages', 'colors', colorData, total);
+    if (id) {
+      const color = colorData.find((c: any) => c.id === id);
+      expect(color).to.exist;
+      cy.wrap(color).as('selectedColor');
+    }
+  });
+});
+
+Cypress.Commands.add('mockCurrencyList', (page: boolean, total?: number, id?: string) => {
+  cy.fixture('currency').then((currencyData) => {
+    mockPage('getCurrencyList', page, 'code', 'asc', 'currency/pages', 'currency', currencyData, total);
+    if (id) {
+      const currency = currencyData.find((c: any) => c.id === id);
+      expect(currency).to.exist;
+      cy.wrap(currency).as('selectedCurrency');
+    }
+  });
+});
+
 Cypress.Commands.add('mockTreatment', (id: string, selectedTreatment?: any) => {
   cy.fixture('treatments').then((treatmentData) => {
     cy.intercept(
@@ -783,14 +811,29 @@ Cypress.Commands.add('mockAdditional', (id: string, selectedAdditional?: any) =>
   });
 });
 
-Cypress.Commands.add('mockColors', (page: boolean, total?: number, id?: string) => {
+Cypress.Commands.add('mockColor', (id: string, selectedColor?: any) => {
   cy.fixture('colors').then((colorData) => {
-    mockPage('getColors', page, 'name', 'asc', 'colors/pages', 'colors', colorData, total);
-    if (id) {
-      const color = colorData.find((c: any) => c.id === id);
-      expect(color).to.exist;
-      cy.wrap(color).as('selectedColor');
-    }
+    cy.intercept(
+      'GET',
+      `**/api/v1/colors/${ selectedColor?.id ?? id }`,
+      {
+        statusCode: 200,
+        body: selectedColor ?? colorData.find((t: any) => t.id === id)
+      }
+    ).as('getColor');
+  });
+});
+
+Cypress.Commands.add('mockCurrency', (id: string, selectedCurrency?: any) => {
+  cy.fixture('currency').then((currencyData) => {
+    cy.intercept(
+      'GET',
+      `**/api/v1/currency/${ selectedCurrency?.id ?? id }`,
+      {
+        statusCode: 200,
+        body: selectedCurrency ?? currencyData.find((t: any) => t.id === id)
+      }
+    ).as('getCurrency');
   });
 });
 
