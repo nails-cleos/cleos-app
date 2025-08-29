@@ -2,7 +2,7 @@ import { Action } from '@ngrx/store';
 
 export enum MainActionTypes {
   getAllCatalogue = '[Main] Get all',
-  getAllTreatments = '[Main] Get all treatments',
+  getListTreatmentsGroup = '[Main] Get list treatments group',
   sendMessage = '[Main] Send message',
   updateUser = '[Main] Update user',
   catalogueSuccess = '[Main] Catalogue Success',
@@ -16,8 +16,8 @@ export class GetAllCatalogue implements Action {
   readonly type = MainActionTypes.getAllCatalogue;
 }
 
-export class GetAllTreatments implements Action {
-  readonly type = MainActionTypes.getAllTreatments;
+export class GetListTreatmentsGroup implements Action {
+  readonly type = MainActionTypes.getListTreatmentsGroup;
 }
 
 export class SendMessage implements Action {
@@ -68,7 +68,7 @@ export class Clean implements Action {
 
 export type All =
   | GetAllCatalogue
-  | GetAllTreatments
+  | GetListTreatmentsGroup
   | SendMessage
   | UpdateUser
   | TreatmentsSuccess

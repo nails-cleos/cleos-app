@@ -75,11 +75,11 @@ export class AdditionalComponent implements OnInit, OnDestroy {
   	}
 
   	if (this.isAddMode) {
-  		this.store.dispatch(new fromActionsAdditional.AdditionalSave(additional));
+  		this.store.dispatch(new fromActionsAdditional.CreateAdditional(additional));
   	} else {
   		additional.id = this.id;
   		this.additional = undefined;
-  		this.store.dispatch(new fromActionsAdditional.AdditionalUpdate(additional));
+  		this.store.dispatch(new fromActionsAdditional.UpdateAdditionalById(additional));
   	}
   	return;
   }
@@ -146,14 +146,14 @@ export class AdditionalComponent implements OnInit, OnDestroy {
   private filterGroup = (name: string): IGroupService[] | undefined => this.allGroups?.filter(
   	option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private findGroups = (): void => this.store.dispatch(new fromActionsAdditional.FindGroups());
+  private findGroups = (): void => this.store.dispatch(new fromActionsAdditional.GetAllTreatmentsGroup());
 
   private clean = (): void => this.store.dispatch(new fromActionsAdditional.Clean());
 
   private getAdditional = (): void => {
   	if (!this.additional) {
   		this.store.dispatch(
-  			new fromActionsAdditional.AdditionalFind(this.id),
+  			new fromActionsAdditional.FindAdditionalById(this.id),
   		);
   	}
   };

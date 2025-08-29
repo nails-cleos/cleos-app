@@ -468,7 +468,7 @@ export class DashComponent implements OnInit, OnDestroy {
     this.getEvents();
     this.isLoading = true;
     this.store.dispatch(
-      new fromActionsDashboard.GetCards(this.viewDate),
+      new fromActionsDashboard.GetSummaries(this.viewDate),
     );
   };
 
@@ -476,7 +476,7 @@ export class DashComponent implements OnInit, OnDestroy {
     this.calendar.resetEvents();
     this.isCalendarLoading = true;
     this.store.dispatch(
-      new fromActionsDashboard.GetEvents(this.viewDate),
+      new fromActionsDashboard.EventsSummaries(this.viewDate),
     );
   };
 

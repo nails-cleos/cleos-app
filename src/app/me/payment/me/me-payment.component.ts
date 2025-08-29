@@ -63,7 +63,7 @@ export class MePaymentComponent implements OnInit, OnDestroy {
     }
 
     this.store.dispatch(
-      new fromActionsPayment.PaymentUpdateLink(payload),
+      new fromActionsPayment.UpdatePaymentById(payload),
     );
     return;
   }
@@ -89,7 +89,9 @@ export class MePaymentComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  private getPayment = (paymentId: string): void => this.store.dispatch(new fromActionsPayment.PaymentFind(paymentId));
+  private getPayment = (paymentId: string): void => this.store.dispatch(
+    new fromActionsPayment.FindPaymentById(paymentId),
+  );
 
   private getOptions = (): void => this.store.dispatch(new fromActionsPayment.PaymentOptions());
 

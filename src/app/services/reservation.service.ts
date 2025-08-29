@@ -15,7 +15,7 @@ export class ReservationService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getAllPage = (
+  findPaged = (
     page: number,
     all?: boolean,
     roomId?: string,
@@ -55,7 +55,7 @@ export class ReservationService {
     return this.http.get<ICustomerReservation>(toUrl(this.urlV1, 'customer'), { params });
   };
 
-  getAllFilterReservationsPage = (
+  getAllFilterReservations = (
     sort: string,
     direction: string,
     page: number,
@@ -95,7 +95,7 @@ export class ReservationService {
     return this.http.get<IRoomReservation[]>(toUrl(this.urlV1, 'rooms', roomId), { params });
   };
 
-  search = (
+  searchAvailability = (
     roomId: string,
     days: number,
     dates: Date[],
@@ -132,7 +132,7 @@ export class ReservationService {
     return this.http.get<IRoomReservation>(toUrl(this.urlV1, 'search'), { params });
   };
 
-  getById = (id: string, edit?: boolean): Observable<IReservation | undefined> => {
+  reservationFind = (id: string, edit?: boolean): Observable<IReservation | undefined> => {
     let url = toUrl(this.urlV1, id);
     if (edit) {
       url += '/edit';
@@ -140,17 +140,18 @@ export class ReservationService {
     return this.http.get<IReservation>(url);
   };
 
-  findHistory = (id: string): Observable<IReservation | undefined> => this.http.get<IReservation>(
+  findReservationHistoryById = (id: string): Observable<IReservation | undefined> => this.http.get<IReservation>(
     toUrl(this.urlV1, id, 'history'),
   );
 
-  add = (
+  createReservation = (
     reservation: IReservation,
   ): Observable<IReservation[]> => this.http.post<IReservation[]>(this.urlV1, reservation);
 
-  delete = (id: string): Observable<IReservation> => this.http.delete<IReservation>(toUrl(this.urlV1, id));
+  deleteReservationById = (id: string): Observable<IReservation> => this.http.delete<IReservation>(
+    toUrl(this.urlV1, id));
 
-  update = (
+  updateReservationById = (
     reservation: IReservation,
   ): Observable<IReservation> => this.http.patch<IReservation>(toUrl(this.urlV1, reservation.id!), reservation);
 
@@ -160,12 +161,12 @@ export class ReservationService {
     extras?: any,
   ): Observable<IReservation> => this.http.post<IReservation>(toUrl(this.urlV1, reservationId, event), extras);
 
-  changeCustomer = (
+  updateCustomerByReservationId = (
     reservationId: string,
     customerId: string,
   ): Observable<void> => this.http.patch<void>(toUrl(this.urlV1, reservationId, 'customers', customerId), null);
 
-  changeColor = (
+  updateColorByReservationId = (
     reservationId: string,
     colorId: string,
   ): Observable<void> => this.http.patch<void>(toUrl(this.urlV1, reservationId, 'colors', colorId), null);
@@ -174,27 +175,31 @@ export class ReservationService {
     toUrl(this.urlV1, 'upcoming'),
   );
 
-  paymentComplete = (reservationId: string): Observable<IReservation> => this.http.post<IReservation>(
+  paymentCompleteReservation = (reservationId: string): Observable<IReservation> => this.http.post<IReservation>(
     toUrl(this.urlV1, reservationId, 'payment', 'complete'),
     null,
   );
 
-  addReview = (
+  createReviewByReservationId = (
     review: IReview,
   ): Observable<IReview> => this.http.post<IReview>(toUrl(this.urlV1, review.reservationId!, 'reviews'), review);
 
-  addNote = (
+  findReviewByReservationId = (id: string): Observable<IReview | undefined> => this.http.get<IReview>(
+    toUrl(this.urlV1, id, 'reviews'),
+  );
+
+  updateNoteByReservationId = (
     id: string,
     note?: string,
     customerNote?: string,
   ): Observable<IReservation> => this.http.patch<IReservation>(toUrl(this.urlV1, id, 'notes'), { note, customerNote });
 
-  addDiscount = (
+  updateDiscountByReservationId = (
     id: string,
     discountId: string,
   ): Observable<IReservation> => this.http.patch<IReservation>(toUrl(this.urlV1, id, 'discounts', discountId), null);
 
-  addTimestamp = (
+  updateTimestampByReservationId = (
     id: string,
     start: string,
   ): Observable<IReservation> => this.http.patch<IReservation>(toUrl(this.urlV1, id, 'timestamp'), start);

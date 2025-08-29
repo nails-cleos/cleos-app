@@ -100,7 +100,7 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
   private clean = (): void => this.store.dispatch(new fromActionsAccount.Clean());
 
   private getTransactions = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsAccount.AccountFindTransactions({
+  	new fromActionsAccount.GetTransactionsByAccountId({
   		active: this.sort.active,
   		direction: this.sort.direction,
   		size: this.pageSize,

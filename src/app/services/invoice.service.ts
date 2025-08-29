@@ -16,9 +16,9 @@ export class InvoiceService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getAllMeOffice = (): Observable<IOffice[]> => this.http.get<IOffice[]>(toUrl(this.urlV1, 'offices'));
+  getAllMyOffices = (): Observable<IOffice[]> => this.http.get<IOffice[]>(toUrl(this.urlV1, 'offices'));
 
-  findInvoiceReservation = (
+  findOfficeToInvoice = (
     officeId: string,
     start: string,
     end: string,

@@ -26,7 +26,7 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case InvoiceActionTypes.invoiceFind: {
+    case InvoiceActionTypes.findOfficeToInvoice: {
       return {
         ...state,
         data: [{} as IInvoice, {} as IInvoice, {} as IInvoice],
@@ -48,7 +48,7 @@ export const reducer = (state = initialState, action: All): State => {
         changes: true,
       };
     }
-    case InvoiceActionTypes.invoiceFindMyOffices: {
+    case InvoiceActionTypes.getAllMyOffices: {
       return {
         ...state,
         offices: null,
@@ -80,7 +80,7 @@ export const reducer = (state = initialState, action: All): State => {
         changes: false,
       };
     }
-    case InvoiceActionTypes.invoiceUpdateOffice: {
+    case InvoiceActionTypes.updateOfficeById: {
       return {
         ...state,
         errorMessage: null,

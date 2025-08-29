@@ -1,20 +1,20 @@
 import { Action } from '@ngrx/store';
 
 export enum ColorActionTypes {
-  getAll = '[Color] Get all',
+  getColorsPage = '[Color] Get colors page',
   colorSuccess = '[Color] Success',
-  colorSave = '[Color] Save',
-  colorUpdate = '[Color] Update',
+  createColor = '[Color] Create color',
+  updateColorById = '[Color] Update color by id',
   colorSaveSuccess = '[Color] Save Success',
   colorFailure = '[Color] Failure',
   colorSelected = '[Color] Selected',
-  colorFind = '[Color] Find',
-  colorDelete = '[Color] Delete',
+  findColorById = '[Color] Find color by id',
+  deleteColorById = '[Color] Delete color by id',
   clean = '[Color] Clean'
 }
 
-export class GetAll implements Action {
-  readonly type = ColorActionTypes.getAll;
+export class GetColorsPage implements Action {
+  readonly type = ColorActionTypes.getColorsPage;
 
   constructor(public payload: any) {
   }
@@ -27,15 +27,15 @@ export class ColorSuccess implements Action {
   }
 }
 
-export class ColorSave implements Action {
-  readonly type = ColorActionTypes.colorSave;
+export class CreateColor implements Action {
+  readonly type = ColorActionTypes.createColor;
 
   constructor(public payload: any) {
   }
 }
 
-export class ColorUpdate implements Action {
-  readonly type = ColorActionTypes.colorUpdate;
+export class UpdateColorById implements Action {
+  readonly type = ColorActionTypes.updateColorById;
 
   constructor(public payload: any) {
   }
@@ -62,15 +62,15 @@ export class ColorSelected implements Action {
   }
 }
 
-export class ColorFind implements Action {
-  readonly type = ColorActionTypes.colorFind;
+export class FindColorById implements Action {
+  readonly type = ColorActionTypes.findColorById;
 
   constructor(public payload: any) {
   }
 }
 
-export class DeleteColor implements Action {
-  readonly type = ColorActionTypes.colorDelete;
+export class DeleteColorById implements Action {
+  readonly type = ColorActionTypes.deleteColorById;
 
   constructor(public payload: any) {
   }
@@ -81,13 +81,13 @@ export class Clean implements Action {
 }
 
 export type All =
-  | GetAll
-  | ColorSave
-  | ColorUpdate
+  | GetColorsPage
+  | CreateColor
+  | UpdateColorById
   | ColorSuccess
   | ColorSaveSuccess
   | ColorFailure
-  | ColorFind
+  | FindColorById
   | ColorSelected
-  | DeleteColor
+  | DeleteColorById
   | Clean;

@@ -187,7 +187,7 @@ const quarterSummaryMap = (summaries: IQuarterRoomSummary[]) => summaries.reduce
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case DashboardActionTypes.dashEvents: {
+    case DashboardActionTypes.eventsSummaries: {
       return {
         ...state,
         data: cleanEventMap(state.data),
@@ -197,7 +197,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case DashboardActionTypes.dashboardEvents: {
+    case DashboardActionTypes.meEvent: {
       return {
         ...state,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -209,7 +209,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case DashboardActionTypes.dashCards: {
+    case DashboardActionTypes.getSummaries: {
       return {
         ...state,
         data: cleanCardMap(state.data),
@@ -251,7 +251,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false,
       };
     }
-    case DashboardActionTypes.monthlySummary: {
+    case DashboardActionTypes.getMonthlySummary: {
       return {
         ...state,
         monthlySummaryMap: null,
@@ -271,7 +271,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case DashboardActionTypes.saveMonthlySummary: {
+    case DashboardActionTypes.updateMonthlySummary: {
       return {
         ...state,
         monthlySummaryMap: null,
@@ -290,7 +290,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: action.payload.message,
       };
     }
-    case DashboardActionTypes.yearSummary: {
+    case DashboardActionTypes.getYearSummary: {
       return {
         ...state,
         yearSummaryMap: null,
@@ -311,7 +311,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case DashboardActionTypes.yearExport: {
+    case DashboardActionTypes.exportYearSummary: {
       return {
         ...state,
         yearExport: null,
@@ -331,7 +331,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case DashboardActionTypes.quarterSummary: {
+    case DashboardActionTypes.getQuarterSummary: {
       return {
         ...state,
         quarterSummaryMap: null,

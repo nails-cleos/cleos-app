@@ -12,28 +12,28 @@ import { OfficeService } from '../../services/office.service';
 export class InvoiceEffects {
 
   findInvoiceReservation$ = createEffect(() =>
-    this.actions.pipe(ofType(fromActionsInvoice.InvoiceActionTypes.invoiceFind)).pipe(
+    this.actions.pipe(ofType(fromActionsInvoice.InvoiceActionTypes.findOfficeToInvoice)).pipe(
       map((action: any) => action.payload),
       switchMap((payload: any) =>
-        this.invoiceService.findInvoiceReservation(payload.officeId, payload.start, payload.end, payload.types).pipe(
+        this.invoiceService.findOfficeToInvoice(payload.officeId, payload.start, payload.end, payload.types).pipe(
           switchMap((response) => of(new fromActionsInvoice.InvoiceSuccess(response ? response : []))),
           catchError((err: HttpErrorResponse) => of(new fromActionsInvoice.InvoiceFailure({ error: err.error }))),
         )),
     ));
 
   findMyOffices$ = createEffect(
-    () => this.actions.pipe(ofType(fromActionsInvoice.InvoiceActionTypes.invoiceFindMyOffices)).pipe(
+    () => this.actions.pipe(ofType(fromActionsInvoice.InvoiceActionTypes.getAllMyOffices)).pipe(
       map((action: any) => action.payload),
-      switchMap(() => this.invoiceService.getAllMeOffice().pipe(
+      switchMap(() => this.invoiceService.getAllMyOffices().pipe(
         switchMap((response) => of(new fromActionsInvoice.OfficesSuccess(response ? response : []))),
         catchError((err: HttpErrorResponse) => of(new fromActionsInvoice.InvoiceFailure({ error: err.error }))),
       )),
     ));
 
   updateOffices$ = createEffect(
-    () => this.actions.pipe(ofType(fromActionsInvoice.InvoiceActionTypes.invoiceUpdateOffice)).pipe(
+    () => this.actions.pipe(ofType(fromActionsInvoice.InvoiceActionTypes.updateOfficeById)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.officeService.update(payload).pipe(
+      switchMap((payload: any) => this.officeService.updateOfficeById(payload).pipe(
         switchMap((response) => of(new fromActionsInvoice.UpdateOfficesSuccess(response))),
         catchError((err: HttpErrorResponse) => of(new fromActionsInvoice.InvoiceFailure({ error: err.error }))),
       )),

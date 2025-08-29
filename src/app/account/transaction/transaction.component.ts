@@ -88,7 +88,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
       paymentRequest: { type, paymentOptionId, transfer, bic },
     };
     this.store.dispatch(
-      new fromActionsAccount.AccountSave({
+      new fromActionsAccount.AddMoney({
         transaction: payload, accountId: this.accountId, hasAdminRole: this.hasAdminRole,
       }),
     );
@@ -122,7 +122,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
   private getAccount = (): void => {
     if (!this.account) {
       this.store.dispatch(
-        new fromActionsAccount.AccountFind(this.accountId),
+        new fromActionsAccount.FindAccountById(this.accountId),
       );
     }
   };

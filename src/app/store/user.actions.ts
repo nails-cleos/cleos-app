@@ -1,30 +1,30 @@
 import { Action } from '@ngrx/store';
 
 export enum UserActionTypes {
-  getAll = '[User] Get all',
+  getUsersPage = '[User] Get users page',
   getAllCustomers = '[User] Get all customers',
   userSuccess = '[User] Success',
   userFailure = '[User] Failure',
   userSelected = '[User] Selected',
   userOverview = '[User] Overview',
-  findUser = '[User] Find',
-  findMe = '[User] Me',
+  getUserById = '[User] Get user by id',
+  findMe = '[User] Find me',
   setRole = '[User] Add role',
   saveUser = '[User] Save',
-  updateUser = '[User] Update',
-  updatePhoto = '[User] Update photo',
+  updateMe = '[User] Update me',
+  updateMePhoto = '[User] Update me photo',
   userSaveSuccess = '[User] Save Success',
-  userDelete = '[User] Delete',
+  deleteUserById = '[User] Delete user by id',
   userRestore = '[User] Restore',
-  resendUserToken = '[User] Resend user token',
-  getAllDisableUsers = '[User] Get all disable users',
+  resendToken = '[User] Resend token',
+  findAllDisableUsers = '[User] Find all disable users',
   disableUsersSuccess = '[User] Disable users success',
   mergeUsers = '[User] Merge users',
   clean = '[User] Clean'
 }
 
-export class GetAll implements Action {
-  readonly type = UserActionTypes.getAll;
+export class GetUsersPage implements Action {
+  readonly type = UserActionTypes.getUsersPage;
 
   constructor(public payload: any) {
   }
@@ -62,8 +62,8 @@ export class UserOverview implements Action {
   }
 }
 
-export class FindUser implements Action {
-  readonly type = UserActionTypes.findUser;
+export class GetUserById implements Action {
+  readonly type = UserActionTypes.getUserById;
 
   constructor(public payload: any) {
   }
@@ -87,15 +87,15 @@ export class SetRole implements Action {
   }
 }
 
-export class UpdateUser implements Action {
-  readonly type = UserActionTypes.updateUser;
+export class UpdateMe implements Action {
+  readonly type = UserActionTypes.updateMe;
 
   constructor(public payload: any) {
   }
 }
 
-export class UpdatePhoto implements Action {
-  readonly type = UserActionTypes.updatePhoto;
+export class UpdateMePhoto implements Action {
+  readonly type = UserActionTypes.updateMePhoto;
 
   constructor(public payload: any) {
   }
@@ -108,8 +108,8 @@ export class UserSaveSuccess implements Action {
   }
 }
 
-export class DeleteUser implements Action {
-  readonly type = UserActionTypes.userDelete;
+export class DeleteUserById implements Action {
+  readonly type = UserActionTypes.deleteUserById;
 
   constructor(public payload: any) {
   }
@@ -123,14 +123,14 @@ export class RestoreUser implements Action {
 }
 
 export class ResendToken implements Action {
-  readonly type = UserActionTypes.resendUserToken;
+  readonly type = UserActionTypes.resendToken;
 
   constructor(public payload: any) {
   }
 }
 
-export class GetAllDisableUsers implements Action {
-  readonly type = UserActionTypes.getAllDisableUsers;
+export class FindAllDisableUsers implements Action {
+  readonly type = UserActionTypes.findAllDisableUsers;
 }
 
 export class DisableUsersSuccess implements Action {
@@ -152,23 +152,23 @@ export class Clean implements Action {
 }
 
 export type All =
-  | GetAll
+  | GetUsersPage
   | GetAllCustomers
   | UserSuccess
   | UserFailure
   | UserSelected
   | UserOverview
-  | FindUser
+  | GetUserById
   | FindMe
   | SaveUser
   | SetRole
-  | UpdateUser
-  | UpdatePhoto
+  | UpdateMe
+  | UpdateMePhoto
   | UserSaveSuccess
-  | DeleteUser
+  | DeleteUserById
   | RestoreUser
   | ResendToken
-  | GetAllDisableUsers
+  | FindAllDisableUsers
   | DisableUsersSuccess
   | MergeUsers
   | Clean;

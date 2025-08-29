@@ -24,7 +24,7 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case CurrencyActionTypes.getAll: {
+    case CurrencyActionTypes.getCurrenciesPage: {
       return {
         ...state,
         data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<ICurrency>,
@@ -34,7 +34,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case CurrencyActionTypes.currencyFind: {
+    case CurrencyActionTypes.findCurrencyById: {
       return {
         ...state,
         data: {} as ICurrency,
@@ -82,9 +82,9 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false,
       };
     }
-    case CurrencyActionTypes.currencyUpdate:
-    case CurrencyActionTypes.currencySave:
-    case CurrencyActionTypes.currencyDelete: {
+    case CurrencyActionTypes.updateCurrencyById:
+    case CurrencyActionTypes.createCurrency:
+    case CurrencyActionTypes.deleteCurrencyById: {
       return {
         ...state,
         errorMessage: null,

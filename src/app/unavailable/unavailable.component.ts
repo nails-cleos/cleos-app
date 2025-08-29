@@ -115,13 +115,13 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   	if (this.isAddMode) {
   		this.store.dispatch(
-  			new fromActionsUnavailable.UnavailableSave(unavailable),
+  			new fromActionsUnavailable.CreateUnavailable(unavailable),
   		);
   	} else {
   		unavailable.id = this.id;
   		this.unavailable = undefined;
   		this.store.dispatch(
-  			new fromActionsUnavailable.UnavailableUpdate(unavailable),
+  			new fromActionsUnavailable.UpdateUnavailableById(unavailable),
   		);
   	}
   	return;
@@ -136,7 +136,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
   	return executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: this.unavailable }, result => {
   		if (result) {
   			this.store.dispatch(
-  				new fromActionsUnavailable.DeleteUnavailable(result),
+  				new fromActionsUnavailable.DeleteUnavailableById(result),
   			);
   		}
   	});
@@ -198,7 +198,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.roomAvailability);
 
-  getRoom = (user: IUser): void => this.store.dispatch(new fromActionsUnavailable.GetRoom(user.id));
+  getRoom = (user: IUser): void => this.store.dispatch(new fromActionsUnavailable.GetAllRoomsByProfessionalId(user.id));
 
   keyDownHandler = (event: any): void => {
   	if (event.code === 'Backspace') {
@@ -332,7 +332,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
   private getUnavailable = (): void => {
   	if (!this.unavailable) {
   		this.store.dispatch(
-  			new fromActionsUnavailable.UnavailableFind(this.id),
+  			new fromActionsUnavailable.FindUnavailableById(this.id),
   		);
   	}
   };

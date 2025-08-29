@@ -24,7 +24,7 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case NotificationActionTypes.notificationPage: {
+    case NotificationActionTypes.getNotificationsPage: {
       return {
         ...state,
         data: { page: { content: [{}, {}, {}] } as Pagination<INotification>, unread: -1 },
@@ -61,7 +61,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false,
       };
     }
-    case NotificationActionTypes.notificationRead: {
+    case NotificationActionTypes.readNotificationById: {
       return {
         ...state,
         data: null,
@@ -71,7 +71,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: true,
       };
     }
-    case NotificationActionTypes.notificationDelete: {
+    case NotificationActionTypes.deleteNotificationById: {
       return {
         ...state,
         dataDeleted: null,

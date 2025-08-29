@@ -77,7 +77,7 @@ export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
   	executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: color }, result => {
   		if (result) {
   			this.store.dispatch(
-  				new fromActionsColor.DeleteColor(result),
+  				new fromActionsColor.DeleteColorById(result),
   			);
   		}
   	});
@@ -96,7 +96,7 @@ export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private getColorList = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsColor.GetAll({
+  	new fromActionsColor.GetColorsPage({
   		active: this.sort.active,
   		direction: this.sort.direction,
   		size: this.pageSize,

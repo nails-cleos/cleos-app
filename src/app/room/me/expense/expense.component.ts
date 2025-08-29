@@ -44,6 +44,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   filteredSupplyStore?: Observable<ISupplyStore[] | undefined>;
   totalMap: Map<number, { btwValue: string, net: string }> = new Map();
 
+  private timeZone?: string;
   private getState: Observable<any>;
   private subscription?: Subscription;
   private readonly language: string;
@@ -88,12 +89,12 @@ export class ExpenseComponent implements OnInit, OnDestroy {
 
   	if (this.isAddMode) {
   		this.store.dispatch(
-  			new fromActionsExpense.ExpenseSave({ roomId: this.roomId, expense }),
+  			new fromActionsExpense.CreateExpense({ roomId: this.roomId, expense }),
   		);
   	} else {
   		expense.id = this.id;
   		this.store.dispatch(
-  			new fromActionsExpense.ExpenseUpdate({ roomId: this.roomId, expense }),
+  			new fromActionsExpense.UpdateExpenseById({ roomId: this.roomId, expense }),
   		);
   	}
   	return;
@@ -216,10 +217,10 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   private filterSupplyStore = (name: string): ISupplyStore[] | undefined => this.supplyStores?.filter(
   	option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private getExpenseInfo = (): void => this.store.dispatch(new fromActionsExpense.GetExpenseInfo(this.roomId));
+  private getExpenseInfo = (): void => this.store.dispatch(new fromActionsExpense.GetAllExpensesInfo(this.roomId));
 
   private getExpense = (): void => this.store.dispatch(
-  	new fromActionsExpense.ExpenseFind({ roomId: this.roomId, id: this.id }),
+  	new fromActionsExpense.FindExpenseById({ roomId: this.roomId, id: this.id }),
   );
 
   private clean = (): void => {
@@ -237,7 +238,8 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   		this.types = state.info?.types;
   		this.roomName = state.info?.roomName;
   		this.currencyIcon = state.info?.currency?.icon;
-  		this.today = getNowTimeZone(state.info?.timeZone);
+      this.timeZone = state.info?.timeZone;
+  		this.today = getNowTimeZone(this.timeZone);
   		this.expense = state.selected;
   		if (this.expense?.id) {
   			this.form.patchValue(this.expense);

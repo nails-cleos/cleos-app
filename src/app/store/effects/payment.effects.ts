@@ -11,9 +11,9 @@ import { Router } from '@angular/router';
 @Injectable()
 export class PaymentEffects {
 
-  findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentFind)).pipe(
+  findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.findPaymentById)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.paymentService.getById(payload).pipe(
+    switchMap((payload: any) => this.paymentService.findPaymentById(payload).pipe(
       switchMap((payment: any) => of(new fromActionsPayment.PaymentSelected({ payment, redirect: false }))),
       catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error }))),
     )),
@@ -37,15 +37,16 @@ export class PaymentEffects {
       )),
     ));
 
-  createOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentCreate)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.paymentService.create(payload.reservationId, payload.payment).pipe(
-      switchMap((payment: any) => {
-        return of(new fromActionsPayment.PaymentSend(payment.link || payment.paymentURL));
-      }),
-      catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error }))),
-    )),
-  ));
+  createOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.createPaymentLink))
+    .pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.paymentService.createPaymentLink(payload.reservationId, payload.payment).pipe(
+        switchMap((payment: any) => {
+          return of(new fromActionsPayment.PaymentSend(payment.link || payment.paymentURL));
+        }),
+        catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error }))),
+      )),
+    ));
 
   save$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentSave)).pipe(
     map((action: any) => action.payload),
@@ -72,9 +73,9 @@ export class PaymentEffects {
       )),
   ));
 
-  update$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentUpdate)).pipe(
+  update$ = createEffect(() => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.adjustPayments)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.paymentService.update(payload).pipe(
+    switchMap((payload: any) => this.paymentService.adjustPayments(payload).pipe(
       switchMap(() => of(new fromActionsPayment.PaymentSaveSuccess({
         message: this.translate.instant('COMMON.PAYMENT.SUCCESS'),
         reload: true,
@@ -84,9 +85,9 @@ export class PaymentEffects {
   ));
 
   updateLink$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.paymentUpdateLink)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsPayment.PaymentActionTypes.updatePaymentById)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.paymentService.updateLink(payload.id, payload.payment).pipe(
+      switchMap((payload: any) => this.paymentService.updatePaymentById(payload.id, payload.payment).pipe(
         switchMap((payment: any) => of(new fromActionsPayment.PaymentSend(payment.link || payment.paymentURL))),
         catchError((err: HttpErrorResponse) => of(new fromActionsPayment.PaymentFailure({ error: err.error }))),
       )),

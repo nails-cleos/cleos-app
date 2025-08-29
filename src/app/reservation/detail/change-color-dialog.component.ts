@@ -86,7 +86,7 @@ export class ChangeColorDialogComponent implements OnInit, OnDestroy {
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
   private getColors = (): void => this.store.dispatch(
-    new fromActionsReservation.GetAllColorsByTreatmentId(this.treatmentId),
+    new fromActionsReservation.FindColorsByTreatmentId(this.treatmentId),
   );
 
   private subscribe = (): void => {

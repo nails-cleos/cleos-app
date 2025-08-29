@@ -62,12 +62,12 @@ export class CurrencyComponent implements OnInit, OnDestroy {
 
   	if (this.isAddMode) {
   		this.store.dispatch(
-  			new fromActionsCurrency.CurrencySave(currency),
+  			new fromActionsCurrency.CreateCurrency(currency),
   		);
   	} else {
   		currency.id = this.id;
   		this.currency = undefined;
-  		this.store.dispatch(new fromActionsCurrency.CurrencyUpdate(currency));
+  		this.store.dispatch(new fromActionsCurrency.UpdateCurrencyById(currency));
   	}
   	return;
   }
@@ -104,7 +104,7 @@ export class CurrencyComponent implements OnInit, OnDestroy {
   private getCurrency = (): void => {
   	if (!this.currency) {
   		this.store.dispatch(
-  			new fromActionsCurrency.CurrencyFind(this.id),
+  			new fromActionsCurrency.FindCurrencyById(this.id),
   		);
   	}
   };

@@ -44,7 +44,7 @@
               <div class="top">
                 <mat-accordion>
                   @for (tab of group.treatments; let i = $index; track tab) {
-                    <mat-expansion-panel [expanded]="i === 0">
+                    <mat-expansion-panel [expanded]="i === expandedPanelIndex">
                       <mat-expansion-panel-header>
                         <mat-panel-title>
                           {{ tab.name }}
@@ -73,7 +73,7 @@
                       </mat-form-field>
                       <div class="card-actions">
                         <div class="spacer"></div>
-                        <button (click)="getHistory(tab.id)" mat-icon-button>
+                        <button (click)="getHistory(tab.id, i)" mat-icon-button>
                           <mat-icon>timeline</mat-icon>
                         </button>
                       </div>

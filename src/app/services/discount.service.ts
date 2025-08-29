@@ -14,38 +14,50 @@ export class DiscountService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getAll = (
+  getDiscountsPage = (
     sort: string,
     direction: string,
     page: number,
-    path: string,
     size: number = PAGE_SIZE,
   ): Observable<IDiscount[]> => this.http.get<IDiscount[]>(
-    toUrl(this.urlV1, path),
+    toUrl(this.urlV1, 'pages'),
     { params: createFilter(page, size, sort, direction) },
   );
 
-  getReferrals = (): Observable<IUserDiscount[]> => this.http.get<IUserDiscount[]>(
+  getMyDiscountsPage = (
+    sort: string,
+    direction: string,
+    page: number,
+    size: number = PAGE_SIZE,
+  ): Observable<IDiscount[]> => this.http.get<IUserDiscount[]>(
+    toUrl(this.urlV1, 'me'),
+    { params: createFilter(page, size, sort, direction) },
+  );
+
+  getMyReferrals = (): Observable<IUserDiscount[]> => this.http.get<IUserDiscount[]>(
     toUrl(this.urlV1, 'me', 'referrals'),
   );
 
-  getById = (id: string): Observable<IDiscount | undefined> => this.http.get<IDiscount>(toUrl(this.urlV1, id));
+  findDiscountById = (id: string): Observable<IDiscount | undefined> => this.http.get<IDiscount>(toUrl(this.urlV1, id));
 
-  add = (discount: IDiscount): Observable<IDiscount> => this.http.post<IDiscount>(this.urlV1, discount);
+  createDiscount = (discount: IDiscount): Observable<IDiscount> => this.http.post<IDiscount>(this.urlV1, discount);
 
-  send = (id: string, customersDiscount: string[]): Observable<IDiscount> => this.http.post<IDiscount>(
+  sendDiscountToCustomers = (
+    id: string,
+    customersDiscount: string[],
+  ): Observable<IDiscount> => this.http.post<IDiscount>(
     toUrl(this.urlV1, id, 'customers'),
     customersDiscount,
   );
 
-  delete = (id: string): Observable<IDiscount> => this.http.delete<IDiscount>(toUrl(this.urlV1, id));
+  deleteDiscountById = (id: string): Observable<IDiscount> => this.http.delete<IDiscount>(toUrl(this.urlV1, id));
 
-  update = (discount: IDiscount): Observable<IDiscount> => this.http.patch<IDiscount>(
+  updateDiscountById = (discount: IDiscount): Observable<IDiscount> => this.http.patch<IDiscount>(
     toUrl(this.urlV1, discount.id!),
     discount,
   );
 
-  findByCustomerId = (customerId: string): Observable<IUserDiscount[]> => this.http.get<IUserDiscount[]>(
+  findUserDiscountByCustomerId = (customerId: string): Observable<IUserDiscount[]> => this.http.get<IUserDiscount[]>(
     toUrl(this.urlV1, 'customers', customerId),
   );
 }

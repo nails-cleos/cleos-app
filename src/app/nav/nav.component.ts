@@ -133,7 +133,7 @@ export class NavComponent implements OnInit, OnDestroy {
     const message = this.translate.instant(
       `COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode.toString().toUpperCase() }`);
     return this.store.dispatch(
-      new fromActionsUser.UpdateUser({ user, redirectUrl, message }),
+      new fromActionsUser.UpdateMe({ user, redirectUrl, message }),
     );
   }
 
@@ -169,7 +169,7 @@ export class NavComponent implements OnInit, OnDestroy {
         return value;
       });
       this.store.dispatch(
-        new fromActionsNotification.NotificationRead(notification),
+        new fromActionsNotification.ReadNotificationById(notification),
       );
     }
   };
@@ -224,7 +224,7 @@ export class NavComponent implements OnInit, OnDestroy {
         page: 0,
       };
       this.store.dispatch(
-        new fromActionsNotification.GetAllPaged(payload),
+        new fromActionsNotification.GetNotificationsPage(payload),
       );
     }
   };

@@ -205,7 +205,7 @@ export class CatalogueComponent implements OnInit, OnDestroy {
 
   private clean = (): void => this.store.dispatch(new fromActionsCatalogue.Clean());
 
-  private findGroups = (): void => this.store.dispatch(new fromActionsCatalogue.FindGroups());
+  private findGroups = (): void => this.store.dispatch(new fromActionsCatalogue.GetAllTreatmentsGroup());
 
   private getCatalogue = (): void => {
   	if (!this.catalogue) {

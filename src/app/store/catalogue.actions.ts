@@ -12,7 +12,7 @@ export enum CatalogueActionTypes {
   catalogueSelected = '[Catalogue] Selected',
   catalogueFind = '[Catalogue] Find',
   catalogueDelete = '[Catalogue] Delete',
-  findGroups = '[Catalogue] Find treatment groups',
+  getAllTreatmentsGroup = '[Catalogue] Get all treatments group',
   findGroupsSuccess = '[Catalogue] Find treatment groups success',
   clean = '[Catalogue] Clean'
 }
@@ -88,8 +88,8 @@ export class DeleteCatalogue implements Action {
   }
 }
 
-export class FindGroups implements Action {
-  readonly type = CatalogueActionTypes.findGroups;
+export class GetAllTreatmentsGroup implements Action {
+  readonly type = CatalogueActionTypes.getAllTreatmentsGroup;
 }
 
 export class FindGroupsSuccess implements Action {
@@ -115,6 +115,6 @@ export type All =
   | CatalogueFind
   | CatalogueSelected
   | DeleteCatalogue
-  | FindGroups
+  | GetAllTreatmentsGroup
   | FindGroupsSuccess
   | Clean;

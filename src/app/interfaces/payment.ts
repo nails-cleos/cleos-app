@@ -41,11 +41,12 @@ export class PaymentOption implements IPaymentOption {
   hidePercentage?: boolean;
   icon?: string;
 
-  constructor(name: string, type: PaymentType, svgIcon: string, bic?: string, subTypes?: IPaymentOption[],
-    hidePercentage: boolean = false) {
+  constructor(name: string, type: PaymentType, svgIcon: string, icon?: string, bic?: string,
+    subTypes?: IPaymentOption[], hidePercentage: boolean = false) {
     this.name = name;
     this.type = type;
     this.svgIcon = svgIcon;
+    this.icon = icon;
     this.bic = bic;
     this.subTypes = subTypes || [];
     this.hidePercentage = hidePercentage;
@@ -71,14 +72,15 @@ export const getPaymentOptions = (
       break;
   }
 
-  return new PaymentOption(name, it, svgIcon, undefined, subTypes);
+  return new PaymentOption(name, it, svgIcon, undefined, undefined, subTypes);
 }) || [];
 
 export const getPayNlOptions = (
   options?: IPaymentOption[],
 ): PaymentOption[] => options?.map((it: any) => new PaymentOption(
-  it.name, PaymentType.paynl, it.image, it.id,
-  it.paymentOptionSubList?.map((sub: any) => new PaymentOption(sub.name, PaymentType.paynl, sub.image, sub.id, []))),
+  it.name, PaymentType.paynl, it.image, it.image, it.id,
+  it.paymentOptionSubList?.map((sub: any) => new PaymentOption(sub.name, PaymentType.paynl, sub.image,
+    sub.image, sub.id, []))),
 ) || [];
 
 export const iDealBanks = (): IPaymentOption[] => [

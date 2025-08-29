@@ -25,7 +25,7 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import * as fromActionsUser from '../../store/user.actions';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
-import { executeDialog } from '../../util/helper';
+import { currencySymbol, executeDialog } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
 import { SharedModule } from '../../shared/shared.module';
@@ -109,7 +109,7 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
   	executeDialog(this.dialog, DiscountDialogComponent, data, result => {
   		if (result) {
   			this.store.dispatch(
-  				new fromActionsDiscount.AddDiscount(result),
+  				new fromActionsDiscount.SendDiscountToCustomers(result),
   			);
   		}
   	}, true);
@@ -131,7 +131,7 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
   private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
 
   private getDiscounts = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsDiscount.GetAll({
+  	new fromActionsDiscount.GetDiscountsPage({
   		active: this.sort.active,
   		direction: this.sort.direction,
   		size: this.pageSize,
@@ -246,7 +246,7 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
   	this.title = this.discount.name;
   	switch (this.discount.type) {
   	case DiscountType.money:
-  		this.title = `$ ${ this.discount.amount } ${ this.title }`;
+  		this.title = `${currencySymbol(this.discount.currency)} ${ this.discount.amount } ${ this.title }`;
   		break;
   	case DiscountType.percentage:
   		this.title = `${ this.discount.amount } % ${ this.title }`;

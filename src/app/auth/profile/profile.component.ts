@@ -103,7 +103,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     user.address = createAddress(this.formattedAddress, this.geometry?.location, this.user?.address);
 
     this.store.dispatch(
-      new fromActionsUser.UpdateUser({ user, redirectUrl: `/${ getLocale(lang).language }/auth/profile` }),
+      new fromActionsUser.UpdateMe({ user, redirectUrl: `/${ getLocale(lang).language }/auth/profile` }),
     );
     return;
   }
@@ -135,7 +135,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
               this.resizedImage.nativeElement.src = dataUrl;
             }
             this.store.dispatch(
-              new fromActionsUser.UpdatePhoto(dataUrl),
+              new fromActionsUser.UpdateMePhoto(dataUrl),
             );
           }
         };

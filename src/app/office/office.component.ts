@@ -70,12 +70,12 @@ export class OfficeComponent implements OnInit, OnDestroy {
   	if (this.isAddMode) {
   		office.managerId = this.getForm.manager.value.id;
   		this.store.dispatch(
-  			new fromActionsOffice.OfficeSave(office),
+  			new fromActionsOffice.CreateOffice(office),
   		);
   	} else {
   		office.id = this.id;
   		this.office = undefined;
-  		this.store.dispatch(new fromActionsOffice.OfficeUpdate(office));
+  		this.store.dispatch(new fromActionsOffice.UpdateOfficeById(office));
   	}
   	return;
   }
@@ -135,7 +135,7 @@ export class OfficeComponent implements OnInit, OnDestroy {
   private getOffice = (): void => {
   	if (!this.office) {
   		this.store.dispatch(
-  			new fromActionsOffice.OfficeFind(this.id),
+  			new fromActionsOffice.FindOfficeById(this.id),
   		);
   	}
   };

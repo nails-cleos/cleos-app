@@ -29,8 +29,8 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case DiscountActionTypes.getMyDiscounts:
-    case DiscountActionTypes.getAll: {
+    case DiscountActionTypes.getMyDiscountsPage:
+    case DiscountActionTypes.getDiscountsPage: {
       return {
         ...state,
         data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IDiscount>,
@@ -40,7 +40,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case DiscountActionTypes.getReferrals: {
+    case DiscountActionTypes.getMyReferrals: {
       return {
         ...state,
         referrals: [],
@@ -50,7 +50,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case DiscountActionTypes.getCurrencies: {
+    case DiscountActionTypes.getAllCurrency: {
       return {
         ...state,
         currencies: [],
@@ -60,7 +60,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case DiscountActionTypes.addDiscount: {
+    case DiscountActionTypes.sendDiscountToCustomers: {
       return {
         ...state,
         errorMessage: null,

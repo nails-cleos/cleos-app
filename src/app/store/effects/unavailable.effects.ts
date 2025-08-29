@@ -13,45 +13,49 @@ import { newDateTimestamp } from '../../util/dates';
 @Injectable()
 export class UnavailableEffects {
 
-  getAll$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.getAll)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.unavailableService.getAll(payload.active, payload.direction, payload.page,
-      payload.size).pipe(
-      switchMap((response: any) => of(new fromActionsUnavailable.UnavailableSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error }))),
-    )),
-  ));
+  getAll$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.getUnavailablePage)).pipe(
+      map((action: any) => action.payload),
+      switchMap(
+        (payload: any) => this.unavailableService.getUnavailablePage(payload.active, payload.direction, payload.page,
+          payload.size).pipe(
+          switchMap((response: any) => of(new fromActionsUnavailable.UnavailableSuccess(response))),
+          catchError(
+            (err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error }))),
+        )),
+    ));
 
   getAllProfessional$ = createEffect(() =>
     this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.getAllProfessional)).pipe(
       map((action: any) => action.payload),
-      switchMap(() => this.userService.getAllProfessionals().pipe(
+      switchMap(() => this.userService.getProfessionals().pipe(
         switchMap((response: any) => of(new fromActionsUnavailable.UnavailableSuccess(response))),
         catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error }))),
       )),
     ));
 
-  getRoom$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.getRoom)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.userService.getRoomByProfessionalId(payload).pipe(
-      switchMap((response: any) => of(new fromActionsUnavailable.RoomSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error }))),
-    )),
-  ));
+  getRoom$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.getAllRoomsByProfessionalId)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.userService.getAllRoomsByProfessionalId(payload).pipe(
+        switchMap((response: any) => of(new fromActionsUnavailable.RoomSuccess(response))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error }))),
+      )),
+    ));
 
   findOne$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableFind)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.findUnavailableById)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.unavailableService.getById(payload).pipe(
+      switchMap((payload: any) => this.unavailableService.findUnavailableById(payload).pipe(
         switchMap((unavailable: any) => of(new fromActionsUnavailable.UnavailableSelected(unavailable))),
         catchError((err: HttpErrorResponse) => of(new fromActionsUnavailable.UnavailableFailure({ error: err.error }))),
       )),
     ));
 
   save$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableSave)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.createUnavailable)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.unavailableService.add(payload).pipe(
+      switchMap((payload: any) => this.unavailableService.createUnavailable(payload).pipe(
         switchMap((response: any) => {
           const message = this.translate.instant('UNAVAILABLE.CREATED', { date: newDateTimestamp(response.timestamp) });
           return of(new fromActionsUnavailable.UnavailableSaveSuccess({ message }));
@@ -61,9 +65,9 @@ export class UnavailableEffects {
     ));
 
   blockAgenda$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableBlockAgenda)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.createBlockAgenda)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.unavailableService.blockAgenda(payload).pipe(
+      switchMap((payload: any) => this.unavailableService.createBlockAgenda(payload).pipe(
         switchMap((response: any) => {
           const message = this.translate.instant('UNAVAILABLE.CREATED', { date: newDateTimestamp(response.timestamp) });
           return of(new fromActionsUnavailable.UnavailableSaveSuccess({ message }));
@@ -73,9 +77,9 @@ export class UnavailableEffects {
     ));
 
   update = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableUpdate)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.updateUnavailableById)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.unavailableService.update(payload).pipe(
+      switchMap((payload: any) => this.unavailableService.updateUnavailableById(payload).pipe(
         switchMap((response: any) => {
           const message = this.translate.instant('UNAVAILABLE.UPDATED.MESSAGE',
             { date: newDateTimestamp(response.timestamp) });
@@ -86,9 +90,9 @@ export class UnavailableEffects {
     ));
 
   delete$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.unavailableDelete)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsUnavailable.UnavailableActionTypes.deleteUnavailableById)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.unavailableService.delete(payload.id).pipe(
+      switchMap((payload: any) => this.unavailableService.deleteUnavailableById(payload.id).pipe(
         switchMap(() => {
           const message = this.translate.instant('UNAVAILABLE.DELETED.MESSAGE',
             { date: newDateTimestamp(payload.timestamp) });

@@ -90,7 +90,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   	dialogRef.afterClosed().subscribe(result => {
   		if (result) {
   			this.store.dispatch(
-  				new fromActionsUnavailable.DeleteUnavailable(result),
+  				new fromActionsUnavailable.DeleteUnavailableById(result),
   			);
   		}
   	});
@@ -119,7 +119,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   };
 
   private getUnavailableList = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsUnavailable.GetAll({
+  	new fromActionsUnavailable.GetUnavailablePage({
   		active: this.sort.active,
   		direction: this.sort.direction,
   		size: this.pageSize,

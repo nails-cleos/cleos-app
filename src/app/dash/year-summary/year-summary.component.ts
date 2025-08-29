@@ -278,7 +278,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
   private getExportData = (year: number): void => {
     this.isExportLoading = true;
     this.store.dispatch(
-      new fromActionsDashboard.GetYearExport(year),
+      new fromActionsDashboard.ExportYearSummary(year),
     );
   };
 

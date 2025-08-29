@@ -66,7 +66,7 @@ export class AccountComponent implements OnInit, OnDestroy {
     transaction.currencyId = valueChange(this.getForm.currency.value, this.account?.currency)?.id;
     transaction.gift = this.getForm.gift.value;
     this.store.dispatch(
-      new fromActionsAccount.AccountUpdate(transaction),
+      new fromActionsAccount.UpdateAccountById(transaction),
     );
     return;
   }
@@ -101,7 +101,7 @@ export class AccountComponent implements OnInit, OnDestroy {
     }
   };
 
-  private getAccount = (): void => this.store.dispatch(new fromActionsAccount.AccountFindByCustomer(this.customerId));
+  private getAccount = (): void => this.store.dispatch(new fromActionsAccount.FindAccountByCustomerId(this.customerId));
 
   private createForm = (): void => {
     this.form = this.formBuilder.group({

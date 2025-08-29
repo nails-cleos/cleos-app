@@ -25,7 +25,7 @@ export class UserService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getAll = (
+  getUsersPage = (
     sort: string,
     direction: string,
     page: number,
@@ -36,13 +36,13 @@ export class UserService {
     { params: createFilter(page, size, sort, direction, filter) },
   );
 
-  getById = (
+  getUserById = (
     id: string,
   ): Observable<IUser | undefined> => this.http.get<IUser>(toUrl(this.userUrlV1, id));
 
-  getMe = (): Observable<IUser | undefined> => this.http.get<IUser>(toUrl(this.userUrlV1, 'me'));
+  findMe = (): Observable<IUser | undefined> => this.http.get<IUser>(toUrl(this.userUrlV1, 'me'));
 
-  update = (
+  updateUserById = (
     user: IUser,
   ): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, user.id!), user);
 
@@ -58,9 +58,9 @@ export class UserService {
     return this.http.patch<IUser>(toUrl(this.userUrlV1, 'me', 'photo'), formData, { headers });
   };
 
-  addCustomer = (user: IUser): Observable<IUser> => this.http.post(this.customerUrlV1, user);
+  createCustomer = (user: IUser): Observable<IUser> => this.http.post(this.customerUrlV1, user);
 
-  getOverview = (
+  getCustomerOverview = (
     id: string | null,
   ): Observable<IUser | undefined> => this.http.get<IUser>(toUrl(this.customerUrlV1, id ? id : 'me', 'reservations'));
 
@@ -68,17 +68,17 @@ export class UserService {
 
   addManager = (user: IUser): Observable<IUser> => this.http.post(this.officeUrlV1, user);
 
-  delete = (id: string): Observable<IUser> => this.http.delete<IUser>(toUrl(this.userUrlV1, id));
+  deleteUserById = (id: string): Observable<IUser> => this.http.delete<IUser>(toUrl(this.userUrlV1, id));
 
   restore = (user: IUser): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, user.id!), user);
 
-  resend = (id: string): Observable<any> => this.http.post(toUrl(this.userUrlV1, id, 'token'), null);
+  resendToken = (id: string): Observable<any> => this.http.post(toUrl(this.userUrlV1, id, 'token'), null);
 
-  getAllProfessionals = (): Observable<IUser[]> => this.http.get<IUser[]>(this.professionalUrlV1);
+  getProfessionals = (): Observable<IUser[]> => this.http.get<IUser[]>(this.professionalUrlV1);
 
-  getAllManagers = (): Observable<IUser[]> => this.http.get<IUser[]>(this.officeUrlV1);
+  getManagers = (): Observable<IUser[]> => this.http.get<IUser[]>(this.officeUrlV1);
 
-  getAllCustomers = (): Observable<IUser[]> => this.http.get<IUser[]>(this.customerUrlV1);
+  getCustomers = (): Observable<IUser[]> => this.http.get<IUser[]>(this.customerUrlV1);
 
   getCustomerInformation = (
     id: string,
@@ -105,11 +105,11 @@ export class UserService {
     return this.http.post<IUser>(toUrl(this.userUrlV1, userId, 'roles', roleName), null);
   };
 
-  getRoomByProfessionalId = (
+  getAllRoomsByProfessionalId = (
     id: string,
   ): Observable<IRoom> => this.http.get<IRoom>(`${ this.professionalUrlV1 }/${ id }/rooms`);
 
-  getAllDisableUsers = (): Observable<IUser[]> => this.http.get<IUser[]>(this.userUrlV1);
+  findAllDisableUsers = (): Observable<IUser[]> => this.http.get<IUser[]>(this.userUrlV1);
 
   mergeUsers = (
     mergeUserRequest: any,

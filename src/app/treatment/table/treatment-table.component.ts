@@ -36,14 +36,14 @@ export class TreatmentTableComponent implements AfterViewInit, OnChanges {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ngOnChanges(_changes: SimpleChanges): void {
-  	this.dataSource = this.treatment?.map(p => {
+  	this.dataSource.data = this.treatment?.map(p => {
   		if (p.duration) {
   			const duration = convertDuration(p.duration);
 
   			return Object.assign({}, p, { hour: duration.hour, minute: duration.minute });
   		}
   		return p;
-  	});
+  	}) || [];
   	this.resultsLength = this.treatment.length;
   }
 }

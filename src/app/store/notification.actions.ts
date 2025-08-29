@@ -1,19 +1,19 @@
 import { Action } from '@ngrx/store';
 
 export enum NotificationActionTypes {
-  notificationPage = '[Notification] Get all paged',
+  getNotificationsPage = '[Notification] Get notifications page',
   notificationSuccess = '[Notification] Notifications success',
   notificationFailure = '[Notification] Failure',
-  notificationRead = '[Notification] Notification read',
-  notificationDelete = '[Notification] Notification delete',
+  readNotificationById = '[Notification] Read notification by id',
+  deleteNotificationById = '[Notification] Delete notification by id',
   notificationDeleteSuccess = '[Notification] Notifications delete success',
   notificationReadSuccess = '[Notification] Notification read success',
-  notificationSubscribe = '[Notification] Notification subscribe',
+  subscribeNotification = '[Notification] Subscribe notification',
   clean = '[Notification] Clean'
 }
 
-export class GetAllPaged implements Action {
-  readonly type = NotificationActionTypes.notificationPage;
+export class GetNotificationsPage implements Action {
+  readonly type = NotificationActionTypes.getNotificationsPage;
 
   constructor(public payload: any) {
   }
@@ -33,15 +33,15 @@ export class NotificationFailure implements Action {
   }
 }
 
-export class NotificationRead implements Action {
-  readonly type = NotificationActionTypes.notificationRead;
+export class ReadNotificationById implements Action {
+  readonly type = NotificationActionTypes.readNotificationById;
 
   constructor(public payload: any) {
   }
 }
 
-export class NotificationDelete implements Action {
-  readonly type = NotificationActionTypes.notificationDelete;
+export class DeleteNotificationById implements Action {
+  readonly type = NotificationActionTypes.deleteNotificationById;
 
   constructor(public payload: any) {
   }
@@ -54,8 +54,8 @@ export class NotificationDeleteSuccess implements Action {
   }
 }
 
-export class NotificationSubscribe implements Action {
-  readonly type = NotificationActionTypes.notificationSubscribe;
+export class SubscribeNotification implements Action {
+  readonly type = NotificationActionTypes.subscribeNotification;
 
   constructor(public payload: any) {
   }
@@ -73,12 +73,12 @@ export class Clean implements Action {
 }
 
 export type All =
-  | GetAllPaged
+  | GetNotificationsPage
   | NotificationSuccess
   | NotificationFailure
-  | NotificationRead
-  | NotificationDelete
+  | ReadNotificationById
+  | DeleteNotificationById
   | NotificationDeleteSuccess
   | NotificationReadSuccess
-  | NotificationSubscribe
+  | SubscribeNotification
   | Clean;

@@ -19,6 +19,10 @@ import { createEventColor } from './color';
 import { FrequencyEnum } from './helper';
 import { IDay } from '../interfaces/reservation';
 
+export const LUNCH = 'LUNCH';
+export const OUT_OF_WORK = 'OUT_OF_WORK';
+export const OUT_OF_WORK_ALL_DAY = 'OUT_OF_WORK_ALL_DAY';
+
 export interface IMeta {
   time?: boolean;
   timeZone?: string;
@@ -70,7 +74,7 @@ export interface IDataEvent {
 
   updateLength(length: number): void;
 
-  getOverlapEvent(eventStartDay: Date, eventEndDay: Date, professionalId?: string): CalendarEvent[]
+  getOverlapEvent(eventStartDay: Date, eventEndDay: Date, professionalId?: string): CalendarEvent[] | undefined;
 
   sameDayEvent(recurring: any, event: CalendarEvent): boolean;
 
@@ -110,10 +114,13 @@ export class DataEvent implements IDataEvent {
 
   addEvent = (event?: CalendarEvent): void => {
     if (event) {
-      if (event.id === undefined || !this.calendarEvents.some(e => e.id === event.id && e.start === event.start)) {
-        if (!((this.calendarEnd && event.end && event.end > this.calendarEnd) ||
-          (this.calendarStart && event.start < this.calendarStart))) {
-          this.calendarEvents = [...this.calendarEvents, event];
+      if (!((this.calendarEnd && event.end && event.end > this.calendarEnd) ||
+        (this.calendarStart && event.start < this.calendarStart))) {
+        const overlap = this.getOverlap(event);
+        if (!event.meta.isReservation && overlap && overlap?.length > 0) {
+          this.validateEvent(event, overlap);
+        } else {
+          this.createEvent(event);
         }
       }
     }
@@ -136,22 +143,27 @@ export class DataEvent implements IDataEvent {
 
   getOverlapEvent = (
     eventStartDay: Date,
-    eventEndDay: Date,
+    eventEndDay?: Date,
     professionalId?: string,
-  ): CalendarEvent[] => {
-    if (professionalId) {
-      return this.calendarEvents.filter(
-        (eventA: CalendarEvent) => ((eventA.meta?.professionalId === professionalId) && (
-          (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
-          || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
-          || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
-        )));
+  ): CalendarEvent[] | undefined => {
+    let overlapEvents;
+    if (eventEndDay) {
+      if (professionalId) {
+        overlapEvents = this.calendarEvents.filter(
+          (eventA: CalendarEvent) => ((eventA.meta?.professionalId === professionalId) && (
+            (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
+            || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
+            || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
+          )));
+      } else {
+        overlapEvents = this.calendarEvents.filter(
+          (eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
+            || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
+            || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end),
+        );
+      }
     }
-    return this.calendarEvents.filter(
-      (eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
-        || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
-        || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end),
-    );
+    return overlapEvents;
   };
 
   sameDayEvent = (recurring: any, event: CalendarEvent): boolean => !this.calendarEvents
@@ -172,6 +184,63 @@ export class DataEvent implements IDataEvent {
   createRecurring(): void {
     this.recurringEvent = new RecurringEvent(this.calendarEnd!, this.calendarStart);
   }
+
+  private eventNotExists = (event: CalendarEvent): boolean =>
+    event.id === undefined ||
+    !this.calendarEvents.some(e => e.id === event.id && e.start.getTime() === event.start.getTime());
+
+  private getOverlap = (event: CalendarEvent): CalendarEvent[] | undefined => {
+    const end = event.end;
+    let overlapEvents;
+    if (end) {
+      const start = event.start;
+      overlapEvents = this.getOverlapEvent(start, end);
+    }
+    return overlapEvents;
+  };
+
+  private validateEvent = (
+    event: CalendarEvent,
+    overlapEvent: CalendarEvent[],
+  ): void => {
+    const start = event.start;
+    const end = event.end!;
+    let newEvent = undefined;
+    const hasReservationOverlap = overlapEvent.some(value => value.meta.isReservation);
+    overlapEvent.forEach(value => {
+      if (value.meta.isReservation) {
+        newEvent = event;
+      } else {
+        if ([OUT_OF_WORK_ALL_DAY, OUT_OF_WORK, LUNCH].includes(`${ event.id }`)) {
+          if (value.end) {
+            if (start < value.start && end < value.end) {
+              value.start = end;
+              newEvent = value;
+            } else if (start > value.start && end > value.end) {
+              value.end = start;
+              newEvent = value;
+            } else if (start < value.start && end > value.end) {
+              if (!hasReservationOverlap) {
+                this.filterEvent(value);
+              }
+              newEvent = event;
+            } else if (start > value.start && end < value.end) {
+              newEvent = undefined;
+            }
+          }
+        }
+      }
+    });
+    if (newEvent) {
+      this.createEvent(newEvent);
+    }
+  };
+
+  private createEvent = (event: CalendarEvent): void => {
+    if (this.eventNotExists(event)) {
+      this.calendarEvents = [...this.calendarEvents, event];
+    }
+  };
 }
 
 class RecurringEvent {
@@ -197,6 +266,7 @@ class RecurringEvent {
       professionalId: professionalId,
       onEachDate: onEachDate,
       rule: createRule(repeat, start, this.calendarEnd, start.getDate(), getWeekDay(start.getDay())),
+      priority: 1,
     }];
   };
 
@@ -217,12 +287,21 @@ class RecurringEvent {
       }),
       onEachDate: (date: Date, recurring: any) => createRecurringEvent(date, recurring, calendar, notWorking,
         unavailable, lunch, isDark, timeZone),
+      priority: 999,
     }];
   };
 
   execute(): void {
-    this.recurring.forEach(recurring => recurring.rule.all()
-      .forEach((date: Date) => recurring.onEachDate(date, recurring)));
+    const allEvents: { priority: number; recurring: any; date: Date }[] = [];
+
+    this.recurring.forEach(recurring => {
+      const priority = recurring.priority || 999;
+      recurring.rule.all().forEach((date: Date) => {
+        allEvents.push({ priority, recurring, date });
+      });
+    });
+    allEvents.sort((a, b) => a.priority - b.priority || a.date.getTime() - b.date.getTime())
+      .forEach(({ date, recurring }) => recurring.onEachDate(date, recurring));
   }
 }
 
@@ -231,8 +310,8 @@ export const newEvent = (
   color: string,
   start: Date,
   isDarkMode: boolean,
-  end?: Date,
-  id?: string,
+  end: Date,
+  id: string,
   meta: IMeta = new Meta(),
   draggable: boolean = false,
 ): CalendarEvent | undefined => {
@@ -255,8 +334,8 @@ export const calendarEvent = (
   color: string,
   start: Date,
   isDarkMode: boolean,
-  end?: Date,
-  id?: string,
+  end: Date,
+  id: string,
   meta: IMeta = new Meta(),
   draggable: boolean = false,
 ): CalendarEvent => ({
@@ -328,7 +407,7 @@ const createEvent = (date: Date, notWorking: string, unavailable: string,
   const newDate = dateToUTC(createNewDate(date), timeZone);
   if (!it) {
     const event = calendarEvent(notWorking, findStateColor('DEFAULT', isDarkMode), newDate,
-      isDarkMode, createNewDate(date, 23, 59), 'NOT_WORKING_ALL_DAY');
+      isDarkMode, createNewDate(date, 23, 59), OUT_OF_WORK_ALL_DAY);
     events = [...events, event];
   } else {
     const now = getNowTimeZone();
@@ -340,7 +419,7 @@ const createEvent = (date: Date, notWorking: string, unavailable: string,
       const endHour = start?.hour;
       const endMinute = start?.minute;
       const eventBefore = calendarEvent(notWorking, findStateColor('DEFAULT', isDarkMode),
-        newDate, isDarkMode, dateToUTC(createNewDate(date, endHour, endMinute), timeZone));
+        newDate, isDarkMode, dateToUTC(createNewDate(date, endHour, endMinute), timeZone), OUT_OF_WORK);
       events = [...events, eventBefore];
     }
     if (it.end) {
@@ -355,7 +434,7 @@ const createEvent = (date: Date, notWorking: string, unavailable: string,
       }
       const eventAfter = calendarEvent(notWorking, findStateColor('DEFAULT', isDarkMode),
         dateToUTC(createNewDate(date, startHour, startMinute), timeZone), isDarkMode,
-        dateToUTC(createNewDate(date, 23, 59), timeZone));
+        dateToUTC(createNewDate(date, 23, 59), timeZone), OUT_OF_WORK);
       events = [...events, eventAfter];
     }
     const ev = createLunchEvent(it, date, unavailable, lunch, isDarkMode, timeZone);
@@ -392,11 +471,11 @@ const createLunchEvent = (it: IAvailability, date: Date, unavailable: string, lu
       }
       const start = dateToUTC(createDate(timeZone), timeZone);
       const end = dateToUTC(createDate(timeZone, hour, minute), timeZone);
-      return newEvent(unavailable, findStateColor('DEFAULT', isDarkMode), start, isDarkMode, end);
+      return newEvent(unavailable, findStateColor('DEFAULT', isDarkMode), start, isDarkMode, end, LUNCH);
     } else {
       const start = dateToUTC(createNewDate(date, lunchStartHour, lunchStartMinute), timeZone);
       const end = dateToUTC(createNewDate(date, lunchEndHour, lunchEndMinute), timeZone);
-      return newEvent(lunch, findStateColor('DEFAULT', isDarkMode), start, isDarkMode, end);
+      return newEvent(lunch, findStateColor('DEFAULT', isDarkMode), start, isDarkMode, end, LUNCH);
     }
   }
 
@@ -419,7 +498,7 @@ const lunchEvent = (hour: number, lunchStartHour: number, minute: number, lunchS
   if ((lunchHour || lunchHour === 0) && (lunchMinute || lunchMinute === 0)) {
     const start = dateToUTC(createNewDate(date, lunchHour, lunchMinute), timeZone);
     const end = dateToUTC(createNewDate(date, lunchEndHour, lunchEndMinute), timeZone);
-    return newEvent(lunch, findStateColor('DEFAULT', isDarkMode), start, isDarkMode, end);
+    return newEvent(lunch, findStateColor('DEFAULT', isDarkMode), start, isDarkMode, end, LUNCH);
   }
 
   return undefined;
@@ -429,7 +508,13 @@ const createRule = (repeat: string, dtstart: Date, until: Date, monthDay: number
   let freq: Frequency | undefined;
   let byweekday: ByWeekday | undefined;
   let bymonthday: number | undefined;
+  let count: number | undefined;
+
   switch (repeat) {
+    case FrequencyEnum.none:
+      freq = RRule.DAILY;
+      count = 1;
+      break;
     case FrequencyEnum.onceAYear:
       freq = RRule.YEARLY;
       break;
@@ -451,7 +536,8 @@ const createRule = (repeat: string, dtstart: Date, until: Date, monthDay: number
     bymonthday,
     byweekday,
     dtstart,
-    until,
+    until: count ? undefined : until,
+    count,
   });
 };
 

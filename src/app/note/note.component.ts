@@ -73,12 +73,12 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   	if (this.isAddMode) {
   		this.store.dispatch(
-  			new fromActionsNote.NoteSave(note),
+  			new fromActionsNote.CreateNote(note),
   		);
   	} else {
   		note.id = this.id;
   		this.store.dispatch(
-  			new fromActionsNote.NoteUpdate(note),
+  			new fromActionsNote.UpdateNoteById(note),
   		);
   	}
   	return;
@@ -92,7 +92,7 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
   	return executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: this.note }, result => {
   		if (result) {
   			this.store.dispatch(
-  				new fromActionsNote.DeleteNote(result),
+  				new fromActionsNote.DeleteNoteById(result),
   			);
   		}
   	});
@@ -153,7 +153,7 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private getProfessionals = (): void => this.store.dispatch(new fromActionsNote.GetAllProfessional());
 
-  private getNote = (): void => this.store.dispatch(new fromActionsNote.NoteFind(this.id));
+  private getNote = (): void => this.store.dispatch(new fromActionsNote.FindNoteById(this.id));
 
   private subscribe = (): void => {
   	this.subscription = this.getState.subscribe(state => {

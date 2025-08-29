@@ -39,11 +39,11 @@ export class TreatmentGroupSortingComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  sorted = (sorted: ISorted[]): void => this.store.dispatch(new fromActionsTreatment.TreatmentGroupUpdateSort(sorted));
+  sorted = (sorted: ISorted[]): void => this.store.dispatch(new fromActionsTreatment.SortGroupTreatment(sorted));
 
   private clean = (): void => this.store.dispatch(new fromActionsTreatment.Clean());
 
-  private getTreatments = (): void => this.store.dispatch(new fromActionsTreatment.GetAllGroup());
+  private getTreatments = (): void => this.store.dispatch(new fromActionsTreatment.GetAllTreatmentsGroup());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((stateValue) => {

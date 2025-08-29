@@ -56,7 +56,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     }
     return this.store.dispatch(
-      new fromActionsRoom.UpdateMyServices({ id: this.roomId, prices }),
+      new fromActionsRoom.UpdateRoomServicesById({ id: this.roomId, prices }),
     );
   }
 
@@ -121,7 +121,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
     this.route.params.subscribe((routeParams) => {
       this.roomId = routeParams.id;
       this.store.dispatch(
-        new fromActionsRoom.GetMyServices({ id: this.roomId }),
+        new fromActionsRoom.FindRoomServicesById({ id: this.roomId }),
       );
     });
   };

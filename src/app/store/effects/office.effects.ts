@@ -12,9 +12,9 @@ import { UserService } from '../../services/user.service';
 @Injectable()
 export class OfficeEffects {
 
-  getAll$ = createEffect(() => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.getAll)).pipe(
+  getAll$ = createEffect(() => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.getOfficesPage)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.officeService.getAll(payload.active, payload.direction, payload.page,
+    switchMap((payload: any) => this.officeService.getOfficesPage(payload.active, payload.direction, payload.page,
       payload.size).pipe(
       switchMap((response: any) => of(new fromActionsOffice.OfficeSuccess(response))),
       catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({ error: err.error }))),
@@ -24,23 +24,23 @@ export class OfficeEffects {
   getAllManager$ = createEffect(
     () => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.getAllManager)).pipe(
       map((action: any) => action.payload),
-      switchMap(() => this.userService.getAllManagers().pipe(
+      switchMap(() => this.userService.getManagers().pipe(
         switchMap((response: any) => of(new fromActionsOffice.OfficeSuccess(response ? response : []))),
         catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({ error: err.error }))),
       )),
     ));
 
-  findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.officeFind)).pipe(
+  findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.findOfficeById)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.officeService.getById(payload).pipe(
+    switchMap((payload: any) => this.officeService.findOfficeById(payload).pipe(
       switchMap((office: any) => of(new fromActionsOffice.OfficeSelected({ office }))),
       catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({ error: err.error }))),
     )),
   ));
 
-  save$ = createEffect(() => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.officeSave)).pipe(
+  save$ = createEffect(() => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.createOffice)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.officeService.add(payload).pipe(
+    switchMap((payload: any) => this.officeService.createOffice(payload).pipe(
       switchMap((response: any) => {
         const message = this.translate.instant('OFFICE.CREATED', { name: response.name });
         return of(new fromActionsOffice.OfficeSaveSuccess({ message }));
@@ -48,9 +48,9 @@ export class OfficeEffects {
     )),
   ));
 
-  update = createEffect(() => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.officeUpdate)).pipe(
+  update = createEffect(() => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.updateOfficeById)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.officeService.update(payload).pipe(
+    switchMap((payload: any) => this.officeService.updateOfficeById(payload).pipe(
       switchMap((response: any) => {
         const message = this.translate.instant('OFFICE.UPDATED.MESSAGE', { name: response.name });
         return of(new fromActionsOffice.OfficeSaveSuccess({ message }));
@@ -58,9 +58,9 @@ export class OfficeEffects {
     )),
   ));
 
-  delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.officeDelete)).pipe(
+  delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.deleteOfficeById)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.officeService.delete(payload.id).pipe(
+    switchMap((payload: any) => this.officeService.deleteOfficeById(payload.id).pipe(
       switchMap(() => {
         const message = this.translate.instant('OFFICE.DELETED.MESSAGE', { name: payload.name });
         return of(new fromActionsOffice.OfficeSaveSuccess({ message }));

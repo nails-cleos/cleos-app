@@ -3,8 +3,8 @@ import { Action } from '@ngrx/store';
 export enum PaymentActionTypes {
   paymentSuccess = '[Payment] Success',
   paymentSave = '[Payment] Save',
-  paymentUpdate = '[Payment] Update',
-  paymentUpdateLink = '[Payment] Update link',
+  adjustPayments = '[Payment] Adjust Payments',
+  updatePaymentById = '[Payment] Update payment by id',
   paymentSend = '[Payment] Send',
   paymentNotify = '[Payment] Notify',
   paymentRecreate = '[Payment] Recreate',
@@ -13,9 +13,9 @@ export enum PaymentActionTypes {
   paymentFailure = '[Payment] Failure',
   paymentSelected = '[Payment] Selected',
   paymentByResource = '[Payment] Find by resource',
-  paymentFind = '[Payment] Find',
-  paymentOptions = '[Payment] Options',
-  paymentCreate = '[Payment] Create',
+  findPaymentById = '[Payment] Find payment by ID',
+  paymentOptions = '[Payment] Payment options',
+  createPaymentLink = '[Payment] Create payment link',
   clean = '[Payment] Clean'
 }
 
@@ -40,15 +40,15 @@ export class PaymentSave implements Action {
   }
 }
 
-export class PaymentUpdate implements Action {
-  readonly type = PaymentActionTypes.paymentUpdate;
+export class AdjustPayments implements Action {
+  readonly type = PaymentActionTypes.adjustPayments;
 
   constructor(public payload: any) {
   }
 }
 
-export class PaymentUpdateLink implements Action {
-  readonly type = PaymentActionTypes.paymentUpdateLink;
+export class UpdatePaymentById implements Action {
+  readonly type = PaymentActionTypes.updatePaymentById;
 
   constructor(public payload: any) {
   }
@@ -103,8 +103,8 @@ export class PaymentFindByResourceId implements Action {
   }
 }
 
-export class PaymentFind implements Action {
-  readonly type = PaymentActionTypes.paymentFind;
+export class FindPaymentById implements Action {
+  readonly type = PaymentActionTypes.findPaymentById;
 
   constructor(public payload: any) {
   }
@@ -114,8 +114,8 @@ export class PaymentOptions implements Action {
   readonly type = PaymentActionTypes.paymentOptions;
 }
 
-export class PaymentCreate implements Action {
-  readonly type = PaymentActionTypes.paymentCreate;
+export class CreatePaymentLink implements Action {
+  readonly type = PaymentActionTypes.createPaymentLink;
 
   constructor(public payload: any) {
   }
@@ -127,8 +127,8 @@ export class Clean implements Action {
 
 export type All =
   | PaymentSave
-  | PaymentUpdate
-  | PaymentUpdateLink
+  | AdjustPayments
+  | UpdatePaymentById
   | PaymentSend
   | PaymentRecreate
   | PaymentNotify
@@ -137,8 +137,8 @@ export type All =
   | PaymentNotComplete
   | PaymentFailure
   | PaymentFindByResourceId
-  | PaymentFind
+  | FindPaymentById
   | PaymentSelected
-  | PaymentCreate
+  | CreatePaymentLink
   | PaymentOptions
   | Clean;

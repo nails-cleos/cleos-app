@@ -14,7 +14,7 @@ export class CurrencyService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getAll = (
+  getCurrenciesPage = (
     sort: string,
     direction: string,
     page: number,
@@ -26,13 +26,13 @@ export class CurrencyService {
 
   getAllCurrency = (): Observable<ICurrency[]> => this.http.get<ICurrency[]>(this.urlV1);
 
-  getById = (id: string): Observable<ICurrency | undefined> => this.http.get<ICurrency>(toUrl(this.urlV1, id));
+  findCurrencyById = (id: string): Observable<ICurrency | undefined> => this.http.get<ICurrency>(toUrl(this.urlV1, id));
 
-  add = (currency: ICurrency): Observable<ICurrency> => this.http.post<ICurrency>(this.urlV1, currency);
+  createCurrency = (currency: ICurrency): Observable<ICurrency> => this.http.post<ICurrency>(this.urlV1, currency);
 
-  delete = (id: string): Observable<ICurrency> => this.http.delete<ICurrency>(toUrl(this.urlV1, id));
+  deleteCurrencyById = (id: string): Observable<ICurrency> => this.http.delete<ICurrency>(toUrl(this.urlV1, id));
 
-  update = (currency: ICurrency): Observable<ICurrency> => this.http.patch<ICurrency>(
+  updateCurrencyById = (currency: ICurrency): Observable<ICurrency> => this.http.patch<ICurrency>(
     toUrl(this.urlV1, currency.id!), currency,
   );
 }

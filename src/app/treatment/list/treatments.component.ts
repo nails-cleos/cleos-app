@@ -80,7 +80,7 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
   	dialogRef.afterClosed().subscribe(result => {
   		if (result) {
   			this.store.dispatch(
-  				new fromActionsTreatment.DeleteTreatment(result),
+  				new fromActionsTreatment.DeleteTreatmentGroupById(result),
   			);
   		}
   	});
@@ -99,7 +99,7 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
   private clean = (): void => this.store.dispatch(new fromActionsTreatment.Clean());
 
   private getTreatments = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsTreatment.GetAll({
+  	new fromActionsTreatment.GetTreatmentsPage({
   		active: this.sort.active,
   		direction: this.sort.direction,
   		size: this.pageSize,

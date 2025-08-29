@@ -27,9 +27,9 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case AccountActionTypes.accountTransactionDetail:
-    case AccountActionTypes.accountFindByCustomer:
-    case AccountActionTypes.accountFind: {
+    case AccountActionTypes.findTransactionById:
+    case AccountActionTypes.findAccountByCustomerId:
+    case AccountActionTypes.findAccountById: {
       return {
         ...state,
         errorMessage: null,
@@ -47,7 +47,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case AccountActionTypes.accountFindTransactions: {
+    case AccountActionTypes.getTransactionsByAccountId: {
       return {
         ...state,
         data: {
@@ -106,8 +106,8 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false,
       };
     }
-    case AccountActionTypes.accountUpdate:
-    case AccountActionTypes.accountSave: {
+    case AccountActionTypes.updateAccountById:
+    case AccountActionTypes.addMoney: {
       return {
         ...state,
         errorMessage: null,

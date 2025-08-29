@@ -11,35 +11,36 @@ import { Router } from '@angular/router';
 @Injectable()
 export class ExpenseEffects {
 
-  getAll$ = createEffect(() => this.actions.pipe(ofType(fromActionsExpense.ExpenseActionTypes.getAll)).pipe(
+  getAll$ = createEffect(() => this.actions.pipe(ofType(fromActionsExpense.ExpenseActionTypes.getExpensesPage)).pipe(
     map((action: any) => action.payload),
     switchMap(
-      (payload: any) => this.expenseService.getAll(payload.roomId, payload.active, payload.direction, payload.page,
-        payload.size, payload.filter, payload.dateFilter).pipe(
+      (payload: any) => this.expenseService.getExpensesPage(payload.roomId, payload.active, payload.direction,
+        payload.page, payload.size, payload.filter, payload.dateFilter).pipe(
         switchMap((response: any) => of(new fromActionsExpense.ExpenseSuccess(response))),
         catchError((err: HttpErrorResponse) => of(new fromActionsExpense.ExpenseFailure({ error: err.error }))),
       )),
   ));
 
-  findOne$ = createEffect(() => this.actions.pipe(ofType(fromActionsExpense.ExpenseActionTypes.expenseFind)).pipe(
+  findOne$ = createEffect(() => this.actions.pipe(ofType(fromActionsExpense.ExpenseActionTypes.findExpenseById)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.expenseService.getById(payload.roomId, payload.id).pipe(
+    switchMap((payload: any) => this.expenseService.findExpenseById(payload.roomId, payload.id).pipe(
       switchMap((expense: any) => of(new fromActionsExpense.ExpenseSelected({ expense }))),
       catchError((err: HttpErrorResponse) => of(new fromActionsExpense.ExpenseFailure({ error: err.error }))),
     )),
   ));
 
-  getInfo$ = createEffect(() => this.actions.pipe(ofType(fromActionsExpense.ExpenseActionTypes.getExpenseInfo)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.expenseService.getExpenseInfo(payload).pipe(
-      switchMap((expense: any) => of(new fromActionsExpense.ExpenseInfoSuccess(expense))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsExpense.ExpenseFailure({ error: err.error }))),
-    )),
-  ));
+  getInfo$ = createEffect(() => this.actions.pipe(ofType(fromActionsExpense.ExpenseActionTypes.getAllExpensesInfo))
+    .pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.expenseService.getAllExpensesInfo(payload).pipe(
+        switchMap((expense: any) => of(new fromActionsExpense.ExpenseInfoSuccess(expense))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsExpense.ExpenseFailure({ error: err.error }))),
+      )),
+    ));
 
-  save$ = createEffect(() => this.actions.pipe(ofType(fromActionsExpense.ExpenseActionTypes.expenseSave)).pipe(
+  save$ = createEffect(() => this.actions.pipe(ofType(fromActionsExpense.ExpenseActionTypes.createExpense)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.expenseService.add(payload.roomId, payload.expense).pipe(
+    switchMap((payload: any) => this.expenseService.createExpense(payload.roomId, payload.expense).pipe(
       switchMap((response: any) => {
         const message = this.translate.instant('EXPENSE.CREATED', { invoice: response.invoice });
         return of(new fromActionsExpense.ExpenseSaveSuccess({ message }));
@@ -47,9 +48,9 @@ export class ExpenseEffects {
     )),
   ));
 
-  update = createEffect(() => this.actions.pipe(ofType(fromActionsExpense.ExpenseActionTypes.expenseUpdate)).pipe(
+  update = createEffect(() => this.actions.pipe(ofType(fromActionsExpense.ExpenseActionTypes.updateExpenseById)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.expenseService.update(payload.roomId, payload.expense).pipe(
+    switchMap((payload: any) => this.expenseService.updateExpenseById(payload.roomId, payload.expense).pipe(
       switchMap((response: any) => {
         const message = this.translate.instant('EXPENSE.UPDATED.MESSAGE', { invoice: response.invoice });
         return of(new fromActionsExpense.ExpenseSaveSuccess({ message }));
@@ -57,9 +58,9 @@ export class ExpenseEffects {
     )),
   ));
 
-  delete$ = createEffect(() => this.actions.pipe(ofType(fromActionsExpense.ExpenseActionTypes.expenseDelete)).pipe(
+  delete$ = createEffect(() => this.actions.pipe(ofType(fromActionsExpense.ExpenseActionTypes.deleteExpenseById)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.expenseService.delete(payload.roomId, payload.id).pipe(
+    switchMap((payload: any) => this.expenseService.deleteExpenseById(payload.roomId, payload.id).pipe(
       switchMap(() => {
         const message = this.translate.instant('EXPENSE.DELETED.MESSAGE', { invoice: payload.invoice });
         return of(new fromActionsExpense.ExpenseSaveSuccess({ message }));

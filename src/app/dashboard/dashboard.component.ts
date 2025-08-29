@@ -328,7 +328,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       reservation.professionalId = professionalId;
     }
     this.store.dispatch(
-      new fromActionsDashboard.UpdateEvent(reservation),
+      new fromActionsDashboard.UpdateEventById(reservation),
     );
   };
 
@@ -407,7 +407,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           const title = it.duration ?
             it.title : `${ this.translate.instant('COMMON.ALL_DAY.CHECK') } - ${ it.title }`;
 
-          let path = 'unavailable/';
+          let path = `${ this.language }/unavailable/`;
           if (it.type === 'BLOCK_AGENDA') {
             path += 'block-agenda/';
           }
@@ -455,7 +455,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private getEvents = (): void => {
     this.calendar.resetEvents();
     this.store.dispatch(
-      new fromActionsDashboard.GetDashboardEvents(this.viewDate),
+      new fromActionsDashboard.MeEvent(this.viewDate),
     );
   };
 
@@ -468,7 +468,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       case 'APPROVE':
         this.calendar.filterEvent(event);
         this.store.dispatch(
-          new fromActionsReservation.Approve(reservationId),
+          new fromActionsReservation.ApproveReservation(reservationId),
         );
         event.meta.state = States.approved;
         setTimeout(() => this.calendar.addEvent(event), 1);

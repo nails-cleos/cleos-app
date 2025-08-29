@@ -27,7 +27,7 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case AdditionalActionTypes.getAll: {
+    case AdditionalActionTypes.getAdditionalPage: {
       return {
         ...state,
         data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IAdditional>,
@@ -46,7 +46,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case AdditionalActionTypes.additionalFind: {
+    case AdditionalActionTypes.findAdditionalById: {
       return {
         ...state,
         data: {} as IAdditional,
@@ -94,9 +94,9 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false,
       };
     }
-    case AdditionalActionTypes.additionalUpdate:
-    case AdditionalActionTypes.additionalSave:
-    case AdditionalActionTypes.additionalDelete: {
+    case AdditionalActionTypes.updateAdditionalById:
+    case AdditionalActionTypes.createAdditional:
+    case AdditionalActionTypes.deleteAdditionalById: {
       return {
         ...state,
         errorMessage: null,
@@ -105,7 +105,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: true,
       };
     }
-    case AdditionalActionTypes.findGroups: {
+    case AdditionalActionTypes.getAllTreatmentsGroup: {
       return {
         ...state,
         groups: null,

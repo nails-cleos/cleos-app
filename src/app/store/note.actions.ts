@@ -3,13 +3,13 @@ import { Action } from '@ngrx/store';
 export enum NoteActionTypes {
   getAllProfessional = '[Note] Get all professional',
   noteSuccess = '[Note] Success',
-  noteSave = '[Note] Save',
-  noteUpdate = '[Note] Update',
+  createNote = '[Note] Create Note',
+  updateNoteById = '[Note] Update note by Id',
   noteSaveSuccess = '[Note] Save Success',
   noteFailure = '[Note] Failure',
   noteSelected = '[Note] Selected',
-  noteFind = '[Note] Find',
-  noteDelete = '[Note] Delete',
+  findNoteById = '[Note] Find note by Id',
+  deleteNoteById = '[Note] Delete note by Id',
   noteComplete = '[Note] Complete',
   clean = '[Note] Clean'
 }
@@ -25,15 +25,15 @@ export class NoteSuccess implements Action {
   }
 }
 
-export class NoteSave implements Action {
-  readonly type = NoteActionTypes.noteSave;
+export class CreateNote implements Action {
+  readonly type = NoteActionTypes.createNote;
 
   constructor(public payload: any) {
   }
 }
 
-export class NoteUpdate implements Action {
-  readonly type = NoteActionTypes.noteUpdate;
+export class UpdateNoteById implements Action {
+  readonly type = NoteActionTypes.updateNoteById;
 
   constructor(public payload: any) {
   }
@@ -60,15 +60,15 @@ export class NoteSelected implements Action {
   }
 }
 
-export class NoteFind implements Action {
-  readonly type = NoteActionTypes.noteFind;
+export class FindNoteById implements Action {
+  readonly type = NoteActionTypes.findNoteById;
 
   constructor(public payload: any) {
   }
 }
 
-export class DeleteNote implements Action {
-  readonly type = NoteActionTypes.noteDelete;
+export class DeleteNoteById implements Action {
+  readonly type = NoteActionTypes.deleteNoteById;
 
   constructor(public payload: any) {
   }
@@ -87,13 +87,13 @@ export class Clean implements Action {
 
 export type All =
   | GetAllProfessional
-  | NoteSave
-  | NoteUpdate
+  | CreateNote
+  | UpdateNoteById
   | NoteSuccess
   | NoteSaveSuccess
   | NoteFailure
-  | NoteFind
+  | FindNoteById
   | NoteSelected
-  | DeleteNote
+  | DeleteNoteById
   | CompleteNote
   | Clean;

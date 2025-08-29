@@ -1,11 +1,11 @@
 import { Action } from '@ngrx/store';
 
 export enum DiscountActionTypes {
-  getAll = '[Discount] Get all',
-  getMyDiscounts = '[Discount] get my discounts',
-  getReferrals = '[Discount] get my referrals',
-  getCurrencies = '[Discount] get currencies',
-  addDiscount = '[Discount] Add discount',
+  getDiscountsPage = '[Discount] Get discounts page',
+  getMyDiscountsPage = '[Discount] Get my discounts page',
+  getMyReferrals = '[Discount] Get my referrals',
+  getAllCurrency = '[Discount] Get all currency',
+  sendDiscountToCustomers = '[Discount] Send discount to customers',
   discountSuccess = '[Discount] Success',
   referralSuccess = '[Discount] referral Success',
   currencySuccess = '[Discount] currency Success',
@@ -20,30 +20,30 @@ export enum DiscountActionTypes {
   clean = '[Discount] Clean'
 }
 
-export class GetAll implements Action {
-  readonly type = DiscountActionTypes.getAll;
+export class GetDiscountsPage implements Action {
+  readonly type = DiscountActionTypes.getDiscountsPage;
 
   constructor(public payload: any) {
   }
 }
 
-export class GetMyDiscounts implements Action {
-  readonly type = DiscountActionTypes.getMyDiscounts;
+export class GetMyDiscountsPage implements Action {
+  readonly type = DiscountActionTypes.getMyDiscountsPage;
 
   constructor(public payload: any) {
   }
 }
 
-export class GetReferrals implements Action {
-  readonly type = DiscountActionTypes.getReferrals;
+export class GetMyReferrals implements Action {
+  readonly type = DiscountActionTypes.getMyReferrals;
 }
 
-export class GetCurrencies implements Action {
-  readonly type = DiscountActionTypes.getCurrencies;
+export class GetAllCurrency implements Action {
+  readonly type = DiscountActionTypes.getAllCurrency;
 }
 
-export class AddDiscount implements Action {
-  readonly type = DiscountActionTypes.addDiscount;
+export class SendDiscountToCustomers implements Action {
+  readonly type = DiscountActionTypes.sendDiscountToCustomers;
 
   constructor(public payload: any) {
   }
@@ -131,11 +131,11 @@ export class Clean implements Action {
 }
 
 export type All =
-  | GetAll
-  | GetMyDiscounts
-  | GetReferrals
-  | GetCurrencies
-  | AddDiscount
+  | GetDiscountsPage
+  | GetMyDiscountsPage
+  | GetMyReferrals
+  | GetAllCurrency
+  | SendDiscountToCustomers
   | DiscountSave
   | DiscountUpdate
   | DiscountSuccess

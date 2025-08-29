@@ -54,13 +54,11 @@ import {
   formatTime,
   getAvailability,
   getCurrentTimeZone,
-  getDuration,
   getDurationOrUndefined,
   getNowTimeZone,
   getStartEndDay,
   getTime,
   getTimeNumber,
-  greaterOrEqualsThan,
   IDuration,
   isBetween,
   isSameTimeZone,
@@ -78,6 +76,7 @@ import { DiscountType, IDiscount, IUserDiscount } from '../interfaces/discount';
 import {
   createRoomOffice,
   createTreatmentGroupService,
+  currencySymbol,
   executeDialogNoWidth,
   getPrice,
   newAdditional,
@@ -351,7 +350,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         reservation.roomId = valueChange(this.room.value.id, this.reservation.room.id);
         reservation.professionalId = valueChange(this.professional.value.id, this.reservation.professional.id);
         this.store.dispatch(
-          new fromActionsReservation.Edit({ reservation, role }),
+          new fromActionsReservation.UpdateReservationById({ reservation, role }),
         );
       } else {
         reservation.treatmentId = this.treatment.value.id;
@@ -359,7 +358,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         reservation.professionalId = this.professional.value.id;
         reservation.discountId = this.discount.value;
         this.store.dispatch(
-          new fromActionsReservation.ReservationSave({ reservation, role }),
+          new fromActionsReservation.CreateReservation({ reservation, role }),
         );
       }
     }
@@ -523,7 +522,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
       this.store.dispatch(
-        new fromActionsReservation.SearchReservation({
+        new fromActionsReservation.SearchAvailability({
           dates,
           roomId: this.room.value.id,
           professionalId: this.professional.value.id,
@@ -700,7 +699,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.events.removeAt(index);
   };
 
-  private createEvent = (eventData: IDataEvent, date: Date, state: string, id?: string): void => {
+  private createEvent = (eventData: IDataEvent, date: Date, state: string, id: string): void => {
     this.errors.overlapping = false;
 
     const dateGroup = this.dateTimeList.at(eventData.index) as FormGroup;
@@ -719,7 +718,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       let content;
       const selectedEvent = this.events.at(eventData.index)?.get('event')?.value;
       const eventsOverlapping = eventData.getOverlapEvent(start, end, this.professionalId);
-      if (eventsOverlapping.length && eventsOverlapping[0] !== selectedEvent) {
+      if (eventsOverlapping?.length && eventsOverlapping[0] !== selectedEvent) {
         let message = '';
         eventsOverlapping.forEach(e => {
           message += `<div>${ e.title }</div>`;
@@ -748,7 +747,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   private createEventForm = (): FormGroup => this.formBuilder.group({ event: ['', Validators.required] });
 
   private createNewEvent = (start: Date, end: Date, state: string, timeZone: string = getCurrentTimeZone(),
-    id?: string): CalendarEvent | undefined => {
+    id: string): CalendarEvent | undefined => {
     let treatments = createBullet(this.treatment.value.name);
     treatments += this.additionalSelected.map(additional => createBullet(additional.name));
 
@@ -759,6 +758,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     const meta = new Meta(true, timeZone, undefined, undefined, this.professional.value.id);
+    meta.isReservation = true;
     return newEvent(detail, findStateColor(state, this.isDarkMode), start, this.isDarkMode, end, id, meta, true);
   };
 
@@ -835,7 +835,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           });
         }
         this.professionalList = value.professionals;
-        const professional = value.professionals?.find((o: IRoom) => o.id === this.professionalId);
+        const professional = value.professionals?.find((o: IUser) => o.id === this.professionalId);
         if (professional) {
           this.professionalList = value.professionals;
           if (this.professional.value.id !== this.professionalId) {
@@ -1037,9 +1037,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       if (it.duration || it.allDay) {
         const startDate = newDateTimestamp(it.timestamp, this.room.value.timeZone);
         const start = it.allDay ? createNewDate(startDate) : startDate;
-        const duration = getDuration(it.allDay, it.duration);
-        const id = it.id;
-        const allDay = it.allDay;
         const professionalId = it.professional.id;
         const title = this.translate.instant('RESERVATION.EVENT.UNAVAILABLE', {
           description: it.description ? it.description : '',
@@ -1049,16 +1046,9 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         if (it.type === 'BLOCK_AGENDA') {
           path += 'block-agenda/';
         }
-        if (it.repeat === 'NONE') {
-          if (!greaterOrEqualsThan(start, this.maxCalendarDate)) {
-            const data = { id, allDay, title, path, duration, professionalId };
-            this.validateUnavailable(start, data, dataEvent);
-          }
-        } else {
-          dataEvent.recurringEvent?.addFrequency(it.repeat, start, it.id, title, 'UNAVAILABLE', path,
-            (date, recurring) => this.validateUnavailable(date, recurring, dataEvent),
-            getDurationOrUndefined(it.duration), professionalId, it.allDay);
-        }
+        dataEvent.recurringEvent?.addFrequency(it.repeat, start, it.id, title, 'UNAVAILABLE', path,
+          (date, recurring) => this.validateUnavailable(date, recurring, dataEvent),
+          getDurationOrUndefined(it.duration), professionalId, it.allDay);
       }
     });
   };
@@ -1187,7 +1177,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const groupId = this.group?.value?.id || this.groupId;
     if (roomId) {
       this.store.dispatch(
-        new fromActionsReservation.GetAllAdditional({ roomId, groupId }),
+        new fromActionsReservation.FindAllAdditionalByGroupId({ roomId, groupId }),
       );
     }
   };
@@ -1280,7 +1270,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         let title = ud.discountCustomer.name;
         switch (ud.discountCustomer.type) {
           case DiscountType.money:
-            title = `$ ${ ud.discountCustomer.amount } ${ title }`;
+            title =
+              `${ currencySymbol(ud.discountCustomer.discount?.currency) } ${ ud.discountCustomer.amount } ${ title }`;
             break;
           case DiscountType.percentage:
             title = `${ ud.discountCustomer.amount } % ${ title }`;

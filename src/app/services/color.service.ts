@@ -14,7 +14,7 @@ export class ColorService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getAll = (
+  getColorsPage = (
     sort: string,
     direction: string,
     page: number,
@@ -23,17 +23,17 @@ export class ColorService {
     { params: createFilter(page, size, sort, direction) },
   );
 
-  getAllByTreatmentId = (treatmentId: string): Observable<IColor[]> => this.http.get<IColor[]>(
+  findColorsByTreatmentId = (treatmentId: string): Observable<IColor[]> => this.http.get<IColor[]>(
     toUrl(this.urlV1, 'treatments', treatmentId),
   );
 
   getAllColors = (): Observable<IColor[]> => this.http.get<IColor[]>(this.urlV1);
 
-  getById = (id: string): Observable<IColor | undefined> => this.http.get<IColor>(toUrl(this.urlV1, id));
+  findColorById = (id: string): Observable<IColor | undefined> => this.http.get<IColor>(toUrl(this.urlV1, id));
 
-  add = (color: IColor): Observable<IColor> => this.http.post<IColor>(this.urlV1, color);
+  createColor = (color: IColor): Observable<IColor> => this.http.post<IColor>(this.urlV1, color);
 
-  delete = (id: string): Observable<IColor> => this.http.delete<IColor>(toUrl(this.urlV1, id));
+  deleteColorById = (id: string): Observable<IColor> => this.http.delete<IColor>(toUrl(this.urlV1, id));
 
-  update = (color: IColor): Observable<IColor> => this.http.patch<IColor>(toUrl(this.urlV1, color.id!), color);
+  updateColorById = (color: IColor): Observable<IColor> => this.http.patch<IColor>(toUrl(this.urlV1, color.id!), color);
 }

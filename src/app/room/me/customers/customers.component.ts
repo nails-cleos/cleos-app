@@ -64,7 +64,7 @@ export class CustomersComponent implements OnInit, AfterViewInit, OnDestroy {
   	this.route.params.subscribe((routeParams) => {
   		this.roomId = routeParams.id;
   		this.store.dispatch(
-  			new fromActionsRoom.GetCustomerInfo({ id: this.roomId }),
+  			new fromActionsRoom.GetAllCustomersInfo({ id: this.roomId }),
   		);
   	});
   };

@@ -26,7 +26,7 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case ExpenseActionTypes.getAll: {
+    case ExpenseActionTypes.getExpensesPage: {
       return {
         ...state,
         data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IExpense>,
@@ -36,7 +36,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case ExpenseActionTypes.getExpenseInfo: {
+    case ExpenseActionTypes.getAllExpensesInfo: {
       return {
         ...state,
         info: null,
@@ -46,7 +46,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case ExpenseActionTypes.expenseFind: {
+    case ExpenseActionTypes.findExpenseById: {
       return {
         ...state,
         selected: {} as IExpense,
@@ -102,9 +102,9 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false,
       };
     }
-    case ExpenseActionTypes.expenseUpdate:
-    case ExpenseActionTypes.expenseSave:
-    case ExpenseActionTypes.expenseDelete: {
+    case ExpenseActionTypes.updateExpenseById:
+    case ExpenseActionTypes.createExpense:
+    case ExpenseActionTypes.deleteExpenseById: {
       return {
         ...state,
         errorMessage: null,

@@ -15,6 +15,7 @@ import { IPayment, IPaymentOption } from '../../interfaces/payment';
 import { IAdditional } from '../../interfaces/additional';
 import { IOffice } from '../../interfaces/office';
 import { IColorAll } from '../../interfaces/color';
+import { IReview } from '../../interfaces/review';
 
 export interface State {
   data: IReservation | IRoomReservation[] | IReservation[] | ICustomerReservation | IAvailableDTO | null;
@@ -32,6 +33,7 @@ export interface State {
   history: IReservation[] | null;
   colors: IColorAll[] | null;
   paymentOptions: IPaymentOption[] | null;
+  review: IReview | null;
   errorMessage: string | null;
   error: any;
   subErrors: any;
@@ -56,6 +58,7 @@ export const initialState: State = {
   history: null,
   colors: null,
   paymentOptions: null,
+  review: null,
   errorMessage: null,
   error: null,
   subErrors: null,
@@ -79,7 +82,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case ReservationActionTypes.getAllFilterPage: {
+    case ReservationActionTypes.getAllFilterReservations: {
       return {
         ...state,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -92,7 +95,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case ReservationActionTypes.getAllPage: {
+    case ReservationActionTypes.findPaged: {
       return {
         ...state,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -129,7 +132,7 @@ export const reducer = (state = initialState, action: All): State => {
       };
     }
     case ReservationActionTypes.customerSearchReservation:
-    case ReservationActionTypes.searchReservation: {
+    case ReservationActionTypes.searchAvailability: {
       return {
         ...state,
         data: null,
@@ -163,7 +166,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case ReservationActionTypes.getRooms:
+    case ReservationActionTypes.getAllRooms:
     case ReservationActionTypes.findRooms: {
       return {
         ...state,
@@ -176,7 +179,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case ReservationActionTypes.getAdditional: {
+    case ReservationActionTypes.findAllAdditionalByGroupId: {
       return {
         ...state,
         additional: null,
@@ -186,7 +189,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case ReservationActionTypes.getTreatments: {
+    case ReservationActionTypes.getAllTreatments: {
       return {
         ...state,
         treatmentDiscount: null,
@@ -196,10 +199,10 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case ReservationActionTypes.updateNote:
-    case ReservationActionTypes.updateDiscount:
-    case ReservationActionTypes.updateTimestamp:
-    case ReservationActionTypes.edit: {
+    case ReservationActionTypes.updateNoteByReservationId:
+    case ReservationActionTypes.updateDiscountByReservationId:
+    case ReservationActionTypes.updateTimestampByReservationId:
+    case ReservationActionTypes.updateReservationById: {
       return {
         ...state,
         data: {} as IReservation,
@@ -225,7 +228,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case ReservationActionTypes.reservationFindHistory: {
+    case ReservationActionTypes.findReservationHistoryById: {
       return {
         ...state,
         history: [{}, {}, {}],
@@ -237,12 +240,12 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case ReservationActionTypes.approve:
+    case ReservationActionTypes.approveReservation:
     case ReservationActionTypes.start:
-    case ReservationActionTypes.complete:
-    case ReservationActionTypes.paymentComplete:
-    case ReservationActionTypes.cancel:
-    case ReservationActionTypes.customerCancel:
+    case ReservationActionTypes.completeReservation:
+    case ReservationActionTypes.paymentCompleteReservation:
+    case ReservationActionTypes.cancelReservation:
+    case ReservationActionTypes.customerCancelReservation:
     case ReservationActionTypes.reservationFind: {
       return {
         ...state,
@@ -381,8 +384,8 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false,
       };
     }
-    case ReservationActionTypes.reservationSave:
-    case ReservationActionTypes.reservationDelete: {
+    case ReservationActionTypes.createReservation:
+    case ReservationActionTypes.deleteReservationById: {
       return {
         ...state,
         errorMessage: null,
@@ -392,8 +395,8 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: true,
       };
     }
-    case ReservationActionTypes.updateTracking:
-    case ReservationActionTypes.executeTracking: {
+    case ReservationActionTypes.updateTrackingByReservationId:
+    case ReservationActionTypes.executeTrackingByReservationId: {
       return {
         ...state,
         tracking: null,
@@ -403,7 +406,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case ReservationActionTypes.findTracking: {
+    case ReservationActionTypes.findTrackingByReservationId: {
       return {
         ...state,
         tracking: null,
@@ -444,7 +447,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case ReservationActionTypes.reservationReview: {
+    case ReservationActionTypes.createReviewByReservationId: {
       return {
         ...state,
         errorMessage: null,
@@ -454,7 +457,29 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false,
       };
     }
-    case ReservationActionTypes.getAllColorsByTreatmentId: {
+    case ReservationActionTypes.findReviewByReservationId: {
+      return {
+        ...state,
+        review: null,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null,
+        isLoading: false,
+      };
+    }
+    case ReservationActionTypes.reservationReviewSuccess: {
+      return {
+        ...state,
+        review: action.payload,
+        errorMessage: null,
+        error: null,
+        subErrors: null,
+        message: null,
+        isLoading: false,
+      };
+    }
+    case ReservationActionTypes.findColorsByTreatmentId: {
       return {
         ...state,
         colors: null,

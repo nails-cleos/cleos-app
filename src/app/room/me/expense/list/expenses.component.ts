@@ -127,7 +127,7 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   	dialogRef.afterClosed().subscribe(result => {
   		if (result) {
   			this.store.dispatch(
-  				new fromActionsExpense.DeleteExpense({ roomId: this.roomId, id: result.id, invoice: result.invoice }),
+  				new fromActionsExpense.DeleteExpenseById({ roomId: this.roomId, id: result.id, invoice: result.invoice }),
   			);
   		}
   	});
@@ -153,19 +153,19 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private getExpenses = (page: number = 0): void => {
-  	this.paginatorSubscription?.unsubscribe();
-  	this.paginatorSubscription = undefined;
-  	this.store.dispatch(
-  		new fromActionsExpense.GetAll({
-  			roomId: this.roomId,
-  			active: this.sort.active,
-  			direction: this.sort.direction,
-  			size: this.pageSize,
-  			filter: this.filter,
-  			dateFilter: this.dateFilter,
-  			page,
-  		}),
-  	);
+    this.paginatorSubscription?.unsubscribe();
+    this.paginatorSubscription = undefined;
+    this.store.dispatch(
+      new fromActionsExpense.GetExpensesPage({
+        roomId: this.roomId,
+        active: this.sort.active,
+        direction: this.sort.direction,
+        size: this.pageSize,
+        filter: this.filter,
+        dateFilter: this.dateFilter,
+        page,
+      }),
+    );
   };
 
   private subscribe = (): void => {
