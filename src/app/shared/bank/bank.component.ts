@@ -1,16 +1,18 @@
 import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Observable } from 'rxjs';
-import { UntypedFormGroup, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, UntypedFormGroup, Validators } from '@angular/forms';
 import { requireMatch } from '../../util/validators';
 import { map, startWith } from 'rxjs/operators';
 import { IPaymentOption } from '../../interfaces/payment';
-import { SharedModule } from '../shared.module';
+import { AppMaterialModule } from '../../util/app-material.module';
+import { TranslateModule } from '@ngx-translate/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-bank',
   templateUrl: './bank.component.html',
   styleUrls: ['./bank.component.scss'],
-  imports: [SharedModule],
+  imports: [CommonModule, AppMaterialModule, TranslateModule, ReactiveFormsModule, FormsModule],
 })
 export class BankComponent implements AfterViewInit {
   @Input() formGroup!: UntypedFormGroup;

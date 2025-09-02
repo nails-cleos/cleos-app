@@ -29,7 +29,7 @@
       </th>
       <td *matCellDef="let userDiscount" mat-cell>
         @if (userDiscount.id) {
-          <div class="bold">{{ userDiscount.symbol | currency }}</div>
+          <div class="bold"> {{userDiscount.discountCustomer.amount | currency:userDiscount.symbol}}</div>
         } @else {
           <div class="ssc-line"></div>
         }
@@ -42,7 +42,9 @@
       </th>
       <td *matCellDef="let userDiscount" class="hide-xs" mat-cell>
         @if (userDiscount.id) {
-          <mat-icon>userDiscount.user ? done : pending</mat-icon>
+          <mat-icon [ngClass]="userDiscount.used ? 'used-icon' : 'unused-icon'">
+            redeem
+          </mat-icon>
         } @else {
           <div class="ssc-line"></div>
         }

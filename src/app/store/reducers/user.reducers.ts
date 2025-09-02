@@ -26,7 +26,7 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case UserActionTypes.getAll: {
+    case UserActionTypes.getUsersPage: {
       return {
         ...state,
         data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IUser>,
@@ -48,7 +48,7 @@ export const reducer = (state = initialState, action: All): State => {
     }
     case UserActionTypes.userOverview:
     case UserActionTypes.findMe:
-    case UserActionTypes.findUser: {
+    case UserActionTypes.getUserById: {
       return {
         ...state,
         data: {},
@@ -99,11 +99,11 @@ export const reducer = (state = initialState, action: All): State => {
     case UserActionTypes.mergeUsers:
     case UserActionTypes.setRole:
     case UserActionTypes.saveUser:
-    case UserActionTypes.updateUser:
-    case UserActionTypes.updatePhoto:
-    case UserActionTypes.resendUserToken:
+    case UserActionTypes.updateMe:
+    case UserActionTypes.updateMePhoto:
+    case UserActionTypes.resendToken:
     case UserActionTypes.userRestore:
-    case UserActionTypes.userDelete: {
+    case UserActionTypes.deleteUserById: {
       return {
         ...state,
         errorMessage: null,
@@ -112,7 +112,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: true,
       };
     }
-    case UserActionTypes.getAllDisableUsers: {
+    case UserActionTypes.findAllDisableUsers: {
       return {
         ...state,
         users: [] as IUserAll[],

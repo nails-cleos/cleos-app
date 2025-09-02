@@ -15,7 +15,7 @@ export class TreatmentService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getAll = (
+  getTreatmentsPage = (
     sort: string,
     direction: string,
     page: number,
@@ -25,7 +25,7 @@ export class TreatmentService {
     { params: createFilter(page, size, sort, direction) },
   );
 
-  getAllTreatmentGroup = (): Observable<ITreatmentGroup[]> => this.http.get<ITreatmentGroup[]>(
+  getAllTreatmentsGroup = (): Observable<ITreatmentGroup[]> => this.http.get<ITreatmentGroup[]>(
     toUrl(this.urlV1, 'groups'),
   );
 
@@ -37,33 +37,33 @@ export class TreatmentService {
     return this.http.get<ITreatmentDiscountDTO[]>(this.urlV1, { params });
   };
 
-  getTreatmentList = (): Observable<ITreatmentGroup[]> => this.http.get<ITreatmentGroup[]>(toUrl(this.urlV1, 'list'));
+  getListTreatmentsGroup = (): Observable<ITreatmentGroup[]> => this.http.get<ITreatmentGroup[]>(toUrl(this.urlV1, 'list'));
 
-  getById = (
+  findTreatmentGroupById = (
     id: string,
   ): Observable<ITreatmentGroup | undefined> => this.http.get<ITreatmentGroup>(toUrl(this.urlV1, id));
 
-  add = (
+  createTreatment = (
     treatment: ITreatmentGroup,
   ): Observable<ITreatmentGroup> => this.http.post<ITreatmentGroup>(this.urlV1, treatment);
 
-  delete = (
+  deleteTreatmentGroupById = (
     id: string,
   ): Observable<ITreatmentGroup> => this.http.delete<ITreatmentGroup>(toUrl(this.urlV1, id));
 
-  update = (
+  updateTreatmentGroupById = (
     treatment: ITreatmentGroup,
   ): Observable<ITreatmentGroup> => this.http.patch<ITreatmentGroup>(toUrl(this.urlV1, treatment.id!), treatment);
 
-  updateSort = (
+  sortTreatment = (
     treatments: ISorted[],
   ): Observable<ITreatment[]> => this.http.patch<ITreatment[]>(toUrl(this.urlV1, 'sort'), treatments);
 
-  updateGroupSort = (
+  sortGroupTreatment = (
     groups: ISorted[],
   ): Observable<ITreatmentGroup[]> => this.http.patch<ITreatmentGroup[]>(toUrl(this.urlV1, 'groups', 'sort'), groups);
 
-  getHistory = (
+  getAllTreatmentsHistory = (
     groupId: string,
     treatmentId: string,
   ): Observable<ITreatmentAll[] | undefined> => this.http.get<ITreatmentAll[]>(

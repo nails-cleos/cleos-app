@@ -43,7 +43,7 @@ import { map, startWith } from 'rxjs/operators';
 import { STEPPER_GLOBAL_OPTIONS, StepperSelectionEvent } from '@angular/cdk/stepper';
 import {
   createRoomOffice,
-  createTreatmentGroupService,
+  createTreatmentGroupService, currencySymbol,
   getPrice,
   newAdditional,
   newDiscount,
@@ -292,13 +292,13 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   		reservation.treatmentId = valueChange(this.treatment.value.id, this.reservation.treatment.id);
 
   		this.store.dispatch(
-  			new fromActionsReservation.Edit({ reservation, role }),
+  			new fromActionsReservation.UpdateReservationById({ reservation, role }),
   		);
   	} else {
   		reservation.treatmentId = this.treatment.value.id;
   		reservation.discountId = this.discount.value;
   		this.store.dispatch(
-  			new fromActionsReservation.ReservationSave({ reservation, role }),
+  			new fromActionsReservation.CreateReservation({ reservation, role }),
   		);
   	}
 
@@ -527,7 +527,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   );
 
   private getAdditionalList = (): void => this.store.dispatch(
-  	new fromActionsReservation.GetAllAdditional({ roomId: this.room.value.id, groupId: this.group.value.id }),
+  	new fromActionsReservation.FindAllAdditionalByGroupId({ roomId: this.room.value.id, groupId: this.group.value.id }),
   );
 
   private createForm = (): void => {
@@ -805,7 +805,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   			let title = ud.discountCustomer.name;
   			switch (ud.discountCustomer.type) {
   			case DiscountType.money:
-  				title = `$ ${ ud.discountCustomer.amount } ${ title }`;
+  				title = `${ currencySymbol(ud.discountCustomer.discount?.currency) } ${ ud.discountCustomer.amount } ${ title }`;
   				break;
   			case DiscountType.percentage:
   				title = `${ ud.discountCustomer.amount } % ${ title }`;

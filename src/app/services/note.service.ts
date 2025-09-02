@@ -14,13 +14,13 @@ export class NoteService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getById = (id: string): Observable<INote | undefined> => this.http.get<INote>(toUrl(this.urlV1, id));
+  findNoteById = (id: string): Observable<INote | undefined> => this.http.get<INote>(toUrl(this.urlV1, id));
 
-  add = (note: INote): Observable<INote> => this.http.post<INote>(this.urlV1, note);
+  createNote = (note: INote): Observable<INote> => this.http.post<INote>(this.urlV1, note);
 
-  delete = (id: string): Observable<INote> => this.http.delete<INote>(toUrl(this.urlV1, id));
+  deleteNoteById = (id: string): Observable<INote> => this.http.delete<INote>(toUrl(this.urlV1, id));
 
-  update = (note: INote): Observable<INote> => this.http.patch<INote>(toUrl(this.urlV1, note.id!), note);
+  updateNoteById = (note: INote): Observable<INote> => this.http.patch<INote>(toUrl(this.urlV1, note.id!), note);
 
   complete = (id: string): Observable<INote> => this.http.patch<INote>(toUrl(this.urlV1, id, 'complete'), null);
 }

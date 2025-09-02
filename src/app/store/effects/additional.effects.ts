@@ -12,14 +12,15 @@ import { TreatmentService } from '../../services/treatment.service';
 @Injectable()
 export class AdditionalEffects {
 
-  getAll$ = createEffect(() => this.actions$.pipe(ofType(fromActionsAdditional.AdditionalActionTypes.getAll)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.additionalService.getAll(payload.active, payload.direction, payload.page,
-      payload.size).pipe(
-      switchMap((response: any) => of(new fromActionsAdditional.AdditionalSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error }))),
-    )),
-  ));
+  getAll$ = createEffect(() => this.actions$.pipe(ofType(fromActionsAdditional.AdditionalActionTypes.getAdditionalPage))
+    .pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.additionalService.getAdditionalPage(payload.active, payload.direction,
+        payload.page, payload.size).pipe(
+        switchMap((response: any) => of(new fromActionsAdditional.AdditionalSuccess(response))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error }))),
+      )),
+    ));
 
   findAdditionalList$ = createEffect(
     () => this.actions$.pipe(ofType(fromActionsAdditional.AdditionalActionTypes.getAdditionalList))
@@ -31,18 +32,18 @@ export class AdditionalEffects {
       ));
 
   findOne$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsAdditional.AdditionalActionTypes.additionalFind)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsAdditional.AdditionalActionTypes.findAdditionalById)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.additionalService.getById(payload).pipe(
+      switchMap((payload: any) => this.additionalService.findAdditionalById(payload).pipe(
         switchMap((additional: any) => of(new fromActionsAdditional.AdditionalSelected(additional))),
         catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error }))),
       )),
     ));
 
   save$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsAdditional.AdditionalActionTypes.additionalSave)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsAdditional.AdditionalActionTypes.createAdditional)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.additionalService.add(payload).pipe(
+      switchMap((payload: any) => this.additionalService.createAdditional(payload).pipe(
         switchMap((response: any) => {
           const message = this.translate.instant('ADDITIONAL.CREATED', { name: response.name });
           return of(new fromActionsAdditional.AdditionalSaveSuccess({ message }));
@@ -52,9 +53,9 @@ export class AdditionalEffects {
     ));
 
   update$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsAdditional.AdditionalActionTypes.additionalUpdate)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsAdditional.AdditionalActionTypes.updateAdditionalById)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.additionalService.update(payload).pipe(
+      switchMap((payload: any) => this.additionalService.updateAdditionalById(payload).pipe(
         switchMap((response: any) => {
           const message = this.translate.instant('ADDITIONAL.UPDATED.MESSAGE', { name: response.name });
           return of(new fromActionsAdditional.AdditionalSaveSuccess({ message }));
@@ -64,9 +65,9 @@ export class AdditionalEffects {
     ));
 
   updateSort$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsAdditional.AdditionalActionTypes.additionalUpdateSort)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsAdditional.AdditionalActionTypes.sortAdditional)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.additionalService.updateSort(payload).pipe(
+      switchMap((payload: any) => this.additionalService.sortAdditional(payload).pipe(
         switchMap(() =>
           of(new fromActionsAdditional.AdditionalSaveSuccess(
             { message: this.translate.instant('ADDITIONAL.SORTED.MESSAGE') })),
@@ -76,9 +77,9 @@ export class AdditionalEffects {
     ));
 
   delete$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsAdditional.AdditionalActionTypes.additionalDelete)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsAdditional.AdditionalActionTypes.deleteAdditionalById)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.additionalService.delete(payload.id).pipe(
+      switchMap((payload: any) => this.additionalService.deleteAdditionalById(payload.id).pipe(
         switchMap(() => {
           const message = this.translate.instant('ADDITIONAL.DELETED.MESSAGE', { name: payload.name });
           return of(new fromActionsAdditional.AdditionalSaveSuccess({ message }));
@@ -88,9 +89,9 @@ export class AdditionalEffects {
     ));
 
   findGroups$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsAdditional.AdditionalActionTypes.findGroups)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsAdditional.AdditionalActionTypes.getAllTreatmentsGroup)).pipe(
       map((action: any) => action.payload),
-      switchMap(() => this.treatmentService.getAllTreatmentGroup().pipe(
+      switchMap(() => this.treatmentService.getAllTreatmentsGroup().pipe(
         switchMap((response: any) => of(new fromActionsAdditional.FindGroupsSuccess(response))),
         catchError((err: HttpErrorResponse) => of(new fromActionsAdditional.AdditionalFailure({ error: err.error }))),
       )),

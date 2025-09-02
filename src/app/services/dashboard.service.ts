@@ -13,22 +13,22 @@ export class DashboardService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getCards = (date: Date): Observable<ICardSummary> => this.getSummaryData<ICardSummary>(date, 'cards');
+  getSummaries = (date: Date): Observable<ICardSummary> => this.getSummaryData<ICardSummary>(date, 'cards');
 
-  getEvents = (date: Date): Observable<IEventSummary> => this.getSummaryData<IEventSummary>(date, 'events');
+  eventsSummaries = (date: Date): Observable<IEventSummary> => this.getSummaryData<IEventSummary>(date, 'events');
 
-  meEvents = (date: Date): Observable<IRoomEvents> => this.getSummaryData<IRoomEvents>(date, 'me', 'events');
+  meEvent = (date: Date): Observable<IRoomEvents> => this.getSummaryData<IRoomEvents>(date, 'me', 'events');
 
-  updateEvent = (
+  updateEventById = (
     reservation: IReservation,
   ): Observable<IRoomEvents> => this.http.patch<IRoomEvents>(
     toUrl(this.urlV1, 'me', 'events', reservation.id!),
     reservation,
   );
 
-  getSummary = (date: string): Observable<any> => this.http.get<any>(toUrl(this.urlV1, 'summaries', date));
+  getMonthlySummary = (date: string): Observable<any> => this.http.get<any>(toUrl(this.urlV1, 'summaries', date));
 
-  saveMonthlySummary = (
+  updateMonthlySummary = (
     date: string, type: string, totals: any, summaries: IMonthlySummaryRequest[], roomId: string,
   ): Observable<void> => this.http.post<void>(
     toUrl(this.urlV1, 'summaries', date), { totals, summaries, type, roomId },
@@ -36,7 +36,7 @@ export class DashboardService {
 
   getYearSummary = (year: number): Observable<any> => this.http.get<any>(toUrl(this.urlV1, 'years', `${ year }`));
 
-  getYearExport = (year: number): Observable<any> => this.http.get<any>(
+  exportYearSummary = (year: number): Observable<any> => this.http.get<any>(
     toUrl(this.urlV1, 'years', `${ year }`, 'export'),
   );
 

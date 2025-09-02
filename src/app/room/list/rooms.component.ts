@@ -82,7 +82,7 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
   	executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: room }, result => {
   		if (result) {
   			this.store.dispatch(
-  				new fromActionsRoom.DeleteRoom(result),
+  				new fromActionsRoom.DeleteRoomById(result),
   			);
   		}
   	});
@@ -101,7 +101,7 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private getRooms = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsRoom.GetAll({
+  	new fromActionsRoom.GetRoomsPage({
   		active: this.sort.active,
   		direction: this.sort.direction,
   		size: this.pageSize,

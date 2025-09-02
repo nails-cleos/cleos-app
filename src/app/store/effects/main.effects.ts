@@ -24,9 +24,9 @@ export class MainEffects {
     ));
 
   getAllTreatments$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsMain.MainActionTypes.getAllTreatments)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsMain.MainActionTypes.getListTreatmentsGroup)).pipe(
       map((action: any) => action.payload),
-      switchMap(() => this.treatmentService.getTreatmentList().pipe(
+      switchMap(() => this.treatmentService.getListTreatmentsGroup().pipe(
         switchMap((response: any) => of(new fromActionsMain.TreatmentsSuccess(response))),
         catchError((err: HttpErrorResponse) => of(new fromActionsMain.RequestFailure({ error: err.error }))),
       )),

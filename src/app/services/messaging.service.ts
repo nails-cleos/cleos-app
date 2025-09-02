@@ -30,7 +30,7 @@ export class MessagingService {
   updateToken = (user: any, token: string): void => {
   	if (this.auth.currentUser) {
   		this.store.dispatch(
-  			new fromActionsNotification.NotificationSubscribe(token),
+  			new fromActionsNotification.SubscribeNotification(token),
   		);
   		const data = {};
   		// @ts-expect-error assign value in data[user.id]

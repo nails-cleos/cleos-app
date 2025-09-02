@@ -1,38 +1,40 @@
 import { Action } from '@ngrx/store';
 
 export enum ReservationActionTypes {
-  getAllPage = '[Reservation] Get all page',
+  findPaged = '[Reservation] Find paged',
   getCustomerReservations = '[Reservation] Get customer reservations',
-  getAllFilterPage = '[Reservation] Get all filter page',
+  getAllFilterReservations = '[Reservation] Get all filter reservations',
   getAllGroupingByRoom = '[Reservation] Get all grouping by room',
   getCustomers = '[Reservation] Get customers',
   getCustomerInfo = '[Reservation] Get customer info',
-  getTreatments = '[Reservation] Get treatments',
-  getRooms = '[Reservation] Get rooms',
+  getAllTreatments = '[Reservation] Get all treatments',
+  getAllRooms = '[Reservation] Get all rooms',
   findRooms = '[Reservation] Find rooms',
-  getAdditional = '[Reservation] Get additional',
+  findAllAdditionalByGroupId = '[Reservation] find all additional by group id',
   getUpcomingReservation = '[Reservation] Get upcoming reservation',
-  searchReservation = '[Reservation] Search reservation',
+  searchAvailability = '[Reservation] Search availability',
   customerSearchReservation = '[Reservation] Customer search reservation',
   reservationFind = '[Reservation] Find',
   reservationFindPayments = '[Reservation] Find payments',
-  reservationFindHistory = '[Reservation] Find history',
-  findTracking = '[Reservation] Find tracking',
-  executeTracking = '[Reservation] Execute tracking',
-  updateTracking = '[Reservation] Update tracking',
-  reservationSave = '[Reservation] Save',
+  findReservationHistoryById = '[Reservation] Find reservation history by id',
+  findTrackingByReservationId = '[Reservation] Find tracking by reservation id',
+  executeTrackingByReservationId = '[Reservation] Execute tracking by reservation id',
+  updateTrackingByReservationId = '[Reservation] Update tracking by reservation id',
+  createReservation = '[Reservation] Create reservation',
   reservationSelected = '[Reservation] Selected',
-  reservationDelete = '[Reservation] Delete',
-  reservationReview = '[Reservation] Review',
-  approve = '[Reservation] Approve',
-  edit = '[Reservation] Edit',
+  deleteReservationById = '[Reservation] Delete reservation by id',
+  createReviewByReservationId = '[Reservation] Create review by reservation id',
+  findReviewByReservationId = '[Reservation] Find review by reservation id',
+  reservationReviewSuccess = '[Reservation] Reservation review success',
+  approveReservation = '[Reservation] Approve reservation',
+  updateReservationById = '[Reservation] Update reservation by id',
   start = '[Reservation] Start',
-  complete = '[Reservation] Complete',
-  paymentComplete = '[Reservation] Payment complete',
-  cancel = '[Reservation] Cancel',
-  customerCancel = '[Reservation] Customer cancel',
-  changeCustomer = '[Reservation] Change customer reservation',
-  changeColor = '[Reservation] Change color reservation',
+  completeReservation = '[Reservation] Complete reservation',
+  paymentCompleteReservation = '[Reservation] Payment complete reservation',
+  cancelReservation = '[Reservation] Cancel reservation',
+  customerCancelReservation = '[Reservation] Customer cancel reservation',
+  updateCustomerByReservationId = '[Reservation] Update customer by reservation id',
+  updateColorByReservationId = '[Reservation] Update color by reservation id',
   stateSuccess = '[Reservation] State success',
   reservationSuccess = '[Reservation] Success',
   reservationPageSuccess = '[Reservation] Page Success',
@@ -49,18 +51,18 @@ export enum ReservationActionTypes {
   trackingSuccess = '[Reservation] Tracking success',
   reservationFailure = '[Reservation] Failure',
   reservationCompleteSuccess = '[Reservation] Complete success',
-  getAllColorsByTreatmentId = '[Reservation] Get all colors by treatment id',
+  findColorsByTreatmentId = '[Reservation] Find colors by treatment id',
   colorsCompleteSuccess = '[Reservation] Colors complete success',
-  updateNote = '[Reservation] Update note',
-  updateDiscount = '[Reservation] Update discount',
-  updateTimestamp = '[Reservation] Update timestamp',
+  updateNoteByReservationId = '[Reservation] Update note by reservation id',
+  updateDiscountByReservationId = '[Reservation] Update discount by reservation id',
+  updateTimestampByReservationId = '[Reservation] Update timestamp by reservation id',
   paymentOptions = '[Reservation] Payment options',
   paymentOptionsSuccess = '[Reservation] Payment options success',
   clean = '[Reservation] Clean'
 }
 
-export class GetAllPage implements Action {
-  readonly type = ReservationActionTypes.getAllPage;
+export class FindPaged implements Action {
+  readonly type = ReservationActionTypes.findPaged;
 
   constructor(public payload: any) {
   }
@@ -73,8 +75,8 @@ export class GetCustomerReservations implements Action {
   }
 }
 
-export class GetAllFilterPage implements Action {
-  readonly type = ReservationActionTypes.getAllFilterPage;
+export class GetAllFilterReservations implements Action {
+  readonly type = ReservationActionTypes.getAllFilterReservations;
 
   constructor(public payload: any) {
   }
@@ -87,8 +89,8 @@ export class GetAllGroupingByRoom implements Action {
   }
 }
 
-export class SearchReservation implements Action {
-  readonly type = ReservationActionTypes.searchReservation;
+export class SearchAvailability implements Action {
+  readonly type = ReservationActionTypes.searchAvailability;
 
   constructor(public payload: any) {
   }
@@ -113,14 +115,14 @@ export class GetCustomerInfo implements Action {
 }
 
 export class GetAllTreatments implements Action {
-  readonly type = ReservationActionTypes.getTreatments;
+  readonly type = ReservationActionTypes.getAllTreatments;
 
   constructor(public payload?: any) {
   }
 }
 
 export class GetAllRooms implements Action {
-  readonly type = ReservationActionTypes.getRooms;
+  readonly type = ReservationActionTypes.getAllRooms;
 
   constructor(public payload?: any) {
   }
@@ -130,8 +132,8 @@ export class FindRooms implements Action {
   readonly type = ReservationActionTypes.findRooms;
 }
 
-export class GetAllAdditional implements Action {
-  readonly type = ReservationActionTypes.getAdditional;
+export class FindAllAdditionalByGroupId implements Action {
+  readonly type = ReservationActionTypes.findAllAdditionalByGroupId;
 
   constructor(public payload?: any) {
   }
@@ -211,8 +213,8 @@ export class ReservationHistorySuccess implements Action {
   }
 }
 
-export class ReservationSave implements Action {
-  readonly type = ReservationActionTypes.reservationSave;
+export class CreateReservation implements Action {
+  readonly type = ReservationActionTypes.createReservation;
 
   constructor(public payload: any) {
   }
@@ -260,29 +262,29 @@ export class ReservationFindPayments implements Action {
   }
 }
 
-export class ReservationFindHistory implements Action {
-  readonly type = ReservationActionTypes.reservationFindHistory;
+export class FindReservationHistoryById implements Action {
+  readonly type = ReservationActionTypes.findReservationHistoryById;
 
   constructor(public payload: any) {
   }
 }
 
-export class DeleteReservation implements Action {
-  readonly type = ReservationActionTypes.reservationDelete;
+export class DeleteReservationById implements Action {
+  readonly type = ReservationActionTypes.deleteReservationById;
 
   constructor(public payload: any) {
   }
 }
 
-export class Approve implements Action {
-  readonly type = ReservationActionTypes.approve;
+export class ApproveReservation implements Action {
+  readonly type = ReservationActionTypes.approveReservation;
 
   constructor(public payload: any) {
   }
 }
 
-export class Edit implements Action {
-  readonly type = ReservationActionTypes.edit;
+export class UpdateReservationById implements Action {
+  readonly type = ReservationActionTypes.updateReservationById;
 
   constructor(public payload: any) {
   }
@@ -295,29 +297,29 @@ export class Start implements Action {
   }
 }
 
-export class Complete implements Action {
-  readonly type = ReservationActionTypes.complete;
+export class CompleteReservation implements Action {
+  readonly type = ReservationActionTypes.completeReservation;
 
   constructor(public payload: any) {
   }
 }
 
-export class PaymentComplete implements Action {
-  readonly type = ReservationActionTypes.paymentComplete;
+export class PaymentCompleteReservation implements Action {
+  readonly type = ReservationActionTypes.paymentCompleteReservation;
 
   constructor(public payload: any) {
   }
 }
 
-export class Cancel implements Action {
-  readonly type = ReservationActionTypes.cancel;
+export class CancelReservation implements Action {
+  readonly type = ReservationActionTypes.cancelReservation;
 
   constructor(public payload: any) {
   }
 }
 
-export class CustomerCancel implements Action {
-  readonly type = ReservationActionTypes.customerCancel;
+export class CustomerCancelReservation implements Action {
+  readonly type = ReservationActionTypes.customerCancelReservation;
 
   constructor(public payload: any) {
   }
@@ -337,22 +339,22 @@ export class ReservationCompleteSuccess implements Action {
   }
 }
 
-export class FindTracking implements Action {
-  readonly type = ReservationActionTypes.findTracking;
+export class FindTrackingByReservationId implements Action {
+  readonly type = ReservationActionTypes.findTrackingByReservationId;
 
   constructor(public payload: any) {
   }
 }
 
-export class ExecuteTracking implements Action {
-  readonly type = ReservationActionTypes.executeTracking;
+export class ExecuteTrackingByReservationId implements Action {
+  readonly type = ReservationActionTypes.executeTrackingByReservationId;
 
   constructor(public payload: any) {
   }
 }
 
-export class UpdateTracking implements Action {
-  readonly type = ReservationActionTypes.updateTracking;
+export class UpdateTrackingByReservationId implements Action {
+  readonly type = ReservationActionTypes.updateTrackingByReservationId;
 
   constructor(public payload: any) {
   }
@@ -365,29 +367,43 @@ export class TrackingSuccess implements Action {
   }
 }
 
-export class ReservationReview implements Action {
-  readonly type = ReservationActionTypes.reservationReview;
+export class CreateReviewByReservationId implements Action {
+  readonly type = ReservationActionTypes.createReviewByReservationId;
 
   constructor(public payload: any) {
   }
 }
 
-export class ChangeCustomer implements Action {
-  readonly type = ReservationActionTypes.changeCustomer;
+export class FindReviewByReservationId implements Action {
+  readonly type = ReservationActionTypes.findReviewByReservationId;
 
   constructor(public payload: any) {
   }
 }
 
-export class ChangeColor implements Action {
-  readonly type = ReservationActionTypes.changeColor;
+export class ReservationReviewSuccess implements Action {
+  readonly type = ReservationActionTypes.reservationReviewSuccess;
 
   constructor(public payload: any) {
   }
 }
 
-export class GetAllColorsByTreatmentId implements Action {
-  readonly type = ReservationActionTypes.getAllColorsByTreatmentId;
+export class UpdateCustomerByReservationId implements Action {
+  readonly type = ReservationActionTypes.updateCustomerByReservationId;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class UpdateColorByReservationId implements Action {
+  readonly type = ReservationActionTypes.updateColorByReservationId;
+
+  constructor(public payload: any) {
+  }
+}
+
+export class FindColorsByTreatmentId implements Action {
+  readonly type = ReservationActionTypes.findColorsByTreatmentId;
 
   constructor(public payload: any) {
   }
@@ -400,22 +416,22 @@ export class ColorSuccess implements Action {
   }
 }
 
-export class UpdateNote implements Action {
-  readonly type = ReservationActionTypes.updateNote;
+export class UpdateNoteByReservationId implements Action {
+  readonly type = ReservationActionTypes.updateNoteByReservationId;
 
   constructor(public payload: any) {
   }
 }
 
-export class UpdateDiscount implements Action {
-  readonly type = ReservationActionTypes.updateDiscount;
+export class UpdateDiscountByReservationId implements Action {
+  readonly type = ReservationActionTypes.updateDiscountByReservationId;
 
   constructor(public payload: any) {
   }
 }
 
-export class UpdateTimestamp implements Action {
-  readonly type = ReservationActionTypes.updateTimestamp;
+export class UpdateTimestampByReservationId implements Action {
+  readonly type = ReservationActionTypes.updateTimestampByReservationId;
 
   constructor(public payload: any) {
   }
@@ -437,20 +453,20 @@ export class Clean implements Action {
 }
 
 export type All =
-  | GetAllPage
+  | FindPaged
   | GetCustomerReservations
-  | GetAllFilterPage
+  | GetAllFilterReservations
   | GetAllGroupingByRoom
-  | SearchReservation
+  | SearchAvailability
   | CustomerSearchReservation
   | GetAllCustomers
   | GetCustomerInfo
   | GetAllTreatments
   | GetAllRooms
   | FindRooms
-  | GetAllAdditional
+  | FindAllAdditionalByGroupId
   | GetUpcomingReservation
-  | ReservationSave
+  | CreateReservation
   | ReservationSuccess
   | ReservationPageSuccess
   | ReservationFilterPageSuccess
@@ -466,29 +482,31 @@ export type All =
   | ReservationFailure
   | ReservationFind
   | ReservationFindPayments
-  | ReservationFindHistory
+  | FindReservationHistoryById
   | ReservationSelected
-  | DeleteReservation
-  | Approve
+  | DeleteReservationById
+  | ApproveReservation
   | Start
-  | Edit
-  | Complete
-  | PaymentComplete
-  | Cancel
-  | CustomerCancel
+  | UpdateReservationById
+  | CompleteReservation
+  | PaymentCompleteReservation
+  | CancelReservation
+  | CustomerCancelReservation
   | StateSuccess
-  | FindTracking
-  | ExecuteTracking
-  | UpdateTracking
+  | FindTrackingByReservationId
+  | ExecuteTrackingByReservationId
+  | UpdateTrackingByReservationId
   | TrackingSuccess
-  | ReservationReview
+  | CreateReviewByReservationId
+  | FindReviewByReservationId
+  | ReservationReviewSuccess
   | ReservationCompleteSuccess
-  | ChangeCustomer
-  | GetAllColorsByTreatmentId
+  | UpdateCustomerByReservationId
+  | FindColorsByTreatmentId
   | ColorSuccess
-  | UpdateNote
-  | UpdateDiscount
-  | UpdateTimestamp
+  | UpdateNoteByReservationId
+  | UpdateDiscountByReservationId
+  | UpdateTimestampByReservationId
   | PaymentOptions
   | PaymentOptionsSuccess
   | Clean;

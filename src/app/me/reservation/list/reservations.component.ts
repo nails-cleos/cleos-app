@@ -110,7 +110,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   			review.detail = result.detail ? result.detail :
           this.translate.instant(`ME.REVIEW.RATING.${ result.rating }`);
   			this.store.dispatch(
-  				new fromActionsReservation.ReservationReview(review),
+  				new fromActionsReservation.CreateReviewByReservationId(review),
   			);
   		}
   	},

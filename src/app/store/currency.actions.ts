@@ -1,20 +1,20 @@
 import { Action } from '@ngrx/store';
 
 export enum CurrencyActionTypes {
-  getAll = '[Currency] Get all',
+  getCurrenciesPage = '[Currency] Get currencies page',
   currencySuccess = '[Currency] Success',
-  currencySave = '[Currency] Save',
-  currencyUpdate = '[Currency] Update',
+  createCurrency = '[Currency] Create currency',
+  updateCurrencyById = '[Currency] Update currency by id',
   currencySaveSuccess = '[Currency] Save Success',
   currencyFailure = '[Currency] Failure',
   currencySelected = '[Currency] Selected',
-  currencyFind = '[Currency] Find',
-  currencyDelete = '[Currency] Delete',
+  findCurrencyById = '[Currency] Find currency by id',
+  deleteCurrencyById = '[Currency] Delete currency by id',
   clean = '[Currency] Clean'
 }
 
-export class GetAll implements Action {
-  readonly type = CurrencyActionTypes.getAll;
+export class GetCurrenciesPage implements Action {
+  readonly type = CurrencyActionTypes.getCurrenciesPage;
 
   constructor(public payload: any) {
   }
@@ -27,15 +27,15 @@ export class CurrencySuccess implements Action {
   }
 }
 
-export class CurrencySave implements Action {
-  readonly type = CurrencyActionTypes.currencySave;
+export class CreateCurrency implements Action {
+  readonly type = CurrencyActionTypes.createCurrency;
 
   constructor(public payload: any) {
   }
 }
 
-export class CurrencyUpdate implements Action {
-  readonly type = CurrencyActionTypes.currencyUpdate;
+export class UpdateCurrencyById implements Action {
+  readonly type = CurrencyActionTypes.updateCurrencyById;
 
   constructor(public payload: any) {
   }
@@ -62,15 +62,15 @@ export class CurrencySelected implements Action {
   }
 }
 
-export class CurrencyFind implements Action {
-  readonly type = CurrencyActionTypes.currencyFind;
+export class FindCurrencyById implements Action {
+  readonly type = CurrencyActionTypes.findCurrencyById;
 
   constructor(public payload: any) {
   }
 }
 
-export class DeleteCurrency implements Action {
-  readonly type = CurrencyActionTypes.currencyDelete;
+export class DeleteCurrencyById implements Action {
+  readonly type = CurrencyActionTypes.deleteCurrencyById;
 
   constructor(public payload: any) {
   }
@@ -81,13 +81,13 @@ export class Clean implements Action {
 }
 
 export type All =
-  | GetAll
-  | CurrencySave
-  | CurrencyUpdate
+  | GetCurrenciesPage
+  | CreateCurrency
+  | UpdateCurrencyById
   | CurrencySuccess
   | CurrencySaveSuccess
   | CurrencyFailure
-  | CurrencyFind
+  | FindCurrencyById
   | CurrencySelected
-  | DeleteCurrency
+  | DeleteCurrencyById
   | Clean;

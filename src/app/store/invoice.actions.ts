@@ -1,18 +1,18 @@
 import { Action } from '@ngrx/store';
 
 export enum InvoiceActionTypes {
-  invoiceFind = '[Invoice] Find',
-  invoiceFindMyOffices = '[Invoice] Find my office',
+  findOfficeToInvoice = '[Invoice] Find office to invoice',
+  getAllMyOffices = '[Invoice] Get all my offices',
   invoiceOfficesSuccess = '[Invoice] Offices success',
   invoiceSuccess = '[Invoice] Success',
-  invoiceUpdateOffice = '[Invoice] Update office',
+  updateOfficeById = '[Invoice] Update office by Id',
   invoiceUpdateOfficeSuccess = '[Invoice] Update office Success',
   invoiceFailure = '[Invoice] Failure',
   clean = '[Invoice] Clean'
 }
 
-export class InvoiceFind implements Action {
-  readonly type = InvoiceActionTypes.invoiceFind;
+export class FindOfficeToInvoice implements Action {
+  readonly type = InvoiceActionTypes.findOfficeToInvoice;
 
   constructor(public payload: any) {
   }
@@ -32,8 +32,8 @@ export class InvoiceFailure implements Action {
   }
 }
 
-export class FindMyOffices implements Action {
-  readonly type = InvoiceActionTypes.invoiceFindMyOffices;
+export class GetAllMyOffices implements Action {
+  readonly type = InvoiceActionTypes.getAllMyOffices;
 }
 
 export class OfficesSuccess implements Action {
@@ -43,8 +43,8 @@ export class OfficesSuccess implements Action {
   }
 }
 
-export class UpdateOffices implements Action {
-  readonly type = InvoiceActionTypes.invoiceUpdateOffice;
+export class UpdateOfficeById implements Action {
+  readonly type = InvoiceActionTypes.updateOfficeById;
 
   constructor(public payload: any) {
   }
@@ -62,11 +62,11 @@ export class Clean implements Action {
 }
 
 export type All =
-  | InvoiceFind
+  | FindOfficeToInvoice
   | InvoiceSuccess
   | InvoiceFailure
-  | FindMyOffices
+  | GetAllMyOffices
   | OfficesSuccess
-  | UpdateOffices
+  | UpdateOfficeById
   | UpdateOfficesSuccess
   | Clean;

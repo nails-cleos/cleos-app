@@ -12,17 +12,15 @@ export class TrackingService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getAll = (): Observable<ITracking[]> => this.http.get<ITracking[]>(this.urlV1);
-
-  findByReservationId = (
+  findTrackingByReservationId = (
     reservationId: string,
   ): Observable<ITracking> => this.http.get<ITracking>(toUrl(this.urlV1, 'reservations', reservationId));
 
-  executeByReservationId = (
+  executeTrackingByReservationId = (
     reservationId: string,
   ): Observable<ITracking> => this.http.post<ITracking>(toUrl(this.urlV1, 'reservations', reservationId), {});
 
-  updateByReservationId = (
+  updateTrackingByReservationId = (
     reservationId: string,
     started?: string,
     completed?: string,

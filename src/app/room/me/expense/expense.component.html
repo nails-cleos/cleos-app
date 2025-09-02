@@ -5,21 +5,30 @@
         <mat-card appearance="outlined">
           <mat-card-header>
             @if (isAddMode) {
-              <mat-card-title>{{ 'EXPENSE.TITLE' | translate }}</mat-card-title>
+              <ng-container>
+                <mat-card-title>{{ 'EXPENSE.TITLE' | translate }}</mat-card-title>
+              </ng-container>
+              <ng-container>
+                @if (roomName) {
+                  <mat-card-subtitle>{{ roomName }}</mat-card-subtitle>
+                } @else {
+                  <div class="ssc-line"></div>
+                }
+              </ng-container>
             } @else {
-            <ng-container>
-              <mat-card-title>{{ 'EXPENSE.DETAIL' | translate }}</mat-card-title>
-              @if (expense) {
-                <mat-card-subtitle>{{ expense.id }}</mat-card-subtitle>
-              } @else {
-              <div class="ssc-line"></div>
-            }
-            </ng-container>
-            }
-            @if (roomName) {
-              <mat-card-subtitle>{{ roomName }}</mat-card-subtitle>
-            } @else {
-              <div class="ssc-line"></div>
+              <mat-card-title-group>
+                <mat-card-title>{{ 'EXPENSE.DETAIL' | translate }}</mat-card-title>
+                @if (expense) {
+                  <mat-card-subtitle>{{ expense.id }}</mat-card-subtitle>
+                } @else {
+                  <div class="ssc-line"></div>
+                }
+                @if (roomName) {
+                  <mat-card-subtitle>{{ roomName }}</mat-card-subtitle>
+                } @else {
+                  <div class="ssc-line"></div>
+                }
+              </mat-card-title-group>
             }
           </mat-card-header>
           @if (isAddMode || expense) {

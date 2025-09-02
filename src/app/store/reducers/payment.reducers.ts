@@ -37,8 +37,8 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case PaymentActionTypes.paymentCreate:
-    case PaymentActionTypes.paymentFind: {
+    case PaymentActionTypes.createPaymentLink:
+    case PaymentActionTypes.findPaymentById: {
       return {
         ...state,
         isLoading: true,
@@ -110,8 +110,8 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false,
       };
     }
-    case PaymentActionTypes.paymentUpdate:
-    case PaymentActionTypes.paymentUpdateLink:
+    case PaymentActionTypes.adjustPayments:
+    case PaymentActionTypes.updatePaymentById:
     case PaymentActionTypes.paymentRecreate:
     case PaymentActionTypes.paymentSave:
     case PaymentActionTypes.paymentSend:

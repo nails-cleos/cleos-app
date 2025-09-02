@@ -44,7 +44,7 @@ export class TreatmentSortingComponent implements OnInit, OnDestroy {
   sorted = (sorted: ISorted[]): void => {
     this.items = undefined;
     this.store.dispatch(
-      new fromActionsTreatment.TreatmentUpdateSort(sorted),
+      new fromActionsTreatment.SortTreatment(sorted),
     );
   };
 
@@ -54,7 +54,7 @@ export class TreatmentSortingComponent implements OnInit, OnDestroy {
     if (!this.items) {
       const id = this.route.snapshot.paramMap.get('id');
       this.store.dispatch(
-        new fromActionsTreatment.TreatmentFind({ id, path: 'sorting' }),
+        new fromActionsTreatment.FindTreatmentGroupById({ id, path: 'sorting' }),
       );
     }
   };

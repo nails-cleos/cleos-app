@@ -24,6 +24,7 @@ export interface IDiscountAll {
   type: DiscountType;
   currency: ICurrency;
   description?: string;
+  discount?: IDiscount;
 }
 
 export interface IUserDiscount {

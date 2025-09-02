@@ -175,7 +175,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   		}
   	});
   	return this.store.dispatch(
-  		new fromActionsPayment.PaymentUpdate(payload),
+  		new fromActionsPayment.AdjustPayments(payload),
   	);
   }
 
@@ -187,7 +187,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   	}, result => {
   		if (result) {
   			this.store.dispatch(
-  				new fromActionsReservation.UpdateNote({
+  				new fromActionsReservation.UpdateNoteByReservationId({
   					note: result.note,
   					customerNote: result.customerNote,
   					reservation: this.reservation,
@@ -203,7 +203,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   		result => {
   			if (result) {
   				this.store.dispatch(
-  					new fromActionsReservation.UpdateDiscount(
+  					new fromActionsReservation.UpdateDiscountByReservationId(
   						{ discountId: result.discountId, reservationId: this.reservation?.id }),
   				);
   			}
@@ -372,7 +372,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   		new fromActionsReservation.ReservationFindPayments(id),
   	);
   	this.store.dispatch(
-  		new fromActionsReservation.ReservationFindHistory({ id }),
+  		new fromActionsReservation.FindReservationHistoryById({ id }),
   	);
   };
 
@@ -437,7 +437,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   	const approveTransaction = ReservationDetailComponent.createTransaction('approved', (): void => {
   		self.reservation = undefined;
   		store.dispatch(
-  			new fromActionsReservation.Approve(reservationId),
+  			new fromActionsReservation.ApproveReservation(reservationId),
   		);
   	});
 
@@ -505,7 +505,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   			if (result) {
   				this.reservation = undefined;
   				this.store.dispatch(
-  					new fromActionsReservation.Cancel({ id: reservation.id, paymentCancellation: result }),
+  					new fromActionsReservation.CancelReservation({ id: reservation.id, paymentCancellation: result }),
   				);
   			}
   		}));
@@ -513,7 +513,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   	const finishTransaction = ReservationDetailComponent.createTransaction('completed', (): void => {
   		self.reservation = undefined;
   		self.store.dispatch(
-  			new fromActionsReservation.PaymentComplete(reservationId),
+  			new fromActionsReservation.PaymentCompleteReservation(reservationId),
   		);
   	});
 
@@ -647,7 +647,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   			if (result) {
   				this.reservation = undefined;
   				this.store.dispatch(
-  					new fromActionsReservation.CustomerCancel({ id: reservation.id, paymentCancellation: result }),
+  					new fromActionsReservation.CustomerCancelReservation({ id: reservation.id, paymentCancellation: result }),
   				);
   			}
   		}, showPenalty, self.options));
@@ -820,7 +820,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   		if (result) {
   			this.reservation = undefined;
   			this.store.dispatch(
-  				new fromActionsReservation.ChangeCustomer(
+  				new fromActionsReservation.UpdateCustomerByReservationId(
             { customerId: result.customerId, reservationId: reservation.id },
           ),
   			);
@@ -841,7 +841,9 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   		if (result) {
   			this.reservation = undefined;
   			this.store.dispatch(
-  				new fromActionsReservation.ChangeColor({ colorId: result.colorId, reservationId: reservation.id }),
+  				new fromActionsReservation.UpdateColorByReservationId(
+            { colorId: result.colorId, reservationId: reservation.id },
+          ),
   			);
   		}
   	},

@@ -1,41 +1,41 @@
 import { Action } from '@ngrx/store';
 
 export enum RoomActionTypes {
-  getAll = '[Room] Get all',
-  getMyService = '[Room] Get my services',
-  getRoomInfo = '[Room] Get room info',
+  getRoomsPage = '[Room] Get rooms page',
+  findRoomServicesById = '[Room] Find room services by id',
+  getAllRoomsInfo = '[Room] Get all rooms info',
   roomInfoSuccess = '[Room] Info Success',
   roomSuccess = '[Room] Success',
-  roomSave = '[Room] Save',
-  roomUpdate = '[Room] Update',
-  roomServiceUpdate = '[Room] Service update',
+  createRoom = '[Room] Create room',
+  updateRoomById = '[Room] Update room by id',
+  updateRoomServicesById = '[Room] Update room services by id',
   roomSaveSuccess = '[Room] Save Success',
   roomFailure = '[Room] Failure',
   roomSelected = '[Room] Selected',
   roomServiceSelected = '[Room] Selected services',
-  roomFind = '[Room] Find',
-  roomDelete = '[Room] Delete',
-  getCustomerInfo = '[Room] Get customer info',
+  findRoomById = '[Room] Find room by id',
+  deleteRoomById = '[Room] Delete room by id',
+  getAllCustomersInfo = '[Room] Get all customers info',
   customerInfoSuccess = '[Room] Customer info Success',
   clean = '[Room] Clean'
 }
 
-export class GetAll implements Action {
-  readonly type = RoomActionTypes.getAll;
+export class GetRoomsPage implements Action {
+  readonly type = RoomActionTypes.getRoomsPage;
 
   constructor(public payload: any) {
   }
 }
 
-export class GetMyServices implements Action {
-  readonly type = RoomActionTypes.getMyService;
+export class FindRoomServicesById implements Action {
+  readonly type = RoomActionTypes.findRoomServicesById;
 
   constructor(public payload: any) {
   }
 }
 
-export class GetRoomInfo implements Action {
-  readonly type = RoomActionTypes.getRoomInfo;
+export class GetAllRoomsInfo implements Action {
+  readonly type = RoomActionTypes.getAllRoomsInfo;
 }
 
 export class RoomInfoSuccess implements Action {
@@ -52,22 +52,22 @@ export class RoomSuccess implements Action {
   }
 }
 
-export class RoomSave implements Action {
-  readonly type = RoomActionTypes.roomSave;
+export class CreateRoom implements Action {
+  readonly type = RoomActionTypes.createRoom;
 
   constructor(public payload: any) {
   }
 }
 
-export class RoomUpdate implements Action {
-  readonly type = RoomActionTypes.roomUpdate;
+export class UpdateRoomById implements Action {
+  readonly type = RoomActionTypes.updateRoomById;
 
   constructor(public payload: any) {
   }
 }
 
-export class UpdateMyServices implements Action {
-  readonly type = RoomActionTypes.roomServiceUpdate;
+export class UpdateRoomServicesById implements Action {
+  readonly type = RoomActionTypes.updateRoomServicesById;
 
   constructor(public payload: any) {
   }
@@ -101,22 +101,22 @@ export class RoomServiceSelected implements Action {
   }
 }
 
-export class RoomFind implements Action {
-  readonly type = RoomActionTypes.roomFind;
+export class FindRoomById implements Action {
+  readonly type = RoomActionTypes.findRoomById;
 
   constructor(public payload: any) {
   }
 }
 
-export class DeleteRoom implements Action {
-  readonly type = RoomActionTypes.roomDelete;
+export class DeleteRoomById implements Action {
+  readonly type = RoomActionTypes.deleteRoomById;
 
   constructor(public payload: any) {
   }
 }
 
-export class GetCustomerInfo implements Action {
-  readonly type = RoomActionTypes.getCustomerInfo;
+export class GetAllCustomersInfo implements Action {
+  readonly type = RoomActionTypes.getAllCustomersInfo;
 
   constructor(public payload: any) {
   }
@@ -134,20 +134,20 @@ export class Clean implements Action {
 }
 
 export type All =
-  | GetAll
-  | GetMyServices
-  | GetRoomInfo
+  | GetRoomsPage
+  | FindRoomServicesById
+  | GetAllRoomsInfo
   | RoomInfoSuccess
-  | RoomSave
-  | RoomUpdate
-  | UpdateMyServices
+  | CreateRoom
+  | UpdateRoomById
+  | UpdateRoomServicesById
   | RoomSuccess
   | RoomSaveSuccess
   | RoomFailure
-  | RoomFind
+  | FindRoomById
   | RoomSelected
   | RoomServiceSelected
-  | DeleteRoom
-  | GetCustomerInfo
+  | DeleteRoomById
+  | GetAllCustomersInfo
   | CustomerInfoSuccess
   | Clean;

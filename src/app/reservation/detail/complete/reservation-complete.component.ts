@@ -280,7 +280,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     if (this.groupId !== groupId && this.roomId) {
       this.groupId = groupId;
       this.store.dispatch(
-        new fromActionsReservation.GetAllAdditional({ roomId: this.roomId, groupId }),
+        new fromActionsReservation.FindAllAdditionalByGroupId({ roomId: this.roomId, groupId }),
       );
     }
   };
@@ -297,7 +297,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   private completeReservation = (): void => {
     if (this.reservation) {
       this.store.dispatch(
-        new fromActionsReservation.Complete({
+        new fromActionsReservation.CompleteReservation({
           reservationId: this.reservation.id,
           complete: {
             treatmentId: valueChange(this.treatment.value.id, this.reservation?.treatment.key),

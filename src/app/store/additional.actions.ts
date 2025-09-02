@@ -1,24 +1,24 @@
 import { Action } from '@ngrx/store';
 
 export enum AdditionalActionTypes {
-  getAll = '[Additional] Get all',
-  getAdditionalList = '[Additional] Get additional List',
+  getAdditionalPage = '[Additional] Get additional page',
+  getAdditionalList = '[Additional] Get additional list',
   additionalSuccess = '[Additional] Success',
-  additionalSave = '[Additional] Save',
-  additionalUpdate = '[Additional] Update',
-  additionalUpdateSort = '[Additional] Update sort',
+  createAdditional = '[Additional] create additional',
+  updateAdditionalById = '[Additional] Update additional by id',
+  sortAdditional = '[Additional] Sort additional',
   additionalSaveSuccess = '[Additional] Save Success',
   additionalFailure = '[Additional] Failure',
   additionalSelected = '[Additional] Selected',
-  additionalFind = '[Additional] Find',
-  additionalDelete = '[Additional] Delete',
-  findGroups = '[Additional] Find treatment groups',
+  findAdditionalById = '[Additional] Find additional by id',
+  deleteAdditionalById = '[Additional] Delete additional by id',
+  getAllTreatmentsGroup = '[Additional] Get all treatments group',
   findGroupsSuccess = '[Additional] Find treatment groups success',
   clean = '[Additional] Clean'
 }
 
-export class GetAll implements Action {
-  readonly type = AdditionalActionTypes.getAll;
+export class GetAdditionalPage implements Action {
+  readonly type = AdditionalActionTypes.getAdditionalPage;
 
   constructor(public payload: any) {
   }
@@ -35,22 +35,22 @@ export class AdditionalSuccess implements Action {
   }
 }
 
-export class AdditionalSave implements Action {
-  readonly type = AdditionalActionTypes.additionalSave;
+export class CreateAdditional implements Action {
+  readonly type = AdditionalActionTypes.createAdditional;
 
   constructor(public payload: any) {
   }
 }
 
-export class AdditionalUpdate implements Action {
-  readonly type = AdditionalActionTypes.additionalUpdate;
+export class UpdateAdditionalById implements Action {
+  readonly type = AdditionalActionTypes.updateAdditionalById;
 
   constructor(public payload: any) {
   }
 }
 
-export class AdditionalUpdateSort implements Action {
-  readonly type = AdditionalActionTypes.additionalUpdateSort;
+export class SortAdditional implements Action {
+  readonly type = AdditionalActionTypes.sortAdditional;
 
   constructor(public payload: any) {
   }
@@ -77,22 +77,22 @@ export class AdditionalSelected implements Action {
   }
 }
 
-export class AdditionalFind implements Action {
-  readonly type = AdditionalActionTypes.additionalFind;
+export class FindAdditionalById implements Action {
+  readonly type = AdditionalActionTypes.findAdditionalById;
 
   constructor(public payload: any) {
   }
 }
 
-export class DeleteAdditional implements Action {
-  readonly type = AdditionalActionTypes.additionalDelete;
+export class DeleteAdditionalById implements Action {
+  readonly type = AdditionalActionTypes.deleteAdditionalById;
 
   constructor(public payload: any) {
   }
 }
 
-export class FindGroups implements Action {
-  readonly type = AdditionalActionTypes.findGroups;
+export class GetAllTreatmentsGroup implements Action {
+  readonly type = AdditionalActionTypes.getAllTreatmentsGroup;
 }
 
 export class FindGroupsSuccess implements Action {
@@ -107,17 +107,17 @@ export class Clean implements Action {
 }
 
 export type All =
-  | GetAll
+  | GetAdditionalPage
   | GetAdditionalList
-  | AdditionalSave
-  | AdditionalUpdate
-  | AdditionalUpdateSort
+  | CreateAdditional
+  | UpdateAdditionalById
+  | SortAdditional
   | AdditionalSuccess
   | AdditionalSaveSuccess
   | AdditionalFailure
-  | AdditionalFind
+  | FindAdditionalById
   | AdditionalSelected
-  | DeleteAdditional
-  | FindGroups
+  | DeleteAdditionalById
+  | GetAllTreatmentsGroup
   | FindGroupsSuccess
   | Clean;

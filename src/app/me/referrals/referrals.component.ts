@@ -86,7 +86,7 @@ export class ReferralsComponent implements OnInit, OnDestroy {
 
   private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
 
-  private getReferrals = (): void => this.store.dispatch(new fromActionsDiscount.GetReferrals());
+  private getReferrals = (): void => this.store.dispatch(new fromActionsDiscount.GetMyReferrals());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {

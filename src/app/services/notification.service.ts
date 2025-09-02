@@ -13,7 +13,7 @@ export class NotificationService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getAll = (
+  getNotificationsPage = (
     sort: string,
     direction: string,
     page: number,
@@ -22,16 +22,18 @@ export class NotificationService {
     { params: createFilter(page, size, sort, direction) },
   );
 
-  readNotification = (notificationId: string): Observable<INotification | undefined> => this.http.post<INotification>(
+  readNotificationById = (
+    notificationId: string,
+  ): Observable<INotification | undefined> => this.http.post<INotification>(
     toUrl(this.urlV1, notificationId),
     null,
   );
 
-  deleteNotification = (
+  deleteNotificationById = (
     notificationId: string,
   ): Observable<INotification | undefined> => this.http.delete<INotification>(
     toUrl(this.urlV1, notificationId),
   );
 
-  subscribe = (token: string): Observable<any> => this.http.post(toUrl(this.urlV1, 'subscribe'), { token });
+  subscribeNotification = (token: string): Observable<any> => this.http.post(toUrl(this.urlV1, 'subscribe'), { token });
 }

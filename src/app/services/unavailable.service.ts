@@ -14,31 +14,36 @@ export class UnavailableService {
 
   private http: HttpClient = inject(HttpClient);
 
-  public getAll(sort: string, direction: string, page: number, size: number = PAGE_SIZE): Observable<IUnavailable[]> {
+  public getUnavailablePage(
+    sort: string,
+    direction: string,
+    page: number,
+    size: number = PAGE_SIZE,
+  ): Observable<IUnavailable[]> {
     const params = createFilter(page, size, sort, direction);
 
     return this.http.get<IUnavailable[]>(toUrl(this.urlV1, 'pages'), { params });
   }
 
-  public getById(id: string): Observable<IUnavailable | undefined> {
+  public findUnavailableById(id: string): Observable<IUnavailable | undefined> {
     const url = toUrl(this.urlV1, id);
     return this.http.get<IUnavailable>(url);
   }
 
-  public add(unavailable: IUnavailable): Observable<IUnavailable> {
+  public createUnavailable(unavailable: IUnavailable): Observable<IUnavailable> {
     return this.http.post<IUnavailable>(this.urlV1, unavailable);
   }
 
-  public blockAgenda(unavailable: IUnavailable): Observable<IUnavailable> {
+  public createBlockAgenda(unavailable: IUnavailable): Observable<IUnavailable> {
     return this.http.post<IUnavailable>(`${ this.urlV1 }/block/agenda`, unavailable);
   }
 
-  public delete(id: string): Observable<IUnavailable> {
+  public deleteUnavailableById(id: string): Observable<IUnavailable> {
     const url = toUrl(this.urlV1, id);
     return this.http.delete<IUnavailable>(url);
   }
 
-  public update(unavailable: IUnavailable): Observable<IUnavailable> {
+  public updateUnavailableById(unavailable: IUnavailable): Observable<IUnavailable> {
     const url = `${ this.urlV1 }/${ unavailable.id }`;
     return this.http.patch<IUnavailable>(url, unavailable);
   }

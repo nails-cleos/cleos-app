@@ -35,7 +35,11 @@
     </mat-form-field>
     @if (bankList.length) {
       <mat-form-field appearance="outline">
-        @if (formGroup.get('bank')?.value?.svgIcon) {
+        @if (formGroup.get('bank')?.value?.icon) {
+          <mat-icon>
+            <img [src]="formGroup.get('bank')?.value?.icon" alt="icon" style="width:24px; height:24px;">
+          </mat-icon>
+        } @else if (formGroup.get('bank')?.value?.svgIcon) {
           <mat-icon matPrefix [svgIcon]="formGroup.get('bank')?.value?.svgIcon" class="svg-icon"></mat-icon>
         } @else if (!formGroup.get('bank')?.value?.svgIcon) {
           <mat-icon matPrefix>account_balance</mat-icon>

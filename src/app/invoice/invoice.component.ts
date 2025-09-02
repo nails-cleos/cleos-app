@@ -113,7 +113,7 @@ export class InvoiceComponent implements OnInit, OnDestroy {
   		office.id = this.office.value.id;
   		office.lastInvoiceNumber = lastInvoiceNumber;
   		this.store.dispatch(
-  			new fromActionsInvoice.UpdateOffices(office),
+  			new fromActionsInvoice.UpdateOfficeById(office),
   		);
   	}
   	const printPdf = pdf(this.selection.selected, this.office.value, start, this.startDate.value, this.endDate.value);
@@ -234,12 +234,12 @@ export class InvoiceComponent implements OnInit, OnDestroy {
   			end: backendFormatDate(this.endDate.value),
   		};
   		this.store.dispatch(
-  			new fromActionsInvoice.InvoiceFind(payload),
+  			new fromActionsInvoice.FindOfficeToInvoice(payload),
   		);
   	}
   };
 
-  private findOffices = (): void => this.store.dispatch(new fromActionsInvoice.FindMyOffices());
+  private findOffices = (): void => this.store.dispatch(new fromActionsInvoice.GetAllMyOffices());
 
   private clean = (): void => this.store.dispatch(new fromActionsInvoice.Clean());
 

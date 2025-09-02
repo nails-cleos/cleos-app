@@ -53,13 +53,13 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     } else {
       this.navigationService.reload(this.router.url.split('/'));
       this.store.dispatch(
-        new fromActionsNotification.NotificationRead(notification),
+        new fromActionsNotification.ReadNotificationById(notification),
       );
     }
   };
 
   getNotifications = (): void => this.store.dispatch(
-    new fromActionsNotification.GetAllPaged({
+    new fromActionsNotification.GetNotificationsPage({
       active: 'date',
       direction: 'desc',
       page: ++this.page,
@@ -72,7 +72,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     }
     const notification = this.notifications.splice(index, 1)[0];
     this.store.dispatch(
-      new fromActionsNotification.NotificationDelete(Object.assign({}, notification, { deleted: true })),
+      new fromActionsNotification.DeleteNotificationById(Object.assign({}, notification, { deleted: true })),
     );
     if (!notification.read) {
       --this.badge;

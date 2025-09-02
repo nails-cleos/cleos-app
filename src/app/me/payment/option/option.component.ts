@@ -84,7 +84,7 @@ export class OptionComponent implements OnInit, OnDestroy {
   		payload.payment.bic = this.typeForm.get('bank')?.value?.bic;
   	}
   	return this.store.dispatch(
-  		new fromActionsPayment.PaymentCreate(payload),
+  		new fromActionsPayment.CreatePaymentLink(payload),
   	);
   }
 

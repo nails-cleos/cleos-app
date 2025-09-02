@@ -16,7 +16,7 @@ export class OfficeService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getAll = (
+  getOfficesPage = (
     sort: string,
     direction: string,
     page: number,
@@ -26,11 +26,13 @@ export class OfficeService {
     { params: createFilter(page, size, sort, direction) },
   );
 
-  getById = (id: string): Observable<IOffice | undefined> => this.http.get<IOffice>(toUrl(this.urlV1, id));
+  findOfficeById = (id: string): Observable<IOffice | undefined> => this.http.get<IOffice>(toUrl(this.urlV1, id));
 
-  add = (office: IOffice): Observable<IOffice> => this.http.post<IOffice>(this.urlV1, office);
+  createOffice = (office: IOffice): Observable<IOffice> => this.http.post<IOffice>(this.urlV1, office);
 
-  delete = (id: string): Observable<IOffice> => this.http.delete<IOffice>(toUrl(this.urlV1, id));
+  deleteOfficeById = (id: string): Observable<IOffice> => this.http.delete<IOffice>(toUrl(this.urlV1, id));
 
-  update = (office: IOffice): Observable<IOffice> => this.http.patch<IOffice>(toUrl(this.urlV1, office.id!), office);
+  updateOfficeById = (
+    office: IOffice,
+  ): Observable<IOffice> => this.http.patch<IOffice>(toUrl(this.urlV1, office.id!), office);
 }

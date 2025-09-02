@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Analytics, logEvent } from '@angular/fire/analytics';
 import { SharedModule } from '../../../shared/shared.module';
+import { currencySymbol } from '../../../util/helper';
 
 @Component({
   selector: 'app-me-discount',
@@ -89,7 +90,7 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private getDiscounts = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsDiscount.GetMyDiscounts({
+  	new fromActionsDiscount.GetMyDiscountsPage({
   		active: this.sort.active,
   		direction: this.sort.direction,
   		size: this.pageSize,
@@ -108,10 +109,10 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
   				let symbol;
   				switch (ud.discountCustomer.type) {
   				case DiscountType.money:
-  					symbol = `$ ${ ud.discountCustomer.amount }`;
+  					symbol = currencySymbol(ud.discountCustomer.discount?.currency);
   					break;
   				case DiscountType.percentage:
-  					symbol = `${ ud.discountCustomer.amount } %`;
+  					symbol = '%';
   					break;
   				}
   				return Object.assign({}, ud, { symbol });

@@ -127,7 +127,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   				if (result) {
   					this.dataSource = [{}, {}, {}];
   					this.store.dispatch(
-  						new fromActionsReservation.Cancel({ id: event, paymentCancellation: result }),
+  						new fromActionsReservation.CancelReservation({ id: event, paymentCancellation: result }),
   					);
   				}
   			});
@@ -183,7 +183,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   private getCustomers = (): void => this.store.dispatch(new fromActionsReservation.GetAllCustomers());
 
   private getReservations = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsReservation.GetAllFilterPage({
+  	new fromActionsReservation.GetAllFilterReservations({
   		states: this.states,
   		userId: this.userId,
   		active: this.sort.active,

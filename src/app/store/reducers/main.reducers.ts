@@ -31,7 +31,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: true,
       };
     }
-    case MainActionTypes.getAllTreatments: {
+    case MainActionTypes.getListTreatmentsGroup: {
       return {
         ...state,
         groups: null,

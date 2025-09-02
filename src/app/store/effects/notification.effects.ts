@@ -12,22 +12,22 @@ import { TranslateService } from '@ngx-translate/core';
 export class NotificationEffects {
 
   getAll$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.notificationPage)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.getNotificationsPage)).pipe(
       map((action: any) => action.payload),
       switchMap(
-        (payload: any) => this.notificationService.getAll(payload.active, payload.direction, payload.page, payload.size)
-          .pipe(
-            switchMap((response: any) => of(
-              new fromActionsNotification.NotificationSuccess(response ? response : { page: { content: [] } }))),
-            catchError(
-              (err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({ error: err.error }))),
-          )),
+        (payload: any) => this.notificationService.getNotificationsPage(payload.active, payload.direction, payload.page,
+          payload.size).pipe(
+          switchMap((response: any) => of(
+            new fromActionsNotification.NotificationSuccess(response ? response : { page: { content: [] } }))),
+          catchError(
+            (err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({ error: err.error }))),
+        )),
     ));
 
   read$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.notificationRead)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.readNotificationById)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.notificationService.readNotification(payload.id).pipe(
+      switchMap((payload: any) => this.notificationService.readNotificationById(payload.id).pipe(
         switchMap(() => of(new fromActionsNotification.NotificationReadSuccess(payload))),
         catchError(
           (err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({ error: err.error }))),
@@ -35,9 +35,9 @@ export class NotificationEffects {
     ));
 
   delete$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.notificationDelete)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.deleteNotificationById)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.notificationService.deleteNotification(payload.id).pipe(
+      switchMap((payload: any) => this.notificationService.deleteNotificationById(payload.id).pipe(
         switchMap(() => of(new fromActionsNotification.NotificationDeleteSuccess(payload))),
         catchError(
           (err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({ error: err.error }))),
@@ -45,9 +45,9 @@ export class NotificationEffects {
     ));
 
   notificationSubscribe$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsNotification.NotificationActionTypes.notificationSubscribe))
+    ofType(fromActionsNotification.NotificationActionTypes.subscribeNotification))
     .pipe(map((action: any) => action.payload),
-      switchMap((payload: any) => this.notificationService.subscribe(payload).pipe(
+      switchMap((payload: any) => this.notificationService.subscribeNotification(payload).pipe(
         switchMap(() => of(new fromActionsNotification.NotificationSuccess(payload))),
         catchError(
           (err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({ error: err.error }))),

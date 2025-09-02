@@ -67,7 +67,7 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
   }
 
   private getTransaction = (): void => this.store.dispatch(
-    new fromActionsAccount.TransactionDetail({ id: this.id, transactionId: this.transactionId }),
+    new fromActionsAccount.FindTransactionById({ id: this.id, transactionId: this.transactionId }),
   );
 
   private subscribe = (): void => {

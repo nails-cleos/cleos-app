@@ -1,35 +1,35 @@
 import { Action } from '@ngrx/store';
 
 export enum DashboardActionTypes {
-  dashEvents = '[Dash] Get events',
-  dashCards = '[Dash] Get cards',
+  eventsSummaries = '[Dash] Events summaries',
+  getSummaries = '[Dash] Get summaries',
   dashSuccess = '[Dash] Dash Success',
   dashFailure = '[Dash] Dash failure',
-  dashboardEvents = '[Dashboard] Get events',
+  meEvent = '[Dashboard] Me event',
   eventSuccess = '[Dashboard] Event success',
-  updateEvent = '[Dashboard] Update event',
-  monthlySummary = '[Dash] Get monthly summary',
+  updateEventById = '[Dashboard] Update event by id',
+  getMonthlySummary = '[Dash] Get monthly summary',
   monthlySummarySuccess = '[Dash] Monthly summary success',
-  saveMonthlySummary = '[Dash] Save Monthly summary',
+  updateMonthlySummary = '[Dash] Update monthly summary',
   saveMonthlySummarySuccess = '[Dash] Save monthly summary success',
-  yearSummary = '[Dash] Get year summary',
+  getYearSummary = '[Dash] Get year summary',
   yearSummarySuccess = '[Dash] Year summary success',
-  yearExport = '[Dash] Get year export',
+  exportYearSummary = '[Dash] Export year summary',
   yearExportSuccess = '[Dash] Year export success',
-  quarterSummary = '[Dash] Get quarter summary',
+  getQuarterSummary = '[Dash] Get quarter summary',
   quarterSummarySuccess = '[Dash] Quarter summary success',
   clean = '[Dash] Clean'
 }
 
-export class GetEvents implements Action {
-  readonly type = DashboardActionTypes.dashEvents;
+export class EventsSummaries implements Action {
+  readonly type = DashboardActionTypes.eventsSummaries;
 
   constructor(public payload: any) {
   }
 }
 
-export class GetDashboardEvents implements Action {
-  readonly type = DashboardActionTypes.dashboardEvents;
+export class MeEvent implements Action {
+  readonly type = DashboardActionTypes.meEvent;
 
   constructor(public payload: any) {
   }
@@ -42,8 +42,8 @@ export class EventSuccess implements Action {
   }
 }
 
-export class GetCards implements Action {
-  readonly type = DashboardActionTypes.dashCards;
+export class GetSummaries implements Action {
+  readonly type = DashboardActionTypes.getSummaries;
 
   constructor(public payload: any) {
   }
@@ -63,15 +63,15 @@ export class DashFailure implements Action {
   }
 }
 
-export class UpdateEvent implements Action {
-  readonly type = DashboardActionTypes.updateEvent;
+export class UpdateEventById implements Action {
+  readonly type = DashboardActionTypes.updateEventById;
 
   constructor(public payload: any) {
   }
 }
 
 export class GetMonthlySummary implements Action {
-  readonly type = DashboardActionTypes.monthlySummary;
+  readonly type = DashboardActionTypes.getMonthlySummary;
 
   constructor(public payload: any) {
   }
@@ -85,7 +85,7 @@ export class MonthlySummarySuccess implements Action {
 }
 
 export class UpdateMonthlySummary implements Action {
-  readonly type = DashboardActionTypes.saveMonthlySummary;
+  readonly type = DashboardActionTypes.updateMonthlySummary;
 
   constructor(public payload: any) {
   }
@@ -99,7 +99,7 @@ export class UpdateMonthlySummarySuccess implements Action {
 }
 
 export class GetYearSummary implements Action {
-  readonly type = DashboardActionTypes.yearSummary;
+  readonly type = DashboardActionTypes.getYearSummary;
 
   constructor(public payload: any) {
   }
@@ -112,8 +112,8 @@ export class YearSummarySuccess implements Action {
   }
 }
 
-export class GetYearExport implements Action {
-  readonly type = DashboardActionTypes.yearExport;
+export class ExportYearSummary implements Action {
+  readonly type = DashboardActionTypes.exportYearSummary;
 
   constructor(public payload: any) {
   }
@@ -127,7 +127,7 @@ export class YearExportSuccess implements Action {
 }
 
 export class GetQuarterSummary implements Action {
-  readonly type = DashboardActionTypes.quarterSummary;
+  readonly type = DashboardActionTypes.getQuarterSummary;
 
   constructor(public payload: any) {
   }
@@ -145,13 +145,13 @@ export class Clean implements Action {
 }
 
 export type All =
-  | GetEvents
-  | GetCards
+  | EventsSummaries
+  | GetSummaries
   | DashSuccess
   | DashFailure
-  | GetDashboardEvents
+  | MeEvent
   | EventSuccess
-  | UpdateEvent
+  | UpdateEventById
   | GetMonthlySummary
   | MonthlySummarySuccess
   | UpdateMonthlySummary
@@ -160,6 +160,6 @@ export type All =
   | YearSummarySuccess
   | GetQuarterSummary
   | QuarterSummarySuccess
-  | GetYearExport
+  | ExportYearSummary
   | YearExportSuccess
   | Clean;

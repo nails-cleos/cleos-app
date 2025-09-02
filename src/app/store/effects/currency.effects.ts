@@ -11,26 +11,29 @@ import { Router } from '@angular/router';
 @Injectable()
 export class CurrencyEffects {
 
-  getAll$ = createEffect(() => this.actions$.pipe(ofType(fromActionsCurrency.CurrencyActionTypes.getAll)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.currencyService.getAll(payload.active, payload.direction, payload.page,
-      payload.size).pipe(
-      switchMap((response: any) => of(new fromActionsCurrency.CurrencySuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsCurrency.CurrencyFailure({ error: err.error }))),
-    )),
-  ));
+  getAll$ = createEffect(() => this.actions$.pipe(ofType(fromActionsCurrency.CurrencyActionTypes.getCurrenciesPage))
+    .pipe(
+      map((action: any) => action.payload),
+      switchMap(
+        (payload: any) => this.currencyService.getCurrenciesPage(payload.active, payload.direction, payload.page,
+          payload.size).pipe(
+          switchMap((response: any) => of(new fromActionsCurrency.CurrencySuccess(response))),
+          catchError((err: HttpErrorResponse) => of(new fromActionsCurrency.CurrencyFailure({ error: err.error }))),
+        )),
+    ));
 
-  findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsCurrency.CurrencyActionTypes.currencyFind)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.currencyService.getById(payload).pipe(
-      switchMap((currency: any) => of(new fromActionsCurrency.CurrencySelected(currency))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsCurrency.CurrencyFailure({ error: err.error }))),
-    )),
-  ));
+  findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsCurrency.CurrencyActionTypes.findCurrencyById))
+    .pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.currencyService.findCurrencyById(payload).pipe(
+        switchMap((currency: any) => of(new fromActionsCurrency.CurrencySelected(currency))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsCurrency.CurrencyFailure({ error: err.error }))),
+      )),
+    ));
 
-  save$ = createEffect(() => this.actions$.pipe(ofType(fromActionsCurrency.CurrencyActionTypes.currencySave)).pipe(
+  save$ = createEffect(() => this.actions$.pipe(ofType(fromActionsCurrency.CurrencyActionTypes.createCurrency)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.currencyService.add(payload).pipe(
+    switchMap((payload: any) => this.currencyService.createCurrency(payload).pipe(
       switchMap((response: any) => {
         const message = this.translate.instant('CURRENCY.CREATED', { code: response.code });
         return of(new fromActionsCurrency.CurrencySaveSuccess({ message }));
@@ -38,25 +41,27 @@ export class CurrencyEffects {
     )),
   ));
 
-  update = createEffect(() => this.actions$.pipe(ofType(fromActionsCurrency.CurrencyActionTypes.currencyUpdate)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.currencyService.update(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('CURRENCY.UPDATED.MESSAGE', { code: response.code });
-        return of(new fromActionsCurrency.CurrencySaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsCurrency.CurrencyFailure({ error: err.error }))),
-    )),
-  ));
+  update = createEffect(() => this.actions$.pipe(ofType(fromActionsCurrency.CurrencyActionTypes.updateCurrencyById))
+    .pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.currencyService.updateCurrencyById(payload).pipe(
+        switchMap((response: any) => {
+          const message = this.translate.instant('CURRENCY.UPDATED.MESSAGE', { code: response.code });
+          return of(new fromActionsCurrency.CurrencySaveSuccess({ message }));
+        }), catchError((err: HttpErrorResponse) => of(new fromActionsCurrency.CurrencyFailure({ error: err.error }))),
+      )),
+    ));
 
-  delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsCurrency.CurrencyActionTypes.currencyDelete)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.currencyService.delete(payload.id).pipe(
-      switchMap(() => {
-        const message = this.translate.instant('CURRENCY.DELETED.MESSAGE', { code: payload.code });
-        return of(new fromActionsCurrency.CurrencySaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsCurrency.CurrencyFailure({ error: err.error }))),
-    )),
-  ));
+  delete$ = createEffect(
+    () => this.actions$.pipe(ofType(fromActionsCurrency.CurrencyActionTypes.deleteCurrencyById)).pipe(
+      map((action: any) => action.payload),
+      switchMap((payload: any) => this.currencyService.deleteCurrencyById(payload.id).pipe(
+        switchMap(() => {
+          const message = this.translate.instant('CURRENCY.DELETED.MESSAGE', { code: payload.code });
+          return of(new fromActionsCurrency.CurrencySaveSuccess({ message }));
+        }), catchError((err: HttpErrorResponse) => of(new fromActionsCurrency.CurrencyFailure({ error: err.error }))),
+      )),
+    ));
 
   selectedData$ = createEffect(() => this.actions$.pipe(
     ofType(fromActionsCurrency.CurrencyActionTypes.currencySelected),

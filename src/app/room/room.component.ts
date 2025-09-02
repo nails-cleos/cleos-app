@@ -155,11 +155,11 @@ export class RoomComponent implements OnInit, OnDestroy {
 
     if (this.isAddMode) {
       this.store.dispatch(
-        new fromActionsRoom.RoomSave(room),
+        new fromActionsRoom.CreateRoom(room),
       );
     } else {
       room.id = this.id;
-      this.store.dispatch(new fromActionsRoom.RoomUpdate(room));
+      this.store.dispatch(new fromActionsRoom.UpdateRoomById(room));
     }
     return;
   }
@@ -320,7 +320,7 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   private clean = (): void => this.store.dispatch(new fromActionsRoom.Clean());
 
-  private getRoomInfo = (): void => this.store.dispatch(new fromActionsRoom.GetRoomInfo());
+  private getRoomInfo = (): void => this.store.dispatch(new fromActionsRoom.GetAllRoomsInfo());
 
   private setIcon = (day: string, icon: RoomIconName): void => {
     switch (day) {
@@ -452,7 +452,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   private getRoom = (): void => {
     const id = this.route.snapshot.paramMap.get('id');
     this.store.dispatch(
-      new fromActionsRoom.RoomFind({ id, redirect: true }),
+      new fromActionsRoom.FindRoomById({ id, redirect: true }),
     );
   };
 
@@ -476,8 +476,7 @@ export class RoomComponent implements OnInit, OnDestroy {
         this.primary = state.selected.room.primary;
         this.currentPaymentTypes = state.selected.room.paymentTypes;
         this.paymentTypes = state.selected.room.paymentTypes;
-        this.allProfessional = state.selected.professionals;
-        state.selected.room.professionals.forEach((professional: IUserAll) => {
+        state.selected.room.professionals?.forEach((professional: IUserAll) => {
           this.professionals.push(professional);
           this.allProfessional = this.allProfessional?.filter(c => c.id !== professional.id);
         });

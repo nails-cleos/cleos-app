@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { IPaymentAll } from '../../../interfaces/payment';
-import { IReservationAll, ITracking } from '../../../interfaces/reservation';
+import { ITracking } from '../../../interfaces/reservation';
 import * as fromActionsReservation from '../../../store/reservation.actions';
 import * as fromActionsPayment from '../../../store/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
@@ -18,6 +18,7 @@ import { SharedModule } from '../../../shared/shared.module';
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
 import { RatingComponent } from '../../../shared/rating/rating.component';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
+import { IReview } from '../../../interfaces/review';
 
 @Component({
   selector: 'app-more-info',
@@ -30,7 +31,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
 
   tracking?: ITracking;
   payments?: IPaymentAll[];
-  reservation?: IReservationAll;
+  review?: IReview;
 
   dateFormat: string;
   totalTime?: string;
@@ -52,7 +53,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
   get execute(): void {
     this.tracking = undefined;
     return this.store.dispatch(
-      new fromActionsReservation.ExecuteTracking({ reservationId: this.reservationId }),
+      new fromActionsReservation.ExecuteTrackingByReservationId({ reservationId: this.reservationId }),
     );
   }
 
@@ -64,7 +65,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
       if (result) {
         this.tracking = undefined;
         this.store.dispatch(
-          new fromActionsReservation.UpdateTracking({
+          new fromActionsReservation.UpdateTrackingByReservationId({
             reservationId: this.reservationId,
             started: result.started,
             completed: result.completed,
@@ -104,7 +105,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
     if (!this.tracking) {
       this.tracking = undefined;
       this.store.dispatch(
-        new fromActionsReservation.FindTracking({ reservationId: this.reservationId }),
+        new fromActionsReservation.FindTrackingByReservationId({ reservationId: this.reservationId }),
       );
     }
     if (!this.payments) {
@@ -113,10 +114,10 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
         new fromActionsReservation.ReservationFindPayments(this.reservationId),
       );
     }
-    if (!this.reservation) {
-      this.reservation = undefined;
+    if (!this.review) {
+      this.review = undefined;
       this.store.dispatch(
-        new fromActionsReservation.ReservationFind({ id: this.reservationId }),
+        new fromActionsReservation.FindReviewByReservationId({ id: this.reservationId }),
       );
     }
   };
@@ -125,7 +126,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
     this.subscription = this.getState.subscribe(state => {
       this.payments = state.payments;
       this.tracking = state.tracking;
-      this.reservation = state.selected;
+      this.review = state.review;
       if (this.tracking && this.tracking.startedTimestamp && this.tracking.completedTimestamp) {
         this.totalTime = getDiffTime(newDateTimestamp(this.tracking.completedTimestamp),
           newDateTimestamp(this.tracking.startedTimestamp));

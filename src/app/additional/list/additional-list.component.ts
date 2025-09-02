@@ -80,7 +80,7 @@ export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy
   	executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: additional }, result => {
   		if (result) {
   			this.store.dispatch(
-  				new fromActionsAdditional.DeleteAdditional(result),
+  				new fromActionsAdditional.DeleteAdditionalById(result),
   			);
   		}
   	});
@@ -99,7 +99,7 @@ export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy
   };
 
   private getAdditionalList = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsAdditional.GetAll({
+  	new fromActionsAdditional.GetAdditionalPage({
   		active: this.sort.active,
   		direction: this.sort.direction,
   		size: this.pageSize,

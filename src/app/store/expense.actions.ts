@@ -1,29 +1,29 @@
 import { Action } from '@ngrx/store';
 
 export enum ExpenseActionTypes {
-  getAll = '[Expense] Get all',
-  getExpenseInfo = '[Expense] Get info',
+  getExpensesPage = '[Expense] Get expenses page',
+  getAllExpensesInfo = '[Expense] Get all expenses info',
   expenseSuccess = '[Expense] Success',
   expenseInfoSuccess = '[Expense] Info success',
-  expenseSave = '[Expense] Save',
-  expenseUpdate = '[Expense] Update',
+  createExpense = '[Expense] Create expense',
+  updateExpenseById = '[Expense] Update expense by id',
   expenseSaveSuccess = '[Expense] Save Success',
   expenseFailure = '[Expense] Failure',
   expenseSelected = '[Expense] Selected',
-  expenseFind = '[Expense] Find',
-  expenseDelete = '[Expense] Delete',
+  findExpenseById = '[Expense] Find expense by id',
+  deleteExpenseById = '[Expense] Delete expense by id',
   clean = '[Expense] Clean'
 }
 
-export class GetAll implements Action {
-  readonly type = ExpenseActionTypes.getAll;
+export class GetExpensesPage implements Action {
+  readonly type = ExpenseActionTypes.getExpensesPage;
 
   constructor(public payload: any) {
   }
 }
 
-export class GetExpenseInfo implements Action {
-  readonly type = ExpenseActionTypes.getExpenseInfo;
+export class GetAllExpensesInfo implements Action {
+  readonly type = ExpenseActionTypes.getAllExpensesInfo;
 
   constructor(public payload: any) {
   }
@@ -43,15 +43,15 @@ export class ExpenseInfoSuccess implements Action {
   }
 }
 
-export class ExpenseSave implements Action {
-  readonly type = ExpenseActionTypes.expenseSave;
+export class CreateExpense implements Action {
+  readonly type = ExpenseActionTypes.createExpense;
 
   constructor(public payload: any) {
   }
 }
 
-export class ExpenseUpdate implements Action {
-  readonly type = ExpenseActionTypes.expenseUpdate;
+export class UpdateExpenseById implements Action {
+  readonly type = ExpenseActionTypes.updateExpenseById;
 
   constructor(public payload: any) {
   }
@@ -78,15 +78,15 @@ export class ExpenseSelected implements Action {
   }
 }
 
-export class ExpenseFind implements Action {
-  readonly type = ExpenseActionTypes.expenseFind;
+export class FindExpenseById implements Action {
+  readonly type = ExpenseActionTypes.findExpenseById;
 
   constructor(public payload: any) {
   }
 }
 
-export class DeleteExpense implements Action {
-  readonly type = ExpenseActionTypes.expenseDelete;
+export class DeleteExpenseById implements Action {
+  readonly type = ExpenseActionTypes.deleteExpenseById;
 
   constructor(public payload: any) {
   }
@@ -97,15 +97,15 @@ export class Clean implements Action {
 }
 
 export type All =
-  | GetAll
-  | GetExpenseInfo
-  | ExpenseSave
-  | ExpenseUpdate
+  | GetExpensesPage
+  | GetAllExpensesInfo
+  | CreateExpense
+  | UpdateExpenseById
   | ExpenseSuccess
   | ExpenseInfoSuccess
   | ExpenseSaveSuccess
   | ExpenseFailure
-  | ExpenseFind
+  | FindExpenseById
   | ExpenseSelected
-  | DeleteExpense
+  | DeleteExpenseById
   | Clean;

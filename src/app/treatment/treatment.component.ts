@@ -96,10 +96,10 @@ export class TreatmentComponent implements OnInit, OnDestroy {
   	}
 
   	if (this.isAddMode) {
-  		this.store.dispatch(new fromActionsTreatment.TreatmentSave(group));
+  		this.store.dispatch(new fromActionsTreatment.CreateTreatment(group));
   	} else {
   		group.id = this.id;
-  		this.store.dispatch(new fromActionsTreatment.TreatmentUpdate(group));
+  		this.store.dispatch(new fromActionsTreatment.UpdateTreatmentGroupById(group));
   	}
   	return;
   }
@@ -191,14 +191,14 @@ export class TreatmentComponent implements OnInit, OnDestroy {
   private filter = (name: string): IColorAll[] | undefined => this.allColors?.filter(
   	option => option?.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private getColors = (): void => this.store.dispatch(new fromActionsTreatment.GetColors());
+  private getColors = (): void => this.store.dispatch(new fromActionsTreatment.GetAllColors());
 
   private clean = (): void => this.store.dispatch(new fromActionsTreatment.Clean());
 
   private getTreatment = (): void => {
   	if (!this.group) {
   		this.store.dispatch(
-  			new fromActionsTreatment.TreatmentFind({ id: this.id, path: 'edit' }),
+  			new fromActionsTreatment.FindTreatmentGroupById({ id: this.id, path: 'edit' }),
   		);
   	}
   };

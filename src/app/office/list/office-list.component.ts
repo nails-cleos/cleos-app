@@ -79,7 +79,7 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
   	dialogRef.afterClosed().subscribe(result => {
   		if (result) {
   			this.store.dispatch(
-  				new fromActionsOffice.DeleteOffice(result),
+  				new fromActionsOffice.DeleteOfficeById(result),
   			);
   		}
   	});
@@ -98,7 +98,7 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private getOffices = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsOffice.GetAll({
+  	new fromActionsOffice.GetOfficesPage({
   		active: this.sort.active,
   		direction: this.sort.direction,
   		size: this.pageSize,

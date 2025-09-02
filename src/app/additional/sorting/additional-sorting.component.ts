@@ -39,7 +39,7 @@ export class AdditionalSortingComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  sorted = (sorted: ISorted[]): void => this.store.dispatch(new fromActionsAdditional.AdditionalUpdateSort(sorted));
+  sorted = (sorted: ISorted[]): void => this.store.dispatch(new fromActionsAdditional.SortAdditional(sorted));
 
   private clean = (): void => this.store.dispatch(new fromActionsAdditional.Clean());
 

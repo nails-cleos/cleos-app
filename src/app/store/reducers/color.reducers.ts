@@ -24,7 +24,7 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case ColorActionTypes.getAll: {
+    case ColorActionTypes.getColorsPage: {
       return {
         ...state,
         data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IColor>,
@@ -34,7 +34,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case ColorActionTypes.colorFind: {
+    case ColorActionTypes.findColorById: {
       return {
         ...state,
         data: {} as IColor,
@@ -82,9 +82,9 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false,
       };
     }
-    case ColorActionTypes.colorUpdate:
-    case ColorActionTypes.colorSave:
-    case ColorActionTypes.colorDelete: {
+    case ColorActionTypes.updateColorById:
+    case ColorActionTypes.createColor:
+    case ColorActionTypes.deleteColorById: {
       return {
         ...state,
         errorMessage: null,

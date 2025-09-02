@@ -30,7 +30,7 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case UnavailableActionTypes.getAll: {
+    case UnavailableActionTypes.getUnavailablePage: {
       return {
         ...state,
         data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IUnavailable>,
@@ -49,7 +49,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case UnavailableActionTypes.getRoom: {
+    case UnavailableActionTypes.getAllRoomsByProfessionalId: {
       return {
         ...state,
         room: null,
@@ -58,7 +58,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case UnavailableActionTypes.unavailableFind: {
+    case UnavailableActionTypes.findUnavailableById: {
       return {
         ...state,
         data: {} as IUnavailable,
@@ -107,10 +107,10 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false,
       };
     }
-    case UnavailableActionTypes.unavailableUpdate:
-    case UnavailableActionTypes.unavailableSave:
-    case UnavailableActionTypes.unavailableBlockAgenda:
-    case UnavailableActionTypes.unavailableDelete: {
+    case UnavailableActionTypes.updateUnavailableById:
+    case UnavailableActionTypes.createUnavailable:
+    case UnavailableActionTypes.createBlockAgenda:
+    case UnavailableActionTypes.deleteUnavailableById: {
       return {
         ...state,
         error: null,

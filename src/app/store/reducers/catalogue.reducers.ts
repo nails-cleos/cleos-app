@@ -106,7 +106,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: true,
       };
     }
-    case CatalogueActionTypes.findGroups: {
+    case CatalogueActionTypes.getAllTreatmentsGroup: {
       return {
         ...state,
         groups: null,

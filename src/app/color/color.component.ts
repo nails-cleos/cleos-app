@@ -59,12 +59,12 @@ export class ColorComponent implements OnInit, OnDestroy {
 
   	if (this.isAddMode) {
   		this.store.dispatch(
-  			new fromActionsColor.ColorSave(color),
+  			new fromActionsColor.CreateColor(color),
   		);
   	} else {
   		color.id = this.id;
   		this.color = undefined;
-  		this.store.dispatch(new fromActionsColor.ColorUpdate(color));
+  		this.store.dispatch(new fromActionsColor.UpdateColorById(color));
   	}
   	return;
   }
@@ -100,7 +100,7 @@ export class ColorComponent implements OnInit, OnDestroy {
   private getColor = (): void => {
   	if (!this.color) {
   		this.store.dispatch(
-  			new fromActionsColor.ColorFind(this.id),
+  			new fromActionsColor.FindColorById(this.id),
   		);
   	}
   };

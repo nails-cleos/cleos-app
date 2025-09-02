@@ -29,7 +29,7 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case TreatmentActionTypes.getAll: {
+    case TreatmentActionTypes.getTreatmentsPage: {
       return {
         ...state,
         data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<ITreatmentGroup>,
@@ -39,7 +39,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case TreatmentActionTypes.getAllGroup: {
+    case TreatmentActionTypes.getAllTreatmentsGroup: {
       return {
         ...state,
         data: null,
@@ -49,7 +49,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case TreatmentActionTypes.getColors: {
+    case TreatmentActionTypes.getAllColors: {
       return {
         ...state,
         colors: null,
@@ -58,7 +58,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case TreatmentActionTypes.treatmentFind: {
+    case TreatmentActionTypes.findTreatmentGroupById: {
       return {
         ...state,
         data: {} as ITreatmentGroup,
@@ -115,9 +115,9 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false,
       };
     }
-    case TreatmentActionTypes.treatmentUpdate:
-    case TreatmentActionTypes.treatmentSave:
-    case TreatmentActionTypes.treatmentDelete: {
+    case TreatmentActionTypes.updateTreatmentGroupById:
+    case TreatmentActionTypes.createTreatment:
+    case TreatmentActionTypes.deleteTreatmentGroupById: {
       return {
         ...state,
         errorMessage: null,
@@ -127,7 +127,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: true,
       };
     }
-    case TreatmentActionTypes.treatmentHistory: {
+    case TreatmentActionTypes.getAllTreatmentsHistory: {
       return {
         ...state,
         history: [{} as ITreatmentAll, {} as ITreatmentAll, {} as ITreatmentAll],

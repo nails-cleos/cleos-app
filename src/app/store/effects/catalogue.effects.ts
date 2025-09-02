@@ -82,9 +82,9 @@ export class CatalogueEffects {
     ));
 
   findGroups$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsCatalogue.CatalogueActionTypes.findGroups)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsCatalogue.CatalogueActionTypes.getAllTreatmentsGroup)).pipe(
       map((action: any) => action.payload),
-      switchMap(() => this.treatmentService.getAllTreatmentGroup().pipe(
+      switchMap(() => this.treatmentService.getAllTreatmentsGroup().pipe(
         switchMap((response: any) => of(new fromActionsCatalogue.FindGroupsSuccess(response))),
         catchError((err: HttpErrorResponse) => of(new fromActionsCatalogue.CatalogueFailure({ error: err.error }))),
       )),

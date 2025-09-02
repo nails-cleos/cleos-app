@@ -183,7 +183,7 @@ export class UserComponent implements OnInit, OnDestroy {
   private getUser = (): void => {
     if (!this.user) {
       this.store.dispatch(
-        new fromActionsUser.FindUser(this.id),
+        new fromActionsUser.GetUserById(this.id),
       );
     }
   };

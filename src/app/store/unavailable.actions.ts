@@ -1,24 +1,24 @@
 import { Action } from '@ngrx/store';
 
 export enum UnavailableActionTypes {
-  getAll = '[Unavailable] Get all',
+  getUnavailablePage = '[Unavailable] Get unavailable page',
   unavailableSuccess = '[Unavailable] Success',
   getAllProfessional = '[Unavailable] Get all professional',
-  getRoom = '[Unavailable] Get room',
+  getAllRoomsByProfessionalId = '[Unavailable] Get all rooms by professional id',
   roomSuccess = '[Unavailable] Get room success',
-  unavailableSave = '[Unavailable] Save',
-  unavailableBlockAgenda = '[Unavailable] Block agenda',
-  unavailableUpdate = '[Unavailable] Update',
+  createUnavailable = '[Unavailable] Create unavailable',
+  createBlockAgenda = '[Unavailable] create block agenda',
+  updateUnavailableById = '[Unavailable] Update unavailable by id',
   unavailableSaveSuccess = '[Unavailable] Save Success',
   unavailableFailure = '[Unavailable] Failure',
   unavailableSelected = '[Unavailable] Selected',
-  unavailableFind = '[Unavailable] Find',
-  unavailableDelete = '[Unavailable] Delete',
+  findUnavailableById = '[Unavailable] Find unavailable by id',
+  deleteUnavailableById = '[Unavailable] Delete unavailable by id',
   clean = '[Unavailable] Clean'
 }
 
-export class GetAll implements Action {
-  readonly type = UnavailableActionTypes.getAll;
+export class GetUnavailablePage implements Action {
+  readonly type = UnavailableActionTypes.getUnavailablePage;
 
   constructor(public payload: any) {
   }
@@ -28,8 +28,8 @@ export class GetAllProfessional implements Action {
   readonly type = UnavailableActionTypes.getAllProfessional;
 }
 
-export class GetRoom implements Action {
-  readonly type = UnavailableActionTypes.getRoom;
+export class GetAllRoomsByProfessionalId implements Action {
+  readonly type = UnavailableActionTypes.getAllRoomsByProfessionalId;
 
   constructor(public payload: any) {
   }
@@ -49,22 +49,22 @@ export class RoomSuccess implements Action {
   }
 }
 
-export class UnavailableSave implements Action {
-  readonly type = UnavailableActionTypes.unavailableSave;
+export class CreateUnavailable implements Action {
+  readonly type = UnavailableActionTypes.createUnavailable;
 
   constructor(public payload: any) {
   }
 }
 
-export class BlockAgenda implements Action {
-  readonly type = UnavailableActionTypes.unavailableBlockAgenda;
+export class CreateBlockAgenda implements Action {
+  readonly type = UnavailableActionTypes.createBlockAgenda;
 
   constructor(public payload: any) {
   }
 }
 
-export class UnavailableUpdate implements Action {
-  readonly type = UnavailableActionTypes.unavailableUpdate;
+export class UpdateUnavailableById implements Action {
+  readonly type = UnavailableActionTypes.updateUnavailableById;
 
   constructor(public payload: any) {
   }
@@ -91,15 +91,15 @@ export class UnavailableSelected implements Action {
   }
 }
 
-export class UnavailableFind implements Action {
-  readonly type = UnavailableActionTypes.unavailableFind;
+export class FindUnavailableById implements Action {
+  readonly type = UnavailableActionTypes.findUnavailableById;
 
   constructor(public payload: any) {
   }
 }
 
-export class DeleteUnavailable implements Action {
-  readonly type = UnavailableActionTypes.unavailableDelete;
+export class DeleteUnavailableById implements Action {
+  readonly type = UnavailableActionTypes.deleteUnavailableById;
 
   constructor(public payload: any) {
   }
@@ -110,17 +110,17 @@ export class Clean implements Action {
 }
 
 export type All =
-  | GetAll
+  | GetUnavailablePage
   | GetAllProfessional
-  | GetRoom
-  | UnavailableSave
-  | BlockAgenda
-  | UnavailableUpdate
+  | GetAllRoomsByProfessionalId
+  | CreateUnavailable
+  | CreateBlockAgenda
+  | UpdateUnavailableById
   | UnavailableSuccess
   | RoomSuccess
   | UnavailableSaveSuccess
   | UnavailableFailure
-  | UnavailableFind
+  | FindUnavailableById
   | UnavailableSelected
-  | DeleteUnavailable
+  | DeleteUnavailableById
   | Clean;

@@ -26,7 +26,7 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case NoteActionTypes.noteFind: {
+    case NoteActionTypes.findNoteById: {
       return {
         ...state,
         data: {} as INote,
@@ -84,9 +84,9 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false,
       };
     }
-    case NoteActionTypes.noteUpdate:
-    case NoteActionTypes.noteSave:
-    case NoteActionTypes.noteDelete:
+    case NoteActionTypes.updateNoteById:
+    case NoteActionTypes.createNote:
+    case NoteActionTypes.deleteNoteById:
     case NoteActionTypes.noteComplete: {
       return {
         ...state,

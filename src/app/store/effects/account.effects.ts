@@ -11,18 +11,18 @@ import { PaymentService } from '../../services/payment.service';
 @Injectable()
 export class AccountEffects {
 
-  findOne$ = createEffect(() => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.accountFind)).pipe(
+  findOne$ = createEffect(() => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.findAccountById)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.accountService.getById(payload).pipe(
+    switchMap((payload: any) => this.accountService.findAccountById(payload).pipe(
       switchMap((account: any) => of(new fromActionsAccount.AccountSelected(account))),
       catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error }))),
     )),
   ));
 
   findTransaction$ = createEffect(
-    () => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.accountTransactionDetail)).pipe(
+    () => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.findTransactionById)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.accountService.findTransaction(payload.id, payload.transactionId).pipe(
+      switchMap((payload: any) => this.accountService.findTransactionById(payload.id, payload.transactionId).pipe(
         switchMap((account: any) => of(new fromActionsAccount.AccountSelected(account))),
         catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error }))),
       )),
@@ -38,28 +38,28 @@ export class AccountEffects {
     ));
 
   findAllTransaction$ = createEffect(
-    () => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.accountFindTransactions)).pipe(
+    () => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.getTransactionsByAccountId)).pipe(
       map((action: any) => action.payload),
       switchMap(
-        (payload: any) => this.accountService.getAllTransactions(payload.accountId, payload.page, payload.active,
-          payload.direction, payload.size).pipe(
+        (payload: any) => this.accountService.getTransactionsByAccountId(payload.accountId, payload.page,
+          payload.active, payload.direction, payload.size).pipe(
           switchMap((transactions: any) => of(new fromActionsAccount.AccountSuccess(transactions))),
           catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error }))),
         )),
     ));
 
   findByCustomer$ = createEffect(
-    () => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.accountFindByCustomer)).pipe(
+    () => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.findAccountByCustomerId)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.accountService.findByCustomer(payload).pipe(
+      switchMap((payload: any) => this.accountService.findAccountByCustomerId(payload).pipe(
         switchMap((account: any) => of(new fromActionsAccount.AccountSelected(account))),
         catchError((err: HttpErrorResponse) => of(new fromActionsAccount.AccountFailure({ error: err.error }))),
       )),
     ));
 
-  save$ = createEffect(() => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.accountSave)).pipe(
+  save$ = createEffect(() => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.addMoney)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.accountService.add(payload.transaction, payload.accountId).pipe(
+    switchMap((payload: any) => this.accountService.addMoney(payload.transaction, payload.accountId).pipe(
       switchMap((response: any) => {
         if (response.paymentLink) {
           return of(new fromActionsAccount.PaymentSend(response.paymentLink));
@@ -71,9 +71,9 @@ export class AccountEffects {
     )),
   ));
 
-  update = createEffect(() => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.accountUpdate)).pipe(
+  update = createEffect(() => this.actions.pipe(ofType(fromActionsAccount.AccountActionTypes.updateAccountById)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.accountService.update(payload).pipe(
+    switchMap((payload: any) => this.accountService.updateAccountById(payload).pipe(
       switchMap((response: any) => {
         const message = this.translate.instant('ACCOUNT.UPDATED', { id: response.id });
         return of(new fromActionsAccount.AccountSaveSuccess({ message }));

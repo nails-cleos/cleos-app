@@ -36,7 +36,7 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case RoomActionTypes.getAll: {
+    case RoomActionTypes.getRoomsPage: {
       return {
         ...state,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -48,7 +48,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case RoomActionTypes.getRoomInfo: {
+    case RoomActionTypes.getAllRoomsInfo: {
       return {
         ...state,
         professionals: null,
@@ -60,7 +60,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case RoomActionTypes.roomFind: {
+    case RoomActionTypes.findRoomById: {
       return {
         ...state,
         data: {} as IRoom,
@@ -70,7 +70,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case RoomActionTypes.getMyService: {
+    case RoomActionTypes.findRoomServicesById: {
       return {
         ...state,
         services: {
@@ -144,10 +144,10 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false,
       };
     }
-    case RoomActionTypes.roomServiceUpdate:
-    case RoomActionTypes.roomUpdate:
-    case RoomActionTypes.roomSave:
-    case RoomActionTypes.roomDelete: {
+    case RoomActionTypes.updateRoomServicesById:
+    case RoomActionTypes.updateRoomById:
+    case RoomActionTypes.createRoom:
+    case RoomActionTypes.deleteRoomById: {
       return {
         ...state,
         selected: null,
@@ -157,7 +157,7 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: true,
       };
     }
-    case RoomActionTypes.getCustomerInfo: {
+    case RoomActionTypes.getAllCustomersInfo: {
       return {
         ...state,
         customers: [{}, {}, {}],

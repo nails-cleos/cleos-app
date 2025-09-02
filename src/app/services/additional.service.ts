@@ -15,7 +15,7 @@ export class AdditionalService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getAll = (
+  getAdditionalPage = (
     sort: string,
     direction: string,
     page: number,
@@ -24,24 +24,26 @@ export class AdditionalService {
     toUrl(this.urlV1, 'pages'), { params: createFilter(page, size, sort, direction) },
   );
 
-  getAllAdditional = (roomId: string, groupId: string): Observable<IAdditional[]> =>
+  findAllAdditionalByGroupId = (roomId: string, groupId: string): Observable<IAdditional[]> =>
     this.http.get<IAdditional[]>(toUrl(this.urlV1, 'groups'),
       { params: new HttpParams().set('roomId', roomId).set('groupId', groupId) },
     );
 
   getAdditionalList = (): Observable<IAdditionalAll[]> => this.http.get<IAdditionalAll[]>(this.urlV1);
 
-  getById = (id: string): Observable<IAdditional | undefined> => this.http.get<IAdditional>(toUrl(this.urlV1, id));
+  findAdditionalById = (id: string): Observable<IAdditional | undefined> => this.http.get<IAdditional>(
+    toUrl(this.urlV1, id));
 
-  add = (additional: IAdditional): Observable<IAdditional> => this.http.post<IAdditional>(this.urlV1, additional);
+  createAdditional = (additional: IAdditional): Observable<IAdditional> => this.http.post<IAdditional>(this.urlV1,
+    additional);
 
-  delete = (id: string): Observable<IAdditional> => this.http.delete<IAdditional>(toUrl(this.urlV1, id));
+  deleteAdditionalById = (id: string): Observable<IAdditional> => this.http.delete<IAdditional>(toUrl(this.urlV1, id));
 
-  update = (additional: IAdditional): Observable<IAdditional> => this.http.patch<IAdditional>(
+  updateAdditionalById = (additional: IAdditional): Observable<IAdditional> => this.http.patch<IAdditional>(
     toUrl(this.urlV1, additional.id!), additional,
   );
 
-  updateSort = (additionalList: ISorted[]): Observable<IAdditionalAll[]> => this.http.patch<IAdditionalAll[]>(
+  sortAdditional = (additionalList: ISorted[]): Observable<IAdditionalAll[]> => this.http.patch<IAdditionalAll[]>(
     this.urlV1, additionalList,
   );
 }

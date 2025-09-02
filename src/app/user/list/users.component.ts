@@ -105,7 +105,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   	dialogRef.afterClosed().subscribe(result => {
   		if (result) {
   			this.store.dispatch(
-  				new fromActionsUser.DeleteUser(result),
+  				new fromActionsUser.DeleteUserById(result),
   			);
   		}
   	});
@@ -203,7 +203,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private getUsers = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsUser.GetAll({
+  	new fromActionsUser.GetUsersPage({
   		active: this.sort.active,
   		direction: this.sort.direction,
   		size: this.pageSize,
@@ -307,7 +307,7 @@ export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestr
   private filterUser = (name: string): IUser[] | undefined => this.users?.filter(
     option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private getOldUsers = (): void => this.store.dispatch(new fromActionsUser.GetAllDisableUsers());
+  private getOldUsers = (): void => this.store.dispatch(new fromActionsUser.FindAllDisableUsers());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe(state => {

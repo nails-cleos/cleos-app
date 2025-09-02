@@ -14,7 +14,7 @@ export class RoomService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getAll = (
+  getRoomsPage = (
     sort: string,
     direction: string,
     page: number,
@@ -32,26 +32,26 @@ export class RoomService {
     return this.http.get<IRoom[]>(this.urlV1, { params });
   };
 
-  getMyService = (
+  findRoomServicesById = (
     id: string,
   ): Observable<IRoomService> => this.http.get<IRoomService>(toUrl(this.urlV1, id, 'services'));
 
-  getRoomInfo = (): Observable<IRoomInfo> => this.http.get<IRoomInfo>(toUrl(this.urlV1, 'info'));
+  getAllRoomsInfo = (): Observable<IRoomInfo> => this.http.get<IRoomInfo>(toUrl(this.urlV1, 'info'));
 
-  getById = (id: string): Observable<IRoomInfo | undefined> => this.http.get<IRoomInfo>(toUrl(this.urlV1, id));
+  findRoomById = (id: string): Observable<IRoomInfo | undefined> => this.http.get<IRoomInfo>(toUrl(this.urlV1, id));
 
-  add = (room: IRoom): Observable<IRoom> => this.http.post<IRoom>(this.urlV1, room);
+  createRoom = (room: IRoom): Observable<IRoom> => this.http.post<IRoom>(this.urlV1, room);
 
-  delete = (id: string): Observable<IRoom> => this.http.delete<IRoom>(toUrl(this.urlV1, id));
+  deleteRoomById = (id: string): Observable<IRoom> => this.http.delete<IRoom>(toUrl(this.urlV1, id));
 
-  update = (room: IRoom): Observable<IRoom> => this.http.patch<IRoom>(toUrl(this.urlV1, room.id!), room);
+  updateRoomById = (room: IRoom): Observable<IRoom> => this.http.patch<IRoom>(toUrl(this.urlV1, room.id!), room);
 
-  updateService = (
+  updateRoomServicesById = (
     id: string,
     prices: IServicePrice[],
   ): Observable<IServicePrice[]> => this.http.patch<IServicePrice[]>(toUrl(this.urlV1, id, 'services'), prices);
 
-  getCustomerInfo = (
+  getAllCustomersInfo = (
     id: string,
   ): Observable<IRoomCustomer[]> => this.http.get<IRoomCustomer[]>(toUrl(this.urlV1, id, 'customers', 'info'));
 }

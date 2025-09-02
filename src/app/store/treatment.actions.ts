@@ -1,38 +1,38 @@
 import { Action } from '@ngrx/store';
 
 export enum TreatmentActionTypes {
-  getAll = '[Treatment] Get all',
-  getAllGroup = '[Treatment] Get all group',
-  getColors = '[Treatment] Get colors',
+  getTreatmentsPage = '[Treatment] Get treatments page',
+  getAllTreatmentsGroup = '[Treatment] Get all treatments group',
+  getAllColors = '[Treatment] Get all colors',
   treatmentSuccess = '[Treatment] Success',
   colorSuccess = '[Treatment] color Success',
-  treatmentSave = '[Treatment] Save',
-  treatmentUpdate = '[Treatment] Update',
-  treatmentUpdateSort = '[Treatment] Update sort',
-  treatmentGroupUpdateSort = '[Treatment] Update group sort',
+  createTreatment = '[Treatment] Create treatment',
+  updateTreatmentGroupById = '[Treatment] Update treatment group by id',
+  sortTreatment = '[Treatment] Sort treatment',
+  sortGroupTreatment = '[Treatment] Sort group treatment',
   treatmentSaveSuccess = '[Treatment] Save Success',
   treatmentFailure = '[Treatment] Failure',
   treatmentSelected = '[Treatment] Selected',
-  treatmentFind = '[Treatment] Find',
-  treatmentDelete = '[Treatment] Delete',
-  treatmentHistory = '[Treatment] history',
-  treatmentHistorySuccess = '[Treatment] history success',
+  findTreatmentGroupById = '[Treatment] Find treatment group by id',
+  deleteTreatmentGroupById = '[Treatment] Delete treatment group by id',
+  getAllTreatmentsHistory = '[Treatment] Get all treatments history',
+  treatmentHistorySuccess = '[Treatment] History success',
   clean = '[Treatment] Clean'
 }
 
-export class GetAll implements Action {
-  readonly type = TreatmentActionTypes.getAll;
+export class GetTreatmentsPage implements Action {
+  readonly type = TreatmentActionTypes.getTreatmentsPage;
 
   constructor(public payload: any) {
   }
 }
 
-export class GetAllGroup implements Action {
-  readonly type = TreatmentActionTypes.getAllGroup;
+export class GetAllTreatmentsGroup implements Action {
+  readonly type = TreatmentActionTypes.getAllTreatmentsGroup;
 }
 
-export class GetColors implements Action {
-  readonly type = TreatmentActionTypes.getColors;
+export class GetAllColors implements Action {
+  readonly type = TreatmentActionTypes.getAllColors;
 }
 
 export class TreatmentSuccess implements Action {
@@ -42,29 +42,29 @@ export class TreatmentSuccess implements Action {
   }
 }
 
-export class TreatmentSave implements Action {
-  readonly type = TreatmentActionTypes.treatmentSave;
+export class CreateTreatment implements Action {
+  readonly type = TreatmentActionTypes.createTreatment;
 
   constructor(public payload: any) {
   }
 }
 
-export class TreatmentUpdate implements Action {
-  readonly type = TreatmentActionTypes.treatmentUpdate;
+export class UpdateTreatmentGroupById implements Action {
+  readonly type = TreatmentActionTypes.updateTreatmentGroupById;
 
   constructor(public payload: any) {
   }
 }
 
-export class TreatmentGroupUpdateSort implements Action {
-  readonly type = TreatmentActionTypes.treatmentGroupUpdateSort;
+export class SortGroupTreatment implements Action {
+  readonly type = TreatmentActionTypes.sortGroupTreatment;
 
   constructor(public payload: any) {
   }
 }
 
-export class TreatmentUpdateSort implements Action {
-  readonly type = TreatmentActionTypes.treatmentUpdateSort;
+export class SortTreatment implements Action {
+  readonly type = TreatmentActionTypes.sortTreatment;
 
   constructor(public payload: any) {
   }
@@ -98,22 +98,22 @@ export class TreatmentSelected implements Action {
   }
 }
 
-export class TreatmentFind implements Action {
-  readonly type = TreatmentActionTypes.treatmentFind;
+export class FindTreatmentGroupById implements Action {
+  readonly type = TreatmentActionTypes.findTreatmentGroupById;
 
   constructor(public payload: any) {
   }
 }
 
-export class DeleteTreatment implements Action {
-  readonly type = TreatmentActionTypes.treatmentDelete;
+export class DeleteTreatmentGroupById implements Action {
+  readonly type = TreatmentActionTypes.deleteTreatmentGroupById;
 
   constructor(public payload: any) {
   }
 }
 
-export class TreatmentHistory implements Action {
-  readonly type = TreatmentActionTypes.treatmentHistory;
+export class GetAllTreatmentsHistory implements Action {
+  readonly type = TreatmentActionTypes.getAllTreatmentsHistory;
 
   constructor(public payload: any) {
   }
@@ -131,20 +131,20 @@ export class Clean implements Action {
 }
 
 export type All =
-  | GetAll
-  | GetAllGroup
-  | GetColors
-  | TreatmentSave
-  | TreatmentUpdate
-  | TreatmentUpdateSort
-  | TreatmentGroupUpdateSort
+  | GetTreatmentsPage
+  | GetAllTreatmentsGroup
+  | GetAllColors
+  | CreateTreatment
+  | UpdateTreatmentGroupById
+  | SortTreatment
+  | SortGroupTreatment
   | TreatmentSuccess
   | ColorSuccess
   | TreatmentSaveSuccess
   | TreatmentFailure
-  | TreatmentFind
+  | FindTreatmentGroupById
   | TreatmentSelected
-  | DeleteTreatment
-  | TreatmentHistory
+  | DeleteTreatmentGroupById
+  | GetAllTreatmentsHistory
   | TreatmentHistorySuccess
   | Clean;

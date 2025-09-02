@@ -12,7 +12,7 @@ export class ExpenseService {
 
   private http: HttpClient = inject(HttpClient);
 
-  public getAll = (roomId: string, sort: string, direction: string, page: number, size: number = PAGE_SIZE,
+  public getExpensesPage = (roomId: string, sort: string, direction: string, page: number, size: number = PAGE_SIZE,
     filter?: string, dateFilter?: string): Observable<IExpense[]> => {
     let params = createFilter(page, size, sort, direction, filter);
     if (dateFilter) {
@@ -22,24 +22,24 @@ export class ExpenseService {
     return this.http.get<IExpense[]>(this.updatePathVariable(roomId, ['pages']), { params });
   };
 
-  getExpenseInfo = (roomId: string): Observable<IExpenseInfo> => this.http.get<IExpenseInfo>(
+  getAllExpensesInfo = (roomId: string): Observable<IExpenseInfo> => this.http.get<IExpenseInfo>(
     this.updatePathVariable(roomId, ['info']),
   );
 
-  getById = (roomId: string, id: string): Observable<IExpense | undefined> => this.http.get<IExpense>(
+  findExpenseById = (roomId: string, id: string): Observable<IExpense | undefined> => this.http.get<IExpense>(
     this.updatePathVariable(roomId, [id]),
   );
 
-  add = (roomId: string, expense: IExpense): Observable<IExpense> => this.http.post<IExpense>(
+  createExpense = (roomId: string, expense: IExpense): Observable<IExpense> => this.http.post<IExpense>(
     this.updatePathVariable(roomId),
     expense,
   );
 
-  delete = (roomId: string, id: string): Observable<IExpense> => this.http.delete<IExpense>(
+  deleteExpenseById = (roomId: string, id: string): Observable<IExpense> => this.http.delete<IExpense>(
     this.updatePathVariable(roomId, [id]),
   );
 
-  update = (roomId: string, expense: IExpense): Observable<IExpense> => this.http.patch<IExpense>(
+  updateExpenseById = (roomId: string, expense: IExpense): Observable<IExpense> => this.http.patch<IExpense>(
     this.updatePathVariable(roomId, [expense.id]),
     expense,
   );

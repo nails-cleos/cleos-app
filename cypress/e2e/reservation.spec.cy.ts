@@ -166,8 +166,8 @@ const wednesday = (reservationTime: string) => [
   { text: '15:30 - 17:00', length: 1 },
   { text: `${ reservationTime } - 15:30`, length: 1 },
 ];
-const thursday = [...defaultEvents, { text: 'All day', length: 1 }];
-const weekend = [{ text: 'Out of work', length: 1 }, dailyCheck];
+const thursday = [{ text: 'All day', length: 1 }];
+const weekend = [{ text: 'Out of work', length: 1 }];
 
 const monday = defaultEvents;
 const tuesday = defaultEvents;

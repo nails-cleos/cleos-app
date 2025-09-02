@@ -20,6 +20,7 @@ import { BackButtonDirective } from '../../directives/back-button.directive';
 export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy {
   group?: ITreatmentGroup;
   colors?: IColorAll[];
+  expandedPanelIndex: number = 0;
 
   private subscription?: Subscription;
   private getState: Observable<any>;
@@ -47,10 +48,13 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
     this.getTreatment();
   }
 
-  getHistory = (treatmentId?: string): void => {
+  getHistory = (treatmentId?: string, index?: number): void => {
     this.treatmentId = treatmentId;
+    if (index !== undefined) {
+      this.expandedPanelIndex = index;
+    }
     this.store.dispatch(
-      new fromActionsTreatment.TreatmentHistory({ id: this.group?.id, treatmentId }),
+      new fromActionsTreatment.GetAllTreatmentsHistory({ id: this.group?.id, treatmentId }),
     );
   };
 
@@ -58,7 +62,7 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
     if (!this.group) {
       const id = this.route.snapshot.paramMap.get('id');
       this.store.dispatch(
-        new fromActionsTreatment.TreatmentFind({ id, path: 'view' }),
+        new fromActionsTreatment.FindTreatmentGroupById({ id, path: 'view' }),
       );
     }
   };

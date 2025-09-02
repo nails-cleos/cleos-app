@@ -102,10 +102,10 @@
         <div [@detailExpand]="transaction === expandedTransaction ? 'expanded' : 'collapsed'"
              class="detail hide-gt-xs">
           <mat-list>
-            @if (transaction.description) {
+            @if (transaction.payment?.description) {
               <div matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
               <mat-list-item role="list">
-                <div matListItemLine>{{ transaction.description }}</div>
+                <div matListItemLine>{{ transaction.payment?.description }}</div>
               </mat-list-item>
             }
             @if (transaction.amount) {

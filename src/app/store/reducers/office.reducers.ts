@@ -27,7 +27,7 @@ export const initialState: State = {
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case OfficeActionTypes.getAll: {
+    case OfficeActionTypes.getOfficesPage: {
       return {
         ...state,
         data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IOffice>,
@@ -47,7 +47,7 @@ export const reducer = (state = initialState, action: All): State => {
         message: null,
       };
     }
-    case OfficeActionTypes.officeFind: {
+    case OfficeActionTypes.findOfficeById: {
       return {
         ...state,
         data: {} as IOffice,
@@ -96,9 +96,9 @@ export const reducer = (state = initialState, action: All): State => {
         isLoading: false,
       };
     }
-    case OfficeActionTypes.officeUpdate:
-    case OfficeActionTypes.officeSave:
-    case OfficeActionTypes.officeDelete: {
+    case OfficeActionTypes.updateOfficeById:
+    case OfficeActionTypes.createOffice:
+    case OfficeActionTypes.deleteOfficeById: {
       return {
         ...state,
         errorMessage: null,

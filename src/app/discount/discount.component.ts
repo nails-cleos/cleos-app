@@ -139,7 +139,7 @@ export class DiscountComponent implements OnInit, OnDestroy {
   	}
   };
 
-  private getCurrencies = (): void => this.store.dispatch(new fromActionsDiscount.GetCurrencies());
+  private getCurrencies = (): void => this.store.dispatch(new fromActionsDiscount.GetAllCurrency());
 
   private subscribe = (): void => {
   	this.subscription = this.getState.subscribe(state => {

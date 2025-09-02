@@ -13,33 +13,33 @@ import { UserService } from '../../services/user.service';
 @Injectable()
 export class NoteEffects {
 
-  findOne$ = createEffect(() => this.actions.pipe(ofType(fromActionsNote.NoteActionTypes.noteFind)).pipe(
+  findOne$ = createEffect(() => this.actions.pipe(ofType(fromActionsNote.NoteActionTypes.findNoteById)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.noteService.getById(payload).pipe(
+    switchMap((payload: any) => this.noteService.findNoteById(payload).pipe(
       switchMap((note: any) => of(new fromActionsNote.NoteSelected(note))),
       catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error }))),
     )),
   ));
 
-  save$ = createEffect(() => this.actions.pipe(ofType(fromActionsNote.NoteActionTypes.noteSave)).pipe(
+  save$ = createEffect(() => this.actions.pipe(ofType(fromActionsNote.NoteActionTypes.createNote)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.noteService.add(payload).pipe(
+    switchMap((payload: any) => this.noteService.createNote(payload).pipe(
       switchMap((response: any) => this.success('CREATED', response.description)),
       catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error }))),
     )),
   ));
 
-  update = createEffect(() => this.actions.pipe(ofType(fromActionsNote.NoteActionTypes.noteUpdate)).pipe(
+  update = createEffect(() => this.actions.pipe(ofType(fromActionsNote.NoteActionTypes.updateNoteById)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.noteService.update(payload).pipe(
+    switchMap((payload: any) => this.noteService.updateNoteById(payload).pipe(
       switchMap((response: any) => this.success('UPDATED', response.description)),
       catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error }))),
     )),
   ));
 
-  delete$ = createEffect(() => this.actions.pipe(ofType(fromActionsNote.NoteActionTypes.noteDelete)).pipe(
+  delete$ = createEffect(() => this.actions.pipe(ofType(fromActionsNote.NoteActionTypes.deleteNoteById)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.noteService.delete(payload.id).pipe(
+    switchMap((payload: any) => this.noteService.deleteNoteById(payload.id).pipe(
       switchMap(() => this.success('DELETED', payload.description)),
       catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error }))),
     )),
@@ -56,7 +56,7 @@ export class NoteEffects {
   getAllProfessional$ = createEffect(
     () => this.actions.pipe(ofType(fromActionsNote.NoteActionTypes.getAllProfessional)).pipe(
       map((action: any) => action.payload),
-      switchMap(() => this.userService.getAllProfessionals().pipe(
+      switchMap(() => this.userService.getProfessionals().pipe(
         switchMap((response: any) => of(new fromActionsNote.NoteSuccess(response))),
         catchError((err: HttpErrorResponse) => of(new fromActionsNote.NoteFailure({ error: err.error }))),
       )),

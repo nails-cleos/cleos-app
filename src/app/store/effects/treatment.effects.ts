@@ -12,46 +12,48 @@ import { ColorService } from '../../services/color.service';
 @Injectable()
 export class TreatmentEffects {
 
-  getAll$ = createEffect(() => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.getAll)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.treatmentService.getAll(payload.active, payload.direction, payload.page,
-      payload.size).pipe(
-      switchMap((response: any) => of(new fromActionsTreatment.TreatmentSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsTreatment.TreatmentFailure({ error: err.error }))),
-    )),
-  ));
+  getAll$ = createEffect(() => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.getTreatmentsPage))
+    .pipe(
+      map((action: any) => action.payload),
+      switchMap(
+        (payload: any) => this.treatmentService.getTreatmentsPage(payload.active, payload.direction, payload.page,
+          payload.size).pipe(
+          switchMap((response: any) => of(new fromActionsTreatment.TreatmentSuccess(response))),
+          catchError((err: HttpErrorResponse) => of(new fromActionsTreatment.TreatmentFailure({ error: err.error }))),
+        )),
+    ));
 
   findGroups$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.getAllGroup)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.getAllTreatmentsGroup)).pipe(
       map((action: any) => action.payload),
-      switchMap(() => this.treatmentService.getAllTreatmentGroup().pipe(
+      switchMap(() => this.treatmentService.getAllTreatmentsGroup().pipe(
         switchMap((response: any) => of(new fromActionsTreatment.TreatmentSuccess(response))),
         catchError((err: HttpErrorResponse) => of(new fromActionsTreatment.TreatmentFailure({ error: err.error }))),
       )),
     ));
 
-  findColors$ = createEffect(() => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.getColors)).pipe(
-    map((action: any) => action.payload),
-    switchMap(() => this.colorService.getAllColors().pipe(
-      switchMap((response: any) => of(new fromActionsTreatment.ColorSuccess(response ? response : []))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsTreatment.TreatmentFailure({ error: err.error }))),
-    )),
-  ));
+  findColors$ = createEffect(() => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.getAllColors))
+    .pipe(map((action: any) => action.payload),
+      switchMap(() => this.colorService.getAllColors().pipe(
+        switchMap((response: any) => of(new fromActionsTreatment.ColorSuccess(response ? response : []))),
+        catchError((err: HttpErrorResponse) => of(new fromActionsTreatment.TreatmentFailure({ error: err.error }))),
+      )),
+    ));
 
 
   findOne$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.treatmentFind)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.findTreatmentGroupById)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.treatmentService.getById(payload.id).pipe(
+      switchMap((payload: any) => this.treatmentService.findTreatmentGroupById(payload.id).pipe(
         switchMap(
           (treatment: any) => of(new fromActionsTreatment.TreatmentSelected({ treatment, path: payload.path }))),
         catchError((err: HttpErrorResponse) => of(new fromActionsTreatment.TreatmentFailure({ error: err.error }))),
       )),
     ));
 
-  save$ = createEffect(() => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.treatmentSave)).pipe(
+  save$ = createEffect(() => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.createTreatment)).pipe(
     map((action: any) => action.payload),
-    switchMap((payload: any) => this.treatmentService.add(payload).pipe(
+    switchMap((payload: any) => this.treatmentService.createTreatment(payload).pipe(
       switchMap((response: any) => {
         const message = this.translate.instant('TREATMENT.CREATED', { name: response.name });
         return of(new fromActionsTreatment.TreatmentSaveSuccess({ message }));
@@ -60,9 +62,9 @@ export class TreatmentEffects {
   ));
 
   update$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.treatmentUpdate)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.updateTreatmentGroupById)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.treatmentService.update(payload).pipe(
+      switchMap((payload: any) => this.treatmentService.updateTreatmentGroupById(payload).pipe(
         switchMap((response: any) => {
           const message = this.translate.instant('TREATMENT.UPDATED.MESSAGE', { name: response.name });
           return of(new fromActionsTreatment.TreatmentSaveSuccess({ message }));
@@ -71,9 +73,9 @@ export class TreatmentEffects {
     ));
 
   updateSort$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.treatmentUpdateSort)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.sortTreatment)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.treatmentService.updateSort(payload).pipe(
+      switchMap((payload: any) => this.treatmentService.sortTreatment(payload).pipe(
         switchMap(() =>
           of(new fromActionsTreatment.TreatmentSaveSuccess(
             { message: this.translate.instant('TREATMENT.SORTED.MESSAGE') })),
@@ -82,9 +84,9 @@ export class TreatmentEffects {
     ));
 
   updateGroupSort$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.treatmentGroupUpdateSort)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.sortGroupTreatment)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.treatmentService.updateGroupSort(payload).pipe(
+      switchMap((payload: any) => this.treatmentService.sortGroupTreatment(payload).pipe(
         switchMap(() =>
           of(new fromActionsTreatment.TreatmentSaveSuccess(
             { message: this.translate.instant('TREATMENT.SORTED.MESSAGE') })),
@@ -93,9 +95,9 @@ export class TreatmentEffects {
     ));
 
   delete$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.treatmentDelete)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.deleteTreatmentGroupById)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.treatmentService.delete(payload.id).pipe(
+      switchMap((payload: any) => this.treatmentService.deleteTreatmentGroupById(payload.id).pipe(
         switchMap(() => {
           const message = this.translate.instant('TREATMENT.DELETED.MESSAGE', { name: payload.name });
           return of(new fromActionsTreatment.TreatmentSaveSuccess({ message }));
@@ -104,9 +106,9 @@ export class TreatmentEffects {
     ));
 
   history$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.treatmentHistory)).pipe(
+    () => this.actions$.pipe(ofType(fromActionsTreatment.TreatmentActionTypes.getAllTreatmentsHistory)).pipe(
       map((action: any) => action.payload),
-      switchMap((payload: any) => this.treatmentService.getHistory(payload.id, payload.treatmentId).pipe(
+      switchMap((payload: any) => this.treatmentService.getAllTreatmentsHistory(payload.id, payload.treatmentId).pipe(
         switchMap((treatment: any) => of(new fromActionsTreatment.TreatmentHistorySuccess(treatment))),
         catchError((err: HttpErrorResponse) => of(new fromActionsTreatment.TreatmentFailure({ error: err.error }))),
       )),
