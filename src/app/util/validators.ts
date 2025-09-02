@@ -48,8 +48,6 @@ export function noDuplicateDatesValidator(key: string = 'date'): ValidatorFn {
       }
     }
 
-    formArray.controls.forEach(control => control.get(key)?.setErrors(null));
-
     if (duplicateIndex !== null) {
       const errorKey = `duplicate${ key.charAt(0).toUpperCase() + key.slice(1) }`;
       const duplicateControl = formArray.controls[duplicateIndex];
@@ -57,7 +55,7 @@ export function noDuplicateDatesValidator(key: string = 'date'): ValidatorFn {
       return { [errorKey]: duplicateIndex };
     }
 
-    return null; // No errors
+    return null;
   };
 }
 

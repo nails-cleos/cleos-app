@@ -7,10 +7,14 @@
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
+          "skipTests": false,
           "style": "scss"
         },
-        "@schematics/angular:application": {
-          "strict": true
+        "@schematics/angular:service": {
+          "skipTests": false
+        },
+        "@schematics/angular:cypress-component": {
+          "generateTests": false
         }
       },
       "root": "",
@@ -294,6 +298,16 @@
     },
     "@angular-eslint/schematics:library": {
       "setParserOptionsProject": true
+    },
+    "@schematics/angular:component": {
+      "skipTests": false,
+      "style": "scss"
+    },
+    "@schematics/angular:service": {
+      "skipTests": false
+    },
+    "@schematics/angular:cypress-component": {
+      "generateTests": false
     }
   },
   "cli": {

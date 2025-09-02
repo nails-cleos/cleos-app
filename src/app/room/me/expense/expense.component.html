@@ -5,16 +5,14 @@
         <mat-card appearance="outlined">
           <mat-card-header>
             @if (isAddMode) {
-              <ng-container>
+              <mat-card-title-group>
                 <mat-card-title>{{ 'EXPENSE.TITLE' | translate }}</mat-card-title>
-              </ng-container>
-              <ng-container>
                 @if (roomName) {
                   <mat-card-subtitle>{{ roomName }}</mat-card-subtitle>
                 } @else {
                   <div class="ssc-line"></div>
                 }
-              </ng-container>
+              </mat-card-title-group>
             } @else {
               <mat-card-title-group>
                 <mat-card-title>{{ 'EXPENSE.DETAIL' | translate }}</mat-card-title>
@@ -128,10 +126,12 @@
                         </mat-form-field>
                         <mat-form-field appearance="outline" class="field">
                           <mat-label>{{ 'EXPENSE.BTW.FIELD' | translate }}</mat-label>
-                          <input [id]="'btw' + i" formControlName="btw" matInput appTwoDigits #btw
+                          <input [id]="'btw' + i" formControlName="btw" matInput required appTwoDigits #btw
                                  (focusout)="validateInputValue(btw, i, 0, 100)">
                           <mat-icon matSuffix>percent</mat-icon>
-                          @if (errors['btw' + i]) {
+                          @if (typeGroup.get('btw')?.hasError('required')) {
+                            <mat-error [innerHTML]="'EXPENSE.BTW.REQUIRED' | translate"></mat-error>
+                          } @else if (errors['btw' + i]) {
                             <mat-error>{{ errors['btw' + i] }}</mat-error>
                           } @else if (typeGroup.get('btw')?.hasError('duplicateBtw')) {
                             <mat-error [innerHTML]="'EXPENSE.BTW.DUPLICATED' | translate"></mat-error>
@@ -187,6 +187,10 @@
             </mat-card-content>
             <mat-card-actions class="card-actions">
               <div class="spacer"></div>
+              @if (isAddMode) {
+                <mat-checkbox (change)="createAnother = !createAnother" [checked]="createAnother">Create another
+                </mat-checkbox>
+              }
               <button [form]="form" appBackButton [date]="getForm.date.value" [step]="1" color="accent" mat-fab extended
                       class="icon-button" type="button">
                 {{ 'COMMON.BUTTON.BACK' | translate }}
