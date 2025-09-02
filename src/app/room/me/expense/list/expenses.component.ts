@@ -53,7 +53,7 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   private paginatorSubscription: Subscription | undefined;
   private getState: Observable<any>;
   private filter?: string;
-  private dateFilter: string | null = null;
+  private dateFilter?: string;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver, private route: ActivatedRoute) {
@@ -127,7 +127,7 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   	dialogRef.afterClosed().subscribe(result => {
   		if (result) {
   			this.store.dispatch(
-  				new fromActionsExpense.DeleteExpenseById({ roomId: this.roomId, id: result.id, invoice: result.invoice }),
+  				new fromActionsExpense.DeleteExpenseById(this.roomId!, result.id, result.invoice ),
   			);
   		}
   	});
@@ -135,7 +135,7 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private valueChange = (): void => {
   	this.date.valueChanges.subscribe(value => {
-  		this.dateFilter = value ? getDateFormat(value) : value;
+  		this.dateFilter = value ? getDateFormat(value) : undefined;
   		this.getExpenses(0);
   	});
   };
@@ -156,15 +156,15 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
     this.paginatorSubscription = undefined;
     this.store.dispatch(
-      new fromActionsExpense.GetExpensesPage({
-        roomId: this.roomId,
-        active: this.sort.active,
-        direction: this.sort.direction,
-        size: this.pageSize,
-        filter: this.filter,
-        dateFilter: this.dateFilter,
+      new fromActionsExpense.GetExpensesPage(
+        this.roomId!,
+        this.sort.active,
+        this.sort.direction,
         page,
-      }),
+        this.pageSize,
+        this.filter,
+        this.dateFilter,
+      ),
     );
   };
 

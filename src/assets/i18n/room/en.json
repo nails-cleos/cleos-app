@@ -175,7 +175,8 @@
       "FIELD": "BTW",
       "MIN": "BTW must be greater than 0.00",
       "MAX": "BTW must be less than 100.00",
-      "DUPLICATED": "BTW already added"
+      "DUPLICATED": "BTW already added",
+      "REQUIRED": "BTW is <b>required</b>"
     },
     "NET": {
       "FIELD": "Net"

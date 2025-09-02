@@ -47,6 +47,7 @@ import { SharedModule } from '../shared/shared.module';
 import { MenuItemComponent } from './menu-item/menu-item.component';
 import { ErrorComponent } from '../shared/error/error.component';
 import { MatRipple } from '@angular/material/core';
+import { LinkMessageSnackBarComponent } from '../shared/snack/link-message-snack-bar/link-message-snack-bar.component';
 
 @Component({
   selector: 'app-nav',
@@ -186,8 +187,13 @@ export class NavComponent implements OnInit, OnDestroy {
       if (!state.subErrors) {
         this.error = state.error;
         if (state.errorMessage || state.message) {
-          const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
+          const snackBarRef = this.snackBar.openFromComponent(LinkMessageSnackBarComponent, {
             duration: 5000,
+            data: {
+              message: state.errorMessage || state.message,
+              path: state.path,
+              language: this.language,
+            },
           });
           if (state.reload) {
             snackBarRef.afterDismissed().subscribe(() => this.navigationService.reload(this.router.url.split('/')));

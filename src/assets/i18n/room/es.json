@@ -175,7 +175,8 @@
       "FIELD": "IVA",
       "MIN": "IVA debe ser mayor a 0.00",
       "MAX": "IVA debe ser menor a 100.00",
-      "DUPLICATED": "IVA ya agregado"
+      "DUPLICATED": "IVA ya agregado",
+      "REQUIRED": "IVA es <b>requerido</b>"
     },
     "NET": {
       "FIELD": "Neto"
