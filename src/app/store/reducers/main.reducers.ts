@@ -1,22 +1,23 @@
 import { All, MainActionTypes } from '../main.actions';
 import { ICatalogue } from '../../interfaces/catalogue';
 import { ITreatmentGroup } from '../../interfaces/treatment';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 
 export interface State {
-  catalogue: ICatalogue[] | null;
-  groups: ITreatmentGroup[] | null;
-  errorMessage: string | null;
-  error: any;
-  message: string | null;
+  response?: IResponseSuccess;
+  catalogue?: ICatalogue[];
+  groups?: ITreatmentGroup[];
+  errorMessage?: string;
+  error?: IError;
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  catalogue: null,
-  groups: null,
-  errorMessage: null,
-  error: null,
-  message: null,
+  catalogue: undefined,
+  groups: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  response: undefined,
   isLoading: false,
 };
 
@@ -26,61 +27,61 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         catalogue: [{}, {}, {}],
-        errorMessage: null,
-        message: null,
+        errorMessage: undefined,
+        response: undefined,
         isLoading: true,
       };
     }
     case MainActionTypes.getListTreatmentsGroup: {
       return {
         ...state,
-        groups: null,
-        errorMessage: null,
-        message: null,
+        groups: undefined,
+        errorMessage: undefined,
+        response: undefined,
         isLoading: true,
       };
     }
-    case MainActionTypes.updateUser:
+    case MainActionTypes.updateMyUser:
     case MainActionTypes.sendMessage: {
       return {
         ...state,
-        errorMessage: null,
-        message: null,
+        errorMessage: undefined,
+        response: undefined,
         isLoading: true,
       };
     }
     case MainActionTypes.catalogueSuccess: {
       return {
         ...state,
-        catalogue: action.payload,
-        errorMessage: null,
-        message: null,
+        catalogue: action.catalogues,
+        errorMessage: undefined,
+        response: undefined,
         isLoading: false,
       };
     }
     case MainActionTypes.treatmentSuccess: {
       return {
         ...state,
-        groups: action.payload,
-        errorMessage: null,
-        message: null,
+        groups: action.groups,
+        errorMessage: undefined,
+        response: undefined,
         isLoading: false,
       };
     }
     case MainActionTypes.requestSuccess: {
       return {
         ...state,
-        message: action.payload.message,
-        errorMessage: null,
+        response: action,
+        errorMessage: undefined,
         isLoading: false,
       };
     }
     case MainActionTypes.requestFailure: {
       return {
         ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        message: null,
+        errorMessage: action.error.message,
+        error: action.error,
+        response: undefined,
         isLoading: false,
       };
     }

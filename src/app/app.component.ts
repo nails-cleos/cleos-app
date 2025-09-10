@@ -47,7 +47,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.i18nSubscription = this.getI18nState.subscribe(state => this.translate.use(state.data));
+    this.i18nSubscription = this.getI18nState.subscribe((state) => this.translate.use(state.data));
   }
 
   ngOnDestroy(): void {

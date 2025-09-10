@@ -1,10 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IDiscount, IUserDiscount } from '../interfaces/discount';
-import { PAGE_SIZE } from '../interfaces/pagination';
+import { IDiscount, IReferral, IUserDiscount } from '../interfaces/discount';
+import { PAGE_SIZE, Pagination } from '../interfaces/pagination';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
+import { SortDirection } from '@angular/material/sort';
+import { IApiResponse } from '../interfaces/common';
 
 @Injectable()
 export class DiscountService {
@@ -15,49 +17,50 @@ export class DiscountService {
   private http: HttpClient = inject(HttpClient);
 
   getDiscountsPage = (
-    sort: string,
-    direction: string,
     page: number,
+    sort: string,
+    direction: SortDirection,
     size: number = PAGE_SIZE,
-  ): Observable<IDiscount[]> => this.http.get<IDiscount[]>(
+  ): Observable<Pagination<IDiscount>> => this.http.get<Pagination<IDiscount>>(
     toUrl(this.urlV1, 'pages'),
     { params: createFilter(page, size, sort, direction) },
   );
 
   getMyDiscountsPage = (
-    sort: string,
-    direction: string,
     page: number,
-    size: number = PAGE_SIZE,
-  ): Observable<IDiscount[]> => this.http.get<IUserDiscount[]>(
+    sort: string,
+    direction: SortDirection,
+    size: number,
+  ): Observable<Pagination<IUserDiscount>> => this.http.get<Pagination<IUserDiscount>>(
     toUrl(this.urlV1, 'me'),
     { params: createFilter(page, size, sort, direction) },
   );
 
-  getMyReferrals = (): Observable<IUserDiscount[]> => this.http.get<IUserDiscount[]>(
+  getMyReferrals = (): Observable<IReferral[]> => this.http.get<IReferral[]>(
     toUrl(this.urlV1, 'me', 'referrals'),
   );
 
-  findDiscountById = (id: string): Observable<IDiscount | undefined> => this.http.get<IDiscount>(toUrl(this.urlV1, id));
+  getDiscount = (id: string): Observable<IDiscount | undefined> => this.http.get<IDiscount>(toUrl(this.urlV1, id));
 
-  createDiscount = (discount: IDiscount): Observable<IDiscount> => this.http.post<IDiscount>(this.urlV1, discount);
+  createDiscount = (discount: IDiscount): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1,
+    discount);
 
-  sendDiscountToCustomers = (
+  sendDiscounts = (
     id: string,
     customersDiscount: string[],
-  ): Observable<IDiscount> => this.http.post<IDiscount>(
+  ): Observable<IApiResponse> => this.http.post<IApiResponse>(
     toUrl(this.urlV1, id, 'customers'),
     customersDiscount,
   );
 
-  deleteDiscountById = (id: string): Observable<IDiscount> => this.http.delete<IDiscount>(toUrl(this.urlV1, id));
+  deleteDiscount = (id: string): Observable<IDiscount> => this.http.delete<IDiscount>(toUrl(this.urlV1, id));
 
-  updateDiscountById = (discount: IDiscount): Observable<IDiscount> => this.http.patch<IDiscount>(
-    toUrl(this.urlV1, discount.id!),
+  updateDiscount = (id: string, discount: IDiscount): Observable<IApiResponse> => this.http.patch<IApiResponse>(
+    toUrl(this.urlV1, id),
     discount,
   );
 
-  findUserDiscountByCustomerId = (customerId: string): Observable<IUserDiscount[]> => this.http.get<IUserDiscount[]>(
+  getUserDiscountByCustomerId = (customerId: string): Observable<IUserDiscount[]> => this.http.get<IUserDiscount[]>(
     toUrl(this.urlV1, 'customers', customerId),
   );
 }

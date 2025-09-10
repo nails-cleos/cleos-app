@@ -350,7 +350,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         reservation.roomId = valueChange(this.room.value.id, this.reservation.room.id);
         reservation.professionalId = valueChange(this.professional.value.id, this.reservation.professional.id);
         this.store.dispatch(
-          new fromActionsReservation.UpdateReservationById({ reservation, role }),
+          new fromActionsReservation.UpdateReservationById(this.reservation.id, reservation, role),
         );
       } else {
         reservation.treatmentId = this.treatment.value.id;
@@ -358,7 +358,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         reservation.professionalId = this.professional.value.id;
         reservation.discountId = this.discount.value;
         this.store.dispatch(
-          new fromActionsReservation.CreateReservation({ reservation, role }),
+          new fromActionsReservation.CreateReservation(reservation, role),
         );
       }
     }
@@ -502,7 +502,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       const timeZone = this.room.value.timeZone;
       const now = dateToUTC(createDate(timeZone), timeZone);
 
-      const dates: string[] = [];
+      const dates: Date[] = [];
       this.dateTimeList.value.forEach((value: any, i: number) => {
         const timeValue = getTimeNumber(value.start || this.minDate);
         if (timeValue) {
@@ -522,12 +522,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
       this.store.dispatch(
-        new fromActionsReservation.SearchAvailability({
-          dates,
-          roomId: this.room.value.id,
-          professionalId: this.professional.value.id,
-          days: this.daysInWeek,
-        }),
+        new fromActionsReservation.SearchAvailability(this.daysInWeek, dates, this.room.value.id,
+          this.professional.value.id),
       );
     }
     completeAndNext(this.steps, this.myStepper, goNext);
@@ -798,7 +794,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.customerInfo = undefined;
       if (value && value.id && !this.isEditing) {
         this.store.dispatch(
-          new fromActionsReservation.GetCustomerInfo(value.id),
+          new fromActionsReservation.GetCustomerInformation(value.id),
         );
       }
       this.cleanTreatment();
@@ -1157,17 +1153,17 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   };
 
-  private getReservation = (id: string | null): void => this.store.dispatch(
-    new fromActionsReservation.ReservationFind({ id }));
+  private getReservation = (id: string): void => this.store.dispatch(
+    new fromActionsReservation.GetReservation(id));
 
   private getRoomList = (): void => this.store.dispatch(
-    new fromActionsReservation.GetAllRooms({ customerId: this.customer?.value?.id }));
+    new fromActionsReservation.GetAllRooms(this.customer?.value?.id));
 
   private getTreatmentList = (): void => {
     const roomId = this.room?.value?.id || this.roomId;
     if (roomId) {
       this.store.dispatch(
-        new fromActionsReservation.GetAllTreatments({ roomId, customerId: this.customer.value?.id }),
+        new fromActionsReservation.GetAllTreatments(roomId, this.customer.value?.id),
       );
     }
   };
@@ -1177,14 +1173,14 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const groupId = this.group?.value?.id || this.groupId;
     if (roomId) {
       this.store.dispatch(
-        new fromActionsReservation.FindAllAdditionalByGroupId({ roomId, groupId }),
+        new fromActionsReservation.GetAllAdditionalByGroupId(roomId, groupId),
       );
     }
   };
 
   private clean = (): void => this.store.dispatch(new fromActionsReservation.Clean());
 
-  private getCustomers = (): void => this.store.dispatch(new fromActionsReservation.GetAllCustomers());
+  private getCustomers = (): void => this.store.dispatch(new fromActionsReservation.GetCustomers());
 
   private setOffice = (): void => {
     let office;
@@ -1248,7 +1244,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.offices = Array.from(createRoomOffice(state.rooms)?.values() || []);
       this.customerInfo = state.customer;
       this.customers = state.customers;

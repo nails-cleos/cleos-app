@@ -1,10 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { PAGE_SIZE } from '../interfaces/pagination';
+import { PAGE_SIZE, Pagination } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { IColor } from '../interfaces/color';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
+import { SortDirection } from '@angular/material/sort';
+import { IApiResponse } from '../interfaces/common';
 
 @Injectable()
 export class ColorService {
@@ -15,25 +17,27 @@ export class ColorService {
   private http: HttpClient = inject(HttpClient);
 
   getColorsPage = (
-    sort: string,
-    direction: string,
     page: number,
+    sort: string,
+    direction: SortDirection,
     size: number = PAGE_SIZE,
-  ): Observable<IColor[]> => this.http.get<IColor[]>(toUrl(this.urlV1, 'pages'),
+  ): Observable<Pagination<IColor>> => this.http.get<Pagination<IColor>>(toUrl(this.urlV1, 'pages'),
     { params: createFilter(page, size, sort, direction) },
   );
 
-  findColorsByTreatmentId = (treatmentId: string): Observable<IColor[]> => this.http.get<IColor[]>(
+  getColorsByTreatmentId = (treatmentId: string): Observable<IColor[]> => this.http.get<IColor[]>(
     toUrl(this.urlV1, 'treatments', treatmentId),
   );
 
   getAllColors = (): Observable<IColor[]> => this.http.get<IColor[]>(this.urlV1);
 
-  findColorById = (id: string): Observable<IColor | undefined> => this.http.get<IColor>(toUrl(this.urlV1, id));
+  getColor = (id: string): Observable<IColor | undefined> => this.http.get<IColor>(toUrl(this.urlV1, id));
 
-  createColor = (color: IColor): Observable<IColor> => this.http.post<IColor>(this.urlV1, color);
+  createColor = (color: IColor): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1, color);
 
-  deleteColorById = (id: string): Observable<IColor> => this.http.delete<IColor>(toUrl(this.urlV1, id));
+  deleteColor = (id: string): Observable<IColor> => this.http.delete<IColor>(toUrl(this.urlV1, id));
 
-  updateColorById = (color: IColor): Observable<IColor> => this.http.patch<IColor>(toUrl(this.urlV1, color.id!), color);
+  updateColor = (id: string, color: IColor): Observable<IApiResponse> => this.http.patch<IApiResponse>(
+    toUrl(this.urlV1, id), color,
+  );
 }

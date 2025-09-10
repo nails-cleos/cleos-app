@@ -1,24 +1,27 @@
 import { Action } from '@ngrx/store';
+import { IError, ResponseSuccess } from '../interfaces/common';
+import { ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
+import { ITreatmentGroup } from '../interfaces/treatment';
 
 export enum CatalogueActionTypes {
-  getAll = '[Catalogue] Get all',
+  getAllCatalogues = '[Catalogue] Get all catalogues',
   getAllCatalogs = '[Catalogue] Get all catalogs',
   catalogueSuccess = '[Catalogue] Success',
-  catalogueSave = '[Catalogue] Save',
-  catalogueUpdate = '[Catalogue] Update',
-  catalogueUpdateAll = '[Catalogue] Update all',
+  createCatalogue = '[Catalogue] Create catalogue',
+  updateCatalogue = '[Catalogue] Update catalogue by id',
+  updateCatalogueOrder = '[Catalogue] Update catalogue order',
   catalogueSaveSuccess = '[Catalogue] Save Success',
   catalogueFailure = '[Catalogue] Failure',
   catalogueSelected = '[Catalogue] Selected',
-  catalogueFind = '[Catalogue] Find',
-  catalogueDelete = '[Catalogue] Delete',
+  getCatalogue = '[Catalogue] Catalogue find by id',
+  deleteCatalogue = '[Catalogue] Delete catalogue by id',
   getAllTreatmentsGroup = '[Catalogue] Get all treatments group',
   findGroupsSuccess = '[Catalogue] Find treatment groups success',
   clean = '[Catalogue] Clean'
 }
 
-export class GetAll implements Action {
-  readonly type = CatalogueActionTypes.getAll;
+export class GetAllCatalogues implements Action {
+  readonly type = CatalogueActionTypes.getAllCatalogues;
 }
 
 export class GetAllCatalogs implements Action {
@@ -28,63 +31,60 @@ export class GetAllCatalogs implements Action {
 export class CatalogueSuccess implements Action {
   readonly type = CatalogueActionTypes.catalogueSuccess;
 
-  constructor(public payload: any) {
+  constructor(public data: ICatalogue[]) {
   }
 }
 
-export class CatalogueSave implements Action {
-  readonly type = CatalogueActionTypes.catalogueSave;
+export class CreateCatalogue implements Action {
+  readonly type = CatalogueActionTypes.createCatalogue;
 
-  constructor(public payload: any) {
+  constructor(public catalogue: ICatalogue, public resizedImageDataUrl: string) {
   }
 }
 
-export class CatalogueUpdate implements Action {
-  readonly type = CatalogueActionTypes.catalogueUpdate;
+export class UpdateCatalogue implements Action {
+  readonly type = CatalogueActionTypes.updateCatalogue;
 
-  constructor(public payload: any) {
+  constructor(public catalogue: ICatalogue, public resizedImageDataUrl: string) {
   }
 }
 
-export class CatalogueUpdateAll implements Action {
-  readonly type = CatalogueActionTypes.catalogueUpdateAll;
+export class UpdateCatalogueOrder implements Action {
+  readonly type = CatalogueActionTypes.updateCatalogueOrder;
 
-  constructor(public payload: any) {
+  constructor(public catalogues: ICatalogueAll[]) {
   }
 }
 
-export class CatalogueSaveSuccess implements Action {
+export class CatalogueSaveSuccess extends ResponseSuccess implements Action {
   readonly type = CatalogueActionTypes.catalogueSaveSuccess;
-
-  constructor(public payload: any) {
-  }
 }
 
 export class CatalogueFailure implements Action {
   readonly type = CatalogueActionTypes.catalogueFailure;
 
-  constructor(public payload: any) {
+  constructor(public error: IError) {
   }
 }
 
 export class CatalogueSelected implements Action {
   readonly type = CatalogueActionTypes.catalogueSelected;
 
-  constructor(public payload: any) {
+  constructor(public selected?: ICatalogue) {
   }
 }
 
-export class CatalogueFind implements Action {
-  readonly type = CatalogueActionTypes.catalogueFind;
+export class GetCatalogue implements Action {
+  readonly type = CatalogueActionTypes.getCatalogue;
 
-  constructor(public payload: any) {
+  constructor(public id: string) {
   }
 }
 
 export class DeleteCatalogue implements Action {
-  readonly type = CatalogueActionTypes.catalogueDelete;
+  readonly type = CatalogueActionTypes.deleteCatalogue;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public name: string) {
   }
 }
 
@@ -95,7 +95,7 @@ export class GetAllTreatmentsGroup implements Action {
 export class FindGroupsSuccess implements Action {
   readonly type = CatalogueActionTypes.findGroupsSuccess;
 
-  constructor(public payload: any) {
+  constructor(public groups: ITreatmentGroup[]) {
   }
 }
 
@@ -104,15 +104,15 @@ export class Clean implements Action {
 }
 
 export type All =
-  | GetAll
+  | GetAllCatalogues
   | GetAllCatalogs
-  | CatalogueSave
-  | CatalogueUpdate
-  | CatalogueUpdateAll
+  | CreateCatalogue
+  | UpdateCatalogue
+  | UpdateCatalogueOrder
   | CatalogueSuccess
   | CatalogueSaveSuccess
   | CatalogueFailure
-  | CatalogueFind
+  | GetCatalogue
   | CatalogueSelected
   | DeleteCatalogue
   | GetAllTreatmentsGroup

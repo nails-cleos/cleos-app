@@ -1,4 +1,9 @@
 import { Action } from '@ngrx/store';
+import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { ITreatmentAll, ITreatmentGroup } from '../interfaces/treatment';
+import { IColor } from '../interfaces/color';
+import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
+import { Pagination } from '../interfaces/pagination';
 
 export enum TreatmentActionTypes {
   getTreatmentsPage = '[Treatment] Get treatments page',
@@ -7,24 +12,21 @@ export enum TreatmentActionTypes {
   treatmentSuccess = '[Treatment] Success',
   colorSuccess = '[Treatment] color Success',
   createTreatment = '[Treatment] Create treatment',
-  updateTreatmentGroupById = '[Treatment] Update treatment group by id',
+  updateTreatmentGroup = '[Treatment] Update treatment group by id',
   sortTreatment = '[Treatment] Sort treatment',
   sortGroupTreatment = '[Treatment] Sort group treatment',
   treatmentSaveSuccess = '[Treatment] Save Success',
   treatmentFailure = '[Treatment] Failure',
   treatmentSelected = '[Treatment] Selected',
-  findTreatmentGroupById = '[Treatment] Find treatment group by id',
-  deleteTreatmentGroupById = '[Treatment] Delete treatment group by id',
+  getTreatmentGroup = '[Treatment] Find treatment group by id',
+  deleteTreatmentGroup = '[Treatment] Delete treatment group by id',
   getAllTreatmentsHistory = '[Treatment] Get all treatments history',
   treatmentHistorySuccess = '[Treatment] History success',
   clean = '[Treatment] Clean'
 }
 
-export class GetTreatmentsPage implements Action {
+export class GetTreatmentsPage extends PageRequest implements Action {
   readonly type = TreatmentActionTypes.getTreatmentsPage;
-
-  constructor(public payload: any) {
-  }
 }
 
 export class GetAllTreatmentsGroup implements Action {
@@ -38,91 +40,88 @@ export class GetAllColors implements Action {
 export class TreatmentSuccess implements Action {
   readonly type = TreatmentActionTypes.treatmentSuccess;
 
-  constructor(public payload: any) {
+  constructor(public data: ITreatmentGroup[] | Pagination<ITreatmentGroup>) {
   }
 }
 
 export class CreateTreatment implements Action {
   readonly type = TreatmentActionTypes.createTreatment;
 
-  constructor(public payload: any) {
+  constructor(public treatment: ITreatmentGroup) {
   }
 }
 
-export class UpdateTreatmentGroupById implements Action {
-  readonly type = TreatmentActionTypes.updateTreatmentGroupById;
+export class UpdateTreatmentGroup implements Action {
+  readonly type = TreatmentActionTypes.updateTreatmentGroup;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public treatment: ITreatmentGroup) {
   }
 }
 
 export class SortGroupTreatment implements Action {
   readonly type = TreatmentActionTypes.sortGroupTreatment;
 
-  constructor(public payload: any) {
+  constructor(public groups: ISorted[]) {
   }
 }
 
 export class SortTreatment implements Action {
   readonly type = TreatmentActionTypes.sortTreatment;
 
-  constructor(public payload: any) {
+  constructor(public treatments: ISorted[]) {
   }
 }
 
 export class ColorSuccess implements Action {
   readonly type = TreatmentActionTypes.colorSuccess;
 
-  constructor(public payload: any) {
+  constructor(public colors: IColor[]) {
   }
 }
 
-export class TreatmentSaveSuccess implements Action {
+export class TreatmentSaveSuccess extends ResponseSuccess implements Action {
   readonly type = TreatmentActionTypes.treatmentSaveSuccess;
-
-  constructor(public payload: any) {
-  }
 }
 
 export class TreatmentFailure implements Action {
   readonly type = TreatmentActionTypes.treatmentFailure;
 
-  constructor(public payload: any) {
+  constructor(public error: IError) {
   }
 }
 
 export class TreatmentSelected implements Action {
   readonly type = TreatmentActionTypes.treatmentSelected;
 
-  constructor(public payload: any) {
+  constructor(public selected?: ITreatmentGroup, public path?: string) {
   }
 }
 
-export class FindTreatmentGroupById implements Action {
-  readonly type = TreatmentActionTypes.findTreatmentGroupById;
+export class GetTreatmentGroup implements Action {
+  readonly type = TreatmentActionTypes.getTreatmentGroup;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public path: string) {
   }
 }
 
-export class DeleteTreatmentGroupById implements Action {
-  readonly type = TreatmentActionTypes.deleteTreatmentGroupById;
+export class DeleteTreatmentGroup implements Action {
+  readonly type = TreatmentActionTypes.deleteTreatmentGroup;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public name: string) {
   }
 }
 
 export class GetAllTreatmentsHistory implements Action {
   readonly type = TreatmentActionTypes.getAllTreatmentsHistory;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public treatmentId: string) {
   }
 }
 
 export class TreatmentHistorySuccess implements Action {
   readonly type = TreatmentActionTypes.treatmentHistorySuccess;
 
-  constructor(public payload: any) {
+  constructor(public history: ITreatmentAll[]) {
   }
 }
 
@@ -135,16 +134,16 @@ export type All =
   | GetAllTreatmentsGroup
   | GetAllColors
   | CreateTreatment
-  | UpdateTreatmentGroupById
+  | UpdateTreatmentGroup
   | SortTreatment
   | SortGroupTreatment
   | TreatmentSuccess
   | ColorSuccess
   | TreatmentSaveSuccess
   | TreatmentFailure
-  | FindTreatmentGroupById
+  | GetTreatmentGroup
   | TreatmentSelected
-  | DeleteTreatmentGroupById
+  | DeleteTreatmentGroup
   | GetAllTreatmentsHistory
   | TreatmentHistorySuccess
   | Clean;

@@ -17,37 +17,38 @@ import {
   QuarterSummary,
 } from '../../interfaces/dashboard';
 import { getMonth } from '../../util/dates';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 
 export interface State {
+  response?: IResponseSuccess;
   data: Map<string, IDashboard>;
-  dashboard: IRoomEvents | null;
-  monthlySummaryMap: Map<ISummaryRoom,
+  dashboard?: IRoomEvents;
+  monthlySummaryMap?: Map<ISummaryRoom,
     {
       summarySale: IMonthlySummarySale[];
       summaryCashSale: IMonthlySummarySale[];
       summaryExpenses: IMonthlySummaryExpense[]
-    }> | null;
-  yearSummaryMap: Map<ISummaryRoom, { quarterSummaries: IQuarterSummary[] }> | null;
-  quarterSummaryMap: Map<ISummaryRoom, { monthSummaries: IMonthSummary[] }> | null;
-  yearExport: any | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  message: string | null;
+    }>;
+  yearSummaryMap?: Map<ISummaryRoom, { quarterSummaries: IQuarterSummary[] }>;
+  quarterSummaryMap?: Map<ISummaryRoom, { monthSummaries: IMonthSummary[] }>;
+  yearExport?: Map<ISummaryRoom, { monthlyExport: IMonthlyExport[]; }>;
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
   isLoading: boolean;
 }
 
 const initialState: State = {
   data: new Map<string, IDashboard>(),
-  dashboard: null,
-  monthlySummaryMap: null,
-  yearSummaryMap: null,
-  quarterSummaryMap: null,
-  yearExport: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  message: null,
+  dashboard: undefined,
+  monthlySummaryMap: undefined,
+  yearSummaryMap: undefined,
+  quarterSummaryMap: undefined,
+  yearExport: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  response: undefined,
   isLoading: false,
 };
 
@@ -187,168 +188,168 @@ const quarterSummaryMap = (summaries: IQuarterRoomSummary[]) => summaries.reduce
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case DashboardActionTypes.eventsSummaries: {
+    case DashboardActionTypes.getEvents: {
       return {
         ...state,
         data: cleanEventMap(state.data),
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
-    case DashboardActionTypes.meEvent: {
+    case DashboardActionTypes.getMyEvent: {
       return {
         ...state,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         dashboard: { availability: {} },
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
-    case DashboardActionTypes.getSummaries: {
+    case DashboardActionTypes.getCards: {
       return {
         ...state,
         data: cleanCardMap(state.data),
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case DashboardActionTypes.dashSuccess: {
       return {
         ...state,
-        data: getMap(state.data, action.payload),
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
+        data: getMap(state.data, action.data),
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
+        response: undefined,
         isLoading: false,
       };
     }
     case DashboardActionTypes.eventSuccess: {
       return {
         ...state,
-        dashboard: action.payload,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
+        dashboard: action.data,
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
+        response: undefined,
         isLoading: false,
       };
     }
     case DashboardActionTypes.dashFailure: {
       return {
         ...state,
-        errorMessage: action.payload.error?.message,
-        error: action.payload.error,
-        subErrors: action.payload.error?.subErrors,
-        message: null,
+        errorMessage: action.error?.message,
+        error: action.error,
+        subErrors: action.error?.subErrors,
+        response: undefined,
         isLoading: false,
       };
     }
     case DashboardActionTypes.getMonthlySummary: {
       return {
         ...state,
-        monthlySummaryMap: null,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
+        monthlySummaryMap: undefined,
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case DashboardActionTypes.monthlySummarySuccess: {
       return {
         ...state,
-        monthlySummaryMap: monthSummaryMap(action.payload),
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
+        monthlySummaryMap: monthSummaryMap(action.monthlySummary),
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case DashboardActionTypes.updateMonthlySummary: {
       return {
         ...state,
-        monthlySummaryMap: null,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
+        monthlySummaryMap: undefined,
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case DashboardActionTypes.saveMonthlySummarySuccess: {
       return {
         ...state,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: action.payload.message,
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
+        response: action,
       };
     }
     case DashboardActionTypes.getYearSummary: {
       return {
         ...state,
-        yearSummaryMap: null,
-        yearExport: null,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
+        yearSummaryMap: undefined,
+        yearExport: undefined,
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case DashboardActionTypes.yearSummarySuccess: {
       return {
         ...state,
-        yearSummaryMap: yearSummaryMap(action.payload),
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
+        yearSummaryMap: yearSummaryMap(action.yearSummary),
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case DashboardActionTypes.exportYearSummary: {
       return {
         ...state,
-        yearExport: null,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
+        yearExport: undefined,
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case DashboardActionTypes.yearExportSuccess: {
       return {
         ...state,
-        yearExport: yearExportMap(action.payload),
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
+        yearExport: yearExportMap(action.yearExport),
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case DashboardActionTypes.getQuarterSummary: {
       return {
         ...state,
-        quarterSummaryMap: null,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
+        quarterSummaryMap: undefined,
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case DashboardActionTypes.quarterSummarySuccess: {
       return {
         ...state,
-        quarterSummaryMap: quarterSummaryMap(action.payload),
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
+        quarterSummaryMap: quarterSummaryMap(action.quarterSummary),
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case DashboardActionTypes.clean: {

@@ -126,7 +126,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
     if (!this.account) {
       const id = this.route.snapshot.paramMap.get('id');
       this.store.dispatch(
-        new fromActionsUser.UserOverview(id),
+        new fromActionsUser.GetCustomerOverview(id),
       );
     }
   };

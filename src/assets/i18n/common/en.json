@@ -342,7 +342,8 @@
       "STATE": {
         "APPROVE": "Reservation approved",
         "START": "Reservation started",
-        "COMPLETE": "Reservation completed"
+        "COMPLETE": "Reservation completed",
+        "CANCEL": "Reservation cancelled"
       },
       "EDIT": {
         "TITLE": "Reschedule reservation",

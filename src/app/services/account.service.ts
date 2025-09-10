@@ -5,6 +5,8 @@ import { IAccount, ITransaction } from '../interfaces/account';
 import { createFilter } from '../util/service-helper';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { toUrl } from '../util/helper';
+import { SortDirection } from '@angular/material/sort';
+import { IApiResponse } from '../interfaces/common';
 
 @Injectable({
   providedIn: 'root',
@@ -16,31 +18,31 @@ export class AccountService {
   private http: HttpClient = inject(HttpClient);
 
   getTransactionsByAccountId = (
-    accountId: string,
+    id: string,
     page: number,
-    sort?: string,
-    direction?: string,
+    sort: string,
+    direction: SortDirection,
     size: number = PAGE_SIZE,
   ): Observable<ITransaction[]> => this.http.get<ITransaction[]>(
-    toUrl(this.urlV1, accountId, 'transactions'),
+    toUrl(this.urlV1, id, 'transactions'),
     { params: createFilter(page, size, sort, direction) },
   );
 
-  findAccountById = (id: string): Observable<IAccount | undefined> => this.http.get<IAccount>(toUrl(this.urlV1, id));
+  getAccount = (id: string): Observable<IAccount | undefined> => this.http.get<IAccount>(toUrl(this.urlV1, id));
 
-  findTransactionById = (
+  getTransaction = (
     id: string,
     transactionId: string,
   ): Observable<ITransaction | undefined> => this.http.get<ITransaction>(
     toUrl(this.urlV1, id, 'transactions', transactionId));
 
-  findAccountByCustomerId = (
+  getAccountByCustomerId = (
     customerId: string,
   ): Observable<IAccount | undefined> => this.http.get<IAccount>(toUrl(this.urlV1, 'customers', customerId));
 
-  addMoney = (transaction: ITransaction, accountId: string): Observable<IAccount> => this.http.post<IAccount>(
-    toUrl(this.urlV1, accountId, 'transactions'), transaction);
+  createTransaction = (id: string, transaction: ITransaction): Observable<IApiResponse> => this.http.post<IApiResponse>(
+    toUrl(this.urlV1, id, 'transactions'), transaction);
 
-  updateAccountById = (transaction: ITransaction): Observable<IAccount> => this.http.patch<IAccount>(
-    toUrl(this.urlV1, transaction.accountId!), transaction);
+  updateAccount = (id: string, transaction: ITransaction): Observable<IApiResponse> => this.http.patch<IApiResponse>(
+    toUrl(this.urlV1, id), transaction);
 }

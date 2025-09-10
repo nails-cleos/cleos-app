@@ -90,7 +90,7 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
   private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.customers = state.data;
       this.customer.setValue(this.customers?.find(customer => customer.id === this.data.customerId));
     });

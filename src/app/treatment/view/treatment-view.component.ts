@@ -32,7 +32,7 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
 
   get edit(): void {
     return this.store.dispatch(
-      new fromActionsTreatment.TreatmentSelected({ treatment: this.group, path: 'edit' }),
+      new fromActionsTreatment.TreatmentSelected(this.group, 'edit'),
     );
   }
 
@@ -54,7 +54,7 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
       this.expandedPanelIndex = index;
     }
     this.store.dispatch(
-      new fromActionsTreatment.GetAllTreatmentsHistory({ id: this.group?.id, treatmentId }),
+      new fromActionsTreatment.GetAllTreatmentsHistory(this.group!.id!, treatmentId!),
     );
   };
 
@@ -62,13 +62,13 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
     if (!this.group) {
       const id = this.route.snapshot.paramMap.get('id');
       this.store.dispatch(
-        new fromActionsTreatment.FindTreatmentGroupById({ id, path: 'view' }),
+        new fromActionsTreatment.GetTreatmentGroup(id!, 'view'),
       );
     }
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.selected) {
         const treatments = [...state.selected.treatments];
         this.group = {

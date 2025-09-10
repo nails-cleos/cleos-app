@@ -4,15 +4,15 @@ import { IUser } from '../interfaces/user';
 import { Store } from '@ngrx/store';
 import { AppState, selectAuthState } from '../store/app.states';
 import { Observable } from 'rxjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 import * as fromActionsLogin from '../store/auth.actions';
+import { ToastService } from './toast.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PermissionsService {
-  private snackBar: MatSnackBar = inject(MatSnackBar);
+  private toastService: ToastService = inject(ToastService);
   private router: Router = inject(Router);
   private store: Store<AppState> = inject(Store<AppState>);
   private translate: TranslateService = inject(TranslateService);
@@ -41,12 +41,8 @@ export class PermissionsService {
         } else {
           message = 'User not have the necessary permissions';
         }
-        this.snackBar.open(message, 'OK', {
-          duration: 5000,
-        });
-        this.store.dispatch(
-          new fromActionsLogin.Redirect(),
-        );
+        this.toastService.info(message);
+        this.store.dispatch(new fromActionsLogin.Redirect());
         return false;
       }
     }

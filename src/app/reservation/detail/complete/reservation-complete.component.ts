@@ -271,7 +271,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   private getTreatments = (): void => {
     if (this.roomId) {
       this.store.dispatch(
-        new fromActionsReservation.GetAllTreatments({ roomId: this.roomId, customerId: this.customerId }),
+        new fromActionsReservation.GetAllTreatments(this.roomId, this.customerId),
       );
     }
   };
@@ -280,7 +280,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     if (this.groupId !== groupId && this.roomId) {
       this.groupId = groupId;
       this.store.dispatch(
-        new fromActionsReservation.FindAllAdditionalByGroupId({ roomId: this.roomId, groupId }),
+        new fromActionsReservation.GetAllAdditionalByGroupId(this.roomId, groupId),
       );
     }
   };
@@ -297,9 +297,9 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   private completeReservation = (): void => {
     if (this.reservation) {
       this.store.dispatch(
-        new fromActionsReservation.CompleteReservation({
-          reservationId: this.reservation.id,
-          complete: {
+        new fromActionsReservation.CompleteReservation(
+          this.reservation.id,
+          {
             treatmentId: valueChange(this.treatment.value.id, this.reservation?.treatment.key),
             paymentType: this.type.value || PaymentType.account,
             additionalIds: this.additionalSelected.map(additional => additional.id),
@@ -310,8 +310,8 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
             extras: this.currentExtraData,
             split: this.currentSplitData,
           },
-          isDashboard: this.isDashboard,
-        }),
+          this.isDashboard,
+        ),
       );
     }
   };
@@ -326,7 +326,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     if (!this.reservation) {
       this.reservation = undefined;
       this.store.dispatch(
-        new fromActionsReservation.ReservationFind({ id: this.reservationId }),
+        new fromActionsReservation.GetReservation(this.reservationId),
       );
     }
   };
@@ -340,7 +340,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.payments = state.payments;
       if (!this.reservation && state.selected) {
         const reservation: IReservationAll = state.selected;

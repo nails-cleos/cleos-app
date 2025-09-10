@@ -40,83 +40,78 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
-  	breakpointObserver.observe([
-  		Breakpoints.XSmall,
-  		Breakpoints.Small,
-  	]).subscribe(result => {
-  		if (result.matches) {
-  			this.pageSize = MOBILE_PAGE_SIZE;
-  		}
-  	});
-  	this.getState = this.store.select(selectOfficeState);
-  	this.language = this.translate.currentLang;
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small,
+    ]).subscribe(result => {
+      if (result.matches) {
+        this.pageSize = MOBILE_PAGE_SIZE;
+      }
+    });
+    this.getState = this.store.select(selectOfficeState);
+    this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {
-  	this.getOffices();
+    this.getOffices();
   }
 
   ngOnInit(): void {
-  	this.clean();
-  	this.subscribe();
+    this.clean();
+    this.subscribe();
   }
 
   ngOnDestroy(): void {
-  	this.subscription?.unsubscribe();
-  	this.paginatorSubscription?.unsubscribe();
+    this.subscription?.unsubscribe();
+    this.paginatorSubscription?.unsubscribe();
   }
 
   edit = (office: IOffice): void => this.store.dispatch(
-  	new fromActionsOffice.OfficeSelected({ office, redirect: true }));
+    new fromActionsOffice.OfficeSelected(office));
 
   delete = (office: IOffice): void => {
-  	const title = this.translate.instant('OFFICE.DELETED.TITLE');
-  	const content = this.translate.instant('OFFICE.DELETED.CONTENT', { name: office.name });
-  	const dialogRef = this.dialog.open(DialogComponent, {
-  		data: { title, content, value: office },
-  	});
+    const title = this.translate.instant('OFFICE.DELETED.TITLE');
+    const content = this.translate.instant('OFFICE.DELETED.CONTENT', { name: office.name });
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: { title, content, value: office },
+    });
 
-  	dialogRef.afterClosed().subscribe(result => {
-  		if (result) {
-  			this.store.dispatch(
-  				new fromActionsOffice.DeleteOfficeById(result),
-  			);
-  		}
-  	});
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.store.dispatch(
+          new fromActionsOffice.DeleteOffice(result.id, result.name),
+        );
+      }
+    });
   };
 
   private clean = (): void => this.store.dispatch(new fromActionsOffice.Clean());
 
   private createPageSubscriptions = (): void => {
-  	this.sort.sortChange.subscribe(() => {
-  		this.paginator.pageIndex = 0;
-  		this.getOffices();
-  	});
-  	this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getOffices(this.paginator.pageIndex));
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getOffices();
+    });
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getOffices(this.paginator.pageIndex));
 
-  	this.cdRef.detectChanges();
+    this.cdRef.detectChanges();
   };
 
   private getOffices = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsOffice.GetOfficesPage({
-  		active: this.sort.active,
-  		direction: this.sort.direction,
-  		size: this.pageSize,
-  		page,
-  	}),
+    new fromActionsOffice.GetOfficesPage(page, this.sort.active, this.sort.direction, this.pageSize),
   );
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe((state) => {
-  		if (state.message) {
-  			this.clean();
-  			this.getOffices();
-  		}
-  		this.dataSource = state.data?.content;
-  		this.resultsLength = state.data?.totalElements;
-  		if (!this.paginatorSubscription && this.resultsLength) {
-  			this.createPageSubscriptions();
-  		}
-  	});
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.response) {
+        this.clean();
+        this.getOffices();
+      }
+      this.dataSource = state.data?.content;
+      this.resultsLength = state.data?.totalElements;
+      if (!this.paginatorSubscription && this.resultsLength) {
+        this.createPageSubscriptions();
+      }
+    });
   };
 }

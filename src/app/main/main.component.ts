@@ -89,7 +89,7 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   		const message = this.translate.instant(
   			`COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode.toString().toUpperCase() }`);
   		this.store.dispatch(
-  			new fromActionsMain.UpdateUser({ user: authenticatedUser, redirectUrl, message }),
+  			new fromActionsMain.UpdateMyUser(authenticatedUser, redirectUrl, message),
   		);
   	}
   	return;

@@ -41,6 +41,13 @@ import localeAr from '@angular/common/locales/es-AR';
 import { provideHttpClient, withInterceptors, withJsonpSupport } from '@angular/common/http';
 import { httpInterceptorProviders } from './app/http-interceptors';
 
+export interface ISendMessage {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
 const cookieConfig: NgcCookieConsentConfig = {
   cookie: {
     domain: environment.appDomain,

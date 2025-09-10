@@ -337,3 +337,16 @@ export const observeElement = (animationState: BehaviorSubject<'open' | 'close'>
 
   return observer;
 };
+
+export const toastAnimation = trigger('fadeInOut', [
+  state('void', style({
+    opacity: 0,
+    transform: 'translateY(-20px)',
+  })),
+  state('*', style({
+    opacity: 1,
+    transform: 'translateY(0)',
+  })),
+  transition('void => *', animate('300ms ease-out')),
+  transition('* => void', animate('200ms ease-in')),
+]);

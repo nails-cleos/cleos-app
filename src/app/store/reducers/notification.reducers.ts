@@ -1,24 +1,23 @@
 import { All, NotificationActionTypes } from '../notification.actions';
 import { INotification, INotificationDTO } from '../../interfaces/notification';
 import { Pagination } from '../../interfaces/pagination';
+import { IError } from '../../interfaces/common';
 
 export interface State {
-  data: INotificationDTO | null;
-  dataDeleted: INotificationDTO | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  message: string | null;
+  data?: INotificationDTO | Pagination<INotification> | string;
+  dataDeleted?: INotificationDTO;
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  data: null,
-  dataDeleted: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  message: null,
+  data: undefined,
+  dataDeleted: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
   isLoading: false,
 };
 
@@ -28,67 +27,61 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         data: { page: { content: [{}, {}, {}] } as Pagination<INotification>, unread: -1 },
-        dataDeleted: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        dataDeleted: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case NotificationActionTypes.notificationSuccess: {
       return {
         ...state,
-        data: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        data: action.data,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case NotificationActionTypes.notificationReadSuccess: {
       return {
         ...state,
-        errorMessage: null,
-        subErrors: null,
+        errorMessage: undefined,
+        subErrors: undefined,
         isLoading: false,
       };
     }
     case NotificationActionTypes.notificationFailure: {
       return {
         ...state,
-        errorMessage: action.payload.error?.message,
-        error: action.payload.error,
-        subErrors: action.payload.error?.subErrors,
-        message: null,
+        errorMessage: action.error?.message,
+        error: action.error,
+        subErrors: action.error?.subErrors,
         isLoading: false,
       };
     }
-    case NotificationActionTypes.readNotificationById: {
+    case NotificationActionTypes.readNotification: {
       return {
         ...state,
-        data: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        data: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
         isLoading: true,
       };
     }
-    case NotificationActionTypes.deleteNotificationById: {
+    case NotificationActionTypes.deleteNotification: {
       return {
         ...state,
-        dataDeleted: null,
-        data: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        dataDeleted: undefined,
+        data: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
         isLoading: false,
       };
     }
     case NotificationActionTypes.notificationDeleteSuccess: {
       return {
         ...state,
-        dataDeleted: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        dataDeleted: action.data,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case NotificationActionTypes.clean: {

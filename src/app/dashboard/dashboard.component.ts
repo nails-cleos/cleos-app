@@ -328,7 +328,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       reservation.professionalId = professionalId;
     }
     this.store.dispatch(
-      new fromActionsDashboard.UpdateEventById(reservation),
+      new fromActionsDashboard.UpdateEvent(id, reservation),
     );
   };
 
@@ -455,12 +455,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private getEvents = (): void => {
     this.calendar.resetEvents();
     this.store.dispatch(
-      new fromActionsDashboard.MeEvent(this.viewDate),
+      new fromActionsDashboard.GetMyEvent(this.viewDate),
     );
   };
 
   private eventClick = (event: CalendarEvent, type: string): void => {
-    const reservationId = event.id;
+    const reservationId = `${ event.id! }`;
     switch (type) {
       case 'VIEW':
         this.router.navigate([this.language, 'reservation', reservationId]);
@@ -502,7 +502,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.dashboard = state.dashboard;
       this.dashboardReady = true;
       this.tryCreateEvents();

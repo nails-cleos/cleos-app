@@ -1,4 +1,10 @@
 import { Action } from '@ngrx/store';
+import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { SortDirection } from '@angular/material/sort';
+import { PAGE_SIZE } from '../interfaces/notification';
+import { Pagination } from '../interfaces/pagination';
+import { IOverview, IUser } from '../interfaces/user';
+import { Role } from '../interfaces/token';
 
 export enum UserActionTypes {
   getUsersPage = '[User] Get users page',
@@ -6,27 +12,28 @@ export enum UserActionTypes {
   userSuccess = '[User] Success',
   userFailure = '[User] Failure',
   userSelected = '[User] Selected',
-  userOverview = '[User] Overview',
-  getUserById = '[User] Get user by id',
-  findMe = '[User] Find me',
+  getCustomerOverview = '[User] Get customer overview',
+  getUser = '[User] Get user by id',
+  getMyUser = '[User] Find me',
   setRole = '[User] Add role',
   saveUser = '[User] Save',
-  updateMe = '[User] Update me',
-  updateMePhoto = '[User] Update me photo',
+  updateMyUser = '[User] Update me',
+  updateMyPhoto = '[User] Update me photo',
   userSaveSuccess = '[User] Save Success',
-  deleteUserById = '[User] Delete user by id',
-  userRestore = '[User] Restore',
+  deleteUser = '[User] Delete user by id',
+  restore = '[User] Restore',
   resendToken = '[User] Resend token',
-  findAllDisableUsers = '[User] Find all disable users',
+  getAllDisableUsers = '[User] Find all disable users',
   disableUsersSuccess = '[User] Disable users success',
   mergeUsers = '[User] Merge users',
   clean = '[User] Clean'
 }
 
-export class GetUsersPage implements Action {
+export class GetUsersPage extends PageRequest implements Action {
   readonly type = UserActionTypes.getUsersPage;
 
-  constructor(public payload: any) {
+  constructor(page: number, sort: string, direction: SortDirection, size: number = PAGE_SIZE, public filter?: string) {
+    super(page, sort, direction, size);
   }
 }
 
@@ -37,113 +44,110 @@ export class GetAllCustomers implements Action {
 export class UserSuccess implements Action {
   readonly type = UserActionTypes.userSuccess;
 
-  constructor(public payload: any) {
+  constructor(public data: Pagination<IUser> | IUser[] | IOverview) {
   }
 }
 
 export class UserFailure implements Action {
   readonly type = UserActionTypes.userFailure;
 
-  constructor(public payload: any) {
+  constructor(public error: IError) {
   }
 }
 
 export class UserSelected implements Action {
   readonly type = UserActionTypes.userSelected;
 
-  constructor(public payload: any) {
+  constructor(public selected?: IUser, public profile?: boolean) {
   }
 }
 
-export class UserOverview implements Action {
-  readonly type = UserActionTypes.userOverview;
+export class GetCustomerOverview implements Action {
+  readonly type = UserActionTypes.getCustomerOverview;
 
-  constructor(public payload: any) {
+  constructor(public id: string | null) {
   }
 }
 
-export class GetUserById implements Action {
-  readonly type = UserActionTypes.getUserById;
+export class getUser implements Action {
+  readonly type = UserActionTypes.getUser;
 
-  constructor(public payload: any) {
+  constructor(public id: string) {
   }
 }
 
-export class FindMe implements Action {
-  readonly type = UserActionTypes.findMe;
+export class GetMyUser implements Action {
+  readonly type = UserActionTypes.getMyUser;
 }
 
 export class SaveUser implements Action {
   readonly type = UserActionTypes.saveUser;
 
-  constructor(public payload: any) {
+  constructor(public user: IUser, public role?: Role) {
   }
 }
 
 export class SetRole implements Action {
   readonly type = UserActionTypes.setRole;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public displayName: string, public role: Role, public action: 'ADD' | 'REMOVE') {
   }
 }
 
-export class UpdateMe implements Action {
-  readonly type = UserActionTypes.updateMe;
+export class UpdateMyUser implements Action {
+  readonly type = UserActionTypes.updateMyUser;
 
-  constructor(public payload: any) {
+  constructor(public user: IUser, public redirectUrl?: string, public message?: string) {
   }
 }
 
-export class UpdateMePhoto implements Action {
-  readonly type = UserActionTypes.updateMePhoto;
+export class UpdateMyPhoto implements Action {
+  readonly type = UserActionTypes.updateMyPhoto;
 
-  constructor(public payload: any) {
+  constructor(public file: string) {
   }
 }
 
-export class UserSaveSuccess implements Action {
+export class UserSaveSuccess extends ResponseSuccess implements Action {
   readonly type = UserActionTypes.userSaveSuccess;
+}
 
-  constructor(public payload: any) {
+export class DeleteUser implements Action {
+  readonly type = UserActionTypes.deleteUser;
+
+  constructor(public id: string, public displayName: string) {
   }
 }
 
-export class DeleteUserById implements Action {
-  readonly type = UserActionTypes.deleteUserById;
+export class Restore implements Action {
+  readonly type = UserActionTypes.restore;
 
-  constructor(public payload: any) {
-  }
-}
-
-export class RestoreUser implements Action {
-  readonly type = UserActionTypes.userRestore;
-
-  constructor(public payload: any) {
+  constructor(public id: string, public user: IUser, public displayName: string) {
   }
 }
 
 export class ResendToken implements Action {
   readonly type = UserActionTypes.resendToken;
 
-  constructor(public payload: any) {
+  constructor(public id: string) {
   }
 }
 
-export class FindAllDisableUsers implements Action {
-  readonly type = UserActionTypes.findAllDisableUsers;
+export class GetAllDisableUsers implements Action {
+  readonly type = UserActionTypes.getAllDisableUsers;
 }
 
 export class DisableUsersSuccess implements Action {
   readonly type = UserActionTypes.disableUsersSuccess;
 
-  constructor(public payload: any) {
+  constructor(public users: IUser[]) {
   }
 }
 
 export class MergeUsers implements Action {
   readonly type = UserActionTypes.mergeUsers;
 
-  constructor(public payload: any) {
+  constructor(public oldUserId: string, public newUserId: string) {
   }
 }
 
@@ -157,18 +161,18 @@ export type All =
   | UserSuccess
   | UserFailure
   | UserSelected
-  | UserOverview
-  | GetUserById
-  | FindMe
+  | GetCustomerOverview
+  | getUser
+  | GetMyUser
   | SaveUser
   | SetRole
-  | UpdateMe
-  | UpdateMePhoto
+  | UpdateMyUser
+  | UpdateMyPhoto
   | UserSaveSuccess
-  | DeleteUserById
-  | RestoreUser
+  | DeleteUser
+  | Restore
   | ResendToken
-  | FindAllDisableUsers
+  | GetAllDisableUsers
   | DisableUsersSuccess
   | MergeUsers
   | Clean;

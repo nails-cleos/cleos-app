@@ -1,24 +1,26 @@
 import { Action } from '@ngrx/store';
+import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { Pagination } from '../interfaces/pagination';
+import { IOffice } from '../interfaces/office';
+import { IUser } from '../interfaces/user';
 
 export enum OfficeActionTypes {
   getOfficesPage = '[Office] Get offices page',
   getAllManager = '[Office] Get all manager',
   officeSuccess = '[Office] Success',
+  managerSuccess = '[Office] Manager Success',
   createOffice = '[Office] Create office',
-  updateOfficeById = '[Office] Update office by Id',
+  updateOffice = '[Office] Update office by Id',
   officeSaveSuccess = '[Office] Save Success',
   officeFailure = '[Office] Failure',
   officeSelected = '[Office] Selected',
-  findOfficeById = '[Office] Find office by Id',
-  deleteOfficeById = '[Office] Delete office by Id',
+  getOffice = '[Office] Find office by Id',
+  deleteOffice = '[Office] Delete office by Id',
   clean = '[Office] Clean'
 }
 
-export class GetOfficesPage implements Action {
+export class GetOfficesPage extends PageRequest implements Action {
   readonly type = OfficeActionTypes.getOfficesPage;
-
-  constructor(public payload: any) {
-  }
 }
 
 export class GetAllManagers implements Action {
@@ -28,56 +30,60 @@ export class GetAllManagers implements Action {
 export class OfficeSuccess implements Action {
   readonly type = OfficeActionTypes.officeSuccess;
 
-  constructor(public payload: any) {
+  constructor(public data: Pagination<IOffice>) {
+  }
+}
+
+export class ManagerSuccess implements Action {
+  readonly type = OfficeActionTypes.managerSuccess;
+
+  constructor(public managers: IUser[] ) {
   }
 }
 
 export class CreateOffice implements Action {
   readonly type = OfficeActionTypes.createOffice;
 
-  constructor(public payload: any) {
+  constructor(public office: IOffice) {
   }
 }
 
-export class UpdateOfficeById implements Action {
-  readonly type = OfficeActionTypes.updateOfficeById;
+export class UpdateOffice implements Action {
+  readonly type = OfficeActionTypes.updateOffice;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public office: IOffice) {
   }
 }
 
-export class OfficeSaveSuccess implements Action {
+export class OfficeSaveSuccess extends ResponseSuccess implements Action {
   readonly type = OfficeActionTypes.officeSaveSuccess;
-
-  constructor(public payload: any) {
-  }
 }
 
 export class OfficeFailure implements Action {
   readonly type = OfficeActionTypes.officeFailure;
 
-  constructor(public payload: any) {
+  constructor(public error: IError) {
   }
 }
 
 export class OfficeSelected implements Action {
   readonly type = OfficeActionTypes.officeSelected;
 
-  constructor(public payload: any) {
+  constructor(public selected?: IOffice) {
   }
 }
 
-export class FindOfficeById implements Action {
-  readonly type = OfficeActionTypes.findOfficeById;
+export class GetOffice implements Action {
+  readonly type = OfficeActionTypes.getOffice;
 
-  constructor(public payload: any) {
+  constructor(public id: string) {
   }
 }
 
-export class DeleteOfficeById implements Action {
-  readonly type = OfficeActionTypes.deleteOfficeById;
+export class DeleteOffice implements Action {
+  readonly type = OfficeActionTypes.deleteOffice;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public name: string) {
   }
 }
 
@@ -89,11 +95,12 @@ export type All =
   | GetOfficesPage
   | GetAllManagers
   | CreateOffice
-  | UpdateOfficeById
+  | UpdateOffice
   | OfficeSuccess
+  | ManagerSuccess
   | OfficeSaveSuccess
   | OfficeFailure
-  | FindOfficeById
+  | GetOffice
   | OfficeSelected
-  | DeleteOfficeById
+  | DeleteOffice
   | Clean;

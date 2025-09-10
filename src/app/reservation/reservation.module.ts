@@ -82,9 +82,9 @@ import { FormFieldAdderComponent } from '../shared/form-field-adder/form-field-a
 export class ReservationModule {
   constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
     const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe(state => {
+    getI18nState.subscribe((state) => {
       translateService.currentLang = '';
-      this.translateService.use(state.data);
+      this.translateService.use(state.language);
     });
   }
 }

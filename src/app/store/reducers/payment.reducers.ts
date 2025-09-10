@@ -1,126 +1,121 @@
 import { Pagination } from '../../interfaces/pagination';
 import { All, PaymentActionTypes } from '../payment.actions';
-import { IPayment } from '../../interfaces/payment';
+import { IPayment, IPaymentOption } from '../../interfaces/payment';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 
 export interface State {
-  data: IPayment | Pagination<IPayment> | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  selected: IPayment | IPayment[] | null;
-  message: string | null;
-  paths: string[] | null;
-  reload: boolean | null;
+  response?: IResponseSuccess;
+  data?: IPayment | Pagination<IPayment> | IPaymentOption[];
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
+  selected?: IPayment | IPayment[];
+  paths?: string[];
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  data: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  selected: null,
-  message: null,
-  paths: null,
-  reload: false,
+  data: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  selected: undefined,
+  response: undefined,
   isLoading: false,
 };
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case PaymentActionTypes.paymentByResource: {
+    case PaymentActionTypes.getPaymentByResourceId: {
       return {
         ...state,
-        errorMessage: null,
-        subErrors: null,
+        errorMessage: undefined,
+        subErrors: undefined,
         selected: [{}, {}, {}],
-        message: null,
+        response: undefined,
       };
     }
-    case PaymentActionTypes.createPaymentLink:
-    case PaymentActionTypes.findPaymentById: {
+    case PaymentActionTypes.createPaymentLinkByReservationId:
+    case PaymentActionTypes.getPayment: {
       return {
         ...state,
         isLoading: true,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
+        response: undefined,
       };
     }
-    case PaymentActionTypes.paymentOptions: {
+    case PaymentActionTypes.getPaymentOptions: {
       return {
         ...state,
-        data: null,
+        data: undefined,
         isLoading: true,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
+        response: undefined,
       };
     }
     case PaymentActionTypes.paymentSuccess: {
       return {
         ...state,
-        data: action.payload,
+        data: action.data,
         isLoading: false,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case PaymentActionTypes.paymentSaveSuccess: {
       return {
         ...state,
-        message: action.payload.message,
-        reload: action.payload.reload,
-        paths: action.payload.paths,
-        errorMessage: null,
-        selected: null,
-        subErrors: null,
+        response: action,
+        errorMessage: undefined,
+        selected: undefined,
+        subErrors: undefined,
         isLoading: false,
       };
     }
     case PaymentActionTypes.paymentNotComplete: {
       return {
         ...state,
-        message: null,
-        errorMessage: null,
-        subErrors: action.payload.message,
-        paths: action.payload.paths,
+        response: action.response,
+        errorMessage: undefined,
+        subErrors: action.subError,
         isLoading: false,
       };
     }
     case PaymentActionTypes.paymentSelected: {
       return {
         ...state,
-        selected: action.payload.payment,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        selected: action.selected,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case PaymentActionTypes.paymentFailure: {
       return {
         ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
-        message: null,
+        errorMessage: action.error.message,
+        error: action.error,
+        subErrors: action.error.subErrors,
+        response: undefined,
         isLoading: false,
       };
     }
     case PaymentActionTypes.adjustPayments:
     case PaymentActionTypes.updatePaymentById:
-    case PaymentActionTypes.paymentRecreate:
+    case PaymentActionTypes.recreate:
     case PaymentActionTypes.paymentSave:
     case PaymentActionTypes.paymentSend:
-    case PaymentActionTypes.paymentNotify: {
+    case PaymentActionTypes.notifyPayment: {
       return {
         ...state,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
         isLoading: true,
       };
     }

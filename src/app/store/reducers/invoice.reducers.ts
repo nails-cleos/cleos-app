@@ -1,92 +1,85 @@
 import { All, InvoiceActionTypes } from '../invoice.actions';
-import { IOfficeAll } from '../../interfaces/office';
+import { IOffice } from '../../interfaces/office';
 import { IInvoice } from '../../interfaces/invoice';
+import { IError } from '../../interfaces/common';
 
 export interface State {
-  data: IInvoice[] | null;
-  offices: IOfficeAll[] | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  message: string | null;
+  data?: IInvoice[];
+  offices?: IOffice[];
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
   isLoading: boolean;
   changes: boolean;
 }
 
 export const initialState: State = {
-  data: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  offices: null,
-  message: null,
+  data: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  offices: undefined,
   isLoading: false,
   changes: true,
 };
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case InvoiceActionTypes.findOfficeToInvoice: {
+    case InvoiceActionTypes.getOfficeToInvoice: {
       return {
         ...state,
         data: [{} as IInvoice, {} as IInvoice, {} as IInvoice],
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
         changes: true,
       };
     }
     case InvoiceActionTypes.invoiceSuccess: {
       return {
         ...state,
-        data: action.payload,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
+        data: action.data,
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
         changes: true,
       };
     }
     case InvoiceActionTypes.getAllMyOffices: {
       return {
         ...state,
-        offices: null,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
+        offices: undefined,
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
         changes: false,
       };
     }
     case InvoiceActionTypes.invoiceOfficesSuccess: {
       return {
         ...state,
-        offices: action.payload,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
+        offices: action.offices,
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
         changes: false,
       };
     }
     case InvoiceActionTypes.invoiceFailure: {
       return {
         ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
-        message: null,
+        errorMessage: action.error.message,
+        error: action.error,
+        subErrors: action.error.subErrors,
         changes: false,
       };
     }
     case InvoiceActionTypes.updateOfficeById: {
       return {
         ...state,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
+        errorMessage: undefined,
+        error: undefined,
+        subErrors: undefined,
         changes: false,
       };
     }

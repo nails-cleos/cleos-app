@@ -31,7 +31,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   @ViewChild(MatSort) sort!: MatSort;
 
   displayedColumns: string[] = ['position', 'professional', 'description', 'timestamp', 'duration', 'repeat',
-  	'actions'];
+    'actions'];
   dataSource: any = new MatTableDataSource<Pagination<IUnavailable>>();
 
   expandedUnavailable?: IUnavailable;
@@ -48,97 +48,92 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
-  	breakpointObserver.observe([
-  		Breakpoints.XSmall,
-  		Breakpoints.Small,
-  	]).subscribe(result => {
-  		if (result.matches) {
-  			this.pageSize = MOBILE_PAGE_SIZE;
-  		}
-  	});
-  	this.getState = this.store.select(selectUnavailableState);
-  	this.dateFormat = this.translate.currentLang;
-  	this.language = this.translate.currentLang;
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small,
+    ]).subscribe(result => {
+      if (result.matches) {
+        this.pageSize = MOBILE_PAGE_SIZE;
+      }
+    });
+    this.getState = this.store.select(selectUnavailableState);
+    this.dateFormat = this.translate.currentLang;
+    this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {
-  	this.getUnavailableList();
+    this.getUnavailableList();
   }
 
   ngOnInit(): void {
-  	this.clean();
-  	this.subscribe();
+    this.clean();
+    this.subscribe();
   }
 
   ngOnDestroy(): void {
-  	this.subscription?.unsubscribe();
-  	this.paginatorSubscription?.unsubscribe();
+    this.subscription?.unsubscribe();
+    this.paginatorSubscription?.unsubscribe();
   }
 
   edit = (unavailable: IUnavailable): void => this.store.dispatch(
-  	new fromActionsUnavailable.UnavailableSelected(unavailable),
+    new fromActionsUnavailable.UnavailableSelected(unavailable),
   );
 
   delete = (unavailable: IUnavailable): void => {
-  	const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
-  	const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT',
-  		{ date: newDateTimestamp(unavailable.timestamp) });
-  	const dialogRef = this.dialog.open(DialogComponent, {
-  		data: { title, content, value: unavailable },
-  	});
+    const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
+    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT',
+      { date: newDateTimestamp(unavailable.timestamp) });
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: { title, content, value: unavailable },
+    });
 
-  	dialogRef.afterClosed().subscribe(result => {
-  		if (result) {
-  			this.store.dispatch(
-  				new fromActionsUnavailable.DeleteUnavailableById(result),
-  			);
-  		}
-  	});
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.store.dispatch(
+          new fromActionsUnavailable.DeleteUnavailable(result.id, result.timestamp, result.timeZone),
+        );
+      }
+    });
   };
 
   showTimeZone = (unavailable: IUnavailableAll): boolean => !isSameTimeZone(unavailable.professional.timeZone);
 
   openDialog = (unavailable: IUnavailableAll): void => {
-  	const time = newDateTimestamp(unavailable.timestamp);
-  	const name = unavailable.professional.displayName;
-  	const timeZone = unavailable.professional.timeZone;
-  	createDialog('PROFESSIONAL_INFO', name, this.dateFormat, this.translate, this.dialog, timeZone, time);
+    const time = newDateTimestamp(unavailable.timestamp);
+    const name = unavailable.professional.displayName;
+    const timeZone = unavailable.professional.timeZone;
+    createDialog('PROFESSIONAL_INFO', name, this.dateFormat, this.translate, this.dialog, timeZone, time);
   };
 
   private clean = (): void => this.store.dispatch(new fromActionsUnavailable.Clean());
 
   private createPageSubscriptions = (): void => {
-  	this.sort.sortChange.subscribe(() => {
-  		this.paginator.pageIndex = 0;
-  		this.getUnavailableList();
-  	});
-  	this.paginatorSubscription =
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getUnavailableList();
+    });
+    this.paginatorSubscription =
       this.paginator?.page.subscribe(() => this.getUnavailableList(this.paginator.pageIndex));
 
-  	this.cdRef.detectChanges();
+    this.cdRef.detectChanges();
   };
 
   private getUnavailableList = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsUnavailable.GetUnavailablePage({
-  		active: this.sort.active,
-  		direction: this.sort.direction,
-  		size: this.pageSize,
-  		page,
-  	}),
+    new fromActionsUnavailable.GetUnavailablePage(page, this.sort.active, this.sort.direction, this.pageSize),
   );
 
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe((state) => {
-  		if (state.message) {
-  			this.clean();
-  			this.getUnavailableList();
-  		}
-  		this.dataSource = state.data?.content;
-  		this.resultsLength = state.data?.totalElements;
-  		if (!this.paginatorSubscription && this.resultsLength) {
-  			this.createPageSubscriptions();
-  		}
-  	});
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.response) {
+        this.clean();
+        this.getUnavailableList();
+      }
+      this.dataSource = state.data?.content;
+      this.resultsLength = state.data?.totalElements;
+      if (!this.paginatorSubscription && this.resultsLength) {
+        this.createPageSubscriptions();
+      }
+    });
   };
 }

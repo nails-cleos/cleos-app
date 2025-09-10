@@ -1,8 +1,10 @@
 import { Action } from '@ngrx/store';
+import { Params } from '@angular/router';
+import { IError, ResponseSuccess } from '../interfaces/common';
+import { Token } from '../interfaces/token';
 
 export enum AuthActionTypes {
   login = '[Auth] Login',
-  refreshToken = '[Auth] Refresh token',
   redirect = '[Auth] Redirect',
   loginSuccess = '[Auth] Login Success',
   loginFailure = '[Auth] Login Failure',
@@ -16,14 +18,7 @@ export enum AuthActionTypes {
 export class Login implements Action {
   readonly type = AuthActionTypes.login;
 
-  constructor(public payload: any) {
-  }
-}
-
-export class RefreshToken implements Action {
-  readonly type = AuthActionTypes.refreshToken;
-
-  constructor(public payload: any) {
+  constructor(public token: string, public queryParams: Params, public theme: string, public code: string | null) {
   }
 }
 
@@ -34,28 +29,25 @@ export class Redirect implements Action {
 export class LoginSuccess implements Action {
   readonly type = AuthActionTypes.loginSuccess;
 
-  constructor(public payload: any) {
+  constructor(public token: Token, public queryParams: Params, public redirect?: boolean) {
   }
 }
 
 export class LoginFailure implements Action {
   readonly type = AuthActionTypes.loginFailure;
 
-  constructor(public payload: any) {
+  constructor(public error: IError) {
   }
 }
 
-export class SignUpSuccess implements Action {
+export class SignUpSuccess extends ResponseSuccess implements Action {
   readonly type = AuthActionTypes.signupSuccess;
-
-  constructor(public payload: any) {
-  }
 }
 
 export class SignUpFailure implements Action {
   readonly type = AuthActionTypes.signupFailure;
 
-  constructor(public payload: any) {
+  constructor(public error: IError) {
   }
 }
 
@@ -74,7 +66,6 @@ export class Clean implements Action {
 export type All =
   | Login
   | LoginSuccess
-  | RefreshToken
   | Redirect
   | LoginFailure
   | SignUpSuccess

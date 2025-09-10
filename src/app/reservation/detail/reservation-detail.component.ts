@@ -45,6 +45,7 @@ import {
   IPayment,
   IPaymentAll,
   IPaymentOption,
+  IPaymentRequest,
   PaymentType,
   PENALTY,
 } from '../../interfaces/payment';
@@ -109,7 +110,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   professionalId?: string;
 
   form = this.formBuilder.group({
-  	payments: this.formBuilder.array([]),
+    payments: this.formBuilder.array([]),
   });
 
   disableUpdateButton = true;
@@ -133,134 +134,130 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private route: ActivatedRoute,
               private store: Store<AppState>, private router: Router, breakpointObserver: BreakpointObserver,
               private formBuilder: UntypedFormBuilder, private authUserService: AuthUserService) {
-  	this.getState = this.store.select(selectReservationState);
-  	breakpointObserver.observe([
-  		Breakpoints.XSmall,
-  		Breakpoints.Small,
-  	]).subscribe(result => this.small = result.matches);
-  	this.language = this.translate.currentLang;
-  	this.dateFormat = this.translate.currentLang;
-  	this.price = new Price();
-  	this.step = this.router.getCurrentNavigation()?.extras.state?.step;
-  	this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
-  		this.professionalId = value.professionalId;
-  		this.customerId = value.customerId;
-  		this.hasRoomAdmin = value.isAdmin || value.isManager || value.isRoomAdmin;
-  	});
-  	this.getPaymentState = this.store.select(selectPaymentState);
+    this.getState = this.store.select(selectReservationState);
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small,
+    ]).subscribe(result => this.small = result.matches);
+    this.language = this.translate.currentLang;
+    this.dateFormat = this.translate.currentLang;
+    this.price = new Price();
+    this.step = this.router.getCurrentNavigation()?.extras.state?.step;
+    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
+      this.professionalId = value.professionalId;
+      this.customerId = value.customerId;
+      this.hasRoomAdmin = value.isAdmin || value.isManager || value.isRoomAdmin;
+    });
+    this.getPaymentState = this.store.select(selectPaymentState);
   }
 
   get payments(): FormArray {
-  	return this.form.controls.payments as FormArray;
+    return this.form.controls.payments as FormArray;
   }
 
   get gmt(): string {
-  	return getReservationGMT(this.reservation);
+    return getReservationGMT(this.reservation);
   }
 
   get total(): number {
-  	return totalPaid(this.paymentPaid);
+    return totalPaid(this.paymentPaid);
   }
 
   get updatePayment(): void {
-  	let payload: any = [];
-  	this.paymentPaid.forEach((p: IPayment, i: number) => {
-  		const payment = this.payments.at(i).value;
-  		if (p.transactionAmount?.toFixed(2) !== payment.amount || p.type !== payment.type) {
-  			payload = [...payload, {
-  				paymentId: p.id,
-  				amount: parseFloat(payment.amount) - parseFloat(p.transactionAmount?.toFixed(2) || '0'),
-  				paymentType: payment.type,
-  			}];
-  		}
-  	});
-  	return this.store.dispatch(
-  		new fromActionsPayment.AdjustPayments(payload),
-  	);
+    let paymentRequests: IPaymentRequest[] = [];
+    this.paymentPaid.forEach((p: IPayment, i: number) => {
+      const payment = this.payments.at(i).value;
+      if (p.transactionAmount?.toFixed(2) !== payment.amount || p.type !== payment.type) {
+        paymentRequests = [...paymentRequests, {
+          paymentId: p.id!,
+          amount: parseFloat(payment.amount) - parseFloat(p.transactionAmount?.toFixed(2) || '0'),
+          paymentType: payment.type,
+        }];
+      }
+    });
+    return this.store.dispatch(
+      new fromActionsPayment.AdjustPayments(paymentRequests),
+    );
   }
 
   get addNote(): void {
-  	return executeDialog(this.dialog, AddNoteDialogComponent, {
-  		note: this.reservation?.note,
-  		customerNote: this.reservation?.customerNote,
-  		isCustomer: this.isCustomer,
-  	}, result => {
-  		if (result) {
-  			this.store.dispatch(
-  				new fromActionsReservation.UpdateNoteByReservationId({
-  					note: result.note,
-  					customerNote: result.customerNote,
-  					reservation: this.reservation,
-  					role: this.professionalId ? Role.professional : Role.customer,
-  				}),
-  			);
-  		}
-  	}, true);
+    return executeDialog(this.dialog, AddNoteDialogComponent, {
+      note: this.reservation?.note,
+      customerNote: this.reservation?.customerNote,
+      isCustomer: this.isCustomer,
+    }, result => {
+      if (result) {
+        const reservation = this.reservation!;
+        this.store.dispatch(
+          new fromActionsReservation.UpdateReservationNote(reservation.id,
+            this.professionalId ? Role.professional : Role.customer, result.note, result.customerNote,
+            reservation.paymentLink, reservation.timestamp, reservation.room.timeZone),
+        );
+      }
+    }, true);
   }
 
   get addDiscount(): void {
-  	return executeDialog(this.dialog, AddDiscountDialogComponent, { customerId: this.reservation?.customer.id },
-  		result => {
-  			if (result) {
-  				this.store.dispatch(
-  					new fromActionsReservation.UpdateDiscountByReservationId(
-  						{ discountId: result.discountId, reservationId: this.reservation?.id }),
-  				);
-  			}
-  		}, true);
+    return executeDialog(this.dialog, AddDiscountDialogComponent, { customerId: this.reservation?.customer.id },
+      result => {
+        if (result) {
+          this.store.dispatch(new fromActionsReservation.UpdateReservationDiscount(this.reservation!.id,
+            result.discountId));
+        }
+      }, true);
   }
 
   private static createMachine = (stateMachineDefinition: any, initialState: any): any => {
-  	ReservationDetailComponent.stateMachineDefinition = stateMachineDefinition;
-  	const machine = {
-  		value: initialState,
-  		transition: (currentState: any, event: any): any => {
-  			const currentStateDefinition = stateMachineDefinition[currentState];
-  			const destinationTransition = currentStateDefinition.transitions[event];
-  			if (!destinationTransition) {
-  				return undefined;
-  			}
-  			const destinationState = destinationTransition.target;
-  			destinationTransition.action();
-  			machine.value = destinationState;
-  			return machine.value;
-  		},
-  		next: (currentState: any): any => {
-  			const currentStateDefinition = stateMachineDefinition[currentState];
-  			return currentStateDefinition.next;
-  		},
-  	};
-  	return machine;
+    ReservationDetailComponent.stateMachineDefinition = stateMachineDefinition;
+    const machine = {
+      value: initialState,
+      transition: (currentState: any, event: any): any => {
+        const currentStateDefinition = stateMachineDefinition[currentState];
+        const destinationTransition = currentStateDefinition.transitions[event];
+        if (!destinationTransition) {
+          return undefined;
+        }
+        const destinationState = destinationTransition.target;
+        destinationTransition.action();
+        machine.value = destinationState;
+        return machine.value;
+      },
+      next: (currentState: any): any => {
+        const currentStateDefinition = stateMachineDefinition[currentState];
+        return currentStateDefinition.next;
+      },
+    };
+    return machine;
   };
 
   private static addTransitionToAllStates = (
-  	eventName: string,
-  	transitionDetails: any,
-  	nextState: any,
-  	last: boolean = true,
+    eventName: string,
+    transitionDetails: any,
+    nextState: any,
+    last: boolean = true,
   ): void => {
-  	for (const state in ReservationDetailComponent.stateMachineDefinition) {
-  		if (state !== 'initialState') {
-  			if (ReservationDetailComponent.stateMachineDefinition.hasOwnProperty(state)) {
-  				const stateDefinition = ReservationDetailComponent.stateMachineDefinition[state];
-  				if (!stateDefinition.transitions) {
-  					stateDefinition.transitions = {};
-  				}
-  				stateDefinition.transitions[eventName] = transitionDetails;
+    for (const state in ReservationDetailComponent.stateMachineDefinition) {
+      if (state !== 'initialState') {
+        if (ReservationDetailComponent.stateMachineDefinition.hasOwnProperty(state)) {
+          const stateDefinition = ReservationDetailComponent.stateMachineDefinition[state];
+          if (!stateDefinition.transitions) {
+            stateDefinition.transitions = {};
+          }
+          stateDefinition.transitions[eventName] = transitionDetails;
 
-  				if (!stateDefinition.next) {
-  					stateDefinition.next = [];
-  				}
-  				if (!stateDefinition.next.includes(nextState)) {
-  					if (last) {
-  						stateDefinition.next.push(nextState);
-  					} else {
-  						stateDefinition.next.unshift(nextState);
-  					}
-  				}
-  			}
-  		}
-  	}
+          if (!stateDefinition.next) {
+            stateDefinition.next = [];
+          }
+          if (!stateDefinition.next.includes(nextState)) {
+            if (last) {
+              stateDefinition.next.push(nextState);
+            } else {
+              stateDefinition.next.unshift(nextState);
+            }
+          }
+        }
+      }
+    }
   };
 
   private static createTransaction = (target: string, action: any): any => ({ target, action });
@@ -270,733 +267,722 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   private static createBullet = (name: string): string => `%0A\uD83D\uDC85\uD83C\uDFFB ${ name }`;
 
   openHistoryDialog = (history: IReservationAll): void => this.openDialog(
-  	ReservationDetailComponent.getDateTimeDetail(history));
+    ReservationDetailComponent.getDateTimeDetail(history));
 
   openDialog = (reservationDate: Date): void => {
-  	if (this.reservation) {
-  		openDialog(this.reservation.room, this.language, this.translate, this.dialog, reservationDate);
-  	}
+    if (this.reservation) {
+      openDialog(this.reservation.room, this.language, this.translate, this.dialog, reservationDate);
+    }
   };
 
   showTimeZone = (reservation: IReservationAll | undefined = this.reservation): boolean => !isSameTimeZone(
-  	reservation?.room.timeZone);
+    reservation?.room.timeZone);
 
   ngOnInit(): void {
-  	this.subscribe();
-  	this.clean();
-  	this.route.params.subscribe(routeParams => {
-  		this.reservationId = routeParams.id;
-  		this.getReservation(this.reservationId);
-  	});
+    this.subscribe();
+    this.clean();
+    this.route.params.subscribe(routeParams => {
+      this.reservationId = routeParams.id;
+      this.getReservation(this.reservationId!);
+    });
   }
 
   ngOnDestroy(): void {
-  	this.subscription?.unsubscribe();
-  	this.paymentSubscription?.unsubscribe();
-  	this.authUserServiceSubscription.unsubscribe();
+    this.subscription?.unsubscribe();
+    this.paymentSubscription?.unsubscribe();
+    this.authUserServiceSubscription.unsubscribe();
   }
 
   onChangeState = (id: string): void => {
-  	const list = ['send', 'coffee', 'book', 'more', 'change', 'cancel', 'cancel_edit', 'notify', 'pay', 'color',
-  		'clone', 'previous', 'next'];
-  	if (list.indexOf(id) >= 0 && this.reservation) {
-  		this.machine.transition(snakeToCamel(this.reservation.state), snakeToCamel(id));
-  		return;
-  	}
-  	const title = this.translate.instant('RESERVATION.CHANGE_STATE.TITLE');
-  	const action = this.translate.instant(`RESERVATION.CHANGE_STATE.ACTION.${ id.toUpperCase() }`);
-  	const content = this.translate.instant('RESERVATION.CHANGE_STATE.CONTENT', { action });
-  	const dialogRef = this.dialog.open(DialogComponent, {
-  		data: { title, content, value: id },
-  	});
+    const list = ['send', 'coffee', 'book', 'more', 'change', 'cancel', 'cancel_edit', 'notify', 'pay', 'color',
+      'clone', 'previous', 'next'];
+    if (list.indexOf(id) >= 0 && this.reservation) {
+      this.machine.transition(snakeToCamel(this.reservation.state), snakeToCamel(id));
+      return;
+    }
+    const title = this.translate.instant('RESERVATION.CHANGE_STATE.TITLE');
+    const action = this.translate.instant(`RESERVATION.CHANGE_STATE.ACTION.${ id.toUpperCase() }`);
+    const content = this.translate.instant('RESERVATION.CHANGE_STATE.CONTENT', { action });
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: { title, content, value: id },
+    });
 
-  	dialogRef.afterClosed().subscribe(event => {
-  		if (event && this.reservation) {
-  			this.machine.transition(snakeToCamel(this.reservation.state), event);
-  		}
-  	});
+    dialogRef.afterClosed().subscribe(event => {
+      if (event && this.reservation) {
+        this.machine.transition(snakeToCamel(this.reservation.state), event);
+      }
+    });
   };
 
   notify = (payment: IPaymentAll): void => this.store.dispatch(
-  	new fromActionsPayment.PaymentNotify({
-  		id: payment.id,
-  		resourceId: payment?.reservation?.id,
-  		path: 'reservation',
-  		preferenceId: payment.preferenceId,
-  		type: payment.type,
-  	}),
+    new fromActionsPayment.NotifyPayment(payment.id, 'reservation', payment.reservation!.id, payment.preferenceId,
+      payment.type),
   );
 
   pay = (payment: IPaymentAll): void => this.store.dispatch(
-  	new fromActionsPayment.PaymentSend(payment.paymentURL || payment.link),
+    new fromActionsPayment.PaymentSend(payment.paymentURL || payment.link),
   );
 
   twoDigit = (i: number): void => {
-  	const payment = this.payments.at(i).value;
-  	if (!isNaN(payment.amount)) {
-  		payment.amount = parseFloat(payment.amount).toFixed(2);
-  		this.payments.at(i).setValue(payment);
-  	}
+    const payment = this.payments.at(i).value;
+    if (!isNaN(payment.amount)) {
+      payment.amount = parseFloat(payment.amount).toFixed(2);
+      this.payments.at(i).setValue(payment);
+    }
   };
 
   private createAction = (
-  	tooltip: string,
-  	icon: string,
-  	id: string,
-  	color?: string,
+    tooltip: string,
+    icon: string,
+    id: string,
+    color?: string,
   ): IFabMenu => ({ tooltip, icon, id, color } as IFabMenu);
 
   private valueChanges = (arr: any[]): void => {
-  	this.payments.valueChanges.pipe(startWith(arr), pairwise()).subscribe(([prev, next]: [any[], any[]]) => {
-  		if (!areEquals(prev, next)) {
-  			this.disableUpdateButton = false;
-  		}
-  	});
+    this.payments.valueChanges.pipe(startWith(arr), pairwise()).subscribe(([prev, next]: [any[], any[]]) => {
+      if (!areEquals(prev, next)) {
+        this.disableUpdateButton = false;
+      }
+    });
   };
 
   private clean = (): void => {
-  	this.payments.clear();
-  	this.store.dispatch(
-  		new fromActionsReservation.Clean(),
-  	);
+    this.payments.clear();
+    this.store.dispatch(
+      new fromActionsReservation.Clean(),
+    );
   };
 
   private getOptions = (): void => this.store.dispatch(new fromActionsPayment.PaymentOptions());
 
-  private getReservation = (id?: string | null): void => {
-  	this.reservation = undefined;
-  	this.store.dispatch(
-  		new fromActionsReservation.ReservationFind({ id }),
-  	);
-  	this.store.dispatch(
-  		new fromActionsReservation.ReservationFindPayments(id),
-  	);
-  	this.store.dispatch(
-  		new fromActionsReservation.FindReservationHistoryById({ id }),
-  	);
+  private getReservation = (id: string): void => {
+    this.reservation = undefined;
+    this.store.dispatch(
+      new fromActionsReservation.GetReservation(id),
+    );
+    this.store.dispatch(
+      new fromActionsReservation.ReservationFindPayments(id),
+    );
+    this.store.dispatch(
+      new fromActionsReservation.GetReservationHistory(id),
+    );
   };
 
   private professionalMachine = (self: this): any => {
-  	if (!self.reservation) {
-  		return;
-  	}
-  	const reservation: IReservationAll = self.reservation;
-  	const reservationId = reservation.id;
-  	const roomId = reservation.room.id;
-  	const customerId = reservation.customer.id;
-  	const initialState = reservation.state;
-  	const store = self.store;
-  	const translate = self.translate;
+    if (!self.reservation) {
+      return;
+    }
+    const reservation: IReservationAll = self.reservation;
+    const reservationId = reservation.id;
+    const roomId = reservation.room.id;
+    const customerId = reservation.customer.id;
+    const initialState = reservation.state;
+    const store = self.store;
+    const translate = self.translate;
 
-  	const approve = this.createAction(translate.instant('RESERVATION.ACTION.APPROVE'),
-  		ReservationIconName.approved, 'approve', 'primary');
-  	const start = this.createAction(translate.instant('RESERVATION.ACTION.START'),
-  		ReservationIconName.started, 'start', 'primary');
-  	const complete = this.createAction(translate.instant('RESERVATION.ACTION.COMPLETE'),
-  		ReservationIconName.completed, 'complete', 'primary');
-  	const edit = this.createAction(translate.instant('RESERVATION.ACTION.EDIT'),
-  		ReservationIconName.edit, 'edit', 'accent');
-  	const cancel = this.createAction(translate.instant('RESERVATION.ACTION.CANCEL'),
-  		ReservationIconName.cancelled, 'cancel', 'warn');
-  	const book = this.createAction(translate.instant('RESERVATION.ACTION.BOOK'),
-  		ReservationIconName.book, 'book', 'primary');
-  	const sendMessage = this.createAction(translate.instant('RESERVATION.ACTION.SEND'),
-  		ReservationIconName.send, 'send', 'green');
-  	const coffeeMessage = this.createAction(translate.instant('RESERVATION.ACTION.COFFEE'),
-  		ReservationIconName.coffee, 'coffee', 'accent');
-  	const change = this.createAction(translate.instant('RESERVATION.ACTION.CHANGE'),
-  		ReservationIconName.change, 'change', 'accent');
+    const approve = this.createAction(translate.instant('RESERVATION.ACTION.APPROVE'),
+      ReservationIconName.approved, 'approve', 'primary');
+    const start = this.createAction(translate.instant('RESERVATION.ACTION.START'),
+      ReservationIconName.started, 'start', 'primary');
+    const complete = this.createAction(translate.instant('RESERVATION.ACTION.COMPLETE'),
+      ReservationIconName.completed, 'complete', 'primary');
+    const edit = this.createAction(translate.instant('RESERVATION.ACTION.EDIT'),
+      ReservationIconName.edit, 'edit', 'accent');
+    const cancel = this.createAction(translate.instant('RESERVATION.ACTION.CANCEL'),
+      ReservationIconName.cancelled, 'cancel', 'warn');
+    const book = this.createAction(translate.instant('RESERVATION.ACTION.BOOK'),
+      ReservationIconName.book, 'book', 'primary');
+    const sendMessage = this.createAction(translate.instant('RESERVATION.ACTION.SEND'),
+      ReservationIconName.send, 'send', 'green');
+    const coffeeMessage = this.createAction(translate.instant('RESERVATION.ACTION.COFFEE'),
+      ReservationIconName.coffee, 'coffee', 'accent');
+    const change = this.createAction(translate.instant('RESERVATION.ACTION.CHANGE'),
+      ReservationIconName.change, 'change', 'accent');
 
-  	const more = this.createAction(translate.instant('RESERVATION.ACTION.MORE'),
-  		ReservationIconName.more, 'more');
+    const more = this.createAction(translate.instant('RESERVATION.ACTION.MORE'),
+      ReservationIconName.more, 'more');
 
-  	const color = this.createAction(translate.instant('RESERVATION.ACTION.COLOR'),
-  		ReservationIconName.color, 'color');
+    const color = this.createAction(translate.instant('RESERVATION.ACTION.COLOR'),
+      ReservationIconName.color, 'color');
 
-  	const clone = this.createAction(translate.instant('RESERVATION.ACTION.CLONE'),
-  		ReservationIconName.clone, 'clone');
+    const clone = this.createAction(translate.instant('RESERVATION.ACTION.CLONE'),
+      ReservationIconName.clone, 'clone');
 
-  	const userPhone = reservation.customer.phone;
+    const userPhone = reservation.customer.phone;
 
-  	let approveActions: IFabMenu[] = [];
-  	const startDate = newDate(self.start);
-  	if (lessOrEqualsThanToday(startDate, reservation.room.timeZone)) {
-  		approveActions = [start];
-  	}
-  	approveActions = [...approveActions, edit];
-  	if (userPhone) {
-  		if (greaterOrEqualsThanToday(startDate, reservation.room.timeZone)) {
-  			approveActions = [...approveActions, sendMessage];
-  		}
-  		if (isTomorrow(startDate)) {
-  			approveActions = [...approveActions, coffeeMessage];
-  		}
-  	}
-  	approveActions = [...approveActions, more, clone, cancel];
+    let approveActions: IFabMenu[] = [];
+    const startDate = newDate(self.start);
+    if (lessOrEqualsThanToday(startDate, reservation.room.timeZone)) {
+      approveActions = [start];
+    }
+    approveActions = [...approveActions, edit];
+    if (userPhone) {
+      if (greaterOrEqualsThanToday(startDate, reservation.room.timeZone)) {
+        approveActions = [...approveActions, sendMessage];
+      }
+      if (isTomorrow(startDate)) {
+        approveActions = [...approveActions, coffeeMessage];
+      }
+    }
+    approveActions = [...approveActions, more, clone, cancel];
 
-  	const approveTransaction = ReservationDetailComponent.createTransaction('approved', (): void => {
-  		self.reservation = undefined;
-  		store.dispatch(
-  			new fromActionsReservation.ApproveReservation(reservationId),
-  		);
-  	});
+    const approveTransaction = ReservationDetailComponent.createTransaction('approved', (): void => {
+      self.reservation = undefined;
+      store.dispatch(
+        new fromActionsReservation.ApproveReservation(reservationId),
+      );
+    });
 
-  	const sendMessageTransaction = ReservationDetailComponent.createTransaction('send', (): void => {
-  		if (startDate) {
-  			let key;
-  			let date = getTime(startDate, self.language);
-  			let treatment = ReservationDetailComponent.createBullet(reservation.treatment.name);
-  			treatment +=
+    const sendMessageTransaction = ReservationDetailComponent.createTransaction('send', (): void => {
+      if (startDate) {
+        let key;
+        let date = getTime(startDate, self.language);
+        let treatment = ReservationDetailComponent.createBullet(reservation.treatment.name);
+        treatment +=
           reservation.additional?.map(additional => ReservationDetailComponent.createBullet(additional.name));
-  			switch (true) {
-  			case isToday(startDate):
-  				key = 'TODAY';
-  				break;
-  			case isTomorrow(startDate):
-  				key = 'TOMORROW';
-  				break;
-  			default:
-  				date = formatDateTime(startDate, self.language);
-  				key = 'APPROVE';
-  				break;
-  			}
-  			const message = translate.instant(`WHATSAPP.SEND.${ key }`, { date, treatment });
-  			window.open(`https://api.whatsapp.com/send?phone=+${ userPhone }&text=${ message }`, '_blank');
-  		}
-  	});
+        switch (true) {
+          case isToday(startDate):
+            key = 'TODAY';
+            break;
+          case isTomorrow(startDate):
+            key = 'TOMORROW';
+            break;
+          default:
+            date = formatDateTime(startDate, self.language);
+            key = 'APPROVE';
+            break;
+        }
+        const message = translate.instant(`WHATSAPP.SEND.${ key }`, { date, treatment });
+        window.open(`https://api.whatsapp.com/send?phone=+${ userPhone }&text=${ message }`, '_blank');
+      }
+    });
 
-  	const coffeeMessageTransaction = ReservationDetailComponent.createTransaction('send', (): void => {
-  		const message = translate.instant('WHATSAPP.SEND.COFFEE');
-  		window.open(`https://api.whatsapp.com/send?phone=+${ userPhone }&text=${ message }`, '_blank');
-  	});
+    const coffeeMessageTransaction = ReservationDetailComponent.createTransaction('send', (): void => {
+      const message = translate.instant('WHATSAPP.SEND.COFFEE');
+      window.open(`https://api.whatsapp.com/send?phone=+${ userPhone }&text=${ message }`, '_blank');
+    });
 
-  	const startTransaction = ReservationDetailComponent.createTransaction('started', (): void => {
-  		self.reservation = undefined;
-  		store.dispatch(
-  			new fromActionsReservation.Start(reservationId),
-  		);
-  	});
+    const startTransaction = ReservationDetailComponent.createTransaction('started', (): void => {
+      self.reservation = undefined;
+      store.dispatch(
+        new fromActionsReservation.Start(reservationId),
+      );
+    });
 
-  	const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void => {
-  		self.router.navigate([this.language, 'reservation', reservationId, 'edit'], { state: { roomId } });
-  	});
+    const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void => {
+      self.router.navigate([this.language, 'reservation', reservationId, 'edit'], { state: { roomId } });
+    });
 
-  	const completeTransaction = ReservationDetailComponent.createTransaction('completed', (): void => {
-  		self.router.navigate(
-  			[this.language, 'reservation', reservationId, 'rooms', roomId, 'customer', customerId, 'complete']);
-  	});
+    const completeTransaction = ReservationDetailComponent.createTransaction('completed', (): void => {
+      self.router.navigate(
+        [this.language, 'reservation', reservationId, 'rooms', roomId, 'customer', customerId, 'complete']);
+    });
 
-  	const moreTransaction = ReservationDetailComponent.createTransaction('more', (): void => {
-  		self.router.navigate([this.language, 'reservation', reservationId, 'more-info']);
-  	});
+    const moreTransaction = ReservationDetailComponent.createTransaction('more', (): void => {
+      self.router.navigate([this.language, 'reservation', reservationId, 'more-info']);
+    });
 
-  	const changeCustomerTransaction = ReservationDetailComponent.createTransaction('change',
-  		(): void => self.changeUser(reservation));
+    const changeCustomerTransaction = ReservationDetailComponent.createTransaction('change',
+      (): void => self.changeUser(reservation));
 
-  	const changeColorTransaction = ReservationDetailComponent.createTransaction('color',
-  		(): void => self.changeColor(reservation));
+    const changeColorTransaction = ReservationDetailComponent.createTransaction('color',
+      (): void => self.changeColor(reservation));
 
-  	const cloneTransaction = ReservationDetailComponent.createTransaction('clone',
-  		(): void => self.clone(reservation));
+    const cloneTransaction = ReservationDetailComponent.createTransaction('clone',
+      (): void => self.clone(reservation));
 
-  	const options = Object.values(CancelOption).filter(co => co !== CancelOption.charge);
-  	const cancelTransaction = ReservationDetailComponent.createTransaction('cancelled', (): void =>
-  		self.cancel(reservation, options, self.price, result => {
-  			if (result) {
-  				this.reservation = undefined;
-  				this.store.dispatch(
-  					new fromActionsReservation.CancelReservation({ id: reservation.id, paymentCancellation: result }),
-  				);
-  			}
-  		}));
+    const options = Object.values(CancelOption).filter(co => co !== CancelOption.charge);
+    const cancelTransaction = ReservationDetailComponent.createTransaction('cancelled', (): void =>
+      self.cancel(reservation, options, self.price, result => {
+        if (result) {
+          this.reservation = undefined;
+          this.store.dispatch(
+            new fromActionsReservation.CancelReservation(reservation.id, result),
+          );
+        }
+      }));
 
-  	const finishTransaction = ReservationDetailComponent.createTransaction('completed', (): void => {
-  		self.reservation = undefined;
-  		self.store.dispatch(
-  			new fromActionsReservation.PaymentCompleteReservation(reservationId),
-  		);
-  	});
+    const finishTransaction = ReservationDetailComponent.createTransaction('completed', (): void => {
+      self.reservation = undefined;
+      self.store.dispatch(
+        new fromActionsReservation.PaymentCompleteReservation(reservationId),
+      );
+    });
 
-  	const bookTransaction = ReservationDetailComponent.createTransaction('booked', (): void => {
-  		const customer = reservation.customer;
-  		const room = reservation.room;
-  		const treatment = reservation.treatment;
-  		const professional = reservation.professional;
-  		const data = { customer, room, treatment, professional };
-  		this.router.navigate([this.language, 'reservation'], { state: data });
-  	});
+    const bookTransaction = ReservationDetailComponent.createTransaction('booked', (): void => {
+      const customer = reservation.customer;
+      const room = reservation.room;
+      const treatment = reservation.treatment;
+      const professional = reservation.professional;
+      const data = { customer, room, treatment, professional };
+      this.router.navigate([this.language, 'reservation'], { state: data });
+    });
 
-  	const approved = {
-  		transitions: {
-  			start: startTransaction,
-  			cancel: cancelTransaction,
-  			edit: editTransaction,
-  			send: sendMessageTransaction,
-  			coffee: coffeeMessageTransaction,
-  			more: moreTransaction,
-  			clone: cloneTransaction,
-  		},
-  		next: approveActions,
-  	};
+    const approved = {
+      transitions: {
+        start: startTransaction,
+        cancel: cancelTransaction,
+        edit: editTransaction,
+        send: sendMessageTransaction,
+        coffee: coffeeMessageTransaction,
+        more: moreTransaction,
+        clone: cloneTransaction,
+      },
+      next: approveActions,
+    };
 
-  	let completeActions: IFabMenu[] = [book];
-  	if (reservation.configurationCanCustomerChange) {
-  		completeActions = [...completeActions, change];
-  	}
-  	completeActions = [...completeActions, more, color, clone];
+    let completeActions: IFabMenu[] = [book];
+    if (reservation.configurationCanCustomerChange) {
+      completeActions = [...completeActions, change];
+    }
+    completeActions = [...completeActions, more, color, clone];
 
-  	const completed = {
-  		transitions: {
-  			book: bookTransaction,
-  			more: moreTransaction,
-  			change: changeCustomerTransaction,
-  			color: changeColorTransaction,
-  			clone: cloneTransaction,
-  		},
-  		next: completeActions,
-  	};
+    const completed = {
+      transitions: {
+        book: bookTransaction,
+        more: moreTransaction,
+        change: changeCustomerTransaction,
+        color: changeColorTransaction,
+        clone: cloneTransaction,
+      },
+      next: completeActions,
+    };
 
-  	this.machine = ReservationDetailComponent.createMachine({
-  		initialState: ReservationIconName.created,
-  		created: {
-  			transitions: {
-  				approve: approveTransaction,
-  				cancel: cancelTransaction,
-  				edit: editTransaction,
-  				more: moreTransaction,
-  				clone: cloneTransaction,
-  			},
-  			next: [approve, edit, cancel, more, clone],
-  		},
-  		approved,
-  		paid: approved,
-  		partiallyPaid: approved,
-  		started: {
-  			transitions: {
-  				complete: completeTransaction,
-  			},
-  			next: [complete],
-  		},
-  		partiallyCompleted: {
-  			transitions: {
-  				complete: finishTransaction,
-  				more: moreTransaction,
-  			},
-  			next: [complete, more],
-  		},
-  		completed,
-  		cancelled: {
-  			transitions: {
-  				clone: cloneTransaction,
-  			},
-  			next: [clone],
-  		},
-  		cancelledPaymentRequired: {
-  			next: [],
-  		},
-  		editCancelled: {
-  			next: [],
-  		},
-  	}, initialState);
+    this.machine = ReservationDetailComponent.createMachine({
+      initialState: ReservationIconName.created,
+      created: {
+        transitions: {
+          approve: approveTransaction,
+          cancel: cancelTransaction,
+          edit: editTransaction,
+          more: moreTransaction,
+          clone: cloneTransaction,
+        },
+        next: [approve, edit, cancel, more, clone],
+      },
+      approved,
+      paid: approved,
+      partiallyPaid: approved,
+      started: {
+        transitions: {
+          complete: completeTransaction,
+        },
+        next: [complete],
+      },
+      partiallyCompleted: {
+        transitions: {
+          complete: finishTransaction,
+          more: moreTransaction,
+        },
+        next: [complete, more],
+      },
+      completed,
+      cancelled: {
+        transitions: {
+          clone: cloneTransaction,
+        },
+        next: [clone],
+      },
+      cancelledPaymentRequired: {
+        next: [],
+      },
+      editCancelled: {
+        next: [],
+      },
+    }, initialState);
   };
 
   private customerMachine = (self: this): any => {
-  	if (!self.reservation) {
-  		return;
-  	}
-  	const reservation: IReservationAll = self.reservation;
-  	const reservationId = reservation.id;
-  	const initialState = reservation.state;
-  	const translate = self.translate;
+    if (!self.reservation) {
+      return;
+    }
+    const reservation: IReservationAll = self.reservation;
+    const reservationId = reservation.id;
+    const initialState = reservation.state;
+    const translate = self.translate;
 
-  	const book = this.createAction(translate.instant('RESERVATION.ACTION.BOOK'),
-  		ReservationIconName.book, 'book', 'primary');
+    const book = this.createAction(translate.instant('RESERVATION.ACTION.BOOK'),
+      ReservationIconName.book, 'book', 'primary');
 
-  	let cancelIcon = ReservationIconName.cancelled;
-  	let cancelOptions: string[] = [];
-  	const price = self.price;
-  	let showPenalty = false;
-  	/* CANCEL */
-  	if (reservation.canEdit) {
-  		if (price.totalPaid) {
-  			cancelOptions = [CancelOption.discount, CancelOption.refund];
-  		} else {
-  			cancelOptions = [CancelOption.none];
-  		}
-  		cancelIcon = ReservationIconName.freeCancellation;
-  	} else {
-  		const penaltyToPay = (price.total * PENALTY / 100);
-  		price.setPenalty(penaltyToPay);
-  		if (price.totalPaid < penaltyToPay) {
-  			cancelOptions = [CancelOption.charge];
-  			showPenalty = true;
-  		} else if (price.totalPaid === penaltyToPay) {
-  			cancelOptions = [CancelOption.none];
-  			cancelIcon = ReservationIconName.freeCancellation;
-  		} else {
-  			cancelOptions = [CancelOption.chargeWithDiscount, CancelOption.chargeWithRefund];
-  			showPenalty = true;
-  			cancelIcon = ReservationIconName.freeCancellation;
-  		}
-  	}
+    let cancelIcon = ReservationIconName.cancelled;
+    let cancelOptions: string[] = [];
+    const price = self.price;
+    let showPenalty = false;
+    /* CANCEL */
+    if (reservation.canEdit) {
+      if (price.totalPaid) {
+        cancelOptions = [CancelOption.discount, CancelOption.refund];
+      } else {
+        cancelOptions = [CancelOption.none];
+      }
+      cancelIcon = ReservationIconName.freeCancellation;
+    } else {
+      const penaltyToPay = (price.total * PENALTY / 100);
+      price.setPenalty(penaltyToPay);
+      if (price.totalPaid < penaltyToPay) {
+        cancelOptions = [CancelOption.charge];
+        showPenalty = true;
+      } else if (price.totalPaid === penaltyToPay) {
+        cancelOptions = [CancelOption.none];
+        cancelIcon = ReservationIconName.freeCancellation;
+      } else {
+        cancelOptions = [CancelOption.chargeWithDiscount, CancelOption.chargeWithRefund];
+        showPenalty = true;
+        cancelIcon = ReservationIconName.freeCancellation;
+      }
+    }
 
-  	const cancel = this.createAction(translate.instant('RESERVATION.ACTION.CANCEL'), cancelIcon, 'cancel', 'warn');
+    const cancel = this.createAction(translate.instant('RESERVATION.ACTION.CANCEL'), cancelIcon, 'cancel', 'warn');
 
-  	const cancelTransaction = ReservationDetailComponent.createTransaction('cancelled', (): void =>
-  		self.cancel(reservation, cancelOptions, price, result => {
-  			if (result) {
-  				this.reservation = undefined;
-  				this.store.dispatch(
-  					new fromActionsReservation.CustomerCancelReservation({ id: reservation.id, paymentCancellation: result }),
-  				);
-  			}
-  		}, showPenalty, self.options));
+    const cancelTransaction = ReservationDetailComponent.createTransaction('cancelled', (): void =>
+      self.cancel(reservation, cancelOptions, price, result => {
+        if (result) {
+          this.reservation = undefined;
+          this.store.dispatch(
+            new fromActionsReservation.CustomerCancelReservation(reservation.id, result),
+          );
+        }
+      }, showPenalty, self.options));
 
-  	const bookTransaction = ReservationDetailComponent.createTransaction('booked', (): void => {
-  		const room = reservation.room;
-  		const treatment = reservation.treatment;
-  		const professional = reservation.professional;
-  		const data = { room, treatment, professional };
-  		this.router.navigate([this.language, 'me', 'reservation'], { state: data });
-  	});
+    const bookTransaction = ReservationDetailComponent.createTransaction('booked', (): void => {
+      const room = reservation.room;
+      const treatment = reservation.treatment;
+      const professional = reservation.professional;
+      const data = { room, treatment, professional };
+      this.router.navigate([this.language, 'me', 'reservation'], { state: data });
+    });
 
-  	const created = {
-  		transitions: {
-  			edit: null,
-  			cancelEdit: null,
-  			cancel: cancelTransaction,
-  		},
-  		next: [cancel],
-  	};
+    const created = {
+      transitions: {
+        edit: null,
+        cancelEdit: null,
+        cancel: cancelTransaction,
+      },
+      next: [cancel],
+    };
 
-  	const approved = {
-  		transitions: {
-  			edit: null,
-  			cancelEdit: null,
-  			cancel: cancelTransaction,
-  			pay: null,
-  		},
-  		next: [cancel],
-  	};
+    const approved = {
+      transitions: {
+        edit: null,
+        cancelEdit: null,
+        cancel: cancelTransaction,
+        pay: null,
+      },
+      next: [cancel],
+    };
 
-  	const paid = {
-  		transitions: {
-  			edit: null,
-  			cancelEdit: null,
-  			cancel: cancelTransaction,
-  		},
-  		next: [cancel],
-  	};
+    const paid = {
+      transitions: {
+        edit: null,
+        cancelEdit: null,
+        cancel: cancelTransaction,
+      },
+      next: [cancel],
+    };
 
-  	const partiallyCompleted = {
-  		transitions: {
-  			pay: null,
-  		},
-  		next: [] as any[],
-  	};
+    const partiallyCompleted = {
+      transitions: {
+        pay: null,
+      },
+      next: [] as any[],
+    };
 
-  	const cancelledPaymentRequired = {
-  		transitions: {
-  			pay: null,
-  			notify: null,
-  		},
-  		next: [] as any[],
-  	};
+    const cancelledPaymentRequired = {
+      transitions: {
+        pay: null,
+        notify: null,
+      },
+      next: [] as any[],
+    };
 
-  	/* EDIT */
-  	if (reservation.canEdit || price.totalPaid >= price.penalty) {
-  		const edit = this.createAction(translate.instant('RESERVATION.ACTION.EDIT'),
-  			ReservationIconName.edit, 'edit', 'accent');
+    /* EDIT */
+    if (reservation.canEdit || price.totalPaid >= price.penalty) {
+      const edit = this.createAction(translate.instant('RESERVATION.ACTION.EDIT'),
+        ReservationIconName.edit, 'edit', 'accent');
 
-  		const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void => {
-  			self.router.navigate([this.language, 'me', 'reservation', reservationId]);
-  		});
+      const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void => {
+        self.router.navigate([this.language, 'me', 'reservation', reservationId]);
+      });
 
-  		created.transitions.edit = editTransaction;
-  		created.next.unshift(edit);
+      created.transitions.edit = editTransaction;
+      created.next.unshift(edit);
 
-  		approved.transitions.edit = editTransaction;
-  		approved.next.unshift(edit);
+      approved.transitions.edit = editTransaction;
+      approved.next.unshift(edit);
 
-  		paid.transitions.edit = editTransaction;
-  		paid.next.unshift(edit);
-  	} else {
-  		const edit = this.createAction(translate.instant('RESERVATION.ACTION.EDIT'),
-  			ReservationIconName.edit, 'cancel_edit', 'accent');
+      paid.transitions.edit = editTransaction;
+      paid.next.unshift(edit);
+    } else {
+      const edit = this.createAction(translate.instant('RESERVATION.ACTION.EDIT'),
+        ReservationIconName.edit, 'cancel_edit', 'accent');
 
-  		const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void =>
-  			customerEditDialog(self.dialog, self.router, reservationId, reservation.room.currency, self.small,
-  				self.language, price));
+      const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void =>
+        customerEditDialog(self.dialog, self.router, reservationId, reservation.room.currency, self.small,
+          self.language, price));
 
-  		created.transitions.cancelEdit = editTransaction;
-  		created.next.unshift(edit);
+      created.transitions.cancelEdit = editTransaction;
+      created.next.unshift(edit);
 
-  		approved.transitions.cancelEdit = editTransaction;
-  		approved.next.unshift(edit);
+      approved.transitions.cancelEdit = editTransaction;
+      approved.next.unshift(edit);
 
-  		paid.transitions.cancelEdit = editTransaction;
-  		paid.next.unshift(edit);
-  	}
+      paid.transitions.cancelEdit = editTransaction;
+      paid.next.unshift(edit);
+    }
 
-  	if (reservation.paymentRequired) {
-  		const paymentPending = self.paymentPaid?.filter((p: IPayment) => p.status === 'PENDING')[0];
-  		if (paymentPending) {
-  			const notify = this.createAction(translate.instant('RESERVATION.ACTION.NOTIFY'),
-  				ReservationIconName.notify, 'notify');
-  			cancelledPaymentRequired.next = [notify];
+    if (reservation.paymentRequired) {
+      const paymentPending = self.paymentPaid?.filter((p: IPayment) => p.status === 'PENDING')[0];
+      if (paymentPending) {
+        const notify = this.createAction(translate.instant('RESERVATION.ACTION.NOTIFY'),
+          ReservationIconName.notify, 'notify');
+        cancelledPaymentRequired.next = [notify];
 
-  			cancelledPaymentRequired.transitions.notify =
+        cancelledPaymentRequired.transitions.notify =
           ReservationDetailComponent.createTransaction('cancelledPaymentRequired', (): void => {
-          	this.notify(paymentPending);
+            this.notify(paymentPending);
           });
-  		} else {
-  			const pay = this.createAction(translate.instant('RESERVATION.ACTION.PAY'),
-  				ReservationIconName.payment, 'pay', 'blue');
-  			cancelledPaymentRequired.next = [pay];
+      } else {
+        const pay = this.createAction(translate.instant('RESERVATION.ACTION.PAY'),
+          ReservationIconName.payment, 'pay', 'blue');
+        cancelledPaymentRequired.next = [pay];
 
-  			cancelledPaymentRequired.transitions.pay =
+        cancelledPaymentRequired.transitions.pay =
           ReservationDetailComponent.createTransaction('cancelledPaymentRequired', (): void => {
-          	this.router.navigate(['/', this.language, 'me', 'payment',
-          		self.paymentPaid?.filter((p: IPayment) => p.status !== 'APPROVED')[0]?.id]);
+            this.router.navigate(['/', this.language, 'me', 'payment',
+              self.paymentPaid?.filter((p: IPayment) => p.status !== 'APPROVED')[0]?.id]);
           });
-  		}
-  		self.addActions();
-  	}
+      }
+      self.addActions();
+    }
 
-  	if (price.total > price.totalPaid) {
-  		const next = this.createAction(translate.instant('RESERVATION.ACTION.PAY'),
-  			ReservationIconName.payment, 'pay', 'blue');
-  		approved.next = [...approved.next, next];
-  		partiallyCompleted.next = [...partiallyCompleted.next, next];
+    if (price.total > price.totalPaid) {
+      const next = this.createAction(translate.instant('RESERVATION.ACTION.PAY'),
+        ReservationIconName.payment, 'pay', 'blue');
+      approved.next = [...approved.next, next];
+      partiallyCompleted.next = [...partiallyCompleted.next, next];
 
-  		const transaction = ReservationDetailComponent.createTransaction('paid',
-  			(): void => {
-  				this.router.navigate(['/', this.language, 'me', 'reservation', reservation.id, 'payment', 'option']);
-  			});
-  		approved.transitions.pay = transaction;
-  		partiallyCompleted.transitions.pay = transaction;
-  	}
+      const transaction = ReservationDetailComponent.createTransaction('paid',
+        (): void => {
+          this.router.navigate(['/', this.language, 'me', 'reservation', reservation.id, 'payment', 'option']);
+        });
+      approved.transitions.pay = transaction;
+      partiallyCompleted.transitions.pay = transaction;
+    }
 
-  	this.machine = ReservationDetailComponent.createMachine({
-  		initialState: ReservationIconName.created,
-  		created,
-  		approved,
-  		paid,
-  		partiallyPaid: approved,
-  		started: {
-  			next: [],
-  		},
-  		partiallyCompleted,
-  		completed: {
-  			transitions: {
-  				book: bookTransaction,
-  			},
-  			next: [book],
-  		},
-  		cancelled: {
-  			next: [],
-  		},
-  		editCancelled: {
-  			next: [],
-  		},
-  		cancelledPaymentRequired,
-  	}, initialState);
+    this.machine = ReservationDetailComponent.createMachine({
+      initialState: ReservationIconName.created,
+      created,
+      approved,
+      paid,
+      partiallyPaid: approved,
+      started: {
+        next: [],
+      },
+      partiallyCompleted,
+      completed: {
+        transitions: {
+          book: bookTransaction,
+        },
+        next: [book],
+      },
+      cancelled: {
+        next: [],
+      },
+      editCancelled: {
+        next: [],
+      },
+      cancelledPaymentRequired,
+    }, initialState);
   };
 
   private addActions = (): void => {
-  	if (!this.paymentDisplayedColumns.includes('actions')) {
-  		this.paymentDisplayedColumns.splice(this.paymentDisplayedColumns.length - 1, 0, 'actions');
-  	}
+    if (!this.paymentDisplayedColumns.includes('actions')) {
+      this.paymentDisplayedColumns.splice(this.paymentDisplayedColumns.length - 1, 0, 'actions');
+    }
   };
 
   private changeUser = (reservation: IReservationAll): void => executeDialog(
-  	this.dialog,
-  	ChangeCustomerDialogComponent,
-  	{
-  		customerId: reservation.customer.id,
-  		small: this.small,
-  	},
-  	result => {
-  		if (result) {
-  			this.reservation = undefined;
-  			this.store.dispatch(
-  				new fromActionsReservation.UpdateCustomerByReservationId(
-            { customerId: result.customerId, reservationId: reservation.id },
-          ),
-  			);
-  		}
-  	},
-  	true,
+    this.dialog,
+    ChangeCustomerDialogComponent,
+    {
+      customerId: reservation.customer.id,
+      small: this.small,
+    },
+    result => {
+      if (result) {
+        this.reservation = undefined;
+        this.store.dispatch(
+          new fromActionsReservation.UpdateReservationCustomer(reservation.id, result.customerId),
+        );
+      }
+    },
+    true,
   );
 
   private changeColor = (reservation: IReservationAll): void => executeDialog(
-  	this.dialog,
-  	ChangeColorDialogComponent,
-  	{
-  		treatmentId: reservation.treatment.key,
-  		colorId: reservation.treatment.color?.id,
-  		small: this.small,
-  	},
-  	result => {
-  		if (result) {
-  			this.reservation = undefined;
-  			this.store.dispatch(
-  				new fromActionsReservation.UpdateColorByReservationId(
-            { colorId: result.colorId, reservationId: reservation.id },
-          ),
-  			);
-  		}
-  	},
-  	true,
+    this.dialog,
+    ChangeColorDialogComponent,
+    {
+      treatmentId: reservation.treatment.key,
+      colorId: reservation.treatment.color?.id,
+      small: this.small,
+    },
+    result => {
+      if (result) {
+        this.reservation = undefined;
+        this.store.dispatch(
+          new fromActionsReservation.UpdateReservationColor(reservation.id, result.colorId),
+        );
+      }
+    },
+    true,
   );
 
   private clone = (reservation: IReservationAll): void => executeDialog(
-  	this.dialog,
-  	ReservationCloneDialogComponent,
-  	{
-  		room: reservation.room,
-  		small: this.small,
-  	},
-  	result => {
-  		if (result) {
-  			if (result.time) {
-  				const timeValue = getTimeNumber(result.time);
-  				if (timeValue) {
-  					result.date.setHours(timeValue.hour, timeValue.minute);
-  				}
-  			}
-  			const state = {
-  				date: result.date,
-  				customer: reservation.customer,
-  				professionalId: reservation.professional.id,
-  				roomId: reservation.room.id,
-  				treatmentId: reservation.treatment.key,
-  				groupId: reservation.treatment.groupId,
-  				additionalIds: reservation.additional?.map(it => it.key),
-  				skip: true,
-  			};
-  			this.router.navigate([this.language, 'reservation'], { state });
-  		}
-  	},
-  	true,
+    this.dialog,
+    ReservationCloneDialogComponent,
+    {
+      room: reservation.room,
+      small: this.small,
+    },
+    result => {
+      if (result) {
+        if (result.time) {
+          const timeValue = getTimeNumber(result.time);
+          if (timeValue) {
+            result.date.setHours(timeValue.hour, timeValue.minute);
+          }
+        }
+        const state = {
+          date: result.date,
+          customer: reservation.customer,
+          professionalId: reservation.professional.id,
+          roomId: reservation.room.id,
+          treatmentId: reservation.treatment.key,
+          groupId: reservation.treatment.groupId,
+          additionalIds: reservation.additional?.map(it => it.key),
+          skip: true,
+        };
+        this.router.navigate([this.language, 'reservation'], { state });
+      }
+    },
+    true,
   );
 
   private cancel = (
-  	reservation: IReservationAll,
-  	options: string[], price: IPrice,
-  	afterClose: (result: any) => void,
-  	showPenalty?: boolean,
-  	paymentOptions?: IPaymentOption[],
+    reservation: IReservationAll,
+    options: string[], price: IPrice,
+    afterClose: (result: any) => void,
+    showPenalty?: boolean,
+    paymentOptions?: IPaymentOption[],
   ) => openCancel(this.dialog, reservation.room, this.small, options, afterClose, showPenalty, price, paymentOptions);
 
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe(state => {
-  		this.isCustomer = this.customerId === state.selected?.customer?.id;
-  		if (state.payments && state.payments[0].id) {
-  			if (this.isCustomer) {
-  				this.paymentPaid = state.payments.map((p: IPayment) => {
-  					if (p.status &&
+    this.subscription = this.getState.subscribe((state) => {
+      this.isCustomer = this.customerId === state.selected?.customer?.id;
+      if (state.payments && state.payments[0].id) {
+        if (this.isCustomer) {
+          this.paymentPaid = state.payments.map((p: IPayment) => {
+            if (p.status &&
               !['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND'].includes(p.status)) {
-  						this.addActions();
-  					}
-  					return p;
-  				}).sort((a?: IPaymentAll, b?: IPaymentAll) => b?.status && a?.status?.localeCompare(b?.status));
-  			} else {
-  				if (!this.payments.length) {
-  					let arr: any[] = [];
-  					this.paymentPaid = state.payments.map((p: IPayment) => {
-  						if (p.id) {
-  							const paymentForm = this.formBuilder.group({
-  								amount: [p.transactionAmount?.toFixed(2)],
-  								type: [p.type],
-  							});
-  							arr = [...arr, { amount: p.transactionAmount?.toFixed(2), type: p.type }];
-  							this.payments.push(paymentForm);
-  						}
-  						return p;
-  					});
-  					this.valueChanges(arr);
-  				} else {
-  					this.paymentPaid = state.payments;
-  				}
-  			}
-  		} else {
-  			this.paymentPaid = [];
-  		}
-  		if (state.selected) {
-  			this.duration = reservationDuration(state.selected);
-  			this.start = newDateTimestamp(state.selected.timestamp);
-  			this.end = createNewDate(this.start, this.start.getHours() + this.duration.hour,
-  				this.start.getMinutes() + this.duration.minute);
-  			this.state = state.selected.state;
-  			this.reservation = state.selected;
-  			const isProfessionalAdmin = this.professionalId &&
+              this.addActions();
+            }
+            return p;
+          }).sort((a?: IPaymentAll, b?: IPaymentAll) => b?.status && a?.status?.localeCompare(b?.status));
+        } else {
+          if (!this.payments.length) {
+            let arr: any[] = [];
+            this.paymentPaid = state.payments.map((p: IPayment) => {
+              if (p.id) {
+                const paymentForm = this.formBuilder.group({
+                  amount: [p.transactionAmount?.toFixed(2)],
+                  type: [p.type],
+                });
+                arr = [...arr, { amount: p.transactionAmount?.toFixed(2), type: p.type }];
+                this.payments.push(paymentForm);
+              }
+              return p;
+            });
+            this.valueChanges(arr);
+          } else {
+            this.paymentPaid = state.payments;
+          }
+        }
+      } else {
+        this.paymentPaid = [];
+      }
+      if (state.selected) {
+        this.duration = reservationDuration(state.selected);
+        this.start = newDateTimestamp(state.selected.timestamp);
+        this.end = createNewDate(this.start, this.start.getHours() + this.duration.hour,
+          this.start.getMinutes() + this.duration.minute);
+        this.state = state.selected.state;
+        this.reservation = state.selected;
+        const isProfessionalAdmin = this.professionalId &&
           isProfessional(this.professionalId, this.reservation?.room?.professionals);
-  			this.isReservationAdmin = isProfessionalAdmin || this.hasRoomAdmin;
-  			if (this.reservation && this.reservation.treatment) {
-  				this.price = getPrice(this.reservation, this.paymentPaid);
-  			}
-  			if (isProfessionalAdmin) {
-  				this.professionalMachine(this);
-  				this.changeState = this.machine.next(snakeToCamel(this.reservation?.state));
-  			} else if (this.isCustomer) {
-  				const types = state.selected.room.paymentTypes.filter(
-  					(p: PaymentType) => ![PaymentType.cash, PaymentType.transfer]
-  						.includes(p));
-  				if (types?.includes(PaymentType.paynl)) {
-  					this.getOptions();
-  				} else {
-  					this.options = getPaymentOptions(this.translate, types);
-  				}
-  				this.customerMachine(this);
-  				this.changeState = this.machine.next(snakeToCamel(state.selected.state));
-  				if (state.selected.state === States.completed) {
-  					this.showFireworks = true;
-  					setTimeout(() => {
-  						this.showFireworks = false;
-  					}, 5000);
-  				}
-  			}
-  		}
-  		this.history = state.history;
-  		this.dataSource = new MatTableDataSource(state.history);
-  		if (this.history && this.history[0]?.id) {
-  			this.dataSource.paginator = this.paginator;
-  			if (this.reservation) {
-  				const allReservations = [...this.history, this.reservation]
-  					.sort((a, b) => a.timestamp - b.timestamp).map(reservation => reservation.id);
+        this.isReservationAdmin = isProfessionalAdmin || this.hasRoomAdmin;
+        if (this.reservation && this.reservation.treatment) {
+          this.price = getPrice(this.reservation, this.paymentPaid);
+        }
+        if (isProfessionalAdmin) {
+          this.professionalMachine(this);
+          this.changeState = this.machine.next(snakeToCamel(this.reservation?.state));
+        } else if (this.isCustomer) {
+          const types = state.selected.room.paymentTypes.filter(
+            (p: PaymentType) => ![PaymentType.cash, PaymentType.transfer]
+              .includes(p));
+          if (types?.includes(PaymentType.paynl)) {
+            this.getOptions();
+          } else {
+            this.options = getPaymentOptions(this.translate, types);
+          }
+          this.customerMachine(this);
+          this.changeState = this.machine.next(snakeToCamel(state.selected.state));
+          if (state.selected.state === States.completed) {
+            this.showFireworks = true;
+            setTimeout(() => {
+              this.showFireworks = false;
+            }, 5000);
+          }
+        }
+      }
+      this.history = state.history;
+      this.dataSource = new MatTableDataSource(state.history);
+      if (this.history && this.history[0]?.id) {
+        this.dataSource.paginator = this.paginator;
+        if (this.reservation) {
+          const allReservations = [...this.history, this.reservation]
+            .sort((a, b) => a.timestamp - b.timestamp).map(reservation => reservation.id);
 
-  				const currentIndex = allReservations.indexOf(this.reservation.id);
-  				if (currentIndex > 0) {
-  					const previous = 'previous';
-  					const previousAction = this.createAction(this.translate.instant('RESERVATION.ACTION.PREVIOUS'),
-  						ReservationIconName.previous, previous, 'gray');
-  					const previousTransition = ReservationDetailComponent.createTransaction(
+          const currentIndex = allReservations.indexOf(this.reservation.id);
+          if (currentIndex > 0) {
+            const previous = 'previous';
+            const previousAction = this.createAction(this.translate.instant('RESERVATION.ACTION.PREVIOUS'),
+              ReservationIconName.previous, previous, 'gray');
+            const previousTransition = ReservationDetailComponent.createTransaction(
               previous, () => this.router.navigate(
                 [this.language, 'reservation', allReservations[currentIndex - 1]],
               ));
-  					ReservationDetailComponent.addTransitionToAllStates(previous, previousTransition, previousAction,
+            ReservationDetailComponent.addTransitionToAllStates(previous, previousTransition, previousAction,
               false);
-  				}
-  				if (currentIndex >= 0 && currentIndex < allReservations.length - 1) {
-  					const next = 'next';
-  					const nextAction = this.createAction(this.translate.instant('RESERVATION.ACTION.NEXT'),
-  						ReservationIconName.next, next, 'gray');
-  					const nextTransition = ReservationDetailComponent.createTransaction(next,
-  						() => this.router.navigate([this.language, 'reservation', allReservations[currentIndex + 1]],
-  						));
-  					ReservationDetailComponent.addTransitionToAllStates(next, nextTransition, nextAction);
-  				}
-  			}
-  		}
-  		if (state.errorMessage || state.message) {
-  			if (state.message) {
-  				const id: string | null = this.route.snapshot.paramMap.get('id');
-  				this.getReservation(id);
-  			}
-  		}
-  	});
-  	this.paymentSubscription = this.getPaymentState.subscribe(state => this.options = getPayNlOptions(state.data));
+          }
+          if (currentIndex >= 0 && currentIndex < allReservations.length - 1) {
+            const next = 'next';
+            const nextAction = this.createAction(this.translate.instant('RESERVATION.ACTION.NEXT'),
+              ReservationIconName.next, next, 'gray');
+            const nextTransition = ReservationDetailComponent.createTransaction(next,
+              () => this.router.navigate([this.language, 'reservation', allReservations[currentIndex + 1]],
+              ));
+            ReservationDetailComponent.addTransitionToAllStates(next, nextTransition, nextAction);
+          }
+        }
+      }
+      if (state.response) {
+        const id: string | null = this.route.snapshot.paramMap.get('id');
+        this.getReservation(id!);
+      }
+    });
+    this.paymentSubscription = this.getPaymentState.subscribe(state => this.options = getPayNlOptions(state.data));
   };
 }

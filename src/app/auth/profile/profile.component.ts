@@ -103,7 +103,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     user.address = createAddress(this.formattedAddress, this.geometry?.location, this.user?.address);
 
     this.store.dispatch(
-      new fromActionsUser.UpdateMe({ user, redirectUrl: `/${ getLocale(lang).language }/auth/profile` }),
+      new fromActionsUser.UpdateMyUser(user, `/${ getLocale(lang).language }/auth/profile`),
     );
     return;
   }
@@ -135,7 +135,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
               this.resizedImage.nativeElement.src = dataUrl;
             }
             this.store.dispatch(
-              new fromActionsUser.UpdateMePhoto(dataUrl),
+              new fromActionsUser.UpdateMyPhoto(dataUrl),
             );
           }
         };
@@ -168,7 +168,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     };
   };
 
-  private findMe = (): void => this.store.dispatch(new fromActionsUser.FindMe());
+  private findMe = (): void => this.store.dispatch(new fromActionsUser.GetMyUser());
 
   private createForm = (): void => {
     this.form = this.formBuilder.group({
@@ -202,7 +202,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.selected) {
         const user = state.selected;
         this.user = user;
@@ -242,7 +242,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
       }
-      if (state.message) {
+      if (state.response) {
         this.clean();
         this.findMe();
       }

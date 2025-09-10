@@ -33,7 +33,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { MessagingService } from '../services/messaging.service';
 import { environment } from '../../environments/environment';
 import { getDisplayNameInitials, getUserImage } from '../util/helper';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { NavigationService } from '../services/navigation.service';
 import { TokenService } from '../services/token.service';
 import { CookieService } from 'ngx-cookie-service';
@@ -47,7 +46,8 @@ import { SharedModule } from '../shared/shared.module';
 import { MenuItemComponent } from './menu-item/menu-item.component';
 import { ErrorComponent } from '../shared/error/error.component';
 import { MatRipple } from '@angular/material/core';
-import { LinkMessageSnackBarComponent } from '../shared/snack/link-message-snack-bar/link-message-snack-bar.component';
+import { ResponseSuccess } from '../interfaces/common';
+import { ToastService } from '../services/toast.service';
 
 @Component({
   selector: 'app-nav',
@@ -62,7 +62,7 @@ export class NavComponent implements OnInit, OnDestroy {
   private router: Router = inject(Router);
   private store: Store<AppState> = inject(Store<AppState>);
   private messagingService: MessagingService = inject(MessagingService);
-  private snackBar: MatSnackBar = inject(MatSnackBar);
+  private toastService: ToastService = inject(ToastService);
   private navigationService: NavigationService = inject(NavigationService);
   private cookieService: CookieService = inject(CookieService);
   private overlayContainer: OverlayContainer = inject(OverlayContainer);
@@ -134,7 +134,7 @@ export class NavComponent implements OnInit, OnDestroy {
     const message = this.translate.instant(
       `COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode.toString().toUpperCase() }`);
     return this.store.dispatch(
-      new fromActionsUser.UpdateMe({ user, redirectUrl, message }),
+      new fromActionsUser.UpdateMyUser(user, redirectUrl, message),
     );
   }
 
@@ -170,7 +170,7 @@ export class NavComponent implements OnInit, OnDestroy {
         return value;
       });
       this.store.dispatch(
-        new fromActionsNotification.ReadNotificationById(notification),
+        new fromActionsNotification.ReadNotification(notification.id),
       );
     }
   };
@@ -186,18 +186,17 @@ export class NavComponent implements OnInit, OnDestroy {
       this.isLoading = state.isLoading;
       if (!state.subErrors) {
         this.error = state.error;
-        if (state.errorMessage || state.message) {
-          const snackBarRef = this.snackBar.openFromComponent(LinkMessageSnackBarComponent, {
-            duration: 5000,
-            data: {
-              message: state.errorMessage || state.message,
-              path: state.path,
-              language: this.language,
-            },
+        if (state.errorMessage) {
+          this.toastService.error(state.errorMessage);
+        } else if (state.response) {
+          const response: ResponseSuccess = state.response;
+          const path = response.path ? `/${ this.language }/${ response.path }` : undefined;
+          const toastRef = this.toastService.show(response.message, response.toastType, 5000, 'link', path);
+          toastRef.onDismiss().subscribe(() => {
+            if (state.reload) {
+              this.navigationService.reload(this.router.url.split('/'));
+            }
           });
-          if (state.reload) {
-            snackBarRef.afterDismissed().subscribe(() => this.navigationService.reload(this.router.url.split('/')));
-          }
         }
       }
     }),
@@ -224,13 +223,8 @@ export class NavComponent implements OnInit, OnDestroy {
 
   private getNotifications = (): void => {
     if (!this.countNotifications) {
-      const payload = {
-        active: 'date',
-        direction: 'desc',
-        page: 0,
-      };
       this.store.dispatch(
-        new fromActionsNotification.GetNotificationsPage(payload),
+        new fromActionsNotification.GetNotificationsPage(0, 'date', 'desc'),
       );
     }
   };
@@ -245,7 +239,7 @@ export class NavComponent implements OnInit, OnDestroy {
         this.getNotifications();
       }
     });
-    this.authSubscription = this.getState.subscribe(state => {
+    this.authSubscription = this.getState.subscribe((state) => {
       this.isAuthorized = state.isAuthenticated;
       this.isLoading = state.isLoading;
       if (state.isAuthenticated) {

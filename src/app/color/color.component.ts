@@ -64,7 +64,7 @@ export class ColorComponent implements OnInit, OnDestroy {
   	} else {
   		color.id = this.id;
   		this.color = undefined;
-  		this.store.dispatch(new fromActionsColor.UpdateColorById(color));
+  		this.store.dispatch(new fromActionsColor.UpdateColor(this.id!, color));
   	}
   	return;
   }
@@ -100,13 +100,13 @@ export class ColorComponent implements OnInit, OnDestroy {
   private getColor = (): void => {
   	if (!this.color) {
   		this.store.dispatch(
-  			new fromActionsColor.FindColorById(this.id),
+  			new fromActionsColor.GetColor(this.id!),
   		);
   	}
   };
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe(state => {
+  	this.subscription = this.getState.subscribe((state) => {
   		if (state.selected) {
   			this.color = {
   				id: state.selected.id,
@@ -120,7 +120,7 @@ export class ColorComponent implements OnInit, OnDestroy {
   				this.errors[value.field] = value.message;
   				this.form.controls[value.field].setErrors({ incorrect: true });
   			});
-  		} else if (state.message) {
+  		} else if (state.response) {
   			this.router.navigate([this.language, 'colors']);
   		}
   	});

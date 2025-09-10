@@ -1,78 +1,75 @@
 import { Action } from '@ngrx/store';
+import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { IColor } from '../interfaces/color';
+import { Pagination } from '../interfaces/pagination';
 
 export enum ColorActionTypes {
   getColorsPage = '[Color] Get colors page',
   colorSuccess = '[Color] Success',
   createColor = '[Color] Create color',
-  updateColorById = '[Color] Update color by id',
+  updateColor = '[Color] Update color by id',
   colorSaveSuccess = '[Color] Save Success',
   colorFailure = '[Color] Failure',
   colorSelected = '[Color] Selected',
-  findColorById = '[Color] Find color by id',
-  deleteColorById = '[Color] Delete color by id',
+  getColor = '[Color] Find color by id',
+  deleteColor = '[Color] Delete color by id',
   clean = '[Color] Clean'
 }
 
-export class GetColorsPage implements Action {
+export class GetColorsPage extends PageRequest implements Action {
   readonly type = ColorActionTypes.getColorsPage;
-
-  constructor(public payload: any) {
-  }
 }
 
 export class ColorSuccess implements Action {
   readonly type = ColorActionTypes.colorSuccess;
 
-  constructor(public payload: any) {
+  constructor(public data: Pagination<IColor>) {
   }
 }
 
 export class CreateColor implements Action {
   readonly type = ColorActionTypes.createColor;
 
-  constructor(public payload: any) {
+  constructor(public color: IColor) {
   }
 }
 
-export class UpdateColorById implements Action {
-  readonly type = ColorActionTypes.updateColorById;
+export class UpdateColor implements Action {
+  readonly type = ColorActionTypes.updateColor;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public color: IColor) {
   }
 }
 
-export class ColorSaveSuccess implements Action {
+export class ColorSaveSuccess extends ResponseSuccess implements Action {
   readonly type = ColorActionTypes.colorSaveSuccess;
-
-  constructor(public payload: any) {
-  }
 }
 
 export class ColorFailure implements Action {
   readonly type = ColorActionTypes.colorFailure;
 
-  constructor(public payload: any) {
+  constructor(public error: IError) {
   }
 }
 
 export class ColorSelected implements Action {
   readonly type = ColorActionTypes.colorSelected;
 
-  constructor(public payload: any) {
+  constructor(public selected?: IColor) {
   }
 }
 
-export class FindColorById implements Action {
-  readonly type = ColorActionTypes.findColorById;
+export class GetColor implements Action {
+  readonly type = ColorActionTypes.getColor;
 
-  constructor(public payload: any) {
+  constructor(public id: string) {
   }
 }
 
-export class DeleteColorById implements Action {
-  readonly type = ColorActionTypes.deleteColorById;
+export class DeleteColor implements Action {
+  readonly type = ColorActionTypes.deleteColor;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public name: string) {
   }
 }
 
@@ -83,11 +80,11 @@ export class Clean implements Action {
 export type All =
   | GetColorsPage
   | CreateColor
-  | UpdateColorById
+  | UpdateColor
   | ColorSuccess
   | ColorSaveSuccess
   | ColorFailure
-  | FindColorById
+  | GetColor
   | ColorSelected
-  | DeleteColorById
+  | DeleteColor
   | Clean;

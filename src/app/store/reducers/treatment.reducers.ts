@@ -1,29 +1,30 @@
 import { Pagination } from '../../interfaces/pagination';
 import { All, TreatmentActionTypes } from '../treatment.actions';
 import { ITreatmentAll, ITreatmentGroup } from '../../interfaces/treatment';
-import { IColorAll } from '../../interfaces/color';
+import { IColor } from '../../interfaces/color';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 
 export interface State {
-  data: ITreatmentGroup | Pagination<ITreatmentGroup> | null;
-  history: ITreatmentAll[] | null;
-  colors: IColorAll[] | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  selected: ITreatmentGroup | null;
-  message: string | null;
+  response?: IResponseSuccess;
+  data?: ITreatmentGroup[] | Pagination<ITreatmentGroup>;
+  history?: ITreatmentAll[];
+  colors?: IColor[];
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
+  selected?: ITreatmentGroup;
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  data: null,
-  history: null,
-  colors: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  selected: null,
-  message: null,
+  data: undefined,
+  history: undefined,
+  colors: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  selected: undefined,
+  response: undefined,
   isLoading: false,
 };
 
@@ -33,97 +34,96 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<ITreatmentGroup>,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
+        response: undefined,
       };
     }
     case TreatmentActionTypes.getAllTreatmentsGroup: {
       return {
         ...state,
-        data: null,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        data: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
+        response: undefined,
       };
     }
     case TreatmentActionTypes.getAllColors: {
       return {
         ...state,
-        colors: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        colors: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
-    case TreatmentActionTypes.findTreatmentGroupById: {
+    case TreatmentActionTypes.getTreatmentGroup: {
       return {
         ...state,
-        data: {} as ITreatmentGroup,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        selected: {} as ITreatmentGroup,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case TreatmentActionTypes.treatmentSuccess: {
       return {
         ...state,
-        data: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        data: action.data,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case TreatmentActionTypes.colorSuccess: {
       return {
         ...state,
-        colors: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        colors: action.colors,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case TreatmentActionTypes.treatmentSaveSuccess: {
       return {
         ...state,
-        message: action.payload.message,
-        errorMessage: null,
-        selected: null,
-        subErrors: null,
+        response: action,
+        errorMessage: undefined,
+        selected: undefined,
+        subErrors: undefined,
         isLoading: false,
       };
     }
     case TreatmentActionTypes.treatmentSelected: {
       return {
         ...state,
-        selected: action.payload.treatment,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        selected: action.selected,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case TreatmentActionTypes.treatmentFailure: {
       return {
         ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
-        message: null,
+        errorMessage: action.error.message,
+        error: action.error,
+        subErrors: action.error.subErrors,
+        response: undefined,
         isLoading: false,
       };
     }
-    case TreatmentActionTypes.updateTreatmentGroupById:
+    case TreatmentActionTypes.updateTreatmentGroup:
     case TreatmentActionTypes.createTreatment:
-    case TreatmentActionTypes.deleteTreatmentGroupById: {
+    case TreatmentActionTypes.deleteTreatmentGroup: {
       return {
         ...state,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
-        selected: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
+        selected: undefined,
         isLoading: true,
       };
     }
@@ -131,19 +131,19 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         history: [{} as ITreatmentAll, {} as ITreatmentAll, {} as ITreatmentAll],
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
+        response: undefined,
       };
     }
     case TreatmentActionTypes.treatmentHistorySuccess: {
       return {
         ...state,
-        history: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        history: action.history,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case TreatmentActionTypes.clean: {

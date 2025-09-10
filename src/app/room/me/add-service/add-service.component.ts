@@ -56,7 +56,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     }
     return this.store.dispatch(
-      new fromActionsRoom.UpdateRoomServicesById({ id: this.roomId, prices }),
+      new fromActionsRoom.UpdateServices(this.roomId!, prices),
     );
   }
 
@@ -121,13 +121,13 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
     this.route.params.subscribe((routeParams) => {
       this.roomId = routeParams.id;
       this.store.dispatch(
-        new fromActionsRoom.FindRoomServicesById({ id: this.roomId }),
+        new fromActionsRoom.GetServices(this.roomId!),
       );
     });
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.services) {
         const currency = state.services.currency.code;
         this.additional = state.services.additionalList.map((value: any) =>
@@ -143,7 +143,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
         });
-      } else if (state.message) {
+      } else if (state.response) {
         this.getServices();
       }
     });

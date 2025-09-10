@@ -54,14 +54,14 @@ export class TreatmentSortingComponent implements OnInit, OnDestroy {
     if (!this.items) {
       const id = this.route.snapshot.paramMap.get('id');
       this.store.dispatch(
-        new fromActionsTreatment.FindTreatmentGroupById({ id, path: 'sorting' }),
+        new fromActionsTreatment.GetTreatmentGroup(id!, 'sorting'),
       );
     }
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
-      if (state.message) {
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.response) {
         this.clean();
         this.getTreatments();
       }

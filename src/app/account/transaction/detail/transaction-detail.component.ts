@@ -44,14 +44,10 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
   }
 
   get notify(): void {
+    const transaction = this.transaction!;
     return this.store.dispatch(
-      new fromActionsPayment.PaymentNotify({
-        id: this.transaction?.payment?.id,
-        resourceId: this.transaction?.id,
-        path: 'transaction',
-        preferenceId: this.transaction?.payment?.preferenceId,
-        type: this.transaction?.payment?.type,
-      }),
+      new fromActionsPayment.NotifyPayment(transaction.payment!.id!, 'transaction', transaction.id!,
+        transaction.payment!.preferenceId!, transaction.payment!.type!),
     );
   }
 
@@ -67,19 +63,20 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
   }
 
   private getTransaction = (): void => this.store.dispatch(
-    new fromActionsAccount.FindTransactionById({ id: this.id, transactionId: this.transactionId }),
+    new fromActionsAccount.GetTransaction(this.id!, this.transactionId!),
   );
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.selected) {
         this.transaction = Object.assign(
           {}, state.selected, { date: newDateTimestamp(state.selected.payment.timestamp) },
         );
       }
-      if (state.paths) {
-        this.router.navigate([this.language].concat(state.paths));
-      } else if (state.subErrors) {
+      const path = state.response?.path;
+      if (path) {
+        this.router.navigate([`${ this.language }/${ path }`]);
+      } else if (state.subErrors?.[0]?.message) {
         this.router.navigate([this.language, 'me', 'transaction', this.id, 'payment']);
       }
     });

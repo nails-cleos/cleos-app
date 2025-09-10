@@ -307,11 +307,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: event }, result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsReservation.UpdateTimestampByReservationId({
-            reservation: event.meta,
-            start: event.start.toLocaleString(API_LOCALE),
-            role: this.isRoomAdmin ? Role.roomAdmin : Role.professional,
-          }),
+          new fromActionsReservation.UpdateReservationTimestamp(event.meta.id,
+            event.start.toLocaleString(API_LOCALE), this.isRoomAdmin ? Role.roomAdmin : Role.professional,
+            event.meta.timeZone),
         );
       } else {
         event.start = oldStart;
@@ -559,12 +557,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
   private getReservations = (): void => {
     this.calendar.resetEvents();
     this.store.dispatch(
-      new fromActionsReservation.GetAllGroupingByRoom({
-        days: this.daysInWeek,
-        date: this.searchDate,
-        roomId: this.roomId,
-        professionalId: this.professionalSelectedId,
-      }),
+      new fromActionsReservation.GetAllGroupingByRoom(this.daysInWeek, this.searchDate, this.roomId!,
+        this.professionalSelectedId),
     );
   };
 

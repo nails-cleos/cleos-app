@@ -45,7 +45,7 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get finish(): void {
   	return this.store.dispatch(
-  		new fromActionsCatalogue.CatalogueUpdateAll(this.catalogues),
+  		new fromActionsCatalogue.UpdateCatalogueOrder(this.catalogues),
   	);
   }
 
@@ -82,7 +82,7 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
   	executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: catalogue }, result => {
   		if (result) {
   			this.store.dispatch(
-  				new fromActionsCatalogue.DeleteCatalogue(result),
+  				new fromActionsCatalogue.DeleteCatalogue(result.id, result.name),
   			);
   		}
   	});
@@ -90,7 +90,7 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private clean = (): void => this.store.dispatch(new fromActionsCatalogue.Clean());
 
-  private getCatalogues = (): void => this.store.dispatch(new fromActionsCatalogue.GetAll());
+  private getCatalogues = (): void => this.store.dispatch(new fromActionsCatalogue.GetAllCatalogues());
 
   private subscribe = (): void => {
   	this.subscription = this.getState.subscribe((state) => {
@@ -103,7 +103,7 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
   			});
   			this.cdRef.detectChanges();
   		}
-  		if (state.message) {
+  		if (state.response) {
   			this.clean();
   			this.getCatalogues();
   		}

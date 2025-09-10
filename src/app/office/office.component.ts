@@ -75,7 +75,7 @@ export class OfficeComponent implements OnInit, OnDestroy {
   	} else {
   		office.id = this.id;
   		this.office = undefined;
-  		this.store.dispatch(new fromActionsOffice.UpdateOfficeById(office));
+  		this.store.dispatch(new fromActionsOffice.UpdateOffice(this.id!, office));
   	}
   	return;
   }
@@ -135,28 +135,28 @@ export class OfficeComponent implements OnInit, OnDestroy {
   private getOffice = (): void => {
   	if (!this.office) {
   		this.store.dispatch(
-  			new fromActionsOffice.FindOfficeById(this.id),
+  			new fromActionsOffice.GetOffice(this.id!),
   		);
   	}
   };
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe(state => {
+  	this.subscription = this.getState.subscribe((state) => {
   		if (state.managers) {
   			this.managers = state.managers;
   		}
   		if (state.selected) {
-  			this.managerName = state.selected.office.manager.displayName;
+  			this.managerName = state.selected.manager.displayName;
   			this.office = {
-  				id: state.selected.office.id,
-  				manager: state.selected.office.manager,
-  				name: state.selected.office.name,
-  				rooms: state.selected.office.rooms,
-  				subject: state.selected.office.subject,
-  				kvk: state.selected.office.kvk,
-  				account: state.selected.office.account,
-  				btw: state.selected.office.btw,
-  				billingAddress: state.selected.office.billingAddress,
+  				id: state.selected.id,
+  				manager: state.selected.manager,
+  				name: state.selected.name,
+  				rooms: state.selected.rooms,
+  				subject: state.selected.subject,
+  				kvk: state.selected.kvk,
+  				account: state.selected.account,
+  				btw: state.selected.btw,
+  				billingAddress: state.selected.billingAddress,
   			} as IOffice;
   			this.form.patchValue(this.office);
   		}
@@ -165,7 +165,7 @@ export class OfficeComponent implements OnInit, OnDestroy {
   				this.errors[value.field] = value.message;
   				this.form.controls[value.field].setErrors({ incorrect: true });
   			});
-  		} else if (state.message) {
+  		} else if (state.response) {
   			this.router.navigate([this.language, 'offices']);
   		}
   	});

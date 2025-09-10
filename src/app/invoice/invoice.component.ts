@@ -58,7 +58,7 @@ export class InvoiceComponent implements OnInit, OnDestroy {
 
   form!: UntypedFormGroup;
   office: UntypedFormControl = new UntypedFormControl('', [
-  	Validators.required, requireMatch,
+    Validators.required, requireMatch,
   ]);
   filteredOffice: Observable<IOfficeAll[] | undefined> | undefined;
 
@@ -88,155 +88,150 @@ export class InvoiceComponent implements OnInit, OnDestroy {
   constructor(private readonly translate: TranslateService, private store: Store<AppState>,
               private formBuilder: FormBuilder,
               private router: Router, breakpointObserver: BreakpointObserver) {
-  	breakpointObserver.observe([
-  		Breakpoints.XSmall,
-  		Breakpoints.Small,
-  	]).subscribe(result => {
-  		if (result.matches) {
-  			this.pageSize = MOBILE_PAGE_SIZE;
-  		}
-  	});
-  	this.getState = this.store.select(selectInvoiceState);
-  	this.dateFormat = this.translate.currentLang;
-  	this.language = this.translate.currentLang;
-  	this.filteredTypes = this.type.valueChanges.pipe(
-  		startWith(null),
-  		map((type: string | null) => type ? this.filterTypes(type) : this.allPaymentTypes.slice()));
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small,
+    ]).subscribe(result => {
+      if (result.matches) {
+        this.pageSize = MOBILE_PAGE_SIZE;
+      }
+    });
+    this.getState = this.store.select(selectInvoiceState);
+    this.dateFormat = this.translate.currentLang;
+    this.language = this.translate.currentLang;
+    this.filteredTypes = this.type.valueChanges.pipe(
+      startWith(null),
+      map((type: string | null) => type ? this.filterTypes(type) : this.allPaymentTypes.slice()));
   }
 
   get print(): void {
-  	const start = Number(this.startNumber.value || 0);
+    const start = Number(this.startNumber.value || 0);
 
-  	if (this.selection.selected.length === this.invoices?.length) {
-  		const lastInvoiceNumber = start + this.selection.selected.length;
-  		const office: IOffice = new Office();
-  		office.id = this.office.value.id;
-  		office.lastInvoiceNumber = lastInvoiceNumber;
-  		this.store.dispatch(
-  			new fromActionsInvoice.UpdateOfficeById(office),
-  		);
-  	}
-  	const printPdf = pdf(this.selection.selected, this.office.value, start, this.startDate.value, this.endDate.value);
-  	pdfMake.createPdf(printPdf, undefined, fonts).open();
-  	return;
+    if (this.selection.selected.length === this.invoices?.length) {
+      const lastInvoiceNumber = start + this.selection.selected.length;
+      const office: IOffice = new Office();
+      office.id = this.office.value.id;
+      office.lastInvoiceNumber = lastInvoiceNumber;
+      this.store.dispatch(
+        new fromActionsInvoice.UpdateOfficeById(this.office.value.id, office),
+      );
+    }
+    const printPdf = pdf(this.selection.selected, this.office.value, start, this.startDate.value, this.endDate.value);
+    pdfMake.createPdf(printPdf, undefined, fonts).open();
+    return;
   }
 
   ngOnInit(): void {
-  	this.clean();
-  	this.createForm();
-  	this.subscribe();
-  	this.findOffices();
+    this.clean();
+    this.createForm();
+    this.subscribe();
+    this.findOffices();
   }
 
   ngOnDestroy(): void {
-  	this.subscription?.unsubscribe();
+    this.subscription?.unsubscribe();
   }
 
   keyDownHandler = (event: any): void => {
-  	if (event.code === 'Backspace') {
-  		this.office.setValue(null);
-  	}
+    if (event.code === 'Backspace') {
+      this.office.setValue(null);
+    }
   };
 
   displayFnOffice = (office: IOfficeAll): string => office ? office.name : '';
 
   selected = (event: MatAutocompleteSelectedEvent): void => {
-  	const type = PaymentType[event.option.value as PaymentTypeKey];
-  	this.types = [...this.types, type];
-  	this.allPaymentTypes = this.allPaymentTypes.filter(s => PaymentType[s as PaymentTypeKey] !== type);
-  	this.typeInput.nativeElement.value = '';
-  	this.type.setValue(null);
-  	this.findInvoices();
+    const type = PaymentType[event.option.value as PaymentTypeKey];
+    this.types = [...this.types, type];
+    this.allPaymentTypes = this.allPaymentTypes.filter(s => PaymentType[s as PaymentTypeKey] !== type);
+    this.typeInput.nativeElement.value = '';
+    this.type.setValue(null);
+    this.findInvoices();
   };
 
   remove = (type: string): void => {
-  	const index = this.types.indexOf(type);
+    const index = this.types.indexOf(type);
 
-  	if (index >= 0) {
-  		this.types = this.types.filter(s => s !== type);
-  		this.allPaymentTypes = Object.keys(PaymentType).filter(s => !this.types.includes(s.toUpperCase()));
+    if (index >= 0) {
+      this.types = this.types.filter(s => s !== type);
+      this.allPaymentTypes = Object.keys(PaymentType).filter(s => !this.types.includes(s.toUpperCase()));
 
-  		this.type.setValue(null);
-  		this.findInvoices();
-  	}
+      this.type.setValue(null);
+      this.findInvoices();
+    }
   };
 
   // numSelected === numRows
   isAllSelected = (): boolean => this.selection.selected.length === this.dataSource.data.length;
 
   toggleAllRows = (): void => {
-  	if (this.isAllSelected()) {
-  		this.selection.clear();
-  		return;
-  	}
+    if (this.isAllSelected()) {
+      this.selection.clear();
+      return;
+    }
 
-  	this.selection.select(...this.dataSource.data);
+    this.selection.select(...this.dataSource.data);
   };
 
   checkboxLabel = (row?: any): string =>
-  	!row ? `${ this.isAllSelected() ? 'deselect' : 'select' } all` :
-  		`${ this.selection.isSelected(row) ? 'deselect' : 'select' } row ${ row.position + 1 }`;
+    !row ? `${ this.isAllSelected() ? 'deselect' : 'select' } all` :
+      `${ this.selection.isSelected(row) ? 'deselect' : 'select' } row ${ row.position + 1 }`;
 
   goToPath = (invoice: IInvoice): void => {
-  	this.router.navigate(invoice.paths);
+    this.router.navigate(invoice.paths);
   };
 
   private createForm = (): void => {
-  	this.dateRange = this.formBuilder.group({
-  		startDate: this.startDate,
-  		endDate: this.endDate,
-  	});
-  	this.form = this.formBuilder.group({
-  		office: this.office,
-  		dateRange: this.dateRange,
-  		type: this.type,
-  	});
+    this.dateRange = this.formBuilder.group({
+      startDate: this.startDate,
+      endDate: this.endDate,
+    });
+    this.form = this.formBuilder.group({
+      office: this.office,
+      dateRange: this.dateRange,
+      type: this.type,
+    });
 
-  	this.filteredOffice = this.office.valueChanges.pipe(
-  		startWith(''),
-  		map(value => typeof value === 'string' ? value : value ? value.name : ''),
-  		map(name => name ? this.filterOffice(name) : this.offices ? this.offices.slice() : this.offices),
-  	);
+    this.filteredOffice = this.office.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value ? value.name : ''),
+      map(name => name ? this.filterOffice(name) : this.offices ? this.offices.slice() : this.offices),
+    );
 
-  	this.valueChanges();
+    this.valueChanges();
   };
 
   private valueChanges = (): void => {
-  	this.dateRange.valueChanges.subscribe(value => {
-  		if (value?.startDate && value?.endDate && this.office.value.id) {
-  			this.findInvoices();
-  		}
-  	});
-  	this.office.valueChanges.subscribe(value => {
-  		if (value && value.id) {
-  			this.startNumber.setValue(value.lastInvoiceNumber || 1);
-  			if (value?.startDate && value?.endDate) {
-  				this.findInvoices();
-  			}
-  		}
-  	});
+    this.dateRange.valueChanges.subscribe(value => {
+      if (value?.startDate && value?.endDate && this.office.value.id) {
+        this.findInvoices();
+      }
+    });
+    this.office.valueChanges.subscribe(value => {
+      if (value && value.id) {
+        this.startNumber.setValue(value.lastInvoiceNumber || 1);
+        if (value?.startDate && value?.endDate) {
+          this.findInvoices();
+        }
+      }
+    });
   };
 
   private filterTypes = (
-  	value: string,
+    value: string,
   ): string[] => this.allPaymentTypes.filter(state => state.toLowerCase().indexOf(value.toLowerCase()) === 0);
 
   private filterOffice = (name: string): IOfficeAll[] | undefined => this.offices?.filter(
-  	option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
   private findInvoices = (): void => {
-  	if (this.startDate.value && this.endDate.value) {
-  		this.selection.clear();
-  		const payload = {
-  			officeId: this.office.value.id,
-  			types: this.types,
-  			start: backendFormatDate(this.startDate.value),
-  			end: backendFormatDate(this.endDate.value),
-  		};
-  		this.store.dispatch(
-  			new fromActionsInvoice.FindOfficeToInvoice(payload),
-  		);
-  	}
+    if (this.startDate.value && this.endDate.value) {
+      this.selection.clear();
+      this.store.dispatch(
+        new fromActionsInvoice.GetOfficeToInvoice(this.office.value.id, backendFormatDate(this.startDate.value)!,
+          backendFormatDate(this.endDate.value)!, this.types),
+      );
+    }
   };
 
   private findOffices = (): void => this.store.dispatch(new fromActionsInvoice.GetAllMyOffices());
@@ -244,29 +239,29 @@ export class InvoiceComponent implements OnInit, OnDestroy {
   private clean = (): void => this.store.dispatch(new fromActionsInvoice.Clean());
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe(state => {
-  		this.offices = state.offices;
-  		if (this.offices?.length === 1) {
-  			this.office.setValue(this.offices[0]);
-  		}
-  		if (state.changes) {
-  			this.invoices = state.data?.map((invoice: IInvoice, position: number) => {
-  				if (invoice.id) {
-  					const date1 = newDateTimestamp(invoice.timestamp, invoice.room.timeZone);
-  					let order;
-  					if (position + 1 < state.data.length) {
-  						const nextRow = state.data[position + 1];
-  						const date2 = newDateTimestamp(nextRow.timestamp, nextRow.room.timeZone);
-  						if (!datesInSameWeek(date1, date2)) {
-  							order = 'newWeek';
-  						}
-  					}
-  					return Object.assign({}, invoice, { position, order });
-  				}
-  				return invoice;
-  			});
-  			this.dataSource = new MatTableDataSource(this.invoices);
-  		}
-  	});
+    this.subscription = this.getState.subscribe((state) => {
+      this.offices = state.offices;
+      if (this.offices?.length === 1) {
+        this.office.setValue(this.offices[0]);
+      }
+      if (state.changes) {
+        this.invoices = state.data?.map((invoice: IInvoice, position: number) => {
+          if (invoice.id) {
+            const date1 = newDateTimestamp(invoice.timestamp, invoice.room.timeZone);
+            let order;
+            if (position + 1 < state.data.length) {
+              const nextRow = state.data[position + 1];
+              const date2 = newDateTimestamp(nextRow.timestamp, nextRow.room.timeZone);
+              if (!datesInSameWeek(date1, date2)) {
+                order = 'newWeek';
+              }
+            }
+            return Object.assign({}, invoice, { position, order });
+          }
+          return invoice;
+        });
+        this.dataSource = new MatTableDataSource(this.invoices);
+      }
+    });
   };
 }

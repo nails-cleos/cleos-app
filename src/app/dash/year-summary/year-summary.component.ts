@@ -285,7 +285,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
   private clean = (): void => this.store.dispatch(new fromActionsDashboard.Clean());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (!this.yearSummaryMap) {
         this.yearSummaryMap = state.yearSummaryMap;
         if (this.yearSummaryMap) {

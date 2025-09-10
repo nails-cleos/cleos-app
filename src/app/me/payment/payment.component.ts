@@ -64,12 +64,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
 
   notify = (payment: IPayment): void => {
     this.store.dispatch(
-      new fromActionsPayment.PaymentNotify({
-        id: payment.id, resourceId: this.id,
-        path: this.path,
-        preferenceId: payment.preferenceId,
-        type: payment.type,
-      }),
+      new fromActionsPayment.NotifyPayment(payment.id!, this.path, this.id, payment.preferenceId!, payment.type!),
     );
   };
 
@@ -86,7 +81,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
   private getPayments = (): void => {
     if (!this.dataSource) {
       this.store.dispatch(
-        new fromActionsPayment.PaymentFindByResourceId({ id: this.id, path: this.path, redirect: true }),
+        new fromActionsPayment.GetPaymentByResourceId(this.id, this.path, true),
       );
     }
   };
@@ -94,15 +89,16 @@ export class PaymentComponent implements OnInit, OnDestroy {
   private clean = (): void => this.store.dispatch(new fromActionsPayment.Clean());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.dataSource = state.selected;
-      const paths = state.paths;
-      if (state.message && paths) {
+      const path = state.response?.path;
+      const errorMessage = state.subErrors?.[0]?.message;
+      if (path) {
         this.clean();
-        this.router.navigate([this.language].concat(paths));
-      } else if (state.subErrors) {
+        this.router.navigate([`${ this.language }/${ path }`]);
+      } else if (errorMessage) {
         this.showError = true;
-        this.errorMessage = state.subErrors;
+        this.errorMessage = errorMessage;
       }
     });
   };

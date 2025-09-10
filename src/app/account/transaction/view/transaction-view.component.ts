@@ -30,7 +30,7 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
   hasAdminRole: boolean;
 
   displayedColumns: string[] = [
-  	'position', 'timestamp', 'amount', 'amountGifted', 'payment.status', 'payment.type', 'actions',
+    'position', 'timestamp', 'amount', 'amountGifted', 'payment.status', 'payment.type', 'actions',
   ];
   dataSource: any = new MatTableDataSource<Pagination<ITransaction>>();
 
@@ -49,78 +49,73 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
   private getState: Observable<any>;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private cdRef: ChangeDetectorRef,
-  	breakpointObserver: BreakpointObserver, private translate: TranslateService,
+    breakpointObserver: BreakpointObserver, private translate: TranslateService,
               private authUserService: AuthUserService) {
-  	breakpointObserver.observe([
-  		Breakpoints.XSmall,
-  		Breakpoints.Small,
-  	]).subscribe(result => {
-  		if (result.matches) {
-  			this.pageSize = MOBILE_PAGE_SIZE;
-  		}
-  	});
-  	this.hasAdminRole = false;
-  	this.getState = this.store.select(selectAccountState);
-  	this.dateFormat = this.translate.currentLang;
-  	this.language = this.translate.currentLang;
-  	this.authUserServiceSubscription = this.authUserService.authUser.subscribe(
-  		value => this.hasAdminRole = value.hasAdminRole,
-  	);
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small,
+    ]).subscribe(result => {
+      if (result.matches) {
+        this.pageSize = MOBILE_PAGE_SIZE;
+      }
+    });
+    this.hasAdminRole = false;
+    this.getState = this.store.select(selectAccountState);
+    this.dateFormat = this.translate.currentLang;
+    this.language = this.translate.currentLang;
+    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(
+      value => this.hasAdminRole = value.hasAdminRole,
+    );
   }
 
   ngOnInit(): void {
-  	const id = this.route.snapshot.paramMap.get('id');
-  	this.clean();
-  	this.subscribe();
-  	if (id) {
-  		this.accountId = id;
-  	}
+    const id = this.route.snapshot.paramMap.get('id');
+    this.clean();
+    this.subscribe();
+    if (id) {
+      this.accountId = id;
+    }
   }
 
   ngAfterViewInit(): void {
-  	this.getTransactions();
+    this.getTransactions();
   }
 
   ngOnDestroy(): void {
-  	this.subscription?.unsubscribe();
-  	this.paginatorSubscription?.unsubscribe();
-  	this.authUserServiceSubscription.unsubscribe();
+    this.subscription?.unsubscribe();
+    this.paginatorSubscription?.unsubscribe();
+    this.authUserServiceSubscription.unsubscribe();
   }
 
   private createPageSubscriptions = (): void => {
-  	this.sort.sortChange.subscribe(() => {
-  		this.paginator.pageIndex = 0;
-  		this.getTransactions();
-  	});
-  	this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getTransactions(this.paginator.pageIndex));
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getTransactions();
+    });
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getTransactions(this.paginator.pageIndex));
 
-  	this.cdRef.detectChanges();
+    this.cdRef.detectChanges();
   };
 
   private clean = (): void => this.store.dispatch(new fromActionsAccount.Clean());
 
   private getTransactions = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsAccount.GetTransactionsByAccountId({
-  		active: this.sort.active,
-  		direction: this.sort.direction,
-  		size: this.pageSize,
-  		accountId: this.accountId,
-  		page,
-  	}),
+    new fromActionsAccount.GetTransactionsByAccountId(this.accountId!, page, this.sort.active, this.sort.direction,
+      this.pageSize),
   );
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe(state => {
-  		if (state.data?.account) {
-  			this.account = state.data.account;
-  		}
-  		this.dataSource = state.data?.transactions?.content?.map((it: ITransaction) =>
-  			Object.assign({}, it, { date: newDateTimestamp(it.payment?.timestamp) }),
-  		);
-  		this.resultsLength = state.data?.transactions?.totalElements || 0;
-  		if (!this.paginatorSubscription && this.resultsLength) {
-  			this.createPageSubscriptions();
-  		}
-  	});
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.data?.account) {
+        this.account = state.data.account;
+      }
+      this.dataSource = state.data?.transactions?.content?.map((it: ITransaction) =>
+        Object.assign({}, it, { date: newDateTimestamp(it.payment?.timestamp) }),
+      );
+      this.resultsLength = state.data?.transactions?.totalElements || 0;
+      if (!this.paginatorSubscription && this.resultsLength) {
+        this.createPageSubscriptions();
+      }
+    });
   };
 }

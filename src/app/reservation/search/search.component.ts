@@ -62,169 +62,163 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
-  	breakpointObserver.observe([
-  		Breakpoints.XSmall,
-  		Breakpoints.Small,
-  	]).subscribe(result => {
-  		if (result.matches) {
-  			this.pageSize = MOBILE_PAGE_SIZE;
-  			this.small = true;
-  		}
-  	});
-  	this.getState = this.store.select(selectReservationState);
-  	this.dateFormat = this.translate.currentLang;
-  	this.language = this.translate.currentLang;
-  	this.filteredStates = this.state.valueChanges.pipe(
-  		startWith(null),
-  		map((state: string | null) => state ? this.filterStates(state) : this.allStates.slice()));
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small,
+    ]).subscribe(result => {
+      if (result.matches) {
+        this.pageSize = MOBILE_PAGE_SIZE;
+        this.small = true;
+      }
+    });
+    this.getState = this.store.select(selectReservationState);
+    this.dateFormat = this.translate.currentLang;
+    this.language = this.translate.currentLang;
+    this.filteredStates = this.state.valueChanges.pipe(
+      startWith(null),
+      map((state: string | null) => state ? this.filterStates(state) : this.allStates.slice()));
   }
 
   ngOnInit(): void {
-  	this.clean();
-  	this.subscribe();
-  	this.getCustomers();
-  	this.filteredCustomer = this.customer.valueChanges.pipe(
-  		startWith(''),
-  		map(value => typeof value === 'string' ? value : value ? value.name : ''),
-  		map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers),
-  	);
-  	this.customer.valueChanges.subscribe(value => {
-  		if (value && value.id) {
-  			this.userId = value.id;
-  			this.getReservations();
-  		}
-  	});
+    this.clean();
+    this.subscribe();
+    this.getCustomers();
+    this.filteredCustomer = this.customer.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value ? value.name : ''),
+      map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers),
+    );
+    this.customer.valueChanges.subscribe(value => {
+      if (value && value.id) {
+        this.userId = value.id;
+        this.getReservations();
+      }
+    });
   }
 
   ngAfterViewInit(): void {
-  	this.getReservations();
+    this.getReservations();
   }
 
   ngOnDestroy(): void {
-  	this.subscription?.unsubscribe();
-  	this.paginatorSubscription?.unsubscribe();
+    this.subscription?.unsubscribe();
+    this.paginatorSubscription?.unsubscribe();
   }
 
   openDialog = (reservation: IReservationAll): void => {
-  	const time = newDateTimestamp(reservation.timestamp);
-  	openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
+    const time = newDateTimestamp(reservation.timestamp);
+    openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
   };
 
   showTimeZone = (reservation: IReservation): boolean => !isSameTimeZone(reservation?.room?.timeZone);
 
   cancel = (reservation: IReservationAll): void => {
-  	const title = this.translate.instant('RESERVATION.LIST.CANCEL.TITLE');
-  	const date = newDateTimestamp(reservation.timestamp);
-  	const content = this.translate.instant('RESERVATION.LIST.CANCEL.CONTENT', { date });
-  	const dialogRef = this.dialog.open(DialogComponent, {
-  		data: { title, content, value: reservation.id },
-  	});
+    const title = this.translate.instant('RESERVATION.LIST.CANCEL.TITLE');
+    const date = newDateTimestamp(reservation.timestamp);
+    const content = this.translate.instant('RESERVATION.LIST.CANCEL.CONTENT', { date });
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: { title, content, value: reservation.id },
+    });
 
-  	dialogRef.afterClosed().subscribe(event => {
-  		if (event) {
-  			const options = Object.values(CancelOption).filter(co => co !== CancelOption.charge);
-  			openCancel(this.dialog, reservation.room, this.small, options, result => {
-  				if (result) {
-  					this.dataSource = [{}, {}, {}];
-  					this.store.dispatch(
-  						new fromActionsReservation.CancelReservation({ id: event, paymentCancellation: result }),
-  					);
-  				}
-  			});
-  		}
-  	});
+    dialogRef.afterClosed().subscribe(event => {
+      if (event) {
+        const options = Object.values(CancelOption).filter(co => co !== CancelOption.charge);
+        openCancel(this.dialog, reservation.room, this.small, options, result => {
+          if (result) {
+            this.dataSource = [{}, {}, {}];
+            this.store.dispatch(
+              new fromActionsReservation.CancelReservation(event, result),
+            );
+          }
+        });
+      }
+    });
   };
 
   displayFnUser = (user: IUser): string => user?.displayName ? user.displayName : '';
 
   keyDownHandler = (event: any): void => {
-  	if (event.code === 'Backspace') {
-  		this.customer.setValue(null);
-  		this.userId = undefined;
-  		this.getReservations();
-  	}
+    if (event.code === 'Backspace') {
+      this.customer.setValue(null);
+      this.userId = undefined;
+      this.getReservations();
+    }
   };
 
   remove = (state: string): void => {
-  	const index = this.states.indexOf(state);
+    const index = this.states.indexOf(state);
 
-  	if (index >= 0) {
-  		this.states = this.states.filter(s => s !== state);
-  		this.allStates = Object.keys(States).filter(s => !this.states.includes(s.toUpperCase()));
+    if (index >= 0) {
+      this.states = this.states.filter(s => s !== state);
+      this.allStates = Object.keys(States).filter(s => !this.states.includes(s.toUpperCase()));
 
-  		this.state.setValue(null);
-  		this.getReservations();
-  	}
+      this.state.setValue(null);
+      this.getReservations();
+    }
   };
 
   selected = (event: MatAutocompleteSelectedEvent): void => {
-  	const state = States[event.option.value as StatesKey];
-  	this.states = [...this.states, state];
-  	this.allStates = this.allStates.filter(s => States[s as StatesKey] !== state);
-  	this.stateInput.nativeElement.value = '';
-  	this.state.setValue(null);
-  	this.getReservations();
+    const state = States[event.option.value as StatesKey];
+    this.states = [...this.states, state];
+    this.allStates = this.allStates.filter(s => States[s as StatesKey] !== state);
+    this.stateInput.nativeElement.value = '';
+    this.state.setValue(null);
+    this.getReservations();
   };
 
   private createPageSubscriptions = (): void => {
-  	this.sort.sortChange.subscribe(() => {
-  		this.paginator.pageIndex = 0;
-  		this.getReservations();
-  	});
-  	this.paginatorSubscription = this.paginator?.page.subscribe(() => {
-  		this.getReservations(this.paginator.pageIndex);
-  	});
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getReservations();
+    });
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => {
+      this.getReservations(this.paginator.pageIndex);
+    });
 
-  	this.cdRef.detectChanges();
+    this.cdRef.detectChanges();
   };
 
   private clean = (): void => this.store.dispatch(new fromActionsReservation.Clean());
 
-  private getCustomers = (): void => this.store.dispatch(new fromActionsReservation.GetAllCustomers());
+  private getCustomers = (): void => this.store.dispatch(new fromActionsReservation.GetCustomers());
 
   private getReservations = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsReservation.GetAllFilterReservations({
-  		states: this.states,
-  		userId: this.userId,
-  		active: this.sort.active,
-  		direction: this.sort.direction,
-  		size: this.pageSize,
-  		page,
-  	}),
+    new fromActionsReservation.GetAllFilterReservations(page, this.sort.active, this.sort.direction, this.pageSize,
+      this.userId, this.states),
   );
 
   private filterCustomer = (name: string): IUser[] | undefined => this.customers?.filter(
-  	option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
   private filterStates = (value: string): string[] => this.allStates.filter(
-  	state => state.toLowerCase().indexOf(value.toLowerCase()) === 0);
+    state => state.toLowerCase().indexOf(value.toLowerCase()) === 0);
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe(state => {
-  		this.customers = state.customers;
-  		if (state.filter) {
-  			const now = getNowTimeZone();
-  			this.dataSource = state.filter.content?.map((reservation: IReservationAll) => {
-  				const reservationStart = newDateTimestamp(reservation.timestamp);
-  				if (reservationStart && [String(States.created), String(States.approved)].includes(reservation.state)) {
-  					const deadLine = reservationStart < now;
-  					return Object.assign({}, reservation, { deadLine });
-  				}
-  				return reservation;
-  			});
-  			this.resultsLength = state.filter?.totalElements;
-  			if (!this.paginatorSubscription && this.resultsLength) {
-  				this.createPageSubscriptions();
-  			} else if (!this.resultsLength) {
-  				this.paginatorSubscription?.unsubscribe();
-  				this.paginatorSubscription = undefined;
-  			}
-  		}
-  		if (state.message) {
-  			this.clean();
-  			this.getReservations();
-  		}
-  	});
+    this.subscription = this.getState.subscribe((state) => {
+      this.customers = state.customers;
+      if (state.filter) {
+        const now = getNowTimeZone();
+        this.dataSource = state.filter.content?.map((reservation: IReservationAll) => {
+          const reservationStart = newDateTimestamp(reservation.timestamp);
+          if (reservationStart && [String(States.created), String(States.approved)].includes(reservation.state)) {
+            const deadLine = reservationStart < now;
+            return Object.assign({}, reservation, { deadLine });
+          }
+          return reservation;
+        });
+        this.resultsLength = state.filter?.totalElements;
+        if (!this.paginatorSubscription && this.resultsLength) {
+          this.createPageSubscriptions();
+        } else if (!this.resultsLength) {
+          this.paginatorSubscription?.unsubscribe();
+          this.paginatorSubscription = undefined;
+        }
+      }
+      if (state.response) {
+        this.clean();
+        this.getReservations();
+      }
+    });
   };
 }
 

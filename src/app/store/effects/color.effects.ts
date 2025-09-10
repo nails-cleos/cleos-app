@@ -2,73 +2,96 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import * as fromActionsColor from '../color.actions';
+import { catchError, switchMap, tap } from 'rxjs/operators';
+import {
+  ColorActionTypes,
+  ColorFailure,
+  ColorSaveSuccess,
+  ColorSelected,
+  ColorSuccess,
+  CreateColor,
+  DeleteColor,
+  GetColor,
+  GetColorsPage,
+  UpdateColor,
+} from '../color.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { ColorService } from '../../services/color.service';
 import { Router } from '@angular/router';
+import { IColor } from '../../interfaces/color';
+import { IApiResponse, success } from '../../interfaces/common';
+import { Pagination } from '../../interfaces/pagination';
 
 @Injectable()
 export class ColorEffects {
 
-  getAll$ = createEffect(() => this.actions.pipe(ofType(fromActionsColor.ColorActionTypes.getColorsPage)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.colorService.getColorsPage(payload.active, payload.direction, payload.page,
-      payload.size).pipe(
-      switchMap((response: any) => of(new fromActionsColor.ColorSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsColor.ColorFailure({ error: err.error }))),
-    )),
+  getAll$ = createEffect(() => this.actions.pipe(
+    ofType(ColorActionTypes.getColorsPage),
+    switchMap((action: GetColorsPage) =>
+      this.colorService.getColorsPage(action.page, action.sort, action.direction, action.size).pipe(
+        switchMap((response: Pagination<IColor>) => of(new ColorSuccess(response))),
+        catchError((err: HttpErrorResponse) => of(new ColorFailure(err.error))),
+      )),
   ));
 
-  findOne$ = createEffect(() => this.actions.pipe(ofType(fromActionsColor.ColorActionTypes.findColorById)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.colorService.findColorById(payload).pipe(
-      switchMap((color: any) => of(new fromActionsColor.ColorSelected(color))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsColor.ColorFailure({ error: err.error }))),
-    )),
+  findOne$ = createEffect(() => this.actions.pipe(
+    ofType(ColorActionTypes.getColor),
+    switchMap((action: GetColor) =>
+      this.colorService.getColor(action.id).pipe(
+        switchMap((color?: IColor) => of(new ColorSelected(color))),
+        catchError((err: HttpErrorResponse) => of(new ColorFailure(err.error))),
+      )),
   ));
 
-  save$ = createEffect(() => this.actions.pipe(ofType(fromActionsColor.ColorActionTypes.createColor)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.colorService.createColor(payload).pipe(
-      switchMap(() => {
-        const message = this.translate.instant('COLOR.CREATED', { name: payload.name });
-        return of(new fromActionsColor.ColorSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsColor.ColorFailure({ error: err.error }))),
-    )),
+  save$ = createEffect(() => this.actions.pipe(
+    ofType(ColorActionTypes.createColor),
+    switchMap((action: CreateColor) =>
+      this.colorService.createColor(action.color).pipe(
+        switchMap((response: IApiResponse) => {
+          const message = this.translate.instant('COLOR.CREATED', { name: response.name });
+          const path = `colors/${ response.id }`;
+          return success(ColorSaveSuccess, message, path);
+        }),
+        catchError((err: HttpErrorResponse) => of(new ColorFailure(err.error))),
+      )),
   ));
 
-  update = createEffect(() => this.actions.pipe(ofType(fromActionsColor.ColorActionTypes.updateColorById)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.colorService.updateColorById(payload).pipe(
-      switchMap(() => {
-        const message = this.translate.instant('COLOR.UPDATED.MESSAGE', { name: payload.name });
-        return of(new fromActionsColor.ColorSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsColor.ColorFailure({ error: err.error }))),
-    )),
+  update$ = createEffect(() => this.actions.pipe(
+    ofType(ColorActionTypes.updateColor),
+    switchMap((action: UpdateColor) =>
+      this.colorService.updateColor(action.id, action.color).pipe(
+        switchMap((response: IApiResponse) => {
+          const message = this.translate.instant('COLOR.UPDATED.MESSAGE', { name: response.name });
+          const path = `colors/${ response.id }`;
+          return success(ColorSaveSuccess, message, path);
+        }),
+        catchError((err: HttpErrorResponse) => of(new ColorFailure(err.error))),
+      )),
   ));
 
-  delete$ = createEffect(() => this.actions.pipe(ofType(fromActionsColor.ColorActionTypes.deleteColorById)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.colorService.deleteColorById(payload.id).pipe(
-      switchMap(() => {
-        const message = this.translate.instant('COLOR.DELETED.MESSAGE', { name: payload.name });
-        return of(new fromActionsColor.ColorSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsColor.ColorFailure({ error: err.error }))),
-    )),
+  delete$ = createEffect(() => this.actions.pipe(
+    ofType(ColorActionTypes.deleteColor),
+    switchMap((action: DeleteColor) =>
+      this.colorService.deleteColor(action.id).pipe(
+        switchMap(() => {
+          const message = this.translate.instant('COLOR.DELETED.MESSAGE', { name: action.name });
+          return success(ColorSaveSuccess, message, undefined, undefined, 'warning');
+        }),
+        catchError((err: HttpErrorResponse) => of(new ColorFailure(err.error))),
+      )),
   ));
 
   selectedData$ = createEffect(() => this.actions.pipe(
-    ofType(fromActionsColor.ColorActionTypes.colorSelected),
-    tap((data: any) => this.router.navigate([this.translate.currentLang, 'colors', data.payload.id])),
+    ofType(ColorActionTypes.colorSelected),
+    tap((data: ColorSelected) => this.router.navigate([this.translate.currentLang, 'colors', data.selected?.id])),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(fromActionsColor.ColorActionTypes.colorSuccess),
+    ofType(ColorActionTypes.colorSuccess),
   ), { dispatch: false });
 
   saveSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(fromActionsColor.ColorActionTypes.colorSaveSuccess),
+    ofType(ColorActionTypes.colorSaveSuccess),
   ), { dispatch: false });
 
   constructor(private readonly translate: TranslateService, private actions: Actions,

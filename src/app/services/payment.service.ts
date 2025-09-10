@@ -1,9 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IPayment, IPaymentStatus } from '../interfaces/payment';
+import { IPay, IPayment, IPaymentOption, IPaymentRequest, IPaymentStatus } from '../interfaces/payment';
 import { IReservationPayment } from '../interfaces/reservation';
 import { toUrl } from '../util/helper';
+import { IApiResponse } from '../interfaces/common';
 
 @Injectable()
 export class PaymentService {
@@ -17,18 +18,18 @@ export class PaymentService {
 
   private http: HttpClient = inject(HttpClient);
 
-  findPaymentById = (id: string): Observable<IPayment | undefined> => this.http.get<IPayment>(toUrl(this.urlV1, id));
+  getPayment = (id: string): Observable<IPayment | undefined> => this.http.get<IPayment>(toUrl(this.urlV1, id));
 
-  paymentOptions = (): Observable<IPayment | undefined> => this.http.get<IPayment>(this.urlV1);
+  getPaymentOptions = (): Observable<IPaymentOption[] | undefined> => this.http.get<IPaymentOption[]>(this.urlV1);
 
   add = (
     id: string,
     path: 'reservation' | 'transaction',
     status: string,
     paymentStatus: IPaymentStatus,
-  ): Observable<IPayment> => this.http.post<IPayment>(toUrl(this.getKey(path), id, this.url, status), paymentStatus);
+  ): Observable<IPay> => this.http.post<IPay>(toUrl(this.getKey(path), id, this.url, status), paymentStatus);
 
-  createPaymentLink = (
+  createPaymentLinkByReservationId = (
     reservationId: string,
     payment: IReservationPayment,
   ): Observable<IPayment> => this.http.post<IPayment>(
@@ -36,9 +37,9 @@ export class PaymentService {
     payment,
   );
 
-  adjustPayments = (payment: IReservationPayment[]): Observable<void> => this.http.patch<void>(this.urlV1, payment);
+  adjustPayments = (payment: IPaymentRequest[]): Observable<void> => this.http.patch<void>(this.urlV1, payment);
 
-  updatePaymentById = (id: string, payment: IReservationPayment): Observable<IPayment> => this.http.patch<IPayment>(
+  updatePayment = (id: string, payment: IReservationPayment): Observable<IApiResponse> => this.http.patch<IApiResponse>(
     toUrl(this.urlV1, id),
     payment,
   );
@@ -48,18 +49,18 @@ export class PaymentService {
     null,
   );
 
-  findByResourceId = (
+  getPaymentByResourceId = (
     id: string,
     path: 'reservation' | 'transaction',
   ): Observable<IPayment[]> => this.http.get<IPayment[]>(toUrl(this.getKey(path), id, this.url));
 
-  public notify = (
+  public notifyPayment = (
     id: string,
     path: 'reservation' | 'transaction',
     resourceId: string,
     preferenceId: string,
     paymentType: string,
-  ): Observable<IPayment> => this.http.patch<IPayment>(
+  ): Observable<IPay> => this.http.patch<IPay>(
     toUrl(this.getKey(path), resourceId, this.url, id),
     { preferenceId, paymentType },
   );

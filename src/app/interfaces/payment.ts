@@ -142,6 +142,18 @@ export interface IPaymentStatus {
   reason?: string;
 }
 
+export interface IPay {
+  status: string;
+  message: string;
+  paths: string[];
+}
+
+export interface IPaymentRequest {
+  paymentId: string;
+  paymentType: PaymentType;
+  amount: number;
+}
+
 export interface IPayment {
   id?: string;
   description?: string;
@@ -154,6 +166,10 @@ export interface IPayment {
   link?: string;
   paymentURL?: string;
   timestamp?: number;
+  transactionId?: string;
+  transaction?: ITransaction;
+  reservationId?: string;
+  reservation?: IReservationAll;
 }
 
 export interface IPaymentAll {

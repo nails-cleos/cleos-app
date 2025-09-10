@@ -25,7 +25,7 @@ import {
   IMonthlySummaryRequest,
   IMonthlySummarySale,
   ISummaryRoom,
-  ISummaryTotal,
+  ISummaryTotal, ITotal,
   ITotalType,
   SummaryType,
   TotalType,
@@ -416,7 +416,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
 
   updateMonthlySummary = (totalTypes: ITotalType, summaries: IMonthlySummaryRequest[]): void => {
     this.isLoading = true;
-    let totals;
+    let totals: ITotal[];
     switch (totalTypes.type) {
       case SummaryType.cash:
         totals = Array.from(totalTypes.totals.values());
@@ -432,16 +432,8 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
         break;
     }
     return this.store.dispatch(
-      new fromActionsDashboard.UpdateMonthlySummary(
-        {
-          date: getDateFormat(this.date.value),
-          roomId: this.roomId,
-          totals,
-          type: totalTypes.type,
-          summaries,
-          step: this.step,
-        },
-      ),
+      new fromActionsDashboard.UpdateMonthlySummary(getDateFormat(this.date.value), totalTypes.type, totals, summaries,
+        this.roomId!, this.step),
     );
   };
 
@@ -597,7 +589,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.monthlySummaryMap = state.monthlySummaryMap;
       this.monthlySummaryMap?.forEach((value, key) => {
         this.monthlySummaryMap?.set(key, {

@@ -1,4 +1,8 @@
 import { Action } from '@ngrx/store';
+import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { Pagination } from '../interfaces/pagination';
+import { IDiscount, IReferral, IUserDiscount } from '../interfaces/discount';
+import { ICurrency } from '../interfaces/currency';
 
 export enum DiscountActionTypes {
   getDiscountsPage = '[Discount] Get discounts page',
@@ -9,29 +13,23 @@ export enum DiscountActionTypes {
   discountSuccess = '[Discount] Success',
   referralSuccess = '[Discount] referral Success',
   currencySuccess = '[Discount] currency Success',
-  discountSave = '[Discount] Save',
-  discountUpdate = '[Discount] Update',
+  createDiscount = '[Discount] Create discount',
+  updateDiscount = '[Discount] Update discount by id',
   discountSaveSuccess = '[Discount] Save Success',
   discountFailure = '[Discount] Failure',
   discountSelected = '[Discount] Selected',
-  discountFind = '[Discount] Find',
-  discountFindByCustomer = '[Discount] Find by customer',
-  discountDelete = '[Discount] Delete',
+  getDiscount = '[Discount] Find discount by id',
+  getUserDiscountByCustomerId = '[Discount] Find user discount by customer id',
+  deleteDiscount = '[Discount] Delete discount by id',
   clean = '[Discount] Clean'
 }
 
-export class GetDiscountsPage implements Action {
+export class GetDiscountsPage extends PageRequest implements Action {
   readonly type = DiscountActionTypes.getDiscountsPage;
-
-  constructor(public payload: any) {
-  }
 }
 
-export class GetMyDiscountsPage implements Action {
+export class GetMyDiscountsPage extends PageRequest implements Action {
   readonly type = DiscountActionTypes.getMyDiscountsPage;
-
-  constructor(public payload: any) {
-  }
 }
 
 export class GetMyReferrals implements Action {
@@ -45,84 +43,81 @@ export class GetAllCurrency implements Action {
 export class SendDiscountToCustomers implements Action {
   readonly type = DiscountActionTypes.sendDiscountToCustomers;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public customersDiscount: string[]) {
   }
 }
 
 export class DiscountSuccess implements Action {
   readonly type = DiscountActionTypes.discountSuccess;
 
-  constructor(public payload: any) {
+  constructor(public data: Pagination<IDiscount> | Pagination<IUserDiscount> | IUserDiscount[]) {
   }
 }
 
 export class ReferralSuccess implements Action {
   readonly type = DiscountActionTypes.referralSuccess;
 
-  constructor(public payload: any) {
+  constructor(public referrals: IReferral[]) {
   }
 }
 
 export class CurrencySuccess implements Action {
   readonly type = DiscountActionTypes.currencySuccess;
 
-  constructor(public payload: any) {
+  constructor(public currencies: ICurrency[]) {
   }
 }
 
-export class DiscountSave implements Action {
-  readonly type = DiscountActionTypes.discountSave;
+export class CreateDiscount implements Action {
+  readonly type = DiscountActionTypes.createDiscount;
 
-  constructor(public payload: any) {
+  constructor(public discount: IDiscount) {
   }
 }
 
-export class DiscountUpdate implements Action {
-  readonly type = DiscountActionTypes.discountUpdate;
+export class UpdateDiscount implements Action {
+  readonly type = DiscountActionTypes.updateDiscount;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public discount: IDiscount) {
   }
 }
 
-export class DiscountSaveSuccess implements Action {
+export class DiscountSaveSuccess extends ResponseSuccess implements Action {
   readonly type = DiscountActionTypes.discountSaveSuccess;
-
-  constructor(public payload: any) {
-  }
 }
 
 export class DiscountFailure implements Action {
   readonly type = DiscountActionTypes.discountFailure;
 
-  constructor(public payload: any) {
+  constructor(public error: IError) {
   }
 }
 
 export class DiscountSelected implements Action {
   readonly type = DiscountActionTypes.discountSelected;
 
-  constructor(public payload: any) {
+  constructor(public selected?: IDiscount) {
   }
 }
 
-export class DiscountFind implements Action {
-  readonly type = DiscountActionTypes.discountFind;
+export class GetDiscount implements Action {
+  readonly type = DiscountActionTypes.getDiscount;
 
-  constructor(public payload: any) {
+  constructor(public id: string) {
   }
 }
 
-export class DiscountFindByCustomer implements Action {
-  readonly type = DiscountActionTypes.discountFindByCustomer;
+export class GetUserDiscountByCustomerId implements Action {
+  readonly type = DiscountActionTypes.getUserDiscountByCustomerId;
 
-  constructor(public payload: any) {
+  constructor(public customerId: string) {
   }
 }
 
 export class DeleteDiscount implements Action {
-  readonly type = DiscountActionTypes.discountDelete;
+  readonly type = DiscountActionTypes.deleteDiscount;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public name: string) {
   }
 }
 
@@ -136,15 +131,15 @@ export type All =
   | GetMyReferrals
   | GetAllCurrency
   | SendDiscountToCustomers
-  | DiscountSave
-  | DiscountUpdate
+  | CreateDiscount
+  | UpdateDiscount
   | DiscountSuccess
   | ReferralSuccess
   | CurrencySuccess
   | DiscountSaveSuccess
   | DiscountFailure
-  | DiscountFind
-  | DiscountFindByCustomer
+  | GetDiscount
+  | GetUserDiscountByCustomerId
   | DiscountSelected
   | DeleteDiscount
   | Clean;

@@ -77,9 +77,8 @@ export class AdditionalComponent implements OnInit, OnDestroy {
   	if (this.isAddMode) {
   		this.store.dispatch(new fromActionsAdditional.CreateAdditional(additional));
   	} else {
-  		additional.id = this.id;
   		this.additional = undefined;
-  		this.store.dispatch(new fromActionsAdditional.UpdateAdditionalById(additional));
+  		this.store.dispatch(new fromActionsAdditional.UpdateAdditional(this.id!, additional));
   	}
   	return;
   }
@@ -153,13 +152,13 @@ export class AdditionalComponent implements OnInit, OnDestroy {
   private getAdditional = (): void => {
   	if (!this.additional) {
   		this.store.dispatch(
-  			new fromActionsAdditional.FindAdditionalById(this.id),
+  			new fromActionsAdditional.GetAdditional(this.id!),
   		);
   	}
   };
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe(state => {
+  	this.subscription = this.getState.subscribe((state) => {
   		this.allGroups = state.groups;
   		if (state.selected) {
   			this.additional = {
@@ -182,7 +181,7 @@ export class AdditionalComponent implements OnInit, OnDestroy {
   				this.errors[value.field] = value.message;
   				this.form.controls[value.field].setErrors({ incorrect: true });
   			});
-  		} else if (state.message) {
+  		} else if (state.response) {
   			this.router.navigate([this.language, 'additional']);
   		}
   	});

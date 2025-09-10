@@ -1,19 +1,19 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, Inject, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState } from '../../store/app.states';
 import { Clipboard } from '@angular/cdk/clipboard';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheet } from '@angular/material/bottom-sheet';
 import { environment } from '../../../environments/environment';
 import { Observable, Subscription } from 'rxjs';
 import * as fromActionsDiscount from '../../store/discount.actions';
-import { IUserDiscount } from '../../interfaces/discount';
+import { IReferral } from '../../interfaces/discount';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Analytics, logEvent } from '@angular/fire/analytics';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { SharedModule } from '../../shared/shared.module';
 import { ShareButtonsComponent } from './share-buttons/share-buttons.component';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-referrals',
@@ -22,39 +22,29 @@ import { ShareButtonsComponent } from './share-buttons/share-buttons.component';
   imports: [SharedModule],
 })
 export class ReferralsComponent implements OnInit, OnDestroy {
+  private store: Store<AppState> = inject(Store<AppState>);
+  private clipboard: Clipboard = inject(Clipboard);
+  private toastService: ToastService = inject(ToastService);
+  private translate: TranslateService = inject(TranslateService);
+  private bottomSheet: MatBottomSheet = inject(MatBottomSheet);
+  private analytic: Analytics = inject(Analytics);
+  private authUserService: AuthUserService = inject(AuthUserService);
+
   userId?: string;
   showInvites = false;
   showShare = false;
 
-  private getState: Observable<any>;
+  private getState: Observable<any> = this.store.select(selectDiscountState);
   private subscription?: Subscription;
-  private authUserServiceSubscription: Subscription;
+  private authUserServiceSubscription?: Subscription;
   private referralMax: number | undefined;
   private referrals = 0;
   private referralsUsed = 0;
 
-  constructor(private store: Store<AppState>, private clipboard: Clipboard, private snackBar: MatSnackBar,
-              private translate: TranslateService, private bottomSheet: MatBottomSheet,
-              private analytic: Analytics, private authUserService: AuthUserService) {
-    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
-      this.userId = value.userId;
-      this.referralMax = value.referralMax;
-    });
-    this.getState = this.store.select(selectDiscountState);
-    logEvent(this.analytic, 'screen_view', {
-      // eslint-disable-next-line camelcase
-      firebase_screen: 'Referral page',
-      // eslint-disable-next-line camelcase
-      firebase_screen_class: 'ReferralsComponent',
-    });
-  }
-
   get copy(): void {
     if (this.userId) {
       this.clipboard.copy(this.userId);
-      this.snackBar.open(this.translate.instant('ME.REFERRAL.COPY'), 'OK', {
-        duration: 5000,
-      });
+      this.toastService.info(this.translate.instant('ME.REFERRAL.COPY'));
     }
     return;
   }
@@ -74,6 +64,16 @@ export class ReferralsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
+      this.userId = value.userId;
+      this.referralMax = value.referralMax;
+    });
+    logEvent(this.analytic, 'screen_view', {
+      // eslint-disable-next-line camelcase
+      firebase_screen: 'Referral page',
+      // eslint-disable-next-line camelcase
+      firebase_screen_class: 'ReferralsComponent',
+    });
     this.clean();
     this.subscribe();
     this.getReferrals();
@@ -81,7 +81,7 @@ export class ReferralsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
-    this.authUserServiceSubscription.unsubscribe();
+    this.authUserServiceSubscription?.unsubscribe();
   }
 
   private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
@@ -89,9 +89,9 @@ export class ReferralsComponent implements OnInit, OnDestroy {
   private getReferrals = (): void => this.store.dispatch(new fromActionsDiscount.GetMyReferrals());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.referrals) {
-        const referrals: IUserDiscount[] = state.referrals;
+        const referrals: IReferral[] = state.referrals;
         this.referrals = referrals.length;
         this.referralsUsed = referrals.filter(referral => referral.used).length;
         this.showInvites = true;

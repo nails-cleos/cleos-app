@@ -101,12 +101,12 @@ export class UserComponent implements OnInit, OnDestroy {
 
     if (this.isAddMode) {
       this.store.dispatch(
-        new fromActionsUser.SaveUser({ user, role: this.getForm.role.value }),
+        new fromActionsUser.SaveUser(user, this.getForm.role.value),
       );
     } else {
       user.id = this.id;
       this.user = undefined;
-      this.store.dispatch(new fromActionsUser.SaveUser({ user }));
+      this.store.dispatch(new fromActionsUser.SaveUser(user));
     }
     return;
   }
@@ -183,7 +183,7 @@ export class UserComponent implements OnInit, OnDestroy {
   private getUser = (): void => {
     if (!this.user) {
       this.store.dispatch(
-        new fromActionsUser.GetUserById(this.id),
+        new fromActionsUser.getUser(this.id!),
       );
     }
   };
@@ -204,7 +204,7 @@ export class UserComponent implements OnInit, OnDestroy {
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.selected) {
         this.user = state.selected;
         const user: IUser = {
@@ -235,7 +235,7 @@ export class UserComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
-      } else if (state.message) {
+      } else if (state.response) {
         this.router.navigate([this.translate.currentLang, 'users']);
       }
     });

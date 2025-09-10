@@ -3,28 +3,29 @@ import { All, UnavailableActionTypes } from '../unavailable.actions';
 import { IUnavailable } from '../../interfaces/unavailable';
 import { IUser } from '../../interfaces/user';
 import { IRoom } from '../../interfaces/room';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 
 export interface State {
-  data: IUnavailable | Pagination<IUnavailable> | null;
-  professionals: IUser[] | null;
-  room: IRoom | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  selected: IUnavailable | null;
-  message: string | null;
+  response?: IResponseSuccess;
+  data?: Pagination<IUnavailable>;
+  professionals?: IUser[];
+  rooms?: IRoom[];
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
+  selected?: IUnavailable;
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  data: null,
-  professionals: null,
-  room: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  selected: null,
-  message: null,
+  data: undefined,
+  professionals: undefined,
+  rooms: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  selected: undefined,
+  response: undefined,
   isLoading: false,
 };
 
@@ -34,99 +35,106 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IUnavailable>,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
+        response: undefined,
       };
     }
     case UnavailableActionTypes.getAllProfessional: {
       return {
         ...state,
-        professionals: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        professionals: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case UnavailableActionTypes.getAllRoomsByProfessionalId: {
       return {
         ...state,
-        room: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        rooms: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
-    case UnavailableActionTypes.findUnavailableById: {
+    case UnavailableActionTypes.getUnavailable: {
       return {
         ...state,
-        data: {} as IUnavailable,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        selected: {} as IUnavailable,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case UnavailableActionTypes.unavailableSuccess: {
       return {
         ...state,
-        data: action.payload,
-        professionals: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        data: action.data,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
+      };
+    }
+    case UnavailableActionTypes.professionalSuccess: {
+      return {
+        ...state,
+        professionals: action.professionals,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case UnavailableActionTypes.unavailableSaveSuccess: {
       return {
         ...state,
-        message: action.payload.message,
-        selected: null,
-        errorMessage: null,
-        subErrors: null,
+        response: action,
+        selected: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
         isLoading: false,
       };
     }
     case UnavailableActionTypes.unavailableSelected: {
       return {
         ...state,
-        selected: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        selected: action.selected,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case UnavailableActionTypes.unavailableFailure: {
       return {
         ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
-        message: null,
+        errorMessage: action.error.message,
+        error: action.error,
+        subErrors: action.error.subErrors,
+        response: undefined,
         isLoading: false,
       };
     }
-    case UnavailableActionTypes.updateUnavailableById:
+    case UnavailableActionTypes.updateUnavailable:
     case UnavailableActionTypes.createUnavailable:
     case UnavailableActionTypes.createBlockAgenda:
-    case UnavailableActionTypes.deleteUnavailableById: {
+    case UnavailableActionTypes.deleteUnavailable: {
       return {
         ...state,
-        error: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        error: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
         isLoading: true,
       };
     }
     case UnavailableActionTypes.roomSuccess: {
       return {
         ...state,
-        room: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        rooms: action.rooms,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case UnavailableActionTypes.clean: {

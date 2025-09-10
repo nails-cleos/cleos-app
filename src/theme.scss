@@ -341,12 +341,32 @@ $light-theme: mat.m2-define-light-theme((
 .light-theme {
   @include style.color($light-theme);
   @include mat.strong-focus-indicators-color($light-theme);
+
+  & {
+    --toast-background: #ffffff;
+    --toast-text: rgba(0, 0, 0, 0.87);
+    --toast-success: var(--primary-color);
+    --toast-error: var(--warn-color);
+    --toast-warning: #ff9800;
+    --toast-info: var(--accent-color);
+    --toast-shadow: rgba(0, 0, 0, 0.15);
+  }
 }
 
 .dark-theme {
   @include mat.all-component-colors($dark-theme);
   @include style.color($dark-theme);
   @include mat.strong-focus-indicators-color($dark-theme);
+
+  & {
+    --toast-background: #424242;
+    --toast-text: rgba(255, 255, 255, 0.87);
+    --toast-success: var(--primary-color);
+    --toast-error: var(--warn-color);
+    --toast-warning: #ffb74d;
+    --toast-info: var(--accent-color);
+    --toast-shadow: rgba(0, 0, 0, 0.4);
+  }
 }
 
 .home-page-form {

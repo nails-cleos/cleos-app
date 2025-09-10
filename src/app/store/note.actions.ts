@@ -1,16 +1,19 @@
 import { Action } from '@ngrx/store';
+import { IError, ResponseSuccess } from '../interfaces/common';
+import { INote } from '../interfaces/note';
+import { IUser } from '../interfaces/user';
 
 export enum NoteActionTypes {
   getAllProfessional = '[Note] Get all professional',
   noteSuccess = '[Note] Success',
   createNote = '[Note] Create Note',
-  updateNoteById = '[Note] Update note by Id',
+  updateNote = '[Note] Update note by Id',
   noteSaveSuccess = '[Note] Save Success',
   noteFailure = '[Note] Failure',
   noteSelected = '[Note] Selected',
-  findNoteById = '[Note] Find note by Id',
-  deleteNoteById = '[Note] Delete note by Id',
-  noteComplete = '[Note] Complete',
+  getNote = '[Note] Find note by Id',
+  deleteNote = '[Note] Delete note by Id',
+  completeNote = '[Note] Complete',
   clean = '[Note] Clean'
 }
 
@@ -21,63 +24,60 @@ export class GetAllProfessional implements Action {
 export class NoteSuccess implements Action {
   readonly type = NoteActionTypes.noteSuccess;
 
-  constructor(public payload: any) {
+  constructor(public data: IUser[]) {
   }
 }
 
 export class CreateNote implements Action {
   readonly type = NoteActionTypes.createNote;
 
-  constructor(public payload: any) {
+  constructor(public note: INote) {
   }
 }
 
-export class UpdateNoteById implements Action {
-  readonly type = NoteActionTypes.updateNoteById;
+export class UpdateNote implements Action {
+  readonly type = NoteActionTypes.updateNote;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public note: INote) {
   }
 }
 
-export class NoteSaveSuccess implements Action {
+export class NoteSaveSuccess extends ResponseSuccess implements Action {
   readonly type = NoteActionTypes.noteSaveSuccess;
-
-  constructor(public payload: any) {
-  }
 }
 
 export class NoteFailure implements Action {
   readonly type = NoteActionTypes.noteFailure;
 
-  constructor(public payload: any) {
+  constructor(public error: IError) {
   }
 }
 
 export class NoteSelected implements Action {
   readonly type = NoteActionTypes.noteSelected;
 
-  constructor(public payload: any) {
+  constructor(public selected?: INote) {
   }
 }
 
-export class FindNoteById implements Action {
-  readonly type = NoteActionTypes.findNoteById;
+export class GetNote implements Action {
+  readonly type = NoteActionTypes.getNote;
 
-  constructor(public payload: any) {
+  constructor(public id: string) {
   }
 }
 
-export class DeleteNoteById implements Action {
-  readonly type = NoteActionTypes.deleteNoteById;
+export class DeleteNote implements Action {
+  readonly type = NoteActionTypes.deleteNote;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public description: string) {
   }
 }
 
 export class CompleteNote implements Action {
-  readonly type = NoteActionTypes.noteComplete;
+  readonly type = NoteActionTypes.completeNote;
 
-  constructor(public payload: any) {
+  constructor(public id: string) {
   }
 }
 
@@ -88,12 +88,12 @@ export class Clean implements Action {
 export type All =
   | GetAllProfessional
   | CreateNote
-  | UpdateNoteById
+  | UpdateNote
   | NoteSuccess
   | NoteSaveSuccess
   | NoteFailure
-  | FindNoteById
+  | GetNote
   | NoteSelected
-  | DeleteNoteById
+  | DeleteNote
   | CompleteNote
   | Clean;

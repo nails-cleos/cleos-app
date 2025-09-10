@@ -3,34 +3,35 @@ import { All, RoomActionTypes } from '../room.actions';
 import { IRoom, IRoomCustomer, IRoomService } from '../../interfaces/room';
 import { IUser } from '../../interfaces/user';
 import { ICurrency } from '../../interfaces/currency';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 
 export interface State {
-  data: IRoom | Pagination<IRoom> | null;
-  services: IRoomService | null;
-  professionals: IUser[] | null;
-  currencies: ICurrency[] | null;
-  offices: IUser[] | null;
-  customers: IRoomCustomer[] | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  selected: IRoom | null;
-  message: string | null;
+  response?: IResponseSuccess;
+  data?: IRoom | Pagination<IRoom>;
+  services?: IRoomService;
+  professionals?: IUser[];
+  currencies?: ICurrency[];
+  offices?: IUser[];
+  customers?: IRoomCustomer[];
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
+  selected?: IRoom;
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  data: null,
-  services: null,
-  professionals: null,
-  currencies: null,
-  offices: null,
-  customers: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  selected: null,
-  message: null,
+  data: undefined,
+  services: undefined,
+  professionals: undefined,
+  currencies: undefined,
+  offices: undefined,
+  customers: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  selected: undefined,
+  response: undefined,
   isLoading: false,
 };
 
@@ -39,38 +40,36 @@ export const reducer = (state = initialState, action: All): State => {
     case RoomActionTypes.getRoomsPage: {
       return {
         ...state,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        data: { content: [{}, {}, {}], totalElements: 3 },
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IRoom>,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
+        response: undefined,
       };
     }
     case RoomActionTypes.getAllRoomsInfo: {
       return {
         ...state,
-        professionals: null,
-        currencies: null,
-        offices: null,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        professionals: undefined,
+        currencies: undefined,
+        offices: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
+        response: undefined,
       };
     }
-    case RoomActionTypes.findRoomById: {
+    case RoomActionTypes.getRoom: {
       return {
         ...state,
         data: {} as IRoom,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
+        response: undefined,
       };
     }
-    case RoomActionTypes.findRoomServicesById: {
+    case RoomActionTypes.getServices: {
       return {
         ...state,
         services: {
@@ -80,80 +79,80 @@ export const reducer = (state = initialState, action: All): State => {
           additionalList: [],
           selectedAdditionalList: [],
         } as IRoomService,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
+        response: undefined,
       };
     }
     case RoomActionTypes.roomInfoSuccess: {
       return {
         ...state,
-        professionals: action.payload.professionals,
-        offices: action.payload.offices,
-        currencies: action.payload.currencies,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        professionals: action.roomInfo?.professionals,
+        offices: action.roomInfo?.offices,
+        currencies: action.roomInfo?.currencies,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case RoomActionTypes.roomSuccess: {
       return {
         ...state,
-        data: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        data: action.data,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case RoomActionTypes.roomSaveSuccess: {
       return {
         ...state,
-        message: action.payload.message,
-        errorMessage: null,
-        selected: null,
-        subErrors: null,
+        response: action,
+        errorMessage: undefined,
+        selected: undefined,
+        subErrors: undefined,
         isLoading: false,
       };
     }
     case RoomActionTypes.roomSelected: {
       return {
         ...state,
-        selected: action.payload.roomInfo,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        selected: action.selected,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case RoomActionTypes.roomServiceSelected: {
       return {
         ...state,
-        services: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        services: action.services,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case RoomActionTypes.roomFailure: {
       return {
         ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
-        message: null,
+        errorMessage: action.error.message,
+        error: action.error,
+        subErrors: action.error.subErrors,
+        response: undefined,
         isLoading: false,
       };
     }
-    case RoomActionTypes.updateRoomServicesById:
-    case RoomActionTypes.updateRoomById:
+    case RoomActionTypes.updateServices:
+    case RoomActionTypes.updateRoom:
     case RoomActionTypes.createRoom:
-    case RoomActionTypes.deleteRoomById: {
+    case RoomActionTypes.deleteRoom: {
       return {
         ...state,
-        selected: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        selected: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
         isLoading: true,
       };
     }
@@ -161,19 +160,19 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         customers: [{}, {}, {}],
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
+        response: undefined,
       };
     }
     case RoomActionTypes.customerInfoSuccess: {
       return {
         ...state,
-        customers: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        customers: action.customers,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case RoomActionTypes.clean: {

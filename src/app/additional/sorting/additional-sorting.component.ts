@@ -46,12 +46,12 @@ export class AdditionalSortingComponent implements OnInit, OnDestroy {
   private getAdditionalList = (): void => this.store.dispatch(new fromActionsAdditional.GetAdditionalList());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((stateValue) => {
-      if (stateValue.message) {
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.response) {
         this.clean();
         this.getAdditionalList();
       }
-      this.items = stateValue?.data?.map((iAdditionalAll: IAdditionalAll) => new ItemSorting(
+      this.items = state?.data?.map((iAdditionalAll: IAdditionalAll) => new ItemSorting(
         iAdditionalAll.id, iAdditionalAll.name, iAdditionalAll.order),
       );
     });

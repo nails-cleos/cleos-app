@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ISendMessage } from '../../main';
 
 @Injectable()
 export class MainService {
@@ -10,5 +11,5 @@ export class MainService {
 
   private http: HttpClient = inject(HttpClient);
 
-  sendMessage = (body: any): Observable<any> => this.http.post<any>(this.urlV1, body);
+  sendMessage = (body: ISendMessage): Observable<void> => this.http.post<void>(this.urlV1, body);
 }

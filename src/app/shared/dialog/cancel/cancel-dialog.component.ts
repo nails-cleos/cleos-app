@@ -66,11 +66,11 @@ export class CancelDialogComponent implements OnInit {
     const option: IPaymentOption = this.typeForm.get('type')?.value;
     const type = option?.type;
     const paymentOptionId = option?.bic;
-    const payload = { cancelOption, type, paymentOptionId, bic: undefined };
+    const cancelRequest = { cancelOption, type, paymentOptionId, bic: undefined };
     if (option?.subTypes?.length) {
-      payload.bic = this.typeForm.get('bank')?.value?.bic;
+      cancelRequest.bic = this.typeForm.get('bank')?.value?.bic;
     }
-    this.dialogRef.close(payload);
+    this.dialogRef.close(cancelRequest);
     return;
   }
 

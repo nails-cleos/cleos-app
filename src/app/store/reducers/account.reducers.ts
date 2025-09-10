@@ -2,49 +2,50 @@ import { Pagination } from '../../interfaces/pagination';
 import { AccountActionTypes, All } from '../account.actions';
 import { IAccount, IAccountTransaction, ITransaction } from '../../interfaces/account';
 import { IPaymentOption } from '../../interfaces/payment';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 
 export interface State {
-  data: IAccount | IAccountTransaction | null;
-  paymentOptions: IPaymentOption[] | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  selected: IAccount | null;
-  message: string | null;
+  response?: IResponseSuccess;
+  data?: IAccount | IAccountTransaction | ITransaction[];
+  paymentOptions?: IPaymentOption[];
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
+  selected?: IAccount;
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  data: null,
-  paymentOptions: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  selected: null,
-  message: null,
+  response: undefined,
+  data: undefined,
+  paymentOptions: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  selected: undefined,
   isLoading: false,
 };
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
-    case AccountActionTypes.findTransactionById:
-    case AccountActionTypes.findAccountByCustomerId:
-    case AccountActionTypes.findAccountById: {
+    case AccountActionTypes.getTransaction:
+    case AccountActionTypes.getAccountByCustomerId:
+    case AccountActionTypes.getAccount: {
       return {
         ...state,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        response: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: {} as IAccount,
       };
     }
     case AccountActionTypes.paymentOptions: {
       return {
         ...state,
-        paymentOptions: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        response: undefined,
+        paymentOptions: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case AccountActionTypes.getTransactionsByAccountId: {
@@ -54,74 +55,66 @@ export const reducer = (state = initialState, action: All): State => {
           transactions: { content: [{}, {}, {}], totalElements: 3 } as Pagination<ITransaction>,
           account: undefined,
         },
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        response: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case AccountActionTypes.accountSuccess: {
       return {
         ...state,
-        data: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        data: action.data,
+        response: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case AccountActionTypes.paymentOptionsSuccess: {
       return {
         ...state,
-        paymentOptions: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        paymentOptions: action.paymentOptions,
+        response: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case AccountActionTypes.accountSaveSuccess: {
       return {
         ...state,
-        message: action.payload.message,
-        selected: null,
-        errorMessage: null,
-        subErrors: null,
+        response: action,
+        selected: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
         isLoading: false,
       };
     }
     case AccountActionTypes.accountSelected: {
       return {
         ...state,
-        selected: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        selected: action.selected,
+        response: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case AccountActionTypes.accountFailure: {
       return {
         ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
-        message: null,
+        errorMessage: action.error.message,
+        error: action.error,
+        subErrors: action.error.subErrors,
+        response: undefined,
         isLoading: false,
       };
     }
-    case AccountActionTypes.updateAccountById:
-    case AccountActionTypes.addMoney: {
+    case AccountActionTypes.paymentSend:
+    case AccountActionTypes.updateAccount:
+    case AccountActionTypes.createTransaction: {
       return {
         ...state,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
-        isLoading: true,
-      };
-    }
-    case AccountActionTypes.paymentSend: {
-      return {
-        ...state,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        response: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
         isLoading: true,
       };
     }

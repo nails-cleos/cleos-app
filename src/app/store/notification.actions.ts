@@ -1,70 +1,70 @@
 import { Action } from '@ngrx/store';
+import { IError, PageRequest } from '../interfaces/common';
+import { Pagination } from '../interfaces/pagination';
+import { INotification } from '../interfaces/notification';
 
 export enum NotificationActionTypes {
   getNotificationsPage = '[Notification] Get notifications page',
   notificationSuccess = '[Notification] Notifications success',
   notificationFailure = '[Notification] Failure',
-  readNotificationById = '[Notification] Read notification by id',
-  deleteNotificationById = '[Notification] Delete notification by id',
+  readNotification = '[Notification] Read notification by id',
+  deleteNotification = '[Notification] Delete notification by id',
   notificationDeleteSuccess = '[Notification] Notifications delete success',
   notificationReadSuccess = '[Notification] Notification read success',
   subscribeNotification = '[Notification] Subscribe notification',
   clean = '[Notification] Clean'
 }
 
-export class GetNotificationsPage implements Action {
+export class GetNotificationsPage extends PageRequest implements Action {
   readonly type = NotificationActionTypes.getNotificationsPage;
-
-  constructor(public payload: any) {
-  }
 }
 
 export class NotificationSuccess implements Action {
   readonly type = NotificationActionTypes.notificationSuccess;
 
-  constructor(public payload: any) {
+  constructor(public data: Pagination<INotification> | string) {
   }
 }
 
 export class NotificationFailure implements Action {
   readonly type = NotificationActionTypes.notificationFailure;
 
-  constructor(public payload: any) {
+  constructor(public error: IError) {
   }
 }
 
-export class ReadNotificationById implements Action {
-  readonly type = NotificationActionTypes.readNotificationById;
+export class ReadNotification implements Action {
+  readonly type = NotificationActionTypes.readNotification;
 
-  constructor(public payload: any) {
+  constructor(public id: string) {
   }
 }
 
-export class DeleteNotificationById implements Action {
-  readonly type = NotificationActionTypes.deleteNotificationById;
+export class DeleteNotification implements Action {
+  readonly type = NotificationActionTypes.deleteNotification;
 
-  constructor(public payload: any) {
+  constructor(public notification: INotification) {
   }
 }
 
 export class NotificationDeleteSuccess implements Action {
   readonly type = NotificationActionTypes.notificationDeleteSuccess;
 
-  constructor(public payload: any) {
+  constructor(public data: any) {
   }
 }
 
 export class SubscribeNotification implements Action {
   readonly type = NotificationActionTypes.subscribeNotification;
 
-  constructor(public payload: any) {
+  constructor(public token: string) {
   }
 }
 
 export class NotificationReadSuccess implements Action {
   readonly type = NotificationActionTypes.notificationReadSuccess;
 
-  constructor(public payload: any) {
+  constructor(public data?: INotification) {
   }
 }
 
@@ -76,8 +76,8 @@ export type All =
   | GetNotificationsPage
   | NotificationSuccess
   | NotificationFailure
-  | ReadNotificationById
-  | DeleteNotificationById
+  | ReadNotification
+  | DeleteNotification
   | NotificationDeleteSuccess
   | NotificationReadSuccess
   | SubscribeNotification

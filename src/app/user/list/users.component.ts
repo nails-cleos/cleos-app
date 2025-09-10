@@ -59,180 +59,174 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private router: Router, private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
-  	breakpointObserver.observe([
-  		Breakpoints.XSmall,
-  		Breakpoints.Small,
-  	]).subscribe(result => {
-  		if (result.matches) {
-  			this.pageSize = MOBILE_PAGE_SIZE;
-  			this.smallScreen = true;
-  		}
-  	});
-  	this.getState = this.store.select(selectUserState);
-  	this.language = this.translate.currentLang;
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small,
+    ]).subscribe(result => {
+      if (result.matches) {
+        this.pageSize = MOBILE_PAGE_SIZE;
+        this.smallScreen = true;
+      }
+    });
+    this.getState = this.store.select(selectUserState);
+    this.language = this.translate.currentLang;
   }
 
   ngOnInit(): void {
-  	this.clean();
-  	this.subscribe();
+    this.clean();
+    this.subscribe();
   }
 
   ngAfterViewInit(): void {
-  	this.getUsers();
+    this.getUsers();
   }
 
   ngOnDestroy(): void {
-  	this.subscription?.unsubscribe();
-  	this.paginatorSubscription?.unsubscribe();
+    this.subscription?.unsubscribe();
+    this.paginatorSubscription?.unsubscribe();
   }
 
   applyFilter = (event: Event): void => {
-  	const filterValue = (event.target as HTMLInputElement).value;
-  	this.filter = filterValue.trim().toLowerCase();
-  	this.getUsers(0);
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.filter = filterValue.trim().toLowerCase();
+    this.getUsers(0);
   };
 
-  edit = (user: IUser): void => this.store.dispatch(new fromActionsUser.UserSelected({ user, profile: false }));
+  edit = (user: IUser): void => this.store.dispatch(new fromActionsUser.UserSelected(user, false));
 
   delete = (user: IUser): void => {
-  	this.noExpanded(user);
-  	const title = this.translate.instant('USER.DELETED.TITLE');
-  	const content = this.translate.instant('USER.DELETED.CONTENT', { displayName: user.displayName });
-  	const dialogRef = this.dialog.open(DialogComponent, {
-  		data: { title, content, value: user },
-  	});
+    this.noExpanded(user);
+    const title = this.translate.instant('USER.DELETED.TITLE');
+    const content = this.translate.instant('USER.DELETED.CONTENT', { displayName: user.displayName });
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: { title, content, value: user },
+    });
 
-  	dialogRef.afterClosed().subscribe(result => {
-  		if (result) {
-  			this.store.dispatch(
-  				new fromActionsUser.DeleteUserById(result),
-  			);
-  		}
-  	});
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.store.dispatch(
+          new fromActionsUser.DeleteUser(result.id, result.displayName),
+        );
+      }
+    });
   };
 
   sendInvite = (user: IUser): void => {
-  	this.noExpanded(user);
-  	const title = this.translate.instant('USER.ACTIVATION_RESEND.TITLE');
-  	const content = this.translate.instant('USER.ACTIVATION_RESEND.CONTENT', { displayName: user.displayName });
-  	const dialogRef = this.dialog.open(DialogComponent, {
-  		data: { title, content, value: user },
-  	});
+    this.noExpanded(user);
+    const title = this.translate.instant('USER.ACTIVATION_RESEND.TITLE');
+    const content = this.translate.instant('USER.ACTIVATION_RESEND.CONTENT', { displayName: user.displayName });
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: { title, content, value: user },
+    });
 
-  	dialogRef.afterClosed().subscribe(result => {
-  		if (result) {
-  			this.store.dispatch(
-  				new fromActionsUser.ResendToken(result.id),
-  			);
-  		}
-  	});
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.store.dispatch(
+          new fromActionsUser.ResendToken(result.id),
+        );
+      }
+    });
   };
 
   restore = (user: IUser): void => {
-  	this.noExpanded(user);
-  	const title = this.translate.instant('USER.RESTORE.TITLE');
-  	const content = this.translate.instant('USER.RESTORE.CONTENT', { displayName: user.displayName });
-  	const dialogRef = this.dialog.open(DialogComponent, {
-  		data: { title, content, value: user },
-  	});
+    this.noExpanded(user);
+    const title = this.translate.instant('USER.RESTORE.TITLE');
+    const content = this.translate.instant('USER.RESTORE.CONTENT', { displayName: user.displayName });
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: { title, content, value: user },
+    });
 
-  	dialogRef.afterClosed().subscribe(result => {
-  		if (result) {
-  			const restoreUser: IUser = new User();
-  			restoreUser.id = result.id;
-  			restoreUser.deleted = false;
-  			this.store.dispatch(
-  				new fromActionsUser.RestoreUser(restoreUser),
-  			);
-  		}
-  	});
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const restoreUser: IUser = new User();
+        restoreUser.id = result.id;
+        restoreUser.deleted = false;
+        this.store.dispatch(
+          new fromActionsUser.Restore(restoreUser.id!, restoreUser, restoreUser.displayName!),
+        );
+      }
+    });
   };
 
   merge = (user: IUser): void => {
-  	this.noExpanded(user);
-  	const data = {
-  		small: this.smallScreen,
-  		newUser: user,
-  	};
+    this.noExpanded(user);
+    const data = {
+      small: this.smallScreen,
+      newUser: user,
+    };
 
-  	executeDialogNoWidth(this.dialog, SelectUserDialogComponent, data, result => {
-  		if (result) {
-  			this.store.dispatch(
-  				new fromActionsUser.MergeUsers({ oldUserId: result.id, newUserId: user.id }),
-  			);
-  		}
-  	}, true);
+    executeDialogNoWidth(this.dialog, SelectUserDialogComponent, data, result => {
+      if (result) {
+        this.store.dispatch(
+          new fromActionsUser.MergeUsers(result.id, user.id!),
+        );
+      }
+    }, true);
   };
 
   getIcon = (name: any): any => {
-  	const iconName: RoleIconKey = snakeToCamel(name) as RoleIconKey;
-  	return RoleIconName[iconName];
+    const iconName: RoleIconKey = snakeToCamel(name) as RoleIconKey;
+    return RoleIconName[iconName];
   };
 
   addRole = (user: IUserAll, role: Role): void => this.store.dispatch(
-  	new fromActionsUser.SetRole({ user, role, action: 'ADD' }),
+    new fromActionsUser.SetRole(user.id, user.displayName, role, 'ADD'),
   );
 
-  removeRole = (user: IUserAll, role: string): void => this.store.dispatch(
-  	new fromActionsUser.SetRole({ user, role, action: 'REMOVE' }),
+  removeRole = (user: IUserAll, role: Role): void => this.store.dispatch(
+    new fromActionsUser.SetRole(user.id, user.displayName, role, 'REMOVE'),
   );
 
   book = (customer: IUser): void => {
-  	const data = { customer };
-  	this.router.navigate([this.translate.currentLang, 'reservation'], { state: data });
+    const data = { customer };
+    this.router.navigate([this.translate.currentLang, 'reservation'], { state: data });
   };
 
   private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
 
   private createPageSubscriptions = (): void => {
-  	this.sort.sortChange.subscribe(() => {
-  		this.paginator.pageIndex = 0;
-  		this.getUsers();
-  	});
-  	this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getUsers(this.paginator.pageIndex));
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getUsers();
+    });
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getUsers(this.paginator.pageIndex));
 
-  	this.cdRef.detectChanges();
+    this.cdRef.detectChanges();
   };
 
   private noExpanded = (user: IUser): void => {
-  	if (this.expandedUser) {
-  		this.expandedUser = undefined;
-  	} else {
-  		this.expandedUser = user;
-  	}
+    if (this.expandedUser) {
+      this.expandedUser = undefined;
+    } else {
+      this.expandedUser = user;
+    }
   };
 
   private getUsers = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsUser.GetUsersPage({
-  		active: this.sort.active,
-  		direction: this.sort.direction,
-  		size: this.pageSize,
-  		filter: this.filter,
-  		page,
-  	}),
+    new fromActionsUser.GetUsersPage(page, this.sort.active, this.sort.direction, this.pageSize, this.filter),
   );
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe((stateValue) => {
-  		if (stateValue.message) {
-  			this.clean();
-  			this.getUsers();
-  		}
-  		this.dataSource = stateValue.data?.content?.map((user: IUserAll) => {
-  			if (user.authorities) {
-  				const missing = this.allRole.filter(au => !user.authorities.some(u => u.authority === au));
-  				return Object.assign({}, user, { missing });
-  			}
-  			return user;
-  		});
-  		this.resultsLength = stateValue.data?.totalElements;
-  		if (this.resultsLength && !this.paginatorSubscription) {
-  			this.createPageSubscriptions();
-  		} else if (!this.resultsLength) {
-  			this.paginatorSubscription?.unsubscribe();
-  			this.paginatorSubscription = undefined;
-  		}
-  	});
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.response) {
+        this.clean();
+        this.getUsers();
+      }
+      this.dataSource = state.data?.content?.map((user: IUserAll) => {
+        if (user.authorities) {
+          const missing = this.allRole.filter(au => !user.authorities.some(u => u.authority === au));
+          return Object.assign({}, user, { missing });
+        }
+        return user;
+      });
+      this.resultsLength = state.data?.totalElements;
+      if (this.resultsLength && !this.paginatorSubscription) {
+        this.createPageSubscriptions();
+      } else if (!this.resultsLength) {
+        this.paginatorSubscription?.unsubscribe();
+        this.paginatorSubscription = undefined;
+      }
+    });
   };
 }
 
@@ -307,10 +301,10 @@ export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestr
   private filterUser = (name: string): IUser[] | undefined => this.users?.filter(
     option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private getOldUsers = (): void => this.store.dispatch(new fromActionsUser.FindAllDisableUsers());
+  private getOldUsers = (): void => this.store.dispatch(new fromActionsUser.GetAllDisableUsers());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.users = state.users?.filter((it: IUser) => it.id !== this.newUser.id);
       this.user.setValue(null);
     });
