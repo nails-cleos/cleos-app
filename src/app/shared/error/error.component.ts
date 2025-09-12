@@ -1,12 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { SharedModule } from '../shared.module';
 import { BackButtonDirective } from '../../directives/back-button.directive';
+import { AppMaterialModule } from '../../util/app-material.module';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-error',
   templateUrl: './error.component.html',
   styleUrls: ['./error.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [AppMaterialModule, BackButtonDirective, TranslatePipe],
 })
 export class ErrorComponent implements OnInit {
 
@@ -19,18 +20,18 @@ export class ErrorComponent implements OnInit {
   }
 
   get reload(): void {
-  	return window.location.reload();
+    return window.location.reload();
   }
 
   ngOnInit(): void {
-  	if (!['NO_CONTENT', 'no_content_error'].includes(this.error.status)) {
-  		if (this.error.status === 'NOT_FOUND') {
-  			this.imageSrc = './assets/not_found.png';
-  			this.retry = false;
-  		} else {
-  			this.imageSrc = './assets/error.png';
-  			this.retry = this.error.status !== 'BAD_REQUEST';
-  		}
-  	}
+    if (!['NO_CONTENT', 'no_content_error'].includes(this.error.status)) {
+      if (this.error.status === 'NOT_FOUND') {
+        this.imageSrc = './assets/not_found.png';
+        this.retry = false;
+      } else {
+        this.imageSrc = './assets/error.png';
+        this.retry = this.error.status !== 'BAD_REQUEST';
+      }
+    }
   }
 }

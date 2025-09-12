@@ -1,0 +1,401 @@
+<?xml version="1.0"?>
+<testsuite name="Chrome Headless 140.0.0.0 (Mac OS 10.15.7)" package="" timestamp="2025-09-12T16:14:04" id="0" hostname="Lucass-MacBook-Pro.local" tests="295" errors="0" failures="0" time="1.879">
+  <properties>
+    <property name="browser.fullName" value="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/140.0.0.0 Safari/537.36"/>
+  </properties>
+  <testcase name="MainContentService should be created" time="0.005" classname="MainContentService"/>
+  <testcase name="InvoiceComponent should create" time="0.066" classname="InvoiceComponent"/>
+  <testcase name="MainComponent should create" time="0.036" classname="MainComponent"/>
+  <testcase name="TransactionComponent should create" time="0.017" classname="TransactionComponent"/>
+  <testcase name="TotalSummaryComponent should create" time="0.011" classname="TotalSummaryComponent"/>
+  <testcase name="TotalSummaryComponent should accept summaryTotals input" time="0.004" classname="TotalSummaryComponent"/>
+  <testcase name="TotalSummaryComponent should initialize showCash to false" time="0.003" classname="TotalSummaryComponent"/>
+  <testcase name="TotalSummaryComponent Component behavior should work without currency input" time="0.005" classname="TotalSummaryComponent Component behavior"/>
+  <testcase name="TotalSummaryComponent Component behavior should render with required summaryTotals input" time="0.005" classname="TotalSummaryComponent Component behavior"/>
+  <testcase name="TotalSummaryComponent Component behavior should toggle cash section visibility" time="0.005" classname="TotalSummaryComponent Component behavior"/>
+  <testcase name="TotalSummaryComponent Template rendering should render mat-card with outlined appearance" time="0.004" classname="TotalSummaryComponent Template rendering"/>
+  <testcase name="TotalSummaryComponent Template rendering should apply correct CSS classes when showCash is false" time="0.003" classname="TotalSummaryComponent Template rendering"/>
+  <testcase name="TotalSummaryComponent Template rendering should render cash section when showCash is true" time="0.005" classname="TotalSummaryComponent Template rendering"/>
+  <testcase name="TotalSummaryComponent Template rendering should not render cash section when showCash is false" time="0.003" classname="TotalSummaryComponent Template rendering"/>
+  <testcase name="TotalSummaryComponent Template rendering should apply correct CSS classes when showCash is true" time="0.005" classname="TotalSummaryComponent Template rendering"/>
+  <testcase name="TotalSummaryComponent Template rendering should render three result summary components in main section" time="0.003" classname="TotalSummaryComponent Template rendering"/>
+  <testcase name="TotalSummaryComponent should accept showCash input" time="0.003" classname="TotalSummaryComponent"/>
+  <testcase name="TotalSummaryComponent should accept currency input" time="0.003" classname="TotalSummaryComponent"/>
+  <testcase name="PriceExtrasComponent should create" time="0.004" classname="PriceExtrasComponent"/>
+  <testcase name="DragDropSortingComponent should create" time="0.005" classname="DragDropSortingComponent"/>
+  <testcase name="ExpenseService should be created" time="0" classname="ExpenseService"/>
+  <testcase name="NoteComponent should create" time="0.015" classname="NoteComponent"/>
+  <testcase name="MenuItemComponent should create" time="0.012" classname="MenuItemComponent"/>
+  <testcase name="TrackingService should be created" time="0" classname="TrackingService"/>
+  <testcase name="ReviewDialogComponent should create" time="0.014" classname="ReviewDialogComponent"/>
+  <testcase name="ReservationsComponent should create" time="0.024" classname="ReservationsComponent"/>
+  <testcase name="CataloguesComponent should create" time="0.006" classname="CataloguesComponent"/>
+  <testcase name="ForgotPasswordComponent should create" time="0.006" classname="ForgotPasswordComponent"/>
+  <testcase name="TransactionDetailComponent should create" time="0.009" classname="TransactionDetailComponent"/>
+  <testcase name="TreatmentComponent should compile" time="0.017" classname="TreatmentComponent"/>
+  <testcase name="ResultSummaryComponent calculateAmount should return expense amount when summaryType is &quot;expense&quot;" time="0.004" classname="ResultSummaryComponent calculateAmount"/>
+  <testcase name="ResultSummaryComponent calculateAmount should return cash amount when summaryType is &quot;cash&quot;" time="0.002" classname="ResultSummaryComponent calculateAmount"/>
+  <testcase name="ResultSummaryComponent calculateAmount should return totals amount when summaryType is &quot;totals&quot;" time="0.002" classname="ResultSummaryComponent calculateAmount"/>
+  <testcase name="ResultSummaryComponent calculateAmount should return income amount when summaryType is &quot;income&quot;" time="0.002" classname="ResultSummaryComponent calculateAmount"/>
+  <testcase name="ResultSummaryComponent calculateAmount should calculate difference between income and expense when summaryType is not set" time="0.001" classname="ResultSummaryComponent calculateAmount"/>
+  <testcase name="ResultSummaryComponent should create" time="0.001" classname="ResultSummaryComponent"/>
+  <testcase name="ResultSummaryComponent input properties should accept summaryType input" time="0.002" classname="ResultSummaryComponent input properties"/>
+  <testcase name="ResultSummaryComponent input properties should accept title input" time="0.002" classname="ResultSummaryComponent input properties"/>
+  <testcase name="ResultSummaryComponent input properties should accept currency input" time="0.002" classname="ResultSummaryComponent input properties"/>
+  <testcase name="ResultSummaryComponent input properties should accept summaryTotals input" time="0.001" classname="ResultSummaryComponent input properties"/>
+  <testcase name="TreatmentService should be created" time="0" classname="TreatmentService"/>
+  <testcase name="NotificationsComponent should create" time="0.005" classname="NotificationsComponent"/>
+  <testcase name="MiniCardComponent should create" time="0.005" classname="MiniCardComponent"/>
+  <testcase name="OfficeListComponent should create" time="0.01" classname="OfficeListComponent"/>
+  <testcase name="DragDropDirective should create an instance" time="0.001" classname="DragDropDirective"/>
+  <testcase name="PaymentPreviewComponent should create" time="0.005" classname="PaymentPreviewComponent"/>
+  <testcase name="CatalogueComponent should create" time="0.014" classname="CatalogueComponent"/>
+  <testcase name="AdditionalSortingComponent should create" time="0.004" classname="AdditionalSortingComponent"/>
+  <testcase name="TwoDigitsDirective with allowNegatives enabled should allow negative numbers when allowNegatives is true" time="0.001" classname="TwoDigitsDirective with allowNegatives enabled"/>
+  <testcase name="TwoDigitsDirective with allowNegatives enabled should allow negative decimal numbers" time="0" classname="TwoDigitsDirective with allowNegatives enabled"/>
+  <testcase name="TwoDigitsDirective with allowNegatives enabled should allow digits after negative sign" time="0" classname="TwoDigitsDirective with allowNegatives enabled"/>
+  <testcase name="TwoDigitsDirective should allow leading zero followed by decimal" time="0" classname="TwoDigitsDirective"/>
+  <testcase name="TwoDigitsDirective should create an instance" time="0" classname="TwoDigitsDirective"/>
+  <testcase name="TwoDigitsDirective should initialize with default values" time="0" classname="TwoDigitsDirective"/>
+  <testcase name="TwoDigitsDirective should handle Decimal key as decimal point" time="0.001" classname="TwoDigitsDirective"/>
+  <testcase name="TwoDigitsDirective should allow special keys" time="0" classname="TwoDigitsDirective"/>
+  <testcase name="TwoDigitsDirective should prevent leading zeros followed by digits" time="0" classname="TwoDigitsDirective"/>
+  <testcase name="TwoDigitsDirective should allow valid numeric input" time="0.001" classname="TwoDigitsDirective"/>
+  <testcase name="TwoDigitsDirective should prevent more than 2 decimal places" time="0" classname="TwoDigitsDirective"/>
+  <testcase name="TwoDigitsDirective should allow decimal point" time="0" classname="TwoDigitsDirective"/>
+  <testcase name="TwoDigitsDirective should prevent non-numeric characters" time="0.001" classname="TwoDigitsDirective"/>
+  <testcase name="TwoDigitsDirective should prevent multiple decimal points" time="0" classname="TwoDigitsDirective"/>
+  <testcase name="TwoDigitsDirective should allow up to 2 decimal places" time="0" classname="TwoDigitsDirective"/>
+  <testcase name="DashboardService should be created" time="0.001" classname="DashboardService"/>
+  <testcase name="TransactionViewComponent should create" time="0.016" classname="TransactionViewComponent"/>
+  <testcase name="RoomService should be created" time="0.002" classname="RoomService"/>
+  <testcase name="AuthUserService should be created" time="0" classname="AuthUserService"/>
+  <testcase name="ColorComponent should create" time="0.01" classname="ColorComponent"/>
+  <testcase name="CurrencyListComponent should create" time="0.011" classname="CurrencyListComponent"/>
+  <testcase name="GeocodeService should be created" time="0.001" classname="GeocodeService"/>
+  <testcase name="PriceComponent should create" time="0.003" classname="PriceComponent"/>
+  <testcase name="TotalSummaryItemComponent should create" time="0.001" classname="TotalSummaryItemComponent"/>
+  <testcase name="TotalSummaryItemComponent should apply the result class when isResult is true" time="0.001" classname="TotalSummaryItemComponent"/>
+  <testcase name="CalendarComponent should create" time="0.01" classname="CalendarComponent"/>
+  <testcase name="MeReservationComponent should create" time="0.041" classname="MeReservationComponent"/>
+  <testcase name="SeoService should be created" time="0.001" classname="SeoService"/>
+  <testcase name="CurrencyComponent should create" time="0.01" classname="CurrencyComponent"/>
+  <testcase name="UnavailableService should be created" time="0.001" classname="UnavailableService"/>
+  <testcase name="ReservationComponent Keyboard Event Handlers should handle room key down event" time="0.048" classname="ReservationComponent Keyboard Event Handlers"/>
+  <testcase name="ReservationComponent Keyboard Event Handlers should handle office key down event" time="0.009" classname="ReservationComponent Keyboard Event Handlers"/>
+  <testcase name="ReservationComponent Keyboard Event Handlers should handle group key down event" time="0.009" classname="ReservationComponent Keyboard Event Handlers"/>
+  <testcase name="ReservationComponent Keyboard Event Handlers should clear form control on backspace" time="0.01" classname="ReservationComponent Keyboard Event Handlers"/>
+  <testcase name="ReservationComponent Date and Time Management should handle time change correctly" time="0.009" classname="ReservationComponent Date and Time Management"/>
+  <testcase name="ReservationComponent Date and Time Management should remove date from dateTimeList" time="0.008" classname="ReservationComponent Date and Time Management"/>
+  <testcase name="ReservationComponent Date and Time Management should add new date to dateTimeList" time="0.008" classname="ReservationComponent Date and Time Management"/>
+  <testcase name="ReservationComponent Step Navigation should validate treatment form before proceeding to step 4" time="0.009" classname="ReservationComponent Step Navigation"/>
+  <testcase name="ReservationComponent Step Navigation should validate customer form before proceeding to step 2" time="0.009" classname="ReservationComponent Step Navigation"/>
+  <testcase name="ReservationComponent Step Navigation should validate office form before proceeding to step 3" time="0.009" classname="ReservationComponent Step Navigation"/>
+  <testcase name="ReservationComponent Step Navigation should validate configuration form before proceeding to step 6" time="0.009" classname="ReservationComponent Step Navigation"/>
+  <testcase name="ReservationComponent Navigation and Router should navigate to add customer page" time="0.009" classname="ReservationComponent Navigation and Router"/>
+  <testcase name="ReservationComponent Display Functions should display room address name correctly" time="0.008" classname="ReservationComponent Display Functions"/>
+  <testcase name="ReservationComponent Display Functions should display office name correctly" time="0.008" classname="ReservationComponent Display Functions"/>
+  <testcase name="ReservationComponent Display Functions should display treatment name correctly" time="0.012" classname="ReservationComponent Display Functions"/>
+  <testcase name="ReservationComponent Display Functions should display empty string for null user" time="0.009" classname="ReservationComponent Display Functions"/>
+  <testcase name="ReservationComponent Display Functions should display user name correctly" time="0.008" classname="ReservationComponent Display Functions"/>
+  <testcase name="ReservationComponent Getters should return events as FormArray" time="0.009" classname="ReservationComponent Getters"/>
+  <testcase name="ReservationComponent Getters should return treatment detail from customerInfo" time="0.008" classname="ReservationComponent Getters"/>
+  <testcase name="ReservationComponent Getters should return empty string when no customerInfo" time="0.008" classname="ReservationComponent Getters"/>
+  <testcase name="ReservationComponent Getters should check if add button is disabled" time="0.009" classname="ReservationComponent Getters"/>
+  <testcase name="ReservationComponent Getters should return dateTimeList as FormArray" time="0.008" classname="ReservationComponent Getters"/>
+  <testcase name="ReservationComponent Form Controls should update customer info when customer changes" time="0.008" classname="ReservationComponent Form Controls"/>
+  <testcase name="ReservationComponent Form Controls should update room list when office changes" time="0.009" classname="ReservationComponent Form Controls"/>
+  <testcase name="ReservationComponent Form Controls should update professional list when room changes" time="0.009" classname="ReservationComponent Form Controls"/>
+  <testcase name="ReservationComponent Form Controls should update treatment list when group changes" time="0.009" classname="ReservationComponent Form Controls"/>
+  <testcase name="ReservationComponent Component Lifecycle should have ngOnDestroy method" time="0.013" classname="ReservationComponent Component Lifecycle"/>
+  <testcase name="ReservationComponent Initialization should initialize with editing mode when reservation ID is provided" time="0.009" classname="ReservationComponent Initialization"/>
+  <testcase name="ReservationComponent Initialization should set up form controls with proper validators" time="0.009" classname="ReservationComponent Initialization"/>
+  <testcase name="ReservationComponent Initialization should initialize forms correctly" time="0.01" classname="ReservationComponent Initialization"/>
+  <testcase name="ReservationComponent Initialization should dispatch GetCustomers action when not editing" time="0.01" classname="ReservationComponent Initialization"/>
+  <testcase name="ReservationComponent should create" time="0.01" classname="ReservationComponent"/>
+  <testcase name="ReservationComponent Additional Services should handle additional services selection" time="0.01" classname="ReservationComponent Additional Services"/>
+  <testcase name="ReservationComponent Additional Services should check if additional service is selected" time="0.01" classname="ReservationComponent Additional Services"/>
+  <testcase name="TimeDetailPipe create an instance" time="0" classname="TimeDetailPipe"/>
+  <testcase name="CatalogueService should be created" time="0.001" classname="CatalogueService"/>
+  <testcase name="MeDiscountComponent should create" time="0.007" classname="MeDiscountComponent"/>
+  <testcase name="BalanceComponent should create" time="0.003" classname="BalanceComponent"/>
+  <testcase name="BalanceComponent balancePercentage getter should calculate correct percentage for fractional results" time="0.001" classname="BalanceComponent balancePercentage getter"/>
+  <testcase name="BalanceComponent balancePercentage getter should return 100 when balance is greater than 2000" time="0.001" classname="BalanceComponent balancePercentage getter"/>
+  <testcase name="BalanceComponent balancePercentage getter should return 0 when account is undefined" time="0.002" classname="BalanceComponent balancePercentage getter"/>
+  <testcase name="BalanceComponent balancePercentage getter should return 100 when balance equals 2000" time="0.001" classname="BalanceComponent balancePercentage getter"/>
+  <testcase name="BalanceComponent balancePercentage getter should return 0 when balance is 0" time="0.001" classname="BalanceComponent balancePercentage getter"/>
+  <testcase name="BalanceComponent balancePercentage getter should calculate correct percentage when balance is less than 2000" time="0.001" classname="BalanceComponent balancePercentage getter"/>
+  <testcase name="BalanceComponent Input properties should accept language input" time="0.002" classname="BalanceComponent Input properties"/>
+  <testcase name="BalanceComponent Input properties should accept showUser input" time="0.002" classname="BalanceComponent Input properties"/>
+  <testcase name="BalanceComponent Input properties should accept account input" time="0.001" classname="BalanceComponent Input properties"/>
+  <testcase name="BalanceComponent Input properties should accept showAdd input" time="0.002" classname="BalanceComponent Input properties"/>
+  <testcase name="BalanceComponent Input properties should accept showView input" time="0.001" classname="BalanceComponent Input properties"/>
+  <testcase name="YearSummaryComponent should create" time="0.016" classname="YearSummaryComponent"/>
+  <testcase name="DiscountComponent should create" time="0.012" classname="DiscountComponent"/>
+  <testcase name="DashComponent should compile" time="0.025" classname="DashComponent"/>
+  <testcase name="TreatmentGroupSortingComponent should create" time="0.004" classname="TreatmentGroupSortingComponent"/>
+  <testcase name="ChartComponent should create" time="0.002" classname="ChartComponent"/>
+  <testcase name="AddServiceComponent should create" time="0.007" classname="AddServiceComponent"/>
+  <testcase name="HideMissingDirective should hide the element on error" time="0" classname="HideMissingDirective"/>
+  <testcase name="HideMissingDirective should create an instance" time="0" classname="HideMissingDirective"/>
+  <testcase name="AccountComponent should create" time="0.009" classname="AccountComponent"/>
+  <testcase name="AccountComponent should set form as valid when all required fields are filled" time="0.007" classname="AccountComponent"/>
+  <testcase name="AccountComponent should prevent non-numeric input in number handler" time="0.007" classname="AccountComponent"/>
+  <testcase name="AccountComponent should handle keydown events correctly" time="0.006" classname="AccountComponent"/>
+  <testcase name="AccountComponent should dispatch UpdateAccount action when form is valid" time="0.007" classname="AccountComponent"/>
+  <testcase name="AccountComponent should display currency code in displayCurrencyFn" time="0.007" classname="AccountComponent"/>
+  <testcase name="AccountComponent should set showAdd to false when user does not have admin role" time="0.006" classname="AccountComponent"/>
+  <testcase name="AccountComponent should set showAdd to true when user has admin role and customerId differs from userId" time="0.007" classname="AccountComponent"/>
+  <testcase name="AccountComponent should dispatch GetAccountByCustomerId action on ngOnInit" time="0.006" classname="AccountComponent"/>
+  <testcase name="AccountComponent should allow backspace in number handler" time="0.005" classname="AccountComponent"/>
+  <testcase name="AccountComponent should return empty string when currency is null in displayCurrencyFn" time="0.006" classname="AccountComponent"/>
+  <testcase name="AccountComponent should initialize form with required controls" time="0.006" classname="AccountComponent"/>
+  <testcase name="AccountComponent should unsubscribe on ngOnDestroy" time="0.007" classname="AccountComponent"/>
+  <testcase name="AccountComponent should set form as invalid when required fields are empty" time="0.006" classname="AccountComponent"/>
+  <testcase name="AccountComponent should return early from submit when form is invalid" time="0.006" classname="AccountComponent"/>
+  <testcase name="AccountComponent should allow numeric input in number handler" time="0.007" classname="AccountComponent"/>
+  <testcase name="authGuard should deny activation if user does not have the required role" time="0.001" classname="authGuard"/>
+  <testcase name="authGuard should deny activation and redirect if user is not logged in" time="0.001" classname="authGuard"/>
+  <testcase name="authGuard should allow activation if user has the required role" time="0" classname="authGuard"/>
+  <testcase name="DashboardComponent should create" time="0.017" classname="DashboardComponent"/>
+  <testcase name="RedirectComponent should create" time="0.003" classname="RedirectComponent"/>
+  <testcase name="CustomersComponent should create" time="0.006" classname="CustomersComponent"/>
+  <testcase name="DiscountPipe create an instance" time="0" classname="DiscountPipe"/>
+  <testcase name="CardComponent should create" time="0.002" classname="CardComponent"/>
+  <testcase name="LegalsComponent should create" time="0.004" classname="LegalsComponent"/>
+  <testcase name="ShortcutComponent should create" time="0.003" classname="ShortcutComponent"/>
+  <testcase name="AnimateDirective should create an instance" time="0" classname="AnimateDirective"/>
+  <testcase name="AnimateDirective should initialize with default values" time="0" classname="AnimateDirective"/>
+  <testcase name="AnimateDirective should not initialize player on ngOnInit when no animation is provided" time="0" classname="AnimateDirective"/>
+  <testcase name="AnimateDirective should initialize player on ngOnInit when animation is provided" time="0" classname="AnimateDirective"/>
+  <testcase name="AnimateDirective should setup IntersectionObserver on ngAfterViewInit" time="0" classname="AnimateDirective"/>
+  <testcase name="AnimateDirective should destroy player on ngOnDestroy" time="0" classname="AnimateDirective"/>
+  <testcase name="FilterPipe create an instance" time="0" classname="FilterPipe"/>
+  <testcase name="ProfileComponent should create" time="0.009" classname="ProfileComponent"/>
+  <testcase name="UpdateTrackingDialogComponent should close the dialog with data on doAction" time="0.013" classname="UpdateTrackingDialogComponent"/>
+  <testcase name="UpdateTrackingDialogComponent should create" time="0.009" classname="UpdateTrackingDialogComponent"/>
+  <testcase name="UpdateTrackingDialogComponent should close the dialog with no data on onNoClick" time="0.007" classname="UpdateTrackingDialogComponent"/>
+  <testcase name="AdditionalService deleteAdditional should delete additional by id" time="0.001" classname="AdditionalService deleteAdditional"/>
+  <testcase name="AdditionalService sortAdditional should sort additionals" time="0.001" classname="AdditionalService sortAdditional"/>
+  <testcase name="AdditionalService getAdditional should fetch single additional by id" time="0" classname="AdditionalService getAdditional"/>
+  <testcase name="AdditionalService createAdditional should create new additional" time="0" classname="AdditionalService createAdditional"/>
+  <testcase name="AdditionalService getAdditionalList should fetch all additional list" time="0" classname="AdditionalService getAdditionalList"/>
+  <testcase name="AdditionalService updateAdditional should update additional by id" time="0" classname="AdditionalService updateAdditional"/>
+  <testcase name="AdditionalService getAllAdditionalByGroupId should fetch all additionals by group id with correct parameters" time="0" classname="AdditionalService getAllAdditionalByGroupId"/>
+  <testcase name="AdditionalService getAdditionalPage should fetch additional page with correct parameters" time="0" classname="AdditionalService getAdditionalPage"/>
+  <testcase name="AdditionalService should be created" time="0" classname="AdditionalService"/>
+  <testcase name="AdditionalListComponent should create" time="0.011" classname="AdditionalListComponent"/>
+  <testcase name="SortByPipe create an instance" time="0" classname="SortByPipe"/>
+  <testcase name="ShareButtonsComponent should create" time="0.004" classname="ShareButtonsComponent"/>
+  <testcase name="CounterComponent should create" time="0.003" classname="CounterComponent"/>
+  <testcase name="UserService should be created" time="0" classname="UserService"/>
+  <testcase name="AuthService should be created" time="0.001" classname="AuthService"/>
+  <testcase name="ReservationIconPipe create an instance" time="0" classname="ReservationIconPipe"/>
+  <testcase name="MonthComponent should create" time="0.003" classname="MonthComponent"/>
+  <testcase name="ColorListComponent should create" time="0.009" classname="ColorListComponent"/>
+  <testcase name="DurationTimePipe create an instance" time="0" classname="DurationTimePipe"/>
+  <testcase name="RoomsComponent should create" time="0.01" classname="RoomsComponent"/>
+  <testcase name="AccountService should be created" time="0.001" classname="AccountService"/>
+  <testcase name="TableComponent should compile" time="0.009" classname="TableComponent"/>
+  <testcase name="MonthSummaryComponent should create" time="0.021" classname="MonthSummaryComponent"/>
+  <testcase name="MainService should be created" time="0.001" classname="MainService"/>
+  <testcase name="RoomNamePipe create an instance" time="0" classname="RoomNamePipe"/>
+  <testcase name="ExpensesComponent should create" time="0.015" classname="ExpensesComponent"/>
+  <testcase name="ReservationService should be created" time="0.001" classname="ReservationService"/>
+  <testcase name="OptionComponent should create" time="0.009" classname="OptionComponent"/>
+  <testcase name="BackButtonDirective should call navigation.back when form is pristine" time="0.001" classname="BackButtonDirective"/>
+  <testcase name="BackButtonDirective should create an instance" time="0" classname="BackButtonDirective"/>
+  <testcase name="BackButtonDirective should show dialog when form is dirty" time="0" classname="BackButtonDirective"/>
+  <testcase name="BackButtonDirective should call navigation.back when no form is provided" time="0" classname="BackButtonDirective"/>
+  <testcase name="CatalogComponent should create" time="0.005" classname="CatalogComponent"/>
+  <testcase name="RoomComponent should create" time="0.017" classname="RoomComponent"/>
+  <testcase name="QuarterSummaryComponent should create" time="0.009" classname="QuarterSummaryComponent"/>
+  <testcase name="BankComponent should create" time="0.01" classname="BankComponent"/>
+  <testcase name="MainContentComponent should create" time="0.025" classname="MainContentComponent"/>
+  <testcase name="InvoiceService should be created" time="0.001" classname="InvoiceService"/>
+  <testcase name="MePaymentComponent should create" time="0.008" classname="MePaymentComponent"/>
+  <testcase name="TimeZoneSnackBarComponent should create" time="0.005" classname="TimeZoneSnackBarComponent"/>
+  <testcase name="ViewComponent should create" time="0.006" classname="ViewComponent"/>
+  <testcase name="OfficeService should be created" time="0" classname="OfficeService"/>
+  <testcase name="UpcomingComponent should create" time="0.002" classname="UpcomingComponent"/>
+  <testcase name="UserComponent should lighten or darken color correctly" time="0.001" classname="UserComponent"/>
+  <testcase name="UserComponent should not submit form when invalid" time="0" classname="UserComponent"/>
+  <testcase name="UserComponent should add color validators for professional/manager roles" time="0" classname="UserComponent"/>
+  <testcase name="UserComponent should handle address selection" time="0.001" classname="UserComponent"/>
+  <testcase name="UserComponent should navigate to users list on successful response" time="0" classname="UserComponent"/>
+  <testcase name="UserComponent should initialize in edit mode when id is provided" time="0" classname="UserComponent"/>
+  <testcase name="UserComponent should unsubscribe on destroy" time="0" classname="UserComponent"/>
+  <testcase name="UserComponent should set isProfessionalOrManager to true for professional role" time="0" classname="UserComponent"/>
+  <testcase name="UserComponent should initialize in add mode when no id is provided" time="0" classname="UserComponent"/>
+  <testcase name="UserComponent should set isProfessionalOrManager to true for manager role" time="0.001" classname="UserComponent"/>
+  <testcase name="UserComponent should create" time="0" classname="UserComponent"/>
+  <testcase name="UserComponent should create form with required validators" time="0" classname="UserComponent"/>
+  <testcase name="UserComponent should handle errors from store" time="0" classname="UserComponent"/>
+  <testcase name="UserComponent should submit form in add mode when valid" time="0" classname="UserComponent"/>
+  <testcase name="UserComponent should dispatch getUser action when in edit mode" time="0" classname="UserComponent"/>
+  <testcase name="UserComponent should dispatch Clean action on initialization" time="0.001" classname="UserComponent"/>
+  <testcase name="UserComponent should clear color validators for non-professional roles" time="0" classname="UserComponent"/>
+  <testcase name="NotificationService should be created" time="0" classname="NotificationService"/>
+  <testcase name="AvailabilityComponent should create" time="0.007" classname="AvailabilityComponent"/>
+  <testcase name="OfficeComponent should create" time="0.014" classname="OfficeComponent"/>
+  <testcase name="ErrorComponent should create" time="0.004" classname="ErrorComponent"/>
+  <testcase name="PaymentComponent should create" time="0.003" classname="PaymentComponent"/>
+  <testcase name="ReferralsComponent should create" time="0.005" classname="ReferralsComponent"/>
+  <testcase name="TreatmentSortingComponent should create" time="0.003" classname="TreatmentSortingComponent"/>
+  <testcase name="NavComponent should compile" time="0.014" classname="NavComponent"/>
+  <testcase name="UnavailableComponent should create" time="0.01" classname="UnavailableComponent"/>
+  <testcase name="ExpenseComponent should create" time="0.021" classname="ExpenseComponent"/>
+  <testcase name="NoteService should be created" time="0.001" classname="NoteService"/>
+  <testcase name="RatingComponent should create" time="0.005" classname="RatingComponent"/>
+  <testcase name="ReservationDetailComponent should create" time="0.02" classname="ReservationDetailComponent"/>
+  <testcase name="BlockAgendaComponent should create" time="0.01" classname="BlockAgendaComponent"/>
+  <testcase name="GoogleMapComponent should create" time="0.003" classname="GoogleMapComponent"/>
+  <testcase name="PwaService should be created" time="0" classname="PwaService"/>
+  <testcase name="PaymentsChartComponent should create" time="0.003" classname="PaymentsChartComponent"/>
+  <testcase name="QuarterComponent should create" time="0.002" classname="QuarterComponent"/>
+  <testcase name="DiscountsComponent should create" time="0.009" classname="DiscountsComponent"/>
+  <testcase name="TokenService should be created" time="0" classname="TokenService"/>
+  <testcase name="ConvertHMPipe create an instance" time="0" classname="ConvertHMPipe"/>
+  <testcase name="UnavailableListComponent should create" time="0.01" classname="UnavailableListComponent"/>
+  <testcase name="TreatmentsComponent should create" time="0.009" classname="TreatmentsComponent"/>
+  <testcase name="SearchComponent should create" time="0.015" classname="SearchComponent"/>
+  <testcase name="CancelDialogComponent should create" time="0.01" classname="CancelDialogComponent"/>
+  <testcase name="DiscountService should be created" time="0.001" classname="DiscountService"/>
+  <testcase name="FormFieldAdderComponent should create" time="0.008" classname="FormFieldAdderComponent"/>
+  <testcase name="ReservationTableComponent should compile" time="0.007" classname="ReservationTableComponent"/>
+  <testcase name="CurrencySymbolPipe create an instance" time="0.001" classname="CurrencySymbolPipe"/>
+  <testcase name="MoreInfoComponent should create" time="0.01" classname="MoreInfoComponent"/>
+  <testcase name="PaymentComponent should create" time="0.01" classname="PaymentComponent"/>
+  <testcase name="UsersComponent should create" time="0.028" classname="UsersComponent"/>
+  <testcase name="CalendarDialogComponent should create" time="0.009" classname="CalendarDialogComponent"/>
+  <testcase name="TermAndConditionComponent should create" time="0.008" classname="TermAndConditionComponent"/>
+  <testcase name="PricePreviewComponent should create" time="0.004" classname="PricePreviewComponent"/>
+  <testcase name="PromptComponentComponent should create" time="0.005" classname="PromptComponentComponent"/>
+  <testcase name="PaymentService should be created" time="0.001" classname="PaymentService"/>
+  <testcase name="ColorService should be created" time="0.001" classname="ColorService"/>
+  <testcase name="QuarterComponent should create" time="0.003" classname="QuarterComponent"/>
+  <testcase name="OverviewComponent should compile" time="0.014" classname="OverviewComponent"/>
+  <testcase name="NavigationService should be created" time="0.001" classname="NavigationService"/>
+  <testcase name="ReservationCompleteComponent should create" time="0.019" classname="ReservationCompleteComponent"/>
+  <testcase name="DialogComponent should create" time="0.139" classname="DialogComponent"/>
+  <testcase name="DialogComponent should have data injected" time="0.042" classname="DialogComponent"/>
+  <testcase name="DialogComponent onNoClick should close the dialog" time="0.006" classname="DialogComponent"/>
+  <testcase name="DialogComponent should render the dialog title" time="0.005" classname="DialogComponent"/>
+  <testcase name="DialogComponent should render the dialog content" time="0.004" classname="DialogComponent"/>
+  <testcase name="DialogComponent should show both buttons when both hideNoButton and hideOkButton are false" time="0.005" classname="DialogComponent"/>
+  <testcase name="DialogComponent should show No button when hideNoButton is false" time="0.005" classname="DialogComponent"/>
+  <testcase name="DialogComponent should show Yes button when hideOkButton is false" time="0.005" classname="DialogComponent"/>
+  <testcase name="DialogComponent should have cdkFocusInitial directive on No button" time="0.003" classname="DialogComponent"/>
+  <testcase name="DialogComponent should call dialogRef.close when No button is clicked" time="0.004" classname="DialogComponent"/>
+  <testcase name="DialogComponent should display translated button texts" time="0.003" classname="DialogComponent"/>
+  <testcase name="DialogComponent should pass correct value to mat-dialog-close directive" time="0.004" classname="DialogComponent"/>
+  <testcase name="ToastService should be created" time="0.001" classname="ToastService"/>
+  <testcase name="TreatmentComponent should create" time="0.018" classname="TreatmentComponent"/>
+  <testcase name="MessagingService should be created" time="0.001" classname="MessagingService"/>
+  <testcase name="AppComponent should create the app" time="0.002" classname="AppComponent"/>
+  <testcase name="CurrencyService should be created" time="0.001" classname="CurrencyService"/>
+  <testcase name="CustomerEditReservationDialogComponent should create" time="0.008" classname="CustomerEditReservationDialogComponent"/>
+  <testcase name="FabMenuComponent should create" time="0.004" classname="FabMenuComponent"/>
+  <testcase name="AdditionalComponent should create" time="0.009" classname="AdditionalComponent"/>
+  <testcase name="AuthComponent should create" time="0.014" classname="AuthComponent"/>
+  <system-out>
+    <![CDATA[Chrome Headless 140.0.0.0 (Mac OS 10.15.7) ERROR: 'Error during cleanup of component', Object{component: MainComponent{breakpointObserver: BreakpointObserver{_mediaMatcher: ..., _zone: ..., _queries: ..., _destroySubject: ...}, store: Object{select: ..., dispatch: ...}, router: Router{disposed: ..., nonRouterCurrentEntryChangeSubscription: ..., console: ..., stateManager: ..., options: ..., pendingTasks: ..., urlUpdateStrategy: ..., navigationTransitions: ..., urlSerializer: ..., location: ..., urlHandlingStrategy: ..., _events: ..., navigated: ..., routeReuseStrategy: ..., onSameUrlNavigation: ..., config: ..., componentInputBindingEnabled: ..., eventsSubscription: ...}, translate: TranslateService{store: ..., currentLoader: ..., compiler: ..., parser: ..., missingTranslationHandler: ..., useDefaultLang: ..., extend: ..., loadingTranslations: ..., pending: ..., _translationRequests: ..., lastUseLanguage: ...}, overlayContainer: OverlayContainer{_platform: ..., _containerElement: ..., _document: ..., _styleLoader: ...}, cookieService: CookieService{document: ..., platformId: ..., documentIsAccessible: ...}, themeService: ThemeService{colorschemesOptions: ...}, auth: Object{currentUser: ..., onIdTokenChanged: ...}, authUserService: Object{cookieConsent: ..., updateMode: ...}, mainContent: MainContentService{data: ..., data$: ..., configure: ...}, tokenService: TokenService{cacheSize: ..., refreshInterval: ..., _token$: ..., translate: ..., router: ..., auth: ..., clear: ...}, navigationService: NavigationService{store: ..., router: ..., translate: ..., history: ..., subscribe: ..., back: ..., reload: ..., reloadPage: ..., attachLang: ...}, route: Object{snapshot: ...}, navigationState: BehaviorSubject{closed: ..., currentObservers: ..., observers: ..., isStopped: ..., hasError: ..., thrownError: ..., _value: ...}, title: 'Cleos DEV', showLoader: true, isAuthenticated: false, appVersion: '1.2.31-rc-dev', isDarkMode: false, backgroundColor: '169, 163, 151', language: 'en-GB', showArrow: false, isHandset$: Observable{source: ..., operator: ...}, authUserServiceSubscription: SafeSubscriber{initialTeardown: ..., closed: ..., _parentage: ..., _finalizers: ..., isStopped: ..., destination: ...}, mainContentSubscription: SafeSubscriber{initialTeardown: ..., closed: ..., _parentage: ..., _finalizers: ..., isStopped: ..., destination: ...}, scrollToElement: element => { ... }, resetTheme: theme => { ... }, navigationAnimation: () => { ... }, __ngContext__: 80, bodySection: ElementRef{nativeElement: ...}, firstSection: null, navigationObserve: undefined}, stacktrace: UnsubscriptionErrorImpl{stack: 'Error: 
+    at _super (http://localhost:9877/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/util/createErrorClass.js:4:26)
+    at new UnsubscriptionErrorImpl (http://localhost:9877/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/util/UnsubscriptionError.js:3:5)
+    at SafeSubscriber.unsubscribe (http://localhost:9877/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Subscription.js:55:23)
+    at SafeSubscriber.unsubscribe (http://localhost:9877/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Subscriber.js:55:19)
+    at MainComponent.call [as ngOnDestroy] (http://localhost:9877/_karma_webpack_/webpack:/src/app/main/main.component.ts:120:37)
+    at executeOnDestroys (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/core.mjs:13371:32)
+    at cleanUpView (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/core.mjs:13266:9)
+    at destroyViewTree (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/core.mjs:13210:17)
+    at destroyLView (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/core.mjs:13240:5)
+    at ViewRef.destroy (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/core.mjs:14682:9)', message: '1 errors occurred during unsubscription:
+1) TypeError: finalizer.unsubscribe is not a function', name: 'UnsubscriptionError', errors: [...]}}
+,Chrome Headless 140.0.0.0 (Mac OS 10.15.7) ERROR: '[2025-09-12T16:14:04.795Z]  @firebase/analytics:', TypeError: gtagFunction is not a function
+TypeError: gtagFunction is not a function
+    at http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/fire/node_modules/@firebase/analytics/dist/esm/index.esm2017.js:662:9
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at apply (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at _ZoneDelegate.invoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+    at ZoneImpl.run (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:113:43)
+    at apply (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:2537:40)
+    at _ZoneDelegate.invokeTask (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:431:33)
+,Chrome Headless 140.0.0.0 (Mac OS 10.15.7) ERROR: '[2025-09-12T16:14:04.822Z]  @firebase/analytics:', TypeError: gtagFunction is not a function
+TypeError: gtagFunction is not a function
+    at http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/fire/node_modules/@firebase/analytics/dist/esm/index.esm2017.js:662:9
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at apply (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at _ZoneDelegate.invoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+    at ZoneImpl.run (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:113:43)
+    at apply (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:2537:40)
+    at _ZoneDelegate.invokeTask (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:431:33)
+,Chrome Headless 140.0.0.0 (Mac OS 10.15.7) WARN: 'Calling Firebase APIs outside of an Injection context may destabilize your application leading to subtle change-detection and hydration bugs. Find more at https://github.com/angular/angularfire/blob/main/docs/zones.md'
+,Chrome Headless 140.0.0.0 (Mac OS 10.15.7) ERROR: '[2025-09-12T16:14:05.065Z]  @firebase/analytics:', TypeError: gtagFunction is not a function
+TypeError: gtagFunction is not a function
+    at http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/fire/node_modules/@firebase/analytics/dist/esm/index.esm2017.js:662:9
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at apply (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at _ZoneDelegate.invoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+    at Object.onInvoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/core.mjs:6568:33)
+    at _ZoneDelegate.invoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+    at ZoneImpl.run (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:113:43)
+,Chrome Headless 140.0.0.0 (Mac OS 10.15.7) ERROR: '[2025-09-12T16:14:05.573Z]  @firebase/analytics:', TypeError: gtagFunction is not a function
+TypeError: gtagFunction is not a function
+    at http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/fire/node_modules/@firebase/analytics/dist/esm/index.esm2017.js:662:9
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at apply (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at _ZoneDelegate.invoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+    at ZoneImpl.run (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:113:43)
+    at apply (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:2537:40)
+    at _ZoneDelegate.invokeTask (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:431:33)
+,Chrome Headless 140.0.0.0 (Mac OS 10.15.7) WARN: 'NG0955: The provided track expression resulted in duplicated keys for a given collection. Adjust the tracking expression such that it uniquely identifies all the items in the collection. Duplicated keys were: 
+key "T" at index "0" and "4", 
+key "T" at index "4" and "8", 
+key "E" at index "2" and "6". Find more at https://angular.dev/errors/NG0955'
+,Chrome Headless 140.0.0.0 (Mac OS 10.15.7) ERROR: '[2025-09-12T16:14:06.118Z]  @firebase/analytics:', TypeError: gtagFunction is not a function
+TypeError: gtagFunction is not a function
+    at http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/fire/node_modules/@firebase/analytics/dist/esm/index.esm2017.js:662:9
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at apply (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at _ZoneDelegate.invoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+    at Object.onInvoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/core.mjs:6568:33)
+    at _ZoneDelegate.invoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+    at ZoneImpl.run (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:113:43)
+,Chrome Headless 140.0.0.0 (Mac OS 10.15.7) LOG: ''
+,Chrome Headless 140.0.0.0 (Mac OS 10.15.7) ERROR: '[2025-09-12T16:14:06.405Z]  @firebase/analytics:', TypeError: gtagFunction is not a function
+TypeError: gtagFunction is not a function
+    at http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/fire/node_modules/@firebase/analytics/dist/esm/index.esm2017.js:662:9
+    at Generator.next (<anonymous>)
+    at asyncGeneratorStep (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+    at apply (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+    at _ZoneDelegate.invoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+    at _ZoneDelegate.invoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+    at Object.onInvoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/@angular/core/fesm2022/core.mjs:6568:33)
+    at _ZoneDelegate.invoke (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:397:34)
+    at ZoneImpl.run (http://localhost:9877/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:113:43)
+,Chrome Headless 140.0.0.0 (Mac OS 10.15.7) WARN: 'Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading'
+,Chrome Headless 140.0.0.0 (Mac OS 10.15.7) WARN: 'NG02952: The NgOptimizedImage directive (activated on an <img> element with the `ngSrc="assets/home_page/img/treatment/biab-1.webp"`) has detected that the aspect ratio of the image does not match the aspect ratio indicated by the width and height attributes. 
+Intrinsic image size: 1000w x 911h (aspect-ratio: 1.10). 
+Supplied width and height attributes: 228w x 250h (aspect-ratio: 0.91). 
+To fix this, update the width and height attributes.'
+
+]]>
+  </system-out>
+  <system-err/>
+</testsuite>

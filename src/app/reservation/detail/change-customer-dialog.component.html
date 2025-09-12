@@ -9,7 +9,7 @@
                  autocomplete="off" matInput required type="text">
         </label>
         <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
-          @for (customer of filteredCustomer | async; track customer) {
+          @for (customer of filteredCustomer | async; track customer.id) {
             <mat-option [value]="customer">{{ customer.displayName }}</mat-option>
           }
         </mat-autocomplete>

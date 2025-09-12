@@ -71,8 +71,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
   private hasAdminRole: boolean;
 
   constructor(private breakpointObserver: BreakpointObserver, private route: ActivatedRoute,
-              private store: Store<AppState>,
-              private translate: TranslateService, private router: Router, private authUserService: AuthUserService) {
+              private store: Store<AppState>, private translate: TranslateService, private router: Router,
+              private authUserService: AuthUserService) {
     this.getState = this.store.select(selectUserState);
     this.language = this.translate.currentLang;
     this.hasAdminRole = false;
@@ -108,7 +108,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
       message += this.translate.instant('WHATSAPP.SEND.ATTENTION');
     }
     const userPhone = this.customer?.phone;
-    window.open(`https://api.whatsapp.com/send?phone=+${ userPhone }&text=${ message }`, '_blank');
+    window.open(`https://api.whatsapp.com/send?phone=+${userPhone}&text=${message}`, '_blank');
     return;
   }
 

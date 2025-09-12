@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MenuItemComponent } from './menu-item.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 describe('MenuItemComponent', () => {
   let component: MenuItemComponent;
@@ -8,7 +9,7 @@ describe('MenuItemComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MenuItemComponent],
+      imports: [MenuItemComponent, TranslateModule.forRoot()],
     })
       .compileComponents();
   });

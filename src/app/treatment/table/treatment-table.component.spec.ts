@@ -1,10 +1,7 @@
-import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatSortModule } from '@angular/material/sort';
-import { MatTableModule } from '@angular/material/table';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { TreatmentTableComponent } from './treatment-table.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 describe('TableComponent', () => {
   let component: TreatmentTableComponent;
@@ -12,13 +9,7 @@ describe('TableComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        NoopAnimationsModule,
-        MatPaginatorModule,
-        MatSortModule,
-        MatTableModule,
-        TreatmentTableComponent,
-      ],
+      imports: [TreatmentTableComponent, TranslateModule.forRoot()],
     }).compileComponents();
   }));
 

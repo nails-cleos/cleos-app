@@ -1,16 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CatalogComponent } from './catalog.component';
+import { of } from 'rxjs';
+import { Store } from '@ngrx/store';
 
 describe('CatalogComponent', () => {
   let component: CatalogComponent;
   let fixture: ComponentFixture<CatalogComponent>;
 
+  const mockStore = {
+    select: jasmine.createSpy('select').and.returnValue(of({})),
+    dispatch: jasmine.createSpy('dispatch'),
+  };
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [CatalogComponent],
-    })
-      .compileComponents();
+      providers: [
+        { provide: Store, useValue: mockStore },
+      ],
+    }).compileComponents();
   });
 
   beforeEach(() => {

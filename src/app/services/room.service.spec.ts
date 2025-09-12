@@ -1,12 +1,20 @@
 import { TestBed } from '@angular/core/testing';
 
+import { HttpClient } from '@angular/common/http';
 import { RoomService } from './room.service';
 
 describe('RoomService', () => {
   let service: RoomService;
+  let httpSpy: jasmine.SpyObj<HttpClient>;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    httpSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'patch', 'delete']);
+    TestBed.configureTestingModule({
+      providers: [
+        RoomService,
+        { provide: HttpClient, useValue: httpSpy },
+      ],
+    });
     service = TestBed.inject(RoomService);
   });
 

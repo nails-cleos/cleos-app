@@ -51,7 +51,7 @@
                       <mat-form-field class="chip-list">
                         <mat-label>{{ 'TREATMENT.COLOR.FIELD' | translate }}</mat-label>
                         <mat-chip-grid #chipList aria-label="Color selection">
-                          @for (color of colors; track color) {
+                          @for (color of colors; track color.id) {
                             <mat-chip-row (removed)="remove(color)" [removable]="true">
                               {{ color.name }}
                               <mat-icon matChipRemove>cancel</mat-icon>
@@ -61,7 +61,7 @@
                                  [matChipInputFor]="chipList">
                         </mat-chip-grid>
                         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedColor($event)">
-                          @for (color of sortColors(filteredColors | async); track color) {
+                          @for (color of sortColors(filteredColors | async); track color.id) {
                             <mat-option [value]="color">{{ color.name }}</mat-option>
                           }
                         </mat-autocomplete>

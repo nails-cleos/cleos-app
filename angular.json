@@ -12,9 +12,6 @@
         },
         "@schematics/angular:service": {
           "skipTests": false
-        },
-        "@schematics/angular:cypress-component": {
-          "generateTests": false
         }
       },
       "root": "",
@@ -305,15 +302,11 @@
     },
     "@schematics/angular:service": {
       "skipTests": false
-    },
-    "@schematics/angular:cypress-component": {
-      "generateTests": false
     }
   },
   "cli": {
     "analytics": false,
     "schematicCollections": [
-      "@cypress/schematic",
       "@schematics/angular"
     ]
   }

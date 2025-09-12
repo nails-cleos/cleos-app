@@ -11,7 +11,7 @@
                 <div #additionalList="cdkDropList" (cdkDropListDropped)="drop($event, false)"
                      [cdkDropListConnectedTo]="[selectedAdditionalList]" [cdkDropListData]="additional" cdkDropList
                      class="item-list">
-                  @for (item of additional; track item) {
+                  @for (item of additional; track item.id) {
                     <div cdkDrag class="item-box">{{ item.name }}</div>
                   }
                 </div>
@@ -22,7 +22,7 @@
                 <div #selectedAdditionalList="cdkDropList" (cdkDropListDropped)="drop($event,true)"
                      [cdkDropListConnectedTo]="[additionalList]" [cdkDropListData]="selectedAdditional" cdkDropList
                      class="item-list">
-                  @for (item of selectedAdditional; track item) {
+                  @for (item of selectedAdditional; track item.id) {
                     <div (click)="changePrice(item)" cdkDrag class="item-box">
                       <div>
                         <div>{{ item.name }}</div>
@@ -45,7 +45,7 @@
                   <div #treatmentList="cdkDropList" (cdkDropListDropped)="drop($event, false)"
                        [cdkDropListConnectedTo]="[selectedTreatmentList]" [cdkDropListData]="group.value.treatments"
                        cdkDropList class="item-list">
-                    @for (item of group.value.treatments; track item) {
+                    @for (item of group.value.treatments; track item.id) {
                       <div cdkDrag class="item-box">{{ item.name }}</div>
                     }
                   </div>
@@ -55,7 +55,7 @@
                   <div #selectedTreatmentList="cdkDropList" (cdkDropListDropped)="drop($event,true)"
                        [cdkDropListConnectedTo]="[treatmentList]" [cdkDropListData]="group.value.selectedTreatments"
                        cdkDropList class="item-list">
-                    @for (item of group.value.selectedTreatments; track item) {
+                    @for (item of group.value.selectedTreatments; track item.id) {
                       <div (click)="changePrice(item)" cdkDrag class="item-box">
                         <div>
                           <div>{{ item.name }}</div>

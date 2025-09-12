@@ -1,12 +1,19 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AuthUserService } from './auth-user.service';
+import { NgcCookieConsentService } from 'ngx-cookieconsent';
 
-describe('ThemeService', () => {
+describe('AuthUserService', () => {
   let service: AuthUserService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    const cookieSpy = jasmine.createSpyObj('cookieConsentService', ['getConfig', 'destroy', 'init']);
+    TestBed.configureTestingModule({
+      providers: [
+        AuthUserService,
+        { provide: NgcCookieConsentService, useValue: cookieSpy },
+      ],
+    });
     service = TestBed.inject(AuthUserService);
   });
 

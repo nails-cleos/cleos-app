@@ -33,7 +33,7 @@ export class ToastService {
     action?: string,
   ): ToastRef {
     const topOffset = this.topSpace + (this.overlayRefs.length * this.spaceBetween);
-    const positionStrategy = this.overlay.position().global().top(`${ topOffset }px`).centerHorizontally();
+    const positionStrategy = this.overlay.position().global().top(`${topOffset}px`).centerHorizontally();
     const toastDismissed = new Subject<void>();
     const toastAction = new Subject<void>();
 
@@ -133,7 +133,7 @@ export class ToastService {
     this.overlayRefs.forEach((overlayRef, index) => {
       const topOffset = this.topSpace + (index * this.spaceBetween);
       overlayRef.updatePositionStrategy(
-        this.overlay.position().global().top(`${ topOffset }px`).right('20px'),
+        this.overlay.position().global().top(`${topOffset}px`).centerHorizontally(),
       );
     });
   }
