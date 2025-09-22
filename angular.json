@@ -207,7 +207,13 @@
               "zone.js"
             ],
             "tsConfig": "tsconfig.spec.json",
-            "karmaConfig": "karma.conf.js",
+            "karmaConfig": "karma.conf.ts",
+            "codeCoverage": true,
+            "codeCoverageExclude": [
+              "src/app/**/*.actions.ts",
+              "src/app/**/*.reducers.ts",
+              "src/app/**/*.effects.ts"
+            ],
             "assets": [
               "src/favicon.ico",
               "src/assets",

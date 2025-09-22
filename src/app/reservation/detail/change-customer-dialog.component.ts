@@ -77,7 +77,7 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
   private createFilters = (): void => {
     this.filteredCustomer = this.customer.valueChanges.pipe(
       startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
+      map(value => typeof value === 'string' ? value : value.displayName),
       map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers),
     );
   };

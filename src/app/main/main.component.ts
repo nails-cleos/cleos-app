@@ -1,10 +1,10 @@
 import { AfterViewInit, Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { AppState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { map, shareReplay } from 'rxjs/operators';
+import { map, shareReplay, takeUntil } from 'rxjs/operators';
 import { ActivatedRoute, Router, RouterLinkActive, RouterOutlet } from '@angular/router';
 import * as fromActionsLogin from '../store/auth.actions';
 import { IUser, User } from '../interfaces/user';
@@ -62,17 +62,9 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
   	.pipe(map(result => result.matches), shareReplay());
 
-  private authUserServiceSubscription: Subscription = user(this.auth).subscribe(response => {
-  	response?.getIdToken().then(idToken => this.tokenService.token = idToken);
-  	this.isAuthenticated = response !== null;
-  });
-  private mainContentSubscription: Subscription = this.mainContent.data$.subscribe(it => {
-  	this.showLoader = it.showPreload;
-  	this.navigationState.next(it.navigationHeader);
-  	this.showArrow = it.showArrow;
-  });
-
   private navigationObserve?: IntersectionObserver;
+
+  private destroy$ = new Subject<void>();
 
   constructor() {
   	this.authUserService.updateMode(this.isDarkMode);
@@ -110,6 +102,21 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
   	this.authUserService.cookieConsent(this.translate);
   	this.language = this.navigationService.attachLang(this.route.snapshot.paramMap.get('lang'));
+
+    user(this.auth)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((response) => {
+        response?.getIdToken().then((idToken) => (this.tokenService.token = idToken));
+        this.isAuthenticated = response !== null;
+      });
+
+    this.mainContent.data$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((it) => {
+        this.showLoader = it.showPreload;
+        this.navigationState.next(it.navigationHeader);
+        this.showArrow = it.showArrow;
+      });
   }
 
   ngAfterViewInit(): void {
@@ -117,8 +124,8 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-  	this.authUserServiceSubscription.unsubscribe();
-  	this.mainContentSubscription.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   scrollToElement = (element: HTMLElement | string): void => {

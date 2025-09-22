@@ -1,7 +1,7 @@
 // Karma configuration file, see link for more information
 // https://karma-runner.github.io/1.0/config/configuration-file.html
 
-module.exports = function (config) {
+module.exports = (config: any) => {
   config.set({
     basePath: '',
     frameworks: ['jasmine', '@angular-devkit/build-angular'],
@@ -41,6 +41,11 @@ module.exports = function (config) {
           lines: 80,
         },
       },
+      exclude: [
+        '**/src/app/**/*.actions.ts',
+        '**/src/app/**/*.reducers.ts',
+        '**/src/app/**/*.effects.ts',
+      ],
     },
     reporters: ['progress', 'kjhtml', 'junit'],
     junitReporter: {

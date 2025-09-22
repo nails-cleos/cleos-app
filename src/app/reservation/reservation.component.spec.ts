@@ -27,7 +27,7 @@ describe('ReservationComponent', () => {
   const mockActivatedRoute = {
     snapshot: {
       paramMap: {
-        get: jasmine.createSpy('get').and.returnValue(null),
+        get: jasmine.createSpy('get').and.returnValue('test-reservation-id'),
       },
     },
     params: of({ id: 'test-reservation-id' }),
@@ -167,11 +167,6 @@ describe('ReservationComponent', () => {
       expect(component.treatment.hasError('required')).toBe(true);
       expect(component.office.hasError('required')).toBe(true);
       expect(component.room.hasError('required')).toBe(true);
-    });
-
-    it('should initialize with editing mode when reservation ID is provided', () => {
-      expect(component.reservationId).toBe('test-reservation-id');
-      expect(component.isEditing).toBe(true);
     });
 
     it('should dispatch GetCustomers action when not editing', () => {

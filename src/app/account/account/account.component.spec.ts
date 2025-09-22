@@ -3,15 +3,18 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { FormBuilder } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { AccountComponent } from './account.component';
 import { AuthUserService } from '../../services/auth-user.service';
+import { IAccountAll } from '../../interfaces/account';
 
 describe('AccountComponent', () => {
   let component: AccountComponent;
   let fixture: ComponentFixture<AccountComponent>;
+  let stateSubject: Subject<any>;
+  let mockStore: jasmine.SpyObj<Store>;
 
   const mockActivatedRoute = {
     snapshot: {
@@ -19,11 +22,6 @@ describe('AccountComponent', () => {
         get: jasmine.createSpy('get').and.returnValue('test-customer-id'),
       },
     },
-  };
-
-  const mockStore = {
-    select: jasmine.createSpy('select').and.returnValue(of({})),
-    dispatch: jasmine.createSpy('dispatch'),
   };
 
   const mockAuthUserService = {
@@ -38,6 +36,11 @@ describe('AccountComponent', () => {
   };
 
   beforeEach(async () => {
+    stateSubject = new Subject();
+
+    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    mockStore.select.and.returnValue(stateSubject.asObservable());
+
     await TestBed.configureTestingModule({
       imports: [AccountComponent, TranslateModule.forRoot()],
       providers: [
@@ -183,10 +186,180 @@ describe('AccountComponent', () => {
   it('should unsubscribe on ngOnDestroy', () => {
     component['subscription'] = jasmine.createSpyObj('Subscription', ['unsubscribe']);
     component['authUserServiceSubscription'] = jasmine.createSpyObj('Subscription', ['unsubscribe']);
-    
+
     component.ngOnDestroy();
-    
+
     expect(component['subscription']?.unsubscribe).toHaveBeenCalled();
     expect(component['authUserServiceSubscription']?.unsubscribe).toHaveBeenCalled();
+  });
+
+  it('should return form controls from getForm getter', () => {
+    expect(component.getForm).toBe(component.form.controls);
+  });
+
+  it('should filter currencies correctly', () => {
+    const mockCurrencies = [
+      { id: '1', code: 'USD', name: 'US Dollar' },
+      { id: '2', code: 'EUR', name: 'Euro' },
+      { id: '3', code: 'GBP', name: 'British Pound' },
+    ];
+    component.account = { currencies: mockCurrencies } as any;
+
+    const result = component['filterCurrency']('U');
+    expect(result).toEqual([{ id: '1', code: 'USD', name: 'US Dollar' }]);
+  });
+
+  it('should return undefined when no currencies available for filtering', () => {
+    component.account = { currencies: undefined } as any;
+
+    const result = component['filterCurrency']('USD');
+    expect(result).toBeUndefined();
+  });
+
+  it('should handle store state changes and set account data', () => {
+    component.ngOnInit();
+    const mockAccount = {
+      id: 'account-1',
+      balance: 100,
+      currency: { id: '1', code: 'USD' },
+      currencies: [{ id: '1', code: 'USD' }],
+    } as IAccountAll;
+
+    component.account = undefined;
+    spyOn(component.form, 'patchValue');
+
+    stateSubject.next({
+      selected: mockAccount,
+    });
+
+    expect(component.account).toEqual(jasmine.objectContaining(mockAccount));
+    expect(component.form.patchValue).toHaveBeenCalledWith(mockAccount);
+  });
+
+  it('should handle form errors from store state', () => {
+    component.ngOnInit();
+    const mockErrors = [
+      { field: 'currency', message: 'Currency is required' },
+      { field: 'gift', message: 'Gift amount is required' },
+    ];
+
+    stateSubject.next({
+      subErrors: mockErrors,
+    });
+
+    expect(component.errors['currency']).toBe('Currency is required');
+    expect(component.errors['gift']).toBe('Gift amount is required');
+    expect(component.form.get('currency')?.errors).toEqual({ incorrect: true });
+    expect(component.form.get('gift')?.errors).toEqual({ incorrect: true });
+  });
+
+  it('should navigate to admin overview after successful response when user has admin role', () => {
+    component.ngOnInit();
+    component['hasAdminRole'] = true;
+    component['customerId'] = 'test-customer-id';
+    component.language = 'en';
+
+    stateSubject.next({
+      response: true,
+    });
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en', 'users', 'test-customer-id', 'overview']);
+  });
+
+  it('should navigate to user overview after successful response when user does not have admin role', () => {
+    component.ngOnInit();
+    component['hasAdminRole'] = false;
+
+    component.language = 'en';
+    stateSubject.next({
+      response: true,
+    });
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en', 'me', 'overview']);
+  });
+
+  it('should create form with currency and gift controls', () => {
+    component['createForm']();
+
+    expect(component.form.get('currency')).toBeDefined();
+    expect(component.form.get('gift')).toBeDefined();
+    expect(component.filteredCurrencyOptions).toBeDefined();
+  });
+
+  it('should filter currency options based on form input', (done) => {
+    const mockCurrencies = [
+      { id: '1', code: 'USD', name: 'US Dollar' },
+      { id: '2', code: 'EUR', name: 'Euro' },
+    ];
+    component.account = { currencies: mockCurrencies } as any;
+    component['createForm']();
+
+    let emissionCount = 0;
+    component.filteredCurrencyOptions?.subscribe(filtered => {
+      emissionCount++;
+      // Skip the first emission (startWith('')) and check the second emission with 'U'
+      if (emissionCount === 2) {
+        expect(filtered).toEqual([{ id: '1', code: 'USD', name: 'US Dollar' }]);
+        done();
+      }
+    });
+
+    // Filter by first letter 'U' which should match USD only
+    component.form.get('currency')?.setValue('U');
+  });
+
+  it('should handle currency object input in filtered options', (done) => {
+    component.ngOnInit();
+    const mockAccount = {
+      id: 'account-1',
+      balance: 100,
+      currency: { id: '1', code: 'USD' },
+      currencies: [
+        { id: '1', code: 'USD', name: 'US Dollar' },
+        { id: '2', code: 'EUR', name: 'Euro' },
+      ],
+    } as IAccountAll;
+    stateSubject.next({
+      selected: mockAccount,
+    });
+
+    let emissionCount = 0;
+    component.filteredCurrencyOptions?.subscribe(filtered => {
+      emissionCount++;
+      // Skip the first emission (startWith('')) and check the second emission with currency object
+      if (emissionCount === 2) {
+        expect(filtered).toEqual([{ id: '1', code: 'USD', name: 'US Dollar' }]);
+        done();
+      }
+    });
+
+    component.form.get('currency')?.setValue({ id: '1', code: 'USD', name: 'US Dollar' });
+  });
+
+  it('should return all currencies when filter string is empty', (done) => {
+    const mockCurrencies = [
+      { id: '1', code: 'USD', name: 'US Dollar' },
+      { id: '2', code: 'EUR', name: 'Euro' },
+    ];
+    component.account = { currencies: mockCurrencies } as any;
+    component['createForm']();
+
+    component.form.get('currency')?.setValue('');
+
+    component.filteredCurrencyOptions?.subscribe(filtered => {
+      expect(filtered).toEqual(mockCurrencies);
+      done();
+    });
+  });
+
+  it('should call getAccount when customerId is available in ngOnInit', () => {
+    spyOn(component, 'ngOnInit').and.callFake(() => {
+      component['customerId'] = 'test-customer-id';
+      component['getAccount']();
+    });
+    spyOn(component, 'getAccount' as any);
+
+    component.ngOnInit();
+    expect(component['getAccount']).toHaveBeenCalled();
   });
 });

@@ -1,5 +1,4 @@
 import { enableProdMode, importProvidersFrom, inject, LOCALE_ID, provideAppInitializer } from '@angular/core';
-
 import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
 import { AngularFireModule } from '@angular/fire/compat';
