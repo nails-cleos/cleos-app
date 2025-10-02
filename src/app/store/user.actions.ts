@@ -1,7 +1,6 @@
 import { Action } from '@ngrx/store';
 import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
 import { SortDirection } from '@angular/material/sort';
-import { PAGE_SIZE } from '../interfaces/notification';
 import { Pagination } from '../interfaces/pagination';
 import { IOverview, IUser } from '../interfaces/user';
 import { Role } from '../interfaces/token';
@@ -32,7 +31,7 @@ export enum UserActionTypes {
 export class GetUsersPage extends PageRequest implements Action {
   readonly type = UserActionTypes.getUsersPage;
 
-  constructor(page: number, sort: string, direction: SortDirection, size: number = PAGE_SIZE, public filter?: string) {
+  constructor(page: number, sort: string, direction: SortDirection, size?: number, public filter?: string) {
     super(page, sort, direction, size);
   }
 }

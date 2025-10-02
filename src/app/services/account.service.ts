@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IAccount, ITransaction } from '../interfaces/account';
 import { createFilter } from '../util/service-helper';
-import { PAGE_SIZE } from '../interfaces/pagination';
 import { toUrl } from '../util/helper';
 import { SortDirection } from '@angular/material/sort';
 import { IApiResponse } from '../interfaces/common';
@@ -13,7 +12,7 @@ import { IApiResponse } from '../interfaces/common';
 })
 export class AccountService {
   private url = 'accounts';
-  private urlV1 = `v1/${ this.url }`;
+  private urlV1 = `v1/${this.url}`;
 
   private http: HttpClient = inject(HttpClient);
 
@@ -22,7 +21,7 @@ export class AccountService {
     page: number,
     sort: string,
     direction: SortDirection,
-    size: number = PAGE_SIZE,
+    size: number,
   ): Observable<ITransaction[]> => this.http.get<ITransaction[]>(
     toUrl(this.urlV1, id, 'transactions'),
     { params: createFilter(page, size, sort, direction) },

@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { PAGE_SIZE, Pagination } from '../interfaces/pagination';
+import { Pagination } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { IColor } from '../interfaces/color';
 import { createFilter } from '../util/service-helper';
@@ -12,7 +12,7 @@ import { IApiResponse } from '../interfaces/common';
 export class ColorService {
 
   private url = 'colors';
-  private urlV1 = `v1/${ this.url }`;
+  private urlV1 = `v1/${this.url}`;
 
   private http: HttpClient = inject(HttpClient);
 
@@ -20,7 +20,7 @@ export class ColorService {
     page: number,
     sort: string,
     direction: SortDirection,
-    size: number = PAGE_SIZE,
+    size: number,
   ): Observable<Pagination<IColor>> => this.http.get<Pagination<IColor>>(toUrl(this.urlV1, 'pages'),
     { params: createFilter(page, size, sort, direction) },
   );

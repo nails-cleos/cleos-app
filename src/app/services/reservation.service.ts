@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ICustomerReservation, IReservation, IRoomReservation } from '../interfaces/reservation';
-import { PAGE_SIZE, Pagination } from '../interfaces/pagination';
+import { Pagination } from '../interfaces/pagination';
 import { IReview } from '../interfaces/review';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
@@ -13,7 +13,7 @@ import { IApiResponse } from '../interfaces/common';
 export class ReservationService {
 
   private url = 'reservations';
-  private urlV1 = `v1/${ this.url }`;
+  private urlV1 = `v1/${this.url}`;
 
   private http: HttpClient = inject(HttpClient);
 
@@ -31,13 +31,13 @@ export class ReservationService {
     let baseUrl = this.urlV1;
     if (!all) {
       if (roomId) {
-        baseUrl += `/rooms/${ roomId }`;
+        baseUrl += `/rooms/${roomId}`;
       } else {
-        baseUrl += `/professionals/${ professionalId }`;
+        baseUrl += `/professionals/${professionalId}`;
       }
     }
 
-    return this.http.get<Pagination<IReservation>>(`${ baseUrl }/pages`, { params });
+    return this.http.get<Pagination<IReservation>>(`${baseUrl}/pages`, { params });
   };
 
   getCustomerReservations = (
@@ -61,7 +61,7 @@ export class ReservationService {
     sort: string,
     direction: SortDirection,
     page: number,
-    size: number = PAGE_SIZE,
+    size: number,
     userId?: string,
     states?: string[],
   ): Observable<Pagination<IReservation>> => {
@@ -179,7 +179,8 @@ export class ReservationService {
 
   createReview = (
     review: IReview,
-  ): Observable<IApiResponse> => this.http.post<IApiResponse>(toUrl(this.urlV1, review.reservationId!, 'reviews'), review);
+  ): Observable<IApiResponse> => this.http.post<IApiResponse>(toUrl(this.urlV1, review.reservationId!, 'reviews'),
+    review);
 
   getReview = (id: string): Observable<IReview | undefined> => this.http.get<IReview>(
     toUrl(this.urlV1, id, 'reviews'),

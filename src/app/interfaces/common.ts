@@ -1,7 +1,7 @@
 import { SortDirection } from '@angular/material/sort';
 import { Observable, of } from 'rxjs';
-import { PAGE_SIZE } from './notification';
 import { ToastType } from '../shared/toast/toast.model';
+import { PAGE_SIZE } from './pagination';
 
 export interface IApiResponse {
   id: string;

@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IDiscount, IReferral, IUserDiscount } from '../interfaces/discount';
-import { PAGE_SIZE, Pagination } from '../interfaces/pagination';
+import { Pagination } from '../interfaces/pagination';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
 import { SortDirection } from '@angular/material/sort';
@@ -12,7 +12,7 @@ import { IApiResponse } from '../interfaces/common';
 export class DiscountService {
 
   private url = 'discounts';
-  private urlV1 = `v1/${ this.url }`;
+  private urlV1 = `v1/${this.url}`;
 
   private http: HttpClient = inject(HttpClient);
 
@@ -20,7 +20,7 @@ export class DiscountService {
     page: number,
     sort: string,
     direction: SortDirection,
-    size: number = PAGE_SIZE,
+    size: number,
   ): Observable<Pagination<IDiscount>> => this.http.get<Pagination<IDiscount>>(
     toUrl(this.urlV1, 'pages'),
     { params: createFilter(page, size, sort, direction) },

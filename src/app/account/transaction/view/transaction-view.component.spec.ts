@@ -165,7 +165,16 @@ describe('TransactionViewComponent', () => {
   });
 
   it('should extract account ID from route and dispatch Clean on init', () => {
-    fixture.detectChanges(); // This calls ngOnInit
+    // Ensure the route parameter is correctly mocked
+    mockActivatedRoute.snapshot.paramMap.get.and.callFake((key: string) => {
+      if (key === 'id') {
+        return 'account-123';
+      }
+      return null;
+    });
+
+    // Reset dispatch calls and initialize
+    mockStore.dispatch.calls.reset();
     component.ngOnInit();
 
     expect(component.accountId).toEqual('account-123');

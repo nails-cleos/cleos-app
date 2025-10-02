@@ -9,7 +9,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { RoomEffects } from '../store/effects/room.effects';
 import { RoomService } from '../services/room.service';
 import { UserService } from '../services/user.service';
-import { AddServiceComponent, PriceDialogComponent } from './me/add-service/add-service.component';
+import { AddServiceComponent } from './me/add-service/add-service.component';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { ExpenseService } from '../services/expense.service';
 import { ExpensesComponent } from './me/expense/list/expenses.component';
@@ -18,6 +18,7 @@ import { ExpenseEffects } from '../store/effects/expense.effects';
 import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
+import { PriceDialogComponent } from './me/add-service/price-dialog.component';
 
 @NgModule({
   imports: [

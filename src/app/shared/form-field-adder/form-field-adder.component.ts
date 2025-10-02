@@ -29,29 +29,6 @@ export class FormFieldAdderComponent implements OnInit {
   expanded?: IExtras;
   allPaymentTypes: string[] = Object.keys(PaymentType);
 
-  get addRow(): void {
-    const element: IExtras = { description: undefined, price: 0 };
-    if (this.split) {
-      element.paymentType = undefined;
-    }
-    const newData = [...this.dataSource.data, element];
-    this.dataSource = new MatTableDataSource<IExtras>(newData);
-
-    this.formArray.push(this.createItemFormGroup());
-    return this.subscribeToFormChanges();
-  }
-
-  get total() {
-    return this.dataSource.data.map(t => t.price).reduce((acc, value) => acc + value, 0);
-  }
-
-  get remainsToBeSplit(): number | null {
-    if (this.split) {
-      return (this.toPaid || 0) - this.total;
-    }
-    return null;
-  }
-
   constructor(private formBuilder: FormBuilder) {
   }
 
@@ -63,6 +40,29 @@ export class FormFieldAdderComponent implements OnInit {
       this.displayedColumns = [...this.displayedColumns, 'paymentType'];
     }
     this.displayedColumns = [...this.displayedColumns, 'actions'];
+  }
+
+  total() {
+    return this.dataSource.data.map(t => t.price).reduce((acc, value) => acc + value, 0);
+  }
+
+  addRow(): void {
+    const element: IExtras = { description: undefined, price: 0 };
+    if (this.split) {
+      element.paymentType = undefined;
+    }
+    const newData = [...this.dataSource.data, element];
+    this.dataSource = new MatTableDataSource<IExtras>(newData);
+
+    this.formArray.push(this.createItemFormGroup());
+    return this.subscribeToFormChanges();
+  }
+
+  remainsToBeSplit(): number | null {
+    if (this.split) {
+      return (this.toPaid || 0) - this.total();
+    }
+    return null;
   }
 
   deleteRow = (index: number): void => {
@@ -94,7 +94,7 @@ export class FormFieldAdderComponent implements OnInit {
     if (!this.split) {
       this.isValid.emit(!this.formGroup.invalid);
     } else {
-      this.isValid.emit(this.total === this.toPaid && !this.formGroup.invalid);
+      this.isValid.emit(this.total() === this.toPaid && !this.formGroup.invalid);
     }
   };
 

@@ -14,5 +14,3 @@ export interface INotificationDTO {
   unread: number;
   page: Pagination<INotification>;
 }
-
-export const PAGE_SIZE = 10;

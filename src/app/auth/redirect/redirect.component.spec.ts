@@ -27,7 +27,7 @@ describe('RedirectComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [RedirectComponent], // standalone
+      imports: [RedirectComponent],
       providers: [
         { provide: Store, useValue: mockStore },
         { provide: NavigationService, useValue: navigateServiceSpy },

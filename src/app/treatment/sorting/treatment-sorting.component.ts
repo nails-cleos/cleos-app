@@ -40,7 +40,6 @@ export class TreatmentSortingComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-
   sorted = (sorted: ISorted[]): void => {
     this.items = undefined;
     this.store.dispatch(

@@ -25,14 +25,14 @@ describe('ReviewDialogComponent', () => {
       },
     } as Analytics;
 
-    const customer = {
+    const customer: IUserAll = {
       id: 'customer-id',
       displayName: 'John Doe',
       email: 'user@test.com',
       authorities: [{ authority: 'ROLE_CUSTOMER' }],
       locale: 'en',
       timeZone: 'UTC',
-    } as IUserAll;
+    };
 
     const address = {
       id: 1,

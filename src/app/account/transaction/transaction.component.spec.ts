@@ -3,7 +3,7 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Subject, of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { TransactionComponent } from './transaction.component';
@@ -124,12 +124,22 @@ describe('TransactionComponent', () => {
   });
 
   it('should extract account ID from route and create form on init', () => {
-    // Ensure account is not set so GetAccount will be dispatched
+    // Ensure the route parameter is correctly mocked
+    mockActivatedRoute.snapshot.paramMap.get.and.callFake((key: string) => {
+      if (key === 'id') {
+        return 'account-123';
+      }
+      return null;
+    });
+
+    // Ensure account is undefined so GetAccount will be dispatched
     component.account = undefined;
 
+    // Reset dispatch calls and initialize
+    mockStore.dispatch.calls.reset();
     component.ngOnInit();
 
-    // accountId is private, but we can test the side effects
+    // Check form creation
     expect(component.form).toBeDefined();
     expect(component.form.get('amount')).toBeDefined();
     expect(component.form.get('type')).toBeDefined();
@@ -355,7 +365,8 @@ describe('TransactionComponent', () => {
     component['accountId'] = 'account-123';
 
     const subOption = new PaymentOption('Sub Option', PaymentType.ideal, 'sub-icon', 'sub-image', 'sub-bic');
-    const paymentOption = new PaymentOption('Test Payment', PaymentType.ideal, 'test-icon', 'test-image', 'test-bic', [subOption]);
+    const paymentOption = new PaymentOption('Test Payment', PaymentType.ideal, 'test-icon', 'test-image', 'test-bic',
+      [subOption]);
 
     component.form.patchValue({
       amount: 400,

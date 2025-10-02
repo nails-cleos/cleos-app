@@ -29,24 +29,24 @@ export class UpcomingComponent implements OnChanges {
   	this.language = this.translate.currentLang;
   }
 
-  get showTimeZone(): boolean {
-  	return this.upcoming ? !isSameTimeZone(this.upcoming.room.timeZone) : false;
-  }
-
-  get edit(): void {
-  	if (this.upcoming && !this.upcoming.canEdit) {
-  		customerEditDialog(this.dialog, this.router, this.upcoming.id, this.upcoming.room.currency, this.small,
-  			this.language,
-  			this.upcoming.price);
-  	} else {
-  		this.router.navigate([this.language, 'me', 'reservation', this.upcoming?.id]);
-  	}
-  	return;
-  }
-
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ngOnChanges(_changes: SimpleChanges): void {
   	this.loadUpcoming();
+  }
+
+  edit(): void {
+    if (this.upcoming && !this.upcoming.canEdit) {
+      customerEditDialog(this.dialog, this.router, this.upcoming.id, this.upcoming.room.currency, this.small,
+        this.language,
+        this.upcoming.price);
+    } else {
+      this.router.navigate([this.language, 'me', 'reservation', this.upcoming?.id]);
+    }
+    return;
+  }
+
+  showTimeZone(): boolean {
+    return this.upcoming ? !isSameTimeZone(this.upcoming.room.timeZone) : false;
   }
 
   openDialog = (reservationDate: Date): void => {

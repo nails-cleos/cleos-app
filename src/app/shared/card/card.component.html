@@ -4,7 +4,7 @@
       <mat-card-title>
         {{ title }}
         @if (title && expand) {
-          <button mat-icon-button class="more-button" (click)="onClick">
+          <button mat-icon-button class="more-button" (click)="onClick()">
             <mat-icon>zoom_out_map</mat-icon>
           </button>
         }
