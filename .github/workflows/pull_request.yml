@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js 22.14.0
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 22.14.0
           cache: 'npm'
@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js 22.14.0
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 22.14.0
           cache: 'npm'
@@ -48,7 +48,8 @@ jobs:
         run: npm ci
 
       - name: Run tests with coverage
-        run: npm test -- --code-coverage --watch=false --browsers=ChromeHeadless
+        run: |
+          node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng test --code-coverage --watch=false --browsers=ChromeHeadless
         continue-on-error: true
 
       - name: Upload coverage reports to Codecov
@@ -82,7 +83,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js 22.14.0
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 22.14.0
           cache: 'npm'
