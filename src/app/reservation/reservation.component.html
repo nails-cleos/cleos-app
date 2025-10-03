@@ -581,7 +581,7 @@
         </div>
         <div class="divider">
           @if (!isEditing) {
-            <button type="button" (click)="back" color="accent" class="icon-button" mat-fab>
+            <button type="button" (click)="back()" color="accent" class="icon-button" mat-fab>
               <mat-icon>arrow_upward</mat-icon>
             </button>
           } @else {
@@ -601,7 +601,7 @@
         <ng-container *ngTemplateOutlet="stepThree"></ng-container>
         <div class="divider">
           @if (!isEditing || (isEditing && isAdmin)) {
-            <button type="button" (click)="back" color="accent" class="icon-button" mat-fab>
+            <button type="button" (click)="back()" color="accent" class="icon-button" mat-fab>
               <mat-icon>arrow_upward</mat-icon>
             </button>
           } @else {
@@ -620,7 +620,7 @@
         <ng-template matStepLabel>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepFour"></ng-container>
         <div class="divider">
-          <button type="button" (click)="back" color="accent" class="icon-button" mat-fab>
+          <button type="button" (click)="back()" color="accent" class="icon-button" mat-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
           <button type="button" (click)="callStepFive(true)" color="primary" class="icon-button" mat-fab
@@ -636,7 +636,7 @@
           <ng-container *ngTemplateOutlet="stepFive"></ng-container>
         </div>
         <div>
-          <button type="button" (click)="back" color="accent" class="icon-button" mat-fab>
+          <button type="button" (click)="back()" color="accent" class="icon-button" mat-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
           <button type="button" (click)="callStepSix(true)" [disabled]="configurationForm.invalid" color="primary"
@@ -650,7 +650,7 @@
         <ng-template matStepLabel>{{ 'RESERVATION.SCHEDULE.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepSix"></ng-container>
         <div class="divider">
-          <button type="button" (click)="back" color="accent" class="icon-button" mat-fab>
+          <button type="button" (click)="back()" color="accent" class="icon-button" mat-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
           <button type="button" (click)="callStepSeven(true)" [disabled]="eventGroup.invalid" color="primary"
@@ -664,10 +664,10 @@
         <ng-template matStepLabel>{{ 'RESERVATION.PREVIEW' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepSeven"></ng-container>
         <div class="divider">
-          <button type="button" (click)="back" color="accent" class="icon-button" mat-fab>
+          <button type="button" (click)="back()" color="accent" class="icon-button" mat-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
-          <button type="button" (click)="create" color="primary" class="icon-button" mat-fab name="create">
+          <button type="button" (click)="create()" color="primary" class="icon-button" mat-fab name="create">
             <mat-icon>add_task</mat-icon>
           </button>
         </div>
@@ -746,7 +746,7 @@
         </div>
         <div class="divider">
           @if (!isEditing) {
-            <button type="button" (click)="back" color="accent" class="icon-button" mat-fab extended>
+            <button type="button" (click)="back()" color="accent" class="icon-button" mat-fab extended>
               {{ 'COMMON.BUTTON.BACK' | translate }}
               <mat-icon>arrow_back</mat-icon>
             </button>
@@ -769,7 +769,7 @@
         <ng-container *ngTemplateOutlet="stepThree"></ng-container>
         <div>
           @if (!isEditing || (isEditing && isAdmin)) {
-            <button type="button" (click)="back" color="accent" mat-fab extended class="icon-button">
+            <button type="button" (click)="back()" color="accent" mat-fab extended class="icon-button">
               <mat-icon>arrow_back</mat-icon>
               {{ 'COMMON.BUTTON.BACK' | translate }}
             </button>
@@ -792,7 +792,7 @@
         <ng-template matStepLabel>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepFour"></ng-container>
         <div>
-          <button type="button" (click)="back" color="accent" mat-fab extended class="icon-button">
+          <button type="button" (click)="back()" color="accent" mat-fab extended class="icon-button">
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
@@ -810,7 +810,7 @@
           <ng-container *ngTemplateOutlet="stepFive"></ng-container>
         </div>
         <div>
-          <button type="button" (click)="back" color="accent" mat-fab extended class="icon-button">
+          <button type="button" (click)="back()" color="accent" mat-fab extended class="icon-button">
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
@@ -826,7 +826,7 @@
         <ng-template matStepLabel>{{ 'RESERVATION.SCHEDULE.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepSix"></ng-container>
         <div class="divider">
-          <button type="button" (click)="back" color="accent" mat-fab extended class="icon-button">
+          <button type="button" (click)="back()" color="accent" mat-fab extended class="icon-button">
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
@@ -842,11 +842,11 @@
         <ng-template matStepLabel>{{ 'RESERVATION.PREVIEW' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepSeven"></ng-container>
         <div class="divider">
-          <button type="button" (click)="back" color="accent" mat-fab extended class="icon-button">
+          <button type="button" (click)="back()" color="accent" mat-fab extended class="icon-button">
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
-          <button (click)="create" color="primary" mat-fab extended class="icon-button" type="button" name="create">
+          <button (click)="create()" color="primary" mat-fab extended class="icon-button" type="button" name="create">
             <mat-icon>add_task</mat-icon>
             {{ 'COMMON.BUTTON.BOOK' | translate }}
           </button>
