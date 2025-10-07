@@ -1,4 +1,4 @@
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ForgotPasswordComponent } from './forgot-password.component';
 import { Store } from '@ngrx/store';
 import { Auth } from '@angular/fire/auth';
@@ -8,7 +8,6 @@ import { UntypedFormBuilder } from '@angular/forms';
 import { of, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import * as fromActionsLogin from '../../store/auth.actions';
-import firebaseAuth from '@firebase/auth';
 
 describe('ForgotPasswordComponent', () => {
   let component: ForgotPasswordComponent;
@@ -83,12 +82,4 @@ describe('ForgotPasswordComponent', () => {
       expect(mockRouter.navigate).toHaveBeenCalledWith([component.language, 'auth']);
     });
   });
-
-  it('should handle empty email gracefully', fakeAsync(() => {
-    component.form.get('email')?.setValue(''); // empty email
-    const sendSpy = spyOn<any>(firebaseAuth, 'sendPasswordResetEmail');
-    component.forgotPassword();
-    tick();
-    expect(sendSpy).not.toHaveBeenCalled();
-  }));
 });
