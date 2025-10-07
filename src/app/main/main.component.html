@@ -60,7 +60,7 @@
           <span (click)="scrollToElement('treatments')" aria-label="Go to treatments" class="pointer-only">
             {{ 'MAIN.SECTION.TREATMENT' | translate }}
           </span>
-          <span (click)="treatment" aria-label="biab"
+          <span (click)="treatment()" aria-label="biab"
                 class="pointer-only">
             {{ 'MAIN.SECTION.BIAB' | translate }}
           </span>
@@ -68,7 +68,7 @@
             {{ 'MAIN.SECTION.CONTACT' | translate }}
           </span>
           @if (isAuthenticated) {
-            <span (click)="redirect" aria-label="Go to my account" class="pointer-only">
+            <span (click)="redirect()" aria-label="Go to my account" class="pointer-only">
               {{ 'MAIN.SECTION.ACCOUNT' | translate }}
             </span>
           } @else {
@@ -77,11 +77,11 @@
             </span>
           }
         </span>
-        <button mat-icon-button (click)="changeTheme" aria-label="Change theme">
+        <button mat-icon-button (click)="changeTheme()" aria-label="Change theme">
           <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
         </button>
       } @else {
-        <button mat-icon-button (click)="changeTheme" aria-label="Change theme">
+        <button mat-icon-button (click)="changeTheme()" aria-label="Change theme">
           <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
         </button>
         <button [matMenuTriggerFor]="menuLogged" mat-icon-button aria-label="Open menu" name="menu">
@@ -120,7 +120,7 @@
             <!--            </a>-->
             <mat-divider></mat-divider>
             @if (isAuthenticated) {
-              <mat-list-item (click)="redirect" aria-label="My account">
+              <mat-list-item (click)="redirect()" aria-label="My account">
                 <mat-icon matListItemIcon>person_pin</mat-icon>
                 <div matListItemTitle>{{ 'MAIN.SECTION.ACCOUNT' | translate }}</div>
               </mat-list-item>

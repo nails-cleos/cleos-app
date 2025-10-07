@@ -36,12 +36,13 @@ import { AnimationAnimateMetadata, AnimationSequenceMetadata } from '@angular/an
 import { isMobile } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MainContentService } from '../main-content.service';
-import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Router } from '@angular/router';
 import { SharedModule } from '../../shared/shared.module';
 import { AnimateDirective } from '../../directives/animate.directive';
 import { ResponseSuccess } from '../../interfaces/common';
 import { ToastService } from '../../services/toast.service';
+import { BottomSheetBookAppointmentComponent } from './bottom-sheet-book-appointment';
 
 @Component({
   selector: 'app-main-content',
@@ -212,20 +213,6 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     ]).subscribe(result => this.isSmall = result.matches);
   }
 
-  get openBottomSheet(): void {
-    this.bottomSheet.open(BottomSheetBookAppointmentComponent);
-    return;
-  }
-
-  get sendEmail(): void {
-    if (!this.form.invalid) {
-      this.store.dispatch(
-        new fromActionsMain.SendMessage(this.form.value),
-      );
-    }
-    return;
-  }
-
   ngOnInit(): void {
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
       this.isAuthenticated = value.isAuthenticated;
@@ -273,9 +260,21 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.authUserServiceSubscription?.unsubscribe();
   }
 
+  openBottomSheet(): void {
+    this.bottomSheet.open(BottomSheetBookAppointmentComponent);
+  }
+
+  sendEmail(): void {
+    if (!this.form.invalid) {
+      this.store.dispatch(
+        new fromActionsMain.SendMessage(this.form.value),
+      );
+    }
+  }
+
   isCurrentSlideIndex = (index: number): boolean => this.currentIndex === index;
 
-  setTreatmentAnimation = (i: number): AnimationSequenceMetadata => scaleIn(`${ i * (this.isSmall ? 0 : 300) }ms`);
+  setTreatmentAnimation = (i: number): AnimationSequenceMetadata => scaleIn(`${i * (this.isSmall ? 0 : 300)}ms`);
 
   goToTreatment = (name?: string): void => {
     if (name === 'biab') {
@@ -286,7 +285,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onHover = (social: ISocialLink, enter: boolean): void => {
     const suffix = enter ? '' : '-NO-COLOR';
-    social.svgIcon = `${ social.name }${ suffix }`;
+    social.svgIcon = `${social.name}${suffix}`;
   };
 
   filterBy = (group?: ITreatmentGroup): void => {
@@ -375,47 +374,5 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
         this.toastService.show(response.message, response.toastType);
       }
     });
-  };
-}
-
-@Component({
-  selector: 'app-bottom-sheet-book-appointment',
-  templateUrl: 'bottom-sheet-book-appointment.html',
-  imports: [SharedModule],
-})
-export class BottomSheetBookAppointmentComponent {
-  constructor(private bottomSheetRef: MatBottomSheetRef<BottomSheetBookAppointmentComponent>,
-              private translate: TranslateService) {
-  }
-
-  openLink = (event: MouseEvent, key: 'whatsapp' | 'instagram' | 'facebook' | 'phone' | 'email'): void => {
-    this.bottomSheetRef.dismiss();
-    event.preventDefault();
-    setTimeout(() => {
-      let url;
-      switch (key) {
-        case 'whatsapp':
-          const phone = this.translate.instant('MAIN.CONTACT.SEND.PHONE');
-          const message = this.translate.instant('MAIN.CONTACT.SEND.HELLO');
-          url = `https://api.whatsapp.com/send?phone=${ phone }&text=${ message }`;
-          break;
-        case 'phone':
-          const tel = this.translate.instant('MAIN.CONTACT.SEND.PHONE');
-          url = `tel:${ tel }`;
-          break;
-        case 'instagram':
-          url = 'https://ig.me/m/carlanailscleos.nl';
-          break;
-        case 'facebook':
-          const message2 = this.translate.instant('MAIN.CONTACT.SEND.HELLO');
-          url = `https://m.me/carlanailscleos.nl?text=${ message2 }`;
-          break;
-        case 'email':
-          const mail = this.translate.instant('MAIN.CONTACT.MAIL');
-          url = `mailto:${ mail }`;
-          break;
-      }
-      window.open(url, '_blank');
-    }, 500);
   };
 }

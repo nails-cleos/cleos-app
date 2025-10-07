@@ -70,35 +70,6 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   	this.authUserService.updateMode(this.isDarkMode);
   }
 
-  get changeTheme(): void {
-  	this.isDarkMode = !this.isDarkMode;
-  	const theme: Theme = getThemeName(this.isDarkMode);
-  	this.resetTheme(theme);
-  	if (this.isAuthenticated) {
-  		const authenticatedUser: IUser = new User();
-  		authenticatedUser.theme = theme;
-  		const redirectUrl = this.router.url;
-  		const message = this.translate.instant(
-  			`COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode.toString().toUpperCase() }`);
-  		this.store.dispatch(
-  			new fromActionsMain.UpdateMyUser(authenticatedUser, redirectUrl, message),
-  		);
-  	}
-  	return;
-  }
-
-  get redirect(): void {
-  	return this.store.dispatch(
-  		new fromActionsLogin.Redirect(),
-  	);
-  }
-
-  get treatment(): void {
-  	goTo('home');
-  	this.router.navigate([this.translate.currentLang, 'biab', 'treatment']);
-  	return;
-  }
-
   ngOnInit(): void {
   	this.authUserService.cookieConsent(this.translate);
   	this.language = this.navigationService.attachLang(this.route.snapshot.paramMap.get('lang'));
@@ -126,6 +97,35 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  changeTheme(): void {
+    this.isDarkMode = !this.isDarkMode;
+    const theme: Theme = getThemeName(this.isDarkMode);
+    this.resetTheme(theme);
+    if (this.isAuthenticated) {
+      const authenticatedUser: IUser = new User();
+      authenticatedUser.theme = theme;
+      const redirectUrl = this.router.url;
+      const message = this.translate.instant(
+        `COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode.toString().toUpperCase() }`);
+      this.store.dispatch(
+        new fromActionsMain.UpdateMyUser(authenticatedUser, redirectUrl, message),
+      );
+    }
+    return;
+  }
+
+  redirect(): void {
+    return this.store.dispatch(
+      new fromActionsLogin.Redirect(),
+    );
+  }
+
+  treatment(): void {
+    goTo('home');
+    this.router.navigate([this.translate.currentLang, 'biab', 'treatment']);
+    return;
   }
 
   scrollToElement = (element: HTMLElement | string): void => {

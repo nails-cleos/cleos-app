@@ -33,11 +33,15 @@ export class UpdateTrackingDialogComponent implements OnInit {
     this.completedTime.setValue(getTime(completedDateTime));
   }
 
-  get onNoClick(): void {
+  ngOnInit(): void {
+    this.createForm();
+  }
+
+  onNoClick(): void {
     return this.dialogRef.close();
   }
 
-  get doAction(): void {
+  doAction(): void {
     let started;
     let completed;
     if (this.startedDateTime?.getTime() !== this.startedDate.value?.getTime()) {
@@ -51,10 +55,6 @@ export class UpdateTrackingDialogComponent implements OnInit {
     }
 
     return this.dialogRef.close();
-  }
-
-  ngOnInit(): void {
-    this.createForm();
   }
 
   timeChange = ($event: string, dateForm: FormControl): void => {

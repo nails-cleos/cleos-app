@@ -1,20 +1,19 @@
-import { Component, inject, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState } from '../../store/app.states';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { TranslateService } from '@ngx-translate/core';
-import { MAT_BOTTOM_SHEET_DATA, MatBottomSheet } from '@angular/material/bottom-sheet';
-import { environment } from '../../../environments/environment';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Observable, Subject } from 'rxjs';
 import * as fromActionsDiscount from '../../store/discount.actions';
 import { IReferral } from '../../interfaces/discount';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Analytics, logEvent } from '@angular/fire/analytics';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { SharedModule } from '../../shared/shared.module';
-import { ShareButtonsComponent } from './share-buttons/share-buttons.component';
 import { ToastService } from '../../services/toast.service';
 import { takeUntil } from 'rxjs/operators';
+import { BottomSheetShareComponent } from './bottom-sheet-share.component';
+import { BottomSheetReferralComponent } from './bottom-sheet-referral.component';
 
 @Component({
   selector: 'app-referrals',
@@ -98,65 +97,5 @@ export class ReferralsComponent implements OnInit, OnDestroy {
         this.showShare = this.referralMax ? this.referrals < this.referralMax : true;
       }
     });
-  };
-}
-
-@Component({
-  selector: 'app-bottom-sheet-share',
-  templateUrl: 'bottom-sheet-share.component.html',
-  imports: [SharedModule, ShareButtonsComponent],
-})
-export class BottomSheetShareComponent {
-  message: any;
-  code: any;
-  url = environment.appServer;
-  image = `${this.url}/assets/icons/icon-512x512.png`;
-  show: number;
-
-  constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public data: { code: string },
-              private translate: TranslateService, breakpointObserver: BreakpointObserver) {
-    this.show = 7;
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small,
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.show = 5;
-      }
-    });
-    this.code = `${this.url}/auth?code=${data.code}`;
-    this.message = this.translate.instant('ME.REFERRAL.LINK', {
-      code: data.code,
-      url: this.code,
-    });
-  }
-}
-
-@Component({
-  selector: 'app-bottom-sheet-referral',
-  templateUrl: 'bottom-sheet-referral.component.html',
-  styleUrls: ['./bottom-sheet-referral.component.scss'],
-  imports: [SharedModule],
-})
-export class BottomSheetReferralComponent {
-  referralMax = 5;
-  referrals = 0;
-  referralsUsed = 0;
-
-  constructor(@Inject(MAT_BOTTOM_SHEET_DATA) public data: any) {
-    this.referralMax = data.referralMax;
-    const max = data.referrals > data.referralsUsed ? data.referrals : data.referralsUsed;
-    this.delay(data, 0, max);
-  }
-
-  private delay = (data: any, count: number, max: number): void => {
-    setTimeout(() => {
-      count++;
-      this.referrals = count > data.referrals ? data.referrals : count;
-      this.referralsUsed = count > data.referralsUsed ? data.referralsUsed : count;
-      if (count < max) {
-        this.delay(data, count, max);
-      }
-    }, 500);
   };
 }

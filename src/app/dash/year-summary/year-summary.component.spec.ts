@@ -1,16 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { YearSummaryComponent } from './year-summary.component';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AuthUserService } from '../../services/auth-user.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { ActivatedRoute } from '@angular/router';
-import { IMonthlyExport } from '../../interfaces/dashboard';
+import { IMonthlyExport, IMonthlySummaryExpense, IMonthlySummarySale, ISummaryTotal } from '../../interfaces/dashboard';
 
 describe('YearSummaryComponent', () => {
   let component: YearSummaryComponent;
   let fixture: ComponentFixture<YearSummaryComponent>;
+  let stateSubject: Subject<any>;
 
   const mockCurrency = {
     id: 'eur',
@@ -40,6 +41,10 @@ describe('YearSummaryComponent', () => {
   };
 
   beforeEach(async () => {
+    stateSubject = new Subject();
+
+    mockStore.select.and.returnValue(stateSubject.asObservable());
+
     await TestBed.configureTestingModule({
       imports: [YearSummaryComponent, TranslateModule.forRoot()],
       providers: [
@@ -81,16 +86,52 @@ describe('YearSummaryComponent', () => {
       const mockMonthlyExport: IMonthlyExport = {
         month: 1,
         saleSummary: [
-          { timestamp: 200, id: 'sale-2' } as any,
-          { timestamp: 100, id: 'sale-1' } as any,
+          {
+            timestamp: 200, id: 'sale-2', paths: ['path', 'to', 'sale-2'], total: {
+              payments: [
+                { gross: 121, net: 100, btw: 21 } as ISummaryTotal,
+              ],
+            },
+          } as IMonthlySummarySale,
+          {
+            timestamp: 100, id: 'sale-1', paths: ['path', 'to', 'sale-1'], total: {
+              payments: [
+                { gross: 242, net: 200, btw: 21 } as ISummaryTotal,
+              ],
+            },
+          } as IMonthlySummarySale,
         ],
         expenseSummary: [
-          { timestamp: 400, id: 'expense-2' } as any,
-          { timestamp: 300, id: 'expense-1' } as any,
+          {
+            timestamp: 400, id: 'expense-2', paths: ['path', 'to', 'expense-2'], total: {
+              payments: [
+                { gross: 60.5, net: 50, btw: 21 } as ISummaryTotal,
+              ],
+            },
+          } as IMonthlySummaryExpense,
+          {
+            timestamp: 300, id: 'expense-1', paths: ['path', 'to', 'expense-1'], total: {
+              payments: [
+                { gross: 10.9, net: 10, btw: 9 } as ISummaryTotal,
+              ],
+            },
+          } as IMonthlySummaryExpense,
         ],
         cashSummary: [
-          { timestamp: 600, id: 'cash-2' } as any,
-          { timestamp: 500, id: 'cash-1' } as any,
+          {
+            timestamp: 600, id: 'cash-2', paths: ['path', 'to', 'cash-2'], total: {
+              payments: [
+                { gross: 242, net: 242, btw: 0 } as ISummaryTotal,
+              ],
+            },
+          } as IMonthlySummarySale,
+          {
+            timestamp: 500, id: 'cash-1', paths: ['path', 'to', 'cash-1'], total: {
+              payments: [
+                { gross: 121, net: 121, btw: 0 } as ISummaryTotal,
+              ],
+            },
+          } as IMonthlySummarySale,
         ],
       };
 
@@ -137,13 +178,15 @@ describe('YearSummaryComponent', () => {
 
   describe('exportAction getter', () => {
     it('should call exportToExcel when export is true', () => {
-      component.export = true;
       component.date.setValue(new Date(2024, 0, 1));
-      component.sheetData = [];
+
+      stateSubject.next({
+        yearExport: {  },
+      });
 
       spyOn<any>(component, 'exportToExcel');
 
-      void component.exportAction;
+      component.exportAction();
 
       expect(component['exportToExcel']).toHaveBeenCalled();
     });
@@ -154,7 +197,7 @@ describe('YearSummaryComponent', () => {
 
       spyOn<any>(component, 'getExportData');
 
-      void component.exportAction;
+      component.exportAction();
 
       expect(component['getExportData']).toHaveBeenCalledWith(2024);
     });
@@ -165,7 +208,7 @@ describe('YearSummaryComponent', () => {
       spyOn<any>(component, 'exportToExcel');
       spyOn<any>(component, 'getExportData');
 
-      void component.exportAction;
+      component.exportAction();
 
       expect(component['exportToExcel']).not.toHaveBeenCalled();
       expect(component['getExportData']).not.toHaveBeenCalled();

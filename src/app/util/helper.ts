@@ -25,7 +25,7 @@ export const hasRoomAdmin = (authorities?: IAuthority[]): boolean => !!authoriti
 export const snakeToCamel = (value: string = ''): string =>
   value.toLowerCase().replace(/([-_]\w)/g, (g: string) => g[1].toUpperCase());
 
-export const getDisplayNameInitials = (user: IUserAll | undefined): string | undefined => {
+export const getDisplayNameInitials = (user?: IUserAll | IUser): string | undefined => {
   if (!user) {
     return undefined;
   }
@@ -34,7 +34,7 @@ export const getDisplayNameInitials = (user: IUserAll | undefined): string | und
   return names?.length ? names.reduce((p, c) => p + c.charAt(0), '') : undefined;
 };
 
-export const getUserImage = (user: IUser | IUserAll | undefined): string | undefined => {
+export const getUserImage = (user?: IUser | IUserAll): string | undefined => {
   let image;
   if (user && user.imageUrl) {
     if (user.imageUrl.indexOf('http') >= 0) {
@@ -47,18 +47,18 @@ export const getUserImage = (user: IUser | IUserAll | undefined): string | undef
   return image;
 };
 
-export interface ILocale {
+interface ILocale {
   language: string;
   flag: string;
   i18n: string;
 }
 
-export class Locale implements ILocale {
+class Locale implements ILocale {
   language: string;
   flag: string;
   i18n: string;
 
-  constructor(language: string = 'en-NL', flag: string = 'en_NL', i18n: string = 'en') {
+  constructor(language: string, i18n: string, flag: string = 'en_NL') {
     this.language = language;
     this.flag = flag;
     this.i18n = i18n;
@@ -83,7 +83,7 @@ export const getLocale = (userLang?: string | null): ILocale => {
   const match = locale?.match(/([-_])/);
   const i18n = !match ? locale : locale.substring(0, match.index);
 
-  return new Locale(locale, flag?.replace('-', '_'), i18n);
+  return new Locale(locale, i18n, flag?.replace('-', '_'));
 };
 
 export const round = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;
@@ -229,7 +229,7 @@ export const createTreatmentGroupService = (groups: Map<string, GroupService>, l
   return groups;
 };
 
-export const createRoomOffice = (rooms: IRoom[] | undefined): Map<string, IOffice> | undefined =>
+export const createRoomOffice = (rooms?: IRoom[]): Map<string, IOffice> | undefined =>
   rooms?.reduce((oMap: Map<string, IOffice>, room: IRoom) => {
     const officeId = room.office?.id;
     if (officeId) {

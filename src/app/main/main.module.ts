@@ -4,7 +4,7 @@ import { MainRoutingModule } from './main-routing.module';
 import { EffectsModule } from '@ngrx/effects';
 
 import { MainComponent } from './main.component';
-import { BottomSheetBookAppointmentComponent, MainContentComponent } from './main-content/main-content.component';
+import { MainContentComponent } from './main-content/main-content.component';
 import { CatalogComponent } from './catalog/catalog.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-conditions.component';
@@ -22,6 +22,7 @@ import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
+import { BottomSheetBookAppointmentComponent } from './main-content/bottom-sheet-book-appointment';
 
 @NgModule({
   imports: [

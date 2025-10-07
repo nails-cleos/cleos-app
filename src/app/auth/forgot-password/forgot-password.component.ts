@@ -33,16 +33,6 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   form!: UntypedFormGroup;
   language: string = this.translate.currentLang;
 
-  get forgotPassword(): void {
-    sendPasswordResetEmail(this.auth, this.form.get('email')?.value.trim()).then(() => {
-      const message = this.translate.instant('AUTH.FORGOT_PASSWORD.MESSAGE');
-      this.store.dispatch(
-        new fromActionsLogin.SignUpSuccess(message),
-      );
-    }).catch(e => console.error(`Error sending reset password. ${ e }`));
-    return;
-  }
-
   ngOnInit(): void {
     this.clean();
     this.createForm();
@@ -51,6 +41,16 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+  }
+
+  forgotPassword(): void {
+    sendPasswordResetEmail(this.auth, this.form.get('email')?.value.trim()).then(() => {
+      const message = this.translate.instant('AUTH.FORGOT_PASSWORD.MESSAGE');
+      this.store.dispatch(
+        new fromActionsLogin.SignUpSuccess(message),
+      );
+    }).catch(e => console.error(`Error sending reset password. ${ e }`));
+    return;
   }
 
   private clean = (): void => this.store.dispatch(new fromActionsLogin.Clean());

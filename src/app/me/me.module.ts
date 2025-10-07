@@ -6,11 +6,7 @@ import { ReservationsComponent } from './reservation/list/reservations.component
 import { MeReservationComponent } from './reservation/me/me-reservation.component';
 import { PaymentComponent } from './payment/payment.component';
 import { PaymentCompleteComponent } from './payment/complete/payment-complete.component';
-import {
-  BottomSheetReferralComponent,
-  BottomSheetShareComponent,
-  ReferralsComponent,
-} from './referrals/referrals.component';
+import { ReferralsComponent } from './referrals/referrals.component';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { ReviewDialogComponent } from './reservation/review/review-dialog.component';
 import { UpcomingComponent } from './reservation/upcoming/upcoming.component';
@@ -36,6 +32,8 @@ import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
 import { ShareButtonsComponent } from './referrals/share-buttons/share-buttons.component';
+import { BottomSheetShareComponent } from './referrals/bottom-sheet-share.component';
+import { BottomSheetReferralComponent } from './referrals/bottom-sheet-referral.component';
 
 @NgModule({
   imports: [

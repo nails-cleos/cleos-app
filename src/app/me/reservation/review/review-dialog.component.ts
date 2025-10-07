@@ -54,11 +54,11 @@ export class ReviewDialogComponent {
     });
   }
 
-  get onNoClick(): void {
+  onNoClick(): void {
     return this.dialogRef.close();
   }
 
-  get doAction(): void {
+  doAction(): void {
     return this.dialogRef.close({ rating: this.rating, detail: this.detail.value });
   }
 
