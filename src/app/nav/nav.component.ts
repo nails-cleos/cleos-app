@@ -175,12 +175,6 @@ export class NavComponent implements OnInit, OnDestroy {
     }
   };
 
-  navigate = (menu: IMenu, drawer?: any): void => {
-    drawer?.toggle();
-    this.error = undefined;
-    this.router.navigate([this.language].concat(menu.path.split('/')));
-  };
-
   private selectStore = (states: any[]): void => states.forEach(
     selectedState => this.store.select(selectedState).subscribe((state: any) => {
       this.isLoading = state.isLoading;
@@ -191,7 +185,8 @@ export class NavComponent implements OnInit, OnDestroy {
         } else if (state.response) {
           const response: ResponseSuccess = state.response;
           const path = response.path ? `/${ this.language }/${ response.path }` : undefined;
-          const toastRef = this.toastService.show(response.message, response.toastType, 5000, 'link', path);
+          const toastAction = path ? 'link' : 'none';
+          const toastRef = this.toastService.show(response.message, response.toastType, 5000, toastAction, path);
           toastRef.onDismiss().subscribe(() => {
             if (state.reload) {
               this.navigationService.reload(this.router.url.split('/'));
