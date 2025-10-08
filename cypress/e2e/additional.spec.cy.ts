@@ -15,7 +15,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockTreatments(false);
     });
 
-    it(`should create a new additional`, () => {
+    it('should create a new additional', () => {
       cy.mockAdditionalList(0);
       cy.intercept('POST', '**/api/v1/additional', (req) => req.alias = 'saveAdditional');
       cy.openMenu(breakpoints, ['Additional', 'Additional']);
@@ -53,7 +53,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       });
     });
 
-    it(`should edit an additional`, () => {
+    it('should edit an additional', () => {
       cy.mockAdditionalList(undefined, 'f78de201-b4dc-457d-9da4-1e8a5e45688a');
       cy.openMenu(breakpoints, ['Additional', 'Additional']);
       cy.wait('@getAdditionalList');

@@ -176,7 +176,18 @@ describe('YearSummaryComponent', () => {
     });
   });
 
-  describe('exportAction getter', () => {
+  describe('exportAction', () => {
+    let saveAsSpy: jasmine.Spy;
+
+    beforeEach(() => {
+      saveAsSpy = jasmine.createSpy('saveAs');
+      (window as any).saveAs = saveAsSpy;
+    });
+
+    afterEach(() => {
+      delete (window as any).saveAs;
+    });
+
     it('should call exportToExcel when export is true', () => {
       component.date.setValue(new Date(2024, 0, 1));
 

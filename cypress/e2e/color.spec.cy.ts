@@ -14,7 +14,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockAdminDashboard(new Date(), 'CLEOS');
     });
 
-    it(`should create a new color`, () => {
+    it('should create a new color', () => {
       cy.mockColors(true, 0);
       cy.intercept('POST', '**/api/v1/colors', (req) => req.alias = 'saveColor');
       cy.openMenu(breakpoints, ['App settings', 'Color']);
@@ -40,7 +40,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       });
     });
 
-    it(`should edit a color`, () => {
+    it('should edit a color', () => {
       cy.mockColors(true, undefined, 'deb71da5-4ded-4e94-89c2-44036ea00451');
       cy.openMenu(breakpoints, ['App settings', 'Color']);
       cy.wait('@getColors');

@@ -506,6 +506,17 @@ describe('MonthSummaryComponent', () => {
   });
 
   describe('exportMonthlySummary method', () => {
+    let saveAsSpy: jasmine.Spy;
+
+    beforeEach(() => {
+      saveAsSpy = jasmine.createSpy('saveAs');
+      (window as any).saveAs = saveAsSpy;
+    });
+
+    afterEach(() => {
+      delete (window as any).saveAs;
+    });
+
     it('should export monthly summary with workbook', () => {
       const mockSale: IMonthlySummarySale = {
         ...mockMonthlySummary,

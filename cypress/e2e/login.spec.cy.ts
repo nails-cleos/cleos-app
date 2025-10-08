@@ -11,11 +11,11 @@ const mapRole = new Map([
   [Role.admin,
     { email: 'nails.cleos@gmail.com', url: '/dashboard', mocks: [() => cy.mockAdminDashboard(today, displayName)] }],
   [Role.roomAdmin,
-    { email: 'Jsbaj@nebeje', url: '/events', mocks: [() => cy.mockRoomAdminDashboard(today, displayName)] }]
+    { email: 'Jsbaj@nebeje', url: '/events', mocks: [() => cy.mockRoomAdminDashboard(today, displayName)] }],
 ]);
 
 devices.forEach(({ name, width, height }) => {
-  describe(`Authentication with ${ name }`, () => {
+  describe(`Authentication with ${name}`, () => {
     beforeEach(() => cy.viewport(width, height));
 
     context('Register', () => {
@@ -28,7 +28,7 @@ devices.forEach(({ name, width, height }) => {
         cy.mockCustomerReservations();
       });
 
-      it(`should register a new user in ${ name }`, () => {
+      it(`should register a new user in ${name}`, () => {
         cy.visit('en-GB/auth');
         cy.mockFirebaseAppCheck();
         cy.get('button').contains('Sign in with Email').click();
@@ -50,7 +50,7 @@ devices.forEach(({ name, width, height }) => {
 
         cy.get('button').contains('Login').click();
 
-        cy.get('.mat-mdc-snack-bar-container').find('.mat-mdc-snack-bar-action').contains('OK').click();
+        cy.get('.toast-success .toast-actions mat-icon').contains('done_all').click({ force: true });
 
         cy.url().should('include', '/me/reservations');
         cy.get('mat-card-title').contains('No upcoming reservations');
@@ -61,7 +61,7 @@ devices.forEach(({ name, width, height }) => {
     context('Login', () => {
       mapRole.forEach((value, role) => {
         const email = value.email;
-        it(`Login with existing user with role: ${ role }`, () => {
+        it(`Login with existing user with role: ${role}`, () => {
           cy.visit('en-GB/auth');
           cy.mockFirebaseAppCheck();
           cy.mockNotifications();
@@ -98,7 +98,7 @@ devices.forEach(({ name, width, height }) => {
             case Role.roomAdmin:
               const date = dayViewTitle(today, 'en-GB');
               cy.get('h2').contains(date);
-              cy.get('h2').contains(`Room is not open ${ date }`);
+              cy.get('h2').contains(`Room is not open ${date}`);
               break;
           }
         });

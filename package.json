@@ -105,6 +105,7 @@
     "@typescript-eslint/parser": "^8.26.1",
     "cypress": "latest",
     "eslint": "^9.22.0",
+    "eslint-plugin-cypress": "^5.2.0",
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-jsdoc": "50.6.8",
     "eslint-plugin-prefer-arrow": "1.2.3",
