@@ -12,7 +12,7 @@ export class TrackingService {
 
   private http: HttpClient = inject(HttpClient);
 
-  findTrackingByReservationId = (
+  getTrackingByReservationId = (
     reservationId: string,
   ): Observable<ITracking> => this.http.get<ITracking>(toUrl(this.urlV1, 'reservations', reservationId));
 

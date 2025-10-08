@@ -26,7 +26,7 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
   private reason: any;
   private orderId: any;
   private orderStatusId: any;
-  private path: string | null = 'reservation';
+  private path: 'reservation' | 'transaction' = 'reservation';
   private readonly language: string;
 
   constructor(private route: ActivatedRoute, private router: Router, private store: Store<AppState>,
@@ -56,7 +56,10 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
     setTimeout(() => {
       this.id = this.route.snapshot.paramMap.get('id');
       let status = this.route.snapshot.paramMap.get('status');
-      this.path = this.route.snapshot.paramMap.get('path');
+      const pathParam = this.route.snapshot.paramMap.get('path');
+      if (pathParam === 'reservation' || pathParam === 'transaction') {
+        this.path = pathParam;
+      }
       // TODO analytic payment option
       let type;
       let referenceId;
@@ -85,22 +88,23 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
       if (!type || !referenceId) {
         const message = this.translate.instant('ME.PAYMENT.ERROR', { reason: 'incomplete' });
         this.store.dispatch(
-          new fromActionsPayment.PaymentNotComplete({ message }),
+          new fromActionsPayment.PaymentNotComplete([{ message }]),
         );
         // this.router.navigate([this.language, 'me', this.path, this.id, 'payment']);
         return;
       }
       const paymentStatus = new PaymentStatus(this.paymentId, type, referenceId, this.reason);
       this.store.dispatch(
-        new fromActionsPayment.PaymentSave({ id: this.id, path: this.path, status, paymentStatus }),
+        new fromActionsPayment.PaymentSave(this.id, this.path!, status!, paymentStatus),
       );
     }, 500);
   }
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
-      if (state.paths) {
-        this.router.navigate([this.language].concat(state.paths));
+    this.subscription = this.getState.subscribe((state) => {
+      const path = state.response?.path;
+      if (path) {
+        this.router.navigate([`${ this.language }/${ path }`]);
       } else if (state.subErrors) {
         this.router.navigate([this.language, 'me', this.path, this.id, 'payment']);
       }

@@ -281,7 +281,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.skip = this.extras.skip;
       this.additionalIds = this.extras.additionalIds;
     }
-    const preview = new Step(6, 'preview', () => this.create);
+    const preview = new Step(6, 'preview', () => this.create());
     const book = new Step(5, 'book_online', (goNext: boolean) => this.callStepSeven(goNext), preview);
     const settings = new Step(4, 'settings', (goNext: boolean) => this.callStepSix(goNext), book);
     const additional = new Step(3, 'post_add', (goNext: boolean) => this.callStepFive(goNext), settings, true);
@@ -308,61 +308,6 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get roomDetail(): string {
     return roomDetail(this.room.value);
-  }
-
-  get back(): void {
-    if (this.isPreview) {
-      this.isPreview = false;
-      this.alreadyCreated = true;
-    } else {
-      this.cleanEvent();
-    }
-
-    this.myStepper.selectedIndex = getBackIndex(this.steps, this.myStepper.selectedIndex);
-    return;
-  }
-
-  get create(): void {
-    const reservation: IReservation = new Reservation();
-    reservation.customerId = this.customer.value.id;
-    const dates: string[] = this.events.value?.map(
-      (calendarEvent: any) => calendarEvent.event.start.toLocaleString(API_LOCALE)) ?? [];
-    if (dates.length) {
-      reservation.start = dates.shift();
-      reservation.moreStart = dates;
-      reservation.timeZone = getCurrentTimeZone();
-      reservation.additionalIds = this.additionalSelected?.map(value => value.id);
-      reservation.canCustomerChange = this.customerChange.value;
-      reservation.reference = this.reference.value;
-      reservation.note = this.note.value;
-      if (this.amount.value && this.type.value) {
-        reservation.payment = {
-          type: this.type.value,
-          amount: this.amount.value,
-          transfer: this.transfer.value,
-        } as IReservationPayment;
-      }
-
-      const role = this.isDashboard ? Role.roomAdmin : Role.professional;
-      if (this.isEditing && this.reservation) {
-        reservation.id = this.reservation.id;
-        reservation.treatmentId = valueChange(this.treatment.value.id, this.reservation.treatment.id);
-        reservation.roomId = valueChange(this.room.value.id, this.reservation.room.id);
-        reservation.professionalId = valueChange(this.professional.value.id, this.reservation.professional.id);
-        this.store.dispatch(
-          new fromActionsReservation.UpdateReservationById({ reservation, role }),
-        );
-      } else {
-        reservation.treatmentId = this.treatment.value.id;
-        reservation.roomId = this.room.value.id;
-        reservation.professionalId = this.professional.value.id;
-        reservation.discountId = this.discount.value;
-        this.store.dispatch(
-          new fromActionsReservation.CreateReservation({ reservation, role }),
-        );
-      }
-    }
-    return;
   }
 
   get addCustomer(): void {
@@ -442,6 +387,61 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.handsetSubscription.unsubscribe();
   }
 
+  create(): void {
+    const reservation: IReservation = new Reservation();
+    reservation.customerId = this.customer.value.id;
+    const dates: string[] = this.events.value?.map(
+      (calendarEvent: any) => calendarEvent.event.start.toLocaleString(API_LOCALE)) ?? [];
+    if (dates.length) {
+      reservation.start = dates.shift();
+      reservation.moreStart = dates;
+      reservation.timeZone = getCurrentTimeZone();
+      reservation.additionalIds = this.additionalSelected?.map(value => value.id);
+      reservation.canCustomerChange = this.customerChange.value;
+      reservation.reference = this.reference.value;
+      reservation.note = this.note.value;
+      if (this.amount.value && this.type.value) {
+        reservation.payment = {
+          type: this.type.value,
+          amount: this.amount.value,
+          transfer: this.transfer.value,
+        } as IReservationPayment;
+      }
+
+      const role = this.isDashboard ? Role.roomAdmin : Role.professional;
+      if (this.isEditing && this.reservation) {
+        reservation.id = this.reservation.id;
+        reservation.treatmentId = valueChange(this.treatment.value.id, this.reservation.treatment.id);
+        reservation.roomId = valueChange(this.room.value.id, this.reservation.room.id);
+        reservation.professionalId = valueChange(this.professional.value.id, this.reservation.professional.id);
+        this.store.dispatch(
+          new fromActionsReservation.UpdateReservationById(this.reservation.id, reservation, role),
+        );
+      } else {
+        reservation.treatmentId = this.treatment.value.id;
+        reservation.roomId = this.room.value.id;
+        reservation.professionalId = this.professional.value.id;
+        reservation.discountId = this.discount.value;
+        this.store.dispatch(
+          new fromActionsReservation.CreateReservation(reservation, role),
+        );
+      }
+    }
+    return;
+  }
+
+  back(): void {
+    if (this.isPreview) {
+      this.isPreview = false;
+      this.alreadyCreated = true;
+    } else {
+      this.cleanEvent();
+    }
+
+    this.myStepper.selectedIndex = getBackIndex(this.steps, this.myStepper.selectedIndex);
+    return;
+  }
+
   triggerClick = (event: StepperSelectionEvent): void => getStepCall(this.steps, event.selectedIndex - 1);
 
   callStepTwo = (goNext: boolean): void => {
@@ -502,7 +502,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       const timeZone = this.room.value.timeZone;
       const now = dateToUTC(createDate(timeZone), timeZone);
 
-      const dates: string[] = [];
+      const dates: Date[] = [];
       this.dateTimeList.value.forEach((value: any, i: number) => {
         const timeValue = getTimeNumber(value.start || this.minDate);
         if (timeValue) {
@@ -522,12 +522,8 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
       this.store.dispatch(
-        new fromActionsReservation.SearchAvailability({
-          dates,
-          roomId: this.room.value.id,
-          professionalId: this.professional.value.id,
-          days: this.daysInWeek,
-        }),
+        new fromActionsReservation.SearchAvailability(this.daysInWeek, dates, this.room.value.id,
+          this.professional.value.id),
       );
     }
     completeAndNext(this.steps, this.myStepper, goNext);
@@ -575,11 +571,11 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   displayFnUser = (user: IUser): string => user?.displayName ? user.displayName : '';
 
-  displayFnGroup = (group: ITreatmentGroup): string => group ? `${ group.name }` : '';
+  displayFnGroup = (group: ITreatmentGroup): string => group ? `${group.name}` : '';
 
-  displayFnTreatment = (treatment: ITreatment): string => treatment ? `${ treatment.name }` : '';
+  displayFnTreatment = (treatment: ITreatment): string => treatment ? `${treatment.name}` : '';
 
-  displayFnOffice = (office: IOffice): string => office ? `${ office.name }` : '';
+  displayFnOffice = (office: IOffice): string => office ? `${office.name}` : '';
 
   displayFnRoom = (room: IRoom): string => room.address ? room.address.name : '';
 
@@ -589,7 +585,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.room.value, this.dateFormat, this.translate, this.dialog, reservationDate,
   );
 
-  segmentClick = (date: Date, state: string, eventKey: string, id: string = `${ Math.random() }`): void => {
+  segmentClick = (date: Date, state: string, eventKey: string, id: string = `${Math.random()}`): void => {
     const eventData = this.dataEvents.get(eventKey);
     if (eventData) {
       if (!this.dateIsValid(date)) {
@@ -721,7 +717,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       if (eventsOverlapping?.length && eventsOverlapping[0] !== selectedEvent) {
         let message = '';
         eventsOverlapping.forEach(e => {
-          message += `<div>${ e.title }</div>`;
+          message += `<div>${e.title}</div>`;
         });
         title = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.TITLE');
         content = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.CONTENT', { data: message });
@@ -798,7 +794,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       this.customerInfo = undefined;
       if (value && value.id && !this.isEditing) {
         this.store.dispatch(
-          new fromActionsReservation.GetCustomerInfo(value.id),
+          new fromActionsReservation.GetCustomerInformation(value.id),
         );
       }
       this.cleanTreatment();
@@ -1157,17 +1153,17 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   };
 
-  private getReservation = (id: string | null): void => this.store.dispatch(
-    new fromActionsReservation.ReservationFind({ id }));
+  private getReservation = (id: string): void => this.store.dispatch(
+    new fromActionsReservation.GetReservation(id));
 
   private getRoomList = (): void => this.store.dispatch(
-    new fromActionsReservation.GetAllRooms({ customerId: this.customer?.value?.id }));
+    new fromActionsReservation.GetAllRooms(this.customer?.value?.id));
 
   private getTreatmentList = (): void => {
     const roomId = this.room?.value?.id || this.roomId;
     if (roomId) {
       this.store.dispatch(
-        new fromActionsReservation.GetAllTreatments({ roomId, customerId: this.customer.value?.id }),
+        new fromActionsReservation.GetAllTreatments(roomId, this.customer.value?.id),
       );
     }
   };
@@ -1177,14 +1173,14 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const groupId = this.group?.value?.id || this.groupId;
     if (roomId) {
       this.store.dispatch(
-        new fromActionsReservation.FindAllAdditionalByGroupId({ roomId, groupId }),
+        new fromActionsReservation.GetAllAdditionalByGroupId(roomId, groupId),
       );
     }
   };
 
   private clean = (): void => this.store.dispatch(new fromActionsReservation.Clean());
 
-  private getCustomers = (): void => this.store.dispatch(new fromActionsReservation.GetAllCustomers());
+  private getCustomers = (): void => this.store.dispatch(new fromActionsReservation.GetCustomers());
 
   private setOffice = (): void => {
     let office;
@@ -1248,7 +1244,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.offices = Array.from(createRoomOffice(state.rooms)?.values() || []);
       this.customerInfo = state.customer;
       this.customers = state.customers;
@@ -1271,10 +1267,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         switch (ud.discountCustomer.type) {
           case DiscountType.money:
             title =
-              `${ currencySymbol(ud.discountCustomer.discount?.currency) } ${ ud.discountCustomer.amount } ${ title }`;
+              `${currencySymbol(ud.discountCustomer.discount?.currency)} ${ud.discountCustomer.amount} ${title}`;
             break;
           case DiscountType.percentage:
-            title = `${ ud.discountCustomer.amount } % ${ title }`;
+            title = `${ud.discountCustomer.amount} % ${title}`;
             break;
         }
         return Object.assign({}, ud, { title });
@@ -1353,7 +1349,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           this.cleanEvent();
           setTimeout(() => {
             const inputField = document.querySelector(
-              `input[formControlName="${ value.field }"]`,
+              `input[formControlName="${value.field}"]`,
             ) as HTMLInputElement;
             if (inputField) {
               inputField.focus();

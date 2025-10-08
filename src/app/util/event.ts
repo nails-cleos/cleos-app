@@ -385,7 +385,6 @@ export const monthEvent = (
   allDay,
 } as unknown as CalendarEvent);
 
-
 const createRecurringEvent = (
   date: Date,
   recurring: any,

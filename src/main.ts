@@ -1,5 +1,4 @@
 import { enableProdMode, importProvidersFrom, inject, LOCALE_ID, provideAppInitializer } from '@angular/core';
-
 import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
 import { AngularFireModule } from '@angular/fire/compat';
@@ -40,6 +39,13 @@ import localeEs from '@angular/common/locales/es';
 import localeAr from '@angular/common/locales/es-AR';
 import { provideHttpClient, withInterceptors, withJsonpSupport } from '@angular/common/http';
 import { httpInterceptorProviders } from './app/http-interceptors';
+
+export interface ISendMessage {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
 
 const cookieConfig: NgcCookieConsentConfig = {
   cookie: {

@@ -159,7 +159,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       );
     } else {
       room.id = this.id;
-      this.store.dispatch(new fromActionsRoom.UpdateRoomById(room));
+      this.store.dispatch(new fromActionsRoom.UpdateRoom(this.id!, room));
     }
     return;
   }
@@ -452,31 +452,31 @@ export class RoomComponent implements OnInit, OnDestroy {
   private getRoom = (): void => {
     const id = this.route.snapshot.paramMap.get('id');
     this.store.dispatch(
-      new fromActionsRoom.FindRoomById({ id, redirect: true }),
+      new fromActionsRoom.GetRoom(id!, true),
     );
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.allProfessional = state.professionals;
       this.currencies = state.currencies;
       this.offices = state.offices;
       if (state.selected && !this.room) {
         const roomTimeZone = getTimeZone(state.selected.timeZone);
         this.room = {
-          id: state.selected.room.id,
-          address: state.selected.room.address,
-          currency: state.selected.room.currency,
-          office: state.selected.room.office,
+          id: state.selected.id,
+          address: state.selected.address,
+          currency: state.selected.currency,
+          office: state.selected.office,
           timeZone: roomTimeZone.label,
         } as IRoomAll;
-        if (state.selected.room.closeDate) {
-          this.room.closeDate = createDateFromString(state.selected.room.closeDate);
+        if (state.selected.closeDate) {
+          this.room.closeDate = createDateFromString(state.selected.closeDate);
         }
-        this.primary = state.selected.room.primary;
-        this.currentPaymentTypes = state.selected.room.paymentTypes;
-        this.paymentTypes = state.selected.room.paymentTypes;
-        state.selected.room.professionals?.forEach((professional: IUserAll) => {
+        this.primary = state.selected.primary;
+        this.currentPaymentTypes = state.selected.paymentTypes;
+        this.paymentTypes = state.selected.paymentTypes;
+        state.selected.professionals?.forEach((professional: IUserAll) => {
           this.professionals.push(professional);
           this.allProfessional = this.allProfessional?.filter(c => c.id !== professional.id);
         });
@@ -485,14 +485,14 @@ export class RoomComponent implements OnInit, OnDestroy {
         this.getForm.addressDescription.setValue(this.room.address?.description);
         this.getForm.address.setValue(this.room.address?.name);
         this.getForm.timeZone.setValue(roomTimeZone);
-        this.getAvailabilities(state.selected.room.availabilities);
+        this.getAvailabilities(state.selected.availabilities);
       }
       if (state.subErrors) {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
-      } else if (state.message) {
+      } else if (state.response) {
         this.router.navigate([this.language, 'rooms']);
       }
     });

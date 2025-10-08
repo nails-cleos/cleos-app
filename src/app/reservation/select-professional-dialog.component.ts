@@ -33,17 +33,17 @@ export class SelectProfessionalDialogComponent implements OnInit {
     this.professionals = data.professionals;
   }
 
-  get onNoClick(): void {
-    return this.dialogRef.close();
-  }
-
-  get doAction(): void {
-    return this.dialogRef.close({ professional: this.professional.value });
-  }
-
   ngOnInit(): void {
     this.createForm();
     this.createFilters();
+  }
+
+  onNoClick(): void {
+    return this.dialogRef.close();
+  }
+
+  doAction(): void {
+    return this.dialogRef.close({ professional: this.professional.value });
   }
 
   displayFnUser = (user: IUser): string => user?.displayName ? user.displayName : '';

@@ -1,340 +1,336 @@
-<div class="flex-container">
-  <div class="card-container">
-    <div class="card-content">
-      <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
-        <mat-card appearance="outlined">
-          @if (isAddMode) {
-            <mat-card-header>
-              <mat-card-title>{{ 'ROOM.TITLE' | translate }}</mat-card-title>
-            </mat-card-header>
+<div>
+  <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+    <mat-card appearance="outlined">
+      @if (isAddMode) {
+        <mat-card-header>
+          <mat-card-title>{{ 'ROOM.TITLE' | translate }}</mat-card-title>
+        </mat-card-header>
+      } @else {
+        <mat-card-header>
+          <mat-card-title>{{ 'ROOM.DETAIL' | translate }}</mat-card-title>
+          @if (room) {
+            <mat-card-subtitle>{{ room.id }}</mat-card-subtitle>
           } @else {
-            <mat-card-header>
-              <mat-card-title>{{ 'ROOM.DETAIL' | translate }}</mat-card-title>
-              @if (room) {
-                <mat-card-subtitle>{{ room.id }}</mat-card-subtitle>
+            <div class="ssc-line"></div>
+          }
+        </mat-card-header>
+      }
+      @if (isAddMode || room) {
+        <mat-card-content>
+          <div class="inner-container">
+            @if (isAddMode) {
+              @if (currencies) {
+                <div class="fields-container" id="fields">
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
+                    <input (keydown)="keyDownHandler($event, getForm.currency)" formControlName="currency"
+                           [matAutocomplete]="auto" matInput required type="text">
+                    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCurrencyFn">
+                      @for (currency of filteredCurrencyOptions | async; track currency) {
+                        <mat-option [value]="currency">{{ currency.code }}</mat-option>
+                      }
+                    </mat-autocomplete>
+                    @if (getForm.currency.hasError('required')) {
+                      <mat-error [innerHTML]="'COMMON.CURRENCY.REQUIRED' | translate"></mat-error>
+                    } @else if (getForm.currency.hasError('requireMatch')) {
+                      <mat-error [innerHTML]="'COMMON.CURRENCY.INVALID' | translate"></mat-error>
+                    } @else if (errors['currency']) {
+                      <mat-error>{{ errors['currency'] }}</mat-error>
+                    }
+                  </mat-form-field>
+                  <button class="hide-gt-xs" (click)="addCurrency" color="accent" mat-fab type="button">
+                    <mat-icon matPrefix>add_card</mat-icon>
+                  </button>
+                  <button class="hide-xs" (click)="addCurrency" color="accent" mat-fab type="button" extended>
+                    <mat-icon matPrefix>add_card</mat-icon>
+                    <span>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
+                  </button>
+                </div>
               } @else {
                 <div class="ssc-line"></div>
               }
-            </mat-card-header>
-          }
-          @if (isAddMode || room) {
-            <mat-card-content>
-              <div class="inner-container">
-                @if (isAddMode) {
-                  @if (currencies) {
-                    <div class="fields-container" id="fields">
-                      <mat-form-field appearance="outline">
-                        <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
-                        <input (keydown)="keyDownHandler($event, getForm.currency)" formControlName="currency"
-                               [matAutocomplete]="auto" matInput required type="text">
-                        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCurrencyFn">
-                          @for (currency of filteredCurrencyOptions | async; track currency) {
-                            <mat-option [value]="currency">{{ currency.code }}</mat-option>
-                          }
-                        </mat-autocomplete>
-                        @if (getForm.currency.hasError('required')) {
-                          <mat-error [innerHTML]="'COMMON.CURRENCY.REQUIRED' | translate"></mat-error>
-                        } @else if (getForm.currency.hasError('requireMatch')) {
-                          <mat-error [innerHTML]="'COMMON.CURRENCY.INVALID' | translate"></mat-error>
-                        } @else if (errors['currency']) {
-                          <mat-error>{{ errors['currency'] }}</mat-error>
-                        }
-                      </mat-form-field>
-                      <button class="hide-gt-xs" (click)="addCurrency" color="accent" mat-fab type="button">
-                        <mat-icon matPrefix>add_card</mat-icon>
-                      </button>
-                      <button class="hide-xs" (click)="addCurrency" color="accent" mat-fab type="button" extended>
-                        <mat-icon matPrefix>add_card</mat-icon>
-                        <span>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
-                      </button>
-                    </div>
-                  } @else {
-                    <div class="ssc-line"></div>
-                  }
-                  @if (offices) {
-                    <div class="fields-container">
-                      <mat-form-field appearance="outline">
-                        <mat-label>{{ 'ROOM.OFFICE.FIELD' | translate }}</mat-label>
-                        <input (keydown)="keyDownHandler($event, getForm.office)" formControlName="office"
-                               [matAutocomplete]="auto" matInput required type="text">
-                        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayOfficeFn">
-                          @for (office of filteredOfficeOptions | async; track office) {
-                            <mat-option [value]="office">{{ office.name }}</mat-option>
-                          }
-                        </mat-autocomplete>
-                        @if (getForm.office.hasError('required')) {
-                          <mat-error [innerHTML]="'ROOM.OFFICE.REQUIRED' | translate"></mat-error>
-                        } @else if (getForm.office.hasError('requireMatch')) {
-                          <mat-error [innerHTML]="'ROOM.OFFICE.INVALID' | translate"></mat-error>
-                        } @else if (errors['office']) {
-                          <mat-error>{{ errors['office'] }}</mat-error>
-                        }
-                      </mat-form-field>
-                      <button class="hide-gt-xs" (click)="addOffice" color="accent" mat-fab type="button">
-                        <mat-icon matPrefix>add_business</mat-icon>
-                      </button>
-                      <button class="hide-xs" (click)="addOffice" color="accent" mat-fab type="button" extended>
-                        <mat-icon matPrefix>add_business</mat-icon>
-                        <span>{{ 'ROOM.OFFICE.ADD_BUTTON' | translate }}</span>
-                      </button>
-                    </div>
-                  } @else {
-                    <div class="ssc-line"></div>
-                  }
-                } @else {
-                  <mat-form-field appearance="outline">
-                    <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
-                    <mat-icon matPrefix>{{ room?.currency?.icon }}</mat-icon>
-                    <input [value]="room?.currency?.code" disabled matInput>
-                  </mat-form-field>
+              @if (offices) {
+                <div class="fields-container">
                   <mat-form-field appearance="outline">
                     <mat-label>{{ 'ROOM.OFFICE.FIELD' | translate }}</mat-label>
-                    <mat-icon matPrefix>store</mat-icon>
-                    <input [value]="room?.office?.name" disabled matInput type="text">
+                    <input (keydown)="keyDownHandler($event, getForm.office)" formControlName="office"
+                           [matAutocomplete]="auto" matInput required type="text">
+                    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayOfficeFn">
+                      @for (office of filteredOfficeOptions | async; track office) {
+                        <mat-option [value]="office">{{ office.name }}</mat-option>
+                      }
+                    </mat-autocomplete>
+                    @if (getForm.office.hasError('required')) {
+                      <mat-error [innerHTML]="'ROOM.OFFICE.REQUIRED' | translate"></mat-error>
+                    } @else if (getForm.office.hasError('requireMatch')) {
+                      <mat-error [innerHTML]="'ROOM.OFFICE.INVALID' | translate"></mat-error>
+                    } @else if (errors['office']) {
+                      <mat-error>{{ errors['office'] }}</mat-error>
+                    }
                   </mat-form-field>
-                  <mat-form-field appearance="outline">
-                    <mat-label>{{ 'ROOM.TIME_ZONE.FIELD' | translate }}</mat-label>
-                    <mat-icon matPrefix>public</mat-icon>
-                    <input [value]="room?.timeZone" disabled matInput type="text">
-                  </mat-form-field>
-                }
-                @if (allProfessional) {
-                  <div class="fields-container" id="professionals">
-                    <mat-form-field class="chip-list full-margin">
-                      <mat-label>{{ 'ROOM.PROFESSIONAL.FIELD' | translate }}</mat-label>
-                      <mat-chip-grid #chipList aria-label="Professional selection">
-                        @for (professional of professionals; track professional) {
-                          <mat-chip-row (removed)="remove(professional)" [removable]="true">
-                            {{ professional.displayName }}
-                            <mat-icon matChipRemove>cancel</mat-icon>
-                          </mat-chip-row>
-                        }
-                        <input #professionalInput formControlName="professional" [matAutocomplete]="auto"
-                               [matChipInputFor]="chipList">
-                      </mat-chip-grid>
-                      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-                        @for (professional of sortProfessionals(filteredProfessionals | async); track professional) {
-                          <mat-option [value]="professional">{{ professional.displayName }}</mat-option>
-                        }
-                      </mat-autocomplete>
-                    </mat-form-field>
-                    <button class="hide-gt-xs" (click)="addProfessional" color="accent" mat-fab type="button">
-                      <mat-icon matPrefix>person_add_alt_1</mat-icon>
-                    </button>
-                    <button class="hide-xs" (click)="addProfessional" color="accent" mat-fab type="button" extended>
-                      <mat-icon matPrefix>person_add_alt_1</mat-icon>
-                      <span>{{ 'COMMON.PROFESSIONAL.ADD_BUTTON' | translate }}</span>
-                    </button>
-                  </div>
-                } @else {
-                  <div class="ssc-line"></div>
-                }
-                @if (errors['professionals']) {
-                  <mat-error [innerHTML]="'ROOM.PROFESSIONAL.REQUIRED' | translate" class="divider"></mat-error>
-                }
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'ROOM.TIME_ZONE.FIELD' | translate }}</mat-label>
-                  <input (keydown)="keyDownHandler($event, getForm.timeZone)" formControlName="timeZone"
-                         [matAutocomplete]="auto" matInput required type="text">
-                  <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayTimeZoneFn">
-                    @for (timeZone of filteredTimeZoneOptions | async; track timeZone) {
-                      <mat-option [value]="timeZone">{{ timeZone.label }}</mat-option>
+                  <button class="hide-gt-xs" (click)="addOffice" color="accent" mat-fab type="button">
+                    <mat-icon matPrefix>add_business</mat-icon>
+                  </button>
+                  <button class="hide-xs" (click)="addOffice" color="accent" mat-fab type="button" extended>
+                    <mat-icon matPrefix>add_business</mat-icon>
+                    <span>{{ 'ROOM.OFFICE.ADD_BUTTON' | translate }}</span>
+                  </button>
+                </div>
+              } @else {
+                <div class="ssc-line"></div>
+              }
+            } @else {
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
+                <mat-icon matPrefix>{{ room?.currency?.icon }}</mat-icon>
+                <input [value]="room?.currency?.code" disabled matInput>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'ROOM.OFFICE.FIELD' | translate }}</mat-label>
+                <mat-icon matPrefix>store</mat-icon>
+                <input [value]="room?.office?.name" disabled matInput type="text">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'ROOM.TIME_ZONE.FIELD' | translate }}</mat-label>
+                <mat-icon matPrefix>public</mat-icon>
+                <input [value]="room?.timeZone" disabled matInput type="text">
+              </mat-form-field>
+            }
+            @if (allProfessional) {
+              <div class="fields-container" id="professionals">
+                <mat-form-field class="chip-list full-margin">
+                  <mat-label>{{ 'ROOM.PROFESSIONAL.FIELD' | translate }}</mat-label>
+                  <mat-chip-grid #chipList aria-label="Professional selection">
+                    @for (professional of professionals; track professional) {
+                      <mat-chip-row (removed)="remove(professional)" [removable]="true">
+                        {{ professional.displayName }}
+                        <mat-icon matChipRemove>cancel</mat-icon>
+                      </mat-chip-row>
+                    }
+                    <input #professionalInput formControlName="professional" [matAutocomplete]="auto"
+                           [matChipInputFor]="chipList">
+                  </mat-chip-grid>
+                  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+                    @for (professional of sortProfessionals(filteredProfessionals | async); track professional) {
+                      <mat-option [value]="professional">{{ professional.displayName }}</mat-option>
                     }
                   </mat-autocomplete>
-                  @if (getForm.timeZone.hasError('required')) {
-                    <mat-error [innerHTML]="'ROOM.TIME_ZONE.REQUIRED' | translate"></mat-error>
-                  } @else if (getForm.timeZone.hasError('requireMatch')) {
-                    <mat-error [innerHTML]="'ROOM.TIME_ZONE.INVALID' | translate"></mat-error>
-                  } @else if (errors['timeZone']) {
-                    <mat-error>{{ errors['timeZone'] }}</mat-error>
-                  }
                 </mat-form-field>
-                <div class="row-column-space-evenly-center">
-                  <mat-checkbox (change)="primary = !primary" color="primary" [checked]="primary">
-                    {{ 'ROOM.PRIMARY.FIELD' | translate }}
-                  </mat-checkbox>
-                  <mat-form-field appearance="outline" color="primary" class="full-margin">
-                    <mat-label>{{ 'ROOM.CLOSE_DATE.FIELD' | translate }}</mat-label>
-                    <button (click)="picker.open()" mat-icon-button matPrefix type="button">
-                      <mat-icon>today</mat-icon>
-                    </button>
-                    <input (focus)="picker.open()" formControlName="closeDate" [matDatepicker]="picker" [min]="today"
-                           matInput>
-                    <mat-datepicker #picker touchUi></mat-datepicker>
-                    @if (errors['closeDate']) {
-                      <mat-error>{{ errors['closeDate'] }}</mat-error>
-                    }
-                  </mat-form-field>
-                </div>
-                <mat-list class="top">
-                  <div matListItemTitle>{{ 'ROOM.PAYMENT_OPTION' | translate }}</div>
-                  <mat-divider class="top"></mat-divider>
-                  <mat-selection-list #paymentType (selectionChange)="onChange(paymentType.selectedOptions.selected)">
-                    @for (option of paymentOptions; track option) {
-                      <mat-list-option [disabled]="option.disabled" [selected]="isSelected(option)"
-                                       [value]="option.name" color="primary">
-                        <div>{{ option.name }}</div>
-                      </mat-list-option>
-                    }
-                  </mat-selection-list>
-                  <mat-divider></mat-divider>
-                </mat-list>
-                <mat-list class="top">
-                  <div matListItemTitle>{{ 'ROOM.AVAILABILITY.FIELD' | translate }}</div>
-                  <mat-divider class="top"></mat-divider>
-                  <mat-accordion class="headers-align" multi id="availabilities">
-                    <mat-expansion-panel (opened)="setStep(0)" [expanded]="step === 0" hideToggle>
-                      <mat-expansion-panel-header>
-                        <mat-panel-title>
-                          {{ 'ROOM.MONDAY_TIME.FIELD' | translate }}
-                        </mat-panel-title>
-                        <mat-panel-description class="hide-xs">
-                          {{ 'ROOM.MONDAY_TIME.DESCRIPTION' | translate }}
-                          <mat-icon>{{ icons.monday }}</mat-icon>
-                        </mat-panel-description>
-                      </mat-expansion-panel-header>
-                      <app-availability (availability)="addAvailability($event, 1)" (ignore)="ignore('MONDAY', 1)"
-                                        [dates]="monDate" [day]="'MONDAY'"></app-availability>
-                      @if (errors['day0']) {
-                        <mat-error>{{ 'ROOM.MONDAY_TIME.REQUIRED' | translate }}</mat-error>
-                      }
-                    </mat-expansion-panel>
-                    <mat-expansion-panel (opened)="setStep(1)" [expanded]="step === 1" hideToggle>
-                      <mat-expansion-panel-header>
-                        <mat-panel-title>
-                          {{ 'ROOM.TUESDAY_TIME.FIELD' | translate }}
-                        </mat-panel-title>
-                        <mat-panel-description class="hide-xs">
-                          {{ 'ROOM.TUESDAY_TIME.DESCRIPTION' | translate }}
-                          <mat-icon>{{ icons.tuesday }}</mat-icon>
-                        </mat-panel-description>
-                      </mat-expansion-panel-header>
-                      <app-availability (availability)="addAvailability($event, 2)" (ignore)="ignore('TUESDAY', 2)"
-                                        [dates]="tueDate" [day]="'TUESDAY'"></app-availability>
-                      @if (errors['day1']) {
-                        <mat-error>{{ 'ROOM.TUESDAY_TIME.REQUIRED' | translate }}</mat-error>
-                      }
-                    </mat-expansion-panel>
-                    <mat-expansion-panel (opened)="setStep(2)" [expanded]="step === 2" hideToggle>
-                      <mat-expansion-panel-header>
-                        <mat-panel-title>
-                          {{ 'ROOM.WEDNESDAY_TIME.FIELD' | translate }}
-                        </mat-panel-title>
-                        <mat-panel-description class="hide-xs">
-                          {{ 'ROOM.WEDNESDAY_TIME.DESCRIPTION' | translate }}
-                          <mat-icon>{{ icons.wednesday }}</mat-icon>
-                        </mat-panel-description>
-                      </mat-expansion-panel-header>
-                      <app-availability (availability)="addAvailability($event, 3)" (ignore)="ignore('WEDNESDAY', 3)"
-                                        [dates]="wedDate" [day]="'WEDNESDAY'"></app-availability>
-                      @if (errors['day2']) {
-                        <mat-error>{{ 'ROOM.WEDNESDAY_TIME.REQUIRED' | translate }}</mat-error>
-                      }
-                    </mat-expansion-panel>
-                    <mat-expansion-panel (opened)="setStep(3)" [expanded]="step === 3" hideToggle>
-                      <mat-expansion-panel-header>
-                        <mat-panel-title>
-                          {{ 'ROOM.THURSDAY_TIME.FIELD' | translate }}
-                        </mat-panel-title>
-                        <mat-panel-description class="hide-xs">
-                          {{ 'ROOM.THURSDAY_TIME.DESCRIPTION' | translate }}
-                          <mat-icon>{{ icons.thursday }}</mat-icon>
-                        </mat-panel-description>
-                      </mat-expansion-panel-header>
-                      <app-availability (availability)="addAvailability($event, 4)" (ignore)="ignore('THURSDAY', 4)"
-                                        [dates]="thuDate" [day]="'THURSDAY'"></app-availability>
-                      @if (errors['day3']) {
-                        <mat-error>{{ 'ROOM.THURSDAY_TIME.REQUIRED' | translate }}</mat-error>
-                      }
-                    </mat-expansion-panel>
-                    <mat-expansion-panel (opened)="setStep(4)" [expanded]="step === 4" hideToggle>
-                      <mat-expansion-panel-header>
-                        <mat-panel-title>
-                          {{ 'ROOM.FRIDAY_TIME.FIELD' | translate }}
-                        </mat-panel-title>
-                        <mat-panel-description class="hide-xs">
-                          {{ 'ROOM.FRIDAY_TIME.DESCRIPTION' | translate }}
-                          <mat-icon>{{ icons.friday }}</mat-icon>
-                        </mat-panel-description>
-                      </mat-expansion-panel-header>
-                      <app-availability (availability)="addAvailability($event, 5)" (ignore)="ignore('FRIDAY', 5)"
-                                        [dates]="friDate" [day]="'FRIDAY'"></app-availability>
-                      @if (errors['day4']) {
-                        <mat-error>{{ 'ROOM.FRIDAY_TIME.REQUIRED' | translate }}</mat-error>
-                      }
-                    </mat-expansion-panel>
-                    <mat-expansion-panel (opened)="setStep(5)" [expanded]="step === 5" hideToggle>
-                      <mat-expansion-panel-header>
-                        <mat-panel-title>
-                          {{ 'ROOM.SATURDAY_TIME.FIELD' | translate }}
-                        </mat-panel-title>
-                        <mat-panel-description class="hide-xs">
-                          {{ 'ROOM.SATURDAY_TIME.DESCRIPTION' | translate }}
-                          <mat-icon>{{ icons.saturday }}</mat-icon>
-                        </mat-panel-description>
-                      </mat-expansion-panel-header>
-                      <app-availability (availability)="addAvailability($event, 6)" (ignore)="ignore('SATURDAY', 6)"
-                                        [dates]="satDate" [day]="'SATURDAY'"></app-availability>
-                      @if (errors['day5']) {
-                        <mat-error>{{ 'ROOM.SATURDAY_TIME.REQUIRED' | translate }}</mat-error>
-                      }
-                    </mat-expansion-panel>
-                    <mat-expansion-panel (opened)="setStep(6)" [expanded]="step === 6" hideToggle>
-                      <mat-expansion-panel-header>
-                        <mat-panel-title>
-                          {{ 'ROOM.SUNDAY_TIME.FIELD' | translate }}
-                        </mat-panel-title>
-                        <mat-panel-description class="hide-xs">
-                          {{ 'ROOM.SUNDAY_TIME.DESCRIPTION' | translate }}
-                          <mat-icon>{{ icons.sunday }}</mat-icon>
-                        </mat-panel-description>
-                      </mat-expansion-panel-header>
-                      <app-availability (availability)="addAvailability($event, 7)" (ignore)="ignore('SUNDAY', 7)"
-                                        [dates]="sunDate" [day]="'SUNDAY'"></app-availability>
-                      @if (errors['day6']) {
-                        <mat-error>{{ 'ROOM.SUNDAY_TIME.REQUIRED' | translate }}</mat-error>
-                      }
-                    </mat-expansion-panel>
-                  </mat-accordion>
-                  @if (errors['availability']) {
-                    <mat-error [innerHTML]="'ROOM.AVAILABILITY.REQUIRED' | translate" class="divider"></mat-error>
-                  }
-                </mat-list>
-                <app-google-map [addressFormGroup]="form" [latitudeMarker]="room?.address?.location?.y"
-                                [longitudeMarker]="room?.address?.location?.x" (addressEmitter)="getAddress($event)"
-                                [markInfo]="'<b>' + room?.address?.name + '</b>'"></app-google-map>
-                @if (errors['location']) {
-                  <mat-error class="divider">{{ errors['location'] }}</mat-error>
-                }
+                <button class="hide-gt-xs" (click)="addProfessional" color="accent" mat-fab type="button">
+                  <mat-icon matPrefix>person_add_alt_1</mat-icon>
+                </button>
+                <button class="hide-xs" (click)="addProfessional" color="accent" mat-fab type="button" extended>
+                  <mat-icon matPrefix>person_add_alt_1</mat-icon>
+                  <span>{{ 'COMMON.PROFESSIONAL.ADD_BUTTON' | translate }}</span>
+                </button>
               </div>
-            </mat-card-content>
-            <mat-card-actions class="card-actions">
-              <div class="spacer"></div>
-              <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
-                {{ 'COMMON.BUTTON.BACK' | translate }}
-              </button>
-              @if (isAddMode) {
-                <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
-                  {{ 'COMMON.BUTTON.CREATE' | translate }}
-                </button>
-              } @else {
-                <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
-                  {{ 'COMMON.BUTTON.UPDATE' | translate }}
-                </button>
+            } @else {
+              <div class="ssc-line"></div>
+            }
+            @if (errors['professionals']) {
+              <mat-error [innerHTML]="'ROOM.PROFESSIONAL.REQUIRED' | translate" class="divider"></mat-error>
+            }
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'ROOM.TIME_ZONE.FIELD' | translate }}</mat-label>
+              <input (keydown)="keyDownHandler($event, getForm.timeZone)" formControlName="timeZone"
+                     [matAutocomplete]="auto" matInput required type="text">
+              <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayTimeZoneFn">
+                @for (timeZone of filteredTimeZoneOptions | async; track timeZone) {
+                  <mat-option [value]="timeZone">{{ timeZone.label }}</mat-option>
+                }
+              </mat-autocomplete>
+              @if (getForm.timeZone.hasError('required')) {
+                <mat-error [innerHTML]="'ROOM.TIME_ZONE.REQUIRED' | translate"></mat-error>
+              } @else if (getForm.timeZone.hasError('requireMatch')) {
+                <mat-error [innerHTML]="'ROOM.TIME_ZONE.INVALID' | translate"></mat-error>
+              } @else if (errors['timeZone']) {
+                <mat-error>{{ errors['timeZone'] }}</mat-error>
               }
-            </mat-card-actions>
+            </mat-form-field>
+            <div class="row-column-space-evenly-center">
+              <mat-checkbox (change)="primary = !primary" color="primary" [checked]="primary">
+                {{ 'ROOM.PRIMARY.FIELD' | translate }}
+              </mat-checkbox>
+              <mat-form-field appearance="outline" color="primary" class="full-margin">
+                <mat-label>{{ 'ROOM.CLOSE_DATE.FIELD' | translate }}</mat-label>
+                <button (click)="picker.open()" mat-icon-button matPrefix type="button">
+                  <mat-icon>today</mat-icon>
+                </button>
+                <input (focus)="picker.open()" formControlName="closeDate" [matDatepicker]="picker" [min]="today"
+                       matInput>
+                <mat-datepicker #picker touchUi></mat-datepicker>
+                @if (errors['closeDate']) {
+                  <mat-error>{{ errors['closeDate'] }}</mat-error>
+                }
+              </mat-form-field>
+            </div>
+            <mat-list class="top">
+              <div matListItemTitle>{{ 'ROOM.PAYMENT_OPTION' | translate }}</div>
+              <mat-divider class="top"></mat-divider>
+              <mat-selection-list #paymentType (selectionChange)="onChange(paymentType.selectedOptions.selected)">
+                @for (option of paymentOptions; track option) {
+                  <mat-list-option [disabled]="option.disabled" [selected]="isSelected(option)"
+                                   [value]="option.name" color="primary">
+                    <div>{{ option.name }}</div>
+                  </mat-list-option>
+                }
+              </mat-selection-list>
+              <mat-divider></mat-divider>
+            </mat-list>
+            <mat-list class="top">
+              <div matListItemTitle>{{ 'ROOM.AVAILABILITY.FIELD' | translate }}</div>
+              <mat-divider class="top"></mat-divider>
+              <mat-accordion class="headers-align" multi id="availabilities">
+                <mat-expansion-panel (opened)="setStep(0)" [expanded]="step === 0" hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      {{ 'ROOM.MONDAY_TIME.FIELD' | translate }}
+                    </mat-panel-title>
+                    <mat-panel-description class="hide-xs">
+                      {{ 'ROOM.MONDAY_TIME.DESCRIPTION' | translate }}
+                      <mat-icon>{{ icons.monday }}</mat-icon>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <app-availability (availability)="addAvailability($event, 1)" (ignore)="ignore('MONDAY', 1)"
+                                    [dates]="monDate" [day]="'MONDAY'"></app-availability>
+                  @if (errors['day0']) {
+                    <mat-error>{{ 'ROOM.MONDAY_TIME.REQUIRED' | translate }}</mat-error>
+                  }
+                </mat-expansion-panel>
+                <mat-expansion-panel (opened)="setStep(1)" [expanded]="step === 1" hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      {{ 'ROOM.TUESDAY_TIME.FIELD' | translate }}
+                    </mat-panel-title>
+                    <mat-panel-description class="hide-xs">
+                      {{ 'ROOM.TUESDAY_TIME.DESCRIPTION' | translate }}
+                      <mat-icon>{{ icons.tuesday }}</mat-icon>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <app-availability (availability)="addAvailability($event, 2)" (ignore)="ignore('TUESDAY', 2)"
+                                    [dates]="tueDate" [day]="'TUESDAY'"></app-availability>
+                  @if (errors['day1']) {
+                    <mat-error>{{ 'ROOM.TUESDAY_TIME.REQUIRED' | translate }}</mat-error>
+                  }
+                </mat-expansion-panel>
+                <mat-expansion-panel (opened)="setStep(2)" [expanded]="step === 2" hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      {{ 'ROOM.WEDNESDAY_TIME.FIELD' | translate }}
+                    </mat-panel-title>
+                    <mat-panel-description class="hide-xs">
+                      {{ 'ROOM.WEDNESDAY_TIME.DESCRIPTION' | translate }}
+                      <mat-icon>{{ icons.wednesday }}</mat-icon>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <app-availability (availability)="addAvailability($event, 3)" (ignore)="ignore('WEDNESDAY', 3)"
+                                    [dates]="wedDate" [day]="'WEDNESDAY'"></app-availability>
+                  @if (errors['day2']) {
+                    <mat-error>{{ 'ROOM.WEDNESDAY_TIME.REQUIRED' | translate }}</mat-error>
+                  }
+                </mat-expansion-panel>
+                <mat-expansion-panel (opened)="setStep(3)" [expanded]="step === 3" hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      {{ 'ROOM.THURSDAY_TIME.FIELD' | translate }}
+                    </mat-panel-title>
+                    <mat-panel-description class="hide-xs">
+                      {{ 'ROOM.THURSDAY_TIME.DESCRIPTION' | translate }}
+                      <mat-icon>{{ icons.thursday }}</mat-icon>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <app-availability (availability)="addAvailability($event, 4)" (ignore)="ignore('THURSDAY', 4)"
+                                    [dates]="thuDate" [day]="'THURSDAY'"></app-availability>
+                  @if (errors['day3']) {
+                    <mat-error>{{ 'ROOM.THURSDAY_TIME.REQUIRED' | translate }}</mat-error>
+                  }
+                </mat-expansion-panel>
+                <mat-expansion-panel (opened)="setStep(4)" [expanded]="step === 4" hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      {{ 'ROOM.FRIDAY_TIME.FIELD' | translate }}
+                    </mat-panel-title>
+                    <mat-panel-description class="hide-xs">
+                      {{ 'ROOM.FRIDAY_TIME.DESCRIPTION' | translate }}
+                      <mat-icon>{{ icons.friday }}</mat-icon>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <app-availability (availability)="addAvailability($event, 5)" (ignore)="ignore('FRIDAY', 5)"
+                                    [dates]="friDate" [day]="'FRIDAY'"></app-availability>
+                  @if (errors['day4']) {
+                    <mat-error>{{ 'ROOM.FRIDAY_TIME.REQUIRED' | translate }}</mat-error>
+                  }
+                </mat-expansion-panel>
+                <mat-expansion-panel (opened)="setStep(5)" [expanded]="step === 5" hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      {{ 'ROOM.SATURDAY_TIME.FIELD' | translate }}
+                    </mat-panel-title>
+                    <mat-panel-description class="hide-xs">
+                      {{ 'ROOM.SATURDAY_TIME.DESCRIPTION' | translate }}
+                      <mat-icon>{{ icons.saturday }}</mat-icon>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <app-availability (availability)="addAvailability($event, 6)" (ignore)="ignore('SATURDAY', 6)"
+                                    [dates]="satDate" [day]="'SATURDAY'"></app-availability>
+                  @if (errors['day5']) {
+                    <mat-error>{{ 'ROOM.SATURDAY_TIME.REQUIRED' | translate }}</mat-error>
+                  }
+                </mat-expansion-panel>
+                <mat-expansion-panel (opened)="setStep(6)" [expanded]="step === 6" hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      {{ 'ROOM.SUNDAY_TIME.FIELD' | translate }}
+                    </mat-panel-title>
+                    <mat-panel-description class="hide-xs">
+                      {{ 'ROOM.SUNDAY_TIME.DESCRIPTION' | translate }}
+                      <mat-icon>{{ icons.sunday }}</mat-icon>
+                    </mat-panel-description>
+                  </mat-expansion-panel-header>
+                  <app-availability (availability)="addAvailability($event, 7)" (ignore)="ignore('SUNDAY', 7)"
+                                    [dates]="sunDate" [day]="'SUNDAY'"></app-availability>
+                  @if (errors['day6']) {
+                    <mat-error>{{ 'ROOM.SUNDAY_TIME.REQUIRED' | translate }}</mat-error>
+                  }
+                </mat-expansion-panel>
+              </mat-accordion>
+              @if (errors['availability']) {
+                <mat-error [innerHTML]="'ROOM.AVAILABILITY.REQUIRED' | translate" class="divider"></mat-error>
+              }
+            </mat-list>
+            <app-google-map [addressFormGroup]="form" [latitudeMarker]="room?.address?.location?.y"
+                            [longitudeMarker]="room?.address?.location?.x" (addressEmitter)="getAddress($event)"
+                            [markInfo]="'<b>' + room?.address?.name + '</b>'"></app-google-map>
+            @if (errors['location']) {
+              <mat-error class="divider">{{ errors['location'] }}</mat-error>
+            }
+          </div>
+        </mat-card-content>
+        <mat-card-actions class="card-actions">
+          <div class="spacer"></div>
+          <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
+            {{ 'COMMON.BUTTON.BACK' | translate }}
+          </button>
+          @if (isAddMode) {
+            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
+              {{ 'COMMON.BUTTON.CREATE' | translate }}
+            </button>
           } @else {
-            <mat-card-content>
-              <div class="ssc-hr"></div>
-              <div class="ssc-square mb"></div>
-              <div class="ssc-hr"></div>
-            </mat-card-content>
-            <mat-card-actions class="card-actions">
-              <div class="ssc-head-line"></div>
-            </mat-card-actions>
+            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
+              {{ 'COMMON.BUTTON.UPDATE' | translate }}
+            </button>
           }
-        </mat-card>
-      </form>
-    </div>
-  </div>
+        </mat-card-actions>
+      } @else {
+        <mat-card-content>
+          <div class="ssc-hr"></div>
+          <div class="ssc-square mb"></div>
+          <div class="ssc-hr"></div>
+        </mat-card-content>
+        <mat-card-actions class="card-actions">
+          <div class="ssc-head-line"></div>
+        </mat-card-actions>
+      }
+    </mat-card>
+  </form>
 </div>

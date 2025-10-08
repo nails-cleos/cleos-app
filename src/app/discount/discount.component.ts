@@ -67,11 +67,11 @@ export class DiscountComponent implements OnInit, OnDestroy {
 
   	if (this.isAddMode) {
   		discount.currencyId = this.getForm.currency.value.id;
-  		this.store.dispatch(new fromActionsDiscount.DiscountSave(discount));
+  		this.store.dispatch(new fromActionsDiscount.CreateDiscount(discount));
   	} else {
   		discount.id = this.id;
   		this.discount = undefined;
-  		this.store.dispatch(new fromActionsDiscount.DiscountUpdate(discount));
+  		this.store.dispatch(new fromActionsDiscount.UpdateDiscount(this.id!, discount));
   	}
   	return;
   }
@@ -134,7 +134,7 @@ export class DiscountComponent implements OnInit, OnDestroy {
   	if (!this.discount) {
   		const id = this.route.snapshot.paramMap.get('id');
   		this.store.dispatch(
-  			new fromActionsDiscount.DiscountFind(id),
+  			new fromActionsDiscount.GetDiscount(id!),
   		);
   	}
   };
@@ -142,7 +142,7 @@ export class DiscountComponent implements OnInit, OnDestroy {
   private getCurrencies = (): void => this.store.dispatch(new fromActionsDiscount.GetAllCurrency());
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe(state => {
+  	this.subscription = this.getState.subscribe((state) => {
   		if (state.selected) {
   			this.discount = {
   				id: state.selected.id,
@@ -161,7 +161,7 @@ export class DiscountComponent implements OnInit, OnDestroy {
   				this.errors[value.field] = value.message;
   				this.form.controls[value.field].setErrors({ incorrect: true });
   			});
-  		} else if (state.message) {
+  		} else if (state.response) {
   			this.router.navigate([this.language, 'discounts']);
   		}
   	});

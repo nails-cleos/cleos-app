@@ -77,7 +77,7 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
   private createFilters = (): void => {
     this.filteredCustomer = this.customer.valueChanges.pipe(
       startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
+      map(value => typeof value === 'string' ? value : value.displayName),
       map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers),
     );
   };
@@ -90,7 +90,7 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
   private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.customers = state.data;
       this.customer.setValue(this.customers?.find(customer => customer.id === this.data.customerId));
     });

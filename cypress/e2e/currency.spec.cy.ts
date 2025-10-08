@@ -14,7 +14,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockAdminDashboard(new Date(), 'CLEOS');
     });
 
-    it(`should create a new currency`, () => {
+    it('should create a new currency', () => {
       cy.mockCurrencyList(true, 0);
       cy.intercept('POST', '**/api/v1/currency', (req) => req.alias = 'saveCurrency');
       cy.openMenu(breakpoints, ['Admin settings', 'Currency']);
@@ -44,7 +44,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       });
     });
 
-    it(`should edit a currency`, () => {
+    it('should edit a currency', () => {
       cy.mockCurrencyList(true, undefined, 'e5fa4fd7-74bb-4a02-bf11-fc30ad9fb358');
       cy.openMenu(breakpoints, ['Admin settings', 'Currency']);
       cy.wait('@getCurrencyList');

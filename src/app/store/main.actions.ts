@@ -1,10 +1,15 @@
 import { Action } from '@ngrx/store';
+import { IError, ResponseSuccess } from '../interfaces/common';
+import { ICatalogue } from '../interfaces/catalogue';
+import { ITreatmentGroup } from '../interfaces/treatment';
+import { ISendMessage } from '../../main';
+import { IUser } from '../interfaces/user';
 
 export enum MainActionTypes {
   getAllCatalogue = '[Main] Get all',
   getListTreatmentsGroup = '[Main] Get list treatments group',
   sendMessage = '[Main] Send message',
-  updateUser = '[Main] Update user',
+  updateMyUser = '[Main] Update user',
   catalogueSuccess = '[Main] Catalogue Success',
   treatmentSuccess = '[Main] Treatment success',
   requestSuccess = '[Main] Success',
@@ -23,42 +28,39 @@ export class GetListTreatmentsGroup implements Action {
 export class SendMessage implements Action {
   readonly type = MainActionTypes.sendMessage;
 
-  constructor(public payload: any) {
+  constructor(public sendMessage: ISendMessage) {
   }
 }
 
-export class UpdateUser implements Action {
-  readonly type = MainActionTypes.updateUser;
+export class UpdateMyUser implements Action {
+  readonly type = MainActionTypes.updateMyUser;
 
-  constructor(public payload: any) {
+  constructor(public user: IUser, public redirectUrl: string, public message: string) {
   }
 }
 
 export class CatalogueSuccess implements Action {
   readonly type = MainActionTypes.catalogueSuccess;
 
-  constructor(public payload: any) {
+  constructor(public catalogues: ICatalogue[]) {
   }
 }
 
 export class TreatmentsSuccess implements Action {
   readonly type = MainActionTypes.treatmentSuccess;
 
-  constructor(public payload: any) {
+  constructor(public groups: ITreatmentGroup[]) {
   }
 }
 
-export class RequestSuccess implements Action {
+export class RequestSuccess extends ResponseSuccess implements Action {
   readonly type = MainActionTypes.requestSuccess;
-
-  constructor(public payload: any) {
-  }
 }
 
 export class RequestFailure implements Action {
   readonly type = MainActionTypes.requestFailure;
 
-  constructor(public payload: any) {
+  constructor(public error: IError) {
   }
 }
 
@@ -70,7 +72,7 @@ export type All =
   | GetAllCatalogue
   | GetListTreatmentsGroup
   | SendMessage
-  | UpdateUser
+  | UpdateMyUser
   | TreatmentsSuccess
   | CatalogueSuccess
   | RequestSuccess

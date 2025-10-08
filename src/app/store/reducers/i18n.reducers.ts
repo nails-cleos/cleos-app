@@ -1,11 +1,11 @@
 import { All, I18nActionTypes } from '../i18n.actions';
 
 export interface State {
-  data: string | null;
+  language?: string;
 }
 
 export const initialState: State = {
-  data: null,
+  language: undefined,
 };
 
 export const reducer = (state = initialState, action: All): State => {
@@ -18,7 +18,7 @@ export const reducer = (state = initialState, action: All): State => {
     case I18nActionTypes.setLanguage: {
       return {
         ...state,
-        data: action.payload,
+        language: action.language,
       };
     }
     default: {

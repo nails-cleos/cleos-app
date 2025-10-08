@@ -1,14 +1,17 @@
 import { inject, Injectable } from '@angular/core';
-import { IUser } from '../interfaces/user';
+import { IOverview, IUser } from '../interfaces/user';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Role } from '../interfaces/token';
+import { Role, Token } from '../interfaces/token';
 import { IRoom } from '../interfaces/room';
-import { PAGE_SIZE } from '../interfaces/pagination';
+import { Pagination } from '../interfaces/pagination';
 import { ICustomerLastReservation } from '../interfaces/reservation';
 import { createFilter } from '../util/service-helper';
 import { dataURLToBlob } from '../util/file';
 import { toUrl } from '../util/helper';
+import { SortDirection } from '@angular/material/sort';
+import { map } from 'rxjs/operators';
+import { IApiResponse } from '../interfaces/common';
 
 @Injectable()
 export class UserService {
@@ -26,53 +29,71 @@ export class UserService {
   private http: HttpClient = inject(HttpClient);
 
   getUsersPage = (
-    sort: string,
-    direction: string,
-    page: number,
-    size: number = PAGE_SIZE,
-    filter: string,
-  ): Observable<IUser[]> => this.http.get<IUser[]>(
+    page: number, sort: string, direction: SortDirection, size: number, filter?: string,
+  ): Observable<Pagination<IUser>> => this.http.get<Pagination<IUser>>(
     toUrl(this.userUrlV1, 'pages'),
     { params: createFilter(page, size, sort, direction, filter) },
   );
 
-  getUserById = (
+  saveUser = (user: IUser, role?: Role): Observable<{ response: IApiResponse, key: string }> => {
+    switch (role) {
+      case Role.customer:
+        return this.createCustomer(user).pipe(
+          map(response => ({ response, key: 'USER.CUSTOMER' })),
+        );
+      case Role.manager:
+        return this.addManager(user).pipe(
+          map(response => ({ response, key: 'USER.MANAGER' })),
+        );
+      case Role.professional:
+        return this.addProfessional(user).pipe(
+          map(response => ({ response, key: 'USER.PROFESSIONAL' })),
+        );
+      default:
+        return this.updateUser(user).pipe(
+          map(response => ({ response, key: 'USER.UPDATED.MESSAGE' })),
+        );
+    }
+  };
+
+  getUser = (
     id: string,
   ): Observable<IUser | undefined> => this.http.get<IUser>(toUrl(this.userUrlV1, id));
 
-  findMe = (): Observable<IUser | undefined> => this.http.get<IUser>(toUrl(this.userUrlV1, 'me'));
+  getMyUser = (): Observable<IUser | undefined> => this.http.get<IUser>(toUrl(this.userUrlV1, 'me'));
 
-  updateUserById = (
+  updateUser = (
     user: IUser,
-  ): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, user.id!), user);
+  ): Observable<IApiResponse> => this.http.patch<IApiResponse>(toUrl(this.userUrlV1, user.id!), user);
 
-  updateMe = (user: IUser): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, 'me'), user);
+  updateMyUser = (user: IUser): Observable<Token> => this.http.patch<Token>(toUrl(this.userUrlV1, 'me'), user);
 
-  updateMePhoto = (resizedImageDataUrl: string): Observable<IUser> => {
+  updateMyPhoto = (resizedImageDataUrl: string): Observable<Token> => {
     const blob = dataURLToBlob(resizedImageDataUrl);
     const formData = new FormData();
     formData.append('file', blob, 'resized-image.jpg');
 
     const headers = new HttpHeaders().set('Upload', 'true');
 
-    return this.http.patch<IUser>(toUrl(this.userUrlV1, 'me', 'photo'), formData, { headers });
+    return this.http.patch<Token>(toUrl(this.userUrlV1, 'me', 'photo'), formData, { headers });
   };
 
-  createCustomer = (user: IUser): Observable<IUser> => this.http.post(this.customerUrlV1, user);
+  createCustomer = (user: IUser): Observable<IApiResponse> => this.http.post<IApiResponse>(this.customerUrlV1, user);
 
   getCustomerOverview = (
     id: string | null,
-  ): Observable<IUser | undefined> => this.http.get<IUser>(toUrl(this.customerUrlV1, id ? id : 'me', 'reservations'));
+  ): Observable<IOverview> => this.http.get<IOverview>(toUrl(this.customerUrlV1, id ? id : 'me', 'reservations'));
 
-  addProfessional = (user: IUser): Observable<IUser> => this.http.post(this.professionalUrlV1, user);
+  addProfessional = (user: IUser): Observable<IApiResponse> => this.http.post<IApiResponse>(this.professionalUrlV1,
+    user);
 
-  addManager = (user: IUser): Observable<IUser> => this.http.post(this.officeUrlV1, user);
+  addManager = (user: IUser): Observable<IApiResponse> => this.http.post<IApiResponse>(this.officeUrlV1, user);
 
-  deleteUserById = (id: string): Observable<IUser> => this.http.delete<IUser>(toUrl(this.userUrlV1, id));
+  deleteUser = (id: string): Observable<IUser> => this.http.delete<IUser>(toUrl(this.userUrlV1, id));
 
-  restore = (user: IUser): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, user.id!), user);
+  restore = (id: string, user: IUser): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, id), user);
 
-  resendToken = (id: string): Observable<any> => this.http.post(toUrl(this.userUrlV1, id, 'token'), null);
+  resendToken = (id: string): Observable<void> => this.http.post<void>(toUrl(this.userUrlV1, id, 'token'), null);
 
   getProfessionals = (): Observable<IUser[]> => this.http.get<IUser[]>(this.professionalUrlV1);
 
@@ -82,7 +103,7 @@ export class UserService {
 
   getCustomerInformation = (
     id: string,
-  ): Observable<ICustomerLastReservation[]> => this.http.get<ICustomerLastReservation[]>(
+  ): Observable<ICustomerLastReservation> => this.http.get<ICustomerLastReservation>(
     toUrl(this.customerUrlV1, id, 'info'));
 
   setRole = (userId: string, role: Role): Observable<IUser> => {
@@ -107,11 +128,11 @@ export class UserService {
 
   getAllRoomsByProfessionalId = (
     id: string,
-  ): Observable<IRoom> => this.http.get<IRoom>(`${ this.professionalUrlV1 }/${ id }/rooms`);
+  ): Observable<IRoom[]> => this.http.get<IRoom[]>(`${ this.professionalUrlV1 }/${ id }/rooms`);
 
-  findAllDisableUsers = (): Observable<IUser[]> => this.http.get<IUser[]>(this.userUrlV1);
+  getAllDisableUsers = (): Observable<IUser[]> => this.http.get<IUser[]>(this.userUrlV1);
 
   mergeUsers = (
-    mergeUserRequest: any,
-  ): Observable<IUser> => this.http.post<IUser>(`${ this.userUrlV1 }/merge`, mergeUserRequest);
+    oldUserId: string, newUserId: string,
+  ): Observable<IUser> => this.http.post<IUser>(`${ this.userUrlV1 }/merge`, { oldUserId, newUserId });
 }

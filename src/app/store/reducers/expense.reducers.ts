@@ -1,28 +1,27 @@
 import { Pagination } from '../../interfaces/pagination';
 import { All, ExpenseActionTypes } from '../expense.actions';
 import { IExpense, IExpenseInfo } from '../../interfaces/expense';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 
 export interface State {
-  path: string | null;
-  data: IExpense | Pagination<IExpense> | null;
-  info: IExpenseInfo | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  selected: IExpense | null;
-  message: string | null;
+  response?: IResponseSuccess;
+  data?: Pagination<IExpense> | IExpense[];
+  info?: IExpenseInfo;
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
+  selected?: IExpense;
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  path: null,
-  data: null,
-  info: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  selected: null,
-  message: null,
+  response: undefined,
+  data: undefined,
+  info: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  selected: undefined,
   isLoading: false,
 };
 
@@ -32,95 +31,86 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IExpense>,
-        path: null,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        response: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
       };
     }
     case ExpenseActionTypes.getAllExpensesInfo: {
       return {
         ...state,
-        path: null,
-        info: null,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        response: undefined,
+        info: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
       };
     }
-    case ExpenseActionTypes.findExpenseById: {
+    case ExpenseActionTypes.getExpense: {
       return {
         ...state,
         selected: {} as IExpense,
-        path: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        response: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case ExpenseActionTypes.expenseSuccess: {
       return {
         ...state,
-        data: action.payload,
-        path: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        data: action.data,
+        response: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case ExpenseActionTypes.expenseInfoSuccess: {
       return {
         ...state,
-        info: action.payload,
-        path: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        info: action.info,
+        response: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case ExpenseActionTypes.expenseSaveSuccess: {
       return {
         ...state,
-        message: action.payload.message,
-        path: action.payload.path,
-        selected: null,
-        errorMessage: null,
-        subErrors: null,
+        response: action,
+        selected: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
         isLoading: false,
       };
     }
     case ExpenseActionTypes.expenseSelected: {
       return {
         ...state,
-        selected: action.payload.expense,
-        path: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        selected: action.selected,
+        response: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case ExpenseActionTypes.expenseFailure: {
       return {
         ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
-        path: null,
-        message: null,
+        errorMessage: action.error.message,
+        error: action.error,
+        subErrors: action.error.subErrors,
+        response: undefined,
         isLoading: false,
       };
     }
-    case ExpenseActionTypes.updateExpenseById:
+    case ExpenseActionTypes.updateExpense:
     case ExpenseActionTypes.createExpense:
-    case ExpenseActionTypes.deleteExpenseById: {
+    case ExpenseActionTypes.deleteExpense: {
       return {
         ...state,
-        path: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        response: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
         isLoading: true,
       };
     }

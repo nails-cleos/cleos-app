@@ -66,7 +66,7 @@ export class AccountComponent implements OnInit, OnDestroy {
     transaction.currencyId = valueChange(this.getForm.currency.value, this.account?.currency)?.id;
     transaction.gift = this.getForm.gift.value;
     this.store.dispatch(
-      new fromActionsAccount.UpdateAccountById(transaction),
+      new fromActionsAccount.UpdateAccount(transaction.accountId!, transaction, this.customerId!),
     );
     return;
   }
@@ -101,7 +101,9 @@ export class AccountComponent implements OnInit, OnDestroy {
     }
   };
 
-  private getAccount = (): void => this.store.dispatch(new fromActionsAccount.FindAccountByCustomerId(this.customerId));
+  private getAccount = (): void => this.store.dispatch(
+    new fromActionsAccount.GetAccountByCustomerId(this.customerId!),
+  );
 
   private createForm = (): void => {
     this.form = this.formBuilder.group({
@@ -121,7 +123,7 @@ export class AccountComponent implements OnInit, OnDestroy {
   );
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.selected && !this.account) {
         this.account = state.selected;
         this.form.patchValue(state.selected);
@@ -131,7 +133,7 @@ export class AccountComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
-      } else if (state.message) {
+      } else if (state.response) {
         if (this.hasAdminRole) {
           this.router.navigate([this.language, 'users', this.customerId, 'overview']);
         } else {

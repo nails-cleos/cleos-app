@@ -43,88 +43,83 @@ export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
-  	breakpointObserver.observe([
-  		Breakpoints.XSmall,
-  		Breakpoints.Small,
-  	]).subscribe(result => {
-  		if (result.matches) {
-  			this.pageSize = MOBILE_PAGE_SIZE;
-  		}
-  	});
-  	this.getState = this.store.select(selectAdditionalState);
-  	this.language = this.translate.currentLang;
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small,
+    ]).subscribe(result => {
+      if (result.matches) {
+        this.pageSize = MOBILE_PAGE_SIZE;
+      }
+    });
+    this.getState = this.store.select(selectAdditionalState);
+    this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {
-  	this.getAdditionalList();
+    this.getAdditionalList();
   }
 
   ngOnInit(): void {
-  	this.clean();
-  	this.subscribe();
+    this.clean();
+    this.subscribe();
   }
 
   ngOnDestroy(): void {
-  	this.subscription?.unsubscribe();
-  	this.paginatorSubscription?.unsubscribe();
+    this.subscription?.unsubscribe();
+    this.paginatorSubscription?.unsubscribe();
   }
 
   edit = (additional: IAdditional): void => this.store.dispatch(
-  	new fromActionsAdditional.AdditionalSelected(additional),
+    new fromActionsAdditional.AdditionalSelected(additional),
   );
 
   delete = (additional: IAdditional): void => {
-  	const title = this.translate.instant('ADDITIONAL.DELETED.TITLE');
-  	const content = this.translate.instant('ADDITIONAL.DELETED.CONTENT', { name: additional.name });
+    const title = this.translate.instant('ADDITIONAL.DELETED.TITLE');
+    const content = this.translate.instant('ADDITIONAL.DELETED.CONTENT', { name: additional.name });
 
-  	executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: additional }, result => {
-  		if (result) {
-  			this.store.dispatch(
-  				new fromActionsAdditional.DeleteAdditionalById(result),
-  			);
-  		}
-  	});
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: additional }, result => {
+      if (result) {
+        this.store.dispatch(
+          new fromActionsAdditional.DeleteAdditional(result.id, result.name),
+        );
+      }
+    });
   };
 
   private clean = (): void => this.store.dispatch(new fromActionsAdditional.Clean());
 
   private createPageSubscriptions = (): void => {
-  	this.sort.sortChange.subscribe(() => {
-  		this.paginator.pageIndex = 0;
-  		this.getAdditionalList();
-  	});
-  	this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getAdditionalList(this.paginator.pageIndex));
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getAdditionalList();
+    });
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getAdditionalList(this.paginator.pageIndex));
 
-  	this.cdRef.detectChanges();
+    this.cdRef.detectChanges();
   };
 
   private getAdditionalList = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsAdditional.GetAdditionalPage({
-  		active: this.sort.active,
-  		direction: this.sort.direction,
-  		size: this.pageSize,
-  		page,
-  	}),
+    new fromActionsAdditional.GetAdditionalPage(page, this.sort.active, this.sort.direction, this.pageSize),
   );
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe((state) => {
-  		if (state.message) {
-  			this.clean();
-  			this.getAdditionalList();
-  		}
-  		this.dataSource = state.data?.content?.map((additional: IAdditional) => {
-  			if (additional.duration) {
-  				const duration = convertDuration(additional.duration);
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.response) {
+        this.clean();
+        this.getAdditionalList();
+      }
+      this.dataSource = state.data?.content?.map((additional: IAdditional) => {
+        if (additional.duration) {
+          const duration = convertDuration(additional.duration);
 
-  				return Object.assign({}, additional, { hour: duration.hour, minute: duration.minute });
-  			}
-  			return additional;
-  		});
-  		this.resultsLength = state.data?.totalElements;
-  		if (!this.paginatorSubscription && this.resultsLength) {
-  			this.createPageSubscriptions();
-  		}
-  	});
+          return Object.assign({}, additional, { hour: duration.hour, minute: duration.minute });
+        }
+        return additional;
+      });
+      this.resultsLength = state.data?.totalElements;
+      if (!this.paginatorSubscription && this.resultsLength) {
+        this.createPageSubscriptions();
+      }
+    });
   };
 }

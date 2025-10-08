@@ -39,7 +39,7 @@ import { ErrorComponent } from '../../../shared/error/error.component';
   imports: [SharedModule, TimeDetailPipe, ReservationIconPipe, ErrorComponent],
 })
 export class ReservationTableComponent implements AfterViewInit, OnInit, OnChanges, OnDestroy {
-  @Input() roomId: any;
+  @Input() roomId?: string;
   @Input() professionalId: any;
   @Input() all?: boolean;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -63,95 +63,88 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver,
               private authUserService: AuthUserService) {
-  	this.getState = this.store.select(selectReservationState);
-  	this.dateFormat = this.translate.currentLang;
-  	this.language = this.translate.currentLang;
-  	this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => this.isAdmin = value.isAdmin);
-  	breakpointObserver.observe([
-  		Breakpoints.XSmall,
-  		Breakpoints.Small,
-  	]).subscribe(result => {
-  		if (result.matches) {
-  			this.pageSize = MOBILE_PAGE_SIZE;
-  		}
-  	});
+    this.getState = this.store.select(selectReservationState);
+    this.dateFormat = this.translate.currentLang;
+    this.language = this.translate.currentLang;
+    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => this.isAdmin = value.isAdmin);
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small,
+    ]).subscribe(result => {
+      if (result.matches) {
+        this.pageSize = MOBILE_PAGE_SIZE;
+      }
+    });
   }
 
   ngOnInit(): void {
-  	this.subscribe();
+    this.subscribe();
   }
 
   ngAfterViewInit(): void {
-  	this.getReservations();
+    this.getReservations();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ngOnChanges(_: SimpleChanges): void {
-  	if (this.sort) {
-  		this.paginator.pageIndex = 0;
-  		this.getReservations(0);
-  	}
+    if (this.sort) {
+      this.paginator.pageIndex = 0;
+      this.getReservations(0);
+    }
   }
 
   ngOnDestroy(): void {
-  	this.subscription?.unsubscribe();
-  	this.paginatorSubscription?.unsubscribe();
-  	this.authUserServiceSubscription.unsubscribe();
+    this.subscription?.unsubscribe();
+    this.paginatorSubscription?.unsubscribe();
+    this.authUserServiceSubscription.unsubscribe();
   }
 
   showTimeZone = (reservation: IReservationAll): boolean => !isSameTimeZone(reservation.room.timeZone);
 
   openDialog = (reservation: IReservationAll): void => {
-  	const time = newDateTimestamp(reservation.timestamp);
-  	openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
+    const time = newDateTimestamp(reservation.timestamp);
+    openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
   };
 
   delete = (reservation: IReservation): void => {
-  	const title = this.translate.instant('RESERVATION.DELETED.TITLE');
-  	const content = this.translate.instant('RESERVATION.DELETED.CONTENT',
-  		{ date: newDateTimestamp(reservation.timestamp) });
+    const title = this.translate.instant('RESERVATION.DELETED.TITLE');
+    const content = this.translate.instant('RESERVATION.DELETED.CONTENT',
+      { date: newDateTimestamp(reservation.timestamp) });
 
-  	executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: reservation }, result => {
-  		if (result) {
-  			this.store.dispatch(
-  				new fromActionsReservation.DeleteReservationById(result),
-  			);
-  		}
-  	});
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: reservation }, result => {
+      if (result) {
+        this.store.dispatch(
+          new fromActionsReservation.DeleteReservation(result.id, result.timestamp, result.room.timeZone),
+        );
+      }
+    });
   };
 
   private getReservations = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsReservation.FindPaged({
-  		all: this.all,
-  		roomId: this.roomId,
-  		professionalId: this.professionalId,
-  		active: this.sort.active,
-  		direction: this.sort.direction,
-  		size: this.pageSize,
-  		page,
-  	}),
+    new fromActionsReservation.GetPage(page, this.sort.active, this.sort.direction, this.pageSize, this.roomId,
+      this.all, this.professionalId),
   );
 
   private createPageSubscriptions = (): void => {
-  	this.sort.sortChange.subscribe(() => {
-  		this.paginator.pageIndex = 0;
-  		this.getReservations();
-  	});
-  	this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getReservations(this.paginator.pageIndex));
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.getReservations();
+    });
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getReservations(this.paginator.pageIndex));
 
-  	this.cdRef.detectChanges();
+    this.cdRef.detectChanges();
   };
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe(state => {
-  		this.error = state.error;
-  		if (state.page) {
-  			this.dataSource = state.page?.content;
-  			this.resultsLength = state.page?.totalElements;
-  			if (!this.paginatorSubscription && this.resultsLength) {
-  				this.createPageSubscriptions();
-  			}
-  		}
-  	});
+    this.subscription = this.getState.subscribe((state) => {
+      this.error = state.error;
+      if (state.page) {
+        this.dataSource = state.page?.content;
+        this.resultsLength = state.page?.totalElements;
+        if (!this.paginatorSubscription && this.resultsLength) {
+          this.createPageSubscriptions();
+        }
+      }
+    });
   };
 }

@@ -1,75 +1,76 @@
 import { Action } from '@ngrx/store';
+import { IAccount, ITransaction } from '../interfaces/account';
+import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { IPaymentOption } from '../interfaces/payment';
+import { SortDirection } from '@angular/material/sort';
 
 export enum AccountActionTypes {
   accountSuccess = '[Account] Success',
-  addMoney = '[Account] Save',
-  updateAccountById = '[Account] Update account by id',
+  createTransaction = '[Account] Save',
+  updateAccount = '[Account] Update account by id',
   accountSaveSuccess = '[Account] Save Success',
   accountFailure = '[Account] Failure',
   accountSelected = '[Account] Selected',
-  findAccountById = '[Account] Find account by id',
+  getAccount = '[Account] Find account by id',
   paymentOptions = '[Account] Payment Option',
   paymentOptionsSuccess = '[Account] Payment Option success',
   paymentSend = '[Account] Payment send',
   getTransactionsByAccountId = '[Account] Get transactions by account id',
-  findTransactionById = '[Account] find transaction by id',
-  findAccountByCustomerId = '[Account] Find account by customer id',
+  getTransaction = '[Account] find transaction by id',
+  getAccountByCustomerId = '[Account] Find account by customer id',
   clean = '[Account] Clean'
 }
 
 export class AccountSuccess implements Action {
   readonly type = AccountActionTypes.accountSuccess;
 
-  constructor(public payload: any) {
+  constructor(public data: ITransaction[]) {
   }
 }
 
 export class PaymentOptionsSuccess implements Action {
   readonly type = AccountActionTypes.paymentOptionsSuccess;
 
-  constructor(public payload: any) {
+  constructor(public paymentOptions?: IPaymentOption[]) {
   }
 }
 
-export class AddMoney implements Action {
-  readonly type = AccountActionTypes.addMoney;
+export class CreateTransaction implements Action {
+  readonly type = AccountActionTypes.createTransaction;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public transaction: ITransaction) {
   }
 }
 
-export class UpdateAccountById implements Action {
-  readonly type = AccountActionTypes.updateAccountById;
+export class UpdateAccount implements Action {
+  readonly type = AccountActionTypes.updateAccount;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public transaction: ITransaction, public customerId: string) {
   }
 }
 
-export class AccountSaveSuccess implements Action {
+export class AccountSaveSuccess extends ResponseSuccess implements Action {
   readonly type = AccountActionTypes.accountSaveSuccess;
-
-  constructor(public payload: any) {
-  }
 }
 
 export class AccountFailure implements Action {
   readonly type = AccountActionTypes.accountFailure;
 
-  constructor(public payload: any) {
+  constructor(public error: IError) {
   }
 }
 
 export class AccountSelected implements Action {
   readonly type = AccountActionTypes.accountSelected;
 
-  constructor(public payload: any) {
+  constructor(public selected?: IAccount | ITransaction) {
   }
 }
 
-export class FindAccountById implements Action {
-  readonly type = AccountActionTypes.findAccountById;
+export class GetAccount implements Action {
+  readonly type = AccountActionTypes.getAccount;
 
-  constructor(public payload: any) {
+  constructor(public id: string) {
   }
 }
 
@@ -80,28 +81,30 @@ export class PaymentOptions implements Action {
 export class PaymentSend implements Action {
   readonly type = AccountActionTypes.paymentSend;
 
-  constructor(public payload: any) {
+  constructor(public link: string) {
   }
 }
 
-export class GetTransactionsByAccountId implements Action {
+export class GetTransactionsByAccountId extends PageRequest implements Action {
   readonly type = AccountActionTypes.getTransactionsByAccountId;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public page: number, public sort: string, public direction: SortDirection,
+              public size: number) {
+    super(page, sort, direction, size);
   }
 }
 
-export class FindTransactionById implements Action {
-  readonly type = AccountActionTypes.findTransactionById;
+export class GetTransaction implements Action {
+  readonly type = AccountActionTypes.getTransaction;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public transactionId: string) {
   }
 }
 
-export class FindAccountByCustomerId implements Action {
-  readonly type = AccountActionTypes.findAccountByCustomerId;
+export class GetAccountByCustomerId implements Action {
+  readonly type = AccountActionTypes.getAccountByCustomerId;
 
-  constructor(public payload: any) {
+  constructor(public customerId: string) {
   }
 }
 
@@ -110,17 +113,17 @@ export class Clean implements Action {
 }
 
 export type All =
-  | AddMoney
-  | UpdateAccountById
+  | CreateTransaction
+  | UpdateAccount
   | AccountSuccess
   | AccountSaveSuccess
   | AccountFailure
-  | FindAccountById
+  | GetAccount
   | GetTransactionsByAccountId
-  | FindAccountByCustomerId
+  | GetAccountByCustomerId
   | AccountSelected
   | PaymentOptions
   | PaymentOptionsSuccess
   | PaymentSend
-  | FindTransactionById
+  | GetTransaction
   | Clean;

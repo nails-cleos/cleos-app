@@ -46,12 +46,12 @@ export class TreatmentGroupSortingComponent implements OnInit, OnDestroy {
   private getTreatments = (): void => this.store.dispatch(new fromActionsTreatment.GetAllTreatmentsGroup());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((stateValue) => {
-      if (stateValue.message) {
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.response) {
         this.clean();
         this.getTreatments();
       }
-      this.items = stateValue?.data?.map((group: ITreatmentGroupAll) => new ItemSorting(
+      this.items = state?.data?.map((group: ITreatmentGroupAll) => new ItemSorting(
         group.id, group.name, group.order),
       );
     });

@@ -28,7 +28,7 @@
             <input (keydown)="keyDownHandler($event)" [formControl]="user" [matAutocomplete]="autoUser"
                    autocomplete="off" matInput required type="text">
             <mat-autocomplete #autoUser="matAutocomplete" [displayWith]="displayFnUser">
-              @for (user of filteredUser | async; track user) {
+              @for (user of filteredUser | async; track user.id) {
                 <mat-option [value]="user">{{ user.displayName }}</mat-option>
               }
             </mat-autocomplete>

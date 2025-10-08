@@ -1,27 +1,33 @@
-import { LayoutModule } from '@angular/cdk/layout';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { DashComponent } from './dash.component';
+import { of } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { TranslateModule } from '@ngx-translate/core';
+import { AuthUserService } from '../services/auth-user.service';
 
 describe('DashComponent', () => {
   let component: DashComponent;
   let fixture: ComponentFixture<DashComponent>;
+  const mockStore = {
+    select: jasmine.createSpy('select').and.returnValue(of({})),
+    dispatch: jasmine.createSpy('dispatch'),
+  };
+
+  const mockAuthUserService = {
+    authUser: of({
+      isDarkMode: true,
+      isAdmin: true,
+      isManager: true,
+    }),
+  };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        NoopAnimationsModule,
-        LayoutModule,
-        MatButtonModule,
-        MatCardModule,
-        MatIconModule,
-        MatMenuModule,
-        DashComponent,
+      imports: [DashComponent, TranslateModule.forRoot()],
+      providers: [
+        { provide: Store, useValue: mockStore },
+        { provide: AuthUserService, useValue: mockAuthUserService },
       ],
     }).compileComponents();
   }));

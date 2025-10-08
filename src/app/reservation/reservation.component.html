@@ -9,7 +9,7 @@
                  [matAutocomplete]="autoCustomer" name="customer"
                  autocomplete="off" matInput required type="text">
           <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
-            @for (customer of filteredCustomer | async; track customer) {
+            @for (customer of filteredCustomer | async; track customer.id) {
               <mat-option [value]="customer">{{ customer.displayName }}</mat-option>
             }
           </mat-autocomplete>
@@ -53,7 +53,7 @@
               <input (keydown)="keyDownOffice($event)" formControlName="office" [matAutocomplete]="autoOffice"
                      matInput required type="text">
               <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
-                @for (office of filteredOffice | async; track office) {
+                @for (office of filteredOffice | async; track office.id) {
                   <mat-option [value]="office">{{ office.name }}</mat-option>
                 }
               </mat-autocomplete>
@@ -74,7 +74,7 @@
               <input (keydown)="keyDownRoom($event)" formControlName="room" [matAutocomplete]="autoRoom" matInput
                      required type="text">
               <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
-                @for (room of filteredRoom | async; track room) {
+                @for (room of filteredRoom | async; track room.id) {
                   <mat-option [value]="room">{{ room | roomName }}</mat-option>
                 }
               </mat-autocomplete>
@@ -95,7 +95,7 @@
               <input (keydown)="keyDownHandler($event, professional)" formControlName="professional"
                      [matAutocomplete]="autoProfessional" matInput type="text" required>
               <mat-autocomplete #autoProfessional="matAutocomplete" [displayWith]="displayFnProfessional">
-                @for (professional of filteredProfessional | async; track professional) {
+                @for (professional of filteredProfessional | async; track professional.id) {
                   <mat-option [value]="professional">{{ professional.displayName }}</mat-option>
                 }
               </mat-autocomplete>
@@ -122,7 +122,7 @@
       } @else {
         <div class="link-container">
           <div formArrayName="dateTimeList" class="array-form">
-            @for (dateGroup of dateTimeList.controls; track dateGroup; let i = $index) {
+            @for (dateGroup of dateTimeList.controls; track $index; let i = $index) {
               <div [formGroupName]="i" class="array-group">
                 <div class="date-time-fields">
                   <mat-form-field appearance="outline" class="date-field">
@@ -166,7 +166,7 @@
               <input (keydown)="keyDownGroup($event)" formControlName="group" [matAutocomplete]="autoGroup"
                      matInput required type="text">
               <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
-                @for (group of filteredGroup | async | sortBy: 'asc':'order'; track group) {
+                @for (group of filteredGroup | async | sortBy: 'asc':'order'; track group.id) {
                   <mat-option [value]="group">{{ group.name }}</mat-option>
                 }
               </mat-autocomplete>
@@ -188,7 +188,7 @@
                 <input (keydown)="keyDownHandler($event, treatment)" formControlName="treatment"
                        [matAutocomplete]="autoTreatment" matInput required type="text">
                 <mat-autocomplete #autoTreatment="matAutocomplete" [displayWith]="displayFnTreatment">
-                  @for (treatment of filteredTreatment | async | sortBy: 'asc':'order'; track treatment) {
+                  @for (treatment of filteredTreatment | async | sortBy: 'asc':'order'; track treatment.id) {
                     <mat-option [value]="treatment">{{ treatment.name }}</mat-option>
                   }
                 </mat-autocomplete>
@@ -216,7 +216,7 @@
                 <mat-label>{{ 'RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</mat-label>
                 <mat-select formControlName="discount">
                   <mat-option>--</mat-option>
-                  @for (d of discounts; track d) {
+                  @for (d of discounts; track d.id) {
                     <mat-option [value]="d.id">{{ d.title }}</mat-option>
                   }
                 </mat-select>
@@ -273,7 +273,7 @@
         <mat-selection-list #additional (selectionChange)="onChange(additional.selectedOptions.selected)"
                             class="app-class">
           <mat-divider></mat-divider>
-          @for (it of additionalList; track it) {
+          @for (it of additionalList; track it.id) {
             <mat-list-option [selected]="isSelected(it)" [value]="it" togglePosition="before" lines="3">
               <div matListItemTitle>{{ it.name }}
                 ({{ room.value.currency | currencySymbol }} {{ it.price | number:'1.2-2' }} -
@@ -352,7 +352,7 @@
   </ng-template>
 
   <ng-template #stepSix>
-    @for (dataEvent of dataEvents | keyvalue; track dataEvent; let last = $last) {
+    @for (dataEvent of dataEvents | keyvalue; track dataEvent.key; let last = $last) {
       <mwl-calendar-week-view
         (beforeViewRender)="beforeMonthViewRender($event, dataEvent.value)"
         (eventTimesChanged)="eventTimesChanged($event, dataEvent.value)"
@@ -447,7 +447,7 @@
               </mat-list-item>
               <mat-divider></mat-divider>
               <div mat-subheader>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</div>
-              @for (it of additionalSelected; track it) {
+              @for (it of additionalSelected; track it.id) {
                 <mat-list-item lines="3">
                   <mat-icon matListItemIcon>add_post</mat-icon>
                   <div matListItemTitle>
@@ -476,7 +476,7 @@
             }
             <mat-divider></mat-divider>
             <div mat-subheader>{{ 'RESERVATION.APPOINTMENT' | translate }}</div>
-            @for (eventGroup of events.value; track eventGroup) {
+            @for (eventGroup of events.value; track eventGroup.event?.id || $index) {
               @if (eventGroup.event) {
                 <mat-list-item>
                   <mat-icon matListItemIcon>event</mat-icon>
@@ -581,7 +581,7 @@
         </div>
         <div class="divider">
           @if (!isEditing) {
-            <button type="button" (click)="back" color="accent" class="icon-button" mat-fab>
+            <button type="button" (click)="back()" color="accent" class="icon-button" mat-fab>
               <mat-icon>arrow_upward</mat-icon>
             </button>
           } @else {
@@ -601,7 +601,7 @@
         <ng-container *ngTemplateOutlet="stepThree"></ng-container>
         <div class="divider">
           @if (!isEditing || (isEditing && isAdmin)) {
-            <button type="button" (click)="back" color="accent" class="icon-button" mat-fab>
+            <button type="button" (click)="back()" color="accent" class="icon-button" mat-fab>
               <mat-icon>arrow_upward</mat-icon>
             </button>
           } @else {
@@ -620,7 +620,7 @@
         <ng-template matStepLabel>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepFour"></ng-container>
         <div class="divider">
-          <button type="button" (click)="back" color="accent" class="icon-button" mat-fab>
+          <button type="button" (click)="back()" color="accent" class="icon-button" mat-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
           <button type="button" (click)="callStepFive(true)" color="primary" class="icon-button" mat-fab
@@ -636,7 +636,7 @@
           <ng-container *ngTemplateOutlet="stepFive"></ng-container>
         </div>
         <div>
-          <button type="button" (click)="back" color="accent" class="icon-button" mat-fab>
+          <button type="button" (click)="back()" color="accent" class="icon-button" mat-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
           <button type="button" (click)="callStepSix(true)" [disabled]="configurationForm.invalid" color="primary"
@@ -650,7 +650,7 @@
         <ng-template matStepLabel>{{ 'RESERVATION.SCHEDULE.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepSix"></ng-container>
         <div class="divider">
-          <button type="button" (click)="back" color="accent" class="icon-button" mat-fab>
+          <button type="button" (click)="back()" color="accent" class="icon-button" mat-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
           <button type="button" (click)="callStepSeven(true)" [disabled]="eventGroup.invalid" color="primary"
@@ -664,10 +664,10 @@
         <ng-template matStepLabel>{{ 'RESERVATION.PREVIEW' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepSeven"></ng-container>
         <div class="divider">
-          <button type="button" (click)="back" color="accent" class="icon-button" mat-fab>
+          <button type="button" (click)="back()" color="accent" class="icon-button" mat-fab>
             <mat-icon>arrow_upward</mat-icon>
           </button>
-          <button type="button" (click)="create" color="primary" class="icon-button" mat-fab name="create">
+          <button type="button" (click)="create()" color="primary" class="icon-button" mat-fab name="create">
             <mat-icon>add_task</mat-icon>
           </button>
         </div>
@@ -746,7 +746,7 @@
         </div>
         <div class="divider">
           @if (!isEditing) {
-            <button type="button" (click)="back" color="accent" class="icon-button" mat-fab extended>
+            <button type="button" (click)="back()" color="accent" class="icon-button" mat-fab extended>
               {{ 'COMMON.BUTTON.BACK' | translate }}
               <mat-icon>arrow_back</mat-icon>
             </button>
@@ -769,7 +769,7 @@
         <ng-container *ngTemplateOutlet="stepThree"></ng-container>
         <div>
           @if (!isEditing || (isEditing && isAdmin)) {
-            <button type="button" (click)="back" color="accent" mat-fab extended class="icon-button">
+            <button type="button" (click)="back()" color="accent" mat-fab extended class="icon-button">
               <mat-icon>arrow_back</mat-icon>
               {{ 'COMMON.BUTTON.BACK' | translate }}
             </button>
@@ -792,7 +792,7 @@
         <ng-template matStepLabel>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepFour"></ng-container>
         <div>
-          <button type="button" (click)="back" color="accent" mat-fab extended class="icon-button">
+          <button type="button" (click)="back()" color="accent" mat-fab extended class="icon-button">
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
@@ -810,7 +810,7 @@
           <ng-container *ngTemplateOutlet="stepFive"></ng-container>
         </div>
         <div>
-          <button type="button" (click)="back" color="accent" mat-fab extended class="icon-button">
+          <button type="button" (click)="back()" color="accent" mat-fab extended class="icon-button">
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
@@ -826,7 +826,7 @@
         <ng-template matStepLabel>{{ 'RESERVATION.SCHEDULE.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepSix"></ng-container>
         <div class="divider">
-          <button type="button" (click)="back" color="accent" mat-fab extended class="icon-button">
+          <button type="button" (click)="back()" color="accent" mat-fab extended class="icon-button">
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
@@ -842,11 +842,11 @@
         <ng-template matStepLabel>{{ 'RESERVATION.PREVIEW' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepSeven"></ng-container>
         <div class="divider">
-          <button type="button" (click)="back" color="accent" mat-fab extended class="icon-button">
+          <button type="button" (click)="back()" color="accent" mat-fab extended class="icon-button">
             <mat-icon>arrow_back</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
-          <button (click)="create" color="primary" mat-fab extended class="icon-button" type="button" name="create">
+          <button (click)="create()" color="primary" mat-fab extended class="icon-button" type="button" name="create">
             <mat-icon>add_task</mat-icon>
             {{ 'COMMON.BUTTON.BOOK' | translate }}
           </button>

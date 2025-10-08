@@ -35,6 +35,7 @@ import { MiniCardComponent } from './mini-card/mini-card.component';
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';
 import { CardComponent } from '../shared/card/card.component';
 import { ChartComponent } from '../shared/chart/chart.component';
+import { IError } from '../interfaces/common';
 
 @Component({
   selector: 'app-dash',
@@ -44,7 +45,7 @@ import { ChartComponent } from '../shared/chart/chart.component';
 })
 export class DashComponent implements OnInit, OnDestroy {
   state: any;
-  error: any;
+  error?: IError;
   mapDashboard?: Map<string, IDashboard>;
   selectedDash = new UntypedFormControl();
   roomId?: string;
@@ -86,7 +87,6 @@ export class DashComponent implements OnInit, OnDestroy {
   private isDarkMode?: boolean;
   private periodStart?: Date;
   private readonly language: string;
-  private calendarEnd: Date = new Date();
 
   constructor(public dialog: MatDialog, private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
               private readonly translate: TranslateService, private router: Router,
@@ -261,7 +261,6 @@ export class DashComponent implements OnInit, OnDestroy {
 
   beforeMonthViewRender = ({ body, period }: { body: CalendarMonthViewDay<IMeta>[]; period: any }): void => {
     this.periodStart = period.start;
-    this.calendarEnd = period.end;
     this.calendar.calendarStart = period.start;
     this.calendar.calendarEnd = period.end;
     this.calendar.createRecurring();
@@ -468,7 +467,7 @@ export class DashComponent implements OnInit, OnDestroy {
     this.getEvents();
     this.isLoading = true;
     this.store.dispatch(
-      new fromActionsDashboard.GetSummaries(this.viewDate),
+      new fromActionsDashboard.GetCards(this.viewDate),
     );
   };
 
@@ -476,12 +475,12 @@ export class DashComponent implements OnInit, OnDestroy {
     this.calendar.resetEvents();
     this.isCalendarLoading = true;
     this.store.dispatch(
-      new fromActionsDashboard.EventsSummaries(this.viewDate),
+      new fromActionsDashboard.GetEvents(this.viewDate),
     );
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.errorMessage) {
         this.state = state;
         this.error = state.errorMessage;

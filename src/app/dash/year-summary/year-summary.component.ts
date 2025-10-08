@@ -82,17 +82,6 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     this.language = this.translate.currentLang;
   }
 
-  get exportAction(): void {
-    if (this.date.value) {
-      if (this.export) {
-        this.exportToExcel();
-      } else {
-        this.getExportData(this.date.value.getFullYear());
-      }
-    }
-    return;
-  }
-
   ngOnInit(): void {
     this.subscribe();
     this.clean();
@@ -107,6 +96,17 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+  }
+
+  exportAction(): void {
+    if (this.date.value) {
+      if (this.export) {
+        this.exportToExcel();
+      } else {
+        this.getExportData(this.date.value.getFullYear());
+      }
+    }
+    return;
   }
 
   setYear = (normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void => {
@@ -285,7 +285,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
   private clean = (): void => this.store.dispatch(new fromActionsDashboard.Clean());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (!this.yearSummaryMap) {
         this.yearSummaryMap = state.yearSummaryMap;
         if (this.yearSummaryMap) {

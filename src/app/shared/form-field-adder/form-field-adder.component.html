@@ -4,7 +4,7 @@
     <ng-container matColumnDef="header">
       <th mat-header-cell *matHeaderCellDef colspan="4">
         <div class="header-container">
-          <button class="align-start" mat-fab type="button" color="accent" (click)="addRow"
+          <button class="align-start" mat-fab type="button" color="accent" (click)="addRow()"
                   [disabled]="formGroup.invalid">
             <mat-icon>forms_add_on</mat-icon>
           </button>
@@ -41,7 +41,7 @@
           }
         </mat-form-field>
       </td>
-      <td mat-footer-cell *matFooterCellDef class="bold"> {{ total | currency: currency.code: 'symbol': '1.2-2' }}</td>
+      <td mat-footer-cell *matFooterCellDef class="bold"> {{ total() | currency: currency.code: 'symbol': '1.2-2' }}</td>
     </ng-container>
 
     <!-- Type Column -->
@@ -80,7 +80,7 @@
     <ng-container matColumnDef="disclaimer">
       <td mat-footer-cell *matFooterCellDef colspan="4">
         <p
-          [innerHTML]="'RESERVATION.TREATMENT.EXTRAS.REMAINS' | translate: {toPaid: remainsToBeSplit | currency: currency.code: 'symbol': '1.2-2'}">
+          [innerHTML]="'RESERVATION.TREATMENT.EXTRAS.REMAINS' | translate: {toPaid: remainsToBeSplit() | currency: currency.code: 'symbol': '1.2-2'}">
         </p>
       </td>
     </ng-container>

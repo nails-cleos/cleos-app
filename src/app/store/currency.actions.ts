@@ -1,78 +1,75 @@
 import { Action } from '@ngrx/store';
+import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { ICurrency } from '../interfaces/currency';
+import { Pagination } from '../interfaces/pagination';
 
 export enum CurrencyActionTypes {
   getCurrenciesPage = '[Currency] Get currencies page',
   currencySuccess = '[Currency] Success',
   createCurrency = '[Currency] Create currency',
-  updateCurrencyById = '[Currency] Update currency by id',
+  updateCurrency = '[Currency] Update currency by id',
   currencySaveSuccess = '[Currency] Save Success',
   currencyFailure = '[Currency] Failure',
   currencySelected = '[Currency] Selected',
-  findCurrencyById = '[Currency] Find currency by id',
-  deleteCurrencyById = '[Currency] Delete currency by id',
+  getCurrency = '[Currency] Find currency by id',
+  deleteCurrency = '[Currency] Delete currency by id',
   clean = '[Currency] Clean'
 }
 
-export class GetCurrenciesPage implements Action {
+export class GetCurrenciesPage extends PageRequest implements Action {
   readonly type = CurrencyActionTypes.getCurrenciesPage;
-
-  constructor(public payload: any) {
-  }
 }
 
 export class CurrencySuccess implements Action {
   readonly type = CurrencyActionTypes.currencySuccess;
 
-  constructor(public payload: any) {
+  constructor(public data: Pagination<ICurrency>) {
   }
 }
 
 export class CreateCurrency implements Action {
   readonly type = CurrencyActionTypes.createCurrency;
 
-  constructor(public payload: any) {
+  constructor(public currency: ICurrency) {
   }
 }
 
-export class UpdateCurrencyById implements Action {
-  readonly type = CurrencyActionTypes.updateCurrencyById;
+export class UpdateCurrency implements Action {
+  readonly type = CurrencyActionTypes.updateCurrency;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public currency: ICurrency) {
   }
 }
 
-export class CurrencySaveSuccess implements Action {
+export class CurrencySaveSuccess extends ResponseSuccess implements Action {
   readonly type = CurrencyActionTypes.currencySaveSuccess;
-
-  constructor(public payload: any) {
-  }
 }
 
 export class CurrencyFailure implements Action {
   readonly type = CurrencyActionTypes.currencyFailure;
 
-  constructor(public payload: any) {
+  constructor(public error: IError) {
   }
 }
 
 export class CurrencySelected implements Action {
   readonly type = CurrencyActionTypes.currencySelected;
 
-  constructor(public payload: any) {
+  constructor(public selected?: ICurrency) {
   }
 }
 
-export class FindCurrencyById implements Action {
-  readonly type = CurrencyActionTypes.findCurrencyById;
+export class GetCurrency implements Action {
+  readonly type = CurrencyActionTypes.getCurrency;
 
-  constructor(public payload: any) {
+  constructor(public id: string) {
   }
 }
 
-export class DeleteCurrencyById implements Action {
-  readonly type = CurrencyActionTypes.deleteCurrencyById;
+export class DeleteCurrency implements Action {
+  readonly type = CurrencyActionTypes.deleteCurrency;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public code: string) {
   }
 }
 
@@ -83,11 +80,11 @@ export class Clean implements Action {
 export type All =
   | GetCurrenciesPage
   | CreateCurrency
-  | UpdateCurrencyById
+  | UpdateCurrency
   | CurrencySuccess
   | CurrencySaveSuccess
   | CurrencyFailure
-  | FindCurrencyById
+  | GetCurrency
   | CurrencySelected
-  | DeleteCurrencyById
+  | DeleteCurrency
   | Clean;

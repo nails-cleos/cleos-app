@@ -249,7 +249,7 @@
              [@bottomTop]="{value:contactItem2State.value, params: {delayIn: isSmall ? '0ms' : '500ms', delayOut: '0ms'}}">
           <h3 class="bold no-content">{{ 'MAIN.CONTACT.SEND.TITLE' | translate }}</h3>
 
-          <form (ngSubmit)="sendEmail" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+          <form (ngSubmit)="sendEmail()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
             <div class="home-page-form inner-container">
               <div class="contact-inner-container">
                 <mat-form-field class="full full-margin">
@@ -338,13 +338,13 @@
 </section>
 <!-- End Contact Us-->
 
-<button color="primary" class="hide-xs book-button fab-book-button" (click)="openBottomSheet" mat-fab
+<button color="primary" class="hide-xs book-button fab-book-button" (click)="openBottomSheet()" mat-fab
         extended type="button" aria-label="Book your appointment">
   <mat-icon matPrefix>book_online</mat-icon>
   <span>{{ 'MAIN.BOOK.APPOINTMENT' | translate }}</span>
 </button>
 
-<button color="primary" class="hide-gt-xs book-button raised-book-button" style="height: 64px" (click)="openBottomSheet"
+<button color="primary" class="hide-gt-xs book-button raised-book-button" style="height: 64px" (click)="openBottomSheet()"
         mat-raised-button type="button" aria-label="Book your appointment">
   <mat-icon matPrefix>book_online</mat-icon>
   <span>{{ 'MAIN.BOOK.APPOINTMENT' | translate }}</span>

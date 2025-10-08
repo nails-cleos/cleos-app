@@ -1,31 +1,33 @@
 import { IMenu, IUser } from '../../interfaces/user';
 import { All, AuthActionTypes } from '../auth.actions';
+import { IError, IResponseSuccess } from '../../interfaces/common';
+import { Params } from '@angular/router';
 
 export interface State {
   isAuthenticated: boolean;
   redirect: boolean;
   isLoading: boolean;
-  user: IUser | null;
-  token: null;
-  menus: IMenu[] | null;
-  errorMessage: string | null;
-  error: any;
-  message: string | null;
-  subErrors: any;
-  queryParams: any;
+  user?: IUser;
+  token?: string;
+  menus?: IMenu[];
+  errorMessage?: string;
+  error?: IError;
+  response?: IResponseSuccess;
+  subErrors?: IError[];
+  queryParams?: Params;
 }
 
 export const initialState: State = {
   isAuthenticated: false,
   redirect: false,
   isLoading: false,
-  user: null,
-  token: null,
-  menus: null,
-  errorMessage: null,
-  error: null,
-  message: null,
-  subErrors: null,
+  user: undefined,
+  token: undefined,
+  menus: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  response: undefined,
+  subErrors: undefined,
   queryParams: {},
 };
 
@@ -34,10 +36,10 @@ export const reducer = (state = initialState, action: All): State => {
     case AuthActionTypes.login: {
       return {
         ...state,
-        errorMessage: null,
-        error: null,
-        message: null,
-        subErrors: null,
+        errorMessage: undefined,
+        error: undefined,
+        response: undefined,
+        subErrors: undefined,
         isLoading: true,
         redirect: false,
       };
@@ -47,10 +49,10 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         isLoading: false,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        message: null,
-        subErrors: action.payload.error.subErrors,
+        errorMessage: action.error.message,
+        error: action.error,
+        response: undefined,
+        subErrors: action.error.subErrors,
         redirect: false,
       };
     }
@@ -59,20 +61,13 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         isLoading: false,
         isAuthenticated: true,
-        user: action.payload.response.user,
-        token: action.payload.response.tokenAccess,
-        menus: action.payload.response.menus,
-        errorMessage: null,
-        message: null,
-        subErrors: null,
-        queryParams: action.payload.queryParams,
-        redirect: false,
-      };
-    }
-    case AuthActionTypes.refreshToken: {
-      return {
-        ...state,
-        token: action.payload.refreshToken,
+        user: action.token.user,
+        token: action.token.tokenAccess,
+        menus: action.token.menus,
+        errorMessage: undefined,
+        response: undefined,
+        subErrors: undefined,
+        queryParams: action.queryParams,
         redirect: false,
       };
     }
@@ -87,9 +82,9 @@ export const reducer = (state = initialState, action: All): State => {
         ...state,
         isLoading: false,
         isAuthenticated: false,
-        errorMessage: null,
-        message: action.payload.message,
-        subErrors: null,
+        errorMessage: undefined,
+        response: action,
+        subErrors: undefined,
         redirect: false,
       };
     }
@@ -97,10 +92,10 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         isLoading: false,
-        errorMessage: null,
-        message: null,
-        subErrors: null,
-        queryParams: null,
+        errorMessage: undefined,
+        response: undefined,
+        subErrors: undefined,
+        queryParams: undefined,
         redirect: false,
       };
     }

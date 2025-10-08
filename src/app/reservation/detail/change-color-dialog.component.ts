@@ -86,11 +86,11 @@ export class ChangeColorDialogComponent implements OnInit, OnDestroy {
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
   private getColors = (): void => this.store.dispatch(
-    new fromActionsReservation.FindColorsByTreatmentId(this.treatmentId),
+    new fromActionsReservation.GetColorsByTreatmentId(this.treatmentId),
   );
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.colors = state.colors;
       this.color.setValue(this.colors?.find(color => color.id === this.data.colorId));
     });

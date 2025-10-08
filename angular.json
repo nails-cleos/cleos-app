@@ -12,9 +12,6 @@
         },
         "@schematics/angular:service": {
           "skipTests": false
-        },
-        "@schematics/angular:cypress-component": {
-          "generateTests": false
         }
       },
       "root": "",
@@ -210,7 +207,13 @@
               "zone.js"
             ],
             "tsConfig": "tsconfig.spec.json",
-            "karmaConfig": "karma.conf.js",
+            "karmaConfig": "karma.conf.ts",
+            "codeCoverage": true,
+            "codeCoverageExclude": [
+              "src/app/**/*.actions.ts",
+              "src/app/**/*.reducers.ts",
+              "src/app/**/*.effects.ts"
+            ],
             "assets": [
               "src/favicon.ico",
               "src/assets",
@@ -240,7 +243,9 @@
           "options": {
             "lintFilePatterns": [
               "src/**/*.ts",
-              "src/**/*.html"
+              "src/**/*.html",
+              "cypress/**/*.ts",
+              "cypress/**/*.js"
             ]
           }
         },
@@ -305,15 +310,11 @@
     },
     "@schematics/angular:service": {
       "skipTests": false
-    },
-    "@schematics/angular:cypress-component": {
-      "generateTests": false
     }
   },
   "cli": {
     "analytics": false,
     "schematicCollections": [
-      "@cypress/schematic",
       "@schematics/angular"
     ]
   }

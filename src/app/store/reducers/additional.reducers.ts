@@ -1,27 +1,28 @@
 import { Pagination } from '../../interfaces/pagination';
 import { AdditionalActionTypes, All } from '../additional.actions';
-import { IAdditional } from '../../interfaces/additional';
+import { IAdditional, IAdditionalAll } from '../../interfaces/additional';
 import { ITreatmentGroup } from '../../interfaces/treatment';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 
 export interface State {
-  data: IAdditional | Pagination<IAdditional> | null;
-  groups: ITreatmentGroup[] | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  selected: IAdditional | null;
-  message: string | null;
+  response?: IResponseSuccess;
+  data?: Pagination<IAdditional> | IAdditionalAll[];
+  groups?: ITreatmentGroup[];
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
+  selected?: IAdditional;
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  data: null,
-  groups: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  selected: null,
-  message: null,
+  response: undefined,
+  data: undefined,
+  groups: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  selected: undefined,
   isLoading: false,
 };
 
@@ -31,96 +32,86 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IAdditional>,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
       };
     }
     case AdditionalActionTypes.getAdditionalList: {
       return {
         ...state,
-        data: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        data: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
-    case AdditionalActionTypes.findAdditionalById: {
+    case AdditionalActionTypes.getAdditional: {
       return {
         ...state,
-        data: {} as IAdditional,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: {} as IAdditional,
       };
     }
     case AdditionalActionTypes.additionalSuccess: {
       return {
         ...state,
-        data: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        data: action.data,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case AdditionalActionTypes.additionalSaveSuccess: {
       return {
         ...state,
-        message: action.payload.message,
-        selected: null,
-        errorMessage: null,
-        subErrors: null,
+        response: action,
+        selected: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
         isLoading: false,
       };
     }
     case AdditionalActionTypes.additionalSelected: {
       return {
         ...state,
-        selected: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        selected: action.selected,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case AdditionalActionTypes.additionalFailure: {
       return {
         ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
-        message: null,
+        errorMessage: action.error.message,
+        error: action.error,
+        subErrors: action.error.subErrors,
         isLoading: false,
       };
     }
-    case AdditionalActionTypes.updateAdditionalById:
+    case AdditionalActionTypes.updateAdditional:
     case AdditionalActionTypes.createAdditional:
-    case AdditionalActionTypes.deleteAdditionalById: {
+    case AdditionalActionTypes.deleteAdditional: {
       return {
         ...state,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
         isLoading: true,
       };
     }
     case AdditionalActionTypes.getAllTreatmentsGroup: {
       return {
         ...state,
-        groups: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        groups: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case AdditionalActionTypes.findGroupsSuccess: {
       return {
         ...state,
-        groups: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        groups: action.groups,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case AdditionalActionTypes.clean: {

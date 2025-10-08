@@ -92,7 +92,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     } else {
       expense.id = this.id;
       this.store.dispatch(
-        new fromActionsExpense.UpdateExpenseById(this.roomId, expense),
+        new fromActionsExpense.UpdateExpense(this.roomId, expense),
       );
     }
     return;
@@ -219,7 +219,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   private getExpenseInfo = (): void => this.store.dispatch(new fromActionsExpense.GetAllExpensesInfo(this.roomId!));
 
   private getExpense = (): void => this.store.dispatch(
-    new fromActionsExpense.FindExpenseById(this.roomId!, this.id!),
+    new fromActionsExpense.GetExpense(this.roomId!, this.id!),
   );
 
   private clean = (): void => {
@@ -232,7 +232,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.supplyStores = state.info?.supplyStores;
       this.types = state.info?.types;
       this.roomName = state.info?.roomName;
@@ -263,7 +263,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
-      } else if (state.message) {
+      } else if (state.response) {
         if (this.isAddMode && this.createAnother) {
           this.form.reset();
           this.form.markAsPristine({ emitEvent: false });

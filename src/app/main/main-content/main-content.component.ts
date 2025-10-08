@@ -1,4 +1,13 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { ITreatmentGroup } from '../../interfaces/treatment';
 import { BehaviorSubject, interval, Observable, Subscription } from 'rxjs';
 import { IExperience, ISlide, ISocialLink, IStory, IWork } from '../../interfaces/main';
@@ -6,7 +15,6 @@ import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } 
 import { Store } from '@ngrx/store';
 import { AppState, selectMainState } from '../../store/app.states';
 import { TranslateService } from '@ngx-translate/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import * as fromActionsMain from '../../store/main.actions';
 import { AuthUserService } from '../../services/auth-user.service';
 import {
@@ -28,10 +36,13 @@ import { AnimationAnimateMetadata, AnimationSequenceMetadata } from '@angular/an
 import { isMobile } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MainContentService } from '../main-content.service';
-import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Router } from '@angular/router';
 import { SharedModule } from '../../shared/shared.module';
 import { AnimateDirective } from '../../directives/animate.directive';
+import { ResponseSuccess } from '../../interfaces/common';
+import { ToastService } from '../../services/toast.service';
+import { BottomSheetBookAppointmentComponent } from './bottom-sheet-book-appointment';
 
 @Component({
   selector: 'app-main-content',
@@ -49,363 +60,319 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('contactItem2', { static: false }) private contactItem2?: ElementRef<HTMLDivElement>;
   @ViewChild('contactItem3', { static: false }) private contactItem3?: ElementRef<HTMLDivElement>;
 
-  treatmentItemState: BehaviorSubject<'open' | 'close'>;
-  storyDescriptionState: BehaviorSubject<'open' | 'close'>;
-  storyMemberState: BehaviorSubject<'open' | 'close'>;
-  contactItem1State: BehaviorSubject<'open' | 'close'>;
-  contactItem2State: BehaviorSubject<'open' | 'close'>;
-  contactItem3State: BehaviorSubject<'open' | 'close'>;
+  private store: Store<AppState> = inject(Store<AppState>);
+  private toastService: ToastService = inject(ToastService);
+  private cdRef: ChangeDetectorRef = inject(ChangeDetectorRef);
+  private formBuilder: UntypedFormBuilder = inject(UntypedFormBuilder);
+  private authUserService: AuthUserService = inject(AuthUserService);
+  private mainContent: MainContentService = inject(MainContentService);
+  private bottomSheet: MatBottomSheet = inject(MatBottomSheet);
+  private translate: TranslateService = inject(TranslateService);
+  private router: Router = inject(Router);
 
-  treatmentTitle: AnimationAnimateMetadata;
-  storyTitle: AnimationSequenceMetadata;
-  workText: AnimationSequenceMetadata;
-  experienceTitle: AnimationSequenceMetadata;
-  contactTitle: AnimationSequenceMetadata;
-  contactText: AnimationSequenceMetadata;
-  contactMap: AnimationAnimateMetadata;
-  faqTitle: AnimationAnimateMetadata;
-  isSmall: boolean;
-  isDark: boolean;
+  treatmentItemState: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('open');
+  storyDescriptionState: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('open');
+  storyMemberState: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('open');
+  contactItem1State: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('open');
+  contactItem2State: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('open');
+  contactItem3State: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('open');
+
+  treatmentTitle: AnimationAnimateMetadata = bounceInDownAnimation('500ms');
+  storyTitle: AnimationSequenceMetadata = fadeInUpDown('20px', '700ms');
+  workText: AnimationSequenceMetadata = gelatine;
+  experienceTitle: AnimationSequenceMetadata = rubberBand;
+  contactTitle: AnimationSequenceMetadata = fadeInUpDown('20px', '500ms');
+  contactText: AnimationSequenceMetadata = rubberBand;
+  contactMap: AnimationAnimateMetadata = bounceInDownAnimation('500ms');
+  faqTitle: AnimationAnimateMetadata = bounceInDownAnimation('500ms');
+
+  isSmall: boolean = isMobile();
+  isDark: boolean = false;
   form!: UntypedFormGroup;
   groups: ITreatmentGroup[] = [];
 
   name: UntypedFormControl = new UntypedFormControl('', [
-  	Validators.required,
+    Validators.required,
   ]);
   email: UntypedFormControl = new UntypedFormControl('', [
-  	Validators.required, Validators.email,
+    Validators.required, Validators.email,
   ]);
   subject: UntypedFormControl = new UntypedFormControl('', [
-  	Validators.required,
+    Validators.required,
   ]);
   body: UntypedFormControl = new UntypedFormControl('', [
-  	Validators.required,
+    Validators.required,
   ]);
 
   // Images 768x1024
   slides: ISlide[] = [
-  	{ id: 'c7ae73b1-c6be-4848-9f84-cbf451e8ee59', image: 'assets/home_page/img/b1.webp', order: 0 },
-  	{ id: '3e989461-81b2-4723-9fa3-746c05fd69a2', image: 'assets/home_page/img/b2.webp', order: 1 },
-  	{ id: '25e33d58-34c3-4e55-b4e4-885f177fb570', image: 'assets/home_page/img/b3.webp', order: 2 },
+    { id: 'c7ae73b1-c6be-4848-9f84-cbf451e8ee59', image: 'assets/home_page/img/b1.webp', order: 0 },
+    { id: '3e989461-81b2-4723-9fa3-746c05fd69a2', image: 'assets/home_page/img/b2.webp', order: 1 },
+    { id: '25e33d58-34c3-4e55-b4e4-885f177fb570', image: 'assets/home_page/img/b3.webp', order: 2 },
   ];
-  socialLinks: ISocialLink[];
+  socialLinks: ISocialLink[] = [
+    {
+      name: 'WHATSAPP',
+      delay: '1000ms',
+      href: 'https://api.whatsapp.com/send?phone=',
+      svgIcon: 'WHATSAPP-NO-COLOR',
+      phone: 'MAIN.CONTACT.SEND.PHONE',
+      phoneKey: '&text=',
+      phoneText: 'MAIN.CONTACT.SEND.HELLO',
+    }, {
+      name: 'INSTAGRAM',
+      delay: '1100ms',
+      href: 'https://www.instagram.com/carlanailscleos.nl/',
+      svgIcon: 'INSTAGRAM-NO-COLOR',
+    }, {
+      name: 'FACEBOOK',
+      delay: '1200ms',
+      href: 'https://www.facebook.com/carlanailscleos.nl/',
+      svgIcon: 'FACEBOOK-NO-COLOR',
+    },
+  ];
   works: IWork[] = [];
   allWorks: IWork[] = [];
-  filter: BehaviorSubject<ITreatmentGroup | undefined>;
-  experiences: IExperience[];
-  stories: IStory[];
-  currentIndex: number;
+  filter: BehaviorSubject<ITreatmentGroup | undefined> = new BehaviorSubject<ITreatmentGroup | undefined>(undefined);
+  experiences: IExperience[] = [
+    {
+      id: 'experienceItem1',
+      state: new BehaviorSubject<'open' | 'close'>('open'),
+      delay: '0ms',
+      delayOut: '900ms',
+      icon: 'waving_hand',
+      position: '1°',
+      text: 'MAIN.EXPERIENCE.TEXT_1',
+    }, {
+      id: 'experienceItem2',
+      state: new BehaviorSubject<'open' | 'close'>('open'),
+      delay: this.isSmall ? '0ms' : '300ms',
+      delayOut: '600ms',
+      icon: 'coffee',
+      position: '2°',
+      text: 'MAIN.EXPERIENCE.TEXT_2',
+    }, {
+      id: 'experienceItem3',
+      state: new BehaviorSubject<'open' | 'close'>('open'),
+      delay: this.isSmall ? '0ms' : '600ms',
+      delayOut: '300ms',
+      icon: 'palette',
+      position: '3°',
+      text: 'MAIN.EXPERIENCE.TEXT_3',
+    }, {
+      id: 'experienceItem4',
+      state: new BehaviorSubject<'open' | 'close'>('open'),
+      delay: this.isSmall ? '0ms' : '900ms',
+      delayOut: '0ms',
+      icon: 'mood',
+      position: '4°',
+      text: 'MAIN.EXPERIENCE.TEXT_4',
+    },
+  ];
+  stories: IStory[] = [
+    {
+      id: 'storyItem1',
+      state: new BehaviorSubject<'open' | 'close'>('open'),
+      delay: '100ms',
+      text: 'MAIN.STORY.TEXT_1',
+    }, {
+      id: 'storyItem2',
+      state: new BehaviorSubject<'open' | 'close'>('open'),
+      delay: '200ms',
+      text: 'MAIN.STORY.TEXT_2',
+    }, {
+      id: 'storyItem3',
+      state: new BehaviorSubject<'open' | 'close'>('open'),
+      delay: '300ms',
+      text: 'MAIN.STORY.TEXT_3',
+    }, {
+      id: 'storyItem4',
+      state: new BehaviorSubject<'open' | 'close'>('open'),
+      delay: '400ms',
+      text: 'MAIN.STORY.TEXT_4',
+    }, {
+      id: 'storyItem5',
+      state: new BehaviorSubject<'open' | 'close'>('open'),
+      delay: '500ms',
+      text: 'MAIN.STORY.TEXT_5',
+    },
+  ];
+  currentIndex: number = 0;
 
   private isAuthenticated = false;
   private subscription?: Subscription;
-  private authUserServiceSubscription: Subscription;
+  private authUserServiceSubscription?: Subscription;
   private sliderSubscription?: Subscription;
   private filterSubscription?: Subscription;
-  private getState: Observable<any>;
+  private getState: Observable<any> = this.store.select(selectMainState);
 
-  constructor(private store: Store<AppState>, private cdRef: ChangeDetectorRef, private formBuilder: UntypedFormBuilder,
-              private snackBar: MatSnackBar, private authUserService: AuthUserService,
-              breakpointObserver: BreakpointObserver, private mainContent: MainContentService,
-              private bottomSheet: MatBottomSheet, private translate: TranslateService, private router: Router) {
-  	this.currentIndex = 0;
-  	this.isSmall = isMobile();
-  	this.isDark = false;
-  	this.socialLinks = this.allSocialLinks();
-  	this.stories = this.allStories();
-  	this.experiences = this.allExperience();
-  	this.filter = new BehaviorSubject<ITreatmentGroup | undefined>(undefined);
-
-  	this.treatmentTitle = bounceInDownAnimation('500ms');
-  	this.storyTitle = fadeInUpDown('20px', '700ms');
-  	this.workText = gelatine;
-  	this.experienceTitle = rubberBand;
-  	this.treatmentItemState = new BehaviorSubject<'open' | 'close'>('open');
-  	this.storyDescriptionState = new BehaviorSubject<'open' | 'close'>('open');
-  	this.storyMemberState = new BehaviorSubject<'open' | 'close'>('open');
-  	this.contactItem1State = new BehaviorSubject<'open' | 'close'>('open');
-  	this.contactItem2State = new BehaviorSubject<'open' | 'close'>('open');
-  	this.contactItem3State = new BehaviorSubject<'open' | 'close'>('open');
-  	this.contactText = rubberBand;
-  	this.contactTitle = fadeInUpDown('20px', '500ms');
-  	this.contactMap = bounceInDownAnimation('500ms');
-  	this.faqTitle = bounceInDownAnimation('500ms');
-
-  	this.getState = this.store.select(selectMainState);
-  	this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
-  		this.isAuthenticated = value.isAuthenticated;
-  		if (this.isAuthenticated) {
-  			this.email.setValue(value.email);
-  			this.name.setValue(value.displayName);
-  		}
-  		this.isDark = value.isDarkMode;
-  	});
-
-  	breakpointObserver.observe([
-  		Breakpoints.XSmall,
-  		Breakpoints.Small,
-  	]).subscribe(result => this.isSmall = result.matches);
-  }
-
-  get openBottomSheet(): void {
-  	this.bottomSheet.open(BottomSheetBookAppointmentComponent);
-  	return;
-  }
-
-  get sendEmail(): void {
-  	if (!this.form.invalid) {
-  		this.store.dispatch(
-  			new fromActionsMain.SendMessage(this.form.value),
-  		);
-  	}
-  	return;
+  constructor(breakpointObserver: BreakpointObserver) {
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small,
+    ]).subscribe(result => this.isSmall = result.matches);
   }
 
   ngOnInit(): void {
-  	this.clean();
-  	this.createForm();
-  	this.subscribe();
-  	this.cdRef.detectChanges();
-  	this.filterSubscription = this.filter.subscribe(group => {
-  		setTimeout(() => {
-  			if (group) {
-  				this.works = this.allWorks.filter(p => p.group.id === group.id);
-  			} else {
-  				this.works = this.allWorks;
-  			}
-  		}, 500);
-  	});
-  	this.groups = this.translate.instant('TREATMENTS');
+    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
+      this.isAuthenticated = value.isAuthenticated;
+      if (this.isAuthenticated) {
+        this.email.setValue(value.email);
+        this.name.setValue(value.displayName);
+      }
+      this.isDark = value.isDarkMode;
+    });
+    this.clean();
+    this.createForm();
+    this.subscribe();
+    this.cdRef.detectChanges();
+    this.filterSubscription = this.filter.subscribe(group => {
+      setTimeout(() => {
+        if (group) {
+          this.works = this.allWorks.filter(p => p.group.id === group.id);
+        } else {
+          this.works = this.allWorks;
+        }
+      }, 500);
+    });
+    this.groups = this.translate.instant('TREATMENTS');
   }
 
   ngAfterViewInit(): void {
-  	observeElement(this.treatmentItemState, this.serviceItem?.nativeElement, !this.isSmall);
-  	observeElement(this.storyDescriptionState, this.storyDescription?.nativeElement, !this.isSmall, 0.1);
-  	observeElement(this.storyMemberState, this.storyItem6?.nativeElement, !this.isSmall, 0.1);
-  	observeElement(this.contactItem1State, this.contactItem1?.nativeElement, !this.isSmall);
-  	observeElement(this.contactItem2State, this.contactItem2?.nativeElement, !this.isSmall);
-  	observeElement(this.contactItem3State, this.contactItem3?.nativeElement, !this.isSmall);
+    observeElement(this.treatmentItemState, this.serviceItem?.nativeElement, !this.isSmall);
+    observeElement(this.storyDescriptionState, this.storyDescription?.nativeElement, !this.isSmall, 0.1);
+    observeElement(this.storyMemberState, this.storyItem6?.nativeElement, !this.isSmall, 0.1);
+    observeElement(this.contactItem1State, this.contactItem1?.nativeElement, !this.isSmall);
+    observeElement(this.contactItem2State, this.contactItem2?.nativeElement, !this.isSmall);
+    observeElement(this.contactItem3State, this.contactItem3?.nativeElement, !this.isSmall);
 
-  	this.experiences.forEach(it => observeElement(it.state, document.getElementById(it.id), !this.isSmall));
-  	this.stories.forEach(it => observeElement(it.state, document.getElementById(it.id), !this.isSmall));
+    this.experiences.forEach(it => observeElement(it.state, document.getElementById(it.id), !this.isSmall));
+    this.stories.forEach(it => observeElement(it.state, document.getElementById(it.id), !this.isSmall));
 
-  	this.automateSlider();
-  	this.mainContent.configure(false, 'close', true);
+    this.automateSlider();
+    this.mainContent.configure(false, 'close', true);
   }
 
   ngOnDestroy(): void {
-  	this.subscription?.unsubscribe();
-  	this.sliderSubscription?.unsubscribe();
-  	this.filterSubscription?.unsubscribe();
-  	this.authUserServiceSubscription.unsubscribe();
+    this.subscription?.unsubscribe();
+    this.sliderSubscription?.unsubscribe();
+    this.filterSubscription?.unsubscribe();
+    this.authUserServiceSubscription?.unsubscribe();
+  }
+
+  openBottomSheet(): void {
+    this.bottomSheet.open(BottomSheetBookAppointmentComponent);
+  }
+
+  sendEmail(): void {
+    if (!this.form.invalid) {
+      this.store.dispatch(
+        new fromActionsMain.SendMessage(this.form.value),
+      );
+    }
   }
 
   isCurrentSlideIndex = (index: number): boolean => this.currentIndex === index;
 
-  setTreatmentAnimation = (i: number): AnimationSequenceMetadata => scaleIn(`${ i * (this.isSmall ? 0 : 300) }ms`);
+  setTreatmentAnimation = (i: number): AnimationSequenceMetadata => scaleIn(`${i * (this.isSmall ? 0 : 300)}ms`);
 
   goToTreatment = (name?: string): void => {
-  	if (name === 'biab') {
-  		goTo('home');
-  		this.router.navigate([this.translate.currentLang, name, 'treatment']);
-  	}
+    if (name === 'biab') {
+      goTo('home');
+      this.router.navigate([this.translate.currentLang, name, 'treatment']);
+    }
   };
 
   onHover = (social: ISocialLink, enter: boolean): void => {
-  	const suffix = enter ? '' : '-NO-COLOR';
-  	social.svgIcon = `${ social.name }${ suffix }`;
+    const suffix = enter ? '' : '-NO-COLOR';
+    social.svgIcon = `${social.name}${suffix}`;
   };
 
   filterBy = (group?: ITreatmentGroup): void => {
-  	this.works = [];
-  	this.filter?.next(group);
+    this.works = [];
+    this.filter?.next(group);
   };
 
   private createForm = (): void => {
-  	this.form = this.formBuilder.group({
-  		name: this.name,
-  		email: this.email,
-  		subject: this.subject,
-  		body: this.body,
-  	});
+    this.form = this.formBuilder.group({
+      name: this.name,
+      email: this.email,
+      subject: this.subject,
+      body: this.body,
+    });
   };
 
   private automateSlider = (): void => {
-  	// let forward = true;
-  	this.sliderSubscription = interval(3000).subscribe(() => this.moveForwardSlide());
+    // let forward = true;
+    this.sliderSubscription = interval(3000).subscribe(() => this.moveForwardSlide());
   };
 
   private moveForwardSlide = (): void => {
-  	if (this.slides?.length) {
-  		// Fade in
-  		if (this.currentIndex === this.slides.length - 1) {
-  			this.currentIndex = 0;
-  		} else {
-  			this.currentIndex++;
-  		}
+    if (this.slides?.length) {
+      // Fade in
+      if (this.currentIndex === this.slides.length - 1) {
+        this.currentIndex = 0;
+      } else {
+        this.currentIndex++;
+      }
 
-  		// Forward and backward
-  		// if (this.currentIndex === this.slides.length - 1) {
-  		//   forward = false;
-  		// }
-  		// if (this.currentIndex === 0 && !forward) {
-  		//   forward = true;
-  		// }
-  		// this.currentIndex = this.currentIndex + (forward ? +1 : -1);
+      // Forward and backward
+      // if (this.currentIndex === this.slides.length - 1) {
+      //   forward = false;
+      // }
+      // if (this.currentIndex === 0 && !forward) {
+      //   forward = true;
+      // }
+      // this.currentIndex = this.currentIndex + (forward ? +1 : -1);
 
-  		// Forward
-  		// if (this.currentIndex === this.slides.length - 1) {
-  		//   this.sliderSubscription?.unsubscribe();
-  		//   const back = interval(100).subscribe(() => {
-  		//     this.currentIndex--;
-  		//     if (this.currentIndex === 0) {
-  		//       back.unsubscribe();
-  		//       this.automateSlider();
-  		//     }
-  		//   });
-  		// } else {
-  		//   this.currentIndex++;
-  		// }
-  	}
+      // Forward
+      // if (this.currentIndex === this.slides.length - 1) {
+      //   this.sliderSubscription?.unsubscribe();
+      //   const back = interval(100).subscribe(() => {
+      //     this.currentIndex--;
+      //     if (this.currentIndex === 0) {
+      //       back.unsubscribe();
+      //       this.automateSlider();
+      //     }
+      //   });
+      // } else {
+      //   this.currentIndex++;
+      // }
+    }
   };
 
   private allSocialLinks = (): ISocialLink[] => [
-  	{
-  		name: 'WHATSAPP',
-  		delay: '1000ms',
-  		href: 'https://api.whatsapp.com/send?phone=',
-  		svgIcon: 'WHATSAPP-NO-COLOR',
-  		phone: 'MAIN.CONTACT.SEND.PHONE',
-  		phoneKey: '&text=',
-  		phoneText: 'MAIN.CONTACT.SEND.HELLO',
-  	}, {
-  		name: 'INSTAGRAM',
-  		delay: '1100ms',
-  		href: 'https://www.instagram.com/carlanailscleos.nl/',
-  		svgIcon: 'INSTAGRAM-NO-COLOR',
-  	}, {
-  		name: 'FACEBOOK',
-  		delay: '1200ms',
-  		href: 'https://www.facebook.com/carlanailscleos.nl/',
-  		svgIcon: 'FACEBOOK-NO-COLOR',
-  	},
-  ];
-
-  private allStories = (): IStory[] => [
-  	{
-  		id: 'storyItem1',
-  		state: new BehaviorSubject<'open' | 'close'>('open'),
-  		delay: '100ms',
-  		text: 'MAIN.STORY.TEXT_1',
-  	}, {
-  		id: 'storyItem2',
-  		state: new BehaviorSubject<'open' | 'close'>('open'),
-  		delay: '200ms',
-  		text: 'MAIN.STORY.TEXT_2',
-  	}, {
-  		id: 'storyItem3',
-  		state: new BehaviorSubject<'open' | 'close'>('open'),
-  		delay: '300ms',
-  		text: 'MAIN.STORY.TEXT_3',
-  	}, {
-  		id: 'storyItem4',
-  		state: new BehaviorSubject<'open' | 'close'>('open'),
-  		delay: '400ms',
-  		text: 'MAIN.STORY.TEXT_4',
-  	}, {
-  		id: 'storyItem5',
-  		state: new BehaviorSubject<'open' | 'close'>('open'),
-  		delay: '500ms',
-  		text: 'MAIN.STORY.TEXT_5',
-  	},
-  ];
-
-  private allExperience = (): IExperience[] => [
-  	{
-  		id: 'experienceItem1',
-  		state: new BehaviorSubject<'open' | 'close'>('open'),
-  		delay: '0ms',
-  		delayOut: '900ms',
-  		icon: 'waving_hand',
-  		position: '1°',
-  		text: 'MAIN.EXPERIENCE.TEXT_1',
-  	}, {
-  		id: 'experienceItem2',
-  		state: new BehaviorSubject<'open' | 'close'>('open'),
-  		delay: this.isSmall ? '0ms' : '300ms',
-  		delayOut: '600ms',
-  		icon: 'coffee',
-  		position: '2°',
-  		text: 'MAIN.EXPERIENCE.TEXT_2',
-  	}, {
-  		id: 'experienceItem3',
-  		state: new BehaviorSubject<'open' | 'close'>('open'),
-  		delay: this.isSmall ? '0ms' : '600ms',
-  		delayOut: '300ms',
-  		icon: 'palette',
-  		position: '3°',
-  		text: 'MAIN.EXPERIENCE.TEXT_3',
-  	}, {
-  		id: 'experienceItem4',
-  		state: new BehaviorSubject<'open' | 'close'>('open'),
-  		delay: this.isSmall ? '0ms' : '900ms',
-  		delayOut: '0ms',
-  		icon: 'mood',
-  		position: '4°',
-  		text: 'MAIN.EXPERIENCE.TEXT_4',
-  	},
+    {
+      name: 'WHATSAPP',
+      delay: '1000ms',
+      href: 'https://api.whatsapp.com/send?phone=',
+      svgIcon: 'WHATSAPP-NO-COLOR',
+      phone: 'MAIN.CONTACT.SEND.PHONE',
+      phoneKey: '&text=',
+      phoneText: 'MAIN.CONTACT.SEND.HELLO',
+    }, {
+      name: 'INSTAGRAM',
+      delay: '1100ms',
+      href: 'https://www.instagram.com/carlanailscleos.nl/',
+      svgIcon: 'INSTAGRAM-NO-COLOR',
+    }, {
+      name: 'FACEBOOK',
+      delay: '1200ms',
+      href: 'https://www.facebook.com/carlanailscleos.nl/',
+      svgIcon: 'FACEBOOK-NO-COLOR',
+    },
   ];
 
   private clean = (): void => this.store.dispatch(new fromActionsMain.Clean());
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe(state => {
-  		if (state.errorMessage || state.message) {
-  			this.snackBar.open(state.errorMessage || state.message, 'OK', {
-  				duration: 5000,
-  			});
-  		}
-  	});
-  };
-}
-
-@Component({
-  selector: 'app-bottom-sheet-book-appointment',
-  templateUrl: 'bottom-sheet-book-appointment.html',
-  imports: [SharedModule],
-})
-export class BottomSheetBookAppointmentComponent {
-  constructor(private bottomSheetRef: MatBottomSheetRef<BottomSheetBookAppointmentComponent>,
-              private translate: TranslateService) {
-  }
-
-  openLink = (event: MouseEvent, key: 'whatsapp' | 'instagram' | 'facebook' | 'phone' | 'email'): void => {
-    this.bottomSheetRef.dismiss();
-    event.preventDefault();
-    setTimeout(() => {
-      let url;
-      switch (key) {
-        case 'whatsapp':
-          const phone = this.translate.instant('MAIN.CONTACT.SEND.PHONE');
-          const message = this.translate.instant('MAIN.CONTACT.SEND.HELLO');
-          url = `https://api.whatsapp.com/send?phone=${ phone }&text=${ message }`;
-          break;
-        case 'phone':
-          const tel = this.translate.instant('MAIN.CONTACT.SEND.PHONE');
-          url = `tel:${ tel }`;
-          break;
-        case 'instagram':
-          url = 'https://ig.me/m/carlanailscleos.nl';
-          break;
-        case 'facebook':
-          const message2 = this.translate.instant('MAIN.CONTACT.SEND.HELLO');
-          url = `https://m.me/carlanailscleos.nl?text=${ message2 }`;
-          break;
-        case 'email':
-          const mail = this.translate.instant('MAIN.CONTACT.MAIL');
-          url = `mailto:${ mail }`;
-          break;
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.errorMessage) {
+        this.toastService.error(state.errorMessage);
+      } else if (state.response) {
+        const response: ResponseSuccess = state.response;
+        this.toastService.show(response.message, response.toastType);
       }
-      window.open(url, '_blank');
-    }, 500);
+    });
   };
 }

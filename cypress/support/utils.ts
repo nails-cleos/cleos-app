@@ -3,7 +3,7 @@ const Breakpoints = {
   Small: 'Small',
   Medium: 'Medium',
   Large: 'Large',
-  XLarge: 'XLarge'
+  XLarge: 'XLarge',
 } as const;
 
 export const devices = [
@@ -22,15 +22,15 @@ export const breakpointToDays = (page: Page, breakpoint: Breakpoint): number => 
       [Breakpoints.XSmall]: 3,
       [Breakpoints.Small]: 3,
       [Breakpoints.Medium]: 3,
-      default: 7
+      default: 7,
     },
     calendar: {
       [Breakpoints.XSmall]: 1,
       [Breakpoints.Small]: 2,
       [Breakpoints.Medium]: 3,
       [Breakpoints.Large]: 5,
-      default: 7
-    }
+      default: 7,
+    },
   };
 
   return config[page][breakpoint] ?? config[page].default;
@@ -40,7 +40,7 @@ export const breakpointToButtons = (
   breakpoint: Breakpoint,
   smallButtons: string[],
   additionalLargeButtons: string[] = [],
-  others: string[] = []
+  others: string[] = [],
 ): string[] => {
   const config: Record<Breakpoint, string[]> & { default: string[] } = {
     [Breakpoints.XSmall]: smallButtons,
@@ -48,7 +48,7 @@ export const breakpointToButtons = (
     [Breakpoints.Medium]: [...smallButtons, ...additionalLargeButtons],
     [Breakpoints.Large]: [...smallButtons, ...additionalLargeButtons],
     [Breakpoints.XLarge]: [...smallButtons, ...additionalLargeButtons],
-    default: []
+    default: [],
   };
 
   const combined = [...config[breakpoint] ?? config.default, ...others];

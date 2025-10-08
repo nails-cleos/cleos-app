@@ -175,7 +175,7 @@ const friday = [...defaultEvents, { text: '10:00 - 10:30', length: 1 }, { text: 
 
 const calendarExpectations = (reservationTime: string): Record<number, { text: string, length: number }[][]> => ({
   3: [tuesday, wednesday(reservationTime), thursday],
-  7: [weekend, monday, tuesday, wednesday(reservationTime), thursday, friday, weekend]
+  7: [weekend, monday, tuesday, wednesday(reservationTime), thursday, friday, weekend],
 });
 
 const validateCalendar = (day: number, events: { text: string, length: number }[]) => {

@@ -58,109 +58,104 @@ export class DiscountsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
-  	breakpointObserver.observe([
-  		Breakpoints.XSmall,
-  		Breakpoints.Small,
-  	]).subscribe(result => {
-  		if (result.matches) {
-  			this.pageSize = MOBILE_PAGE_SIZE;
-  		}
-  	});
-  	this.getState = this.store.select(selectDiscountState);
-  	this.language = this.translate.currentLang;
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small,
+    ]).subscribe(result => {
+      if (result.matches) {
+        this.pageSize = MOBILE_PAGE_SIZE;
+      }
+    });
+    this.getState = this.store.select(selectDiscountState);
+    this.language = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {
-  	this.getDiscounts();
+    this.getDiscounts();
   }
 
   ngOnInit(): void {
-  	this.clean();
-  	this.subscribe();
+    this.clean();
+    this.subscribe();
   }
 
   ngOnDestroy(): void {
-  	this.subscription?.unsubscribe();
-  	this.paginatorSubscription?.unsubscribe();
+    this.subscription?.unsubscribe();
+    this.paginatorSubscription?.unsubscribe();
   }
 
   edit = (discount: IDiscount): void => this.store.dispatch(new fromActionsDiscount.DiscountSelected(discount));
 
   delete = (discount: IDiscount): void => {
-  	const title = this.translate.instant('DISCOUNT.DELETED.TITLE');
-  	const content = this.translate.instant('DISCOUNT.DELETED.CONTENT', { name: discount.name });
-  	const dialogRef = this.dialog.open(DialogComponent, {
-  		data: { title, content, value: discount },
-  	});
+    const title = this.translate.instant('DISCOUNT.DELETED.TITLE');
+    const content = this.translate.instant('DISCOUNT.DELETED.CONTENT', { name: discount.name });
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: { title, content, value: discount },
+    });
 
-  	dialogRef.afterClosed().subscribe(result => {
-  		if (result) {
-  			this.store.dispatch(
-  				new fromActionsDiscount.DeleteDiscount(result),
-  			);
-  		}
-  	});
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.store.dispatch(
+          new fromActionsDiscount.DeleteDiscount(result.id, result.name),
+        );
+      }
+    });
   };
 
   sentToUsers = (discount: IDiscount): void => {
-  	const data = {
-  		discount,
-  	};
-  	executeDialog(this.dialog, DiscountDialogComponent, data, result => {
-  		if (result) {
-  			this.store.dispatch(
-  				new fromActionsDiscount.SendDiscountToCustomers(result),
-  			);
-  		}
-  	}, true);
+    const data = {
+      discount,
+    };
+    executeDialog(this.dialog, DiscountDialogComponent, data, result => {
+      if (result) {
+        this.store.dispatch(
+          new fromActionsDiscount.SendDiscountToCustomers(result.discountId, result.customerIds),
+        );
+      }
+    }, true);
   };
 
   private createPageSubscriptions = (): void => {
-  	this.sort.sortChange.subscribe((a) => {
-  		if (a !== this.lastSort) {
-  			this.paginator.pageIndex = 0;
-  			this.getDiscounts();
-  		}
-  		this.lastSort = a;
-  	});
-  	this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getDiscounts(this.paginator.pageIndex));
+    this.sort.sortChange.subscribe((a) => {
+      if (a !== this.lastSort) {
+        this.paginator.pageIndex = 0;
+        this.getDiscounts();
+      }
+      this.lastSort = a;
+    });
+    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getDiscounts(this.paginator.pageIndex));
 
-  	this.cdRef.detectChanges();
+    this.cdRef.detectChanges();
   };
 
   private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
 
   private getDiscounts = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsDiscount.GetDiscountsPage({
-  		active: this.sort.active,
-  		direction: this.sort.direction,
-  		size: this.pageSize,
-  		page,
-  	}),
+    new fromActionsDiscount.GetDiscountsPage(page, this.sort.active, this.sort.direction, this.pageSize),
   );
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe((stateValue) => {
-  		if (stateValue.message) {
-  			this.clean();
-  			this.getDiscounts();
-  		}
-  		this.dataSource = stateValue.data?.content?.map((it: IDiscount) => {
-  			let icon = '';
-  			switch (it.type) {
-  			case DiscountType.money:
-  				icon = it.currency?.icon ?? 'euro';
-  				break;
-  			case DiscountType.percentage:
-  				icon = 'percent';
-  			}
-  			return Object.assign({}, it, { icon });
-  		});
-  		this.resultsLength = stateValue.data?.totalElements;
-  		if (!this.paginatorSubscription && this.resultsLength) {
-  			this.createPageSubscriptions();
-  		}
-  	});
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.response) {
+        this.clean();
+        this.getDiscounts();
+      }
+      this.dataSource = state.data?.content?.map((it: IDiscount) => {
+        let icon = '';
+        switch (it.type) {
+          case DiscountType.money:
+            icon = it.currency?.icon ?? 'euro';
+            break;
+          case DiscountType.percentage:
+            icon = 'percent';
+        }
+        return Object.assign({}, it, { icon });
+      });
+      this.resultsLength = state.data?.totalElements;
+      if (!this.paginatorSubscription && this.resultsLength) {
+        this.createPageSubscriptions();
+      }
+    });
   };
 }
 
@@ -186,72 +181,72 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
 
   constructor(public dialogRef: MatDialogRef<DiscountDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
               private store: Store<AppState>, private cdRef: ChangeDetectorRef) {
-  	this.getState = this.store.select(selectUserState);
-  	this.discount = data.discount;
-  	this.setSymbol();
+    this.getState = this.store.select(selectUserState);
+    this.discount = data.discount;
+    this.setSymbol();
   }
 
   get onNoClick(): void {
-  	return this.dialogRef.close();
+    return this.dialogRef.close();
   }
 
   get doAction(): void {
-  	const customerIds = this.customers.map(({ id }) => id);
-  	return this.dialogRef.close({ discountId: this.discount.id, customerIds });
+    const customerIds = this.customers.map(({ id }) => id);
+    return this.dialogRef.close({ discountId: this.discount.id, customerIds });
   }
 
   ngOnInit(): void {
-  	this.clean();
-  	this.subscribe();
-  	this.getCustomers();
-  	this.filteredCustomers = this.customerCtrl.valueChanges.pipe(
-  		startWith(''),
-  		map(value => typeof value === 'string' ? value : value ? value.name : ''),
-  		map(name => name ? this.filter(name) : (this.allCustomers ? this.allCustomers.slice() : this.allCustomers)),
-  	);
+    this.clean();
+    this.subscribe();
+    this.getCustomers();
+    this.filteredCustomers = this.customerCtrl.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value ? value.name : ''),
+      map(name => name ? this.filter(name) : (this.allCustomers ? this.allCustomers.slice() : this.allCustomers)),
+    );
   }
 
   ngAfterViewInit(): void {
-  	this.cdRef.detectChanges();
+    this.cdRef.detectChanges();
   }
 
   ngOnDestroy(): void {
-  	this.subscription?.unsubscribe();
+    this.subscription?.unsubscribe();
   }
 
   remove = (customer: IUserAll): void => {
-  	const index = this.customers.indexOf(customer);
-  	if (index >= 0) {
-  		this.customers.splice(index, 1);
-  		this.allCustomers?.push(customer);
-  		this.customerCtrl.setValue(null);
-  	}
+    const index = this.customers.indexOf(customer);
+    if (index >= 0) {
+      this.customers.splice(index, 1);
+      this.allCustomers?.push(customer);
+      this.customerCtrl.setValue(null);
+    }
   };
 
   selected = (event: MatAutocompleteSelectedEvent): void => {
-  	const customer = event.option.value;
-  	this.customers.push(customer);
-  	this.allCustomers = this.allCustomers?.filter(c => c.id !== customer.id);
-  	this.customerInput.nativeElement.value = '';
-  	this.customerCtrl.setValue(null);
+    const customer = event.option.value;
+    this.customers.push(customer);
+    this.allCustomers = this.allCustomers?.filter(c => c.id !== customer.id);
+    this.customerInput.nativeElement.value = '';
+    this.customerCtrl.setValue(null);
   };
 
   sortCustomers = (data: any): IUser[] => data.sort((a: any, b: any) => {
-  	const aName = a.displayName?.toUpperCase();
-  	const bName = b.displayName?.toUpperCase();
-  	return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
+    const aName = a.displayName?.toUpperCase();
+    const bName = b.displayName?.toUpperCase();
+    return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
   });
 
   private setSymbol = (): void => {
-  	this.title = this.discount.name;
-  	switch (this.discount.type) {
-  	case DiscountType.money:
-  		this.title = `${currencySymbol(this.discount.currency)} ${ this.discount.amount } ${ this.title }`;
-  		break;
-  	case DiscountType.percentage:
-  		this.title = `${ this.discount.amount } % ${ this.title }`;
-  		break;
-  	}
+    this.title = this.discount.name;
+    switch (this.discount.type) {
+      case DiscountType.money:
+        this.title = `${ currencySymbol(this.discount.currency) } ${ this.discount.amount } ${ this.title }`;
+        break;
+      case DiscountType.percentage:
+        this.title = `${ this.discount.amount } % ${ this.title }`;
+        break;
+    }
   };
 
   private getCustomers = (): void => this.store.dispatch(new fromActionsUser.GetAllCustomers());
@@ -259,12 +254,12 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
   private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
 
   private filter = (name: string): IUserAll[] | undefined => this.allCustomers?.filter(
-  	option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe(state => {
-  		this.allCustomers = state.data;
-  		this.customerCtrl.setValue(null);
-  	});
+    this.subscription = this.getState.subscribe((state) => {
+      this.allCustomers = state.data;
+      this.customerCtrl.setValue(null);
+    });
   };
 }

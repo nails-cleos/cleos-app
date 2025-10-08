@@ -1,5 +1,7 @@
 import { Action } from '@ngrx/store';
-import { IExpense } from '../interfaces/expense';
+import { IExpense, IExpenseInfo } from '../interfaces/expense';
+import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { SortDirection } from '@angular/material/sort';
 
 export enum ExpenseActionTypes {
   getExpensesPage = '[Expense] Get expenses page',
@@ -7,20 +9,21 @@ export enum ExpenseActionTypes {
   expenseSuccess = '[Expense] Success',
   expenseInfoSuccess = '[Expense] Info success',
   createExpense = '[Expense] Create expense',
-  updateExpenseById = '[Expense] Update expense by id',
+  updateExpense = '[Expense] Update expense by id',
   expenseSaveSuccess = '[Expense] Save Success',
   expenseFailure = '[Expense] Failure',
   expenseSelected = '[Expense] Selected',
-  findExpenseById = '[Expense] Find expense by id',
-  deleteExpenseById = '[Expense] Delete expense by id',
+  getExpense = '[Expense] Find expense by id',
+  deleteExpense = '[Expense] Delete expense by id',
   clean = '[Expense] Clean'
 }
 
-export class GetExpensesPage implements Action {
+export class GetExpensesPage extends PageRequest implements Action {
   readonly type = ExpenseActionTypes.getExpensesPage;
 
-  constructor(public roomId: string, public sort: string, public direction: string, public page: number,
-              public size?: number, public filter?: string, public dateFilter?: string) {
+  constructor(public roomId: string, public sort: string, public direction: SortDirection, public page: number,
+              public size: number, public filter?: string, public dateFilter?: string) {
+    super(page, sort, direction, size);
   }
 }
 
@@ -34,14 +37,14 @@ export class GetAllExpensesInfo implements Action {
 export class ExpenseSuccess implements Action {
   readonly type = ExpenseActionTypes.expenseSuccess;
 
-  constructor(public payload: any) {
+  constructor(public data: IExpense[]) {
   }
 }
 
 export class ExpenseInfoSuccess implements Action {
   readonly type = ExpenseActionTypes.expenseInfoSuccess;
 
-  constructor(public payload: any) {
+  constructor(public info: IExpenseInfo) {
   }
 }
 
@@ -52,43 +55,40 @@ export class CreateExpense implements Action {
   }
 }
 
-export class UpdateExpenseById implements Action {
-  readonly type = ExpenseActionTypes.updateExpenseById;
+export class UpdateExpense implements Action {
+  readonly type = ExpenseActionTypes.updateExpense;
 
   constructor(public roomId: string, public expense: IExpense) {
   }
 }
 
-export class ExpenseSaveSuccess implements Action {
+export class ExpenseSaveSuccess extends ResponseSuccess implements Action {
   readonly type = ExpenseActionTypes.expenseSaveSuccess;
-
-  constructor(public payload: any) {
-  }
 }
 
 export class ExpenseFailure implements Action {
   readonly type = ExpenseActionTypes.expenseFailure;
 
-  constructor(public payload: any) {
+  constructor(public error: IError) {
   }
 }
 
 export class ExpenseSelected implements Action {
   readonly type = ExpenseActionTypes.expenseSelected;
 
-  constructor(public payload: any) {
+  constructor(public selected?: IExpense) {
   }
 }
 
-export class FindExpenseById implements Action {
-  readonly type = ExpenseActionTypes.findExpenseById;
+export class GetExpense implements Action {
+  readonly type = ExpenseActionTypes.getExpense;
 
   constructor(public roomId: string, public id: string) {
   }
 }
 
-export class DeleteExpenseById implements Action {
-  readonly type = ExpenseActionTypes.deleteExpenseById;
+export class DeleteExpense implements Action {
+  readonly type = ExpenseActionTypes.deleteExpense;
 
   constructor(public roomId: string, public id: string, public invoice: string) {
   }
@@ -102,12 +102,12 @@ export type All =
   | GetExpensesPage
   | GetAllExpensesInfo
   | CreateExpense
-  | UpdateExpenseById
+  | UpdateExpense
   | ExpenseSuccess
   | ExpenseInfoSuccess
   | ExpenseSaveSuccess
   | ExpenseFailure
-  | FindExpenseById
+  | GetExpense
   | ExpenseSelected
-  | DeleteExpenseById
+  | DeleteExpense
   | Clean;

@@ -1,36 +1,36 @@
 import { Action } from '@ngrx/store';
+import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { Pagination } from '../interfaces/pagination';
+import { IRoom, IRoomCustomer, IRoomInfo, IRoomService, IServicePrice } from '../interfaces/room';
 
 export enum RoomActionTypes {
   getRoomsPage = '[Room] Get rooms page',
-  findRoomServicesById = '[Room] Find room services by id',
+  getServices = '[Room] Find room services by id',
   getAllRoomsInfo = '[Room] Get all rooms info',
   roomInfoSuccess = '[Room] Info Success',
   roomSuccess = '[Room] Success',
   createRoom = '[Room] Create room',
-  updateRoomById = '[Room] Update room by id',
-  updateRoomServicesById = '[Room] Update room services by id',
+  updateRoom = '[Room] Update room by id',
+  updateServices = '[Room] Update room services by id',
   roomSaveSuccess = '[Room] Save Success',
   roomFailure = '[Room] Failure',
   roomSelected = '[Room] Selected',
   roomServiceSelected = '[Room] Selected services',
-  findRoomById = '[Room] Find room by id',
-  deleteRoomById = '[Room] Delete room by id',
+  getRoom = '[Room] Find room by id',
+  deleteRoom = '[Room] Delete room by id',
   getAllCustomersInfo = '[Room] Get all customers info',
   customerInfoSuccess = '[Room] Customer info Success',
   clean = '[Room] Clean'
 }
 
-export class GetRoomsPage implements Action {
+export class GetRoomsPage extends PageRequest implements Action {
   readonly type = RoomActionTypes.getRoomsPage;
-
-  constructor(public payload: any) {
-  }
 }
 
-export class FindRoomServicesById implements Action {
-  readonly type = RoomActionTypes.findRoomServicesById;
+export class GetServices implements Action {
+  readonly type = RoomActionTypes.getServices;
 
-  constructor(public payload: any) {
+  constructor(public id: string) {
   }
 }
 
@@ -41,91 +41,88 @@ export class GetAllRoomsInfo implements Action {
 export class RoomInfoSuccess implements Action {
   readonly type = RoomActionTypes.roomInfoSuccess;
 
-  constructor(public payload: any) {
+  constructor(public roomInfo?: IRoomInfo, public redirect?: boolean) {
   }
 }
 
 export class RoomSuccess implements Action {
   readonly type = RoomActionTypes.roomSuccess;
 
-  constructor(public payload: any) {
+  constructor(public data: Pagination<IRoom>) {
   }
 }
 
 export class CreateRoom implements Action {
   readonly type = RoomActionTypes.createRoom;
 
-  constructor(public payload: any) {
+  constructor(public room: IRoom) {
   }
 }
 
-export class UpdateRoomById implements Action {
-  readonly type = RoomActionTypes.updateRoomById;
+export class UpdateRoom implements Action {
+  readonly type = RoomActionTypes.updateRoom;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public room: IRoom) {
   }
 }
 
-export class UpdateRoomServicesById implements Action {
-  readonly type = RoomActionTypes.updateRoomServicesById;
+export class UpdateServices implements Action {
+  readonly type = RoomActionTypes.updateServices;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public prices: IServicePrice[]) {
   }
 }
 
-export class RoomSaveSuccess implements Action {
+export class RoomSaveSuccess extends ResponseSuccess implements Action {
   readonly type = RoomActionTypes.roomSaveSuccess;
-
-  constructor(public payload: any) {
-  }
 }
 
 export class RoomFailure implements Action {
   readonly type = RoomActionTypes.roomFailure;
 
-  constructor(public payload: any) {
+  constructor(public error: IError) {
   }
 }
 
 export class RoomSelected implements Action {
   readonly type = RoomActionTypes.roomSelected;
 
-  constructor(public payload: any) {
+  constructor(public selected?: IRoom, public redirect?: boolean) {
   }
 }
 
 export class RoomServiceSelected implements Action {
   readonly type = RoomActionTypes.roomServiceSelected;
 
-  constructor(public payload: any) {
+  constructor(public services?: IRoomService) {
   }
 }
 
-export class FindRoomById implements Action {
-  readonly type = RoomActionTypes.findRoomById;
+export class GetRoom implements Action {
+  readonly type = RoomActionTypes.getRoom;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public redirect: boolean) {
   }
 }
 
-export class DeleteRoomById implements Action {
-  readonly type = RoomActionTypes.deleteRoomById;
+export class DeleteRoom implements Action {
+  readonly type = RoomActionTypes.deleteRoom;
 
-  constructor(public payload: any) {
+  constructor(public id: string, public room: IRoom) {
   }
 }
 
 export class GetAllCustomersInfo implements Action {
   readonly type = RoomActionTypes.getAllCustomersInfo;
 
-  constructor(public payload: any) {
+  constructor(public id: string) {
   }
 }
 
 export class CustomerInfoSuccess implements Action {
   readonly type = RoomActionTypes.customerInfoSuccess;
 
-  constructor(public payload: any) {
+  constructor(public customers: IRoomCustomer[]) {
   }
 }
 
@@ -135,19 +132,19 @@ export class Clean implements Action {
 
 export type All =
   | GetRoomsPage
-  | FindRoomServicesById
+  | GetServices
   | GetAllRoomsInfo
   | RoomInfoSuccess
   | CreateRoom
-  | UpdateRoomById
-  | UpdateRoomServicesById
+  | UpdateRoom
+  | UpdateServices
   | RoomSuccess
   | RoomSaveSuccess
   | RoomFailure
-  | FindRoomById
+  | GetRoom
   | RoomSelected
   | RoomServiceSelected
-  | DeleteRoomById
+  | DeleteRoom
   | GetAllCustomersInfo
   | CustomerInfoSuccess
   | Clean;

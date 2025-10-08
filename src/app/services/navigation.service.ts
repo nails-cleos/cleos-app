@@ -63,7 +63,7 @@ export class NavigationService {
       this.store.dispatch(new fromActionsI18n.SetLanguage(language));
       if (userLanguage?.language !== language) {
         this.store.dispatch(
-          new fromActionsUser.UpdateMe({ user, redirectUrl }),
+          new fromActionsUser.UpdateMyUser(user, redirectUrl),
         );
       }
     }

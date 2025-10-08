@@ -23,11 +23,11 @@ export class CustomerEditDialogComponent {
     this.currency = data.currency;
   }
 
-  get onNoClick(): void {
+  onNoClick(): void {
     return this.dialogRef.close();
   }
 
-  get doAction(): void {
+  doAction(): void {
     return this.dialogRef.close(true);
   }
 }

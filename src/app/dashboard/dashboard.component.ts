@@ -80,8 +80,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private getState: Observable<any>;
   private subscription?: Subscription;
   private authUserServiceSubscription: Subscription;
-  private calendarStart: Date = this.viewDate;
-  private calendarEnd: Date = this.viewDate;
   private dashboardReady = false;
   private calendarReady = false;
 
@@ -120,12 +118,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private static getProfessionalImage = (professional: IProfessionalEvent): string => {
     let image;
-    if (professional && professional.imageUrl) {
+    if (professional.imageUrl) {
       if (professional.imageUrl.indexOf('http') >= 0) {
         image = professional.imageUrl;
-      } else if (professional.image) {
-        image = `data:image/jpg;base64,${ professional.image }`;
       }
+    } else if (professional.image) {
+      image = `data:image/jpg;base64,${professional.image}`;
     }
 
     return image || 'assets/icons/icon-512x512.png';
@@ -148,8 +146,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   beforeMonthViewRender = ({ period }: any): void => {
-    this.calendarStart = period.start;
-    this.calendarEnd = period.end;
     this.calendar.calendarStart = period.start;
     this.calendar.calendarEnd = period.end;
     this.calendar.createRecurring();
@@ -215,7 +211,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private createTitle = (calendarEvent: CalendarEvent, now: Date = getNowTimeZone()): CalendarEvent => {
     const matcher = calendarEvent.title.match(/(?<=<b>\s*).*?(?=\s*<\/b>)/gs);
-    const title = matcher ? `<b>${ matcher[0] }</b>` : calendarEvent.title;
+    const title = matcher ? `<b>${matcher[0]}</b>` : calendarEvent.title;
 
     if (calendarEvent.meta.state === States.started && calendarEvent.end) {
       const dateTime = calendarEvent.meta.started instanceof Date ? calendarEvent.meta.started
@@ -228,9 +224,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const diffStart = getMinutesBetweenTimesABS(calendarEvent.start, dateTime);
       let startText;
       if (startTime > startedTime) {
-        startText = `<span class="green-text"><b id="start">-${ diffStart } min.</b></span>`;
+        startText = `<span class="green-text"><b id="start">-${diffStart} min.</b></span>`;
       } else if (startTime < startedTime) {
-        startText = `<span class="red-text"><b id="start">+${ diffStart } min.</b></span>`;
+        startText = `<span class="red-text"><b id="start">+${diffStart} min.</b></span>`;
       } else {
         startText = '<span><b id="start">0 min.</b></span>';
       }
@@ -242,9 +238,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       let elapsedText;
       if (duration > diffElapsed) {
-        elapsedText = `<span class="green-text"><b id="elapsed">${ diffElapsed } min.</b></span>`;
+        elapsedText = `<span class="green-text"><b id="elapsed">${diffElapsed} min.</b></span>`;
       } else if (duration < diffElapsed) {
-        elapsedText = `<span class="red-text"><b id="elapsed">+${ diffElapsed } min.</b></span>`;
+        elapsedText = `<span class="red-text"><b id="elapsed">+${diffElapsed} min.</b></span>`;
       } else {
         elapsedText = '<span><b id="elapsed">0 min.</b></span>';
       }
@@ -254,16 +250,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const diffFinish = getMinutesBetweenTimesABS(calendarEvent.end, now);
       let finishText;
       if (endTime > nowTime) {
-        finishText = `<span class="green-text"><b id="finish">-${ diffFinish } min.</b></span>`;
+        finishText = `<span class="green-text"><b id="finish">-${diffFinish} min.</b></span>`;
       } else if (endTime < nowTime) {
-        finishText = `<span class="red-text"><b id="finish">+${ diffFinish } min.</b></span>`;
+        finishText = `<span class="red-text"><b id="finish">+${diffFinish} min.</b></span>`;
       } else {
         finishText = '<span><b id="finish">0 min.</b></span>';
       }
 
       const timeFinish = this.finishInText.replace('{finishText}', finishText);
 
-      calendarEvent.title = `${ title } <div class="timing"> ${ start } ${ timeElapsed } ${ timeFinish }</div>`;
+      calendarEvent.title = `${title} <div class="timing"> ${start} ${timeElapsed} ${timeFinish}</div>`;
     }
 
     const isNow = isToday(calendarEvent.start);
@@ -328,7 +324,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       reservation.professionalId = professionalId;
     }
     this.store.dispatch(
-      new fromActionsDashboard.UpdateEventById(reservation),
+      new fromActionsDashboard.UpdateEvent(id, reservation),
     );
   };
 
@@ -405,9 +401,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         professionalEvent.calendarSummary.unavailable?.forEach(it => {
           const start = newDateTimestamp(it.start);
           const title = it.duration ?
-            it.title : `${ this.translate.instant('COMMON.ALL_DAY.CHECK') } - ${ it.title }`;
+            it.title : `${this.translate.instant('COMMON.ALL_DAY.CHECK')} - ${it.title}`;
 
-          let path = `${ this.language }/unavailable/`;
+          let path = `${this.language}/unavailable/`;
           if (it.type === 'BLOCK_AGENDA') {
             path += 'block-agenda/';
           }
@@ -431,7 +427,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   };
 
   private createLabel = (icon: string, text: string) => `<div class="mat-raised-button">
-                   <div class="custom-material-icons material-icons">${ icon }</div>&nbsp;${ text }
+                   <div class="custom-material-icons material-icons">${icon}</div>&nbsp;${text}
                </div>`;
 
   private createUnavailableEvent = (start: Date, recurring: any, professional: Professional, darkMode: boolean) => {
@@ -455,12 +451,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private getEvents = (): void => {
     this.calendar.resetEvents();
     this.store.dispatch(
-      new fromActionsDashboard.MeEvent(this.viewDate),
+      new fromActionsDashboard.GetMyEvent(this.viewDate),
     );
   };
 
   private eventClick = (event: CalendarEvent, type: string): void => {
-    const reservationId = event.id;
+    const reservationId = `${event.id!}`;
     switch (type) {
       case 'VIEW':
         this.router.navigate([this.language, 'reservation', reservationId]);
@@ -502,7 +498,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.dashboard = state.dashboard;
       this.dashboardReady = true;
       this.tryCreateEvents();

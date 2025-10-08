@@ -75,7 +75,7 @@ export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
   	executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: currency }, result => {
   		if (result) {
   			this.store.dispatch(
-  				new fromActionsCurrency.DeleteCurrencyById(result),
+  				new fromActionsCurrency.DeleteCurrency(result.id, result.code),
   			);
   		}
   	});
@@ -94,17 +94,12 @@ export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private getCurrency = (page: number = 0): void => this.store.dispatch(
-  	new fromActionsCurrency.GetCurrenciesPage({
-  		active: this.sort.active,
-  		direction: this.sort.direction,
-  		size: this.pageSize,
-  		page,
-  	}),
+  	new fromActionsCurrency.GetCurrenciesPage(page, this.sort.active, this.sort.direction, this.pageSize),
   );
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe(state => {
-  		if (state.message) {
+  	this.subscription = this.getState.subscribe((state) => {
+  		if (state.response) {
   			this.clean();
   			this.getCurrency();
   		}

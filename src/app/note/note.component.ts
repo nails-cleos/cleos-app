@@ -78,7 +78,7 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
   	} else {
   		note.id = this.id;
   		this.store.dispatch(
-  			new fromActionsNote.UpdateNoteById(note),
+  			new fromActionsNote.UpdateNote(this.id!, note),
   		);
   	}
   	return;
@@ -92,7 +92,7 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
   	return executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: this.note }, result => {
   		if (result) {
   			this.store.dispatch(
-  				new fromActionsNote.DeleteNoteById(result),
+  				new fromActionsNote.DeleteNote(result.id, result.description),
   			);
   		}
   	});
@@ -153,10 +153,10 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private getProfessionals = (): void => this.store.dispatch(new fromActionsNote.GetAllProfessional());
 
-  private getNote = (): void => this.store.dispatch(new fromActionsNote.FindNoteById(this.id));
+  private getNote = (): void => this.store.dispatch(new fromActionsNote.GetNote(this.id!));
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe(state => {
+  	this.subscription = this.getState.subscribe((state) => {
   		this.professionals = state.professionals;
   		this.note = state.selected;
   		if (this.note?.id) {
@@ -168,7 +168,7 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
   				this.errors[value.field] = value.message;
   				this.form.controls[value.field].setErrors({ incorrect: true });
   			});
-  		} else if (state.message) {
+  		} else if (state.response) {
   			this.router.navigate([this.language, 'reservation', 'calendar']);
   		}
   	});

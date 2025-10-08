@@ -54,3 +54,6 @@ Thumbs.db
 # Cypress
 cypress/screenshots/**
 cypress/results/**
+cypress/downloads/**
+
+**/junit-report.xml

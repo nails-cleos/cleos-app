@@ -59,11 +59,11 @@ export class AddDiscountDialogComponent implements OnInit, OnDestroy {
   };
 
   private getDiscounts = (): void => this.store.dispatch(
-    new fromActionsDiscount.DiscountFindByCustomer(this.customerId));
+    new fromActionsDiscount.GetUserDiscountByCustomerId(this.customerId));
 
   private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => this.discounts = state.data);
+    this.subscription = this.getState.subscribe((state) => this.discounts = state.data);
   };
 }

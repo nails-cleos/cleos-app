@@ -12,7 +12,7 @@ export class GetLanguage implements Action {
 export class SetLanguage implements Action {
   readonly type = I18nActionTypes.setLanguage;
 
-  constructor(public payload: any) {
+  constructor(public language: string) {
   }
 }
 

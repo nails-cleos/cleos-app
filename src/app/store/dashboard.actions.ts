@@ -1,13 +1,25 @@
 import { Action } from '@ngrx/store';
+import { IError, ResponseSuccess } from '../interfaces/common';
+import {
+  ICardSummary,
+  IEventSummary,
+  IMonthlyRoomSummary,
+  IMonthlySummaryRequest,
+  IRoomEvents,
+  ITotal,
+  IYearRoomExport,
+  IYearRoomSummary,
+} from '../interfaces/dashboard';
+import { IReservation } from '../interfaces/reservation';
 
 export enum DashboardActionTypes {
-  eventsSummaries = '[Dash] Events summaries',
-  getSummaries = '[Dash] Get summaries',
+  getEvents = '[Dash] Events summaries',
+  getCards = '[Dash] Get summaries',
   dashSuccess = '[Dash] Dash Success',
   dashFailure = '[Dash] Dash failure',
-  meEvent = '[Dashboard] Me event',
+  getMyEvent = '[Dashboard] Me event',
   eventSuccess = '[Dashboard] Event success',
-  updateEventById = '[Dashboard] Update event by id',
+  updateEvent = '[Dashboard] Update event by id',
   getMonthlySummary = '[Dash] Get monthly summary',
   monthlySummarySuccess = '[Dash] Monthly summary success',
   updateMonthlySummary = '[Dash] Update monthly summary',
@@ -21,122 +33,124 @@ export enum DashboardActionTypes {
   clean = '[Dash] Clean'
 }
 
-export class EventsSummaries implements Action {
-  readonly type = DashboardActionTypes.eventsSummaries;
+export class GetEvents implements Action {
+  readonly type = DashboardActionTypes.getEvents;
 
-  constructor(public payload: any) {
+  constructor(public date: Date) {
   }
 }
 
-export class MeEvent implements Action {
-  readonly type = DashboardActionTypes.meEvent;
+export class GetMyEvent implements Action {
+  readonly type = DashboardActionTypes.getMyEvent;
 
-  constructor(public payload: any) {
+  constructor(public date: Date) {
   }
 }
 
 export class EventSuccess implements Action {
   readonly type = DashboardActionTypes.eventSuccess;
 
-  constructor(public payload: any) {
+  constructor(public data: IRoomEvents) {
   }
 }
 
-export class GetSummaries implements Action {
-  readonly type = DashboardActionTypes.getSummaries;
+export class GetCards implements Action {
+  readonly type = DashboardActionTypes.getCards;
 
-  constructor(public payload: any) {
+  constructor(public date: Date) {
   }
 }
 
 export class DashSuccess implements Action {
   readonly type = DashboardActionTypes.dashSuccess;
 
-  constructor(public payload: any) {
+  constructor(public data: IEventSummary | ICardSummary) {
   }
 }
 
 export class DashFailure implements Action {
   readonly type = DashboardActionTypes.dashFailure;
 
-  constructor(public payload: any) {
+  constructor(public error: IError) {
   }
 }
 
-export class UpdateEventById implements Action {
-  readonly type = DashboardActionTypes.updateEventById;
+export class UpdateEvent implements Action {
+  readonly type = DashboardActionTypes.updateEvent;
 
-  constructor(public payload: any) {
+  constructor(public reservationId: string, public reservation: IReservation) {
   }
 }
 
 export class GetMonthlySummary implements Action {
   readonly type = DashboardActionTypes.getMonthlySummary;
 
-  constructor(public payload: any) {
+  constructor(public date: string) {
   }
 }
 
 export class MonthlySummarySuccess implements Action {
   readonly type = DashboardActionTypes.monthlySummarySuccess;
 
-  constructor(public payload: any) {
+  constructor(public monthlySummary: IMonthlyRoomSummary[]) {
   }
 }
 
 export class UpdateMonthlySummary implements Action {
   readonly type = DashboardActionTypes.updateMonthlySummary;
 
-  constructor(public payload: any) {
+  constructor(public date: string, public summaryType: string, public totals: ITotal[],
+              public summaries: IMonthlySummaryRequest[], public roomId: string, public step: number) {
   }
 }
 
-export class UpdateMonthlySummarySuccess implements Action {
+export class SaveMonthlySummarySuccess extends ResponseSuccess implements Action {
   readonly type = DashboardActionTypes.saveMonthlySummarySuccess;
 
-  constructor(public payload: any) {
+  constructor(public date: string, public step: number, public message: string) {
+    super(message);
   }
 }
 
 export class GetYearSummary implements Action {
   readonly type = DashboardActionTypes.getYearSummary;
 
-  constructor(public payload: any) {
+  constructor(public year: number) {
   }
 }
 
 export class YearSummarySuccess implements Action {
   readonly type = DashboardActionTypes.yearSummarySuccess;
 
-  constructor(public payload: any) {
+  constructor(public yearSummary: IYearRoomSummary[] | []) {
   }
 }
 
 export class ExportYearSummary implements Action {
   readonly type = DashboardActionTypes.exportYearSummary;
 
-  constructor(public payload: any) {
+  constructor(public year: number) {
   }
 }
 
 export class YearExportSuccess implements Action {
   readonly type = DashboardActionTypes.yearExportSuccess;
 
-  constructor(public payload: any) {
+  constructor(public yearExport: IYearRoomExport[] | []) {
   }
 }
 
 export class GetQuarterSummary implements Action {
   readonly type = DashboardActionTypes.getQuarterSummary;
 
-  constructor(public payload: any) {
+  constructor(public year: number, public quarter: number) {
   }
 }
 
 export class QuarterSummarySuccess implements Action {
   readonly type = DashboardActionTypes.quarterSummarySuccess;
 
-  constructor(public payload: any) {
+  constructor(public quarterSummary: any) {
   }
 }
 
@@ -145,17 +159,17 @@ export class Clean implements Action {
 }
 
 export type All =
-  | EventsSummaries
-  | GetSummaries
+  | GetEvents
+  | GetCards
   | DashSuccess
   | DashFailure
-  | MeEvent
+  | GetMyEvent
   | EventSuccess
-  | UpdateEventById
+  | UpdateEvent
   | GetMonthlySummary
   | MonthlySummarySuccess
   | UpdateMonthlySummary
-  | UpdateMonthlySummarySuccess
+  | SaveMonthlySummarySuccess
   | GetYearSummary
   | YearSummarySuccess
   | GetQuarterSummary

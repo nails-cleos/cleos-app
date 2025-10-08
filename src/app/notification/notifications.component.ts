@@ -53,17 +53,13 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     } else {
       this.navigationService.reload(this.router.url.split('/'));
       this.store.dispatch(
-        new fromActionsNotification.ReadNotificationById(notification),
+        new fromActionsNotification.ReadNotification(notification.id),
       );
     }
   };
 
   getNotifications = (): void => this.store.dispatch(
-    new fromActionsNotification.GetNotificationsPage({
-      active: 'date',
-      direction: 'desc',
-      page: ++this.page,
-    }),
+    new fromActionsNotification.GetNotificationsPage(++this.page, 'date', 'desc'),
   );
 
   remove = (index: number): void => {
@@ -72,7 +68,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     }
     const notification = this.notifications.splice(index, 1)[0];
     this.store.dispatch(
-      new fromActionsNotification.DeleteNotificationById(Object.assign({}, notification, { deleted: true })),
+      new fromActionsNotification.DeleteNotification(Object.assign({}, notification, { deleted: true })),
     );
     if (!notification.read) {
       --this.badge;
@@ -86,7 +82,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   private clean = (): void => this.store.dispatch(new fromActionsNotification.Clean());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.data) {
         if (state.data.page?.content?.length) {
           if (state.data.page?.content[0]?.id) {

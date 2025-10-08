@@ -15,7 +15,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockColors(false);
     });
 
-    it(`should create a new treatment`, () => {
+    it('should create a new treatment', () => {
       cy.mockTreatments(true, 0);
       cy.intercept('POST', '**/api/v1/treatments', (req) => req.alias = 'saveTreatment');
       cy.openMenu(breakpoints, ['Treatments', 'Treatments']);
@@ -32,7 +32,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         { name: 'Treatment 1', hour: '1', minute: 30 },
         { name: 'Treatment 2', hour: '2', minute: 45 },
         { name: 'Treatment 3', hour: '00', minute: 15 },
-        { name: 'Treatment 4', hour: '3', minute: 0 }
+        { name: 'Treatment 4', hour: '3', minute: 0 },
       ];
 
       cy.formControlType('name', treatmentGroupName);
@@ -75,7 +75,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       });
     });
 
-    it(`should edit a treatment`, () => {
+    it('should edit a treatment', () => {
       cy.mockTreatments(true, undefined, '9c44aaf0-82c0-4e09-a8f9-bcc915d23ed3');
       cy.openMenu(breakpoints, ['Treatments', 'Treatments']);
       cy.wait('@getTreatments');
@@ -125,7 +125,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         const newTreatment = {
           name: 'New Treatment',
           hour: '1',
-          minute: 0
+          minute: 0,
         };
         const newTreatmentExpected = {
           name: newTreatment.name,
@@ -133,7 +133,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           description: `${ newTreatment.name } Description`,
           errors: {},
           time: `${ zeroPad(newTreatment.hour) }:${ zeroPad(newTreatment.minute) }`,
-          order: treatment.treatments.length - 1
+          order: treatment.treatments.length - 1,
         };
         cy.get('#add-treatment').should('be.visible');
         cy.get('#add-treatment').clear().type(newTreatment.name);

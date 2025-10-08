@@ -2,126 +2,126 @@ import { Pagination } from '../../interfaces/pagination';
 import { All, CatalogueActionTypes } from '../catalogue.actions';
 import { ICatalogue } from '../../interfaces/catalogue';
 import { ITreatmentGroup } from '../../interfaces/treatment';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 
 export interface State {
-  data: ICatalogue | ICatalogue[] | Pagination<ICatalogue> | null;
-  groups: ITreatmentGroup[] | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  selected: ICatalogue | null;
-  message: string | null;
+  response?: IResponseSuccess;
+  data?: ICatalogue[] | Pagination<ICatalogue>;
+  groups?: ITreatmentGroup[];
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
+  selected?: ICatalogue;
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  data: null,
-  groups: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  selected: null,
-  message: null,
+  response: undefined,
+  data: undefined,
+  groups: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  selected: undefined,
   isLoading: false,
 };
 
 export const reducer = (state = initialState, action: All): State => {
   switch (action.type) {
     case CatalogueActionTypes.getAllCatalogs:
-    case CatalogueActionTypes.getAll: {
+    case CatalogueActionTypes.getAllCatalogues: {
       return {
         ...state,
         data: [{}, {}, {}],
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        response: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
       };
     }
-    case CatalogueActionTypes.catalogueFind: {
+    case CatalogueActionTypes.getCatalogue: {
       return {
         ...state,
-        data: {} as ICatalogue,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        selected: {} as ICatalogue,
+        response: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case CatalogueActionTypes.catalogueSuccess: {
       return {
         ...state,
-        data: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        data: action.data,
+        response: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case CatalogueActionTypes.catalogueSaveSuccess: {
       return {
         ...state,
-        message: action.payload.message,
-        selected: null,
-        errorMessage: null,
-        subErrors: null,
+        response: action,
+        selected: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
         isLoading: false,
       };
     }
     case CatalogueActionTypes.catalogueSelected: {
       return {
         ...state,
-        selected: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        selected: action.selected,
+        response: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case CatalogueActionTypes.catalogueFailure: {
       return {
         ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
-        message: null,
+        errorMessage: action.error.message,
+        error: action.error,
+        subErrors: action.error.subErrors,
+        response: undefined,
         isLoading: false,
       };
     }
-    case CatalogueActionTypes.catalogueUpdateAll: {
+    case CatalogueActionTypes.updateCatalogueOrder: {
       return {
         ...state,
         data: [{}, {}, {}],
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        response: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
-    case CatalogueActionTypes.catalogueUpdate:
-    case CatalogueActionTypes.catalogueSave:
-    case CatalogueActionTypes.catalogueDelete: {
+    case CatalogueActionTypes.updateCatalogue:
+    case CatalogueActionTypes.createCatalogue:
+    case CatalogueActionTypes.deleteCatalogue: {
       return {
         ...state,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        response: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
         isLoading: true,
       };
     }
     case CatalogueActionTypes.getAllTreatmentsGroup: {
       return {
         ...state,
-        groups: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        response: undefined,
+        groups: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case CatalogueActionTypes.findGroupsSuccess: {
       return {
         ...state,
-        groups: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        groups: action.groups,
+        response: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
       };
     }
     case CatalogueActionTypes.clean: {

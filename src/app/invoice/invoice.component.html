@@ -9,7 +9,7 @@
                  autocomplete="off" matInput placeholder="{{ 'INVOICE.OFFICE.FIELD' | translate }}"
                  type="text" required>
           <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
-            @for (office of filteredOffice | async; track office) {
+            @for (office of filteredOffice | async; track office.id) {
               <mat-option [value]="office">
                 {{ office.name }}
               </mat-option>

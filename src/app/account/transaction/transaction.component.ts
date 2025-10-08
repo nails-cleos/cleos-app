@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectAccountState } from '../../store/app.states';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Observable, Subscription } from 'rxjs';
-import { IAccountAll } from '../../interfaces/account';
+import { IAccountAll, ITransaction } from '../../interfaces/account';
 import { getPayNlOptions, IPaymentOption, PaymentOption, PaymentType } from '../../interfaces/payment';
 import { currencySymbol } from '../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
@@ -82,16 +82,12 @@ export class TransactionComponent implements OnInit, OnDestroy {
       type = option;
     }
     const transfer = this.getForm.transfer.value;
-    const payload = {
+    const transaction = {
       customerId,
       amount,
       paymentRequest: { type, paymentOptionId, transfer, bic },
-    };
-    this.store.dispatch(
-      new fromActionsAccount.AddMoney({
-        transaction: payload, accountId: this.accountId, hasAdminRole: this.hasAdminRole,
-      }),
-    );
+    } as ITransaction;
+    this.store.dispatch(new fromActionsAccount.CreateTransaction(this.accountId!, transaction));
     return;
   }
 
@@ -122,7 +118,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
   private getAccount = (): void => {
     if (!this.account) {
       this.store.dispatch(
-        new fromActionsAccount.FindAccountById(this.accountId),
+        new fromActionsAccount.GetAccount(this.accountId!),
       );
     }
   };
@@ -130,7 +126,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
   private getOptions = (): void => this.store.dispatch(new fromActionsAccount.PaymentOptions());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.selected) {
         this.account = state.selected;
       }
@@ -142,7 +138,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
-      } else if (state.message) {
+      } else if (state.response) {
         if (this.hasAdminRole) {
           this.router.navigate([this.language, 'users', this.account?.customer?.id, 'overview']);
         } else {

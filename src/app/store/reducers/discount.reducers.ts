@@ -2,28 +2,29 @@ import { Pagination } from '../../interfaces/pagination';
 import { All, DiscountActionTypes } from '../discount.actions';
 import { IDiscount, IReferral, IUserDiscount } from '../../interfaces/discount';
 import { ICurrency } from '../../interfaces/currency';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 
 export interface State {
-  data: IDiscount | Pagination<IDiscount> | Pagination<IUserDiscount> | IUserDiscount[] | null;
-  referrals: IReferral[] | null;
-  currencies: ICurrency[] | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  selected: IDiscount | null;
-  message: string | null;
+  response?: IResponseSuccess;
+  data: IDiscount | Pagination<IDiscount> | Pagination<IUserDiscount> | IUserDiscount[] | undefined;
+  referrals?: IReferral[];
+  currencies?: ICurrency[];
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
+  selected?: IDiscount;
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  data: null,
-  referrals: null,
-  currencies: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  selected: null,
-  message: null,
+  data: undefined,
+  referrals: undefined,
+  currencies: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  selected: undefined,
+  response: undefined,
   isLoading: false,
 };
 
@@ -34,126 +35,126 @@ export const reducer = (state = initialState, action: All): State => {
       return {
         ...state,
         data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IDiscount>,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
+        response: undefined,
       };
     }
     case DiscountActionTypes.getMyReferrals: {
       return {
         ...state,
         referrals: [],
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
+        response: undefined,
       };
     }
     case DiscountActionTypes.getAllCurrency: {
       return {
         ...state,
         currencies: [],
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
+        response: undefined,
       };
     }
     case DiscountActionTypes.sendDiscountToCustomers: {
       return {
         ...state,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
+        response: undefined,
         isLoading: true,
       };
     }
-    case DiscountActionTypes.discountFind: {
+    case DiscountActionTypes.getDiscount: {
       return {
         ...state,
         data: {} as IDiscount,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
+        response: undefined,
       };
     }
-    case DiscountActionTypes.discountFindByCustomer: {
+    case DiscountActionTypes.getUserDiscountByCustomerId: {
       return {
         ...state,
         data: [],
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        selected: undefined,
+        response: undefined,
       };
     }
     case DiscountActionTypes.discountSuccess: {
       return {
         ...state,
-        data: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        data: action.data,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case DiscountActionTypes.referralSuccess: {
       return {
         ...state,
-        referrals: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        referrals: action.referrals,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case DiscountActionTypes.currencySuccess: {
       return {
         ...state,
-        currencies: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        currencies: action.currencies,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case DiscountActionTypes.discountSaveSuccess: {
       return {
         ...state,
-        message: action.payload.message,
-        selected: null,
-        errorMessage: null,
-        subErrors: null,
+        response: action,
+        selected: undefined,
+        errorMessage: undefined,
+        subErrors: undefined,
         isLoading: false,
       };
     }
     case DiscountActionTypes.discountSelected: {
       return {
         ...state,
-        selected: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        selected: action.selected,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
       };
     }
     case DiscountActionTypes.discountFailure: {
       return {
         ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
-        message: null,
+        errorMessage: action.error.message,
+        error: action.error,
+        subErrors: action.error.subErrors,
+        response: undefined,
         isLoading: false,
       };
     }
-    case DiscountActionTypes.discountUpdate:
-    case DiscountActionTypes.discountSave:
-    case DiscountActionTypes.discountDelete: {
+    case DiscountActionTypes.updateDiscount:
+    case DiscountActionTypes.createDiscount:
+    case DiscountActionTypes.deleteDiscount: {
       return {
         ...state,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
+        errorMessage: undefined,
+        subErrors: undefined,
+        response: undefined,
         isLoading: true,
       };
     }

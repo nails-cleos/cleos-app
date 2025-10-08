@@ -127,7 +127,7 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   	dialogRef.afterClosed().subscribe(result => {
   		if (result) {
   			this.store.dispatch(
-  				new fromActionsExpense.DeleteExpenseById(this.roomId!, result.id, result.invoice ),
+  				new fromActionsExpense.DeleteExpense(this.roomId!, result.id, result.invoice ),
   			);
   		}
   	});
@@ -170,7 +170,7 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscribe = (): void => {
   	this.subscription = this.getState.subscribe((state) => {
-  		if (state.message) {
+  		if (state.response) {
   			this.clean();
   			this.getExpenses();
   		}

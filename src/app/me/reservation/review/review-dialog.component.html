@@ -1,6 +1,6 @@
 <div class="dialog-header">
   <h1 mat-dialog-title>{{ 'ME.REVIEW.TITLE' | translate }}</h1>
-  <button (click)="onNoClick" class="close-button" mat-icon-button>
+  <button (click)="onNoClick()" class="close-button" mat-icon-button>
     <mat-icon>close</mat-icon>
   </button>
 </div>
@@ -63,9 +63,9 @@
 <mat-divider class="divider-padding"></mat-divider>
 <div mat-dialog-actions class="card-actions">
   <div class="spacer"></div>
-  <button (click)="onNoClick" color="accent" mat-fab extended>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+  <button (click)="onNoClick()" color="accent" mat-fab extended>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
   @if (!review) {
-    <button (click)="doAction" [disabled]="rating < 1" color="primary" mat-fab extended>
+    <button (click)="doAction()" [disabled]="rating < 1" color="primary" mat-fab extended>
       {{ 'COMMON.BUTTON.ADD' | translate }}
     </button>
   }

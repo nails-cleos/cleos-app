@@ -1,10 +1,10 @@
-import { defineConfig } from 'cypress'
+import { defineConfig } from 'cypress';
 
 export default defineConfig({
-  projectId: "wr2ba6",
+  projectId: 'wr2ba6',
   e2e: {
     baseUrl: 'http://localhost:4300',
-    defaultCommandTimeout: 8000
+    defaultCommandTimeout: 8000,
   },
 
   component: {
@@ -12,11 +12,11 @@ export default defineConfig({
       framework: 'angular',
       bundler: 'webpack',
     },
-    specPattern: '**/*.cy.ts'
+    specPattern: '**/*.cy.ts',
   },
 
-  reporter: "mocha-multi-reporters",
+  reporter: 'mocha-multi-reporters',
   reporterOptions: {
-    configFile: "multi-reporter-config.json",
-  }
-})
+    configFile: 'multi-reporter-config.json',
+  },
+});

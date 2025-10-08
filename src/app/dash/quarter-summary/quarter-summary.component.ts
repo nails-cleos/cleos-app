@@ -225,7 +225,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     this.quarter = quarter;
     this.isLoading = true;
     this.store.dispatch(
-      new fromActionsDashboard.GetQuarterSummary({ year, quarter }),
+      new fromActionsDashboard.GetQuarterSummary(year, quarter),
     );
   };
 
@@ -237,7 +237,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
   private clean = (): void => this.store.dispatch(new fromActionsDashboard.Clean());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.quarterSummaryMap = state.quarterSummaryMap;
       if (this.quarterSummaryMap) {
         if (this.quarterSummaryMap.size === 1) {
