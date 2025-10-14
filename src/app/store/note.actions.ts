@@ -6,13 +6,13 @@ import { IUser } from '../interfaces/user';
 enum NoteActionTypes {
   getAllProfessional = '[Note] Get all professional',
   noteSuccess = '[Note] Success',
-  createNote = '[Note] Create Note',
-  updateNote = '[Note] Update note by Id',
-  noteSaveSuccess = '[Note] Save Success',
+  createNote = '[Note] Create note',
+  updateNote = '[Note] Update note by id',
+  noteSaveSuccess = '[Note] Save success',
   noteFailure = '[Note] Failure',
   noteSelected = '[Note] Selected',
-  getNote = '[Note] Find note by Id',
-  deleteNote = '[Note] Delete note by Id',
+  getNote = '[Note] Find note by id',
+  deleteNote = '[Note] Delete note by id',
   completeNote = '[Note] Complete',
   clean = '[Note] Clean'
 }

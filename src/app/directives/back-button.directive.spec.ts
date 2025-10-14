@@ -1,39 +1,42 @@
 import { BackButtonDirective } from './back-button.directive';
 import { TestBed } from '@angular/core/testing';
 import { NavigationService } from '../services/navigation.service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { UntypedFormGroup, UntypedFormControl } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 
 describe('BackButtonDirective', () => {
   let directive: BackButtonDirective;
   let mockNavigationService: jasmine.SpyObj<NavigationService>;
-  let mockTranslateService: jasmine.SpyObj<TranslateService>;
   let mockDialog: jasmine.SpyObj<MatDialog>;
+  let translateService: TranslateService;
 
   beforeEach(() => {
     mockNavigationService = jasmine.createSpyObj('NavigationService', ['back']);
-    mockTranslateService = jasmine.createSpyObj('TranslateService', ['instant']);
-    
+
     const mockDialogRef = {
       afterClosed: () => ({
         subscribe: jasmine.createSpy('subscribe'),
       }),
     };
-    
+
     mockDialog = jasmine.createSpyObj('MatDialog', ['open']);
     mockDialog.open.and.returnValue(mockDialogRef as any);
 
     TestBed.configureTestingModule({
+      imports: [TranslateModule.forRoot()],
       providers: [
         BackButtonDirective,
         { provide: NavigationService, useValue: mockNavigationService },
-        { provide: TranslateService, useValue: mockTranslateService },
         { provide: MatDialog, useValue: mockDialog },
       ],
     });
 
     directive = TestBed.inject(BackButtonDirective);
+
+    translateService = TestBed.inject(TranslateService);
+    translateService.setDefaultLang('en-GB');
+    translateService.use('en-GB');
   });
 
   it('should create an instance', () => {
@@ -69,11 +72,18 @@ describe('BackButtonDirective', () => {
     form.markAsDirty();
     directive.form = form;
 
-    mockTranslateService.instant.and.returnValue('Translated text');
+    translateService.setTranslation('en-GB', {
+      COMMON: {
+        BACK: {
+          TITLE: 'Back Title',
+          CONTENT: 'Back Content',
+        },
+      },
+    });
 
     directive.onClick();
 
-    expect(mockTranslateService.instant).toHaveBeenCalledWith('COMMON.BACK.TITLE');
-    expect(mockTranslateService.instant).toHaveBeenCalledWith('COMMON.BACK.CONTENT');
+    expect(translateService.instant('COMMON.BACK.TITLE')).toBe('Back Title');
+    expect(translateService.instant('COMMON.BACK.CONTENT')).toBe('Back Content');
   });
 });

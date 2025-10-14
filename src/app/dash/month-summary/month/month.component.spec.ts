@@ -8,7 +8,6 @@ describe('MonthComponent', () => {
   let component: MonthComponent;
   let fixture: ComponentFixture<MonthComponent>;
   let mockRouter: jasmine.SpyObj<Router>;
-  let mockTranslate: jasmine.SpyObj<TranslateService>;
 
   const monthSummary: IMonthSummary = {
     month: 1,
@@ -27,15 +26,17 @@ describe('MonthComponent', () => {
 
   beforeEach(async () => {
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-    mockTranslate = jasmine.createSpyObj('TranslateService', [], { currentLang: 'en' });
 
     await TestBed.configureTestingModule({
       imports: [MonthComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Router, useValue: mockRouter },
-        { provide: TranslateService, useValue: mockTranslate },
       ],
     }).compileComponents();
+
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
 
     fixture = TestBed.createComponent(MonthComponent);
     component = fixture.componentInstance;
@@ -79,7 +80,7 @@ describe('MonthComponent', () => {
       component.goToMonth(5, 'INCOME');
 
       expect(mockRouter.navigate).toHaveBeenCalledWith(
-        ['en', 'dashboard', 'monthly', 'summary'],
+        ['en-GB', 'dashboard', 'monthly', 'summary'],
         { state: { date: '5-2025', step: 0 } },
       );
     });
@@ -88,7 +89,7 @@ describe('MonthComponent', () => {
       component.goToMonth(5, 'EXPENSE');
 
       expect(mockRouter.navigate).toHaveBeenCalledWith(
-        ['en', 'dashboard', 'monthly', 'summary'],
+        ['en-GB', 'dashboard', 'monthly', 'summary'],
         { state: { date: '5-2025', step: 1 } },
       );
     });
@@ -97,7 +98,7 @@ describe('MonthComponent', () => {
       component.goToMonth(5, 'CASH');
 
       expect(mockRouter.navigate).toHaveBeenCalledWith(
-        ['en', 'dashboard', 'monthly', 'summary'],
+        ['en-GB', 'dashboard', 'monthly', 'summary'],
         { state: { date: '5-2025', step: 2 } },
       );
     });
@@ -106,7 +107,7 @@ describe('MonthComponent', () => {
       component.goToMonth(7);
 
       expect(mockRouter.navigate).toHaveBeenCalledWith(
-        ['en', 'dashboard', 'monthly', 'summary'],
+        ['en-GB', 'dashboard', 'monthly', 'summary'],
         { state: { date: '7-2025', step: 0 } },
       );
     });

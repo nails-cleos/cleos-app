@@ -15,7 +15,7 @@ import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } 
 import { Store } from '@ngrx/store';
 import { AppState, selectMainState } from '../../store/app.states';
 import { TranslateService } from '@ngx-translate/core';
-import { sendMessage, clean } from '../../store/main.actions';
+import { clean, sendMessage } from '../../store/main.actions';
 import { AuthUserService } from '../../services/auth-user.service';
 import {
   bottomTop,
@@ -84,7 +84,6 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   contactTitle: AnimationSequenceMetadata = fadeInUpDown('20px', '500ms');
   contactText: AnimationSequenceMetadata = rubberBand;
   contactMap: AnimationAnimateMetadata = bounceInDownAnimation('500ms');
-  faqTitle: AnimationAnimateMetadata = bounceInDownAnimation('500ms');
 
   isSmall: boolean = isMobile();
   isDark: boolean = false;
@@ -272,7 +271,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isCurrentSlideIndex = (index: number): boolean => this.currentIndex === index;
 
-  setTreatmentAnimation = (i: number): AnimationSequenceMetadata => scaleIn(`${i * (this.isSmall ? 0 : 300)}ms`);
+  setTreatmentAnimation = (i: number): AnimationSequenceMetadata => scaleIn(`${ i * (this.isSmall ? 0 : 300) }ms`);
 
   goToTreatment = (name?: string): void => {
     if (name === 'biab') {
@@ -283,7 +282,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onHover = (social: ISocialLink, enter: boolean): void => {
     const suffix = enter ? '' : '-NO-COLOR';
-    social.svgIcon = `${social.name}${suffix}`;
+    social.svgIcon = `${ social.name }${ suffix }`;
   };
 
   filterBy = (group?: ITreatmentGroup): void => {
@@ -338,28 +337,6 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
       // }
     }
   };
-
-  private allSocialLinks = (): ISocialLink[] => [
-    {
-      name: 'WHATSAPP',
-      delay: '1000ms',
-      href: 'https://api.whatsapp.com/send?phone=',
-      svgIcon: 'WHATSAPP-NO-COLOR',
-      phone: 'MAIN.CONTACT.SEND.PHONE',
-      phoneKey: '&text=',
-      phoneText: 'MAIN.CONTACT.SEND.HELLO',
-    }, {
-      name: 'INSTAGRAM',
-      delay: '1100ms',
-      href: 'https://www.instagram.com/carlanailscleos.nl/',
-      svgIcon: 'INSTAGRAM-NO-COLOR',
-    }, {
-      name: 'FACEBOOK',
-      delay: '1200ms',
-      href: 'https://www.facebook.com/carlanailscleos.nl/',
-      svgIcon: 'FACEBOOK-NO-COLOR',
-    },
-  ];
 
   private clean = (): void => this.store.dispatch(clean());
 

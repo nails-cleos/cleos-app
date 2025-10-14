@@ -3,7 +3,7 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { of, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { TransactionComponent } from './transaction.component';
@@ -71,14 +71,6 @@ describe('TransactionComponent', () => {
     const authUserSpyObj = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSubject.asObservable(),
     });
-    const translateSpyObj = jasmine.createSpyObj('TranslateService', ['instant', 'get', 'stream'], {
-      currentLang: 'en',
-      onLangChange: of('en'),
-      onTranslationChange: of('en'),
-      onDefaultLangChange: of('en'),
-    });
-    translateSpyObj.get.and.returnValue(of('translated text'));
-    translateSpyObj.stream.and.returnValue(of('translated text'));
 
     storeSpyObj.select.and.returnValue(stateSubject.asObservable());
 
@@ -95,12 +87,15 @@ describe('TransactionComponent', () => {
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
         { provide: Router, useValue: routerSpyObj },
         { provide: AuthUserService, useValue: authUserSpyObj },
-        { provide: TranslateService, useValue: translateSpyObj },
       ],
     }).compileComponents();
 
     mockStore = TestBed.inject(Store) as jasmine.SpyObj<Store>;
     mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
 
     fixture = TestBed.createComponent(TransactionComponent);
     component = fixture.componentInstance;
@@ -118,7 +113,7 @@ describe('TransactionComponent', () => {
   it('should initialize with default values', () => {
     expect(component.hasAdminRole).toBe(false);
     expect(component.amountMin).toBe(100);
-    expect(component.language).toBe('en');
+    expect(component.language).toBe('en-GB');
     expect(component.types).toEqual([PaymentType.cash, PaymentType.transfer]);
     expect(component.errors).toEqual([]);
   });
@@ -251,7 +246,7 @@ describe('TransactionComponent', () => {
 
     stateSubject.next(stateWithResponse);
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en', 'users', 'customer-123', 'overview']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'users', 'customer-123', 'overview']);
   });
 
   it('should navigate to user overview on success when not admin', () => {
@@ -264,7 +259,7 @@ describe('TransactionComponent', () => {
 
     stateSubject.next(stateWithResponse);
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en', 'me', 'overview']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'overview']);
   });
 
   it('should return currency icon from account', () => {

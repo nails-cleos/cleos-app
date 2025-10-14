@@ -1,28 +1,29 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { QuarterComponent } from './quarter.component';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 
 describe('QuarterComponent', () => {
   let component: QuarterComponent;
   let fixture: ComponentFixture<QuarterComponent>;
   let routerMock: any;
-  let translateMock: any;
 
   beforeEach(async () => {
     routerMock = { navigate: jasmine.createSpy('navigate') };
-    translateMock = { currentLang: 'en-GB' };
 
     await TestBed.configureTestingModule({
-      imports: [QuarterComponent],
+      imports: [QuarterComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Router, useValue: routerMock },
-        { provide: TranslateService, useValue: translateMock },
       ],
     }).compileComponents();
   });
 
   beforeEach(() => {
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
+
     fixture = TestBed.createComponent(QuarterComponent);
     component = fixture.componentInstance;
     component.year = 2025;

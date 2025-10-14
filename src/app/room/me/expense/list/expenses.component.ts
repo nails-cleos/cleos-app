@@ -11,7 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectExpenseState } from '../../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { clean, deleteExpense, getExpensesPage } from '../../../../store/expense.actions';
+import { clean, deleteExpense, expenseSelected, getExpensesPage } from '../../../../store/expense.actions';
 import { DialogComponent } from '../../../../shared/dialog/generic/dialog.component';
 import { ActivatedRoute } from '@angular/router';
 import { getDateFormat, getNowTimeZone, isSameTimeZone, newDateTimestamp } from '../../../../util/dates';
@@ -56,7 +56,7 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   private dateFilter?: string;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver, private route: ActivatedRoute) {
+    private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver, private route: ActivatedRoute) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small,
@@ -116,6 +116,8 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   openDialog = (expense: IExpenseAll): void => openDialog(
     expense.room, this.dateFormat, this.translate, this.dialog, newDateTimestamp(expense.timestamp),
   );
+
+  edit = (selected: IExpense): void => this.store.dispatch(expenseSelected({ selected }));
 
   delete = (expense: IExpense): void => {
     const title = this.translate.instant('EXPENSE.DELETED.TITLE');

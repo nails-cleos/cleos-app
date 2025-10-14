@@ -10,12 +10,12 @@ enum OfficeActionTypes {
   officeSuccess = '[Office] Success',
   managerSuccess = '[Office] Manager Success',
   createOffice = '[Office] Create office',
-  updateOffice = '[Office] Update office by Id',
-  officeSaveSuccess = '[Office] Save Success',
+  updateOffice = '[Office] Update office by id',
+  officeSaveSuccess = '[Office] Save success',
   officeFailure = '[Office] Failure',
   officeSelected = '[Office] Selected',
-  getOffice = '[Office] Find office by Id',
-  deleteOffice = '[Office] Delete office by Id',
+  getOffice = '[Office] Find office by id',
+  deleteOffice = '[Office] Delete office by id',
   clean = '[Office] Clean',
 }
 

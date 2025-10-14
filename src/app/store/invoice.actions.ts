@@ -8,7 +8,7 @@ enum InvoiceActionTypes {
   getAllMyOffices = '[Invoice] Get all my offices',
   invoiceOfficesSuccess = '[Invoice] Offices success',
   invoiceSuccess = '[Invoice] Success',
-  updateOfficeById = '[Invoice] Update office by Id',
+  updateOfficeById = '[Invoice] Update office by id',
   invoiceUpdateOfficeSuccess = '[Invoice] Update office Success',
   invoiceFailure = '[Invoice] Failure',
   clean = '[Invoice] Clean'

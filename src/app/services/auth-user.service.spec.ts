@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NgcCookieConsentService } from 'ngx-cookieconsent';
 
 import { AuthUserService } from './auth-user.service';
@@ -9,7 +9,7 @@ import { Role } from '../interfaces/token';
 describe('AuthUserService', () => {
   let service: AuthUserService;
   let cookieConsentService: jasmine.SpyObj<NgcCookieConsentService>;
-  let translateService: jasmine.SpyObj<TranslateService>;
+  let translateService: TranslateService;
 
   const mockUser: IUserAll = {
     id: 'user-123',
@@ -56,7 +56,6 @@ describe('AuthUserService', () => {
       'destroy',
       'init',
     ]);
-    const translateSpy = jasmine.createSpyObj('TranslateService', ['instant']);
 
     // Mock cookie consent service config
     cookieSpy.getConfig.and.returnValue({
@@ -72,16 +71,18 @@ describe('AuthUserService', () => {
     });
 
     TestBed.configureTestingModule({
+      imports: [TranslateModule.forRoot()],
       providers: [
         AuthUserService,
         { provide: NgcCookieConsentService, useValue: cookieSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     });
 
     service = TestBed.inject(AuthUserService);
     cookieConsentService = TestBed.inject(NgcCookieConsentService) as jasmine.SpyObj<NgcCookieConsentService>;
-    translateService = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
+    translateService = TestBed.inject(TranslateService);
+    translateService.setDefaultLang('en-GB');
+    translateService.use('en-GB');
   });
 
   it('should be created', () => {
@@ -287,21 +288,22 @@ describe('AuthUserService', () => {
 
   describe('cookieConsent', () => {
     beforeEach(() => {
-      translateService.instant.and.returnValue({
-        HEADER: 'Cookie Header',
-        MESSAGE: 'Cookie Message',
-        DISMISS: 'Dismiss',
-        ALLOW: 'Allow',
-        DENY: 'Deny',
-        LINK: 'Link',
-        POLICY: 'Policy',
+      translateService.setTranslation('en-GB', {
+        COOKIE: {
+          HEADER: 'Cookie Header',
+          MESSAGE: 'Cookie Message',
+          DISMISS: 'Dismiss',
+          ALLOW: 'Allow',
+          DENY: 'Deny',
+          LINK: 'Link',
+          POLICY: 'Policy',
+        },
       });
     });
 
     it('should update cookie consent configuration with translated content', () => {
       service.cookieConsent(translateService);
 
-      expect(translateService.instant).toHaveBeenCalledWith('COOKIE');
       expect(cookieConsentService.getConfig).toHaveBeenCalled();
 
       const config = cookieConsentService.getConfig();

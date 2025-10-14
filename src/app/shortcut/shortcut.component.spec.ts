@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ShortcutComponent } from './shortcut.component';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { AuthUserService } from '../services/auth-user.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -34,18 +34,18 @@ describe('ShortcutComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [ShortcutComponent],
+      imports: [ShortcutComponent, TranslateModule.forRoot()],
       providers: [
         { provide: AuthUserService, useValue: authUserSpyObj },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        {
-          provide: TranslateService,
-          useValue: { currentLang: 'en-GB' },
-        },
         { provide: Router, useValue: mockRouter },
         { provide: NavigationService, useValue: navigateServiceSpy },
       ],
     }).compileComponents();
+
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
   });
 
   afterEach(async () => {

@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { NavigationService } from '../../services/navigation.service';
 import { TokenService } from '../../services/token.service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Role } from '../../interfaces/token';
 
 describe('RedirectComponent', () => {
@@ -27,20 +27,21 @@ describe('RedirectComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [RedirectComponent],
+      imports: [RedirectComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: mockStore },
         { provide: NavigationService, useValue: navigateServiceSpy },
         { provide: TokenService, useValue: mockTokenService },
-        {
-          provide: TranslateService,
-          useValue: { currentLang: 'en-GB' },
-        },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(RedirectComponent);
     tokenService = TestBed.inject(TokenService);
+
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
+
     fixture.detectChanges();
   });
 

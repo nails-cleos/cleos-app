@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { NavigationEnd, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 
 import { NavigationService } from './navigation.service';
@@ -14,7 +14,6 @@ describe('NavigationService', () => {
   let service: NavigationService;
   let storeSpy: jasmine.SpyObj<Store<AppState>>;
   let routerSpy: jasmine.SpyObj<Router>;
-  let translateSpy: jasmine.SpyObj<TranslateService>;
   let routerEventsSubject: Subject<any>;
 
   const mockUser: IUser = {
@@ -33,22 +32,22 @@ describe('NavigationService', () => {
       events: routerEventsSubject.asObservable(),
       url: '/test/path',
     });
-    translateSpy = jasmine.createSpyObj('TranslateService', ['instant'], {
-      currentLang: 'en',
-    });
 
     // Mock router methods to return promises
     routerSpy.navigate.and.returnValue(Promise.resolve(true));
     routerSpy.navigateByUrl.and.returnValue(Promise.resolve(true));
 
     TestBed.configureTestingModule({
+      imports: [TranslateModule.forRoot()],
       providers: [
         NavigationService,
         { provide: Store, useValue: storeSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     });
+    const translateService = TestBed.inject(TranslateService);
+    translateService.setDefaultLang('en-GB');
+    translateService.use('en-GB');
 
     service = TestBed.inject(NavigationService);
   });

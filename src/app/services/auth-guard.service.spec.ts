@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { authGuard, PermissionsService } from './auth-guard.service';
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ToastService } from './toast.service';
 import { of } from 'rxjs';
 
@@ -21,24 +21,28 @@ describe('authGuard', () => {
     storeSpy.select.and.returnValue(of({ user: { authorities: [{ authority: 'ROLE_USER' }] } }));
 
     TestBed.configureTestingModule({
+      imports: [TranslateModule.forRoot()],
       providers: [
         PermissionsService,
         { provide: Router, useValue: routerSpy },
         { provide: Store, useValue: storeSpy },
-        { provide: TranslateService, useValue: { currentLang: 'en' } },
         { provide: ToastService, useValue: toastSpy },
       ],
     });
 
     service = TestBed.inject(PermissionsService);
     router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
     guard = authGuard;
   });
 
   it('should allow activation if user has the required role', () => {
     const route = { data: { roles: ['ROLE_USER'] } } as unknown as ActivatedRouteSnapshot;
     const state = {} as RouterStateSnapshot;
-    
+
     TestBed.runInInjectionContext(() => {
       expect(guard(route, state)).toBeTruthy();
     });
@@ -47,7 +51,7 @@ describe('authGuard', () => {
   it('should deny activation if user does not have the required role', () => {
     const route = { data: { roles: ['ROLE_ADMIN'] } } as unknown as ActivatedRouteSnapshot;
     const state = {} as RouterStateSnapshot;
-    
+
     TestBed.runInInjectionContext(() => {
       expect(guard(route, state)).toBeFalsy();
     });
@@ -57,10 +61,10 @@ describe('authGuard', () => {
     service.currentUser = undefined;
     const route = {} as ActivatedRouteSnapshot;
     const state = { url: '/test' } as RouterStateSnapshot;
-    
+
     TestBed.runInInjectionContext(() => {
       expect(guard(route, state)).toBeFalsy();
-      expect(router.navigate).toHaveBeenCalledWith(['en', 'auth'], { queryParams: { state: jasmine.any(String) } });
+      expect(router.navigate).toHaveBeenCalledWith(['en-GB', 'auth'], { queryParams: { state: jasmine.any(String) } });
     });
   });
 });

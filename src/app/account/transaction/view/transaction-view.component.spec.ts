@@ -87,14 +87,6 @@ describe('TransactionViewComponent', () => {
       authUser: authUserSubject.asObservable(),
     });
     const breakpointSpyObj = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    const translateSpyObj = jasmine.createSpyObj('TranslateService', ['instant', 'get', 'stream'], {
-      currentLang: 'en',
-      onLangChange: of('en'),
-      onTranslationChange: of('en'),
-      onDefaultLangChange: of('en'),
-    });
-    translateSpyObj.get.and.returnValue(of('translated text'));
-    translateSpyObj.stream.and.returnValue(of('translated text'));
 
     storeSpyObj.select.and.returnValue(stateSubject.asObservable());
     breakpointSpyObj.observe.and.returnValue(breakpointSubject.asObservable());
@@ -111,11 +103,14 @@ describe('TransactionViewComponent', () => {
         { provide: ChangeDetectorRef, useValue: changeDetectorSpyObj },
         { provide: AuthUserService, useValue: authUserSpyObj },
         { provide: BreakpointObserver, useValue: breakpointSpyObj },
-        { provide: TranslateService, useValue: translateSpyObj },
       ],
     }).compileComponents();
 
     mockStore = TestBed.inject(Store) as jasmine.SpyObj<Store>;
+
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
 
     fixture = TestBed.createComponent(TransactionViewComponent);
     component = fixture.componentInstance;
@@ -134,8 +129,8 @@ describe('TransactionViewComponent', () => {
   it('should initialize with default values', () => {
     expect(component.hasAdminRole).toBe(false);
     expect(component.pageSize).toBe(PAGE_SIZE);
-    expect(component.dateFormat).toBe('en');
-    expect(component.language).toBe('en');
+    expect(component.dateFormat).toBe('en-GB');
+    expect(component.language).toBe('en-GB');
     expect(component.displayedColumns).toEqual([
       'position', 'timestamp', 'amount', 'amountGifted', 'payment.status', 'payment.type', 'actions',
     ]);

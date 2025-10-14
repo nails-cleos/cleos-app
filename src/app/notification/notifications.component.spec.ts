@@ -3,7 +3,7 @@ import { NotificationsComponent } from './notifications.component';
 import { Store } from '@ngrx/store';
 import { of, Subject, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../services/navigation.service';
 import { deleteNotification, readNotification } from '../store/notification.actions';
 import { INotification } from '../interfaces/notification';
@@ -13,29 +13,29 @@ describe('NotificationsComponent', () => {
   let fixture: ComponentFixture<NotificationsComponent>;
   let storeSpy: jasmine.SpyObj<Store<any>>;
   let routerSpy: jasmine.SpyObj<Router>;
-  let translateSpy: jasmine.SpyObj<TranslateService>;
   let navigationSpy: jasmine.SpyObj<NavigationService>;
   let stateSubject: Subject<any>;
 
   beforeEach(async () => {
     storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate'], { url: '/home/test' });
-    translateSpy = jasmine.createSpyObj('TranslateService', [], { currentLang: 'en' });
     navigationSpy = jasmine.createSpyObj('NavigationService', ['reload']);
 
     stateSubject = new Subject<any>();
     storeSpy.select.and.returnValue(stateSubject.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [NotificationsComponent],
+      imports: [NotificationsComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: TranslateService, useValue: translateSpy },
         { provide: NavigationService, useValue: navigationSpy },
       ],
     }).compileComponents();
 
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
     fixture = TestBed.createComponent(NotificationsComponent);
     component = fixture.componentInstance;
 
@@ -44,7 +44,7 @@ describe('NotificationsComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
-    expect(component.dateFormat).toBe('en');
+    expect(component.dateFormat).toBe('en-GB');
   });
 
   it('should dispatch Clean and GetNotificationsPage on init', () => {

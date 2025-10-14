@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UpcomingComponent } from './upcoming.component';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { IUpcomingAll } from '../../../interfaces/reservation';
@@ -13,7 +13,6 @@ import { of } from 'rxjs';
 describe('UpcomingComponent', () => {
   let component: UpcomingComponent;
   let fixture: ComponentFixture<UpcomingComponent>;
-  let translateSpyObj: jasmine.SpyObj<TranslateService>;
   let dialogSpyObj: jasmine.SpyObj<MatDialog>;
   let routerSpyObj: jasmine.SpyObj<Router>;
 
@@ -95,14 +94,6 @@ describe('UpcomingComponent', () => {
   };
 
   beforeEach(async () => {
-    translateSpyObj = jasmine.createSpyObj('TranslateService', ['instant', 'get'], {
-      currentLang: 'en-GB',
-    });
-
-    // Mock the get method to return an observable for any key
-    translateSpyObj.get.and.callFake((key: string) => of(`mocked translation for ${key}`));
-    translateSpyObj.instant.and.callFake((key: string) => `mocked instant translation for ${key}`);
-
     dialogSpyObj = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
 
     // Create proper subject spies
@@ -125,13 +116,16 @@ describe('UpcomingComponent', () => {
     routerSpyObj = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
 
     await TestBed.configureTestingModule({
-      imports: [UpcomingComponent],
+      imports: [UpcomingComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: TranslateService, useValue: translateSpyObj },
         { provide: MatDialog, useValue: dialogSpyObj },
         { provide: Router, useValue: routerSpyObj },
       ],
     }).compileComponents();
+
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
 
     fixture = TestBed.createComponent(UpcomingComponent);
     component = fixture.componentInstance;

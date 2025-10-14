@@ -97,9 +97,6 @@ describe('ReservationComponent', () => {
     const routerSpyObj = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
     const dialogSpyObj = jasmine.createSpyObj('MatDialog', ['open']);
     const snackBarSpyObj = jasmine.createSpyObj('MatSnackBar', ['openFromComponent']);
-    const translateSpyObj = jasmine.createSpyObj('TranslateService', ['instant', 'get', 'getParsedResult'], {
-      currentLang: 'en',
-    });
 
     storeSpyObj.select.and.returnValue(of({
       rooms: [],
@@ -113,12 +110,6 @@ describe('ReservationComponent', () => {
     }));
 
     routerSpyObj.getCurrentNavigation.and.returnValue(null);
-    translateSpyObj.instant.and.returnValue('translated text');
-    translateSpyObj.get.and.returnValue(of('translated text'));
-    translateSpyObj.getParsedResult.and.returnValue('translated text');
-    translateSpyObj.onLangChange = of({ lang: 'en', translations: {} });
-    translateSpyObj.onTranslationChange = of({ lang: 'en', translations: {} });
-    translateSpyObj.onDefaultLangChange = of({ lang: 'en', translations: {} });
 
     await TestBed.configureTestingModule({
       imports: [
@@ -135,12 +126,14 @@ describe('ReservationComponent', () => {
         { provide: MatDialog, useValue: dialogSpyObj },
         { provide: MatSnackBar, useValue: snackBarSpyObj },
         { provide: BreakpointObserver, useValue: mockBreakpointObserver },
-        { provide: TranslateService, useValue: translateSpyObj },
       ],
     }).compileComponents();
 
     mockStore = TestBed.inject(Store) as jasmine.SpyObj<Store>;
     mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
   });
 
   beforeEach(() => {
@@ -344,7 +337,7 @@ describe('ReservationComponent', () => {
   describe('Navigation and Router', () => {
     it('should navigate to add customer page', () => {
       void component.addCustomer;
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['en', 'users', 'add'], { state: { role: 'ROLE_CUSTOMER' } });
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'users', 'add'], { state: { role: 'ROLE_CUSTOMER' } });
     });
   });
 

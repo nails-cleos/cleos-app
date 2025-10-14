@@ -50,9 +50,6 @@ describe('TransactionDetailComponent', () => {
     stateSubject = new Subject();
     const storeSpyObj = jasmine.createSpyObj('Store', ['select', 'dispatch']);
     const routerSpyObj = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
-    const translateSpyObj = jasmine.createSpyObj('TranslateService', ['instant'], {
-      currentLang: 'en',
-    });
 
     storeSpyObj.select.and.returnValue(stateSubject.asObservable());
     routerSpyObj.getCurrentNavigation.and.returnValue({
@@ -65,13 +62,14 @@ describe('TransactionDetailComponent', () => {
         { provide: Store, useValue: storeSpyObj },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
         { provide: Router, useValue: routerSpyObj },
-        { provide: TranslateService, useValue: translateSpyObj },
       ],
     }).compileComponents();
 
     mockStore = TestBed.inject(Store) as jasmine.SpyObj<Store>;
     mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     mockTranslateService = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
+    mockTranslateService.setDefaultLang('en-GB');
+    mockTranslateService.use('en-GB');
 
     fixture = TestBed.createComponent(TransactionDetailComponent);
     component = fixture.componentInstance;
@@ -93,9 +91,9 @@ describe('TransactionDetailComponent', () => {
   });
 
   it('should set initial properties from constructor', () => {
-    expect(component.dateFormat).toBe('en');
+    expect(component.dateFormat).toBe('en-GB');
     expect(component.step).toBe(2);
-    expect(component.language).toBe('en');
+    expect(component.language).toBe('en-GB');
   });
 
   it('should dispatch GetTransaction action on init', () => {
@@ -130,7 +128,7 @@ describe('TransactionDetailComponent', () => {
 
     stateSubject.next(stateWithPath);
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en/some/path']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB/some/path']);
   });
 
   it('should navigate to payment page when there are subErrors', () => {
@@ -142,7 +140,7 @@ describe('TransactionDetailComponent', () => {
 
     stateSubject.next(stateWithErrors);
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en', 'me', 'transaction', 'account-123', 'payment']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'transaction', 'account-123', 'payment']);
   });
 
   it('should dispatch PaymentSend action when pay getter is called', () => {
