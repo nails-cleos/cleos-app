@@ -238,7 +238,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         this.getForm.date.setValue(createNewDateZonedTime(this.expense.timestamp, this.expense.room?.timeZone));
         this.removeExpense(0);
         this.expense.expenseTotals.forEach((it, index) => {
-          let btw = '';
+          let btw = '0';
           const total = { net: '', btwValue: '' };
           if (it.btw !== undefined) {
             btw = it.btw.toFixed(2);

@@ -2,9 +2,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
-import { of } from 'rxjs';
+import { Subject } from 'rxjs';
 
 import { NoteComponent } from './note.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -19,6 +19,8 @@ describe('NoteComponent', () => {
   let component: NoteComponent;
   let fixture: ComponentFixture<NoteComponent>;
   let mockStore: jasmine.SpyObj<Store>;
+  let mockRouter: jasmine.SpyObj<Router>;
+  let stateSubject: Subject<any>;
 
   const mockActivatedRoute = {
     snapshot: {
@@ -48,18 +50,13 @@ describe('NoteComponent', () => {
   };
 
   beforeEach(async () => {
-    const storeSpyObj = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    const routerSpyObj = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    stateSubject = new Subject();
+    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    mockRouter = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    mockRouter.getCurrentNavigation.and.returnValue(null);
     const dialogSpyObj = jasmine.createSpyObj('MatDialog', ['open']);
 
-    storeSpyObj.select.and.returnValue(of({
-      professionals: [],
-      selected: null,
-      subErrors: null,
-      response: null,
-    }));
-
-    routerSpyObj.getCurrentNavigation.and.returnValue(null);
+    mockStore.select.and.returnValue(stateSubject.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [
@@ -69,19 +66,21 @@ describe('NoteComponent', () => {
         BrowserAnimationsModule,
       ],
       providers: [
-        { provide: Store, useValue: storeSpyObj },
+        { provide: Store, useValue: mockStore },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: Router, useValue: routerSpyObj },
+        { provide: Router, useValue: mockRouter },
         { provide: MatDialog, useValue: dialogSpyObj },
       ],
     }).compileComponents();
-
-    mockStore = TestBed.inject(Store) as jasmine.SpyObj<Store>;
   });
 
   beforeEach(() => {
     // Reset the mock to return null before creating component
     mockActivatedRoute.snapshot.paramMap.get = jasmine.createSpy('get').and.returnValue(null);
+
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
 
     fixture = TestBed.createComponent(NoteComponent);
     component = fixture.componentInstance;
@@ -137,6 +136,43 @@ describe('NoteComponent', () => {
     });
   });
 
+  it('should patch form when note is selected from state', () => {
+    component.ngOnInit();
+
+    stateSubject.next({
+      selected: mockNote,
+    });
+
+    expect(component.note).toEqual(mockNote);
+    expect(component.getForm.description.value).toBe(mockNote.description);
+    expect(component.getForm.repeat.value).toBe(mockNote.repeat);
+  });
+
+  it('should handle form errors from state', () => {
+    component.ngOnInit();
+
+    const mockErrors = [
+      { field: 'description', message: 'Description is required' },
+    ];
+
+    stateSubject.next({
+      subErrors: mockErrors,
+    });
+
+    expect(component.errors['description']).toBe('Description is required');
+    expect(component.getForm.description.hasError('incorrect')).toBe(true);
+  });
+
+  it('should navigate to colors list on successful response', () => {
+    component.ngOnInit();
+
+    stateSubject.next({
+      response: true,
+    });
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'reservation', 'calendar']);
+  });
+
   describe('Submit', () => {
     it('should dispatch createNote action when in add mode with valid form', () => {
       component.ngOnInit();
@@ -183,7 +219,7 @@ describe('NoteComponent', () => {
       descriptionControl.markAsDirty();
 
       const professionalControl = component.getForm.professional;
-      professionalControl.setValue(mockProfessional);
+      professionalControl.setValue({ ...mockProfessional, id: 'prof-2' });
       professionalControl.markAsDirty();
 
       const newDate = getNowTimeZone();
@@ -200,7 +236,7 @@ describe('NoteComponent', () => {
       expect(dispatchedAction).toEqual(jasmine.objectContaining({
         note: jasmine.objectContaining({
           description: 'New note',
-          professionalId: 'prof-1',
+          professionalId: 'prof-2',
           repeat: FrequencyEnum.onceAWeek,
           date: backendFormatDate(newDate),
         }),
@@ -414,5 +450,74 @@ describe('NoteComponent', () => {
     it('should have isAddMode property', () => {
       expect(component.isAddMode).toBeDefined();
     });
+  });
+
+  it('should dispatch GetAllTreatmentsGroup action when findGroups is called', () => {
+    mockStore.dispatch.calls.reset();
+
+    component['getProfessionals']();
+
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getAllProfessional());
+  });
+
+  it('should filter professionals correctly when filter is called', () => {
+    component.professionals = [
+      { ...mockProfessional, displayName: 'Test Group 1', id: '1' },
+      { ...mockProfessional, displayName: 'Another Group', id: '2' },
+      { ...mockProfessional, displayName: 'Test Group 2', id: '3' },
+    ] as any[];
+
+    const result = component['filter']('test');
+
+    expect(result?.length).toBe(2);
+    expect(result?.[0].displayName).toBe('Test Group 1');
+    expect(result?.[1].displayName).toBe('Test Group 2');
+  });
+
+  it('should return undefined when filter is called with no professionals', () => {
+    component.professionals = undefined;
+
+    const result = component['filter']('test');
+
+    expect(result).toBeUndefined();
+  });
+
+  it('should filter group options based on form input', (done) => {
+    component.professionals = [
+      { ...mockProfessional, displayName: 'Test Group 1', id: '1' },
+      { ...mockProfessional, displayName: 'Another Group', id: '2' },
+      { ...mockProfessional, displayName: 'Test Group 2', id: '3' },
+    ] as any[];
+    component['createForm']();
+
+    let emissionCount = 0;
+    component.filteredOptions?.subscribe(filtered => {
+      emissionCount++;
+      // Skip the first emission (startWith('')) and check the second emission with 'T'
+      if (emissionCount === 2) {
+        expect(filtered).toEqual([
+          { ...mockProfessional, displayName: 'Test Group 1', id: '1' },
+          { ...mockProfessional, displayName: 'Test Group 2', id: '3' },
+        ]);
+        done();
+      }
+    });
+
+    component.getForm.professional.setValue('T');
+  });
+
+  it('should set date from extras when provided', () => {
+    const mockExtras = {
+      professional: mockProfessional,
+      date: new Date(2024, 0, 15),
+    };
+    mockRouter.getCurrentNavigation.and.returnValue({ extras: { state: mockExtras } } as any);
+
+    const newFixture = TestBed.createComponent(NoteComponent);
+    const newComponent = newFixture.componentInstance;
+    newFixture.detectChanges();
+
+    expect(newComponent.getForm.professional.value).toBe(mockProfessional);
+    expect(newComponent.getForm.date.value).toBeDefined();
   });
 });
