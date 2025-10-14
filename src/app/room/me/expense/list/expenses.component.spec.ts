@@ -324,10 +324,14 @@ describe('ExpensesComponent', () => {
       direction: 'asc',
     } as unknown as MatSort;
 
-    component['filter'] = 'test';
     component['dateFilter'] = '2024-01-01';
+    const mockEvent = {
+      target: { value: '  My Filter  ' },
+    } as unknown as Event;
+    component.applyFilter(mockEvent);
     component['getExpenses'](2);
 
+    expect(component['filter']).toBe('my filter');
     expect(mockStore.dispatch).toHaveBeenCalledWith(getExpensesPage(
       {
         roomId: '1',
@@ -335,7 +339,7 @@ describe('ExpensesComponent', () => {
         direction: 'asc',
         page: 2,
         size: PAGE_SIZE,
-        filter: 'test',
+        filter: 'my filter',
         dateFilter: '2024-01-01',
       },
     ));
@@ -387,5 +391,13 @@ describe('ExpensesComponent', () => {
     // Test is handled by component initialization with BreakpointObserver
     // The mobile adjustment happens in constructor based on breakpoint observer
     expect(component.pageSize).toBeDefined();
+  });
+
+  it('should handle keydown events correctly', () => {
+    const backspaceEvent = { code: 'Backspace' };
+    const dateControl = component.date;
+
+    component.keyDownHandler(backspaceEvent);
+    expect(dateControl?.value).toBe(null);
   });
 });
