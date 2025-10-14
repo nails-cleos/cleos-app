@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import { getDisplayNameInitials, getUserImage } from '../../util/helper';
 import { Observable, Subscription } from 'rxjs';
-import * as fromActionsUser from '../../store/user.actions';
+import { getCustomerOverview } from '../../store/user.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IReservationOverview } from '../../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
@@ -71,8 +71,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
   private hasAdminRole: boolean;
 
   constructor(private breakpointObserver: BreakpointObserver, private route: ActivatedRoute,
-              private store: Store<AppState>, private translate: TranslateService, private router: Router,
-              private authUserService: AuthUserService) {
+    private store: Store<AppState>, private translate: TranslateService, private router: Router,
+    private authUserService: AuthUserService) {
     this.getState = this.store.select(selectUserState);
     this.language = this.translate.currentLang;
     this.hasAdminRole = false;
@@ -125,9 +125,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   private getUserOverview = (): void => {
     if (!this.account) {
       const id = this.route.snapshot.paramMap.get('id');
-      this.store.dispatch(
-        new fromActionsUser.GetCustomerOverview(id),
-      );
+      this.store.dispatch(getCustomerOverview({ id }));
     }
   };
 

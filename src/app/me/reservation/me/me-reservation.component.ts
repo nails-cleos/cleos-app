@@ -38,12 +38,24 @@ import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ActivatedRoute, Router } from '@angular/router';
-import * as fromActionsReservation from '../../../store/reservation.actions';
+import {
+  clean,
+  createReservation,
+  customerSearchReservation,
+  getAllAdditionalByGroupId,
+  getAllRooms,
+  getAllTreatments,
+  getEditReservation,
+  getUpcomingReservation,
+  paymentOptions,
+  updateReservationById,
+} from '../../../store/reservation.actions';
 import { map, startWith } from 'rxjs/operators';
 import { STEPPER_GLOBAL_OPTIONS, StepperSelectionEvent } from '@angular/cdk/stepper';
 import {
   createRoomOffice,
-  createTreatmentGroupService, currencySymbol,
+  createTreatmentGroupService,
+  currencySymbol,
   getPrice,
   newAdditional,
   newDiscount,
@@ -199,9 +211,9 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
   private readonly language: string;
 
   constructor(private readonly translate: TranslateService, private snackBar: MatSnackBar,
-              private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
-              breakpointObserver: BreakpointObserver, private router: Router, private route: ActivatedRoute,
-              public dialog: MatDialog, private analytic: Analytics, private authUserService: AuthUserService) {
+    private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
+    breakpointObserver: BreakpointObserver, private router: Router, private route: ActivatedRoute,
+    public dialog: MatDialog, private analytic: Analytics, private authUserService: AuthUserService) {
     this.getState = this.store.select(selectReservationState);
     this.authUserServiceSubscription =
       this.authUserService.authUser.subscribe(value => this.customerId = value.customerId);
@@ -291,15 +303,11 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
       reservation.id = this.reservation.id;
       reservation.treatmentId = valueChange(this.treatment.value.id, this.reservation.treatment.id);
 
-      this.store.dispatch(
-        new fromActionsReservation.UpdateReservationById(this.reservation.id, reservation, role),
-      );
+      this.store.dispatch(updateReservationById({ id: this.reservation.id, reservation, role }));
     } else {
       reservation.treatmentId = this.treatment.value.id;
       reservation.discountId = this.discount.value;
-      this.store.dispatch(
-        new fromActionsReservation.CreateReservation(reservation, role),
-      );
+      this.store.dispatch(createReservation({ reservation, role }));
     }
 
     return;
@@ -390,8 +398,13 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.totalDurationFormatted = formatTime(duration.duration, this.room.value.timeZone, this.dateFormat);
 
     this.store.dispatch(
-      new fromActionsReservation.CustomerSearchReservation(this.room.value.id, this.treatment.value.id,
-        this.startDate.value, this.professional.value.id, this.additionalSelected?.map(additional => additional.id)),
+      customerSearchReservation({
+        roomId: this.room.value.id,
+        treatmentId: this.treatment.value.id,
+        date: this.startDate.value,
+        professionalId: this.professional.value.id,
+        additionalIds: this.additionalSelected?.map(additional => additional.id),
+      }),
     );
     completeAndNext(this.steps, this.myStepper, goNext, this.analytic);
   };
@@ -509,21 +522,16 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.price = newPercentage(this.price, percentage);
   };
 
-  private getReservation = (id: string): void => this.store.dispatch(
-    new fromActionsReservation.GetEditReservation(id),
-  );
+  private getReservation = (id: string): void => this.store.dispatch(getEditReservation({ id }));
 
-  private getRoomList = (): void => this.store.dispatch(new fromActionsReservation.GetAllRooms());
+  private getRoomList = (): void => this.store.dispatch(getAllRooms({}));
 
-  private getUpcomingReservation = (): void => this.store.dispatch(new fromActionsReservation.GetUpcomingReservation());
+  private getUpcomingReservation = (): void => this.store.dispatch(getUpcomingReservation());
 
-  private getTreatmentList = (): void => this.store.dispatch(
-    new fromActionsReservation.GetAllTreatments(this.room.value.id),
-  );
+  private getTreatmentList = (): void => this.store.dispatch(getAllTreatments({ roomId: this.room.value.id }));
 
   private getAdditionalList = (): void => this.store.dispatch(
-    new fromActionsReservation.GetAllAdditionalByGroupId(this.room.value.id, this.group.value.id),
-  );
+    getAllAdditionalByGroupId({ roomId: this.room.value.id, groupId: this.group.value.id }));
 
   private createForm = (): void => {
     this.treatmentForm = this.formBuilder.group({
@@ -667,7 +675,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     );
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsReservation.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private canNotContinue = (message: string, type: string): void => {
     logEvent(this.analytic, 'screen_view', {
@@ -767,7 +775,7 @@ export class MeReservationComponent implements OnInit, AfterViewInit, OnDestroy 
     this.event.setValue(undefined);
   };
 
-  private getOptions = (): void => this.store.dispatch(new fromActionsReservation.PaymentOptions());
+  private getOptions = (): void => this.store.dispatch(paymentOptions());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {

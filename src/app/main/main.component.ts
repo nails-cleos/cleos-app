@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay, takeUntil } from 'rxjs/operators';
 import { ActivatedRoute, Router, RouterLinkActive, RouterOutlet } from '@angular/router';
-import * as fromActionsLogin from '../store/auth.actions';
+import { redirect } from '../store/auth.actions';
 import { IUser, User } from '../interfaces/user';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CookieService } from 'ngx-cookie-service';
@@ -17,7 +17,7 @@ import { bottomTop, colorChange, colorChangeChild, fade, goTo, observeElement } 
 import { Auth, user } from '@angular/fire/auth';
 import { AuthUserService } from '../services/auth-user.service';
 import { MainContentService } from './main-content.service';
-import * as fromActionsMain from '../store/main.actions';
+import { updateMyUser } from '../store/main.actions';
 import { TokenService } from '../services/token.service';
 import { NavigationService } from '../services/navigation.service';
 import { SharedModule } from '../shared/shared.module';
@@ -110,16 +110,14 @@ export class MainComponent implements OnInit, AfterViewInit, OnDestroy {
       const message = this.translate.instant(
         `COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode.toString().toUpperCase() }`);
       this.store.dispatch(
-        new fromActionsMain.UpdateMyUser(authenticatedUser, redirectUrl, message),
+        updateMyUser({ user: authenticatedUser, redirectUrl, message }),
       );
     }
     return;
   }
 
   redirect(): void {
-    return this.store.dispatch(
-      new fromActionsLogin.Redirect(),
-    );
+    return this.store.dispatch(redirect());
   }
 
   treatment(): void {

@@ -1,19 +1,18 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { Observable, of } from 'rxjs';
-import { catchError, switchMap, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import {
-  CreateCurrency,
-  CurrencyActionTypes,
-  CurrencyFailure,
-  CurrencySaveSuccess,
-  CurrencySelected,
-  CurrencySuccess,
-  DeleteCurrency,
-  GetCurrency,
-  GetCurrenciesPage,
-  UpdateCurrency,
+  createCurrency,
+  currencyFailure,
+  currencySaveSuccess,
+  currencySelected,
+  currencySuccess,
+  deleteCurrency,
+  getCurrenciesPage,
+  getCurrency,
+  updateCurrency,
 } from '../currency.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { CurrencyService } from '../../services/currency.service';
@@ -25,74 +24,73 @@ import { ToastType } from '../../shared/toast/toast.model';
 
 @Injectable()
 export class CurrencyEffects {
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly actions: Actions = inject(Actions);
+  private readonly currencyService: CurrencyService = inject(CurrencyService);
+  private readonly router: Router = inject(Router);
 
   getAll$ = createEffect(() => this.actions.pipe(
-    ofType(CurrencyActionTypes.getCurrenciesPage),
-    switchMap((action: GetCurrenciesPage) =>
-      this.currencyService.getCurrenciesPage(action.page, action.sort, action.direction, action.size).pipe(
-        switchMap((response: Pagination<ICurrency>) => of(new CurrencySuccess(response))),
-        catchError((err: HttpErrorResponse) => of(new CurrencyFailure(err.error))),
+    ofType(getCurrenciesPage),
+    switchMap(({ page, sort, direction, size }) =>
+      this.currencyService.getCurrenciesPage(page, sort, direction, size).pipe(
+        map((data: Pagination<ICurrency>) => currencySuccess({ data })),
+        catchError((err: HttpErrorResponse) => of(currencyFailure({ error: err.error }))),
       )),
   ));
 
   findOne$ = createEffect(() => this.actions.pipe(
-    ofType(CurrencyActionTypes.getCurrency),
-    switchMap((action: GetCurrency) =>
-      this.currencyService.getCurrency(action.id).pipe(
-        switchMap((currency?: ICurrency) => of(new CurrencySelected(currency))),
-        catchError((err: HttpErrorResponse) => of(new CurrencyFailure(err.error))),
+    ofType(getCurrency),
+    switchMap(({ id }) =>
+      this.currencyService.getCurrency(id).pipe(
+        map((selected?: ICurrency) => currencySelected({ selected })),
+        catchError((err: HttpErrorResponse) => of(currencyFailure({ error: err.error }))),
       )),
   ));
 
   save$ = createEffect(() => this.actions.pipe(
-    ofType(CurrencyActionTypes.createCurrency),
-    switchMap((action: CreateCurrency) =>
-      this.currencyService.createCurrency(action.currency).pipe(
+    ofType(createCurrency),
+    switchMap(({ currency }) =>
+      this.currencyService.createCurrency(currency).pipe(
         switchMap((response: ICurrency) => this.requestSuccess('CURRENCY.CREATED', response.name!, response.id)),
-        catchError((err: HttpErrorResponse) => of(new CurrencyFailure(err.error))),
+        catchError((err: HttpErrorResponse) => of(currencyFailure({ error: err.error }))),
       )),
   ));
 
   update$ = createEffect(() => this.actions.pipe(
-    ofType(CurrencyActionTypes.updateCurrency),
-    switchMap((action: UpdateCurrency) =>
-      this.currencyService.updateCurrency(action.id, action.currency).pipe(
+    ofType(updateCurrency),
+    switchMap(({ id, currency }) =>
+      this.currencyService.updateCurrency(id, currency).pipe(
         switchMap((response: IApiResponse) =>
           this.requestSuccess('CURRENCY.UPDATED.MESSAGE', response.name!, response.id)),
-        catchError((err: HttpErrorResponse) => of(new CurrencyFailure(err.error))),
+        catchError((err: HttpErrorResponse) => of(currencyFailure({ error: err.error }))),
       )),
   ));
 
   delete$ = createEffect(() => this.actions.pipe(
-    ofType(CurrencyActionTypes.deleteCurrency),
-    switchMap((action: DeleteCurrency) =>
-      this.currencyService.deleteCurrency(action.id).pipe(
-        switchMap(() => this.requestSuccess('CURRENCY.DELETED.MESSAGE', action.code!, undefined, 'warning')),
-        catchError((err: HttpErrorResponse) => of(new CurrencyFailure(err.error))),
+    ofType(deleteCurrency),
+    switchMap(({ id, code }) =>
+      this.currencyService.deleteCurrency(id).pipe(
+        switchMap(() => this.requestSuccess('CURRENCY.DELETED.MESSAGE', code!, undefined, 'warning')),
+        catchError((err: HttpErrorResponse) => of(currencyFailure({ error: err.error }))),
       )),
   ));
 
   selectedData$ = createEffect(() => this.actions.pipe(
-    ofType(CurrencyActionTypes.currencySelected),
-    tap((data: CurrencySelected) => this.router.navigate([this.translate.currentLang, 'currency', data.selected?.id])),
+    ofType(currencySelected),
+    tap(({ selected }) => this.router.navigate([this.translate.currentLang, 'currency', selected?.id])),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(CurrencyActionTypes.currencySuccess),
+    ofType(currencySuccess),
   ), { dispatch: false });
 
   saveSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(CurrencyActionTypes.currencySaveSuccess),
+    ofType(currencySaveSuccess),
   ), { dispatch: false });
 
-  constructor(private readonly translate: TranslateService, private actions: Actions,
-              private currencyService: CurrencyService, private router: Router) {
-  }
-
-  private requestSuccess(key: string, code: string, id?: string,
-    toastType?: ToastType): Observable<CurrencySaveSuccess> {
+  private requestSuccess(key: string, code: string, id?: string, toastType?: ToastType) {
     const message = this.translate.instant(key, { code });
     const path = id ? `currency/${ id }` : undefined;
-    return success(CurrencySaveSuccess, message, path, undefined, toastType);
+    return success(currencySaveSuccess, message, path, undefined, toastType);
   }
 }

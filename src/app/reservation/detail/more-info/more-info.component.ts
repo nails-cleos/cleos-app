@@ -5,8 +5,14 @@ import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { IPaymentAll } from '../../../interfaces/payment';
 import { ITracking } from '../../../interfaces/reservation';
-import * as fromActionsReservation from '../../../store/reservation.actions';
-import * as fromActionsPayment from '../../../store/payment.actions';
+import {
+  executeTrackingByReservationId,
+  getReview,
+  getTrackingByReservationId,
+  reservationFindPayments,
+  updateTrackingByReservationId,
+} from '../../../store/reservation.actions';
+import { recreate } from '../../../store/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { getDiffTime, newDateTimestamp } from '../../../util/dates';
 import { Clipboard } from '@angular/cdk/clipboard';
@@ -52,9 +58,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
 
   get execute(): void {
     this.tracking = undefined;
-    return this.store.dispatch(
-      new fromActionsReservation.ExecuteTrackingByReservationId(this.reservationId),
-    );
+    return this.store.dispatch(executeTrackingByReservationId({ id: this.reservationId }));
   }
 
   get update(): void {
@@ -64,9 +68,8 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
     }, result => {
       if (result) {
         this.tracking = undefined;
-        this.store.dispatch(
-          new fromActionsReservation.UpdateTrackingByReservationId(this.reservationId, result.started,
-            result.completed),
+        this.store.dispatch(updateTrackingByReservationId(
+          { id: this.reservationId, started: result.started, completed: result.completed }),
         );
       }
     }, true);
@@ -86,7 +89,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
   }
 
   resend = (payment: IPaymentAll): void => this.store.dispatch(
-    new fromActionsPayment.Recreate(payment.id, payment.type),
+    recreate({ id: payment.id, paymentType: payment.type }),
   );
 
   copy = (payment: IPaymentAll): void => {
@@ -100,19 +103,19 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
     if (!this.tracking) {
       this.tracking = undefined;
       this.store.dispatch(
-        new fromActionsReservation.GetTrackingByReservationId(this.reservationId),
+        getTrackingByReservationId({ id: this.reservationId }),
       );
     }
     if (!this.payments) {
       this.payments = undefined;
       this.store.dispatch(
-        new fromActionsReservation.ReservationFindPayments(this.reservationId),
+        reservationFindPayments({ id: this.reservationId }),
       );
     }
     if (!this.review) {
       this.review = undefined;
       this.store.dispatch(
-        new fromActionsReservation.GetReview(this.reservationId),
+        getReview({ id: this.reservationId }),
       );
     }
   };

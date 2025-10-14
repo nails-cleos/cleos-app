@@ -11,8 +11,8 @@ import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Router } from '@angular/router';
 import { MainContentService } from '../main-content.service';
 import { ToastService } from '../../services/toast.service';
-import * as fromActionsMain from '../../store/main.actions';
 import { ISocialLink } from '../../interfaces/main';
+import { clean, sendMessage } from '../../store/main.actions';
 
 describe('MainContentComponent', () => {
   let component: MainContentComponent;
@@ -105,20 +105,24 @@ describe('MainContentComponent', () => {
   });
 
   it('should dispatch Clean action on init', () => {
-    expect(store.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsMain.Clean));
+    expect(store.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch SendMessage action when form is valid', () => {
-    component.form.patchValue({
+    const message = {
       name: 'Test User',
       email: 'test@example.com',
       subject: 'Test Subject',
       body: 'Test Body',
-    });
+    };
+    component.form.patchValue(message);
+    expect(component.form.valid).toBeTrue();
 
     component.sendEmail();
 
-    expect(store.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsMain.SendMessage));
+    expect(store.dispatch).toHaveBeenCalledWith(
+      sendMessage({ sendMessage: component.form.value }),
+    );
   });
 
   it('should not dispatch SendMessage action when form is invalid', () => {
@@ -133,7 +137,7 @@ describe('MainContentComponent', () => {
     component.sendEmail();
 
     const sendMessageCalls = mockStore.dispatch.calls.all().filter(
-      (call: any) => call.args[0] instanceof fromActionsMain.SendMessage,
+      (call: any) => call.args[0] instanceof sendMessage,
     );
     expect(sendMessageCalls.length).toBe(0);
   });

@@ -4,7 +4,7 @@ import { FormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@
 import { AppState, selectInvoiceState } from '../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-import * as fromActionsInvoice from '../store/invoice.actions';
+import { clean, getAllMyOffices, getOfficeToInvoice, updateOfficeById } from '../store/invoice.actions';
 import { MatTableDataSource } from '@angular/material/table';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../interfaces/pagination';
 import { backendFormatDate, datesInSameWeek, newDateTimestamp } from '../util/dates';
@@ -86,8 +86,8 @@ export class InvoiceComponent implements OnInit, OnDestroy {
   private offices?: IOfficeAll[];
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>,
-              private formBuilder: FormBuilder,
-              private router: Router, breakpointObserver: BreakpointObserver) {
+    private formBuilder: FormBuilder,
+    private router: Router, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small,
@@ -110,11 +110,9 @@ export class InvoiceComponent implements OnInit, OnDestroy {
     if (this.selection.selected.length === this.invoices?.length) {
       const lastInvoiceNumber = start + this.selection.selected.length;
       const office: IOffice = new Office();
-      office.id = this.office.value.id;
+      const id = this.office.value.id;
       office.lastInvoiceNumber = lastInvoiceNumber;
-      this.store.dispatch(
-        new fromActionsInvoice.UpdateOfficeById(this.office.value.id, office),
-      );
+      this.store.dispatch(updateOfficeById({ id, office }));
     }
     const printPdf = pdf(this.selection.selected, this.office.value, start, this.startDate.value, this.endDate.value);
     pdfMake.createPdf(printPdf, undefined, fonts).open();
@@ -228,15 +226,19 @@ export class InvoiceComponent implements OnInit, OnDestroy {
     if (this.startDate.value && this.endDate.value) {
       this.selection.clear();
       this.store.dispatch(
-        new fromActionsInvoice.GetOfficeToInvoice(this.office.value.id, backendFormatDate(this.startDate.value)!,
-          backendFormatDate(this.endDate.value)!, this.types),
+        getOfficeToInvoice({
+          officeId: this.office.value.id,
+          start: backendFormatDate(this.startDate.value)!,
+          end: backendFormatDate(this.endDate.value)!,
+          types: this.types,
+        }),
       );
     }
   };
 
-  private findOffices = (): void => this.store.dispatch(new fromActionsInvoice.GetAllMyOffices());
+  private findOffices = (): void => this.store.dispatch(getAllMyOffices());
 
-  private clean = (): void => this.store.dispatch(new fromActionsInvoice.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {

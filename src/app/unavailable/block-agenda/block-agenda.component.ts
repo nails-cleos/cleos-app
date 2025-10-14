@@ -31,7 +31,15 @@ import {
   newDate,
   zoneDateToDate,
 } from '../../util/dates';
-import * as fromActionsUnavailable from '../../store/unavailable.actions';
+import {
+  clean,
+  createBlockAgenda,
+  deleteUnavailable,
+  getAllProfessional,
+  getAllRoomsByProfessionalId,
+  getUnavailable,
+  updateUnavailable,
+} from '../../store/unavailable.actions';
 import { executeDialogNoWidth } from '../../util/helper';
 import { map, startWith } from 'rxjs/operators';
 import { closest } from '../../util/numbers';
@@ -71,7 +79,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
   private readonly timeZone: string;
 
   constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
-              private route: ActivatedRoute, private translate: TranslateService, public dialog: MatDialog) {
+    private route: ActivatedRoute, private translate: TranslateService, public dialog: MatDialog) {
     this.isAddMode = true;
     this.getState = this.store.select(selectUnavailableState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
@@ -98,14 +106,12 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
 
     if (this.isAddMode) {
       this.store.dispatch(
-        new fromActionsUnavailable.CreateBlockAgenda(unavailable),
+        createBlockAgenda({ unavailable }),
       );
     } else {
-      unavailable.id = this.id;
+      const id = this.id!;
       this.unavailable = undefined;
-      this.store.dispatch(
-        new fromActionsUnavailable.UpdateUnavailable(this.id!, unavailable, 'unavailable/block-agenda'),
-      );
+      this.store.dispatch(updateUnavailable({ id, unavailable, path: 'unavailable/block-agenda' }));
     }
     return;
   }
@@ -134,7 +140,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
     return executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: this.unavailable }, result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsUnavailable.DeleteUnavailable(result.id, result.timestamp, result.timeZone),
+          deleteUnavailable({ id: result.id, timestamp: result.timestamp, timeZone: result.timeZone }),
         );
       }
     });
@@ -179,9 +185,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.roomAvailability);
 
-  getRoom = (user: IUser): void => this.store.dispatch(
-    new fromActionsUnavailable.GetAllRoomsByProfessionalId(user.id!),
-  );
+  getRoom = (user: IUser): void => this.store.dispatch(getAllRoomsByProfessionalId({ professionalId: user.id! }));
 
   keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
@@ -272,9 +276,9 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsUnavailable.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
-  private getProfessionals = (): void => this.store.dispatch(new fromActionsUnavailable.GetAllProfessional());
+  private getProfessionals = (): void => this.store.dispatch(getAllProfessional());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {
@@ -318,9 +322,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private getBlockAgenda = (): void => {
     if (!this.unavailable) {
-      this.store.dispatch(
-        new fromActionsUnavailable.GetUnavailable(this.id!),
-      );
+      this.store.dispatch(getUnavailable({ id: this.id! }));
     }
   };
 }

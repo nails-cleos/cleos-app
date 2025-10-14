@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import * as fromActionsAccount from '../../store/account.actions';
+import { createTransaction, getAccount, paymentOptions } from '../../store/account.actions';
 import { FormBuilder, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -82,12 +82,13 @@ export class TransactionComponent implements OnInit, OnDestroy {
       type = option;
     }
     const transfer = this.getForm.transfer.value;
-    const transaction = {
+    const transaction: ITransaction = {
       customerId,
       amount,
       paymentRequest: { type, paymentOptionId, transfer, bic },
-    } as ITransaction;
-    this.store.dispatch(new fromActionsAccount.CreateTransaction(this.accountId!, transaction));
+    };
+    const id = this.accountId!;
+    this.store.dispatch(createTransaction({ id, transaction }));
     return;
   }
 
@@ -118,12 +119,12 @@ export class TransactionComponent implements OnInit, OnDestroy {
   private getAccount = (): void => {
     if (!this.account) {
       this.store.dispatch(
-        new fromActionsAccount.GetAccount(this.accountId!),
+        getAccount({ id: this.accountId! }),
       );
     }
   };
 
-  private getOptions = (): void => this.store.dispatch(new fromActionsAccount.PaymentOptions());
+  private getOptions = (): void => this.store.dispatch(paymentOptions());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {

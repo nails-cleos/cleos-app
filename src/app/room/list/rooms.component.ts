@@ -9,7 +9,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
-import * as fromActionsRoom from '../../store/room.actions';
+import { clean, deleteRoom, getRoomsPage, roomSelected } from '../../store/room.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
@@ -42,7 +42,7 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
   private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
+    private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small,
@@ -73,22 +73,19 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getGMT = (timeZone?: string): string => this.getTimeZone(timeZone).gmt;
 
-  edit = (room: IRoom): void => this.store.dispatch(
-    new fromActionsRoom.RoomSelected(room , true));
+  edit = (selected: IRoom): void => this.store.dispatch(roomSelected({ selected, redirect: true }));
 
   delete = (room: IRoom): void => {
     const title = this.translate.instant('ROOM.DELETED.TITLE');
     const content = this.translate.instant('ROOM.DELETED.CONTENT', { name: room.address?.name });
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: room }, result => {
       if (result) {
-        this.store.dispatch(
-          new fromActionsRoom.DeleteRoom(result.id, result),
-        );
+        this.store.dispatch(deleteRoom({ id: result.id, room: result }));
       }
     });
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsRoom.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe(() => {
@@ -101,7 +98,7 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private getRooms = (page: number = 0): void => this.store.dispatch(
-    new fromActionsRoom.GetRoomsPage(page, this.sort.active, this.sort.direction, this.pageSize),
+    getRoomsPage({ page: page, sort: this.sort.active, direction: this.sort.direction, size: this.pageSize }),
   );
 
   private subscribe = (): void => {

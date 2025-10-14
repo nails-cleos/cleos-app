@@ -6,8 +6,8 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { TransactionDetailComponent } from './transaction-detail.component';
 import { ITransaction } from '../../../interfaces/account';
-import * as fromActionsAccount from '../../../store/account.actions';
-import * as fromActionsPayment from '../../../store/payment.actions';
+import { getTransaction } from '../../../store/account.actions';
+import { notifyPayment, paymentSend } from '../../../store/payment.actions';
 
 describe('TransactionDetailComponent', () => {
   let component: TransactionDetailComponent;
@@ -102,7 +102,7 @@ describe('TransactionDetailComponent', () => {
     fixture.detectChanges();
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      new fromActionsAccount.GetTransaction('account-123', 'transaction-123'),
+      getTransaction({ id: 'account-123', transactionId: 'transaction-123' }),
     );
   });
 
@@ -151,7 +151,7 @@ describe('TransactionDetailComponent', () => {
     void component.pay;
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      new fromActionsPayment.PaymentSend('https://payment.url'),
+      paymentSend({ link: 'https://payment.url' }),
     );
   });
 
@@ -161,13 +161,13 @@ describe('TransactionDetailComponent', () => {
     void component.notify;
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      new fromActionsPayment.NotifyPayment(
-        'payment-123',
-        'transaction',
-        'transaction-123',
-        'preference-123',
-        'card',
-      ),
+      notifyPayment({
+        id: 'payment-123',
+        path: 'transaction',
+        resourceId: 'transaction-123',
+        preferenceId: 'preference-123',
+        paymentType: 'card',
+      }),
     );
   });
 

@@ -14,7 +14,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import * as fromActionsCurrency from '../../store/currency.actions';
+import { clean, currencySelected, getCurrenciesPage } from '../../store/currency.actions';
 
 describe('CurrencyListComponent', () => {
   let component: CurrencyListComponent;
@@ -110,7 +110,7 @@ describe('CurrencyListComponent', () => {
     mockStore.dispatch.calls.reset();
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCurrency.Clean));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should call getCurrency after view init', () => {
@@ -168,7 +168,7 @@ describe('CurrencyListComponent', () => {
 
     component.edit(testCurrency);
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCurrency.CurrencySelected));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(currencySelected({ selected: testCurrency }));
   });
 
   it('should call delete method without errors', () => {
@@ -262,7 +262,9 @@ describe('CurrencyListComponent', () => {
 
     component['getCurrency'](2);
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCurrency.GetCurrenciesPage));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getCurrenciesPage(
+      { page: 2, sort: 'name', direction: 'asc', size: component.pageSize }),
+    );
   });
 
   it('should handle undefined expanded currency', () => {

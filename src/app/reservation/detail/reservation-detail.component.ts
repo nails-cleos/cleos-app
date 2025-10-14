@@ -2,7 +2,21 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState, selectPaymentState, selectReservationState } from '../../store/app.states';
 import { Observable, pairwise, Subscription } from 'rxjs';
-import * as fromActionsReservation from '../../store/reservation.actions';
+import {
+  approveReservation,
+  cancelReservation,
+  clean,
+  customerCancelReservation,
+  getReservation,
+  getReservationHistory,
+  paymentCompleteReservation,
+  reservationFindPayments,
+  startReservation,
+  updateReservationColor,
+  updateReservationCustomer,
+  updateReservationDiscount,
+  updateReservationNote,
+} from '../../store/reservation.actions';
 import { CancelOption, IFabMenu, IReservationAll, States } from '../../interfaces/reservation';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -54,7 +68,7 @@ import { isToday, isTomorrow } from 'date-fns';
 import { ReservationIconName } from '../../util/icon';
 import { FormArray, UntypedFormBuilder } from '@angular/forms';
 import { startWith } from 'rxjs/operators';
-import * as fromActionsPayment from '../../store/payment.actions';
+import { adjustPayments, notifyPayment, paymentOptions, paymentSend } from '../../store/payment.actions';
 import { ChangeCustomerDialogComponent } from './change-customer-dialog.component';
 import { ChangeColorDialogComponent } from './change-color-dialog.component';
 import { AddNoteDialogComponent } from './add-note-dialog.component';
@@ -132,8 +146,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   private hasRoomAdmin?: boolean;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private route: ActivatedRoute,
-              private store: Store<AppState>, private router: Router, breakpointObserver: BreakpointObserver,
-              private formBuilder: UntypedFormBuilder, private authUserService: AuthUserService) {
+    private store: Store<AppState>, private router: Router, breakpointObserver: BreakpointObserver,
+    private formBuilder: UntypedFormBuilder, private authUserService: AuthUserService) {
     this.getState = this.store.select(selectReservationState);
     breakpointObserver.observe([
       Breakpoints.XSmall,
@@ -175,9 +189,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         }];
       }
     });
-    return this.store.dispatch(
-      new fromActionsPayment.AdjustPayments(paymentRequests),
-    );
+    return this.store.dispatch(adjustPayments({ payments: paymentRequests }));
   }
 
   get addNote(): void {
@@ -189,9 +201,15 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       if (result) {
         const reservation = this.reservation!;
         this.store.dispatch(
-          new fromActionsReservation.UpdateReservationNote(reservation.id,
-            this.professionalId ? Role.professional : Role.customer, result.note, result.customerNote,
-            reservation.paymentLink, reservation.timestamp, reservation.room.timeZone),
+          updateReservationNote({
+            id: reservation.id,
+            role: this.professionalId ? Role.professional : Role.customer,
+            note: result.note,
+            customerNote: result.customerNote,
+            paymentLink: reservation.paymentLink,
+            timestamp: reservation.timestamp,
+            timeZone: reservation.room.timeZone,
+          }),
         );
       }
     }, true);
@@ -201,8 +219,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     return executeDialog(this.dialog, AddDiscountDialogComponent, { customerId: this.reservation?.customer.id },
       result => {
         if (result) {
-          this.store.dispatch(new fromActionsReservation.UpdateReservationDiscount(this.reservation!.id,
-            result.discountId));
+          this.store.dispatch(updateReservationDiscount({ id: this.reservation!.id, discountId: result.discountId }));
         }
       }, true);
   }
@@ -314,14 +331,15 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     });
   };
 
-  notify = (payment: IPaymentAll): void => this.store.dispatch(
-    new fromActionsPayment.NotifyPayment(payment.id, 'reservation', payment.reservation!.id, payment.preferenceId,
-      payment.type),
-  );
+  notify = (payment: IPaymentAll): void => this.store.dispatch(notifyPayment({
+    id: payment.id,
+    path: 'reservation',
+    resourceId: payment.reservation!.id,
+    preferenceId: payment.preferenceId,
+    paymentType: payment.type,
+  }));
 
-  pay = (payment: IPaymentAll): void => this.store.dispatch(
-    new fromActionsPayment.PaymentSend(payment.paymentURL || payment.link),
-  );
+  pay = (payment: IPaymentAll): void => this.store.dispatch(paymentSend({ link: payment.paymentURL || payment.link }));
 
   twoDigit = (i: number): void => {
     const payment = this.payments.at(i).value;
@@ -348,24 +366,16 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
   private clean = (): void => {
     this.payments.clear();
-    this.store.dispatch(
-      new fromActionsReservation.Clean(),
-    );
+    this.store.dispatch(clean());
   };
 
-  private getOptions = (): void => this.store.dispatch(new fromActionsPayment.PaymentOptions());
+  private getOptions = (): void => this.store.dispatch(paymentOptions());
 
   private getReservation = (id: string): void => {
     this.reservation = undefined;
-    this.store.dispatch(
-      new fromActionsReservation.GetReservation(id),
-    );
-    this.store.dispatch(
-      new fromActionsReservation.ReservationFindPayments(id),
-    );
-    this.store.dispatch(
-      new fromActionsReservation.GetReservationHistory(id),
-    );
+    this.store.dispatch(getReservation({ id }));
+    this.store.dispatch(reservationFindPayments({ id }));
+    this.store.dispatch(getReservationHistory({ id }));
   };
 
   private professionalMachine = (self: this): any => {
@@ -373,7 +383,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       return;
     }
     const reservation: IReservationAll = self.reservation;
-    const reservationId = reservation.id;
+    const id = reservation.id;
     const roomId = reservation.room.id;
     const customerId = reservation.customer.id;
     const initialState = reservation.state;
@@ -428,9 +438,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
     const approveTransaction = ReservationDetailComponent.createTransaction('approved', (): void => {
       self.reservation = undefined;
-      store.dispatch(
-        new fromActionsReservation.ApproveReservation(reservationId),
-      );
+      store.dispatch(approveReservation(id));
     });
 
     const sendMessageTransaction = ReservationDetailComponent.createTransaction('send', (): void => {
@@ -464,22 +472,20 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
     const startTransaction = ReservationDetailComponent.createTransaction('started', (): void => {
       self.reservation = undefined;
-      store.dispatch(
-        new fromActionsReservation.Start(reservationId),
-      );
+      store.dispatch(startReservation(id));
     });
 
     const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void => {
-      self.router.navigate([this.language, 'reservation', reservationId, 'edit'], { state: { roomId } });
+      self.router.navigate([this.language, 'reservation', id, 'edit'], { state: { roomId } });
     });
 
     const completeTransaction = ReservationDetailComponent.createTransaction('completed', (): void => {
       self.router.navigate(
-        [this.language, 'reservation', reservationId, 'rooms', roomId, 'customer', customerId, 'complete']);
+        [this.language, 'reservation', id, 'rooms', roomId, 'customer', customerId, 'complete']);
     });
 
     const moreTransaction = ReservationDetailComponent.createTransaction('more', (): void => {
-      self.router.navigate([this.language, 'reservation', reservationId, 'more-info']);
+      self.router.navigate([this.language, 'reservation', id, 'more-info']);
     });
 
     const changeCustomerTransaction = ReservationDetailComponent.createTransaction('change',
@@ -496,17 +502,13 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
       self.cancel(reservation, options, self.price, result => {
         if (result) {
           this.reservation = undefined;
-          this.store.dispatch(
-            new fromActionsReservation.CancelReservation(reservation.id, result),
-          );
+          this.store.dispatch(cancelReservation(reservation.id, result));
         }
       }));
 
     const finishTransaction = ReservationDetailComponent.createTransaction('completed', (): void => {
       self.reservation = undefined;
-      self.store.dispatch(
-        new fromActionsReservation.PaymentCompleteReservation(reservationId),
-      );
+      self.store.dispatch(paymentCompleteReservation(id));
     });
 
     const bookTransaction = ReservationDetailComponent.createTransaction('booked', (): void => {
@@ -639,7 +641,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         if (result) {
           this.reservation = undefined;
           this.store.dispatch(
-            new fromActionsReservation.CustomerCancelReservation(reservation.id, result),
+            customerCancelReservation(reservation.id, result),
           );
         }
       }, showPenalty, self.options));
@@ -811,9 +813,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     result => {
       if (result) {
         this.reservation = undefined;
-        this.store.dispatch(
-          new fromActionsReservation.UpdateReservationCustomer(reservation.id, result.customerId),
-        );
+        this.store.dispatch(updateReservationCustomer({ id: reservation.id, customerId: result.customerId }));
       }
     },
     true,
@@ -830,9 +830,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     result => {
       if (result) {
         this.reservation = undefined;
-        this.store.dispatch(
-          new fromActionsReservation.UpdateReservationColor(reservation.id, result.colorId),
-        );
+        this.store.dispatch(updateReservationColor({ id: reservation.id, colorId: result.colorId }));
       }
     },
     true,

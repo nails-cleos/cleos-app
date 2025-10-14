@@ -3,8 +3,8 @@ import { CatalogComponent } from './catalog.component';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { Store } from '@ngrx/store';
 import { Subject, Subscription } from 'rxjs';
-import * as fromActionsCatalogue from '../../store/catalogue.actions';
 import { MainContentService } from '../main-content.service';
+import { clean, getAllCatalogs } from '../../store/catalogue.actions';
 
 describe('CatalogComponent', () => {
   let component: CatalogComponent;
@@ -44,8 +44,8 @@ describe('CatalogComponent', () => {
 
   it('should dispatch Clean and GetAllCatalogs on init', () => {
     fixture.detectChanges();
-    expect(storeMock.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.Clean));
-    expect(storeMock.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.GetAllCatalogs));
+    expect(storeMock.dispatch).toHaveBeenCalledWith(clean());
+    expect(storeMock.dispatch).toHaveBeenCalledWith(getAllCatalogs());
   });
 
   it('should unsubscribe on destroy', () => {

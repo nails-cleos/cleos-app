@@ -14,7 +14,7 @@ import { TransactionViewComponent } from './transaction-view.component';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { IAccountAll, ITransaction } from '../../../interfaces/account';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
-import * as fromActionsAccount from '../../../store/account.actions';
+import { clean, getTransactionsByAccountId } from '../../../store/account.actions';
 
 describe('TransactionViewComponent', () => {
   let component: TransactionViewComponent;
@@ -178,7 +178,7 @@ describe('TransactionViewComponent', () => {
     component.ngOnInit();
 
     expect(component.accountId).toEqual('account-123');
-    expect(mockStore.dispatch).toHaveBeenCalledWith(new fromActionsAccount.Clean());
+    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch GetTransactionsByAccountId after view init', () => {
@@ -189,12 +189,14 @@ describe('TransactionViewComponent', () => {
     component.ngAfterViewInit();
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      new fromActionsAccount.GetTransactionsByAccountId(
-        'account-123',
-        0,
-        'timestamp',
-        'desc',
-        PAGE_SIZE,
+      getTransactionsByAccountId(
+        {
+          id: 'account-123',
+          page: 0,
+          sort: 'timestamp',
+          direction: 'desc',
+          size: PAGE_SIZE,
+        },
       ),
     );
   });
@@ -326,13 +328,13 @@ describe('TransactionViewComponent', () => {
 
     expect(component.paginator.pageIndex).toBe(0);
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      new fromActionsAccount.GetTransactionsByAccountId(
-        'account-123',
-        0,
-        'amount',
-        'asc',
-        PAGE_SIZE,
-      ),
+      getTransactionsByAccountId({
+        id: 'account-123',
+        page: 0,
+        sort: 'amount',
+        direction: 'asc',
+        size: PAGE_SIZE,
+      }),
     );
   });
 
@@ -359,13 +361,13 @@ describe('TransactionViewComponent', () => {
     pageSubject.next({ pageIndex: 2 });
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      new fromActionsAccount.GetTransactionsByAccountId(
-        'account-123',
-        2,
-        'timestamp',
-        'desc',
-        PAGE_SIZE,
-      ),
+      getTransactionsByAccountId({
+        id: 'account-123',
+        page: 2,
+        sort: 'timestamp',
+        direction: 'desc',
+        size: PAGE_SIZE,
+      }),
     );
   });
 

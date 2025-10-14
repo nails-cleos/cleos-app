@@ -12,7 +12,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectColorState } from '../store/app.states';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Color, IColor } from '../interfaces/color';
-import * as fromActionsColor from '../store/color.actions';
+import { clean, createColor, getColor, updateColor } from '../store/color.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { fieldChange, valueChange } from '../util/validators';
 import { SharedModule } from '../shared/shared.module';
@@ -39,90 +39,86 @@ export class ColorComponent implements OnInit, OnDestroy {
 
   constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
               private translate: TranslateService, private route: ActivatedRoute, private cdRef: ChangeDetectorRef) {
-  	this.isAddMode = true;
-  	this.getState = this.store.select(selectColorState);
-  	this.language = this.translate.currentLang;
+    this.isAddMode = true;
+    this.getState = this.store.select(selectColorState);
+    this.language = this.translate.currentLang;
   }
 
   get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
-  	return this.form.controls;
+    return this.form.controls;
   }
 
   get submit(): void {
-  	if (this.form.invalid) {
-  		return;
-  	}
+    if (this.form.invalid) {
+      return;
+    }
 
-  	const color: IColor = new Color();
-  	color.name = fieldChange(this.getForm.name as UntypedFormControl, this.color?.name);
-  	color.description = valueChange(this.getForm.description.value, this.color?.description);
+    const color: IColor = new Color();
+    color.name = fieldChange(this.getForm.name as UntypedFormControl, this.color?.name);
+    color.description = valueChange(this.getForm.description.value, this.color?.description);
 
-  	if (this.isAddMode) {
-  		this.store.dispatch(
-  			new fromActionsColor.CreateColor(color),
-  		);
-  	} else {
-  		color.id = this.id;
-  		this.color = undefined;
-  		this.store.dispatch(new fromActionsColor.UpdateColor(this.id!, color));
-  	}
-  	return;
+    if (this.isAddMode) {
+      this.store.dispatch(createColor({ color }));
+    } else {
+      this.color = undefined;
+      const id = this.id!;
+      this.store.dispatch(updateColor({ id, color }));
+    }
+    return;
   }
 
   ngOnInit(): void {
-  	const id = this.route.snapshot.paramMap.get('id');
-  	if (id) {
-  		this.id = id;
-  	}
-  	this.clean();
-  	this.createForm();
-  	this.subscribe();
-  	this.isAddMode = !this.id;
-  	if (!this.isAddMode) {
-  		this.getColor();
-  	}
-  	this.cdRef.detectChanges();
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.id = id;
+    }
+    this.clean();
+    this.createForm();
+    this.subscribe();
+    this.isAddMode = !this.id;
+    if (!this.isAddMode) {
+      this.getColor();
+    }
+    this.cdRef.detectChanges();
   }
 
   ngOnDestroy(): void {
-  	this.subscription?.unsubscribe();
+    this.subscription?.unsubscribe();
   }
 
   private createForm = (): void => {
-  	this.form = this.formBuilder.group({
-  		name: ['', [Validators.required]],
-  		description: [''],
-  	});
+    this.form = this.formBuilder.group({
+      name: ['', [Validators.required]],
+      description: [''],
+    });
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsColor.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private getColor = (): void => {
-  	if (!this.color) {
-  		this.store.dispatch(
-  			new fromActionsColor.GetColor(this.id!),
-  		);
-  	}
+    if (!this.color) {
+      this.store.dispatch(getColor({ id: this.id! }));
+    }
   };
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe((state) => {
-  		if (state.selected) {
-  			this.color = {
-  				id: state.selected.id,
-  				name: state.selected.name,
-  				description: state.selected.description,
-  			} as IColor;
-  			this.form.patchValue(this.color);
-  		}
-  		if (state.subErrors) {
-  			state.subErrors.forEach((value: any) => {
-  				this.errors[value.field] = value.message;
-  				this.form.controls[value.field].setErrors({ incorrect: true });
-  			});
-  		} else if (state.response) {
-  			this.router.navigate([this.language, 'colors']);
-  		}
-  	});
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.selected) {
+        this.color = {
+          id: state.selected.id,
+          name: state.selected.name,
+          description: state.selected.description,
+        } as IColor;
+        this.form.patchValue(this.color);
+      }
+      if (state.subErrors) {
+        state.subErrors.forEach((value: any) => {
+          this.errors[value.field] = value.message;
+          this.form.controls[value.field].setErrors({ incorrect: true });
+        });
+      } else if (state.response) {
+        this.router.navigate([this.language, 'colors']);
+      }
+    });
   };
 }

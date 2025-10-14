@@ -4,9 +4,12 @@ import { AppState, selectAccountState } from '../../../store/app.states';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ITransaction } from '../../../interfaces/account';
-import * as fromActionsAccount from '../../../store/account.actions';
+import { getTransaction } from '../../../store/account.actions';
 import { TranslateService } from '@ngx-translate/core';
-import * as fromActionsPayment from '../../../store/payment.actions';
+import {
+  paymentSend,
+  notifyPayment,
+} from '../../../store/payment.actions';
 import { newDateTimestamp } from '../../../util/dates';
 import { SharedModule } from '../../../shared/shared.module';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
@@ -30,7 +33,7 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
   private transactionId: string | null = null;
 
   constructor(private store: Store<AppState>, private route: ActivatedRoute, private translate: TranslateService,
-              private router: Router) {
+    private router: Router) {
     this.getState = this.store.select(selectAccountState);
     this.dateFormat = this.translate.currentLang;
     this.step = this.router.getCurrentNavigation()?.extras.state?.step;
@@ -38,16 +41,19 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
   }
 
   get pay(): void {
-    return this.store.dispatch(
-      new fromActionsPayment.PaymentSend(this.transaction?.payment?.paymentURL),
-    );
+    return this.store.dispatch(paymentSend({ link: this.transaction?.payment?.paymentURL }));
   }
 
   get notify(): void {
     const transaction = this.transaction!;
     return this.store.dispatch(
-      new fromActionsPayment.NotifyPayment(transaction.payment!.id!, 'transaction', transaction.id!,
-        transaction.payment!.preferenceId!, transaction.payment!.type!),
+      notifyPayment({
+        id: transaction.payment!.id!,
+        path: 'transaction',
+        resourceId: transaction.id!,
+        preferenceId: transaction.payment!.preferenceId!,
+        paymentType: transaction.payment!.type!,
+      }),
     );
   }
 
@@ -63,7 +69,7 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
   }
 
   private getTransaction = (): void => this.store.dispatch(
-    new fromActionsAccount.GetTransaction(this.id!, this.transactionId!),
+    getTransaction({ id: this.id!, transactionId: this.transactionId! }),
   );
 
   private subscribe = (): void => {

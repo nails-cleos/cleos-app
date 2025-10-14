@@ -15,7 +15,7 @@ import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } 
 import { Store } from '@ngrx/store';
 import { AppState, selectMainState } from '../../store/app.states';
 import { TranslateService } from '@ngx-translate/core';
-import * as fromActionsMain from '../../store/main.actions';
+import { sendMessage, clean } from '../../store/main.actions';
 import { AuthUserService } from '../../services/auth-user.service';
 import {
   bottomTop,
@@ -266,9 +266,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
   sendEmail(): void {
     if (!this.form.invalid) {
-      this.store.dispatch(
-        new fromActionsMain.SendMessage(this.form.value),
-      );
+      this.store.dispatch(sendMessage({ sendMessage: this.form.value }));
     }
   }
 
@@ -363,7 +361,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     },
   ];
 
-  private clean = (): void => this.store.dispatch(new fromActionsMain.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {

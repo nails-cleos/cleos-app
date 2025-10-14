@@ -8,9 +8,9 @@ import { ChangeDetectorRef } from '@angular/core';
 import { ICatalogue } from '../interfaces/catalogue';
 import { ReactiveFormsModule, UntypedFormBuilder } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import * as fromActionsCatalogue from '../store/catalogue.actions';
 import { ToastService } from '../services/toast.service';
 import { ITreatmentGroup } from '../interfaces/treatment';
+import { clean, getAllTreatmentsGroup, getCatalogue } from '../store/catalogue.actions';
 
 describe('CatalogueComponent', () => {
   let component: CatalogueComponent;
@@ -114,7 +114,7 @@ describe('CatalogueComponent', () => {
   it('should dispatch Clean action on initialization', () => {
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.Clean));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch GetCatalogue action when in edit mode', () => {
@@ -123,7 +123,7 @@ describe('CatalogueComponent', () => {
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.GetCatalogue));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getCatalogue({ id: testId }));
   });
 
   it('should patch form when catalogue is selected from state', () => {
@@ -180,34 +180,94 @@ describe('CatalogueComponent', () => {
 
   it('should dispatch CreateCatalogue action when in add mode and form is valid', () => {
     component.ngOnInit();
-    component.form.get('name')?.setValue('New Catalogue');
-    component.form.get('description')?.setValue('New Description');
-    component.form.get('home')?.setValue(true);
-    component.form.get('catalog')?.setValue(true);
-    component.form.get('group')?.setValue({ id: 'groupId' });
+    component.resizedImageDataUrl = 'data:image/jpeg;base64,test';
+
+    const catalogue: ICatalogue = {
+      name: 'New Catalogue',
+      description: 'New Description',
+      home: true,
+      catalog: true,
+      groupId: 'groupId',
+    };
+
+    const nameControl = component.form.get('name')!;
+    const descriptionControl = component.form.get('description')!;
+    const homeControl = component.form.get('home')!;
+    const catalogControl = component.form.get('catalog')!;
+    const groupControl = component.form.get('group')!;
+
+    nameControl.setValue(catalogue.name);
+    nameControl.markAsDirty();
+
+    descriptionControl.setValue(catalogue.description);
+    descriptionControl.markAsDirty();
+
+    homeControl.setValue(catalogue.home);
+    homeControl.markAsDirty();
+
+    catalogControl.setValue(catalogue.catalog);
+    catalogControl.markAsDirty();
+
+    groupControl.setValue({ id: catalogue.groupId });
+    groupControl.markAsDirty();
     mockStore.dispatch.calls.reset();
 
     void component.submit;
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.CreateCatalogue));
+    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+      resizedImageDataUrl: component.resizedImageDataUrl,
+      catalogue: jasmine.objectContaining(catalogue),
+      type: '[Catalogue] Create catalogue',
+    }));
   });
 
   it('should dispatch UpdateCatalogue action when in edit mode and form is valid', () => {
     const testId = '123';
+    component.resizedImageDataUrl = 'data:image/jpeg;base64,test';
+
+    const catalogue: ICatalogue = {
+      name: 'Updated Catalogue',
+      description: 'Updated Description',
+      home: true,
+      catalog: true,
+      groupId: 'groupId',
+    };
     mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
     component.catalogue = mockCatalogue;
 
     component.ngOnInit();
-    component.form.get('name')?.setValue('Updated Catalogue');
-    component.form.get('description')?.setValue('Updated Description');
-    component.form.get('home')?.setValue(true);
-    component.form.get('catalog')?.setValue(true);
-    component.form.get('group')?.setValue({ id: 'groupId' });
+
+    const nameControl = component.form.get('name')!;
+    const descriptionControl = component.form.get('description')!;
+    const homeControl = component.form.get('home')!;
+    const catalogControl = component.form.get('catalog')!;
+    const groupControl = component.form.get('group')!;
+
+    nameControl.setValue(catalogue.name);
+    nameControl.markAsDirty();
+
+    descriptionControl.setValue(catalogue.description);
+    descriptionControl.markAsDirty();
+
+    homeControl.setValue(catalogue.home);
+    homeControl.markAsDirty();
+
+    catalogControl.setValue(catalogue.catalog);
+    catalogControl.markAsDirty();
+
+    groupControl.setValue({ id: catalogue.groupId });
+    groupControl.markAsDirty();
     mockStore.dispatch.calls.reset();
 
     void component.submit;
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.UpdateCatalogue));
+    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+      resizedImageDataUrl: component.resizedImageDataUrl,
+      catalogue: jasmine.objectContaining(catalogue),
+      type: '[Catalogue] Update catalogue by id',
+    }));
   });
 
   it('should return form controls from getForm getter', () => {
@@ -243,7 +303,7 @@ describe('CatalogueComponent', () => {
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.GetCatalogue));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getCatalogue({ id: testId }));
   });
 
   it('should clear catalogue when updating in edit mode', () => {
@@ -397,7 +457,7 @@ describe('CatalogueComponent', () => {
 
     component['findGroups']();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.GetAllTreatmentsGroup));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getAllTreatmentsGroup());
   });
 
   it('should filter groups correctly when filterGroup is called', () => {

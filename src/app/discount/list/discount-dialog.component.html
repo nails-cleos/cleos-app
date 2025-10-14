@@ -25,8 +25,8 @@
 }
 <div mat-dialog-actions class="card-actions">
   <div class="spacer"></div>
-  <button (click)="doAction" cdkFocusInitial color="primary"
+  <button (click)="doAction()" cdkFocusInitial color="primary"
           mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.DISCOUNT.SEND' | translate }}
   </button>
-  <button (click)="onNoClick" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+  <button (click)="onNoClick()" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
 </div>

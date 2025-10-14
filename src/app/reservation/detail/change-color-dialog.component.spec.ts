@@ -4,7 +4,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
-import * as fromActionsReservation from '../../store/reservation.actions';
+import { getColorsByTreatmentId } from '../../store/reservation.actions';
 import { ChangeColorDialogComponent } from './change-color-dialog.component';
 import { IColorAll } from '../../interfaces/color';
 
@@ -144,7 +144,7 @@ describe('ChangeColorDialogComponent', () => {
 
     component['getColors']();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsReservation.GetColorsByTreatmentId));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getColorsByTreatmentId({ treatmentId: mockData.treatmentId }));
   });
 
   it('should filter colors correctly when filterColor is called', () => {

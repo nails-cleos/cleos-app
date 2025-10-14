@@ -5,7 +5,7 @@ import { of, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import * as fromActionsRoom from '../../../store/room.actions';
+import { getAllCustomersInfo } from '../../../store/room.actions';
 import { IRoomCustomer } from '../../../interfaces/room';
 
 describe('CustomersComponent', () => {
@@ -45,7 +45,7 @@ describe('CustomersComponent', () => {
     fixture.detectChanges();
     routeParams$.next({ id: 'room-1' });
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(new fromActionsRoom.GetAllCustomersInfo('room-1'));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllCustomersInfo({ id: 'room-1' }));
   });
 
   it('should update datasource when customers change', () => {

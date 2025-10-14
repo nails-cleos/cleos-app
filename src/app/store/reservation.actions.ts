@@ -1,6 +1,7 @@
-import { Action } from '@ngrx/store';
-import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { createAction, props } from '@ngrx/store';
 import { SortDirection } from '@angular/material/sort';
+import { IError, PageRequest } from '../interfaces/common';
+import { Pagination } from '../interfaces/pagination';
 import {
   ICustomerLastReservation,
   ICustomerReservation,
@@ -8,7 +9,6 @@ import {
   IRoomReservation,
   ITracking,
 } from '../interfaces/reservation';
-import { Pagination } from '../interfaces/pagination';
 import { IUser } from '../interfaces/user';
 import { ITreatmentDiscountDTO } from '../interfaces/treatment';
 import { IRoom } from '../interfaces/room';
@@ -19,7 +19,7 @@ import { IReview } from '../interfaces/review';
 import { IColor } from '../interfaces/color';
 import { ToastType } from '../shared/toast/toast.model';
 
-export enum ReservationActionTypes {
+enum ReservationActionTypes {
   getPage = '[Reservation] Find paged',
   getCustomerReservations = '[Reservation] Get customer reservations',
   getAllFilterReservations = '[Reservation] Get all filter reservations',
@@ -48,7 +48,7 @@ export enum ReservationActionTypes {
   reservationReviewSuccess = '[Reservation] Reservation review success',
   approveReservation = '[Reservation] Approve reservation',
   updateReservationById = '[Reservation] Update reservation by id',
-  start = '[Reservation] Start',
+  startReservation = '[Reservation] Start',
   completeReservation = '[Reservation] Complete reservation',
   paymentCompleteReservation = '[Reservation] Payment complete reservation',
   cancelReservation = '[Reservation] Cancel reservation',
@@ -80,474 +80,348 @@ export enum ReservationActionTypes {
   clean = '[Reservation] Clean'
 }
 
-export class GetPage extends PageRequest implements Action {
-  readonly type = ReservationActionTypes.getPage;
-
-  constructor(public page: number, public sort: string, public direction: SortDirection,
-              public size: number, public roomId?: string, public all?: boolean, public professionalId?: string) {
-    super(page, sort, direction, size);
-  }
-}
-
-export class GetCustomerReservations extends PageRequest implements Action {
-  readonly type = ReservationActionTypes.getCustomerReservations;
-}
-
-export class GetAllFilterReservations extends PageRequest implements Action {
-  readonly type = ReservationActionTypes.getAllFilterReservations;
-
-  constructor(public page: number, public sort: string, public direction: SortDirection,
-              public size: number, public userId?: string, public states?: string[]) {
-    super(page, sort, direction, size);
-  }
-}
-
-export class GetAllGroupingByRoom implements Action {
-  readonly type = ReservationActionTypes.getAllGroupingByRoom;
-
-  constructor(public days: number, public date: Date, public roomId: string, public professionalId?: string) {
-  }
-}
-
-export class SearchAvailability implements Action {
-  readonly type = ReservationActionTypes.searchAvailability;
-
-  constructor(public days: number, public dates: Date[], public roomId: string, public professionalId?: string) {
-  }
-}
-
-export class CustomerSearchReservation implements Action {
-  readonly type = ReservationActionTypes.customerSearchReservation;
-
-  constructor(public roomId: string, public treatmentId: string, public date: Date, public professionalId: string,
-              public additionalIds?: string[]) {
-  }
-}
-
-export class GetCustomers implements Action {
-  readonly type = ReservationActionTypes.getCustomers;
-}
-
-export class GetCustomerInformation implements Action {
-  readonly type = ReservationActionTypes.getCustomerInformation;
-
-  constructor(public id: string) {
-  }
-}
-
-export class GetAllTreatments implements Action {
-  readonly type = ReservationActionTypes.getAllTreatments;
-
-  constructor(public roomId: string, public customerId?: string) {
-  }
-}
-
-export class GetAllRooms implements Action {
-  readonly type = ReservationActionTypes.getAllRooms;
-
-  constructor(public customerId?: string) {
-  }
-}
-
-export class FindRooms implements Action {
-  readonly type = ReservationActionTypes.findRooms;
-}
-
-export class GetAllAdditionalByGroupId implements Action {
-  readonly type = ReservationActionTypes.getAllAdditionalByGroupId;
-
-  constructor(public roomId: string, public groupId: string) {
-  }
-}
-
-export class GetUpcomingReservation implements Action {
-  readonly type = ReservationActionTypes.getUpcomingReservation;
-}
-
-export class ReservationSuccess implements Action {
-  readonly type = ReservationActionTypes.reservationSuccess;
-
-  constructor(public data: IRoomReservation | IRoomReservation[] | []) {
-  }
-}
-
-export class ReservationPageSuccess implements Action {
-  readonly type = ReservationActionTypes.reservationPageSuccess;
-
-  constructor(public page: Pagination<IReservation>) {
-  }
-}
-
-export class ReservationFilterPageSuccess implements Action {
-  readonly type = ReservationActionTypes.reservationFilterPageSuccess;
-
-  constructor(public filter: Pagination<IReservation>) {
-  }
-}
-
-export class CustomersSuccess implements Action {
-  readonly type = ReservationActionTypes.customersSuccess;
-
-  constructor(public customers: IUser[]) {
-  }
-}
-
-export class CustomerSuccess implements Action {
-  readonly type = ReservationActionTypes.customerSuccess;
-
-  constructor(public customer: ICustomerLastReservation) {
-  }
-}
-
-export class ReservationTreatmentsSuccess implements Action {
-  readonly type = ReservationActionTypes.reservationTreatmentsSuccess;
-
-  constructor(public treatmentDiscount: ITreatmentDiscountDTO[]) {
-  }
-}
-
-export class ReservationRoomsSuccess implements Action {
-  readonly type = ReservationActionTypes.reservationRoomsSuccess;
-
-  constructor(public rooms: IRoom[]) {
-  }
-}
-
-export class ReservationAdditionalSuccess implements Action {
-  readonly type = ReservationActionTypes.reservationAdditionalSuccess;
-
-  constructor(public additional: IAdditional[]) {
-  }
-}
-
-export class ReservationPaymentsSuccess implements Action {
-  readonly type = ReservationActionTypes.reservationPaymentsSuccess;
-
-  constructor(public payments: IPayment[]) {
-  }
-}
-
-export class ReservationHistorySuccess implements Action {
-  readonly type = ReservationActionTypes.reservationHistorySuccess;
-
-  constructor(public history: IReservation[]) {
-  }
-}
-
-export class CreateReservation implements Action {
-  readonly type = ReservationActionTypes.createReservation;
-
-  constructor(public reservation: IReservation, public role: Role) {
-  }
-}
-
-export class ReservationSaveSuccess extends ResponseSuccess implements Action {
-  readonly type = ReservationActionTypes.reservationSaveSuccess;
-
-  constructor(public message: string, public navigate: boolean, public path?: string, public role?: Role,
-              public paymentLink?: string, public deleted?: boolean, public id?: string,
-              public toastType: ToastType = 'success') {
-    super(message, path, undefined, toastType);
-  }
-}
-
-export class ReservationCustomerSuccess implements Action {
-  readonly type = ReservationActionTypes.reservationsCustomerSuccess;
-
-  constructor(public customerReservation: ICustomerReservation) {
-  }
-}
-
-export class ReservationFailure implements Action {
-  readonly type = ReservationActionTypes.reservationFailure;
-
-  constructor(public error: IError) {
-  }
-}
-
-export class ReservationSelected implements Action {
-  readonly type = ReservationActionTypes.reservationSelected;
-
-  constructor(public selected?: IReservation) {
-  }
-}
-
-export class GetReservation implements Action {
-  readonly type = ReservationActionTypes.getReservation;
-  readonly editPath?: string;
-
-  constructor(public id: string) {
-  }
-}
-
-export class GetEditReservation implements Action {
-  readonly type = ReservationActionTypes.getEditReservation;
-  readonly editPath?: string = 'edit';
-
-  constructor(public id: string) {
-  }
-}
-
-export class ReservationFindPayments implements Action {
-  readonly type = ReservationActionTypes.reservationFindPayments;
-
-  constructor(public id: string) {
-  }
-}
-
-export class GetReservationHistory implements Action {
-  readonly type = ReservationActionTypes.getReservationHistory;
-
-  constructor(public id: string) {
-  }
-}
-
-export class DeleteReservation implements Action {
-  readonly type = ReservationActionTypes.deleteReservation;
-
-  constructor(public id: string, public timestamp: number, public timeZone: string) {
-  }
-}
-
-export class UpdateReservationById implements Action {
-  readonly type = ReservationActionTypes.updateReservationById;
-
-  constructor(public id: string, public reservation: IReservation, public role: Role) {
-  }
-}
-
-export class ApproveReservation implements Action {
-  readonly type = ReservationActionTypes.approveReservation;
-  readonly state = 'approve';
-  readonly key = 'APPROVE';
-
-  constructor(public id: string, public extras?: any, public isDashboard?: boolean) {
-  }
-}
-
-export class Start implements Action {
-  readonly type = ReservationActionTypes.start;
-  readonly state = 'start';
-  readonly key = 'START';
-
-  constructor(public id: string, public extras?: any, public isDashboard?: boolean) {
-  }
-}
-
-export class CompleteReservation implements Action {
-  readonly type = ReservationActionTypes.completeReservation;
-  readonly state = 'complete';
-  readonly key = 'COMPLETE';
-
-  constructor(public id: string, public extras?: any, public isDashboard: boolean = false) {
-  }
-}
-
-export class CancelReservation implements Action {
-  readonly type = ReservationActionTypes.cancelReservation;
-  readonly state = 'cancel';
-  readonly key = 'CANCEL';
-
-  constructor(public id: string, public extras?: any, public isDashboard?: boolean) {
-  }
-}
-
-export class CustomerCancelReservation implements Action {
-  readonly type = ReservationActionTypes.customerCancelReservation;
-  readonly state = 'cancel/customer';
-  readonly key = 'CANCEL';
-
-  constructor(public id: string, public extras?: any, public isDashboard?: boolean) {
-  }
-}
-
-export class PaymentCompleteReservation implements Action {
-  readonly type = ReservationActionTypes.paymentCompleteReservation;
-  readonly state = 'payment/complete';
-  readonly key = 'COMPLETE';
-
-  constructor(public id: string, public extras?: any, public isDashboard?: boolean) {
-  }
-}
-
-export class UpdateReservationCustomer implements Action {
-  readonly type = ReservationActionTypes.updateReservationCustomer;
-
-  constructor(public id: string, public customerId: string) {
-  }
-}
-
-export class UpdateReservationColor implements Action {
-  readonly type = ReservationActionTypes.updateReservationColor;
-
-  constructor(public id: string, public colorId: string) {
-  }
-}
-
-export class StateSuccess extends ResponseSuccess implements Action {
-  readonly type = ReservationActionTypes.stateSuccess;
-
-  constructor(public message: string, public id: string, public paymentLink?: string,
-              public isDashboard?: boolean) {
-    super(message);
-  }
-}
-
-export class GetTrackingByReservationId implements Action {
-  readonly type = ReservationActionTypes.getTrackingByReservationId;
-
-  constructor(public id: string) {
-  }
-}
-
-export class ExecuteTrackingByReservationId implements Action {
-  readonly type = ReservationActionTypes.executeTrackingByReservationId;
-
-  constructor(public id: string) {
-  }
-}
-
-export class UpdateTrackingByReservationId implements Action {
-  readonly type = ReservationActionTypes.updateTrackingByReservationId;
-
-  constructor(public id: string, public started?: string, public completed?: string) {
-  }
-}
-
-export class TrackingSuccess implements Action {
-  readonly type = ReservationActionTypes.trackingSuccess;
-
-  constructor(public tracking: ITracking) {
-  }
-}
-
-export class CreateReview implements Action {
-  readonly type = ReservationActionTypes.createReview;
-
-  constructor(public review: IReview) {
-  }
-}
-
-export class GetReview implements Action {
-  readonly type = ReservationActionTypes.getReview;
-
-  constructor(public id: string) {
-  }
-}
-
-export class ReservationReviewSuccess implements Action {
-  readonly type = ReservationActionTypes.reservationReviewSuccess;
-
-  constructor(public review?: IReview) {
-  }
-}
-
-export class GetColorsByTreatmentId implements Action {
-  readonly type = ReservationActionTypes.getColorsByTreatmentId;
-
-  constructor(public treatmentId: string) {
-  }
-}
-
-export class ColorSuccess implements Action {
-  readonly type = ReservationActionTypes.colorsCompleteSuccess;
-
-  constructor(public colors: IColor[]) {
-  }
-}
-
-export class UpdateReservationNote implements Action {
-  readonly type = ReservationActionTypes.updateReservationNote;
-
-  constructor(public id: string, public role: Role, public note?: string, public customerNote?: string,
-              public paymentLink?: string, public timestamp?: number, public timeZone?: string) {
-  }
-}
-
-export class UpdateReservationDiscount implements Action {
-  readonly type = ReservationActionTypes.updateReservationDiscount;
-
-  constructor(public id: string, public discountId: string) {
-  }
-}
-
-export class UpdateReservationTimestamp implements Action {
-  readonly type = ReservationActionTypes.updateReservationTimestamp;
-
-  constructor(public id: string, public start: string, public role: Role, public timeZone?: string) {
-  }
-}
-
-export class PaymentOptions implements Action {
-  readonly type = ReservationActionTypes.paymentOptions;
-}
-
-export class PaymentOptionsSuccess implements Action {
-  readonly type = ReservationActionTypes.paymentOptionsSuccess;
-
-  constructor(public paymentOptions?: IPaymentOption[]) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = ReservationActionTypes.clean;
-}
-
-export type All =
-  | GetPage
-  | GetCustomerReservations
-  | GetAllFilterReservations
-  | GetAllGroupingByRoom
-  | SearchAvailability
-  | CustomerSearchReservation
-  | GetCustomers
-  | GetCustomerInformation
-  | GetAllTreatments
-  | GetAllRooms
-  | FindRooms
-  | GetAllAdditionalByGroupId
-  | GetUpcomingReservation
-  | CreateReservation
-  | ReservationSuccess
-  | ReservationPageSuccess
-  | ReservationFilterPageSuccess
-  | CustomersSuccess
-  | CustomerSuccess
-  | ReservationTreatmentsSuccess
-  | ReservationRoomsSuccess
-  | ReservationAdditionalSuccess
-  | ReservationPaymentsSuccess
-  | ReservationHistorySuccess
-  | ReservationSaveSuccess
-  | ReservationCustomerSuccess
-  | ReservationFailure
-  | GetReservation
-  | GetEditReservation
-  | ReservationFindPayments
-  | GetReservationHistory
-  | ReservationSelected
-  | DeleteReservation
-  | ApproveReservation
-  | Start
-  | UpdateReservationById
-  | CompleteReservation
-  | PaymentCompleteReservation
-  | CancelReservation
-  | CustomerCancelReservation
-  | StateSuccess
-  | GetTrackingByReservationId
-  | ExecuteTrackingByReservationId
-  | UpdateTrackingByReservationId
-  | TrackingSuccess
-  | CreateReview
-  | GetReview
-  | ReservationReviewSuccess
-  | UpdateReservationCustomer
-  | GetColorsByTreatmentId
-  | ColorSuccess
-  | UpdateReservationNote
-  | UpdateReservationDiscount
-  | UpdateReservationTimestamp
-  | PaymentOptions
-  | PaymentOptionsSuccess
-  | Clean;
+export const getPage = createAction(
+  ReservationActionTypes.getPage,
+  props<{
+    page: number;
+    sort: string;
+    direction: SortDirection;
+    size: number;
+    roomId?: string;
+    all?: boolean;
+    professionalId?: string;
+  }>(),
+);
+
+export const getCustomerReservations = createAction(
+  ReservationActionTypes.getCustomerReservations,
+  props<PageRequest>(),
+);
+
+export const getAllFilterReservations = createAction(
+  ReservationActionTypes.getAllFilterReservations,
+  props<{
+    page: number;
+    sort: string;
+    direction: SortDirection;
+    size: number;
+    userId?: string;
+    states?: string[];
+  }>(),
+);
+
+export const getAllGroupingByRoom = createAction(
+  ReservationActionTypes.getAllGroupingByRoom,
+  props<{ days: number; date: Date; roomId: string; professionalId?: string }>(),
+);
+
+export const searchAvailability = createAction(
+  ReservationActionTypes.searchAvailability,
+  props<{ days: number; dates: Date[]; roomId: string; professionalId?: string }>(),
+);
+
+export const customerSearchReservation = createAction(
+  ReservationActionTypes.customerSearchReservation,
+  props<{ roomId: string; treatmentId: string; date: Date; professionalId: string; additionalIds?: string[] }>(),
+);
+
+export const getCustomers = createAction(ReservationActionTypes.getCustomers);
+
+export const getCustomerInformation = createAction(
+  ReservationActionTypes.getCustomerInformation,
+  props<{ id: string }>(),
+);
+
+export const getAllTreatments = createAction(
+  ReservationActionTypes.getAllTreatments,
+  props<{ roomId: string; customerId?: string }>(),
+);
+
+export const getAllRooms = createAction(
+  ReservationActionTypes.getAllRooms,
+  props<{ customerId?: string }>(),
+);
+
+export const findRooms = createAction(
+  ReservationActionTypes.findRooms,
+  props<{ customerId?: string }>(),
+);
+
+export const getAllAdditionalByGroupId = createAction(
+  ReservationActionTypes.getAllAdditionalByGroupId,
+  props<{ roomId: string; groupId: string }>(),
+);
+
+export const getUpcomingReservation = createAction(ReservationActionTypes.getUpcomingReservation);
+
+export const reservationSuccess = createAction(
+  ReservationActionTypes.reservationSuccess,
+  props<{ data: IRoomReservation | IRoomReservation[] | [] }>(),
+);
+
+export const reservationPageSuccess = createAction(
+  ReservationActionTypes.reservationPageSuccess,
+  props<{ page: Pagination<IReservation> }>(),
+);
+
+export const reservationFilterPageSuccess = createAction(
+  ReservationActionTypes.reservationFilterPageSuccess,
+  props<{ filter: Pagination<IReservation> }>(),
+);
+
+export const customersSuccess = createAction(
+  ReservationActionTypes.customersSuccess,
+  props<{ customers: IUser[] }>(),
+);
+
+export const customerSuccess = createAction(
+  ReservationActionTypes.customerSuccess,
+  props<{ customer: ICustomerLastReservation }>(),
+);
+
+export const reservationTreatmentsSuccess = createAction(
+  ReservationActionTypes.reservationTreatmentsSuccess,
+  props<{ treatmentDiscount: ITreatmentDiscountDTO[] }>(),
+);
+
+export const reservationRoomsSuccess = createAction(
+  ReservationActionTypes.reservationRoomsSuccess,
+  props<{ rooms: IRoom[] }>(),
+);
+
+export const reservationAdditionalSuccess = createAction(
+  ReservationActionTypes.reservationAdditionalSuccess,
+  props<{ additional: IAdditional[] }>(),
+);
+
+export const reservationPaymentsSuccess = createAction(
+  ReservationActionTypes.reservationPaymentsSuccess,
+  props<{ payments: IPayment[] }>(),
+);
+
+export const reservationHistorySuccess = createAction(
+  ReservationActionTypes.reservationHistorySuccess,
+  props<{ history: IReservation[] }>(),
+);
+
+export const createReservation = createAction(
+  ReservationActionTypes.createReservation,
+  props<{ reservation: IReservation; role: Role }>(),
+);
+
+export const reservationSaveSuccess = createAction(
+  ReservationActionTypes.reservationSaveSuccess,
+  props<{
+    message: string;
+    navigate: boolean;
+    path?: string;
+    role?: Role;
+    paymentLink?: string;
+    deleted?: boolean;
+    id?: string;
+    toastType?: ToastType;
+  }>(),
+);
+
+export const reservationsCustomerSuccess = createAction(
+  ReservationActionTypes.reservationsCustomerSuccess,
+  props<{ customerReservation: ICustomerReservation }>(),
+);
+
+export const reservationFailure = createAction(
+  ReservationActionTypes.reservationFailure,
+  props<{ error: IError }>(),
+);
+
+export const reservationSelected = createAction(
+  ReservationActionTypes.reservationSelected,
+  props<{ selected?: IReservation }>(),
+);
+
+export const getReservation = createAction(
+  ReservationActionTypes.getReservation,
+  props<{ id: string; editPath?: string }>(),
+);
+
+export const getEditReservation = createAction(
+  ReservationActionTypes.getEditReservation,
+  props<{ id: string; editPath?: string }>(),
+);
+
+export const reservationFindPayments = createAction(
+  ReservationActionTypes.reservationFindPayments,
+  props<{ id: string }>(),
+);
+
+export const getReservationHistory = createAction(
+  ReservationActionTypes.getReservationHistory,
+  props<{ id: string }>(),
+);
+
+export const deleteReservation = createAction(
+  ReservationActionTypes.deleteReservation,
+  props<{ id: string; timestamp: number; timeZone: string }>(),
+);
+
+export const updateReservationById = createAction(
+  ReservationActionTypes.updateReservationById,
+  props<{ id: string; reservation: IReservation; role: Role }>(),
+);
+
+export const approveReservation = createAction(
+  ReservationActionTypes.approveReservation,
+  (id: string, extras?: any, isDashboard?: boolean) => ({
+    id,
+    extras,
+    isDashboard,
+    state: 'approve' as const,
+    key: 'APPROVE' as const,
+  }),
+);
+
+export const startReservation = createAction(
+  ReservationActionTypes.startReservation,
+  (id: string, extras?: any, isDashboard?: boolean) => ({
+    id,
+    extras,
+    isDashboard,
+    state: 'start' as const,
+    key: 'START' as const,
+  }),
+);
+
+export const completeReservation = createAction(
+  ReservationActionTypes.completeReservation,
+  (id: string, extras?: any, isDashboard?: boolean) => ({
+    id,
+    extras,
+    isDashboard,
+    state: 'complete' as const,
+    key: 'COMPLETE' as const,
+  }),
+);
+
+export const cancelReservation = createAction(
+  ReservationActionTypes.cancelReservation,
+  (id: string, extras?: any, isDashboard?: boolean) => ({
+    id,
+    extras,
+    isDashboard,
+    state: 'cancel' as const,
+    key: 'CANCEL' as const,
+  }),
+);
+
+export const customerCancelReservation = createAction(
+  ReservationActionTypes.customerCancelReservation,
+  (id: string, extras?: any, isDashboard?: boolean) => ({
+    id,
+    extras,
+    isDashboard,
+    state: 'cancel/customer' as const,
+    key: 'CANCEL' as const,
+  }),
+);
+
+export const paymentCompleteReservation = createAction(
+  ReservationActionTypes.paymentCompleteReservation,
+  (id: string, extras?: any, isDashboard?: boolean) => ({
+    id,
+    extras,
+    isDashboard,
+    state: 'payment/complete' as const,
+    key: 'COMPLETE' as const,
+  }),
+);
+
+export const updateReservationCustomer = createAction(
+  ReservationActionTypes.updateReservationCustomer,
+  props<{ id: string; customerId: string }>(),
+);
+
+export const updateReservationColor = createAction(
+  ReservationActionTypes.updateReservationColor,
+  props<{ id: string; colorId: string }>(),
+);
+
+export const stateSuccess = createAction(
+  ReservationActionTypes.stateSuccess,
+  props<{ message: string; id: string; paymentLink?: string; isDashboard?: boolean }>(),
+);
+
+export const getTrackingByReservationId = createAction(
+  ReservationActionTypes.getTrackingByReservationId,
+  props<{ id: string }>(),
+);
+
+export const executeTrackingByReservationId = createAction(
+  ReservationActionTypes.executeTrackingByReservationId,
+  props<{ id: string }>(),
+);
+
+export const updateTrackingByReservationId = createAction(
+  ReservationActionTypes.updateTrackingByReservationId,
+  props<{ id: string; started?: string; completed?: string }>(),
+);
+
+export const trackingSuccess = createAction(
+  ReservationActionTypes.trackingSuccess,
+  props<{ tracking: ITracking }>(),
+);
+
+export const createReview = createAction(
+  ReservationActionTypes.createReview,
+  props<{ review: IReview }>(),
+);
+
+export const getReview = createAction(
+  ReservationActionTypes.getReview,
+  props<{ id: string }>(),
+);
+
+export const reservationReviewSuccess = createAction(
+  ReservationActionTypes.reservationReviewSuccess,
+  props<{ review?: IReview }>(),
+);
+
+export const getColorsByTreatmentId = createAction(
+  ReservationActionTypes.getColorsByTreatmentId,
+  props<{ treatmentId: string }>(),
+);
+
+export const colorsCompleteSuccess = createAction(
+  ReservationActionTypes.colorsCompleteSuccess,
+  props<{ colors: IColor[] }>(),
+);
+
+export const updateReservationNote = createAction(
+  ReservationActionTypes.updateReservationNote,
+  props<{
+    id: string;
+    role: Role;
+    note?: string;
+    customerNote?: string;
+    paymentLink?: string;
+    timestamp?: number;
+    timeZone?: string;
+  }>(),
+);
+
+export const updateReservationDiscount = createAction(
+  ReservationActionTypes.updateReservationDiscount,
+  props<{ id: string; discountId: string }>(),
+);
+
+export const updateReservationTimestamp = createAction(
+  ReservationActionTypes.updateReservationTimestamp,
+  props<{ id: string; start: string; role: Role; timeZone?: string }>(),
+);
+
+export const paymentOptions = createAction(ReservationActionTypes.paymentOptions);
+
+export const paymentOptionsSuccess = createAction(
+  ReservationActionTypes.paymentOptionsSuccess,
+  props<{ paymentOptions?: IPaymentOption[] }>(),
+);
+
+export const clean = createAction(ReservationActionTypes.clean);

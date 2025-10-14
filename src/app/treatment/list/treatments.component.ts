@@ -9,7 +9,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AppState, selectTreatmentState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
-import * as fromActionsTreatment from '../../store/treatment.actions';
+import { clean, deleteTreatmentGroup, getTreatmentsPage } from '../../store/treatment.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
@@ -42,7 +42,7 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
   private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
+    private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small,
@@ -79,9 +79,7 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.store.dispatch(
-          new fromActionsTreatment.DeleteTreatmentGroup(result.id, result.name),
-        );
+        this.store.dispatch(deleteTreatmentGroup({ id: result.id, name: result.name }));
       }
     });
   };
@@ -96,10 +94,15 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cdRef.detectChanges();
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsTreatment.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private getTreatments = (page: number = 0): void => this.store.dispatch(
-    new fromActionsTreatment.GetTreatmentsPage(page, this.sort.active, this.sort.direction, this.pageSize),
+    getTreatmentsPage({
+      page: page,
+      sort: this.sort.active,
+      direction: this.sort.direction,
+      size: this.pageSize,
+    }),
   );
 
   private subscribe = (): void => {

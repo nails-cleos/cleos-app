@@ -1,7 +1,19 @@
 import { Pagination } from '../../interfaces/pagination';
-import { All, CurrencyActionTypes } from '../currency.actions';
+import {
+  clean,
+  createCurrency,
+  currencyFailure,
+  currencySaveSuccess,
+  currencySelected,
+  currencySuccess,
+  deleteCurrency,
+  getCurrenciesPage,
+  getCurrency,
+  updateCurrency,
+} from '../currency.actions';
 import { ICurrency } from '../../interfaces/currency';
 import { IError, IResponseSuccess } from '../../interfaces/common';
+import { createReducer, on } from '@ngrx/store';
 
 export interface State {
   response?: IResponseSuccess;
@@ -23,81 +35,59 @@ export const initialState: State = {
   isLoading: false,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case CurrencyActionTypes.getCurrenciesPage: {
-      return {
-        ...state,
-        data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<ICurrency>,
-        errorMessage: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case CurrencyActionTypes.getCurrency: {
-      return {
-        ...state,
-        selected: {} as ICurrency,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case CurrencyActionTypes.currencySuccess: {
-      return {
-        ...state,
-        data: action.data,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case CurrencyActionTypes.currencySaveSuccess: {
-      return {
-        ...state,
-        response: action,
-        selected: undefined,
-        errorMessage: undefined,
-        subErrors: undefined,
-        isLoading: false,
-      };
-    }
-    case CurrencyActionTypes.currencySelected: {
-      return {
-        ...state,
-        selected: action.selected,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case CurrencyActionTypes.currencyFailure: {
-      return {
-        ...state,
-        errorMessage: action.error.message,
-        error: action.error,
-        subErrors: action.error.subErrors,
-        response: undefined,
-        isLoading: false,
-      };
-    }
-    case CurrencyActionTypes.updateCurrency:
-    case CurrencyActionTypes.createCurrency:
-    case CurrencyActionTypes.deleteCurrency: {
-      return {
-        ...state,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-        isLoading: true,
-      };
-    }
-    case CurrencyActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const currencyReducer = createReducer(
+  initialState,
+  on(getCurrenciesPage, (state) => ({
+    ...state,
+    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<ICurrency>,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getCurrency, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: {} as ICurrency,
+    response: undefined,
+  })),
+  on(currencySuccess, (state, { data }) => ({
+    ...state,
+    data: data,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(currencySaveSuccess, (state, action) => ({
+    ...state,
+    response: action,
+    selected: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    isLoading: false,
+  })),
+  on(currencySelected, (state, { selected }) => ({
+    ...state,
+    selected: selected,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(currencyFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error: error,
+    subErrors: error.subErrors,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(updateCurrency, createCurrency, deleteCurrency, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(clean, () => initialState),
+);

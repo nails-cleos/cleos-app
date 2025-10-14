@@ -3,7 +3,7 @@ import { Observable, Subscription } from 'rxjs';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../store/app.states';
-import * as fromActionsRoom from '../store/room.actions';
+import { clean, createRoom, getAllRoomsInfo, getRoom, updateRoom } from '../store/room.actions';
 import { AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, IRoomAll, Room } from '../interfaces/room';
 import { IUser, IUserAll } from '../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
@@ -111,7 +111,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   private readonly language: string;
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>,
-              private route: ActivatedRoute, private formBuilder: UntypedFormBuilder, private router: Router) {
+    private route: ActivatedRoute, private formBuilder: UntypedFormBuilder, private router: Router) {
     this.isAddMode = true;
     this.primary = false;
     this.today = createDate();
@@ -154,12 +154,10 @@ export class RoomComponent implements OnInit, OnDestroy {
     }
 
     if (this.isAddMode) {
-      this.store.dispatch(
-        new fromActionsRoom.CreateRoom(room),
-      );
+      this.store.dispatch(createRoom({ room }));
     } else {
-      room.id = this.id;
-      this.store.dispatch(new fromActionsRoom.UpdateRoom(this.id!, room));
+      const id = this.id!;
+      this.store.dispatch(updateRoom({ id, room }));
     }
     return;
   }
@@ -318,9 +316,9 @@ export class RoomComponent implements OnInit, OnDestroy {
     );
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsRoom.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
-  private getRoomInfo = (): void => this.store.dispatch(new fromActionsRoom.GetAllRoomsInfo());
+  private getRoomInfo = (): void => this.store.dispatch(getAllRoomsInfo());
 
   private setIcon = (day: string, icon: RoomIconName): void => {
     switch (day) {
@@ -450,10 +448,8 @@ export class RoomComponent implements OnInit, OnDestroy {
     option => option.label?.toLowerCase().indexOf(name.toString()) >= 0);
 
   private getRoom = (): void => {
-    const id = this.route.snapshot.paramMap.get('id');
-    this.store.dispatch(
-      new fromActionsRoom.GetRoom(id!, true),
-    );
+    const id = this.route.snapshot.paramMap.get('id')!;
+    this.store.dispatch(getRoom({ id, redirect: true }));
   };
 
   private subscribe = (): void => {

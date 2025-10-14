@@ -3,7 +3,8 @@ import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateS
 import { DiscountRoutingModule } from './discount-routing.module';
 
 import { DiscountComponent } from './discount.component';
-import { DiscountDialogComponent, DiscountsComponent } from './list/discounts.component';
+import { DiscountsComponent } from './list/discounts.component';
+import { DiscountDialogComponent } from './list/discount-dialog.component';
 import { EffectsModule } from '@ngrx/effects';
 import { DiscountEffects } from '../store/effects/discount.effects';
 import { DiscountService } from '../services/discount.service';

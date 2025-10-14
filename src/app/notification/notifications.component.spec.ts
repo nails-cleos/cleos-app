@@ -5,7 +5,7 @@ import { of, Subject, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../services/navigation.service';
-import * as fromActionsNotification from '../store/notification.actions';
+import { deleteNotification, readNotification } from '../store/notification.actions';
 import { INotification } from '../interfaces/notification';
 
 describe('NotificationsComponent', () => {
@@ -74,7 +74,7 @@ describe('NotificationsComponent', () => {
     component.notification(notif);
 
     expect(routerSpy.navigate).toHaveBeenCalledWith([notif.navigation]);
-    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(jasmine.any(fromActionsNotification.ReadNotification));
+    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(readNotification({ id: '1' }));
   });
 
   it('should reload and dispatch ReadNotification if not read', () => {
@@ -83,9 +83,7 @@ describe('NotificationsComponent', () => {
     component.notification(notif);
 
     expect(navigationSpy.reload).toHaveBeenCalledWith(['', 'home', 'test']);
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      jasmine.any(fromActionsNotification.ReadNotification),
-    );
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(readNotification({ id: '2' }));
   });
 
   it('should remove notification and dispatch DeleteNotification', () => {
@@ -94,9 +92,9 @@ describe('NotificationsComponent', () => {
 
     component.remove(0);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      jasmine.any(fromActionsNotification.DeleteNotification),
-    );
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteNotification({ notification: jasmine.objectContaining({ id: '3', deleted: true }) }));
     expect(component.badge).toBe(0);
   });
 

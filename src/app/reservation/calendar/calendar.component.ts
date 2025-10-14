@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit, ViewChild } fr
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
 import { Observable, Subject, Subscription } from 'rxjs';
-import * as fromActionsReservation from '../../store/reservation.actions';
+import { clean, findRooms, getAllGroupingByRoom, updateReservationTimestamp } from '../../store/reservation.actions';
 import { Day, IRoomReservation, MAX_RESERVATION_MONTH, States } from '../../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -146,7 +146,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   constructor() {
     this.breakpointObserver.observe(Object.values(CALENDAR_RESPONSIVE).map(({ breakpoint }) => breakpoint))
-      .pipe(takeUntil(this.destroy$)).subscribe((state: BreakpointState) => {
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((state: BreakpointState) => {
         const foundBreakpoint = Object.values(CALENDAR_RESPONSIVE)
           .find(({ breakpoint }) => !!state.breakpoints[breakpoint]);
         if (foundBreakpoint) {
@@ -307,9 +308,12 @@ export class CalendarComponent implements OnInit, OnDestroy {
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: event }, result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsReservation.UpdateReservationTimestamp(event.meta.id,
-            event.start.toLocaleString(API_LOCALE), this.isRoomAdmin ? Role.roomAdmin : Role.professional,
-            event.meta.timeZone),
+          updateReservationTimestamp({
+            id: event.meta.id,
+            start: event.start.toLocaleString(API_LOCALE),
+            role: this.isRoomAdmin ? Role.roomAdmin : Role.professional,
+            timeZone: event.meta.timeZone,
+          }),
         );
       } else {
         event.start = oldStart;
@@ -549,20 +553,22 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   private clean = (): void => {
     this.calendar.resetEvents();
-    this.store.dispatch(
-      new fromActionsReservation.Clean(),
+    this.store.dispatch(clean(),
     );
   };
 
   private getReservations = (): void => {
     this.calendar.resetEvents();
     this.store.dispatch(
-      new fromActionsReservation.GetAllGroupingByRoom(this.daysInWeek, this.searchDate, this.roomId!,
-        this.professionalSelectedId),
+      getAllGroupingByRoom({
+        days: this.daysInWeek,
+        date: this.searchDate,
+        roomId: this.roomId!,
+        professionalId: this.professionalSelectedId,
+      }),
     );
   };
-
-  private getRoomList = (): void => this.store.dispatch(new fromActionsReservation.FindRooms());
+  private getRoomList = (): void => this.store.dispatch(findRooms({}));
 
   private tryFillData = (darkMode = this.isDarkMode): void => {
     if (this.dataReady && this.calendarReady) {

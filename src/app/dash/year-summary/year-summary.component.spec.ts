@@ -12,6 +12,7 @@ describe('YearSummaryComponent', () => {
   let component: YearSummaryComponent;
   let fixture: ComponentFixture<YearSummaryComponent>;
   let stateSubject: Subject<any>;
+  let saveAsSpy: jasmine.Spy;
 
   const mockCurrency = {
     id: 'eur',
@@ -57,6 +58,15 @@ describe('YearSummaryComponent', () => {
     fixture = TestBed.createComponent(YearSummaryComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  });
+
+  beforeEach(() => {
+    saveAsSpy = jasmine.createSpy('saveAs');
+    (window as any).saveAs = saveAsSpy;
+  });
+
+  afterEach(() => {
+    delete (window as any).saveAs;
   });
 
   it('should create', () => {
@@ -177,17 +187,6 @@ describe('YearSummaryComponent', () => {
   });
 
   describe('exportAction', () => {
-    let saveAsSpy: jasmine.Spy;
-
-    beforeEach(() => {
-      saveAsSpy = jasmine.createSpy('saveAs');
-      (window as any).saveAs = saveAsSpy;
-    });
-
-    afterEach(() => {
-      delete (window as any).saveAs;
-    });
-
     it('should call exportToExcel when export is true', () => {
       component.date.setValue(new Date(2024, 0, 1));
 

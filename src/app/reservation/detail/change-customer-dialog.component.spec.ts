@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { ChangeCustomerDialogComponent } from './change-customer-dialog.component';
 import { IUser, IUserAll } from '../../interfaces/user';
-import * as fromActionsUser from '../../store/user.actions';
+import { clean, getAllCustomers } from '../../store/user.actions';
 
 describe('ChangeCustomerDialogComponent', () => {
   let component: ChangeCustomerDialogComponent;
@@ -77,7 +77,7 @@ describe('ChangeCustomerDialogComponent', () => {
 
   it('should dispatch Clean action on initialization', () => {
     component.ngOnInit();
-    expect(mockStore.dispatch).toHaveBeenCalledWith(new fromActionsUser.Clean());
+    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('onNoClick should close the dialog', () => {
@@ -169,7 +169,7 @@ describe('ChangeCustomerDialogComponent', () => {
 
     component['getCustomers']();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsUser.GetAllCustomers));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getAllCustomers());
   });
 
   it('should filter customers correctly when filterCustomer is called', () => {

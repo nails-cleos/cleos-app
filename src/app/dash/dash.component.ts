@@ -4,8 +4,7 @@ import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/l
 import { Observable, Subject, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectDashboardState } from '../store/app.states';
-import * as fromActionsDashboard from '../store/dashboard.actions';
-import * as fromActionsReservation from '../store/reservation.actions';
+import { clean, getCards, getEvents } from '../store/dashboard.actions';
 import { IReservationSummary, States } from '../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
 import {
@@ -101,7 +100,8 @@ export class DashComponent implements OnInit, OnDestroy {
       const isAdminOrManager = value.isAdmin || value.isManager;
       const miniCard = isAdminOrManager ? { cols: 1, rows: 1 } : { cols: 0, rows: 0 };
       this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium])
-        .pipe(takeUntil(this.destroy$)).subscribe((breakpointState: BreakpointState) => {
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((breakpointState: BreakpointState) => {
           if (breakpointState.breakpoints[Breakpoints.Medium]) {
             this.cardLayout = {
               columns: 2,
@@ -347,12 +347,7 @@ export class DashComponent implements OnInit, OnDestroy {
   };
 
   private clean = (): void => {
-    this.store.dispatch(
-      new fromActionsReservation.Clean(),
-    );
-    this.store.dispatch(
-      new fromActionsDashboard.Clean(),
-    );
+    this.store.dispatch(clean());
   };
 
   private miniCardError = (error: string): void => {
@@ -378,7 +373,9 @@ export class DashComponent implements OnInit, OnDestroy {
 
         const event = monthEvent(it.title, start, end, it.reservationId, findStateColor(it.state, darkMode),
           new Meta(true, this.timeZone, it.state, [this.language, 'reservation', it.reservationId], undefined,
-            it.total), darkMode);
+            it.total,
+          ), darkMode,
+        );
         this.calendar.addEvent(event);
       });
       calendarSummary.unavailable?.forEach(it => {
@@ -394,14 +391,16 @@ export class DashComponent implements OnInit, OnDestroy {
           const end = getEnd(start, it.duration);
           const event = monthEvent(title, start, end, it.unavailableId, findStateColor('DEFAULT', darkMode),
             new Meta(!!it.duration, this.timeZone, 'UNAVAILABLE', [this.language, 'unavailable', it.unavailableId]),
-            darkMode);
+            darkMode,
+          );
           if (event) {
             this.calendar.addEvent(event);
           }
         } else {
           this.calendar.recurringEvent?.addFrequency(it.repeat, start, it.unavailableId, title, 'UNAVAILABLE',
             `${ this.language }/unavailable/`, (date, recurring) => this.createEvent(date, recurring, darkMode),
-            getDurationOrUndefined(it.duration), undefined, it.allDay);
+            getDurationOrUndefined(it.duration), undefined, it.allDay,
+          );
         }
       });
 
@@ -410,7 +409,8 @@ export class DashComponent implements OnInit, OnDestroy {
         startDate.setFullYear(getNowTimeZone(this.timeZone).getFullYear());
         const color = findStateColor('BIRTHDAY', darkMode);
         const event = allDayEvent(it.title, color, startDate, darkMode, `${ this.language }/users/${ it.userId }`,
-          new Meta(false, this.timeZone, 'BIRTHDAY', [this.language, 'users', it.userId]));
+          new Meta(false, this.timeZone, 'BIRTHDAY', [this.language, 'users', it.userId]),
+        );
         this.calendar.addEvent(event);
       });
 
@@ -421,7 +421,9 @@ export class DashComponent implements OnInit, OnDestroy {
         const event = allDayEvent(it.title, color, startDate, darkMode,
           `${ this.language }/accounts/${ it.accountId }/transactions/ ${ it.transactionId }`,
           new Meta(false, this.timeZone, 'TRANSACTION',
-            [this.language, 'accounts', it.accountId, 'transactions', it.transactionId], undefined, it.total));
+            [this.language, 'accounts', it.accountId, 'transactions', it.transactionId], undefined, it.total,
+          ),
+        );
         this.calendar.addEvent(event);
       });
 
@@ -439,7 +441,8 @@ export class DashComponent implements OnInit, OnDestroy {
           }
           this.calendar.recurringEvent?.addFrequency(it.repeat, repeatDate, it.noteId, it.title, 'NOTE',
             `${ this.language }/notes/`,
-            (date, recurring) => this.createEvent(date, recurring, darkMode), undefined, undefined, true);
+            (date, recurring) => this.createEvent(date, recurring, darkMode), undefined, undefined, true,
+          );
         }
       });
 
@@ -452,31 +455,29 @@ export class DashComponent implements OnInit, OnDestroy {
   private createEvent = (date: Date, recurring: any, darkMode: boolean) => {
     const end = getEndWithDuration(date, recurring.duration);
     const event = monthEvent(recurring.title, date, end, recurring.id, findStateColor(recurring.state, darkMode),
-      new Meta(!!recurring.duration, this.timeZone, recurring.state, [recurring.path, recurring.id]), darkMode);
+      new Meta(!!recurring.duration, this.timeZone, recurring.state, [recurring.path, recurring.id]), darkMode,
+    );
     this.calendar.addEvent(event);
   };
 
   private createNoteEvent = (note: ICalendarNote, date: Date, darkMode: boolean): void => {
     const color = findStateColor('NOTE', darkMode);
     const event = allDayEvent(note.title, color, date, darkMode, `${ this.language }/notes/${ note.noteId }`,
-      new Meta(false, this.timeZone, 'NOTE', [this.language, 'notes', note.noteId]));
+      new Meta(false, this.timeZone, 'NOTE', [this.language, 'notes', note.noteId]),
+    );
     this.calendar.addEvent(event);
   };
 
   private getSummaries = (): void => {
     this.getEvents();
     this.isLoading = true;
-    this.store.dispatch(
-      new fromActionsDashboard.GetCards(this.viewDate),
-    );
+    this.store.dispatch(getCards({ date: this.viewDate }));
   };
 
   private getEvents = (): void => {
     this.calendar.resetEvents();
     this.isCalendarLoading = true;
-    this.store.dispatch(
-      new fromActionsDashboard.GetEvents(this.viewDate),
-    );
+    this.store.dispatch(getEvents({ date: this.viewDate }));
   };
 
   private subscribe = (): void => {

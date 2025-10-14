@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
-import * as fromActionsRoom from '../../../store/room.actions';
+import { getServices, updateServices } from '../../../store/room.actions';
 import { MatDialog } from '@angular/material/dialog';
 import { IService, IServicePrice, ServicePrice, ServiceType } from '../../../interfaces/room';
 import { IGroupService } from '../../../interfaces/treatment';
@@ -47,9 +47,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
         prices = [...prices, price];
       });
     }
-    return this.store.dispatch(
-      new fromActionsRoom.UpdateServices(this.roomId!, prices),
-    );
+    return this.store.dispatch(updateServices({ id: this.roomId!, prices }));
   }
 
   ngOnDestroy(): void {
@@ -112,9 +110,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
   private getServices = (): void => {
     this.route.params.subscribe((routeParams) => {
       this.roomId = routeParams.id;
-      this.store.dispatch(
-        new fromActionsRoom.GetServices(this.roomId!),
-      );
+      this.store.dispatch(getServices({ id: this.roomId! }));
     });
   };
 

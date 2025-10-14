@@ -40,10 +40,9 @@ export class ExpenseService {
     this.updatePathVariable(roomId, [id]),
   );
 
-  updateExpense = (roomId: string, expense: IExpense): Observable<IApiResponse> => this.http.patch<IApiResponse>(
-    this.updatePathVariable(roomId, [expense.id]),
-    expense,
-  );
+  updateExpense = (
+    id: string, roomId: string, expense: IExpense,
+  ): Observable<IApiResponse> => this.http.patch<IApiResponse>(this.updatePathVariable(roomId, [id]), expense);
 
   private updatePathVariable(roomId: string, args?: (string | null | undefined)[]): string {
     let url = this.urlV1;

@@ -1,9 +1,9 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
 import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
 import { IRoom, IRoomCustomer, IRoomInfo, IRoomService, IServicePrice } from '../interfaces/room';
 
-export enum RoomActionTypes {
+enum RoomActionTypes {
   getRoomsPage = '[Room] Get rooms page',
   getServices = '[Room] Find room services by id',
   getAllRoomsInfo = '[Room] Get all rooms info',
@@ -20,131 +20,84 @@ export enum RoomActionTypes {
   deleteRoom = '[Room] Delete room by id',
   getAllCustomersInfo = '[Room] Get all customers info',
   customerInfoSuccess = '[Room] Customer info Success',
-  clean = '[Room] Clean'
+  clean = '[Room] Clean',
 }
 
-export class GetRoomsPage extends PageRequest implements Action {
-  readonly type = RoomActionTypes.getRoomsPage;
-}
+export const getRoomsPage = createAction(
+  RoomActionTypes.getRoomsPage,
+  props<PageRequest>(),
+);
 
-export class GetServices implements Action {
-  readonly type = RoomActionTypes.getServices;
+export const getServices = createAction(
+  RoomActionTypes.getServices,
+  props<{ id: string }>(),
+);
 
-  constructor(public id: string) {
-  }
-}
+export const getAllRoomsInfo = createAction(RoomActionTypes.getAllRoomsInfo);
 
-export class GetAllRoomsInfo implements Action {
-  readonly type = RoomActionTypes.getAllRoomsInfo;
-}
+export const roomInfoSuccess = createAction(
+  RoomActionTypes.roomInfoSuccess,
+  props<{ roomInfo?: IRoomInfo; redirect?: boolean }>(),
+);
 
-export class RoomInfoSuccess implements Action {
-  readonly type = RoomActionTypes.roomInfoSuccess;
+export const roomSuccess = createAction(
+  RoomActionTypes.roomSuccess,
+  props<{ data: Pagination<IRoom> }>(),
+);
 
-  constructor(public roomInfo?: IRoomInfo, public redirect?: boolean) {
-  }
-}
+export const createRoom = createAction(
+  RoomActionTypes.createRoom,
+  props<{ room: IRoom }>(),
+);
 
-export class RoomSuccess implements Action {
-  readonly type = RoomActionTypes.roomSuccess;
+export const updateRoom = createAction(
+  RoomActionTypes.updateRoom,
+  props<{ id: string; room: IRoom }>(),
+);
 
-  constructor(public data: Pagination<IRoom>) {
-  }
-}
+export const updateServices = createAction(
+  RoomActionTypes.updateServices,
+  props<{ id: string; prices: IServicePrice[] }>(),
+);
 
-export class CreateRoom implements Action {
-  readonly type = RoomActionTypes.createRoom;
+export const roomSaveSuccess = createAction(
+  RoomActionTypes.roomSaveSuccess,
+  props<ResponseSuccess>(),
+);
 
-  constructor(public room: IRoom) {
-  }
-}
+export const roomFailure = createAction(
+  RoomActionTypes.roomFailure,
+  props<{ error: IError }>(),
+);
 
-export class UpdateRoom implements Action {
-  readonly type = RoomActionTypes.updateRoom;
+export const roomSelected = createAction(
+  RoomActionTypes.roomSelected,
+  props<{ selected?: IRoom; redirect?: boolean }>(),
+);
 
-  constructor(public id: string, public room: IRoom) {
-  }
-}
+export const roomServiceSelected = createAction(
+  RoomActionTypes.roomServiceSelected,
+  props<{ services?: IRoomService }>(),
+);
 
-export class UpdateServices implements Action {
-  readonly type = RoomActionTypes.updateServices;
+export const getRoom = createAction(
+  RoomActionTypes.getRoom,
+  props<{ id: string; redirect: boolean }>(),
+);
 
-  constructor(public id: string, public prices: IServicePrice[]) {
-  }
-}
+export const deleteRoom = createAction(
+  RoomActionTypes.deleteRoom,
+  props<{ id: string; room: IRoom }>(),
+);
 
-export class RoomSaveSuccess extends ResponseSuccess implements Action {
-  readonly type = RoomActionTypes.roomSaveSuccess;
-}
+export const getAllCustomersInfo = createAction(
+  RoomActionTypes.getAllCustomersInfo,
+  props<{ id: string }>(),
+);
 
-export class RoomFailure implements Action {
-  readonly type = RoomActionTypes.roomFailure;
+export const customerInfoSuccess = createAction(
+  RoomActionTypes.customerInfoSuccess,
+  props<{ customers: IRoomCustomer[] }>(),
+);
 
-  constructor(public error: IError) {
-  }
-}
-
-export class RoomSelected implements Action {
-  readonly type = RoomActionTypes.roomSelected;
-
-  constructor(public selected?: IRoom, public redirect?: boolean) {
-  }
-}
-
-export class RoomServiceSelected implements Action {
-  readonly type = RoomActionTypes.roomServiceSelected;
-
-  constructor(public services?: IRoomService) {
-  }
-}
-
-export class GetRoom implements Action {
-  readonly type = RoomActionTypes.getRoom;
-
-  constructor(public id: string, public redirect: boolean) {
-  }
-}
-
-export class DeleteRoom implements Action {
-  readonly type = RoomActionTypes.deleteRoom;
-
-  constructor(public id: string, public room: IRoom) {
-  }
-}
-
-export class GetAllCustomersInfo implements Action {
-  readonly type = RoomActionTypes.getAllCustomersInfo;
-
-  constructor(public id: string) {
-  }
-}
-
-export class CustomerInfoSuccess implements Action {
-  readonly type = RoomActionTypes.customerInfoSuccess;
-
-  constructor(public customers: IRoomCustomer[]) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = RoomActionTypes.clean;
-}
-
-export type All =
-  | GetRoomsPage
-  | GetServices
-  | GetAllRoomsInfo
-  | RoomInfoSuccess
-  | CreateRoom
-  | UpdateRoom
-  | UpdateServices
-  | RoomSuccess
-  | RoomSaveSuccess
-  | RoomFailure
-  | GetRoom
-  | RoomSelected
-  | RoomServiceSelected
-  | DeleteRoom
-  | GetAllCustomersInfo
-  | CustomerInfoSuccess
-  | Clean;
+export const clean = createAction(RoomActionTypes.clean);

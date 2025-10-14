@@ -9,7 +9,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ColorComponent } from './color.component';
 import { IColor } from '../interfaces/color';
-import * as fromActionsColor from '../store/color.actions';
+import { clean, getColor } from '../store/color.actions';
 
 describe('ColorComponent', () => {
   let component: ColorComponent;
@@ -98,7 +98,7 @@ describe('ColorComponent', () => {
   it('should dispatch Clean action on initialization', () => {
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsColor.Clean));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch GetColor action when in edit mode', () => {
@@ -107,7 +107,7 @@ describe('ColorComponent', () => {
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsColor.GetColor));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getColor({ id: testId }));
   });
 
   it('should patch form when color is selected from state', () => {
@@ -159,13 +159,26 @@ describe('ColorComponent', () => {
 
   it('should dispatch CreateColor action when in add mode and form is valid', () => {
     component.ngOnInit();
-    component.form.get('name')?.setValue('New Color');
-    component.form.get('description')?.setValue('New Description');
+    const nameControl = component.form.get('name')!;
+    const descriptionControl = component.form.get('description')!;
+
+    nameControl.setValue('New Color');
+    nameControl.markAsDirty();
+
+    descriptionControl.setValue('New Description');
+    descriptionControl.markAsDirty();
+
     mockStore.dispatch.calls.reset();
 
     void component.submit;
-
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsColor.CreateColor));
+    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+      color: jasmine.objectContaining({
+        name: 'New Color',
+        description: 'New Description',
+      }),
+      type: '[Color] Create color',
+    }));
   });
 
   it('should dispatch UpdateColor action when in edit mode and form is valid', () => {
@@ -174,13 +187,26 @@ describe('ColorComponent', () => {
     component.color = mockColor;
 
     component.ngOnInit();
-    component.form.get('name')?.setValue('Updated Color');
-    component.form.get('description')?.setValue('Updated Description');
+    const nameControl = component.form.get('name')!;
+    const descriptionControl = component.form.get('description')!;
+
+    nameControl.setValue('Update Color');
+    nameControl.markAsDirty();
+
+    descriptionControl.setValue('Update Description');
+    descriptionControl.markAsDirty();
+
     mockStore.dispatch.calls.reset();
 
     void component.submit;
-
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsColor.UpdateColor));
+    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+      color: jasmine.objectContaining({
+        name: 'Update Color',
+        description: 'Update Description',
+      }),
+      type: '[Color] Update color by id',
+    }));
   });
 
   it('should return form controls from getForm getter', () => {
@@ -216,7 +242,7 @@ describe('ColorComponent', () => {
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsColor.GetColor));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getColor({ id: testId }));
   });
 
   it('should clear color when updating in edit mode', () => {

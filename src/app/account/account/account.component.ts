@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AppState, selectAccountState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
-import * as fromActionsAccount from '../../store/account.actions';
+import { getAccountByCustomerId, updateAccount } from '../../store/account.actions';
 import { IAccountAll, ITransaction, Transaction } from '../../interfaces/account';
 import { ICurrency, ICurrencyAll } from '../../interfaces/currency';
 import { map, startWith } from 'rxjs/operators';
@@ -60,13 +60,14 @@ export class AccountComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const id = this.account!.id;
+    const customerId = this.customerId!;
     const transaction: ITransaction = new Transaction();
-    transaction.accountId = this.account?.id;
-    transaction.customerId = this.customerId;
+    transaction.customerId = customerId;
     transaction.currencyId = valueChange(this.getForm.currency.value, this.account?.currency)?.id;
     transaction.gift = this.getForm.gift.value;
     this.store.dispatch(
-      new fromActionsAccount.UpdateAccount(transaction.accountId!, transaction, this.customerId!),
+      updateAccount({ id, transaction, customerId }),
     );
     return;
   }
@@ -102,7 +103,7 @@ export class AccountComponent implements OnInit, OnDestroy {
   };
 
   private getAccount = (): void => this.store.dispatch(
-    new fromActionsAccount.GetAccountByCustomerId(this.customerId!),
+    getAccountByCustomerId({ customerId: this.customerId! }),
   );
 
   private createForm = (): void => {

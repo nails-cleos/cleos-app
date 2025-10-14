@@ -1,7 +1,6 @@
 import { Component, inject, OnDestroy, OnInit, Optional } from '@angular/core';
 import { Store } from '@ngrx/store';
-import * as fromActionsLogin from '../store/auth.actions';
-import { Login, SignUpSuccess } from '../store/auth.actions';
+import { clean, login, redirect, signupSuccess } from '../store/auth.actions';
 import { AppState, selectAuthState } from '../store/app.states';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
@@ -53,8 +52,8 @@ export class AuthComponent implements OnInit, OnDestroy {
   language: string = this.translate.currentLang;
   showForm: boolean = false;
   status: string = 'init';
-  tos: string = `${ environment.appServer }/${ this.language }/term-and-conditions`;
-  privacyPolicy: string = `${ environment.appServer }/${ this.language }/privacy`;
+  tos: string = `${environment.appServer}/${this.language}/term-and-conditions`;
+  privacyPolicy: string = `${environment.appServer}/${this.language}/privacy`;
 
   private subscription?: Subscription;
   private getState: Observable<any> = this.store.select(selectAuthState);
@@ -125,7 +124,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     this.authSubscription?.unsubscribe();
   }
 
-  private clean = (): void => this.store.dispatch(new fromActionsLogin.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private subscribe = (): void => {
     this.loginForm.get('code')?.valueChanges.subscribe(value => {
@@ -145,9 +144,7 @@ export class AuthComponent implements OnInit, OnDestroy {
           returnUrl = JSON.parse(atob(state.queryParams.state))?.returnUrl;
         }
         if (!state.redirect && !returnUrl) {
-          this.store.dispatch(
-            new fromActionsLogin.Redirect(),
-          );
+          this.store.dispatch(redirect());
         }
       }
       if (!state.subErrors || !state.subErrors.length) {
@@ -169,17 +166,19 @@ export class AuthComponent implements OnInit, OnDestroy {
         if (!user.emailVerified && !this.cookieService.get(VERIFICATION_EMAIL)) {
           sendEmailVerification(user).then(() => {
             const message = this.translate.instant('AUTH.ACTIVATE_ACCOUNT.MESSAGE');
-            this.store.dispatch(
-              new SignUpSuccess(message),
-            );
+            this.store.dispatch(signupSuccess(message));
             this.cookieService.set(VERIFICATION_EMAIL, 'sent');
-          }).catch(e => console.error(`Error sending email verification. ${ e }`));
+          }).catch(e => console.error(`Error sending email verification. ${e}`));
         } else {
           user.getIdToken().then(idToken => {
             localStorage.removeItem('CODE');
             this.store.dispatch(
-              new Login(idToken, this.route.snapshot.queryParams, this.cookieService.get(THEME),
-                localStorage.getItem('CODE')),
+              login({
+                token: idToken,
+                queryParams: this.route.snapshot.queryParams,
+                theme: this.cookieService.get(THEME),
+                code: localStorage.getItem('CODE'),
+              }),
             );
           });
         }

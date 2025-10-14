@@ -9,7 +9,7 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { ActivatedRoute } from '@angular/router';
 import { ICatalogueAll } from '../../interfaces/catalogue';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import * as fromActionsCatalogue from '../../store/catalogue.actions';
+import { catalogueSelected, clean, getAllCatalogues, updateCatalogueOrder } from '../../store/catalogue.actions';
 import { CataloguesComponent } from './catalogues.component';
 
 describe('CataloguesComponent', () => {
@@ -102,13 +102,13 @@ describe('CataloguesComponent', () => {
   it('should dispatch Clean action on initialization', () => {
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.Clean));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch GetAllCatalogues action on initialization', () => {
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.GetAllCatalogues));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getAllCatalogues());
   });
 
   it('should update catalogues when state changes with data', () => {
@@ -157,7 +157,7 @@ describe('CataloguesComponent', () => {
 
     component.edit(testCatalogue);
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.CatalogueSelected));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(catalogueSelected({ selected: testCatalogue }));
   });
 
   it('should call delete method without errors', () => {
@@ -171,7 +171,7 @@ describe('CataloguesComponent', () => {
 
     void component.finish;
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.UpdateCatalogueOrder));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(updateCatalogueOrder({ catalogues: mockCatalogues }));
   });
 
   it('should handle drag and drop correctly', () => {

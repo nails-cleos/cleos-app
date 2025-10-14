@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState, selectNotificationState } from '../store/app.states';
 import { Observable, Subscription } from 'rxjs';
-import * as fromActionsNotification from '../store/notification.actions';
 import { INotification } from '../interfaces/notification';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -11,6 +10,8 @@ import { zoneDateToDate } from '../util/dates';
 import { addRemoveItemList, insertItemList } from '../util/animation';
 import { SharedModule } from '../shared/shared.module';
 import { MatRipple } from '@angular/material/core';
+import { clean, deleteNotification, getNotificationsPage, readNotification } from '../store/notification.actions';
+import { PAGE_SIZE } from '../interfaces/pagination';
 
 @Component({
   selector: 'app-notifications',
@@ -31,7 +32,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   private page: number;
 
   constructor(private router: Router, private store: Store<AppState>, private translate: TranslateService,
-              private navigationService: NavigationService) {
+    private navigationService: NavigationService) {
     this.dateFormat = this.translate.currentLang;
     this.getState = this.store.select(selectNotificationState);
     this.page = -1;
@@ -52,14 +53,12 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       this.router.navigate([notification.navigation]);
     } else {
       this.navigationService.reload(this.router.url.split('/'));
-      this.store.dispatch(
-        new fromActionsNotification.ReadNotification(notification.id),
-      );
+      this.store.dispatch(readNotification({ id: notification.id }));
     }
   };
 
   getNotifications = (): void => this.store.dispatch(
-    new fromActionsNotification.GetNotificationsPage(++this.page, 'date', 'desc'),
+    getNotificationsPage({ page: ++this.page, sort: 'date', direction: 'desc', size: PAGE_SIZE }),
   );
 
   remove = (index: number): void => {
@@ -67,9 +66,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       return;
     }
     const notification = this.notifications.splice(index, 1)[0];
-    this.store.dispatch(
-      new fromActionsNotification.DeleteNotification(Object.assign({}, notification, { deleted: true })),
-    );
+    this.store.dispatch(deleteNotification({ notification: Object.assign({}, notification, { deleted: true }) }));
     if (!notification.read) {
       --this.badge;
     }
@@ -79,7 +76,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     }
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsNotification.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {

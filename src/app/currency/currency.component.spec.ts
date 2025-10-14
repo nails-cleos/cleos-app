@@ -9,7 +9,7 @@ import { ChangeDetectorRef } from '@angular/core';
 import { ICurrency } from '../interfaces/currency';
 import { ReactiveFormsModule, UntypedFormBuilder } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import * as fromActionsCurrency from '../store/currency.actions';
+import { clean, getCurrency } from '../store/currency.actions';
 
 describe('CurrencyComponent', () => {
   let component: CurrencyComponent;
@@ -101,7 +101,7 @@ describe('CurrencyComponent', () => {
   it('should dispatch Clean action on initialization', () => {
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCurrency.Clean));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch GetCurrency action when in edit mode', () => {
@@ -110,7 +110,7 @@ describe('CurrencyComponent', () => {
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCurrency.GetCurrency));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getCurrency({ id: testId }));
   });
 
   it('should patch form when currency is selected from state', () => {
@@ -164,14 +164,31 @@ describe('CurrencyComponent', () => {
 
   it('should dispatch CreateCurrency action when in add mode and form is valid', () => {
     component.ngOnInit();
-    component.form.get('name')?.setValue('New Currency');
-    component.form.get('code')?.setValue('USD');
-    component.form.get('icon')?.setValue('usd');
+    const nameControl = component.form.get('name')!;
+    const codeControl = component.form.get('code')!;
+    const iconControl = component.form.get('icon')!;
+
+    nameControl.setValue('New Currency');
+    nameControl.markAsDirty();
+
+    codeControl.setValue('EUR');
+    codeControl.markAsDirty();
+
+    iconControl.setValue('euro');
+    iconControl.markAsDirty();
+
     mockStore.dispatch.calls.reset();
 
     void component.submit;
-
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCurrency.CreateCurrency));
+    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+      currency: jasmine.objectContaining({
+        name: 'New Currency',
+        code: 'EUR',
+        icon: 'euro',
+      }),
+      type: '[Currency] Create currency',
+    }));
   });
 
   it('should dispatch UpdateCurrency action when in edit mode and form is valid', () => {
@@ -180,14 +197,31 @@ describe('CurrencyComponent', () => {
     component.currency = mockCurrency;
 
     component.ngOnInit();
-    component.form.get('name')?.setValue('Updated Currency');
-    component.form.get('code')?.setValue('ARS');
-    component.form.get('icon')?.setValue('cash');
+    const nameControl = component.form.get('name')!;
+    const codeControl = component.form.get('code')!;
+    const iconControl = component.form.get('icon')!;
+
+    nameControl.setValue('Updated Currency');
+    nameControl.markAsDirty();
+
+    codeControl.setValue('ARS');
+    codeControl.markAsDirty();
+
+    iconControl.setValue('cash');
+    iconControl.markAsDirty();
+
     mockStore.dispatch.calls.reset();
 
     void component.submit;
-
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCurrency.UpdateCurrency));
+    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+      currency: jasmine.objectContaining({
+        name: 'Updated Currency',
+        code: 'ARS',
+        icon: 'cash',
+      }),
+      type: '[Currency] Update currency by id',
+    }));
   });
 
   it('should return form controls from getForm getter', () => {
@@ -223,7 +257,7 @@ describe('CurrencyComponent', () => {
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCurrency.GetCurrency));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getCurrency({ id: testId }));
   });
 
   it('should clear currency when updating in edit mode', () => {

@@ -1,5 +1,10 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import * as fromActionsPayment from '../../../store/payment.actions';
+import {
+  clean,
+  createPaymentLinkByReservationId,
+  getPaymentByResourceId,
+  paymentOptions,
+} from '../../../store/payment.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectPaymentState } from '../../../store/app.states';
@@ -13,7 +18,7 @@ import { MatStepper } from '@angular/material/stepper';
 import { getPaymentOptions, getPayNlOptions, IPaymentOption, PaymentType } from '../../../interfaces/payment';
 import { IPrice, Price } from '../../../interfaces/treatment';
 import { IReservationAll, IReservationPayment } from '../../../interfaces/reservation';
-import * as fromActionsReservation from '../../../store/reservation.actions';
+import { getReservation } from '../../../store/reservation.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { SharedModule } from '../../../shared/shared.module';
@@ -80,9 +85,7 @@ export class OptionComponent implements OnInit, OnDestroy {
     if (option.subTypes.length) {
       payment.bic = this.typeForm.get('bank')?.value?.bic;
     }
-    return this.store.dispatch(
-      new fromActionsPayment.CreatePaymentLinkByReservationId(this.reservationId, payment),
-    );
+    return this.store.dispatch(createPaymentLinkByReservationId({ reservationId: this.reservationId, payment }));
   }
 
   get professionalName(): string {
@@ -122,17 +125,13 @@ export class OptionComponent implements OnInit, OnDestroy {
   };
 
   private getPaymentFindByReservationId = (): void => {
-    this.store.dispatch(
-      new fromActionsPayment.GetPaymentByResourceId(this.reservationId, 'reservation'),
-    );
-    this.store.dispatch(
-      new fromActionsReservation.GetReservation(this.reservationId),
-    );
+    this.store.dispatch(getPaymentByResourceId({ id: this.reservationId, path: 'reservation' }));
+    this.store.dispatch(getReservation({ id: this.reservationId }));
   };
 
-  private getOptions = (): void => this.store.dispatch(new fromActionsPayment.PaymentOptions());
+  private getOptions = (): void => this.store.dispatch(paymentOptions());
 
-  private clean = (): void => this.store.dispatch(new fromActionsPayment.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {

@@ -20,7 +20,7 @@ import {
   SummaryTotals,
   Total,
 } from '../../interfaces/dashboard';
-import * as fromActionsDashboard from '../../store/dashboard.actions';
+import { clean, exportYearSummary, getYearSummary } from '../../store/dashboard.actions';
 import { Router } from '@angular/router';
 import { AuthUserService } from '../../services/auth-user.service';
 import { allElementsHaveSameKeyFilterValue, currencySymbol } from '../../util/helper';
@@ -175,8 +175,8 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
             this.yearSummaryTotals.totals.btw + value.totalBTW, this.yearSummaryTotals.totals.net + value.totalNet);
           this.yearSummaryTotals.totalsWithoutCash =
             new Total(this.yearSummaryTotals.totalsWithoutCash.gross + value.totalWithoutGross,
-            	this.yearSummaryTotals.totalsWithoutCash.btw + value.totalWithoutBTW,
-            	this.yearSummaryTotals.totalsWithoutCash.net + value.totalWithoutNet);
+              this.yearSummaryTotals.totalsWithoutCash.btw + value.totalWithoutBTW,
+              this.yearSummaryTotals.totalsWithoutCash.net + value.totalWithoutNet);
         });
       });
     }
@@ -270,19 +270,15 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
   private getSummary = (year: number): void => {
     this.reset();
     this.isLoading = true;
-    this.store.dispatch(
-      new fromActionsDashboard.GetYearSummary(year),
-    );
+    this.store.dispatch(getYearSummary({ year }));
   };
 
   private getExportData = (year: number): void => {
     this.isExportLoading = true;
-    this.store.dispatch(
-      new fromActionsDashboard.ExportYearSummary(year),
-    );
+    this.store.dispatch(exportYearSummary({ year }));
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsDashboard.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {

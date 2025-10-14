@@ -3,7 +3,7 @@ import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../../store/app.states';
-import * as fromActionsRoom from '../../../store/room.actions';
+import { getAllCustomersInfo } from '../../../store/room.actions';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { SharedModule } from '../../../shared/shared.module';
@@ -39,44 +39,42 @@ export class CustomersComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscription?: Subscription;
 
   constructor(breakpointObserver: BreakpointObserver, private route: ActivatedRoute, private store: Store<AppState>,
-              private translate: TranslateService) {
-  	this.getState = this.store.select(selectRoomState);
-  	breakpointObserver.observe([
-  		Breakpoints.XSmall,
-  		Breakpoints.Small,
-  	]).subscribe(result => this.pageSize = result.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
-  	this.language = this.translate.currentLang;
+    private translate: TranslateService) {
+    this.getState = this.store.select(selectRoomState);
+    breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small,
+    ]).subscribe(result => this.pageSize = result.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
+    this.language = this.translate.currentLang;
   }
 
   ngOnDestroy(): void {
-  	this.subscription?.unsubscribe();
+    this.subscription?.unsubscribe();
   }
 
   ngOnInit(): void {
-  	this.subscribe();
+    this.subscribe();
   }
 
   ngAfterViewInit(): void {
-  	this.getCustomers();
+    this.getCustomers();
   }
 
   private getCustomers = (): void => {
-  	this.route.params.subscribe((routeParams) => {
-  		this.roomId = routeParams.id;
-  		this.store.dispatch(
-  			new fromActionsRoom.GetAllCustomersInfo(this.roomId!),
-  		);
-  	});
+    this.route.params.subscribe((routeParams) => {
+      this.roomId = routeParams.id;
+      this.store.dispatch(getAllCustomersInfo({ id: this.roomId! }));
+    });
   };
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe((state) => {
-  		this.customers = state.customers;
-  		if (this.customers) {
-  			this.dataSource.data = this.customers;
-  			this.dataSource.paginator = this.paginator;
-  			this.dataSource.sort = this.sort;
-  		}
-  	});
+    this.subscription = this.getState.subscribe((state) => {
+      this.customers = state.customers;
+      if (this.customers) {
+        this.dataSource.data = this.customers;
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+      }
+    });
   };
 }

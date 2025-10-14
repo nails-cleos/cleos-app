@@ -8,9 +8,9 @@ import {
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectAdditionalState } from '../../store/app.states';
-import * as fromActionsAdditional from '../../store/additional.actions';
 import { IAdditionalAll } from '../../interfaces/additional';
 import { SharedModule } from '../../shared/shared.module';
+import { clean, getAdditionalList, sortAdditional } from '../../store/additional.actions';
 
 @Component({
   selector: 'app-sorting',
@@ -39,11 +39,11 @@ export class AdditionalSortingComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  sorted = (sorted: ISorted[]): void => this.store.dispatch(new fromActionsAdditional.SortAdditional(sorted));
+  sorted = (additionalList: ISorted[]): void => this.store.dispatch(sortAdditional({ additionalList }));
 
-  private clean = (): void => this.store.dispatch(new fromActionsAdditional.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
-  private getAdditionalList = (): void => this.store.dispatch(new fromActionsAdditional.GetAdditionalList());
+  private getAdditionalList = (): void => this.store.dispatch(getAdditionalList());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {

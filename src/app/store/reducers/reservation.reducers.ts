@@ -1,4 +1,61 @@
-import { All, ReservationActionTypes } from '../reservation.actions';
+import {
+  approveReservation,
+  cancelReservation,
+  clean,
+  colorsCompleteSuccess,
+  completeReservation,
+  createReservation,
+  createReview,
+  customerCancelReservation,
+  customerSearchReservation,
+  customersSuccess,
+  customerSuccess,
+  deleteReservation,
+  executeTrackingByReservationId,
+  findRooms,
+  getAllAdditionalByGroupId,
+  getAllFilterReservations,
+  getAllGroupingByRoom,
+  getAllRooms,
+  getAllTreatments,
+  getColorsByTreatmentId,
+  getCustomerInformation,
+  getCustomerReservations,
+  getCustomers,
+  getEditReservation,
+  getPage,
+  getReservation,
+  getReservationHistory,
+  getReview,
+  getTrackingByReservationId,
+  getUpcomingReservation,
+  paymentCompleteReservation,
+  paymentOptions,
+  paymentOptionsSuccess,
+  reservationAdditionalSuccess,
+  reservationFailure,
+  reservationFilterPageSuccess,
+  reservationFindPayments,
+  reservationHistorySuccess,
+  reservationPageSuccess,
+  reservationPaymentsSuccess,
+  reservationReviewSuccess,
+  reservationRoomsSuccess,
+  reservationSaveSuccess,
+  reservationsCustomerSuccess,
+  reservationSelected,
+  reservationSuccess,
+  reservationTreatmentsSuccess,
+  searchAvailability,
+  startReservation,
+  stateSuccess,
+  trackingSuccess,
+  updateReservationById,
+  updateReservationDiscount,
+  updateReservationNote,
+  updateReservationTimestamp,
+  updateTrackingByReservationId,
+} from '../reservation.actions';
 import {
   IAvailableDTO,
   ICustomerLastReservation,
@@ -17,6 +74,7 @@ import { IOffice } from '../../interfaces/office';
 import { IColor } from '../../interfaces/color';
 import { IReview } from '../../interfaces/review';
 import { IError, IResponseSuccess } from '../../interfaces/common';
+import { createReducer, on } from '@ngrx/store';
 
 export interface State {
   response?: IResponseSuccess;
@@ -68,456 +126,362 @@ export const initialState: State = {
   isLoading: false,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case ReservationActionTypes.getCustomerReservations: {
-      return {
-        ...state,
-        customerReservation: {
-          reservations: { content: [{}, {}, {}], totalElements: 3 },
-          upcoming: [{}],
-        } as ICustomerReservation,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.getAllFilterReservations: {
-      return {
-        ...state,
-        filter: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IReservation>,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.getPage: {
-      return {
-        ...state,
-        page: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IReservation>,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.getAllGroupingByRoom: {
-      return {
-        ...state,
-        data: undefined,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-        isLoading: true,
-      };
-    }
-    case ReservationActionTypes.getUpcomingReservation: {
-      return {
-        ...state,
-        data: undefined,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.customerSearchReservation:
-    case ReservationActionTypes.searchAvailability: {
-      return {
-        ...state,
-        data: undefined,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-        isLoading: true,
-      };
-    }
-    case ReservationActionTypes.getCustomers: {
-      return {
-        ...state,
-        customers: undefined,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.getCustomerInformation: {
-      return {
-        ...state,
-        customer: undefined,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.getAllRooms:
-    case ReservationActionTypes.findRooms: {
-      return {
-        ...state,
-        rooms: undefined,
-        isLoading: true,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.getAllAdditionalByGroupId: {
-      return {
-        ...state,
-        additional: undefined,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.getAllTreatments: {
-      return {
-        ...state,
-        treatmentDiscount: undefined,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.updateReservationNote:
-    case ReservationActionTypes.updateReservationDiscount:
-    case ReservationActionTypes.updateReservationTimestamp:
-    case ReservationActionTypes.updateReservationById: {
-      return {
-        ...state,
-        data: {} as IReservation,
-        page: undefined,
-        filter: undefined,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-        isLoading: true,
-      };
-    }
-    case ReservationActionTypes.reservationFindPayments: {
-      return {
-        ...state,
-        payments: [{}, {}, {}],
-        page: undefined,
-        filter: undefined,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.getReservationHistory: {
-      return {
-        ...state,
-        history: [{}, {}, {}],
-        page: undefined,
-        filter: undefined,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.approveReservation:
-    case ReservationActionTypes.start:
-    case ReservationActionTypes.completeReservation:
-    case ReservationActionTypes.paymentCompleteReservation:
-    case ReservationActionTypes.cancelReservation:
-    case ReservationActionTypes.customerCancelReservation:
-    case ReservationActionTypes.getEditReservation:
-    case ReservationActionTypes.getReservation: {
-      return {
-        ...state,
-        data: {} as IReservation,
-        page: undefined,
-        filter: undefined,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.reservationPageSuccess: {
-      return {
-        ...state,
-        page: action.page,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.reservationFilterPageSuccess: {
-      return {
-        ...state,
-        filter: action.filter,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.reservationsCustomerSuccess: {
-      return {
-        ...state,
-        customerReservation: action.customerReservation,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.reservationSuccess: {
-      return {
-        ...state,
-        data: action.data,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-        isLoading: false,
-      };
-    }
-    case ReservationActionTypes.customersSuccess: {
-      return {
-        ...state,
-        customers: action.customers,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.customerSuccess: {
-      return {
-        ...state,
-        customer: action.customer,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.reservationRoomsSuccess: {
-      return {
-        ...state,
-        rooms: action.rooms,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-        isLoading: false,
-      };
-    }
-    case ReservationActionTypes.reservationTreatmentsSuccess: {
-      return {
-        ...state,
-        treatmentDiscount: action.treatmentDiscount,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.reservationAdditionalSuccess: {
-      return {
-        ...state,
-        additional: action.additional,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.stateSuccess:
-    case ReservationActionTypes.reservationSaveSuccess: {
-      return {
-        ...state,
-        response: action,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        isLoading: false,
-      };
-    }
-    case ReservationActionTypes.reservationSelected: {
-      return {
-        ...state,
-        selected: action.selected,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-        isLoading: false,
-      };
-    }
-    case ReservationActionTypes.reservationFailure: {
-      return {
-        ...state,
-        errorMessage: action.error.message,
-        error: action.error,
-        subErrors: action.error.subErrors,
-        response: undefined,
-        isLoading: false,
-      };
-    }
-    case ReservationActionTypes.createReservation:
-    case ReservationActionTypes.deleteReservation: {
-      return {
-        ...state,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-        isLoading: true,
-      };
-    }
-    case ReservationActionTypes.updateTrackingByReservationId:
-    case ReservationActionTypes.executeTrackingByReservationId: {
-      return {
-        ...state,
-        tracking: undefined,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.getTrackingByReservationId: {
-      return {
-        ...state,
-        tracking: undefined,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.trackingSuccess: {
-      return {
-        ...state,
-        tracking: action.tracking,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.reservationPaymentsSuccess: {
-      return {
-        ...state,
-        payments: action.payments,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.reservationHistorySuccess: {
-      return {
-        ...state,
-        history: action.history,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.createReview: {
-      return {
-        ...state,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-        isLoading: false,
-      };
-    }
-    case ReservationActionTypes.getReview: {
-      return {
-        ...state,
-        review: undefined,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-        isLoading: false,
-      };
-    }
-    case ReservationActionTypes.reservationReviewSuccess: {
-      return {
-        ...state,
-        review: action.review,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        response: undefined,
-        isLoading: false,
-      };
-    }
-    case ReservationActionTypes.getColorsByTreatmentId: {
-      return {
-        ...state,
-        colors: undefined,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.colorsCompleteSuccess: {
-      return {
-        ...state,
-        colors: action.colors,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.paymentOptions: {
-      return {
-        ...state,
-        paymentOptions: undefined,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.paymentOptionsSuccess: {
-      return {
-        ...state,
-        paymentOptions: action.paymentOptions,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ReservationActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const reservationReducer = createReducer(
+  initialState,
+  on(getCustomerReservations, (state) => ({
+    ...state,
+    customerReservation: {
+      reservations: { content: [{}, {}, {}], totalElements: 3 },
+      upcoming: [{}],
+    } as ICustomerReservation,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getAllFilterReservations, (state) => ({
+    ...state,
+    filter: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IReservation>,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getPage, (state) => ({
+    ...state,
+    page: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IReservation>,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getAllGroupingByRoom, (state) => ({
+    ...state,
+    data: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(getUpcomingReservation, (state) => ({
+    ...state,
+    data: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(customerSearchReservation, searchAvailability, (state) => ({
+    ...state,
+    data: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(getCustomers, (state) => ({
+    ...state,
+    customers: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getCustomerInformation, (state) => ({
+    ...state,
+    customer: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getAllRooms, findRooms, (state) => ({
+    ...state,
+    rooms: undefined,
+    isLoading: true,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getAllAdditionalByGroupId, (state) => ({
+    ...state,
+    additional: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(getAllTreatments, (state) => ({
+    ...state,
+    treatmentDiscount: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(updateReservationNote, updateReservationDiscount, updateReservationTimestamp, updateReservationById, (state) => ({
+    ...state,
+    data: {} as IReservation,
+    page: undefined,
+    filter: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(reservationFindPayments, (state) => ({
+    ...state,
+    payments: [{}, {}, {}],
+    page: undefined,
+    filter: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(getReservationHistory, (state) => ({
+    ...state,
+    history: [{}, {}, {}],
+    page: undefined,
+    filter: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(approveReservation,
+    startReservation,
+    completeReservation,
+    paymentCompleteReservation,
+    cancelReservation,
+    customerCancelReservation,
+    getEditReservation,
+    getReservation, (state) => ({
+      ...state,
+      data: {} as IReservation,
+      page: undefined,
+      filter: undefined,
+      errorMessage: undefined,
+      error: undefined,
+      subErrors: undefined,
+      selected: undefined,
+      response: undefined,
+    })),
+  on(reservationPageSuccess, (state, { page }) => ({
+    ...state,
+    page,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(reservationFilterPageSuccess, (state, { filter }) => ({
+    ...state,
+    filter,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(reservationsCustomerSuccess, (state, { customerReservation }) => ({
+    ...state,
+    customerReservation,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(reservationSuccess, (state, { data }) => ({
+    ...state,
+    data,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(customersSuccess, (state, { customers }) => ({
+    ...state,
+    customers,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(customerSuccess, (state, { customer }) => ({
+    ...state,
+    customer,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(reservationRoomsSuccess, (state, { rooms }) => ({
+    ...state,
+    rooms,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(reservationTreatmentsSuccess, (state, { treatmentDiscount }) => ({
+    ...state,
+    treatmentDiscount,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(reservationAdditionalSuccess, (state, { additional }) => ({
+    ...state,
+    additional,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(stateSuccess, reservationSaveSuccess, (state, action) => ({
+    ...state,
+    response: action,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    isLoading: false,
+  })),
+  on(reservationSelected, (state, { selected }) => ({
+    ...state,
+    selected: selected,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(reservationFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error: error,
+    subErrors: error.subErrors,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(createReservation, deleteReservation, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(updateTrackingByReservationId, executeTrackingByReservationId, (state) => ({
+    ...state,
+    tracking: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(getTrackingByReservationId, (state) => ({
+    ...state,
+    tracking: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(trackingSuccess, (state, { tracking }) => ({
+    ...state,
+    tracking,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(reservationPaymentsSuccess, (state, { payments }) => ({
+    ...state,
+    payments,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(reservationHistorySuccess, (state, { history }) => ({
+    ...state,
+    history,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(createReview, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(getReview, (state) => ({
+    ...state,
+    review: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(reservationReviewSuccess, (state, { review }) => ({
+    ...state,
+    review,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(getColorsByTreatmentId, (state) => ({
+    ...state,
+    colors: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(colorsCompleteSuccess, (state, { colors }) => ({
+    ...state,
+    colors,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(paymentOptions, (state) => ({
+    ...state,
+    paymentOptions: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(paymentOptionsSuccess, (state, { paymentOptions }) => ({
+    ...state,
+    paymentOptions,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(clean, () => initialState),
+);

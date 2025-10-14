@@ -1,11 +1,11 @@
-import { Action } from '@ngrx/store';
-import { IError, ResponseSuccess } from '../interfaces/common';
+import { createAction, props } from '@ngrx/store';
+import { IError, IResponseSuccess } from '../interfaces/common';
 import { ICatalogue } from '../interfaces/catalogue';
 import { ITreatmentGroup } from '../interfaces/treatment';
 import { ISendMessage } from '../../main';
 import { IUser } from '../interfaces/user';
 
-export enum MainActionTypes {
+enum MainActionTypes {
   getAllCatalogue = '[Main] Get all',
   getListTreatmentsGroup = '[Main] Get list treatments group',
   sendMessage = '[Main] Send message',
@@ -17,64 +17,38 @@ export enum MainActionTypes {
   clean = '[Main] Clean'
 }
 
-export class GetAllCatalogue implements Action {
-  readonly type = MainActionTypes.getAllCatalogue;
-}
+export const getAllCatalogue = createAction(MainActionTypes.getAllCatalogue);
 
-export class GetListTreatmentsGroup implements Action {
-  readonly type = MainActionTypes.getListTreatmentsGroup;
-}
+export const getListTreatmentsGroup = createAction(MainActionTypes.getListTreatmentsGroup);
 
-export class SendMessage implements Action {
-  readonly type = MainActionTypes.sendMessage;
+export const sendMessage = createAction(
+  MainActionTypes.sendMessage,
+  props<{ sendMessage: ISendMessage }>(),
+);
 
-  constructor(public sendMessage: ISendMessage) {
-  }
-}
+export const updateMyUser = createAction(
+  MainActionTypes.updateMyUser,
+  props<{ user: IUser; redirectUrl: string; message: string }>(),
+);
 
-export class UpdateMyUser implements Action {
-  readonly type = MainActionTypes.updateMyUser;
+export const catalogueSuccess = createAction(
+  MainActionTypes.catalogueSuccess,
+  props<{ catalogues: ICatalogue[] }>(),
+);
 
-  constructor(public user: IUser, public redirectUrl: string, public message: string) {
-  }
-}
+export const treatmentSuccess = createAction(
+  MainActionTypes.treatmentSuccess,
+  props<{ groups: ITreatmentGroup[] }>(),
+);
 
-export class CatalogueSuccess implements Action {
-  readonly type = MainActionTypes.catalogueSuccess;
+export const requestSuccess = createAction(
+  MainActionTypes.requestSuccess,
+  props<IResponseSuccess>(),
+);
 
-  constructor(public catalogues: ICatalogue[]) {
-  }
-}
+export const requestFailure = createAction(
+  MainActionTypes.requestFailure,
+  props<{ error: IError }>(),
+);
 
-export class TreatmentsSuccess implements Action {
-  readonly type = MainActionTypes.treatmentSuccess;
-
-  constructor(public groups: ITreatmentGroup[]) {
-  }
-}
-
-export class RequestSuccess extends ResponseSuccess implements Action {
-  readonly type = MainActionTypes.requestSuccess;
-}
-
-export class RequestFailure implements Action {
-  readonly type = MainActionTypes.requestFailure;
-
-  constructor(public error: IError) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = MainActionTypes.clean;
-}
-
-export type All =
-  | GetAllCatalogue
-  | GetListTreatmentsGroup
-  | SendMessage
-  | UpdateMyUser
-  | TreatmentsSuccess
-  | CatalogueSuccess
-  | RequestSuccess
-  | RequestFailure
-  | Clean;
+export const clean = createAction(MainActionTypes.clean);

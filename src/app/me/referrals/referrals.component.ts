@@ -5,7 +5,7 @@ import { Clipboard } from '@angular/cdk/clipboard';
 import { TranslateService } from '@ngx-translate/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Observable, Subject } from 'rxjs';
-import * as fromActionsDiscount from '../../store/discount.actions';
+import { clean, getMyReferrals } from '../../store/discount.actions';
 import { IReferral } from '../../interfaces/discount';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Analytics, logEvent } from '@angular/fire/analytics';
@@ -83,9 +83,9 @@ export class ReferralsComponent implements OnInit, OnDestroy {
     return;
   }
 
-  private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
-  private getReferrals = (): void => this.store.dispatch(new fromActionsDiscount.GetMyReferrals());
+  private getReferrals = (): void => this.store.dispatch(getMyReferrals());
 
   private subscribe = (): void => {
     this.getState.pipe(takeUntil(this.destroy$)).subscribe((state) => {

@@ -14,7 +14,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ColorListComponent } from './color-list.component';
 import { IColor } from '../../interfaces/color';
 import { PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import * as fromActionsColor from '../../store/color.actions';
+import { clean, colorSelected, getColorsPage } from '../../store/color.actions';
 
 describe('ColorListComponent', () => {
   let component: ColorListComponent;
@@ -110,7 +110,7 @@ describe('ColorListComponent', () => {
     mockStore.dispatch.calls.reset();
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsColor.Clean));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should call getColorList after view init', () => {
@@ -168,7 +168,7 @@ describe('ColorListComponent', () => {
 
     component.edit(testColor);
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsColor.ColorSelected));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(colorSelected({ selected: testColor }));
   });
 
   it('should call delete method without errors', () => {
@@ -262,7 +262,9 @@ describe('ColorListComponent', () => {
 
     component['getColorList'](2);
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsColor.GetColorsPage));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getColorsPage(
+      { page: 2, size: PAGE_SIZE, sort: 'name', direction: 'asc' },
+    ));
   });
 
   it('should handle undefined expanded color', () => {

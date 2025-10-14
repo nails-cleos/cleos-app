@@ -4,7 +4,7 @@ import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { IPayment, IPaymentAll } from '../../interfaces/payment';
-import * as fromActionsPayment from '../../store/payment.actions';
+import { clean, getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/payment.actions';
 import { MatTableDataSource } from '@angular/material/table';
 import { Pagination } from '../../interfaces/pagination';
 import { TranslateService } from '@ngx-translate/core';
@@ -55,16 +55,21 @@ export class PaymentComponent implements OnInit, OnDestroy {
   }
 
   pay = (payment: IPaymentAll): void => {
-    if (payment.link || payment.paymentURL) {
-      this.store.dispatch(
-        new fromActionsPayment.PaymentSend(payment.link || payment.paymentURL),
-      );
+    const link = payment.link || payment.paymentURL;
+    if (link) {
+      this.store.dispatch(paymentSend({ link }));
     }
   };
 
   notify = (payment: IPayment): void => {
     this.store.dispatch(
-      new fromActionsPayment.NotifyPayment(payment.id!, this.path, this.id, payment.preferenceId!, payment.type!),
+      notifyPayment({
+        id: payment.id!,
+        path: this.path,
+        resourceId: this.id,
+        preferenceId: payment.preferenceId!,
+        paymentType: payment.type!,
+      }),
     );
   };
 
@@ -80,13 +85,11 @@ export class PaymentComponent implements OnInit, OnDestroy {
 
   private getPayments = (): void => {
     if (!this.dataSource) {
-      this.store.dispatch(
-        new fromActionsPayment.GetPaymentByResourceId(this.id, this.path, true),
-      );
+      this.store.dispatch(getPaymentByResourceId({ id: this.id, path: this.path, redirect: true }));
     }
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsPayment.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {

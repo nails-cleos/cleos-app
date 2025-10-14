@@ -3,10 +3,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AdditionalSortingComponent } from './additional-sorting.component';
 import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
-import * as fromActionsAdditional from '../../store/additional.actions';
 import { IAdditionalAll } from '../../interfaces/additional';
 import { ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
 import { ServiceType } from '../../interfaces/room';
+import { sortAdditional, clean } from '../../store/additional.actions';
 
 describe('AdditionalSortingComponent', () => {
   let component: AdditionalSortingComponent;
@@ -73,7 +73,7 @@ describe('AdditionalSortingComponent', () => {
     mockStore.dispatch.calls.reset();
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsAdditional.Clean));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should call getAdditionalList on initialization', () => {
@@ -102,7 +102,7 @@ describe('AdditionalSortingComponent', () => {
 
     component.sorted(sorted);
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsAdditional.SortAdditional));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(sortAdditional({ additionalList: sorted }));
   });
 
   it('should update items when state changes', () => {

@@ -47,8 +47,8 @@ export class TreatmentService {
   ): Observable<ITreatmentGroup | undefined> => this.http.get<ITreatmentGroup>(toUrl(this.urlV1, id));
 
   createTreatment = (
-    treatment: ITreatmentGroup,
-  ): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1, treatment);
+    treatmentGroup: ITreatmentGroup,
+  ): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1, treatmentGroup);
 
   deleteTreatmentGroup = (
     id: string,
@@ -56,8 +56,8 @@ export class TreatmentService {
 
   updateTreatmentGroup = (
     id: string,
-    treatment: ITreatmentGroup,
-  ): Observable<IApiResponse> => this.http.patch<IApiResponse>(toUrl(this.urlV1, id), treatment);
+    treatmentGroup: ITreatmentGroup,
+  ): Observable<IApiResponse> => this.http.patch<IApiResponse>(toUrl(this.urlV1, id), treatmentGroup);
 
   sortTreatment = (
     treatments: ISorted[],

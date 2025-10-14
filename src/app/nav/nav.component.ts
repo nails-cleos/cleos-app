@@ -25,9 +25,9 @@ import {
   selectUserState,
 } from '../store/app.states';
 import { IMenu, IUser, IUserAll, User } from '../interfaces/user';
-import * as fromActionsLogin from '../store/auth.actions';
-import * as fromActionsNotification from '../store/notification.actions';
-import * as fromActionsUser from '../store/user.actions';
+import { logOut, redirect } from '../store/auth.actions';
+import { getNotificationsPage, readNotification } from '../store/notification.actions';
+import { updateMyUser } from '../store/user.actions';
 import { INotification } from '../interfaces/notification';
 import { TranslateService } from '@ngx-translate/core';
 import { MessagingService } from '../services/messaging.service';
@@ -48,6 +48,7 @@ import { ErrorComponent } from '../shared/error/error.component';
 import { MatRipple } from '@angular/material/core';
 import { ResponseSuccess } from '../interfaces/common';
 import { ToastService } from '../services/toast.service';
+import { PAGE_SIZE } from '../interfaces/pagination';
 
 @Component({
   selector: 'app-nav',
@@ -119,9 +120,7 @@ export class NavComponent implements OnInit, OnDestroy {
   }
 
   get logout(): void {
-    return this.store.dispatch(
-      new fromActionsLogin.LogOut(),
-    );
+    return this.store.dispatch(logOut());
   }
 
   get changeTheme(): void {
@@ -133,9 +132,7 @@ export class NavComponent implements OnInit, OnDestroy {
     const redirectUrl = this.router.url;
     const message = this.translate.instant(
       `COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode.toString().toUpperCase() }`);
-    return this.store.dispatch(
-      new fromActionsUser.UpdateMyUser(user, redirectUrl, message),
-    );
+    return this.store.dispatch(updateMyUser({ user, redirectUrl, message }));
   }
 
   ngOnInit(): void {
@@ -169,9 +166,7 @@ export class NavComponent implements OnInit, OnDestroy {
         }
         return value;
       });
-      this.store.dispatch(
-        new fromActionsNotification.ReadNotification(notification.id),
-      );
+      this.store.dispatch(readNotification({ id: notification.id }));
     }
   };
 
@@ -218,9 +213,7 @@ export class NavComponent implements OnInit, OnDestroy {
 
   private getNotifications = (): void => {
     if (!this.countNotifications) {
-      this.store.dispatch(
-        new fromActionsNotification.GetNotificationsPage(0, 'date', 'desc'),
-      );
+      this.store.dispatch(getNotificationsPage({ page: 0, sort: 'date', direction: 'desc', size: PAGE_SIZE }));
     }
   };
 
@@ -283,9 +276,7 @@ export class NavComponent implements OnInit, OnDestroy {
       this.authSubject.next(this.isAuthorized);
       if (this.router.url === `/${ this.language }`) {
         if (this.isAuthorized && !state.redirect) {
-          this.store.dispatch(
-            new fromActionsLogin.Redirect(),
-          );
+          this.store.dispatch(redirect());
         } else {
           this.router.navigate(['/', this.language, 'home']);
         }

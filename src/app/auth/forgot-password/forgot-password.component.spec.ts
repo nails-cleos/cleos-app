@@ -7,7 +7,7 @@ import { ToastService } from '../../services/toast.service';
 import { UntypedFormBuilder } from '@angular/forms';
 import { of, Subject } from 'rxjs';
 import { Router } from '@angular/router';
-import * as fromActionsLogin from '../../store/auth.actions';
+import { clean } from '../../store/auth.actions';
 
 describe('ForgotPasswordComponent', () => {
   let component: ForgotPasswordComponent;
@@ -55,7 +55,7 @@ describe('ForgotPasswordComponent', () => {
   it('should initialize form and dispatch clean on ngOnInit', () => {
     component.ngOnInit();
     expect(component.form).toBeDefined();
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsLogin.Clean));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should unsubscribe on ngOnDestroy', () => {

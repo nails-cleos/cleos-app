@@ -10,12 +10,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectAdditionalState } from '../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import * as fromActionsAdditional from '../../store/additional.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { convertDuration } from '../../util/dates';
 import { detailExpandAnimation } from '../../util/animation';
 import { executeDialogNoWidth } from '../../util/helper';
 import { SharedModule } from '../../shared/shared.module';
+import { additionalSelected, deleteAdditional, getAdditionalPage, clean } from '../../store/additional.actions';
 
 @Component({
   selector: 'app-additional-list',
@@ -69,8 +69,8 @@ export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy
     this.paginatorSubscription?.unsubscribe();
   }
 
-  edit = (additional: IAdditional): void => this.store.dispatch(
-    new fromActionsAdditional.AdditionalSelected(additional),
+  edit = (selected: IAdditional): void => this.store.dispatch(
+    additionalSelected({ selected }),
   );
 
   delete = (additional: IAdditional): void => {
@@ -80,13 +80,13 @@ export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: additional }, result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsAdditional.DeleteAdditional(result.id, result.name),
+          deleteAdditional({ id: result.id, name: result.name }),
         );
       }
     });
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsAdditional.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe(() => {
@@ -99,7 +99,7 @@ export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy
   };
 
   private getAdditionalList = (page: number = 0): void => this.store.dispatch(
-    new fromActionsAdditional.GetAdditionalPage(page, this.sort.active, this.sort.direction, this.pageSize),
+    getAdditionalPage({ page: page, sort: this.sort.active, direction: this.sort.direction, size: this.pageSize }),
   );
 
   private subscribe = (): void => {

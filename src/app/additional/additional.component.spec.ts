@@ -8,8 +8,8 @@ import { Store } from '@ngrx/store';
 import { ChangeDetectorRef } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import * as fromActionsAdditional from '../store/additional.actions';
 import { formatDuration } from '../util/dates';
+import { clean, getAdditional, getAllTreatmentsGroup } from '../store/additional.actions';
 
 describe('AdditionalComponent', () => {
   let component: AdditionalComponent;
@@ -102,7 +102,7 @@ describe('AdditionalComponent', () => {
   it('should dispatch Clean action on initialization', () => {
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsAdditional.Clean));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch GetAdditional action when in edit mode', () => {
@@ -111,7 +111,7 @@ describe('AdditionalComponent', () => {
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsAdditional.GetAdditional));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getAdditional({ id: testId }));
   });
 
   it('should patch form when additional is selected from state', () => {
@@ -174,14 +174,32 @@ describe('AdditionalComponent', () => {
 
   it('should dispatch CreateAdditional action when in add mode and form is valid', () => {
     component.ngOnInit();
-    component.form.get('name')?.setValue('New Additional');
-    component.form.get('description')?.setValue('New Description');
-    component.form.get('duration')?.setValue('PT30M');
+    const nameControl = component.form.get('name')!;
+    const descriptionControl = component.form.get('description')!;
+    const durationControl = component.form.get('duration')!;
+
+    nameControl.setValue('New Additional');
+    nameControl.markAsDirty();
+
+    descriptionControl.setValue('New Description');
+    descriptionControl.markAsDirty();
+
+    durationControl.setValue('00:30');
+    durationControl.markAsDirty();
     mockStore.dispatch.calls.reset();
+    expect(component.form.valid).toBeTrue();
 
     void component.submit;
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsAdditional.CreateAdditional));
+    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+      additional: jasmine.objectContaining({
+        name: 'New Additional',
+        description: 'New Description',
+        duration: '00:30',
+      }),
+      type: '[Additional] create additional',
+    }));
   });
 
   it('should dispatch UpdateAdditional action when in edit mode and form is valid', () => {
@@ -190,14 +208,32 @@ describe('AdditionalComponent', () => {
     component.additional = mockAdditional;
 
     component.ngOnInit();
-    component.form.get('name')?.setValue('Updated Additional');
-    component.form.get('description')?.setValue('Updated Description');
-    component.form.get('duration')?.setValue('PT45M');
+    const nameControl = component.form.get('name')!;
+    const descriptionControl = component.form.get('description')!;
+    const durationControl = component.form.get('duration')!;
+
+    nameControl.setValue('Updated Additional');
+    nameControl.markAsDirty();
+
+    descriptionControl.setValue('Updated Description');
+    descriptionControl.markAsDirty();
+
+    durationControl.setValue('00:45');
+    durationControl.markAsDirty();
     mockStore.dispatch.calls.reset();
 
     void component.submit;
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsAdditional.UpdateAdditional));
+    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+      id: '123',
+      additional: jasmine.objectContaining({
+        description: 'Updated Description',
+        duration: '00:45',
+        name: 'Updated Additional',
+      }),
+      type: '[Additional] Update additional by id',
+    }));
   });
 
   it('should return form controls from getForm getter', () => {
@@ -233,7 +269,7 @@ describe('AdditionalComponent', () => {
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsAdditional.GetAdditional));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getAdditional({ id: testId }));
   });
 
   it('should clear additional when updating in edit mode', () => {
@@ -290,7 +326,7 @@ describe('AdditionalComponent', () => {
 
     component['findGroups']();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsAdditional.GetAllTreatmentsGroup));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getAllTreatmentsGroup());
   });
 
   it('should filter groups correctly when filterGroup is called', () => {
@@ -317,9 +353,9 @@ describe('AdditionalComponent', () => {
 
   it('should filter group options based on form input', (done) => {
     component.allGroups = [
-      { name: 'Test Group 1', id: '1', treatments: [], selectedTreatments: []  },
-      { name: 'Another Group', id: '2', treatments: [], selectedTreatments: []  },
-      { name: 'Test Group 2', id: '3', treatments: [], selectedTreatments: []  },
+      { name: 'Test Group 1', id: '1', treatments: [], selectedTreatments: [] },
+      { name: 'Another Group', id: '2', treatments: [], selectedTreatments: [] },
+      { name: 'Test Group 2', id: '3', treatments: [], selectedTreatments: [] },
     ] as any[];
     component['createForm']();
 
@@ -329,8 +365,8 @@ describe('AdditionalComponent', () => {
       // Skip the first emission (startWith('')) and check the second emission with 'T'
       if (emissionCount === 2) {
         expect(filtered).toEqual([
-          { name: 'Test Group 1', id: '1', treatments: [], selectedTreatments: []  },
-          { name: 'Test Group 2', id: '3', treatments: [], selectedTreatments: []  },
+          { name: 'Test Group 1', id: '1', treatments: [], selectedTreatments: [] },
+          { name: 'Test Group 2', id: '3', treatments: [], selectedTreatments: [] },
         ]);
         done();
       }
@@ -341,9 +377,9 @@ describe('AdditionalComponent', () => {
 
   it('should sort allGroups alphabetically by name', () => {
     const allGroups = [
-      { name: 'Beta Group', id: '2', treatments: [], selectedTreatments: []  },
-      { name: 'Alpha Group', id: '1', treatments: [], selectedTreatments: []  },
-      { name: 'Gamma Group', id: '3', treatments: [], selectedTreatments: []  },
+      { name: 'Beta Group', id: '2', treatments: [], selectedTreatments: [] },
+      { name: 'Alpha Group', id: '1', treatments: [], selectedTreatments: [] },
+      { name: 'Gamma Group', id: '3', treatments: [], selectedTreatments: [] },
     ] as any[];
     const response = component.sortGroups(allGroups);
     expect(response[0].name).toBe('Alpha Group');

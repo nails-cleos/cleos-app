@@ -4,7 +4,7 @@ import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectTreatmentState } from '../../store/app.states';
-import * as fromActionsTreatment from '../../store/treatment.actions';
+import { getAllTreatmentsHistory, getTreatmentGroup, treatmentSelected } from '../../store/treatment.actions';
 import { IColorAll } from '../../interfaces/color';
 import { SharedModule } from '../../shared/shared.module';
 import { DurationTimePipe } from '../../pipes/durationTime.pipe';
@@ -31,9 +31,7 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   get edit(): void {
-    return this.store.dispatch(
-      new fromActionsTreatment.TreatmentSelected(this.group, 'edit'),
-    );
+    return this.store.dispatch(treatmentSelected({ selected: this.group, path: 'edit' }));
   }
 
   ngOnInit(): void {
@@ -53,17 +51,13 @@ export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy 
     if (index !== undefined) {
       this.expandedPanelIndex = index;
     }
-    this.store.dispatch(
-      new fromActionsTreatment.GetAllTreatmentsHistory(this.group!.id!, treatmentId!),
-    );
+    this.store.dispatch(getAllTreatmentsHistory({ id: this.group!.id!, treatmentId: treatmentId! }));
   };
 
   private getTreatment = (): void => {
     if (!this.group) {
-      const id = this.route.snapshot.paramMap.get('id');
-      this.store.dispatch(
-        new fromActionsTreatment.GetTreatmentGroup(id!, 'view'),
-      );
+      const id = this.route.snapshot.paramMap.get('id')!;
+      this.store.dispatch(getTreatmentGroup({ id, path: 'view' }));
     }
   };
 

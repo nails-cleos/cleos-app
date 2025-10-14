@@ -1,23 +1,23 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { Observable, of } from 'rxjs';
-import { catchError, switchMap, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import {
-  CreateBlockAgenda,
-  CreateUnavailable,
-  DeleteUnavailable,
-  GetUnavailable,
-  GetAllRoomsByProfessionalId,
-  GetUnavailablePage,
-  ProfessionalSuccess,
-  RoomSuccess,
-  UnavailableActionTypes,
-  UnavailableFailure,
-  UnavailableSaveSuccess,
-  UnavailableSelected,
-  UnavailableSuccess,
-  UpdateUnavailable,
+  createBlockAgenda,
+  createUnavailable,
+  deleteUnavailable,
+  getAllProfessional,
+  getAllRoomsByProfessionalId,
+  getUnavailable,
+  getUnavailablePage,
+  professionalSuccess,
+  roomSuccess,
+  unavailableFailure,
+  unavailableSaveSuccess,
+  unavailableSelected,
+  unavailableSuccess,
+  updateUnavailable,
 } from '../unavailable.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { UnavailableService } from '../../services/unavailable.service';
@@ -33,122 +33,110 @@ import { ToastType } from '../../shared/toast/toast.model';
 
 @Injectable()
 export class UnavailableEffects {
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly actions: Actions = inject(Actions);
+  private readonly unavailableService: UnavailableService = inject(UnavailableService);
+  private readonly userService: UserService = inject(UserService);
+  private readonly router: Router = inject(Router);
 
   getAll$ = createEffect(() => this.actions.pipe(
-    ofType(UnavailableActionTypes.getUnavailablePage),
-    switchMap((action: GetUnavailablePage) =>
-      this.unavailableService.getUnavailablePage(action.page, action.sort, action.direction, action.size).pipe(
-        switchMap((response: Pagination<IUnavailable>) => of(new UnavailableSuccess(response))),
-        catchError((err: HttpErrorResponse) => of(new UnavailableFailure(err.error))),
+    ofType(getUnavailablePage),
+    switchMap(({ page, sort, direction, size }) =>
+      this.unavailableService.getUnavailablePage(page, sort, direction, size).pipe(
+        map((data: Pagination<IUnavailable>) => unavailableSuccess({ data })),
+        catchError((err: HttpErrorResponse) => of(unavailableFailure({ error: err.error }))),
       )),
   ));
 
   getAllProfessional$ = createEffect(() => this.actions.pipe(
-    ofType(UnavailableActionTypes.getAllProfessional),
-    switchMap(() =>
-      this.userService.getProfessionals().pipe(
-        switchMap((response: IUser[]) => of(new ProfessionalSuccess(response))),
-        catchError((err: HttpErrorResponse) => of(new UnavailableFailure(err.error))),
-      )),
+    ofType(getAllProfessional),
+    switchMap(() => this.userService.getProfessionals().pipe(
+      map((professionals: IUser[]) => professionalSuccess({ professionals })),
+      catchError((err: HttpErrorResponse) => of(unavailableFailure({ error: err.error }))),
+    )),
   ));
 
   getRoom$ = createEffect(() => this.actions.pipe(
-    ofType(UnavailableActionTypes.getAllRoomsByProfessionalId),
-    switchMap((action: GetAllRoomsByProfessionalId) =>
-      this.userService.getAllRoomsByProfessionalId(action.professionalId).pipe(
-        switchMap((response: IRoom[]) => of(new RoomSuccess(response))),
-        catchError((err: HttpErrorResponse) => of(new UnavailableFailure(err.error))),
-      )),
+    ofType(getAllRoomsByProfessionalId),
+    switchMap(({ professionalId }) => this.userService.getAllRoomsByProfessionalId(professionalId).pipe(
+      map((rooms: IRoom[]) => roomSuccess({ rooms })),
+      catchError((err: HttpErrorResponse) => of(unavailableFailure({ error: err.error }))),
+    )),
   ));
 
   findOne$ = createEffect(() => this.actions.pipe(
-    ofType(UnavailableActionTypes.getUnavailable),
-    switchMap((action: GetUnavailable) =>
-      this.unavailableService.getUnavailable(action.id).pipe(
-        switchMap((response?: IUnavailable) => of(new UnavailableSelected(response))),
-        catchError((err: HttpErrorResponse) => of(new UnavailableFailure(err.error))),
-      )),
+    ofType(getUnavailable),
+    switchMap(({ id }) => this.unavailableService.getUnavailable(id).pipe(
+      map((selected?: IUnavailable) => unavailableSelected({ selected })),
+      catchError((err: HttpErrorResponse) => of(unavailableFailure({ error: err.error }))),
+    )),
   ));
 
   save$ = createEffect(() => this.actions.pipe(
-    ofType(UnavailableActionTypes.createUnavailable),
-    switchMap((action: CreateUnavailable) =>
-      this.unavailableService.createUnavailable(action.unavailable).pipe(
-        switchMap((response: IApiResponse) =>
-          this.requestSuccess('UNAVAILABLE.CREATED', newDateTimestamp(response.timestamp),
-            `unavailable/${ response.id }`)),
-        catchError((err: HttpErrorResponse) => of(new UnavailableFailure(err.error))),
-      )),
+    ofType(createUnavailable),
+    switchMap(({ unavailable }) => this.unavailableService.createUnavailable(unavailable).pipe(
+      switchMap((response: IApiResponse) => this.requestSuccess('UNAVAILABLE.CREATED',
+        newDateTimestamp(response.timestamp), `unavailable/${ response.id }`)),
+      catchError((err: HttpErrorResponse) => of(unavailableFailure({ error: err.error }))),
+    )),
   ));
 
   blockAgenda$ = createEffect(() => this.actions.pipe(
-    ofType(UnavailableActionTypes.createBlockAgenda),
-    switchMap((action: CreateBlockAgenda) =>
-      this.unavailableService.createBlockAgenda(action.unavailable).pipe(
-        switchMap((response: IApiResponse) =>
-          this.requestSuccess('UNAVAILABLE.CREATED', newDateTimestamp(response.timestamp),
-            `unavailable/block-agenda/${ response.id }`)),
-        catchError((err: HttpErrorResponse) => of(new UnavailableFailure(err.error))),
-      )),
+    ofType(createBlockAgenda),
+    switchMap(({ unavailable }) => this.unavailableService.createBlockAgenda(unavailable).pipe(
+      switchMap((response: IApiResponse) => this.requestSuccess('UNAVAILABLE.CREATED',
+        newDateTimestamp(response.timestamp), `unavailable/block-agenda/${ response.id }`)),
+      catchError((err: HttpErrorResponse) => of(unavailableFailure({ error: err.error }))),
+    )),
   ));
 
   update$ = createEffect(() => this.actions.pipe(
-    ofType(UnavailableActionTypes.updateUnavailable),
-    switchMap((action: UpdateUnavailable) =>
-      this.unavailableService.updateUnavailable(action.id, action.unavailable).pipe(
-        switchMap((response: IApiResponse) =>
-          this.requestSuccess('UNAVAILABLE.UPDATED.MESSAGE', newDateTimestamp(response.timestamp),
-            `${ action.path }/${ response.id }`)),
-        catchError((err: HttpErrorResponse) => of(new UnavailableFailure(err.error))),
-      )),
+    ofType(updateUnavailable),
+    switchMap(({ id, unavailable, path }) => this.unavailableService.updateUnavailable(id, unavailable).pipe(
+      switchMap((response: IApiResponse) => this.requestSuccess('UNAVAILABLE.UPDATED.MESSAGE',
+        newDateTimestamp(response.timestamp), `${ path }/${ response.id }`)),
+      catchError((err: HttpErrorResponse) => of(unavailableFailure({ error: err.error }))),
+    )),
   ));
 
   delete$ = createEffect(() => this.actions.pipe(
-    ofType(UnavailableActionTypes.deleteUnavailable),
-    switchMap((action: DeleteUnavailable) =>
-      this.unavailableService.deleteUnavailable(action.id).pipe(
-        switchMap(() =>
-          this.requestSuccess('UNAVAILABLE.DELETED.MESSAGE', newDateTimestamp(action.timestamp, action.timeZone),
-            undefined, 'warning')),
-        catchError((err: HttpErrorResponse) => of(new UnavailableFailure(err.error))),
-      )),
+    ofType(deleteUnavailable),
+    switchMap(({ id, timestamp, timeZone }) => this.unavailableService.deleteUnavailable(id).pipe(
+      switchMap(() => this.requestSuccess('UNAVAILABLE.DELETED.MESSAGE', newDateTimestamp(timestamp, timeZone),
+        undefined, 'warning')),
+      catchError((err: HttpErrorResponse) => of(unavailableFailure({ error: err.error }))),
+    )),
   ));
 
   selectedData$ = createEffect(() => this.actions.pipe(
-    ofType(UnavailableActionTypes.unavailableSelected),
-    tap((data: UnavailableSelected) => {
+    ofType(unavailableSelected),
+    tap(({ selected }) => {
       let path = [this.translate.currentLang, 'unavailable'];
-      if (data.selected?.type === 'BLOCK_AGENDA') {
+      if (selected?.type === 'BLOCK_AGENDA') {
         path = [...path, 'block-agenda'];
       }
-      this.router.navigate([...path, data.selected?.id]);
+      this.router.navigate([...path, selected?.id]);
     }),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(UnavailableActionTypes.unavailableSuccess),
+    ofType(unavailableSuccess),
   ), { dispatch: false });
 
   roomSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(UnavailableActionTypes.roomSuccess),
+    ofType(roomSuccess),
   ), { dispatch: false });
 
   professionalSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(UnavailableActionTypes.professionalSuccess),
+    ofType(professionalSuccess),
   ), { dispatch: false });
 
   saveSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(UnavailableActionTypes.unavailableSaveSuccess),
+    ofType(unavailableSaveSuccess),
   ), { dispatch: false });
 
-  constructor(private readonly translate: TranslateService, private actions: Actions,
-              private unavailableService: UnavailableService,
-              private userService: UserService, private router: Router) {
-  }
-
-  private requestSuccess(key: string, date?: Date, path?: string,
-    toastType?: ToastType): Observable<UnavailableSaveSuccess> {
+  private requestSuccess(key: string, date?: Date, path?: string, toastType?: ToastType) {
     const message = this.translate.instant(key, { date });
-    return success(UnavailableSaveSuccess, message, path, undefined, toastType);
+    return success(unavailableSaveSuccess, message, path, undefined, toastType);
   }
 }

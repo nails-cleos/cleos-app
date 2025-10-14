@@ -9,8 +9,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withJsonpSupport } from '@angular/common/http';
 import { MainContentService } from './main-content.service';
-import * as fromActionsLogin from '../store/auth.actions';
-import * as fromActionsMain from '../store/main.actions';
+import { redirect } from '../store/auth.actions';
+import { updateMyUser } from '../store/main.actions';
 import { TokenService } from '../services/token.service';
 import { NavigationService } from '../services/navigation.service';
 
@@ -119,7 +119,7 @@ describe('MainComponent', () => {
 
   it('should dispatch Redirect action in redirect()', () => {
     component.redirect();
-    expect(store.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsLogin.Redirect));
+    expect(store.dispatch).toHaveBeenCalledWith(redirect());
   });
 
   it('should update mainContent data$ subscription', fakeAsync(() => {
@@ -135,9 +135,15 @@ describe('MainComponent', () => {
 
     component.changeTheme();
 
+    const expectedAction = updateMyUser({
+      user: jasmine.any(Object) as any,
+      redirectUrl: '/en/home',
+      message: jasmine.any(String) as any,
+    });
+
     expect(component.isDarkMode).toBe(!initialMode);
     expect(mockAuthUserService.updateMode).toHaveBeenCalled();
-    expect(store.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsMain.UpdateMyUser));
+    expect(store.dispatch).toHaveBeenCalledWith(expectedAction);
   });
 
   it('should not dispatch UpdateMyUser action when changeTheme is called and user is not authenticated', () => {
@@ -146,8 +152,14 @@ describe('MainComponent', () => {
 
     component.changeTheme();
 
+    const expectedAction = updateMyUser({
+      user: jasmine.any(Object) as any,
+      redirectUrl: '/en/home',
+      message: jasmine.any(String) as any,
+    });
+
     expect(mockAuthUserService.updateMode).toHaveBeenCalled();
-    expect(store.dispatch).not.toHaveBeenCalledWith(jasmine.any(fromActionsMain.UpdateMyUser));
+    expect(store.dispatch).not.toHaveBeenCalledWith(expectedAction);
   });
 
   it('should call navigationService.attachLang on ngOnInit', () => {

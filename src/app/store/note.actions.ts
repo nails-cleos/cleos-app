@@ -1,9 +1,9 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
 import { IError, ResponseSuccess } from '../interfaces/common';
 import { INote } from '../interfaces/note';
 import { IUser } from '../interfaces/user';
 
-export enum NoteActionTypes {
+enum NoteActionTypes {
   getAllProfessional = '[Note] Get all professional',
   noteSuccess = '[Note] Success',
   createNote = '[Note] Create Note',
@@ -17,83 +17,53 @@ export enum NoteActionTypes {
   clean = '[Note] Clean'
 }
 
-export class GetAllProfessional implements Action {
-  readonly type = NoteActionTypes.getAllProfessional;
-}
+export const getAllProfessional = createAction(
+  NoteActionTypes.getAllProfessional,
+);
 
-export class NoteSuccess implements Action {
-  readonly type = NoteActionTypes.noteSuccess;
+export const noteSuccess = createAction(
+  NoteActionTypes.noteSuccess,
+  props<{ data: IUser[] }>(),
+);
 
-  constructor(public data: IUser[]) {
-  }
-}
+export const createNote = createAction(
+  NoteActionTypes.createNote,
+  props<{ note: INote }>(),
+);
 
-export class CreateNote implements Action {
-  readonly type = NoteActionTypes.createNote;
+export const updateNote = createAction(
+  NoteActionTypes.updateNote,
+  props<{ id: string; note: INote }>(),
+);
 
-  constructor(public note: INote) {
-  }
-}
+export const noteSaveSuccess = createAction(
+  NoteActionTypes.noteSaveSuccess,
+  props<ResponseSuccess>(),
+);
 
-export class UpdateNote implements Action {
-  readonly type = NoteActionTypes.updateNote;
+export const noteFailure = createAction(
+  NoteActionTypes.noteFailure,
+  props<{ error: IError }>(),
+);
 
-  constructor(public id: string, public note: INote) {
-  }
-}
+export const noteSelected = createAction(
+  NoteActionTypes.noteSelected,
+  props<{ selected?: INote }>(),
+);
 
-export class NoteSaveSuccess extends ResponseSuccess implements Action {
-  readonly type = NoteActionTypes.noteSaveSuccess;
-}
+export const getNote = createAction(
+  NoteActionTypes.getNote,
+  props<{ id: string }>(),
+);
 
-export class NoteFailure implements Action {
-  readonly type = NoteActionTypes.noteFailure;
+export const deleteNote = createAction(
+  NoteActionTypes.deleteNote,
+  props<{ id: string; description: string }>(),
+);
 
-  constructor(public error: IError) {
-  }
-}
+export const completeNote = createAction(
+  NoteActionTypes.completeNote,
+  props<{ id: string }>(),
+);
 
-export class NoteSelected implements Action {
-  readonly type = NoteActionTypes.noteSelected;
-
-  constructor(public selected?: INote) {
-  }
-}
-
-export class GetNote implements Action {
-  readonly type = NoteActionTypes.getNote;
-
-  constructor(public id: string) {
-  }
-}
-
-export class DeleteNote implements Action {
-  readonly type = NoteActionTypes.deleteNote;
-
-  constructor(public id: string, public description: string) {
-  }
-}
-
-export class CompleteNote implements Action {
-  readonly type = NoteActionTypes.completeNote;
-
-  constructor(public id: string) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = NoteActionTypes.clean;
-}
-
-export type All =
-  | GetAllProfessional
-  | CreateNote
-  | UpdateNote
-  | NoteSuccess
-  | NoteSaveSuccess
-  | NoteFailure
-  | GetNote
-  | NoteSelected
-  | DeleteNote
-  | CompleteNote
-  | Clean;
+export const clean = createAction(NoteActionTypes.clean);

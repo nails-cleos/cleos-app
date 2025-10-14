@@ -5,7 +5,7 @@ import { AddDiscountDialogComponent } from './add-discount-dialog.component';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
-import * as fromActionsDiscount from '../../store/discount.actions';
+import { clean } from '../../store/discount.actions';
 import { DiscountType, IUserDiscount } from '../../interfaces/discount';
 
 describe('AddDiscountDialogComponent', () => {
@@ -109,7 +109,7 @@ describe('AddDiscountDialogComponent', () => {
     mockStore.dispatch.calls.reset();
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsDiscount.Clean));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should initialize form with empty values', () => {

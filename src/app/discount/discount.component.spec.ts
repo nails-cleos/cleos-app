@@ -9,7 +9,7 @@ import { ChangeDetectorRef } from '@angular/core';
 import { DiscountType, IDiscountAll } from '../interfaces/discount';
 import { ReactiveFormsModule, UntypedFormBuilder } from '@angular/forms';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import * as fromActionsDiscount from '../store/discount.actions';
+import { clean, getAllCurrency, getDiscount } from '../store/discount.actions';
 
 describe('DiscountComponent', () => {
   let component: DiscountComponent;
@@ -112,7 +112,7 @@ describe('DiscountComponent', () => {
   it('should dispatch Clean action on initialization', () => {
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsDiscount.Clean));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch GetDiscount action when in edit mode', () => {
@@ -121,7 +121,7 @@ describe('DiscountComponent', () => {
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsDiscount.GetDiscount));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getDiscount({ id: testId }));
   });
 
   it('should patch form when discount is selected from state', () => {
@@ -185,34 +185,78 @@ describe('DiscountComponent', () => {
 
   it('should dispatch CreateDiscount action when in add mode and form is valid', () => {
     component.ngOnInit();
-    component.form.get('name')?.setValue('New Discount');
-    component.form.get('description')?.setValue('New Description');
-    component.form.get('currency')?.setValue({ id: '1', code: 'EUR' });
-    component.form.get('amount')?.setValue(20);
-    component.form.get('type')?.setValue(DiscountType.percentage);
+    const nameControl = component.form.get('name')!;
+    nameControl.setValue('New Discount');
+    nameControl.markAsDirty();
+
+    const descriptionControl = component.form.get('description')!;
+    descriptionControl.setValue('New Description');
+    descriptionControl.markAsDirty();
+
+    const currencyControl = component.form.get('currency')!;
+    currencyControl.setValue({ id: '1', code: 'EUR' });
+    currencyControl.markAsDirty();
+
+    const amountControl = component.form.get('amount')!;
+    amountControl.setValue(20);
+    amountControl.markAsDirty();
+
+    const typeControl = component.form.get('type')!;
+    typeControl.setValue(DiscountType.percentage);
+    typeControl.markAsDirty();
+
     mockStore.dispatch.calls.reset();
 
     void component.submit;
-
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsDiscount.CreateDiscount));
+    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+      discount: jasmine.objectContaining({
+        name: 'New Discount',
+        description: 'New Description',
+        amount: 20,
+        type: DiscountType.percentage,
+        currencyId: '1',
+      }),
+      type: '[Discount] Create discount',
+    }));
   });
 
   it('should dispatch UpdateDiscount action when in edit mode and form is valid', () => {
     const testId = '123';
     mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
-    component.discount = mockDiscount;
-
     component.ngOnInit();
-    component.form.get('name')?.setValue('Updated Discount');
-    component.form.get('description')?.setValue('Updated Description');
-    component.form.get('currency')?.setValue({ id: '1', code: 'EUR' });
-    component.form.get('amount')?.setValue(20);
-    component.form.get('type')?.setValue(DiscountType.percentage);
+
+    stateSubject.next({ selected: mockDiscount });
+
+    const nameControl = component.getForm.name;
+    nameControl.setValue('Updated Discount');
+    nameControl.markAsDirty();
+
+    const descriptionControl = component.getForm.description;
+    descriptionControl.setValue('Updated Description');
+    descriptionControl.markAsDirty();
+
+    const amountControl = component.getForm.amount;
+    amountControl.setValue(15);
+    amountControl.markAsDirty();
+
+    const typeControl = component.getForm.type;
+    typeControl.setValue(DiscountType.percentage);
+    typeControl.markAsDirty();
+
     mockStore.dispatch.calls.reset();
 
     void component.submit;
-
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsDiscount.UpdateDiscount));
+    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+      discount: jasmine.objectContaining({
+        name: 'Updated Discount',
+        description: 'Updated Description',
+        amount: 15,
+        type: DiscountType.percentage,
+      }),
+      type: '[Discount] Update discount by id',
+    }));
   });
 
   it('should return form controls from getForm getter', () => {
@@ -248,7 +292,7 @@ describe('DiscountComponent', () => {
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsDiscount.GetDiscount));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getDiscount({ id: testId }));
   });
 
   it('should clear discount when updating in edit mode', () => {
@@ -311,7 +355,7 @@ describe('DiscountComponent', () => {
 
     component['getCurrencies']();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsDiscount.GetAllCurrency));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getAllCurrency());
   });
 
   it('should filter currencies correctly when filterCurrency is called', () => {

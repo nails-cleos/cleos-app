@@ -1,9 +1,9 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
 import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
 import { IColor } from '../interfaces/color';
 import { Pagination } from '../interfaces/pagination';
 
-export enum ColorActionTypes {
+enum ColorActionTypes {
   getColorsPage = '[Color] Get colors page',
   colorSuccess = '[Color] Success',
   createColor = '[Color] Create color',
@@ -16,75 +16,49 @@ export enum ColorActionTypes {
   clean = '[Color] Clean'
 }
 
-export class GetColorsPage extends PageRequest implements Action {
-  readonly type = ColorActionTypes.getColorsPage;
-}
+export const getColorsPage = createAction(
+  ColorActionTypes.getColorsPage,
+  props<PageRequest>(),
+);
 
-export class ColorSuccess implements Action {
-  readonly type = ColorActionTypes.colorSuccess;
+export const colorSuccess = createAction(
+  ColorActionTypes.colorSuccess,
+  props<{ data: Pagination<IColor> }>(),
+);
 
-  constructor(public data: Pagination<IColor>) {
-  }
-}
+export const createColor = createAction(
+  ColorActionTypes.createColor,
+  props<{ color: IColor }>(),
+);
 
-export class CreateColor implements Action {
-  readonly type = ColorActionTypes.createColor;
+export const updateColor = createAction(
+  ColorActionTypes.updateColor,
+  props<{ id: string, color: IColor }>(),
+);
 
-  constructor(public color: IColor) {
-  }
-}
+export const colorSaveSuccess = createAction(
+  ColorActionTypes.colorSaveSuccess,
+  props<ResponseSuccess>(),
+);
 
-export class UpdateColor implements Action {
-  readonly type = ColorActionTypes.updateColor;
+export const colorFailure = createAction(
+  ColorActionTypes.colorFailure,
+  props<{ error: IError }>(),
+);
 
-  constructor(public id: string, public color: IColor) {
-  }
-}
+export const colorSelected = createAction(
+  ColorActionTypes.colorSelected,
+  props<{ selected?: IColor }>(),
+);
 
-export class ColorSaveSuccess extends ResponseSuccess implements Action {
-  readonly type = ColorActionTypes.colorSaveSuccess;
-}
+export const getColor = createAction(
+  ColorActionTypes.getColor,
+  props<{ id: string }>(),
+);
 
-export class ColorFailure implements Action {
-  readonly type = ColorActionTypes.colorFailure;
+export const deleteColor = createAction(
+  ColorActionTypes.deleteColor,
+  props<{ id: string, name: string }>(),
+);
 
-  constructor(public error: IError) {
-  }
-}
-
-export class ColorSelected implements Action {
-  readonly type = ColorActionTypes.colorSelected;
-
-  constructor(public selected?: IColor) {
-  }
-}
-
-export class GetColor implements Action {
-  readonly type = ColorActionTypes.getColor;
-
-  constructor(public id: string) {
-  }
-}
-
-export class DeleteColor implements Action {
-  readonly type = ColorActionTypes.deleteColor;
-
-  constructor(public id: string, public name: string) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = ColorActionTypes.clean;
-}
-
-export type All =
-  | GetColorsPage
-  | CreateColor
-  | UpdateColor
-  | ColorSuccess
-  | ColorSaveSuccess
-  | ColorFailure
-  | GetColor
-  | ColorSelected
-  | DeleteColor
-  | Clean;
+export const clean = createAction(ColorActionTypes.clean);

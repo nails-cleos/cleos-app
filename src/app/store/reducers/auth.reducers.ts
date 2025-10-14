@@ -1,7 +1,17 @@
 import { IMenu, IUser } from '../../interfaces/user';
-import { All, AuthActionTypes } from '../auth.actions';
+import {
+  clean,
+  login,
+  loginFailure,
+  loginSuccess,
+  logOut,
+  redirect,
+  signupFailure,
+  signupSuccess,
+} from '../auth.actions';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { Params } from '@angular/router';
+import { createReducer, on } from '@ngrx/store';
 
 export interface State {
   isAuthenticated: boolean;
@@ -31,80 +41,60 @@ export const initialState: State = {
   queryParams: {},
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case AuthActionTypes.login: {
-      return {
-        ...state,
-        errorMessage: undefined,
-        error: undefined,
-        response: undefined,
-        subErrors: undefined,
-        isLoading: true,
-        redirect: false,
-      };
-    }
-    case AuthActionTypes.loginFailure:
-    case AuthActionTypes.signupFailure: {
-      return {
-        ...state,
-        isLoading: false,
-        errorMessage: action.error.message,
-        error: action.error,
-        response: undefined,
-        subErrors: action.error.subErrors,
-        redirect: false,
-      };
-    }
-    case AuthActionTypes.loginSuccess: {
-      return {
-        ...state,
-        isLoading: false,
-        isAuthenticated: true,
-        user: action.token.user,
-        token: action.token.tokenAccess,
-        menus: action.token.menus,
-        errorMessage: undefined,
-        response: undefined,
-        subErrors: undefined,
-        queryParams: action.queryParams,
-        redirect: false,
-      };
-    }
-    case AuthActionTypes.redirect: {
-      return {
-        ...state,
-        redirect: true,
-      };
-    }
-    case AuthActionTypes.signupSuccess: {
-      return {
-        ...state,
-        isLoading: false,
-        isAuthenticated: false,
-        errorMessage: undefined,
-        response: action,
-        subErrors: undefined,
-        redirect: false,
-      };
-    }
-    case AuthActionTypes.clean: {
-      return {
-        ...state,
-        isLoading: false,
-        errorMessage: undefined,
-        response: undefined,
-        subErrors: undefined,
-        queryParams: undefined,
-        redirect: false,
-      };
-    }
-    case AuthActionTypes.reLogin:
-    case AuthActionTypes.logout: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const authReducer = createReducer(
+  initialState,
+  on(login, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    error: undefined,
+    response: undefined,
+    subErrors: undefined,
+    isLoading: true,
+    redirect: false,
+  })),
+  on(loginFailure, signupFailure, (state, { error }) => ({
+    ...state,
+    isLoading: false,
+    errorMessage: error.message,
+    error: error,
+    response: undefined,
+    subErrors: error.subErrors,
+    redirect: false,
+  })),
+  on(loginSuccess, (state, { token, queryParams }) => ({
+    ...state,
+    isLoading: false,
+    isAuthenticated: true,
+    user: token.user,
+    token: token.tokenAccess,
+    menus: token.menus,
+    errorMessage: undefined,
+    response: undefined,
+    subErrors: undefined,
+    queryParams: queryParams,
+    redirect: false,
+  })),
+  on(redirect, (state) => ({
+    ...state,
+    redirect: true,
+  })),
+  on(signupSuccess, (state, action) => ({
+    ...state,
+    isLoading: false,
+    isAuthenticated: false,
+    errorMessage: undefined,
+    response: action,
+    subErrors: undefined,
+    redirect: false,
+  })),
+  on(clean, (state) => ({
+    ...state,
+    isLoading: false,
+    errorMessage: undefined,
+    response: undefined,
+    subErrors: undefined,
+    queryParams: undefined,
+    redirect: false,
+  })),
+  on(logOut, () => initialState),
+);

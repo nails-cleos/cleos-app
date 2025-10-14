@@ -9,7 +9,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState } from '../../../store/app.states';
-import * as fromActionsDiscount from '../../../store/discount.actions';
+import { clean, getMyDiscountsPage } from '../../../store/discount.actions';
 import { Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Analytics, logEvent } from '@angular/fire/analytics';
@@ -77,7 +77,7 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate([this.language, 'me', 'reservation'], { state: data });
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe(() => {
@@ -90,7 +90,13 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private getDiscounts = (page: number = 0): void => this.store.dispatch(
-    new fromActionsDiscount.GetMyDiscountsPage(page, this.sort.active, this.sort.direction, this.pageSize),
+    getMyDiscountsPage(
+      {
+        page: page,
+        sort: this.sort.active,
+        direction: this.sort.direction,
+        size: this.pageSize,
+      }),
   );
 
   private subscribe = (): void => {

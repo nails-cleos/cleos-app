@@ -3,10 +3,11 @@ import { TreatmentSortingComponent } from './treatment-sorting.component';
 import { Subject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import * as fromActionsTreatment from '../../store/treatment.actions';
+import { sortTreatment } from '../../store/treatment.actions';
 import { ITreatmentAll } from '../../interfaces/treatment';
 import { Store } from '@ngrx/store';
 import { ServiceType } from '../../interfaces/room';
+import { ISorted } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
 
 describe('TreatmentSortingComponent', () => {
   let component: TreatmentSortingComponent;
@@ -51,12 +52,10 @@ describe('TreatmentSortingComponent', () => {
   });
 
   it('should dispatch SortTreatment when sorted() is called', () => {
-    const sorted = [{ id: '1', name: 'treatment 1', order: 1 }];
-    component.sorted(sorted as any);
+    const treatments: ISorted[] = [{ key: 'treatment 1', order: 1 }];
+    component.sorted(treatments);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      jasmine.any(fromActionsTreatment.SortTreatment),
-    );
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(sortTreatment({ treatments }));
   });
 
   it('should update items when state emits treatments', () => {

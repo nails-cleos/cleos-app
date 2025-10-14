@@ -14,7 +14,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import * as fromActionsAdditional from '../../store/additional.actions';
+import { additionalSelected, clean, getAdditionalPage } from '../../store/additional.actions';
 import { convertDuration } from '../../util/dates';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 
@@ -114,7 +114,7 @@ describe('AdditionalListComponent', () => {
     mockStore.dispatch.calls.reset();
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsAdditional.Clean));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should call getAdditionalList after view init', () => {
@@ -178,7 +178,7 @@ describe('AdditionalListComponent', () => {
 
     component.edit(testAdditional);
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsAdditional.AdditionalSelected));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(additionalSelected({ selected: testAdditional }));
   });
 
   it('should call delete method without errors', () => {
@@ -272,7 +272,12 @@ describe('AdditionalListComponent', () => {
 
     component['getAdditionalList'](2);
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsAdditional.GetAdditionalPage));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getAdditionalPage({
+      page: 2,
+      size: PAGE_SIZE,
+      sort: 'name',
+      direction: 'asc',
+    }));
   });
 
   it('should handle undefined expanded additional', () => {

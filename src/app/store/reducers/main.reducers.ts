@@ -1,7 +1,18 @@
-import { All, MainActionTypes } from '../main.actions';
+import {
+  catalogueSuccess,
+  clean,
+  getAllCatalogue,
+  getListTreatmentsGroup,
+  requestFailure,
+  requestSuccess,
+  sendMessage,
+  treatmentSuccess,
+  updateMyUser,
+} from '../main.actions';
 import { ICatalogue } from '../../interfaces/catalogue';
 import { ITreatmentGroup } from '../../interfaces/treatment';
 import { IError, IResponseSuccess } from '../../interfaces/common';
+import { createReducer, on } from '@ngrx/store';
 
 export interface State {
   response?: IResponseSuccess;
@@ -21,75 +32,54 @@ export const initialState: State = {
   isLoading: false,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case MainActionTypes.getAllCatalogue: {
-      return {
-        ...state,
-        catalogue: [{}, {}, {}],
-        errorMessage: undefined,
-        response: undefined,
-        isLoading: true,
-      };
-    }
-    case MainActionTypes.getListTreatmentsGroup: {
-      return {
-        ...state,
-        groups: undefined,
-        errorMessage: undefined,
-        response: undefined,
-        isLoading: true,
-      };
-    }
-    case MainActionTypes.updateMyUser:
-    case MainActionTypes.sendMessage: {
-      return {
-        ...state,
-        errorMessage: undefined,
-        response: undefined,
-        isLoading: true,
-      };
-    }
-    case MainActionTypes.catalogueSuccess: {
-      return {
-        ...state,
-        catalogue: action.catalogues,
-        errorMessage: undefined,
-        response: undefined,
-        isLoading: false,
-      };
-    }
-    case MainActionTypes.treatmentSuccess: {
-      return {
-        ...state,
-        groups: action.groups,
-        errorMessage: undefined,
-        response: undefined,
-        isLoading: false,
-      };
-    }
-    case MainActionTypes.requestSuccess: {
-      return {
-        ...state,
-        response: action,
-        errorMessage: undefined,
-        isLoading: false,
-      };
-    }
-    case MainActionTypes.requestFailure: {
-      return {
-        ...state,
-        errorMessage: action.error.message,
-        error: action.error,
-        response: undefined,
-        isLoading: false,
-      };
-    }
-    case MainActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const mainReducer = createReducer(
+  initialState,
+  on(getAllCatalogue, (state) => ({
+    ...state,
+    catalogue: [{}, {}, {}],
+    errorMessage: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(getListTreatmentsGroup, (state) => ({
+    ...state,
+    groups: undefined,
+    errorMessage: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(updateMyUser, sendMessage, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(catalogueSuccess, (state, { catalogues }) => ({
+    ...state,
+    catalogue: catalogues,
+    errorMessage: undefined,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(treatmentSuccess, (state, { groups }) => ({
+    ...state,
+    groups: groups,
+    errorMessage: undefined,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(requestSuccess, (state, action) => ({
+    ...state,
+    response: action,
+    errorMessage: undefined,
+    isLoading: false,
+  })),
+  on(requestFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error: error,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(clean, () => initialState),
+);

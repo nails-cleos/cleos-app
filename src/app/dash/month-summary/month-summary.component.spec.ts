@@ -25,6 +25,7 @@ describe('MonthSummaryComponent', () => {
   let mockStore: jasmine.SpyObj<Store>;
   let mockRouter: jasmine.SpyObj<Router>;
   let mockTranslate: jasmine.SpyObj<TranslateService>;
+  let saveAsSpy: jasmine.Spy;
 
   const mockAuthUserService = {
     authUser: of({
@@ -104,6 +105,15 @@ describe('MonthSummaryComponent', () => {
     fixture = TestBed.createComponent(MonthSummaryComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  });
+
+  beforeEach(() => {
+    saveAsSpy = jasmine.createSpy('saveAs');
+    (window as any).saveAs = saveAsSpy;
+  });
+
+  afterEach(() => {
+    delete (window as any).saveAs;
   });
 
   it('should create', () => {
@@ -506,17 +516,6 @@ describe('MonthSummaryComponent', () => {
   });
 
   describe('exportMonthlySummary method', () => {
-    let saveAsSpy: jasmine.Spy;
-
-    beforeEach(() => {
-      saveAsSpy = jasmine.createSpy('saveAs');
-      (window as any).saveAs = saveAsSpy;
-    });
-
-    afterEach(() => {
-      delete (window as any).saveAs;
-    });
-
     it('should export monthly summary with workbook', () => {
       const mockSale: IMonthlySummarySale = {
         ...mockMonthlySummary,

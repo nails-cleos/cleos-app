@@ -11,7 +11,7 @@ import { Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../store/app.states';
-import * as fromActionsUser from '../store/user.actions';
+import { clean, getUser, saveUser } from '../store/user.actions';
 import { IUser, User } from '../interfaces/user';
 import { findFlag, flags, IFlag } from '../util/flags';
 import { lightenDarkenColor, randomColor } from '../util/color';
@@ -63,8 +63,8 @@ export class UserComponent implements OnInit, OnDestroy {
   private readonly extras: any;
 
   constructor(private readonly translate: TranslateService, private route: ActivatedRoute,
-              private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
-              private cdRef: ChangeDetectorRef) {
+    private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
+    private cdRef: ChangeDetectorRef) {
     this.isAddMode = true;
     this.isProfessionalOrManager = false;
     this.getState = this.store.select(selectUserState);
@@ -101,12 +101,12 @@ export class UserComponent implements OnInit, OnDestroy {
 
     if (this.isAddMode) {
       this.store.dispatch(
-        new fromActionsUser.SaveUser(user, this.getForm.role.value),
+        saveUser({ user, role: this.getForm.role.value }),
       );
     } else {
       user.id = this.id;
       this.user = undefined;
-      this.store.dispatch(new fromActionsUser.SaveUser(user));
+      this.store.dispatch(saveUser({ user }));
     }
     return;
   }
@@ -178,12 +178,12 @@ export class UserComponent implements OnInit, OnDestroy {
     });
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private getUser = (): void => {
     if (!this.user) {
       this.store.dispatch(
-        new fromActionsUser.getUser(this.id!),
+        getUser({ id: this.id! }),
       );
     }
   };

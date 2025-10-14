@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { AppState, selectAuthState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
-import * as fromActionsLogin from '../../store/auth.actions';
+import { clean, signupSuccess } from '../../store/auth.actions';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
@@ -46,14 +46,12 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   forgotPassword(): void {
     sendPasswordResetEmail(this.auth, this.form.get('email')?.value.trim()).then(() => {
       const message = this.translate.instant('AUTH.FORGOT_PASSWORD.MESSAGE');
-      this.store.dispatch(
-        new fromActionsLogin.SignUpSuccess(message),
-      );
-    }).catch(e => console.error(`Error sending reset password. ${ e }`));
+      this.store.dispatch(signupSuccess({ message }));
+    }).catch(e => console.error(`Error sending reset password. ${e}`));
     return;
   }
 
-  private clean = (): void => this.store.dispatch(new fromActionsLogin.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private createForm = (): void => {
     this.form = this.formBuilder.group({

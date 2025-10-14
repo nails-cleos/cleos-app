@@ -8,7 +8,7 @@ import { AppState } from '../store/app.states';
 
 import { UserComponent } from './user.component';
 import { Role } from '../interfaces/token';
-import * as fromActionsUser from '../store/user.actions';
+import { clean, getUser } from '../store/user.actions';
 
 describe('UserComponent', () => {
   let component: UserComponent;
@@ -28,7 +28,7 @@ describe('UserComponent', () => {
       currentLang: 'en',
     });
     mockChangeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-    
+
     mockActivatedRoute = {
       snapshot: {
         paramMap: {
@@ -87,13 +87,13 @@ describe('UserComponent', () => {
 
   it('should dispatch Clean action on initialization', () => {
     component.ngOnInit();
-    expect(mockStore.dispatch).toHaveBeenCalledWith(new fromActionsUser.Clean());
+    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch getUser action when in edit mode', () => {
     mockActivatedRoute.snapshot.paramMap.get.and.returnValue('123');
     component.ngOnInit();
-    expect(mockStore.dispatch).toHaveBeenCalledWith(new fromActionsUser.getUser('123'));
+    expect(mockStore.dispatch).toHaveBeenCalledWith(getUser({ id: '123' }));
   });
 
   it('should set isProfessionalOrManager to true for manager role', () => {
@@ -128,7 +128,7 @@ describe('UserComponent', () => {
       geometry: { location: { lat: () => 40.7128, lng: () => -74.0060 } },
       'formatted_address': 'New York, NY, USA',
     } as any;
-    
+
     component.getAddress(mockPlaceResult);
     expect(component.geometry).toBe(mockPlaceResult.geometry);
     expect(component.formattedAddress).toBe('New York, NY, USA');
@@ -143,15 +143,35 @@ describe('UserComponent', () => {
 
   it('should submit form in add mode when valid', () => {
     component.ngOnInit();
-    component.getForm.role.setValue(Role.customer);
-    component.getForm.displayName.setValue('Test User');
-    component.getForm.email.setValue('test@example.com');
-    component.getForm.lang.setValue({ value: 'en' });
-    
+    const roleControl = component.getForm.role;
+    const displayNameControl = component.getForm.displayName;
+    const emailControl = component.getForm.email;
+    const langControl = component.getForm.lang;
+
+    roleControl.setValue(Role.customer);
+    roleControl.markAsDirty();
+
+    displayNameControl.setValue('Test User');
+    displayNameControl.markAsDirty();
+
+    emailControl.setValue('test@example.com');
+    emailControl.markAsDirty();
+
+    langControl.setValue({ value: 'en' });
+    langControl.markAsDirty();
+
+    mockStore.dispatch.calls.reset();
+
     void component.submit;
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      jasmine.any(fromActionsUser.SaveUser),
-    );
+    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+      user: jasmine.objectContaining({
+        displayName: 'Test User',
+        email: 'test@example.com',
+        lang: 'en',
+      }),
+      type: '[User] Save',
+    }));
   });
 
   it('should handle errors from store', () => {
@@ -161,7 +181,7 @@ describe('UserComponent', () => {
       ],
     };
     mockStore.select.and.returnValue(of(stateWithErrors));
-    
+
     // Create a new component instance with the error state
     const errorComponent = new UserComponent(
       mockTranslateService,
@@ -171,9 +191,9 @@ describe('UserComponent', () => {
       mockRouter,
       mockChangeDetectorRef,
     );
-    
+
     errorComponent.ngOnInit();
-    
+
     expect(errorComponent.errors.email).toBe('Email already exists');
     expect(errorComponent.getForm.email.hasError('incorrect')).toBe(true);
   });
@@ -181,7 +201,7 @@ describe('UserComponent', () => {
   it('should navigate to users list on successful response', () => {
     const stateWithResponse = { response: { success: true } };
     mockStore.select.and.returnValue(of(stateWithResponse));
-    
+
     // Create a new component instance with the success state
     const successComponent = new UserComponent(
       mockTranslateService,
@@ -191,9 +211,9 @@ describe('UserComponent', () => {
       mockRouter,
       mockChangeDetectorRef,
     );
-    
+
     successComponent.ngOnInit();
-    
+
     expect(mockRouter.navigate).toHaveBeenCalledWith(['en', 'users']);
   });
 

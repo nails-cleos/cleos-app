@@ -10,7 +10,7 @@ import { TransactionComponent } from './transaction.component';
 import { AuthUserService } from '../../services/auth-user.service';
 import { IAccountAll, ITransaction } from '../../interfaces/account';
 import { PaymentOption, PaymentType } from '../../interfaces/payment';
-import * as fromActionsAccount from '../../store/account.actions';
+import { createTransaction, getAccount, paymentOptions } from '../../store/account.actions';
 
 describe('TransactionComponent', () => {
   let component: TransactionComponent;
@@ -148,7 +148,7 @@ describe('TransactionComponent', () => {
 
     // Verify GetAccount was called with the correct ID
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      new fromActionsAccount.GetAccount('account-123'),
+      getAccount({ id: 'account-123' }),
     );
   });
 
@@ -165,7 +165,7 @@ describe('TransactionComponent', () => {
     component.ngOnInit();
 
     expect(mockStore.dispatch).not.toHaveBeenCalledWith(
-      new fromActionsAccount.GetAccount('account-123'),
+      getAccount({ id: 'account-123' }),
     );
   });
 
@@ -317,16 +317,18 @@ describe('TransactionComponent', () => {
     void component.submit;
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      new fromActionsAccount.CreateTransaction('account-123', {
-        customerId: 'customer-123',
-        amount: 200,
-        paymentRequest: {
-          type: PaymentType.cash,
-          paymentOptionId: undefined,
-          transfer: 'test-transfer',
-          bic: undefined,
-        },
-      } as ITransaction),
+      createTransaction({
+        id: 'account-123', transaction: {
+          customerId: 'customer-123',
+          amount: 200,
+          paymentRequest: {
+            type: PaymentType.cash,
+            paymentOptionId: undefined,
+            transfer: 'test-transfer',
+            bic: undefined,
+          },
+        } as ITransaction,
+      }),
     );
   });
 
@@ -346,16 +348,18 @@ describe('TransactionComponent', () => {
     void component.submit;
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      new fromActionsAccount.CreateTransaction('account-123', {
-        customerId: 'customer-123',
-        amount: 300,
-        paymentRequest: {
-          type: PaymentType.paynl,
-          paymentOptionId: 'test-bic' as any,
-          transfer: 'test-transfer',
-          bic: undefined,
-        },
-      } as ITransaction),
+      createTransaction({
+        id: 'account-123', transaction: {
+          customerId: 'customer-123',
+          amount: 300,
+          paymentRequest: {
+            type: PaymentType.paynl,
+            paymentOptionId: 'test-bic' as any,
+            transfer: 'test-transfer',
+            bic: undefined,
+          },
+        } as ITransaction,
+      }),
     );
   });
 
@@ -378,23 +382,25 @@ describe('TransactionComponent', () => {
     void component.submit;
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      new fromActionsAccount.CreateTransaction('account-123', {
-        customerId: 'customer-123',
-        amount: 400,
-        paymentRequest: {
-          type: PaymentType.ideal,
-          paymentOptionId: 'test-bic' as any,
-          transfer: 'test-transfer',
-          bic: 'selected-bic',
-        },
-      } as ITransaction),
+      createTransaction({
+        id: 'account-123', transaction: {
+          customerId: 'customer-123',
+          amount: 400,
+          paymentRequest: {
+            type: PaymentType.ideal,
+            paymentOptionId: 'test-bic' as any,
+            transfer: 'test-transfer',
+            bic: 'selected-bic',
+          },
+        } as ITransaction,
+      }),
     );
   });
 
   it('should dispatch PaymentOptions action', () => {
     component['getOptions']();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(new fromActionsAccount.PaymentOptions());
+    expect(mockStore.dispatch).toHaveBeenCalledWith(paymentOptions());
   });
 
   it('should handle case when account ID is not provided', () => {

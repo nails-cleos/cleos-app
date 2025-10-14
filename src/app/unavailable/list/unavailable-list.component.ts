@@ -8,7 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../../store/app.states';
-import * as fromActionsUnavailable from '../../store/unavailable.actions';
+import { clean, deleteUnavailable, getUnavailablePage, unavailableSelected } from '../../store/unavailable.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { isSameTimeZone, newDateTimestamp } from '../../util/dates';
 import { IUnavailable, IUnavailableAll } from '../../interfaces/unavailable';
@@ -47,7 +47,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
+    private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small,
@@ -75,9 +75,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
     this.paginatorSubscription?.unsubscribe();
   }
 
-  edit = (unavailable: IUnavailable): void => this.store.dispatch(
-    new fromActionsUnavailable.UnavailableSelected(unavailable),
-  );
+  edit = (selected: IUnavailable): void => this.store.dispatch(unavailableSelected({ selected }));
 
   delete = (unavailable: IUnavailable): void => {
     const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
@@ -90,7 +88,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsUnavailable.DeleteUnavailable(result.id, result.timestamp, result.timeZone),
+          deleteUnavailable({ id: result.id, timestamp: result.timestamp, timeZone: result.timeZone }),
         );
       }
     });
@@ -105,7 +103,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
     createDialog('PROFESSIONAL_INFO', name, this.dateFormat, this.translate, this.dialog, timeZone, time);
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsUnavailable.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe(() => {
@@ -119,7 +117,12 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   };
 
   private getUnavailableList = (page: number = 0): void => this.store.dispatch(
-    new fromActionsUnavailable.GetUnavailablePage(page, this.sort.active, this.sort.direction, this.pageSize),
+    getUnavailablePage({
+      page,
+      sort: this.sort.active,
+      direction: this.sort.direction,
+      size: this.pageSize,
+    }),
   );
 
 
