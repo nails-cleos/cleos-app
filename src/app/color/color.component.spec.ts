@@ -3,7 +3,7 @@ import { ReactiveFormsModule, UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -59,6 +59,10 @@ describe('ColorComponent', () => {
       ],
     }).compileComponents();
 
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
+
     fixture = TestBed.createComponent(ColorComponent);
     component = fixture.componentInstance;
   });
@@ -72,7 +76,7 @@ describe('ColorComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isAddMode).toBe(true);
+    expect(component.isAddMode).toBeTrue();
     expect(component.id).toBeUndefined();
   });
 
@@ -82,7 +86,7 @@ describe('ColorComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isAddMode).toBe(false);
+    expect(component.isAddMode).toBeFalse();
     expect(component.id).toBe(testId);
   });
 
@@ -92,7 +96,7 @@ describe('ColorComponent', () => {
     expect(component.form).toBeDefined();
     expect(component.form.get('name')).toBeDefined();
     expect(component.form.get('description')).toBeDefined();
-    expect(component.form.get('name')?.hasError('required')).toBe(true);
+    expect(component.form.get('name')?.hasError('required')).toBeTrue();
   });
 
   it('should dispatch Clean action on initialization', () => {
@@ -134,7 +138,7 @@ describe('ColorComponent', () => {
     });
 
     expect(component.errors['name']).toBe('Name is required');
-    expect(component.form.get('name')?.hasError('incorrect')).toBe(true);
+    expect(component.form.get('name')?.hasError('incorrect')).toBeTrue();
   });
 
   it('should navigate to colors list on successful response', () => {
@@ -144,7 +148,7 @@ describe('ColorComponent', () => {
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith([component['language'], 'colors']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'colors']);
   });
 
   it('should not dispatch action when form is invalid', () => {
@@ -268,10 +272,10 @@ describe('ColorComponent', () => {
   it('should validate form correctly', () => {
     component.ngOnInit();
 
-    expect(component.form.invalid).toBe(true);
+    expect(component.form.invalid).toBeTrue();
 
     component.form.get('name')?.setValue('Test Name');
-    expect(component.form.valid).toBe(true);
+    expect(component.form.valid).toBeTrue();
   });
 
   it('should handle state subscription correctly', () => {
@@ -288,6 +292,6 @@ describe('ColorComponent', () => {
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith([component['language'], 'colors']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'colors']);
   });
 });

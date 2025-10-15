@@ -50,11 +50,11 @@ export class ReservationCloneDialogComponent {
     this.time.setValue(this.minDate);
   }
 
-  get onNoClick(): void {
+  onNoClick(): void {
     return this.dialogRef.close();
   }
 
-  get doAction(): void {
+  doAction(): void {
     return this.dialogRef.close({ date: this.date.value, time: this.time.value });
   }
 

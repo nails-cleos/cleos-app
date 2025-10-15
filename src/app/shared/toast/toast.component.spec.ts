@@ -57,8 +57,8 @@ describe('ToastComponent', () => {
     action$.subscribe(() => actionEmitted = true);
     dismiss$.subscribe(() => dismissEmitted = true, undefined, () => {
       // Complete callback
-      expect(actionEmitted).toBe(true);
-      expect(dismissEmitted).toBe(true);
+      expect(actionEmitted).toBeTrue();
+      expect(dismissEmitted).toBeTrue();
       done();
     });
 
@@ -69,7 +69,7 @@ describe('ToastComponent', () => {
     let dismissEmitted = false;
 
     dismiss$.subscribe(() => dismissEmitted = true, undefined, () => {
-      expect(dismissEmitted).toBe(true);
+      expect(dismissEmitted).toBeTrue();
       done();
     });
 

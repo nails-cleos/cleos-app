@@ -28,7 +28,7 @@ describe('AnimateDirective', () => {
   });
 
   it('should initialize with default values', () => {
-    expect(directive.stopAnimation).toBe(false);
+    expect(directive.stopAnimation).toBeFalse();
     expect(directive.threshold).toBe(0.1);
   });
 

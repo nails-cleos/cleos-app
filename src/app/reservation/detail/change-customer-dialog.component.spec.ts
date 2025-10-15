@@ -144,10 +144,10 @@ describe('ChangeCustomerDialogComponent', () => {
   it('should validate form correctly', () => {
     component.ngOnInit();
 
-    expect(component.customerForm.invalid).toBe(true);
+    expect(component.customerForm.invalid).toBeTrue();
 
     component.customerForm.get('customer')?.setValue({ id: '1', displayName: 'Customer' } as IUser);
-    expect(component.customerForm.valid).toBe(true);
+    expect(component.customerForm.valid).toBeTrue();
   });
 
   it('should handle state subscription correctly', () => {

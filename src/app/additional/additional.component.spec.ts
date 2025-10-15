@@ -6,7 +6,7 @@ import { ReactiveFormsModule, UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ChangeDetectorRef } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { formatDuration } from '../util/dates';
 import { clean, getAdditional, getAllTreatmentsGroup } from '../store/additional.actions';
@@ -61,6 +61,10 @@ describe('AdditionalComponent', () => {
       ],
     }).compileComponents();
 
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
+
     fixture = TestBed.createComponent(AdditionalComponent);
     component = fixture.componentInstance;
   });
@@ -74,7 +78,7 @@ describe('AdditionalComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isAddMode).toBe(true);
+    expect(component.isAddMode).toBeTrue();
     expect(component.id).toBeUndefined();
   });
 
@@ -84,7 +88,7 @@ describe('AdditionalComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isAddMode).toBe(false);
+    expect(component.isAddMode).toBeFalse();
     expect(component.id).toBe(testId);
   });
 
@@ -95,8 +99,8 @@ describe('AdditionalComponent', () => {
     expect(component.form.get('name')).toBeDefined();
     expect(component.form.get('duration')).toBeDefined();
     expect(component.form.get('description')).toBeDefined();
-    expect(component.form.get('name')?.hasError('required')).toBe(true);
-    expect(component.form.get('duration')?.hasError('required')).toBe(true);
+    expect(component.form.get('name')?.hasError('required')).toBeTrue();
+    expect(component.form.get('duration')?.hasError('required')).toBeTrue();
   });
 
   it('should dispatch Clean action on initialization', () => {
@@ -146,9 +150,9 @@ describe('AdditionalComponent', () => {
     });
 
     expect(component.errors['name']).toBe('Name is required');
-    expect(component.form.get('name')?.hasError('incorrect')).toBe(true);
+    expect(component.form.get('name')?.hasError('incorrect')).toBeTrue();
     expect(component.errors['duration']).toBe('Duration is required');
-    expect(component.form.get('duration')?.hasError('incorrect')).toBe(true);
+    expect(component.form.get('duration')?.hasError('incorrect')).toBeTrue();
   });
 
   it('should navigate to additional list on successful response', () => {
@@ -158,7 +162,7 @@ describe('AdditionalComponent', () => {
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith([component['language'], 'additional']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'additional']);
   });
 
   it('should not dispatch action when form is invalid', () => {
@@ -297,11 +301,11 @@ describe('AdditionalComponent', () => {
   it('should validate form correctly', () => {
     component.ngOnInit();
 
-    expect(component.form.invalid).toBe(true);
+    expect(component.form.invalid).toBeTrue();
 
     component.form.get('name')?.setValue('Test Name');
     component.form.get('duration')?.setValue('PT30M');
-    expect(component.form.valid).toBe(true);
+    expect(component.form.valid).toBeTrue();
   });
 
   it('should handle state subscription correctly', () => {
@@ -318,7 +322,7 @@ describe('AdditionalComponent', () => {
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith([component['language'], 'additional']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'additional']);
   });
 
   it('should dispatch GetAllTreatmentsGroup action when findGroups is called', () => {

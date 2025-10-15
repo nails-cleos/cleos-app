@@ -35,17 +35,17 @@ describe('BalanceComponent', () => {
 
     it('should accept showAdd input', () => {
       component.showAdd = true;
-      expect(component.showAdd).toBe(true);
+      expect(component.showAdd).toBeTrue();
     });
 
     it('should accept showView input', () => {
       component.showView = false;
-      expect(component.showView).toBe(false);
+      expect(component.showView).toBeFalse();
     });
 
     it('should accept showUser input', () => {
       component.showUser = true;
-      expect(component.showUser).toBe(true);
+      expect(component.showUser).toBeTrue();
     });
 
     it('should accept language input', () => {

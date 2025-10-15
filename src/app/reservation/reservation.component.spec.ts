@@ -156,11 +156,11 @@ describe('ReservationComponent', () => {
     });
 
     it('should set up form controls with proper validators', () => {
-      expect(component.customer.hasError('required')).toBe(true);
-      expect(component.group.hasError('required')).toBe(true);
-      expect(component.treatment.hasError('required')).toBe(true);
-      expect(component.office.hasError('required')).toBe(true);
-      expect(component.room.hasError('required')).toBe(true);
+      expect(component.customer.hasError('required')).toBeTrue();
+      expect(component.group.hasError('required')).toBeTrue();
+      expect(component.treatment.hasError('required')).toBeTrue();
+      expect(component.office.hasError('required')).toBeTrue();
+      expect(component.room.hasError('required')).toBeTrue();
     });
 
     it('should dispatch GetCustomers action when not editing', () => {
@@ -256,28 +256,28 @@ describe('ReservationComponent', () => {
       spyOn(component, 'callStepTwo');
       component.customerForm.setErrors({ invalid: true });
       component.callStepTwo(true);
-      expect(component.customerForm.invalid).toBe(true);
+      expect(component.customerForm.invalid).toBeTrue();
     });
 
     it('should validate office form before proceeding to step 3', () => {
       spyOn(component, 'callStepThree');
       component.officeForm.setErrors({ invalid: true });
       component.callStepThree(true);
-      expect(component.officeForm.invalid).toBe(true);
+      expect(component.officeForm.invalid).toBeTrue();
     });
 
     it('should validate treatment form before proceeding to step 4', () => {
       spyOn(component, 'callStepFour');
       component.treatmentForm.setErrors({ invalid: true });
       component.callStepFour(true);
-      expect(component.treatmentForm.invalid).toBe(true);
+      expect(component.treatmentForm.invalid).toBeTrue();
     });
 
     it('should validate configuration form before proceeding to step 6', () => {
       spyOn(component, 'callStepSix');
       component.configurationForm.setErrors({ invalid: true });
       component.callStepSix(true);
-      expect(component.configurationForm.invalid).toBe(true);
+      expect(component.configurationForm.invalid).toBeTrue();
     });
   });
 
@@ -329,8 +329,8 @@ describe('ReservationComponent', () => {
       const additional = { id: 'add-1', name: 'Additional 1' };
       component.additionalSelected = [additional as any];
 
-      expect(component.isSelected(additional as any)).toBe(true);
-      expect(component.isSelected({ id: 'add-2', name: 'Additional 2' } as any)).toBe(false);
+      expect(component.isSelected(additional as any)).toBeTrue();
+      expect(component.isSelected({ id: 'add-2', name: 'Additional 2' } as any)).toBeFalse();
     });
   });
 
@@ -450,7 +450,7 @@ describe('ReservationComponent', () => {
 
       component.back();
 
-      expect(component.isPreview).toBe(false);
+      expect(component.isPreview).toBeFalse();
       expect(component['cleanEvent']).not.toHaveBeenCalled();
     });
 
@@ -460,7 +460,7 @@ describe('ReservationComponent', () => {
 
       component.back();
 
-      expect(component['alreadyCreated']).toBe(true);
+      expect(component['alreadyCreated']).toBeTrue();
     });
 
     it('should call cleanEvent when not in preview mode', () => {
@@ -516,7 +516,7 @@ describe('ReservationComponent', () => {
 
     it('should check if add button is disabled', () => {
       component.dateTimeList.setErrors({ invalid: true });
-      expect(component.isAddButtonDisabled).toBe(true);
+      expect(component.isAddButtonDisabled).toBeTrue();
     });
   });
 
@@ -542,40 +542,40 @@ describe('ReservationComponent', () => {
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + 7);
       const result = component['dateIsValid'](futureDate);
-      expect(result).toBe(true);
+      expect(result).toBeTrue();
     });
 
     it('should invalidate date outside allowed range', () => {
       const pastDate = new Date();
       pastDate.setDate(pastDate.getDate() - 7);
       const result = component['dateIsValid'](pastDate);
-      expect(result).toBe(false);
+      expect(result).toBeFalse();
     });
   });
 
   describe('Form Validation', () => {
     it('should mark customer form as invalid when empty', () => {
-      expect(component.customerForm.invalid).toBe(true);
+      expect(component.customerForm.invalid).toBeTrue();
     });
 
     it('should mark customer form as valid when filled', () => {
       component.customer.setValue(mockCustomer);
-      expect(component.customer.valid).toBe(true);
+      expect(component.customer.valid).toBeTrue();
     });
 
     it('should mark office form as invalid when empty', () => {
-      expect(component.officeForm.invalid).toBe(true);
+      expect(component.officeForm.invalid).toBeTrue();
     });
 
     it('should mark office form as valid when filled', () => {
       component.office.setValue(mockOffice);
       component.room.setValue(mockRoom);
       component.professional.setValue(mockRoom.professionals![0]);
-      expect(component.officeForm.valid).toBe(true);
+      expect(component.officeForm.valid).toBeTrue();
     });
 
     it('should mark treatment form as invalid when empty', () => {
-      expect(component.treatmentForm.invalid).toBe(true);
+      expect(component.treatmentForm.invalid).toBeTrue();
     });
 
     it('should mark treatment form as valid when filled', () => {
@@ -586,8 +586,8 @@ describe('ReservationComponent', () => {
       };
       component.group.setValue(mockGroup);
       component.treatment.setValue(mockTreatment);
-      expect(component.group.valid).toBe(true);
-      expect(component.treatment.valid).toBe(true);
+      expect(component.group.valid).toBeTrue();
+      expect(component.treatment.valid).toBeTrue();
     });
   });
 
@@ -708,7 +708,7 @@ describe('ReservationComponent', () => {
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + 7);
       const result = component['dateIsValid'](futureDate);
-      expect(result).toBe(true);
+      expect(result).toBeTrue();
     });
   });
 
@@ -716,7 +716,7 @@ describe('ReservationComponent', () => {
     it('should complete step 2 and move to step 3', () => {
       component.customer.setValue(mockCustomer);
       component.callStepTwo(false);
-      expect(component.customerForm.valid).toBe(true);
+      expect(component.customerForm.valid).toBeTrue();
     });
 
     it('should complete step 3 and move to step 4', () => {
@@ -724,12 +724,12 @@ describe('ReservationComponent', () => {
       component.room.setValue(mockRoom);
       component.professional.setValue(mockRoom.professionals![0]);
       component.callStepThree(false);
-      expect(component.officeForm.valid).toBe(true);
+      expect(component.officeForm.valid).toBeTrue();
     });
 
     it('should handle step 5 navigation', () => {
       component.callStepFive(false);
-      expect(component.isPreview).toBe(false);
+      expect(component.isPreview).toBeFalse();
     });
   });
 

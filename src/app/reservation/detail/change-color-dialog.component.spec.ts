@@ -113,10 +113,10 @@ describe('ChangeColorDialogComponent', () => {
   it('should validate form correctly', () => {
     component.ngOnInit();
 
-    expect(component.colorForm.invalid).toBe(true);
+    expect(component.colorForm.invalid).toBeTrue();
 
     component.colorForm.get('color')?.setValue({ id: '1', name: 'Red' } as IColorAll);
-    expect(component.colorForm.valid).toBe(true);
+    expect(component.colorForm.valid).toBeTrue();
   });
 
   it('should handle state subscription correctly', () => {

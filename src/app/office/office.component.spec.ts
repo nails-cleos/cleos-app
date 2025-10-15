@@ -93,14 +93,14 @@ describe('OfficeComponent', () => {
 
   describe('Initialization', () => {
     it('should initialize in add mode when no id is provided', () => {
-      expect(component.isAddMode).toBe(true);
+      expect(component.isAddMode).toBeTrue();
       expect(component.id).toBeUndefined();
     });
 
     it('should initialize form with required validators', () => {
       expect(component.form).toBeDefined();
-      expect(component.getForm.name.hasError('required')).toBe(true);
-      expect(component.getForm.manager.hasError('required')).toBe(true);
+      expect(component.getForm.name.hasError('required')).toBeTrue();
+      expect(component.getForm.manager.hasError('required')).toBeTrue();
     });
 
     it('should dispatch getAllManager action when in add mode', () => {
@@ -136,11 +136,11 @@ describe('OfficeComponent', () => {
     });
 
     it('should have optional fields without required validator', () => {
-      expect(component.getForm.subject.hasError('required')).toBe(false);
-      expect(component.getForm.kvk.hasError('required')).toBe(false);
-      expect(component.getForm.account.hasError('required')).toBe(false);
-      expect(component.getForm.btw.hasError('required')).toBe(false);
-      expect(component.getForm.billingAddress.hasError('required')).toBe(false);
+      expect(component.getForm.subject.hasError('required')).toBeFalse();
+      expect(component.getForm.kvk.hasError('required')).toBeFalse();
+      expect(component.getForm.account.hasError('required')).toBeFalse();
+      expect(component.getForm.btw.hasError('required')).toBeFalse();
+      expect(component.getForm.billingAddress.hasError('required')).toBeFalse();
     });
   });
 
@@ -205,7 +205,7 @@ describe('OfficeComponent', () => {
       const dispatchCountBefore = mockStore.dispatch.calls.count();
       void component.submit;
       const dispatchCountAfter = mockStore.dispatch.calls.count();
-      expect(component.form.invalid).toBe(true);
+      expect(component.form.invalid).toBeTrue();
       expect(dispatchCountAfter).toBe(dispatchCountBefore);
     });
 
@@ -319,25 +319,25 @@ describe('OfficeComponent', () => {
   describe('Form Validation', () => {
     it('should mark form as invalid when name is empty', () => {
       component.getForm.name.setValue('');
-      expect(component.getForm.name.hasError('required')).toBe(true);
+      expect(component.getForm.name.hasError('required')).toBeTrue();
     });
 
     it('should mark form as invalid when manager is empty', () => {
       component.getForm.manager.setValue('');
-      expect(component.getForm.manager.hasError('required')).toBe(true);
+      expect(component.getForm.manager.hasError('required')).toBeTrue();
     });
 
     it('should allow valid name values', () => {
       component.getForm.name.setValue('Valid Office Name');
-      expect(component.getForm.name.valid).toBe(true);
+      expect(component.getForm.name.valid).toBeTrue();
     });
 
     it('should allow empty optional fields', () => {
-      expect(component.getForm.subject.valid).toBe(true);
-      expect(component.getForm.kvk.valid).toBe(true);
-      expect(component.getForm.account.valid).toBe(true);
-      expect(component.getForm.btw.valid).toBe(true);
-      expect(component.getForm.billingAddress.valid).toBe(true);
+      expect(component.getForm.subject.valid).toBeTrue();
+      expect(component.getForm.kvk.valid).toBeTrue();
+      expect(component.getForm.account.valid).toBeTrue();
+      expect(component.getForm.btw.valid).toBeTrue();
+      expect(component.getForm.billingAddress.valid).toBeTrue();
     });
   });
 

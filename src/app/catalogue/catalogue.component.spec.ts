@@ -3,7 +3,7 @@ import { CatalogueComponent } from './catalogue.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { ICatalogue } from '../interfaces/catalogue';
 import { ReactiveFormsModule, UntypedFormBuilder } from '@angular/forms';
@@ -72,6 +72,10 @@ describe('CatalogueComponent', () => {
       ],
     }).compileComponents();
 
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
+
     fixture = TestBed.createComponent(CatalogueComponent);
     component = fixture.componentInstance;
   });
@@ -85,7 +89,7 @@ describe('CatalogueComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isAddMode).toBe(true);
+    expect(component.isAddMode).toBeTrue();
     expect(component.id).toBeUndefined();
   });
 
@@ -95,7 +99,7 @@ describe('CatalogueComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isAddMode).toBe(false);
+    expect(component.isAddMode).toBeFalse();
     expect(component.id).toBe(testId);
   });
 
@@ -108,7 +112,7 @@ describe('CatalogueComponent', () => {
     expect(component.form.get('home')).toBeDefined();
     expect(component.form.get('catalog')).toBeDefined();
     expect(component.form.get('group')).toBeDefined();
-    expect(component.form.get('name')?.hasError('required')).toBe(true);
+    expect(component.form.get('name')?.hasError('required')).toBeTrue();
   });
 
   it('should dispatch Clean action on initialization', () => {
@@ -154,8 +158,8 @@ describe('CatalogueComponent', () => {
 
     expect(component.errors['name']).toBe('Name is required');
     expect(component.errors['group']).toBe('Treatment type is invalid');
-    expect(component.form.get('name')?.hasError('incorrect')).toBe(true);
-    expect(component.form.get('group')?.hasError('incorrect')).toBe(true);
+    expect(component.form.get('name')?.hasError('incorrect')).toBeTrue();
+    expect(component.form.get('group')?.hasError('incorrect')).toBeTrue();
   });
 
   it('should navigate to catalogues list on successful response', () => {
@@ -165,7 +169,7 @@ describe('CatalogueComponent', () => {
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith([component['language'], 'catalogues']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'catalogues']);
   });
 
   it('should not dispatch action when form is invalid', () => {
@@ -332,10 +336,10 @@ describe('CatalogueComponent', () => {
   it('should validate form correctly', () => {
     component.ngOnInit();
 
-    expect(component.form.invalid).toBe(true);
+    expect(component.form.invalid).toBeTrue();
 
     component.form.get('name')?.setValue('Test Name');
-    expect(component.form.valid).toBe(true);
+    expect(component.form.valid).toBeTrue();
   });
 
   it('should handle state subscription correctly', () => {
@@ -352,7 +356,7 @@ describe('CatalogueComponent', () => {
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith([component['language'], 'catalogues']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'catalogues']);
   });
 
   it('should clear file when deleteFile is called', () => {

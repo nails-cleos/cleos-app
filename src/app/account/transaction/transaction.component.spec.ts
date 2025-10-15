@@ -111,7 +111,7 @@ describe('TransactionComponent', () => {
   });
 
   it('should initialize with default values', () => {
-    expect(component.hasAdminRole).toBe(false);
+    expect(component.hasAdminRole).toBeFalse();
     expect(component.amountMin).toBe(100);
     expect(component.language).toBe('en-GB');
     expect(component.types).toEqual([PaymentType.cash, PaymentType.transfer]);
@@ -150,7 +150,7 @@ describe('TransactionComponent', () => {
   it('should dispatch GetAccount action when account is not loaded', () => {
     // This test is redundant with the 'should extract account ID...' test
     // since ngOnInit already calls getAccount when account is not loaded
-    expect(true).toBe(true);
+    expect(true).toBeTrue();
   });
 
   it('should not dispatch GetAccount when account is already loaded', () => {
@@ -170,25 +170,25 @@ describe('TransactionComponent', () => {
     const amountControl = component.form.get('amount');
     const typeControl = component.form.get('type');
 
-    expect(amountControl?.hasError('required')).toBe(true);
-    expect(typeControl?.hasError('required')).toBe(true);
+    expect(amountControl?.hasError('required')).toBeTrue();
+    expect(typeControl?.hasError('required')).toBeTrue();
 
     amountControl?.setValue(50);
-    expect(amountControl?.hasError('min')).toBe(true);
+    expect(amountControl?.hasError('min')).toBeTrue();
 
     amountControl?.setValue(150);
-    expect(amountControl?.hasError('min')).toBe(false);
+    expect(amountControl?.hasError('min')).toBeFalse();
   });
 
   it('should update hasAdminRole and call getOptions when auth user changes', () => {
     spyOn(component, 'getOptions' as any);
 
     authUserSubject.next({ hasAdminRole: true });
-    expect(component.hasAdminRole).toBe(true);
+    expect(component.hasAdminRole).toBeTrue();
     expect(component['getOptions']).not.toHaveBeenCalled();
 
     authUserSubject.next({ hasAdminRole: false });
-    expect(component.hasAdminRole).toBe(false);
+    expect(component.hasAdminRole).toBeFalse();
     expect(component['getOptions']).toHaveBeenCalled();
   });
 
@@ -231,8 +231,8 @@ describe('TransactionComponent', () => {
 
     expect(component.errors['amount']).toBe('Amount is invalid');
     expect(component.errors['type']).toBe('Type is required');
-    expect(component.form.get('amount')?.hasError('incorrect')).toBe(true);
-    expect(component.form.get('type')?.hasError('incorrect')).toBe(true);
+    expect(component.form.get('amount')?.hasError('incorrect')).toBeTrue();
+    expect(component.form.get('type')?.hasError('incorrect')).toBeTrue();
   });
 
   it('should navigate to user overview on success when admin', () => {

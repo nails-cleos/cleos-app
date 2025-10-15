@@ -123,7 +123,7 @@ describe('MonthSummaryComponent', () => {
   describe('Initialization', () => {
     it('should initialize with default values', () => {
       expect(component.step).toBe(0);
-      expect(component.showCash).toBe(true);
+      expect(component.showCash).toBeTrue();
       expect(component.amountFormat.value).toBe('ES');
       expect(component.locale).toBe('es');
     });
@@ -148,7 +148,7 @@ describe('MonthSummaryComponent', () => {
     });
 
     it('should subscribe to authUserService', () => {
-      expect(component.showCash).toBe(true);
+      expect(component.showCash).toBeTrue();
     });
   });
 
@@ -308,7 +308,7 @@ describe('MonthSummaryComponent', () => {
       component.updateMonthlySummary(totalTypes, summaries);
 
       expect(mockStore.dispatch).toHaveBeenCalled();
-      expect(component.isLoading).toBe(true);
+      expect(component.isLoading).toBeTrue();
     });
 
     it('should dispatch UpdateMonthlySummary action for expense type', () => {
@@ -432,16 +432,16 @@ describe('MonthSummaryComponent', () => {
     });
 
     it('isInvalidInput should return true for invalid values', () => {
-      expect(MonthSummaryComponent['isInvalidInput']('')).toBe(true);
-      expect(MonthSummaryComponent['isInvalidInput']('0')).toBe(true);
-      expect(MonthSummaryComponent['isInvalidInput']('0.0')).toBe(true);
-      expect(MonthSummaryComponent['isInvalidInput']('.0')).toBe(true);
+      expect(MonthSummaryComponent['isInvalidInput']('')).toBeTrue();
+      expect(MonthSummaryComponent['isInvalidInput']('0')).toBeTrue();
+      expect(MonthSummaryComponent['isInvalidInput']('0.0')).toBeTrue();
+      expect(MonthSummaryComponent['isInvalidInput']('.0')).toBeTrue();
     });
 
     it('isInvalidInput should return false for valid values', () => {
-      expect(MonthSummaryComponent['isInvalidInput']('100')).toBe(false);
-      expect(MonthSummaryComponent['isInvalidInput']('50.50')).toBe(false);
-      expect(MonthSummaryComponent['isInvalidInput']('1.23')).toBe(false);
+      expect(MonthSummaryComponent['isInvalidInput']('100')).toBeFalse();
+      expect(MonthSummaryComponent['isInvalidInput']('50.50')).toBeFalse();
+      expect(MonthSummaryComponent['isInvalidInput']('1.23')).toBeFalse();
     });
 
     it('getType should return correct SummaryType', () => {

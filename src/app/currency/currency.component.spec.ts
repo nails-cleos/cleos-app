@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CurrencyComponent } from './currency.component';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -60,6 +60,10 @@ describe('CurrencyComponent', () => {
       ],
     }).compileComponents();
 
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
+
     fixture = TestBed.createComponent(CurrencyComponent);
     component = fixture.componentInstance;
 
@@ -74,7 +78,7 @@ describe('CurrencyComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isAddMode).toBe(true);
+    expect(component.isAddMode).toBeTrue();
     expect(component.id).toBeUndefined();
   });
 
@@ -84,7 +88,7 @@ describe('CurrencyComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isAddMode).toBe(false);
+    expect(component.isAddMode).toBeFalse();
     expect(component.id).toBe(testId);
   });
 
@@ -95,7 +99,7 @@ describe('CurrencyComponent', () => {
     expect(component.form.get('name')).toBeDefined();
     expect(component.form.get('code')).toBeDefined();
     expect(component.form.get('icon')).toBeDefined();
-    expect(component.form.get('code')?.hasError('required')).toBe(true);
+    expect(component.form.get('code')?.hasError('required')).toBeTrue();
   });
 
   it('should dispatch Clean action on initialization', () => {
@@ -139,7 +143,7 @@ describe('CurrencyComponent', () => {
     });
 
     expect(component.errors['code']).toBe('Code is required');
-    expect(component.form.get('code')?.hasError('incorrect')).toBe(true);
+    expect(component.form.get('code')?.hasError('incorrect')).toBeTrue();
   });
 
   it('should navigate to currency list on successful response', () => {
@@ -149,7 +153,7 @@ describe('CurrencyComponent', () => {
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith([component['language'], 'currency']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'currency']);
   });
 
   it('should not dispatch action when form is invalid', () => {
@@ -284,10 +288,10 @@ describe('CurrencyComponent', () => {
   it('should validate form correctly', () => {
     component.ngOnInit();
 
-    expect(component.form.invalid).toBe(true);
+    expect(component.form.invalid).toBeTrue();
 
     component.form.get('code')?.setValue('Test code');
-    expect(component.form.valid).toBe(true);
+    expect(component.form.valid).toBeTrue();
   });
 
   it('should handle state subscription correctly', () => {
@@ -304,6 +308,6 @@ describe('CurrencyComponent', () => {
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith([component['language'], 'currency']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'currency']);
   });
 });

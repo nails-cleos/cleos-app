@@ -156,7 +156,7 @@ describe('QuarterSummaryComponent', () => {
 
   describe('Component Initialization', () => {
     it('should initialize with default values', () => {
-      expect(component.isLoading).toBe(false);
+      expect(component.isLoading).toBeFalse();
       expect(component.quarterSummaryTotals).toEqual(new SummaryTotals());
     });
 
@@ -167,7 +167,7 @@ describe('QuarterSummaryComponent', () => {
 
     it('should set user properties from authUser service', () => {
       fixture.detectChanges();
-      expect(component.showCash).toBe(true);
+      expect(component.showCash).toBeTrue();
     });
 
     it('should initialize with current date and quarter when no extras', () => {
@@ -194,7 +194,7 @@ describe('QuarterSummaryComponent', () => {
     it('should set up breakpoint observer for handset detection', (done) => {
       fixture.detectChanges();
       component.isHandset$.subscribe((isHandset) => {
-        expect(isHandset).toBe(false);
+        expect(isHandset).toBeFalse();
         done();
       });
     });
@@ -212,7 +212,7 @@ describe('QuarterSummaryComponent', () => {
       stateSubject.next({ quarterSummaryMap: map });
 
       expect(component.selectedRoom.value).toEqual(mockRoom);
-      expect(component.isLoading).toBe(false);
+      expect(component.isLoading).toBeFalse();
     });
 
     it('should select primary room when multiple rooms exist', () => {
@@ -465,7 +465,7 @@ describe('QuarterSummaryComponent', () => {
     it('should set isLoading to true', () => {
       (component as any).getSummary(2024, 1);
 
-      expect(component.isLoading).toBe(true);
+      expect(component.isLoading).toBeTrue();
     });
 
     it('should reset data before getting new summary', () => {
@@ -611,7 +611,7 @@ describe('QuarterSummaryComponent', () => {
       const responsiveComponent = responsiveFixture.componentInstance;
 
       responsiveComponent.isHandset$.subscribe((isHandset) => {
-        expect(isHandset).toBe(true);
+        expect(isHandset).toBeTrue();
         done();
       });
     });

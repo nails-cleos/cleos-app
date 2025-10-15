@@ -86,7 +86,7 @@ describe('ExpenseComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isAddMode).toBe(true);
+    expect(component.isAddMode).toBeTrue();
     expect(component.id).toBeUndefined();
   });
 
@@ -104,7 +104,7 @@ describe('ExpenseComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isAddMode).toBe(false);
+    expect(component.isAddMode).toBeFalse();
     expect(component.id).toBe(testId);
   });
 
@@ -116,9 +116,9 @@ describe('ExpenseComponent', () => {
     expect(component.getForm.supplyStore).toBeDefined();
     expect(component.getForm.date).toBeDefined();
     expect(component.getForm.totals).toBeDefined();
-    expect(component.getForm.invoice.hasError('required')).toBe(true);
-    expect(component.getForm.supplyStore.hasError('required')).toBe(true);
-    expect(component.getForm.date.hasError('required')).toBe(true);
+    expect(component.getForm.invoice.hasError('required')).toBeTrue();
+    expect(component.getForm.supplyStore.hasError('required')).toBeTrue();
+    expect(component.getForm.date.hasError('required')).toBeTrue();
   });
 
   it('should dispatch Clean action on initialization', () => {
@@ -207,9 +207,9 @@ describe('ExpenseComponent', () => {
     });
 
     expect(component.errors['invoice']).toBe('Invoice is required');
-    expect(component.getForm.invoice.hasError('incorrect')).toBe(true);
+    expect(component.getForm.invoice.hasError('incorrect')).toBeTrue();
     expect(component.errors['supplyStore']).toBe('Supply store is required');
-    expect(component.getForm.supplyStore.hasError('incorrect')).toBe(true);
+    expect(component.getForm.supplyStore.hasError('incorrect')).toBeTrue();
   });
 
   it('should navigate to expense list on successful response', () => {
@@ -227,7 +227,7 @@ describe('ExpenseComponent', () => {
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith([component['language'], 'rooms', roomId, 'expenses']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'rooms', roomId, 'expenses']);
   });
 
   it('should not dispatch action when form is invalid', () => {
@@ -370,7 +370,7 @@ describe('ExpenseComponent', () => {
     component.ngOnInit();
     component.addDate();
 
-    expect(component.form.invalid).toBe(true);
+    expect(component.form.invalid).toBeTrue();
 
     component.getForm.invoice.setValue('INV-123');
     component.getForm.supplyStore.setValue({ id: 's1', name: 'Test Store' });
@@ -379,7 +379,7 @@ describe('ExpenseComponent', () => {
     component.totals.at(0).get('gross')?.setValue('100.00');
     component.totals.at(0).get('btw')?.setValue('21.00');
 
-    expect(component.form.valid).toBe(true);
+    expect(component.form.valid).toBeTrue();
   });
 
   it('should handle state subscription correctly', () => {
@@ -500,7 +500,7 @@ describe('ExpenseComponent', () => {
     component.validateInputValue(input, 0, 0, 100);
 
     expect(component.errors['btw0']).toBe('BTW must be greater than 0.00');
-    expect(component.totals.at(0).get('btw')?.hasError('incorrect')).toBe(true);
+    expect(component.totals.at(0).get('btw')?.hasError('incorrect')).toBeTrue();
   });
 
   it('should set error when input value is above maximum', () => {
@@ -513,7 +513,7 @@ describe('ExpenseComponent', () => {
     component.validateInputValue(input, 0, 0, 100);
 
     expect(component.errors['btw0']).toBe('BTW must be less than 100.00');
-    expect(component.totals.at(0).get('btw')?.hasError('incorrect')).toBe(true);
+    expect(component.totals.at(0).get('btw')?.hasError('incorrect')).toBeTrue();
   });
 
   it('should display supply store name correctly', () => {
@@ -549,7 +549,7 @@ describe('ExpenseComponent', () => {
       response: true,
     });
 
-    expect(component.createAnother).toBe(false);
+    expect(component.createAnother).toBeFalse();
     expect(mockRouter.navigate).not.toHaveBeenCalled();
   });
 
@@ -559,7 +559,7 @@ describe('ExpenseComponent', () => {
     component.totals.at(0).get('type')?.setValue('');
     component.totals.at(0).get('gross')?.setValue('');
 
-    expect(component.isAddButtonDisabled).toBe(true);
+    expect(component.isAddButtonDisabled).toBeTrue();
   });
 
   it('should return isAddButtonDisabled as false when totals form is valid', () => {
@@ -569,7 +569,7 @@ describe('ExpenseComponent', () => {
     component.totals.at(0).get('gross')?.setValue('100.00');
     component.totals.at(0).get('btw')?.setValue('21.00');
 
-    expect(component.isAddButtonDisabled).toBe(false);
+    expect(component.isAddButtonDisabled).toBeFalse();
   });
 
   it('should not dispatch action when roomId is null', () => {

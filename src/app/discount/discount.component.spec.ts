@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DiscountComponent } from './discount.component';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -67,6 +67,10 @@ describe('DiscountComponent', () => {
       ],
     }).compileComponents();
 
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
+
     fixture = TestBed.createComponent(DiscountComponent);
     component = fixture.componentInstance;
   });
@@ -80,7 +84,7 @@ describe('DiscountComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isAddMode).toBe(true);
+    expect(component.isAddMode).toBeTrue();
     expect(component.id).toBeUndefined();
   });
 
@@ -90,7 +94,7 @@ describe('DiscountComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.isAddMode).toBe(false);
+    expect(component.isAddMode).toBeFalse();
     expect(component.id).toBe(testId);
   });
 
@@ -103,10 +107,10 @@ describe('DiscountComponent', () => {
     expect(component.form.get('currency')).toBeDefined();
     expect(component.form.get('amount')).toBeDefined();
     expect(component.form.get('type')).toBeDefined();
-    expect(component.form.get('name')?.hasError('required')).toBe(true);
-    expect(component.form.get('currency')?.hasError('required')).toBe(true);
-    expect(component.form.get('amount')?.hasError('required')).toBe(true);
-    expect(component.form.get('type')?.hasError('required')).toBe(true);
+    expect(component.form.get('name')?.hasError('required')).toBeTrue();
+    expect(component.form.get('currency')?.hasError('required')).toBeTrue();
+    expect(component.form.get('amount')?.hasError('required')).toBeTrue();
+    expect(component.form.get('type')?.hasError('required')).toBeTrue();
   });
 
   it('should dispatch Clean action on initialization', () => {
@@ -157,10 +161,10 @@ describe('DiscountComponent', () => {
     expect(component.errors['currency']).toBe('Currency is required');
     expect(component.errors['amount']).toBe('Amount is required');
     expect(component.errors['type']).toBe('Type is required');
-    expect(component.form.get('name')?.hasError('incorrect')).toBe(true);
-    expect(component.form.get('currency')?.hasError('incorrect')).toBe(true);
-    expect(component.form.get('amount')?.hasError('incorrect')).toBe(true);
-    expect(component.form.get('type')?.hasError('incorrect')).toBe(true);
+    expect(component.form.get('name')?.hasError('incorrect')).toBeTrue();
+    expect(component.form.get('currency')?.hasError('incorrect')).toBeTrue();
+    expect(component.form.get('amount')?.hasError('incorrect')).toBeTrue();
+    expect(component.form.get('type')?.hasError('incorrect')).toBeTrue();
   });
 
   it('should navigate to discounts list on successful response', () => {
@@ -170,7 +174,7 @@ describe('DiscountComponent', () => {
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith([component['language'], 'discounts']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'discounts']);
   });
 
   it('should not dispatch action when form is invalid', () => {
@@ -324,13 +328,13 @@ describe('DiscountComponent', () => {
   it('should validate form correctly', () => {
     component.ngOnInit();
 
-    expect(component.form.invalid).toBe(true);
+    expect(component.form.invalid).toBeTrue();
 
     component.form.get('name')?.setValue('Test Name');
     component.form.get('currency')?.setValue({ id: '1', code: 'EUR' });
     component.form.get('amount')?.setValue(15);
     component.form.get('type')?.setValue(DiscountType.percentage);
-    expect(component.form.valid).toBe(true);
+    expect(component.form.valid).toBeTrue();
   });
 
   it('should handle state subscription correctly', () => {
@@ -347,7 +351,7 @@ describe('DiscountComponent', () => {
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith([component['language'], 'discounts']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'discounts']);
   });
 
   it('should dispatch GetAllCurrency action when findGroups is called', () => {
@@ -382,7 +386,7 @@ describe('DiscountComponent', () => {
   it('should test addCurrency getter navigation', () => {
     void component.addCurrency;
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith([component['language'], 'currency', 'add']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'currency', 'add']);
   });
 
   it('should test displayCurrencyFn with valid currency', () => {
@@ -426,8 +430,8 @@ describe('DiscountComponent', () => {
 
     component.form.get('amount')?.setValue(0);
 
-    expect(component.form.get('amount')?.hasError('min')).toBe(true);
-    expect(component.form.invalid).toBe(true);
+    expect(component.form.get('amount')?.hasError('min')).toBeTrue();
+    expect(component.form.invalid).toBeTrue();
   });
 
   it('should handle currencies from state', () => {

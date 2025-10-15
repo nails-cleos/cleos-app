@@ -66,23 +66,23 @@ describe('UserComponent', () => {
 
   it('should initialize in add mode when no id is provided', () => {
     component.ngOnInit();
-    expect(component.isAddMode).toBe(true);
+    expect(component.isAddMode).toBeTrue();
   });
 
   it('should initialize in edit mode when id is provided', () => {
     mockActivatedRoute.snapshot.paramMap.get.and.returnValue('123');
     component.ngOnInit();
-    expect(component.isAddMode).toBe(false);
+    expect(component.isAddMode).toBeFalse();
     expect(component.id).toBe('123');
   });
 
   it('should create form with required validators', () => {
     component.ngOnInit();
     expect(component.form).toBeDefined();
-    expect(component.getForm.role.hasError('required')).toBe(true);
-    expect(component.getForm.displayName.hasError('required')).toBe(true);
-    expect(component.getForm.email.hasError('required')).toBe(true);
-    expect(component.getForm.lang.hasError('required')).toBe(true);
+    expect(component.getForm.role.hasError('required')).toBeTrue();
+    expect(component.getForm.displayName.hasError('required')).toBeTrue();
+    expect(component.getForm.email.hasError('required')).toBeTrue();
+    expect(component.getForm.lang.hasError('required')).toBeTrue();
   });
 
   it('should dispatch Clean action on initialization', () => {
@@ -99,13 +99,13 @@ describe('UserComponent', () => {
   it('should set isProfessionalOrManager to true for manager role', () => {
     component.ngOnInit();
     component.getForm.role.setValue(Role.manager);
-    expect(component.isProfessionalOrManager).toBe(true);
+    expect(component.isProfessionalOrManager).toBeTrue();
   });
 
   it('should set isProfessionalOrManager to true for professional role', () => {
     component.ngOnInit();
     component.getForm.role.setValue(Role.professional);
-    expect(component.isProfessionalOrManager).toBe(true);
+    expect(component.isProfessionalOrManager).toBeTrue();
   });
 
   it('should add color validators for professional/manager roles', () => {
@@ -132,7 +132,7 @@ describe('UserComponent', () => {
     component.getAddress(mockPlaceResult);
     expect(component.geometry).toBe(mockPlaceResult.geometry);
     expect(component.formattedAddress).toBe('New York, NY, USA');
-    expect(component.addressUpdated).toBe(true);
+    expect(component.addressUpdated).toBeTrue();
   });
 
   it('should not submit form when invalid', () => {
@@ -195,7 +195,7 @@ describe('UserComponent', () => {
     errorComponent.ngOnInit();
 
     expect(errorComponent.errors.email).toBe('Email already exists');
-    expect(errorComponent.getForm.email.hasError('incorrect')).toBe(true);
+    expect(errorComponent.getForm.email.hasError('incorrect')).toBeTrue();
   });
 
   it('should navigate to users list on successful response', () => {

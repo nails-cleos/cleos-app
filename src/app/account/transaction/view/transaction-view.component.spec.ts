@@ -127,7 +127,7 @@ describe('TransactionViewComponent', () => {
   });
 
   it('should initialize with default values', () => {
-    expect(component.hasAdminRole).toBe(false);
+    expect(component.hasAdminRole).toBeFalse();
     expect(component.pageSize).toBe(PAGE_SIZE);
     expect(component.dateFormat).toBe('en-GB');
     expect(component.language).toBe('en-GB');
@@ -152,11 +152,11 @@ describe('TransactionViewComponent', () => {
   it('should update hasAdminRole based on auth user service', () => {
     authUserSubject.next({ hasAdminRole: true });
 
-    expect(component.hasAdminRole).toBe(true);
+    expect(component.hasAdminRole).toBeTrue();
 
     authUserSubject.next({ hasAdminRole: false });
 
-    expect(component.hasAdminRole).toBe(false);
+    expect(component.hasAdminRole).toBeFalse();
   });
 
   it('should extract account ID from route and dispatch Clean on init', () => {

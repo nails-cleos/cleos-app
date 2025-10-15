@@ -26,7 +26,7 @@ describe('TwoDigitsDirective', () => {
   });
 
   it('should initialize with default values', () => {
-    expect(directive.allowNegatives).toBe(false);
+    expect(directive.allowNegatives).toBeFalse();
   });
 
   it('should allow special keys', () => {

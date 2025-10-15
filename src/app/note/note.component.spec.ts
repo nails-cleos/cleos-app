@@ -93,16 +93,16 @@ describe('NoteComponent', () => {
 
   describe('Initialization', () => {
     it('should initialize in add mode when no id is provided', () => {
-      expect(component.isAddMode).toBe(true);
+      expect(component.isAddMode).toBeTrue();
       expect(component.id).toBeUndefined();
     });
 
     it('should initialize form with required validators', () => {
       expect(component.form).toBeDefined();
-      expect(component.getForm.description.hasError('required')).toBe(true);
-      expect(component.getForm.professional.hasError('required')).toBe(true);
-      expect(component.getForm.date.hasError('required')).toBe(true);
-      expect(component.getForm.repeat.hasError('required')).toBe(true);
+      expect(component.getForm.description.hasError('required')).toBeTrue();
+      expect(component.getForm.professional.hasError('required')).toBeTrue();
+      expect(component.getForm.date.hasError('required')).toBeTrue();
+      expect(component.getForm.repeat.hasError('required')).toBeTrue();
     });
 
     it('should dispatch getAllProfessional action after view init', () => {
@@ -160,7 +160,7 @@ describe('NoteComponent', () => {
     });
 
     expect(component.errors['description']).toBe('Description is required');
-    expect(component.getForm.description.hasError('incorrect')).toBe(true);
+    expect(component.getForm.description.hasError('incorrect')).toBeTrue();
   });
 
   it('should navigate to colors list on successful response', () => {
@@ -248,7 +248,7 @@ describe('NoteComponent', () => {
       const dispatchCountBefore = mockStore.dispatch.calls.count();
       void component.submit;
       const dispatchCountAfter = mockStore.dispatch.calls.count();
-      expect(component.form.invalid).toBe(true);
+      expect(component.form.invalid).toBeTrue();
       expect(dispatchCountAfter).toBe(dispatchCountBefore);
     });
 
@@ -373,44 +373,44 @@ describe('NoteComponent', () => {
       void component.submit;
 
       // Should not crash, but form validation should catch it
-      expect(component.form.invalid).toBe(true);
+      expect(component.form.invalid).toBeTrue();
     });
   });
 
   describe('Form Validation', () => {
     it('should mark form as invalid when description is empty', () => {
       component.getForm.description.setValue('');
-      expect(component.getForm.description.hasError('required')).toBe(true);
+      expect(component.getForm.description.hasError('required')).toBeTrue();
     });
 
     it('should mark form as invalid when professional is empty', () => {
       component.getForm.professional.setValue('');
-      expect(component.getForm.professional.hasError('required')).toBe(true);
+      expect(component.getForm.professional.hasError('required')).toBeTrue();
     });
 
     it('should mark form as invalid when date is empty', () => {
       component.getForm.date.setValue('');
-      expect(component.getForm.date.hasError('required')).toBe(true);
+      expect(component.getForm.date.hasError('required')).toBeTrue();
     });
 
     it('should mark form as invalid when repeat is empty', () => {
       component.getForm.repeat.setValue('');
-      expect(component.getForm.repeat.hasError('required')).toBe(true);
+      expect(component.getForm.repeat.hasError('required')).toBeTrue();
     });
 
     it('should allow valid description values', () => {
       component.getForm.description.setValue('Valid note description');
-      expect(component.getForm.description.valid).toBe(true);
+      expect(component.getForm.description.valid).toBeTrue();
     });
 
     it('should allow valid date values', () => {
       component.getForm.date.setValue(new Date('2024-01-15'));
-      expect(component.getForm.date.valid).toBe(true);
+      expect(component.getForm.date.valid).toBeTrue();
     });
 
     it('should allow valid repeat values', () => {
       component.getForm.repeat.setValue(FrequencyEnum.none);
-      expect(component.getForm.repeat.valid).toBe(true);
+      expect(component.getForm.repeat.valid).toBeTrue();
     });
   });
 

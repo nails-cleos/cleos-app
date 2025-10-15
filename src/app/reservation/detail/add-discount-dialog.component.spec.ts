@@ -121,10 +121,10 @@ describe('AddDiscountDialogComponent', () => {
   it('should validate form correctly', () => {
     component.ngOnInit();
 
-    expect(component.discountForm.invalid).toBe(true);
+    expect(component.discountForm.invalid).toBeTrue();
 
     component.discountForm.get('discount')?.setValue('Test Name');
-    expect(component.discountForm.valid).toBe(true);
+    expect(component.discountForm.valid).toBeTrue();
   });
 
   it('should handle state subscription correctly', () => {

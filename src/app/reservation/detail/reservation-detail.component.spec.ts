@@ -60,7 +60,7 @@ describe('ReservationDetailComponent', () => {
     expect(component.changeState).toEqual([]);
     expect(component.displayedColumns).toEqual(['position', 'professional', 'start', 'treatment', 'state']);
     expect(component.pageSize).toBe(5);
-    expect(component.disableUpdateButton).toBe(true);
+    expect(component.disableUpdateButton).toBeTrue();
   });
 
   it('should subscribe to auth user service on init', () => {
