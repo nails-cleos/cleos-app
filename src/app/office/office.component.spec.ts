@@ -3,7 +3,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
-import { of } from 'rxjs';
+import { Subject } from 'rxjs';
 
 import { OfficeComponent } from './office.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -17,6 +17,7 @@ describe('OfficeComponent', () => {
   let fixture: ComponentFixture<OfficeComponent>;
   let mockStore: jasmine.SpyObj<Store>;
   let mockRouter: jasmine.SpyObj<Router>;
+  let stateSubject: Subject<any>;
 
   const mockActivatedRoute = {
     snapshot: {
@@ -47,15 +48,11 @@ describe('OfficeComponent', () => {
   };
 
   beforeEach(async () => {
-    const storeSpyObj = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    const routerSpyObj = jasmine.createSpyObj('Router', ['navigate']);
+    stateSubject = new Subject();
+    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
-    storeSpyObj.select.and.returnValue(of({
-      managers: [],
-      selected: null,
-      subErrors: null,
-      response: null,
-    }));
+    mockStore.select.and.returnValue(stateSubject.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [
@@ -65,14 +62,12 @@ describe('OfficeComponent', () => {
         BrowserAnimationsModule,
       ],
       providers: [
-        { provide: Store, useValue: storeSpyObj },
+        { provide: Store, useValue: mockStore },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: Router, useValue: routerSpyObj },
+        { provide: Router, useValue: mockRouter },
       ],
     }).compileComponents();
 
-    mockStore = TestBed.inject(Store) as jasmine.SpyObj<Store>;
-    mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     const translate = TestBed.inject(TranslateService);
     translate.setDefaultLang('en-GB');
     translate.use('en-GB');
@@ -382,5 +377,98 @@ describe('OfficeComponent', () => {
       component.managerName = 'Test Manager';
       expect(component.managerName).toBe('Test Manager');
     });
+  });
+
+  it('should patch form when office is selected from state', () => {
+    component.ngOnInit();
+
+    stateSubject.next({
+      selected: mockOffice,
+      managers: [mockManager],
+    });
+
+    expect(component.office?.id).toEqual(mockOffice.id);
+    expect(component.getForm.manager?.value).toBe(mockOffice.manager);
+    expect(component.getForm.name?.value).toBe(mockOffice.name);
+    expect(component.getForm.subject?.value).toBe(mockOffice.subject);
+    expect(component.getForm.kvk?.value).toBe(mockOffice.kvk);
+    expect(component.getForm.account?.value).toBe(mockOffice.account);
+    expect(component.getForm.btw?.value).toBe(mockOffice.btw);
+    expect(component.getForm.billingAddress?.value).toBe(mockOffice.billingAddress);
+    expect(component.managers).toEqual([mockManager]);
+  });
+
+  it('should handle form errors from state', () => {
+    component.ngOnInit();
+
+    const mockErrors = [
+      { field: 'name', message: 'Name is required' },
+      { field: 'manager', message: 'Manager is required' },
+    ];
+
+    stateSubject.next({
+      subErrors: mockErrors,
+    });
+
+    expect(component.errors['name']).toBe('Name is required');
+    expect(component.getForm.name?.hasError('incorrect')).toBeTrue();
+    expect(component.errors['manager']).toBe('Manager is required');
+    expect(component.getForm.manager?.hasError('incorrect')).toBeTrue();
+  });
+
+  it('should navigate to office list on successful response', () => {
+    component.ngOnInit();
+
+    stateSubject.next({
+      response: true,
+    });
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'offices']);
+  });
+
+  it('should filter manager options based on form input', (done) => {
+    component.managers = [
+      { displayName: 'Test Manager 1', id: '1' },
+      { displayName: 'Another Manager', id: '2' },
+      { displayName: 'Test Manager 2', id: '3' },
+    ] as any[];
+    component['createForm']();
+
+    let emissionCount = 0;
+    component.filteredOptions?.subscribe(filtered => {
+      emissionCount++;
+      // Skip the first emission (startWith('')) and check the second emission with 'T'
+      if (emissionCount === 2) {
+        expect(filtered).toEqual([
+          { displayName: 'Test Manager 1', id: '1' },
+          { displayName: 'Test Manager 2', id: '3' },
+        ]);
+        done();
+      }
+    });
+
+    component.getForm.manager?.setValue('T');
+  });
+
+  it('should filter manager options based on form input object', (done) => {
+    const managers = [
+      { displayName: 'Test Manager 1', id: '1' },
+      { displayName: 'Another Manager', id: '2' },
+      { displayName: 'Test Manager 2', id: '3' },
+    ] as any[];
+    component.managers = managers;
+    component['createForm']();
+
+    let emissionCount = 0;
+    component.filteredOptions?.subscribe(filtered => {
+      emissionCount++;
+      // Skip the first emission (startWith('')) and check the second emission with 'T'
+      if (emissionCount === 2) {
+        expect(filtered).toEqual(managers);
+        done();
+      }
+    });
+
+    component.getForm.manager?.setValue(undefined);
   });
 });

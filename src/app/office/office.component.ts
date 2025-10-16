@@ -43,8 +43,8 @@ export class OfficeComponent implements OnInit, OnDestroy {
   private readonly language: string;
 
   constructor(private translate: TranslateService, private store: Store<AppState>,
-    private formBuilder: UntypedFormBuilder, private router: Router, private route: ActivatedRoute,
-    private cdRef: ChangeDetectorRef) {
+              private formBuilder: UntypedFormBuilder, private router: Router, private route: ActivatedRoute,
+              private cdRef: ChangeDetectorRef) {
     this.isAddMode = true;
     this.getState = this.store.select(selectOfficeState);
     this.language = this.translate.currentLang;
@@ -69,9 +69,7 @@ export class OfficeComponent implements OnInit, OnDestroy {
 
     if (this.isAddMode) {
       office.managerId = this.getForm.manager.value.id;
-      this.store.dispatch(
-        createOffice({ office }),
-      );
+      this.store.dispatch(createOffice({ office }));
     } else {
       const id = this.id!;
       this.office = undefined;
@@ -120,7 +118,7 @@ export class OfficeComponent implements OnInit, OnDestroy {
     });
     this.filteredOptions = this.getForm.manager.valueChanges.pipe(
       startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
+      map(value => typeof value === 'string' ? value : value?.name),
       map(name => name ? this.filter(name) : this.managers ? this.managers.slice() : this.managers),
     );
   };

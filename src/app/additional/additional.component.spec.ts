@@ -96,11 +96,11 @@ describe('AdditionalComponent', () => {
     component.ngOnInit();
 
     expect(component.form).toBeDefined();
-    expect(component.form.get('name')).toBeDefined();
-    expect(component.form.get('duration')).toBeDefined();
-    expect(component.form.get('description')).toBeDefined();
-    expect(component.form.get('name')?.hasError('required')).toBeTrue();
-    expect(component.form.get('duration')?.hasError('required')).toBeTrue();
+    expect(component.getForm.name).toBeDefined();
+    expect(component.getForm.duration).toBeDefined();
+    expect(component.getForm.description).toBeDefined();
+    expect(component.getForm.name?.hasError('required')).toBeTrue();
+    expect(component.getForm.duration?.hasError('required')).toBeTrue();
   });
 
   it('should dispatch Clean action on initialization', () => {
@@ -130,9 +130,9 @@ describe('AdditionalComponent', () => {
     });
 
     expect(component.additional?.id).toEqual(mockAdditional.id);
-    expect(component.form.get('name')?.value).toBe(mockAdditional.name);
-    expect(component.form.get('description')?.value).toBe(mockAdditional.description);
-    expect(component.form.get('duration')?.value).toBe(formatDuration(mockAdditional.duration!));
+    expect(component.getForm.name?.value).toBe(mockAdditional.name);
+    expect(component.getForm.description?.value).toBe(mockAdditional.description);
+    expect(component.getForm.duration?.value).toBe(formatDuration(mockAdditional.duration!));
     expect(component.groups).toEqual(mockAdditional.groups);
     expect(component.allGroups).toEqual([{ id: 'g2', name: 'Group 2', treatments: [], selectedTreatments: [] }]);
   });
@@ -150,9 +150,9 @@ describe('AdditionalComponent', () => {
     });
 
     expect(component.errors['name']).toBe('Name is required');
-    expect(component.form.get('name')?.hasError('incorrect')).toBeTrue();
+    expect(component.getForm.name?.hasError('incorrect')).toBeTrue();
     expect(component.errors['duration']).toBe('Duration is required');
-    expect(component.form.get('duration')?.hasError('incorrect')).toBeTrue();
+    expect(component.getForm.duration?.hasError('incorrect')).toBeTrue();
   });
 
   it('should navigate to additional list on successful response', () => {
@@ -167,8 +167,8 @@ describe('AdditionalComponent', () => {
 
   it('should not dispatch action when form is invalid', () => {
     component.ngOnInit();
-    component.form.get('name')?.setValue('');
-    component.form.get('duration')?.setValue('');
+    component.getForm.name?.setValue('');
+    component.getForm.duration?.setValue('');
     mockStore.dispatch.calls.reset();
 
     void component.submit;
@@ -178,9 +178,9 @@ describe('AdditionalComponent', () => {
 
   it('should dispatch CreateAdditional action when in add mode and form is valid', () => {
     component.ngOnInit();
-    const nameControl = component.form.get('name')!;
-    const descriptionControl = component.form.get('description')!;
-    const durationControl = component.form.get('duration')!;
+    const nameControl = component.getForm.name!;
+    const descriptionControl = component.getForm.description!;
+    const durationControl = component.getForm.duration!;
 
     nameControl.setValue('New Additional');
     nameControl.markAsDirty();
@@ -212,9 +212,9 @@ describe('AdditionalComponent', () => {
     component.additional = mockAdditional;
 
     component.ngOnInit();
-    const nameControl = component.form.get('name')!;
-    const descriptionControl = component.form.get('description')!;
-    const durationControl = component.form.get('duration')!;
+    const nameControl = component.getForm.name!;
+    const descriptionControl = component.getForm.description!;
+    const durationControl = component.getForm.duration!;
 
     nameControl.setValue('Updated Additional');
     nameControl.markAsDirty();
@@ -282,8 +282,8 @@ describe('AdditionalComponent', () => {
     component.additional = mockAdditional;
 
     component.ngOnInit();
-    component.form.get('name')?.setValue('Updated Additional');
-    component.form.get('duration')?.setValue('PT30M');
+    component.getForm.name?.setValue('Updated Additional');
+    component.getForm.duration?.setValue('PT30M');
 
     void component.submit;
 
@@ -293,9 +293,9 @@ describe('AdditionalComponent', () => {
   it('should initialize form with empty values', () => {
     component.ngOnInit();
 
-    expect(component.form.get('name')?.value).toBe('');
-    expect(component.form.get('description')?.value).toBe('');
-    expect(component.form.get('duration')?.value).toBe('');
+    expect(component.getForm.name?.value).toBe('');
+    expect(component.getForm.description?.value).toBe('');
+    expect(component.getForm.duration?.value).toBe('');
   });
 
   it('should validate form correctly', () => {
@@ -303,8 +303,8 @@ describe('AdditionalComponent', () => {
 
     expect(component.form.invalid).toBeTrue();
 
-    component.form.get('name')?.setValue('Test Name');
-    component.form.get('duration')?.setValue('PT30M');
+    component.getForm.name?.setValue('Test Name');
+    component.getForm.duration?.setValue('PT30M');
     expect(component.form.valid).toBeTrue();
   });
 
@@ -376,7 +376,7 @@ describe('AdditionalComponent', () => {
       }
     });
 
-    component.form.get('group')?.setValue('T');
+    component.getForm.group?.setValue('T');
   });
 
   it('should sort allGroups alphabetically by name', () => {
@@ -405,6 +405,6 @@ describe('AdditionalComponent', () => {
     expect(component.groups[0].id).toBe('g1');
     expect(component.allGroups?.length).toBe(1);
     expect(component.allGroups?.[0].id).toBe('g2');
-    expect(component.form.get('group')?.value).toBe(null);
+    expect(component.getForm.group?.value).toBe(null);
   });
 });

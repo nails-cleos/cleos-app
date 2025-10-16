@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
 import { BreakpointObserver } from '@angular/cdk/layout';
@@ -13,7 +12,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ExpensesComponent } from './expenses.component';
 import { PAGE_SIZE, Pagination } from '../../../../interfaces/pagination';
-import { clean, expenseSelected, getExpensesPage } from '../../../../store/expense.actions';
+import { clean, deleteExpense, expenseSelected, getExpensesPage } from '../../../../store/expense.actions';
 import { IExpense, IExpenseAll } from '../../../../interfaces/expense';
 import { dateToTimestamp, getCurrentTimeZone } from '../../../../util/dates';
 import { IRoomAll } from '../../../../interfaces/room';
@@ -23,11 +22,11 @@ describe('ExpensesComponent', () => {
   let component: ExpensesComponent;
   let fixture: ComponentFixture<ExpensesComponent>;
   let mockStore: jasmine.SpyObj<Store>;
-  let mockDialog: jasmine.SpyObj<MatDialog>;
   let mockBreakpointObserver: jasmine.SpyObj<BreakpointObserver>;
   let mockChangeDetectorRef: jasmine.SpyObj<ChangeDetectorRef>;
   let mockActivatedRoute: any;
   let stateSubject: Subject<any>;
+  let openDialogSpy: jasmine.Spy<any>;
 
   const room: IRoomAll = {
     id: 'room-id',
@@ -103,11 +102,6 @@ describe('ExpensesComponent', () => {
     stateSubject = new Subject();
 
     mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    mockDialog = jasmine.createSpyObj('MatDialog', ['open'], {
-      openDialogs: [],
-      afterOpened: new Subject(),
-      afterAllClosed: new Subject(),
-    });
     mockBreakpointObserver = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     mockChangeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
     mockActivatedRoute = {
@@ -128,7 +122,6 @@ describe('ExpensesComponent', () => {
       imports: [ExpensesComponent, TranslateModule.forRoot(), NoopAnimationsModule],
       providers: [
         { provide: Store, useValue: mockStore },
-        { provide: MatDialog, useValue: mockDialog },
         { provide: BreakpointObserver, useValue: mockBreakpointObserver },
         { provide: ChangeDetectorRef, useValue: mockChangeDetectorRef },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
@@ -151,6 +144,8 @@ describe('ExpensesComponent', () => {
     } as unknown as MatSort;
 
     component.roomId = '1';
+
+    openDialogSpy = spyOn(component.dialog, 'open');
 
     component.ngOnInit();
   });
@@ -238,20 +233,42 @@ describe('ExpensesComponent', () => {
   it('should call delete method without errors', () => {
     const testExpense = mockExpenses[0] as unknown as IExpense;
 
-    expect(() => component.delete(testExpense)).not.toThrow();
+    openDialogSpy.and.returnValue({
+      afterClosed: () => of(testExpense),
+    });
+
+    component.delete(testExpense);
+
+    expect(openDialogSpy).toHaveBeenCalledWith(
+      jasmine.any(Function),
+      jasmine.objectContaining({
+        data: {
+          title: 'EXPENSE.DELETED.TITLE',
+          content: 'EXPENSE.DELETED.CONTENT',
+          value: testExpense,
+        },
+      }));
+
+    expect(mockStore.dispatch).toHaveBeenCalledWith(deleteExpense(
+      { roomId: component.roomId!, id: testExpense.id!, invoice: testExpense.invoice! },
+    ));
   });
 
-  it('should have delete method defined', () => {
-    expect(component.delete).toBeDefined();
-    expect(typeof component.delete).toBe('function');
-  });
+  it('should call openDialog method without errors', () => {
+    const testExpense = mockExpenses[0] as unknown as IExpenseAll;
 
-  it('should handle delete operation', () => {
-    const testExpense = mockExpenses[0] as unknown as IExpense;
+    component.openDialog(testExpense);
 
-    expect(() => {
-      component.delete(testExpense);
-    }).not.toThrow();
+    expect(openDialogSpy).toHaveBeenCalledWith(
+      jasmine.any(Function),
+      jasmine.objectContaining({
+        data: {
+          title: 'COMMON.TIME_ZONE.TITLE',
+          content: 'COMMON.TIME_ZONE.ROOM_INFO',
+          hideNoButton: true,
+          hideOkButton: true,
+        },
+      }));
   });
 
   it('should unsubscribe from subscriptions on destroy', () => {
