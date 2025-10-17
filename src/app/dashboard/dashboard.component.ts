@@ -152,6 +152,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.calendarReady = true;
     this.tryCreateEvents();
   };
+
   selectDate = (event: any): void => {
     this.changeDate(newDate(event.value));
     this.getEvents();

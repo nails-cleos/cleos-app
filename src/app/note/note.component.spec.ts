@@ -4,16 +4,16 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
-import { Subject } from 'rxjs';
+import { of, Subject } from 'rxjs';
 
 import { NoteComponent } from './note.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { IUser, IUserAll } from '../interfaces/user';
 import { INoteAll } from '../interfaces/note';
 import { FrequencyEnum } from '../util/helper';
-import { clean, getAllProfessional } from '../store/note.actions';
+import { clean, deleteNote, getAllProfessional } from '../store/note.actions';
 import { Role } from '../interfaces/token';
-import { backendFormatDate, getNowTimeZone } from '../util/dates';
+import { backendFormatDate, createNewDateZonedTime, getNowTimeZone } from '../util/dates';
 
 describe('NoteComponent', () => {
   let component: NoteComponent;
@@ -21,6 +21,7 @@ describe('NoteComponent', () => {
   let mockStore: jasmine.SpyObj<Store>;
   let mockRouter: jasmine.SpyObj<Router>;
   let stateSubject: Subject<any>;
+  let openDialogSpy: jasmine.Spy<any>;
 
   const mockActivatedRoute = {
     snapshot: {
@@ -84,6 +85,8 @@ describe('NoteComponent', () => {
 
     fixture = TestBed.createComponent(NoteComponent);
     component = fixture.componentInstance;
+
+    openDialogSpy = spyOn(component.dialog, 'open');
     fixture.detectChanges();
   });
 
@@ -519,5 +522,113 @@ describe('NoteComponent', () => {
 
     expect(newComponent.getForm.professional.value).toBe(mockProfessional);
     expect(newComponent.getForm.date.value).toBeDefined();
+  });
+
+  it('should patch form when note is selected from state', () => {
+    component.ngOnInit();
+
+    stateSubject.next({ selected: mockNote });
+
+    expect(component.note?.id).toEqual(mockNote.id);
+    expect(component.getForm.description?.value).toBe(mockNote.description);
+    expect(component.getForm.repeat?.value).toBe(mockNote.repeat);
+    expect(component.getForm.date?.value).toEqual(createNewDateZonedTime(mockNote.date));
+  });
+
+  it('should dispatch CreateNote action when in add mode and form is valid', () => {
+    component.ngOnInit();
+    const professionalControl = component.getForm.professional;
+    professionalControl.setValue(mockProfessional);
+    professionalControl.markAsDirty();
+
+    const descriptionControl = component.getForm.description;
+    descriptionControl.setValue('New Description');
+    descriptionControl.markAsDirty();
+
+    const dateControl = component.getForm.date;
+    dateControl.setValue(new Date());
+    dateControl.markAsDirty();
+
+    const repeatControl = component.getForm.repeat;
+    repeatControl.setValue(FrequencyEnum.everyDay);
+    repeatControl.markAsDirty();
+
+    mockStore.dispatch.calls.reset();
+    expect(component.form.valid).toBeTrue();
+
+    void component.submit;
+
+    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+      note: jasmine.objectContaining({
+        description: 'New Description',
+        professionalId: 'prof-1',
+        repeat: FrequencyEnum.everyDay,
+        date: backendFormatDate(component.getForm.date.value),
+      }),
+      type: '[Note] Create note',
+    }));
+  });
+
+  it('should dispatch UpdateNote action when in edit mode and form is valid', () => {
+    const testId = '123';
+    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    component.note = mockNote;
+
+    component.ngOnInit();
+    const professionalControl = component.getForm.professional;
+    professionalControl.setValue({ ...mockProfessional, id: 'prof-2' });
+    professionalControl.markAsDirty();
+
+    const descriptionControl = component.getForm.description;
+    descriptionControl.setValue('Updated Description');
+    descriptionControl.markAsDirty();
+
+    const dateControl = component.getForm.date;
+    dateControl.setValue(new Date());
+    dateControl.markAsDirty();
+
+    const repeatControl = component.getForm.repeat;
+    repeatControl.setValue(FrequencyEnum.everyDay);
+    repeatControl.markAsDirty();
+    mockStore.dispatch.calls.reset();
+
+    void component.submit;
+
+    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+      id: '123',
+      note: jasmine.objectContaining({
+        description: 'Updated Description',
+        professionalId: 'prof-2',
+        repeat: FrequencyEnum.everyDay,
+        date: backendFormatDate(component.getForm.date.value),
+      }),
+      type: '[Note] Update note by id',
+    }));
+  });
+
+  it('should call delete method without errors', () => {
+    stateSubject.next({ selected: mockNote });
+
+    openDialogSpy.and.returnValue({
+      afterClosed: () => of(mockNote),
+    });
+
+    void component.delete;
+
+    expect(openDialogSpy).toHaveBeenCalledWith(
+      jasmine.any(Function),
+      jasmine.objectContaining({
+        data: {
+          title: 'NOTE.DELETED.TITLE',
+          content: 'NOTE.DELETED.CONTENT',
+          value: mockNote,
+        },
+      }));
+
+    expect(mockStore.dispatch).toHaveBeenCalledWith(deleteNote(
+      { id: mockNote.id!, description: mockNote.description! },
+    ));
   });
 });

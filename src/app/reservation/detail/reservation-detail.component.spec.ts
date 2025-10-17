@@ -900,5 +900,4 @@ describe('ReservationDetailComponent', () => {
       expect(mockStore.dispatch).toHaveBeenCalledWith(paymentSend({ link: 'https://payment.url' }));
     });
   });
-})
-;
+});

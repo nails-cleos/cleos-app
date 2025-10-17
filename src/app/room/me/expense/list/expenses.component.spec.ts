@@ -17,6 +17,7 @@ import { IExpense, IExpenseAll } from '../../../../interfaces/expense';
 import { dateToTimestamp, getCurrentTimeZone } from '../../../../util/dates';
 import { IRoomAll } from '../../../../interfaces/room';
 import { PaymentType } from '../../../../interfaces/payment';
+import { MatDatepicker } from '@angular/material/datepicker';
 
 describe('ExpensesComponent', () => {
   let component: ExpensesComponent;
@@ -24,6 +25,7 @@ describe('ExpensesComponent', () => {
   let mockStore: jasmine.SpyObj<Store>;
   let mockBreakpointObserver: jasmine.SpyObj<BreakpointObserver>;
   let mockChangeDetectorRef: jasmine.SpyObj<ChangeDetectorRef>;
+  let mockDatepicker: jasmine.SpyObj<MatDatepicker<Date>>;
   let mockActivatedRoute: any;
   let stateSubject: Subject<any>;
   let openDialogSpy: jasmine.Spy<any>;
@@ -104,6 +106,8 @@ describe('ExpensesComponent', () => {
     mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
     mockBreakpointObserver = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     mockChangeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
+    mockDatepicker = jasmine.createSpyObj('MatDatepicker', ['close']);
+
     mockActivatedRoute = {
       snapshot: {
         paramMap: {
@@ -416,5 +420,29 @@ describe('ExpensesComponent', () => {
 
     component.keyDownHandler(backspaceEvent);
     expect(dateControl?.value).toBe(null);
+  });
+
+  it('should set month and year from normalizedMonthAndYear and close datepicker', () => {
+    const normalizedMonthAndYear = new Date(2024, 6, 1); // July 2024
+
+    component.setMonthAndYear(normalizedMonthAndYear, mockDatepicker);
+
+    const result = component.date.value!;
+    expect(result.getMonth()).toBe(6); // July (0-based)
+    expect(result.getFullYear()).toBe(2024);
+    expect(mockDatepicker.close).toHaveBeenCalled();
+  });
+
+  it('should use getNowTimeZone() if date has no value', () => {
+    component.date.setValue(null);
+
+    const normalizedMonthAndYear = new Date(2025, 2, 1); // March 2025
+
+    component.setMonthAndYear(normalizedMonthAndYear, mockDatepicker);
+
+    const result = component.date.value!;
+    expect(result.getFullYear()).toBe(2025);
+    expect(result.getMonth()).toBe(2);
+    expect(mockDatepicker.close).toHaveBeenCalled();
   });
 });
