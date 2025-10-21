@@ -7,6 +7,7 @@ import { TranslateModule } from '@ngx-translate/core';
 describe('TimeZoneSnackBarComponent', () => {
   let component: TimeZoneSnackBarComponent;
   let fixture: ComponentFixture<TimeZoneSnackBarComponent>;
+
   let matSnackBarRefSpy: jasmine.SpyObj<MatSnackBarRef<TimeZoneSnackBarComponent>>;
 
   beforeEach(async () => {
@@ -18,9 +19,7 @@ describe('TimeZoneSnackBarComponent', () => {
         { provide: MAT_SNACK_BAR_DATA, useValue: {} },
       ],
     }).compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(TimeZoneSnackBarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

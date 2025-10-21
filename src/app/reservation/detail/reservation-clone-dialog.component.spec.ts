@@ -12,6 +12,7 @@ import { PaymentType } from '../../interfaces/payment';
 describe('ReservationCloneDialogComponent', () => {
   let component: ReservationCloneDialogComponent;
   let fixture: ComponentFixture<ReservationCloneDialogComponent>;
+
   let dialogRefSpy: jasmine.SpyObj<MatDialogRef<any>>;
 
   const room: IRoomAll = {

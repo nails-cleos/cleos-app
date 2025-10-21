@@ -24,18 +24,22 @@ import {
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { UntypedFormBuilder } from '@angular/forms';
 import { notifyPayment, paymentSend } from '../../store/payment.actions';
+import { AppState } from '../../store/app.states';
 
 describe('ReservationDetailComponent', () => {
   let component: ReservationDetailComponent;
   let fixture: ComponentFixture<ReservationDetailComponent>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockActivatedRoute: any;
-  let mockAuthUserService: any;
-  let stateSubject: Subject<any>;
-  let paymentStateSubject: Subject<any>;
-  let authUserSubject: Subject<any>;
-  let openDialogSpy: jasmine.Spy<any>;
+
+  let state$: Subject<any>;
+  let paymentState$: Subject<any>;
+  let authUser$: Subject<any>;
+  let params$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let dialogSpy: jasmine.Spy<any>;
 
   const mockReservation: IReservationAll = {
     id: 'reservation-123',
@@ -91,34 +95,30 @@ describe('ReservationDetailComponent', () => {
   ];
 
   beforeEach(async () => {
-    stateSubject = new Subject();
-    paymentStateSubject = new Subject();
-    authUserSubject = new Subject();
+    state$ = new Subject();
+    paymentState$ = new Subject();
+    authUser$ = new Subject();
+    params$ = new Subject();
 
-    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
-
-    mockActivatedRoute = {
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
-        paramMap: {
-          get: jasmine.createSpy('get').and.returnValue('reservation-123'),
-        },
+        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
       },
-      params: of({ id: 'reservation-123' }),
-    };
-
-    mockAuthUserService = {
-      authUser: authUserSubject.asObservable(),
-    };
-
-    mockStore.select.and.callFake((selector: any) => {
-      if (selector.toString().includes('payment')) {
-        return paymentStateSubject.asObservable();
-      }
-      return stateSubject.asObservable();
+      params: params$.asObservable(),
+    });
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
+      authUser: authUser$.asObservable(),
     });
 
-    mockRouter.getCurrentNavigation.and.returnValue(null);
+    storeSpy.select.and.callFake((selector: any) => {
+      if (selector.toString().includes('payment')) {
+        return paymentState$.asObservable();
+      }
+      return state$.asObservable();
+    });
+    routerSpy.getCurrentNavigation.and.returnValue(null);
 
     await TestBed.configureTestingModule({
       imports: [
@@ -128,10 +128,10 @@ describe('ReservationDetailComponent', () => {
       ],
       providers: [
         UntypedFormBuilder,
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: Store, useValue: mockStore },
-        { provide: Router, useValue: mockRouter },
-        { provide: AuthUserService, useValue: mockAuthUserService },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: Store, useValue: storeSpy },
+        { provide: Router, useValue: routerSpy },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
       ],
     }).compileComponents();
 
@@ -142,7 +142,14 @@ describe('ReservationDetailComponent', () => {
     fixture = TestBed.createComponent(ReservationDetailComponent);
     component = fixture.componentInstance;
 
-    openDialogSpy = spyOn(component.dialog, 'open');
+    dialogSpy = spyOn(component.dialog, 'open');
+  });
+
+  afterEach(() => {
+    state$.complete();
+    paymentState$.complete();
+    authUser$.complete();
+    params$.complete();
   });
 
   it('should create', () => {
@@ -158,7 +165,7 @@ describe('ReservationDetailComponent', () => {
   });
 
   it('should subscribe to auth user service on init', () => {
-    authUserSubject.next({
+    authUser$.next({
       isAdmin: false,
       isManager: false,
       isRoomAdmin: false,
@@ -173,19 +180,20 @@ describe('ReservationDetailComponent', () => {
   });
 
   it('should dispatch clean action on init', () => {
-    authUserSubject.next({});
+    authUser$.next({});
     fixture.detectChanges();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch getReservation actions on init', () => {
-    authUserSubject.next({});
-    fixture.detectChanges();
+    authUser$.next({});
+    component.ngOnInit();
+    params$.next({ id: 'reservation-123' });
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(getReservation({ id: 'reservation-123' }));
-    expect(mockStore.dispatch).toHaveBeenCalledWith(reservationFindPayments({ id: 'reservation-123' }));
-    expect(mockStore.dispatch).toHaveBeenCalledWith(getReservationHistory({ id: 'reservation-123' }));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getReservation({ id: 'reservation-123' }));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(reservationFindPayments({ id: 'reservation-123' }));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getReservationHistory({ id: 'reservation-123' }));
   });
 
   it('should return form payments array', () => {
@@ -224,7 +232,7 @@ describe('ReservationDetailComponent', () => {
   });
 
   it('should clean up subscriptions on destroy', () => {
-    authUserSubject.next({});
+    authUser$.next({});
     fixture.detectChanges();
     expect(() => component.ngOnDestroy()).not.toThrow();
   });
@@ -242,7 +250,7 @@ describe('ReservationDetailComponent', () => {
 
   describe('State Machine - Professional', () => {
     beforeEach(() => {
-      authUserSubject.next({
+      authUser$.next({
         isAdmin: false,
         isManager: false,
         isRoomAdmin: false,
@@ -253,7 +261,7 @@ describe('ReservationDetailComponent', () => {
     });
 
     it('should create professional machine with created state', () => {
-      stateSubject.next({
+      state$.next({
         selected: mockReservation,
         history: [],
       });
@@ -263,34 +271,34 @@ describe('ReservationDetailComponent', () => {
     });
 
     it('should transition from created to approved state', () => {
-      stateSubject.next({
+      state$.next({
         selected: mockReservation,
         history: [],
       });
 
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of('approve'),
       });
 
       component.onChangeState('approve');
 
-      expect(mockStore.dispatch).toHaveBeenCalledWith(approveReservation('reservation-123'));
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(approveReservation('reservation-123'));
     });
 
     it('should transition from approve to start state', () => {
       const approvedReservation = { ...mockReservation, state: States.approved };
-      stateSubject.next({
+      state$.next({
         selected: approvedReservation,
         history: [],
       });
 
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of('start'),
       });
 
       component.onChangeState('start');
 
-      expect(mockStore.dispatch).toHaveBeenCalledWith(startReservation(mockReservation.id));
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(startReservation(mockReservation.id));
     });
 
     it('should send tomorrow message', () => {
@@ -299,12 +307,12 @@ describe('ReservationDetailComponent', () => {
         state: States.approved,
         timestamp: (Date.now() / 1000) + 86400, // Tomorrow
       };
-      stateSubject.next({
+      state$.next({
         selected: approvedReservation,
         history: [],
       });
 
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of('send'),
       });
 
@@ -322,12 +330,12 @@ describe('ReservationDetailComponent', () => {
         state: States.approved,
         timestamp: (Date.now() / 1000) + 86400, // Tomorrow
       };
-      stateSubject.next({
+      state$.next({
         selected: approvedReservation,
         history: [],
       });
 
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of('coffee'),
       });
 
@@ -345,12 +353,12 @@ describe('ReservationDetailComponent', () => {
         state: States.approved,
         timestamp: (Date.now() / 1000), // Today
       };
-      stateSubject.next({
+      state$.next({
         selected: approvedReservation,
         history: [],
       });
 
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of('send'),
       });
 
@@ -369,12 +377,12 @@ describe('ReservationDetailComponent', () => {
         timestamp: (Date.now() / 1000) + (86400 * 2), // 2 days later
         additional: [{ name: 'additional-1', price: 20 }],
       };
-      stateSubject.next({
+      state$.next({
         selected: approvedReservation,
         history: [],
       });
 
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of('send'),
       });
 
@@ -387,18 +395,18 @@ describe('ReservationDetailComponent', () => {
     });
 
     it('should allow editing from created state', () => {
-      stateSubject.next({
+      state$.next({
         selected: mockReservation,
         history: [],
       });
 
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of('edit'),
       });
 
       component.onChangeState('edit');
 
-      expect(mockRouter.navigate).toHaveBeenCalledWith(
+      expect(routerSpy.navigate).toHaveBeenCalledWith(
         ['en-GB', 'reservation', 'reservation-123', 'edit'],
         { state: { roomId: 'room-123' } },
       );
@@ -406,25 +414,25 @@ describe('ReservationDetailComponent', () => {
 
     it('should transition from started to completed state', () => {
       const startedReservation = { ...mockReservation, state: States.started };
-      stateSubject.next({
+      state$.next({
         selected: startedReservation,
         history: [],
       });
 
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of('complete'),
       });
 
       component.onChangeState('complete');
 
-      expect(mockRouter.navigate).toHaveBeenCalledWith(
+      expect(routerSpy.navigate).toHaveBeenCalledWith(
         ['en-GB', 'reservation', 'reservation-123', 'rooms', 'room-123', 'customer', 'customer-123', 'complete'],
       );
     });
 
     it('should allow clone from completed state', () => {
       const startedReservation = { ...mockReservation, state: States.completed };
-      stateSubject.next({
+      state$.next({
         selected: startedReservation,
         history: [],
       });
@@ -435,7 +443,7 @@ describe('ReservationDetailComponent', () => {
       const nextMonday = new Date(today);
       nextMonday.setDate(today.getDate() + daysUntilMonday);
 
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of({
           time: '10:00',
           date: nextMonday,
@@ -444,7 +452,7 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('clone');
 
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'reservation'], jasmine.objectContaining({
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'reservation'], jasmine.objectContaining({
         state: jasmine.objectContaining({
           date: nextMonday,
           customer: mockReservation.customer,
@@ -459,12 +467,12 @@ describe('ReservationDetailComponent', () => {
 
     it('should allow change color from completed state', () => {
       const startedReservation = { ...mockReservation, state: States.completed };
-      stateSubject.next({
+      state$.next({
         selected: startedReservation,
         history: [],
       });
 
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of({
           colorId: 'color-2',
         }),
@@ -472,18 +480,18 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('color');
 
-      expect(mockStore.dispatch)
+      expect(storeSpy.dispatch)
         .toHaveBeenCalledWith(updateReservationColor({ id: mockReservation.id, colorId: 'color-2' }));
     });
 
     it('should allow change customer from completed state', () => {
       const startedReservation = { ...mockReservation, state: States.completed };
-      stateSubject.next({
+      state$.next({
         selected: startedReservation,
         history: [],
       });
 
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of({
           customerId: 'customer-2',
         }),
@@ -491,23 +499,23 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('change');
 
-      expect(mockStore.dispatch)
+      expect(storeSpy.dispatch)
         .toHaveBeenCalledWith(updateReservationCustomer({ id: mockReservation.id, customerId: 'customer-2' }));
     });
 
     it('should allow canceling from created state', () => {
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of({ option: CancelOption.none }),
       });
 
-      stateSubject.next({
+      state$.next({
         selected: mockReservation,
         history: [],
       });
 
       component.onChangeState('cancel');
 
-      expect(openDialogSpy).toHaveBeenCalledWith(
+      expect(dialogSpy).toHaveBeenCalledWith(
         jasmine.any(Function),
         jasmine.objectContaining({
           data: jasmine.objectContaining({
@@ -520,40 +528,40 @@ describe('ReservationDetailComponent', () => {
           }),
         }));
 
-      expect(mockStore.dispatch)
+      expect(storeSpy.dispatch)
         .toHaveBeenCalledWith(cancelReservation('reservation-123', { option: CancelOption.none }));
     });
 
     it('should navigate to more info page', () => {
-      stateSubject.next({
+      state$.next({
         selected: mockReservation,
         history: [],
       });
 
       component.onChangeState('more');
 
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'reservation', 'reservation-123', 'more-info']);
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'reservation', 'reservation-123', 'more-info']);
     });
 
     it('should transition from partiallyCompleted to completed', () => {
       const partiallyCompletedReservation = { ...mockReservation, state: States.partiallyCompleted };
-      stateSubject.next({
+      state$.next({
         selected: partiallyCompletedReservation,
         history: [],
       });
 
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of('complete'),
       });
 
       component.onChangeState('complete');
 
-      expect(mockStore.dispatch).toHaveBeenCalledWith(paymentCompleteReservation('reservation-123'));
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentCompleteReservation('reservation-123'));
     });
 
     it('should allow booking from completed state', () => {
       const completedReservation = { ...mockReservation, state: States.completed };
-      stateSubject.next({
+      state$.next({
         selected: completedReservation,
         history: [],
       });
@@ -566,13 +574,13 @@ describe('ReservationDetailComponent', () => {
       const professional = mockReservation.professional;
       const data = { customer, room, treatment, professional };
 
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'reservation'], { state: data });
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'reservation'], { state: data });
     });
   });
 
   describe('State Machine - Customer', () => {
     beforeEach(() => {
-      authUserSubject.next({
+      authUser$.next({
         isAdmin: false,
         isManager: false,
         isRoomAdmin: false,
@@ -583,7 +591,7 @@ describe('ReservationDetailComponent', () => {
     });
 
     it('should create customer machine with created state', () => {
-      stateSubject.next({
+      state$.next({
         selected: mockReservation,
         history: [],
       });
@@ -594,7 +602,7 @@ describe('ReservationDetailComponent', () => {
 
     it('should allow booking from completed state', () => {
       const completedReservation = { ...mockReservation, state: States.completed };
-      stateSubject.next({
+      state$.next({
         selected: completedReservation,
         history: [],
       });
@@ -606,22 +614,22 @@ describe('ReservationDetailComponent', () => {
       const professional = mockReservation.professional;
       const data = { room, treatment, professional };
 
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'reservation'], { state: data });
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'reservation'], { state: data });
     });
 
     it('should allow edit a reservation', () => {
-      stateSubject.next({
+      state$.next({
         selected: { ...mockReservation, canEdit: true },
         history: [],
       });
 
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of('edit'),
       });
 
       component.onChangeState('edit');
 
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'reservation', mockReservation.id]);
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'reservation', mockReservation.id]);
     });
 
     it('should allow notify when it has pending payments', () => {
@@ -634,7 +642,7 @@ describe('ReservationDetailComponent', () => {
         reservation: mockReservation,
       } as any;
 
-      stateSubject.next({
+      state$.next({
         selected: { ...mockReservation, state: States.cancelledPaymentRequired, paymentRequired: true },
         payments: [pendingPayment],
         history: [],
@@ -642,7 +650,7 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('notify');
 
-      expect(mockStore.dispatch).toHaveBeenCalledWith(notifyPayment({
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(notifyPayment({
         id: pendingPayment.id,
         path: 'reservation',
         resourceId: mockReservation.id,
@@ -661,7 +669,7 @@ describe('ReservationDetailComponent', () => {
         reservation: mockReservation,
       } as any;
 
-      stateSubject.next({
+      state$.next({
         selected: { ...mockReservation, state: States.cancelledPaymentRequired, paymentRequired: true },
         payments: [createdPayment],
         history: [],
@@ -669,35 +677,35 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('pay');
 
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/', 'en-GB', 'me', 'payment', createdPayment.id]);
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/', 'en-GB', 'me', 'payment', createdPayment.id]);
     });
 
 
     it('should allow paid when reservation is approved', () => {
-      stateSubject.next({
+      state$.next({
         selected: { ...mockReservation, state: States.approved },
         history: [],
       });
 
       component.onChangeState('pay');
 
-      expect(mockRouter.navigate)
+      expect(routerSpy.navigate)
         .toHaveBeenCalledWith(['/', 'en-GB', 'me', 'reservation', mockReservation.id, 'payment', 'option']);
     });
 
     it('should allow cancel and edit a reservation', () => {
-      stateSubject.next({
+      state$.next({
         selected: { ...mockReservation, canEdit: false },
         history: [],
       });
 
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of(true),
       });
 
       component.onChangeState('cancel_edit');
 
-      expect(openDialogSpy).toHaveBeenCalledWith(
+      expect(dialogSpy).toHaveBeenCalledWith(
         jasmine.any(Function),
         jasmine.objectContaining({
           data: jasmine.objectContaining({
@@ -712,22 +720,22 @@ describe('ReservationDetailComponent', () => {
           }),
         }));
 
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'reservation', mockReservation.id]);
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'reservation', mockReservation.id]);
     });
 
     it('should allow canceling when is edit mode and no payments', () => {
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of({ option: CancelOption.none }),
       });
 
-      stateSubject.next({
+      state$.next({
         selected: { ...mockReservation, canEdit: true },
         history: [],
       });
 
       component.onChangeState('cancel');
 
-      expect(openDialogSpy).toHaveBeenCalledWith(
+      expect(dialogSpy).toHaveBeenCalledWith(
         jasmine.any(Function),
         jasmine.objectContaining({
           data: jasmine.objectContaining({
@@ -740,16 +748,16 @@ describe('ReservationDetailComponent', () => {
           }),
         }));
 
-      expect(mockStore.dispatch)
+      expect(storeSpy.dispatch)
         .toHaveBeenCalledWith(customerCancelReservation('reservation-123', { option: CancelOption.none }));
     });
 
     it('should allow canceling when is edit mode with payments', () => {
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of({ option: CancelOption.discount }),
       });
 
-      stateSubject.next({
+      state$.next({
         selected: { ...mockReservation, canEdit: true },
         payments: [{ id: 'payment-1', transactionAmount: 100, status: 'APPROVED', type: PaymentType.transfer } as any],
         history: [],
@@ -757,7 +765,7 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('cancel');
 
-      expect(openDialogSpy).toHaveBeenCalledWith(
+      expect(dialogSpy).toHaveBeenCalledWith(
         jasmine.any(Function),
         jasmine.objectContaining({
           data: jasmine.objectContaining({
@@ -770,23 +778,23 @@ describe('ReservationDetailComponent', () => {
           }),
         }));
 
-      expect(mockStore.dispatch)
+      expect(storeSpy.dispatch)
         .toHaveBeenCalledWith(customerCancelReservation('reservation-123', { option: CancelOption.discount }));
     });
 
     it('should allow canceling with a penalty when is not edit mode', () => {
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of({ option: CancelOption.charge }),
       });
 
-      stateSubject.next({
+      state$.next({
         selected: { ...mockReservation, canEdit: false },
         history: [],
       });
 
       component.onChangeState('cancel');
 
-      expect(openDialogSpy).toHaveBeenCalledWith(
+      expect(dialogSpy).toHaveBeenCalledWith(
         jasmine.any(Function),
         jasmine.objectContaining({
           data: jasmine.objectContaining({
@@ -800,16 +808,16 @@ describe('ReservationDetailComponent', () => {
           }),
         }));
 
-      expect(mockStore.dispatch)
+      expect(storeSpy.dispatch)
         .toHaveBeenCalledWith(customerCancelReservation('reservation-123', { option: CancelOption.charge }));
     });
 
     it('should allow canceling with a penalty when is not edit mode and has paid the penalty', () => {
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of({ option: CancelOption.none }),
       });
 
-      stateSubject.next({
+      state$.next({
         selected: { ...mockReservation, canEdit: false },
         payments: [{ id: 'payment-1', transactionAmount: 50, status: 'APPROVED', type: PaymentType.transfer } as any],
         history: [],
@@ -817,7 +825,7 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('cancel');
 
-      expect(openDialogSpy).toHaveBeenCalledWith(
+      expect(dialogSpy).toHaveBeenCalledWith(
         jasmine.any(Function),
         jasmine.objectContaining({
           data: jasmine.objectContaining({
@@ -831,16 +839,16 @@ describe('ReservationDetailComponent', () => {
           }),
         }));
 
-      expect(mockStore.dispatch)
+      expect(storeSpy.dispatch)
         .toHaveBeenCalledWith(customerCancelReservation('reservation-123', { option: CancelOption.none }));
     });
 
     it('should allow canceling when is not edit mode and has paid more than the penalty', () => {
-      openDialogSpy.and.returnValue({
+      dialogSpy.and.returnValue({
         afterClosed: () => of({ option: CancelOption.chargeWithDiscount }),
       });
 
-      stateSubject.next({
+      state$.next({
         selected: { ...mockReservation, canEdit: false },
         payments: [{ id: 'payment-1', transactionAmount: 100, status: 'APPROVED', type: PaymentType.transfer } as any],
         history: [],
@@ -848,7 +856,7 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('cancel');
 
-      expect(openDialogSpy).toHaveBeenCalledWith(
+      expect(dialogSpy).toHaveBeenCalledWith(
         jasmine.any(Function),
         jasmine.objectContaining({
           data: jasmine.objectContaining({
@@ -862,7 +870,7 @@ describe('ReservationDetailComponent', () => {
           }),
         }));
 
-      expect(mockStore.dispatch)
+      expect(storeSpy.dispatch)
         .toHaveBeenCalledWith(
           customerCancelReservation('reservation-123', { option: CancelOption.chargeWithDiscount }));
     });
@@ -870,7 +878,7 @@ describe('ReservationDetailComponent', () => {
 
   describe('Payment Management', () => {
     beforeEach(() => {
-      authUserSubject.next({
+      authUser$.next({
         isAdmin: false,
         isManager: false,
         isRoomAdmin: false,
@@ -881,7 +889,7 @@ describe('ReservationDetailComponent', () => {
     });
 
     it('should populate payment form when payments are loaded', () => {
-      stateSubject.next({
+      state$.next({
         selected: mockReservation,
         payments: mockPayments,
         history: [],
@@ -897,7 +905,7 @@ describe('ReservationDetailComponent', () => {
 
       component.pay(payment);
 
-      expect(mockStore.dispatch).toHaveBeenCalledWith(paymentSend({ link: 'https://payment.url' }));
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentSend({ link: 'https://payment.url' }));
     });
   });
 });

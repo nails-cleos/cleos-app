@@ -1,13 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { of, Subject } from 'rxjs';
 
 import { NoteComponent } from './note.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { IUser, IUserAll } from '../interfaces/user';
 import { INoteAll } from '../interfaces/note';
 import { FrequencyEnum } from '../util/helper';
@@ -18,18 +16,14 @@ import { backendFormatDate, createNewDateZonedTime, getNowTimeZone } from '../ut
 describe('NoteComponent', () => {
   let component: NoteComponent;
   let fixture: ComponentFixture<NoteComponent>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let stateSubject: Subject<any>;
-  let openDialogSpy: jasmine.Spy<any>;
 
-  const mockActivatedRoute = {
-    snapshot: {
-      paramMap: {
-        get: jasmine.createSpy('get').and.returnValue(null),
-      },
-    },
-  };
+  let state$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let dialogSpy: jasmine.Spy<any>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let paramMapSpy: jasmine.SpyObj<ParamMap>;
 
   const mockProfessional: IUserAll = {
     id: 'prof-1',
@@ -51,25 +45,31 @@ describe('NoteComponent', () => {
   };
 
   beforeEach(async () => {
-    stateSubject = new Subject();
-    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
-    mockRouter.getCurrentNavigation.and.returnValue(null);
-    const dialogSpyObj = jasmine.createSpyObj('MatDialog', ['open']);
+    state$ = new Subject();
 
-    mockStore.select.and.returnValue(stateSubject.asObservable());
+    const dialogSpyObj = jasmine.createSpyObj('MatDialog', ['open']);
+    paramMapSpy = jasmine.createSpyObj('ParamMap', ['get']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      snapshot: {
+        paramMap: paramMapSpy,
+      },
+    });
+
+    storeSpy.select.and.returnValue(state$.asObservable());
+    routerSpy.getCurrentNavigation.and.returnValue(null);
+    paramMapSpy.get.and.returnValue(null);
 
     await TestBed.configureTestingModule({
       imports: [
         NoteComponent,
         TranslateModule.forRoot(),
-        ReactiveFormsModule,
-        BrowserAnimationsModule,
       ],
       providers: [
-        { provide: Store, useValue: mockStore },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: Router, useValue: mockRouter },
+        { provide: Store, useValue: storeSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: Router, useValue: routerSpy },
         { provide: MatDialog, useValue: dialogSpyObj },
       ],
     }).compileComponents();
@@ -77,7 +77,7 @@ describe('NoteComponent', () => {
 
   beforeEach(() => {
     // Reset the mock to return null before creating component
-    mockActivatedRoute.snapshot.paramMap.get = jasmine.createSpy('get').and.returnValue(null);
+    activatedRouteSpy.snapshot.paramMap.get = jasmine.createSpy('get').and.returnValue(null);
 
     const translate = TestBed.inject(TranslateService);
     translate.setDefaultLang('en-GB');
@@ -86,7 +86,7 @@ describe('NoteComponent', () => {
     fixture = TestBed.createComponent(NoteComponent);
     component = fixture.componentInstance;
 
-    openDialogSpy = spyOn(component.dialog, 'open');
+    dialogSpy = spyOn(component.dialog, 'open');
     fixture.detectChanges();
   });
 
@@ -110,13 +110,13 @@ describe('NoteComponent', () => {
 
     it('should dispatch getAllProfessional action after view init', () => {
       component.ngAfterViewInit();
-      expect(mockStore.dispatch).toHaveBeenCalledWith(getAllProfessional());
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllProfessional());
     });
 
     it('should dispatch clean action on init', () => {
       const newComponent = TestBed.createComponent(NoteComponent).componentInstance;
       newComponent.ngOnInit();
-      expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
     });
   });
 
@@ -142,7 +142,7 @@ describe('NoteComponent', () => {
   it('should patch form when note is selected from state', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       selected: mockNote,
     });
 
@@ -158,7 +158,7 @@ describe('NoteComponent', () => {
       { field: 'description', message: 'Description is required' },
     ];
 
-    stateSubject.next({
+    state$.next({
       subErrors: mockErrors,
     });
 
@@ -169,11 +169,11 @@ describe('NoteComponent', () => {
   it('should navigate to colors list on successful response', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'reservation', 'calendar']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'reservation', 'calendar']);
   });
 
   describe('Submit', () => {
@@ -196,10 +196,10 @@ describe('NoteComponent', () => {
       repeatControl.setValue(FrequencyEnum.none);
       repeatControl.markAsDirty();
 
-      mockStore.dispatch.calls.reset();
+      storeSpy.dispatch.calls.reset();
 
       void component.submit;
-      const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+      const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
       expect(dispatchedAction).toEqual(jasmine.objectContaining({
         note: jasmine.objectContaining({
           description: 'New note',
@@ -213,7 +213,7 @@ describe('NoteComponent', () => {
 
     it('should dispatch updateNote action when in edit mode with valid form', () => {
       const testId = 'note-123';
-      mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+      paramMapSpy.get.and.returnValue(testId);
       component.note = mockNote;
       component.ngOnInit();
 
@@ -235,7 +235,7 @@ describe('NoteComponent', () => {
       repeatControl.markAsDirty();
 
       void component.submit;
-      const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+      const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
       expect(dispatchedAction).toEqual(jasmine.objectContaining({
         note: jasmine.objectContaining({
           description: 'New note',
@@ -248,9 +248,9 @@ describe('NoteComponent', () => {
     });
 
     it('should not submit when form is invalid', () => {
-      const dispatchCountBefore = mockStore.dispatch.calls.count();
+      const dispatchCountBefore = storeSpy.dispatch.calls.count();
       void component.submit;
-      const dispatchCountAfter = mockStore.dispatch.calls.count();
+      const dispatchCountAfter = storeSpy.dispatch.calls.count();
       expect(component.form.invalid).toBeTrue();
       expect(dispatchCountAfter).toBe(dispatchCountBefore);
     });
@@ -264,7 +264,7 @@ describe('NoteComponent', () => {
 
       void component.submit;
 
-      expect(mockStore.dispatch).toHaveBeenCalled();
+      expect(storeSpy.dispatch).toHaveBeenCalled();
     });
   });
 
@@ -456,11 +456,11 @@ describe('NoteComponent', () => {
   });
 
   it('should dispatch GetAllTreatmentsGroup action when findGroups is called', () => {
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     component['getProfessionals']();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(getAllProfessional());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllProfessional());
   });
 
   it('should filter professionals correctly when filter is called', () => {
@@ -514,7 +514,7 @@ describe('NoteComponent', () => {
       professional: mockProfessional,
       date: new Date(2024, 0, 15),
     };
-    mockRouter.getCurrentNavigation.and.returnValue({ extras: { state: mockExtras } } as any);
+    routerSpy.getCurrentNavigation.and.returnValue({ extras: { state: mockExtras } } as any);
 
     const newFixture = TestBed.createComponent(NoteComponent);
     const newComponent = newFixture.componentInstance;
@@ -527,7 +527,7 @@ describe('NoteComponent', () => {
   it('should patch form when note is selected from state', () => {
     component.ngOnInit();
 
-    stateSubject.next({ selected: mockNote });
+    state$.next({ selected: mockNote });
 
     expect(component.note?.id).toEqual(mockNote.id);
     expect(component.getForm.description?.value).toBe(mockNote.description);
@@ -553,12 +553,12 @@ describe('NoteComponent', () => {
     repeatControl.setValue(FrequencyEnum.everyDay);
     repeatControl.markAsDirty();
 
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
     expect(component.form.valid).toBeTrue();
 
     void component.submit;
 
-    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
     expect(dispatchedAction).toEqual(jasmine.objectContaining({
       note: jasmine.objectContaining({
         description: 'New Description',
@@ -572,7 +572,7 @@ describe('NoteComponent', () => {
 
   it('should dispatch UpdateNote action when in edit mode and form is valid', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
     component.note = mockNote;
 
     component.ngOnInit();
@@ -591,11 +591,11 @@ describe('NoteComponent', () => {
     const repeatControl = component.getForm.repeat;
     repeatControl.setValue(FrequencyEnum.everyDay);
     repeatControl.markAsDirty();
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     void component.submit;
 
-    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
     expect(dispatchedAction).toEqual(jasmine.objectContaining({
       id: '123',
       note: jasmine.objectContaining({
@@ -609,15 +609,15 @@ describe('NoteComponent', () => {
   });
 
   it('should call delete method without errors', () => {
-    stateSubject.next({ selected: mockNote });
+    state$.next({ selected: mockNote });
 
-    openDialogSpy.and.returnValue({
+    dialogSpy.and.returnValue({
       afterClosed: () => of(mockNote),
     });
 
     void component.delete;
 
-    expect(openDialogSpy).toHaveBeenCalledWith(
+    expect(dialogSpy).toHaveBeenCalledWith(
       jasmine.any(Function),
       jasmine.objectContaining({
         data: {
@@ -627,7 +627,7 @@ describe('NoteComponent', () => {
         },
       }));
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(deleteNote(
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteNote(
       { id: mockNote.id!, description: mockNote.description! },
     ));
   });

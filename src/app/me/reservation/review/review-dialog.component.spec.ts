@@ -14,13 +14,20 @@ import { PaymentType } from '../../../interfaces/payment';
 describe('ReviewDialogComponent', () => {
   let component: ReviewDialogComponent;
   let fixture: ComponentFixture<ReviewDialogComponent>;
+
   let dialogRefSpy: jasmine.SpyObj<MatDialogRef<ReviewDialogComponent>>;
-  let translate: TranslateService;
+  let analyticsSpy: jasmine.SpyObj<Analytics>;
+
+  let translateService: TranslateService;
 
   beforeEach(async () => {
     dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
 
-    const mockAnalytics = { app: { options: {} } } as Analytics;
+    analyticsSpy = jasmine.createSpyObj('Analytics', ['logEvent'], {
+      app: { options: {} },
+      gtagFunction: () => {
+      },
+    });
 
     const customer: IUserAll = {
       id: 'customer-id',
@@ -79,13 +86,13 @@ describe('ReviewDialogComponent', () => {
       providers: [
         { provide: MatDialogRef, useValue: dialogRefSpy },
         { provide: MAT_DIALOG_DATA, useValue: reservation },
-        { provide: Analytics, useValue: mockAnalytics },
+        { provide: Analytics, useValue: analyticsSpy },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ReviewDialogComponent);
     component = fixture.componentInstance;
-    translate = TestBed.inject(TranslateService);
+    translateService = TestBed.inject(TranslateService);
     fixture.detectChanges();
   });
 
@@ -97,7 +104,7 @@ describe('ReviewDialogComponent', () => {
     expect(component.reservation).toBeDefined();
     expect(component.price).toBeDefined();
     expect(component.end).toBeInstanceOf(Date);
-    expect(component.dateFormat).toBe(translate.currentLang);
+    expect(component.dateFormat).toBe(translateService.currentLang);
   });
 
   it('should close dialog on onNoClick', () => {

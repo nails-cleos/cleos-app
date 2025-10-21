@@ -7,20 +7,25 @@ import { TranslateModule } from '@ngx-translate/core';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { getAllCustomersInfo } from '../../../store/room.actions';
 import { IRoomCustomer } from '../../../interfaces/room';
+import { AppState } from '../../../store/app.states';
 
 describe('CustomersComponent', () => {
   let component: CustomersComponent;
   let fixture: ComponentFixture<CustomersComponent>;
-  let storeSpy: jasmine.SpyObj<Store<any>>;
+
   let state$: Subject<any>;
   let routeParams$: Subject<any>;
 
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+
   beforeEach(async () => {
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
     routeParams$ = new Subject();
     state$ = new Subject();
 
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+
     storeSpy.select.and.returnValue(state$.asObservable());
+
     await TestBed.configureTestingModule({
       imports: [CustomersComponent, TranslateModule.forRoot()],
       providers: [
@@ -35,6 +40,11 @@ describe('CustomersComponent', () => {
 
     fixture = TestBed.createComponent(CustomersComponent);
     component = fixture.componentInstance;
+  });
+
+  afterEach(() => {
+    state$.complete();
+    routeParams$.complete();
   });
 
   it('should create', () => {

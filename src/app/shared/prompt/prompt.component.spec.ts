@@ -6,6 +6,7 @@ import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material/bott
 describe('PromptComponentComponent', () => {
   let component: PromptComponent;
   let fixture: ComponentFixture<PromptComponent>;
+
   let matBottomSheetRefSpy: jasmine.SpyObj<MatBottomSheetRef<PromptComponent>>;
 
   beforeEach(async () => {

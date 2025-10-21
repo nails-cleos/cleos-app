@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { QuarterSummaryComponent } from './quarter-summary.component';
-import { BehaviorSubject, of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AuthUserService } from '../../services/auth-user.service';
 import { TranslateModule } from '@ngx-translate/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { clean, getQuarterSummary } from '../../store/dashboard.actions';
@@ -21,11 +21,15 @@ import { ICurrencyAll } from '../../interfaces/currency';
 describe('QuarterSummaryComponent', () => {
   let component: QuarterSummaryComponent;
   let fixture: ComponentFixture<QuarterSummaryComponent>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockBreakpointObserver: jasmine.SpyObj<BreakpointObserver>;
-  let mockAuthUserService: any;
-  let stateSubject: BehaviorSubject<any>;
+
+  let state$: Subject<any>;
+  let authUser$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
+  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let saveAsSpy: jasmine.Spy;
 
   const mockCurrency: ICurrencyAll = {
@@ -100,40 +104,36 @@ describe('QuarterSummaryComponent', () => {
   };
 
   beforeEach(async () => {
-    stateSubject = new BehaviorSubject<any>({});
+    state$ = new Subject<any>();
+    authUser$ = new Subject<any>();
 
-    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    mockStore.select.and.returnValue(stateSubject.asObservable());
-
-    mockRouter = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
-    mockRouter.getCurrentNavigation.and.returnValue(null);
-
-    mockBreakpointObserver = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    mockBreakpointObserver.observe.and.returnValue(of({ matches: false, breakpoints: {} }));
-
-    mockAuthUserService = {
-      authUser: of({
-        showCash: true,
-        displayName: 'Test User',
-      }),
-    };
-
-    const mockActivatedRoute = {
+    const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
+      authUser: authUser$.asObservable(),
+    });
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
-        paramMap: {
-          get: jasmine.createSpy('get').and.returnValue('test'),
-        },
+        paramMap: paramMapSpy,
       },
-    };
+    });
+
+    storeSpy.select.and.returnValue(state$.asObservable());
+    routerSpy.getCurrentNavigation.and.returnValue(null);
+    breakpointObserverSpy.observe.and.returnValue(of({ matches: false, breakpoints: {} }));
+
+    paramMapSpy.get.and.returnValue('test');
 
     await TestBed.configureTestingModule({
       imports: [QuarterSummaryComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: mockStore },
-        { provide: AuthUserService, useValue: mockAuthUserService },
-        { provide: Router, useValue: mockRouter },
-        { provide: BreakpointObserver, useValue: mockBreakpointObserver },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: Store, useValue: storeSpy },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
+        { provide: Router, useValue: routerSpy },
+        { provide: BreakpointObserver, useValue: breakpointObserverSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
     }).compileComponents();
 
@@ -162,11 +162,15 @@ describe('QuarterSummaryComponent', () => {
 
     it('should dispatch clean action on init', () => {
       fixture.detectChanges();
-      expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
     });
 
     it('should set user properties from authUser service', () => {
-      fixture.detectChanges();
+      authUser$.next({
+        showCash: true,
+        displayName: 'Test User',
+      });
+
       expect(component.showCash).toBeTrue();
     });
 
@@ -178,7 +182,7 @@ describe('QuarterSummaryComponent', () => {
 
     it('should initialize with extras date and quarter when provided', () => {
       const mockExtras = { year: 2024, quarter: 2 };
-      mockRouter.getCurrentNavigation.and.returnValue({
+      routerSpy.getCurrentNavigation.and.returnValue({
         extras: { state: mockExtras },
       } as any);
 
@@ -203,13 +207,13 @@ describe('QuarterSummaryComponent', () => {
   describe('State Management', () => {
     it('should subscribe to dashboard state', () => {
       fixture.detectChanges();
-      expect(mockStore.select).toHaveBeenCalled();
+      expect(storeSpy.select).toHaveBeenCalled();
     });
 
     it('should handle single room in quarterSummaryMap', () => {
       fixture.detectChanges();
       const map = createMockQuarterSummaryMap();
-      stateSubject.next({ quarterSummaryMap: map });
+      state$.next({ quarterSummaryMap: map });
 
       expect(component.selectedRoom.value).toEqual(mockRoom);
       expect(component.isLoading).toBeFalse();
@@ -221,7 +225,7 @@ describe('QuarterSummaryComponent', () => {
       map.set(mockRoom2, { monthSummaries: [mockMonthSummary] });
       map.set(mockRoom, { monthSummaries: [mockMonthSummary] });
 
-      stateSubject.next({ quarterSummaryMap: map });
+      state$.next({ quarterSummaryMap: map });
 
       expect(component.selectedRoom.value).toEqual(mockRoom);
     });
@@ -232,7 +236,7 @@ describe('QuarterSummaryComponent', () => {
       map.set(mockRoom, { monthSummaries: [mockMonthSummary] });
       map.set(mockRoom2, { monthSummaries: [mockMonthSummary] });
 
-      stateSubject.next({ quarterSummaryMap: map });
+      state$.next({ quarterSummaryMap: map });
 
       expect(component.primaryRoom).toBeTruthy();
     });
@@ -450,7 +454,7 @@ describe('QuarterSummaryComponent', () => {
     it('should dispatch getQuarterSummary action with correct parameters', () => {
       (component as any).getSummary(2024, 2);
 
-      expect(mockStore.dispatch).toHaveBeenCalledWith(
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(
         getQuarterSummary({ year: 2024, quarter: 2 }),
       );
     });
@@ -516,7 +520,7 @@ describe('QuarterSummaryComponent', () => {
 
       component.goBack();
 
-      expect(mockRouter.navigate).toHaveBeenCalledWith(
+      expect(routerSpy.navigate).toHaveBeenCalledWith(
         ['en', 'dashboard', 'year', 'summary'],
         { state: { year: 2024 } },
       );
@@ -603,7 +607,7 @@ describe('QuarterSummaryComponent', () => {
 
   describe('Responsive Behavior', () => {
     it('should detect handset breakpoint', (done) => {
-      mockBreakpointObserver.observe.and.returnValue(
+      breakpointObserverSpy.observe.and.returnValue(
         of({ matches: true, breakpoints: { [Breakpoints.XSmall]: true } }),
       );
 
@@ -619,7 +623,7 @@ describe('QuarterSummaryComponent', () => {
     it('should observe multiple breakpoints', () => {
       fixture.detectChanges();
 
-      expect(mockBreakpointObserver.observe).toHaveBeenCalledWith([
+      expect(breakpointObserverSpy.observe).toHaveBeenCalledWith([
         Breakpoints.XSmall,
         Breakpoints.Small,
         Breakpoints.Medium,

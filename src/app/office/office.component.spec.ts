@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
@@ -15,17 +15,13 @@ import { Role } from '../interfaces/token';
 describe('OfficeComponent', () => {
   let component: OfficeComponent;
   let fixture: ComponentFixture<OfficeComponent>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let stateSubject: Subject<any>;
 
-  const mockActivatedRoute = {
-    snapshot: {
-      paramMap: {
-        get: jasmine.createSpy('get').and.returnValue(null),
-      },
-    },
-  };
+  let state$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let paramMapSpy: jasmine.SpyObj<ParamMap>;
 
   const mockManager: IUserAll = {
     id: 'manager-1',
@@ -48,11 +44,19 @@ describe('OfficeComponent', () => {
   };
 
   beforeEach(async () => {
-    stateSubject = new Subject();
-    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    state$ = new Subject();
 
-    mockStore.select.and.returnValue(stateSubject.asObservable());
+    paramMapSpy = jasmine.createSpyObj('ParamMap', ['get']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      snapshot: {
+        paramMap: paramMapSpy,
+      },
+    });
+
+    storeSpy.select.and.returnValue(state$.asObservable());
+    paramMapSpy.get.and.returnValue(null);
 
     await TestBed.configureTestingModule({
       imports: [
@@ -62,25 +66,22 @@ describe('OfficeComponent', () => {
         BrowserAnimationsModule,
       ],
       providers: [
-        { provide: Store, useValue: mockStore },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: Router, useValue: mockRouter },
+        { provide: Store, useValue: storeSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
 
     const translate = TestBed.inject(TranslateService);
     translate.setDefaultLang('en-GB');
     translate.use('en-GB');
-  });
-
-  beforeEach(() => {
-    // Reset the mock to return null before creating component
-    mockActivatedRoute.snapshot.paramMap.get = jasmine.createSpy('get').and.returnValue(null);
 
     fixture = TestBed.createComponent(OfficeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
+
+  afterEach(() => state$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -101,20 +102,20 @@ describe('OfficeComponent', () => {
     it('should dispatch getAllManager action when in add mode', () => {
       const newComponent = TestBed.createComponent(OfficeComponent).componentInstance;
       newComponent.ngOnInit();
-      expect(mockStore.dispatch).toHaveBeenCalledWith(getAllManager());
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllManager());
     });
 
     it('should dispatch clean action on init', () => {
       const newComponent = TestBed.createComponent(OfficeComponent).componentInstance;
       newComponent.ngOnInit();
-      expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
     });
 
     it('should dispatch getOffice action when in edit mode', () => {
-      mockActivatedRoute.snapshot.paramMap.get = jasmine.createSpy('get').and.returnValue('office-123');
+      activatedRouteSpy.snapshot.paramMap.get = jasmine.createSpy('get').and.returnValue('office-123');
       const newComponent = TestBed.createComponent(OfficeComponent).componentInstance;
       newComponent.ngOnInit();
-      expect(mockStore.dispatch).toHaveBeenCalledWith(getOffice({ id: 'office-123' }));
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(getOffice({ id: 'office-123' }));
     });
   });
 
@@ -150,12 +151,12 @@ describe('OfficeComponent', () => {
       managerControl.setValue(mockManager);
       managerControl.markAsDirty();
 
-      mockStore.dispatch.calls.reset();
+      storeSpy.dispatch.calls.reset();
 
       void component.submit;
 
-      expect(mockStore.dispatch).toHaveBeenCalled();
-      const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+      expect(storeSpy.dispatch).toHaveBeenCalled();
+      const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
       expect(dispatchedAction).toEqual(jasmine.objectContaining({
         office: jasmine.objectContaining({
           name: 'New Office',
@@ -167,7 +168,7 @@ describe('OfficeComponent', () => {
 
     it('should dispatch updateOffice action when in edit mode with valid form', () => {
       const testId = 'office-123';
-      mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+      paramMapSpy.get.and.returnValue(testId);
       component.office = mockOffice;
       component.ngOnInit();
 
@@ -181,12 +182,12 @@ describe('OfficeComponent', () => {
       // Clear validator error to make form valid
       managerControl.setErrors(null);
 
-      mockStore.dispatch.calls.reset();
+      storeSpy.dispatch.calls.reset();
 
       void component.submit;
 
-      expect(mockStore.dispatch).toHaveBeenCalled();
-      const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+      expect(storeSpy.dispatch).toHaveBeenCalled();
+      const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
       expect(dispatchedAction).toEqual(jasmine.objectContaining({
         id: testId,
         office: jasmine.objectContaining({
@@ -197,9 +198,9 @@ describe('OfficeComponent', () => {
     });
 
     it('should not submit when form is invalid', () => {
-      const dispatchCountBefore = mockStore.dispatch.calls.count();
+      const dispatchCountBefore = storeSpy.dispatch.calls.count();
       void component.submit;
-      const dispatchCountAfter = mockStore.dispatch.calls.count();
+      const dispatchCountAfter = storeSpy.dispatch.calls.count();
       expect(component.form.invalid).toBeTrue();
       expect(dispatchCountAfter).toBe(dispatchCountBefore);
     });
@@ -218,7 +219,7 @@ describe('OfficeComponent', () => {
 
       void component.submit;
 
-      expect(mockStore.dispatch).toHaveBeenCalled();
+      expect(storeSpy.dispatch).toHaveBeenCalled();
     });
   });
 
@@ -243,7 +244,7 @@ describe('OfficeComponent', () => {
   describe('Add Manager', () => {
     it('should navigate to add manager page', () => {
       void component.addManager;
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'users', 'add'], {
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'users', 'add'], {
         state: { role: Role.manager },
       });
     });
@@ -382,7 +383,7 @@ describe('OfficeComponent', () => {
   it('should patch form when office is selected from state', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       selected: mockOffice,
       managers: [mockManager],
     });
@@ -406,7 +407,7 @@ describe('OfficeComponent', () => {
       { field: 'manager', message: 'Manager is required' },
     ];
 
-    stateSubject.next({
+    state$.next({
       subErrors: mockErrors,
     });
 
@@ -419,11 +420,11 @@ describe('OfficeComponent', () => {
   it('should navigate to office list on successful response', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'offices']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'offices']);
   });
 
   it('should filter manager options based on form input', (done) => {

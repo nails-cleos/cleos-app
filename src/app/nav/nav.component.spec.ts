@@ -14,24 +14,25 @@ import { updateMyUser } from '../store/user.actions';
 import { IUser, User } from '../interfaces/user';
 import { NavigationService } from '../services/navigation.service';
 import { INotification } from '../interfaces/notification';
-import { selectAuthState, selectNotificationState } from '../store/app.states';
+import { AppState, selectAuthState, selectNotificationState } from '../store/app.states';
 import { getNotificationsPage, readNotification } from '../store/notification.actions';
 import { PAGE_SIZE } from '../interfaces/pagination';
 
 describe('NavComponent', () => {
   let component: NavComponent;
   let fixture: ComponentFixture<NavComponent>;
-  let stateSubject: Subject<any>;
-  let authSubject: Subject<any>;
-  let notificationSubject: Subject<any>;
-  let messageSubject: Subject<any>;
+
+  let state$: Subject<any>;
+  let authUser$: Subject<any>;
+  let notification$: Subject<any>;
+  let message$: Subject<any>;
 
   let cookieServiceSpy: jasmine.SpyObj<CookieService>;
-  let routeSpy: jasmine.SpyObj<Router>;
+  let routerSpy: jasmine.SpyObj<Router>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
   let tokenServiceSpy: jasmine.SpyObj<TokenService>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let storeSpy: jasmine.SpyObj<Store>;
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let messagingServiceSpy: jasmine.SpyObj<MessagingService>;
 
@@ -67,45 +68,43 @@ describe('NavComponent', () => {
   };
 
   beforeEach(async () => {
-    stateSubject = new Subject();
-    authSubject = new Subject();
-    notificationSubject = new Subject();
-    messageSubject = new Subject();
+    state$ = new Subject();
+    authUser$ = new Subject();
+    notification$ = new Subject();
+    message$ = new Subject();
 
+    const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
     cookieServiceSpy = jasmine.createSpyObj('CookieService', ['get', 'set']);
-    routeSpy = jasmine.createSpyObj('Router', ['navigate'], {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['subscribe', 'attachLang']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['cookieConsent', 'reloadUser']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate'], {
       url: '/en-GB/home',
     });
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['subscribe', 'attachLang']);
     tokenServiceSpy = jasmine.createSpyObj('TokenService', ['user'], {
       token: 'mock-token',
     });
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['cookieConsent', 'reloadUser']);
     messagingServiceSpy = jasmine.createSpyObj('MessagingService', ['requestPermission', 'receiveMessage'], {
-      message$: messageSubject.asObservable(),
+      message$: message$.asObservable(),
     });
-
-    const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
-    paramMapSpy.get.and.returnValue(null);
-
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: paramMapSpy,
       },
     });
 
+    paramMapSpy.get.and.returnValue(null);
     navigationServiceSpy.subscribe.and.returnValue({} as any);
     navigationServiceSpy.attachLang.and.returnValue('en-GB');
     authUserServiceSpy.reloadUser.and.returnValue(mockAuthUser);
     storeSpy.select.and.callFake((selector: any) => {
       switch (selector) {
         case selectAuthState:
-          return authSubject.asObservable();
+          return authUser$.asObservable();
         case selectNotificationState:
-          return notificationSubject.asObservable();
+          return notification$.asObservable();
         default:
-          return stateSubject.asObservable();
+          return state$.asObservable();
       }
     });
 
@@ -118,7 +117,7 @@ describe('NavComponent', () => {
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: CookieService, useValue: cookieServiceSpy },
-        { provide: Router, useValue: routeSpy },
+        { provide: Router, useValue: routerSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
@@ -131,6 +130,13 @@ describe('NavComponent', () => {
 
     component = fixture.componentInstance;
     fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    state$.complete();
+    notification$.complete();
+    authUser$.complete();
+    message$.complete();
   });
 
   it('should compile', () => {
@@ -160,13 +166,13 @@ describe('NavComponent', () => {
   it('should go to home when goHome is called', () => {
     void component.goToHome;
 
-    expect(routeSpy.navigate).toHaveBeenCalledWith(['en-GB', 'home']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'home']);
   });
 
   it('should navigate to the notification navigation when it is read', () => {
     component.notification(mockNotification);
 
-    expect(routeSpy.navigate).toHaveBeenCalledWith(['/en-GB/reservation/r-1']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/en-GB/reservation/r-1']);
   });
 
   it('should mark notification as read and navigate', () => {
@@ -194,14 +200,14 @@ describe('NavComponent', () => {
       read: false,
     } as INotification;
 
-    authSubject.next({
+    authUser$.next({
       isAuthenticated: true,
       isLoading: false,
       user: mockUser,
       token: mockToken,
     });
 
-    messageSubject.next({
+    message$.next({
       data: {
         id: mockNotification.id,
         date: mockNotification.date,
@@ -234,9 +240,9 @@ describe('NavComponent', () => {
   });
 
   it('should dispatch redirect', () => {
-    Object.defineProperty(routeSpy, 'url', { value: '/en-GB' });
+    Object.defineProperty(routerSpy, 'url', { value: '/en-GB' });
 
-    authSubject.next({
+    authUser$.next({
       isAuthenticated: true,
       isLoading: false,
       user: mockUser,
@@ -247,32 +253,32 @@ describe('NavComponent', () => {
   });
 
   it('should navigate to home when not authenticated', () => {
-    Object.defineProperty(routeSpy, 'url', { value: '/en-GB' });
+    Object.defineProperty(routerSpy, 'url', { value: '/en-GB' });
 
-    authSubject.next({
+    authUser$.next({
       isAuthenticated: false,
       isLoading: false,
       redirect: false,
     });
 
-    expect(routeSpy.navigate).toHaveBeenCalledWith(['/', 'en-GB', 'home']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/', 'en-GB', 'home']);
   });
 
   it('should navigate to home when redirect', () => {
-    Object.defineProperty(routeSpy, 'url', { value: '/en-GB' });
+    Object.defineProperty(routerSpy, 'url', { value: '/en-GB' });
 
-    authSubject.next({
+    authUser$.next({
       isAuthenticated: true,
       isLoading: false,
       user: mockUser,
       redirect: true,
     });
 
-    expect(routeSpy.navigate).toHaveBeenCalledWith(['/', 'en-GB', 'home']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/', 'en-GB', 'home']);
   });
 
   it('should handle notifications', () => {
-    notificationSubject.next({
+    notification$.next({
       data: {
         page: {
           content: [
@@ -301,7 +307,7 @@ describe('NavComponent', () => {
   });
 
   it('should handle delete notifications', () => {
-    notificationSubject.next({
+    notification$.next({
       data: {
         page: {
           content: [
@@ -328,7 +334,7 @@ describe('NavComponent', () => {
       jasmine.objectContaining({ id: '3', read: false }),
     ]);
 
-    notificationSubject.next({
+    notification$.next({
       dataDeleted: { ...mockNotification, id: '3', deleted: true, read: false },
     });
 

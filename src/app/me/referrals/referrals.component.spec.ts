@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReferralsComponent } from './referrals.component';
 import { Store } from '@ngrx/store';
-import { of } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
@@ -9,50 +9,64 @@ import { ToastService } from '../../services/toast.service';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Analytics } from '@angular/fire/analytics';
 import { provideHttpClient } from '@angular/common/http';
+import { AppState } from '../../store/app.states';
 
 describe('ReferralsComponent', () => {
   let component: ReferralsComponent;
   let fixture: ComponentFixture<ReferralsComponent>;
 
-  let storeMock: any;
-  let clipboardMock: any;
-  let toastMock: any;
-  let bottomSheetMock: any;
-  let authUserServiceMock: any;
+  let state$: Subject<any>;
+  let authUser$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let clipboardSpy: jasmine.SpyObj<Clipboard>;
+  let toastServiceSpy: jasmine.SpyObj<ToastService>;
+  let bottomSheetSpy: jasmine.SpyObj<MatBottomSheet>;
+  let analyticsSpy: jasmine.SpyObj<Analytics>;
+  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
   beforeEach(async () => {
-    storeMock = { select: jasmine.createSpy().and.returnValue(of({ referrals: [] })), dispatch: jasmine.createSpy() };
-    clipboardMock = { copy: jasmine.createSpy() };
-    toastMock = { info: jasmine.createSpy() };
-    bottomSheetMock = jasmine.createSpyObj('MatBottomSheet', ['open']);
+    state$ = new Subject<any>();
+    authUser$ = new Subject<any>();
 
-    authUserServiceMock = { authUser: of({ userId: '123', referralMax: 5 }) };
-    const mockAnalytics = {
-      app: {
-        options: {},
+    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'select']);
+    clipboardSpy = jasmine.createSpyObj('Clipboard', ['copy']);
+    toastServiceSpy = jasmine.createSpyObj('ToastService', ['info']);
+    bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
+    analyticsSpy = jasmine.createSpyObj('Analytics', ['logEvent'], {
+      app: { options: {} },
+      gtagFunction: () => {
       },
-    } as Analytics;
+    });
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
+      authUser: authUser$.asObservable(),
+    });
+
+    storeSpy.select.and.returnValue(state$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [ReferralsComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeMock },
-        { provide: Clipboard, useValue: clipboardMock },
-        { provide: ToastService, useValue: toastMock },
-        { provide: MatBottomSheet, useValue: bottomSheetMock },
-        { provide: AuthUserService, useValue: authUserServiceMock },
-        { provide: Analytics, useValue: mockAnalytics },
+        { provide: Store, useValue: storeSpy },
+        { provide: Clipboard, useValue: clipboardSpy },
+        { provide: ToastService, useValue: toastServiceSpy },
+        { provide: MatBottomSheet, useValue: bottomSheetSpy },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
+        { provide: Analytics, useValue: analyticsSpy },
         provideHttpClient(),
       ],
     }).compileComponents();
 
-    TestBed.overrideProvider(MatBottomSheet, { useValue: bottomSheetMock });
-  });
+    TestBed.overrideProvider(MatBottomSheet, { useValue: bottomSheetSpy });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(ReferralsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    state$.complete();
+    authUser$.complete();
   });
 
   it('should create', () => {
@@ -62,14 +76,14 @@ describe('ReferralsComponent', () => {
   it('should copy userId to clipboard and show toast', () => {
     component.userId = 'abc123';
     void component.copy;
-    expect(clipboardMock.copy).toHaveBeenCalledWith('abc123');
-    expect(toastMock.info).toHaveBeenCalledWith('ME.REFERRAL.COPY');
+    expect(clipboardSpy.copy).toHaveBeenCalledWith('abc123');
+    expect(toastServiceSpy.info).toHaveBeenCalledWith('ME.REFERRAL.COPY');
   });
 
   it('should open share bottom sheet', () => {
     component.userId = 'abc123';
     component.openBottomSheetShare();
-    expect(bottomSheetMock.open).toHaveBeenCalled();
+    expect(bottomSheetSpy.open).toHaveBeenCalled();
   });
 
   it('should open referral bottom sheet', () => {
@@ -77,20 +91,20 @@ describe('ReferralsComponent', () => {
     component['referrals'] = 2;
     component['referralsUsed'] = 1;
     component.openBottomSheetReferral();
-    expect(bottomSheetMock.open).toHaveBeenCalled();
+    expect(bottomSheetSpy.open).toHaveBeenCalled();
   });
 
-  it('should set userId and referralMax on ngOnInit', (done) => {
+  it('should set userId and referralMax on ngOnInit', () => {
     component.ngOnInit();
-    setTimeout(() => {
-      expect(component.userId).toBe('123');
-      expect(component['referralMax']).toBe(5);
-      done();
-    });
+
+    authUser$.next({ userId: '123', referralMax: 5 });
+
+    expect(component.userId).toBe('123');
+    expect(component['referralMax']).toBe(5);
   });
 
   it('should call dispatch Clean and GetMyReferrals on ngOnInit', () => {
-    expect(storeMock.dispatch).toHaveBeenCalledTimes(2);
+    expect(storeSpy.dispatch).toHaveBeenCalledTimes(2);
   });
 
   it('should unsubscribe on ngOnDestroy', () => {

@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { IChartUtil } from '../../util/chart';
 import { By } from '@angular/platform-browser';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { CardChartComponent } from './card-chart.component';
 import { Chart, registerables } from 'chart.js';
 
@@ -21,7 +20,7 @@ describe('CardChartComponent', () => {
     },
     labels: ['Jan', 'Feb'],
     options: { responsive: true },
-  } as unknown as IChartUtil;
+  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -32,12 +31,10 @@ describe('CardChartComponent', () => {
           useValue: { chart: fakeChart, title: 'Test Chart' },
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA], // ignore Angular Material & chart directives
     }).compileComponents();
 
     fixture = TestBed.createComponent(CardChartComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -52,6 +49,8 @@ describe('CardChartComponent', () => {
   });
 
   it('should render the dialog title in the template', () => {
+    fixture.detectChanges();
+
     const titleEl = fixture.debugElement.query(By.css('h1')).nativeElement;
     expect(titleEl.textContent).toContain('Test Chart');
   });

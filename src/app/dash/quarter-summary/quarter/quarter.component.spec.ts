@@ -6,20 +6,19 @@ import { Router } from '@angular/router';
 describe('QuarterComponent', () => {
   let component: QuarterComponent;
   let fixture: ComponentFixture<QuarterComponent>;
-  let routerMock: any;
+
+  let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
-    routerMock = { navigate: jasmine.createSpy('navigate') };
+    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
 
     await TestBed.configureTestingModule({
       imports: [QuarterComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Router, useValue: routerMock },
+        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
-  });
 
-  beforeEach(() => {
     const translate = TestBed.inject(TranslateService);
     translate.setDefaultLang('en-GB');
     translate.use('en-GB');
@@ -28,7 +27,6 @@ describe('QuarterComponent', () => {
     component = fixture.componentInstance;
     component.year = 2025;
     component.measure = 'long';
-    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -36,14 +34,14 @@ describe('QuarterComponent', () => {
   });
 
   it('should return month title', () => {
-    const monthName = component.getMonth(1); // enero
+    const monthName = component.getMonth(1);
     expect(monthName).toBeDefined();
   });
 
   it('should navigate to quarter', () => {
     component.quarter = 2;
     component.goToQuarter(2);
-    expect(routerMock.navigate).toHaveBeenCalledWith(
+    expect(routerSpy.navigate).toHaveBeenCalledWith(
       ['en-GB', 'dashboard', 'quarter', 'summary'],
       { state: { year: 2025, quarter: 2 } },
     );
@@ -51,7 +49,7 @@ describe('QuarterComponent', () => {
 
   it('should navigate to month with correct step for income', () => {
     component.goToMonth(1, 'INCOME');
-    expect(routerMock.navigate).toHaveBeenCalledWith(
+    expect(routerSpy.navigate).toHaveBeenCalledWith(
       ['en-GB', 'dashboard', 'monthly', 'summary'],
       { state: { date: '1-2025', step: 0 } },
     );
@@ -59,7 +57,7 @@ describe('QuarterComponent', () => {
 
   it('should navigate to month with correct step for expense', () => {
     component.goToMonth(3, 'EXPENSE');
-    expect(routerMock.navigate).toHaveBeenCalledWith(
+    expect(routerSpy.navigate).toHaveBeenCalledWith(
       ['en-GB', 'dashboard', 'monthly', 'summary'],
       { state: { date: '3-2025', step: 1 } },
     );
@@ -67,7 +65,7 @@ describe('QuarterComponent', () => {
 
   it('should navigate to month with correct step for cash', () => {
     component.goToMonth(4, 'CASH');
-    expect(routerMock.navigate).toHaveBeenCalledWith(
+    expect(routerSpy.navigate).toHaveBeenCalledWith(
       ['en-GB', 'dashboard', 'monthly', 'summary'],
       { state: { date: '4-2025', step: 2 } },
     );

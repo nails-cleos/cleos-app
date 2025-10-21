@@ -4,21 +4,23 @@ import { DiscountComponent } from './discount.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 import { DiscountType, IDiscountAll } from '../interfaces/discount';
-import { ReactiveFormsModule, UntypedFormBuilder } from '@angular/forms';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { clean, getAllCurrency, getDiscount } from '../store/discount.actions';
+import { AppState } from '../store/app.states';
 
 describe('DiscountComponent', () => {
   let component: DiscountComponent;
   let fixture: ComponentFixture<DiscountComponent>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockActivatedRoute: any;
-  let mockChangeDetectorRef: jasmine.SpyObj<ChangeDetectorRef>;
-  let stateSubject: Subject<any>;
+
+  let state$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
+  let paramMapSpy: jasmine.SpyObj<ParamMap>;
 
   const mockDiscount: IDiscountAll = {
     id: '1',
@@ -35,35 +37,28 @@ describe('DiscountComponent', () => {
   };
 
   beforeEach(async () => {
-    stateSubject = new Subject();
+    state$ = new Subject();
 
-    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-    mockChangeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-
-    mockActivatedRoute = {
+    paramMapSpy = jasmine.createSpyObj('ParamMap', ['get']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
-        paramMap: {
-          get: jasmine.createSpy('get').and.returnValue(null),
-        },
+        paramMap: paramMapSpy,
       },
-    };
+    });
 
-    mockStore.select.and.returnValue(stateSubject.asObservable());
+    storeSpy.select.and.returnValue(state$.asObservable());
+    paramMapSpy.get.and.returnValue(null);
 
     await TestBed.configureTestingModule({
-      imports: [
-        DiscountComponent,
-        TranslateModule.forRoot(),
-        ReactiveFormsModule,
-        NoopAnimationsModule,
-      ],
+      imports: [DiscountComponent, TranslateModule.forRoot()],
       providers: [
-        UntypedFormBuilder,
-        { provide: Store, useValue: mockStore },
-        { provide: Router, useValue: mockRouter },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: ChangeDetectorRef, useValue: mockChangeDetectorRef },
+        { provide: Store, useValue: storeSpy },
+        { provide: Router, useValue: routerSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
       ],
     }).compileComponents();
 
@@ -75,12 +70,14 @@ describe('DiscountComponent', () => {
     component = fixture.componentInstance;
   });
 
+  afterEach(() => state$.complete());
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
   it('should initialize in add mode when no id is provided', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(null);
+    paramMapSpy.get.and.returnValue(null);
 
     component.ngOnInit();
 
@@ -90,7 +87,7 @@ describe('DiscountComponent', () => {
 
   it('should initialize in edit mode when id is provided', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
 
     component.ngOnInit();
 
@@ -116,22 +113,22 @@ describe('DiscountComponent', () => {
   it('should dispatch Clean action on initialization', () => {
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch GetDiscount action when in edit mode', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(getDiscount({ id: testId }));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getDiscount({ id: testId }));
   });
 
   it('should patch form when discount is selected from state', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       selected: mockDiscount,
     });
 
@@ -153,7 +150,7 @@ describe('DiscountComponent', () => {
       { field: 'type', message: 'Type is required' },
     ];
 
-    stateSubject.next({
+    state$.next({
       subErrors: mockErrors,
     });
 
@@ -170,21 +167,21 @@ describe('DiscountComponent', () => {
   it('should navigate to discounts list on successful response', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'discounts']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'discounts']);
   });
 
   it('should not dispatch action when form is invalid', () => {
     component.ngOnInit();
     component.form.get('name')?.setValue('');
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     void component.submit;
 
-    expect(mockStore.dispatch).not.toHaveBeenCalled();
+    expect(storeSpy.dispatch).not.toHaveBeenCalled();
   });
 
   it('should dispatch CreateDiscount action when in add mode and form is valid', () => {
@@ -209,10 +206,10 @@ describe('DiscountComponent', () => {
     typeControl.setValue(DiscountType.percentage);
     typeControl.markAsDirty();
 
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     void component.submit;
-    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
     expect(dispatchedAction).toEqual(jasmine.objectContaining({
       discount: jasmine.objectContaining({
         name: 'New Discount',
@@ -227,10 +224,10 @@ describe('DiscountComponent', () => {
 
   it('should dispatch UpdateDiscount action when in edit mode and form is valid', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
     component.ngOnInit();
 
-    stateSubject.next({ selected: mockDiscount });
+    state$.next({ selected: mockDiscount });
 
     const nameControl = component.getForm.name;
     nameControl.setValue('Updated Discount');
@@ -248,10 +245,10 @@ describe('DiscountComponent', () => {
     typeControl.setValue(DiscountType.percentage);
     typeControl.markAsDirty();
 
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     void component.submit;
-    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
     expect(dispatchedAction).toEqual(jasmine.objectContaining({
       discount: jasmine.objectContaining({
         name: 'Updated Discount',
@@ -286,22 +283,22 @@ describe('DiscountComponent', () => {
   });
 
   it('should call detectChanges when needed', () => {
-    expect(mockChangeDetectorRef.detectChanges).not.toHaveBeenCalled();
+    expect(changeDetectorRefSpy.detectChanges).not.toHaveBeenCalled();
   });
 
   it('should handle undefined discount in edit mode', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
     component.discount = undefined;
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(getDiscount({ id: testId }));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getDiscount({ id: testId }));
   });
 
   it('should clear discount when updating in edit mode', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
     component.discount = mockDiscount;
 
     component.ngOnInit();
@@ -340,26 +337,26 @@ describe('DiscountComponent', () => {
   it('should handle state subscription correctly', () => {
     component.ngOnInit();
 
-    expect(mockStore.select).toHaveBeenCalled();
+    expect(storeSpy.select).toHaveBeenCalled();
   });
 
   it('should clean state and get discount list on response', () => {
     component.ngOnInit();
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
-    stateSubject.next({
+    state$.next({
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'discounts']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'discounts']);
   });
 
   it('should dispatch GetAllCurrency action when findGroups is called', () => {
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     component['getCurrencies']();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(getAllCurrency());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllCurrency());
   });
 
   it('should filter currencies correctly when filterCurrency is called', () => {
@@ -386,7 +383,7 @@ describe('DiscountComponent', () => {
   it('should test addCurrency getter navigation', () => {
     void component.addCurrency;
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'currency', 'add']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'currency', 'add']);
   });
 
   it('should test displayCurrencyFn with valid currency', () => {
@@ -442,7 +439,7 @@ describe('DiscountComponent', () => {
 
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       currencies: testCurrencies,
     });
 
@@ -456,7 +453,7 @@ describe('DiscountComponent', () => {
   });
 
   it('should call getCurrencies when in add mode', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(null);
+    paramMapSpy.get.and.returnValue(null);
     spyOn(component as any, 'getCurrencies');
 
     component.ngOnInit();
@@ -465,7 +462,7 @@ describe('DiscountComponent', () => {
   });
 
   it('should call getDiscount when in edit mode', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue('123');
+    paramMapSpy.get.and.returnValue('123');
     spyOn(component as any, 'getDiscount');
 
     component.ngOnInit();
@@ -477,14 +474,14 @@ describe('DiscountComponent', () => {
     component.ngOnInit();
 
     // First set some errors
-    stateSubject.next({
+    state$.next({
       subErrors: [{ field: 'name', message: 'Name error' }],
     });
 
     expect(component.errors['name']).toBe('Name error');
 
     // Then clear errors
-    stateSubject.next({
+    state$.next({
       response: false,
       subErrors: null,
     });

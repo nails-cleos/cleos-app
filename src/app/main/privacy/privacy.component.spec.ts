@@ -9,11 +9,8 @@ describe('LegalsComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [PrivacyComponent],
-    })
-      .compileComponents();
-  });
+    }).compileComponents();
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(PrivacyComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

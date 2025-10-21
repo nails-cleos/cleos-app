@@ -3,26 +3,27 @@ import { TreatmentSortingComponent } from './treatment-sorting.component';
 import { Subject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { sortTreatment } from '../../store/treatment.actions';
+import { clean, getTreatmentGroup, sortTreatment } from '../../store/treatment.actions';
 import { ITreatmentAll } from '../../interfaces/treatment';
 import { Store } from '@ngrx/store';
 import { ServiceType } from '../../interfaces/room';
 import { ISorted } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
+import { AppState } from '../../store/app.states';
 
 describe('TreatmentSortingComponent', () => {
   let component: TreatmentSortingComponent;
   let fixture: ComponentFixture<TreatmentSortingComponent>;
 
-  let storeSpy: { dispatch: jasmine.Spy; select: jasmine.Spy };
   let state$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
 
   beforeEach(async () => {
     state$ = new Subject();
 
-    storeSpy = {
-      dispatch: jasmine.createSpy('dispatch'),
-      select: jasmine.createSpy('select').and.returnValue(state$.asObservable()),
-    };
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+
+    storeSpy.select.and.returnValue(state$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [TreatmentSortingComponent, TranslateModule.forRoot()],
@@ -82,12 +83,8 @@ describe('TreatmentSortingComponent', () => {
 
     state$.next({ response: true, selected: { treatments: [] } });
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      jasmine.objectContaining({ type: '[Treatment] Clean' }),
-    );
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      jasmine.objectContaining({ type: '[Treatment] Find treatment group by id', id: '123', path: 'sorting' }),
-    );
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getTreatmentGroup({ id: '123', path: 'sorting' }));
   });
 
   it('should unsubscribe on destroy', () => {

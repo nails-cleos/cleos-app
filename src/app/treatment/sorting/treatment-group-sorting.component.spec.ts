@@ -10,11 +10,14 @@ import { ISorted } from '../../util/drag-drop-sorting/drag-drop-sorting.componen
 describe('TreatmentGroupSortingComponent', () => {
   let component: TreatmentGroupSortingComponent;
   let fixture: ComponentFixture<TreatmentGroupSortingComponent>;
-  let storeSpy: jasmine.SpyObj<Store<any>>;
+
   let state$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store<any>>;
 
   beforeEach(async () => {
     state$ = new Subject();
+
     storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
     storeSpy.select.and.returnValue(state$.asObservable());
 
@@ -27,8 +30,10 @@ describe('TreatmentGroupSortingComponent', () => {
     component = fixture.componentInstance;
   });
 
+  afterEach(() => state$.complete());
+
   it('should create', () => {
-    fixture.detectChanges(); // corre ngOnInit
+    fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 

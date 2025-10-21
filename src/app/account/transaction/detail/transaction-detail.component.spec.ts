@@ -1,21 +1,26 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { TransactionDetailComponent } from './transaction-detail.component';
 import { ITransaction } from '../../../interfaces/account';
 import { getTransaction } from '../../../store/account.actions';
 import { notifyPayment, paymentSend } from '../../../store/payment.actions';
+import { AppState } from '../../../store/app.states';
 
 describe('TransactionDetailComponent', () => {
   let component: TransactionDetailComponent;
   let fixture: ComponentFixture<TransactionDetailComponent>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockTranslateService: jasmine.SpyObj<TranslateService>;
-  let stateSubject: Subject<any>;
+
+  let state$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+
+  let translateService: TranslateService;
 
   const mockTransaction: ITransaction = {
     id: 'transaction-123',
@@ -30,54 +35,49 @@ describe('TransactionDetailComponent', () => {
     },
   };
 
-  const mockActivatedRoute = {
-    snapshot: {
-      paramMap: {
-        get: jasmine.createSpy('get').and.callFake((param: string) => {
-          if (param === 'id') {
-            return 'account-123';
-          }
-          if (param === 'transactionId') {
-            return 'transaction-123';
-          }
-          return null;
-        }),
-      },
-    },
-  };
-
   beforeEach(async () => {
-    stateSubject = new Subject();
-    const storeSpyObj = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    const routerSpyObj = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    state$ = new Subject();
 
-    storeSpyObj.select.and.returnValue(stateSubject.asObservable());
-    routerSpyObj.getCurrentNavigation.and.returnValue({
-      extras: { state: { step: 2 } },
+    const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
+
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      snapshot: {
+        paramMap: paramMapSpy,
+      },
+    });
+
+    storeSpy.select.and.returnValue(state$.asObservable());
+    routerSpy.getCurrentNavigation.and.returnValue({ extras: { state: { step: 2 } } } as any);
+    paramMapSpy.get.and.callFake((param: string) => {
+      if (param === 'id') {
+        return 'account-123';
+      }
+      if (param === 'transactionId') {
+        return 'transaction-123';
+      }
+      return null;
     });
 
     await TestBed.configureTestingModule({
       imports: [TransactionDetailComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpyObj },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: Router, useValue: routerSpyObj },
+        { provide: Store, useValue: storeSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
 
-    mockStore = TestBed.inject(Store) as jasmine.SpyObj<Store>;
-    mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-    mockTranslateService = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
-    mockTranslateService.setDefaultLang('en-GB');
-    mockTranslateService.use('en-GB');
+    translateService = TestBed.inject(TranslateService);
+    translateService.setDefaultLang('en-GB');
+    translateService.use('en-GB');
 
     fixture = TestBed.createComponent(TransactionDetailComponent);
     component = fixture.componentInstance;
   });
 
-  afterEach(() => {
-    stateSubject.complete();
-  });
+  afterEach(() => state$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -99,7 +99,7 @@ describe('TransactionDetailComponent', () => {
   it('should dispatch GetTransaction action on init', () => {
     fixture.detectChanges();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(
       getTransaction({ id: 'account-123', transactionId: 'transaction-123' }),
     );
   });
@@ -111,7 +111,7 @@ describe('TransactionDetailComponent', () => {
       selected: mockTransaction,
     };
 
-    stateSubject.next(stateWithTransaction);
+    state$.next(stateWithTransaction);
 
     expect(component.transaction).toBeDefined();
     expect(component.transaction?.id).toBe('transaction-123');
@@ -126,9 +126,9 @@ describe('TransactionDetailComponent', () => {
       response: { path: 'some/path' },
     };
 
-    stateSubject.next(stateWithPath);
+    state$.next(stateWithPath);
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB/some/path']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB/some/path']);
   });
 
   it('should navigate to payment page when there are subErrors', () => {
@@ -138,9 +138,9 @@ describe('TransactionDetailComponent', () => {
       subErrors: [{ message: 'Payment failed' }],
     };
 
-    stateSubject.next(stateWithErrors);
+    state$.next(stateWithErrors);
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'transaction', 'account-123', 'payment']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'transaction', 'account-123', 'payment']);
   });
 
   it('should dispatch PaymentSend action when pay getter is called', () => {
@@ -148,7 +148,7 @@ describe('TransactionDetailComponent', () => {
 
     void component.pay;
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(
       paymentSend({ link: 'https://payment.url' }),
     );
   });
@@ -158,7 +158,7 @@ describe('TransactionDetailComponent', () => {
 
     void component.notify;
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(
       notifyPayment({
         id: 'payment-123',
         path: 'transaction',
@@ -170,14 +170,9 @@ describe('TransactionDetailComponent', () => {
   });
 
   it('should handle case when getCurrentNavigation returns null', () => {
-    mockRouter.getCurrentNavigation.and.returnValue(null);
+    routerSpy.getCurrentNavigation.and.returnValue(null);
 
-    const newComponent = new TransactionDetailComponent(
-      mockStore as any,
-      mockActivatedRoute as any,
-      mockTranslateService,
-      mockRouter,
-    );
+    const newComponent = new TransactionDetailComponent(storeSpy, activatedRouteSpy, translateService, routerSpy);
 
     expect(newComponent.step).toBeUndefined();
   });
@@ -194,16 +189,16 @@ describe('TransactionDetailComponent', () => {
   it('should handle empty state gracefully', () => {
     fixture.detectChanges();
 
-    stateSubject.next({});
+    state$.next({});
 
     expect(component.transaction).toBeUndefined();
-    expect(mockRouter.navigate).not.toHaveBeenCalled();
+    expect(routerSpy.navigate).not.toHaveBeenCalled();
   });
 
   it('should handle state with null selected transaction', () => {
     fixture.detectChanges();
 
-    stateSubject.next({ selected: null });
+    state$.next({ selected: null });
 
     expect(component.transaction).toBeUndefined();
   });

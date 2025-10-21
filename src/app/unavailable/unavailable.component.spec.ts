@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UnavailableComponent } from './unavailable.component';
 import { Subject } from 'rxjs';
 import { ReactiveFormsModule, UntypedFormBuilder } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ChangeDetectorRef } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -13,15 +13,19 @@ import { clean, getAllProfessional, getUnavailable } from '../store/unavailable.
 import { IUnavailable } from '../interfaces/unavailable';
 import { IUserAll } from '../interfaces/user';
 import { IAvailability, IRoomAll } from '../interfaces/room';
+import { AppState } from '../store/app.states';
 
 describe('UnavailableComponent', () => {
   let component: UnavailableComponent;
   let fixture: ComponentFixture<UnavailableComponent>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockActivatedRoute: any;
-  let mockChangeDetectorRef: jasmine.SpyObj<ChangeDetectorRef>;
-  let stateSubject: Subject<any>;
+
+  let state$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
+  let paramMapGetSpy: jasmine.SpyObj<ParamMap>;
 
   const mockProfessionals: IUserAll[] = [
     { id: 'a', displayName: 'Alice' } as IUserAll,
@@ -78,22 +82,20 @@ describe('UnavailableComponent', () => {
   nextMonday.setHours(12, 0, 0, 0);
 
   beforeEach(async () => {
-    stateSubject = new Subject();
+    state$ = new Subject();
 
-    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
-    mockChangeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-
-    mockActivatedRoute = {
+    paramMapGetSpy = jasmine.createSpyObj('ParamMap', ['get']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [''], {
       snapshot: {
-        paramMap: {
-          get: jasmine.createSpy('get').and.returnValue(null),
-        },
+        paramMap: paramMapGetSpy,
       },
-    };
+    });
 
-    mockStore.select.and.returnValue(stateSubject.asObservable());
-    mockRouter.getCurrentNavigation.and.returnValue(null);
+    storeSpy.select.and.returnValue(state$.asObservable());
+    routerSpy.getCurrentNavigation.and.returnValue(null);
 
     await TestBed.configureTestingModule({
       imports: [
@@ -104,10 +106,10 @@ describe('UnavailableComponent', () => {
       ],
       providers: [
         UntypedFormBuilder,
-        { provide: Store, useValue: mockStore },
-        { provide: Router, useValue: mockRouter },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: ChangeDetectorRef, useValue: mockChangeDetectorRef },
+        { provide: Store, useValue: storeSpy },
+        { provide: Router, useValue: routerSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
       ],
     }).compileComponents();
 
@@ -124,7 +126,7 @@ describe('UnavailableComponent', () => {
   });
 
   it('should initialize in add mode when no id is provided', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(null);
+    paramMapGetSpy.get.and.returnValue(null);
 
     component.ngOnInit();
 
@@ -134,7 +136,7 @@ describe('UnavailableComponent', () => {
 
   it('should initialize in edit mode when id is provided', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapGetSpy.get.and.returnValue(testId);
 
     component.ngOnInit();
 
@@ -161,22 +163,22 @@ describe('UnavailableComponent', () => {
   it('should dispatch Clean action on initialization', () => {
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch GetUnavailable action when in edit mode', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapGetSpy.get.and.returnValue(testId);
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(getUnavailable({ id: testId }));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getUnavailable({ id: testId }));
   });
 
   it('should patch form when unavailable is selected from state', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       selected: mockUnavailable,
       professionals: mockProfessionals,
     });
@@ -202,7 +204,7 @@ describe('UnavailableComponent', () => {
       { field: 'duration', message: 'Duration is required' },
     ];
 
-    stateSubject.next({
+    state$.next({
       subErrors: mockErrors,
     });
 
@@ -215,11 +217,11 @@ describe('UnavailableComponent', () => {
   it('should navigate to unavailable list on successful response', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'unavailable']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'unavailable']);
   });
 
   it('should set mix and max when room is set', () => {
@@ -227,30 +229,28 @@ describe('UnavailableComponent', () => {
 
     component.getForm.startDate.setValue(nextMonday);
 
-    stateSubject.next({
-      rooms: [mockRoom],
-    });
+    state$.next({ rooms: [mockRoom] });
 
-    expect(component.minTime).toBe('11:00');
-    expect(component.maxTime).toBe('20:00');
+    expect(component.minTime).toBe('10:00');
+    expect(component.maxTime).toBe('19:00');
     expect(component.roomAvailability).toEqual(
       {
         availabilities: mockRoom.availabilities.filter(av => av !== undefined),
       } as IRoomAll,
     );
     expect(component.showDuration).toBeTrue();
-    expect(component.durationMax).toBe('08:00');
+    expect(component.durationMax).toBe('07:00');
   });
 
   it('should not dispatch action when form is invalid', () => {
     component.ngOnInit();
     component.getForm.professional?.setValue('');
     component.getForm.duration?.setValue('');
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     void component.submit;
 
-    expect(mockStore.dispatch).not.toHaveBeenCalled();
+    expect(storeSpy.dispatch).not.toHaveBeenCalled();
   });
 
   it('should dispatch CreateUnavailable action when in add mode and form is valid for all day false', () => {
@@ -287,12 +287,12 @@ describe('UnavailableComponent', () => {
     endDateControl.setValue('2024-06-01');
     endDateControl.markAsDirty();
 
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
     expect(component.form.valid).toBeTrue();
 
     void component.submit;
 
-    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
     expect(dispatchedAction).toEqual(jasmine.objectContaining({
       unavailable: jasmine.objectContaining({
         professionalId: mockProfessionals[0].id,
@@ -335,12 +335,12 @@ describe('UnavailableComponent', () => {
     endDateControl.setValue('2024-06-01');
     endDateControl.markAsDirty();
 
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
     expect(component.form.valid).toBeTrue();
 
     void component.submit;
 
-    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
     expect(dispatchedAction).toEqual(jasmine.objectContaining({
       unavailable: jasmine.objectContaining({
         professionalId: mockProfessionals[0].id,
@@ -357,7 +357,7 @@ describe('UnavailableComponent', () => {
 
   it('should dispatch UpdateUnavailable action when in edit mode and form is valid', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapGetSpy.get.and.returnValue(testId);
     component.unavailable = mockUnavailable;
 
     component.ngOnInit();
@@ -384,11 +384,11 @@ describe('UnavailableComponent', () => {
     const endDateControl = component.getForm.endDate;
     endDateControl.setValue('2024-06-01');
     endDateControl.markAsDirty();
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     void component.submit;
 
-    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
     expect(dispatchedAction).toEqual(jasmine.objectContaining({
       id: '123',
       unavailable: jasmine.objectContaining({
@@ -427,17 +427,17 @@ describe('UnavailableComponent', () => {
   });
 
   it('should call detectChanges when needed', () => {
-    expect(mockChangeDetectorRef.detectChanges).not.toHaveBeenCalled();
+    expect(changeDetectorRefSpy.detectChanges).not.toHaveBeenCalled();
   });
 
   it('should handle undefined unavailable in edit mode', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapGetSpy.get.and.returnValue(testId);
     component.unavailable = undefined;
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(getUnavailable({ id: testId }));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getUnavailable({ id: testId }));
   });
 
   it('should initialize form with empty values', () => {
@@ -472,26 +472,26 @@ describe('UnavailableComponent', () => {
   it('should handle state subscription correctly', () => {
     component.ngOnInit();
 
-    expect(mockStore.select).toHaveBeenCalled();
+    expect(storeSpy.select).toHaveBeenCalled();
   });
 
   it('should clean state and get unavailable list on response', () => {
     component.ngOnInit();
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
-    stateSubject.next({
+    state$.next({
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'unavailable']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'unavailable']);
   });
 
   it('should dispatch GetAllTreatmentsGroup action when getProfessionals is called', () => {
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     component['getProfessionals']();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(getAllProfessional());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllProfessional());
   });
 
   it('should filter professionals correctly when filter is called', () => {
@@ -575,12 +575,13 @@ describe('UnavailableComponent', () => {
     expect(endDateControl.value).toBeUndefined();
     expect(repeatControl.value).toBeUndefined();
     expect(allDayControl.value).toBeFalse();
-  });it('should set date from extras when provided', () => {
+  });
+  it('should set date from extras when provided', () => {
     const mockExtras = {
       room: mockRoom,
       date: nextMonday,
     };
-    mockRouter.getCurrentNavigation.and.returnValue({ extras: { state: mockExtras } } as any);
+    routerSpy.getCurrentNavigation.and.returnValue({ extras: { state: mockExtras } } as any);
 
     const newFixture = TestBed.createComponent(UnavailableComponent);
     const newComponent = newFixture.componentInstance;

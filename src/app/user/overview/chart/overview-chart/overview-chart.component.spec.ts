@@ -9,11 +9,8 @@ describe('PaymentsChartComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [OverviewChartComponent],
-    })
-      .compileComponents();
-  });
+    }).compileComponents();
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(OverviewChartComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

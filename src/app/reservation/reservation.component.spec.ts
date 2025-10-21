@@ -1,12 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormArray, ReactiveFormsModule } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 
 import { ReservationComponent } from './reservation.component';
 import { AuthUserService } from '../services/auth-user.service';
@@ -18,33 +17,33 @@ import { IAdditionalAll } from '../interfaces/additional';
 import { PaymentType } from '../interfaces/payment';
 import { ITreatment, ITreatmentAll } from '../interfaces/treatment';
 import { DiscountType, IUserDiscount } from '../interfaces/discount';
+import { MatStepper } from '@angular/material/stepper';
+import { DataEvent } from '../util/event';
+import { Duration } from '../util/dates';
+import { addMonths } from 'date-fns';
+import { MAX_RESERVATION_MONTH } from '../interfaces/reservation';
 
 describe('ReservationComponent', () => {
   let component: ReservationComponent;
   let fixture: ComponentFixture<ReservationComponent>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let mockRouter: jasmine.SpyObj<Router>;
 
-  const mockActivatedRoute = {
-    snapshot: {
-      paramMap: {
-        get: jasmine.createSpy('get').and.returnValue('test-reservation-id'),
-      },
-    },
-    params: of({ id: 'test-reservation-id' }),
-  };
+  let state$: Subject<any>;
+  let params$: Subject<any>;
+  let matches$: Subject<any>;
 
-  const mockAuthUserService = {
+  let storeSpy: jasmine.SpyObj<Store>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let snackBarSpy: jasmine.SpyObj<MatSnackBar>;
+
+  let dialogSpy: jasmine.SpyObj<any>;
+
+  const authUserServiceSpy = {
     authUser: of({
       isAdmin: false,
       isDarkMode: true,
     }),
-  };
-
-  const mockBreakpointObserver = {
-    observe: jasmine.createSpy('observe').and.returnValue(of({
-      matches: false,
-    })),
   };
 
   const mockCustomer: IUser = {
@@ -93,12 +92,26 @@ describe('ReservationComponent', () => {
   };
 
   beforeEach(async () => {
-    const storeSpyObj = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    const routerSpyObj = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
-    const dialogSpyObj = jasmine.createSpyObj('MatDialog', ['open']);
-    const snackBarSpyObj = jasmine.createSpyObj('MatSnackBar', ['openFromComponent']);
+    state$ = new Subject<any>();
+    params$ = new Subject<any>();
+    matches$ = new Subject<any>();
 
-    storeSpyObj.select.and.returnValue(of({
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe'], {
+      observe: () => matches$.asObservable(),
+    });
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      params: params$.asObservable(),
+      snapshot: {
+        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+      },
+    });
+    snackBarSpy = jasmine.createSpyObj('MatSnackBar', ['openFromComponent']);
+
+    storeSpy.select.and.returnValue(state$.asObservable());
+
+    state$.next({
       rooms: [],
       customers: [],
       additional: [],
@@ -107,9 +120,11 @@ describe('ReservationComponent', () => {
       data: null,
       subErrors: null,
       isLoading: false,
-    }));
+    });
 
-    routerSpyObj.getCurrentNavigation.and.returnValue(null);
+    params$.next({ id: 'test-reservation-id' });
+
+    routerSpy.getCurrentNavigation.and.returnValue(null);
 
     await TestBed.configureTestingModule({
       imports: [
@@ -119,27 +134,25 @@ describe('ReservationComponent', () => {
         BrowserAnimationsModule,
       ],
       providers: [
-        { provide: Store, useValue: storeSpyObj },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: AuthUserService, useValue: mockAuthUserService },
-        { provide: Router, useValue: routerSpyObj },
-        { provide: MatDialog, useValue: dialogSpyObj },
-        { provide: MatSnackBar, useValue: snackBarSpyObj },
-        { provide: BreakpointObserver, useValue: mockBreakpointObserver },
+        { provide: Store, useValue: storeSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
+        { provide: Router, useValue: routerSpy },
+        { provide: MatSnackBar, useValue: snackBarSpy },
+        { provide: BreakpointObserver, useValue: breakpointObserverSpy },
       ],
     }).compileComponents();
 
-    mockStore = TestBed.inject(Store) as jasmine.SpyObj<Store>;
-    mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    storeSpy = TestBed.inject(Store) as jasmine.SpyObj<Store>;
+    routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     const translate = TestBed.inject(TranslateService);
     translate.setDefaultLang('en-GB');
     translate.use('en-GB');
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(ReservationComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+
+    dialogSpy = spyOn(component.dialog, 'open');
   });
 
   it('should create', () => {
@@ -148,6 +161,8 @@ describe('ReservationComponent', () => {
 
   describe('Initialization', () => {
     it('should initialize forms correctly', () => {
+      component.ngOnInit();
+
       expect(component.customerForm).toBeDefined();
       expect(component.treatmentForm).toBeDefined();
       expect(component.officeForm).toBeDefined();
@@ -164,9 +179,9 @@ describe('ReservationComponent', () => {
     });
 
     it('should dispatch GetCustomers action when not editing', () => {
-      mockActivatedRoute.params = of({ id: '' });
+      activatedRouteSpy.params = of({ id: '' });
       component.ngOnInit();
-      expect(mockStore.dispatch).toHaveBeenCalled();
+      expect(storeSpy.dispatch).toHaveBeenCalled();
     });
   });
 
@@ -182,11 +197,13 @@ describe('ReservationComponent', () => {
     });
 
     it('should update professional list when room changes', () => {
+      component.ngOnInit();
       component.room.setValue(mockRoom);
       expect(component.professionalList).toEqual(mockRoom.professionals);
     });
 
     it('should update treatment list when group changes', () => {
+      component.ngOnInit();
       const mockGroup = {
         id: 'group-1',
         name: 'Test Group',
@@ -225,6 +242,8 @@ describe('ReservationComponent', () => {
   });
 
   describe('Date and Time Management', () => {
+    beforeEach(() => component.ngOnInit());
+
     it('should add new date to dateTimeList', () => {
       const initialLength = component.dateTimeList.length;
       component.addDate(new Date(), '10:00');
@@ -252,6 +271,8 @@ describe('ReservationComponent', () => {
   });
 
   describe('Step Navigation', () => {
+    beforeEach(() => component.ngOnInit());
+
     it('should validate customer form before proceeding to step 2', () => {
       spyOn(component, 'callStepTwo');
       component.customerForm.setErrors({ invalid: true });
@@ -337,12 +358,14 @@ describe('ReservationComponent', () => {
   describe('Navigation and Router', () => {
     it('should navigate to add customer page', () => {
       void component.addCustomer;
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'users', 'add'], { state: { role: 'ROLE_CUSTOMER' } });
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'users', 'add'], { state: { role: 'ROLE_CUSTOMER' } });
     });
   });
 
-  describe('create method', () => {
+  describe('Create method', () => {
     beforeEach(() => {
+      component.ngOnInit();
+
       component.customer.setValue(mockCustomer);
       component.office.setValue(mockOffice);
       component.room.setValue(mockRoom);
@@ -367,12 +390,12 @@ describe('ReservationComponent', () => {
 
     it('should dispatch CreateReservation action when creating a new reservation', () => {
       component.create();
-      expect(mockStore.dispatch).toHaveBeenCalled();
+      expect(storeSpy.dispatch).toHaveBeenCalled();
     });
 
     it('should include customer ID in reservation', () => {
       component.create();
-      const dispatchCall = mockStore.dispatch.calls.mostRecent();
+      const dispatchCall = storeSpy.dispatch.calls.mostRecent();
       expect(dispatchCall).toBeDefined();
     });
 
@@ -382,7 +405,7 @@ describe('ReservationComponent', () => {
       ];
       component.additionalSelected = mockAdditional;
       component.create();
-      expect(mockStore.dispatch).toHaveBeenCalled();
+      expect(storeSpy.dispatch).toHaveBeenCalled();
     });
 
     it('should include payment information when amount and type are provided', () => {
@@ -390,20 +413,20 @@ describe('ReservationComponent', () => {
       component.type.setValue(PaymentType.cash);
       component.transfer.setValue('REF123');
       component.create();
-      expect(mockStore.dispatch).toHaveBeenCalled();
+      expect(storeSpy.dispatch).toHaveBeenCalled();
     });
 
     it('should include customer change flag in reservation', () => {
       component.customerChange.setValue(true);
       component.reference.setValue('Test reference');
       component.create();
-      expect(mockStore.dispatch).toHaveBeenCalled();
+      expect(storeSpy.dispatch).toHaveBeenCalled();
     });
 
     it('should include note in reservation', () => {
       component.note.setValue('Test note');
       component.create();
-      expect(mockStore.dispatch).toHaveBeenCalled();
+      expect(storeSpy.dispatch).toHaveBeenCalled();
     });
 
     it('should dispatch UpdateReservationById when editing existing reservation', () => {
@@ -415,7 +438,7 @@ describe('ReservationComponent', () => {
         professional: mockRoom.professionals![0],
       } as any;
       component.create();
-      expect(mockStore.dispatch).toHaveBeenCalled();
+      expect(storeSpy.dispatch).toHaveBeenCalled();
     });
 
     it('should not dispatch action if no dates are provided', () => {
@@ -424,9 +447,9 @@ describe('ReservationComponent', () => {
         component.events.removeAt(0);
       }
 
-      const dispatchCountBefore = mockStore.dispatch.calls.count();
+      const dispatchCountBefore = storeSpy.dispatch.calls.count();
       component.create();
-      const dispatchCountAfter = mockStore.dispatch.calls.count();
+      const dispatchCountAfter = storeSpy.dispatch.calls.count();
 
       // Should not have dispatched any new actions
       expect(dispatchCountAfter).toBe(dispatchCountBefore);
@@ -435,11 +458,8 @@ describe('ReservationComponent', () => {
 
   describe('back method', () => {
     beforeEach(() => {
-      // Mock the myStepper to avoid out-of-bounds errors
-      Object.defineProperty(component['myStepper'], 'selectedIndex', {
-        get: jasmine.createSpy('get').and.returnValue(0),
-        set: jasmine.createSpy('set'),
-        configurable: true,
+      component.myStepper = jasmine.createSpyObj<MatStepper>('MatStepper', [], {
+        selectedIndex: 0,
       });
     });
 
@@ -493,11 +513,13 @@ describe('ReservationComponent', () => {
 
   describe('Getters', () => {
     it('should return dateTimeList as FormArray', () => {
+      component.ngOnInit();
       const dateTimeList = component.dateTimeList;
       expect(dateTimeList).toBeInstanceOf(FormArray);
     });
 
     it('should return events as FormArray', () => {
+      component.ngOnInit();
       const events = component.events;
       expect(events).toBeInstanceOf(FormArray);
     });
@@ -515,6 +537,7 @@ describe('ReservationComponent', () => {
     });
 
     it('should check if add button is disabled', () => {
+      component.ngOnInit();
       component.dateTimeList.setErrors({ invalid: true });
       expect(component.isAddButtonDisabled).toBeTrue();
     });
@@ -554,6 +577,8 @@ describe('ReservationComponent', () => {
   });
 
   describe('Form Validation', () => {
+    beforeEach(() => component.ngOnInit());
+
     it('should mark customer form as invalid when empty', () => {
       expect(component.customerForm.invalid).toBeTrue();
     });
@@ -593,6 +618,8 @@ describe('ReservationComponent', () => {
 
   describe('Professional Selection', () => {
     beforeEach(() => {
+      component.ngOnInit();
+
       component.room.setValue(mockRoom);
     });
 
@@ -666,6 +693,8 @@ describe('ReservationComponent', () => {
   });
 
   describe('Date Time List Management', () => {
+    beforeEach(() => component.ngOnInit());
+
     it('should add multiple dates', () => {
       component.addDate(new Date(), '10:00');
       component.addDate(new Date(), '14:00');
@@ -713,6 +742,12 @@ describe('ReservationComponent', () => {
   });
 
   describe('Step Navigation Advanced', () => {
+    beforeEach(() => {
+      fixture.detectChanges();
+      component.myStepper = jasmine.createSpyObj<MatStepper>('MatStepper', [], {
+        selectedIndex: 0,
+      });
+    });
     it('should complete step 2 and move to step 3', () => {
       component.customer.setValue(mockCustomer);
       component.callStepTwo(false);
@@ -740,6 +775,8 @@ describe('ReservationComponent', () => {
     });
 
     it('should clear customer info when customer changes', () => {
+      component.ngOnInit();
+
       component.customerInfo = { treatment: { name: 'Old Treatment' } } as any;
       component.customer.setValue(mockCustomer);
       expect(component.customerInfo).toBeUndefined();
@@ -792,9 +829,156 @@ describe('ReservationComponent', () => {
     });
 
     it('should handle invalid time format', () => {
+      component.ngOnInit();
+
       component.addDate(new Date(), 'invalid-time');
       // Should handle gracefully
       expect(component.dateTimeList.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('segmentClick', () => {
+    const mockProfessional = { id: 'professional-1', displayName: 'Test Professional', email: 'test@professional.com' };
+
+    beforeEach(() => {
+      const customer = { id: 'customer-1', displayName: 'Test Customer', email: 'test@customer.com' };
+      component.customer.setValue(customer);
+      component.professional.setValue(mockProfessional);
+    });
+
+    it('should set the selected segment', () => {
+      component.ngOnInit();
+
+      const today = new Date();
+      const daysUntilMonday = (1 + 7 - today.getDay()) % 7 || 7;
+
+      const nextMonday = new Date(today);
+      nextMonday.setDate(today.getDate() + daysUntilMonday);
+      nextMonday.setHours(12, 0, 0, 0);
+
+      component.dataEvents.set('event', new DataEvent([], 0, nextMonday, 0));
+      component['professionalId'] = 'professional-1';
+      component['totalDuration'] = new Duration(1);
+
+      dialogSpy.and.callFake((_: any, config: any) => {
+        return {
+          afterClosed: () => of({ value: config.data.value }),
+        };
+      });
+
+      component.segmentClick(nextMonday, 'CREATED', 'event');
+
+      expect(dialogSpy).toHaveBeenCalledWith(
+        jasmine.any(Function),
+        {
+          data: {
+            title: 'RESERVATION.EVENT.CHANGE.TITLE',
+            content: 'RESERVATION.EVENT.CHANGE.CONTENT',
+            value: jasmine.objectContaining({
+              start: nextMonday,
+              end: jasmine.any(Date),
+              title: 'RESERVATION.EVENT.DETAIL',
+              meta: jasmine.objectContaining({
+                isReservation: true,
+              }),
+            }),
+          },
+        });
+    });
+
+    it('should check for professionalId before proceeding', () => {
+      component.ngOnInit();
+
+      const today = new Date();
+      const daysUntilMonday = (1 + 7 - today.getDay()) % 7 || 7;
+
+      const nextMonday = new Date(today);
+      nextMonday.setDate(today.getDate() + daysUntilMonday);
+      nextMonday.setHours(12, 0, 0, 0);
+
+      component.professionalList = [mockProfessional, { ...mockProfessional, id: 'professional-2' }];
+      component.dataEvents.set('event', new DataEvent([], 0, nextMonday, 0));
+      component['totalDuration'] = new Duration(1);
+      matches$.next({ matches: true });
+
+      dialogSpy.and.callFake((_: any, config: any) => {
+        return {
+          afterClosed: () => of({ value: config.data.value, professional: mockProfessional }),
+        };
+      });
+
+      component.segmentClick(nextMonday, 'CREATED', 'event');
+
+      expect(dialogSpy).toHaveBeenCalledWith(
+        jasmine.any(Function),
+        {
+          disableClose: true,
+          data: {
+            professionals: [mockProfessional, { ...mockProfessional, id: 'professional-2' }],
+            small: true,
+          },
+        });
+
+      expect(dialogSpy).toHaveBeenCalledWith(
+        jasmine.any(Function),
+        {
+          data: {
+            title: 'RESERVATION.EVENT.CHANGE.TITLE',
+            content: 'RESERVATION.EVENT.CHANGE.CONTENT',
+            value: jasmine.objectContaining({
+              start: nextMonday,
+              end: jasmine.any(Date),
+              title: 'RESERVATION.EVENT.DETAIL',
+              meta: jasmine.objectContaining({
+                isReservation: true,
+              }),
+            }),
+          },
+        });
+    });
+
+    it('should not set the segment if event data does not exist', () => {
+      component.ngOnInit();
+
+      const today = new Date();
+      const daysUntilMonday = (1 + 7 - today.getDay()) % 7 || 7;
+
+      const nextMonday = new Date(today);
+      nextMonday.setDate(today.getDate() + daysUntilMonday);
+      nextMonday.setHours(12, 0, 0, 0);
+
+      component.dataEvents.set('event', new DataEvent([], 0, nextMonday, 0));
+
+      component.segmentClick(nextMonday, 'CREATED', 'invalid-key');
+
+      expect(dialogSpy).not.toHaveBeenCalled();
+    });
+
+    it('should not set the segment if date is older than today', () => {
+      component.ngOnInit();
+
+      const oldDate = new Date();
+      oldDate.setDate(oldDate.getDate() - 1);
+      oldDate.setHours(12, 0, 0, 0);
+
+      component.dataEvents.set('event', new DataEvent([], 0, oldDate, 0));
+
+      component.segmentClick(oldDate, 'CREATED', 'event');
+
+      expect(dialogSpy).not.toHaveBeenCalled();
+    });
+
+    it('should not set the segment if date is after max reservation date', () => {
+      component.ngOnInit();
+
+      const invalidDate = addMonths(new Date(), MAX_RESERVATION_MONTH + 1);
+      invalidDate.setHours(12, 0, 0, 0);
+
+      component.dataEvents.set('event', new DataEvent([], 0, invalidDate, 0));
+
+      component.segmentClick(invalidDate, 'CREATED', 'event');
+
+      expect(dialogSpy).not.toHaveBeenCalled();
     });
   });
 });

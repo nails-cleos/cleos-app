@@ -11,9 +11,11 @@ import { clean, getAllCustomers } from '../../store/user.actions';
 describe('ChangeCustomerDialogComponent', () => {
   let component: ChangeCustomerDialogComponent;
   let fixture: ComponentFixture<ChangeCustomerDialogComponent>;
+  let state$: Subject<any>;
+
   let mockDialogRef: jasmine.SpyObj<MatDialogRef<ChangeCustomerDialogComponent>>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let stateSubject: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store>;
 
   const mockCustomers: IUserAll[] = [
     {
@@ -47,18 +49,19 @@ describe('ChangeCustomerDialogComponent', () => {
   };
 
   beforeEach(async () => {
-    stateSubject = new Subject();
-    mockDialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
-    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    state$ = new Subject();
 
-    mockStore.select.and.returnValue(stateSubject.asObservable());
+    mockDialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+
+    storeSpy.select.and.returnValue(state$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [ChangeCustomerDialogComponent, TranslateModule.forRoot(), AppMaterialModule],
       providers: [
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { ...mockData } },
-        { provide: Store, useValue: mockStore },
+        { provide: Store, useValue: storeSpy },
       ],
     }).compileComponents();
 
@@ -66,6 +69,8 @@ describe('ChangeCustomerDialogComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
+
+  afterEach(() => state$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -77,7 +82,7 @@ describe('ChangeCustomerDialogComponent', () => {
 
   it('should dispatch Clean action on initialization', () => {
     component.ngOnInit();
-    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('onNoClick should close the dialog', () => {
@@ -153,11 +158,11 @@ describe('ChangeCustomerDialogComponent', () => {
   it('should handle state subscription correctly', () => {
     component.ngOnInit();
 
-    expect(mockStore.select).toHaveBeenCalled();
+    expect(storeSpy.select).toHaveBeenCalled();
   });
 
   it('should update customer list when state changes', () => {
-    stateSubject.next({
+    state$.next({
       data: mockCustomers,
     });
 
@@ -165,11 +170,11 @@ describe('ChangeCustomerDialogComponent', () => {
   });
 
   it('should dispatch GetCustomer action when getCustomers is called', () => {
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     component['getCustomers']();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(getAllCustomers());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllCustomers());
   });
 
   it('should filter customers correctly when filterCustomer is called', () => {

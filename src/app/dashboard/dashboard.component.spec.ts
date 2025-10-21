@@ -11,36 +11,38 @@ import { addDays, addHours } from 'date-fns';
 import { States } from '../interfaces/reservation';
 import { FrequencyEnum } from '../util/helper';
 import { daysOfWeek } from '../util/dates';
+import { AppState } from '../store/app.states';
 
 describe('DashboardComponent', () => {
   let fixture: ComponentFixture<DashboardComponent>;
   let component: DashboardComponent;
-  let openDialogSpy: jasmine.Spy<any>;
-  let mockRouter: jasmine.SpyObj<Router>;
 
-  let storeMock: any;
-  let authUserServiceMock: any;
-  let stateSubject: Subject<any>;
-  let authUserSubject: Subject<any>;
+  let state$: Subject<any>;
+  let authUser$: Subject<any>;
+
+  let dialogSpy: jasmine.Spy<any>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
   beforeEach(async () => {
-    stateSubject = new Subject();
-    authUserSubject = new Subject();
+    state$ = new Subject();
+    authUser$ = new Subject();
 
-    mockRouter = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
+      authUser: authUser$.asObservable(),
+    });
 
-    storeMock = {
-      select: jasmine.createSpy().and.returnValue(stateSubject.asObservable()),
-      dispatch: jasmine.createSpy(),
-    };
-    authUserServiceMock = { authUser: authUserSubject.asObservable() };
+    storeSpy.select.and.returnValue(state$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [DashboardComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeMock },
-        { provide: Router, useValue: mockRouter },
-        { provide: AuthUserService, useValue: authUserServiceMock },
+        { provide: Store, useValue: storeSpy },
+        { provide: Router, useValue: routerSpy },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
       ],
     }).compileComponents();
 
@@ -51,18 +53,20 @@ describe('DashboardComponent', () => {
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
 
-    openDialogSpy = spyOn(component.dialog, 'open');
+    dialogSpy = spyOn(component.dialog, 'open');
 
     fixture.detectChanges();
   });
 
   afterEach(() => {
     fixture.destroy();
+    state$.complete();
+    authUser$.complete();
   });
 
   it('should dispatch Clean and GetMyEvent on init', () => {
-    expect(storeMock.dispatch).toHaveBeenCalledWith(jasmine.anything()); // Clean
-    expect(storeMock.dispatch).toHaveBeenCalledWith(jasmine.anything()); // GetMyEvent
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.anything()); // Clean
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.anything()); // GetMyEvent
   });
 
   it('should update professional reservations on professionalChanged', () => {
@@ -242,7 +246,7 @@ describe('DashboardComponent', () => {
     end.setHours(23, 59, 59, 999);
     component.beforeMonthViewRender({ period: { start, end } });
 
-    stateSubject.next({ dashboard });
+    state$.next({ dashboard });
 
     expect(component.calendar.calendarEvents).toEqual([
       jasmine.objectContaining({
@@ -255,7 +259,7 @@ describe('DashboardComponent', () => {
   });
 
   it('should allow segment click', () => {
-    openDialogSpy.and.returnValue({
+    dialogSpy.and.returnValue({
       afterClosed: () => of('unavailable,block-agenda'),
     });
 
@@ -265,11 +269,11 @@ describe('DashboardComponent', () => {
 
     component.segmentClick(date, professionalId);
 
-    expect(openDialogSpy).toHaveBeenCalledWith(
+    expect(dialogSpy).toHaveBeenCalledWith(
       jasmine.any(Function),
       jasmine.objectContaining({ data: null }));
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(
+    expect(routerSpy.navigate).toHaveBeenCalledWith(
       ['en-GB', 'unavailable', 'block-agenda'], { state: { date, professionalId, isDashboard: true } });
   });
 });

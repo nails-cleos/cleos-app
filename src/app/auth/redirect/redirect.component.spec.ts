@@ -6,37 +6,36 @@ import { NavigationService } from '../../services/navigation.service';
 import { TokenService } from '../../services/token.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Role } from '../../interfaces/token';
+import { AppState } from '../../store/app.states';
 
 describe('RedirectComponent', () => {
   let fixture: ComponentFixture<RedirectComponent>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let stateSubject: Subject<any>;
+
+  let state$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
   let navigateServiceSpy: jasmine.SpyObj<NavigationService>;
-  let tokenService: TokenService;
+  let tokenServiceSpy: jasmine.SpyObj<TokenService>;
 
   beforeEach(async () => {
-    stateSubject = new Subject<any>();
+    state$ = new Subject<any>();
 
-    mockStore = jasmine.createSpyObj<Store>('Store', ['select', 'dispatch']);
-    mockStore.select.and.returnValue(stateSubject.asObservable());
-
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
     navigateServiceSpy = jasmine.createSpyObj('NavigationService', ['reload']);
-    const mockTokenService = {
-      token: jasmine.createSpy('token'),
-      user: jasmine.createSpy('user'),
-    };
+    tokenServiceSpy = jasmine.createSpyObj('TokenService', ['token', 'user']);
+
+    storeSpy.select.and.returnValue(state$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [RedirectComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: mockStore },
+        { provide: Store, useValue: storeSpy },
         { provide: NavigationService, useValue: navigateServiceSpy },
-        { provide: TokenService, useValue: mockTokenService },
+        { provide: TokenService, useValue: tokenServiceSpy },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(RedirectComponent);
-    tokenService = TestBed.inject(TokenService);
 
     const translate = TestBed.inject(TranslateService);
     translate.setDefaultLang('en-GB');
@@ -46,29 +45,29 @@ describe('RedirectComponent', () => {
   });
 
   it('should not navigate if redirect is false', () => {
-    stateSubject.next({ redirect: false });
+    state$.next({ redirect: false });
     expect(navigateServiceSpy.reload).not.toHaveBeenCalled();
   });
 
   it('should navigate to /en/home if not authenticated', () => {
-    stateSubject.next({ redirect: true, isAuthenticated: false });
+    state$.next({ redirect: true, isAuthenticated: false });
     expect(navigateServiceSpy.reload).toHaveBeenCalledWith(['en-GB', 'home']);
   });
 
   it('should navigate to /en/dashboard if user has admin role', () => {
-    stateSubject.next({
+    state$.next({
       redirect: true,
       isAuthenticated: true,
       token: 'fake-token',
       user: { authorities: [{ authority: Role.admin }] },
     });
 
-    expect(tokenService.token).toBe('fake-token');
+    expect(tokenServiceSpy.token).toBe('fake-token');
     expect(navigateServiceSpy.reload).toHaveBeenCalledWith(['en-GB', 'dashboard']);
   });
 
   it('should navigate to /en/events if user has room admin role', () => {
-    stateSubject.next({
+    state$.next({
       redirect: true,
       isAuthenticated: true,
       token: 'fake-token',
@@ -78,7 +77,7 @@ describe('RedirectComponent', () => {
   });
 
   it('should navigate to /en/me/reservations for other roles', () => {
-    stateSubject.next({
+    state$.next({
       redirect: true,
       isAuthenticated: true,
       token: 'fake-token',

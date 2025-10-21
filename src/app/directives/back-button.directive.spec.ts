@@ -2,33 +2,25 @@ import { BackButtonDirective } from './back-button.directive';
 import { TestBed } from '@angular/core/testing';
 import { NavigationService } from '../services/navigation.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { MatDialog } from '@angular/material/dialog';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { of } from 'rxjs';
 
 describe('BackButtonDirective', () => {
   let directive: BackButtonDirective;
-  let mockNavigationService: jasmine.SpyObj<NavigationService>;
-  let mockDialog: jasmine.SpyObj<MatDialog>;
+
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let dialogSpy: jasmine.Spy<any>;
+
   let translateService: TranslateService;
 
   beforeEach(() => {
-    mockNavigationService = jasmine.createSpyObj('NavigationService', ['back']);
-
-    const mockDialogRef = {
-      afterClosed: () => ({
-        subscribe: jasmine.createSpy('subscribe'),
-      }),
-    };
-
-    mockDialog = jasmine.createSpyObj('MatDialog', ['open']);
-    mockDialog.open.and.returnValue(mockDialogRef as any);
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot()],
       providers: [
         BackButtonDirective,
-        { provide: NavigationService, useValue: mockNavigationService },
-        { provide: MatDialog, useValue: mockDialog },
+        { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     });
 
@@ -37,6 +29,8 @@ describe('BackButtonDirective', () => {
     translateService = TestBed.inject(TranslateService);
     translateService.setDefaultLang('en-GB');
     translateService.use('en-GB');
+
+    dialogSpy = spyOn(directive.dialog, 'open');
   });
 
   it('should create an instance', () => {
@@ -51,9 +45,13 @@ describe('BackButtonDirective', () => {
     directive.date = new Date();
     directive.step = 1;
 
+    dialogSpy.and.returnValue({
+      afterClosed: () => of(form),
+    });
+
     directive.onClick();
 
-    expect(mockNavigationService.back).toHaveBeenCalledWith(directive.date, directive.step);
+    expect(navigationServiceSpy.back).toHaveBeenCalledWith(directive.date, directive.step);
   });
 
   it('should call navigation.back when no form is provided', () => {
@@ -62,7 +60,11 @@ describe('BackButtonDirective', () => {
 
     directive.onClick();
 
-    expect(mockNavigationService.back).toHaveBeenCalledWith(directive.date, directive.step);
+    dialogSpy.and.returnValue({
+      afterClosed: () => of(directive.form),
+    });
+
+    expect(navigationServiceSpy.back).toHaveBeenCalledWith(directive.date, directive.step);
   });
 
   it('should show dialog when form is dirty', () => {
@@ -79,6 +81,10 @@ describe('BackButtonDirective', () => {
           CONTENT: 'Back Content',
         },
       },
+    });
+
+    dialogSpy.and.returnValue({
+      afterClosed: () => of(form),
     });
 
     directive.onClick();

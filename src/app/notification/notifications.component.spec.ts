@@ -11,18 +11,22 @@ import { INotification } from '../interfaces/notification';
 describe('NotificationsComponent', () => {
   let component: NotificationsComponent;
   let fixture: ComponentFixture<NotificationsComponent>;
+
+  let state$: Subject<any>;
+
   let storeSpy: jasmine.SpyObj<Store<any>>;
   let routerSpy: jasmine.SpyObj<Router>;
   let navigationSpy: jasmine.SpyObj<NavigationService>;
-  let stateSubject: Subject<any>;
 
   beforeEach(async () => {
     storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate'], { url: '/home/test' });
     navigationSpy = jasmine.createSpyObj('NavigationService', ['reload']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate'], {
+      url: '/home/test',
+    });
 
-    stateSubject = new Subject<any>();
-    storeSpy.select.and.returnValue(stateSubject.asObservable());
+    state$ = new Subject<any>();
+    storeSpy.select.and.returnValue(state$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [NotificationsComponent, TranslateModule.forRoot()],
@@ -41,6 +45,8 @@ describe('NotificationsComponent', () => {
 
     storeSpy.select.and.returnValue(of({}));
   });
+
+  afterEach(() => state$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -92,9 +98,9 @@ describe('NotificationsComponent', () => {
 
     component.remove(0);
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteNotification({ notification: jasmine.objectContaining({ id: '3', deleted: true }) }));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteNotification(
+      { notification: jasmine.objectContaining({ id: '3', deleted: true }) } as any,
+    ));
     expect(component.badge).toBe(0);
   });
 
@@ -113,7 +119,7 @@ describe('NotificationsComponent', () => {
     component.ngOnInit();
 
     // simula que viene data con una notificación no leída
-    stateSubject.next({
+    state$.next({
       data: {
         page: {
           content: [{ id: 'n1', date: '2025-10-01T00:00:00Z', read: false }],
@@ -132,7 +138,7 @@ describe('NotificationsComponent', () => {
   it('should set loadingNotifications when no id in content', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       data: {
         page: { content: [{}] },
       },
@@ -144,7 +150,7 @@ describe('NotificationsComponent', () => {
   it('should set loadingNotifications to undefined when content is empty', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       data: {
         page: { content: [] },
       },

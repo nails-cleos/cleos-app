@@ -4,41 +4,42 @@ import { ShortcutComponent } from './shortcut.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { AuthUserService } from '../services/auth-user.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { NavigationService } from '../services/navigation.service';
 
 describe('ShortcutComponent', () => {
   let component: ShortcutComponent;
   let fixture: ComponentFixture<ShortcutComponent>;
+
+  let authUser$: Subject<any>;
+  let paramMap$: Subject<ParamMap>;
+
   let navigateServiceSpy: jasmine.SpyObj<NavigationService>;
-  let authUserSubject: Subject<any>;
-
-  const mockActivatedRoute = {
-    snapshot: {
-      paramMap: {
-        get: jasmine.createSpy('get').and.returnValue('calendar'),
-      },
-    },
-  };
-
-  const mockRouter = {
-    navigate: jasmine.createSpy('navigate'),
-  };
+  let routerSpy: jasmine.SpyObj<Router>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let paramMapSpy: jasmine.SpyObj<ParamMap>;
 
   beforeEach(async () => {
-    authUserSubject = new Subject();
+    authUser$ = new Subject();
+    paramMap$ = new Subject();
 
+    paramMapSpy = jasmine.createSpyObj('ParamMap', ['get']);
     navigateServiceSpy = jasmine.createSpyObj('NavigationService', ['reload']);
-    const authUserSpyObj = jasmine.createSpyObj('AuthUserService', [], {
-      authUser: authUserSubject.asObservable(),
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
+      authUser: authUser$.asObservable(),
+    });
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      paramMap: paramMap$.asObservable(),
     });
 
     await TestBed.configureTestingModule({
       imports: [ShortcutComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: AuthUserService, useValue: authUserSpyObj },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: Router, useValue: mockRouter },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: Router, useValue: routerSpy },
         { provide: NavigationService, useValue: navigateServiceSpy },
       ],
     }).compileComponents();
@@ -46,33 +47,30 @@ describe('ShortcutComponent', () => {
     const translate = TestBed.inject(TranslateService);
     translate.setDefaultLang('en-GB');
     translate.use('en-GB');
+
+    fixture = TestBed.createComponent(ShortcutComponent);
+    component = fixture.componentInstance;
   });
 
   afterEach(async () => {
-    authUserSubject.complete();
+    authUser$.complete();
     component.ngOnDestroy();
   });
 
   it('should create', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue('calendar');
-
-    fixture = TestBed.createComponent(ShortcutComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
-    mockRouter.navigate.calls.reset();
+    paramMapSpy.get.and.returnValue('calendar');
 
     expect(component).toBeTruthy();
   });
 
-  it('should navigate to /en-GB/events if user is room admin', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue('calendar');
+  it('should navigate to /en-GB/events if user is room admin and shortcut calendar', () => {
+    paramMapSpy.get.and.returnValue('calendar');
+    paramMap$.next(paramMapSpy);
 
-    fixture = TestBed.createComponent(ShortcutComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
-    mockRouter.navigate.calls.reset();
 
-    authUserSubject.next({
+    authUser$.next({
       isRoomAdmin: true,
       isAdmin: false,
       isManager: false,
@@ -80,19 +78,17 @@ describe('ShortcutComponent', () => {
       isCustomer: false,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'events']);
-    expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'events']);
+    expect(routerSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
   it('should navigate to /en-GB/reservation/calendar if user is admin', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue('calendar');
+    paramMapSpy.get.and.returnValue('calendar');
+    paramMap$.next(paramMapSpy);
 
-    fixture = TestBed.createComponent(ShortcutComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
-    mockRouter.navigate.calls.reset();
 
-    authUserSubject.next({
+    authUser$.next({
       isRoomAdmin: false,
       isAdmin: true,
       isManager: false,
@@ -100,19 +96,17 @@ describe('ShortcutComponent', () => {
       isCustomer: false,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'reservation', 'calendar']);
-    expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'reservation', 'calendar']);
+    expect(routerSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
   it('should navigate to /en-GB/reservation/calendar if user is manager', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue('calendar');
+    paramMapSpy.get.and.returnValue('calendar');
+    paramMap$.next(paramMapSpy);
 
-    fixture = TestBed.createComponent(ShortcutComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
-    mockRouter.navigate.calls.reset();
 
-    authUserSubject.next({
+    authUser$.next({
       isRoomAdmin: false,
       isAdmin: false,
       isManager: true,
@@ -120,19 +114,17 @@ describe('ShortcutComponent', () => {
       isCustomer: false,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'reservation', 'calendar']);
-    expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'reservation', 'calendar']);
+    expect(routerSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
   it('should navigate to /en-GB/reservation/calendar if user is professional', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue('calendar');
+    paramMapSpy.get.and.returnValue('calendar');
+    paramMap$.next(paramMapSpy);
 
-    fixture = TestBed.createComponent(ShortcutComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
-    mockRouter.navigate.calls.reset();
 
-    authUserSubject.next({
+    authUser$.next({
       isRoomAdmin: false,
       isAdmin: false,
       isManager: false,
@@ -140,19 +132,17 @@ describe('ShortcutComponent', () => {
       isCustomer: false,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'reservation', 'calendar']);
-    expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'reservation', 'calendar']);
+    expect(routerSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
   it('should navigate to /en-GB/me/reservations if user is customer', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue('calendar');
+    paramMapSpy.get.and.returnValue('calendar');
+    paramMap$.next(paramMapSpy);
 
-    fixture = TestBed.createComponent(ShortcutComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
-    mockRouter.navigate.calls.reset();
 
-    authUserSubject.next({
+    authUser$.next({
       isRoomAdmin: false,
       isAdmin: false,
       isManager: false,
@@ -160,19 +150,17 @@ describe('ShortcutComponent', () => {
       isCustomer: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'reservations']);
-    expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'reservations']);
+    expect(routerSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
   it('should navigate to /en-GB/events if user is room admin', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue('dashboard');
+    paramMapSpy.get.and.returnValue('dashboard');
+    paramMap$.next(paramMapSpy);
 
-    fixture = TestBed.createComponent(ShortcutComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
-    mockRouter.navigate.calls.reset();
 
-    authUserSubject.next({
+    authUser$.next({
       isRoomAdmin: true,
       isAdmin: false,
       isManager: false,
@@ -180,19 +168,17 @@ describe('ShortcutComponent', () => {
       isCustomer: false,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'events']);
-    expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'events']);
+    expect(routerSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
   it('should navigate to /en-GB/dashboard if user is admin', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue('dashboard');
+    paramMapSpy.get.and.returnValue('dashboard');
+    paramMap$.next(paramMapSpy);
 
-    fixture = TestBed.createComponent(ShortcutComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
-    mockRouter.navigate.calls.reset();
 
-    authUserSubject.next({
+    authUser$.next({
       isRoomAdmin: false,
       isAdmin: true,
       isManager: false,
@@ -200,19 +186,20 @@ describe('ShortcutComponent', () => {
       isCustomer: false,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'dashboard']);
-    expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'dashboard']);
+    expect(routerSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
   it('should navigate to /en-GB/dashboard if user is manager', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue('dashboard');
+    paramMapSpy.get.and.returnValue('dashboard');
+    paramMap$.next(paramMapSpy);
 
-    fixture = TestBed.createComponent(ShortcutComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
-    mockRouter.navigate.calls.reset();
+    paramMap$.next(paramMapSpy);
 
-    authUserSubject.next({
+    fixture.detectChanges();
+
+    authUser$.next({
       isRoomAdmin: false,
       isAdmin: false,
       isManager: true,
@@ -220,19 +207,17 @@ describe('ShortcutComponent', () => {
       isCustomer: false,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'dashboard']);
-    expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'dashboard']);
+    expect(routerSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
   it('should navigate to /en-GB/dashboard if user is professional', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue('dashboard');
+    paramMapSpy.get.and.returnValue('dashboard');
+    paramMap$.next(paramMapSpy);
 
-    fixture = TestBed.createComponent(ShortcutComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
-    mockRouter.navigate.calls.reset();
 
-    authUserSubject.next({
+    authUser$.next({
       isRoomAdmin: false,
       isAdmin: false,
       isManager: false,
@@ -240,19 +225,17 @@ describe('ShortcutComponent', () => {
       isCustomer: false,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'dashboard']);
-    expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'dashboard']);
+    expect(routerSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
   it('should navigate to /en-GB/me/overview if user is customer', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue('dashboard');
+    paramMapSpy.get.and.returnValue('dashboard');
+    paramMap$.next(paramMapSpy);
 
-    fixture = TestBed.createComponent(ShortcutComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
-    mockRouter.navigate.calls.reset();
 
-    authUserSubject.next({
+    authUser$.next({
       isRoomAdmin: false,
       isAdmin: false,
       isManager: false,
@@ -260,19 +243,17 @@ describe('ShortcutComponent', () => {
       isCustomer: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'overview']);
-    expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'overview']);
+    expect(routerSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
   it('should navigate to /en-GB/reservation if user is not customer', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue('reservation');
+    paramMapSpy.get.and.returnValue('reservation');
+    paramMap$.next(paramMapSpy);
 
-    fixture = TestBed.createComponent(ShortcutComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
-    mockRouter.navigate.calls.reset();
 
-    authUserSubject.next({
+    authUser$.next({
       isRoomAdmin: false,
       isAdmin: false,
       isManager: false,
@@ -280,19 +261,17 @@ describe('ShortcutComponent', () => {
       isCustomer: false,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'reservation']);
-    expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'reservation']);
+    expect(routerSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
   it('should navigate to /en-GB/me/reservation if user is customer', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue('reservation');
+    paramMapSpy.get.and.returnValue('reservation');
+    paramMap$.next(paramMapSpy);
 
-    fixture = TestBed.createComponent(ShortcutComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
-    mockRouter.navigate.calls.reset();
 
-    authUserSubject.next({
+    authUser$.next({
       isRoomAdmin: false,
       isAdmin: false,
       isManager: false,
@@ -300,7 +279,7 @@ describe('ShortcutComponent', () => {
       isCustomer: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'reservation']);
-    expect(mockRouter.navigate).toHaveBeenCalledTimes(1);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'reservation']);
+    expect(routerSpy.navigate).toHaveBeenCalledTimes(1);
   });
 });

@@ -7,31 +7,35 @@ import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { clean } from '../../store/discount.actions';
 import { DiscountType, IUserDiscount } from '../../interfaces/discount';
+import { AppState } from '../../store/app.states';
 
 describe('AddDiscountDialogComponent', () => {
   let component: AddDiscountDialogComponent;
   let fixture: ComponentFixture<AddDiscountDialogComponent>;
+
+  let state$: Subject<any>;
+
   let mockDialogRef: jasmine.SpyObj<MatDialogRef<AddDiscountDialogComponent>>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let stateSubject: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
 
   const mockData = {
     customerId: 'customer-id',
   };
 
   beforeEach(async () => {
-    stateSubject = new Subject();
+    state$ = new Subject();
     mockDialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
-    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
 
-    mockStore.select.and.returnValue(stateSubject.asObservable());
+    storeSpy.select.and.returnValue(state$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [AddDiscountDialogComponent, TranslateModule.forRoot(), AppMaterialModule],
       providers: [
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { ...mockData } },
-        { provide: Store, useValue: mockStore },
+        { provide: Store, useValue: storeSpy },
       ],
     }).compileComponents();
 
@@ -39,6 +43,8 @@ describe('AddDiscountDialogComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
+
+  afterEach(() => state$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -106,10 +112,10 @@ describe('AddDiscountDialogComponent', () => {
 
   it('should dispatch Clean action on initialization', () => {
     // Reset to check only the initialization call
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should initialize form with empty values', () => {
@@ -130,7 +136,7 @@ describe('AddDiscountDialogComponent', () => {
   it('should handle state subscription correctly', () => {
     component.ngOnInit();
 
-    expect(mockStore.select).toHaveBeenCalled();
+    expect(storeSpy.select).toHaveBeenCalled();
   });
 
   it('should update discount list when state changes', () => {
@@ -158,7 +164,7 @@ describe('AddDiscountDialogComponent', () => {
       },
     ];
 
-    stateSubject.next({
+    state$.next({
       data: mockDiscounts,
     });
 

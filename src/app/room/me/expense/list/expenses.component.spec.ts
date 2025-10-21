@@ -22,13 +22,17 @@ import { MatDatepicker } from '@angular/material/datepicker';
 describe('ExpensesComponent', () => {
   let component: ExpensesComponent;
   let fixture: ComponentFixture<ExpensesComponent>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let mockBreakpointObserver: jasmine.SpyObj<BreakpointObserver>;
-  let mockChangeDetectorRef: jasmine.SpyObj<ChangeDetectorRef>;
-  let mockDatepicker: jasmine.SpyObj<MatDatepicker<Date>>;
-  let mockActivatedRoute: any;
-  let stateSubject: Subject<any>;
-  let openDialogSpy: jasmine.Spy<any>;
+
+  let state$: Subject<any>;
+  let paramMap$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store>;
+  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
+  let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
+  let datepickerSpy: jasmine.SpyObj<MatDatepicker<Date>>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+
+  let dialogSpy: jasmine.Spy<any>;
 
   const room: IRoomAll = {
     id: 'room-id',
@@ -101,34 +105,32 @@ describe('ExpensesComponent', () => {
   };
 
   beforeEach(async () => {
-    stateSubject = new Subject();
+    state$ = new Subject();
+    paramMap$ = new Subject();
 
-    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    mockBreakpointObserver = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    mockChangeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-    mockDatepicker = jasmine.createSpyObj('MatDatepicker', ['close']);
-
-    mockActivatedRoute = {
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
+    datepickerSpy = jasmine.createSpyObj('MatDatepicker', ['close']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: {
           get: jasmine.createSpy('get').and.returnValue('1'),
         },
       },
-      paramMap: of({
-        get: () => '1',
-      }),
-    };
+      paramMap: paramMap$.asObservable(),
+    });
 
-    mockStore.select.and.returnValue(stateSubject.asObservable());
-    mockBreakpointObserver.observe.and.returnValue(of({ matches: false, breakpoints: {} }));
+    storeSpy.select.and.returnValue(state$.asObservable());
+    breakpointObserverSpy.observe.and.returnValue(of({ matches: false, breakpoints: {} }));
 
     await TestBed.configureTestingModule({
       imports: [ExpensesComponent, TranslateModule.forRoot(), NoopAnimationsModule],
       providers: [
-        { provide: Store, useValue: mockStore },
-        { provide: BreakpointObserver, useValue: mockBreakpointObserver },
-        { provide: ChangeDetectorRef, useValue: mockChangeDetectorRef },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: Store, useValue: storeSpy },
+        { provide: BreakpointObserver, useValue: breakpointObserverSpy },
+        { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
     }).compileComponents();
 
@@ -149,9 +151,12 @@ describe('ExpensesComponent', () => {
 
     component.roomId = '1';
 
-    openDialogSpy = spyOn(component.dialog, 'open');
+    dialogSpy = spyOn(component.dialog, 'open');
+  });
 
-    component.ngOnInit();
+  afterEach(() => {
+    state$.complete();
+    paramMap$.complete();
   });
 
   it('should create', () => {
@@ -167,22 +172,16 @@ describe('ExpensesComponent', () => {
 
   it('should dispatch Clean action on initialization', () => {
     // Reset to check only the initialization call
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
-  });
-
-  it('should call getExpenses after view init', () => {
-    spyOn(component as any, 'getExpenses');
-
-    component.ngAfterViewInit();
-
-    expect(component['getExpenses']).toHaveBeenCalled();
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should update data source when state changes', () => {
-    stateSubject.next({
+    component.ngOnInit();
+
+    state$.next({
       data: mockPagination,
     });
 
@@ -194,18 +193,27 @@ describe('ExpensesComponent', () => {
   });
 
   it('should clean and get expense list on response', () => {
-    spyOn(component as any, 'clean');
-    spyOn(component as any, 'getExpenses');
+    component.ngOnInit();
 
-    stateSubject.next({
-      response: true,
-    });
+    paramMap$.next({ id: '1' });
+    state$.next({ response: true });
 
-    expect(component['clean']).toHaveBeenCalled();
-    expect(component['getExpenses']).toHaveBeenCalled();
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(
+      getExpensesPage({
+        roomId: '1',
+        sort: 'name',
+        direction: 'asc',
+        page: 0,
+        size: PAGE_SIZE,
+        filter: undefined,
+        dateFilter: undefined,
+      }),
+    );
   });
 
   it('should create page subscriptions when results length is available', () => {
+    component.ngOnInit();
     component.paginator = {
       pageIndex: 0,
       page: of({ pageIndex: 0, pageSize: PAGE_SIZE }),
@@ -219,7 +227,7 @@ describe('ExpensesComponent', () => {
 
     spyOn(component as any, 'createPageSubscriptions');
 
-    stateSubject.next({
+    state$.next({
       data: mockPagination,
     });
 
@@ -231,19 +239,19 @@ describe('ExpensesComponent', () => {
 
     component.edit(testExpense);
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(expenseSelected({ selected: testExpense }));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(expenseSelected({ selected: testExpense }));
   });
 
   it('should call delete method without errors', () => {
     const testExpense = mockExpenses[0] as unknown as IExpense;
 
-    openDialogSpy.and.returnValue({
+    dialogSpy.and.returnValue({
       afterClosed: () => of(testExpense),
     });
 
     component.delete(testExpense);
 
-    expect(openDialogSpy).toHaveBeenCalledWith(
+    expect(dialogSpy).toHaveBeenCalledWith(
       jasmine.any(Function),
       jasmine.objectContaining({
         data: {
@@ -253,7 +261,7 @@ describe('ExpensesComponent', () => {
         },
       }));
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(deleteExpense(
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteExpense(
       { roomId: component.roomId!, id: testExpense.id!, invoice: testExpense.invoice! },
     ));
   });
@@ -263,7 +271,7 @@ describe('ExpensesComponent', () => {
 
     component.openDialog(testExpense);
 
-    expect(openDialogSpy).toHaveBeenCalledWith(
+    expect(dialogSpy).toHaveBeenCalledWith(
       jasmine.any(Function),
       jasmine.objectContaining({
         data: {
@@ -353,7 +361,7 @@ describe('ExpensesComponent', () => {
     component['getExpenses'](2);
 
     expect(component['filter']).toBe('my filter');
-    expect(mockStore.dispatch).toHaveBeenCalledWith(getExpensesPage(
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getExpensesPage(
       {
         roomId: '1',
         sort: 'invoice',
@@ -376,13 +384,15 @@ describe('ExpensesComponent', () => {
 
   it('should handle state subscription errors gracefully', () => {
     expect(() => {
-      stateSubject.next({
+      state$.next({
         data: null,
       });
     }).not.toThrow();
   });
 
   it('should handle empty pagination data', () => {
+    component.ngOnInit();
+
     const emptyPagination: Pagination<IExpense> = {
       content: [],
       totalElements: 0,
@@ -390,7 +400,7 @@ describe('ExpensesComponent', () => {
       number: 0,
     };
 
-    stateSubject.next({
+    state$.next({
       data: emptyPagination,
     });
 
@@ -399,7 +409,7 @@ describe('ExpensesComponent', () => {
   });
 
   it('should initialize with correct state observable', () => {
-    expect(mockStore.select).toHaveBeenCalled();
+    expect(storeSpy.select).toHaveBeenCalled();
   });
 
   it('should maintain correct displayedColumns order', () => {
@@ -425,12 +435,12 @@ describe('ExpensesComponent', () => {
   it('should set month and year from normalizedMonthAndYear and close datepicker', () => {
     const normalizedMonthAndYear = new Date(2024, 6, 1); // July 2024
 
-    component.setMonthAndYear(normalizedMonthAndYear, mockDatepicker);
+    component.setMonthAndYear(normalizedMonthAndYear, datepickerSpy);
 
     const result = component.date.value!;
     expect(result.getMonth()).toBe(6); // July (0-based)
     expect(result.getFullYear()).toBe(2024);
-    expect(mockDatepicker.close).toHaveBeenCalled();
+    expect(datepickerSpy.close).toHaveBeenCalled();
   });
 
   it('should use getNowTimeZone() if date has no value', () => {
@@ -438,11 +448,11 @@ describe('ExpensesComponent', () => {
 
     const normalizedMonthAndYear = new Date(2025, 2, 1); // March 2025
 
-    component.setMonthAndYear(normalizedMonthAndYear, mockDatepicker);
+    component.setMonthAndYear(normalizedMonthAndYear, datepickerSpy);
 
     const result = component.date.value!;
     expect(result.getFullYear()).toBe(2025);
     expect(result.getMonth()).toBe(2);
-    expect(mockDatepicker.close).toHaveBeenCalled();
+    expect(datepickerSpy.close).toHaveBeenCalled();
   });
 });

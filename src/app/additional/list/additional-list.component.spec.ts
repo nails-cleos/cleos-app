@@ -5,8 +5,7 @@ import { of, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { ChangeDetectorRef } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
-import { ActivatedRoute } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { IAdditional } from '../../interfaces/additional';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
@@ -14,20 +13,22 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { additionalSelected, clean, getAdditionalPage } from '../../store/additional.actions';
+import { additionalSelected, clean, deleteAdditional, getAdditionalPage } from '../../store/additional.actions';
 import { convertDuration } from '../../util/dates';
-import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
+import { AppState } from '../../store/app.states';
 
 describe('AdditionalListComponent', () => {
   let component: AdditionalListComponent;
   let fixture: ComponentFixture<AdditionalListComponent>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let mockDialog: jasmine.SpyObj<DialogComponent>;
-  let mockBreakpointObserver: jasmine.SpyObj<BreakpointObserver>;
-  let mockChangeDetectorRef: jasmine.SpyObj<ChangeDetectorRef>;
-  let mockActivatedRoute: any;
-  let stateSubject: Subject<any>;
-  let breakpointSubject: Subject<any>;
+
+  let state$: Subject<any>;
+  let breakpoint$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
+  let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let dialogSpy: jasmine.Spy<any>;
 
   const mockAdditionalList: IAdditional[] = [
     { id: '1', name: 'Additional 1', description: '1 additional', duration: 'PT15M' },
@@ -44,27 +45,22 @@ describe('AdditionalListComponent', () => {
   };
 
   beforeEach(async () => {
-    stateSubject = new Subject();
-    breakpointSubject = new Subject();
+    state$ = new Subject();
+    breakpoint$ = new Subject();
 
-    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    mockDialog = jasmine.createSpyObj('MatDialog', ['open'], {
-      openDialogs: [],
-      afterOpened: new Subject(),
-      afterAllClosed: new Subject(),
-    });
-    mockBreakpointObserver = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    mockChangeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-    mockActivatedRoute = {
+    const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
-        paramMap: {
-          get: jasmine.createSpy('get').and.returnValue(null),
-        },
+        paramMap: paramMapSpy,
       },
-    };
+    });
 
-    mockStore.select.and.returnValue(stateSubject.asObservable());
-    mockBreakpointObserver.observe.and.returnValue(breakpointSubject.asObservable());
+    storeSpy.select.and.returnValue(state$.asObservable());
+    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
+    paramMapSpy.get.and.returnValue(null);
 
     await TestBed.configureTestingModule({
       imports: [
@@ -73,11 +69,10 @@ describe('AdditionalListComponent', () => {
         NoopAnimationsModule,
       ],
       providers: [
-        { provide: Store, useValue: mockStore },
-        { provide: MatDialog, useValue: mockDialog },
-        { provide: BreakpointObserver, useValue: mockBreakpointObserver },
-        { provide: ChangeDetectorRef, useValue: mockChangeDetectorRef },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: Store, useValue: storeSpy },
+        { provide: BreakpointObserver, useValue: breakpointObserverSpy },
+        { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
     }).compileComponents();
 
@@ -96,7 +91,12 @@ describe('AdditionalListComponent', () => {
       direction: 'asc',
     } as unknown as MatSort;
 
-    component.ngOnInit();
+    dialogSpy = spyOn(component.dialog, 'open');
+  });
+
+  afterEach(() => {
+    state$.complete();
+    breakpoint$.complete();
   });
 
   it('should create', () => {
@@ -111,10 +111,10 @@ describe('AdditionalListComponent', () => {
 
   it('should dispatch Clean action on initialization', () => {
     // Reset to check only the initialization call
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should call getAdditionalList after view init', () => {
@@ -126,9 +126,12 @@ describe('AdditionalListComponent', () => {
   });
 
   it('should update data source when state changes', () => {
-    stateSubject.next({
+    component.ngOnInit();
+
+    state$.next({
       data: mockPagination,
     });
+
     expect(component.dataSource).toEqual(mockAdditionalList.map((additional: IAdditional) => {
       if (additional.duration) {
         const duration = convertDuration(additional.duration);
@@ -141,18 +144,25 @@ describe('AdditionalListComponent', () => {
   });
 
   it('should clean and get additional list on response', () => {
+    component.ngOnInit();
+    component.ngAfterViewInit();
+
     spyOn(component as any, 'clean');
     spyOn(component as any, 'getAdditionalList');
 
-    stateSubject.next({
+    state$.next({
       response: true,
     });
 
-    expect(component['clean']).toHaveBeenCalled();
-    expect(component['getAdditionalList']).toHaveBeenCalled();
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(
+      getAdditionalPage({ page: 0, sort: 'name', direction: 'asc', size: PAGE_SIZE }),
+    );
   });
 
   it('should create page subscriptions when results length is available', () => {
+    component.ngOnInit();
+
     component.paginator = {
       pageIndex: 0,
       page: of({ pageIndex: 0, pageSize: PAGE_SIZE }),
@@ -166,7 +176,7 @@ describe('AdditionalListComponent', () => {
 
     spyOn(component as any, 'createPageSubscriptions');
 
-    stateSubject.next({
+    state$.next({
       data: mockPagination,
     });
 
@@ -178,26 +188,12 @@ describe('AdditionalListComponent', () => {
 
     component.edit(testAdditional);
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(additionalSelected({ selected: testAdditional }));
-  });
-
-  it('should call delete method without errors', () => {
-    const testAdditional = mockAdditionalList[0];
-
-    expect(() => component.delete(testAdditional)).not.toThrow();
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(additionalSelected({ selected: testAdditional }));
   });
 
   it('should have delete method defined', () => {
     expect(component.delete).toBeDefined();
     expect(typeof component.delete).toBe('function');
-  });
-
-  it('should handle delete operation', () => {
-    const testAdditional = mockAdditionalList[0];
-
-    expect(() => {
-      component.delete(testAdditional);
-    }).not.toThrow();
   });
 
   it('should unsubscribe from subscriptions on destroy', () => {
@@ -272,7 +268,7 @@ describe('AdditionalListComponent', () => {
 
     component['getAdditionalList'](2);
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(getAdditionalPage({
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAdditionalPage({
       page: 2,
       size: PAGE_SIZE,
       sort: 'name',
@@ -289,13 +285,15 @@ describe('AdditionalListComponent', () => {
 
   it('should handle state subscription errors gracefully', () => {
     expect(() => {
-      stateSubject.next({
+      state$.next({
         data: null,
       });
     }).not.toThrow();
   });
 
   it('should handle empty pagination data', () => {
+    component.ngOnInit();
+
     const emptyPagination: Pagination<IAdditional> = {
       content: [],
       totalElements: 0,
@@ -303,7 +301,7 @@ describe('AdditionalListComponent', () => {
       number: 0,
     };
 
-    stateSubject.next({
+    state$.next({
       data: emptyPagination,
     });
 
@@ -312,7 +310,7 @@ describe('AdditionalListComponent', () => {
   });
 
   it('should initialize with correct state observable', () => {
-    expect(mockStore.select).toHaveBeenCalled();
+    expect(storeSpy.select).toHaveBeenCalled();
   });
 
   it('should maintain correct displayedColumns order', () => {
@@ -321,9 +319,35 @@ describe('AdditionalListComponent', () => {
   });
 
   it('should handle mobile breakpoint adjustment', () => {
-    breakpointSubject.next({ matches: true, breakpoints: {} });
+    breakpoint$.next({ matches: true, breakpoints: {} });
 
     expect(component.pageSize).toBeDefined();
     expect(component.pageSize).toBe(MOBILE_PAGE_SIZE);
+  });
+
+  it('should call delete method without errors', () => {
+    component.ngOnInit();
+
+    const testAdditional = mockAdditionalList[0] as unknown as IAdditional;
+
+    dialogSpy.and.returnValue({
+      afterClosed: () => of(testAdditional),
+    });
+
+    component.delete(testAdditional);
+
+    expect(dialogSpy).toHaveBeenCalledWith(
+      jasmine.any(Function),
+      jasmine.objectContaining({
+        data: {
+          title: 'ADDITIONAL.DELETED.TITLE',
+          content: 'ADDITIONAL.DELETED.CONTENT',
+          value: testAdditional,
+        },
+      }));
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteAdditional(
+      { id: testAdditional.id!, name: testAdditional.name! }),
+    );
   });
 });

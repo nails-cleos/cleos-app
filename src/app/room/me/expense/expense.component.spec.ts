@@ -3,20 +3,24 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ExpenseComponent } from './expense.component';
 import { Subject } from 'rxjs';
 import { ReactiveFormsModule, UntypedFormBuilder } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { clean, getAllExpensesInfo, getExpense } from '../../../store/expense.actions';
 import { IExpenseAll, ISupplyStore } from '../../../interfaces/expense';
+import { AppState } from '../../../store/app.states';
 
 describe('ExpenseComponent', () => {
   let component: ExpenseComponent;
   let fixture: ComponentFixture<ExpenseComponent>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockActivatedRoute: any;
-  let stateSubject: Subject<any>;
+
+  let state$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let paramMapSpy: jasmine.SpyObj<ParamMap>;
 
   const mockExpense: IExpenseAll = {
     id: '1',
@@ -31,20 +35,18 @@ describe('ExpenseComponent', () => {
   } as any;
 
   beforeEach(async () => {
-    stateSubject = new Subject();
+    state$ = new Subject();
 
-    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-
-    mockActivatedRoute = {
+    paramMapSpy = jasmine.createSpyObj('ParamMap', ['get']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
-        paramMap: {
-          get: jasmine.createSpy('get').and.returnValue(null),
-        },
+        paramMap: paramMapSpy,
       },
-    };
+    });
 
-    mockStore.select.and.returnValue(stateSubject.asObservable());
+    storeSpy.select.and.returnValue(state$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [
@@ -55,9 +57,9 @@ describe('ExpenseComponent', () => {
       ],
       providers: [
         UntypedFormBuilder,
-        { provide: Store, useValue: mockStore },
-        { provide: Router, useValue: mockRouter },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: Store, useValue: storeSpy },
+        { provide: Router, useValue: routerSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
     }).compileComponents();
 
@@ -77,12 +79,14 @@ describe('ExpenseComponent', () => {
     component = fixture.componentInstance;
   });
 
+  afterEach(() => state$.complete());
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
   it('should initialize in add mode when no id is provided', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(null);
+    paramMapSpy.get.and.returnValue(null);
 
     component.ngOnInit();
 
@@ -92,7 +96,7 @@ describe('ExpenseComponent', () => {
 
   it('should initialize in edit mode when id is provided', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.callFake((key: string) => {
+    paramMapSpy.get.and.callFake((key: string) => {
       if (key === 'expenseId') {
         return testId;
       }
@@ -124,11 +128,11 @@ describe('ExpenseComponent', () => {
   it('should dispatch Clean action on initialization', () => {
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch GetAllExpensesInfo action when initialized', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.callFake((key: string) => {
+    paramMapSpy.get.and.callFake((key: string) => {
       if (key === 'id') {
         {
           return 'room123';
@@ -139,13 +143,13 @@ describe('ExpenseComponent', () => {
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(getAllExpensesInfo({ roomId: 'room123' }));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllExpensesInfo({ roomId: 'room123' }));
   });
 
   it('should dispatch GetExpense action when in edit mode', () => {
     const testId = '123';
     const roomId = 'room123';
-    mockActivatedRoute.snapshot.paramMap.get.and.callFake((key: string) => {
+    paramMapSpy.get.and.callFake((key: string) => {
       if (key === 'expenseId') {
         return testId;
       }
@@ -157,11 +161,11 @@ describe('ExpenseComponent', () => {
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(getExpense({ roomId, id: testId }));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getExpense({ roomId, id: testId }));
   });
 
   it('should patch form when expense is selected from state', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.callFake((key: string) => {
+    paramMapSpy.get.and.callFake((key: string) => {
       if (key === 'id') {
         return 'room123';
       }
@@ -170,7 +174,7 @@ describe('ExpenseComponent', () => {
 
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       selected: mockExpense,
       info: {
         supplyStores: [{ id: 's1', name: 'Test Store' }],
@@ -188,7 +192,7 @@ describe('ExpenseComponent', () => {
   });
 
   it('should handle form errors from state', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.callFake((key: string) => {
+    paramMapSpy.get.and.callFake((key: string) => {
       if (key === 'id') {
         return 'room123';
       }
@@ -202,7 +206,7 @@ describe('ExpenseComponent', () => {
       { field: 'supplyStore', message: 'Supply store is required' },
     ];
 
-    stateSubject.next({
+    state$.next({
       subErrors: mockErrors,
     });
 
@@ -214,7 +218,7 @@ describe('ExpenseComponent', () => {
 
   it('should navigate to expense list on successful response', () => {
     const roomId = 'room123';
-    mockActivatedRoute.snapshot.paramMap.get.and.callFake((key: string) => {
+    paramMapSpy.get.and.callFake((key: string) => {
       if (key === 'id') {
         return roomId;
       }
@@ -223,15 +227,15 @@ describe('ExpenseComponent', () => {
 
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'rooms', roomId, 'expenses']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'rooms', roomId, 'expenses']);
   });
 
   it('should not dispatch action when form is invalid', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.callFake((key: string) => {
+    paramMapSpy.get.and.callFake((key: string) => {
       if (key === 'id') {
         return 'room123';
       }
@@ -241,16 +245,16 @@ describe('ExpenseComponent', () => {
     component.ngOnInit();
     component.getForm.invoice.setValue('');
     component.getForm.supplyStore.setValue('');
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     void component.submit;
 
-    expect(mockStore.dispatch).not.toHaveBeenCalled();
+    expect(storeSpy.dispatch).not.toHaveBeenCalled();
   });
 
   it('should dispatch CreateExpense action when in add mode and form is valid', () => {
     const roomId = 'room123';
-    mockActivatedRoute.snapshot.paramMap.get.and.callFake((key: string) => {
+    paramMapSpy.get.and.callFake((key: string) => {
       if (key === 'id') {
         return roomId;
       }
@@ -278,12 +282,12 @@ describe('ExpenseComponent', () => {
     component.totals.at(0).get('btw')?.setValue('21.00');
     component.totals.at(0).markAsDirty();
 
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
     expect(component.form.valid).toBeTrue();
 
     void component.submit;
 
-    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0] as any;
+    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0] as any;
     expect(dispatchedAction.type).toBe('[Expense] Create expense');
     expect(dispatchedAction.roomId).toBe(roomId);
     expect(dispatchedAction.expense).toBeDefined();
@@ -292,7 +296,7 @@ describe('ExpenseComponent', () => {
   it('should dispatch UpdateExpense action when in edit mode and form is valid', () => {
     const testId = '123';
     const roomId = 'room123';
-    mockActivatedRoute.snapshot.paramMap.get.and.callFake((key: string) => {
+    paramMapSpy.get.and.callFake((key: string) => {
       if (key === 'expenseId') {
         return testId;
       }
@@ -304,7 +308,7 @@ describe('ExpenseComponent', () => {
 
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       selected: mockExpense,
       info: {
         supplyStores: [{ id: 's1', name: 'Test Store' }],
@@ -319,11 +323,11 @@ describe('ExpenseComponent', () => {
     invoiceControl.setValue('INV-456');
     invoiceControl.markAsDirty();
 
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     void component.submit;
 
-    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0] as any;
+    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0] as any;
     expect(dispatchedAction.type).toBe('[Expense] Update expense by id');
     expect(dispatchedAction.id).toBe(testId);
     expect(dispatchedAction.roomId).toBe(roomId);
@@ -360,7 +364,7 @@ describe('ExpenseComponent', () => {
   });
 
   it('should validate form correctly', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.callFake((key: string) => {
+    paramMapSpy.get.and.callFake((key: string) => {
       if (key === 'id') {
         return 'room123';
       }
@@ -385,7 +389,7 @@ describe('ExpenseComponent', () => {
   it('should handle state subscription correctly', () => {
     component.ngOnInit();
 
-    expect(mockStore.select).toHaveBeenCalled();
+    expect(storeSpy.select).toHaveBeenCalled();
   });
 
   it('should filter supply stores correctly when filterSupplyStore is called', () => {
@@ -535,7 +539,7 @@ describe('ExpenseComponent', () => {
 
   it('should reset form and create another when createAnother is true', () => {
     const roomId = 'room123';
-    mockActivatedRoute.snapshot.paramMap.get.and.callFake((key: string) => {
+    paramMapSpy.get.and.callFake((key: string) => {
       if (key === 'id') {
         return roomId;
       }
@@ -545,12 +549,12 @@ describe('ExpenseComponent', () => {
     component.ngOnInit();
     component.createAnother = true;
 
-    stateSubject.next({
+    state$.next({
       response: true,
     });
 
     expect(component.createAnother).toBeFalse();
-    expect(mockRouter.navigate).not.toHaveBeenCalled();
+    expect(routerSpy.navigate).not.toHaveBeenCalled();
   });
 
   it('should return isAddButtonDisabled as true when totals form is invalid', () => {
@@ -573,7 +577,7 @@ describe('ExpenseComponent', () => {
   });
 
   it('should not dispatch action when roomId is null', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(null);
+    paramMapSpy.get.and.returnValue(null);
 
     component.ngOnInit();
     component.getForm.invoice.setValue('INV-123');
@@ -584,11 +588,11 @@ describe('ExpenseComponent', () => {
     component.totals.at(0).get('gross')?.setValue('100.00');
     component.totals.at(0).get('btw')?.setValue('21.00');
 
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     void component.submit;
 
-    expect(mockStore.dispatch).not.toHaveBeenCalled();
+    expect(storeSpy.dispatch).not.toHaveBeenCalled();
   });
 
   it('should calculate net value correctly when btw is provided', () => {

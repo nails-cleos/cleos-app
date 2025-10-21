@@ -7,7 +7,8 @@ import { Router } from '@angular/router';
 describe('MonthComponent', () => {
   let component: MonthComponent;
   let fixture: ComponentFixture<MonthComponent>;
-  let mockRouter: jasmine.SpyObj<Router>;
+
+  let routerSpy: jasmine.SpyObj<Router>;
 
   const monthSummary: IMonthSummary = {
     month: 1,
@@ -25,12 +26,12 @@ describe('MonthComponent', () => {
   };
 
   beforeEach(async () => {
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
       imports: [MonthComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Router, useValue: mockRouter },
+        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
 
@@ -79,7 +80,7 @@ describe('MonthComponent', () => {
     it('should navigate with step 0 for INCOME', () => {
       component.goToMonth(5, 'INCOME');
 
-      expect(mockRouter.navigate).toHaveBeenCalledWith(
+      expect(routerSpy.navigate).toHaveBeenCalledWith(
         ['en-GB', 'dashboard', 'monthly', 'summary'],
         { state: { date: '5-2025', step: 0 } },
       );
@@ -88,7 +89,7 @@ describe('MonthComponent', () => {
     it('should navigate with step 1 for EXPENSE', () => {
       component.goToMonth(5, 'EXPENSE');
 
-      expect(mockRouter.navigate).toHaveBeenCalledWith(
+      expect(routerSpy.navigate).toHaveBeenCalledWith(
         ['en-GB', 'dashboard', 'monthly', 'summary'],
         { state: { date: '5-2025', step: 1 } },
       );
@@ -97,7 +98,7 @@ describe('MonthComponent', () => {
     it('should navigate with step 2 for CASH', () => {
       component.goToMonth(5, 'CASH');
 
-      expect(mockRouter.navigate).toHaveBeenCalledWith(
+      expect(routerSpy.navigate).toHaveBeenCalledWith(
         ['en-GB', 'dashboard', 'monthly', 'summary'],
         { state: { date: '5-2025', step: 2 } },
       );
@@ -106,7 +107,7 @@ describe('MonthComponent', () => {
     it('should navigate with step 0 when type is undefined', () => {
       component.goToMonth(7);
 
-      expect(mockRouter.navigate).toHaveBeenCalledWith(
+      expect(routerSpy.navigate).toHaveBeenCalledWith(
         ['en-GB', 'dashboard', 'monthly', 'summary'],
         { state: { date: '7-2025', step: 0 } },
       );

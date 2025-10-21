@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Subject } from 'rxjs';
-import { ToastData } from './toast.model';
 import { ToastComponent } from './toast.component';
 
 describe('ToastComponent', () => {
@@ -8,17 +7,17 @@ describe('ToastComponent', () => {
   let fixture: ComponentFixture<ToastComponent>;
   let dismiss$: Subject<void>;
   let action$: Subject<void>;
-  let data: ToastData;
 
   beforeEach(() => {
     dismiss$ = new Subject<void>();
     action$ = new Subject<void>();
-    data = { type: 'success', message: 'Test toast', duration: 5000, actionType: 'none' };
+
+    const mockToastData = { type: 'success', message: 'Test toast', duration: 5000, actionType: 'none' };
 
     TestBed.configureTestingModule({
       imports: [ToastComponent],
       providers: [
-        { provide: 'TOAST_DATA', useValue: data },
+        { provide: 'TOAST_DATA', useValue: mockToastData },
         { provide: 'TOAST_DISMISS', useValue: dismiss$ },
         { provide: 'TOAST_ACTION', useValue: action$ },
       ],

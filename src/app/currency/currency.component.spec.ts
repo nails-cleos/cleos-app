@@ -4,7 +4,7 @@ import { CurrencyComponent } from './currency.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 import { ICurrency } from '../interfaces/currency';
 import { ReactiveFormsModule, UntypedFormBuilder } from '@angular/forms';
@@ -14,11 +14,14 @@ import { clean, getCurrency } from '../store/currency.actions';
 describe('CurrencyComponent', () => {
   let component: CurrencyComponent;
   let fixture: ComponentFixture<CurrencyComponent>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockActivatedRoute: any;
-  let mockChangeDetectorRef: jasmine.SpyObj<ChangeDetectorRef>;
-  let stateSubject: Subject<any>;
+
+  let state$: Subject<any>;
+  
+  let storeSpy: jasmine.SpyObj<Store>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
+  let paramMapSpy: jasmine.SpyObj<ParamMap>;
 
   const mockCurrency: ICurrency = {
     id: '1',
@@ -28,21 +31,20 @@ describe('CurrencyComponent', () => {
   };
 
   beforeEach(async () => {
-    stateSubject = new Subject();
+    state$ = new Subject();
 
-    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-    mockChangeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-
-    mockActivatedRoute = {
+    paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
-        paramMap: {
-          get: jasmine.createSpy('get').and.returnValue(null),
-        },
+        paramMap: paramMapSpy,
       },
-    };
+    });
 
-    mockStore.select.and.returnValue(stateSubject.asObservable());
+    paramMapSpy.get.and.returnValue(null);
+    storeSpy.select.and.returnValue(state$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [
@@ -53,10 +55,10 @@ describe('CurrencyComponent', () => {
       ],
       providers: [
         UntypedFormBuilder,
-        { provide: Store, useValue: mockStore },
-        { provide: Router, useValue: mockRouter },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: ChangeDetectorRef, useValue: mockChangeDetectorRef },
+        { provide: Store, useValue: storeSpy },
+        { provide: Router, useValue: routerSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
       ],
     }).compileComponents();
 
@@ -66,15 +68,16 @@ describe('CurrencyComponent', () => {
 
     fixture = TestBed.createComponent(CurrencyComponent);
     component = fixture.componentInstance;
-
   });
+  
+  afterEach(() => state$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
   it('should initialize in add mode when no id is provided', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(null);
+    paramMapSpy.get.and.returnValue(null);
 
     component.ngOnInit();
 
@@ -84,7 +87,7 @@ describe('CurrencyComponent', () => {
 
   it('should initialize in edit mode when id is provided', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
 
     component.ngOnInit();
 
@@ -105,22 +108,22 @@ describe('CurrencyComponent', () => {
   it('should dispatch Clean action on initialization', () => {
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(clean());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch GetCurrency action when in edit mode', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(getCurrency({ id: testId }));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getCurrency({ id: testId }));
   });
 
   it('should patch form when currency is selected from state', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       selected: mockCurrency,
     });
 
@@ -138,7 +141,7 @@ describe('CurrencyComponent', () => {
       { field: 'code', message: 'Code is required' },
     ];
 
-    stateSubject.next({
+    state$.next({
       subErrors: mockErrors,
     });
 
@@ -149,21 +152,21 @@ describe('CurrencyComponent', () => {
   it('should navigate to currency list on successful response', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'currency']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'currency']);
   });
 
   it('should not dispatch action when form is invalid', () => {
     component.ngOnInit();
     component.form.get('name')?.setValue('');
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     void component.submit;
 
-    expect(mockStore.dispatch).not.toHaveBeenCalled();
+    expect(storeSpy.dispatch).not.toHaveBeenCalled();
   });
 
   it('should dispatch CreateCurrency action when in add mode and form is valid', () => {
@@ -181,10 +184,10 @@ describe('CurrencyComponent', () => {
     iconControl.setValue('euro');
     iconControl.markAsDirty();
 
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     void component.submit;
-    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
     expect(dispatchedAction).toEqual(jasmine.objectContaining({
       currency: jasmine.objectContaining({
         name: 'New Currency',
@@ -197,7 +200,7 @@ describe('CurrencyComponent', () => {
 
   it('should dispatch UpdateCurrency action when in edit mode and form is valid', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
     component.currency = mockCurrency;
 
     component.ngOnInit();
@@ -214,10 +217,10 @@ describe('CurrencyComponent', () => {
     iconControl.setValue('cash');
     iconControl.markAsDirty();
 
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     void component.submit;
-    const dispatchedAction = mockStore.dispatch.calls.mostRecent().args[0];
+    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
     expect(dispatchedAction).toEqual(jasmine.objectContaining({
       currency: jasmine.objectContaining({
         name: 'Updated Currency',
@@ -251,22 +254,22 @@ describe('CurrencyComponent', () => {
   });
 
   it('should call detectChanges when needed', () => {
-    expect(mockChangeDetectorRef.detectChanges).not.toHaveBeenCalled();
+    expect(changeDetectorRefSpy.detectChanges).not.toHaveBeenCalled();
   });
 
   it('should handle undefined currency in edit mode', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
     component.currency = undefined;
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(getCurrency({ id: testId }));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getCurrency({ id: testId }));
   });
 
   it('should clear currency when updating in edit mode', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
     component.currency = mockCurrency;
 
     component.ngOnInit();
@@ -297,17 +300,17 @@ describe('CurrencyComponent', () => {
   it('should handle state subscription correctly', () => {
     component.ngOnInit();
 
-    expect(mockStore.select).toHaveBeenCalled();
+    expect(storeSpy.select).toHaveBeenCalled();
   });
 
   it('should clean state and get currency list on response', () => {
     component.ngOnInit();
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
-    stateSubject.next({
+    state$.next({
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en-GB', 'currency']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'currency']);
   });
 });

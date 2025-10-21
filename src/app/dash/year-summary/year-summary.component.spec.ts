@@ -1,17 +1,24 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { YearSummaryComponent } from './year-summary.component';
-import { of, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AuthUserService } from '../../services/auth-user.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { ActivatedRoute } from '@angular/router';
 import { IMonthlyExport, IMonthlySummaryExpense, IMonthlySummarySale, ISummaryTotal } from '../../interfaces/dashboard';
+import { AppState } from '../../store/app.states';
 
 describe('YearSummaryComponent', () => {
   let component: YearSummaryComponent;
   let fixture: ComponentFixture<YearSummaryComponent>;
-  let stateSubject: Subject<any>;
+
+  let state$: Subject<any>;
+  let authUser$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let saveAsSpy: jasmine.Spy;
 
   const mockCurrency = {
@@ -21,52 +28,43 @@ describe('YearSummaryComponent', () => {
     icon: '€',
   };
 
-  const mockStore = {
-    select: jasmine.createSpy('select').and.returnValue(of({})),
-    dispatch: jasmine.createSpy('dispatch'),
-  };
-
-  const mockAuthUserService = {
-    authUser: of({
-      displayName: 'Test User',
-      showCash: true,
-    }),
-  };
-
-  const mockActivatedRoute = {
-    snapshot: {
-      paramMap: {
-        get: jasmine.createSpy('get').and.returnValue('calendar'),
-      },
-    },
-  };
-
   beforeEach(async () => {
-    stateSubject = new Subject();
+    state$ = new Subject();
+    authUser$ = new Subject();
 
-    mockStore.select.and.returnValue(stateSubject.asObservable());
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      snapshot: {
+        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+      },
+    });
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
+      authUser: authUser$.asObservable(),
+    });
+
+    storeSpy.select.and.returnValue(state$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [YearSummaryComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: mockStore },
-        { provide: AuthUserService, useValue: mockAuthUserService },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: Store, useValue: storeSpy },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(YearSummaryComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
 
-  beforeEach(() => {
     saveAsSpy = jasmine.createSpy('saveAs');
     (window as any).saveAs = saveAsSpy;
   });
 
   afterEach(() => {
     delete (window as any).saveAs;
+    state$.complete();
+    authUser$.complete();
   });
 
   it('should create', () => {
@@ -190,8 +188,8 @@ describe('YearSummaryComponent', () => {
     it('should call exportToExcel when export is true', () => {
       component.date.setValue(new Date(2024, 0, 1));
 
-      stateSubject.next({
-        yearExport: {  },
+      state$.next({
+        yearExport: {},
       });
 
       spyOn<any>(component, 'exportToExcel');

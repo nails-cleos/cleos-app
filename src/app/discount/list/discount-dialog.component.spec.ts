@@ -1,20 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DiscountDialogComponent } from './discount-dialog.component';
-import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { clean, getAllCustomers } from '../../store/user.actions';
 import { DiscountType, IDiscountAll } from '../../interfaces/discount';
 import { IUserAll } from '../../interfaces/user';
 import { TranslateModule } from '@ngx-translate/core';
-import { BehaviorSubject } from 'rxjs';
-import { selectUserState } from '../../store/app.states';
+import { Subject } from 'rxjs';
+import { AppState } from '../../store/app.states';
+import { Store } from '@ngrx/store';
 
 describe('DiscountDialogComponent', () => {
   let component: DiscountDialogComponent;
   let fixture: ComponentFixture<DiscountDialogComponent>;
-  let store: MockStore;
+
+  let state$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
   let dialogRefSpy: jasmine.SpyObj<MatDialogRef<DiscountDialogComponent>>;
-  let userStateSubject: BehaviorSubject<any>;
 
   const mockDiscount = {
     id: '1',
@@ -29,25 +31,27 @@ describe('DiscountDialogComponent', () => {
   ];
 
   beforeEach(async () => {
+    state$ = new Subject();
+
     dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
-    userStateSubject = new BehaviorSubject({ data: mockCustomers });
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+
+    storeSpy.select.and.returnValue(state$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [DiscountDialogComponent, TranslateModule.forRoot()],
       providers: [
-        provideMockStore(),
         { provide: MAT_DIALOG_DATA, useValue: { discount: mockDiscount } },
         { provide: MatDialogRef, useValue: dialogRefSpy },
+        { provide: Store, useValue: storeSpy },
       ],
     }).compileComponents();
 
-    store = TestBed.inject(MockStore);
-    store.overrideSelector(selectUserState, userStateSubject.value);
-
     fixture = TestBed.createComponent(DiscountDialogComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
+
+  afterEach(() => state$.complete());
 
   it('should create component', () => {
     expect(component).toBeTruthy();
@@ -59,16 +63,17 @@ describe('DiscountDialogComponent', () => {
   });
 
   it('should dispatch clean and getAllCustomers on init', () => {
-    const dispatchSpy = spyOn(store, 'dispatch').and.callThrough();
-
     component.ngOnInit();
 
-    expect(dispatchSpy).toHaveBeenCalledWith(clean());
-    expect(dispatchSpy).toHaveBeenCalledWith(getAllCustomers());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllCustomers());
   });
 
   it('should update allCustomers when state changes', () => {
-    component['subscribe']();
+    component.ngOnInit();
+
+    state$.next({ data: mockCustomers });
+
     expect(component['allCustomers']).toEqual(mockCustomers);
   });
 
@@ -109,6 +114,8 @@ describe('DiscountDialogComponent', () => {
   });
 
   it('should unsubscribe on destroy', () => {
+    component.ngOnInit();
+
     const unsubSpy = spyOn(component['subscription'] || {
       unsubscribe: () => {
       },
