@@ -13,13 +13,13 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { AsyncPipe } from '@angular/common';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { DiscountType, IDiscountAll } from '../../interfaces/discount';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
-import { map, startWith } from 'rxjs/operators';
+import { map, startWith, takeUntil } from 'rxjs/operators';
 import { currencySymbol } from '../../util/helper';
 import { clean, getAllCustomers } from '../../store/user.actions';
 
@@ -40,11 +40,11 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
   allCustomers?: IUserAll[];
 
   private getState: Observable<any>;
-  private subscription?: Subscription;
+  private destroy$ = new Subject<void>();
   private discount: IDiscountAll;
 
   constructor(public dialogRef: MatDialogRef<DiscountDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-    private store: Store<AppState>, private cdRef: ChangeDetectorRef) {
+              private store: Store<AppState>, private cdRef: ChangeDetectorRef) {
     this.getState = this.store.select(selectUserState);
     this.discount = data.discount;
     this.setSymbol();
@@ -56,7 +56,7 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
     this.getCustomers();
     this.filteredCustomers = this.customerCtrl.valueChanges.pipe(
       startWith(''),
-      map(value => typeof value === 'string' ? value : value ? value.name : ''),
+      map(value => typeof value === 'string' ? value : value ? value.displayName : ''),
       map(name => name ? this.filter(name) : (this.allCustomers ? this.allCustomers.slice() : this.allCustomers)),
     );
   }
@@ -66,7 +66,8 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   onNoClick(): void {
@@ -105,10 +106,10 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
     this.title = this.discount.name;
     switch (this.discount.type) {
       case DiscountType.money:
-        this.title = `${ currencySymbol(this.discount.currency) } ${ this.discount.amount } ${ this.title }`;
+        this.title = `${currencySymbol(this.discount.currency)} ${this.discount.amount} ${this.title}`;
         break;
       case DiscountType.percentage:
-        this.title = `${ this.discount.amount } % ${ this.title }`;
+        this.title = `${this.discount.amount} % ${this.title}`;
         break;
     }
   };
@@ -121,7 +122,7 @@ export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy
     option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
+    this.getState.pipe(takeUntil(this.destroy$)).subscribe((state) => {
       this.allCustomers = state.data;
       this.customerCtrl.setValue(null);
     });

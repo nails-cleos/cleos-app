@@ -9,6 +9,8 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { formatDuration } from '../util/dates';
 import { clean, getAdditional, getAllTreatmentsGroup } from '../store/additional.actions';
 import { AppState } from '../store/app.states';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { IGroupService } from '../interfaces/treatment';
 
 describe('AdditionalComponent', () => {
   let component: AdditionalComponent;
@@ -376,16 +378,41 @@ describe('AdditionalComponent', () => {
     component.getForm.group?.setValue('T');
   });
 
+  it('should handle group object input in filtered options', (done) => {
+    component.allGroups = [
+      { name: 'Test Group 1', id: '1', treatments: [], selectedTreatments: [] },
+      { name: 'Another Group', id: '2', treatments: [], selectedTreatments: [] },
+      { name: 'Test Group 2', id: '3', treatments: [], selectedTreatments: [] },
+    ] as any[];
+    component['createForm']();
+
+    let emissionCount = 0;
+    component.filteredGroup?.subscribe(filtered => {
+      emissionCount++;
+      // Skip the first emission (startWith('')) and check the second emission with 'T'
+      if (emissionCount === 2) {
+        expect(filtered).toEqual([
+          { name: 'Test Group 2', id: '3', treatments: [], selectedTreatments: [] },
+        ]);
+        done();
+      }
+    });
+
+    component.getForm.group?.setValue({ name: 'Test Group 2', id: '3', treatments: [], selectedTreatments: [] });
+  });
+
   it('should sort allGroups alphabetically by name', () => {
     const allGroups = [
       { name: 'Beta Group', id: '2', treatments: [], selectedTreatments: [] },
       { name: 'Alpha Group', id: '1', treatments: [], selectedTreatments: [] },
+      { name: 'Alpha Group', id: '4', treatments: [], selectedTreatments: [] },
       { name: 'Gamma Group', id: '3', treatments: [], selectedTreatments: [] },
     ] as any[];
     const response = component.sortGroups(allGroups);
     expect(response[0].name).toBe('Alpha Group');
-    expect(response[1].name).toBe('Beta Group');
-    expect(response[2].name).toBe('Gamma Group');
+    expect(response[1].name).toBe('Alpha Group');
+    expect(response[2].name).toBe('Beta Group');
+    expect(response[3].name).toBe('Gamma Group');
   });
 
   it('should remove a group correctly', () => {
@@ -403,5 +430,32 @@ describe('AdditionalComponent', () => {
     expect(component.allGroups?.length).toBe(1);
     expect(component.allGroups?.[0].id).toBe('g2');
     expect(component.getForm.group?.value).toBe(null);
+  });
+
+  it('should add selected group and clear input', () => {
+    component.ngOnInit();
+
+    const mockGroup = { id: '1', name: 'service 1', treatments: [], selectedTreatments: [] } as IGroupService;
+    component.groups = [];
+    component.allGroups = [
+      { id: '1', name: 'service 1', treatments: [], selectedTreatments: [] } as IGroupService,
+      { id: '2', name: 'service 2', treatments: [], selectedTreatments: [] } as IGroupService,
+    ];
+
+    const mockInputEl = { value: '' };
+    component.groupInput = { nativeElement: mockInputEl } as any;
+    component.getForm.group = { setValue: jasmine.createSpy('setValue') } as any;
+
+    const mockEvent = {
+      option: { value: mockGroup },
+    } as unknown as MatAutocompleteSelectedEvent;
+
+    component.selectedGroup(mockEvent);
+
+    expect(component.groups).toContain(mockGroup);
+    expect(component.allGroups)
+      .toEqual([{ id: '2', name: 'service 2', treatments: [], selectedTreatments: [] } as IGroupService]);
+    expect(mockInputEl.value).toBe('');
+    expect(component.getForm.group.setValue).toHaveBeenCalledWith(null);
   });
 });

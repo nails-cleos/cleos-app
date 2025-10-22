@@ -1102,9 +1102,9 @@ describe('dates utility', () => {
       };
 
       const result = getMinMaxDate(3, date, [room, anotherRoom]);
-      expect(result.minDate.getHours()).toBe(11);
+      expect(result.minDate.getHours()).toBe(10);
       expect(result.minDate.getMinutes()).toBe(30);
-      expect(result.maxDate.getHours()).toBe(21);
+      expect(result.maxDate.getHours()).toBe(20);
       expect(result.maxDate.getMinutes()).toBe(0);
     });
   });

@@ -6,12 +6,12 @@ import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { of, Subject } from 'rxjs';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ExpensesComponent } from './expenses.component';
-import { PAGE_SIZE, Pagination } from '../../../../interfaces/pagination';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../../../interfaces/pagination';
 import { clean, deleteExpense, expenseSelected, getExpensesPage } from '../../../../store/expense.actions';
 import { IExpense, IExpenseAll } from '../../../../interfaces/expense';
 import { dateToTimestamp, getCurrentTimeZone } from '../../../../util/dates';
@@ -25,6 +25,7 @@ describe('ExpensesComponent', () => {
 
   let state$: Subject<any>;
   let paramMap$: Subject<any>;
+  let breakpoint$: Subject<any>;
 
   let storeSpy: jasmine.SpyObj<Store>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
@@ -107,6 +108,7 @@ describe('ExpensesComponent', () => {
   beforeEach(async () => {
     state$ = new Subject();
     paramMap$ = new Subject();
+    breakpoint$ = new Subject();
 
     storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
@@ -122,7 +124,7 @@ describe('ExpensesComponent', () => {
     });
 
     storeSpy.select.and.returnValue(state$.asObservable());
-    breakpointObserverSpy.observe.and.returnValue(of({ matches: false, breakpoints: {} }));
+    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [ExpensesComponent, TranslateModule.forRoot(), NoopAnimationsModule],
@@ -149,14 +151,13 @@ describe('ExpensesComponent', () => {
       direction: 'asc',
     } as unknown as MatSort;
 
-    component.roomId = '1';
-
     dialogSpy = spyOn(component.dialog, 'open');
   });
 
   afterEach(() => {
     state$.complete();
     paramMap$.complete();
+    breakpoint$.complete();
   });
 
   it('should create', () => {
@@ -193,17 +194,17 @@ describe('ExpensesComponent', () => {
   });
 
   it('should clean and get expense list on response', () => {
-    component.ngOnInit();
+    fixture.detectChanges();
 
-    paramMap$.next({ id: '1' });
+    paramMap$.next(convertToParamMap({ id: '1' }));
     state$.next({ response: true });
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
     expect(storeSpy.dispatch).toHaveBeenCalledWith(
       getExpensesPage({
         roomId: '1',
-        sort: 'name',
-        direction: 'asc',
+        sort: 'timestamp',
+        direction: 'desc',
         page: 0,
         size: PAGE_SIZE,
         filter: undefined,
@@ -348,12 +349,17 @@ describe('ExpensesComponent', () => {
   });
 
   it('should dispatch GetExpensesPage action with correct parameters', () => {
+    fixture.detectChanges();
+
+    paramMap$.next(convertToParamMap({ id: '1' }));
+    breakpoint$.next({ matches: true });
+
     component.sort = {
       active: 'invoice',
       direction: 'asc',
     } as unknown as MatSort;
 
-    component['dateFilter'] = '2024-01-01';
+    component.date.setValue(new Date('2024-01-01'));
     const mockEvent = {
       target: { value: '  My Filter  ' },
     } as unknown as Event;
@@ -361,17 +367,29 @@ describe('ExpensesComponent', () => {
     component['getExpenses'](2);
 
     expect(component['filter']).toBe('my filter');
+    expect(component['dateFilter']).toBe('01-2024');
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getExpensesPage(
       {
         roomId: '1',
         sort: 'invoice',
         direction: 'asc',
         page: 2,
-        size: PAGE_SIZE,
+        size: MOBILE_PAGE_SIZE,
         filter: 'my filter',
-        dateFilter: '2024-01-01',
+        dateFilter: '01-2024',
       },
     ));
+  });
+
+  it('should remove date filter', () => {
+    component.ngOnInit();
+
+    component.date.setValue(new Date('2024-01-01'));
+
+    expect(component['dateFilter']).toBe('01-2024');
+
+    component.date.setValue(null);
+    expect(component['dateFilter']).toBeUndefined();
   });
 
   it('should handle undefined expanded expense', () => {

@@ -5,7 +5,7 @@ import {
   loginFailure,
   loginSuccess,
   logOut,
-  redirect,
+  redirect, reLogin,
   signupFailure,
   signupSuccess,
 } from '../auth.actions';
@@ -87,14 +87,5 @@ export const authReducer = createReducer(
     subErrors: undefined,
     redirect: false,
   })),
-  on(clean, (state) => ({
-    ...state,
-    isLoading: false,
-    errorMessage: undefined,
-    response: undefined,
-    subErrors: undefined,
-    queryParams: undefined,
-    redirect: false,
-  })),
-  on(logOut, () => initialState),
+  on(reLogin, clean, logOut, () => initialState),
 );
