@@ -1,5 +1,5 @@
 <div class="fab-menu" [class.open]="menuOpen">
-  <button mat-fab color="primary" (click)="toggleMenu" [@iconChange]="menuOpen ? 'open' : 'closed'">
+  <button mat-fab color="primary" (click)="toggleMenu()" [@iconChange]="menuOpen ? 'open' : 'closed'">
     <mat-icon>all_out</mat-icon>
   </button>
   @if (menuOpen) {

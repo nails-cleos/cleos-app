@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -14,7 +14,7 @@ import { SharedModule } from '../../shared/shared.module';
   styleUrls: ['./treatment-table.component.scss'],
   imports: [SharedModule],
 })
-export class TreatmentTableComponent implements AfterViewInit, OnChanges {
+export class TreatmentTableComponent implements OnInit, AfterViewInit, OnChanges {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   @Input() treatment: ITreatmentAll[] = [];
@@ -24,26 +24,28 @@ export class TreatmentTableComponent implements AfterViewInit, OnChanges {
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
-  dateFormat: string;
+  dateFormat!: string;
 
-  constructor(protected translate: TranslateService) {
-  	this.dateFormat = this.translate.currentLang;
+  private translate = inject(TranslateService);
+
+  ngOnInit(): void {
+    this.dateFormat = this.translate.currentLang;
   }
 
   ngAfterViewInit(): void {
-  	this.dataSource.paginator = this.paginator;
+    this.dataSource.paginator = this.paginator;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ngOnChanges(_changes: SimpleChanges): void {
-  	this.dataSource.data = this.treatment?.map(p => {
-  		if (p.duration) {
-  			const duration = convertDuration(p.duration);
+    this.dataSource.data = this.treatment.map(p => {
+      if (p.duration) {
+        const duration = convertDuration(p.duration);
 
-  			return Object.assign({}, p, { hour: duration.hour, minute: duration.minute });
-  		}
-  		return p;
-  	}) || [];
-  	this.resultsLength = this.treatment.length;
+        return Object.assign({}, p, { hour: duration.hour, minute: duration.minute });
+      }
+      return p;
+    });
+    this.resultsLength = this.treatment.length;
   }
 }
