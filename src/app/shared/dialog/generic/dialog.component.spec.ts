@@ -105,7 +105,7 @@ describe('DialogComponent', () => {
     const buttons = Array.from(compiled.querySelectorAll('button')) as HTMLButtonElement[];
     const noButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.NO'));
     expect(noButton).toBeTruthy();
-    expect(noButton?.hasAttribute('cdkfocusinitial')).toBe(true);
+    expect(noButton?.hasAttribute('cdkfocusinitial')).toBeTrue();
   });
 
   it('should display translated button texts', () => {

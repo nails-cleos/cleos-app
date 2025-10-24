@@ -50,7 +50,7 @@ devices.forEach(({ name, width, height }) => {
 
         cy.get('button').contains('Login').click();
 
-        cy.get('.toast-success .toast-actions mat-icon').contains('done_all').click({ force: true });
+        cy.get('.toast-info .toast-actions mat-icon').contains('done_all').click({ force: true });
 
         cy.url().should('include', '/me/reservations');
         cy.get('mat-card-title').contains('No upcoming reservations');

@@ -1,7 +1,16 @@
-import { All, InvoiceActionTypes } from '../invoice.actions';
+import {
+  clean,
+  getAllMyOffices,
+  getOfficeToInvoice,
+  invoiceFailure,
+  invoiceOfficesSuccess,
+  invoiceSuccess,
+  updateOfficeById,
+} from '../invoice.actions';
 import { IOffice } from '../../interfaces/office';
 import { IInvoice } from '../../interfaces/invoice';
 import { IError } from '../../interfaces/common';
+import { createReducer, on } from '@ngrx/store';
 
 export interface State {
   data?: IInvoice[];
@@ -23,71 +32,53 @@ export const initialState: State = {
   changes: true,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case InvoiceActionTypes.getOfficeToInvoice: {
-      return {
-        ...state,
-        data: [{} as IInvoice, {} as IInvoice, {} as IInvoice],
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        changes: true,
-      };
-    }
-    case InvoiceActionTypes.invoiceSuccess: {
-      return {
-        ...state,
-        data: action.data,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        changes: true,
-      };
-    }
-    case InvoiceActionTypes.getAllMyOffices: {
-      return {
-        ...state,
-        offices: undefined,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        changes: false,
-      };
-    }
-    case InvoiceActionTypes.invoiceOfficesSuccess: {
-      return {
-        ...state,
-        offices: action.offices,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        changes: false,
-      };
-    }
-    case InvoiceActionTypes.invoiceFailure: {
-      return {
-        ...state,
-        errorMessage: action.error.message,
-        error: action.error,
-        subErrors: action.error.subErrors,
-        changes: false,
-      };
-    }
-    case InvoiceActionTypes.updateOfficeById: {
-      return {
-        ...state,
-        errorMessage: undefined,
-        error: undefined,
-        subErrors: undefined,
-        changes: false,
-      };
-    }
-    case InvoiceActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const invoiceReducer = createReducer(
+  initialState,
+  on(getOfficeToInvoice, (state) => ({
+    ...state,
+    data: [{} as IInvoice, {} as IInvoice, {} as IInvoice],
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    changes: true,
+  })),
+  on(invoiceSuccess, (state, { data }) => ({
+    ...state,
+    data: data,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    changes: true,
+  })),
+  on(getAllMyOffices, (state) => ({
+    ...state,
+    offices: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    changes: false,
+  })),
+  on(invoiceOfficesSuccess, (state, { offices }) => ({
+    ...state,
+    offices: offices,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    changes: false,
+  })),
+  on(invoiceFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error: error,
+    subErrors: error.subErrors,
+    changes: false,
+  })),
+  on(updateOfficeById, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    changes: false,
+  })),
+  on(clean, () => initialState),
+);

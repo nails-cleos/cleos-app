@@ -3,38 +3,38 @@ import { CatalogComponent } from './catalog.component';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { Store } from '@ngrx/store';
 import { Subject, Subscription } from 'rxjs';
-import * as fromActionsCatalogue from '../../store/catalogue.actions';
 import { MainContentService } from '../main-content.service';
+import { clean, getAllCatalogs } from '../../store/catalogue.actions';
+import { AppState } from '../../store/app.states';
 
 describe('CatalogComponent', () => {
   let component: CatalogComponent;
   let fixture: ComponentFixture<CatalogComponent>;
-  let breakpointSubject: Subject<BreakpointState>;
-  let storeMock: any;
-  let mainContentMock: any;
-  let stateSubject: Subject<any>;
-  let breakpointObserverMock: any;
+
+  let state$: Subject<any>;
+  let breakpoint$: Subject<BreakpointState>;
+
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let mainContentServiceSpy: jasmine.SpyObj<MainContentService>;
+  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
 
   beforeEach(async () => {
-    stateSubject = new Subject<any>();
-    breakpointSubject = new Subject<BreakpointState>();
-    breakpointObserverMock = {
-      observe: jasmine.createSpy().and.returnValue(breakpointSubject.asObservable()),
-    };
+    state$ = new Subject<any>();
+    breakpoint$ = new Subject<BreakpointState>();
 
-    storeMock = {
-      select: jasmine.createSpy().and.returnValue(stateSubject.asObservable()),
-      dispatch: jasmine.createSpy(),
-    };
+    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    mainContentServiceSpy = jasmine.createSpyObj('MainContentService', ['configure']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
 
-    mainContentMock = jasmine.createSpyObj('MainContentService', ['configure']);
+    storeSpy.select.and.returnValue(state$.asObservable());
+    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [CatalogComponent],
       providers: [
-        { provide: Store, useValue: storeMock },
-        { provide: MainContentService, useValue: mainContentMock },
-        { provide: BreakpointObserver, useValue: breakpointObserverMock },
+        { provide: Store, useValue: storeSpy },
+        { provide: MainContentService, useValue: mainContentServiceSpy },
+        { provide: BreakpointObserver, useValue: breakpointObserverSpy },
       ],
     }).compileComponents();
 
@@ -42,10 +42,15 @@ describe('CatalogComponent', () => {
     component = fixture.componentInstance;
   });
 
+  afterEach(() => {
+    state$.complete();
+    breakpoint$.complete();
+  });
+
   it('should dispatch Clean and GetAllCatalogs on init', () => {
     fixture.detectChanges();
-    expect(storeMock.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.Clean));
-    expect(storeMock.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.GetAllCatalogs));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllCatalogs());
   });
 
   it('should unsubscribe on destroy', () => {
@@ -63,11 +68,11 @@ describe('CatalogComponent', () => {
 
     fixture.detectChanges();
 
-    stateSubject.next({ data: [fakeItem] });
+    state$.next({ data: [fakeItem] });
 
     expect(component.catalogues.length).toBe(1);
     expect(component.catalogues[0].image).toBe('blob:fake-url');
-    expect(mainContentMock.configure).toHaveBeenCalledWith(false, 'open');
+    expect(mainContentServiceSpy.configure).toHaveBeenCalledWith(false, 'open');
   });
 
   it('should emit true when matches is true', (done) => {
@@ -79,7 +84,7 @@ describe('CatalogComponent', () => {
       done();
     });
 
-    breakpointSubject.next({ matches: true } as BreakpointState);
+    breakpoint$.next({ matches: true } as BreakpointState);
   });
 
   it('should emit false when matches is false', (done) => {
@@ -91,6 +96,6 @@ describe('CatalogComponent', () => {
       done();
     });
 
-    breakpointSubject.next({ matches: false } as BreakpointState);
+    breakpoint$.next({ matches: false } as BreakpointState);
   });
 });

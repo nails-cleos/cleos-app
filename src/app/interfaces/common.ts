@@ -49,14 +49,14 @@ export class PageRequest {
   }
 }
 
-export const success = <T>(
-  ActionClass: new (message: string, path?: string, reload?: boolean, toastType?: ToastType) => T,
+export const success = <T extends (...args: any[]) => any>(
+  actionCreator: T,
   message: string,
   path?: string,
   reload: boolean = false,
   toastType: ToastType = 'success',
   ...additionalActions: any[]
-): Observable<T> => {
-  const mainAction = new ActionClass(message, path, reload, toastType);
+): Observable<ReturnType<T>> => {
+  const mainAction = actionCreator({ message, path, reload, toastType });
   return of(mainAction, ...additionalActions);
 };

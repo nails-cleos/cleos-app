@@ -9,7 +9,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
-import * as fromActionsReservation from '../../store/reservation.actions';
+import { cancelReservation, clean, getAllFilterReservations, getCustomers } from '../../store/reservation.actions';
 import { getNowTimeZone, isSameTimeZone, newDateTimestamp } from '../../util/dates';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { map, startWith } from 'rxjs/operators';
@@ -61,7 +61,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   private paginatorSubscription: Subscription | undefined;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+    private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
       Breakpoints.Small,
@@ -120,14 +120,14 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
       data: { title, content, value: reservation.id },
     });
 
-    dialogRef.afterClosed().subscribe(event => {
-      if (event) {
+    dialogRef.afterClosed().subscribe(reservationId => {
+      if (reservationId) {
         const options = Object.values(CancelOption).filter(co => co !== CancelOption.charge);
         openCancel(this.dialog, reservation.room, this.small, options, result => {
           if (result) {
             this.dataSource = [{}, {}, {}];
             this.store.dispatch(
-              new fromActionsReservation.CancelReservation(event, result),
+              cancelReservation(reservationId, result),
             );
           }
         });
@@ -178,13 +178,19 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     this.cdRef.detectChanges();
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsReservation.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
-  private getCustomers = (): void => this.store.dispatch(new fromActionsReservation.GetCustomers());
+  private getCustomers = (): void => this.store.dispatch(getCustomers());
 
   private getReservations = (page: number = 0): void => this.store.dispatch(
-    new fromActionsReservation.GetAllFilterReservations(page, this.sort.active, this.sort.direction, this.pageSize,
-      this.userId, this.states),
+    getAllFilterReservations({
+      page,
+      sort: this.sort.active,
+      direction: this.sort.direction,
+      size: this.pageSize,
+      userId: this.userId,
+      states: this.states,
+    }),
   );
 
   private filterCustomer = (name: string): IUser[] | undefined => this.customers?.filter(

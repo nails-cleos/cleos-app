@@ -4,34 +4,35 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
-import * as fromActionsReservation from '../../store/reservation.actions';
+import { getColorsByTreatmentId } from '../../store/reservation.actions';
 import { ChangeColorDialogComponent } from './change-color-dialog.component';
 import { IColorAll } from '../../interfaces/color';
 
 describe('ChangeColorDialogComponent', () => {
   let component: ChangeColorDialogComponent;
   let fixture: ComponentFixture<ChangeColorDialogComponent>;
+  let state$: Subject<any>;
+
   let mockDialogRef: jasmine.SpyObj<MatDialogRef<ChangeColorDialogComponent>>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let stateSubject: Subject<any>;
+  let storeSpy: jasmine.SpyObj<Store>;
 
   const mockData = {
     treatmentId: 'treatment-id',
   };
 
   beforeEach(async () => {
-    stateSubject = new Subject();
+    state$ = new Subject();
     mockDialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
-    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
 
-    mockStore.select.and.returnValue(stateSubject.asObservable());
+    storeSpy.select.and.returnValue(state$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [ChangeColorDialogComponent, TranslateModule.forRoot(), AppMaterialModule],
       providers: [
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { ...mockData } },
-        { provide: Store, useValue: mockStore },
+        { provide: Store, useValue: storeSpy },
       ],
     }).compileComponents();
 
@@ -39,6 +40,8 @@ describe('ChangeColorDialogComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
+
+  afterEach(() => state$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -113,16 +116,16 @@ describe('ChangeColorDialogComponent', () => {
   it('should validate form correctly', () => {
     component.ngOnInit();
 
-    expect(component.colorForm.invalid).toBe(true);
+    expect(component.colorForm.invalid).toBeTrue();
 
     component.colorForm.get('color')?.setValue({ id: '1', name: 'Red' } as IColorAll);
-    expect(component.colorForm.valid).toBe(true);
+    expect(component.colorForm.valid).toBeTrue();
   });
 
   it('should handle state subscription correctly', () => {
     component.ngOnInit();
 
-    expect(mockStore.select).toHaveBeenCalled();
+    expect(storeSpy.select).toHaveBeenCalled();
   });
 
   it('should update color list when state changes', () => {
@@ -132,7 +135,7 @@ describe('ChangeColorDialogComponent', () => {
       { id: '3', name: 'Green' },
     ];
 
-    stateSubject.next({
+    state$.next({
       colors: mockColors,
     });
 
@@ -140,11 +143,11 @@ describe('ChangeColorDialogComponent', () => {
   });
 
   it('should dispatch GetColor action when getColors is called', () => {
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     component['getColors']();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsReservation.GetColorsByTreatmentId));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getColorsByTreatmentId({ treatmentId: mockData.treatmentId }));
   });
 
   it('should filter colors correctly when filterColor is called', () => {

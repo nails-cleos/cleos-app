@@ -1,44 +1,476 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import { Store } from '@ngrx/store';
+import { TranslateModule } from '@ngx-translate/core';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { ChangeDetectorRef } from '@angular/core';
+import { ActivatedRoute, convertToParamMap } from '@angular/router';
+import { of, Subject } from 'rxjs';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ExpensesComponent } from './expenses.component';
-import { TranslateModule } from '@ngx-translate/core';
-import { of } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { ActivatedRoute } from '@angular/router';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../../../interfaces/pagination';
+import { clean, deleteExpense, expenseSelected, getExpensesPage } from '../../../../store/expense.actions';
+import { IExpense, IExpenseAll } from '../../../../interfaces/expense';
+import { dateToTimestamp, getCurrentTimeZone } from '../../../../util/dates';
+import { IRoomAll } from '../../../../interfaces/room';
+import { PaymentType } from '../../../../interfaces/payment';
+import { MatDatepicker } from '@angular/material/datepicker';
 
 describe('ExpensesComponent', () => {
   let component: ExpensesComponent;
   let fixture: ComponentFixture<ExpensesComponent>;
 
-  const mockStore = {
-    select: jasmine.createSpy('select').and.returnValue(of({})),
-    dispatch: jasmine.createSpy('dispatch'),
+  let state$: Subject<any>;
+  let paramMap$: Subject<any>;
+  let breakpoint$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store>;
+  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
+  let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
+  let datepickerSpy: jasmine.SpyObj<MatDatepicker<Date>>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+
+  let dialogSpy: jasmine.Spy<any>;
+
+  const room: IRoomAll = {
+    id: 'room-id',
+    availabilities: [{ day: 'MONDAY', start: '09:00', end: '17:00' }],
+    address: {
+      id: 1,
+      name: 'Main Location',
+      location: { x: 0, y: 0 },
+    },
+    currency: { code: 'EUR', name: 'Euro', id: 'eur', icon: '€' },
+    office: {},
+    timeZone: getCurrentTimeZone(),
+    paymentTypes: [PaymentType.transfer],
+    primary: true,
   };
 
-  const mockActivatedRoute = {
-    paramMap: of({
-      get: jasmine.createSpy('get').and.returnValue(null),
-    }),
+  const mockExpenses: IExpenseAll[] = [
+    {
+      id: '1',
+      invoice: 'Invoice-1',
+      description: 'expense 1',
+      supplyStore: 'Store 1',
+      timestamp: dateToTimestamp(),
+      type: 'expense',
+      gross: 100,
+      btw: 21,
+      room,
+      expenseTotals: [],
+      totalNet: 79,
+      totalGross: 100,
+      deleted: false,
+    },
+    {
+      id: '2',
+      invoice: 'Invoice-2',
+      description: 'expense 2',
+      supplyStore: 'Store 2',
+      timestamp: dateToTimestamp(),
+      type: 'expense',
+      gross: 200,
+      btw: 42,
+      room,
+      expenseTotals: [],
+      totalNet: 158,
+      totalGross: 200,
+      deleted: false,
+    },
+    {
+      id: '3',
+      invoice: 'Invoice-3',
+      description: 'expense 3',
+      supplyStore: 'Store 3',
+      timestamp: dateToTimestamp(),
+      type: 'expense',
+      gross: 300,
+      btw: 63,
+      room,
+      expenseTotals: [],
+      totalNet: 237,
+      totalGross: 300,
+      deleted: false,
+    },
+  ];
+
+  const mockPagination: Pagination<IExpenseAll> = {
+    content: mockExpenses,
+    totalElements: 3,
+    totalPages: 1,
+    number: 0,
   };
 
   beforeEach(async () => {
+    state$ = new Subject();
+    paramMap$ = new Subject();
+    breakpoint$ = new Subject();
+
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
+    datepickerSpy = jasmine.createSpyObj('MatDatepicker', ['close']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      snapshot: {
+        paramMap: {
+          get: jasmine.createSpy('get').and.returnValue('1'),
+        },
+      },
+      paramMap: paramMap$.asObservable(),
+    });
+
+    storeSpy.select.and.returnValue(state$.asObservable());
+    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
+
     await TestBed.configureTestingModule({
-      imports: [ExpensesComponent, TranslateModule.forRoot()],
+      imports: [ExpensesComponent, TranslateModule.forRoot(), NoopAnimationsModule],
       providers: [
-        { provide: Store, useValue: mockStore },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: Store, useValue: storeSpy },
+        { provide: BreakpointObserver, useValue: breakpointObserverSpy },
+        { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ExpensesComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+
+    // Set up mock paginator and sort before initialization to prevent errors
+    component.paginator = {
+      pageIndex: 0,
+      page: of({ pageIndex: 0, pageSize: PAGE_SIZE }),
+    } as unknown as MatPaginator;
+
+    component.sort = {
+      sortChange: of(),
+      active: 'name',
+      direction: 'asc',
+    } as unknown as MatSort;
+
+    dialogSpy = spyOn(component.dialog, 'open');
+  });
+
+  afterEach(() => {
+    state$.complete();
+    paramMap$.complete();
+    breakpoint$.complete();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
 
-    component.ngAfterViewInit();
+  it('should initialize with default values', () => {
+    expect(component.displayedColumns).toEqual(['position', 'invoice', 'supplyStore.name', 'timestamp', 'totalGross',
+      'totalBtw', 'totalNet', 'actions']);
+    expect(component.dataSource).toBeInstanceOf(MatTableDataSource);
+    expect(component.pageSize).toBe(PAGE_SIZE);
+  });
+
+  it('should dispatch Clean action on initialization', () => {
+    // Reset to check only the initialization call
+    storeSpy.dispatch.calls.reset();
+    component.ngOnInit();
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
+  });
+
+  it('should update data source when state changes', () => {
+    component.ngOnInit();
+
+    state$.next({
+      data: mockPagination,
+    });
+
+    expect(component.dataSource).toEqual(mockExpenses.map((expense: IExpenseAll) => {
+      const totalBtw = expense.totalGross - expense.totalNet;
+      return Object.assign({}, expense, { totalBtw });
+    }));
+    expect(component.resultsLength).toBe(3);
+  });
+
+  it('should clean and get expense list on response', () => {
     fixture.detectChanges();
+
+    paramMap$.next(convertToParamMap({ id: '1' }));
+    state$.next({ response: true });
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(
+      getExpensesPage({
+        roomId: '1',
+        sort: 'timestamp',
+        direction: 'desc',
+        page: 0,
+        size: PAGE_SIZE,
+        filter: undefined,
+        dateFilter: undefined,
+      }),
+    );
+  });
+
+  it('should create page subscriptions when results length is available', () => {
+    component.ngOnInit();
+    component.paginator = {
+      pageIndex: 0,
+      page: of({ pageIndex: 0, pageSize: PAGE_SIZE }),
+    } as unknown as MatPaginator;
+
+    component.sort = {
+      sortChange: of({ active: 'invoice', direction: 'asc' }),
+      active: 'invoice',
+      direction: 'asc',
+    } as unknown as MatSort;
+
+    spyOn(component as any, 'createPageSubscriptions');
+
+    state$.next({
+      data: mockPagination,
+    });
+
+    expect(component['createPageSubscriptions']).toHaveBeenCalled();
+  });
+
+  it('should dispatch ExpenseSelected action when edit is called', () => {
+    const testExpense = mockExpenses[0] as unknown as IExpense;
+
+    component.edit(testExpense);
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(expenseSelected({ selected: testExpense }));
+  });
+
+  it('should call delete method without errors', () => {
+    const testExpense = mockExpenses[0] as unknown as IExpense;
+
+    dialogSpy.and.returnValue({
+      afterClosed: () => of(testExpense),
+    });
+
+    component.delete(testExpense);
+
+    expect(dialogSpy).toHaveBeenCalledWith(
+      jasmine.any(Function),
+      jasmine.objectContaining({
+        data: {
+          title: 'EXPENSE.DELETED.TITLE',
+          content: 'EXPENSE.DELETED.CONTENT',
+          value: testExpense,
+        },
+      }));
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteExpense(
+      { roomId: component.roomId!, id: testExpense.id!, invoice: testExpense.invoice! },
+    ));
+  });
+
+  it('should call openDialog method without errors', () => {
+    const testExpense = mockExpenses[0] as unknown as IExpenseAll;
+
+    component.openDialog(testExpense);
+
+    expect(dialogSpy).toHaveBeenCalledWith(
+      jasmine.any(Function),
+      jasmine.objectContaining({
+        data: {
+          title: 'COMMON.TIME_ZONE.TITLE',
+          content: 'COMMON.TIME_ZONE.ROOM_INFO',
+          hideNoButton: true,
+          hideOkButton: true,
+        },
+      }));
+  });
+
+  it('should unsubscribe from subscriptions on destroy', () => {
+    const subscription = jasmine.createSpy('subscription');
+    const paginatorSubscription = jasmine.createSpy('paginatorSubscription');
+
+    component['subscription'] = { unsubscribe: subscription } as any;
+    component['paginatorSubscription'] = { unsubscribe: paginatorSubscription } as any;
+
+    component.ngOnDestroy();
+
+    expect(subscription).toHaveBeenCalled();
+    expect(paginatorSubscription).toHaveBeenCalled();
+  });
+
+  it('should handle missing subscriptions on destroy', () => {
+    component['subscription'] = undefined;
+    component['paginatorSubscription'] = undefined;
+
+    expect(() => component.ngOnDestroy()).not.toThrow();
+  });
+
+  it('should reset paginator page index when sort changes', () => {
+    const sortChangeSubject = new Subject();
+
+    component.paginator = {
+      pageIndex: 5,
+      page: of({ pageIndex: 0, pageSize: PAGE_SIZE }),
+    } as unknown as MatPaginator;
+
+    component.sort = {
+      sortChange: sortChangeSubject.asObservable(),
+      active: 'invoice',
+      direction: 'asc',
+    } as unknown as MatSort;
+
+    spyOn(component as any, 'getExpenses');
+    component['createPageSubscriptions']();
+
+    sortChangeSubject.next({ active: 'description', direction: 'desc' });
+
+    expect(component.paginator.pageIndex).toBe(0);
+    expect(component['getExpenses']).toHaveBeenCalled();
+  });
+
+  it('should handle paginator page changes', () => {
+    const pageSubject = new Subject();
+    component.paginator = {
+      pageIndex: 1,
+      page: pageSubject.asObservable(),
+    } as unknown as MatPaginator;
+
+    component.sort = {
+      sortChange: of(),
+      active: 'invoice',
+      direction: 'asc',
+    } as unknown as MatSort;
+
+    spyOn(component as any, 'getExpenses');
+    component['createPageSubscriptions']();
+
+    pageSubject.next({ pageIndex: 1, pageSize: PAGE_SIZE });
+
+    expect(component['getExpenses']).toHaveBeenCalled();
+  });
+
+  it('should dispatch GetExpensesPage action with correct parameters', () => {
+    fixture.detectChanges();
+
+    paramMap$.next(convertToParamMap({ id: '1' }));
+    breakpoint$.next({ matches: true });
+
+    component.sort = {
+      active: 'invoice',
+      direction: 'asc',
+    } as unknown as MatSort;
+
+    component.date.setValue(new Date('2024-01-01'));
+    const mockEvent = {
+      target: { value: '  My Filter  ' },
+    } as unknown as Event;
+    component.applyFilter(mockEvent);
+    component['getExpenses'](2);
+
+    expect(component['filter']).toBe('my filter');
+    expect(component['dateFilter']).toBe('01-2024');
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getExpensesPage(
+      {
+        roomId: '1',
+        sort: 'invoice',
+        direction: 'asc',
+        page: 2,
+        size: MOBILE_PAGE_SIZE,
+        filter: 'my filter',
+        dateFilter: '01-2024',
+      },
+    ));
+  });
+
+  it('should remove date filter', () => {
+    component.ngOnInit();
+
+    component.date.setValue(new Date('2024-01-01'));
+
+    expect(component['dateFilter']).toBe('01-2024');
+
+    component.date.setValue(null);
+    expect(component['dateFilter']).toBeUndefined();
+  });
+
+  it('should handle undefined expanded expense', () => {
+    expect(component.expanded).toBeUndefined();
+    const expandedExpense = mockExpenses[0] as unknown as IExpense;
+
+    component.expanded = expandedExpense;
+    expect(component.expanded).toBe(expandedExpense);
+  });
+
+  it('should handle state subscription errors gracefully', () => {
+    expect(() => {
+      state$.next({
+        data: null,
+      });
+    }).not.toThrow();
+  });
+
+  it('should handle empty pagination data', () => {
+    component.ngOnInit();
+
+    const emptyPagination: Pagination<IExpense> = {
+      content: [],
+      totalElements: 0,
+      totalPages: 0,
+      number: 0,
+    };
+
+    state$.next({
+      data: emptyPagination,
+    });
+
+    expect(component.dataSource).toEqual([]);
+    expect(component.resultsLength).toBe(0);
+  });
+
+  it('should initialize with correct state observable', () => {
+    expect(storeSpy.select).toHaveBeenCalled();
+  });
+
+  it('should maintain correct displayedColumns order', () => {
+    const expectedColumns = ['position', 'invoice', 'supplyStore.name', 'timestamp', 'totalGross',
+      'totalBtw', 'totalNet', 'actions'];
+    expect(component.displayedColumns).toEqual(expectedColumns);
+  });
+
+  it('should handle mobile breakpoint adjustment', () => {
+    // Test is handled by component initialization with BreakpointObserver
+    // The mobile adjustment happens in constructor based on breakpoint observer
+    expect(component.pageSize).toBeDefined();
+  });
+
+  it('should handle keydown events correctly', () => {
+    const backspaceEvent = { code: 'Backspace' };
+    const dateControl = component.date;
+
+    component.keyDownHandler(backspaceEvent);
+    expect(dateControl?.value).toBe(null);
+  });
+
+  it('should set month and year from normalizedMonthAndYear and close datepicker', () => {
+    const normalizedMonthAndYear = new Date(2024, 6, 1); // July 2024
+
+    component.setMonthAndYear(normalizedMonthAndYear, datepickerSpy);
+
+    const result = component.date.value!;
+    expect(result.getMonth()).toBe(6); // July (0-based)
+    expect(result.getFullYear()).toBe(2024);
+    expect(datepickerSpy.close).toHaveBeenCalled();
+  });
+
+  it('should use getNowTimeZone() if date has no value', () => {
+    component.date.setValue(null);
+
+    const normalizedMonthAndYear = new Date(2025, 2, 1); // March 2025
+
+    component.setMonthAndYear(normalizedMonthAndYear, datepickerSpy);
+
+    const result = component.date.value!;
+    expect(result.getFullYear()).toBe(2025);
+    expect(result.getMonth()).toBe(2);
+    expect(datepickerSpy.close).toHaveBeenCalled();
   });
 });

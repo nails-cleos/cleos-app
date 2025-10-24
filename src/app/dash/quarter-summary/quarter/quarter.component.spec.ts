@@ -1,33 +1,32 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { QuarterComponent } from './quarter.component';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 
 describe('QuarterComponent', () => {
   let component: QuarterComponent;
   let fixture: ComponentFixture<QuarterComponent>;
-  let routerMock: any;
-  let translateMock: any;
+
+  let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
-    routerMock = { navigate: jasmine.createSpy('navigate') };
-    translateMock = { currentLang: 'en-GB' };
+    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
 
     await TestBed.configureTestingModule({
-      imports: [QuarterComponent],
+      imports: [QuarterComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Router, useValue: routerMock },
-        { provide: TranslateService, useValue: translateMock },
+        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
-  });
 
-  beforeEach(() => {
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
+
     fixture = TestBed.createComponent(QuarterComponent);
     component = fixture.componentInstance;
     component.year = 2025;
     component.measure = 'long';
-    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -35,14 +34,14 @@ describe('QuarterComponent', () => {
   });
 
   it('should return month title', () => {
-    const monthName = component.getMonth(1); // enero
+    const monthName = component.getMonth(1);
     expect(monthName).toBeDefined();
   });
 
   it('should navigate to quarter', () => {
     component.quarter = 2;
     component.goToQuarter(2);
-    expect(routerMock.navigate).toHaveBeenCalledWith(
+    expect(routerSpy.navigate).toHaveBeenCalledWith(
       ['en-GB', 'dashboard', 'quarter', 'summary'],
       { state: { year: 2025, quarter: 2 } },
     );
@@ -50,7 +49,7 @@ describe('QuarterComponent', () => {
 
   it('should navigate to month with correct step for income', () => {
     component.goToMonth(1, 'INCOME');
-    expect(routerMock.navigate).toHaveBeenCalledWith(
+    expect(routerSpy.navigate).toHaveBeenCalledWith(
       ['en-GB', 'dashboard', 'monthly', 'summary'],
       { state: { date: '1-2025', step: 0 } },
     );
@@ -58,7 +57,7 @@ describe('QuarterComponent', () => {
 
   it('should navigate to month with correct step for expense', () => {
     component.goToMonth(3, 'EXPENSE');
-    expect(routerMock.navigate).toHaveBeenCalledWith(
+    expect(routerSpy.navigate).toHaveBeenCalledWith(
       ['en-GB', 'dashboard', 'monthly', 'summary'],
       { state: { date: '3-2025', step: 1 } },
     );
@@ -66,7 +65,7 @@ describe('QuarterComponent', () => {
 
   it('should navigate to month with correct step for cash', () => {
     component.goToMonth(4, 'CASH');
-    expect(routerMock.navigate).toHaveBeenCalledWith(
+    expect(routerSpy.navigate).toHaveBeenCalledWith(
       ['en-GB', 'dashboard', 'monthly', 'summary'],
       { state: { date: '4-2025', step: 2 } },
     );

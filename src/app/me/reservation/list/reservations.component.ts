@@ -10,7 +10,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import * as fromActionsReservation from '../../../store/reservation.actions';
+import {
+
+  createReview,
+  clean,
+  getCustomerReservations,
+} from '../../../store/reservation.actions';
 import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
 import { executeDialogNoWidth, openDialog } from '../../../util/helper';
 import { stampAnimation, transitionAnimation } from '../../../util/animation';
@@ -57,8 +62,8 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   private subscription?: Subscription;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private router: Router, breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef,
-              private analytic: Analytics) {
+    private router: Router, breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef,
+    private analytic: Analytics) {
     this.getState = this.store.select(selectReservationState);
     this.dateFormat = this.translate.currentLang;
     this.language = this.translate.currentLang;
@@ -109,9 +114,7 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
         review.reservationId = reservation?.id;
         review.detail = result.detail ? result.detail :
           this.translate.instant(`ME.REVIEW.RATING.${ result.rating }`);
-        this.store.dispatch(
-          new fromActionsReservation.CreateReview(review),
-        );
+        this.store.dispatch(createReview({ review }));
       }
     },
   );
@@ -121,10 +124,15 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
     openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsReservation.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private getReservations = (page: number = 0): void => this.store.dispatch(
-    new fromActionsReservation.GetCustomerReservations(page, this.sort.active, this.sort.direction, this.pageSize),
+    getCustomerReservations({
+      page,
+      sort: this.sort.active,
+      direction: this.sort.direction,
+      size: this.pageSize,
+    }),
   );
 
   private subscribe = (): void => {

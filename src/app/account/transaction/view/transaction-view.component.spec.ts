@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { of, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -14,15 +14,23 @@ import { TransactionViewComponent } from './transaction-view.component';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { IAccountAll, ITransaction } from '../../../interfaces/account';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
-import * as fromActionsAccount from '../../../store/account.actions';
+import { clean, getTransactionsByAccountId } from '../../../store/account.actions';
+import { AppState } from '../../../store/app.states';
 
 describe('TransactionViewComponent', () => {
   let component: TransactionViewComponent;
   let fixture: ComponentFixture<TransactionViewComponent>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let stateSubject: Subject<any>;
-  let breakpointSubject: Subject<any>;
-  let authUserSubject: Subject<any>;
+
+  let state$: Subject<any>;
+  let breakpoint$: Subject<any>;
+  let authUser$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let paramMapSpy: jasmine.SpyObj<ParamMap>;
+  let changeDetectorSpy: jasmine.SpyObj<ChangeDetectorRef>;
+  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
 
   const mockAccount: IAccountAll = {
     id: 'account-123',
@@ -68,36 +76,27 @@ describe('TransactionViewComponent', () => {
     },
   ];
 
-  const mockActivatedRoute = {
-    snapshot: {
-      paramMap: {
-        get: jasmine.createSpy('get').and.returnValue('account-123'),
-      },
-    },
-  };
-
   beforeEach(async () => {
-    stateSubject = new Subject();
-    breakpointSubject = new Subject();
-    authUserSubject = new Subject();
+    state$ = new Subject();
+    breakpoint$ = new Subject();
+    authUser$ = new Subject();
 
-    const storeSpyObj = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    const changeDetectorSpyObj = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-    const authUserSpyObj = jasmine.createSpyObj('AuthUserService', [], {
-      authUser: authUserSubject.asObservable(),
+    changeDetectorSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      snapshot: {
+        paramMap: paramMapSpy,
+      },
     });
-    const breakpointSpyObj = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    const translateSpyObj = jasmine.createSpyObj('TranslateService', ['instant', 'get', 'stream'], {
-      currentLang: 'en',
-      onLangChange: of('en'),
-      onTranslationChange: of('en'),
-      onDefaultLangChange: of('en'),
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
+      authUser: authUser$.asObservable(),
     });
-    translateSpyObj.get.and.returnValue(of('translated text'));
-    translateSpyObj.stream.and.returnValue(of('translated text'));
+    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
 
-    storeSpyObj.select.and.returnValue(stateSubject.asObservable());
-    breakpointSpyObj.observe.and.returnValue(breakpointSubject.asObservable());
+    paramMapSpy.get.and.returnValue('account-123');
+    storeSpy.select.and.returnValue(state$.asObservable());
+    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [
@@ -106,25 +105,26 @@ describe('TransactionViewComponent', () => {
         BrowserAnimationsModule,
       ],
       providers: [
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: Store, useValue: storeSpyObj },
-        { provide: ChangeDetectorRef, useValue: changeDetectorSpyObj },
-        { provide: AuthUserService, useValue: authUserSpyObj },
-        { provide: BreakpointObserver, useValue: breakpointSpyObj },
-        { provide: TranslateService, useValue: translateSpyObj },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: Store, useValue: storeSpy },
+        { provide: ChangeDetectorRef, useValue: changeDetectorSpy },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
+        { provide: BreakpointObserver, useValue: breakpointObserverSpy },
       ],
     }).compileComponents();
 
-    mockStore = TestBed.inject(Store) as jasmine.SpyObj<Store>;
+    const translateService = TestBed.inject(TranslateService);
+    translateService.setDefaultLang('en-GB');
+    translateService.use('en-GB');
 
     fixture = TestBed.createComponent(TransactionViewComponent);
     component = fixture.componentInstance;
   });
 
   afterEach(() => {
-    stateSubject.complete();
-    breakpointSubject.complete();
-    authUserSubject.complete();
+    state$.complete();
+    breakpoint$.complete();
+    authUser$.complete();
   });
 
   it('should create', () => {
@@ -132,10 +132,10 @@ describe('TransactionViewComponent', () => {
   });
 
   it('should initialize with default values', () => {
-    expect(component.hasAdminRole).toBe(false);
+    expect(component.hasAdminRole).toBeFalse();
     expect(component.pageSize).toBe(PAGE_SIZE);
-    expect(component.dateFormat).toBe('en');
-    expect(component.language).toBe('en');
+    expect(component.dateFormat).toBe('en-GB');
+    expect(component.language).toBe('en-GB');
     expect(component.displayedColumns).toEqual([
       'position', 'timestamp', 'amount', 'amountGifted', 'payment.status', 'payment.type', 'actions',
     ]);
@@ -143,30 +143,30 @@ describe('TransactionViewComponent', () => {
   });
 
   it('should set mobile page size when small breakpoint matches', () => {
-    breakpointSubject.next({ matches: true });
+    breakpoint$.next({ matches: true });
 
     expect(component.pageSize).toBe(MOBILE_PAGE_SIZE);
   });
 
   it('should keep default page size when breakpoint does not match', () => {
-    breakpointSubject.next({ matches: false });
+    breakpoint$.next({ matches: false });
 
     expect(component.pageSize).toBe(PAGE_SIZE);
   });
 
   it('should update hasAdminRole based on auth user service', () => {
-    authUserSubject.next({ hasAdminRole: true });
+    authUser$.next({ hasAdminRole: true });
 
-    expect(component.hasAdminRole).toBe(true);
+    expect(component.hasAdminRole).toBeTrue();
 
-    authUserSubject.next({ hasAdminRole: false });
+    authUser$.next({ hasAdminRole: false });
 
-    expect(component.hasAdminRole).toBe(false);
+    expect(component.hasAdminRole).toBeFalse();
   });
 
   it('should extract account ID from route and dispatch Clean on init', () => {
     // Ensure the route parameter is correctly mocked
-    mockActivatedRoute.snapshot.paramMap.get.and.callFake((key: string) => {
+    paramMapSpy.get.and.callFake((key: string) => {
       if (key === 'id') {
         return 'account-123';
       }
@@ -174,11 +174,11 @@ describe('TransactionViewComponent', () => {
     });
 
     // Reset dispatch calls and initialize
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
     component.ngOnInit();
 
     expect(component.accountId).toEqual('account-123');
-    expect(mockStore.dispatch).toHaveBeenCalledWith(new fromActionsAccount.Clean());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch GetTransactionsByAccountId after view init', () => {
@@ -188,13 +188,15 @@ describe('TransactionViewComponent', () => {
 
     component.ngAfterViewInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      new fromActionsAccount.GetTransactionsByAccountId(
-        'account-123',
-        0,
-        'timestamp',
-        'desc',
-        PAGE_SIZE,
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(
+      getTransactionsByAccountId(
+        {
+          id: 'account-123',
+          page: 0,
+          sort: 'timestamp',
+          direction: 'desc',
+          size: PAGE_SIZE,
+        },
       ),
     );
   });
@@ -223,7 +225,7 @@ describe('TransactionViewComponent', () => {
       },
     };
 
-    stateSubject.next(stateWithData);
+    state$.next(stateWithData);
 
     expect(component.account).toEqual(mockAccount);
     expect(component.dataSource.length).toBe(2);
@@ -233,7 +235,7 @@ describe('TransactionViewComponent', () => {
   it('should handle empty state gracefully', () => {
     component.ngOnInit();
 
-    stateSubject.next({});
+    state$.next({});
 
     expect(component.account).toBeUndefined();
     expect(component.dataSource).toBeUndefined();
@@ -263,7 +265,7 @@ describe('TransactionViewComponent', () => {
       },
     };
 
-    stateSubject.next(stateWithData);
+    state$.next(stateWithData);
 
     expect(component.dataSource[0].date).toBeDefined();
     expect(component.dataSource[1].date).toBeDefined();
@@ -296,7 +298,7 @@ describe('TransactionViewComponent', () => {
 
     expect(component['paginatorSubscription']).toBeUndefined();
 
-    stateSubject.next(stateWithData);
+    state$.next(stateWithData);
 
     expect(component['paginatorSubscription']).toBeDefined();
   });
@@ -325,14 +327,14 @@ describe('TransactionViewComponent', () => {
     sortChangeSubject.next({ active: 'amount', direction: 'asc' });
 
     expect(component.paginator.pageIndex).toBe(0);
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      new fromActionsAccount.GetTransactionsByAccountId(
-        'account-123',
-        0,
-        'amount',
-        'asc',
-        PAGE_SIZE,
-      ),
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(
+      getTransactionsByAccountId({
+        id: 'account-123',
+        page: 0,
+        sort: 'amount',
+        direction: 'asc',
+        size: PAGE_SIZE,
+      }),
     );
   });
 
@@ -358,19 +360,19 @@ describe('TransactionViewComponent', () => {
 
     pageSubject.next({ pageIndex: 2 });
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      new fromActionsAccount.GetTransactionsByAccountId(
-        'account-123',
-        2,
-        'timestamp',
-        'desc',
-        PAGE_SIZE,
-      ),
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(
+      getTransactionsByAccountId({
+        id: 'account-123',
+        page: 2,
+        sort: 'timestamp',
+        direction: 'desc',
+        size: PAGE_SIZE,
+      }),
     );
   });
 
   it('should handle case when account ID is not provided', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(null);
+    paramMapSpy.get.and.returnValue(null);
 
     component.ngOnInit();
 
@@ -422,7 +424,7 @@ describe('TransactionViewComponent', () => {
       },
     };
 
-    stateSubject.next(stateWithData);
+    state$.next(stateWithData);
 
     expect(component.dataSource[0].date).toBeDefined();
   });

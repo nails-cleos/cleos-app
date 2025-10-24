@@ -1,47 +1,49 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { OverviewComponent } from './overview.component';
 import { ActivatedRoute } from '@angular/router';
-import { of } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthUserService } from '../../services/auth-user.service';
+import { AppState } from '../../store/app.states';
 
 describe('OverviewComponent', () => {
   let component: OverviewComponent;
   let fixture: ComponentFixture<OverviewComponent>;
 
-  const mockStore = {
-    select: jasmine.createSpy('select').and.returnValue(of({})),
-    dispatch: jasmine.createSpy('dispatch'),
-  };
+  let state$: Subject<any>;
+  let authUser$: Subject<any>;
 
-  const mockActivatedRoute = {
-    snapshot: {
-      paramMap: {
-        get: jasmine.createSpy('get').and.returnValue('calendar'),
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+
+  beforeEach(async () => {
+    state$ = new Subject<any>();
+    authUser$ = new Subject<any>();
+
+    storeSpy = jasmine.createSpyObj<Store<AppState>>('Store', ['select', 'dispatch']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      snapshot: {
+        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
       },
-    },
-  };
+    });
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['authUser'], {
+      authUser: authUser$.asObservable(),
+    });
 
-  const mockAuthUserService = {
-    authUser: of({
-      hasAdminRole: false,
-    }),
-  };
+    storeSpy.select.and.returnValue(state$.asObservable());
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       imports: [OverviewComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: Store, useValue: mockStore },
-        { provide: AuthUserService, useValue: mockAuthUserService },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: Store, useValue: storeSpy },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
       ],
     }).compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(OverviewComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

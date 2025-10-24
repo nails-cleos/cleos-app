@@ -1,9 +1,29 @@
 import { Pagination } from '../../interfaces/pagination';
-import { All, RoomActionTypes } from '../room.actions';
+import {
+  clean,
+  createRoom,
+  customerInfoSuccess,
+  deleteRoom,
+  getAllCustomersInfo,
+  getAllRoomsInfo,
+  getRoom,
+  getRoomsPage,
+  getServices,
+  roomFailure,
+  roomInfoSuccess,
+  roomSaveSuccess,
+  roomSelected,
+  roomServiceSelected,
+  roomSuccess,
+  updateRoom,
+  updateServices,
+} from '../room.actions';
 import { IRoom, IRoomCustomer, IRoomService } from '../../interfaces/room';
 import { IUser } from '../../interfaces/user';
 import { ICurrency } from '../../interfaces/currency';
 import { IError, IResponseSuccess } from '../../interfaces/common';
+
+import { createReducer, on } from '@ngrx/store';
 
 export interface State {
   response?: IResponseSuccess;
@@ -35,151 +55,123 @@ export const initialState: State = {
   isLoading: false,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case RoomActionTypes.getRoomsPage: {
-      return {
-        ...state,
-        data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IRoom>,
-        errorMessage: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case RoomActionTypes.getAllRoomsInfo: {
-      return {
-        ...state,
-        professionals: undefined,
-        currencies: undefined,
-        offices: undefined,
-        errorMessage: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case RoomActionTypes.getRoom: {
-      return {
-        ...state,
-        data: {} as IRoom,
-        errorMessage: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case RoomActionTypes.getServices: {
-      return {
-        ...state,
-        services: {
-          currency: {},
-          treatments: [],
-          selectedTreatments: [],
-          additionalList: [],
-          selectedAdditionalList: [],
-        } as IRoomService,
-        errorMessage: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case RoomActionTypes.roomInfoSuccess: {
-      return {
-        ...state,
-        professionals: action.roomInfo?.professionals,
-        offices: action.roomInfo?.offices,
-        currencies: action.roomInfo?.currencies,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case RoomActionTypes.roomSuccess: {
-      return {
-        ...state,
-        data: action.data,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case RoomActionTypes.roomSaveSuccess: {
-      return {
-        ...state,
-        response: action,
-        errorMessage: undefined,
-        selected: undefined,
-        subErrors: undefined,
-        isLoading: false,
-      };
-    }
-    case RoomActionTypes.roomSelected: {
-      return {
-        ...state,
-        selected: action.selected,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case RoomActionTypes.roomServiceSelected: {
-      return {
-        ...state,
-        services: action.services,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case RoomActionTypes.roomFailure: {
-      return {
-        ...state,
-        errorMessage: action.error.message,
-        error: action.error,
-        subErrors: action.error.subErrors,
-        response: undefined,
-        isLoading: false,
-      };
-    }
-    case RoomActionTypes.updateServices:
-    case RoomActionTypes.updateRoom:
-    case RoomActionTypes.createRoom:
-    case RoomActionTypes.deleteRoom: {
-      return {
-        ...state,
-        selected: undefined,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-        isLoading: true,
-      };
-    }
-    case RoomActionTypes.getAllCustomersInfo: {
-      return {
-        ...state,
-        customers: [{}, {}, {}],
-        errorMessage: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case RoomActionTypes.customerInfoSuccess: {
-      return {
-        ...state,
-        customers: action.customers,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case RoomActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const roomReducer = createReducer(
+  initialState,
+  on(getRoomsPage, (state) => ({
+    ...state,
+    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IRoom>,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getAllRoomsInfo, (state) => ({
+    ...state,
+    professionals: undefined,
+    currencies: undefined,
+    offices: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getRoom, (state) => ({
+    ...state,
+    data: {} as IRoom,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getServices, (state) => ({
+    ...state,
+    services: {
+      currency: {},
+      treatments: [],
+      selectedTreatments: [],
+      additionalList: [],
+      selectedAdditionalList: [],
+    } as IRoomService,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(roomInfoSuccess, (state, { roomInfo }) => ({
+    ...state,
+    professionals: roomInfo?.professionals,
+    offices: roomInfo?.offices,
+    currencies: roomInfo?.currencies,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(roomSuccess, (state, { data }) => ({
+    ...state,
+    data,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(roomSaveSuccess, (state, action) => ({
+    ...state,
+    response: action,
+    errorMessage: undefined,
+    selected: undefined,
+    subErrors: undefined,
+    isLoading: false,
+  })),
+  on(roomSelected, (state, { selected }) => ({
+    ...state,
+    selected,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(roomServiceSelected, (state, { services }) => ({
+    ...state,
+    services,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(roomFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error,
+    subErrors: error.subErrors,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(
+    updateServices,
+    updateRoom,
+    createRoom,
+    deleteRoom,
+    (state) => ({
+      ...state,
+      selected: undefined,
+      errorMessage: undefined,
+      subErrors: undefined,
+      response: undefined,
+      isLoading: true,
+    }),
+  ),
+  on(getAllCustomersInfo, (state) => ({
+    ...state,
+    customers: [{}, {}, {}],
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(customerInfoSuccess, (state, { customers }) => ({
+    ...state,
+    customers,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(clean, () => initialState),
+);
+

@@ -13,11 +13,10 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import { map, startWith } from 'rxjs/operators';
-import * as fromActionsUser from '../../store/user.actions';
+import { clean, getAllCustomers } from '../../store/user.actions';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AsyncPipe } from '@angular/common';
-
 
 @Component({
   selector: 'app-change-customer-dialog-component',
@@ -36,7 +35,7 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
 
   constructor(public dialogRef: MatDialogRef<ChangeCustomerDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-              private store: Store<AppState>, private formBuilder: UntypedFormBuilder) {
+    private store: Store<AppState>, private formBuilder: UntypedFormBuilder) {
     this.getState = this.store.select(selectUserState);
   }
 
@@ -85,9 +84,9 @@ export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
   private filterCustomer = (name: string): IUser[] | undefined => this.customers?.filter(
     option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private getCustomers = (): void => this.store.dispatch(new fromActionsUser.GetAllCustomers());
+  private getCustomers = (): void => this.store.dispatch(getAllCustomers());
 
-  private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {

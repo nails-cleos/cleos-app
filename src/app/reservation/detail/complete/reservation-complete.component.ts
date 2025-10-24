@@ -3,7 +3,13 @@ import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../../store/app.states';
 import { ActivatedRoute, Router } from '@angular/router';
-import * as fromActionsReservation from '../../../store/reservation.actions';
+import {
+  completeReservation,
+  getAllAdditionalByGroupId,
+  getAllTreatments,
+  getReservation,
+  reservationFindPayments,
+} from '../../../store/reservation.actions';
 import { IExtras, IReservationAll } from '../../../interfaces/reservation';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
@@ -100,8 +106,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   private currentSplitData?: IExtras[];
 
   constructor(public dialog: MatDialog, private store: Store<AppState>, private route: ActivatedRoute,
-              private formBuilder: UntypedFormBuilder, private readonly translate: TranslateService,
-              private router: Router) {
+    private formBuilder: UntypedFormBuilder, private readonly translate: TranslateService, private router: Router) {
     this.getState = this.store.select(selectReservationState);
     this.dateFormat = this.translate.currentLang;
     this.endDate = getNowTimeZone();
@@ -270,9 +275,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
 
   private getTreatments = (): void => {
     if (this.roomId) {
-      this.store.dispatch(
-        new fromActionsReservation.GetAllTreatments(this.roomId, this.customerId),
-      );
+      this.store.dispatch(getAllTreatments({ roomId: this.roomId, customerId: this.customerId }));
     }
   };
 
@@ -280,7 +283,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     if (this.groupId !== groupId && this.roomId) {
       this.groupId = groupId;
       this.store.dispatch(
-        new fromActionsReservation.GetAllAdditionalByGroupId(this.roomId, groupId),
+        getAllAdditionalByGroupId({ roomId: this.roomId, groupId }),
       );
     }
   };
@@ -297,7 +300,7 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
   private completeReservation = (): void => {
     if (this.reservation) {
       this.store.dispatch(
-        new fromActionsReservation.CompleteReservation(
+        completeReservation(
           this.reservation.id,
           {
             treatmentId: valueChange(this.treatment.value.id, this.reservation?.treatment.key),
@@ -320,13 +323,13 @@ export class ReservationCompleteComponent implements OnInit, OnDestroy {
     if (!this.payments) {
       this.payments = undefined;
       this.store.dispatch(
-        new fromActionsReservation.ReservationFindPayments(this.reservationId),
+        reservationFindPayments({ id: this.reservationId }),
       );
     }
     if (!this.reservation) {
       this.reservation = undefined;
       this.store.dispatch(
-        new fromActionsReservation.GetReservation(this.reservationId),
+        getReservation({ id: this.reservationId }),
       );
     }
   };

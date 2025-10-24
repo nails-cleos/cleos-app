@@ -21,10 +21,10 @@ export class UserService {
   private customerUrl = 'customers';
   private officeUrl = 'offices/managers';
 
-  private userUrlV1 = `v1/${ this.userUrl }`;
-  private professionalUrlV1 = `v1/${ this.professionalUrl }`;
-  private customerUrlV1 = `v1/${ this.customerUrl }`;
-  private officeUrlV1 = `v1/${ this.officeUrl }`;
+  private userUrlV1 = `v1/${this.userUrl}`;
+  private professionalUrlV1 = `v1/${this.professionalUrl}`;
+  private customerUrlV1 = `v1/${this.customerUrl}`;
+  private officeUrlV1 = `v1/${this.officeUrl}`;
 
   private http: HttpClient = inject(HttpClient);
 
@@ -89,9 +89,10 @@ export class UserService {
 
   addManager = (user: IUser): Observable<IApiResponse> => this.http.post<IApiResponse>(this.officeUrlV1, user);
 
-  deleteUser = (id: string): Observable<IUser> => this.http.delete<IUser>(toUrl(this.userUrlV1, id));
+  deleteUser = (id: string): Observable<void> => this.http.delete<void>(toUrl(this.userUrlV1, id));
 
-  restore = (id: string, user: IUser): Observable<IUser> => this.http.patch<IUser>(toUrl(this.userUrlV1, id), user);
+  restore = (id: string, user: IUser): Observable<IApiResponse> => this.http.patch<IApiResponse>(
+    toUrl(this.userUrlV1, id), user);
 
   resendToken = (id: string): Observable<void> => this.http.post<void>(toUrl(this.userUrlV1, id, 'token'), null);
 
@@ -128,11 +129,11 @@ export class UserService {
 
   getAllRoomsByProfessionalId = (
     id: string,
-  ): Observable<IRoom[]> => this.http.get<IRoom[]>(`${ this.professionalUrlV1 }/${ id }/rooms`);
+  ): Observable<IRoom[]> => this.http.get<IRoom[]>(`${this.professionalUrlV1}/${id}/rooms`);
 
   getAllDisableUsers = (): Observable<IUser[]> => this.http.get<IUser[]>(this.userUrlV1);
 
   mergeUsers = (
     oldUserId: string, newUserId: string,
-  ): Observable<IUser> => this.http.post<IUser>(`${ this.userUrlV1 }/merge`, { oldUserId, newUserId });
+  ): Observable<IUser> => this.http.post<IUser>(`${this.userUrlV1}/merge`, { oldUserId, newUserId });
 }

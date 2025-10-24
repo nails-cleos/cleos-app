@@ -4,7 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState } from '../../store/app.states';
-import * as fromActionsDiscount from '../../store/discount.actions';
+import { clean, getUserDiscountByCustomerId } from '../../store/discount.actions';
 import { IUserDiscount } from '../../interfaces/discount';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -58,10 +58,9 @@ export class AddDiscountDialogComponent implements OnInit, OnDestroy {
     });
   };
 
-  private getDiscounts = (): void => this.store.dispatch(
-    new fromActionsDiscount.GetUserDiscountByCustomerId(this.customerId));
+  private getDiscounts = (): void => this.store.dispatch(getUserDiscountByCustomerId({ customerId: this.customerId }));
 
-  private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => this.discounts = state.data);

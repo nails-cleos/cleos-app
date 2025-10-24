@@ -4,12 +4,13 @@ import { AppState, selectPaymentState } from '../../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute } from '@angular/router';
-import * as fromActionsPayment from '../../../store/payment.actions';
+import { clean, getPayment, paymentOptions, updatePaymentById } from '../../../store/payment.actions';
 import {
   getPaymentOptions,
   getPayNlOptions,
   IPaymentAll,
-  IPaymentOption, PaymentPercentage,
+  IPaymentOption,
+  PaymentPercentage,
   PaymentType,
 } from '../../../interfaces/payment';
 import { Analytics, logEvent } from '@angular/fire/analytics';
@@ -38,7 +39,7 @@ export class MePaymentComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
 
   constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private route: ActivatedRoute,
-              private analytic: Analytics, private translate: TranslateService) {
+    private analytic: Analytics, private translate: TranslateService) {
     this.getState = this.store.select(selectPaymentState);
     this.typeForm = this.formBuilder.group({
       type: new UntypedFormControl(undefined),
@@ -61,9 +62,7 @@ export class MePaymentComponent implements OnInit, OnDestroy {
       payment.bic = this.typeForm.get('bank')?.value?.bic;
     }
 
-    this.store.dispatch(
-      new fromActionsPayment.UpdatePaymentById(this.payment!.id, payment),
-    );
+    this.store.dispatch(updatePaymentById({ id: this.payment!.id, payment }));
     return;
   }
 
@@ -88,13 +87,11 @@ export class MePaymentComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  private getPayment = (paymentId: string): void => this.store.dispatch(
-    new fromActionsPayment.GetPayment(paymentId),
-  );
+  private getPayment = (id: string): void => this.store.dispatch(getPayment({ id }));
 
-  private getOptions = (): void => this.store.dispatch(new fromActionsPayment.PaymentOptions());
+  private getOptions = (): void => this.store.dispatch(paymentOptions());
 
-  private clean = (): void => this.store.dispatch(new fromActionsPayment.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {

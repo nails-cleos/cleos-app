@@ -1,5 +1,23 @@
 import { Pagination } from '../../interfaces/pagination';
-import { All, TreatmentActionTypes } from '../treatment.actions';
+import { createReducer, on } from '@ngrx/store';
+
+import {
+  clean,
+  colorSuccess,
+  createTreatment,
+  deleteTreatmentGroup,
+  getAllColors,
+  getAllTreatmentsGroup,
+  getAllTreatmentsHistory,
+  getTreatmentGroup,
+  getTreatmentsPage,
+  treatmentFailure,
+  treatmentHistorySuccess,
+  treatmentSaveSuccess,
+  treatmentSelected,
+  treatmentSuccess,
+  updateTreatmentGroup,
+} from '../treatment.actions';
 import { ITreatmentAll, ITreatmentGroup } from '../../interfaces/treatment';
 import { IColor } from '../../interfaces/color';
 import { IError, IResponseSuccess } from '../../interfaces/common';
@@ -28,129 +46,97 @@ export const initialState: State = {
   isLoading: false,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case TreatmentActionTypes.getTreatmentsPage: {
-      return {
-        ...state,
-        data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<ITreatmentGroup>,
-        errorMessage: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case TreatmentActionTypes.getAllTreatmentsGroup: {
-      return {
-        ...state,
-        data: undefined,
-        errorMessage: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case TreatmentActionTypes.getAllColors: {
-      return {
-        ...state,
-        colors: undefined,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case TreatmentActionTypes.getTreatmentGroup: {
-      return {
-        ...state,
-        selected: {} as ITreatmentGroup,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case TreatmentActionTypes.treatmentSuccess: {
-      return {
-        ...state,
-        data: action.data,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case TreatmentActionTypes.colorSuccess: {
-      return {
-        ...state,
-        colors: action.colors,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case TreatmentActionTypes.treatmentSaveSuccess: {
-      return {
-        ...state,
-        response: action,
-        errorMessage: undefined,
-        selected: undefined,
-        subErrors: undefined,
-        isLoading: false,
-      };
-    }
-    case TreatmentActionTypes.treatmentSelected: {
-      return {
-        ...state,
-        selected: action.selected,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case TreatmentActionTypes.treatmentFailure: {
-      return {
-        ...state,
-        errorMessage: action.error.message,
-        error: action.error,
-        subErrors: action.error.subErrors,
-        response: undefined,
-        isLoading: false,
-      };
-    }
-    case TreatmentActionTypes.updateTreatmentGroup:
-    case TreatmentActionTypes.createTreatment:
-    case TreatmentActionTypes.deleteTreatmentGroup: {
-      return {
-        ...state,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-        selected: undefined,
-        isLoading: true,
-      };
-    }
-    case TreatmentActionTypes.getAllTreatmentsHistory: {
-      return {
-        ...state,
-        history: [{} as ITreatmentAll, {} as ITreatmentAll, {} as ITreatmentAll],
-        errorMessage: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case TreatmentActionTypes.treatmentHistorySuccess: {
-      return {
-        ...state,
-        history: action.history,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case TreatmentActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const treatmentReducer = createReducer(
+  initialState,
+  on(getTreatmentsPage, (state) => ({
+    ...state,
+    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<ITreatmentGroup>,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getAllTreatmentsGroup, (state) => ({
+    ...state,
+    data: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getAllColors, (state) => ({
+    ...state,
+    colors: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(getTreatmentGroup, (state) => ({
+    ...state,
+    selected: {} as ITreatmentGroup,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(treatmentSuccess, (state, { data }) => ({
+    ...state,
+    data,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(colorSuccess, (state, { colors }) => ({
+    ...state,
+    colors,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(treatmentSaveSuccess, (state, action) => ({
+    ...state,
+    response: action,
+    errorMessage: undefined,
+    selected: undefined,
+    subErrors: undefined,
+    isLoading: false,
+  })),
+  on(treatmentSelected, (state, { selected }) => ({
+    ...state,
+    selected,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(treatmentFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error,
+    subErrors: error.subErrors,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(updateTreatmentGroup, createTreatment, deleteTreatmentGroup, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+    selected: undefined,
+    isLoading: true,
+  })),
+  on(getAllTreatmentsHistory, (state) => ({
+    ...state,
+    history: [{} as ITreatmentAll, {} as ITreatmentAll, {} as ITreatmentAll],
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(treatmentHistorySuccess, (state, { history }) => ({
+    ...state,
+    history,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(clean, () => initialState),
+);

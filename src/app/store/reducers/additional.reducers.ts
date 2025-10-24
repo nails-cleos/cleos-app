@@ -1,8 +1,23 @@
 import { Pagination } from '../../interfaces/pagination';
-import { AdditionalActionTypes, All } from '../additional.actions';
+import {
+  additionalFailure,
+  additionalSaveSuccess,
+  additionalSelected,
+  additionalSuccess,
+  clean,
+  createAdditional,
+  deleteAdditional,
+  findGroupsSuccess,
+  getAdditional,
+  getAdditionalList,
+  getAdditionalPage,
+  getAllTreatmentsGroup,
+  updateAdditional,
+} from '../additional.actions';
 import { IAdditional, IAdditionalAll } from '../../interfaces/additional';
 import { ITreatmentGroup } from '../../interfaces/treatment';
 import { IError, IResponseSuccess } from '../../interfaces/common';
+import { createReducer, on } from '@ngrx/store';
 
 export interface State {
   response?: IResponseSuccess;
@@ -26,99 +41,81 @@ export const initialState: State = {
   isLoading: false,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case AdditionalActionTypes.getAdditionalPage: {
-      return {
-        ...state,
-        data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IAdditional>,
-        errorMessage: undefined,
-        subErrors: undefined,
-        selected: undefined,
-      };
-    }
-    case AdditionalActionTypes.getAdditionalList: {
-      return {
-        ...state,
-        data: undefined,
-        errorMessage: undefined,
-        subErrors: undefined,
-      };
-    }
-    case AdditionalActionTypes.getAdditional: {
-      return {
-        ...state,
-        errorMessage: undefined,
-        subErrors: undefined,
-        selected: {} as IAdditional,
-      };
-    }
-    case AdditionalActionTypes.additionalSuccess: {
-      return {
-        ...state,
-        data: action.data,
-        errorMessage: undefined,
-        subErrors: undefined,
-      };
-    }
-    case AdditionalActionTypes.additionalSaveSuccess: {
-      return {
-        ...state,
-        response: action,
-        selected: undefined,
-        errorMessage: undefined,
-        subErrors: undefined,
-        isLoading: false,
-      };
-    }
-    case AdditionalActionTypes.additionalSelected: {
-      return {
-        ...state,
-        selected: action.selected,
-        errorMessage: undefined,
-        subErrors: undefined,
-      };
-    }
-    case AdditionalActionTypes.additionalFailure: {
-      return {
-        ...state,
-        errorMessage: action.error.message,
-        error: action.error,
-        subErrors: action.error.subErrors,
-        isLoading: false,
-      };
-    }
-    case AdditionalActionTypes.updateAdditional:
-    case AdditionalActionTypes.createAdditional:
-    case AdditionalActionTypes.deleteAdditional: {
-      return {
-        ...state,
-        errorMessage: undefined,
-        subErrors: undefined,
-        isLoading: true,
-      };
-    }
-    case AdditionalActionTypes.getAllTreatmentsGroup: {
-      return {
-        ...state,
-        groups: undefined,
-        errorMessage: undefined,
-        subErrors: undefined,
-      };
-    }
-    case AdditionalActionTypes.findGroupsSuccess: {
-      return {
-        ...state,
-        groups: action.groups,
-        errorMessage: undefined,
-        subErrors: undefined,
-      };
-    }
-    case AdditionalActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const additionalReducer = createReducer(
+  initialState,
+  on(getAdditionalPage, (state) => ({
+    ...state,
+    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IAdditional>,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+  })),
+
+  on(getAdditionalList, (state) => ({
+    ...state,
+    data: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+
+  on(getAdditional, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: {} as IAdditional,
+  })),
+
+  on(additionalSuccess, (state, { data }) => ({
+    ...state,
+    data: data,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+
+  on(additionalSaveSuccess, (state, action) => ({
+    ...state,
+    response: action,
+    selected: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    isLoading: false,
+  })),
+
+  on(additionalSelected, (state, { selected }) => ({
+    ...state,
+    selected: selected,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+
+  on(additionalFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error: error,
+    subErrors: error.subErrors,
+    isLoading: false,
+  })),
+
+  on(updateAdditional, createAdditional, deleteAdditional, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    subErrors: undefined,
+    isLoading: true,
+  })),
+
+  on(getAllTreatmentsGroup, (state) => ({
+    ...state,
+    groups: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+
+  on(findGroupsSuccess, (state, { groups }) => ({
+    ...state,
+    groups: groups,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+
+  on(clean, () => initialState),
+);

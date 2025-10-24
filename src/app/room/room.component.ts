@@ -1,12 +1,12 @@
 import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../store/app.states';
-import * as fromActionsRoom from '../store/room.actions';
+import { clean, createRoom, getAllRoomsInfo, getRoom, updateRoom } from '../store/room.actions';
 import { AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, IRoomAll, Room } from '../interfaces/room';
 import { IUser, IUserAll } from '../interfaces/user';
-import { map, startWith } from 'rxjs/operators';
+import { map, startWith, takeUntil } from 'rxjs/operators';
 import { requireMatch, valueChange } from '../util/validators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Role } from '../interfaces/token';
@@ -15,7 +15,7 @@ import { ICurrency, ICurrencyAll } from '../interfaces/currency';
 import { IOffice, IOfficeAll } from '../interfaces/office';
 import { MatListOption } from '@angular/material/list';
 import { IPaymentType, paymentOptions } from '../interfaces/payment';
-import timezones from 'timezones-list';
+import timezones, { TimeZone } from 'timezones-list';
 import {
   API_LOCALE,
   createDate,
@@ -100,7 +100,6 @@ export class RoomComponent implements OnInit, OnDestroy {
   paymentOptions: IPaymentType[] = paymentOptions();
 
   private getState: Observable<any>;
-  private subscription?: Subscription;
   private availabilities: IAvailability[] = [];
   private paymentTypes: string[] = [];
   private geometry?: PlaceGeometry;
@@ -109,6 +108,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   private currentPaymentTypes: string[] = [];
   private currentProfessionalIds: string[] = [];
   private readonly language: string;
+  private destroy$ = new Subject<void>();
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>,
               private route: ActivatedRoute, private formBuilder: UntypedFormBuilder, private router: Router) {
@@ -154,12 +154,10 @@ export class RoomComponent implements OnInit, OnDestroy {
     }
 
     if (this.isAddMode) {
-      this.store.dispatch(
-        new fromActionsRoom.CreateRoom(room),
-      );
+      this.store.dispatch(createRoom({ room }));
     } else {
-      room.id = this.id;
-      this.store.dispatch(new fromActionsRoom.UpdateRoom(this.id!, room));
+      const id = this.id!;
+      this.store.dispatch(updateRoom({ id, room }));
     }
     return;
   }
@@ -188,15 +186,13 @@ export class RoomComponent implements OnInit, OnDestroy {
   };
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(param => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(param => {
       const id = param.get('id');
       if (id) {
         this.id = id;
+        this.getRoom(id);
       }
       this.isAddMode = !this.id;
-      if (!this.isAddMode) {
-        this.getRoom();
-      }
       this.getRoomInfo(); // TODO needs manager role
     });
     this.createForm();
@@ -205,18 +201,19 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   setStep = (index: number): void => {
     this.step = index;
   };
 
-  displayCurrencyFn = (currency: ICurrencyAll): string => currency ? currency.code : '';
+  displayCurrencyFn = (currency?: ICurrencyAll): string => currency ? currency.code : '';
 
-  displayOfficeFn = (office: IOfficeAll): string => office ? office.name : '';
+  displayOfficeFn = (office?: IOfficeAll): string => office ? office.name : '';
 
-  displayTimeZoneFn = (timeZone: any): string => timeZone ? timeZone.label : '';
+  displayTimeZoneFn = (timeZone?: TimeZone): string => timeZone ? timeZone.label : '';
 
   keyDownHandler = (event: any, form: AbstractControl): void => {
     if (event.code === 'Backspace') {
@@ -318,9 +315,9 @@ export class RoomComponent implements OnInit, OnDestroy {
     );
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsRoom.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
-  private getRoomInfo = (): void => this.store.dispatch(new fromActionsRoom.GetAllRoomsInfo());
+  private getRoomInfo = (): void => this.store.dispatch(getAllRoomsInfo());
 
   private setIcon = (day: string, icon: RoomIconName): void => {
     switch (day) {
@@ -421,7 +418,7 @@ export class RoomComponent implements OnInit, OnDestroy {
         break;
     }
     if (step > -1) {
-      this.errors[`day${ step }`] = true;
+      this.errors[`day${step}`] = true;
       this.setStep(step);
       goTo('availabilities');
       return false;
@@ -449,15 +446,12 @@ export class RoomComponent implements OnInit, OnDestroy {
   private filterTimeZone = (name: string): any[] | undefined => this.timeZoneList?.filter(
     option => option.label?.toLowerCase().indexOf(name.toString()) >= 0);
 
-  private getRoom = (): void => {
-    const id = this.route.snapshot.paramMap.get('id');
-    this.store.dispatch(
-      new fromActionsRoom.GetRoom(id!, true),
-    );
+  private getRoom = (id: string): void => {
+    this.store.dispatch(getRoom({ id, redirect: true }));
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
+    this.getState.pipe(takeUntil(this.destroy$)).subscribe((state) => {
       this.allProfessional = state.professionals;
       this.currencies = state.currencies;
       this.offices = state.offices;

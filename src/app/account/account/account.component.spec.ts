@@ -1,56 +1,53 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { FormBuilder } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { of, Subject } from 'rxjs';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { Subject } from 'rxjs';
 
 import { AccountComponent } from './account.component';
 import { AuthUserService } from '../../services/auth-user.service';
 import { IAccountAll } from '../../interfaces/account';
+import { AppState } from '../../store/app.states';
 
 describe('AccountComponent', () => {
   let component: AccountComponent;
   let fixture: ComponentFixture<AccountComponent>;
-  let stateSubject: Subject<any>;
-  let mockStore: jasmine.SpyObj<Store>;
 
-  const mockActivatedRoute = {
-    snapshot: {
-      paramMap: {
-        get: jasmine.createSpy('get').and.returnValue('test-customer-id'),
-      },
-    },
-  };
+  let state$: Subject<any>;
+  let authUser$: Subject<any>;
 
-  const mockAuthUserService = {
-    authUser: of({
-      hasAdminRole: false,
-      customerId: 'test-user-id',
-    }),
-  };
-
-  const mockRouter = {
-    navigate: jasmine.createSpy('navigate'),
-  };
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let routeSpy: jasmine.SpyObj<Router>;
+  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
   beforeEach(async () => {
-    stateSubject = new Subject();
+    state$ = new Subject();
+    authUser$ = new Subject();
 
-    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    mockStore.select.and.returnValue(stateSubject.asObservable());
+    const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    routeSpy = jasmine.createSpyObj('Router', ['navigate']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      snapshot: {
+        paramMap: paramMapSpy,
+      },
+    });
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
+      authUser: authUser$.asObservable(),
+    });
+
+    paramMapSpy.get.and.returnValue('test-customer-id');
+    storeSpy.select.and.returnValue(state$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [AccountComponent, TranslateModule.forRoot()],
       providers: [
-        FormBuilder,
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: Store, useValue: mockStore },
-        { provide: AuthUserService, useValue: mockAuthUserService },
-        { provide: Router, useValue: mockRouter },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: Store, useValue: storeSpy },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
+        { provide: Router, useValue: routeSpy },
       ],
-      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AccountComponent);
@@ -82,7 +79,7 @@ describe('AccountComponent', () => {
 
   it('should dispatch GetAccountByCustomerId action on ngOnInit', () => {
     component.ngOnInit();
-    expect(mockStore.dispatch).toHaveBeenCalled();
+    expect(storeSpy.dispatch).toHaveBeenCalled();
   });
 
   it('should set showAdd to true when user has admin role and customerId differs from userId', () => {
@@ -92,7 +89,7 @@ describe('AccountComponent', () => {
       component['customerId'] = 'test-customer-id';
       component.showAdd = component['hasAdminRole'] && component['customerId'] !== component['userId'];
     });
-    
+
     component.ngOnInit();
     expect(component.showAdd).toBeTruthy();
   });
@@ -104,70 +101,77 @@ describe('AccountComponent', () => {
 
   it('should return early from submit when form is invalid', () => {
     component.form.patchValue({ currency: '', gift: '' });
-    (mockStore.dispatch as jasmine.Spy).calls.reset();
-    
+    (storeSpy.dispatch as jasmine.Spy).calls.reset();
+
     void component.submit;
-    expect(mockStore.dispatch).not.toHaveBeenCalled();
+    expect(storeSpy.dispatch).not.toHaveBeenCalled();
   });
 
   it('should dispatch UpdateAccount action when form is valid', () => {
-    const mockAccount = { 
-      id: 'account-1', 
-      balance: 100, 
-      customer: { id: 'user-1', displayName: 'Test User', email: 'test@test.com', authorities: [], locale: 'en-US', timeZone: 'UTC' },
-      currency: { id: '1', name: 'US Dollar', code: 'USD', icon: 'usd' }, 
+    const mockAccount = {
+      id: 'account-1',
+      balance: 100,
+      customer: {
+        id: 'user-1',
+        displayName: 'Test User',
+        email: 'test@test.com',
+        authorities: [],
+        locale: 'en-US',
+        timeZone: 'UTC',
+      },
+      currency: { id: '1', name: 'US Dollar', code: 'USD', icon: 'usd' },
     };
     component.account = mockAccount;
     component['customerId'] = 'test-customer-id';
-    
+
     const mockCurrency = { id: '2', code: 'EUR' };
     component.form.patchValue({ currency: mockCurrency, gift: 15 });
     component.form.get('currency')?.setErrors(null);
     component.form.get('gift')?.setErrors(null);
-    
-    (mockStore.dispatch as jasmine.Spy).calls.reset();
+
+    (storeSpy.dispatch as jasmine.Spy).calls.reset();
     void component.submit;
-    
-    expect(mockStore.dispatch).toHaveBeenCalled();
+
+    expect(storeSpy.dispatch).toHaveBeenCalled();
   });
 
   it('should handle keydown events correctly', () => {
     const backspaceEvent = { code: 'Backspace' };
     const currencyControl = component.form.get('currency');
-    
+
     component.keyDownHandler(backspaceEvent);
     expect(currencyControl?.value).toBe('');
   });
 
   it('should prevent non-numeric input in number handler', () => {
-    const letterEvent = { 
-      code: 'KeyA', 
-      key: 'a', 
-      preventDefault: jasmine.createSpy('preventDefault'), 
+    const letterEvent = {
+      code: 'KeyA',
+      key: 'a',
+      preventDefault: jasmine.createSpy('preventDefault'),
     };
-    
+
     component.keyDownNumberHandler(letterEvent);
     expect(letterEvent.preventDefault).toHaveBeenCalled();
   });
 
   it('should allow numeric input in number handler', () => {
-    const numberEvent = { 
-      code: 'Digit5', 
-      key: '5', 
-      preventDefault: jasmine.createSpy('preventDefault'), 
+    const numberEvent = {
+      code: 'Digit5',
+      key: '5',
+      preventDefault: jasmine.createSpy('preventDefault'),
     };
-    
+
     component.keyDownNumberHandler(numberEvent);
     expect(numberEvent.preventDefault).not.toHaveBeenCalled();
   });
 
   it('should allow backspace in number handler', () => {
-    const backspaceEvent = { 
-      code: 'Backspace', 
-      key: 'Backspace', 
-      preventDefault: jasmine.createSpy('preventDefault'), 
+    const backspaceEvent = {
+      code: 'Backspace',
+      key: 'Backspace',
+      preventDefault: jasmine.createSpy('preventDefault'),
     };
-    
+
     component.keyDownNumberHandler(backspaceEvent);
     expect(backspaceEvent.preventDefault).not.toHaveBeenCalled();
   });
@@ -228,7 +232,7 @@ describe('AccountComponent', () => {
     component.account = undefined;
     spyOn(component.form, 'patchValue');
 
-    stateSubject.next({
+    state$.next({
       selected: mockAccount,
     });
 
@@ -243,7 +247,7 @@ describe('AccountComponent', () => {
       { field: 'gift', message: 'Gift amount is required' },
     ];
 
-    stateSubject.next({
+    state$.next({
       subErrors: mockErrors,
     });
 
@@ -259,11 +263,11 @@ describe('AccountComponent', () => {
     component['customerId'] = 'test-customer-id';
     component.language = 'en';
 
-    stateSubject.next({
+    state$.next({
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en', 'users', 'test-customer-id', 'overview']);
+    expect(routeSpy.navigate).toHaveBeenCalledWith(['en', 'users', 'test-customer-id', 'overview']);
   });
 
   it('should navigate to user overview after successful response when user does not have admin role', () => {
@@ -271,11 +275,11 @@ describe('AccountComponent', () => {
     component['hasAdminRole'] = false;
 
     component.language = 'en';
-    stateSubject.next({
+    state$.next({
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en', 'me', 'overview']);
+    expect(routeSpy.navigate).toHaveBeenCalledWith(['en', 'me', 'overview']);
   });
 
   it('should create form with currency and gift controls', () => {
@@ -319,7 +323,7 @@ describe('AccountComponent', () => {
         { id: '2', code: 'EUR', name: 'Euro' },
       ],
     } as IAccountAll;
-    stateSubject.next({
+    state$.next({
       selected: mockAccount,
     });
 

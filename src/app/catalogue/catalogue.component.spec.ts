@@ -1,26 +1,30 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CatalogueComponent } from './catalogue.component';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { ICatalogue } from '../interfaces/catalogue';
-import { ReactiveFormsModule, UntypedFormBuilder } from '@angular/forms';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import * as fromActionsCatalogue from '../store/catalogue.actions';
 import { ToastService } from '../services/toast.service';
 import { ITreatmentGroup } from '../interfaces/treatment';
+import { clean, getAllTreatmentsGroup, getCatalogue } from '../store/catalogue.actions';
+import { AppState } from '../store/app.states';
 
 describe('CatalogueComponent', () => {
   let component: CatalogueComponent;
   let fixture: ComponentFixture<CatalogueComponent>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockActivatedRoute: any;
-  let mockChangeDetectorRef: jasmine.SpyObj<ChangeDetectorRef>;
-  let mockToastService: jasmine.SpyObj<ToastService>;
-  let stateSubject: Subject<any>;
+
+  let state$: Subject<any>;
+  let action$: Subject<void>;
+  let dismiss$: Subject<void>;
+
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
+  let toastServiceSpy: jasmine.SpyObj<ToastService>;
+  let paramMapSpy: jasmine.SpyObj<ParamMap>;
 
   const mockCatalogue: ICatalogue = {
     id: '1',
@@ -32,48 +36,51 @@ describe('CatalogueComponent', () => {
   };
 
   beforeEach(async () => {
-    stateSubject = new Subject();
+    state$ = new Subject();
+    action$ = new Subject();
+    dismiss$ = new Subject();
 
-    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-    mockChangeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-    mockToastService = jasmine.createSpyObj('ToastService', ['warning']);
-
-    const mockToastRef = {
-      onAction: jasmine.createSpy('onAction').and.returnValue(new Subject()),
-      onDismiss: jasmine.createSpy('onDismiss').and.returnValue(new Subject()),
-    };
-    mockToastService.warning.and.returnValue(mockToastRef);
-
-    mockActivatedRoute = {
+    paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
+    toastServiceSpy = jasmine.createSpyObj('ToastService', ['warning', 'show']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
-        paramMap: {
-          get: jasmine.createSpy('get').and.returnValue(null),
-        },
+        paramMap: paramMapSpy,
       },
-    };
+    });
 
-    mockStore.select.and.returnValue(stateSubject.asObservable());
+    storeSpy.select.and.returnValue(state$.asObservable());
+    paramMapSpy.get.and.returnValue(null);
+    toastServiceSpy.warning.and.returnValue({
+      onAction: () => action$.asObservable(),
+      onDismiss: () => dismiss$.asObservable(),
+    });
 
     await TestBed.configureTestingModule({
-      imports: [
-        CatalogueComponent,
-        TranslateModule.forRoot(),
-        ReactiveFormsModule,
-        NoopAnimationsModule,
-      ],
+      imports: [CatalogueComponent, TranslateModule.forRoot()],
       providers: [
-        UntypedFormBuilder,
-        { provide: Store, useValue: mockStore },
-        { provide: Router, useValue: mockRouter },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: ChangeDetectorRef, useValue: mockChangeDetectorRef },
-        { provide: ToastService, useValue: mockToastService },
+        { provide: Store, useValue: storeSpy },
+        { provide: Router, useValue: routerSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
+        { provide: ToastService, useValue: toastServiceSpy },
       ],
     }).compileComponents();
 
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
+
     fixture = TestBed.createComponent(CatalogueComponent);
     component = fixture.componentInstance;
+  });
+
+  afterEach(() => {
+    state$.complete();
+    action$.complete();
+    dismiss$.complete();
   });
 
   it('should create', () => {
@@ -81,21 +88,21 @@ describe('CatalogueComponent', () => {
   });
 
   it('should initialize in add mode when no id is provided', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(null);
+    paramMapSpy.get.and.returnValue(null);
 
     component.ngOnInit();
 
-    expect(component.isAddMode).toBe(true);
+    expect(component.isAddMode).toBeTrue();
     expect(component.id).toBeUndefined();
   });
 
   it('should initialize in edit mode when id is provided', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
 
     component.ngOnInit();
 
-    expect(component.isAddMode).toBe(false);
+    expect(component.isAddMode).toBeFalse();
     expect(component.id).toBe(testId);
   });
 
@@ -103,41 +110,41 @@ describe('CatalogueComponent', () => {
     component.ngOnInit();
 
     expect(component.form).toBeDefined();
-    expect(component.form.get('name')).toBeDefined();
-    expect(component.form.get('description')).toBeDefined();
-    expect(component.form.get('home')).toBeDefined();
-    expect(component.form.get('catalog')).toBeDefined();
-    expect(component.form.get('group')).toBeDefined();
-    expect(component.form.get('name')?.hasError('required')).toBe(true);
+    expect(component.getForm.name).toBeDefined();
+    expect(component.getForm.description).toBeDefined();
+    expect(component.getForm.home).toBeDefined();
+    expect(component.getForm.catalog).toBeDefined();
+    expect(component.getForm.group).toBeDefined();
+    expect(component.getForm.name?.hasError('required')).toBeTrue();
   });
 
   it('should dispatch Clean action on initialization', () => {
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.Clean));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch GetCatalogue action when in edit mode', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.GetCatalogue));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getCatalogue({ id: testId }));
   });
 
   it('should patch form when catalogue is selected from state', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       selected: mockCatalogue,
     });
 
     expect(component.catalogue).toEqual(mockCatalogue);
-    expect(component.form.get('name')?.value).toBe(mockCatalogue.name);
-    expect(component.form.get('description')?.value).toBe(mockCatalogue.description);
-    expect(component.form.get('home')?.value).toBe(mockCatalogue.home);
-    expect(component.form.get('catalog')?.value).toBe(mockCatalogue.catalog);
+    expect(component.getForm.name?.value).toBe(mockCatalogue.name);
+    expect(component.getForm.description?.value).toBe(mockCatalogue.description);
+    expect(component.getForm.home?.value).toBe(mockCatalogue.home);
+    expect(component.getForm.catalog?.value).toBe(mockCatalogue.catalog);
   });
 
   it('should handle form errors from state', () => {
@@ -148,66 +155,126 @@ describe('CatalogueComponent', () => {
       { field: 'group', message: 'Treatment type is invalid' },
     ];
 
-    stateSubject.next({
+    state$.next({
       subErrors: mockErrors,
     });
 
     expect(component.errors['name']).toBe('Name is required');
     expect(component.errors['group']).toBe('Treatment type is invalid');
-    expect(component.form.get('name')?.hasError('incorrect')).toBe(true);
-    expect(component.form.get('group')?.hasError('incorrect')).toBe(true);
+    expect(component.getForm.name?.hasError('incorrect')).toBeTrue();
+    expect(component.getForm.group?.hasError('incorrect')).toBeTrue();
   });
 
   it('should navigate to catalogues list on successful response', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith([component['language'], 'catalogues']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'catalogues']);
   });
 
   it('should not dispatch action when form is invalid', () => {
     component.ngOnInit();
-    component.form.get('name')?.setValue('');
-    mockStore.dispatch.calls.reset();
+    component.getForm.name?.setValue('');
+    storeSpy.dispatch.calls.reset();
 
     void component.submit;
 
-    expect(mockStore.dispatch).not.toHaveBeenCalled();
+    expect(storeSpy.dispatch).not.toHaveBeenCalled();
   });
 
   it('should dispatch CreateCatalogue action when in add mode and form is valid', () => {
     component.ngOnInit();
-    component.form.get('name')?.setValue('New Catalogue');
-    component.form.get('description')?.setValue('New Description');
-    component.form.get('home')?.setValue(true);
-    component.form.get('catalog')?.setValue(true);
-    component.form.get('group')?.setValue({ id: 'groupId' });
-    mockStore.dispatch.calls.reset();
+    component.resizedImageDataUrl = 'data:image/jpeg;base64,test';
+
+    const catalogue: ICatalogue = {
+      name: 'New Catalogue',
+      description: 'New Description',
+      home: true,
+      catalog: true,
+      groupId: 'groupId',
+    };
+
+    const nameControl = component.getForm.name;
+    const descriptionControl = component.getForm.description;
+    const homeControl = component.getForm.home;
+    const catalogControl = component.getForm.catalog;
+    const groupControl = component.getForm.group;
+
+    nameControl.setValue(catalogue.name);
+    nameControl.markAsDirty();
+
+    descriptionControl.setValue(catalogue.description);
+    descriptionControl.markAsDirty();
+
+    homeControl.setValue(catalogue.home);
+    homeControl.markAsDirty();
+
+    catalogControl.setValue(catalogue.catalog);
+    catalogControl.markAsDirty();
+
+    groupControl.setValue({ id: catalogue.groupId });
+    groupControl.markAsDirty();
+    storeSpy.dispatch.calls.reset();
 
     void component.submit;
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.CreateCatalogue));
+    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
+    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+      resizedImageDataUrl: component.resizedImageDataUrl,
+      catalogue: jasmine.objectContaining(catalogue),
+      type: '[Catalogue] Create catalogue',
+    }));
   });
 
   it('should dispatch UpdateCatalogue action when in edit mode and form is valid', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    component.resizedImageDataUrl = 'data:image/jpeg;base64,test';
+
+    const catalogue: ICatalogue = {
+      name: 'Updated Catalogue',
+      description: 'Updated Description',
+      home: true,
+      catalog: true,
+      groupId: 'groupId',
+    };
+    paramMapSpy.get.and.returnValue(testId);
     component.catalogue = mockCatalogue;
 
     component.ngOnInit();
-    component.form.get('name')?.setValue('Updated Catalogue');
-    component.form.get('description')?.setValue('Updated Description');
-    component.form.get('home')?.setValue(true);
-    component.form.get('catalog')?.setValue(true);
-    component.form.get('group')?.setValue({ id: 'groupId' });
-    mockStore.dispatch.calls.reset();
+
+    const nameControl = component.getForm.name!;
+    const descriptionControl = component.getForm.description!;
+    const homeControl = component.getForm.home!;
+    const catalogControl = component.getForm.catalog!;
+    const groupControl = component.getForm.group!;
+
+    nameControl.setValue(catalogue.name);
+    nameControl.markAsDirty();
+
+    descriptionControl.setValue(catalogue.description);
+    descriptionControl.markAsDirty();
+
+    homeControl.setValue(catalogue.home);
+    homeControl.markAsDirty();
+
+    catalogControl.setValue(catalogue.catalog);
+    catalogControl.markAsDirty();
+
+    groupControl.setValue({ id: catalogue.groupId });
+    groupControl.markAsDirty();
+    storeSpy.dispatch.calls.reset();
 
     void component.submit;
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.UpdateCatalogue));
+    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
+    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+      resizedImageDataUrl: component.resizedImageDataUrl,
+      catalogue: jasmine.objectContaining(catalogue),
+      type: '[Catalogue] Update catalogue by id',
+    }));
   });
 
   it('should return form controls from getForm getter', () => {
@@ -233,26 +300,26 @@ describe('CatalogueComponent', () => {
   });
 
   it('should call detectChanges when needed', () => {
-    expect(mockChangeDetectorRef.detectChanges).not.toHaveBeenCalled();
+    expect(changeDetectorRefSpy.detectChanges).not.toHaveBeenCalled();
   });
 
   it('should handle undefined catalogue in edit mode', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
     component.catalogue = undefined;
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.GetCatalogue));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getCatalogue({ id: testId }));
   });
 
   it('should clear catalogue when updating in edit mode', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
     component.catalogue = mockCatalogue;
 
     component.ngOnInit();
-    component.form.get('name')?.setValue('Updated Catalogue');
+    component.getForm.name?.setValue('Updated Catalogue');
 
     void component.submit;
 
@@ -262,37 +329,37 @@ describe('CatalogueComponent', () => {
   it('should initialize form with empty values', () => {
     component.ngOnInit();
 
-    expect(component.form.get('name')?.value).toBe('');
-    expect(component.form.get('description')?.value).toBe('');
-    expect(component.form.get('home')?.value).toBe('');
-    expect(component.form.get('catalog')?.value).toBe('');
-    expect(component.form.get('group')?.value).toBe('');
+    expect(component.getForm.name?.value).toBe('');
+    expect(component.getForm.description?.value).toBe('');
+    expect(component.getForm.home?.value).toBe('');
+    expect(component.getForm.catalog?.value).toBe('');
+    expect(component.getForm.group?.value).toBe('');
   });
 
   it('should validate form correctly', () => {
     component.ngOnInit();
 
-    expect(component.form.invalid).toBe(true);
+    expect(component.form.invalid).toBeTrue();
 
-    component.form.get('name')?.setValue('Test Name');
-    expect(component.form.valid).toBe(true);
+    component.getForm.name?.setValue('Test Name');
+    expect(component.form.valid).toBeTrue();
   });
 
   it('should handle state subscription correctly', () => {
     component.ngOnInit();
 
-    expect(mockStore.select).toHaveBeenCalled();
+    expect(storeSpy.select).toHaveBeenCalled();
   });
 
   it('should clean state and get catalogue list on response', () => {
     component.ngOnInit();
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
-    stateSubject.next({
+    state$.next({
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith([component['language'], 'catalogues']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'catalogues']);
   });
 
   it('should clear file when deleteFile is called', () => {
@@ -321,8 +388,23 @@ describe('CatalogueComponent', () => {
 
     void component.deleteImg;
 
-    expect(mockToastService.warning).toHaveBeenCalled();
+    dismiss$.next();
+
+    expect(toastServiceSpy.warning).toHaveBeenCalled();
     expect(component.resizedImageDataUrl).toBeUndefined();
+  });
+
+  it('should show toast and not clear image when deleteImg is called in edit mode and undo is press', () => {
+    component.isAddMode = false;
+    component.catalogue = { name: 'Test Catalogue' } as ICatalogue;
+    component.resizedImageDataUrl = 'data:image/jpeg;base64,test';
+
+    void component.deleteImg;
+
+    action$.next();
+
+    expect(toastServiceSpy.warning).toHaveBeenCalled();
+    expect(component.resizedImageDataUrl).toBeDefined();
   });
 
   it('should return group name when displayFnGroup is called with group', () => {
@@ -341,20 +423,20 @@ describe('CatalogueComponent', () => {
 
   it('should clear group form control when keyDownGroup is called with Backspace', () => {
     component.ngOnInit();
-    component.form.get('group')?.setValue('test value');
+    component.getForm.group?.setValue('test value');
 
     component.keyDownGroup({ code: 'Backspace' });
 
-    expect(component.form.get('group')?.value).toBe('');
+    expect(component.getForm.group?.value).toBe('');
   });
 
   it('should not clear group form control when keyDownGroup is called with other key', () => {
     component.ngOnInit();
-    component.form.get('group')?.setValue('test value');
+    component.getForm.group?.setValue('test value');
 
     component.keyDownGroup({ code: 'Enter' });
 
-    expect(component.form.get('group')?.value).toBe('test value');
+    expect(component.getForm.group?.value).toBe('test value');
   });
 
   it('should set file and start upload when onFileDropped is called', () => {
@@ -393,11 +475,11 @@ describe('CatalogueComponent', () => {
   });
 
   it('should dispatch GetAllTreatmentsGroup action when findGroups is called', () => {
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     component['findGroups']();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.GetAllTreatmentsGroup));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllTreatmentsGroup());
   });
 
   it('should filter groups correctly when filterGroup is called', () => {

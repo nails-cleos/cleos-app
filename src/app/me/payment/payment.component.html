@@ -1,6 +1,6 @@
 @if (showError) {
   <fieldset id="error-box">
-    <mat-icon (click)="close" id="close">close</mat-icon>
+    <mat-icon (click)="close()" id="close">close</mat-icon>
     <legend>{{ 'ME.PAYMENT.ERROR_TEXT' | translate }}</legend>
     <div id="error-text">{{ errorMessage }}</div>
   </fieldset>

@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectTreatmentState } from '../../store/app.states';
 import { TranslateService } from '@ngx-translate/core';
 import { ITreatmentAll } from '../../interfaces/treatment';
-import * as fromActionsTreatment from '../../store/treatment.actions';
+import { clean, getTreatmentGroup, sortTreatment } from '../../store/treatment.actions';
 import {
   DragDropSortingComponent,
   ISorted,
@@ -40,21 +40,17 @@ export class TreatmentSortingComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  sorted = (sorted: ISorted[]): void => {
+  sorted = (treatments: ISorted[]): void => {
     this.items = undefined;
-    this.store.dispatch(
-      new fromActionsTreatment.SortTreatment(sorted),
-    );
+    this.store.dispatch(sortTreatment({ treatments }));
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsTreatment.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private getTreatments = (): void => {
     if (!this.items) {
-      const id = this.route.snapshot.paramMap.get('id');
-      this.store.dispatch(
-        new fromActionsTreatment.GetTreatmentGroup(id!, 'sorting'),
-      );
+      const id = this.route.snapshot.paramMap.get('id')!;
+      this.store.dispatch(getTreatmentGroup({ id, path: 'sorting' }));
     }
   };
 

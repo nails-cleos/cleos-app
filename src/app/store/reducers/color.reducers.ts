@@ -1,7 +1,19 @@
 import { Pagination } from '../../interfaces/pagination';
-import { All, ColorActionTypes } from '../color.actions';
+import {
+  clean,
+  colorFailure,
+  colorSaveSuccess,
+  colorSelected,
+  colorSuccess,
+  createColor,
+  deleteColor,
+  getColor,
+  getColorsPage,
+  updateColor,
+} from '../color.actions';
 import { IColor } from '../../interfaces/color';
 import { IError, IResponseSuccess } from '../../interfaces/common';
+import { createReducer, on } from '@ngrx/store';
 
 export interface State {
   response?: IResponseSuccess;
@@ -23,81 +35,59 @@ export const initialState: State = {
   isLoading: false,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case ColorActionTypes.getColorsPage: {
-      return {
-        ...state,
-        data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IColor>,
-        errorMessage: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case ColorActionTypes.getColor: {
-      return {
-        ...state,
-        errorMessage: undefined,
-        subErrors: undefined,
-        selected: {} as IColor,
-        response: undefined,
-      };
-    }
-    case ColorActionTypes.colorSuccess: {
-      return {
-        ...state,
-        data: action.data,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ColorActionTypes.colorSaveSuccess: {
-      return {
-        ...state,
-        response: action,
-        selected: undefined,
-        errorMessage: undefined,
-        subErrors: undefined,
-        isLoading: false,
-      };
-    }
-    case ColorActionTypes.colorSelected: {
-      return {
-        ...state,
-        selected: action.selected,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case ColorActionTypes.colorFailure: {
-      return {
-        ...state,
-        errorMessage: action.error.message,
-        error: action.error,
-        subErrors: action.error.subErrors,
-        response: undefined,
-        isLoading: false,
-      };
-    }
-    case ColorActionTypes.updateColor:
-    case ColorActionTypes.createColor:
-    case ColorActionTypes.deleteColor: {
-      return {
-        ...state,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-        isLoading: true,
-      };
-    }
-    case ColorActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const colorReducer = createReducer(
+  initialState,
+  on(getColorsPage, (state) => ({
+    ...state,
+    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IColor>,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getColor, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: {} as IColor,
+    response: undefined,
+  })),
+  on(colorSuccess, (state, { data }) => ({
+    ...state,
+    data: data,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(colorSaveSuccess, (state, action) => ({
+    ...state,
+    response: action,
+    selected: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    isLoading: false,
+  })),
+  on(colorSelected, (state, { selected }) => ({
+    ...state,
+    selected: selected,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(colorFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error: error,
+    subErrors: error.subErrors,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(updateColor, createColor, deleteColor, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(clean, () => initialState),
+);

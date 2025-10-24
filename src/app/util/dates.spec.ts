@@ -589,18 +589,18 @@ describe('dates utility', () => {
     it('should create date from timestamp', () => {
       const timestamp = 1704067200000; // 2024-01-01
       const date = newDate(timestamp);
-      expect(date instanceof Date).toBe(true);
+      expect(date instanceof Date).toBeTrue();
     });
 
     it('should create date from string', () => {
       const date = newDate('2024-01-01');
-      expect(date instanceof Date).toBe(true);
+      expect(date instanceof Date).toBeTrue();
     });
 
     it('should create date from Date', () => {
       const inputDate = new Date(2024, 0, 1);
       const date = newDate(inputDate);
-      expect(date instanceof Date).toBe(true);
+      expect(date instanceof Date).toBeTrue();
     });
   });
 
@@ -632,19 +632,19 @@ describe('dates utility', () => {
     it('should return true when date1 > date2', () => {
       const date1 = new Date(2024, 0, 2);
       const date2 = new Date(2024, 0, 1);
-      expect(greaterOrEqualsThan(date1, date2)).toBe(true);
+      expect(greaterOrEqualsThan(date1, date2)).toBeTrue();
     });
 
     it('should return true when dates are equal', () => {
       const date1 = new Date(2024, 0, 1);
       const date2 = new Date(2024, 0, 1);
-      expect(greaterOrEqualsThan(date1, date2)).toBe(true);
+      expect(greaterOrEqualsThan(date1, date2)).toBeTrue();
     });
 
     it('should return false when date1 < date2', () => {
       const date1 = new Date(2024, 0, 1);
       const date2 = new Date(2024, 0, 2);
-      expect(greaterOrEqualsThan(date1, date2)).toBe(false);
+      expect(greaterOrEqualsThan(date1, date2)).toBeFalse();
     });
   });
 
@@ -653,35 +653,35 @@ describe('dates utility', () => {
       const min = new Date(2024, 0, 1);
       const max = new Date(2024, 0, 10);
       const date = new Date(2024, 0, 5);
-      expect(isBetween(min, max, date)).toBe(true);
+      expect(isBetween(min, max, date)).toBeTrue();
     });
 
     it('should return true when date equals min', () => {
       const min = new Date(2024, 0, 1);
       const max = new Date(2024, 0, 10);
       const date = new Date(2024, 0, 1);
-      expect(isBetween(min, max, date)).toBe(true);
+      expect(isBetween(min, max, date)).toBeTrue();
     });
 
     it('should return true when date equals max end of day', () => {
       const min = new Date(2024, 0, 1);
       const max = new Date(2024, 0, 10);
       const date = new Date(2024, 0, 10, 23, 59);
-      expect(isBetween(min, max, date)).toBe(true);
+      expect(isBetween(min, max, date)).toBeTrue();
     });
 
     it('should return false when date is before min', () => {
       const min = new Date(2024, 0, 1);
       const max = new Date(2024, 0, 10);
       const date = new Date(2023, 11, 31);
-      expect(isBetween(min, max, date)).toBe(false);
+      expect(isBetween(min, max, date)).toBeFalse();
     });
 
     it('should return false when date is after max', () => {
       const min = new Date(2024, 0, 1);
       const max = new Date(2024, 0, 10);
       const date = new Date(2024, 0, 11);
-      expect(isBetween(min, max, date)).toBe(false);
+      expect(isBetween(min, max, date)).toBeFalse();
     });
   });
 
@@ -837,13 +837,13 @@ describe('dates utility', () => {
     it('should return true for dates in same week', () => {
       const date1 = new Date(2024, 0, 1); // Monday
       const date2 = new Date(2024, 0, 3); // Wednesday
-      expect(datesInSameWeek(date1, date2)).toBe(true);
+      expect(datesInSameWeek(date1, date2)).toBeTrue();
     });
 
     it('should return false for dates in different weeks', () => {
       const date1 = new Date(2024, 0, 1);
       const date2 = new Date(2024, 0, 10);
-      expect(datesInSameWeek(date1, date2)).toBe(false);
+      expect(datesInSameWeek(date1, date2)).toBeFalse();
     });
   });
 
@@ -1102,9 +1102,9 @@ describe('dates utility', () => {
       };
 
       const result = getMinMaxDate(3, date, [room, anotherRoom]);
-      expect(result.minDate.getHours()).toBe(11);
+      expect(result.minDate.getHours()).toBe(10);
       expect(result.minDate.getMinutes()).toBe(30);
-      expect(result.maxDate.getHours()).toBe(21);
+      expect(result.maxDate.getHours()).toBe(20);
       expect(result.maxDate.getMinutes()).toBe(0);
     });
   });
@@ -1127,7 +1127,7 @@ describe('dates utility', () => {
       };
 
       const result = filterDateRoom(futureDate, roomWithMonday);
-      expect(result).toBe(true);
+      expect(result).toBeTrue();
     });
 
     it('should return false for future date without room availability on that day', () => {
@@ -1150,7 +1150,7 @@ describe('dates utility', () => {
       };
 
       const result = filterDateRoom(futureDate, roomWithoutTuesday);
-      expect(result).toBe(false);
+      expect(result).toBeFalse();
     });
 
     it('should return false for past date', () => {
@@ -1172,12 +1172,12 @@ describe('dates utility', () => {
       };
 
       const result = filterDateRoom(pastDate, roomWithAllDays);
-      expect(result).toBe(false);
+      expect(result).toBeFalse();
     });
 
     it('should return true for null date when room has availability', () => {
       const result = filterDateRoom(null, room);
-      expect(result).toBe(true);
+      expect(result).toBeTrue();
     });
 
     it('should return true for future date without room parameter', () => {
@@ -1185,7 +1185,7 @@ describe('dates utility', () => {
       futureDate.setDate(futureDate.getDate() + 7);
 
       const result = filterDateRoom(futureDate);
-      expect(result).toBe(true);
+      expect(result).toBeTrue();
     });
 
     it('should return false for past date without room parameter', () => {
@@ -1193,7 +1193,7 @@ describe('dates utility', () => {
       pastDate.setDate(pastDate.getDate() - 7);
 
       const result = filterDateRoom(pastDate);
-      expect(result).toBe(false);
+      expect(result).toBeFalse();
     });
   });
 

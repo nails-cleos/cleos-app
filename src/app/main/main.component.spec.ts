@@ -1,6 +1,6 @@
 import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { MainComponent } from './main.component';
-import { BehaviorSubject, EMPTY, of } from 'rxjs';
+import { EMPTY, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Auth } from '@angular/fire/auth';
@@ -9,90 +9,93 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withJsonpSupport } from '@angular/common/http';
 import { MainContentService } from './main-content.service';
-import * as fromActionsLogin from '../store/auth.actions';
-import * as fromActionsMain from '../store/main.actions';
+import { redirect } from '../store/auth.actions';
+import { updateMyUser } from '../store/main.actions';
 import { TokenService } from '../services/token.service';
 import { NavigationService } from '../services/navigation.service';
+import { AppState } from '../store/app.states';
 
 describe('MainComponent', () => {
   let component: MainComponent;
   let fixture: ComponentFixture<MainComponent>;
-  let store: Store<any>;
-  let translate: TranslateService;
-  let router: Router;
 
-  const mockStore = {
-    select: jasmine.createSpy('select').and.returnValue(of({})),
-    dispatch: jasmine.createSpy('dispatch'),
-  };
+  let state$: Subject<any>;
+  let mainContent$: Subject<any>;
 
-  const mockAuth = {
-    currentUser: jasmine.createSpy('currentUser').and.returnValue(null),
-    onIdTokenChanged: jasmine.createSpy('onIdTokenChanged').and.returnValue(of(null)),
-  };
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let authSpy: jasmine.SpyObj<Auth>;
+  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let mainContentServiceSpy: jasmine.SpyObj<MainContentService>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let tokenServiceSpy: jasmine.SpyObj<TokenService>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
 
-  const mockAuthUserService = {
-    cookieConsent: jasmine.createSpy('cookieConsent'),
-    updateMode: jasmine.createSpy('updateMode'),
-  };
-
-  const mockActivatedRoute = {
-    snapshot: {
-      paramMap: {
-        get: jasmine.createSpy('get').and.returnValue('en'),
-      },
-    },
-  };
-
-  const mockMainContentService = {
-    data$: new BehaviorSubject({ showPreload: false, navigationHeader: 'close', showArrow: false }),
-  };
-
-  const mockRouter = {
-    navigate: jasmine.createSpy('navigate').and.returnValue(Promise.resolve(true)),
-    url: '/en/home',
-    events: EMPTY,
-  };
-
-  const mockTokenService = {
-    token: '',
-  };
-
-  const mockNavigationService = {
-    attachLang: jasmine.createSpy('attachLang').and.returnValue('en'),
-  };
+  let translateService: TranslateService;
 
   beforeEach(async () => {
+    state$ = new Subject<any>();
+    mainContent$ = new Subject<any>();
+
+    const paramMapSpy = jasmine.createSpyObj('ParamMap', ['get', 'lang']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['cookieConsent', 'updateMode']);
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['attachLang']);
+    mainContentServiceSpy = jasmine.createSpyObj('MainContentService', [], {
+      data$: mainContent$.asObservable(),
+    });
+    authSpy = jasmine.createSpyObj('Auth', ['onIdTokenChanged'], {
+      currentUser: null,
+    });
+    tokenServiceSpy = jasmine.createSpyObj('TokenService', ['getToken'], {
+      token: '',
+    });
+    routerSpy = jasmine.createSpyObj('Router', ['navigate'], {
+      url: '/en/home',
+      events: EMPTY,
+    });
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      snapshot: {
+        paramMap: paramMapSpy,
+      },
+    });
+
+    storeSpy.select.and.returnValue(state$.asObservable());
+    paramMapSpy.get.and.returnValue('en');
+    navigationServiceSpy.attachLang.and.returnValue('en');
+    authSpy.onIdTokenChanged.and.callFake((callback: any) => {
+      callback(null);
+      return () => {
+      };
+    });
+
     await TestBed.configureTestingModule({
       imports: [MainComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: mockStore },
-        { provide: Auth, useValue: mockAuth },
-        { provide: AuthUserService, useValue: mockAuthUserService },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: MainContentService, useValue: mockMainContentService },
-        { provide: Router, useValue: mockRouter },
-        { provide: TokenService, useValue: mockTokenService },
-        { provide: NavigationService, useValue: mockNavigationService },
-        TranslateService,
+        { provide: Store, useValue: storeSpy },
+        { provide: Auth, useValue: authSpy },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: MainContentService, useValue: mainContentServiceSpy },
+        { provide: Router, useValue: routerSpy },
+        { provide: TokenService, useValue: tokenServiceSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
         provideNoopAnimations(),
         provideHttpClient(withJsonpSupport()),
       ],
     }).compileComponents();
-  });
 
-  beforeEach(() => {
-    mockStore.dispatch.calls.reset();
-    mockAuthUserService.updateMode.calls.reset();
-    mockNavigationService.attachLang.calls.reset();
-    mockRouter.navigate.calls.reset();
+    translateService = TestBed.inject(TranslateService);
+    translateService.setDefaultLang('en-GB');
+    translateService.use('en-GB');
 
     fixture = TestBed.createComponent(MainComponent);
     component = fixture.componentInstance;
-    store = TestBed.inject(Store);
-    translate = TestBed.inject(TranslateService);
-    router = TestBed.inject(Router);
-    fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    state$.complete();
+    mainContent$.complete();
   });
 
   it('should create', () => {
@@ -100,30 +103,34 @@ describe('MainComponent', () => {
   });
 
   it('should initialize isAuthenticated in ngOnInit', fakeAsync(() => {
+    component.ngOnInit();
+
     expect(component.isAuthenticated).toBeFalse();
-    expect(mockAuthUserService.cookieConsent).toHaveBeenCalledWith(translate);
-    expect(mockNavigationService.attachLang).toHaveBeenCalledWith('en');
+    expect(authUserServiceSpy.cookieConsent).toHaveBeenCalledWith(translateService);
+    expect(navigationServiceSpy.attachLang).toHaveBeenCalledWith('en');
   }));
 
   it('should toggle theme in changeTheme when not authenticated', () => {
     component.isAuthenticated = false;
     const initialMode = component.isDarkMode;
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     component.changeTheme();
 
     expect(component.isDarkMode).toBe(!initialMode);
-    expect(mockAuthUserService.updateMode).toHaveBeenCalled();
-    expect(store.dispatch).not.toHaveBeenCalled(); // no dispatch when not authenticated
+    expect(authUserServiceSpy.updateMode).toHaveBeenCalled();
+    expect(storeSpy.dispatch).not.toHaveBeenCalled(); // no dispatch when not authenticated
   });
 
   it('should dispatch Redirect action in redirect()', () => {
     component.redirect();
-    expect(store.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsLogin.Redirect));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(redirect());
   });
 
   it('should update mainContent data$ subscription', fakeAsync(() => {
-    mockMainContentService.data$.next({ showPreload: true, navigationHeader: 'open', showArrow: true });
+    component.ngOnInit();
+
+    mainContent$.next({ showPreload: true, navigationHeader: 'open', showArrow: true });
     expect(component.showLoader).toBeTrue();
     expect(component.navigationState.value).toBe('open');
     expect(component.showArrow).toBeTrue();
@@ -135,38 +142,53 @@ describe('MainComponent', () => {
 
     component.changeTheme();
 
+    const expectedAction = updateMyUser({
+      user: jasmine.any(Object) as any,
+      redirectUrl: '/en/home',
+      message: jasmine.any(String) as any,
+    });
+
     expect(component.isDarkMode).toBe(!initialMode);
-    expect(mockAuthUserService.updateMode).toHaveBeenCalled();
-    expect(store.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsMain.UpdateMyUser));
+    expect(authUserServiceSpy.updateMode).toHaveBeenCalled();
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(expectedAction);
   });
 
   it('should not dispatch UpdateMyUser action when changeTheme is called and user is not authenticated', () => {
     component.isAuthenticated = false;
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     component.changeTheme();
 
-    expect(mockAuthUserService.updateMode).toHaveBeenCalled();
-    expect(store.dispatch).not.toHaveBeenCalledWith(jasmine.any(fromActionsMain.UpdateMyUser));
+    const expectedAction = updateMyUser({
+      user: jasmine.any(Object) as any,
+      redirectUrl: '/en/home',
+      message: jasmine.any(String) as any,
+    });
+
+    expect(authUserServiceSpy.updateMode).toHaveBeenCalled();
+    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(expectedAction);
   });
 
   it('should call navigationService.attachLang on ngOnInit', () => {
-    expect(mockNavigationService.attachLang).toHaveBeenCalledWith('en');
+    component.ngOnInit();
+
+    expect(navigationServiceSpy.attachLang).toHaveBeenCalledWith('en');
     expect(component.language).toBe('en');
   });
 
   it('should navigate and scroll to element in scrollToElement', fakeAsync(() => {
     const element = 'test-element';
+    routerSpy.navigate.and.returnValue(Promise.resolve(true));
 
     component.scrollToElement(element);
 
-    expect(router.navigate).toHaveBeenCalledWith(['/', component.language]);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/', component.language]);
   }));
 
   it('should call treatment and navigate to biab/treatment', () => {
     component.treatment();
 
-    expect(router.navigate).toHaveBeenCalledWith([translate.currentLang, 'biab', 'treatment']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([translateService.currentLang, 'biab', 'treatment']);
   });
 
   it('should unsubscribe on destroy', () => {

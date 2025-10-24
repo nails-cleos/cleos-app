@@ -11,7 +11,15 @@ import {
 import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../store/app.states';
 import { IUnavailable, Unavailable } from '../interfaces/unavailable';
-import * as fromActionsUnavailable from '../store/unavailable.actions';
+import {
+  clean,
+  createUnavailable,
+  deleteUnavailable,
+  getAllProfessional,
+  getAllRoomsByProfessionalId,
+  getUnavailable,
+  updateUnavailable,
+} from '../store/unavailable.actions';
 import { IUser, IUserAll } from '../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
 import {
@@ -76,7 +84,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly timeZone: string;
 
   constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
-              private route: ActivatedRoute, private translate: TranslateService, public dialog: MatDialog) {
+    private route: ActivatedRoute, private translate: TranslateService, public dialog: MatDialog) {
     this.isAddMode = true;
     this.getState = this.store.select(selectUnavailableState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
@@ -114,15 +122,11 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     if (this.isAddMode) {
-      this.store.dispatch(
-        new fromActionsUnavailable.CreateUnavailable(unavailable),
-      );
+      this.store.dispatch(createUnavailable({ unavailable }));
     } else {
-      unavailable.id = this.id;
+      const id = this.id!;
       this.unavailable = undefined;
-      this.store.dispatch(
-        new fromActionsUnavailable.UpdateUnavailable(this.id!, unavailable, 'unavailable'),
-      );
+      this.store.dispatch(updateUnavailable({ id, unavailable, path: 'unavailable' }));
     }
     return;
   }
@@ -136,7 +140,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
     return executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: this.unavailable }, result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsUnavailable.DeleteUnavailable(result.id, result.timestamp, result.timeZone),
+          deleteUnavailable({ id: result.id, timestamp: result.timestamp, timeZone: result.timeZone }),
         );
       }
     });
@@ -198,9 +202,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.roomAvailability);
 
-  getRoom = (user: IUser): void => this.store.dispatch(
-    new fromActionsUnavailable.GetAllRoomsByProfessionalId(user.id!),
-  );
+  getRoom = (user: IUser): void => this.store.dispatch(getAllRoomsByProfessionalId({ professionalId: user.id! }));
 
   keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
@@ -323,9 +325,9 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsUnavailable.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
-  private getProfessionals = (): void => this.store.dispatch(new fromActionsUnavailable.GetAllProfessional());
+  private getProfessionals = (): void => this.store.dispatch(getAllProfessional());
 
   private filter = (name: string): IUser[] | undefined => this.professionals?.filter(
     option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0,
@@ -333,9 +335,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private getUnavailable = (): void => {
     if (!this.unavailable) {
-      this.store.dispatch(
-        new fromActionsUnavailable.GetUnavailable(this.id!),
-      );
+      this.store.dispatch(getUnavailable({ id: this.id! }));
     }
   };
 

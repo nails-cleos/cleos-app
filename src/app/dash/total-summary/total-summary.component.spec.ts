@@ -53,7 +53,7 @@ describe('TotalSummaryComponent', () => {
 
   it('should accept showCash input', () => {
     component.showCash = true;
-    expect(component.showCash).toBe(true);
+    expect(component.showCash).toBeTrue();
   });
 
   describe('Template rendering', () => {
@@ -100,10 +100,10 @@ describe('TotalSummaryComponent', () => {
       fixture.detectChanges();
 
       const contentDivs = fixture.debugElement.queryAll(By.css('.bottom'));
-      expect(contentDivs[0].nativeElement.classList.contains('year-content')).toBe(true);
-      expect(contentDivs[0].nativeElement.classList.contains('year-cash-content')).toBe(false);
-      expect(contentDivs[1].nativeElement.classList.contains('year-content')).toBe(true);
-      expect(contentDivs[1].nativeElement.classList.contains('year-cash-content')).toBe(false);
+      expect(contentDivs[0].nativeElement.classList.contains('year-content')).toBeTrue();
+      expect(contentDivs[0].nativeElement.classList.contains('year-cash-content')).toBeFalse();
+      expect(contentDivs[1].nativeElement.classList.contains('year-content')).toBeTrue();
+      expect(contentDivs[1].nativeElement.classList.contains('year-cash-content')).toBeFalse();
     });
 
     it('should apply correct CSS classes when showCash is true', () => {
@@ -111,10 +111,10 @@ describe('TotalSummaryComponent', () => {
       fixture.detectChanges();
 
       const contentDivs = fixture.debugElement.queryAll(By.css('.bottom'));
-      expect(contentDivs[0].nativeElement.classList.contains('year-cash-content')).toBe(true);
-      expect(contentDivs[0].nativeElement.classList.contains('year-content')).toBe(false);
-      expect(contentDivs[1].nativeElement.classList.contains('year-cash-content')).toBe(true);
-      expect(contentDivs[1].nativeElement.classList.contains('year-content')).toBe(false);
+      expect(contentDivs[0].nativeElement.classList.contains('year-cash-content')).toBeTrue();
+      expect(contentDivs[0].nativeElement.classList.contains('year-content')).toBeFalse();
+      expect(contentDivs[1].nativeElement.classList.contains('year-cash-content')).toBeTrue();
+      expect(contentDivs[1].nativeElement.classList.contains('year-content')).toBeFalse();
     });
   });
 

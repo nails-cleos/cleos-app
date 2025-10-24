@@ -4,7 +4,13 @@ import { CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-dro
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectCatalogueState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
-import * as fromActionsCatalogue from '../../store/catalogue.actions';
+import {
+  catalogueSelected,
+  clean,
+  deleteCatalogue,
+  getAllCatalogues,
+  updateCatalogueOrder,
+} from '../../store/catalogue.actions';
 import { ICatalogueAll } from '../../interfaces/catalogue';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
@@ -24,10 +30,10 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChildren(CdkDropList) dropsQuery!: QueryList<CdkDropList>;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
-  	.pipe(
-  		map(result => result.matches),
-  		shareReplay(),
-  	);
+    .pipe(
+      map(result => result.matches),
+      shareReplay(),
+    );
 
   subscription?: Subscription;
   getState: Observable<any>;
@@ -39,74 +45,70 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(private readonly translate: TranslateService, public dialog: MatDialog,
               private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
               private cdRef: ChangeDetectorRef) {
-  	this.getState = this.store.select(selectCatalogueState);
-  	this.language = this.translate.currentLang;
+    this.getState = this.store.select(selectCatalogueState);
+    this.language = this.translate.currentLang;
   }
 
   get finish(): void {
-  	return this.store.dispatch(
-  		new fromActionsCatalogue.UpdateCatalogueOrder(this.catalogues),
-  	);
+    return this.store.dispatch(
+      updateCatalogueOrder({ catalogues: this.catalogues }),
+    );
   }
 
   ngOnInit(): void {
-  	this.clean();
-  	this.subscribe();
-  	this.getCatalogues();
+    this.clean();
+    this.subscribe();
+    this.getCatalogues();
   }
 
   ngOnDestroy(): void {
-  	this.subscription?.unsubscribe();
+    this.subscription?.unsubscribe();
   }
 
   ngAfterViewInit(): void {
-  	this.dropsQuery.changes.subscribe(() => {
-  		this.drops = this.dropsQuery.toArray();
-  	});
-  	Promise.resolve().then(() => {
-  		this.drops = this.dropsQuery.toArray();
-  	});
+    this.dropsQuery.changes.subscribe(() => {
+      this.drops = this.dropsQuery.toArray();
+    });
+    Promise.resolve().then(() => {
+      this.drops = this.dropsQuery.toArray();
+    });
   }
 
   drop = (event: CdkDragDrop<{ title: string; poster: string }[]>): void => moveItemInArray(
-  	this.catalogues, event.previousIndex, event.currentIndex,
+    this.catalogues, event.previousIndex, event.currentIndex,
   );
 
-  edit = (catalogue: ICatalogueAll): void => this.store.dispatch(
-  	new fromActionsCatalogue.CatalogueSelected(catalogue),
-  );
+  edit = (selected: ICatalogueAll): void => this.store.dispatch(catalogueSelected({ selected }));
 
   delete = (catalogue: ICatalogueAll): void => {
-  	const title = this.translate.instant('CATALOGUE.DELETED.TITLE');
-  	const content = this.translate.instant('CATALOGUE.DELETED.CONTENT', { name: catalogue.name });
-  	executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: catalogue }, result => {
-  		if (result) {
-  			this.store.dispatch(
-  				new fromActionsCatalogue.DeleteCatalogue(result.id, result.name),
-  			);
-  		}
-  	});
+    const title = this.translate.instant('CATALOGUE.DELETED.TITLE');
+    const content = this.translate.instant('CATALOGUE.DELETED.CONTENT', { name: catalogue.name });
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: catalogue }, result => {
+      if (result) {
+        this.store.dispatch(deleteCatalogue({ id: result.id, name: result.name }));
+      }
+    });
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsCatalogue.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
-  private getCatalogues = (): void => this.store.dispatch(new fromActionsCatalogue.GetAllCatalogues());
+  private getCatalogues = (): void => this.store.dispatch(getAllCatalogues());
 
   private subscribe = (): void => {
-  	this.subscription = this.getState.subscribe((state) => {
-  		if (state.data) {
-  			this.catalogues = state.data.map((it: ICatalogueAll) => {
-  				if (it.blob) {
-  					return Object.assign({}, it, { image: `data:image/jpeg;base64,${ it.blob }` });
-  				}
-  				return it;
-  			});
-  			this.cdRef.detectChanges();
-  		}
-  		if (state.response) {
-  			this.clean();
-  			this.getCatalogues();
-  		}
-  	});
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.data) {
+        this.catalogues = state.data.map((it: ICatalogueAll) => {
+          if (it.blob) {
+            return Object.assign({}, it, { image: `data:image/jpeg;base64,${it.blob}` });
+          }
+          return it;
+        });
+        this.cdRef.detectChanges();
+      }
+      if (state.response) {
+        this.clean();
+        this.getCatalogues();
+      }
+    });
   };
 }

@@ -8,6 +8,7 @@ import { TranslateModule } from '@ngx-translate/core';
 describe('SelectProfessionalDialogComponent', () => {
   let component: SelectProfessionalDialogComponent;
   let fixture: ComponentFixture<SelectProfessionalDialogComponent>;
+
   let dialogRefSpy: jasmine.SpyObj<MatDialogRef<SelectProfessionalDialogComponent>>;
 
   const mockProfessionals: IUser[] = [

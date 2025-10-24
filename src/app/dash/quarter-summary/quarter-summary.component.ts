@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import * as fromActionsDashboard from '../../store/dashboard.actions';
+import { clean, getQuarterSummary } from '../../store/dashboard.actions';
 import { FormControl, UntypedFormControl } from '@angular/forms';
 import {
   IMonthSummary,
@@ -79,11 +79,6 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     this.language = this.translate.currentLang;
   }
 
-  get goBack(): void {
-    this.router.navigate([this.language, 'dashboard', 'year', 'summary'], { state: { year: this.year } });
-    return;
-  }
-
   ngOnInit(): void {
     this.subscribe();
     this.clean();
@@ -104,6 +99,11 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+  }
+
+  goBack(): void {
+    this.router.navigate([this.language, 'dashboard', 'year', 'summary'], { state: { year: this.year } });
+    return;
   }
 
   setYear = (normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void => {
@@ -196,11 +196,11 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
           totals.net + value.totalNet);
         totalsWithoutCash =
           new Total(totalsWithoutCash.gross + value.totalWithoutGross, totalsWithoutCash.btw + value.totalWithoutBTW,
-          	totalsWithoutCash.net + value.totalWithoutNet);
+            totalsWithoutCash.net + value.totalWithoutNet);
 
         this.quarterSummaryTotals =
           new SummaryTotals(this.quarterSummaryTotals.income, this.quarterSummaryTotals.expense,
-          	this.quarterSummaryTotals.cash, totalsWithoutCash, totals);
+            this.quarterSummaryTotals.cash, totalsWithoutCash, totals);
       });
     }
   };
@@ -224,9 +224,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     this.year = year;
     this.quarter = quarter;
     this.isLoading = true;
-    this.store.dispatch(
-      new fromActionsDashboard.GetQuarterSummary(year, quarter),
-    );
+    this.store.dispatch(getQuarterSummary({ year, quarter }));
   };
 
   private reset = (): void => {
@@ -234,7 +232,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     this.quarterSummaryTotals = new SummaryTotals();
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsDashboard.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {

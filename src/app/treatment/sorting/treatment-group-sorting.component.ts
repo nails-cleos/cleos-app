@@ -8,7 +8,7 @@ import {
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectTreatmentState } from '../../store/app.states';
-import * as fromActionsTreatment from '../../store/treatment.actions';
+import { clean, getAllTreatmentsGroup, sortGroupTreatment } from '../../store/treatment.actions';
 import { ITreatmentGroupAll } from '../../interfaces/treatment';
 import { SharedModule } from '../../shared/shared.module';
 
@@ -39,11 +39,11 @@ export class TreatmentGroupSortingComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  sorted = (sorted: ISorted[]): void => this.store.dispatch(new fromActionsTreatment.SortGroupTreatment(sorted));
+  sorted = (groups: ISorted[]): void => this.store.dispatch(sortGroupTreatment({ groups }));
 
-  private clean = (): void => this.store.dispatch(new fromActionsTreatment.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
-  private getTreatments = (): void => this.store.dispatch(new fromActionsTreatment.GetAllTreatmentsGroup());
+  private getTreatments = (): void => this.store.dispatch(getAllTreatmentsGroup());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {

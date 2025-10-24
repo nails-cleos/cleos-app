@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import { IUser, User } from '../../interfaces/user';
 import { FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import * as fromActionsUser from '../../store/user.actions';
+import { clean, getMyUser, updateMyPhoto, updateMyUser } from '../../store/user.actions';
 import { fieldChange, validColorValidator, valueChange } from '../../util/validators';
 import { findFlag, flags, IFlag } from '../../util/flags';
 import { createAddress, getDisplayNameInitials, getLocale, getUserImage } from '../../util/helper';
@@ -102,9 +102,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
     user.address = createAddress(this.formattedAddress, this.geometry?.location, this.user?.address);
 
-    this.store.dispatch(
-      new fromActionsUser.UpdateMyUser(user, `/${ getLocale(lang).language }/auth/profile`),
-    );
+    this.store.dispatch(updateMyUser({ user, redirectUrl: `/${getLocale(lang).language}/auth/profile` }));
     return;
   }
 
@@ -134,9 +132,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
             if (this.resizedImage) {
               this.resizedImage.nativeElement.src = dataUrl;
             }
-            this.store.dispatch(
-              new fromActionsUser.UpdateMyPhoto(dataUrl),
-            );
+            this.store.dispatch(updateMyPhoto({ file: dataUrl }));
           }
         };
         img.src = e.target.result;
@@ -168,7 +164,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     };
   };
 
-  private findMe = (): void => this.store.dispatch(new fromActionsUser.GetMyUser());
+  private findMe = (): void => this.store.dispatch(getMyUser());
 
   private createForm = (): void => {
     this.form = this.formBuilder.group({
@@ -182,7 +178,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     });
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private resizeImageFromUrl = (url?: string): void => {
     if (url) {

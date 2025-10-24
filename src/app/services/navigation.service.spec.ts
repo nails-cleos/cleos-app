@@ -1,20 +1,19 @@
 import { TestBed } from '@angular/core/testing';
 import { NavigationEnd, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 
 import { NavigationService } from './navigation.service';
 import { AppState } from '../store/app.states';
 import { IUser, User } from '../interfaces/user';
-import * as fromActionsUser from '../store/user.actions';
-import * as fromActionsI18n from '../store/i18n.actions';
+import { updateMyUser } from '../store/user.actions';
+import { setLanguage } from '../store/i18n.actions';
 
 describe('NavigationService', () => {
   let service: NavigationService;
   let storeSpy: jasmine.SpyObj<Store<AppState>>;
   let routerSpy: jasmine.SpyObj<Router>;
-  let translateSpy: jasmine.SpyObj<TranslateService>;
   let routerEventsSubject: Subject<any>;
 
   const mockUser: IUser = {
@@ -33,22 +32,22 @@ describe('NavigationService', () => {
       events: routerEventsSubject.asObservable(),
       url: '/test/path',
     });
-    translateSpy = jasmine.createSpyObj('TranslateService', ['instant'], {
-      currentLang: 'en',
-    });
 
     // Mock router methods to return promises
     routerSpy.navigate.and.returnValue(Promise.resolve(true));
     routerSpy.navigateByUrl.and.returnValue(Promise.resolve(true));
 
     TestBed.configureTestingModule({
+      imports: [TranslateModule.forRoot()],
       providers: [
         NavigationService,
         { provide: Store, useValue: storeSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     });
+    const translateService = TestBed.inject(TranslateService);
+    translateService.setDefaultLang('en-GB');
+    translateService.use('en-GB');
 
     service = TestBed.inject(NavigationService);
   });
@@ -237,7 +236,7 @@ describe('NavigationService', () => {
       const result = service.attachLang('es', mockUser);
 
       expect(result).toBe('es');
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(new fromActionsI18n.SetLanguage('es'));
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(setLanguage({ language: 'es' }));
     });
 
     it('should update user language when user locale differs from new language', () => {
@@ -247,9 +246,9 @@ describe('NavigationService', () => {
       const updatedUser: IUser = new User();
       updatedUser.lang = 'es';
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(new fromActionsI18n.SetLanguage('es'));
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(setLanguage({ language: 'es' }));
       expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        new fromActionsUser.UpdateMyUser(updatedUser, '/test/path'),
+        updateMyUser({ user: updatedUser, redirectUrl: '/test/path' }),
       );
     });
 
@@ -258,7 +257,7 @@ describe('NavigationService', () => {
 
       service.attachLang('es', userWithSameLocale);
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(new fromActionsI18n.SetLanguage('es'));
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(setLanguage({ language: 'es' }));
       expect(storeSpy.dispatch).toHaveBeenCalledTimes(1); // Only language change, not user update
     });
 
@@ -275,18 +274,16 @@ describe('NavigationService', () => {
       const updatedUser: IUser = new User();
       updatedUser.lang = 'es';
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(new fromActionsI18n.SetLanguage('es'));
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(setLanguage({ language: 'es' }));
       expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        new fromActionsUser.UpdateMyUser(updatedUser, '/test/path'),
+        updateMyUser({ user: updatedUser, redirectUrl: '/test/path' }),
       );
     });
 
     it('should create User object with correct language', () => {
       let capturedUser: IUser;
       storeSpy.dispatch.and.callFake((action: any) => {
-        if (action instanceof fromActionsUser.UpdateMyUser) {
-          capturedUser = action.user;
-        }
+        capturedUser = action.user;
         return undefined as any;
       });
 

@@ -11,12 +11,12 @@ describe('MePaymentComponent', () => {
   let component: MePaymentComponent;
   let fixture: ComponentFixture<MePaymentComponent>;
 
-  const mockStore = {
+  const storeSpy = {
     select: jasmine.createSpy('select').and.returnValue(of({})),
     dispatch: jasmine.createSpy('dispatch'),
   };
 
-  const mockActivatedRoute = {
+  const activatedRouteSpy = {
     snapshot: {
       paramMap: {
         get: jasmine.createSpy('get').and.returnValue('calendar'),
@@ -35,8 +35,8 @@ describe('MePaymentComponent', () => {
     await TestBed.configureTestingModule({
       imports: [MePaymentComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: mockStore },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: Store, useValue: storeSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Analytics, useValue: mockAnalytics },
       ],
     }).compileComponents();

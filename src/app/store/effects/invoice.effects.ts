@@ -1,16 +1,16 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import {
-  GetOfficeToInvoice,
-  InvoiceActionTypes,
-  InvoiceFailure,
-  InvoiceSuccess,
-  OfficesSuccess,
-  UpdateOfficeById,
-  UpdateOfficesSuccess,
+  getAllMyOffices,
+  getOfficeToInvoice,
+  invoiceFailure,
+  invoiceOfficesSuccess,
+  invoiceSuccess,
+  invoiceUpdateOfficeSuccess,
+  updateOfficeById,
 } from '../invoice.actions';
 import { InvoiceService } from '../../services/invoice.service';
 import { OfficeService } from '../../services/office.service';
@@ -19,42 +19,42 @@ import { IOffice } from '../../interfaces/office';
 
 @Injectable()
 export class InvoiceEffects {
+  private readonly actions: Actions = inject(Actions);
+  private readonly invoiceService: InvoiceService = inject(InvoiceService);
+  private readonly officeService: OfficeService = inject(OfficeService);
 
   findInvoiceReservation$ = createEffect(() => this.actions.pipe(
-    ofType(InvoiceActionTypes.getOfficeToInvoice),
-    switchMap((action: GetOfficeToInvoice) =>
-      this.invoiceService.getOfficeToInvoice(action.officeId, action.start, action.end, action.types).pipe(
-        switchMap((response: IInvoice[]) => of(new InvoiceSuccess(response ? response : []))),
-        catchError((err: HttpErrorResponse) => of(new InvoiceFailure(err.error))),
+    ofType(getOfficeToInvoice),
+    switchMap(({ officeId, start, end, types }) =>
+      this.invoiceService.getOfficeToInvoice(officeId, start, end, types).pipe(
+        map((data: IInvoice[]) => invoiceSuccess(data ? { data } : { data: [] })),
+        catchError((err: HttpErrorResponse) => of(invoiceFailure({ error: err.error }))),
       )),
   ));
 
   findMyOffices$ = createEffect(() => this.actions.pipe(
-    ofType(InvoiceActionTypes.getAllMyOffices),
+    ofType(getAllMyOffices),
     switchMap(() =>
       this.invoiceService.getAllMyOffices().pipe(
-        switchMap((response: IOffice[]) => of(new OfficesSuccess(response ? response : []))),
-        catchError((err: HttpErrorResponse) => of(new InvoiceFailure(err.error))),
+        map((offices: IOffice[]) => invoiceOfficesSuccess(offices ? { offices } : { offices: [] })),
+        catchError((err: HttpErrorResponse) => of(invoiceFailure({ error: err.error }))),
       )),
   ));
 
   updateOffices$ = createEffect(() => this.actions.pipe(
-    ofType(InvoiceActionTypes.updateOfficeById),
-    switchMap((action: UpdateOfficeById) =>
-      this.officeService.updateOffice(action.id, action.office).pipe(
-        switchMap(() => of(new UpdateOfficesSuccess())),
-        catchError((err: HttpErrorResponse) => of(new InvoiceFailure(err.error))),
+    ofType(updateOfficeById),
+    switchMap(({ id, office }) =>
+      this.officeService.updateOffice(id, office).pipe(
+        map(() => invoiceUpdateOfficeSuccess()),
+        catchError((err: HttpErrorResponse) => of(invoiceFailure({ error: err.error }))),
       )),
   ));
 
   officesSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(InvoiceActionTypes.invoiceOfficesSuccess),
+    ofType(invoiceOfficesSuccess),
   ), { dispatch: false });
 
   updateOfficesSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(InvoiceActionTypes.invoiceUpdateOfficeSuccess),
+    ofType(invoiceUpdateOfficeSuccess),
   ), { dispatch: false });
-
-  constructor(private actions: Actions, private invoiceService: InvoiceService, private officeService: OfficeService) {
-  }
 }

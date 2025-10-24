@@ -286,7 +286,8 @@
           "options": {
             "devServerTarget": "cleos:serve",
             "watch": true,
-            "headless": false
+            "headless": false,
+            "tsConfig": "cypress/tsconfig.json"
           },
           "configurations": {
             "production": {

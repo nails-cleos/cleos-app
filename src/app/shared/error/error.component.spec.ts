@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ErrorComponent } from './error.component';
-import { IError } from '../../interfaces/common';
 import { NavigationService } from '../../services/navigation.service';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -9,32 +8,29 @@ describe('ErrorComponent', () => {
   let component: ErrorComponent;
   let fixture: ComponentFixture<ErrorComponent>;
 
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+
   const error = {
     status: 'NOT_FOUND',
-  } as IError;
-
-  const mockNavigationService = {
-    reload: jasmine.createSpy('reload'),
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['reload']);
+
     await TestBed.configureTestingModule({
       imports: [ErrorComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: NavigationService, useValue: mockNavigationService },
+        { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(ErrorComponent);
     component = fixture.componentInstance;
     component.error = error;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
     fixture.detectChanges();
+    expect(component).toBeTruthy();
   });
 });

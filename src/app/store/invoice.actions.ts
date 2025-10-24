@@ -1,72 +1,48 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
 import { IError } from '../interfaces/common';
 import { IInvoice } from '../interfaces/invoice';
 import { IOffice } from '../interfaces/office';
 
-export enum InvoiceActionTypes {
+enum InvoiceActionTypes {
   getOfficeToInvoice = '[Invoice] Find office to invoice',
   getAllMyOffices = '[Invoice] Get all my offices',
   invoiceOfficesSuccess = '[Invoice] Offices success',
   invoiceSuccess = '[Invoice] Success',
-  updateOfficeById = '[Invoice] Update office by Id',
+  updateOfficeById = '[Invoice] Update office by id',
   invoiceUpdateOfficeSuccess = '[Invoice] Update office Success',
   invoiceFailure = '[Invoice] Failure',
   clean = '[Invoice] Clean'
 }
 
-export class GetOfficeToInvoice implements Action {
-  readonly type = InvoiceActionTypes.getOfficeToInvoice;
+export const getOfficeToInvoice = createAction(
+  InvoiceActionTypes.getOfficeToInvoice,
+  props<{ officeId: string, start: string, end: string, types?: string[] }>(),
+);
 
-  constructor(public officeId: string, public start: string, public end: string, public types?: string[]) {
-  }
-}
+export const invoiceSuccess = createAction(
+  InvoiceActionTypes.invoiceSuccess,
+  props<{ data: IInvoice[] }>(),
+);
 
-export class InvoiceSuccess implements Action {
-  readonly type = InvoiceActionTypes.invoiceSuccess;
+export const invoiceFailure = createAction(
+  InvoiceActionTypes.invoiceFailure,
+  props<{ error: IError }>(),
+);
 
-  constructor(public data: IInvoice[]) {
-  }
-}
+export const getAllMyOffices = createAction(
+  InvoiceActionTypes.getAllMyOffices,
+);
 
-export class InvoiceFailure implements Action {
-  readonly type = InvoiceActionTypes.invoiceFailure;
+export const invoiceOfficesSuccess = createAction(
+  InvoiceActionTypes.invoiceOfficesSuccess,
+  props<{ offices: IOffice[] }>(),
+);
 
-  constructor(public error: IError) {
-  }
-}
+export const updateOfficeById = createAction(
+  InvoiceActionTypes.updateOfficeById,
+  props<{ id: string, office: IOffice }>(),
+);
 
-export class GetAllMyOffices implements Action {
-  readonly type = InvoiceActionTypes.getAllMyOffices;
-}
+export const invoiceUpdateOfficeSuccess = createAction(InvoiceActionTypes.invoiceUpdateOfficeSuccess);
 
-export class OfficesSuccess implements Action {
-  readonly type = InvoiceActionTypes.invoiceOfficesSuccess;
-
-  constructor(public offices: IOffice[]) {
-  }
-}
-
-export class UpdateOfficeById implements Action {
-  readonly type = InvoiceActionTypes.updateOfficeById;
-
-  constructor(public id: string, public office: IOffice) {
-  }
-}
-
-export class UpdateOfficesSuccess implements Action {
-  readonly type = InvoiceActionTypes.invoiceUpdateOfficeSuccess;
-}
-
-export class Clean implements Action {
-  readonly type = InvoiceActionTypes.clean;
-}
-
-export type All =
-  | GetOfficeToInvoice
-  | InvoiceSuccess
-  | InvoiceFailure
-  | GetAllMyOffices
-  | OfficesSuccess
-  | UpdateOfficeById
-  | UpdateOfficesSuccess
-  | Clean;
+export const clean = createAction(InvoiceActionTypes.clean);

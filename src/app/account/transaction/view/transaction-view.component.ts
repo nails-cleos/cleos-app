@@ -10,7 +10,7 @@ import { AppState, selectAccountState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
-import * as fromActionsAccount from '../../../store/account.actions';
+import { clean, getTransactionsByAccountId } from '../../../store/account.actions';
 import { detailExpandAnimation } from '../../../util/animation';
 import { newDateTimestamp } from '../../../util/dates';
 import { AuthUserService } from '../../../services/auth-user.service';
@@ -97,11 +97,16 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
     this.cdRef.detectChanges();
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsAccount.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private getTransactions = (page: number = 0): void => this.store.dispatch(
-    new fromActionsAccount.GetTransactionsByAccountId(this.accountId!, page, this.sort.active, this.sort.direction,
-      this.pageSize),
+    getTransactionsByAccountId({
+      id: this.accountId!,
+      page: page,
+      sort: this.sort.active,
+      direction: this.sort.direction,
+      size: this.pageSize,
+    }),
   );
 
   private subscribe = (): void => {

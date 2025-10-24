@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 
 import { UserService } from './user.service';
-import { IUser, IOverview, IUserAll } from '../interfaces/user';
+import { IOverview, IUser, IUserAll } from '../interfaces/user';
 import { Role, Token } from '../interfaces/token';
 import { Pagination } from '../interfaces/pagination';
 import { IRoom } from '../interfaces/room';
@@ -322,9 +322,7 @@ describe('UserService', () => {
     it('should delete user', () => {
       httpSpy.delete.and.returnValue(of(mockUser));
 
-      service.deleteUser('user-123').subscribe(result => {
-        expect(result).toEqual(mockUser);
-      });
+      service.deleteUser('user-123');
 
       expect(httpSpy.delete).toHaveBeenCalledWith('v1/users/user-123');
     });
@@ -332,10 +330,14 @@ describe('UserService', () => {
 
   describe('restore', () => {
     it('should restore user', () => {
-      httpSpy.patch.and.returnValue(of(mockUser));
+      const response: IApiResponse = {
+        id: mockUser.id!,
+        name: mockUser.displayName,
+      };
+      httpSpy.patch.and.returnValue(of(response));
 
       service.restore('user-123', mockUser).subscribe(result => {
-        expect(result).toEqual(mockUser);
+        expect(result).toEqual(response);
       });
 
       expect(httpSpy.patch).toHaveBeenCalledWith('v1/users/user-123', mockUser);

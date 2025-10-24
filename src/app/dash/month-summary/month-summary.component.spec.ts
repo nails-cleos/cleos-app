@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MonthSummaryComponent } from './month-summary.component';
-import { TranslateModule, TranslateService, TranslateLoader, TranslateFakeLoader } from '@ngx-translate/core';
-import { of } from 'rxjs';
+import { TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { of, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Router } from '@angular/router';
@@ -22,11 +22,16 @@ import { MatDatepicker } from '@angular/material/datepicker';
 describe('MonthSummaryComponent', () => {
   let component: MonthSummaryComponent;
   let fixture: ComponentFixture<MonthSummaryComponent>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockTranslate: jasmine.SpyObj<TranslateService>;
 
-  const mockAuthUserService = {
+  let state$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let saveAsSpy: jasmine.Spy;
+
+  let translateService: TranslateService;
+
+  const authUserServiceSpy = {
     authUser: of({
       showCash: true,
       displayName: 'Test User',
@@ -74,13 +79,13 @@ describe('MonthSummaryComponent', () => {
   };
 
   beforeEach(async () => {
-    const storeSpyObj = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    const routerSpyObj = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    state$ = new Subject();
 
-    storeSpyObj.select.and.returnValue(of({
-      monthlySummaryMap: new Map(),
-    }));
-    routerSpyObj.getCurrentNavigation.and.returnValue(null);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+
+    storeSpy.select.and.returnValue(state$.asObservable());
+    routerSpy.getCurrentNavigation.and.returnValue(null);
 
     await TestBed.configureTestingModule({
       imports: [
@@ -91,19 +96,28 @@ describe('MonthSummaryComponent', () => {
         BrowserAnimationsModule,
       ],
       providers: [
-        { provide: Store, useValue: storeSpyObj },
-        { provide: AuthUserService, useValue: mockAuthUserService },
-        { provide: Router, useValue: routerSpyObj },
+        { provide: Store, useValue: storeSpy },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
+        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
 
-    mockStore = TestBed.inject(Store) as jasmine.SpyObj<Store>;
-    mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-    mockTranslate = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
+    translateService = TestBed.inject(TranslateService);
+    translateService.setDefaultLang('en-GB');
+    translateService.use('en-GB');
 
     fixture = TestBed.createComponent(MonthSummaryComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  });
+
+  beforeEach(() => {
+    saveAsSpy = jasmine.createSpy('saveAs');
+    (window as any).saveAs = saveAsSpy;
+  });
+
+  afterEach(() => {
+    delete (window as any).saveAs;
   });
 
   it('should create', () => {
@@ -113,7 +127,7 @@ describe('MonthSummaryComponent', () => {
   describe('Initialization', () => {
     it('should initialize with default values', () => {
       expect(component.step).toBe(0);
-      expect(component.showCash).toBe(true);
+      expect(component.showCash).toBeTrue();
       expect(component.amountFormat.value).toBe('ES');
       expect(component.locale).toBe('es');
     });
@@ -123,7 +137,7 @@ describe('MonthSummaryComponent', () => {
         step: 1,
         date: new Date(2024, 0, 15),
       };
-      mockRouter.getCurrentNavigation.and.returnValue({ extras: { state: mockExtras } } as any);
+      routerSpy.getCurrentNavigation.and.returnValue({ extras: { state: mockExtras } } as any);
 
       const newFixture = TestBed.createComponent(MonthSummaryComponent);
       const newComponent = newFixture.componentInstance;
@@ -138,7 +152,7 @@ describe('MonthSummaryComponent', () => {
     });
 
     it('should subscribe to authUserService', () => {
-      expect(component.showCash).toBe(true);
+      expect(component.showCash).toBeTrue();
     });
   });
 
@@ -160,15 +174,15 @@ describe('MonthSummaryComponent', () => {
     it('should navigate to quarter summary with year and quarter when date is set', () => {
       component.date.setValue(new Date(2024, 0, 15));
       void component.goBack;
-      expect(mockRouter.navigate).toHaveBeenCalled();
+      expect(routerSpy.navigate).toHaveBeenCalled();
     });
 
     it('should navigate to quarter summary without state when date is null', () => {
       component.date.setValue(null);
       void component.goBack;
       // TranslateService currentLang is undefined in the test context, so we check the actual call
-      const navigateCall = mockRouter.navigate.calls.mostRecent();
-      expect(navigateCall.args[0]).toEqual([mockTranslate.currentLang, 'dashboard', 'quarter', 'summary']);
+      const navigateCall = routerSpy.navigate.calls.mostRecent();
+      expect(navigateCall.args[0]).toEqual([translateService.currentLang, 'dashboard', 'quarter', 'summary']);
     });
   });
 
@@ -297,8 +311,8 @@ describe('MonthSummaryComponent', () => {
 
       component.updateMonthlySummary(totalTypes, summaries);
 
-      expect(mockStore.dispatch).toHaveBeenCalled();
-      expect(component.isLoading).toBe(true);
+      expect(storeSpy.dispatch).toHaveBeenCalled();
+      expect(component.isLoading).toBeTrue();
     });
 
     it('should dispatch UpdateMonthlySummary action for expense type', () => {
@@ -309,7 +323,7 @@ describe('MonthSummaryComponent', () => {
 
       component.updateMonthlySummary(totalTypes, summaries);
 
-      expect(mockStore.dispatch).toHaveBeenCalled();
+      expect(storeSpy.dispatch).toHaveBeenCalled();
     });
 
     it('should dispatch UpdateMonthlySummary action for cash type', () => {
@@ -320,7 +334,7 @@ describe('MonthSummaryComponent', () => {
 
       component.updateMonthlySummary(totalTypes, summaries);
 
-      expect(mockStore.dispatch).toHaveBeenCalled();
+      expect(storeSpy.dispatch).toHaveBeenCalled();
     });
   });
 
@@ -334,7 +348,7 @@ describe('MonthSummaryComponent', () => {
     it('should dispatch GetMonthlySummary when date changes', () => {
       component.date.setValue(new Date(2024, 5, 1));
 
-      expect(mockStore.dispatch).toHaveBeenCalled();
+      expect(storeSpy.dispatch).toHaveBeenCalled();
     });
 
     it('should create data when selectedRoom changes', () => {
@@ -422,16 +436,16 @@ describe('MonthSummaryComponent', () => {
     });
 
     it('isInvalidInput should return true for invalid values', () => {
-      expect(MonthSummaryComponent['isInvalidInput']('')).toBe(true);
-      expect(MonthSummaryComponent['isInvalidInput']('0')).toBe(true);
-      expect(MonthSummaryComponent['isInvalidInput']('0.0')).toBe(true);
-      expect(MonthSummaryComponent['isInvalidInput']('.0')).toBe(true);
+      expect(MonthSummaryComponent['isInvalidInput']('')).toBeTrue();
+      expect(MonthSummaryComponent['isInvalidInput']('0')).toBeTrue();
+      expect(MonthSummaryComponent['isInvalidInput']('0.0')).toBeTrue();
+      expect(MonthSummaryComponent['isInvalidInput']('.0')).toBeTrue();
     });
 
     it('isInvalidInput should return false for valid values', () => {
-      expect(MonthSummaryComponent['isInvalidInput']('100')).toBe(false);
-      expect(MonthSummaryComponent['isInvalidInput']('50.50')).toBe(false);
-      expect(MonthSummaryComponent['isInvalidInput']('1.23')).toBe(false);
+      expect(MonthSummaryComponent['isInvalidInput']('100')).toBeFalse();
+      expect(MonthSummaryComponent['isInvalidInput']('50.50')).toBeFalse();
+      expect(MonthSummaryComponent['isInvalidInput']('1.23')).toBeFalse();
     });
 
     it('getType should return correct SummaryType', () => {
@@ -506,17 +520,6 @@ describe('MonthSummaryComponent', () => {
   });
 
   describe('exportMonthlySummary method', () => {
-    let saveAsSpy: jasmine.Spy;
-
-    beforeEach(() => {
-      saveAsSpy = jasmine.createSpy('saveAs');
-      (window as any).saveAs = saveAsSpy;
-    });
-
-    afterEach(() => {
-      delete (window as any).saveAs;
-    });
-
     it('should export monthly summary with workbook', () => {
       const mockSale: IMonthlySummarySale = {
         ...mockMonthlySummary,
@@ -598,7 +601,7 @@ describe('MonthSummaryComponent', () => {
 
       component.exportToExcel('TITLE', totalTypes, values, data);
 
-      expect(mockStore.dispatch).toHaveBeenCalled();
+      expect(storeSpy.dispatch).toHaveBeenCalled();
     });
 
     it('should export expense type to Excel', () => {
@@ -625,7 +628,7 @@ describe('MonthSummaryComponent', () => {
 
       component.exportToExcel('TITLE', totalTypes, values, data);
 
-      expect(mockStore.dispatch).toHaveBeenCalled();
+      expect(storeSpy.dispatch).toHaveBeenCalled();
     });
 
     it('should export cash type to Excel', () => {
@@ -654,7 +657,7 @@ describe('MonthSummaryComponent', () => {
 
       component.exportToExcel('TITLE', totalTypes, values, data);
 
-      expect(mockStore.dispatch).toHaveBeenCalled();
+      expect(storeSpy.dispatch).toHaveBeenCalled();
     });
 
     it('should not export when data is empty', () => {

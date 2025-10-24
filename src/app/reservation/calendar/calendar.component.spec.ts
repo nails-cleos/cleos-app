@@ -2,21 +2,22 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CalendarComponent } from './calendar.component';
 import { TranslateModule } from '@ngx-translate/core';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AuthUserService } from '../../services/auth-user.service';
 import { ActivatedRoute } from '@angular/router';
+import { AppState } from '../../store/app.states';
 
 describe('CalendarComponent', () => {
   let component: CalendarComponent;
   let fixture: ComponentFixture<CalendarComponent>;
 
-  const mockStore = {
-    select: jasmine.createSpy('select').and.returnValue(of({})),
-    dispatch: jasmine.createSpy('dispatch'),
-  };
+  let state$: Subject<any>;
 
-  const mockAuthUserService = {
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+
+  const authUserServiceSpy = {
     authUser: of({
       isDarkMode: true,
       professionalId: 'professional-id',
@@ -24,30 +25,33 @@ describe('CalendarComponent', () => {
     }),
   };
 
-  const mockActivatedRoute = {
-    snapshot: {
-      paramMap: {
-        get: jasmine.createSpy('get').and.returnValue('calendar'),
-      },
-    },
-  };
-
   beforeEach(async () => {
+    state$ = new Subject<any>();
+
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      snapshot: {
+        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+      },
+    });
+
+    storeSpy.select.and.returnValue(state$.asObservable());
+
     await TestBed.configureTestingModule({
       imports: [CalendarComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: mockStore },
-        { provide: AuthUserService, useValue: mockAuthUserService },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: Store, useValue: storeSpy },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
     }).compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(CalendarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
+
+  afterEach(() => state$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();

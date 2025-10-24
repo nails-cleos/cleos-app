@@ -1,9 +1,9 @@
-import { Action } from '@ngrx/store';
-import { IError, ResponseSuccess } from '../interfaces/common';
+import { createAction, props } from '@ngrx/store';
 import { ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
 import { ITreatmentGroup } from '../interfaces/treatment';
+import { IError, IResponseSuccess } from '../interfaces/common';
 
-export enum CatalogueActionTypes {
+enum CatalogueActionTypes {
   getAllCatalogues = '[Catalogue] Get all catalogues',
   getAllCatalogs = '[Catalogue] Get all catalogs',
   catalogueSuccess = '[Catalogue] Success',
@@ -20,101 +20,60 @@ export enum CatalogueActionTypes {
   clean = '[Catalogue] Clean'
 }
 
-export class GetAllCatalogues implements Action {
-  readonly type = CatalogueActionTypes.getAllCatalogues;
-}
+export const getAllCatalogues = createAction(CatalogueActionTypes.getAllCatalogues);
 
-export class GetAllCatalogs implements Action {
-  readonly type = CatalogueActionTypes.getAllCatalogs;
-}
+export const getAllCatalogs = createAction(CatalogueActionTypes.getAllCatalogs);
 
-export class CatalogueSuccess implements Action {
-  readonly type = CatalogueActionTypes.catalogueSuccess;
+export const catalogueSuccess = createAction(
+  CatalogueActionTypes.catalogueSuccess,
+  props<{ data: ICatalogue[] }>(),
+);
 
-  constructor(public data: ICatalogue[]) {
-  }
-}
+export const catalogueSaveSuccess = createAction(
+  CatalogueActionTypes.catalogueSaveSuccess,
+  props<IResponseSuccess>(),
+);
 
-export class CreateCatalogue implements Action {
-  readonly type = CatalogueActionTypes.createCatalogue;
+export const catalogueFailure = createAction(
+  CatalogueActionTypes.catalogueFailure,
+  props<{ error: IError }>(),
+);
 
-  constructor(public catalogue: ICatalogue, public resizedImageDataUrl: string) {
-  }
-}
+export const createCatalogue = createAction(
+  CatalogueActionTypes.createCatalogue,
+  props<{ catalogue: ICatalogue; resizedImageDataUrl: string }>(),
+);
 
-export class UpdateCatalogue implements Action {
-  readonly type = CatalogueActionTypes.updateCatalogue;
+export const updateCatalogue = createAction(
+  CatalogueActionTypes.updateCatalogue,
+  props<{ catalogue: ICatalogue; resizedImageDataUrl: string }>(),
+);
 
-  constructor(public catalogue: ICatalogue, public resizedImageDataUrl: string) {
-  }
-}
+export const updateCatalogueOrder = createAction(
+  CatalogueActionTypes.updateCatalogueOrder,
+  props<{ catalogues: ICatalogueAll[] }>(),
+);
 
-export class UpdateCatalogueOrder implements Action {
-  readonly type = CatalogueActionTypes.updateCatalogueOrder;
+export const catalogueSelected = createAction(
+  CatalogueActionTypes.catalogueSelected,
+  props<{ selected?: ICatalogue }>(),
+);
 
-  constructor(public catalogues: ICatalogueAll[]) {
-  }
-}
+export const getCatalogue = createAction(
+  CatalogueActionTypes.getCatalogue,
+  props<{ id: string }>(),
+);
 
-export class CatalogueSaveSuccess extends ResponseSuccess implements Action {
-  readonly type = CatalogueActionTypes.catalogueSaveSuccess;
-}
+export const deleteCatalogue = createAction(
+  CatalogueActionTypes.deleteCatalogue,
+  props<{ id: string; name: string }>(),
+);
 
-export class CatalogueFailure implements Action {
-  readonly type = CatalogueActionTypes.catalogueFailure;
+export const getAllTreatmentsGroup = createAction(CatalogueActionTypes.getAllTreatmentsGroup);
 
-  constructor(public error: IError) {
-  }
-}
+export const findGroupsSuccess = createAction(
+  CatalogueActionTypes.findGroupsSuccess,
+  props<{ groups: ITreatmentGroup[] }>(),
+);
 
-export class CatalogueSelected implements Action {
-  readonly type = CatalogueActionTypes.catalogueSelected;
-
-  constructor(public selected?: ICatalogue) {
-  }
-}
-
-export class GetCatalogue implements Action {
-  readonly type = CatalogueActionTypes.getCatalogue;
-
-  constructor(public id: string) {
-  }
-}
-
-export class DeleteCatalogue implements Action {
-  readonly type = CatalogueActionTypes.deleteCatalogue;
-
-  constructor(public id: string, public name: string) {
-  }
-}
-
-export class GetAllTreatmentsGroup implements Action {
-  readonly type = CatalogueActionTypes.getAllTreatmentsGroup;
-}
-
-export class FindGroupsSuccess implements Action {
-  readonly type = CatalogueActionTypes.findGroupsSuccess;
-
-  constructor(public groups: ITreatmentGroup[]) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = CatalogueActionTypes.clean;
-}
-
-export type All =
-  | GetAllCatalogues
-  | GetAllCatalogs
-  | CreateCatalogue
-  | UpdateCatalogue
-  | UpdateCatalogueOrder
-  | CatalogueSuccess
-  | CatalogueSaveSuccess
-  | CatalogueFailure
-  | GetCatalogue
-  | CatalogueSelected
-  | DeleteCatalogue
-  | GetAllTreatmentsGroup
-  | FindGroupsSuccess
-  | Clean;
+export const clean = createAction(CatalogueActionTypes.clean);

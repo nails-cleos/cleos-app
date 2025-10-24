@@ -13,7 +13,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
 import { map, startWith } from 'rxjs/operators';
-import * as fromActionsReservation from '../../store/reservation.actions';
+import { getColorsByTreatmentId } from '../../store/reservation.actions';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AsyncPipe } from '@angular/common';
@@ -36,7 +36,7 @@ export class ChangeColorDialogComponent implements OnInit, OnDestroy {
   private readonly treatmentId: string;
 
   constructor(public dialogRef: MatDialogRef<ChangeColorDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-              private store: Store<AppState>, private formBuilder: UntypedFormBuilder) {
+    private store: Store<AppState>, private formBuilder: UntypedFormBuilder) {
     this.getState = this.store.select(selectReservationState);
     this.treatmentId = data.treatmentId;
   }
@@ -85,9 +85,7 @@ export class ChangeColorDialogComponent implements OnInit, OnDestroy {
   private filterColor = (name: string): IColorAll[] | undefined => this.colors?.filter(
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private getColors = (): void => this.store.dispatch(
-    new fromActionsReservation.GetColorsByTreatmentId(this.treatmentId),
-  );
+  private getColors = (): void => this.store.dispatch(getColorsByTreatmentId({ treatmentId: this.treatmentId }));
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {

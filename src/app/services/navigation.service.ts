@@ -3,10 +3,10 @@ import { NavigationEnd, Router } from '@angular/router';
 import { getLocale } from '../util/helper';
 import { TranslateService } from '@ngx-translate/core';
 import { IUser, User } from '../interfaces/user';
-import * as fromActionsUser from '../store/user.actions';
+import { updateMyUser } from '../store/user.actions';
 import { AppState } from '../store/app.states';
 import { Store } from '@ngrx/store';
-import * as fromActionsI18n from '../store/i18n.actions';
+import { setLanguage } from '../store/i18n.actions';
 
 @Injectable({
   providedIn: 'root',
@@ -60,10 +60,10 @@ export class NavigationService {
       if (currentUser?.locale) {
         userLanguage = getLocale(currentUser.locale);
       }
-      this.store.dispatch(new fromActionsI18n.SetLanguage(language));
+      this.store.dispatch(setLanguage({ language }));
       if (userLanguage?.language !== language) {
         this.store.dispatch(
-          new fromActionsUser.UpdateMyUser(user, redirectUrl),
+          updateMyUser({ user, redirectUrl }),
         );
       }
     }

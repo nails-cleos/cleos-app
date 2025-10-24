@@ -24,8 +24,8 @@ import {
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { IProfessionalEvent, IRoomEvents } from '../interfaces/dashboard';
-import * as fromActionsDashboard from '../store/dashboard.actions';
-import * as fromActionsReservation from '../store/reservation.actions';
+import { clean, getMyEvent, updateEvent } from '../store/dashboard.actions';
+import { approveReservation, startReservation } from '../store/reservation.actions';
 import { DayViewSchedulerComponent, IProfessional, Professional } from './day-view-scheduler.component';
 import { EventColor } from 'calendar-utils';
 import { Day, IReservation, MAX_RESERVATION_MONTH, States } from '../interfaces/reservation';
@@ -84,7 +84,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private calendarReady = false;
 
   constructor(private store: Store<AppState>, private readonly translate: TranslateService, private router: Router,
-              public dialog: MatDialog, private authUserService: AuthUserService) {
+    public dialog: MatDialog, private authUserService: AuthUserService) {
     this.getState = this.store.select(selectDashboardState);
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
       const darkMode: boolean = value.isDarkMode;
@@ -123,7 +123,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         image = professional.imageUrl;
       }
     } else if (professional.image) {
-      image = `data:image/jpg;base64,${professional.image}`;
+      image = `data:image/jpg;base64,${ professional.image }`;
     }
 
     return image || 'assets/icons/icon-512x512.png';
@@ -152,6 +152,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.calendarReady = true;
     this.tryCreateEvents();
   };
+
   selectDate = (event: any): void => {
     this.changeDate(newDate(event.value));
     this.getEvents();
@@ -211,7 +212,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private createTitle = (calendarEvent: CalendarEvent, now: Date = getNowTimeZone()): CalendarEvent => {
     const matcher = calendarEvent.title.match(/(?<=<b>\s*).*?(?=\s*<\/b>)/gs);
-    const title = matcher ? `<b>${matcher[0]}</b>` : calendarEvent.title;
+    const title = matcher ? `<b>${ matcher[0] }</b>` : calendarEvent.title;
 
     if (calendarEvent.meta.state === States.started && calendarEvent.end) {
       const dateTime = calendarEvent.meta.started instanceof Date ? calendarEvent.meta.started
@@ -224,9 +225,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const diffStart = getMinutesBetweenTimesABS(calendarEvent.start, dateTime);
       let startText;
       if (startTime > startedTime) {
-        startText = `<span class="green-text"><b id="start">-${diffStart} min.</b></span>`;
+        startText = `<span class="green-text"><b id="start">-${ diffStart } min.</b></span>`;
       } else if (startTime < startedTime) {
-        startText = `<span class="red-text"><b id="start">+${diffStart} min.</b></span>`;
+        startText = `<span class="red-text"><b id="start">+${ diffStart } min.</b></span>`;
       } else {
         startText = '<span><b id="start">0 min.</b></span>';
       }
@@ -238,9 +239,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       let elapsedText;
       if (duration > diffElapsed) {
-        elapsedText = `<span class="green-text"><b id="elapsed">${diffElapsed} min.</b></span>`;
+        elapsedText = `<span class="green-text"><b id="elapsed">${ diffElapsed } min.</b></span>`;
       } else if (duration < diffElapsed) {
-        elapsedText = `<span class="red-text"><b id="elapsed">+${diffElapsed} min.</b></span>`;
+        elapsedText = `<span class="red-text"><b id="elapsed">+${ diffElapsed } min.</b></span>`;
       } else {
         elapsedText = '<span><b id="elapsed">0 min.</b></span>';
       }
@@ -250,16 +251,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
       const diffFinish = getMinutesBetweenTimesABS(calendarEvent.end, now);
       let finishText;
       if (endTime > nowTime) {
-        finishText = `<span class="green-text"><b id="finish">-${diffFinish} min.</b></span>`;
+        finishText = `<span class="green-text"><b id="finish">-${ diffFinish } min.</b></span>`;
       } else if (endTime < nowTime) {
-        finishText = `<span class="red-text"><b id="finish">+${diffFinish} min.</b></span>`;
+        finishText = `<span class="red-text"><b id="finish">+${ diffFinish } min.</b></span>`;
       } else {
         finishText = '<span><b id="finish">0 min.</b></span>';
       }
 
       const timeFinish = this.finishInText.replace('{finishText}', finishText);
 
-      calendarEvent.title = `${title} <div class="timing"> ${start} ${timeElapsed} ${timeFinish}</div>`;
+      calendarEvent.title = `${ title } <div class="timing"> ${ start } ${ timeElapsed } ${ timeFinish }</div>`;
     }
 
     const isNow = isToday(calendarEvent.start);
@@ -323,9 +324,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (professionalId) {
       reservation.professionalId = professionalId;
     }
-    this.store.dispatch(
-      new fromActionsDashboard.UpdateEvent(id, reservation),
-    );
+    this.store.dispatch(updateEvent({ reservationId: id, reservation }));
   };
 
   private changeDate = (date: Date): void => {
@@ -401,9 +400,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         professionalEvent.calendarSummary.unavailable?.forEach(it => {
           const start = newDateTimestamp(it.start);
           const title = it.duration ?
-            it.title : `${this.translate.instant('COMMON.ALL_DAY.CHECK')} - ${it.title}`;
+            it.title : `${ this.translate.instant('COMMON.ALL_DAY.CHECK') } - ${ it.title }`;
 
-          let path = `${this.language}/unavailable/`;
+          let path = `${ this.language }/unavailable/`;
           if (it.type === 'BLOCK_AGENDA') {
             path += 'block-agenda/';
           }
@@ -427,7 +426,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   };
 
   private createLabel = (icon: string, text: string) => `<div class="mat-raised-button">
-                   <div class="custom-material-icons material-icons">${icon}</div>&nbsp;${text}
+                   <div class="custom-material-icons material-icons">${ icon }</div>&nbsp;${ text }
                </div>`;
 
   private createUnavailableEvent = (start: Date, recurring: any, professional: Professional, darkMode: boolean) => {
@@ -446,34 +445,28 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.calendar.addEvent(event);
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsDashboard.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private getEvents = (): void => {
     this.calendar.resetEvents();
-    this.store.dispatch(
-      new fromActionsDashboard.GetMyEvent(this.viewDate),
-    );
+    this.store.dispatch(getMyEvent({ date: this.viewDate }));
   };
 
   private eventClick = (event: CalendarEvent, type: string): void => {
-    const reservationId = `${event.id!}`;
+    const reservationId = `${ event.id! }`;
     switch (type) {
       case 'VIEW':
         this.router.navigate([this.language, 'reservation', reservationId]);
         break;
       case 'APPROVE':
         this.calendar.filterEvent(event);
-        this.store.dispatch(
-          new fromActionsReservation.ApproveReservation(reservationId),
-        );
+        this.store.dispatch(approveReservation(reservationId));
         event.meta.state = States.approved;
         setTimeout(() => this.calendar.addEvent(event), 1);
         break;
       case 'START':
         this.calendar.filterEvent(event);
-        this.store.dispatch(
-          new fromActionsReservation.Start(reservationId),
-        );
+        this.store.dispatch(startReservation(reservationId));
         event.meta.state = States.started;
         event.meta.started = dateToTimestamp();
         event.draggable = false;

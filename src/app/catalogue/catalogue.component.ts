@@ -10,7 +10,13 @@ import {
 } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState, selectCatalogueState } from '../store/app.states';
-import * as fromActionsCatalogue from '../store/catalogue.actions';
+import {
+  clean,
+  createCatalogue,
+  getAllTreatmentsGroup,
+  getCatalogue,
+  updateCatalogue,
+} from '../store/catalogue.actions';
 import { Catalogue, ICatalogue } from '../interfaces/catalogue';
 import { formatBytes, resizeImage } from '../util/file';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -74,14 +80,11 @@ export class CatalogueComponent implements OnInit, OnDestroy {
     catalogue.groupId = this.getForm.group.value?.id;
 
     if (this.isAddMode) {
-      this.store.dispatch(
-        new fromActionsCatalogue.CreateCatalogue(catalogue, this.resizedImageDataUrl!),
-      );
+      this.store.dispatch(createCatalogue({ catalogue, resizedImageDataUrl: this.resizedImageDataUrl! }));
     } else {
       catalogue.id = this.id;
       this.catalogue = undefined;
-      this.store.dispatch(
-        new fromActionsCatalogue.UpdateCatalogue(catalogue, this.resizedImageDataUrl!));
+      this.store.dispatch(updateCatalogue({ catalogue, resizedImageDataUrl: this.resizedImageDataUrl! }));
     }
     return;
   }
@@ -128,7 +131,7 @@ export class CatalogueComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  displayFnGroup = (group: ITreatmentGroup): string => group ? `${ group.name }` : '';
+  displayFnGroup = (group: ITreatmentGroup): string => group ? `${group.name}` : '';
 
   keyDownGroup = (event: any): void => {
     if (event.code === 'Backspace') {
@@ -202,16 +205,14 @@ export class CatalogueComponent implements OnInit, OnDestroy {
     }
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsCatalogue.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
-  private findGroups = (): void => this.store.dispatch(new fromActionsCatalogue.GetAllTreatmentsGroup());
+  private findGroups = (): void => this.store.dispatch(getAllTreatmentsGroup());
 
   private getCatalogue = (): void => {
     if (!this.catalogue) {
-      const id = this.route.snapshot.paramMap.get('id');
-      this.store.dispatch(
-        new fromActionsCatalogue.GetCatalogue(id!),
-      );
+      const id = this.route.snapshot.paramMap.get('id')!;
+      this.store.dispatch(getCatalogue({ id }));
     }
   };
 
@@ -227,7 +228,7 @@ export class CatalogueComponent implements OnInit, OnDestroy {
           catalog: state.selected.catalog,
           groupId: state.selected.treatmentGroup?.id,
         } as ICatalogue;
-        this.resizedImageDataUrl = `data:${ state.selected.contentType };base64,${ state.selected.blob }`;
+        this.resizedImageDataUrl = `data:${state.selected.contentType};base64,${state.selected.blob}`;
         this.form.patchValue(this.catalogue);
         if (state.selected.treatmentGroup) {
           this.getForm.group.setValue(state.selected.treatmentGroup);

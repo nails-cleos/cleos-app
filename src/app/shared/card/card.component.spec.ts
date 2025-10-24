@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialog } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
 import { CardComponent } from './card.component';
 import { AuthUserService } from '../../services/auth-user.service';
@@ -7,41 +6,34 @@ import { IChart } from '../../interfaces/dashboard';
 import { ICurrency } from '../../interfaces/currency';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
-class MockAuthUserService {
-  private subject = new Subject<any>();
-  authUser = this.subject.asObservable();
-
-  emit(value: any) {
-    this.subject.next(value);
-  }
-}
-
-class MockMatDialog {
-  open = jasmine.createSpy('open');
-}
-
 describe('CardComponent', () => {
   let component: CardComponent;
   let fixture: ComponentFixture<CardComponent>;
-  let mockAuthUserService: MockAuthUserService;
-  let mockDialog: MockMatDialog;
+
+  let authUser$: Subject<any>;
+
+  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let dialogSpy: jasmine.Spy<any>;
 
   beforeEach(async () => {
-    mockAuthUserService = new MockAuthUserService();
-    mockDialog = new MockMatDialog();
+    authUser$ = new Subject<any>();
+
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
+      authUser: authUser$.asObservable(),
+    });
 
     await TestBed.configureTestingModule({
       imports: [CardComponent],
       providers: [
-        { provide: AuthUserService, useValue: mockAuthUserService },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
       ],
       schemas: [NO_ERRORS_SCHEMA],
-    }).overrideProvider(MatDialog, { useValue: mockDialog })
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(CardComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+
+    dialogSpy = spyOn(component.dialog, 'open');
   });
 
   it('should create', () => {
@@ -49,15 +41,25 @@ describe('CardComponent', () => {
   });
 
   it('should subscribe to AuthUserService and set dark mode', () => {
-    mockAuthUserService.emit({ isDarkMode: true });
-    expect((component as any).isDarkMode).toBeTrue();
+    authUser$.next({ isDarkMode: true });
+    expect(component['isDarkMode']).toBeTrue();
 
-    mockAuthUserService.emit({ isDarkMode: false });
-    expect((component as any).isDarkMode).toBeFalse();
+    authUser$.next({ isDarkMode: false });
+    expect(component['isDarkMode']).toBeFalse();
   });
 
   it('should open dialog when chart is provided on click', () => {
-    const chart: IChart = { /* minimal fake chart object */ } as IChart;
+    const chart: IChart = {
+      title: 'Test Chart',
+      colors: 'COLORS',
+      options: 'BAR_CHART',
+      labels: ['Jan', 'Feb', 'Mar'],
+      dataSet: [
+        { data: 10, label: '1', type: 'number' },
+        { data: 20, label: '2', type: 'number' },
+        { data: 30, label: '3', type: 'number' },
+      ],
+    };
     const mockCurrency: ICurrency = {
       id: '1',
       name: 'Test Currency',
@@ -67,21 +69,36 @@ describe('CardComponent', () => {
 
     component.chart = chart;
     component.currency = mockCurrency;
-    component.title = 'Test Chart';
+    component.title = 'Chart';
 
     // act
     component.onClick();
 
-    expect(mockDialog.open).toHaveBeenCalled();
-    const callArgs = mockDialog.open.calls.mostRecent().args[1].data;
-    expect(callArgs.title).toBe('Test Chart');
-    expect(callArgs.chart).toBeDefined();
+    expect(dialogSpy).toHaveBeenCalledWith(
+      jasmine.any(Function),
+      jasmine.objectContaining({
+        data: jasmine.objectContaining({
+          chart: jasmine.objectContaining({
+            labels: ['Jan', 'Feb', 'Mar'],
+            type: 'bar',
+            charData: jasmine.objectContaining({
+              datasets: [
+                jasmine.objectContaining({ data: 10, label: '1', type: 'number' }),
+                jasmine.objectContaining({ data: 20, label: '2', type: 'number' }),
+                jasmine.objectContaining({ data: 30, label: '3', type: 'number' }),
+              ],
+            }),
+          }),
+          title: 'Chart',
+        }),
+      }),
+    );
   });
 
   it('should not open dialog when no chart is provided', () => {
     component.chart = undefined;
     component.onClick();
-    expect(mockDialog.open).not.toHaveBeenCalled();
+    expect(dialogSpy).not.toHaveBeenCalled();
   });
 
   it('should unsubscribe on destroy', () => {

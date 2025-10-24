@@ -14,7 +14,7 @@ import { MatSort } from '@angular/material/sort';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
-import * as fromActionsReservation from '../../../store/reservation.actions';
+import { deleteReservation, getPage } from '../../../store/reservation.actions';
 import { IReservation, IReservationAll } from '../../../interfaces/reservation';
 import { MatTableDataSource } from '@angular/material/table';
 import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../../interfaces/pagination';
@@ -61,8 +61,8 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
   private authUserServiceSubscription: Subscription;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver,
-              private authUserService: AuthUserService) {
+    private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver,
+    private authUserService: AuthUserService) {
     this.getState = this.store.select(selectReservationState);
     this.dateFormat = this.translate.currentLang;
     this.language = this.translate.currentLang;
@@ -114,15 +114,22 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: reservation }, result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsReservation.DeleteReservation(result.id, result.timestamp, result.room.timeZone),
+          deleteReservation({ id: result.id, timestamp: result.timestamp, timeZone: result.room.timeZone }),
         );
       }
     });
   };
 
   private getReservations = (page: number = 0): void => this.store.dispatch(
-    new fromActionsReservation.GetPage(page, this.sort.active, this.sort.direction, this.pageSize, this.roomId,
-      this.all, this.professionalId),
+    getPage({
+      page,
+      sort: this.sort.active,
+      direction: this.sort.direction,
+      size: this.pageSize,
+      roomId: this.roomId,
+      all: this.all,
+      professionalId: this.professionalId,
+    }),
   );
 
   private createPageSubscriptions = (): void => {

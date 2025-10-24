@@ -11,9 +11,7 @@ describe('TermAndConditionComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TermsAndConditionsComponent, TranslateModule.forRoot()],
     }).compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(TermsAndConditionsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

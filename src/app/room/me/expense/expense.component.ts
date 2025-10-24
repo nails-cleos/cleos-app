@@ -15,7 +15,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectExpenseState } from '../../../store/app.states';
 import { Store } from '@ngrx/store';
-import * as fromActionsExpense from '../../../store/expense.actions';
+import { clean, createExpense, getAllExpensesInfo, getExpense, updateExpense } from '../../../store/expense.actions';
 import { API_LOCALE, createNewDateZonedTime, getNowTimeZone } from '../../../util/dates';
 import { fieldChange, noDuplicateDatesValidator } from '../../../util/validators';
 import { map, startWith } from 'rxjs/operators';
@@ -51,7 +51,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   private readonly language: string = this.translate.currentLang;
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>,
-              private formBuilder: FormBuilder, private route: ActivatedRoute, private router: Router) {
+    private formBuilder: FormBuilder, private route: ActivatedRoute, private router: Router) {
   }
 
   get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl }> {
@@ -84,16 +84,13 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     expense.expenseTotals = this.totals.value;
     expense.date =
       createNewDateZonedTime(this.getForm.date.value, this.expense?.room?.timeZone).toLocaleString(API_LOCALE);
+    const roomId = this.roomId;
 
     if (this.isAddMode) {
-      this.store.dispatch(
-        new fromActionsExpense.CreateExpense(this.roomId, expense),
-      );
+      this.store.dispatch(createExpense({ roomId, expense }));
     } else {
-      expense.id = this.id;
-      this.store.dispatch(
-        new fromActionsExpense.UpdateExpense(this.roomId, expense),
-      );
+      const id = this.id!;
+      this.store.dispatch(updateExpense({ id, roomId, expense }));
     }
     return;
   }
@@ -216,19 +213,15 @@ export class ExpenseComponent implements OnInit, OnDestroy {
   private filterSupplyStore = (name: string): ISupplyStore[] | undefined => this.supplyStores?.filter(
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private getExpenseInfo = (): void => this.store.dispatch(new fromActionsExpense.GetAllExpensesInfo(this.roomId!));
+  private getExpenseInfo = (): void => this.store.dispatch(getAllExpensesInfo({ roomId: this.roomId! }));
 
-  private getExpense = (): void => this.store.dispatch(
-    new fromActionsExpense.GetExpense(this.roomId!, this.id!),
-  );
+  private getExpense = (): void => this.store.dispatch(getExpense({ roomId: this.roomId!, id: this.id! }));
 
   private clean = (): void => {
     for (let i = this.totals.length - 1; i >= 0; i--) {
       this.removeExpense(i);
     }
-    this.store.dispatch(
-      new fromActionsExpense.Clean(),
-    );
+    this.store.dispatch(clean());
   };
 
   private subscribe = (): void => {
@@ -245,7 +238,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         this.getForm.date.setValue(createNewDateZonedTime(this.expense.timestamp, this.expense.room?.timeZone));
         this.removeExpense(0);
         this.expense.expenseTotals.forEach((it, index) => {
-          let btw = '';
+          let btw = '0';
           const total = { net: '', btwValue: '' };
           if (it.btw !== undefined) {
             btw = it.btw.toFixed(2);

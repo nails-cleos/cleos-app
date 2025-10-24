@@ -12,7 +12,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectCurrencyState } from '../store/app.states';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Currency, ICurrency } from '../interfaces/currency';
-import * as fromActionsCurrency from '../store/currency.actions';
+import { clean, createCurrency, getCurrency, updateCurrency } from '../store/currency.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { fieldChange } from '../util/validators';
 import { SharedModule } from '../shared/shared.module';
@@ -62,12 +62,12 @@ export class CurrencyComponent implements OnInit, OnDestroy {
 
     if (this.isAddMode) {
       this.store.dispatch(
-        new fromActionsCurrency.CreateCurrency(currency),
+        createCurrency({ currency }),
       );
     } else {
-      currency.id = this.id;
       this.currency = undefined;
-      this.store.dispatch(new fromActionsCurrency.UpdateCurrency(this.id!, currency));
+      const id = this.id!;
+      this.store.dispatch(updateCurrency({ id, currency }));
     }
     return;
   }
@@ -99,13 +99,11 @@ export class CurrencyComponent implements OnInit, OnDestroy {
     });
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsCurrency.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private getCurrency = (): void => {
     if (!this.currency) {
-      this.store.dispatch(
-        new fromActionsCurrency.GetCurrency(this.id!),
-      );
+      this.store.dispatch(getCurrency({ id: this.id! }));
     }
   };
 

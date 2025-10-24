@@ -2,23 +2,27 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AdditionalComponent } from './additional.component';
 import { Subject } from 'rxjs';
-import { ReactiveFormsModule, UntypedFormBuilder } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ChangeDetectorRef } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import * as fromActionsAdditional from '../store/additional.actions';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { formatDuration } from '../util/dates';
+import { clean, getAdditional, getAllTreatmentsGroup } from '../store/additional.actions';
+import { AppState } from '../store/app.states';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { IGroupService } from '../interfaces/treatment';
 
 describe('AdditionalComponent', () => {
   let component: AdditionalComponent;
   let fixture: ComponentFixture<AdditionalComponent>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockActivatedRoute: any;
-  let mockChangeDetectorRef: jasmine.SpyObj<ChangeDetectorRef>;
-  let stateSubject: Subject<any>;
+
+  let state$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let paramMapSpy: jasmine.SpyObj<ParamMap>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
 
   const mockAdditional = {
     id: '1',
@@ -29,62 +33,61 @@ describe('AdditionalComponent', () => {
   };
 
   beforeEach(async () => {
-    stateSubject = new Subject();
+    state$ = new Subject();
 
-    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-    mockChangeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-
-    mockActivatedRoute = {
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
+    paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
-        paramMap: {
-          get: jasmine.createSpy('get').and.returnValue(null),
-        },
+        paramMap: paramMapSpy,
       },
-    };
+    });
 
-    mockStore.select.and.returnValue(stateSubject.asObservable());
+    storeSpy.select.and.returnValue(state$.asObservable());
+    paramMapSpy.get.and.returnValue(null);
 
     await TestBed.configureTestingModule({
-      imports: [
-        AdditionalComponent,
-        TranslateModule.forRoot(),
-        ReactiveFormsModule,
-        NoopAnimationsModule,
-      ],
+      imports: [AdditionalComponent, TranslateModule.forRoot()],
       providers: [
-        UntypedFormBuilder,
-        { provide: Store, useValue: mockStore },
-        { provide: Router, useValue: mockRouter },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        { provide: ChangeDetectorRef, useValue: mockChangeDetectorRef },
+        { provide: Store, useValue: storeSpy },
+        { provide: Router, useValue: routerSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
       ],
     }).compileComponents();
+
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
 
     fixture = TestBed.createComponent(AdditionalComponent);
     component = fixture.componentInstance;
   });
+
+  afterEach(() => state$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
   it('should initialize in add mode when no id is provided', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(null);
+    paramMapSpy.get.and.returnValue(null);
 
     component.ngOnInit();
 
-    expect(component.isAddMode).toBe(true);
+    expect(component.isAddMode).toBeTrue();
     expect(component.id).toBeUndefined();
   });
 
   it('should initialize in edit mode when id is provided', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
 
     component.ngOnInit();
 
-    expect(component.isAddMode).toBe(false);
+    expect(component.isAddMode).toBeFalse();
     expect(component.id).toBe(testId);
   });
 
@@ -92,32 +95,32 @@ describe('AdditionalComponent', () => {
     component.ngOnInit();
 
     expect(component.form).toBeDefined();
-    expect(component.form.get('name')).toBeDefined();
-    expect(component.form.get('duration')).toBeDefined();
-    expect(component.form.get('description')).toBeDefined();
-    expect(component.form.get('name')?.hasError('required')).toBe(true);
-    expect(component.form.get('duration')?.hasError('required')).toBe(true);
+    expect(component.getForm.name).toBeDefined();
+    expect(component.getForm.duration).toBeDefined();
+    expect(component.getForm.description).toBeDefined();
+    expect(component.getForm.name?.hasError('required')).toBeTrue();
+    expect(component.getForm.duration?.hasError('required')).toBeTrue();
   });
 
   it('should dispatch Clean action on initialization', () => {
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsAdditional.Clean));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch GetAdditional action when in edit mode', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsAdditional.GetAdditional));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAdditional({ id: testId }));
   });
 
   it('should patch form when additional is selected from state', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       selected: mockAdditional,
       groups: [
         { id: 'g1', name: 'Group 1', treatments: [], selectedTreatments: [] },
@@ -126,9 +129,9 @@ describe('AdditionalComponent', () => {
     });
 
     expect(component.additional?.id).toEqual(mockAdditional.id);
-    expect(component.form.get('name')?.value).toBe(mockAdditional.name);
-    expect(component.form.get('description')?.value).toBe(mockAdditional.description);
-    expect(component.form.get('duration')?.value).toBe(formatDuration(mockAdditional.duration!));
+    expect(component.getForm.name?.value).toBe(mockAdditional.name);
+    expect(component.getForm.description?.value).toBe(mockAdditional.description);
+    expect(component.getForm.duration?.value).toBe(formatDuration(mockAdditional.duration!));
     expect(component.groups).toEqual(mockAdditional.groups);
     expect(component.allGroups).toEqual([{ id: 'g2', name: 'Group 2', treatments: [], selectedTreatments: [] }]);
   });
@@ -141,63 +144,99 @@ describe('AdditionalComponent', () => {
       { field: 'duration', message: 'Duration is required' },
     ];
 
-    stateSubject.next({
+    state$.next({
       subErrors: mockErrors,
     });
 
     expect(component.errors['name']).toBe('Name is required');
-    expect(component.form.get('name')?.hasError('incorrect')).toBe(true);
+    expect(component.getForm.name?.hasError('incorrect')).toBeTrue();
     expect(component.errors['duration']).toBe('Duration is required');
-    expect(component.form.get('duration')?.hasError('incorrect')).toBe(true);
+    expect(component.getForm.duration?.hasError('incorrect')).toBeTrue();
   });
 
   it('should navigate to additional list on successful response', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith([component['language'], 'additional']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'additional']);
   });
 
   it('should not dispatch action when form is invalid', () => {
     component.ngOnInit();
-    component.form.get('name')?.setValue('');
-    component.form.get('duration')?.setValue('');
-    mockStore.dispatch.calls.reset();
+    component.getForm.name?.setValue('');
+    component.getForm.duration?.setValue('');
+    storeSpy.dispatch.calls.reset();
 
     void component.submit;
 
-    expect(mockStore.dispatch).not.toHaveBeenCalled();
+    expect(storeSpy.dispatch).not.toHaveBeenCalled();
   });
 
   it('should dispatch CreateAdditional action when in add mode and form is valid', () => {
     component.ngOnInit();
-    component.form.get('name')?.setValue('New Additional');
-    component.form.get('description')?.setValue('New Description');
-    component.form.get('duration')?.setValue('PT30M');
-    mockStore.dispatch.calls.reset();
+    const nameControl = component.getForm.name!;
+    const descriptionControl = component.getForm.description!;
+    const durationControl = component.getForm.duration!;
+
+    nameControl.setValue('New Additional');
+    nameControl.markAsDirty();
+
+    descriptionControl.setValue('New Description');
+    descriptionControl.markAsDirty();
+
+    durationControl.setValue('00:30');
+    durationControl.markAsDirty();
+    storeSpy.dispatch.calls.reset();
+    expect(component.form.valid).toBeTrue();
 
     void component.submit;
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsAdditional.CreateAdditional));
+    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
+    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+      additional: jasmine.objectContaining({
+        name: 'New Additional',
+        description: 'New Description',
+        duration: '00:30',
+      }),
+      type: '[Additional] create additional',
+    }));
   });
 
   it('should dispatch UpdateAdditional action when in edit mode and form is valid', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
     component.additional = mockAdditional;
 
     component.ngOnInit();
-    component.form.get('name')?.setValue('Updated Additional');
-    component.form.get('description')?.setValue('Updated Description');
-    component.form.get('duration')?.setValue('PT45M');
-    mockStore.dispatch.calls.reset();
+    const nameControl = component.getForm.name!;
+    const descriptionControl = component.getForm.description!;
+    const durationControl = component.getForm.duration!;
+
+    nameControl.setValue('Updated Additional');
+    nameControl.markAsDirty();
+
+    descriptionControl.setValue('Updated Description');
+    descriptionControl.markAsDirty();
+
+    durationControl.setValue('00:45');
+    durationControl.markAsDirty();
+    storeSpy.dispatch.calls.reset();
 
     void component.submit;
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsAdditional.UpdateAdditional));
+    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
+    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+      id: '123',
+      additional: jasmine.objectContaining({
+        description: 'Updated Description',
+        duration: '00:45',
+        name: 'Updated Additional',
+      }),
+      type: '[Additional] Update additional by id',
+    }));
   });
 
   it('should return form controls from getForm getter', () => {
@@ -223,27 +262,27 @@ describe('AdditionalComponent', () => {
   });
 
   it('should call detectChanges when needed', () => {
-    expect(mockChangeDetectorRef.detectChanges).not.toHaveBeenCalled();
+    expect(changeDetectorRefSpy.detectChanges).not.toHaveBeenCalled();
   });
 
   it('should handle undefined additional in edit mode', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
     component.additional = undefined;
 
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsAdditional.GetAdditional));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAdditional({ id: testId }));
   });
 
   it('should clear additional when updating in edit mode', () => {
     const testId = '123';
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue(testId);
+    paramMapSpy.get.and.returnValue(testId);
     component.additional = mockAdditional;
 
     component.ngOnInit();
-    component.form.get('name')?.setValue('Updated Additional');
-    component.form.get('duration')?.setValue('PT30M');
+    component.getForm.name?.setValue('Updated Additional');
+    component.getForm.duration?.setValue('PT30M');
 
     void component.submit;
 
@@ -253,44 +292,44 @@ describe('AdditionalComponent', () => {
   it('should initialize form with empty values', () => {
     component.ngOnInit();
 
-    expect(component.form.get('name')?.value).toBe('');
-    expect(component.form.get('description')?.value).toBe('');
-    expect(component.form.get('duration')?.value).toBe('');
+    expect(component.getForm.name?.value).toBe('');
+    expect(component.getForm.description?.value).toBe('');
+    expect(component.getForm.duration?.value).toBe('');
   });
 
   it('should validate form correctly', () => {
     component.ngOnInit();
 
-    expect(component.form.invalid).toBe(true);
+    expect(component.form.invalid).toBeTrue();
 
-    component.form.get('name')?.setValue('Test Name');
-    component.form.get('duration')?.setValue('PT30M');
-    expect(component.form.valid).toBe(true);
+    component.getForm.name?.setValue('Test Name');
+    component.getForm.duration?.setValue('PT30M');
+    expect(component.form.valid).toBeTrue();
   });
 
   it('should handle state subscription correctly', () => {
     component.ngOnInit();
 
-    expect(mockStore.select).toHaveBeenCalled();
+    expect(storeSpy.select).toHaveBeenCalled();
   });
 
   it('should clean state and get additional list on response', () => {
     component.ngOnInit();
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
-    stateSubject.next({
+    state$.next({
       response: true,
     });
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith([component['language'], 'additional']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'additional']);
   });
 
   it('should dispatch GetAllTreatmentsGroup action when findGroups is called', () => {
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
 
     component['findGroups']();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsAdditional.GetAllTreatmentsGroup));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllTreatmentsGroup());
   });
 
   it('should filter groups correctly when filterGroup is called', () => {
@@ -317,9 +356,9 @@ describe('AdditionalComponent', () => {
 
   it('should filter group options based on form input', (done) => {
     component.allGroups = [
-      { name: 'Test Group 1', id: '1', treatments: [], selectedTreatments: []  },
-      { name: 'Another Group', id: '2', treatments: [], selectedTreatments: []  },
-      { name: 'Test Group 2', id: '3', treatments: [], selectedTreatments: []  },
+      { name: 'Test Group 1', id: '1', treatments: [], selectedTreatments: [] },
+      { name: 'Another Group', id: '2', treatments: [], selectedTreatments: [] },
+      { name: 'Test Group 2', id: '3', treatments: [], selectedTreatments: [] },
     ] as any[];
     component['createForm']();
 
@@ -329,26 +368,51 @@ describe('AdditionalComponent', () => {
       // Skip the first emission (startWith('')) and check the second emission with 'T'
       if (emissionCount === 2) {
         expect(filtered).toEqual([
-          { name: 'Test Group 1', id: '1', treatments: [], selectedTreatments: []  },
-          { name: 'Test Group 2', id: '3', treatments: [], selectedTreatments: []  },
+          { name: 'Test Group 1', id: '1', treatments: [], selectedTreatments: [] },
+          { name: 'Test Group 2', id: '3', treatments: [], selectedTreatments: [] },
         ]);
         done();
       }
     });
 
-    component.form.get('group')?.setValue('T');
+    component.getForm.group?.setValue('T');
+  });
+
+  it('should handle group object input in filtered options', (done) => {
+    component.allGroups = [
+      { name: 'Test Group 1', id: '1', treatments: [], selectedTreatments: [] },
+      { name: 'Another Group', id: '2', treatments: [], selectedTreatments: [] },
+      { name: 'Test Group 2', id: '3', treatments: [], selectedTreatments: [] },
+    ] as any[];
+    component['createForm']();
+
+    let emissionCount = 0;
+    component.filteredGroup?.subscribe(filtered => {
+      emissionCount++;
+      // Skip the first emission (startWith('')) and check the second emission with 'T'
+      if (emissionCount === 2) {
+        expect(filtered).toEqual([
+          { name: 'Test Group 2', id: '3', treatments: [], selectedTreatments: [] },
+        ]);
+        done();
+      }
+    });
+
+    component.getForm.group?.setValue({ name: 'Test Group 2', id: '3', treatments: [], selectedTreatments: [] });
   });
 
   it('should sort allGroups alphabetically by name', () => {
     const allGroups = [
-      { name: 'Beta Group', id: '2', treatments: [], selectedTreatments: []  },
-      { name: 'Alpha Group', id: '1', treatments: [], selectedTreatments: []  },
-      { name: 'Gamma Group', id: '3', treatments: [], selectedTreatments: []  },
+      { name: 'Beta Group', id: '2', treatments: [], selectedTreatments: [] },
+      { name: 'Alpha Group', id: '1', treatments: [], selectedTreatments: [] },
+      { name: 'Alpha Group', id: '4', treatments: [], selectedTreatments: [] },
+      { name: 'Gamma Group', id: '3', treatments: [], selectedTreatments: [] },
     ] as any[];
     const response = component.sortGroups(allGroups);
     expect(response[0].name).toBe('Alpha Group');
-    expect(response[1].name).toBe('Beta Group');
-    expect(response[2].name).toBe('Gamma Group');
+    expect(response[1].name).toBe('Alpha Group');
+    expect(response[2].name).toBe('Beta Group');
+    expect(response[3].name).toBe('Gamma Group');
   });
 
   it('should remove a group correctly', () => {
@@ -365,6 +429,33 @@ describe('AdditionalComponent', () => {
     expect(component.groups[0].id).toBe('g1');
     expect(component.allGroups?.length).toBe(1);
     expect(component.allGroups?.[0].id).toBe('g2');
-    expect(component.form.get('group')?.value).toBe(null);
+    expect(component.getForm.group?.value).toBe(null);
+  });
+
+  it('should add selected group and clear input', () => {
+    component.ngOnInit();
+
+    const mockGroup = { id: '1', name: 'service 1', treatments: [], selectedTreatments: [] } as IGroupService;
+    component.groups = [];
+    component.allGroups = [
+      { id: '1', name: 'service 1', treatments: [], selectedTreatments: [] } as IGroupService,
+      { id: '2', name: 'service 2', treatments: [], selectedTreatments: [] } as IGroupService,
+    ];
+
+    const mockInputEl = { value: '' };
+    component.groupInput = { nativeElement: mockInputEl } as any;
+    component.getForm.group = { setValue: jasmine.createSpy('setValue') } as any;
+
+    const mockEvent = {
+      option: { value: mockGroup },
+    } as unknown as MatAutocompleteSelectedEvent;
+
+    component.selectedGroup(mockEvent);
+
+    expect(component.groups).toContain(mockGroup);
+    expect(component.allGroups)
+      .toEqual([{ id: '2', name: 'service 2', treatments: [], selectedTreatments: [] } as IGroupService]);
+    expect(mockInputEl.value).toBe('');
+    expect(component.getForm.group.setValue).toHaveBeenCalledWith(null);
   });
 });

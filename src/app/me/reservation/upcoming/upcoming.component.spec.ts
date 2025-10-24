@@ -1,21 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UpcomingComponent } from './upcoming.component';
-import { TranslateService } from '@ngx-translate/core';
-import { MatDialog } from '@angular/material/dialog';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { IUpcomingAll } from '../../../interfaces/reservation';
 import { Price } from '../../../interfaces/treatment';
 import { ServiceType } from '../../../interfaces/room';
 import { Role } from '../../../interfaces/token';
 import { ICurrencyAll } from '../../../interfaces/currency';
-import { of } from 'rxjs';
 
 describe('UpcomingComponent', () => {
   let component: UpcomingComponent;
   let fixture: ComponentFixture<UpcomingComponent>;
-  let translateSpyObj: jasmine.SpyObj<TranslateService>;
-  let dialogSpyObj: jasmine.SpyObj<MatDialog>;
   let routerSpyObj: jasmine.SpyObj<Router>;
+  let dialogSpy: jasmine.Spy<any>;
 
   const currency: ICurrencyAll = {
     id: '1',
@@ -95,47 +92,24 @@ describe('UpcomingComponent', () => {
   };
 
   beforeEach(async () => {
-    translateSpyObj = jasmine.createSpyObj('TranslateService', ['instant', 'get'], {
-      currentLang: 'en-GB',
-    });
-
-    // Mock the get method to return an observable for any key
-    translateSpyObj.get.and.callFake((key: string) => of(`mocked translation for ${key}`));
-    translateSpyObj.instant.and.callFake((key: string) => `mocked instant translation for ${key}`);
-
-    dialogSpyObj = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
-
-    // Create proper subject spies
-    const afterOpenedSpy = jasmine.createSpyObj('Subject', ['next', 'asObservable']);
-    afterOpenedSpy.asObservable.and.returnValue({ subscribe: jasmine.createSpy() });
-
-    const afterAllClosedSpy = jasmine.createSpyObj('Subject', ['next', 'asObservable']);
-    afterAllClosedSpy.asObservable.and.returnValue({ subscribe: jasmine.createSpy() });
-
-    Object.defineProperty(dialogSpyObj, 'openDialogs', { value: [] });
-    Object.defineProperty(dialogSpyObj, 'afterOpened', { value: afterOpenedSpy });
-    Object.defineProperty(dialogSpyObj, 'afterAllClosed', { value: afterAllClosedSpy });
-
-    dialogSpyObj.open.and.returnValue({
-      afterClosed: jasmine.createSpy().and.returnValue(of(null)),
-      close: jasmine.createSpy(),
-      componentInstance: {},
-    } as any);
-
     routerSpyObj = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
 
     await TestBed.configureTestingModule({
-      imports: [UpcomingComponent],
+      imports: [UpcomingComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: TranslateService, useValue: translateSpyObj },
-        { provide: MatDialog, useValue: dialogSpyObj },
         { provide: Router, useValue: routerSpyObj },
       ],
     }).compileComponents();
 
+    const translateService = TestBed.inject(TranslateService);
+    translateService.setDefaultLang('en-GB');
+    translateService.use('en-GB');
+
     fixture = TestBed.createComponent(UpcomingComponent);
     component = fixture.componentInstance;
     component.small = false;
+
+    dialogSpy = spyOn(component.dialog, 'open');
   });
 
   it('should create', () => {
@@ -167,5 +141,21 @@ describe('UpcomingComponent', () => {
     const reservationDate = new Date();
     component.upcoming = upcoming;
     expect(() => component.openDialog(reservationDate)).not.toThrowError();
+  });
+
+  it('should open dialog when openDialog is called', () => {
+    const reservationDate = new Date();
+    component.upcoming = upcoming;
+    component.openDialog(reservationDate);
+    expect(dialogSpy).toHaveBeenCalledWith(
+      jasmine.any(Function),
+      {
+        data: {
+          title: 'COMMON.TIME_ZONE.TITLE',
+          content: 'COMMON.TIME_ZONE.ROOM_INFO',
+          hideNoButton: true,
+          hideOkButton: true,
+        },
+      });
   });
 });

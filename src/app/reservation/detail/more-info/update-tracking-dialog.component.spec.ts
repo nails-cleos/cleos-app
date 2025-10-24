@@ -7,6 +7,7 @@ import { UpdateTrackingDialogComponent } from './update-tracking-dialog.componen
 describe('UpdateTrackingDialogComponent', () => {
   let component: UpdateTrackingDialogComponent;
   let fixture: ComponentFixture<UpdateTrackingDialogComponent>;
+
   let dialogRefSpy: jasmine.SpyObj<MatDialogRef<UpdateTrackingDialogComponent>>;
 
   const mockTimestamps = {

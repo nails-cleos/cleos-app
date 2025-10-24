@@ -1,26 +1,33 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CdkDragDrop, CdkDropList, DragDropModule } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { TranslateModule } from '@ngx-translate/core';
-import { Subject } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { ChangeDetectorRef, QueryList } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { ICatalogueAll } from '../../interfaces/catalogue';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import * as fromActionsCatalogue from '../../store/catalogue.actions';
+import {
+  catalogueSelected,
+  clean,
+  deleteCatalogue,
+  getAllCatalogues,
+  updateCatalogueOrder,
+} from '../../store/catalogue.actions';
 import { CataloguesComponent } from './catalogues.component';
+import { AppState } from '../../store/app.states';
 
 describe('CataloguesComponent', () => {
   let component: CataloguesComponent;
   let fixture: ComponentFixture<CataloguesComponent>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let mockDialog: jasmine.SpyObj<MatDialog>;
-  let mockBreakpointObserver: jasmine.SpyObj<BreakpointObserver>;
-  let mockChangeDetectorRef: jasmine.SpyObj<ChangeDetectorRef>;
-  let mockActivatedRoute: jasmine.SpyObj<ActivatedRoute>;
-  let stateSubject: Subject<any>;
+
+  let state$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
+  let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let dialogSpy: jasmine.Spy<any>;
 
   const mockCatalogues: ICatalogueAll[] = [
     {
@@ -48,44 +55,39 @@ describe('CataloguesComponent', () => {
   ];
 
   beforeEach(async () => {
-    stateSubject = new Subject();
+    state$ = new Subject();
 
-    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    mockDialog = jasmine.createSpyObj('MatDialog', ['open'], {
-      openDialogs: [],
-      afterOpened: new Subject(),
-      afterAllClosed: new Subject(),
-    });
-    mockBreakpointObserver = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    mockChangeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-    mockActivatedRoute = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: { params: {}, queryParams: {} },
-      params: new Subject(),
-      queryParams: new Subject(),
+    const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      snapshot: {
+        paramMap: paramMapSpy,
+      },
     });
 
-    mockStore.select.and.returnValue(stateSubject.asObservable());
-    mockBreakpointObserver.observe.and.returnValue(stateSubject.asObservable());
+    storeSpy.select.and.returnValue(state$.asObservable());
+    breakpointObserverSpy.observe.and.returnValue(state$.asObservable());
+    paramMapSpy.get.and.returnValue(null);
 
     await TestBed.configureTestingModule({
-      imports: [
-        CataloguesComponent,
-        TranslateModule.forRoot(),
-        NoopAnimationsModule,
-        DragDropModule,
-      ],
+      imports: [CataloguesComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: mockStore },
-        { provide: MatDialog, useValue: mockDialog },
-        { provide: BreakpointObserver, useValue: mockBreakpointObserver },
-        { provide: ChangeDetectorRef, useValue: mockChangeDetectorRef },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: Store, useValue: storeSpy },
+        { provide: BreakpointObserver, useValue: breakpointObserverSpy },
+        { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CataloguesComponent);
     component = fixture.componentInstance;
+
+    dialogSpy = spyOn(component.dialog, 'open');
   });
+
+  afterEach(() => state$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -102,19 +104,19 @@ describe('CataloguesComponent', () => {
   it('should dispatch Clean action on initialization', () => {
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.Clean));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch GetAllCatalogues action on initialization', () => {
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.GetAllCatalogues));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllCatalogues());
   });
 
   it('should update catalogues when state changes with data', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       data: mockCatalogues,
     });
 
@@ -131,7 +133,7 @@ describe('CataloguesComponent', () => {
 
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       data: cataloguesWithBlob,
     });
 
@@ -144,7 +146,7 @@ describe('CataloguesComponent', () => {
 
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       response: true,
     });
 
@@ -157,13 +159,7 @@ describe('CataloguesComponent', () => {
 
     component.edit(testCatalogue);
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.CatalogueSelected));
-  });
-
-  it('should call delete method without errors', () => {
-    const testCatalogue = mockCatalogues[0];
-
-    expect(() => component.delete(testCatalogue)).not.toThrow();
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(catalogueSelected({ selected: testCatalogue }));
   });
 
   it('should dispatch UpdateCatalogueOrder action when finish is called', () => {
@@ -171,7 +167,7 @@ describe('CataloguesComponent', () => {
 
     void component.finish;
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsCatalogue.UpdateCatalogueOrder));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(updateCatalogueOrder({ catalogues: mockCatalogues }));
   });
 
   it('should handle drag and drop correctly', () => {
@@ -205,7 +201,7 @@ describe('CataloguesComponent', () => {
   it('should set up drops array after view init', () => {
     const mockDropList = {} as CdkDropList;
     const mockQueryList = {
-      changes: stateSubject.asObservable(),
+      changes: state$.asObservable(),
       toArray: jasmine.createSpy('toArray').and.returnValue([mockDropList]),
     } as unknown as QueryList<CdkDropList>;
 
@@ -223,27 +219,27 @@ describe('CataloguesComponent', () => {
     const mockDropList1 = {} as CdkDropList;
     const mockDropList2 = {} as CdkDropList;
     const mockQueryList = {
-      changes: stateSubject.asObservable(),
+      changes: state$.asObservable(),
       toArray: jasmine.createSpy('toArray').and.returnValue([mockDropList1, mockDropList2]),
     } as unknown as QueryList<CdkDropList>;
 
     component.dropsQuery = mockQueryList;
     component.ngAfterViewInit();
 
-    stateSubject.next(null);
+    state$.next(null);
 
     expect(component.drops).toEqual([mockDropList1, mockDropList2]);
   });
 
 
   it('should select catalogue state in constructor', () => {
-    expect(mockStore.select).toHaveBeenCalled();
+    expect(storeSpy.select).toHaveBeenCalled();
   });
 
   it('should handle state with no data gracefully', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       data: null,
     });
 
@@ -253,10 +249,35 @@ describe('CataloguesComponent', () => {
   it('should handle empty catalogues array', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       data: [],
     });
 
     expect(component.catalogues).toEqual([]);
+  });
+
+  it('should call delete method without errors', () => {
+    component.ngOnInit();
+    const testCatalogue = mockCatalogues[0];
+
+    dialogSpy.and.returnValue({
+      afterClosed: () => of(testCatalogue),
+    });
+
+    component.delete(testCatalogue);
+
+    expect(dialogSpy).toHaveBeenCalledWith(
+      jasmine.any(Function),
+      jasmine.objectContaining({
+        data: {
+          title: 'CATALOGUE.DELETED.TITLE',
+          content: 'CATALOGUE.DELETED.CONTENT',
+          value: testCatalogue,
+        },
+      }));
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteCatalogue(
+      { id: testCatalogue.id!, name: testCatalogue.name! },
+    ));
   });
 });

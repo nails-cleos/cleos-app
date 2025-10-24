@@ -1,9 +1,9 @@
-import { Action } from '@ngrx/store';
-import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { createAction, props } from '@ngrx/store';
+import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
 import { ICurrency } from '../interfaces/currency';
 import { Pagination } from '../interfaces/pagination';
 
-export enum CurrencyActionTypes {
+enum CurrencyActionTypes {
   getCurrenciesPage = '[Currency] Get currencies page',
   currencySuccess = '[Currency] Success',
   createCurrency = '[Currency] Create currency',
@@ -16,75 +16,51 @@ export enum CurrencyActionTypes {
   clean = '[Currency] Clean'
 }
 
-export class GetCurrenciesPage extends PageRequest implements Action {
-  readonly type = CurrencyActionTypes.getCurrenciesPage;
-}
+export const getCurrenciesPage = createAction(
+  CurrencyActionTypes.getCurrenciesPage,
+  props<PageRequest>(),
+);
 
-export class CurrencySuccess implements Action {
-  readonly type = CurrencyActionTypes.currencySuccess;
+export const currencySuccess = createAction(
+  CurrencyActionTypes.currencySuccess,
+  props<{ data: Pagination<ICurrency> }>(),
+);
 
-  constructor(public data: Pagination<ICurrency>) {
-  }
-}
+export const createCurrency = createAction(
+  CurrencyActionTypes.createCurrency,
+  props<{ currency: ICurrency }>(),
+);
 
-export class CreateCurrency implements Action {
-  readonly type = CurrencyActionTypes.createCurrency;
+export const updateCurrency = createAction(
+  CurrencyActionTypes.updateCurrency,
+  props<{ id: string; currency: ICurrency }>(),
+);
 
-  constructor(public currency: ICurrency) {
-  }
-}
+export const currencySaveSuccess = createAction(
+  CurrencyActionTypes.currencySaveSuccess,
+  props<IResponseSuccess>(),
+);
 
-export class UpdateCurrency implements Action {
-  readonly type = CurrencyActionTypes.updateCurrency;
+export const currencyFailure = createAction(
+  CurrencyActionTypes.currencyFailure,
+  props<{ error: IError }>(),
+);
 
-  constructor(public id: string, public currency: ICurrency) {
-  }
-}
+export const currencySelected = createAction(
+  CurrencyActionTypes.currencySelected,
+  props<{ selected?: ICurrency }>(),
+);
 
-export class CurrencySaveSuccess extends ResponseSuccess implements Action {
-  readonly type = CurrencyActionTypes.currencySaveSuccess;
-}
+export const getCurrency = createAction(
+  CurrencyActionTypes.getCurrency,
+  props<{ id: string }>(),
+);
 
-export class CurrencyFailure implements Action {
-  readonly type = CurrencyActionTypes.currencyFailure;
+export const deleteCurrency = createAction(
+  CurrencyActionTypes.deleteCurrency,
+  props<{ id: string; code: string }>(),
+);
 
-  constructor(public error: IError) {
-  }
-}
-
-export class CurrencySelected implements Action {
-  readonly type = CurrencyActionTypes.currencySelected;
-
-  constructor(public selected?: ICurrency) {
-  }
-}
-
-export class GetCurrency implements Action {
-  readonly type = CurrencyActionTypes.getCurrency;
-
-  constructor(public id: string) {
-  }
-}
-
-export class DeleteCurrency implements Action {
-  readonly type = CurrencyActionTypes.deleteCurrency;
-
-  constructor(public id: string, public code: string) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = CurrencyActionTypes.clean;
-}
-
-export type All =
-  | GetCurrenciesPage
-  | CreateCurrency
-  | UpdateCurrency
-  | CurrencySuccess
-  | CurrencySaveSuccess
-  | CurrencyFailure
-  | GetCurrency
-  | CurrencySelected
-  | DeleteCurrency
-  | Clean;
+export const clean = createAction(
+  CurrencyActionTypes.clean,
+);

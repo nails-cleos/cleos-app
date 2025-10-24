@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { Observable, EMPTY } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
 
 import { MessagingService } from './messaging.service';
 import { Store } from '@ngrx/store';
@@ -8,7 +8,7 @@ import { Messaging } from '@angular/fire/messaging';
 import { Auth } from '@angular/fire/auth';
 import { Database } from '@angular/fire/database';
 import { AppCheck } from '@angular/fire/app-check';
-import * as fromActionsNotification from '../store/notification.actions';
+import { subscribeNotification } from '../store/notification.actions';
 
 describe('MessagingService', () => {
   let service: MessagingService;
@@ -56,10 +56,9 @@ describe('MessagingService', () => {
 
   describe('updateToken', () => {
     beforeEach(() => {
-      // Spy on the service methods to avoid Firebase calls
-      spyOn(service, 'updateToken').and.callFake((user: any, token: string) => {
+      spyOn(service, 'updateToken').and.callFake((_: any, token: string) => {
         if (authSpy.currentUser) {
-          storeSpy.dispatch(new fromActionsNotification.SubscribeNotification(token));
+          storeSpy.dispatch(subscribeNotification({ token }));
         }
       });
     });
@@ -71,9 +70,7 @@ describe('MessagingService', () => {
       service.updateToken(mockUser, token);
 
       expect(service.updateToken).toHaveBeenCalledWith(mockUser, token);
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        new fromActionsNotification.SubscribeNotification(token),
-      );
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(subscribeNotification({ token }));
     });
 
     it('should not dispatch action when user is not authenticated', () => {
@@ -159,10 +156,9 @@ describe('MessagingService', () => {
 
   describe('store integration', () => {
     beforeEach(() => {
-      // Spy on updateToken to avoid Firebase calls for integration tests
-      spyOn(service, 'updateToken').and.callFake((user: any, token: string) => {
+      spyOn(service, 'updateToken').and.callFake((_: any, token: string) => {
         if (authSpy.currentUser) {
-          storeSpy.dispatch(new fromActionsNotification.SubscribeNotification(token));
+          storeSpy.dispatch(subscribeNotification({ token }));
         }
       });
     });
@@ -173,21 +169,7 @@ describe('MessagingService', () => {
 
       service.updateToken(mockUser, token);
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        jasmine.any(fromActionsNotification.SubscribeNotification),
-      );
-    });
-
-    it('should create correct notification action with token', () => {
-      const token = 'specific-token-123';
-      authSpy.currentUser = { id: 'user' };
-
-      service.updateToken(mockUser, token);
-
-      const dispatchCall = storeSpy.dispatch.calls.mostRecent();
-      const action = dispatchCall.args[0] as unknown as fromActionsNotification.SubscribeNotification;
-      expect(action).toBeInstanceOf(fromActionsNotification.SubscribeNotification);
-      expect(action.token).toBe(token);
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(subscribeNotification({ token }));
     });
   });
 

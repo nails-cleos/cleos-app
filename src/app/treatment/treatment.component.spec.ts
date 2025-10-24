@@ -1,43 +1,47 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TreatmentComponent } from './treatment.component';
-import { of } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { AppState } from '../store/app.states';
 
 describe('TreatmentComponent', () => {
   let component: TreatmentComponent;
   let fixture: ComponentFixture<TreatmentComponent>;
 
-  const mockStore = {
-    select: jasmine.createSpy('select').and.returnValue(of({})),
-    dispatch: jasmine.createSpy('dispatch'),
-  };
+  let state$: Subject<any>;
 
-  const mockActivatedRoute = {
-    snapshot: {
-      paramMap: {
-        get: jasmine.createSpy('get').and.returnValue(null),
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+
+  beforeEach(async () => {
+    state$ = new Subject();
+
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      snapshot: {
+        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
       },
-    },
-  };
+    });
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+    storeSpy.select.and.returnValue(state$.asObservable());
+
+    await TestBed.configureTestingModule({
       imports: [TreatmentComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: mockStore },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: Store, useValue: storeSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
     }).compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(TreatmentComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
+
+  afterEach(() => state$.complete());
 
   it('should compile', () => {
     expect(component).toBeTruthy();

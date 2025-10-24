@@ -1,10 +1,9 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
 import { IAccount, ITransaction } from '../interfaces/account';
-import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
 import { IPaymentOption } from '../interfaces/payment';
-import { SortDirection } from '@angular/material/sort';
 
-export enum AccountActionTypes {
+enum AccountActionTypes {
   accountSuccess = '[Account] Success',
   createTransaction = '[Account] Save',
   updateAccount = '[Account] Update account by id',
@@ -21,109 +20,70 @@ export enum AccountActionTypes {
   clean = '[Account] Clean'
 }
 
-export class AccountSuccess implements Action {
-  readonly type = AccountActionTypes.accountSuccess;
+export const accountSuccess = createAction(
+  AccountActionTypes.accountSuccess,
+  props<{ data: ITransaction[] }>(),
+);
 
-  constructor(public data: ITransaction[]) {
-  }
-}
+export const paymentOptionsSuccess = createAction(
+  AccountActionTypes.paymentOptionsSuccess,
+  props<{ paymentOptions?: IPaymentOption[] }>(),
+);
 
-export class PaymentOptionsSuccess implements Action {
-  readonly type = AccountActionTypes.paymentOptionsSuccess;
+export const createTransaction = createAction(
+  AccountActionTypes.createTransaction,
+  props<{ id: string; transaction: ITransaction }>(),
+);
 
-  constructor(public paymentOptions?: IPaymentOption[]) {
-  }
-}
+export const updateAccount = createAction(
+  AccountActionTypes.updateAccount,
+  props<{ id: string; transaction: ITransaction; customerId: string }>(),
+);
 
-export class CreateTransaction implements Action {
-  readonly type = AccountActionTypes.createTransaction;
+export const accountSaveSuccess = createAction(
+  AccountActionTypes.accountSaveSuccess,
+  props<IResponseSuccess>(),
+);
 
-  constructor(public id: string, public transaction: ITransaction) {
-  }
-}
+export const accountFailure = createAction(
+  AccountActionTypes.accountFailure,
+  props<{ error: IError }>(),
+);
 
-export class UpdateAccount implements Action {
-  readonly type = AccountActionTypes.updateAccount;
+export const accountSelected = createAction(
+  AccountActionTypes.accountSelected,
+  props<{ selected?: IAccount | ITransaction }>(),
+);
 
-  constructor(public id: string, public transaction: ITransaction, public customerId: string) {
-  }
-}
+export const getAccount = createAction(
+  AccountActionTypes.getAccount,
+  props<{ id: string }>(),
+);
 
-export class AccountSaveSuccess extends ResponseSuccess implements Action {
-  readonly type = AccountActionTypes.accountSaveSuccess;
-}
+export const paymentOptions = createAction(
+  AccountActionTypes.paymentOptions,
+);
 
-export class AccountFailure implements Action {
-  readonly type = AccountActionTypes.accountFailure;
+export const paymentSend = createAction(
+  AccountActionTypes.paymentSend,
+  props<{ link: string }>(),
+);
 
-  constructor(public error: IError) {
-  }
-}
+export const getTransactionsByAccountId = createAction(
+  AccountActionTypes.getTransactionsByAccountId,
+  props<PageRequest & { id: string }>(),
+);
 
-export class AccountSelected implements Action {
-  readonly type = AccountActionTypes.accountSelected;
+export const getTransaction = createAction(
+  AccountActionTypes.getTransaction,
+  props<{ id: string; transactionId: string }>(),
+);
 
-  constructor(public selected?: IAccount | ITransaction) {
-  }
-}
+export const getAccountByCustomerId = createAction(
+  AccountActionTypes.getAccountByCustomerId,
+  props<{ customerId: string }>(),
+);
 
-export class GetAccount implements Action {
-  readonly type = AccountActionTypes.getAccount;
-
-  constructor(public id: string) {
-  }
-}
-
-export class PaymentOptions implements Action {
-  readonly type = AccountActionTypes.paymentOptions;
-}
-
-export class PaymentSend implements Action {
-  readonly type = AccountActionTypes.paymentSend;
-
-  constructor(public link: string) {
-  }
-}
-
-export class GetTransactionsByAccountId extends PageRequest implements Action {
-  readonly type = AccountActionTypes.getTransactionsByAccountId;
-
-  constructor(public id: string, public page: number, public sort: string, public direction: SortDirection,
-              public size: number) {
-    super(page, sort, direction, size);
-  }
-}
-
-export class GetTransaction implements Action {
-  readonly type = AccountActionTypes.getTransaction;
-
-  constructor(public id: string, public transactionId: string) {
-  }
-}
-
-export class GetAccountByCustomerId implements Action {
-  readonly type = AccountActionTypes.getAccountByCustomerId;
-
-  constructor(public customerId: string) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = AccountActionTypes.clean;
-}
-
-export type All =
-  | CreateTransaction
-  | UpdateAccount
-  | AccountSuccess
-  | AccountSaveSuccess
-  | AccountFailure
-  | GetAccount
-  | GetTransactionsByAccountId
-  | GetAccountByCustomerId
-  | AccountSelected
-  | PaymentOptions
-  | PaymentOptionsSuccess
-  | PaymentSend
-  | GetTransaction
-  | Clean;
+export const clean = createAction(
+  AccountActionTypes.clean,
+);

@@ -1,9 +1,26 @@
+import { createReducer, on } from '@ngrx/store';
 import { Pagination } from '../../interfaces/pagination';
-import { All, UnavailableActionTypes } from '../unavailable.actions';
 import { IUnavailable } from '../../interfaces/unavailable';
 import { IUser } from '../../interfaces/user';
 import { IRoom } from '../../interfaces/room';
 import { IError, IResponseSuccess } from '../../interfaces/common';
+import {
+  clean,
+  createBlockAgenda,
+  createUnavailable,
+  deleteUnavailable,
+  getAllProfessional,
+  getAllRoomsByProfessionalId,
+  getUnavailable,
+  getUnavailablePage,
+  professionalSuccess,
+  roomSuccess,
+  unavailableFailure,
+  unavailableSaveSuccess,
+  unavailableSelected,
+  unavailableSuccess,
+  updateUnavailable,
+} from '../unavailable.actions';
 
 export interface State {
   response?: IResponseSuccess;
@@ -29,119 +46,88 @@ export const initialState: State = {
   isLoading: false,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case UnavailableActionTypes.getUnavailablePage: {
-      return {
-        ...state,
-        data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IUnavailable>,
-        errorMessage: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case UnavailableActionTypes.getAllProfessional: {
-      return {
-        ...state,
-        professionals: undefined,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case UnavailableActionTypes.getAllRoomsByProfessionalId: {
-      return {
-        ...state,
-        rooms: undefined,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case UnavailableActionTypes.getUnavailable: {
-      return {
-        ...state,
-        selected: {} as IUnavailable,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case UnavailableActionTypes.unavailableSuccess: {
-      return {
-        ...state,
-        data: action.data,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case UnavailableActionTypes.professionalSuccess: {
-      return {
-        ...state,
-        professionals: action.professionals,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case UnavailableActionTypes.unavailableSaveSuccess: {
-      return {
-        ...state,
-        response: action,
-        selected: undefined,
-        errorMessage: undefined,
-        subErrors: undefined,
-        isLoading: false,
-      };
-    }
-    case UnavailableActionTypes.unavailableSelected: {
-      return {
-        ...state,
-        selected: action.selected,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case UnavailableActionTypes.unavailableFailure: {
-      return {
-        ...state,
-        errorMessage: action.error.message,
-        error: action.error,
-        subErrors: action.error.subErrors,
-        response: undefined,
-        isLoading: false,
-      };
-    }
-    case UnavailableActionTypes.updateUnavailable:
-    case UnavailableActionTypes.createUnavailable:
-    case UnavailableActionTypes.createBlockAgenda:
-    case UnavailableActionTypes.deleteUnavailable: {
-      return {
-        ...state,
-        error: undefined,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-        isLoading: true,
-      };
-    }
-    case UnavailableActionTypes.roomSuccess: {
-      return {
-        ...state,
-        rooms: action.rooms,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case UnavailableActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const unavailableReducer = createReducer(
+  initialState,
+  on(getUnavailablePage, (state) => ({
+    ...state,
+    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IUnavailable>,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getAllProfessional, (state) => ({
+    ...state,
+    professionals: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(getAllRoomsByProfessionalId, (state) => ({
+    ...state,
+    rooms: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(getUnavailable, (state) => ({
+    ...state,
+    selected: {} as IUnavailable,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(unavailableSuccess, (state, { data }) => ({
+    ...state,
+    data,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(professionalSuccess, (state, { professionals }) => ({
+    ...state,
+    professionals,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(unavailableSaveSuccess, (state, response) => ({
+    ...state,
+    response,
+    selected: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    isLoading: false,
+  })),
+  on(unavailableSelected, (state, { selected }) => ({
+    ...state,
+    selected,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(unavailableFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error,
+    subErrors: error.subErrors,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(updateUnavailable, createUnavailable, createBlockAgenda, deleteUnavailable, (state) => ({
+    ...state,
+    error: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(roomSuccess, (state, { rooms }) => ({
+    ...state,
+    rooms,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(clean, () => initialState),
+);

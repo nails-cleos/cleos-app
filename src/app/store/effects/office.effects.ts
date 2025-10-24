@@ -1,25 +1,25 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { Observable, of } from 'rxjs';
-import { catchError, switchMap, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { OfficeService } from '../../services/office.service';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { Pagination } from '../../interfaces/pagination';
 import {
-  CreateOffice,
-  DeleteOffice,
-  GetOffice,
-  GetOfficesPage,
-  ManagerSuccess,
-  OfficeActionTypes,
-  OfficeFailure,
-  OfficeSaveSuccess,
-  OfficeSelected,
-  OfficeSuccess,
-  UpdateOffice,
+  createOffice,
+  deleteOffice,
+  getAllManager,
+  getOffice,
+  getOfficesPage,
+  managerSuccess,
+  officeFailure,
+  officeSaveSuccess,
+  officeSelected,
+  officeSuccess,
+  updateOffice,
 } from '../office.actions';
 import { IOffice } from '../../interfaces/office';
 import { IUser } from '../../interfaces/user';
@@ -28,84 +28,84 @@ import { ToastType } from '../../shared/toast/toast.model';
 
 @Injectable()
 export class OfficeEffects {
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly actions: Actions = inject(Actions);
+  private readonly officeService: OfficeService = inject(OfficeService);
+  private readonly userService: UserService = inject(UserService);
+  private readonly router: Router = inject(Router);
 
   getAll$ = createEffect(() => this.actions.pipe(
-    ofType(OfficeActionTypes.getOfficesPage),
-    switchMap((action: GetOfficesPage) =>
-      this.officeService.getOfficesPage(action.page, action.sort, action.direction, action.size).pipe(
-        switchMap((response: Pagination<IOffice>) => of(new OfficeSuccess(response))),
-        catchError((err: HttpErrorResponse) => of(new OfficeFailure(err.error))),
+    ofType(getOfficesPage),
+    switchMap(({ page, sort, direction, size }) =>
+      this.officeService.getOfficesPage(page, sort, direction, size).pipe(
+        map((data: Pagination<IOffice>) => officeSuccess({ data })),
+        catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
       )),
   ));
 
   getAllManager$ = createEffect(() => this.actions.pipe(
-    ofType(OfficeActionTypes.getAllManager),
+    ofType(getAllManager),
     switchMap(() =>
       this.userService.getManagers().pipe(
-        switchMap((response: IUser[]) => of(new ManagerSuccess(response ? response : []))),
-        catchError((err: HttpErrorResponse) => of(new OfficeFailure(err.error))),
+        map((managers: IUser[]) => managerSuccess(managers ? { managers } : { managers: [] })),
+        catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
       )),
   ));
 
   findOne$ = createEffect(() => this.actions.pipe(
-    ofType(OfficeActionTypes.getOffice),
-    switchMap((action: GetOffice) =>
-      this.officeService.getOffice(action.id).pipe(
-        switchMap((response?: IOffice) => of(new OfficeSelected(response))),
-        catchError((err: HttpErrorResponse) => of(new OfficeFailure(err.error))),
+    ofType(getOffice),
+    switchMap(({ id }) =>
+      this.officeService.getOffice(id).pipe(
+        map((selected?: IOffice) => officeSelected({ selected })),
+        catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
       )),
   ));
 
   save$ = createEffect(() => this.actions.pipe(
-    ofType(OfficeActionTypes.createOffice),
-    switchMap((action: CreateOffice) =>
-      this.officeService.createOffice(action.office).pipe(
+    ofType(createOffice),
+    switchMap(({ office }) =>
+      this.officeService.createOffice(office).pipe(
         switchMap((response: IApiResponse) => this.requestSuccess('OFFICE.CREATED', response.name, response.id)),
-        catchError((err: HttpErrorResponse) => of(new OfficeFailure(err.error))),
+        catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
       )),
   ));
 
   update$ = createEffect(() => this.actions.pipe(
-    ofType(OfficeActionTypes.updateOffice),
-    switchMap((action: UpdateOffice) =>
-      this.officeService.updateOffice(action.id, action.office).pipe(
-        switchMap(
-          (response: IApiResponse) => this.requestSuccess('OFFICE.UPDATED.MESSAGE', response.name, response.id)),
-        catchError((err: HttpErrorResponse) => of(new OfficeFailure(err.error))),
+    ofType(updateOffice),
+    switchMap(({ id, office }) =>
+      this.officeService.updateOffice(id, office).pipe(
+        switchMap((response: IApiResponse) =>
+          this.requestSuccess('OFFICE.UPDATED.MESSAGE', response.name, response.id)),
+        catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
       )),
   ));
 
   delete$ = createEffect(() => this.actions.pipe(
-    ofType(OfficeActionTypes.deleteOffice),
-    switchMap((action: DeleteOffice) =>
-      this.officeService.deleteOffice(action.id).pipe(
-        switchMap(() => this.requestSuccess('OFFICE.DELETED.MESSAGE', action.name, undefined, 'warning')),
-        catchError((err: HttpErrorResponse) => of(new OfficeFailure(err.error))),
+    ofType(deleteOffice),
+    switchMap(({ id, name }) =>
+      this.officeService.deleteOffice(id).pipe(
+        switchMap(() => this.requestSuccess('OFFICE.DELETED.MESSAGE', name, undefined, 'warning')),
+        catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
       )),
   ));
 
   selectedData$ = createEffect(() => this.actions.pipe(
-    ofType(OfficeActionTypes.officeSelected),
-    tap((data: OfficeSelected) => this.router
-      .navigate([this.translate.currentLang, 'offices', data.selected?.id])),
+    ofType(officeSelected),
+    tap(({ selected }) => this.router
+      .navigate([this.translate.currentLang, 'offices', selected?.id])),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(OfficeActionTypes.officeSuccess),
+    ofType(officeSuccess),
   ), { dispatch: false });
 
   saveSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(OfficeActionTypes.officeSaveSuccess),
+    ofType(officeSaveSuccess),
   ), { dispatch: false });
 
-  constructor(private readonly translate: TranslateService, private actions: Actions,
-              private officeService: OfficeService, private userService: UserService, private router: Router) {
-  }
-
-  private requestSuccess(key: string, name?: string, id?: string,
-    toastType?: ToastType): Observable<OfficeSaveSuccess> {
+  private requestSuccess(key: string, name?: string, id?: string, toastType?: ToastType) {
     const message = this.translate.instant(key, { name });
     const path = id ? `offices/${ id }` : undefined;
-    return success(OfficeSaveSuccess, message, path, undefined, toastType);
+    return success(officeSaveSuccess, message, path, undefined, toastType);
   }
 }

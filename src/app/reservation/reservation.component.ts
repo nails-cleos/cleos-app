@@ -22,7 +22,18 @@ import { IUser, IUserAll } from '../interfaces/user';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../store/app.states';
-import * as fromActionsReservation from '../store/reservation.actions';
+import {
+  clean,
+  createReservation,
+  getAllAdditionalByGroupId,
+  getAllRooms,
+  getAllTreatments,
+  getCustomerInformation,
+  getCustomers,
+  getReservation,
+  searchAvailability,
+  updateReservationById,
+} from '../store/reservation.actions';
 import { noDuplicateDatesValidator, requireMatch, valueChange } from '../util/validators';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../interfaces/treatment';
 import { MatStepper } from '@angular/material/stepper';
@@ -228,17 +239,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     smallScreen: boolean;
     daysInWeek: number;
     lessDays: number;
-  }> = this.breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small,
-    ]).pipe(
-      map(result => ({
-        smallScreen: result.matches,
-        daysInWeek: result.matches ? 3 : 7,
-        lessDays: result.matches ? 1 : 3,
-      })),
-      shareReplay(),
-    );
+  }> = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]).pipe(map(result => ({
+      smallScreen: result.matches,
+      daysInWeek: result.matches ? 3 : 7,
+      lessDays: result.matches ? 1 : 3,
+    })),
+    shareReplay());
 
   private treatmentId?: string;
   private roomId?: string;
@@ -414,16 +420,14 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         reservation.treatmentId = valueChange(this.treatment.value.id, this.reservation.treatment.id);
         reservation.roomId = valueChange(this.room.value.id, this.reservation.room.id);
         reservation.professionalId = valueChange(this.professional.value.id, this.reservation.professional.id);
-        this.store.dispatch(
-          new fromActionsReservation.UpdateReservationById(this.reservation.id, reservation, role),
-        );
+        this.store.dispatch(updateReservationById({ id: this.reservation.id, reservation, role }));
       } else {
         reservation.treatmentId = this.treatment.value.id;
         reservation.roomId = this.room.value.id;
         reservation.professionalId = this.professional.value.id;
         reservation.discountId = this.discount.value;
         this.store.dispatch(
-          new fromActionsReservation.CreateReservation(reservation, role),
+          createReservation({ reservation, role }),
         );
       }
     }
@@ -522,8 +526,12 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
       this.store.dispatch(
-        new fromActionsReservation.SearchAvailability(this.daysInWeek, dates, this.room.value.id,
-          this.professional.value.id),
+        searchAvailability({
+          days: this.daysInWeek,
+          dates,
+          roomId: this.room.value.id,
+          professionalId: this.professional.value.id,
+        }),
       );
     }
     completeAndNext(this.steps, this.myStepper, goNext);
@@ -571,11 +579,11 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   displayFnUser = (user: IUser): string => user?.displayName ? user.displayName : '';
 
-  displayFnGroup = (group: ITreatmentGroup): string => group ? `${group.name}` : '';
+  displayFnGroup = (group: ITreatmentGroup): string => group ? `${ group.name }` : '';
 
-  displayFnTreatment = (treatment: ITreatment): string => treatment ? `${treatment.name}` : '';
+  displayFnTreatment = (treatment: ITreatment): string => treatment ? `${ treatment.name }` : '';
 
-  displayFnOffice = (office: IOffice): string => office ? `${office.name}` : '';
+  displayFnOffice = (office: IOffice): string => office ? `${ office.name }` : '';
 
   displayFnRoom = (room: IRoom): string => room.address ? room.address.name : '';
 
@@ -585,7 +593,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.room.value, this.dateFormat, this.translate, this.dialog, reservationDate,
   );
 
-  segmentClick = (date: Date, state: string, eventKey: string, id: string = `${Math.random()}`): void => {
+  segmentClick = (date: Date, state: string, eventKey: string, id: string = `${ Math.random() }`): void => {
     const eventData = this.dataEvents.get(eventKey);
     if (eventData) {
       if (!this.dateIsValid(date)) {
@@ -717,7 +725,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
       if (eventsOverlapping?.length && eventsOverlapping[0] !== selectedEvent) {
         let message = '';
         eventsOverlapping.forEach(e => {
-          message += `<div>${e.title}</div>`;
+          message += `<div>${ e.title }</div>`;
         });
         title = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.TITLE');
         content = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.CONTENT', { data: message });
@@ -793,9 +801,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.customer.valueChanges.subscribe((value) => {
       this.customerInfo = undefined;
       if (value && value.id && !this.isEditing) {
-        this.store.dispatch(
-          new fromActionsReservation.GetCustomerInformation(value.id),
-        );
+        this.store.dispatch(getCustomerInformation({ id: value.id }));
       }
       this.cleanTreatment();
     });
@@ -1154,17 +1160,15 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private getReservation = (id: string): void => this.store.dispatch(
-    new fromActionsReservation.GetReservation(id));
+    getReservation({ id }));
 
   private getRoomList = (): void => this.store.dispatch(
-    new fromActionsReservation.GetAllRooms(this.customer?.value?.id));
+    getAllRooms({ customerId: this.customer?.value?.id }));
 
   private getTreatmentList = (): void => {
     const roomId = this.room?.value?.id || this.roomId;
     if (roomId) {
-      this.store.dispatch(
-        new fromActionsReservation.GetAllTreatments(roomId, this.customer.value?.id),
-      );
+      this.store.dispatch(getAllTreatments({ roomId, customerId: this.customer.value?.id }));
     }
   };
 
@@ -1172,15 +1176,13 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
     const roomId = this.room?.value?.id || this.roomId;
     const groupId = this.group?.value?.id || this.groupId;
     if (roomId) {
-      this.store.dispatch(
-        new fromActionsReservation.GetAllAdditionalByGroupId(roomId, groupId),
-      );
+      this.store.dispatch(getAllAdditionalByGroupId({ roomId, groupId }));
     }
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsReservation.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
-  private getCustomers = (): void => this.store.dispatch(new fromActionsReservation.GetCustomers());
+  private getCustomers = (): void => this.store.dispatch(getCustomers());
 
   private setOffice = (): void => {
     let office;
@@ -1267,10 +1269,10 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
         switch (ud.discountCustomer.type) {
           case DiscountType.money:
             title =
-              `${currencySymbol(ud.discountCustomer.discount?.currency)} ${ud.discountCustomer.amount} ${title}`;
+              `${ currencySymbol(ud.discountCustomer.discount?.currency) } ${ ud.discountCustomer.amount } ${ title }`;
             break;
           case DiscountType.percentage:
-            title = `${ud.discountCustomer.amount} % ${title}`;
+            title = `${ ud.discountCustomer.amount } % ${ title }`;
             break;
         }
         return Object.assign({}, ud, { title });
@@ -1349,7 +1351,7 @@ export class ReservationComponent implements OnInit, AfterViewInit, OnDestroy {
           this.cleanEvent();
           setTimeout(() => {
             const inputField = document.querySelector(
-              `input[formControlName="${value.field}"]`,
+              `input[formControlName="${ value.field }"]`,
             ) as HTMLInputElement;
             if (inputField) {
               inputField.focus();

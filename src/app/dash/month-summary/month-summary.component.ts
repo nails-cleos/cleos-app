@@ -16,7 +16,7 @@ import { Observable, Subscription } from 'rxjs';
 import { AppState, selectDashboardState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
-import * as fromActionsDashboard from '../../store/dashboard.actions';
+import { getMonthlySummary, updateMonthlySummary } from '../../store/dashboard.actions';
 import {
   AmountFormat,
   ExpenseType,
@@ -25,7 +25,8 @@ import {
   IMonthlySummaryRequest,
   IMonthlySummarySale,
   ISummaryRoom,
-  ISummaryTotal, ITotal,
+  ISummaryTotal,
+  ITotal,
   ITotalType,
   SummaryType,
   TotalType,
@@ -432,8 +433,14 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
         break;
     }
     return this.store.dispatch(
-      new fromActionsDashboard.UpdateMonthlySummary(getDateFormat(this.date.value), totalTypes.type, totals, summaries,
-        this.roomId!, this.step),
+      updateMonthlySummary({
+        date: getDateFormat(this.date.value),
+        summaryType: totalTypes.type,
+        totals: totals,
+        summaries: summaries,
+        roomId: this.roomId!,
+        step: this.step,
+      }),
     );
   };
 
@@ -497,9 +504,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     this.reservationMonth = new TotalType(SummaryType.payment);
     this.expenseMonth = new TotalType(SummaryType.expense, Object.values(ExpenseType));
     this.cashMonth = new TotalType(SummaryType.cash);
-    this.store.dispatch(
-      new fromActionsDashboard.GetMonthlySummary(date),
-    );
+    this.store.dispatch(getMonthlySummary({ date }));
   };
 
   private createData = (): void => {

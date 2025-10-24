@@ -3,7 +3,7 @@ import { Observable, Subscription } from 'rxjs';
 import { ICatalogueAll } from '../../interfaces/catalogue';
 import { Store } from '@ngrx/store';
 import { AppState, selectCatalogueState } from '../../store/app.states';
-import * as fromActionsCatalogue from '../../store/catalogue.actions';
+import { clean, getAllCatalogs } from '../../store/catalogue.actions';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
 import { MainContentService } from '../main-content.service';
@@ -43,9 +43,9 @@ export class CatalogComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  private clean = (): void => this.store.dispatch(new fromActionsCatalogue.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
-  private getCatalogs = (): void => this.store.dispatch(new fromActionsCatalogue.GetAllCatalogs());
+  private getCatalogs = (): void => this.store.dispatch(getAllCatalogs());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {

@@ -1,8 +1,8 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ReservationTableComponent } from './reservation-table.component';
 import { TranslateModule } from '@ngx-translate/core';
-import { of } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AuthUserService } from '../../../services/auth-user.service';
 
@@ -10,31 +10,33 @@ describe('ReservationTableComponent', () => {
   let component: ReservationTableComponent;
   let fixture: ComponentFixture<ReservationTableComponent>;
 
-  const mockStore = {
-    select: jasmine.createSpy('select').and.returnValue(of({})),
-    dispatch: jasmine.createSpy('dispatch'),
-  };
+  let state$: Subject<any>;
+  let authUser$: Subject<any>;
 
-  const mockAuthUserService = {
-    authUser: of({
-      isAdmin: false,
-    }),
-  };
+  let storeSpy: jasmine.SpyObj<Store>;
+  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    state$ = new Subject();
+    authUser$ = new Subject();
+
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
+      authUser: authUser$.asObservable(),
+    });
+
+    storeSpy.select.and.returnValue(state$.asObservable());
+
+    await TestBed.configureTestingModule({
       imports: [ReservationTableComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: mockStore },
-        { provide: AuthUserService, useValue: mockAuthUserService },
+        { provide: Store, useValue: storeSpy },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
       ],
     }).compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(ReservationTableComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should compile', () => {

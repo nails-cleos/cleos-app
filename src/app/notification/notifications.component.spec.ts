@@ -3,48 +3,54 @@ import { NotificationsComponent } from './notifications.component';
 import { Store } from '@ngrx/store';
 import { of, Subject, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../services/navigation.service';
-import * as fromActionsNotification from '../store/notification.actions';
+import { deleteNotification, readNotification } from '../store/notification.actions';
 import { INotification } from '../interfaces/notification';
 
 describe('NotificationsComponent', () => {
   let component: NotificationsComponent;
   let fixture: ComponentFixture<NotificationsComponent>;
+
+  let state$: Subject<any>;
+
   let storeSpy: jasmine.SpyObj<Store<any>>;
   let routerSpy: jasmine.SpyObj<Router>;
-  let translateSpy: jasmine.SpyObj<TranslateService>;
   let navigationSpy: jasmine.SpyObj<NavigationService>;
-  let stateSubject: Subject<any>;
 
   beforeEach(async () => {
     storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate'], { url: '/home/test' });
-    translateSpy = jasmine.createSpyObj('TranslateService', [], { currentLang: 'en' });
     navigationSpy = jasmine.createSpyObj('NavigationService', ['reload']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate'], {
+      url: '/home/test',
+    });
 
-    stateSubject = new Subject<any>();
-    storeSpy.select.and.returnValue(stateSubject.asObservable());
+    state$ = new Subject<any>();
+    storeSpy.select.and.returnValue(state$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [NotificationsComponent],
+      imports: [NotificationsComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: TranslateService, useValue: translateSpy },
         { provide: NavigationService, useValue: navigationSpy },
       ],
     }).compileComponents();
 
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
     fixture = TestBed.createComponent(NotificationsComponent);
     component = fixture.componentInstance;
 
     storeSpy.select.and.returnValue(of({}));
   });
 
+  afterEach(() => state$.complete());
+
   it('should create', () => {
     expect(component).toBeTruthy();
-    expect(component.dateFormat).toBe('en');
+    expect(component.dateFormat).toBe('en-GB');
   });
 
   it('should dispatch Clean and GetNotificationsPage on init', () => {
@@ -74,7 +80,7 @@ describe('NotificationsComponent', () => {
     component.notification(notif);
 
     expect(routerSpy.navigate).toHaveBeenCalledWith([notif.navigation]);
-    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(jasmine.any(fromActionsNotification.ReadNotification));
+    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(readNotification({ id: '1' }));
   });
 
   it('should reload and dispatch ReadNotification if not read', () => {
@@ -83,9 +89,7 @@ describe('NotificationsComponent', () => {
     component.notification(notif);
 
     expect(navigationSpy.reload).toHaveBeenCalledWith(['', 'home', 'test']);
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      jasmine.any(fromActionsNotification.ReadNotification),
-    );
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(readNotification({ id: '2' }));
   });
 
   it('should remove notification and dispatch DeleteNotification', () => {
@@ -94,9 +98,9 @@ describe('NotificationsComponent', () => {
 
     component.remove(0);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      jasmine.any(fromActionsNotification.DeleteNotification),
-    );
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteNotification(
+      { notification: jasmine.objectContaining({ id: '3', deleted: true }) } as any,
+    ));
     expect(component.badge).toBe(0);
   });
 
@@ -115,7 +119,7 @@ describe('NotificationsComponent', () => {
     component.ngOnInit();
 
     // simula que viene data con una notificación no leída
-    stateSubject.next({
+    state$.next({
       data: {
         page: {
           content: [{ id: 'n1', date: '2025-10-01T00:00:00Z', read: false }],
@@ -134,7 +138,7 @@ describe('NotificationsComponent', () => {
   it('should set loadingNotifications when no id in content', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       data: {
         page: { content: [{}] },
       },
@@ -146,7 +150,7 @@ describe('NotificationsComponent', () => {
   it('should set loadingNotifications to undefined when content is empty', () => {
     component.ngOnInit();
 
-    stateSubject.next({
+    state$.next({
       data: {
         page: { content: [] },
       },

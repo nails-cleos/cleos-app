@@ -5,22 +5,21 @@ import { AnimationBuilder, AnimationPlayer, style } from '@angular/animations';
 describe('AnimateDirective', () => {
   let directive: AnimateDirective;
   let mockElementRef: ElementRef;
-  let mockAnimationBuilder: jasmine.SpyObj<AnimationBuilder>;
-  let mockAnimationPlayer: jasmine.SpyObj<AnimationPlayer>;
+  let animationBuilderSpy: jasmine.SpyObj<AnimationBuilder>;
+  let animationPlayerSpy: jasmine.SpyObj<AnimationPlayer>;
 
   beforeEach(() => {
     const mockElement = document.createElement('div');
     mockElementRef = new ElementRef(mockElement);
-    
-    mockAnimationPlayer = jasmine.createSpyObj('AnimationPlayer', ['init', 'play', 'destroy']);
-    
-    const mockAnimationFactory = jasmine.createSpyObj('AnimationFactory', ['create']);
-    mockAnimationFactory.create.and.returnValue(mockAnimationPlayer);
-    
-    mockAnimationBuilder = jasmine.createSpyObj('AnimationBuilder', ['build']);
-    mockAnimationBuilder.build.and.returnValue(mockAnimationFactory);
 
-    directive = new AnimateDirective(mockElementRef, mockAnimationBuilder);
+    const mockAnimationFactory = jasmine.createSpyObj('AnimationFactory', ['create']);
+    animationPlayerSpy = jasmine.createSpyObj('AnimationPlayer', ['init', 'play', 'destroy']);
+    animationBuilderSpy = jasmine.createSpyObj('AnimationBuilder', ['build']);
+
+    mockAnimationFactory.create.and.returnValue(animationPlayerSpy);
+    animationBuilderSpy.build.and.returnValue(mockAnimationFactory);
+
+    directive = new AnimateDirective(mockElementRef, animationBuilderSpy);
   });
 
   it('should create an instance', () => {
@@ -28,7 +27,7 @@ describe('AnimateDirective', () => {
   });
 
   it('should initialize with default values', () => {
-    expect(directive.stopAnimation).toBe(false);
+    expect(directive.stopAnimation).toBeFalse();
     expect(directive.threshold).toBe(0.1);
   });
 
@@ -37,14 +36,14 @@ describe('AnimateDirective', () => {
     
     directive.ngOnInit();
     
-    expect(mockAnimationBuilder.build).toHaveBeenCalled();
-    expect(mockAnimationPlayer.init).toHaveBeenCalled();
+    expect(animationBuilderSpy.build).toHaveBeenCalled();
+    expect(animationPlayerSpy.init).toHaveBeenCalled();
   });
 
   it('should not initialize player on ngOnInit when no animation is provided', () => {
     directive.ngOnInit();
     
-    expect(mockAnimationBuilder.build).not.toHaveBeenCalled();
+    expect(animationBuilderSpy.build).not.toHaveBeenCalled();
   });
 
   it('should destroy player on ngOnDestroy', () => {
@@ -53,7 +52,7 @@ describe('AnimateDirective', () => {
     
     directive.ngOnDestroy();
     
-    expect(mockAnimationPlayer.destroy).toHaveBeenCalled();
+    expect(animationPlayerSpy.destroy).toHaveBeenCalled();
   });
 
   it('should setup IntersectionObserver on ngAfterViewInit', () => {

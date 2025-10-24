@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { TokenService } from './token.service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
@@ -17,13 +17,17 @@ describe('TokenService', () => {
     authSpy.select.and.returnValue(of({ user: { authorities: [{ authority: 'ROLE_USER' }] } }));
 
     TestBed.configureTestingModule({
+      imports: [TranslateModule.forRoot()],
       providers: [
         TokenService,
         { provide: Router, useValue: routerSpy },
         { provide: Auth, useValue: authSpy },
-        { provide: TranslateService, useValue: { currentLang: 'en' } },
       ],
     });
+
+    const translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en-GB');
+    translate.use('en-GB');
 
     service = TestBed.inject(TokenService);
   });

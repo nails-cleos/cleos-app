@@ -1,20 +1,22 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { catchError, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import {
-  CatalogueActionTypes,
-  CatalogueFailure,
-  CatalogueSaveSuccess,
-  CatalogueSelected,
-  CatalogueSuccess,
-  CreateCatalogue,
-  DeleteCatalogue,
-  GetCatalogue,
-  FindGroupsSuccess,
-  UpdateCatalogue,
-  UpdateCatalogueOrder,
+  catalogueFailure,
+  catalogueSaveSuccess,
+  catalogueSelected,
+  catalogueSuccess,
+  createCatalogue,
+  deleteCatalogue,
+  findGroupsSuccess,
+  getAllCatalogs,
+  getAllCatalogues,
+  getAllTreatmentsGroup,
+  getCatalogue,
+  updateCatalogue,
+  updateCatalogueOrder,
 } from '../catalogue.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { CatalogueService } from '../../services/catalogue.service';
@@ -26,112 +28,104 @@ import { IApiResponse, success } from '../../interfaces/common';
 
 @Injectable()
 export class CatalogueEffects {
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly actions: Actions = inject(Actions);
+  private readonly catalogueService: CatalogueService = inject(CatalogueService);
+  private readonly treatmentService: TreatmentService = inject(TreatmentService);
+  private readonly router: Router = inject(Router);
 
   getAll$ = createEffect(() => this.actions.pipe(
-    ofType(CatalogueActionTypes.getAllCatalogues),
-    switchMap(() =>
-      this.catalogueService.getAllCatalogues().pipe(
-        switchMap(
-          (catalogues: ICatalogue[]) => of(new CatalogueSuccess(catalogues ? catalogues : []))),
-        catchError((err: HttpErrorResponse) => of(new CatalogueFailure(err.error))),
-      )),
+    ofType(getAllCatalogues),
+    switchMap(() => this.catalogueService.getAllCatalogues().pipe(
+      map((data: ICatalogue[]) => catalogueSuccess(data ? { data } : { data: [] })),
+      catchError((err: HttpErrorResponse) => of(catalogueFailure({ error: err.error }))),
+    )),
   ));
 
   getAllCatalogs$ = createEffect(() => this.actions.pipe(
-    ofType(CatalogueActionTypes.getAllCatalogs),
-    switchMap(() =>
-      this.catalogueService.getAllCatalogs().pipe(
-        switchMap(
-          (catalogues: ICatalogue[]) => of(new CatalogueSuccess(catalogues ? catalogues : []))),
-        catchError((err: HttpErrorResponse) => of(new CatalogueFailure(err.error))),
-      )),
+    ofType(getAllCatalogs),
+    switchMap(() => this.catalogueService.getAllCatalogs().pipe(
+      map((data: ICatalogue[]) => catalogueSuccess(data ? { data } : { data: [] })),
+      catchError((err: HttpErrorResponse) => of(catalogueFailure({ error: err.error }))),
+    )),
   ));
 
   findOne$ = createEffect(() => this.actions.pipe(
-    ofType(CatalogueActionTypes.getCatalogue),
-    switchMap((action: GetCatalogue) =>
-      this.catalogueService.getCatalogue(action.id).pipe(
-        switchMap(
-          (catalogue?: ICatalogue) => of(new CatalogueSelected(catalogue))),
-        catchError((err: HttpErrorResponse) => of(new CatalogueFailure(err.error))),
-      )),
+    ofType(getCatalogue),
+    switchMap(({ id }) => this.catalogueService.getCatalogue(id).pipe(
+      map((selected?: ICatalogue) => catalogueSelected({ selected })),
+      catchError((err: HttpErrorResponse) => of(catalogueFailure({ error: err.error }))),
+    )),
   ));
 
   save$ = createEffect(() => this.actions.pipe(
-    ofType(CatalogueActionTypes.createCatalogue),
-    switchMap((action: CreateCatalogue) =>
-      this.catalogueService.createCatalogue(action.catalogue, action.resizedImageDataUrl).pipe(
+    ofType(createCatalogue),
+    switchMap(({ catalogue, resizedImageDataUrl }) =>
+      this.catalogueService.createCatalogue(catalogue, resizedImageDataUrl).pipe(
         switchMap((response: IApiResponse) => {
           const message = this.translate.instant('CATALOGUE.CREATED', { name: response.name });
           const path = `catalogues/${ response.id }`;
-          return success(CatalogueSaveSuccess, message, path);
+          return success(catalogueSaveSuccess, message, path);
         }),
-        catchError((err: HttpErrorResponse) => of(new CatalogueFailure(err.error))),
+        catchError((err: HttpErrorResponse) => of(catalogueFailure({ error: err.error }))),
       )),
   ));
 
   update$ = createEffect(() => this.actions.pipe(
-    ofType(CatalogueActionTypes.updateCatalogue),
-    switchMap((action: UpdateCatalogue) =>
-      this.catalogueService.updateCatalogue(action.catalogue, action.resizedImageDataUrl).pipe(
+    ofType(updateCatalogue),
+    switchMap(({ catalogue, resizedImageDataUrl }) =>
+      this.catalogueService.updateCatalogue(catalogue, resizedImageDataUrl).pipe(
         switchMap((response: IApiResponse) => {
           const message = this.translate.instant('CATALOGUE.UPDATED.MESSAGE', { name: response.name });
           const path = `catalogues/${ response.id }`;
-          return success(CatalogueSaveSuccess, message, path);
+          return success(catalogueSaveSuccess, message, path);
         }),
-        catchError((err: HttpErrorResponse) => of(new CatalogueFailure(err.error))),
+        catchError((err: HttpErrorResponse) => of(catalogueFailure({ error: err.error }))),
       )),
   ));
 
   updateAll$ = createEffect(() => this.actions.pipe(
-    ofType(CatalogueActionTypes.updateCatalogueOrder),
-    switchMap((action: UpdateCatalogueOrder) =>
-      this.catalogueService.updateCatalogueOrder(action.catalogues).pipe(
+    ofType(updateCatalogueOrder),
+    switchMap(({ catalogues }) =>
+      this.catalogueService.updateCatalogueOrder(catalogues).pipe(
         switchMap(() => {
           const message = this.translate.instant('CATALOGUE.UPDATED.ALL.MESSAGE');
-          return success(CatalogueSaveSuccess, message);
+          return success(catalogueSaveSuccess, message);
         }),
-        catchError((err: HttpErrorResponse) => of(new CatalogueFailure(err.error))),
+        catchError((err: HttpErrorResponse) => of(catalogueFailure({ error: err.error }))),
       )),
   ));
 
   delete$ = createEffect(() => this.actions.pipe(
-    ofType(CatalogueActionTypes.deleteCatalogue),
-    switchMap((action: DeleteCatalogue) =>
-      this.catalogueService.deleteCatalogue(action.id).pipe(
+    ofType(deleteCatalogue),
+    switchMap(({ id, name }) =>
+      this.catalogueService.deleteCatalogue(id).pipe(
         switchMap(() => {
-          const message = this.translate.instant('CATALOGUE.DELETED.MESSAGE', { name: action.name });
-          return success(CatalogueSaveSuccess, message, undefined, undefined, 'warning');
+          const message = this.translate.instant('CATALOGUE.DELETED.MESSAGE', { name });
+          return success(catalogueSaveSuccess, message, undefined, undefined, 'warning');
         }),
-        catchError((err: HttpErrorResponse) => of(new CatalogueFailure(err.error))),
+        catchError((err: HttpErrorResponse) => of(catalogueFailure({ error: err.error }))),
       )),
   ));
 
   findGroups$ = createEffect(() => this.actions.pipe(
-    ofType(CatalogueActionTypes.getAllTreatmentsGroup),
-    switchMap(() =>
-      this.treatmentService.getAllTreatmentsGroup().pipe(
-        switchMap((groups: ITreatmentGroup[]) => of(new FindGroupsSuccess(groups))),
-        catchError((err: HttpErrorResponse) => of(new CatalogueFailure(err.error))),
-      )),
+    ofType(getAllTreatmentsGroup),
+    switchMap(() => this.treatmentService.getAllTreatmentsGroup().pipe(
+      map((groups: ITreatmentGroup[]) => findGroupsSuccess({ groups })),
+      catchError((err: HttpErrorResponse) => of(catalogueFailure({ error: err.error }))),
+    )),
   ));
 
   selectedData$ = createEffect(() => this.actions.pipe(
-    ofType(CatalogueActionTypes.catalogueSelected),
-    tap(
-      (data: CatalogueSelected) => this.router.navigate([this.translate.currentLang, 'catalogues', data.selected?.id])),
+    ofType(catalogueSelected),
+    tap(({ selected }) => this.router.navigate([this.translate.currentLang, 'catalogues', selected?.id])),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(CatalogueActionTypes.catalogueSuccess),
+    ofType(catalogueSuccess),
   ), { dispatch: false });
 
   saveSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(CatalogueActionTypes.catalogueSaveSuccess),
+    ofType(catalogueSaveSuccess),
   ), { dispatch: false });
-
-  constructor(private readonly translate: TranslateService, private actions: Actions,
-              private catalogueService: CatalogueService, private treatmentService: TreatmentService,
-              private router: Router) {
-  }
 }

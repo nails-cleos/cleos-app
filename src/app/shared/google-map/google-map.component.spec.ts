@@ -2,36 +2,40 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GoogleMapComponent } from './google-map.component';
 import { provideHttpClient, withJsonpSupport } from '@angular/common/http';
-import { of } from 'rxjs';
+import { Subject } from 'rxjs';
 import { AuthUserService } from '../../services/auth-user.service';
 
 describe('GoogleMapComponent', () => {
   let component: GoogleMapComponent;
   let fixture: ComponentFixture<GoogleMapComponent>;
 
-  const mockAuthUserService = {
-    authUser: of({
-      isDarkMode: true,
-    }),
-  };
+  let authUser$: Subject<any>;
+
+  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
   beforeEach(async () => {
+    authUser$ = new Subject();
+
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser'], {
+      authUser: authUser$.asObservable(),
+    });
+
     await TestBed.configureTestingModule({
       imports: [GoogleMapComponent],
       providers: [
-        { provide: AuthUserService, useValue: mockAuthUserService },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
         provideHttpClient(withJsonpSupport()),
       ],
     }).compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(GoogleMapComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
+  afterEach(() => authUser$.complete());
+
   it('should create', () => {
+    fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 });

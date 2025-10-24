@@ -10,7 +10,7 @@ describe('TreatmentComponent', () => {
   let fixture: ComponentFixture<TreatmentComponent>;
   let translateService: TranslateService;
 
-  const mockActivatedRoute = {
+  const activatedRouteSpy = {
     params: of({ id: 'id' }),
   };
 
@@ -18,18 +18,22 @@ describe('TreatmentComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TreatmentComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TreatmentComponent);
     component = fixture.componentInstance;
     translateService = TestBed.inject(TranslateService);
-    
-    spyOn(translateService, 'instant').and.returnValue([
-      { id: 'id', translations: { title: 'Test Title', description: 'Test Description' } },
-    ]);
-    
+    translateService.setDefaultLang('en-GB');
+    translateService.use('en-GB');
+
+    translateService.setTranslation('en-GB', {
+      TREATMENTS: [
+        { id: 'id', translations: { title: 'Test Title', description: 'Test Description' } },
+      ],
+    });
+
     fixture.detectChanges();
   });
 

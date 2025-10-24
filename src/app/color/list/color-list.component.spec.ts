@@ -2,29 +2,31 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { of, Subject } from 'rxjs';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ColorListComponent } from './color-list.component';
 import { IColor } from '../../interfaces/color';
 import { PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import * as fromActionsColor from '../../store/color.actions';
+import { clean, colorSelected, deleteColor, getColorsPage } from '../../store/color.actions';
+import { AppState } from '../../store/app.states';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('ColorListComponent', () => {
   let component: ColorListComponent;
   let fixture: ComponentFixture<ColorListComponent>;
-  let mockStore: jasmine.SpyObj<Store>;
-  let mockDialog: jasmine.SpyObj<MatDialog>;
-  let mockBreakpointObserver: jasmine.SpyObj<BreakpointObserver>;
-  let mockChangeDetectorRef: jasmine.SpyObj<ChangeDetectorRef>;
-  let mockActivatedRoute: any;
-  let stateSubject: Subject<any>;
+
+  let state$: Subject<any>;
+
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
+  let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let dialogSpy: jasmine.Spy<any>;
 
   const mockColors: IColor[] = [
     { id: '1', name: 'Red', description: 'Red color' },
@@ -40,39 +42,29 @@ describe('ColorListComponent', () => {
   };
 
   beforeEach(async () => {
-    stateSubject = new Subject();
+    state$ = new Subject();
 
-    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    mockDialog = jasmine.createSpyObj('MatDialog', ['open'], {
-      openDialogs: [],
-      afterOpened: new Subject(),
-      afterAllClosed: new Subject(),
-    });
-    mockBreakpointObserver = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    mockChangeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-    mockActivatedRoute = {
+    const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
-        paramMap: {
-          get: jasmine.createSpy('get').and.returnValue(null),
-        },
+        paramMap: paramMapSpy,
       },
-    };
+    });
 
-    mockStore.select.and.returnValue(stateSubject.asObservable());
-    mockBreakpointObserver.observe.and.returnValue(of({ matches: false, breakpoints: {} }));
+    paramMapSpy.get.and.returnValue(null);
+    storeSpy.select.and.returnValue(state$.asObservable());
+    breakpointObserverSpy.observe.and.returnValue(of({ matches: false, breakpoints: {} }));
 
     await TestBed.configureTestingModule({
-      imports: [
-        ColorListComponent,
-        TranslateModule.forRoot(),
-        NoopAnimationsModule,
-      ],
+      imports: [ColorListComponent, TranslateModule.forRoot(), NoopAnimationsModule],
       providers: [
-        { provide: Store, useValue: mockStore },
-        { provide: MatDialog, useValue: mockDialog },
-        { provide: BreakpointObserver, useValue: mockBreakpointObserver },
-        { provide: ChangeDetectorRef, useValue: mockChangeDetectorRef },
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: Store, useValue: storeSpy },
+        { provide: BreakpointObserver, useValue: breakpointObserverSpy },
+        { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
     }).compileComponents();
 
@@ -91,9 +83,10 @@ describe('ColorListComponent', () => {
       direction: 'asc',
     } as unknown as MatSort;
 
-    // Initialize component after creation
-    component.ngOnInit();
+    dialogSpy = spyOn(component.dialog, 'open');
   });
+
+  afterEach(() => state$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -107,10 +100,10 @@ describe('ColorListComponent', () => {
 
   it('should dispatch Clean action on initialization', () => {
     // Reset to check only the initialization call
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
     component.ngOnInit();
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsColor.Clean));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should call getColorList after view init', () => {
@@ -122,7 +115,9 @@ describe('ColorListComponent', () => {
   });
 
   it('should update data source when state changes', () => {
-    stateSubject.next({
+    component.ngOnInit();
+
+    state$.next({
       data: mockPagination,
     });
 
@@ -131,18 +126,25 @@ describe('ColorListComponent', () => {
   });
 
   it('should clean and get color list on response', () => {
-    spyOn(component as any, 'clean');
-    spyOn(component as any, 'getColorList');
+    component.ngOnInit();
+    component.ngAfterViewInit();
 
-    stateSubject.next({
+    state$.next({
       response: true,
     });
 
-    expect(component['clean']).toHaveBeenCalled();
-    expect(component['getColorList']).toHaveBeenCalled();
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getColorsPage({
+      page: 0,
+      sort: 'name',
+      direction: 'asc',
+      size: PAGE_SIZE,
+    }));
   });
 
   it('should create page subscriptions when results length is available', () => {
+    component.ngOnInit();
+
     component.paginator = {
       pageIndex: 0,
       page: of({ pageIndex: 0, pageSize: PAGE_SIZE }),
@@ -156,7 +158,7 @@ describe('ColorListComponent', () => {
 
     spyOn(component as any, 'createPageSubscriptions');
 
-    stateSubject.next({
+    state$.next({
       data: mockPagination,
     });
 
@@ -168,26 +170,7 @@ describe('ColorListComponent', () => {
 
     component.edit(testColor);
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsColor.ColorSelected));
-  });
-
-  it('should call delete method without errors', () => {
-    const testColor = mockColors[0];
-
-    expect(() => component.delete(testColor)).not.toThrow();
-  });
-
-  it('should have delete method defined', () => {
-    expect(component.delete).toBeDefined();
-    expect(typeof component.delete).toBe('function');
-  });
-
-  it('should handle delete operation', () => {
-    const testColor = mockColors[0];
-
-    expect(() => {
-      component.delete(testColor);
-    }).not.toThrow();
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(colorSelected({ selected: testColor }));
   });
 
   it('should unsubscribe from subscriptions on destroy', () => {
@@ -262,7 +245,9 @@ describe('ColorListComponent', () => {
 
     component['getColorList'](2);
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsColor.GetColorsPage));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getColorsPage(
+      { page: 2, size: PAGE_SIZE, sort: 'name', direction: 'asc' },
+    ));
   });
 
   it('should handle undefined expanded color', () => {
@@ -274,13 +259,14 @@ describe('ColorListComponent', () => {
 
   it('should handle state subscription errors gracefully', () => {
     expect(() => {
-      stateSubject.next({
+      state$.next({
         data: null,
       });
     }).not.toThrow();
   });
 
   it('should handle empty pagination data', () => {
+    component.ngOnInit();
     const emptyPagination: Pagination<IColor> = {
       content: [],
       totalElements: 0,
@@ -288,7 +274,7 @@ describe('ColorListComponent', () => {
       number: 0,
     };
 
-    stateSubject.next({
+    state$.next({
       data: emptyPagination,
     });
 
@@ -297,7 +283,7 @@ describe('ColorListComponent', () => {
   });
 
   it('should initialize with correct state observable', () => {
-    expect(mockStore.select).toHaveBeenCalled();
+    expect(storeSpy.select).toHaveBeenCalled();
   });
 
   it('should maintain correct displayedColumns order', () => {
@@ -309,5 +295,29 @@ describe('ColorListComponent', () => {
     // Test is handled by component initialization with BreakpointObserver
     // The mobile adjustment happens in constructor based on breakpoint observer
     expect(component.pageSize).toBeDefined();
+  });
+
+  it('should call delete method without errors', () => {
+    component.ngOnInit();
+
+    const testColor = mockColors[0] as unknown as IColor;
+
+    dialogSpy.and.returnValue({
+      afterClosed: () => of(testColor),
+    });
+
+    component.delete(testColor);
+
+    expect(dialogSpy).toHaveBeenCalledWith(
+      jasmine.any(Function),
+      jasmine.objectContaining({
+        data: {
+          title: 'COLOR.DELETED.TITLE',
+          content: 'COLOR.DELETED.CONTENT',
+          value: testColor,
+        },
+      }));
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteColor({ id: testColor.id!, name: testColor.name! }));
   });
 });

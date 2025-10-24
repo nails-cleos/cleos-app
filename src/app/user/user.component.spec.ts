@@ -1,63 +1,80 @@
-import { UntypedFormBuilder } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
-import { of } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AppState } from '../store/app.states';
 
 import { UserComponent } from './user.component';
 import { Role } from '../interfaces/token';
-import * as fromActionsUser from '../store/user.actions';
+import { clean, getUser } from '../store/user.actions';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient, withJsonpSupport } from '@angular/common/http';
+import { AuthUserService } from '../services/auth-user.service';
+import { flagGb } from '@ng-icons/flag-icons';
 
 describe('UserComponent', () => {
   let component: UserComponent;
-  let mockStore: jasmine.SpyObj<Store<AppState>>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockTranslateService: jasmine.SpyObj<TranslateService>;
-  let mockActivatedRoute: any;
-  let mockChangeDetectorRef: jasmine.SpyObj<ChangeDetectorRef>;
-  let formBuilder: UntypedFormBuilder;
+  let fixture: ComponentFixture<UserComponent>;
 
+  let state$: Subject<any>;
+  let authUser$: Subject<any>;
 
-  beforeEach(() => {
-    mockStore = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
-    mockTranslateService = jasmine.createSpyObj('TranslateService', ['instant'], {
-      onLangChange: of({ lang: 'en' }),
-      currentLang: 'en',
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let paramMapSpy: jasmine.SpyObj<ParamMap>;
+  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+
+  beforeEach(async () => {
+    state$ = new Subject<any>();
+    authUser$ = new Subject<any>();
+
+    paramMapSpy = jasmine.createSpyObj('ParamMap', ['get']);
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
+      authUser: authUser$.asObservable(),
     });
-    mockChangeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-    
-    mockActivatedRoute = {
+
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
-        paramMap: {
-          get: jasmine.createSpy('get').and.returnValue(null),
-        },
+        paramMap: paramMapSpy,
       },
-    };
-
-    formBuilder = new UntypedFormBuilder();
-
-    mockStore.select.and.returnValue(of({}));
-    mockRouter.getCurrentNavigation.and.returnValue(null);
-    mockTranslateService.instant.and.returnValue({
-      SEARCH: 'Search',
-      COUNTRY_NOT_FOUND: 'Country not found',
-      FIELD: 'Phone number',
-      INVALID: 'Invalid phone number',
-      REQUIRED: 'Phone number is required',
     });
 
-    // Create component instance directly without TestBed template rendering
-    component = new UserComponent(
-      mockTranslateService,
-      mockActivatedRoute,
-      mockStore,
-      formBuilder,
-      mockRouter,
-      mockChangeDetectorRef,
-    );
+    storeSpy.select.and.returnValue(state$.asObservable());
+    routerSpy.getCurrentNavigation.and.returnValue(null);
+
+    await TestBed.configureTestingModule({
+      imports: [UserComponent, TranslateModule.forRoot()],
+      providers: [
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: Router, useValue: routerSpy },
+        { provide: Store, useValue: storeSpy },
+        { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
+        provideHttpClient(withJsonpSupport()),
+      ],
+    }).compileComponents();
+
+    const translateService = TestBed.inject(TranslateService);
+    translateService.setDefaultLang('en-GB');
+    translateService.use('en-GB');
+    translateService.setTranslation('en-GB', {
+      ME: {
+        SEARCH: 'Search',
+        COUNTRY_NOT_FOUND: 'Country not found',
+        FIELD: 'Phone number',
+        INVALID: 'Invalid phone number',
+        REQUIRED: 'Phone number is required',
+      },
+    });
+
+    fixture = TestBed.createComponent(UserComponent);
+    component = fixture.componentInstance;
   });
 
   it('should create', () => {
@@ -66,46 +83,46 @@ describe('UserComponent', () => {
 
   it('should initialize in add mode when no id is provided', () => {
     component.ngOnInit();
-    expect(component.isAddMode).toBe(true);
+    expect(component.isAddMode).toBeTrue();
   });
 
   it('should initialize in edit mode when id is provided', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue('123');
+    paramMapSpy.get.and.returnValue('123');
     component.ngOnInit();
-    expect(component.isAddMode).toBe(false);
+    expect(component.isAddMode).toBeFalse();
     expect(component.id).toBe('123');
   });
 
   it('should create form with required validators', () => {
     component.ngOnInit();
     expect(component.form).toBeDefined();
-    expect(component.getForm.role.hasError('required')).toBe(true);
-    expect(component.getForm.displayName.hasError('required')).toBe(true);
-    expect(component.getForm.email.hasError('required')).toBe(true);
-    expect(component.getForm.lang.hasError('required')).toBe(true);
+    expect(component.getForm.role.hasError('required')).toBeTrue();
+    expect(component.getForm.displayName.hasError('required')).toBeTrue();
+    expect(component.getForm.email.hasError('required')).toBeTrue();
+    expect(component.getForm.lang.hasError('required')).toBeTrue();
   });
 
   it('should dispatch Clean action on initialization', () => {
     component.ngOnInit();
-    expect(mockStore.dispatch).toHaveBeenCalledWith(new fromActionsUser.Clean());
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch getUser action when in edit mode', () => {
-    mockActivatedRoute.snapshot.paramMap.get.and.returnValue('123');
+    paramMapSpy.get.and.returnValue('123');
     component.ngOnInit();
-    expect(mockStore.dispatch).toHaveBeenCalledWith(new fromActionsUser.getUser('123'));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getUser({ id: '123' }));
   });
 
   it('should set isProfessionalOrManager to true for manager role', () => {
     component.ngOnInit();
     component.getForm.role.setValue(Role.manager);
-    expect(component.isProfessionalOrManager).toBe(true);
+    expect(component.isProfessionalOrManager).toBeTrue();
   });
 
   it('should set isProfessionalOrManager to true for professional role', () => {
     component.ngOnInit();
     component.getForm.role.setValue(Role.professional);
-    expect(component.isProfessionalOrManager).toBe(true);
+    expect(component.isProfessionalOrManager).toBeTrue();
   });
 
   it('should add color validators for professional/manager roles', () => {
@@ -128,73 +145,81 @@ describe('UserComponent', () => {
       geometry: { location: { lat: () => 40.7128, lng: () => -74.0060 } },
       'formatted_address': 'New York, NY, USA',
     } as any;
-    
+
     component.getAddress(mockPlaceResult);
     expect(component.geometry).toBe(mockPlaceResult.geometry);
     expect(component.formattedAddress).toBe('New York, NY, USA');
-    expect(component.addressUpdated).toBe(true);
+    expect(component.addressUpdated).toBeTrue();
   });
 
   it('should not submit form when invalid', () => {
     component.ngOnInit();
+
+    storeSpy.dispatch.calls.reset();
+
     void component.submit;
-    expect(mockStore.dispatch).toHaveBeenCalledTimes(1); // Only Clean action
+    expect(storeSpy.dispatch).not.toHaveBeenCalled();
   });
 
   it('should submit form in add mode when valid', () => {
     component.ngOnInit();
-    component.getForm.role.setValue(Role.customer);
-    component.getForm.displayName.setValue('Test User');
-    component.getForm.email.setValue('test@example.com');
-    component.getForm.lang.setValue({ value: 'en' });
-    
+    const roleControl = component.getForm.role;
+    roleControl.setValue(Role.customer);
+    roleControl.markAsDirty();
+
+    const displayNameControl = component.getForm.displayName;
+    displayNameControl.setValue('Test User');
+    displayNameControl.markAsDirty();
+
+    const emailControl = component.getForm.email;
+    emailControl.setValue('test@example.com');
+    emailControl.markAsDirty();
+
+    const langControl = component.getForm.lang;
+    langControl.setValue({ icon: 'gb', value: 'en_GB', text: 'EN', flag: flagGb });
+    langControl.markAsDirty();
+
+    const phoneControl = component.getForm.phone;
+    phoneControl.setValue('+31234567890');
+    phoneControl.markAsDirty();
+
+    expect(component.form.valid).toBeTrue();
+
+    storeSpy.dispatch.calls.reset();
+
     void component.submit;
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      jasmine.any(fromActionsUser.SaveUser),
-    );
+    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
+    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+      user: jasmine.objectContaining({
+        displayName: 'Test User',
+        email: 'test@example.com',
+        lang: 'en_GB',
+      }),
+      type: '[User] Save',
+    }));
   });
 
   it('should handle errors from store', () => {
+    component.ngOnInit();
     const stateWithErrors = {
       subErrors: [
         { field: 'email', message: 'Email already exists' },
       ],
     };
-    mockStore.select.and.returnValue(of(stateWithErrors));
-    
-    // Create a new component instance with the error state
-    const errorComponent = new UserComponent(
-      mockTranslateService,
-      mockActivatedRoute,
-      mockStore,
-      formBuilder,
-      mockRouter,
-      mockChangeDetectorRef,
-    );
-    
-    errorComponent.ngOnInit();
-    
-    expect(errorComponent.errors.email).toBe('Email already exists');
-    expect(errorComponent.getForm.email.hasError('incorrect')).toBe(true);
+    state$.next(stateWithErrors);
+
+    expect(component.errors.email).toBe('Email already exists');
+    expect(component.getForm.email.hasError('incorrect')).toBeTrue();
   });
 
   it('should navigate to users list on successful response', () => {
-    const stateWithResponse = { response: { success: true } };
-    mockStore.select.and.returnValue(of(stateWithResponse));
-    
-    // Create a new component instance with the success state
-    const successComponent = new UserComponent(
-      mockTranslateService,
-      mockActivatedRoute,
-      mockStore,
-      formBuilder,
-      mockRouter,
-      mockChangeDetectorRef,
-    );
-    
-    successComponent.ngOnInit();
-    
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['en', 'users']);
+    component.ngOnInit();
+
+    state$.next({
+      response: true,
+    });
+
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'users']);
   });
 
   it('should unsubscribe on destroy', () => {

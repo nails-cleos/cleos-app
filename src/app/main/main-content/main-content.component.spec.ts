@@ -1,7 +1,7 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { MainContentComponent } from './main-content.component';
-import { BehaviorSubject, of } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AuthUserService } from '../../services/auth-user.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -11,88 +11,76 @@ import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Router } from '@angular/router';
 import { MainContentService } from '../main-content.service';
 import { ToastService } from '../../services/toast.service';
-import * as fromActionsMain from '../../store/main.actions';
 import { ISocialLink } from '../../interfaces/main';
+import { clean, sendMessage } from '../../store/main.actions';
+import { AppState } from '../../store/app.states';
 
 describe('MainContentComponent', () => {
   let component: MainContentComponent;
   let fixture: ComponentFixture<MainContentComponent>;
-  let store: Store;
-  let translate: TranslateService;
-  let router: Router;
-  let toastService: ToastService;
 
-  const mockStore = {
-    select: jasmine.createSpy('select').and.returnValue(of({})),
-    dispatch: jasmine.createSpy('dispatch'),
-  };
+  let state$: Subject<any>;
+  let authUser$: Subject<any>;
 
-  const mockAuthUserService = {
-    authUser: new BehaviorSubject({
-      isAuthenticated: false,
-      email: 'test@email.com',
-      displayName: 'Test User',
-      isDarkMode: true,
-    }),
-  };
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let toastServiceSpy: jasmine.SpyObj<ToastService>;
+  let bottomSheetSpy: jasmine.SpyObj<MatBottomSheet>;
+  let mainContentServiceSpy: jasmine.SpyObj<MainContentService>;
 
-  const mockBottomSheet = {
-    open: jasmine.createSpy('open'),
-  };
-
-  const mockRouter = {
-    navigate: jasmine.createSpy('navigate').and.returnValue(Promise.resolve(true)),
-  };
-
-  const mockMainContentService = {
-    configure: jasmine.createSpy('configure'),
-  };
-
-  const mockToastService = {
-    show: jasmine.createSpy('show'),
-    error: jasmine.createSpy('error'),
-  };
+  let translateService: TranslateService;
 
   beforeEach(async () => {
+    state$ = new Subject<any>();
+    authUser$ = new Subject<any>();
+
+    storeSpy = jasmine.createSpyObj<Store<AppState>>('Store', ['dispatch', 'select']);
+    routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate']);
+    toastServiceSpy = jasmine.createSpyObj<ToastService>('ToastService', ['show', 'error']);
+    bottomSheetSpy = jasmine.createSpyObj<MatBottomSheet>('MatBottomSheet', ['open']);
+    mainContentServiceSpy = jasmine.createSpyObj<MainContentService>('MainContentService', ['configure']);
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
+      authUser: authUser$.asObservable(),
+    });
+
+    storeSpy.select.and.returnValue(state$);
+
     await TestBed.configureTestingModule({
       imports: [MainContentComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: mockStore },
-        { provide: AuthUserService, useValue: mockAuthUserService },
-        { provide: MatBottomSheet, useValue: mockBottomSheet },
-        { provide: Router, useValue: mockRouter },
-        { provide: MainContentService, useValue: mockMainContentService },
-        { provide: ToastService, useValue: mockToastService },
-        TranslateService,
+        { provide: Store, useValue: storeSpy },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
+        { provide: MatBottomSheet, useValue: bottomSheetSpy },
+        { provide: Router, useValue: routerSpy },
+        { provide: MainContentService, useValue: mainContentServiceSpy },
+        { provide: ToastService, useValue: toastServiceSpy },
         provideNoopAnimations(),
         provideHttpClient(withJsonpSupport()),
       ],
-    })
-      .compileComponents();
-  });
+    }).compileComponents();
 
-  beforeEach(() => {
-    mockStore.dispatch.calls.reset();
-    mockBottomSheet.open.calls.reset();
-    mockRouter.navigate.calls.reset();
-    mockToastService.show.calls.reset();
-    mockToastService.error.calls.reset();
+    translateService = TestBed.inject(TranslateService);
+    translateService.setDefaultLang('en-GB');
+    translateService.use('en-GB');
 
     fixture = TestBed.createComponent(MainContentComponent);
     component = fixture.componentInstance;
-    store = TestBed.inject(Store);
-    translate = TestBed.inject(TranslateService);
-    router = TestBed.inject(Router);
-    toastService = TestBed.inject(ToastService);
     fixture.detectChanges();
   });
 
+  afterEach(() => {
+    state$.complete();
+    authUser$.complete();
+  });
+
   it('should create', () => {
+    component.ngOnInit();
     expect(component).toBeTruthy();
   });
 
   it('should initialize form with authenticated user data', () => {
-    mockAuthUserService.authUser.next({
+    authUser$.next({
       isAuthenticated: true,
       email: 'user@test.com',
       displayName: 'John Doe',
@@ -105,24 +93,26 @@ describe('MainContentComponent', () => {
   });
 
   it('should dispatch Clean action on init', () => {
-    expect(store.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsMain.Clean));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
   });
 
   it('should dispatch SendMessage action when form is valid', () => {
-    component.form.patchValue({
+    const message = {
       name: 'Test User',
       email: 'test@example.com',
       subject: 'Test Subject',
       body: 'Test Body',
-    });
+    };
+    component.form.patchValue(message);
+    expect(component.form.valid).toBeTrue();
 
     component.sendEmail();
 
-    expect(store.dispatch).toHaveBeenCalledWith(jasmine.any(fromActionsMain.SendMessage));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(sendMessage({ sendMessage: component.form.value }));
   });
 
   it('should not dispatch SendMessage action when form is invalid', () => {
-    mockStore.dispatch.calls.reset();
+    storeSpy.dispatch.calls.reset();
     component.form.patchValue({
       name: '',
       email: 'invalid-email',
@@ -132,8 +122,8 @@ describe('MainContentComponent', () => {
 
     component.sendEmail();
 
-    const sendMessageCalls = mockStore.dispatch.calls.all().filter(
-      (call: any) => call.args[0] instanceof fromActionsMain.SendMessage,
+    const sendMessageCalls = storeSpy.dispatch.calls.all().filter(
+      (call: any) => call.args[0] instanceof sendMessage,
     );
     expect(sendMessageCalls.length).toBe(0);
   });
@@ -148,13 +138,13 @@ describe('MainContentComponent', () => {
   it('should navigate to biab treatment', () => {
     component.goToTreatment('biab');
 
-    expect(router.navigate).toHaveBeenCalledWith([translate.currentLang, 'biab', 'treatment']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([translateService.currentLang, 'biab', 'treatment']);
   });
 
   it('should not navigate when treatment name is not biab', () => {
     component.goToTreatment('other');
 
-    expect(router.navigate).not.toHaveBeenCalled();
+    expect(routerSpy.navigate).not.toHaveBeenCalled();
   });
 
   it('should update social icon on hover', () => {
@@ -200,7 +190,7 @@ describe('MainContentComponent', () => {
     expect(component.works.length).toBe(2);
   }));
 
-  it('should move to next slide in slider', fakeAsync(() => {
+  it('should move to next slide in slider', () => {
     component.currentIndex = 0;
     component.slides = [
       { id: '1', image: 'img1.jpg', order: 0 },
@@ -216,37 +206,21 @@ describe('MainContentComponent', () => {
 
     component['moveForwardSlide']();
     expect(component.currentIndex).toBe(0); // Loop back to start
-  }));
+  });
 
-  it('should display error toast when error message is received', fakeAsync(() => {
-    const errorSubject = new BehaviorSubject({ errorMessage: 'Error occurred' });
-    mockStore.select.and.returnValue(errorSubject);
+  it('should display error toast when error message is received', () => {
+    state$.next({ errorMessage: 'Error occurred' });
 
-    // Create a new component instance to trigger subscription
-    fixture = TestBed.createComponent(MainContentComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    expect(toastServiceSpy.error).toHaveBeenCalledWith('Error occurred');
+  });
 
-    tick();
-
-    expect(toastService.error).toHaveBeenCalledWith('Error occurred');
-  }));
-
-  it('should display success toast when response is received', fakeAsync(() => {
-    const responseSubject = new BehaviorSubject({
+  it('should display success toast when response is received', () => {
+    state$.next({
       response: { message: 'Success', toastType: 'success' },
     });
-    mockStore.select.and.returnValue(responseSubject);
 
-    // Create a new component instance to trigger subscription
-    fixture = TestBed.createComponent(MainContentComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-
-    tick();
-
-    expect(toastService.show).toHaveBeenCalledWith('Success', 'success');
-  }));
+    expect(toastServiceSpy.show).toHaveBeenCalledWith('Success', 'success');
+  });
 
   it('should unsubscribe on destroy', () => {
     spyOn(component['subscription'] as any, 'unsubscribe');
@@ -257,7 +231,7 @@ describe('MainContentComponent', () => {
   });
 
   it('should set dark mode based on auth user', () => {
-    mockAuthUserService.authUser.next({
+    authUser$.next({
       isAuthenticated: false,
       email: 'test@test.com',
       displayName: 'Test',
@@ -266,7 +240,7 @@ describe('MainContentComponent', () => {
 
     expect(component.isDark).toBeTrue();
 
-    mockAuthUserService.authUser.next({
+    authUser$.next({
       isAuthenticated: false,
       email: 'test@test.com',
       displayName: 'Test',

@@ -1,5 +1,19 @@
+import { createReducer, on } from '@ngrx/store';
 import { Pagination } from '../../interfaces/pagination';
-import { All, OfficeActionTypes } from '../office.actions';
+import {
+  clean,
+  createOffice,
+  deleteOffice,
+  getAllManager,
+  getOffice,
+  getOfficesPage,
+  managerSuccess,
+  officeFailure,
+  officeSaveSuccess,
+  officeSelected,
+  officeSuccess,
+  updateOffice,
+} from '../office.actions';
 import { IOffice } from '../../interfaces/office';
 import { IUser } from '../../interfaces/user';
 import { IError, IResponseSuccess } from '../../interfaces/common';
@@ -26,101 +40,75 @@ export const initialState: State = {
   isLoading: false,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case OfficeActionTypes.getOfficesPage: {
-      return {
-        ...state,
-        data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IOffice>,
-        errorMessage: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case OfficeActionTypes.getAllManager: {
-      return {
-        ...state,
-        managers: undefined,
-        errorMessage: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case OfficeActionTypes.getOffice: {
-      return {
-        ...state,
-        data: {} as IOffice,
-        errorMessage: undefined,
-        subErrors: undefined,
-        selected: undefined,
-        response: undefined,
-      };
-    }
-    case OfficeActionTypes.officeSuccess: {
-      return {
-        ...state,
-        data: action.data,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case OfficeActionTypes.managerSuccess: {
-      return {
-        ...state,
-        managers: action.managers,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case OfficeActionTypes.officeSaveSuccess: {
-      return {
-        ...state,
-        response: action,
-        selected: undefined,
-        errorMessage: undefined,
-        subErrors: undefined,
-        isLoading: false,
-      };
-    }
-    case OfficeActionTypes.officeSelected: {
-      return {
-        ...state,
-        selected: action.selected,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-      };
-    }
-    case OfficeActionTypes.officeFailure: {
-      return {
-        ...state,
-        errorMessage: action.error.message,
-        error: action.error,
-        subErrors: action.error.subErrors,
-        response: undefined,
-        isLoading: false,
-      };
-    }
-    case OfficeActionTypes.updateOffice:
-    case OfficeActionTypes.createOffice:
-    case OfficeActionTypes.deleteOffice: {
-      return {
-        ...state,
-        errorMessage: undefined,
-        subErrors: undefined,
-        response: undefined,
-        isLoading: true,
-      };
-    }
-    case OfficeActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const officeReducer = createReducer(
+  initialState,
+  on(getOfficesPage, (state) => ({
+    ...state,
+    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IOffice>,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getAllManager, (state) => ({
+    ...state,
+    managers: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getOffice, (state) => ({
+    ...state,
+    data: {} as IOffice,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(officeSuccess, (state, { data }) => ({
+    ...state,
+    data,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(managerSuccess, (state, { managers }) => ({
+    ...state,
+    managers,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(officeSaveSuccess, (state, action) => ({
+    ...state,
+    response: action,
+    selected: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    isLoading: false,
+  })),
+  on(officeSelected, (state, { selected }) => ({
+    ...state,
+    selected,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(officeFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error,
+    subErrors: error.subErrors,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(updateOffice, createOffice, deleteOffice, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(clean, () => initialState),
+);

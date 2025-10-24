@@ -1,7 +1,7 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DashComponent } from './dash.component';
-import { of } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthUserService } from '../services/auth-user.service';
@@ -9,33 +9,39 @@ import { AuthUserService } from '../services/auth-user.service';
 describe('DashComponent', () => {
   let component: DashComponent;
   let fixture: ComponentFixture<DashComponent>;
-  const mockStore = {
-    select: jasmine.createSpy('select').and.returnValue(of({})),
-    dispatch: jasmine.createSpy('dispatch'),
-  };
 
-  const mockAuthUserService = {
-    authUser: of({
-      isDarkMode: true,
-      isAdmin: true,
-      isManager: true,
-    }),
-  };
+  let state$: Subject<any>;
+  let authUser$: Subject<any>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+  let storeSpy: jasmine.SpyObj<Store<any>>;
+  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+
+  beforeEach(async () => {
+    state$ = new Subject();
+    authUser$ = new Subject();
+
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
+      authUser: authUser$.asObservable(),
+    });
+
+    storeSpy.select.and.returnValue(state$.asObservable());
+    await TestBed.configureTestingModule({
       imports: [DashComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: mockStore },
-        { provide: AuthUserService, useValue: mockAuthUserService },
+        { provide: Store, useValue: storeSpy },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
       ],
     }).compileComponents();
-  }));
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(DashComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    state$.complete();
+    authUser$.complete();
   });
 
   it('should compile', () => {

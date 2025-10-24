@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectPaymentState } from '../../../store/app.states';
 import { Store } from '@ngrx/store';
-import * as fromActionsPayment from '../../../store/payment.actions';
+import { paymentNotComplete, paymentSave } from '../../../store/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { PaymentStatus, PaymentType } from '../../../interfaces/payment';
 import { SharedModule } from '../../../shared/shared.module';
@@ -30,7 +30,7 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
   private readonly language: string;
 
   constructor(private route: ActivatedRoute, private router: Router, private store: Store<AppState>,
-              private translate: TranslateService) {
+    private translate: TranslateService) {
     this.getState = this.store.select(selectPaymentState);
     this.route.queryParams.subscribe(params => {
       this.paymentId = params.payment_id || params.paymentId;
@@ -88,15 +88,13 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
       if (!type || !referenceId) {
         const message = this.translate.instant('ME.PAYMENT.ERROR', { reason: 'incomplete' });
         this.store.dispatch(
-          new fromActionsPayment.PaymentNotComplete([{ message }]),
+          paymentNotComplete({ subError: [{ message }] }),
         );
         // this.router.navigate([this.language, 'me', this.path, this.id, 'payment']);
         return;
       }
       const paymentStatus = new PaymentStatus(this.paymentId, type, referenceId, this.reason);
-      this.store.dispatch(
-        new fromActionsPayment.PaymentSave(this.id, this.path!, status!, paymentStatus),
-      );
+      this.store.dispatch(paymentSave({ id: this.id, path: this.path!, status: status!, paymentStatus }));
     }, 500);
   }
 

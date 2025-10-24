@@ -9,8 +9,7 @@ describe('PriceExtrasComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [PriceExtrasComponent],
-    })
-      .compileComponents();
+    }).compileComponents();
     
     fixture = TestBed.createComponent(PriceExtrasComponent);
     component = fixture.componentInstance;

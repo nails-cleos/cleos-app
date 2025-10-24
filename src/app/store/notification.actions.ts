@@ -1,9 +1,9 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
 import { IError, PageRequest } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
 import { INotification } from '../interfaces/notification';
 
-export enum NotificationActionTypes {
+enum NotificationActionTypes {
   getNotificationsPage = '[Notification] Get notifications page',
   notificationSuccess = '[Notification] Notifications success',
   notificationFailure = '[Notification] Failure',
@@ -15,70 +15,44 @@ export enum NotificationActionTypes {
   clean = '[Notification] Clean'
 }
 
-export class GetNotificationsPage extends PageRequest implements Action {
-  readonly type = NotificationActionTypes.getNotificationsPage;
-}
+export const getNotificationsPage = createAction(
+  NotificationActionTypes.getNotificationsPage,
+  props<PageRequest>(),
+);
 
-export class NotificationSuccess implements Action {
-  readonly type = NotificationActionTypes.notificationSuccess;
+export const notificationSuccess = createAction(
+  NotificationActionTypes.notificationSuccess,
+  props<{ data: Pagination<INotification> | string }>(),
+);
 
-  constructor(public data: Pagination<INotification> | string) {
-  }
-}
+export const notificationFailure = createAction(
+  NotificationActionTypes.notificationFailure,
+  props<{ error: IError }>(),
+);
 
-export class NotificationFailure implements Action {
-  readonly type = NotificationActionTypes.notificationFailure;
+export const readNotification = createAction(
+  NotificationActionTypes.readNotification,
+  props<{ id: string }>(),
+);
 
-  constructor(public error: IError) {
-  }
-}
+export const deleteNotification = createAction(
+  NotificationActionTypes.deleteNotification,
+  props<{ notification: INotification }>(),
+);
 
-export class ReadNotification implements Action {
-  readonly type = NotificationActionTypes.readNotification;
+export const notificationDeleteSuccess = createAction(
+  NotificationActionTypes.notificationDeleteSuccess,
+  props<{ data: INotification }>(),
+);
 
-  constructor(public id: string) {
-  }
-}
+export const notificationReadSuccess = createAction(
+  NotificationActionTypes.notificationReadSuccess,
+  props<{ data?: INotification }>(),
+);
 
-export class DeleteNotification implements Action {
-  readonly type = NotificationActionTypes.deleteNotification;
+export const subscribeNotification = createAction(
+  NotificationActionTypes.subscribeNotification,
+  props<{ token: string }>(),
+);
 
-  constructor(public notification: INotification) {
-  }
-}
-
-export class NotificationDeleteSuccess implements Action {
-  readonly type = NotificationActionTypes.notificationDeleteSuccess;
-
-  constructor(public data: any) {
-  }
-}
-
-export class SubscribeNotification implements Action {
-  readonly type = NotificationActionTypes.subscribeNotification;
-
-  constructor(public token: string) {
-  }
-}
-
-export class NotificationReadSuccess implements Action {
-  readonly type = NotificationActionTypes.notificationReadSuccess;
-
-  constructor(public data?: INotification) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = NotificationActionTypes.clean;
-}
-
-export type All =
-  | GetNotificationsPage
-  | NotificationSuccess
-  | NotificationFailure
-  | ReadNotification
-  | DeleteNotification
-  | NotificationDeleteSuccess
-  | NotificationReadSuccess
-  | SubscribeNotification
-  | Clean;
+export const clean = createAction(NotificationActionTypes.clean);

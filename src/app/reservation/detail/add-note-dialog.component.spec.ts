@@ -7,6 +7,7 @@ import { AppMaterialModule } from '../../util/app-material.module';
 describe('AddNoteDialogComponent', () => {
   let component: AddNoteDialogComponent;
   let fixture: ComponentFixture<AddNoteDialogComponent>;
+
   let mockDialogRef: jasmine.SpyObj<MatDialogRef<AddNoteDialogComponent>>;
 
   const mockData = {

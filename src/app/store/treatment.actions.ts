@@ -1,16 +1,16 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
 import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
 import { ITreatmentAll, ITreatmentGroup } from '../interfaces/treatment';
 import { IColor } from '../interfaces/color';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { Pagination } from '../interfaces/pagination';
 
-export enum TreatmentActionTypes {
+enum TreatmentActionTypes {
   getTreatmentsPage = '[Treatment] Get treatments page',
   getAllTreatmentsGroup = '[Treatment] Get all treatments group',
   getAllColors = '[Treatment] Get all colors',
   treatmentSuccess = '[Treatment] Success',
-  colorSuccess = '[Treatment] color Success',
+  colorSuccess = '[Treatment] Color Success',
   createTreatment = '[Treatment] Create treatment',
   updateTreatmentGroup = '[Treatment] Update treatment group by id',
   sortTreatment = '[Treatment] Sort treatment',
@@ -25,125 +25,82 @@ export enum TreatmentActionTypes {
   clean = '[Treatment] Clean'
 }
 
-export class GetTreatmentsPage extends PageRequest implements Action {
-  readonly type = TreatmentActionTypes.getTreatmentsPage;
-}
+export const getTreatmentsPage = createAction(
+  TreatmentActionTypes.getTreatmentsPage,
+  props<PageRequest>(),
+);
 
-export class GetAllTreatmentsGroup implements Action {
-  readonly type = TreatmentActionTypes.getAllTreatmentsGroup;
-}
+export const getAllTreatmentsGroup = createAction(
+  TreatmentActionTypes.getAllTreatmentsGroup,
+);
 
-export class GetAllColors implements Action {
-  readonly type = TreatmentActionTypes.getAllColors;
-}
+export const getAllColors = createAction(
+  TreatmentActionTypes.getAllColors,
+);
 
-export class TreatmentSuccess implements Action {
-  readonly type = TreatmentActionTypes.treatmentSuccess;
+export const treatmentSuccess = createAction(
+  TreatmentActionTypes.treatmentSuccess,
+  props<{ data: ITreatmentGroup[] | Pagination<ITreatmentGroup> }>(),
+);
 
-  constructor(public data: ITreatmentGroup[] | Pagination<ITreatmentGroup>) {
-  }
-}
+export const colorSuccess = createAction(
+  TreatmentActionTypes.colorSuccess,
+  props<{ colors: IColor[] }>(),
+);
 
-export class CreateTreatment implements Action {
-  readonly type = TreatmentActionTypes.createTreatment;
+export const createTreatment = createAction(
+  TreatmentActionTypes.createTreatment,
+  props<{ treatmentGroup: ITreatmentGroup }>(),
+);
 
-  constructor(public treatment: ITreatmentGroup) {
-  }
-}
+export const updateTreatmentGroup = createAction(
+  TreatmentActionTypes.updateTreatmentGroup,
+  props<{ id: string; treatmentGroup: ITreatmentGroup }>(),
+);
 
-export class UpdateTreatmentGroup implements Action {
-  readonly type = TreatmentActionTypes.updateTreatmentGroup;
+export const sortTreatment = createAction(
+  TreatmentActionTypes.sortTreatment,
+  props<{ treatments: ISorted[] }>(),
+);
 
-  constructor(public id: string, public treatment: ITreatmentGroup) {
-  }
-}
+export const sortGroupTreatment = createAction(
+  TreatmentActionTypes.sortGroupTreatment,
+  props<{ groups: ISorted[] }>(),
+);
 
-export class SortGroupTreatment implements Action {
-  readonly type = TreatmentActionTypes.sortGroupTreatment;
+export const treatmentSaveSuccess = createAction(
+  TreatmentActionTypes.treatmentSaveSuccess,
+  props<ResponseSuccess>(),
+);
 
-  constructor(public groups: ISorted[]) {
-  }
-}
+export const treatmentFailure = createAction(
+  TreatmentActionTypes.treatmentFailure,
+  props<{ error: IError }>(),
+);
 
-export class SortTreatment implements Action {
-  readonly type = TreatmentActionTypes.sortTreatment;
+export const treatmentSelected = createAction(
+  TreatmentActionTypes.treatmentSelected,
+  props<{ selected?: ITreatmentGroup; path?: string }>(),
+);
 
-  constructor(public treatments: ISorted[]) {
-  }
-}
+export const getTreatmentGroup = createAction(
+  TreatmentActionTypes.getTreatmentGroup,
+  props<{ id: string; path: string }>(),
+);
 
-export class ColorSuccess implements Action {
-  readonly type = TreatmentActionTypes.colorSuccess;
+export const deleteTreatmentGroup = createAction(
+  TreatmentActionTypes.deleteTreatmentGroup,
+  props<{ id: string; name: string }>(),
+);
 
-  constructor(public colors: IColor[]) {
-  }
-}
+export const getAllTreatmentsHistory = createAction(
+  TreatmentActionTypes.getAllTreatmentsHistory,
+  props<{ id: string; treatmentId: string }>(),
+);
 
-export class TreatmentSaveSuccess extends ResponseSuccess implements Action {
-  readonly type = TreatmentActionTypes.treatmentSaveSuccess;
-}
+export const treatmentHistorySuccess = createAction(
+  TreatmentActionTypes.treatmentHistorySuccess,
+  props<{ history: ITreatmentAll[] }>(),
+);
 
-export class TreatmentFailure implements Action {
-  readonly type = TreatmentActionTypes.treatmentFailure;
-
-  constructor(public error: IError) {
-  }
-}
-
-export class TreatmentSelected implements Action {
-  readonly type = TreatmentActionTypes.treatmentSelected;
-
-  constructor(public selected?: ITreatmentGroup, public path?: string) {
-  }
-}
-
-export class GetTreatmentGroup implements Action {
-  readonly type = TreatmentActionTypes.getTreatmentGroup;
-
-  constructor(public id: string, public path: string) {
-  }
-}
-
-export class DeleteTreatmentGroup implements Action {
-  readonly type = TreatmentActionTypes.deleteTreatmentGroup;
-
-  constructor(public id: string, public name: string) {
-  }
-}
-
-export class GetAllTreatmentsHistory implements Action {
-  readonly type = TreatmentActionTypes.getAllTreatmentsHistory;
-
-  constructor(public id: string, public treatmentId: string) {
-  }
-}
-
-export class TreatmentHistorySuccess implements Action {
-  readonly type = TreatmentActionTypes.treatmentHistorySuccess;
-
-  constructor(public history: ITreatmentAll[]) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = TreatmentActionTypes.clean;
-}
-
-export type All =
-  | GetTreatmentsPage
-  | GetAllTreatmentsGroup
-  | GetAllColors
-  | CreateTreatment
-  | UpdateTreatmentGroup
-  | SortTreatment
-  | SortGroupTreatment
-  | TreatmentSuccess
-  | ColorSuccess
-  | TreatmentSaveSuccess
-  | TreatmentFailure
-  | GetTreatmentGroup
-  | TreatmentSelected
-  | DeleteTreatmentGroup
-  | GetAllTreatmentsHistory
-  | TreatmentHistorySuccess
-  | Clean;
+export const clean = createAction(TreatmentActionTypes.clean);

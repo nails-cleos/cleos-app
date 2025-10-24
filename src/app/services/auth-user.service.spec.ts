@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NgcCookieConsentService } from 'ngx-cookieconsent';
 
 import { AuthUserService } from './auth-user.service';
@@ -9,7 +9,7 @@ import { Role } from '../interfaces/token';
 describe('AuthUserService', () => {
   let service: AuthUserService;
   let cookieConsentService: jasmine.SpyObj<NgcCookieConsentService>;
-  let translateService: jasmine.SpyObj<TranslateService>;
+  let translateService: TranslateService;
 
   const mockUser: IUserAll = {
     id: 'user-123',
@@ -56,7 +56,6 @@ describe('AuthUserService', () => {
       'destroy',
       'init',
     ]);
-    const translateSpy = jasmine.createSpyObj('TranslateService', ['instant']);
 
     // Mock cookie consent service config
     cookieSpy.getConfig.and.returnValue({
@@ -72,16 +71,18 @@ describe('AuthUserService', () => {
     });
 
     TestBed.configureTestingModule({
+      imports: [TranslateModule.forRoot()],
       providers: [
         AuthUserService,
         { provide: NgcCookieConsentService, useValue: cookieSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     });
 
     service = TestBed.inject(AuthUserService);
     cookieConsentService = TestBed.inject(NgcCookieConsentService) as jasmine.SpyObj<NgcCookieConsentService>;
-    translateService = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
+    translateService = TestBed.inject(TranslateService);
+    translateService.setDefaultLang('en-GB');
+    translateService.use('en-GB');
   });
 
   it('should be created', () => {
@@ -91,15 +92,15 @@ describe('AuthUserService', () => {
   it('should initialize with default auth user', () => {
     const initialAuthUser = service.authUser.getValue();
 
-    expect(initialAuthUser.isDarkMode).toBe(false);
-    expect(initialAuthUser.isAdmin).toBe(false);
-    expect(initialAuthUser.isManager).toBe(false);
-    expect(initialAuthUser.isRoomAdmin).toBe(false);
-    expect(initialAuthUser.isProfessional).toBe(false);
-    expect(initialAuthUser.isCustomer).toBe(false);
-    expect(initialAuthUser.hasAdminRole).toBe(false);
-    expect(initialAuthUser.isAuthenticated).toBe(false);
-    expect(initialAuthUser.showCash).toBe(false);
+    expect(initialAuthUser.isDarkMode).toBeFalse();
+    expect(initialAuthUser.isAdmin).toBeFalse();
+    expect(initialAuthUser.isManager).toBeFalse();
+    expect(initialAuthUser.isRoomAdmin).toBeFalse();
+    expect(initialAuthUser.isProfessional).toBeFalse();
+    expect(initialAuthUser.isCustomer).toBeFalse();
+    expect(initialAuthUser.hasAdminRole).toBeFalse();
+    expect(initialAuthUser.isAuthenticated).toBeFalse();
+    expect(initialAuthUser.showCash).toBeFalse();
     expect(initialAuthUser.locale).toBe(navigator.language);
     expect(initialAuthUser.referralMax).toBe(5);
     expect(initialAuthUser.email).toBeUndefined();
@@ -114,72 +115,72 @@ describe('AuthUserService', () => {
     it('should return initial auth user when no user provided', () => {
       const result = service.reloadUser();
 
-      expect(result.isAuthenticated).toBe(false);
-      expect(result.hasAdminRole).toBe(false);
+      expect(result.isAuthenticated).toBeFalse();
+      expect(result.hasAdminRole).toBeFalse();
       expect(result.userId).toBeUndefined();
     });
 
     it('should correctly set professional user properties', () => {
       const result = service.reloadUser(mockUser);
 
-      expect(result.isAuthenticated).toBe(true);
-      expect(result.isProfessional).toBe(true);
-      expect(result.isCustomer).toBe(false);
-      expect(result.isAdmin).toBe(false);
-      expect(result.isManager).toBe(false);
-      expect(result.isRoomAdmin).toBe(false);
-      expect(result.hasAdminRole).toBe(true); // Professional has admin role
+      expect(result.isAuthenticated).toBeTrue();
+      expect(result.isProfessional).toBeTrue();
+      expect(result.isCustomer).toBeFalse();
+      expect(result.isAdmin).toBeFalse();
+      expect(result.isManager).toBeFalse();
+      expect(result.isRoomAdmin).toBeFalse();
+      expect(result.hasAdminRole).toBeTrue(); // Professional has admin role
       expect(result.professionalId).toBe('user-123');
       expect(result.customerId).toBeUndefined();
       expect(result.userId).toBe('user-123');
       expect(result.email).toBe('john@example.com');
       expect(result.displayName).toBe('John Doe');
       expect(result.locale).toBe('en-US');
-      expect(result.showCash).toBe(true);
+      expect(result.showCash).toBeTrue();
       expect(result.referralMax).toBe(10);
       expect(result.theme).toBe('light-theme');
-      expect(result.isDarkMode).toBe(false);
+      expect(result.isDarkMode).toBeFalse();
     });
 
     it('should correctly set admin user properties', () => {
       const result = service.reloadUser(mockAdminUser);
 
-      expect(result.isAuthenticated).toBe(true);
-      expect(result.isProfessional).toBe(false);
-      expect(result.isCustomer).toBe(false);
-      expect(result.isAdmin).toBe(true);
-      expect(result.isManager).toBe(false);
-      expect(result.isRoomAdmin).toBe(false);
-      expect(result.hasAdminRole).toBe(true);
+      expect(result.isAuthenticated).toBeTrue();
+      expect(result.isProfessional).toBeFalse();
+      expect(result.isCustomer).toBeFalse();
+      expect(result.isAdmin).toBeTrue();
+      expect(result.isManager).toBeFalse();
+      expect(result.isRoomAdmin).toBeFalse();
+      expect(result.hasAdminRole).toBeTrue();
       expect(result.professionalId).toBeUndefined();
       expect(result.customerId).toBeUndefined();
       expect(result.userId).toBe('admin-123');
       expect(result.email).toBe('admin@example.com');
       expect(result.displayName).toBe('Admin User');
       expect(result.locale).toBe('en-GB');
-      expect(result.showCash).toBe(false);
+      expect(result.showCash).toBeFalse();
       expect(result.referralMax).toBe(3);
       expect(result.theme).toBe('dark-theme');
-      expect(result.isDarkMode).toBe(true);
+      expect(result.isDarkMode).toBeTrue();
     });
 
     it('should correctly set customer user properties', () => {
       const result = service.reloadUser(mockCustomerUser);
 
-      expect(result.isAuthenticated).toBe(true);
-      expect(result.isProfessional).toBe(false);
-      expect(result.isCustomer).toBe(true);
-      expect(result.isAdmin).toBe(false);
-      expect(result.isManager).toBe(false);
-      expect(result.isRoomAdmin).toBe(false);
-      expect(result.hasAdminRole).toBe(false); // Customer doesn't have admin role
+      expect(result.isAuthenticated).toBeTrue();
+      expect(result.isProfessional).toBeFalse();
+      expect(result.isCustomer).toBeTrue();
+      expect(result.isAdmin).toBeFalse();
+      expect(result.isManager).toBeFalse();
+      expect(result.isRoomAdmin).toBeFalse();
+      expect(result.hasAdminRole).toBeFalse(); // Customer doesn't have admin role
       expect(result.professionalId).toBeUndefined();
       expect(result.customerId).toBe('customer-123');
       expect(result.userId).toBe('customer-123');
       expect(result.email).toBe('customer@example.com');
       expect(result.displayName).toBe('Customer User');
       expect(result.locale).toBe('de-DE');
-      expect(result.showCash).toBe(false); // Default when not specified
+      expect(result.showCash).toBeFalse(); // Default when not specified
       expect(result.referralMax).toBe(5); // Default when not specified
     });
 
@@ -194,9 +195,9 @@ describe('AuthUserService', () => {
 
       const result = service.reloadUser(multiRoleUser);
 
-      expect(result.isProfessional).toBe(true);
-      expect(result.isManager).toBe(true);
-      expect(result.hasAdminRole).toBe(true);
+      expect(result.isProfessional).toBeTrue();
+      expect(result.isManager).toBeTrue();
+      expect(result.hasAdminRole).toBeTrue();
       expect(result.professionalId).toBe('user-123');
     });
 
@@ -210,8 +211,8 @@ describe('AuthUserService', () => {
 
       const result = service.reloadUser(roomAdminUser);
 
-      expect(result.isRoomAdmin).toBe(true);
-      expect(result.hasAdminRole).toBe(true);
+      expect(result.isRoomAdmin).toBeTrue();
+      expect(result.hasAdminRole).toBeTrue();
     });
 
     it('should use default values when user properties are undefined', () => {
@@ -228,7 +229,7 @@ describe('AuthUserService', () => {
 
       expect(result.locale).toBe(navigator.language); // Uses default
       expect(result.referralMax).toBe(5); // Uses default
-      expect(result.showCash).toBe(false); // Uses default
+      expect(result.showCash).toBeFalse(); // Uses default
     });
 
     it('should emit updated auth user via BehaviorSubject', () => {
@@ -247,8 +248,8 @@ describe('AuthUserService', () => {
 
       const result = service.updateMode(true);
 
-      expect(result.isDarkMode).toBe(true);
-      expect(service.authUser.getValue().isDarkMode).toBe(true);
+      expect(result.isDarkMode).toBeTrue();
+      expect(service.authUser.getValue().isDarkMode).toBeTrue();
     });
 
     it('should update dark mode to false', () => {
@@ -257,8 +258,8 @@ describe('AuthUserService', () => {
 
       const result = service.updateMode(false);
 
-      expect(result.isDarkMode).toBe(false);
-      expect(service.authUser.getValue().isDarkMode).toBe(false);
+      expect(result.isDarkMode).toBeFalse();
+      expect(service.authUser.getValue().isDarkMode).toBeFalse();
     });
 
     it('should emit updated auth user via BehaviorSubject', () => {
@@ -281,27 +282,28 @@ describe('AuthUserService', () => {
       expect(updatedAuthUser.email).toBe(originalAuthUser.email);
       expect(updatedAuthUser.displayName).toBe(originalAuthUser.displayName);
       expect(updatedAuthUser.isProfessional).toBe(originalAuthUser.isProfessional);
-      expect(updatedAuthUser.isDarkMode).toBe(true); // Only this should change
+      expect(updatedAuthUser.isDarkMode).toBeTrue(); // Only this should change
     });
   });
 
   describe('cookieConsent', () => {
     beforeEach(() => {
-      translateService.instant.and.returnValue({
-        HEADER: 'Cookie Header',
-        MESSAGE: 'Cookie Message',
-        DISMISS: 'Dismiss',
-        ALLOW: 'Allow',
-        DENY: 'Deny',
-        LINK: 'Link',
-        POLICY: 'Policy',
+      translateService.setTranslation('en-GB', {
+        COOKIE: {
+          HEADER: 'Cookie Header',
+          MESSAGE: 'Cookie Message',
+          DISMISS: 'Dismiss',
+          ALLOW: 'Allow',
+          DENY: 'Deny',
+          LINK: 'Link',
+          POLICY: 'Policy',
+        },
       });
     });
 
     it('should update cookie consent configuration with translated content', () => {
       service.cookieConsent(translateService);
 
-      expect(translateService.instant).toHaveBeenCalledWith('COOKIE');
       expect(cookieConsentService.getConfig).toHaveBeenCalled();
 
       const config = cookieConsentService.getConfig();
@@ -358,7 +360,7 @@ describe('AuthUserService', () => {
       service.reloadUser(mockUser);
 
       service.authUser.subscribe((authUser) => {
-        expect(authUser.isAuthenticated).toBe(true);
+        expect(authUser.isAuthenticated).toBeTrue();
         expect(authUser.userId).toBe('user-123');
       });
     });
@@ -373,12 +375,12 @@ describe('AuthUserService', () => {
 
       const result = service.reloadUser(userWithNoAuthorities);
 
-      expect(result.isAdmin).toBe(false);
-      expect(result.isManager).toBe(false);
-      expect(result.isProfessional).toBe(false);
-      expect(result.isCustomer).toBe(false);
-      expect(result.isRoomAdmin).toBe(false);
-      expect(result.hasAdminRole).toBe(false);
+      expect(result.isAdmin).toBeFalse();
+      expect(result.isManager).toBeFalse();
+      expect(result.isProfessional).toBeFalse();
+      expect(result.isCustomer).toBeFalse();
+      expect(result.isRoomAdmin).toBeFalse();
+      expect(result.hasAdminRole).toBeFalse();
     });
 
     it('should handle user with undefined authorities', () => {
@@ -393,14 +395,14 @@ describe('AuthUserService', () => {
     it('should handle null user input', () => {
       const result = service.reloadUser(null as any);
 
-      expect(result.isAuthenticated).toBe(false);
+      expect(result.isAuthenticated).toBeFalse();
       expect(result.userId).toBeUndefined();
     });
 
     it('should handle undefined user input', () => {
       const result = service.reloadUser(undefined);
 
-      expect(result.isAuthenticated).toBe(false);
+      expect(result.isAuthenticated).toBeFalse();
       expect(result.userId).toBeUndefined();
     });
   });

@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectAuthState } from '../store/app.states';
 import { Observable } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-import * as fromActionsLogin from '../store/auth.actions';
+import { redirect } from '../store/auth.actions';
 import { ToastService } from './toast.service';
 
 @Injectable({
@@ -42,7 +42,7 @@ export class PermissionsService {
           message = 'User not have the necessary permissions';
         }
         this.toastService.info(message);
-        this.store.dispatch(new fromActionsLogin.Redirect());
+        this.store.dispatch(redirect());
         return false;
       }
     }
