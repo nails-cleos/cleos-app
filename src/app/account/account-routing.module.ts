@@ -10,29 +10,29 @@ import { TransactionDetailComponent } from './transaction/detail/transaction-det
 const routes: Routes = [
   {
     path: 'customers/:customerId', component: AccountComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.roomAdmin, Role.manager, Role.professional]
-    }
+      roles: [Role.admin, Role.roomAdmin, Role.manager, Role.professional],
+    },
   },
   {
     path: ':id/transactions/add', component: TransactionComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.roomAdmin, Role.manager, Role.professional, Role.customer]
-    }
+      roles: [Role.admin, Role.roomAdmin, Role.manager, Role.professional, Role.customer],
+    },
   },
   {
     path: ':id/transactions/view', component: TransactionViewComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.roomAdmin, Role.manager, Role.professional, Role.customer]
-    }
+      roles: [Role.admin, Role.roomAdmin, Role.manager, Role.professional, Role.customer],
+    },
   },
   {
     path: ':id/transactions/:transactionId', component: TransactionDetailComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.roomAdmin, Role.manager, Role.professional, Role.customer]
-    }
-  }
+      roles: [Role.admin, Role.roomAdmin, Role.manager, Role.professional, Role.customer],
+    },
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class AccountRoutingModule {
 }

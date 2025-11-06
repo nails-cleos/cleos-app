@@ -14,14 +14,14 @@ const routes: Routes = [
       { path: 'catalogs', component: CatalogComponent },
       { path: 'privacy', component: PrivacyComponent },
       { path: 'term-and-conditions', component: TermsAndConditionsComponent },
-      { path: ':id/treatment', component: TreatmentComponent }
-    ]
-  }
+      { path: ':id/treatment', component: TreatmentComponent },
+    ],
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class MainRoutingModule {
 }

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -12,9 +12,9 @@ import { SharedModule } from '../../shared/shared.module';
   selector: 'app-treatment-table',
   templateUrl: './treatment-table.component.html',
   styleUrls: ['./treatment-table.component.scss'],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
-export class TreatmentTableComponent implements AfterViewInit, OnChanges {
+export class TreatmentTableComponent implements OnInit, AfterViewInit, OnChanges {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   @Input() treatment: ITreatmentAll[] = [];
@@ -24,9 +24,11 @@ export class TreatmentTableComponent implements AfterViewInit, OnChanges {
 
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
-  dateFormat: string;
+  dateFormat!: string;
 
-  constructor(protected translate: TranslateService) {
+  private translate = inject(TranslateService);
+
+  ngOnInit(): void {
     this.dateFormat = this.translate.currentLang;
   }
 
@@ -36,7 +38,7 @@ export class TreatmentTableComponent implements AfterViewInit, OnChanges {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ngOnChanges(_changes: SimpleChanges): void {
-    this.dataSource = this.treatment?.map(p => {
+    this.dataSource.data = this.treatment.map(p => {
       if (p.duration) {
         const duration = convertDuration(p.duration);
 

@@ -5,7 +5,7 @@ import {
   UntypedFormControl,
   UntypedFormGroup,
   Validators,
-  ɵTypedOrUntyped
+  ɵTypedOrUntyped,
 } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
@@ -14,7 +14,7 @@ import { AppState, selectNoteState } from '../store/app.states';
 import { ActivatedRoute, Router } from '@angular/router';
 import { backendFormatDate, createDateFromString } from '../util/dates';
 import { fieldChange, requireMatchAsync, valueChange } from '../util/validators';
-import * as fromActionsNote from '../store/note.actions';
+import { clean, createNote, deleteNote, getAllProfessional, getNote, updateNote } from '../store/note.actions';
 import { INote, INoteAll, Note } from '../interfaces/note';
 import { IUser, IUserAll } from '../interfaces/user';
 import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
@@ -28,7 +28,7 @@ import { BackButtonDirective } from '../directives/back-button.directive';
   selector: 'app-note',
   templateUrl: './note.component.html',
   styleUrls: ['./note.component.scss'],
-  imports: [SharedModule, BackButtonDirective]
+  imports: [SharedModule, BackButtonDirective],
 })
 export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() note?: INoteAll;
@@ -48,8 +48,8 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly language: string;
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>,
-              private formBuilder: FormBuilder, private route: ActivatedRoute, private router: Router,
-              public dialog: MatDialog) {
+    private formBuilder: FormBuilder, private route: ActivatedRoute, private router: Router,
+    public dialog: MatDialog) {
     this.isAddMode = true;
     this.getState = this.store.select(selectNoteState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
@@ -72,15 +72,12 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
     note.date = backendFormatDate(this.getForm.date.value);
 
     if (this.isAddMode) {
-      return this.store.dispatch(
-        new fromActionsNote.NoteSave(note)
-      );
+      this.store.dispatch(createNote({ note }));
     } else {
-      note.id = this.id;
-      return this.store.dispatch(
-        new fromActionsNote.NoteUpdate(note)
-      );
+      const id = this.id!;
+      this.store.dispatch(updateNote({ id, note }));
     }
+    return;
   }
 
   get delete(): void {
@@ -90,9 +87,7 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
 
     return executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: this.note }, result => {
       if (result) {
-        this.store.dispatch(
-          new fromActionsNote.DeleteNote(result)
-        );
+        this.store.dispatch(deleteNote({ id: result.id, description: result.description }));
       }
     });
   }
@@ -136,26 +131,26 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
       description: ['', Validators.required],
       professional: ['', Validators.required, requireMatchAsync],
       date: ['', Validators.required],
-      repeat: ['', Validators.required]
+      repeat: ['', Validators.required],
     });
     this.filteredOptions = this.getForm.professional.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals)
+      map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals),
     );
   };
 
   private filter = (name: string): IUser[] | undefined => this.professionals?.filter(
     option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private clean = (): void => this.store.dispatch(new fromActionsNote.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
-  private getProfessionals = (): void => this.store.dispatch(new fromActionsNote.GetAllProfessional());
+  private getProfessionals = (): void => this.store.dispatch(getAllProfessional());
 
-  private getNote = (): void => this.store.dispatch(new fromActionsNote.NoteFind(this.id));
+  private getNote = (): void => this.store.dispatch(getNote({ id: this.id! }));
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.professionals = state.professionals;
       this.note = state.selected;
       if (this.note?.id) {
@@ -167,7 +162,7 @@ export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
-      } else if (state.message) {
+      } else if (state.response) {
         this.router.navigate([this.language, 'reservation', 'calendar']);
       }
     });

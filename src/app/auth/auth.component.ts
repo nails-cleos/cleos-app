@@ -1,10 +1,9 @@
 import { Component, inject, OnDestroy, OnInit, Optional } from '@angular/core';
 import { Store } from '@ngrx/store';
-import * as fromActionsLogin from '../store/auth.actions';
+import { clean, login, redirect, signupSuccess } from '../store/auth.actions';
 import { AppState, selectAuthState } from '../store/app.states';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { CookieService } from 'ngx-cookie-service';
 import {
   Auth,
@@ -12,7 +11,7 @@ import {
   sendEmailVerification,
   signInWithEmailAndPassword,
   signInWithPopup,
-  updateProfile
+  updateProfile,
 } from '@angular/fire/auth';
 import { VERIFICATION_EMAIL } from '../util/helper';
 import { THEME } from '../util/theme';
@@ -23,12 +22,14 @@ import { GoogleAuthProvider } from 'firebase/auth';
 import { user } from 'rxfire/auth';
 import { fetchSignInMethodsForEmail } from '@firebase/auth';
 import { SharedModule } from '../shared/shared.module';
+import { ToastService } from '../services/toast.service';
+import { ResponseSuccess } from '../interfaces/common';
 
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.scss'],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class AuthComponent implements OnInit, OnDestroy {
 
@@ -36,7 +37,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   private formBuilder: FormBuilder = inject(FormBuilder);
   private store: Store<AppState> = inject(Store<AppState>);
   private route: ActivatedRoute = inject(ActivatedRoute);
-  private snackBar: MatSnackBar = inject(MatSnackBar);
+  private toastService: ToastService = inject(ToastService);
   private cookieService: CookieService = inject(CookieService);
   private translate: TranslateService = inject(TranslateService);
 
@@ -44,15 +45,15 @@ export class AuthComponent implements OnInit, OnDestroy {
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
     code: [''],
-    displayName: ['']
+    displayName: [''],
   });
 
   code: string | null = null;
   language: string = this.translate.currentLang;
   showForm: boolean = false;
   status: string = 'init';
-  tos: string = `${ environment.appServer }/${ this.language }/term-and-conditions`;
-  privacyPolicy: string = `${ environment.appServer }/${ this.language }/privacy`;
+  tos: string = `${environment.appServer}/${this.language}/term-and-conditions`;
+  privacyPolicy: string = `${environment.appServer}/${this.language}/privacy`;
 
   private subscription?: Subscription;
   private getState: Observable<any> = this.store.select(selectAuthState);
@@ -123,7 +124,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     this.authSubscription?.unsubscribe();
   }
 
-  private clean = (): void => this.store.dispatch(new fromActionsLogin.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private subscribe = (): void => {
     this.loginForm.get('code')?.valueChanges.subscribe(value => {
@@ -143,19 +144,16 @@ export class AuthComponent implements OnInit, OnDestroy {
           returnUrl = JSON.parse(atob(state.queryParams.state))?.returnUrl;
         }
         if (!state.redirect && !returnUrl) {
-          this.store.dispatch(
-            new fromActionsLogin.Redirect()
-          );
+          this.store.dispatch(redirect());
         }
       }
-      if (!state.subErrors && (state.errorMessage || state.message)) {
-        const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-        if (state.message) {
-          snackBarRef.afterDismissed().subscribe(() => {
-            this.clean();
-          });
+      if (!state.subErrors || !state.subErrors.length) {
+        if (state.errorMessage) {
+          this.toastService.error(state.errorMessage);
+        } else if (state.response) {
+          const response: ResponseSuccess = state.response;
+          const toastRef = this.toastService.show(response.message, response.toastType, 5000, 'button');
+          toastRef.onAction().subscribe(() => this.clean());
         }
       }
     });
@@ -168,22 +166,19 @@ export class AuthComponent implements OnInit, OnDestroy {
         if (!user.emailVerified && !this.cookieService.get(VERIFICATION_EMAIL)) {
           sendEmailVerification(user).then(() => {
             const message = this.translate.instant('AUTH.ACTIVATE_ACCOUNT.MESSAGE');
-            this.store.dispatch(
-              new fromActionsLogin.SignUpSuccess({ message })
-            );
+            this.store.dispatch(signupSuccess(message));
             this.cookieService.set(VERIFICATION_EMAIL, 'sent');
-          }).catch(e => console.error(`Error sending email verification. ${ e }`));
+          }).catch(e => console.error(`Error sending email verification. ${e}`));
         } else {
           user.getIdToken().then(idToken => {
-            const payload = {
-              idToken,
-              theme: this.cookieService.get(THEME),
-              code: localStorage.getItem('CODE'),
-              queryParams: this.route.snapshot.queryParams
-            };
             localStorage.removeItem('CODE');
             this.store.dispatch(
-              new fromActionsLogin.Login(payload)
+              login({
+                token: idToken,
+                queryParams: this.route.snapshot.queryParams,
+                theme: this.cookieService.get(THEME),
+                code: localStorage.getItem('CODE'),
+              }),
             );
           });
         }

@@ -9,7 +9,7 @@ import { AppMaterialModule } from '../../../util/app-material.module';
   templateUrl: './dialog.component.html',
   styleUrls: ['./dialog.component.scss'],
   imports: [AppMaterialModule, TranslatePipe],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DialogComponent {
   readonly dialogRef = inject(MatDialogRef<DialogComponent>);

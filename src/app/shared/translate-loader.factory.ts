@@ -36,7 +36,7 @@ export class MissingTranslateHandler implements MissingTranslationHandler {
       if (k in o) {
         o = o[k];
       } else {
-        return;
+        return undefined;
       }
     }
     return o;

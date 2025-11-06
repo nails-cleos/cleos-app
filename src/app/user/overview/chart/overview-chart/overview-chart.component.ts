@@ -9,7 +9,7 @@ import { ErrorComponent } from '../../../../shared/error/error.component';
   selector: 'app-overview-chart',
   templateUrl: './overview-chart.component.html',
   styleUrls: ['./overview-chart.component.scss'],
-  imports: [SharedModule, ErrorComponent]
+  imports: [SharedModule, ErrorComponent],
 })
 export class OverviewChartComponent implements OnChanges {
   @Input() chartSummary: IChart | undefined;
@@ -24,8 +24,8 @@ export class OverviewChartComponent implements OnChanges {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ngOnChanges(_changes: SimpleChanges): void {
-    if (this.chartSummary) {
-      this.chart = createChart(this.chartSummary, this.currency, this.isDark);
-    }
+  	if (this.chartSummary) {
+  		this.chart = createChart(this.chartSummary, this.currency, this.isDark);
+  	}
   }
 }

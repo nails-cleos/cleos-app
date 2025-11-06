@@ -2,13 +2,13 @@ import { DiscountType, IDiscount } from '../interfaces/discount';
 import { IAuthority, IUser, IUserAll } from '../interfaces/user';
 import { GroupService, IGroupService, IPrice, ITreatmentAll, Price } from '../interfaces/treatment';
 import { IPayment, IPaymentOption } from '../interfaces/payment';
-import { IDataEvent, IReservationAll } from '../interfaces/reservation';
+import { IReservationAll } from '../interfaces/reservation';
 import { IAdditionalAll } from '../interfaces/additional';
 import { TranslateService } from '@ngx-translate/core';
 import { IAddress, ILocation, IRoom, IRoomAll, ServiceType } from '../interfaces/room';
 import { IOffice } from '../interfaces/office';
 import { ICurrency, ICurrencyAll } from '../interfaces/currency';
-import { getTime, getTimeZone, localeTimeZoneDate, searchDates } from './dates';
+import { getTime, getTimeZone, localeTimeZoneDate } from './dates';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { isSameDay } from 'date-fns';
@@ -25,7 +25,7 @@ export const hasRoomAdmin = (authorities?: IAuthority[]): boolean => !!authoriti
 export const snakeToCamel = (value: string = ''): string =>
   value.toLowerCase().replace(/([-_]\w)/g, (g: string) => g[1].toUpperCase());
 
-export const getDisplayNameInitials = (user: IUserAll | undefined): string | undefined => {
+export const getDisplayNameInitials = (user?: IUserAll | IUser): string | undefined => {
   if (!user) {
     return undefined;
   }
@@ -34,7 +34,7 @@ export const getDisplayNameInitials = (user: IUserAll | undefined): string | und
   return names?.length ? names.reduce((p, c) => p + c.charAt(0), '') : undefined;
 };
 
-export const getUserImage = (user: IUser | IUserAll | undefined): string | undefined => {
+export const getUserImage = (user?: IUser | IUserAll): string | undefined => {
   let image;
   if (user && user.imageUrl) {
     if (user.imageUrl.indexOf('http') >= 0) {
@@ -47,18 +47,18 @@ export const getUserImage = (user: IUser | IUserAll | undefined): string | undef
   return image;
 };
 
-export interface ILocale {
+interface ILocale {
   language: string;
   flag: string;
   i18n: string;
 }
 
-export class Locale implements ILocale {
+class Locale implements ILocale {
   language: string;
   flag: string;
   i18n: string;
 
-  constructor(language: string = 'en-NL', flag: string = 'en_NL', i18n: string = 'en') {
+  constructor(language: string, i18n: string, flag: string = 'en_NL') {
     this.language = language;
     this.flag = flag;
     this.i18n = i18n;
@@ -83,7 +83,7 @@ export const getLocale = (userLang?: string | null): ILocale => {
   const match = locale?.match(/([-_])/);
   const i18n = !match ? locale : locale.substring(0, match.index);
 
-  return new Locale(locale, flag?.replace('-', '_'), i18n);
+  return new Locale(locale, i18n, flag?.replace('-', '_'));
 };
 
 export const round = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;
@@ -209,7 +209,7 @@ export const newPercentage = (price: IPrice, percentage: number): IPrice => new 
   price.priceWithExtras, price.priceWithAdditional, percentage, price.balance);
 
 export const createTreatmentGroupService = (groups: Map<string, GroupService>, list: ITreatmentAll[], currency: string,
-                                            isSelected: boolean = false): Map<string, GroupService> => {
+  isSelected: boolean = false): Map<string, GroupService> => {
   list.forEach((treatment: ITreatmentAll) => {
     const groupId = treatment.group.id;
     const mapGroup = groups.get(groupId);
@@ -229,7 +229,7 @@ export const createTreatmentGroupService = (groups: Map<string, GroupService>, l
   return groups;
 };
 
-export const createRoomOffice = (rooms: IRoom[] | undefined): Map<string, IOffice> | undefined =>
+export const createRoomOffice = (rooms?: IRoom[]): Map<string, IOffice> | undefined =>
   rooms?.reduce((oMap: Map<string, IOffice>, room: IRoom) => {
     const officeId = room.office?.id;
     if (officeId) {
@@ -299,13 +299,13 @@ export const currencySymbol = (currency?: ICurrency | string): string => {
 };
 
 export const openDialog = (myRoom: IRoomAll, locale: string, translate: TranslateService,
-                           dialog: MatDialog, time?: Date): void => {
+  dialog: MatDialog, time?: Date): void => {
   const room = roomName(myRoom);
   createDialog('ROOM_INFO', room, locale, translate, dialog, myRoom.timeZone, time);
 };
 
 export const createDialog = (key: string, value: string, locale: string, translate: TranslateService,
-                             dialog: MatDialog, timeZone?: string, time?: Date): void => {
+  dialog: MatDialog, timeZone?: string, time?: Date): void => {
   const localDate = new Date(localeTimeZoneDate('en-US', time));
   const date = new Date(localeTimeZoneDate('en-US', time, timeZone));
 
@@ -324,7 +324,7 @@ export const createDialog = (key: string, value: string, locale: string, transla
   const title = translate.instant('COMMON.TIME_ZONE.TITLE');
   const content = translate.instant(`COMMON.TIME_ZONE.${ key }`, { localTime, timeZoneTime, value, arg });
   dialog.open(DialogComponent, {
-    data: { title, content, hideNoButton: true, hideOkButton: true }
+    data: { title, content, hideNoButton: true, hideOkButton: true },
   });
 };
 
@@ -338,8 +338,8 @@ export const totalPaid = (payments: IPayment[] | undefined): number => payments?
 
 export const areEquals = (array1: any[], array2: any[]): boolean => (array1.length === array2.length &&
   array1.every((element1) => array2.some((element2) =>
-      Object.keys(element1).every((key) => element1[key] === element2[key])
-    )
+  	Object.keys(element1).every((key) => element1[key] === element2[key]),
+  ),
   )
 );
 
@@ -376,7 +376,7 @@ export const openCancel = (
   afterClose: (result: any) => void,
   showPenalty?: boolean,
   price?: IPrice,
-  paymentOptions?: IPaymentOption[]
+  paymentOptions?: IPaymentOption[],
 ): void => {
   const currency = room.currency;
   const data = {
@@ -385,7 +385,7 @@ export const openCancel = (
     price,
     paymentOptions,
     currency,
-    showPenalty
+    showPenalty,
   };
 
   executeDialog(dialog, CancelDialogComponent, data, afterClose, true);
@@ -398,12 +398,12 @@ export const customerEditDialog = (
   currency: ICurrencyAll,
   small: boolean,
   language: string,
-  price?: IPrice
+  price?: IPrice,
 ): void => {
   const data = {
     small,
     price,
-    currency
+    currency,
   };
   executeDialog(dialog, CustomerEditDialogComponent, data, result => {
     if (result) {
@@ -417,22 +417,22 @@ export const executeDialogNoWidth = (
   dialogComponent: any,
   data: any,
   afterClose: (result: any) => void,
-  disableClose: boolean = false
+  disableClose: boolean = false,
 ): void => {
   const dialogRef = dialog.open(dialogComponent, {
     disableClose,
-    data
+    data,
   });
 
   dialogRef.afterClosed().subscribe(afterClose);
 };
 
 export const executeDialog = (dialog: MatDialog, dialogComponent: any, data: any, afterClose: (result: any) => void,
-                              disableClose: boolean = false, width: string = '70vw'): void => {
+  disableClose: boolean = false, width: string = '70vw'): void => {
   const dialogRef = dialog.open(dialogComponent, {
     width,
     disableClose,
-    data
+    data,
   });
 
   dialogRef.afterClosed().subscribe(afterClose);
@@ -468,7 +468,7 @@ export enum FrequencyEnum {
 }
 
 export const createAddress = (formattedAddress?: string, location?: google.maps.LatLng,
-                              address?: IAddress, description?: string): IAddress | undefined => {
+  address?: IAddress, description?: string): IAddress | undefined => {
   if (location || address) {
     return {
       id: address?.id,
@@ -476,43 +476,11 @@ export const createAddress = (formattedAddress?: string, location?: google.maps.
       description: description || address?.description,
       location: {
         x: location?.lng() || address?.location?.x,
-        y: location?.lat() || address?.location?.y
-      } as ILocation
+        y: location?.lat() || address?.location?.y,
+      } as ILocation,
     } as IAddress;
   }
   return undefined;
 };
 
 export const toUrl = (...url: string[]): string => url.join('/');
-
-export const validateUnavailableEvent = (
-  start: Date,
-  recurring: any,
-  dataEvent: IDataEvent,
-  createUnavailableEvent: (start: Date, end: Date, dataEvent: IDataEvent) => void
-): void => {
-  const [startSearch, endSearch] = searchDates(recurring.allDay, start, recurring.duration);
-  const overlapEvent = dataEvent.getOverlapEvent(startSearch, endSearch);
-
-  if (overlapEvent.length > 0) {
-    overlapEvent.forEach(value => {
-      if (value.id !== 'NOT_WORKING_ALL_DAY' && !value.meta.isReservation) {
-        dataEvent.filterEvent(value);
-        if (value.end) {
-          if (startSearch < value.start && endSearch < value.end) {
-            value.start = endSearch;
-            dataEvent.addEvent(value);
-          } else if (startSearch > value.start && endSearch > value.end) {
-            value.end = startSearch;
-            dataEvent.addEvent(value);
-          }
-        }
-      }
-      if (dataEvent.sameDayEvent(recurring, value)) {
-        createUnavailableEvent(startSearch, endSearch, dataEvent);
-      }
-    });
-  } else {
-    createUnavailableEvent(startSearch, endSearch, dataEvent);
-  }
-};

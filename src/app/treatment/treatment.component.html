@@ -51,7 +51,7 @@
                       <mat-form-field class="chip-list">
                         <mat-label>{{ 'TREATMENT.COLOR.FIELD' | translate }}</mat-label>
                         <mat-chip-grid #chipList aria-label="Color selection">
-                          @for (color of colors; track color) {
+                          @for (color of colors; track color.id) {
                             <mat-chip-row (removed)="remove(color)" [removable]="true">
                               {{ color.name }}
                               <mat-icon matChipRemove>cancel</mat-icon>
@@ -61,7 +61,7 @@
                                  [matChipInputFor]="chipList">
                         </mat-chip-grid>
                         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedColor($event)">
-                          @for (color of sortColors(filteredColors | async); track color) {
+                          @for (color of sortColors(filteredColors | async); track color.id) {
                             <mat-option [value]="color">{{ color.name }}</mat-option>
                           }
                         </mat-autocomplete>
@@ -82,7 +82,7 @@
                 }
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
-                  <input #inputName matInput>
+                  <input #inputName matInput id="add-treatment">
                   <button (click)="addTab" [attr.aria-label]="'Add treatment'" [disabled]="!inputName.value"
                           color="primary" mat-icon-button matSuffix type="button">
                     <mat-icon>inventory</mat-icon>
@@ -97,7 +97,8 @@
                     <mat-tab [label]="tab.name || ''">
                       <mat-form-field appearance="outline" class="tab-field">
                         <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
-                        <input (change)="setValue(tab, 'name', $event)" [value]="tab.name" matInput required>
+                        <input (change)="setValue(tab, 'name', $event)" [value]="tab.name" matInput required
+                               id="treatment-name">
                         @if (tab.errors['name']) {
                           <mat-hint [innerHTML]="'TREATMENT.' + tab.errors['name'] | translate"
                                     class="mat-mdc-form-field-error"></mat-hint>
@@ -105,11 +106,13 @@
                       </mat-form-field>
                       <mat-form-field appearance="outline" class="tab-field">
                         <mat-label>{{ 'TREATMENT.DESCRIPTION.FIELD' | translate }}</mat-label>
-                        <input (change)="setValue(tab, 'description', $event)" [value]="tab.description" matInput>
+                        <input (change)="setValue(tab, 'description', $event)" [value]="tab.description" matInput
+                               id="treatment-description">
                       </mat-form-field>
                       <mat-form-field appearance="outline" class="tab-field">
                         <mat-label>{{ 'TREATMENT.DURATION.FIELD' | translate }}</mat-label>
-                        <input [format]="24" [ngxTimepicker]="t" [value]="tab.time || ''" matInput readonly required/>
+                        <input [format]="24" [ngxTimepicker]="t" [value]="tab.time || ''" matInput readonly required
+                               id="treatment-duration"/>
                         <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
                         <ngx-material-timepicker #t (timeSet)="setTime(tab, $event)"
                                                  [minutesGap]="15"></ngx-material-timepicker>

@@ -1,9 +1,10 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { AfterViewInit, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../../store/app.states';
-import * as fromActionsRoom from '../../../store/room.actions';
+import { getAllCustomersInfo } from '../../../store/room.actions';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { SharedModule } from '../../../shared/shared.module';
@@ -16,11 +17,11 @@ import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
 
 @Component({
-    selector: 'app-customers',
-    animations: [detailExpandAnimation],
-    templateUrl: './customers.component.html',
-    styleUrl: './customers.component.scss',
-    imports: [SharedModule, TimeDetailPipe]
+  selector: 'app-customers',
+  animations: [detailExpandAnimation],
+  templateUrl: './customers.component.html',
+  styleUrl: './customers.component.scss',
+  imports: [SharedModule, TimeDetailPipe],
 })
 export class CustomersComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -28,49 +29,52 @@ export class CustomersComponent implements OnInit, AfterViewInit, OnDestroy {
 
   displayedColumns: string[] = ['position', 'customer', 'days', 'lastTime', 'actions'];
   customers?: IRoomCustomer[];
-  dataSource: MatTableDataSource<IRoomCustomer> = new MatTableDataSource<IRoomCustomer>();
+  dataSource = new MatTableDataSource<IRoomCustomer>();
   expanded?: IRoomCustomer;
   resultsLength = DEFAULT_LENGTH;
   pageSize = PAGE_SIZE;
-  language: string;
+  language!: string;
 
+  private readonly store = inject(Store<AppState>);
+  private readonly route = inject(ActivatedRoute);
+  private readonly translate = inject(TranslateService);
+  private readonly breakpointObserver = inject(BreakpointObserver);
+
+  private getState: Observable<any> = this.store.select(selectRoomState);
   private roomId?: string;
-  private getState: Observable<any>;
-  private subscription?: Subscription;
-
-  constructor(breakpointObserver: BreakpointObserver, private route: ActivatedRoute, private store: Store<AppState>,
-              private translate: TranslateService) {
-    this.getState = this.store.select(selectRoomState);
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small
-    ]).subscribe(result => this.pageSize = result.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
-    this.language = this.translate.currentLang;
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
+  private destroy$ = new Subject<void>();
 
   ngOnInit(): void {
-    this.subscribe();
+    this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]).pipe(takeUntil(this.destroy$))
+      .subscribe((result) => {
+        this.pageSize = result.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE;
+      });
+
+    this.language = this.translate.currentLang;
+
+    this.subscribeToState();
   }
 
   ngAfterViewInit(): void {
-    this.getCustomers();
+    this.loadCustomers();
   }
 
-  private getCustomers = (): void => {
-    this.route.params.subscribe((routeParams) => {
-      this.roomId = routeParams.id;
-      this.store.dispatch(
-        new fromActionsRoom.GetCustomerInfo({ id: this.roomId })
-      );
-    });
-  };
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+  private loadCustomers(): void {
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+      this.roomId = params['id'];
+      if (this.roomId) {
+        this.store.dispatch(getAllCustomersInfo({ id: this.roomId }));
+      }
+    });
+  }
+
+  private subscribeToState(): void {
+    this.getState.pipe(takeUntil(this.destroy$)).subscribe((state) => {
       this.customers = state.customers;
       if (this.customers) {
         this.dataSource.data = this.customers;
@@ -78,5 +82,5 @@ export class CustomersComponent implements OnInit, AfterViewInit, OnDestroy {
         this.dataSource.sort = this.sort;
       }
     });
-  };
+  }
 }

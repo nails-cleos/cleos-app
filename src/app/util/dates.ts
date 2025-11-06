@@ -14,7 +14,7 @@ import {
   startOfWeek,
   subDays,
   subMonths,
-  subWeeks
+  subWeeks,
 } from 'date-fns';
 import { RRule, Weekday } from 'rrule';
 import { IReservation, IReservationAll } from '../interfaces/reservation';
@@ -133,7 +133,7 @@ export const getEndWithDuration = (start: Date, duration?: IDuration): Date => {
 };
 
 export const getRoomStartEndDay = (availability: IAvailability, timeZone: string,
-                                   viewDate: Date = getNowTimeZone()): { min: Date; max: Date } => {
+  viewDate: Date = getNowTimeZone()): { min: Date; max: Date } => {
   const availabilityMinMax = getMinAndMax(availability, viewDate, timeZone);
 
   const min: Date = availabilityMinMax.min;
@@ -143,8 +143,8 @@ export const getRoomStartEndDay = (availability: IAvailability, timeZone: string
 };
 
 export const getStartEndDay = (monday: IAvailability, tuesday: IAvailability, wednesday: IAvailability,
-                               thursday: IAvailability, friday: IAvailability, saturday: IAvailability,
-                               sunday: IAvailability, timeZone: string): any => {
+  thursday: IAvailability, friday: IAvailability, saturday: IAvailability,
+  sunday: IAvailability, timeZone: string): any => {
   const date: Date = getNowTimeZone(timeZone);
   const mondayMinMax = getMinAndMax(monday, date, timeZone);
   const tuesdayMinMax = getMinAndMax(tuesday, date, timeZone);
@@ -262,6 +262,7 @@ export const getAvailability = (room: IRoom): any => {
     }
     return { monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude };
   }
+  return undefined;
 };
 
 export const getMinMaxDate = (day: number, date: any, rooms: IRoomAll[]): any => {
@@ -324,7 +325,7 @@ export const getMinMaxDate = (day: number, date: any, rooms: IRoomAll[]): any =>
 
   const roomAvailability = {
     availabilities: [mondayAv, tuesdayAv, wednesdayAv, thursdayAv, fridayAv, saturdayAv, sundayAv].filter(
-      av => av !== undefined)
+      av => av !== undefined),
   } as IRoom;
 
   minDate = minDate ?? createNewDate(date);
@@ -342,61 +343,61 @@ export const getMinMaxDate = (day: number, date: any, rooms: IRoomAll[]): any =>
 };
 
 export const getTime = (date: Date, locale: string = API_LOCALE): string => date.toLocaleTimeString(locale, {
-  hour: '2-digit', minute: '2-digit'
+  hour: '2-digit', minute: '2-digit',
 });
 
 export const formatFullDateTime = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
-  day: 'numeric', month: 'long', weekday: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+  day: 'numeric', month: 'long', weekday: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
 });
 
 export const formatFullDate = (date: Date, locale: string): string => date.toLocaleDateString(locale, {
-  day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+  day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
 });
 
 export const formatDateTime = (date: Date, locale: string): string => {
   const result = date.toLocaleDateString(locale, {
-    day: 'numeric', month: 'long', weekday: 'long', hour: '2-digit', minute: '2-digit'
+    day: 'numeric', month: 'long', weekday: 'long', hour: '2-digit', minute: '2-digit',
   });
 
   return result.charAt(0).toUpperCase() + result.slice(1);
 };
 
 export const formatDateName = (date: Date, locale: string, measure: any): string => date.toLocaleDateString(locale, {
-  day: 'numeric', month: measure, weekday: measure, year: 'numeric'
+  day: 'numeric', month: measure, weekday: measure, year: 'numeric',
 });
 
 export const localeTimeZoneDate = (locale: string, date?: Date | string,
-                                   timeZone: string = getCurrentTimeZone()): string =>
+  timeZone: string = getCurrentTimeZone()): string =>
   date ? reservationDateTime(newDate(date), locale, timeZone) : '';
 
 export const reservationDateTime = (date: Date, locale: string, timeZone: string = getCurrentTimeZone()): string =>
   date.toLocaleDateString(locale, {
-    day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit', timeZone
+    day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit', timeZone,
   });
 
 export const monthViewTitle = (date: Date, locale: string = 'en'): string => date.toLocaleDateString(locale, {
-  year: 'numeric', month: 'long'
+  year: 'numeric', month: 'long',
 }).replace(/^\w/, (c) => c.toUpperCase());
 
 export const monthTitle = (date: Date, locale: string, measure: 'long' | 'short'): string => date.toLocaleDateString(
   locale, {
-    month: measure
+    month: measure,
   }).replace(/^\w/, (c) => c.toUpperCase());
 
 export const invoiceTitle = (date: Date): string => date.toLocaleDateString(API_LOCALE, {
-  year: 'numeric', month: '2-digit', day: '2-digit'
+  year: 'numeric', month: '2-digit', day: '2-digit',
 });
 
 export const columnHeader = (date: Date, locale: string = 'en'): string => date.toLocaleDateString(locale, {
-  weekday: 'long'
+  weekday: 'long',
 }).replace(/^\w/, (c) => c.toUpperCase());
 
 export const dayViewTitle = (date: Date, locale: string = 'en'): string => date.toLocaleDateString(locale, {
-  day: 'numeric', month: 'long', weekday: 'long', year: 'numeric'
+  day: 'numeric', month: 'long', weekday: 'long', year: 'numeric',
 }).replace(/^\w/, (c) => c.toUpperCase());
 
 export const formatDateHourMinute = (date: Date, locale: string = 'en'): string => date.toLocaleTimeString(locale, {
-  hour: '2-digit', minute: '2-digit'
+  hour: '2-digit', minute: '2-digit',
 }).replace(/^\w/, (c) => c.toUpperCase());
 
 export const formatDateTwoDigit = (date: Date, locale: string, timeZone: string = getCurrentTimeZone()): string =>
@@ -413,7 +414,7 @@ export const backendFormatDate = (date?: Date): string | undefined => {
 
 export const exportFormatDate = (date: Date, locale: string = API_LOCALE, timeZone: string = getCurrentTimeZone()):
   string => date.toLocaleDateString(locale, {
-  day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone
+  day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone,
 }).replace(/\//g, '-').replace(',', '');
 
 export const formatDuration = (duration: string, locale: string = API_LOCALE): string => {
@@ -436,7 +437,7 @@ export const createDate = (
   hour: number = 0,
   minute: number = 0,
   second: number = 0,
-  milli: number = 0
+  milli: number = 0,
 ): Date => createNewDate(getNowTimeZone(timeZone), hour, minute, second, milli);
 
 export const createEndDate = (stringDate: string): Date => {
@@ -452,7 +453,7 @@ export const createFullDate = (selectDate: Date): Date => {
 };
 
 export const newDateTimestamp = (date: string | Date | number = new Date(),
-                                 timeZone: string = getCurrentTimeZone()): Date => {
+  timeZone: string = getCurrentTimeZone()): Date => {
   if (typeof date === 'string') {
     return toZonedTime(new Date(date), timeZone);
   } else if (date instanceof Date) {
@@ -473,7 +474,7 @@ export const createNewDateZonedTime = (
   hour: number = 0,
   minute: number = 0,
   second: number = 0,
-  milli: number = 0
+  milli: number = 0,
 ): Date => toZonedTime(createNewDate(newDateTimestamp(date), hour, minute, second, milli), timeZone);
 
 export const createNewDate = (
@@ -481,7 +482,7 @@ export const createNewDate = (
   hour: number = 0,
   minute: number = 0,
   second: number = 0,
-  milli: number = 0
+  milli: number = 0,
 ): Date => {
   const d = new Date(date);
   d.setHours(hour, minute, second, milli);
@@ -534,8 +535,6 @@ export const plusMonthDate = (date: Date, plus: number, day: number): Date => {
 
   return d;
 };
-
-export const plusDays = (date: Date, plus: number): Date => addDays(new Date(date), plus);
 
 export const plusMinutes = (date: Date, plus: number): Date => addMinutes(date, plus);
 
@@ -744,22 +743,6 @@ export const datesInSameWeek = (date1: Date, date2: Date): boolean => {
   // Check if the dates are in the same week by comparing year and week number
   return copyDate1.getFullYear() === copyDate2.getFullYear() &&
     Math.ceil(dayDiff1 / 7) === Math.ceil(dayDiff2 / 7);
-};
-
-export const getPreviousSunday = (date: Date): Date => {
-  // Create a new Date object based on the input date to avoid modifying the original date
-  const previousSunday = new Date(date);
-
-  // Get the current day of the week (0-6, where 0 is Sunday)
-  const dayOfWeek = previousSunday.getDay();
-
-  // Calculate the difference in days to the previous Sunday
-  const diff = dayOfWeek === 0 ? 0 : dayOfWeek;
-
-  // Subtract the difference in days from the current date
-  previousSunday.setDate(previousSunday.getDate() - diff);
-
-  return previousSunday;
 };
 
 export const searchDates = (allDay: boolean, start: Date, duration: IDuration): [Date, Date] => {

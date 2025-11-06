@@ -1,139 +1,133 @@
+import { createReducer, on } from '@ngrx/store';
 import { Pagination } from '../../interfaces/pagination';
-import { All, UnavailableActionTypes } from '../unavailable.actions';
 import { IUnavailable } from '../../interfaces/unavailable';
 import { IUser } from '../../interfaces/user';
 import { IRoom } from '../../interfaces/room';
+import { IError, IResponseSuccess } from '../../interfaces/common';
+import {
+  clean,
+  createBlockAgenda,
+  createUnavailable,
+  deleteUnavailable,
+  getAllProfessional,
+  getAllRoomsByProfessionalId,
+  getUnavailable,
+  getUnavailablePage,
+  professionalSuccess,
+  roomSuccess,
+  unavailableFailure,
+  unavailableSaveSuccess,
+  unavailableSelected,
+  unavailableSuccess,
+  updateUnavailable,
+} from '../unavailable.actions';
 
 export interface State {
-  data: IUnavailable | Pagination<IUnavailable> | null;
-  professionals: IUser[] | null;
-  room: IRoom | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  selected: IUnavailable | null;
-  message: string | null;
+  response?: IResponseSuccess;
+  data?: Pagination<IUnavailable>;
+  professionals?: IUser[];
+  rooms?: IRoom[];
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
+  selected?: IUnavailable;
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  data: null,
-  professionals: null,
-  room: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  selected: null,
-  message: null,
-  isLoading: false
+  data: undefined,
+  professionals: undefined,
+  rooms: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  selected: undefined,
+  response: undefined,
+  isLoading: false,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case UnavailableActionTypes.getAll: {
-      return {
-        ...state,
-        data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IUnavailable>,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case UnavailableActionTypes.getAllProfessional: {
-      return {
-        ...state,
-        professionals: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case UnavailableActionTypes.getRoom: {
-      return {
-        ...state,
-        room: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case UnavailableActionTypes.unavailableFind: {
-      return {
-        ...state,
-        data: {} as IUnavailable,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case UnavailableActionTypes.unavailableSuccess: {
-      return {
-        ...state,
-        data: action.payload,
-        professionals: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case UnavailableActionTypes.unavailableSaveSuccess: {
-      return {
-        ...state,
-        message: action.payload.message,
-        selected: null,
-        errorMessage: null,
-        subErrors: null,
-        isLoading: false
-      };
-    }
-    case UnavailableActionTypes.unavailableSelected: {
-      return {
-        ...state,
-        selected: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case UnavailableActionTypes.unavailableFailure: {
-      return {
-        ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
-        message: null,
-        isLoading: false
-      };
-    }
-    case UnavailableActionTypes.unavailableUpdate:
-    case UnavailableActionTypes.unavailableSave:
-    case UnavailableActionTypes.unavailableBlockAgenda:
-    case UnavailableActionTypes.unavailableDelete: {
-      return {
-        ...state,
-        error: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
-        isLoading: true
-      };
-    }
-    case UnavailableActionTypes.roomSuccess: {
-      return {
-        ...state,
-        room: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case UnavailableActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const unavailableReducer = createReducer(
+  initialState,
+  on(getUnavailablePage, (state) => ({
+    ...state,
+    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IUnavailable>,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getAllProfessional, (state) => ({
+    ...state,
+    professionals: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(getAllRoomsByProfessionalId, (state) => ({
+    ...state,
+    rooms: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(getUnavailable, (state) => ({
+    ...state,
+    selected: {} as IUnavailable,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(unavailableSuccess, (state, { data }) => ({
+    ...state,
+    data,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(professionalSuccess, (state, { professionals }) => ({
+    ...state,
+    professionals,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(unavailableSaveSuccess, (state, response) => ({
+    ...state,
+    response,
+    selected: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    isLoading: false,
+  })),
+  on(unavailableSelected, (state, { selected }) => ({
+    ...state,
+    selected,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(unavailableFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error,
+    subErrors: error.subErrors,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(updateUnavailable, createUnavailable, createBlockAgenda, deleteUnavailable, (state) => ({
+    ...state,
+    error: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(roomSuccess, (state, { rooms }) => ({
+    ...state,
+    rooms,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(clean, () => initialState),
+);

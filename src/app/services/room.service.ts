@@ -2,9 +2,11 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IRoom, IRoomCustomer, IRoomInfo, IRoomService, IServicePrice } from '../interfaces/room';
-import { PAGE_SIZE } from '../interfaces/pagination';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
+import { SortDirection } from '@angular/material/sort';
+import { Pagination } from '../interfaces/pagination';
+import { IApiResponse } from '../interfaces/common';
 
 @Injectable()
 export class RoomService {
@@ -14,14 +16,14 @@ export class RoomService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getAll = (
-    sort: string,
-    direction: string,
+  getRoomsPage = (
     page: number,
-    size: number = PAGE_SIZE
-  ): Observable<IRoom[]> => this.http.get<IRoom[]>(
+    sort: string,
+    direction: SortDirection,
+    size: number,
+  ): Observable<Pagination<IRoom>> => this.http.get<Pagination<IRoom>>(
     toUrl(this.urlV1, 'pages'),
-    { params: createFilter(page, size, sort, direction) }
+    { params: createFilter(page, size, sort, direction) },
   );
 
   getAllRooms = (customerId?: string): Observable<IRoom[]> => {
@@ -32,26 +34,27 @@ export class RoomService {
     return this.http.get<IRoom[]>(this.urlV1, { params });
   };
 
-  getMyService = (
-    id: string
+  getServices = (
+    id: string,
   ): Observable<IRoomService> => this.http.get<IRoomService>(toUrl(this.urlV1, id, 'services'));
 
-  getRoomInfo = (): Observable<IRoomInfo> => this.http.get<IRoomInfo>(toUrl(this.urlV1, 'info'));
+  getAllRoomsInfo = (): Observable<IRoomInfo> => this.http.get<IRoomInfo>(toUrl(this.urlV1, 'info'));
 
-  getById = (id: string): Observable<IRoomInfo | undefined> => this.http.get<IRoomInfo>(toUrl(this.urlV1, id));
+  getRoom = (id: string): Observable<IRoom | undefined> => this.http.get<IRoom>(toUrl(this.urlV1, id));
 
-  add = (room: IRoom): Observable<IRoom> => this.http.post<IRoom>(this.urlV1, room);
+  createRoom = (room: IRoom): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1, room);
 
-  delete = (id: string): Observable<IRoom> => this.http.delete<IRoom>(toUrl(this.urlV1, id));
+  deleteRoom = (id: string): Observable<IRoom> => this.http.delete<IRoom>(toUrl(this.urlV1, id));
 
-  update = (room: IRoom): Observable<IRoom> => this.http.patch<IRoom>(toUrl(this.urlV1, room.id!), room);
+  updateRoom = (id: string, room: IRoom): Observable<IApiResponse> => this.http.patch<IApiResponse>(
+    toUrl(this.urlV1, id), room);
 
-  updateService = (
+  updateServices = (
     id: string,
-    prices: IServicePrice[]
-  ): Observable<IServicePrice[]> => this.http.patch<IServicePrice[]>(toUrl(this.urlV1, id, 'services'), prices);
+    prices: IServicePrice[],
+  ): Observable<void> => this.http.patch<void>(toUrl(this.urlV1, id, 'services'), prices);
 
-  getCustomerInfo = (
-    id: string
+  getAllCustomersInfo = (
+    id: string,
   ): Observable<IRoomCustomer[]> => this.http.get<IRoomCustomer[]>(toUrl(this.urlV1, id, 'customers', 'info'));
 }

@@ -917,12 +917,28 @@
     .accent-snack-bar {
       color: black !important;
     }
+
+    .used-icon {
+      color: #c3f69d !important;
+    }
+
+    .unused-icon {
+      color: darkgrey !important;
+    }
   } @else {
     .warning-snack-bar {
       color: mat.m2-get-color-from-palette($warn-palette, 200);
     }
     .accent-snack-bar {
       color: white !important;
+    }
+
+    .used-icon {
+      color: #008b00 !important;
+    }
+
+    .unused-icon {
+      color: grey !important;
     }
   }
 }

@@ -9,7 +9,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../store/app.states';
-import * as fromActionsRoom from '../../store/room.actions';
+import { clean, deleteRoom, getRoomsPage, roomSelected } from '../../store/room.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
@@ -23,7 +23,7 @@ import { SortByPipe } from '../../pipes/sort-by.pipe';
   templateUrl: './rooms.component.html',
   styleUrls: ['./rooms.component.scss'],
   animations: [detailExpandAnimation],
-  imports: [SharedModule, SortByPipe]
+  imports: [SharedModule, SortByPipe],
 })
 export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -42,10 +42,10 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
   private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
+    private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
-      Breakpoints.Small
+      Breakpoints.Small,
     ]).subscribe(result => {
       if (result.matches) {
         this.pageSize = MOBILE_PAGE_SIZE;
@@ -73,22 +73,19 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getGMT = (timeZone?: string): string => this.getTimeZone(timeZone).gmt;
 
-  edit = (room: IRoom): void => this.store.dispatch(
-    new fromActionsRoom.RoomSelected({ roomInfo: { room }, redirect: true }));
+  edit = (selected: IRoom): void => this.store.dispatch(roomSelected({ selected, redirect: true }));
 
   delete = (room: IRoom): void => {
     const title = this.translate.instant('ROOM.DELETED.TITLE');
     const content = this.translate.instant('ROOM.DELETED.CONTENT', { name: room.address?.name });
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: room }, result => {
       if (result) {
-        this.store.dispatch(
-          new fromActionsRoom.DeleteRoom(result)
-        );
+        this.store.dispatch(deleteRoom({ id: result.id, room: result }));
       }
     });
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsRoom.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe(() => {
@@ -101,21 +98,16 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private getRooms = (page: number = 0): void => this.store.dispatch(
-    new fromActionsRoom.GetAll({
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    })
+    getRoomsPage({ page: page, sort: this.sort.active, direction: this.sort.direction, size: this.pageSize }),
   );
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((stateValue) => {
-      if (stateValue.message) {
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.response) {
         this.clean();
         this.getRooms();
       }
-      this.dataSource = stateValue.data?.content?.map((r: IRoom) => {
+      this.dataSource = state.data?.content?.map((r: IRoom) => {
         if (r && r.availabilities && r.availabilities.length) {
           const availabilities = r.availabilities.map((i: IAvailability) =>
             Object.assign({}, i, { order: findDayOfWeek(i.day) }));
@@ -134,7 +126,7 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
       //   }, map)
       //   return Object.assign({}, r, {times: map})
       // });
-      this.resultsLength = stateValue.data?.totalElements;
+      this.resultsLength = state.data?.totalElements;
       if (!this.paginatorSubscription && this.resultsLength) {
         this.createPageSubscriptions();
       }

@@ -1,0 +1,152 @@
+[
+  {
+    "createdAt": "2023-04-11T12:43:39.556436",
+    "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "modifiedAt": "2024-05-14T15:30:11.258771",
+    "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "deleted": false,
+    "id": "9c44aaf0-82c0-4e09-a8f9-bcc915d23ed3",
+    "name": "Biab Treatment ",
+    "description": "The GelBottle Inc™ BIAB is a thicker consistency gel, chip-resistant which helps to harden your natural nails while you wear it and offer extreme long lasting shine. BIAB tends to last around three to four weeks – sometimes longer. \n",
+    "priceFrom": 70,
+    "colors": [
+      {
+        "createdAt": "2023-07-22T10:28:56.07039",
+        "createdBy": "Unknown user",
+        "modifiedAt": "2023-07-22T10:28:56.07039",
+        "modifiedBy": "Unknown user",
+        "deleted": false,
+        "id": "b7688ab9-2957-4f87-9ec8-f6fae2885fe1",
+        "name": "Teddy"
+      },
+      {
+        "createdAt": "2024-11-15T13:33:00",
+        "createdBy": "",
+        "deleted": false,
+        "id": "3f53af14-a751-471b-be54-7554d11a13a3",
+        "name": "Snow",
+        "description": ""
+      },
+      {
+        "createdAt": "2025-02-11T14:59:00",
+        "createdBy": "",
+        "deleted": false,
+        "id": "9fe671dc-2926-4bdf-bcb4-f592aef7efb2",
+        "name": "Hunny",
+        "description": ""
+      },
+      {
+        "createdAt": "2024-04-03T17:16:21.748777",
+        "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+        "modifiedAt": "2024-04-03T17:16:21.748777",
+        "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+        "deleted": false,
+        "id": "207dc998-c1d2-4e40-b077-24cca8d28011",
+        "name": "Jolie "
+      },
+      {
+        "createdAt": "2023-07-01T13:13:09.153927",
+        "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+        "modifiedAt": "2023-07-01T13:13:09.153927",
+        "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+        "deleted": false,
+        "id": "c27eb337-33b1-475c-86e7-014773344605",
+        "name": "Let it glow",
+        "description": "Let it glow BIAB"
+      },
+      {
+        "createdAt": "2024-10-01T19:29:00",
+        "createdBy": "",
+        "deleted": false,
+        "id": "9250d30e-b770-467c-9e62-9e7901bea63d",
+        "name": "017",
+        "description": ""
+      },
+      {
+        "createdAt": "2025-02-11T14:59:00",
+        "createdBy": "",
+        "deleted": false,
+        "id": "481c75ca-d9cf-477d-a881-24b481178e03",
+        "name": "Dewy",
+        "description": ""
+      }
+    ],
+    "order": 1
+  },
+  {
+    "createdAt": "2023-04-11T13:07:26.355429",
+    "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "modifiedAt": "2023-12-14T07:14:08.612492",
+    "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "deleted": false,
+    "id": "62f3c0db-7545-4afe-8238-08fac393dcf4",
+    "name": "GelPolish",
+    "description": "The GelPolish Colour is applied with the Biab Rubber Base Coat underneath to give extra strength to flaky, brittle, thin or splitting nails. Treatments includes manicure always. GelPolish tends to last around two to three weeks – sometimes longer.",
+    "priceFrom": 50,
+    "colors": [],
+    "order": 2
+  },
+  {
+    "createdAt": "2023-04-11T13:09:23.835542",
+    "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "modifiedAt": "2023-12-14T07:15:56.209194",
+    "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "deleted": false,
+    "id": "530445f8-f5e8-4a2c-829f-33d3c7a65be4",
+    "name": "Nail Polish CND Vinylux",
+    "description": "CND VINYLUX™ Long Wear Polish Colour finished with top coat shine which makes it way more chip-resistant than your average nail polish. It tends to last at least a week. Then you can remove it with standard nail polish remover.",
+    "priceFrom": 35,
+    "colors": [],
+    "order": 3
+  },
+  {
+    "createdAt": "2023-04-11T13:16:36.390939",
+    "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "modifiedAt": "2023-12-14T07:16:12.952715",
+    "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "deleted": false,
+    "id": "8eca340d-8a3c-4714-a03c-84a89c7bdf0b",
+    "name": "Manicure E-File ",
+    "description": "The E-file manicure means I perform on dry skin using different E-file bits to push back and exfoliate the dead skin which gives us a more clean and polished look. Then your nails are ready to receive the treatment you are wanting! ",
+    "priceFrom": 25,
+    "colors": [],
+    "order": 4
+  },
+  {
+    "createdAt": "2023-04-12T18:23:36.155903",
+    "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "modifiedAt": "2023-12-14T07:16:50.176076",
+    "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "deleted": false,
+    "id": "e705ef54-d8c7-4c3f-9309-3bea07119c62",
+    "name": "Toenails Color",
+    "description": "Color on toenails (the treatment includes cuticles removal and shape toenails) ",
+    "priceFrom": 40,
+    "colors": [],
+    "order": 5
+  },
+  {
+    "createdAt": "2023-04-15T15:47:03.500721",
+    "createdBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "modifiedAt": "2023-12-14T07:16:58.890294",
+    "modifiedBy": "57ceebd2-a012-42a3-af9a-5d546c193200",
+    "deleted": false,
+    "id": "8ca73393-064b-4e37-9462-ad5486373c59",
+    "name": "Nail Repair ",
+    "description": "Fixing nails just before your treatment or when you come to me to fix one. Time and price will depend on the condition of the nail. If it happend due to a defect in the treatment itself then it will be free of charge.",
+    "priceFrom": 5,
+    "colors": [],
+    "order": 6
+  },
+  {
+    "createdAt": "2024-07-16T20:52:00",
+    "createdBy": "",
+    "deleted": false,
+    "id": "f61ad215-a260-487f-93ed-31d8e5f3686e",
+    "name": "Pedicure",
+    "description": "pulido de la piel seca o dureza con torno + trabajo de cuticula con torno + remocion de cuticulas + limado + CND Scrub Exfoliation & massage + hair waxing + lotion & CND oil",
+    "priceFrom": 25,
+    "colors": [],
+    "order": 7
+  }
+]

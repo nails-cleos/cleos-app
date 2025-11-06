@@ -8,6 +8,19 @@ declare namespace Cypress {
 
     checkMatList(title?: string, icon?: string, ...details: string[]): Chainable<any>;
 
+    openMenu(breakpoint: string, menus: string[]): Chainable<any>;
+
+    buttonClickOnTable(breakpoint: string, column: string, rowClass: string, rowExpandedClass: string,
+                       button: string, otherButtons?: string[]): Chainable<any>;
+
+    selectOption(id: string, option: string): Chainable<any>;
+
+    selectChip(chipName: string): Chainable<any>;
+
+    formControlType(formControlName: string, value: any, type?: string): Chainable<any>;
+
+    setTime(hour: number | string, minute?: number | string): Chainable<any>;
+
     mockAuthentication(email: string, role: string): Chainable<any>;
 
     mockLogin(email: string, displayName: string, role: string): Chainable<any>;
@@ -30,14 +43,33 @@ declare namespace Cypress {
 
     mockCustomersData(customerId: string, treatmentId: string): Chainable<any>;
 
-    mockRoomData(customerId: string, roomId: string): Chainable<any>;
+    mockRoomData(customerId: string): Chainable<any>;
 
-    mockTreatments(customerId: string, roomId: string, treatmentId: string, groupId: string): Chainable<any>;
+    mockSearch(customerId: string, roomId: string, groupId: string, professionalId: string, date: Date,
+               days: number): Chainable<any>;
 
-    mockSearch(roomId: string, professionalId: string, date: Date): Chainable<any>;
+    mockCreateReservation(reservationId: string, customerId: string, date: Date, professionalId: string,
+                          roomId: string, treatmentId: string, additionalList?: string[]): Chainable<any>;
 
-    mockCreateReservation(reservationId: string, customerId: string, date: Date, professionalId: string, roomId: string,
-                          treatmentId: string, additionalList?: string[]): Chainable<any>;
+    mockUsers(total?: number, displayName?: string): Chainable<any>;
+
+    mockUser(id: string, selectedUser?: any): Chainable<any>;
+
+    mockTreatments(page: boolean, total?: number, id?: string): Chainable<any>;
+
+    mockAdditionalList(total?: number, id?: string): Chainable<any>;
+
+    mockColors(page: boolean, total?: number, id?: string): Chainable<any>;
+
+    mockCurrencyList(page: boolean, total?: number, id?: string): Chainable<any>;
+
+    mockTreatment(id: string, selectedTreatment?: any): Chainable<any>;
+
+    mockAdditional(id: string, selectedAdditional?: any): Chainable<any>;
+
+    mockColor(id: string, selectedColor?: any): Chainable<any>;
+
+    mockCurrency(id: string, selectedCurrency?: any): Chainable<any>;
   }
 }
 
@@ -49,6 +81,7 @@ Cypress.Commands.add('randomUUID', () => cy.wrap('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxx
 Cypress.Commands.add('logout', () => {
   cy.get('button[name="settings"]').click();
   cy.get('mat-list-item').contains('Sign out').click();
+  cy.url().should('include', 'home');
 });
 
 Cypress.Commands.add('checkAppDialog', (title: string, message: string, buttonClick: string) => {
@@ -65,7 +98,7 @@ Cypress.Commands.add('checkAppDialog', (title: string, message: string, buttonCl
   cy.get('app-dialog')
     .find('div[mat-dialog-actions]')
     .contains(buttonClick)
-    .click();
+    .click({ force: true });
 });
 
 Cypress.Commands.add('checkMatList', (title?: string, icon?: string, ...details: string[]) => {
@@ -80,6 +113,68 @@ Cypress.Commands.add('checkMatList', (title?: string, icon?: string, ...details:
   details.forEach(detail => cy.get('mat-list-item').find('div[matListItemLine]').contains(detail).should('exist'));
 });
 
+Cypress.Commands.add('openMenu', (breakpoint: string, menus: string[]) => {
+  if (['XSmall', 'Small', 'Medium'].includes(breakpoint)) {
+    cy.get('button[name="cleosMenu"]').click();
+  }
+  menus.forEach((menu, index) => {
+    if (index === 0) {
+      cy.get('mat-list-item').contains(menu).click();
+    } else {
+      cy.get('mat-list-item.sub-menu').contains(menu).click();
+    }
+  });
+});
+
+Cypress.Commands.add('buttonClickOnTable', (breakpoint: string, column: string, rowClass: string, rowExpandedClass,
+  button: string, otherButtons?: string[]) => {
+  if (['XSmall', 'Small'].includes(breakpoint)) {
+    cy.get(`tr.${ rowClass }`).contains('td', column).then($cell => {
+      const $row = $cell.closest('tr');
+      cy.wrap($row).click({ force: true });
+
+      cy.wrap($row).next(`tr.${ rowExpandedClass }`).should('be.visible').within(() => {
+        otherButtons?.forEach(otherButton => {
+          cy.get('button[mat-icon-button]').contains(otherButton).should('exist');
+        });
+
+        cy.get('button[mat-icon-button]').contains(button).click({ force: true });
+      });
+    });
+  } else {
+    otherButtons?.forEach(otherButton => cy.get('table').contains('tr', column)
+      .find('button[mat-icon-button]').contains(otherButton));
+    cy.get('table').contains('tr', column).find('button[mat-icon-button]').contains(button).click({ force: true });
+  }
+});
+
+Cypress.Commands.add('selectOption', (id: string, option: string) => {
+  cy.get(`#${ id }`).should('be.visible');
+  cy.get(`#${ id }`).click({ force: true });
+
+  cy.get('mat-option').should('exist').and('be.visible');
+  cy.get('mat-option').contains(option).click({ force: true });
+});
+
+Cypress.Commands.add('selectChip', (chipName: string) => {
+  cy.get('mat-form-field mat-chip-grid').find('input').type(chipName, { force: true });
+  cy.get('div.mat-mdc-autocomplete-panel mat-option').should('have.length.greaterThan', 0);
+  cy.get('div.mat-mdc-autocomplete-panel mat-option').contains(chipName).click();
+  cy.get('mat-chip-grid').find('mat-chip-row').should('contain', chipName);
+});
+
+Cypress.Commands.add('formControlType', (formControlName: string, value: any, type: string = 'input') => {
+  cy.get(`${ type }[formControlName="${ formControlName }"]`).scrollIntoView().should('be.visible');
+  cy.get(`${ type }[formControlName="${ formControlName }"]`).clear().type(value);
+});
+
+Cypress.Commands.add('setTime', (hour: number | string, minute: number | string = 0) => {
+  cy.get('ngx-material-timepicker-content', { timeout: 5000 }).should('exist').contains(hour).click({ force: true });
+  cy.get('ngx-material-timepicker-content').contains(minute === 0 ? '00' : minute).click({ force: true });
+  cy.get('.timepicker-button').contains('Ok').click({ force: true });
+  cy.wait(50);
+});
+
 const firebaseUser = (email: string, displayName?: string, kind?: string) => ({
   kind: kind,
   idToken: 'mock-id-token',
@@ -88,7 +183,7 @@ const firebaseUser = (email: string, displayName?: string, kind?: string) => ({
   photoUrl: null,
   refreshToken: 'mock-refresh-token',
   expiresIn: '3600',
-  localId: '12345'
+  localId: '12345',
 });
 
 const dashboardNoContent = (displayName: string, messageKey: string) => ({
@@ -96,7 +191,7 @@ const dashboardNoContent = (displayName: string, messageKey: string) => ({
   professionalId: 'a6f7c7d1-1b7f-4e47-8f45-3a5c7c2bb4f8',
   error: {
     status: 'NO_CONTENT_ERROR',
-    message: `${ messageKey } no content`
+    message: `${ messageKey } no content`,
   },
   timeZone: 'Europe/Amsterdam',
 });
@@ -108,7 +203,7 @@ const createReservationTreatment = (treatment?: any) => ({
   description: treatment?.description,
   price: treatment?.price,
   duration: treatment?.duration,
-  groupId: treatment?.group?.id
+  groupId: treatment?.group?.id,
 });
 
 const createReservationAdditional = (additional?: any) => ({
@@ -127,7 +222,7 @@ const createColor = (name: string, id: string) => ({
   modifiedBy: 'Unknown user',
   deleted: false,
   id: id,
-  name: name
+  name: name,
 });
 
 const createTimestamp = (date: Date, plusDays?: number, hour?: number, minute?: number) => {
@@ -135,18 +230,24 @@ const createTimestamp = (date: Date, plusDays?: number, hour?: number, minute?: 
   if (hour) {
     newDate.setHours(hour, minute ?? 0);
   }
-  return Math.floor(newDate.getTime() / 1000)
-}
+  return Math.floor(newDate.getTime() / 1000);
+};
 
 const addDays = (date: Date, plusDays: number = 0) => {
   const newDate = new Date(date);
   newDate.setDate(newDate.getDate() + plusDays);
   return newDate;
-}
+};
 
-const createUnavailable = (professional: any, description: string, timestamp: number, end: string,
-                           repeat: string, duration?: number, allDay: boolean = false,
-                           type: string = 'UNAVAILABLE') => ({
+const addMonths = (date: Date, plusMonths: number = 0) => {
+  const newDate = new Date(date);
+  newDate.setMonth(newDate.getMonth() + plusMonths);
+  return newDate;
+};
+
+const createUnavailable = (professional: any, description: string, timestamp: number,
+  repeat: string, end?: string, duration?: number, allDay: boolean = false,
+  type: string = 'UNAVAILABLE') => ({
   createdAt: '2025-01-31T11:54:00',
   createdBy: '57ceebd2-a012-42a3-af9a-5d546c193200',
   deleted: false,
@@ -158,7 +259,7 @@ const createUnavailable = (professional: any, description: string, timestamp: nu
   duration: duration,
   repeat: repeat,
   allDay: allDay,
-  type: type
+  type: type,
 });
 
 const createNote = (professional: any, description: string, date: string, repeat: string) => ({
@@ -170,7 +271,7 @@ const createNote = (professional: any, description: string, date: string, repeat
   professional: professional,
   date: date,
   repeat: repeat,
-  completed: false
+  completed: false,
 });
 
 Cypress.Commands.add('mockAuthentication', (email: string, role: string) => {
@@ -183,8 +284,8 @@ Cypress.Commands.add('mockAuthentication', (email: string, role: string) => {
         user: usersData.find(((user: { email: string; }) => user.email === email)),
         token: 'mockToken',
         menus: menuData.find((menu: { role: string; }) => menu.role === role)?.menu,
-        queryParams: {}
-      }
+        queryParams: {},
+      };
       localStorage.setItem('auth', JSON.stringify(userAuth));
     });
   });
@@ -198,7 +299,7 @@ Cypress.Commands.add('mockLogin', (email: string, displayName: string, role: str
         body: {
           tokenAccess: 'mock-token-access',
           user: usersData.find(((user: { email: string; }) => user.email === email)),
-          menus: menuData.find((menu: { role: string; }) => menu.role === role)?.menu
+          menus: menuData.find((menu: { role: string; }) => menu.role === role)?.menu,
         },
       }).as('loginRequest');
     });
@@ -227,14 +328,14 @@ Cypress.Commands.add('mockLogin', (email: string, displayName: string, role: str
 
   cy.intercept('POST', 'https://identitytoolkit.googleapis.com/v1/accounts:update*', {
     statusCode: 200,
-    body: firebaseUser(email, displayName, 'identitytoolkit#UpdateAccountResponse')
+    body: firebaseUser(email, displayName, 'identitytoolkit#UpdateAccountResponse'),
   }).as('updateProfileSuccess');
 });
 
 Cypress.Commands.add('mockFirebase', (email: string) => {
   cy.intercept('POST', '**/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword**', {
     statusCode: 200,
-    body: firebaseUser(email)
+    body: firebaseUser(email),
   }).as('firebaseSignIn');
 
   cy.intercept('POST', 'https://identitytoolkit.googleapis.com/v1/accounts:signUp*', {
@@ -257,11 +358,11 @@ Cypress.Commands.add('mockFirebaseAppCheck', () => {
     statusCode: 200, // You can also test with 403 if needed
     body: {
       token: 'mock-app-check-token',
-      ttl: '3600s'
-    }
+      ttl: '3600s',
+    },
   }).as('firebaseAppCheck');
 
-  cy.contains('Got it!').click();
+  cy.contains('Got it!').click({ force: true });
 });
 
 // Cypress.Commands.add('mockFetchSignInMethodsForEmail', (email) => {
@@ -282,7 +383,7 @@ Cypress.Commands.add('mockCreateAuthUri', (registered: boolean, methods: string[
       registered: registered,
       captchaRequired: false,
       sessionId: 'fake-session-id',
-      signinMethods: methods
+      signinMethods: methods,
     },
   }).as('createAuthUriRequest');
 });
@@ -290,18 +391,18 @@ Cypress.Commands.add('mockCreateAuthUri', (registered: boolean, methods: string[
 Cypress.Commands.add('mockNotifications', () => {
   cy.intercept(
     'GET',
-    '**/api/v1/notifications/pages?page=0&size=10&sort=date&direction=desc',
+    new RegExp('/api/v1/notifications/pages\\?page=0&size=\\d+&sort=date&direction=desc'),
     {
       statusCode: 204,
       body: null,
-    }
+    },
   ).as('getNotifications');
 });
 
 Cypress.Commands.add('mockCustomerReservations', () => {
   cy.intercept(
     'GET',
-    '**/api/v1/reservations/customer?page=0&size=10&sort=timestamp&direction=desc',
+    new RegExp('/api/v1/reservations/customer\\?page=0&size=\\d+&sort=timestamp&direction=desc'),
     {
       statusCode: 200,
       body: {
@@ -311,9 +412,9 @@ Cypress.Commands.add('mockCustomerReservations', () => {
           totalPages: 0,
           totalElements: 0,
           numberOfElements: 0,
-        }
-      }
-    }
+        },
+      },
+    },
   ).as('getCustomerReservations');
 });
 
@@ -323,8 +424,8 @@ Cypress.Commands.add('mockAdminDashboard', (date: Date, displayName: string) => 
     `**/api/v1/dashboard/cards?date=${ date.toISOString().slice(0, 10) }`,
     {
       statusCode: 200,
-      body: [dashboardNoContent(displayName, 'Reservations')]
-    }
+      body: [dashboardNoContent(displayName, 'Reservations')],
+    },
   ).as('getCards');
 
   cy.intercept(
@@ -332,8 +433,8 @@ Cypress.Commands.add('mockAdminDashboard', (date: Date, displayName: string) => 
     `**/api/v1/dashboard/events?date=${ date.toISOString().slice(0, 10) }`,
     {
       statusCode: 200,
-      body: [dashboardNoContent(displayName, 'Events')]
-    }
+      body: [dashboardNoContent(displayName, 'Events')],
+    },
   ).as('getEvents');
 });
 
@@ -343,8 +444,8 @@ Cypress.Commands.add('mockRoomAdminDashboard', (date: Date, displayName: string)
     `**/api/v1/dashboard/me/events?date=${ date.toISOString().slice(0, 10) }`,
     {
       statusCode: 200,
-      body: [dashboardNoContent(displayName, 'Events')]
-    }
+      body: [dashboardNoContent(displayName, 'Events')],
+    },
   ).as('getMeEvents');
 });
 
@@ -355,12 +456,12 @@ Cypress.Commands.add('mockCustomersData', (customerId: string, treatmentId: stri
       '**/api/v1/customers',
       {
         statusCode: 200,
-        body: usersData
-      }
+        body: usersData,
+      },
     ).as('getCustomers');
   });
 
-  cy.fixture('treatments').then((treatments) => {
+  cy.fixture('treatmentGroups').then((treatments) => {
     const treatment = treatments.find((treatment: { id: string; }) => treatment.id === treatmentId);
     cy.intercept(
       'GET',
@@ -381,29 +482,31 @@ Cypress.Commands.add('mockCustomersData', (customerId: string, treatmentId: stri
           days: 20,
           professionalName: 'Nails Cleos',
           additionalIds: [
-            '397bce4b-27ba-459f-801a-dcceea330b8d'
-          ]
-        }
-      }
+            '397bce4b-27ba-459f-801a-dcceea330b8d',
+          ],
+        },
+      },
     ).as('getCustomerInfo');
   });
 });
 
-Cypress.Commands.add('mockRoomData', (customerId: string, roomId: string) => {
+Cypress.Commands.add('mockRoomData', (customerId: string) => {
   cy.fixture('rooms').then((roomData) => {
     cy.intercept(
       'GET',
       `**/api/v1/rooms?customerId=${ customerId }`,
       {
         statusCode: 200,
-        body: roomData
-      }
+        body: roomData,
+      },
     ).as('getRooms');
   });
 });
 
-Cypress.Commands.add('mockTreatments', (customerId: string, roomId: string, treatmentId: string, groupId: string) => {
-  cy.fixture('treatments').then((treatments) => {
+Cypress.Commands.add('mockSearch', (
+  customerId: string, roomId: string, groupId: string, professionalId: string, date: Date, days: number,
+) => {
+  cy.fixture('treatmentSearch').then((treatments) => {
     cy.intercept(
       'GET',
       `**/api/v1/treatments?roomId=${ roomId }&customerId=${ customerId }`,
@@ -411,10 +514,10 @@ Cypress.Commands.add('mockTreatments', (customerId: string, roomId: string, trea
         statusCode: 200,
         body: {
           discounts: [],
-          treatments: treatments
-        }
-      }
-    ).as('getTreatments');
+          treatments: treatments,
+        },
+      },
+    ).as('getTreatmentSearch');
   });
 
   cy.fixture('additional').then((additionalList) => {
@@ -423,27 +526,21 @@ Cypress.Commands.add('mockTreatments', (customerId: string, roomId: string, trea
       `**/api/v1/additional/groups?roomId=${ roomId }&groupId=${ groupId }`,
       {
         statusCode: 200,
-        body: additionalList
-      }
-    ).as('getAdditional');
+        body: additionalList,
+      },
+    ).as('getAdditionalSearch');
   });
-});
 
-Cypress.Commands.add('mockSearch', (roomId: string, professionalId: string, date: Date) => {
   const dateFormatted = date.toISOString().slice(0, 10);
   cy.fixture('rooms').then((roomData) => {
-    cy.log(roomData)
     cy.fixture('users').then((usersData) => {
-      cy.log(usersData)
-      cy.fixture('treatments').then((treatmentData) => {
-        cy.log(treatmentData)
+      cy.fixture('treatmentSearch').then((treatmentData) => {
         cy.fixture('additional').then((additionalData) => {
-          cy.log(additionalData)
           const room = roomData.find((room: { id: string; }) => room.id === roomId);
           const professional = usersData.find((user: { id: string; }) => user.id === professionalId);
           cy.intercept(
             'GET',
-            `**/api/v1/reservations/rooms/${ roomId }?days=7&dates=${ dateFormatted }&professionalId=${ professionalId }`,
+            `**/api/v1/reservations/rooms/${ roomId }?days=${ days }&dates=${ dateFormatted }&professionalId=${ professionalId }`,
             {
               statusCode: 200,
               body: [
@@ -468,7 +565,7 @@ Cypress.Commands.add('mockSearch', (roomId: string, professionalId: string, date
                       state: 'APPROVED',
                       customerCreated: false,
                       accepted: true,
-                      version: 3
+                      version: 3,
                     },
                     {
                       createdAt: '2025-03-17T18:21:00',
@@ -489,34 +586,32 @@ Cypress.Commands.add('mockSearch', (roomId: string, professionalId: string, date
                       state: 'APPROVED',
                       customerCreated: false,
                       accepted: true,
-                      version: 1
-                    }
+                      version: 1,
+                    },
                   ],
                   unavailableList: [
-                    createUnavailable(professional, 'Cena Arg', createTimestamp(date, 2, 17, 30), '2026-01-01',
-                      'ONCE_A_MONTH',
-                      3600),
-                    createUnavailable(professional, 'Merienda', createTimestamp(date, 0, 16, 45), '2026-01-01',
-                      'EVERY_DAY',
-                      1800), // TODO check
-                    createUnavailable(professional, 'Magda', createTimestamp(date, 2, 10, 0),
-                      addDays(date, 1).toISOString().slice(0, 10), 'NONE', 1800),
-                    // createUnavailable(professional, 'Unavailable', createTimestamp(date, 1, 10, 0),
-                    //   addDays(date, 1).toISOString().slice(0, 10), 'NONE', undefined, true), // TODO check
+                    createUnavailable(professional, 'Once a month', createTimestamp(date, 2, 17, 30),
+                      'ONCE_A_MONTH', addMonths(date, 2).toISOString().slice(0, 10), 3600),
+                    createUnavailable(professional, 'Every day', createTimestamp(date, -5, 16, 45),
+                      'EVERY_DAY', addDays(date, 5).toISOString().slice(0, 10), 1800),
+                    createUnavailable(professional, 'None', createTimestamp(date, 2, 10, 0),
+                      'NONE', addDays(date, 1).toISOString().slice(0, 10), 1800),
+                    createUnavailable(professional, 'All day', createTimestamp(date, 1, 10, 0),
+                      'NONE', undefined, undefined, true),
                   ],
                   birthdays: [
                     {
                       ...usersData.find(
                         (user: { id: string; }) => user.id === '0a701cb5-673b-4512-aaf1-cdc61c76a3fa'),
-                      dob: dateFormatted
-                    }
+                      dob: dateFormatted,
+                    },
                   ],
                   notes: [createNote(professional, 'Transferir', addDays(date, 1).toISOString().slice(0, 10),
                     'ONCE_A_MONTH')],
-                  date: dateFormatted
-                }
-              ]
-            }
+                  date: dateFormatted,
+                },
+              ],
+            },
           ).as('searchReservations');
         });
       });
@@ -535,36 +630,21 @@ Cypress.Commands.add('mockCreateReservation', (
 ) => {
   cy.fixture('users').then((usersData) => {
     cy.fixture('rooms').then((roomData) => {
-      cy.fixture('treatments').then((treatmentData) => {
+      cy.fixture('treatmentSearch').then((treatmentData) => {
         cy.fixture('additional').then((additionalData) => {
           cy.intercept(
             'POST',
             '**/api/v1/reservations',
-            {
-              statusCode: 201,
-              body: [
-                {
-                  createdAt: new Date().toLocaleDateString('en-GB'),
-                  createdBy: '57ceebd2-a012-42a3-af9a-5d546c193200',
-                  deleted: false,
+            (req) => {
+              req.alias = 'createReservation';
+              req.reply({
+                statusCode: 201,
+                body: [{
                   id: reservationId,
-                  customer: usersData.find((user: { id: string; }) => user.id === customerId),
-                  professional: usersData.find((user: { id: string; }) => user.id === professionalId),
-                  room: roomData.find((room: { id: string; }) => room.id === roomId),
-                  treatment: createReservationTreatment(
-                    treatmentData.find((it: { id: string; }) => it.id === treatmentId)),
-                  additional: additionalList?.map(additionalId => createReservationAdditional(
-                    additionalData.find((it: { id: string; }) => it.id === additionalId))),
-                  extras: [],
-                  timestamp: createTimestamp(date),
-                  state: 'APPROVED',
-                  customerCreated: false,
-                  accepted: true,
-                  version: 0
-                }
-              ]
-            }
-          ).as('createReservation');
+                  ...req.body,
+                }],
+              });
+            });
           cy.intercept(
             'GET',
             `**/api/v1/reservations/${ reservationId }`,
@@ -587,9 +667,9 @@ Cypress.Commands.add('mockCreateReservation', (
                 state: 'APPROVED',
                 customerCreated: false,
                 accepted: true,
-                version: 0
-              }
-            }
+                version: 0,
+              },
+            },
           ).as('getReservation');
 
           cy.intercept(
@@ -597,8 +677,8 @@ Cypress.Commands.add('mockCreateReservation', (
             `**/api/v1/reservations/${ reservationId }/payments`,
             {
               statusCode: 204,
-              body: []
-            }
+              body: [],
+            },
           ).as('getPayments');
 
           cy.intercept(
@@ -606,11 +686,178 @@ Cypress.Commands.add('mockCreateReservation', (
             `**/api/v1/reservations/${ reservationId }/history`,
             {
               statusCode: 204,
-              body: []
-            }
+              body: [],
+            },
           ).as('getHistory');
         });
       });
     });
   });
-})
+});
+
+Cypress.Commands.add('mockUsers', (total?: number, displayName?: string) => {
+  cy.fixture('users').then((userData) => {
+    cy.intercept(
+      'GET',
+      new RegExp('/api/v1/users/pages\\?page=0&size=\\d+&sort=displayName&direction=asc'),
+      {
+        statusCode: 200,
+        body: { content: userData.slice(0, total ?? userData.length), totalElements: total ?? userData.length },
+      },
+    ).as('getUsers');
+
+    if (displayName) {
+      const user = userData.find((u: any) => u.displayName === displayName);
+      expect(user).to.exist;
+      cy.wrap(user).as('selectedUser');
+    }
+  });
+});
+
+Cypress.Commands.add('mockUser', (id: string, selectedUser?: any) => {
+  cy.fixture('users').then((userData) => {
+    cy.intercept(
+      'GET',
+      `**/api/v1/users/${ selectedUser?.id ?? id }`,
+      {
+        statusCode: 200,
+        body: selectedUser ?? userData.find((u: any) => u.id === id),
+      },
+    ).as('getUser');
+  });
+});
+
+Cypress.Commands.add('mockTreatments', (page: boolean, total?: number, id?: string) => {
+  cy.fixture('treatmentGroups').then((treatmentGroupData) => {
+    mockPage('getTreatments', page, 'order', 'asc', 'treatments/pages', 'treatments/groups', treatmentGroupData, total);
+
+    if (id) {
+      cy.fixture('treatments').then((treatmentData) => {
+        const treatment = treatmentData.find((t: any) => t.id === id);
+        expect(treatment).to.exist;
+        cy.wrap(treatment).as('selectedTreatment');
+      });
+    }
+  });
+});
+
+Cypress.Commands.add('mockAdditionalList', (total?: number, id?: string) => {
+  cy.fixture('additional').then((additionalData) => {
+    cy.intercept(
+      'GET',
+      new RegExp('/api/v1/additional/pages\\?page=0&size=\\d+&sort=order&direction=asc'),
+      {
+        statusCode: 200,
+        body: {
+          content: additionalData.slice(0, total ?? additionalData.length),
+          totalElements: total ?? additionalData.length,
+        },
+      },
+    ).as('getAdditionalList');
+
+    if (id) {
+      const additional = additionalData.find((t: any) => t.id === id);
+      expect(additional).to.exist;
+      cy.wrap(additional).as('selectedAdditional');
+    }
+  });
+});
+
+Cypress.Commands.add('mockColors', (page: boolean, total?: number, id?: string) => {
+  cy.fixture('colors').then((colorData) => {
+    mockPage('getColors', page, 'name', 'asc', 'colors/pages', 'colors', colorData, total);
+    if (id) {
+      const color = colorData.find((c: any) => c.id === id);
+      expect(color).to.exist;
+      cy.wrap(color).as('selectedColor');
+    }
+  });
+});
+
+Cypress.Commands.add('mockCurrencyList', (page: boolean, total?: number, id?: string) => {
+  cy.fixture('currency').then((currencyData) => {
+    mockPage('getCurrencyList', page, 'code', 'asc', 'currency/pages', 'currency', currencyData, total);
+    if (id) {
+      const currency = currencyData.find((c: any) => c.id === id);
+      expect(currency).to.exist;
+      cy.wrap(currency).as('selectedCurrency');
+    }
+  });
+});
+
+Cypress.Commands.add('mockTreatment', (id: string, selectedTreatment?: any) => {
+  cy.fixture('treatments').then((treatmentData) => {
+    cy.intercept(
+      'GET',
+      `**/api/v1/treatments/${ selectedTreatment?.id ?? id }`,
+      {
+        statusCode: 200,
+        body: selectedTreatment ?? treatmentData.find((t: any) => t.id === id),
+      },
+    ).as('getTreatment');
+  });
+});
+
+Cypress.Commands.add('mockAdditional', (id: string, selectedAdditional?: any) => {
+  return cy.fixture('additional').then((additionalData) => {
+    cy.intercept(
+      'GET',
+      `**/api/v1/additional/${ selectedAdditional?.id ?? id }`,
+      {
+        statusCode: 200,
+        body: selectedAdditional ?? additionalData.find((t: any) => t.id === id),
+      },
+    ).as('getAdditional');
+  });
+});
+
+Cypress.Commands.add('mockColor', (id: string, selectedColor?: any) => {
+  cy.fixture('colors').then((colorData) => {
+    cy.intercept(
+      'GET',
+      `**/api/v1/colors/${ selectedColor?.id ?? id }`,
+      {
+        statusCode: 200,
+        body: selectedColor ?? colorData.find((t: any) => t.id === id),
+      },
+    ).as('getColor');
+  });
+});
+
+Cypress.Commands.add('mockCurrency', (id: string, selectedCurrency?: any) => {
+  cy.fixture('currency').then((currencyData) => {
+    cy.intercept(
+      'GET',
+      `**/api/v1/currency/${ selectedCurrency?.id ?? id }`,
+      {
+        statusCode: 200,
+        body: selectedCurrency ?? currencyData.find((t: any) => t.id === id),
+      },
+    ).as('getCurrency');
+  });
+});
+
+const mockPage = (
+  alias: string,
+  page: boolean,
+  sort: string,
+  direction: string,
+  pageUrl: string,
+  baseUrl: string,
+  data: any,
+  total?: number,
+) => {
+  const url = new RegExp(
+    page ? `/api/v1/${ pageUrl }\\?page=0&size=\\d+&sort=${ sort }&direction=${ direction }` : `/api/v1/${ baseUrl }`);
+  const content = data.slice(0, total ?? data.length);
+  const body = page ? {
+    content: content,
+    totalElements: content.length,
+  } : content;
+  cy.intercept('GET', url,
+    {
+      statusCode: 200,
+      body: body,
+    },
+  ).as(alias);
+};

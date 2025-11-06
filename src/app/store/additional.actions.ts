@@ -1,123 +1,90 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
+import { IAdditional, IAdditionalAll } from '../interfaces/additional';
+import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
+import { ITreatmentGroup } from '../interfaces/treatment';
+import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
+import { Pagination } from '../interfaces/pagination';
 
-export enum AdditionalActionTypes {
-  getAll = '[Additional] Get all',
-  getAdditionalList = '[Additional] Get additional List',
+enum AdditionalActionTypes {
+  getAdditionalPage = '[Additional] Get additional page',
+  getAdditionalList = '[Additional] Get additional list',
   additionalSuccess = '[Additional] Success',
-  additionalSave = '[Additional] Save',
-  additionalUpdate = '[Additional] Update',
-  additionalUpdateSort = '[Additional] Update sort',
+  createAdditional = '[Additional] create additional',
+  updateAdditional = '[Additional] Update additional by id',
+  sortAdditional = '[Additional] Sort additional',
   additionalSaveSuccess = '[Additional] Save Success',
   additionalFailure = '[Additional] Failure',
   additionalSelected = '[Additional] Selected',
-  additionalFind = '[Additional] Find',
-  additionalDelete = '[Additional] Delete',
-  findGroups = '[Additional] Find treatment groups',
+  getAdditional = '[Additional] Find additional by id',
+  deleteAdditional = '[Additional] Delete additional by id',
+  getAllTreatmentsGroup = '[Additional] Get all treatments group',
   findGroupsSuccess = '[Additional] Find treatment groups success',
   clean = '[Additional] Clean'
 }
 
-export class GetAll implements Action {
-  readonly type = AdditionalActionTypes.getAll;
+export const getAdditionalPage = createAction(
+  AdditionalActionTypes.getAdditionalPage,
+  props<PageRequest>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getAdditionalList = createAction(
+  AdditionalActionTypes.getAdditionalList,
+);
 
-export class GetAdditionalList implements Action {
-  readonly type = AdditionalActionTypes.getAdditionalList;
-}
+export const additionalSuccess = createAction(
+  AdditionalActionTypes.additionalSuccess,
+  props<{ data: Pagination<IAdditional> | IAdditionalAll[] }>(),
+);
 
-export class AdditionalSuccess implements Action {
-  readonly type = AdditionalActionTypes.additionalSuccess;
+export const createAdditional = createAction(
+  AdditionalActionTypes.createAdditional,
+  props<{ additional: IAdditional }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const updateAdditional = createAction(
+  AdditionalActionTypes.updateAdditional,
+  props<{ id: string; additional: IAdditional }>(),
+);
 
-export class AdditionalSave implements Action {
-  readonly type = AdditionalActionTypes.additionalSave;
+export const sortAdditional = createAction(
+  AdditionalActionTypes.sortAdditional,
+  props<{ additionalList: ISorted[] }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const additionalSaveSuccess = createAction(
+  AdditionalActionTypes.additionalSaveSuccess,
+  props<IResponseSuccess>(),
+);
 
-export class AdditionalUpdate implements Action {
-  readonly type = AdditionalActionTypes.additionalUpdate;
+export const additionalFailure = createAction(
+  AdditionalActionTypes.additionalFailure,
+  props<{ error: IError }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const additionalSelected = createAction(
+  AdditionalActionTypes.additionalSelected,
+  props<{ selected?: IAdditional }>(),
+);
 
-export class AdditionalUpdateSort implements Action {
-  readonly type = AdditionalActionTypes.additionalUpdateSort;
+export const getAdditional = createAction(
+  AdditionalActionTypes.getAdditional,
+  props<{ id: string }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const deleteAdditional = createAction(
+  AdditionalActionTypes.deleteAdditional,
+  props<{ id: string; name: string }>(),
+);
 
-export class AdditionalSaveSuccess implements Action {
-  readonly type = AdditionalActionTypes.additionalSaveSuccess;
+export const getAllTreatmentsGroup = createAction(
+  AdditionalActionTypes.getAllTreatmentsGroup,
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const findGroupsSuccess = createAction(
+  AdditionalActionTypes.findGroupsSuccess,
+  props<{ groups: ITreatmentGroup[] }>(),
+);
 
-export class AdditionalFailure implements Action {
-  readonly type = AdditionalActionTypes.additionalFailure;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class AdditionalSelected implements Action {
-  readonly type = AdditionalActionTypes.additionalSelected;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class AdditionalFind implements Action {
-  readonly type = AdditionalActionTypes.additionalFind;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class DeleteAdditional implements Action {
-  readonly type = AdditionalActionTypes.additionalDelete;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class FindGroups implements Action {
-  readonly type = AdditionalActionTypes.findGroups;
-}
-
-export class FindGroupsSuccess implements Action {
-  readonly type = AdditionalActionTypes.findGroupsSuccess;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = AdditionalActionTypes.clean;
-}
-
-export type All =
-  | GetAll
-  | GetAdditionalList
-  | AdditionalSave
-  | AdditionalUpdate
-  | AdditionalUpdateSort
-  | AdditionalSuccess
-  | AdditionalSaveSuccess
-  | AdditionalFailure
-  | AdditionalFind
-  | AdditionalSelected
-  | DeleteAdditional
-  | FindGroups
-  | FindGroupsSuccess
-  | Clean;
+export const clean = createAction(
+  AdditionalActionTypes.clean,
+);

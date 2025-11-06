@@ -11,7 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectExpenseState } from '../../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import * as fromActionsExpense from '../../../../store/expense.actions';
+import { clean, deleteExpense, expenseSelected, getExpensesPage } from '../../../../store/expense.actions';
 import { DialogComponent } from '../../../../shared/dialog/generic/dialog.component';
 import { ActivatedRoute } from '@angular/router';
 import { getDateFormat, getNowTimeZone, isSameTimeZone, newDateTimestamp } from '../../../../util/dates';
@@ -29,9 +29,9 @@ import { TimeDetailPipe } from '../../../../pipes/time-detail.pipe';
   styleUrls: ['./expenses.component.scss'],
   animations: [detailExpandAnimation],
   providers: [
-    { provide: DateAdapter, useClass: YearMonthAdapter }
+    { provide: DateAdapter, useClass: YearMonthAdapter },
   ],
-  imports: [SharedModule, TimeDetailPipe]
+  imports: [SharedModule, TimeDetailPipe],
 })
 export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -53,13 +53,13 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   private paginatorSubscription: Subscription | undefined;
   private getState: Observable<any>;
   private filter?: string;
-  private dateFilter: string | null = null;
+  private dateFilter?: string;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver, private route: ActivatedRoute) {
+    private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver, private route: ActivatedRoute) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
-      Breakpoints.Small
+      Breakpoints.Small,
     ]).subscribe(result => {
       if (result.matches) {
         this.pageSize = MOBILE_PAGE_SIZE;
@@ -114,33 +114,33 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   openDialog = (expense: IExpenseAll): void => openDialog(
-    expense.room, this.dateFormat, this.translate, this.dialog, newDateTimestamp(expense.timestamp)
+    expense.room, this.dateFormat, this.translate, this.dialog, newDateTimestamp(expense.timestamp),
   );
+
+  edit = (selected: IExpense): void => this.store.dispatch(expenseSelected({ selected }));
 
   delete = (expense: IExpense): void => {
     const title = this.translate.instant('EXPENSE.DELETED.TITLE');
     const content = this.translate.instant('EXPENSE.DELETED.CONTENT', { invoice: expense.invoice });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: expense }
+      data: { title, content, value: expense },
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.store.dispatch(
-          new fromActionsExpense.DeleteExpense({ roomId: this.roomId, id: result.id, invoice: result.invoice })
-        );
+        this.store.dispatch(deleteExpense({ roomId: this.roomId!, id: result.id, invoice: result.invoice }));
       }
     });
   };
 
   private valueChange = (): void => {
     this.date.valueChanges.subscribe(value => {
-      this.dateFilter = value ? getDateFormat(value) : value;
+      this.dateFilter = value ? getDateFormat(value) : undefined;
       this.getExpenses(0);
     });
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsExpense.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe(() => {
@@ -156,21 +156,23 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
     this.paginatorSubscription = undefined;
     this.store.dispatch(
-      new fromActionsExpense.GetAll({
-        roomId: this.roomId,
-        active: this.sort.active,
-        direction: this.sort.direction,
-        size: this.pageSize,
-        filter: this.filter,
-        dateFilter: this.dateFilter,
-        page
-      })
+      getExpensesPage(
+        {
+          roomId: this.roomId!,
+          sort: this.sort.active,
+          direction: this.sort.direction,
+          page: page,
+          size: this.pageSize,
+          filter: this.filter,
+          dateFilter: this.dateFilter,
+        },
+      ),
     );
   };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {
-      if (state.message) {
+      if (state.response) {
         this.clean();
         this.getExpenses();
       }

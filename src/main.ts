@@ -1,5 +1,4 @@
 import { enableProdMode, importProvidersFrom, inject, LOCALE_ID, provideAppInitializer } from '@angular/core';
-
 import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
 import { AngularFireModule } from '@angular/fire/compat';
@@ -41,9 +40,16 @@ import localeAr from '@angular/common/locales/es-AR';
 import { provideHttpClient, withInterceptors, withJsonpSupport } from '@angular/common/http';
 import { httpInterceptorProviders } from './app/http-interceptors';
 
+export interface ISendMessage {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
 const cookieConfig: NgcCookieConsentConfig = {
   cookie: {
-    domain: environment.appDomain
+    domain: environment.appDomain,
   },
   position: 'top-right',
   theme: 'classic',
@@ -51,18 +57,18 @@ const cookieConfig: NgcCookieConsentConfig = {
     popup: {
       background: '#b5ac9e',
       text: '#000',
-      link: '#000'
+      link: '#000',
     },
     button: {
       background: '#dcc8c2',
       text: '#000',
-      border: 'transparent'
-    }
+      border: 'transparent',
+    },
   },
   type: 'info',
   content: {
     href: `${ environment.appServer }/privacy`,
-  }
+  },
 };
 
 const localStorageSyncReducer =
@@ -82,18 +88,18 @@ const providersFrom = importProvidersFrom(BrowserModule, StoreModule.forRoot(red
     defaultLanguage: 'en',
     loader: {
       provide: TranslateLoader,
-      useClass: TranslateLoaderFactory.forModule('common')
+      useClass: TranslateLoaderFactory.forModule('common'),
     },
     isolate: false,
-    extend: true
+    extend: true,
   }),
   NgcCookieConsentModule.forRoot(cookieConfig),
   AppRoutingModule,
   ServiceWorkerModule.register('ngsw-worker.js', {
     enabled: environment.production,
-    registrationStrategy: 'registerWhenStable:30000'
+    registrationStrategy: 'registerWhenStable:30000',
   }),
-  AngularFireModule.initializeApp(environment.firebase)
+  AngularFireModule.initializeApp(environment.firebase),
 );
 
 const authProvider = provideAuth(() => {
@@ -106,7 +112,7 @@ const authProvider = provideAuth(() => {
 
 const appCheckProvider = provideAppCheck(() => initializeAppCheck(getApp(), {
   provider: new ReCaptchaV3Provider(environment.recaptcha.siteKey),
-  isTokenAutoRefreshEnabled: true
+  isTokenAutoRefreshEnabled: true,
 }));
 
 const databaseProvider = provideDatabase(() => {
@@ -126,7 +132,7 @@ const providers = [
   providersFrom,
   {
     provide: MatPaginatorIntl, deps: [TranslateService],
-    useFactory: (translateService: TranslateService) => new PaginatorI18n(translateService).getPaginatorIntl()
+    useFactory: (translateService: TranslateService) => new PaginatorI18n(translateService).getPaginatorIntl(),
   },
   PermissionsService,
   TokenService,
@@ -139,11 +145,11 @@ const providers = [
   AuthUserService,
   {
     provide: LOCALE_ID,
-    useValue: 'en-GB'
+    useValue: 'en-GB',
   },
   {
     provide: MAT_ICON_DEFAULT_OPTIONS,
-    useValue: { fontSet: 'material-symbols-outlined' }
+    useValue: { fontSet: 'material-symbols-outlined' },
   },
   provideAppInitializer(() => initializePwaService(inject(PwaService))),
   provideCharts(withDefaultRegisterables()),
@@ -155,7 +161,7 @@ const providers = [
   provideAnalytics(() => getAnalytics()),
   ScreenTrackingService,
   UserTrackingService,
-  provideAnimations()
+  provideAnimations(),
 ];
 
 if (environment.production) {
@@ -163,7 +169,7 @@ if (environment.production) {
 }
 
 bootstrapApplication(AppComponent, {
-  providers: [...providers]
+  providers: [...providers],
 }).then(() => {
   if ('serviceWorker' in navigator && environment.production) {
     navigator.serviceWorker.register('ngsw-worker.js');

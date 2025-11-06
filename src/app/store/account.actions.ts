@@ -1,126 +1,89 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
+import { IAccount, ITransaction } from '../interfaces/account';
+import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
+import { IPaymentOption } from '../interfaces/payment';
 
-export enum AccountActionTypes {
+enum AccountActionTypes {
   accountSuccess = '[Account] Success',
-  accountSave = '[Account] Save',
-  accountUpdate = '[Account] Update',
+  createTransaction = '[Account] Save',
+  updateAccount = '[Account] Update account by id',
   accountSaveSuccess = '[Account] Save Success',
   accountFailure = '[Account] Failure',
   accountSelected = '[Account] Selected',
-  accountFind = '[Account] Find',
+  getAccount = '[Account] Find account by id',
   paymentOptions = '[Account] Payment Option',
   paymentOptionsSuccess = '[Account] Payment Option success',
   paymentSend = '[Account] Payment send',
-  accountFindTransactions = '[Account] Find transactions',
-  accountTransactionDetail = '[Account] transaction detail',
-  accountFindByCustomer = '[Account] Find by customer',
+  getTransactionsByAccountId = '[Account] Get transactions by account id',
+  getTransaction = '[Account] find transaction by id',
+  getAccountByCustomerId = '[Account] Find account by customer id',
   clean = '[Account] Clean'
 }
 
-export class AccountSuccess implements Action {
-  readonly type = AccountActionTypes.accountSuccess;
+export const accountSuccess = createAction(
+  AccountActionTypes.accountSuccess,
+  props<{ data: ITransaction[] }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const paymentOptionsSuccess = createAction(
+  AccountActionTypes.paymentOptionsSuccess,
+  props<{ paymentOptions?: IPaymentOption[] }>(),
+);
 
-export class PaymentOptionsSuccess implements Action {
-  readonly type = AccountActionTypes.paymentOptionsSuccess;
+export const createTransaction = createAction(
+  AccountActionTypes.createTransaction,
+  props<{ id: string; transaction: ITransaction }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const updateAccount = createAction(
+  AccountActionTypes.updateAccount,
+  props<{ id: string; transaction: ITransaction; customerId: string }>(),
+);
 
-export class AccountSave implements Action {
-  readonly type = AccountActionTypes.accountSave;
+export const accountSaveSuccess = createAction(
+  AccountActionTypes.accountSaveSuccess,
+  props<IResponseSuccess>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const accountFailure = createAction(
+  AccountActionTypes.accountFailure,
+  props<{ error: IError }>(),
+);
 
-export class AccountUpdate implements Action {
-  readonly type = AccountActionTypes.accountUpdate;
+export const accountSelected = createAction(
+  AccountActionTypes.accountSelected,
+  props<{ selected?: IAccount | ITransaction }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getAccount = createAction(
+  AccountActionTypes.getAccount,
+  props<{ id: string }>(),
+);
 
-export class AccountSaveSuccess implements Action {
-  readonly type = AccountActionTypes.accountSaveSuccess;
+export const paymentOptions = createAction(
+  AccountActionTypes.paymentOptions,
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const paymentSend = createAction(
+  AccountActionTypes.paymentSend,
+  props<{ link: string }>(),
+);
 
-export class AccountFailure implements Action {
-  readonly type = AccountActionTypes.accountFailure;
+export const getTransactionsByAccountId = createAction(
+  AccountActionTypes.getTransactionsByAccountId,
+  props<PageRequest & { id: string }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getTransaction = createAction(
+  AccountActionTypes.getTransaction,
+  props<{ id: string; transactionId: string }>(),
+);
 
-export class AccountSelected implements Action {
-  readonly type = AccountActionTypes.accountSelected;
+export const getAccountByCustomerId = createAction(
+  AccountActionTypes.getAccountByCustomerId,
+  props<{ customerId: string }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
-
-export class AccountFind implements Action {
-  readonly type = AccountActionTypes.accountFind;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class PaymentOptions implements Action {
-  readonly type = AccountActionTypes.paymentOptions;
-}
-
-export class PaymentSend implements Action {
-  readonly type = AccountActionTypes.paymentSend;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class AccountFindTransactions implements Action {
-  readonly type = AccountActionTypes.accountFindTransactions;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class TransactionDetail implements Action {
-  readonly type = AccountActionTypes.accountTransactionDetail;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class AccountFindByCustomer implements Action {
-  readonly type = AccountActionTypes.accountFindByCustomer;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = AccountActionTypes.clean;
-}
-
-export type All =
-  | AccountSave
-  | AccountUpdate
-  | AccountSuccess
-  | AccountSaveSuccess
-  | AccountFailure
-  | AccountFind
-  | AccountFindTransactions
-  | AccountFindByCustomer
-  | AccountSelected
-  | PaymentOptions
-  | PaymentOptionsSuccess
-  | PaymentSend
-  | TransactionDetail
-  | Clean;
+export const clean = createAction(
+  AccountActionTypes.clean,
+);

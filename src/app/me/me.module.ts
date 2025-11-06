@@ -6,11 +6,7 @@ import { ReservationsComponent } from './reservation/list/reservations.component
 import { MeReservationComponent } from './reservation/me/me-reservation.component';
 import { PaymentComponent } from './payment/payment.component';
 import { PaymentCompleteComponent } from './payment/complete/payment-complete.component';
-import {
-  BottomSheetReferralComponent,
-  BottomSheetShareComponent,
-  ReferralsComponent
-} from './referrals/referrals.component';
+import { ReferralsComponent } from './referrals/referrals.component';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { ReviewDialogComponent } from './reservation/review/review-dialog.component';
 import { UpcomingComponent } from './reservation/upcoming/upcoming.component';
@@ -36,6 +32,8 @@ import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
 import { ShareButtonsComponent } from './referrals/share-buttons/share-buttons.component';
+import { BottomSheetShareComponent } from './referrals/bottom-sheet-share.component';
+import { BottomSheetReferralComponent } from './referrals/bottom-sheet-referral.component';
 
 @NgModule({
   imports: [
@@ -56,14 +54,14 @@ import { ShareButtonsComponent } from './referrals/share-buttons/share-buttons.c
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('me')
+        useClass: TranslateLoaderFactory.forModule('me'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
     EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects, CurrencyEffects]),
   ],
@@ -77,15 +75,15 @@ import { ShareButtonsComponent } from './referrals/share-buttons/share-buttons.c
     TrackingService,
     DiscountService,
     CurrencyService,
-    ColorService
-  ]
+    ColorService,
+  ],
 })
 export class MeModule {
   constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
     const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe(state => {
+    getI18nState.subscribe((state) => {
       translateService.currentLang = '';
-      this.translateService.use(state.data);
+      this.translateService.use(state.language);
     });
   }
 }

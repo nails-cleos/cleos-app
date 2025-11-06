@@ -44,6 +44,7 @@ export interface IExpenseAll {
 export interface IExpenseInfo {
   roomId: string;
   roomName: string;
+  timeZone: string;
   currency: ICurrencyAll;
   types: any[];
 }

@@ -5,14 +5,14 @@ import {
   UntypedFormControl,
   UntypedFormGroup,
   Validators,
-  ɵTypedOrUntyped
+  ɵTypedOrUntyped,
 } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectColorState } from '../store/app.states';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Color, IColor } from '../interfaces/color';
-import * as fromActionsColor from '../store/color.actions';
+import { clean, createColor, getColor, updateColor } from '../store/color.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { fieldChange, valueChange } from '../util/validators';
 import { SharedModule } from '../shared/shared.module';
@@ -22,7 +22,7 @@ import { BackButtonDirective } from '../directives/back-button.directive';
   selector: 'app-colors',
   templateUrl: './color.component.html',
   styleUrls: ['./color.component.scss'],
-  imports: [SharedModule, BackButtonDirective]
+  imports: [SharedModule, BackButtonDirective],
 })
 export class ColorComponent implements OnInit, OnDestroy {
   @Input() color?: IColor;
@@ -58,14 +58,13 @@ export class ColorComponent implements OnInit, OnDestroy {
     color.description = valueChange(this.getForm.description.value, this.color?.description);
 
     if (this.isAddMode) {
-      return this.store.dispatch(
-        new fromActionsColor.ColorSave(color)
-      );
+      this.store.dispatch(createColor({ color }));
     } else {
-      color.id = this.id;
       this.color = undefined;
-      return this.store.dispatch(new fromActionsColor.ColorUpdate(color));
+      const id = this.id!;
+      this.store.dispatch(updateColor({ id, color }));
     }
+    return;
   }
 
   ngOnInit(): void {
@@ -90,27 +89,25 @@ export class ColorComponent implements OnInit, OnDestroy {
   private createForm = (): void => {
     this.form = this.formBuilder.group({
       name: ['', [Validators.required]],
-      description: ['']
+      description: [''],
     });
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsColor.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private getColor = (): void => {
     if (!this.color) {
-      this.store.dispatch(
-        new fromActionsColor.ColorFind(this.id)
-      );
+      this.store.dispatch(getColor({ id: this.id! }));
     }
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.selected) {
         this.color = {
           id: state.selected.id,
           name: state.selected.name,
-          description: state.selected.description
+          description: state.selected.description,
         } as IColor;
         this.form.patchValue(this.color);
       }
@@ -119,7 +116,7 @@ export class ColorComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
-      } else if (state.message) {
+      } else if (state.response) {
         this.router.navigate([this.language, 'colors']);
       }
     });

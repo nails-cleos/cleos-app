@@ -8,24 +8,24 @@ import { DiscountComponent } from './discount.component';
 const routes: Routes = [
   {
     path: '', component: DiscountsComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin]
-    }
+      roles: [Role.admin],
+    },
   },
   {
     path: 'add', component: DiscountComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin]
-    }
+      roles: [Role.admin],
+    },
   },
   {
     path: ':id', component: DiscountComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin]
-    }
-  }
+      roles: [Role.admin],
+    },
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class DiscountRoutingModule {
 }

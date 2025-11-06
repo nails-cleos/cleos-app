@@ -1,5 +1,10 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import * as fromActionsPayment from '../../../store/payment.actions';
+import {
+  clean,
+  createPaymentLinkByReservationId,
+  getPaymentByResourceId,
+  paymentOptions,
+} from '../../../store/payment.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectPaymentState } from '../../../store/app.states';
@@ -12,8 +17,8 @@ import { IStep, Step } from '../../../interfaces/step';
 import { MatStepper } from '@angular/material/stepper';
 import { getPaymentOptions, getPayNlOptions, IPaymentOption, PaymentType } from '../../../interfaces/payment';
 import { IPrice, Price } from '../../../interfaces/treatment';
-import { IReservationAll } from '../../../interfaces/reservation';
-import * as fromActionsReservation from '../../../store/reservation.actions';
+import { IReservationAll, IReservationPayment } from '../../../interfaces/reservation';
+import { getReservation } from '../../../store/reservation.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { SharedModule } from '../../../shared/shared.module';
@@ -26,7 +31,7 @@ import { BackButtonDirective } from '../../../directives/back-button.directive';
   selector: 'app-option',
   templateUrl: './option.component.html',
   styleUrls: ['./option.component.scss'],
-  imports: [SharedModule, BankComponent, DurationTimePipe, PaymentPreviewComponent, BackButtonDirective]
+  imports: [SharedModule, BankComponent, DurationTimePipe, PaymentPreviewComponent, BackButtonDirective],
 })
 export class OptionComponent implements OnInit, OnDestroy {
   @ViewChild('stepper') myStepper!: MatStepper;
@@ -51,7 +56,7 @@ export class OptionComponent implements OnInit, OnDestroy {
   private readonly language: string;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: UntypedFormBuilder,
-              breakpointObserver: BreakpointObserver, private router: Router, private translate: TranslateService) {
+    breakpointObserver: BreakpointObserver, private router: Router, private translate: TranslateService) {
     this.getState = this.store.select(selectPaymentState);
     breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small])
       .subscribe(result => this.smallScreen = result.matches);
@@ -60,7 +65,7 @@ export class OptionComponent implements OnInit, OnDestroy {
     this.steps = [type, preview];
     this.typeForm = this.formBuilder.group({
       type: new UntypedFormControl(undefined),
-      bank: new UntypedFormControl('')
+      bank: new UntypedFormControl(''),
     });
     this.price = new Price();
     this.language = this.translate.currentLang;
@@ -76,16 +81,11 @@ export class OptionComponent implements OnInit, OnDestroy {
     const type = option.type;
     const paymentOptionId = option.bic;
     const percentage = this.typeForm.get('percentage')?.value || 'TOTAL';
-    const payload = {
-      reservationId: this.reservationId,
-      payment: { type, paymentOptionId, percentage, bic: undefined }
-    };
+    const payment: IReservationPayment = { type, paymentOptionId, percentage, bic: undefined };
     if (option.subTypes.length) {
-      payload.payment.bic = this.typeForm.get('bank')?.value?.bic;
+      payment.bic = this.typeForm.get('bank')?.value?.bic;
     }
-    return this.store.dispatch(
-      new fromActionsPayment.PaymentCreate(payload)
-    );
+    return this.store.dispatch(createPaymentLinkByReservationId({ reservationId: this.reservationId, payment }));
   }
 
   get professionalName(): string {
@@ -125,20 +125,16 @@ export class OptionComponent implements OnInit, OnDestroy {
   };
 
   private getPaymentFindByReservationId = (): void => {
-    this.store.dispatch(
-      new fromActionsPayment.PaymentFindByResourceId({ id: this.reservationId, path: 'reservation' })
-    );
-    this.store.dispatch(
-      new fromActionsReservation.ReservationFind({ id: this.reservationId })
-    );
+    this.store.dispatch(getPaymentByResourceId({ id: this.reservationId, path: 'reservation' }));
+    this.store.dispatch(getReservation({ id: this.reservationId }));
   };
 
-  private getOptions = (): void => this.store.dispatch(new fromActionsPayment.PaymentOptions());
+  private getOptions = (): void => this.store.dispatch(paymentOptions());
 
-  private clean = (): void => this.store.dispatch(new fromActionsPayment.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.selected) {
         const reservation = state.selected[0].reservation;
         if (reservation) {
@@ -160,7 +156,7 @@ export class OptionComponent implements OnInit, OnDestroy {
                 this.typeForm = this.formBuilder.group({
                   bank: new UntypedFormControl(''),
                   percentage: new UntypedFormControl(undefined),
-                  type: new UntypedFormControl(undefined)
+                  type: new UntypedFormControl(undefined),
                 });
               }
               this.first = this.price.totalPaid === 0;

@@ -4,30 +4,30 @@ import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import { IUser, User } from '../../interfaces/user';
 import { FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import * as fromActionsUser from '../../store/user.actions';
-import { fieldChange, valueChange } from '../../util/validators';
+import { clean, getMyUser, updateMyPhoto, updateMyUser } from '../../store/user.actions';
+import { fieldChange, validColorValidator, valueChange } from '../../util/validators';
 import { findFlag, flags, IFlag } from '../../util/flags';
 import { createAddress, getDisplayNameInitials, getLocale, getUserImage } from '../../util/helper';
 import { backendFormatDate, createDateFromString, newDate } from '../../util/dates';
 import { lightenDarkenColor } from '../../util/color';
 import { Role } from '../../interfaces/token';
 import { TranslateService } from '@ngx-translate/core';
-import { NgxColorsModule, validColorValidator } from 'ngx-colors';
 import { resizeImage } from '../../util/file';
 import { SharedModule } from '../../shared/shared.module';
-import PlaceResult = google.maps.places.PlaceResult;
-import PlaceGeometry = google.maps.places.PlaceGeometry;
 import { GoogleMapComponent } from '../../shared/google-map/google-map.component';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { NgxMaterialIntlTelInputComponent, TextLabels } from 'ngx-material-intl-tel-input';
 import { NgIcon } from '@ng-icons/core';
+import { ColorPickerComponent, ColorPickerDirective } from 'ngx-color-picker';
+import PlaceResult = google.maps.places.PlaceResult;
+import PlaceGeometry = google.maps.places.PlaceGeometry;
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
-  imports: [SharedModule, NgxMaterialIntlTelInputComponent, NgxColorsModule, GoogleMapComponent, BackButtonDirective,
-    NgIcon]
+  imports: [SharedModule, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective,
+    NgIcon, ColorPickerComponent, ColorPickerDirective],
 })
 export class ProfileComponent implements OnInit, OnDestroy {
   @ViewChild('canvas', { static: false }) canvas?: ElementRef<HTMLCanvasElement>;
@@ -45,16 +45,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
   initials?: string;
 
   langValue: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
+    Validators.required,
   ]);
 
   displayName: UntypedFormControl = new UntypedFormControl();
   phone: FormControl = new FormControl('', [Validators.required]);
   dob: UntypedFormControl = new UntypedFormControl();
-  darkColor: UntypedFormControl = new UntypedFormControl(undefined, [validColorValidator()]);
-  darkColorPicker: UntypedFormControl = new UntypedFormControl();
-  lightColor: UntypedFormControl = new UntypedFormControl(undefined, [validColorValidator()]);
-  lightColorPicker: UntypedFormControl = new UntypedFormControl();
+  darkColor: UntypedFormControl = new UntypedFormControl();
+  lightColor: UntypedFormControl = new UntypedFormControl();
 
   address: UntypedFormControl = new UntypedFormControl();
 
@@ -72,7 +70,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     nationalNumberLabel: '',
     hintLabel: '',
     invalidNumberError: '',
-    requiredError: ''
+    requiredError: '',
   };
 
   private getState: Observable<any> = this.store.select(selectUserState);
@@ -104,9 +102,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
     user.address = createAddress(this.formattedAddress, this.geometry?.location, this.user?.address);
 
-    return this.store.dispatch(
-      new fromActionsUser.UpdateUser({ user, redirectUrl: `/${ getLocale(lang).language }/auth/profile` })
-    );
+    this.store.dispatch(updateMyUser({ user, redirectUrl: `/${getLocale(lang).language}/auth/profile` }));
+    return;
   }
 
   ngOnInit(): void {
@@ -135,9 +132,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
             if (this.resizedImage) {
               this.resizedImage.nativeElement.src = dataUrl;
             }
-            this.store.dispatch(
-              new fromActionsUser.UpdatePhoto(dataUrl)
-            );
+            this.store.dispatch(updateMyPhoto({ file: dataUrl }));
           }
         };
         img.src = e.target.result;
@@ -165,46 +160,25 @@ export class ProfileComponent implements OnInit, OnDestroy {
       nationalNumberLabel: phoneTranslations.FIELD || '',
       hintLabel: '',
       invalidNumberError: phoneTranslations.INVALID || '',
-      requiredError: phoneTranslations.REQUIRED || ''
+      requiredError: phoneTranslations.REQUIRED || '',
     };
   };
 
-  private findMe = (): void => this.store.dispatch(new fromActionsUser.FindMe());
+  private findMe = (): void => this.store.dispatch(getMyUser());
 
   private createForm = (): void => {
     this.form = this.formBuilder.group({
-        langValue: this.langValue,
-        displayName: this.displayName,
-        phone: this.phone,
-        dob: this.dob,
-        darkColor: this.darkColor,
-        darkColorPicker: this.darkColorPicker,
-        lightColor: this.lightColor,
-        lightColorPicker: this.lightColorPicker,
-        address: this.address
-      }
-    );
-
-    this.darkColor.valueChanges.subscribe((color) => {
-      if (this.darkColorPicker.valid) {
-        this.darkColorPicker.setValue(color, { emitEvent: false });
-      }
+      langValue: this.langValue,
+      displayName: this.displayName,
+      phone: this.phone,
+      dob: this.dob,
+      darkColor: this.darkColor,
+      lightColor: this.lightColor,
+      address: this.address,
     });
-    this.darkColorPicker.valueChanges.subscribe((color) =>
-      this.darkColor.setValue(color, { emitEvent: false })
-    );
-
-    this.lightColor.valueChanges.subscribe((color) => {
-      if (this.lightColorPicker.valid) {
-        this.lightColorPicker.setValue(color, { emitEvent: false });
-      }
-    });
-    this.lightColorPicker.valueChanges.subscribe((color) =>
-      this.lightColor.setValue(color, { emitEvent: false })
-    );
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private resizeImageFromUrl = (url?: string): void => {
     if (url) {
@@ -224,7 +198,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.selected) {
         const user = state.selected;
         this.user = user;
@@ -238,11 +212,17 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.showColors = state.selected.authorities?.some((au: any) => roles.includes(au.authority));
         this.isAdmin = state.selected.authorities?.some((u: any) => u.authority === Role.admin);
 
-        if (state.selected.lightColor) {
-          this.lightColorPicker.setValue(state.selected.lightColor);
-        }
-        if (state.selected.darkColor) {
-          this.darkColorPicker.setValue(state.selected.darkColor);
+        if (this.showColors) {
+          if (state.selected.lightColor) {
+            this.lightColor.setValue(state.selected.lightColor);
+          }
+          if (state.selected.darkColor) {
+            this.darkColor.setValue(state.selected.darkColor);
+          }
+          this.lightColor.setValidators([Validators.required, validColorValidator()]);
+          this.darkColor.setValidators([Validators.required, validColorValidator()]);
+          this.lightColor.updateValueAndValidity();
+          this.darkColor.updateValueAndValidity();
         }
         if (state.selected.dob) {
           this.dob.setValue(createDateFromString(state.selected.dob));
@@ -258,7 +238,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
       }
-      if (state.message) {
+      if (state.response) {
         this.clean();
         this.findMe();
       }

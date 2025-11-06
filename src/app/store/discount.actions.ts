@@ -1,150 +1,108 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
+import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { Pagination } from '../interfaces/pagination';
+import { IDiscount, IReferral, IUserDiscount } from '../interfaces/discount';
+import { ICurrency } from '../interfaces/currency';
 
-export enum DiscountActionTypes {
-  getAll = '[Discount] Get all',
-  getMyDiscounts = '[Discount] get my discounts',
-  getReferrals = '[Discount] get my referrals',
-  getCurrencies = '[Discount] get currencies',
-  addDiscount = '[Discount] Add discount',
+enum DiscountActionTypes {
+  getDiscountsPage = '[Discount] Get discounts page',
+  getMyDiscountsPage = '[Discount] Get my discounts page',
+  getMyReferrals = '[Discount] Get my referrals',
+  getAllCurrency = '[Discount] Get all currency',
+  sendDiscountToCustomers = '[Discount] Send discount to customers',
   discountSuccess = '[Discount] Success',
   referralSuccess = '[Discount] referral Success',
   currencySuccess = '[Discount] currency Success',
-  discountSave = '[Discount] Save',
-  discountUpdate = '[Discount] Update',
+  createDiscount = '[Discount] Create discount',
+  updateDiscount = '[Discount] Update discount by id',
   discountSaveSuccess = '[Discount] Save Success',
   discountFailure = '[Discount] Failure',
   discountSelected = '[Discount] Selected',
-  discountFind = '[Discount] Find',
-  discountFindByCustomer = '[Discount] Find by customer',
-  discountDelete = '[Discount] Delete',
+  getDiscount = '[Discount] Find discount by id',
+  getUserDiscountByCustomerId = '[Discount] Find user discount by customer id',
+  deleteDiscount = '[Discount] Delete discount by id',
   clean = '[Discount] Clean'
 }
 
-export class GetAll implements Action {
-  readonly type = DiscountActionTypes.getAll;
+export const getDiscountsPage = createAction(
+  DiscountActionTypes.getDiscountsPage,
+  props<PageRequest>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getMyDiscountsPage = createAction(
+  DiscountActionTypes.getMyDiscountsPage,
+  props<PageRequest>(),
+);
 
-export class GetMyDiscounts implements Action {
-  readonly type = DiscountActionTypes.getMyDiscounts;
+export const getMyReferrals = createAction(
+  DiscountActionTypes.getMyReferrals,
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getAllCurrency = createAction(
+  DiscountActionTypes.getAllCurrency,
+);
 
-export class GetReferrals implements Action {
-  readonly type = DiscountActionTypes.getReferrals;
-}
+export const sendDiscountToCustomers = createAction(
+  DiscountActionTypes.sendDiscountToCustomers,
+  props<{ id: string; customersDiscount: string[] }>(),
+);
 
-export class GetCurrencies implements Action {
-  readonly type = DiscountActionTypes.getCurrencies;
-}
 
-export class AddDiscount implements Action {
-  readonly type = DiscountActionTypes.addDiscount;
+export const discountSuccess = createAction(
+  DiscountActionTypes.discountSuccess,
+  props<{ data: Pagination<IDiscount> | Pagination<IUserDiscount> | IUserDiscount[] }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const referralSuccess = createAction(
+  DiscountActionTypes.referralSuccess,
+  props<{ referrals: IReferral[] }>(),
+);
 
-export class DiscountSuccess implements Action {
-  readonly type = DiscountActionTypes.discountSuccess;
+export const currencySuccess = createAction(
+  DiscountActionTypes.currencySuccess,
+  props<{ currencies: ICurrency[] }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const createDiscount = createAction(
+  DiscountActionTypes.createDiscount,
+  props<{ discount: IDiscount }>(),
+);
 
-export class ReferralSuccess implements Action {
-  readonly type = DiscountActionTypes.referralSuccess;
+export const updateDiscount = createAction(
+  DiscountActionTypes.updateDiscount,
+  props<{ id: string; discount: IDiscount }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const discountSaveSuccess = createAction(
+  DiscountActionTypes.discountSaveSuccess,
+  props<ResponseSuccess>(),
+);
 
-export class CurrencySuccess implements Action {
-  readonly type = DiscountActionTypes.currencySuccess;
+export const discountFailure = createAction(
+  DiscountActionTypes.discountFailure,
+  props<{ error: IError }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const discountSelected = createAction(
+  DiscountActionTypes.discountSelected,
+  props<{ selected?: IDiscount }>(),
+);
 
-export class DiscountSave implements Action {
-  readonly type = DiscountActionTypes.discountSave;
+export const getDiscount = createAction(
+  DiscountActionTypes.getDiscount,
+  props<{ id: string }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getUserDiscountByCustomerId = createAction(
+  DiscountActionTypes.getUserDiscountByCustomerId,
+  props<{ customerId: string }>(),
+);
 
-export class DiscountUpdate implements Action {
-  readonly type = DiscountActionTypes.discountUpdate;
+export const deleteDiscount = createAction(
+  DiscountActionTypes.deleteDiscount,
+  props<{ id: string; name: string }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
-
-export class DiscountSaveSuccess implements Action {
-  readonly type = DiscountActionTypes.discountSaveSuccess;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class DiscountFailure implements Action {
-  readonly type = DiscountActionTypes.discountFailure;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class DiscountSelected implements Action {
-  readonly type = DiscountActionTypes.discountSelected;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class DiscountFind implements Action {
-  readonly type = DiscountActionTypes.discountFind;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class DiscountFindByCustomer implements Action {
-  readonly type = DiscountActionTypes.discountFindByCustomer;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class DeleteDiscount implements Action {
-  readonly type = DiscountActionTypes.discountDelete;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = DiscountActionTypes.clean;
-}
-
-export type All =
-  | GetAll
-  | GetMyDiscounts
-  | GetReferrals
-  | GetCurrencies
-  | AddDiscount
-  | DiscountSave
-  | DiscountUpdate
-  | DiscountSuccess
-  | ReferralSuccess
-  | CurrencySuccess
-  | DiscountSaveSuccess
-  | DiscountFailure
-  | DiscountFind
-  | DiscountFindByCustomer
-  | DiscountSelected
-  | DeleteDiscount
-  | Clean;
+export const clean = createAction(
+  DiscountActionTypes.clean,
+);

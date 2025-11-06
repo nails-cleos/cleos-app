@@ -1,4 +1,22 @@
-import { All, DashboardActionTypes } from '../dashboard.actions';
+import {
+  clean,
+  dashFailure,
+  dashSuccess,
+  eventSuccess,
+  exportYearSummary,
+  getCards,
+  getEvents,
+  getMonthlySummary,
+  getMyEvent,
+  getQuarterSummary,
+  getYearSummary,
+  monthlySummarySuccess,
+  quarterSummarySuccess,
+  saveMonthlySummarySuccess,
+  updateMonthlySummary,
+  yearExportSuccess,
+  yearSummarySuccess,
+} from '../dashboard.actions';
 import {
   IDashboard,
   IMonthlyExport,
@@ -14,41 +32,43 @@ import {
   IYearRoomExport,
   IYearRoomSummary,
   MonthSummary,
-  QuarterSummary
+  QuarterSummary,
 } from '../../interfaces/dashboard';
 import { getMonth } from '../../util/dates';
+import { IError, IResponseSuccess } from '../../interfaces/common';
+import { createReducer, on } from '@ngrx/store';
 
 export interface State {
+  response?: IResponseSuccess;
   data: Map<string, IDashboard>;
-  dashboard: IRoomEvents | null;
-  monthlySummaryMap: Map<ISummaryRoom,
+  dashboard?: IRoomEvents;
+  monthlySummaryMap?: Map<ISummaryRoom,
     {
       summarySale: IMonthlySummarySale[];
       summaryCashSale: IMonthlySummarySale[];
       summaryExpenses: IMonthlySummaryExpense[]
-    }> | null;
-  yearSummaryMap: Map<ISummaryRoom, { quarterSummaries: IQuarterSummary[] }> | null;
-  quarterSummaryMap: Map<ISummaryRoom, { monthSummaries: IMonthSummary[] }> | null;
-  yearExport: any | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  message: string | null;
+    }>;
+  yearSummaryMap?: Map<ISummaryRoom, { quarterSummaries: IQuarterSummary[] }>;
+  quarterSummaryMap?: Map<ISummaryRoom, { monthSummaries: IMonthSummary[] }>;
+  yearExport?: Map<ISummaryRoom, { monthlyExport: IMonthlyExport[]; }>;
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
   isLoading: boolean;
 }
 
 const initialState: State = {
   data: new Map<string, IDashboard>(),
-  dashboard: null,
-  monthlySummaryMap: null,
-  yearSummaryMap: null,
-  quarterSummaryMap: null,
-  yearExport: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  message: null,
-  isLoading: false
+  dashboard: undefined,
+  monthlySummaryMap: undefined,
+  yearSummaryMap: undefined,
+  quarterSummaryMap: undefined,
+  yearExport: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  response: undefined,
+  isLoading: false,
 };
 
 const getMap = (a: Map<string, IDashboard>, b: IDashboard): Map<string, IDashboard> => {
@@ -95,11 +115,11 @@ const monthSummaryMap = (summaries: IMonthlyRoomSummary[]) => summaries.reduce((
     roomName: summary.roomName,
     currency: summary.currency,
     timeZone: summary.timeZone,
-    primary: summary.primary
+    primary: summary.primary,
   }, {
     summarySale: summary.saleSummary,
     summaryExpenses: summary.expenseSummary,
-    summaryCashSale: summary.cashSaleSummary
+    summaryCashSale: summary.cashSaleSummary,
   });
   return map;
 }, new Map<ISummaryRoom, {
@@ -114,9 +134,9 @@ const yearExportMap = (summaries: IYearRoomExport[]) => summaries.reduce((map, s
     roomName: summary.roomName,
     currency: summary.currency,
     timeZone: summary.timeZone,
-    primary: summary.primary
+    primary: summary.primary,
   }, {
-    monthlyExport: summary.monthExport
+    monthlyExport: summary.monthExport,
   });
   return map;
 }, new Map<ISummaryRoom, {
@@ -165,9 +185,9 @@ const yearSummaryMap = (summaries: IYearRoomSummary[]) => summaries.reduce((map,
     roomName: summary.roomName,
     currency: summary.currency,
     timeZone: summary.timeZone,
-    primary: summary.primary
+    primary: summary.primary,
   }, {
-    quarterSummaries: fullYear(summary.quarterSummaries)
+    quarterSummaries: fullYear(summary.quarterSummaries),
   });
   return map;
 }, new Map<ISummaryRoom, { quarterSummaries: IQuarterSummary[] }>());
@@ -178,184 +198,146 @@ const quarterSummaryMap = (summaries: IQuarterRoomSummary[]) => summaries.reduce
     roomName: summary.roomName,
     currency: summary.currency,
     timeZone: summary.timeZone,
-    primary: summary.primary
+    primary: summary.primary,
   }, {
-    monthSummaries: fullQuarter(summary.monthSummaries, summary.quarter)
+    monthSummaries: fullQuarter(summary.monthSummaries, summary.quarter),
   });
   return map;
 }, new Map<ISummaryRoom, { monthSummaries: IMonthSummary[] }>());
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case DashboardActionTypes.dashEvents: {
-      return {
-        ...state,
-        data: cleanEventMap(state.data),
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case DashboardActionTypes.dashboardEvents: {
-      return {
-        ...state,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        dashboard: { availability: {} },
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case DashboardActionTypes.dashCards: {
-      return {
-        ...state,
-        data: cleanCardMap(state.data),
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case DashboardActionTypes.dashSuccess: {
-      return {
-        ...state,
-        data: getMap(state.data, action.payload),
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
-        isLoading: false
-      };
-    }
-    case DashboardActionTypes.eventSuccess: {
-      return {
-        ...state,
-        dashboard: action.payload,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
-        isLoading: false
-      };
-    }
-    case DashboardActionTypes.dashFailure: {
-      return {
-        ...state,
-        errorMessage: action.payload.error?.message,
-        error: action.payload.error,
-        subErrors: action.payload.error?.subErrors,
-        message: null,
-        isLoading: false
-      };
-    }
-    case DashboardActionTypes.monthlySummary: {
-      return {
-        ...state,
-        monthlySummaryMap: null,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case DashboardActionTypes.monthlySummarySuccess: {
-      return {
-        ...state,
-        monthlySummaryMap: monthSummaryMap(action.payload),
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case DashboardActionTypes.saveMonthlySummary: {
-      return {
-        ...state,
-        monthlySummaryMap: null,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case DashboardActionTypes.saveMonthlySummarySuccess: {
-      return {
-        ...state,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: action.payload.message
-      };
-    }
-    case DashboardActionTypes.yearSummary: {
-      return {
-        ...state,
-        yearSummaryMap: null,
-        yearExport: null,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case DashboardActionTypes.yearSummarySuccess: {
-      return {
-        ...state,
-        yearSummaryMap: yearSummaryMap(action.payload),
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case DashboardActionTypes.yearExport: {
-      return {
-        ...state,
-        yearExport: null,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case DashboardActionTypes.yearExportSuccess: {
-      return {
-        ...state,
-        yearExport: yearExportMap(action.payload),
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case DashboardActionTypes.quarterSummary: {
-      return {
-        ...state,
-        quarterSummaryMap: null,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case DashboardActionTypes.quarterSummarySuccess: {
-      return {
-        ...state,
-        quarterSummaryMap: quarterSummaryMap(action.payload),
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case DashboardActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const dashboardReducer = createReducer(
+  initialState,
+  on(getEvents, (state) => ({
+    ...state,
+    data: cleanEventMap(state.data),
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(getMyEvent, (state) => ({
+    ...state,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    dashboard: { availability: {} },
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(getCards, (state) => ({
+    ...state,
+    data: cleanCardMap(state.data),
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(dashSuccess, (state, { data }) => ({
+    ...state,
+    data: getMap(state.data, data),
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(eventSuccess, (state, { data }) => ({
+    ...state,
+    dashboard: data,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(dashFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error?.message,
+    error: error,
+    subErrors: error?.subErrors,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(getMonthlySummary, (state) => ({
+    ...state,
+    monthlySummaryMap: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(monthlySummarySuccess, (state, { monthlySummary }) => ({
+    ...state,
+    monthlySummaryMap: monthSummaryMap(monthlySummary),
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(updateMonthlySummary, (state) => ({
+    ...state,
+    monthlySummaryMap: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(saveMonthlySummarySuccess, (state, action) => ({
+    ...state,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: action,
+  })),
+  on(getYearSummary, (state) => ({
+    ...state,
+    yearSummaryMap: undefined,
+    yearExport: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(yearSummarySuccess, (state, { yearSummary }) => ({
+    ...state,
+    yearSummaryMap: yearSummaryMap(yearSummary),
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(exportYearSummary, (state) => ({
+    ...state,
+    yearExport: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(yearExportSuccess, (state, { yearExport }) => ({
+    ...state,
+    yearExport: yearExportMap(yearExport),
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(getQuarterSummary, (state) => ({
+    ...state,
+    quarterSummaryMap: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(quarterSummarySuccess, (state, { quarterSummary }) => ({
+    ...state,
+    quarterSummaryMap: quarterSummaryMap(quarterSummary),
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(clean, () => initialState),
+);

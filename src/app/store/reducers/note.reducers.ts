@@ -1,106 +1,96 @@
-import { All, NoteActionTypes } from '../note.actions';
+import { createReducer, on } from '@ngrx/store';
+import {
+  clean,
+  completeNote,
+  createNote,
+  deleteNote,
+  getAllProfessional,
+  getNote,
+  noteFailure,
+  noteSaveSuccess,
+  noteSelected,
+  noteSuccess,
+  updateNote,
+} from '../note.actions';
 import { INote } from '../../interfaces/note';
 import { IUser } from '../../interfaces/user';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 
 export interface State {
-  data: INote | null;
-  professionals: IUser[] | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  selected: INote | null;
-  message: string | null;
+  response?: IResponseSuccess;
+  data?: INote;
+  professionals?: IUser[];
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
+  selected?: INote;
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  data: null,
-  professionals: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  selected: null,
-  message: null,
-  isLoading: false
+  data: undefined,
+  professionals: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  selected: undefined,
+  response: undefined,
+  isLoading: false,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case NoteActionTypes.noteFind: {
-      return {
-        ...state,
-        data: {} as INote,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case NoteActionTypes.getAllProfessional: {
-      return {
-        ...state,
-        professionals: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case NoteActionTypes.noteSuccess: {
-      return {
-        ...state,
-        data: action.payload,
-        professionals: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case NoteActionTypes.noteSaveSuccess: {
-      return {
-        ...state,
-        message: action.payload.message,
-        selected: null,
-        errorMessage: null,
-        subErrors: null,
-        isLoading: false
-      };
-    }
-    case NoteActionTypes.noteSelected: {
-      return {
-        ...state,
-        selected: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case NoteActionTypes.noteFailure: {
-      return {
-        ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
-        message: null,
-        isLoading: false
-      };
-    }
-    case NoteActionTypes.noteUpdate:
-    case NoteActionTypes.noteSave:
-    case NoteActionTypes.noteDelete:
-    case NoteActionTypes.noteComplete: {
-      return {
-        ...state,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
-        isLoading: true
-      };
-    }
-    case NoteActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const noteReducer = createReducer(
+  initialState,
+  on(getNote, (state) => ({
+    ...state,
+    data: {} as INote,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getAllProfessional, (state) => ({
+    ...state,
+    professionals: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(noteSuccess, (state, { data }) => ({
+    ...state,
+    professionals: data,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(noteSaveSuccess, (state, action) => ({
+    ...state,
+    response: action,
+    selected: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    isLoading: false,
+  })),
+  on(noteSelected, (state, { selected }) => ({
+    ...state,
+    selected,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(noteFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error,
+    subErrors: error.subErrors,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(updateNote, createNote, deleteNote, completeNote, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(clean, () => initialState),
+);

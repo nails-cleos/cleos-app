@@ -1,32 +1,24 @@
-import { AfterViewInit, Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectRoomState } from '../../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
-import * as fromActionsRoom from '../../../store/room.actions';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { getServices, updateServices } from '../../../store/room.actions';
+import { MatDialog } from '@angular/material/dialog';
 import { IService, IServicePrice, ServicePrice, ServiceType } from '../../../interfaces/room';
 import { IGroupService } from '../../../interfaces/treatment';
-import {
-  ReactiveFormsModule,
-  UntypedFormBuilder,
-  UntypedFormControl,
-  UntypedFormGroup,
-  Validators
-} from '@angular/forms';
 import { createTreatmentGroupService, executeDialogNoWidth } from '../../../util/helper';
 import { SharedModule } from '../../../shared/shared.module';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
-import { TranslatePipe } from '@ngx-translate/core';
-import { AppMaterialModule } from '../../../util/app-material.module';
+import { PriceDialogComponent } from './price-dialog.component';
 
 @Component({
   selector: 'app-add-service',
   templateUrl: './add-service.component.html',
   styleUrls: ['./add-service.component.scss'],
-  imports: [SharedModule, CurrencySymbolPipe, BackButtonDirective]
+  imports: [SharedModule, CurrencySymbolPipe, BackButtonDirective],
 })
 export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -55,9 +47,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
         prices = [...prices, price];
       });
     }
-    return this.store.dispatch(
-      new fromActionsRoom.UpdateMyServices({ id: this.roomId, prices })
-    );
+    return this.store.dispatch(updateServices({ id: this.roomId!, prices }));
   }
 
   ngOnDestroy(): void {
@@ -93,7 +83,7 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
 
   changePrice = (service: IService): void => {
     const dialogRef = this.dialog.open(PriceDialogComponent, {
-      data: { name: service.name, type: service.type, currentPrice: service.price }
+      data: { name: service.name, type: service.type, currentPrice: service.price },
     });
     dialogRef.afterClosed().subscribe(s => {
       if (s) {
@@ -120,14 +110,12 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
   private getServices = (): void => {
     this.route.params.subscribe((routeParams) => {
       this.roomId = routeParams.id;
-      this.store.dispatch(
-        new fromActionsRoom.GetMyServices({ id: this.roomId })
-      );
+      this.store.dispatch(getServices({ id: this.roomId! }));
     });
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.services) {
         const currency = state.services.currency.code;
         this.additional = state.services.additionalList.map((value: any) =>
@@ -143,45 +131,9 @@ export class AddServiceComponent implements OnInit, AfterViewInit, OnDestroy {
         state.subErrors.forEach((value: any) => {
           this.errors[value.field] = value.message;
         });
-      } else if (state.message) {
+      } else if (state.response) {
         this.getServices();
       }
     });
   };
-}
-
-@Component({
-  selector: 'app-price-dialog',
-  templateUrl: 'price-dialog.html',
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe]
-})
-export class PriceDialogComponent implements OnInit {
-
-  form!: UntypedFormGroup;
-  price: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required
-  ]);
-
-  constructor(public dialogRef: MatDialogRef<PriceDialogComponent>, private formBuilder: UntypedFormBuilder,
-              @Inject(MAT_DIALOG_DATA) public data: { name: string; price: number; currentPrice?: number }) {
-  }
-
-  get onNoClick(): void {
-    return this.dialogRef.close();
-  }
-
-  get submit(): void {
-    this.data.price = this.price.value;
-    return this.dialogRef.close(this.data);
-  }
-
-  ngOnInit(): void {
-    this.form = this.formBuilder.group({
-      price: this.price
-    });
-
-    if (this.data.currentPrice) {
-      this.price.setValue(this.data.currentPrice);
-    }
-  }
 }

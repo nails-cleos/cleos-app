@@ -27,7 +27,7 @@ export interface IPaymentRequest {
   type?: PaymentType;
   bic?: string;
   ipAddress?: string;
-  paymentOptionId?: number;
+  paymentOptionId?: number | string;
   transfer?: string;
   preferenceId?: string;
 }

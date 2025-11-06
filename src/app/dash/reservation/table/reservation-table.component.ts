@@ -7,14 +7,14 @@ import {
   OnDestroy,
   OnInit,
   SimpleChanges,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
-import * as fromActionsReservation from '../../../store/reservation.actions';
+import { deleteReservation, getPage } from '../../../store/reservation.actions';
 import { IReservation, IReservationAll } from '../../../interfaces/reservation';
 import { MatTableDataSource } from '@angular/material/table';
 import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../../interfaces/pagination';
@@ -36,10 +36,10 @@ import { ErrorComponent } from '../../../shared/error/error.component';
   templateUrl: './reservation-table.component.html',
   styleUrls: ['./reservation-table.component.scss'],
   animations: [detailExpandAnimation],
-  imports: [SharedModule, TimeDetailPipe, ReservationIconPipe, ErrorComponent]
+  imports: [SharedModule, TimeDetailPipe, ReservationIconPipe, ErrorComponent],
 })
 export class ReservationTableComponent implements AfterViewInit, OnInit, OnChanges, OnDestroy {
-  @Input() roomId: any;
+  @Input() roomId?: string;
   @Input() professionalId: any;
   @Input() all?: boolean;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -61,15 +61,15 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
   private authUserServiceSubscription: Subscription;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver,
-              private authUserService: AuthUserService) {
+    private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver,
+    private authUserService: AuthUserService) {
     this.getState = this.store.select(selectReservationState);
     this.dateFormat = this.translate.currentLang;
     this.language = this.translate.currentLang;
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => this.isAdmin = value.isAdmin);
     breakpointObserver.observe([
       Breakpoints.XSmall,
-      Breakpoints.Small
+      Breakpoints.Small,
     ]).subscribe(result => {
       if (result.matches) {
         this.pageSize = MOBILE_PAGE_SIZE;
@@ -114,22 +114,22 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: reservation }, result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsReservation.DeleteReservation(result)
+          deleteReservation({ id: result.id, timestamp: result.timestamp, timeZone: result.room.timeZone }),
         );
       }
     });
   };
 
   private getReservations = (page: number = 0): void => this.store.dispatch(
-    new fromActionsReservation.GetAllPage({
-      all: this.all,
-      roomId: this.roomId,
-      professionalId: this.professionalId,
-      active: this.sort.active,
+    getPage({
+      page,
+      sort: this.sort.active,
       direction: this.sort.direction,
       size: this.pageSize,
-      page
-    })
+      roomId: this.roomId,
+      all: this.all,
+      professionalId: this.professionalId,
+    }),
   );
 
   private createPageSubscriptions = (): void => {
@@ -143,7 +143,7 @@ export class ReservationTableComponent implements AfterViewInit, OnInit, OnChang
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.error = state.error;
       if (state.page) {
         this.dataSource = state.page?.content;

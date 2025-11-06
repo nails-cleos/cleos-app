@@ -1,94 +1,85 @@
-import { All, MainActionTypes } from '../main.actions';
+import {
+  catalogueSuccess,
+  clean,
+  getAllCatalogue,
+  getListTreatmentsGroup,
+  requestFailure,
+  requestSuccess,
+  sendMessage,
+  treatmentSuccess,
+  updateMyUser,
+} from '../main.actions';
 import { ICatalogue } from '../../interfaces/catalogue';
 import { ITreatmentGroup } from '../../interfaces/treatment';
+import { IError, IResponseSuccess } from '../../interfaces/common';
+import { createReducer, on } from '@ngrx/store';
 
 export interface State {
-  catalogue: ICatalogue[] | null;
-  groups: ITreatmentGroup[] | null;
-  errorMessage: string | null;
-  error: any;
-  message: string | null;
+  response?: IResponseSuccess;
+  catalogue?: ICatalogue[];
+  groups?: ITreatmentGroup[];
+  errorMessage?: string;
+  error?: IError;
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  catalogue: null,
-  groups: null,
-  errorMessage: null,
-  error: null,
-  message: null,
-  isLoading: false
+  catalogue: undefined,
+  groups: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  response: undefined,
+  isLoading: false,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case MainActionTypes.getAllCatalogue: {
-      return {
-        ...state,
-        catalogue: [{}, {}, {}],
-        errorMessage: null,
-        message: null,
-        isLoading: true
-      };
-    }
-    case MainActionTypes.getAllTreatments: {
-      return {
-        ...state,
-        groups: null,
-        errorMessage: null,
-        message: null,
-        isLoading: true
-      };
-    }
-    case MainActionTypes.updateUser:
-    case MainActionTypes.sendMessage: {
-      return {
-        ...state,
-        errorMessage: null,
-        message: null,
-        isLoading: true
-      };
-    }
-    case MainActionTypes.catalogueSuccess: {
-      return {
-        ...state,
-        catalogue: action.payload,
-        errorMessage: null,
-        message: null,
-        isLoading: false
-      };
-    }
-    case MainActionTypes.treatmentSuccess: {
-      return {
-        ...state,
-        groups: action.payload,
-        errorMessage: null,
-        message: null,
-        isLoading: false
-      };
-    }
-    case MainActionTypes.requestSuccess: {
-      return {
-        ...state,
-        message: action.payload.message,
-        errorMessage: null,
-        isLoading: false
-      };
-    }
-    case MainActionTypes.requestFailure: {
-      return {
-        ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        message: null,
-        isLoading: false
-      };
-    }
-    case MainActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const mainReducer = createReducer(
+  initialState,
+  on(getAllCatalogue, (state) => ({
+    ...state,
+    catalogue: [{}, {}, {}],
+    errorMessage: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(getListTreatmentsGroup, (state) => ({
+    ...state,
+    groups: undefined,
+    errorMessage: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(updateMyUser, sendMessage, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(catalogueSuccess, (state, { catalogues }) => ({
+    ...state,
+    catalogue: catalogues,
+    errorMessage: undefined,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(treatmentSuccess, (state, { groups }) => ({
+    ...state,
+    groups: groups,
+    errorMessage: undefined,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(requestSuccess, (state, action) => ({
+    ...state,
+    response: action,
+    errorMessage: undefined,
+    isLoading: false,
+  })),
+  on(requestFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error: error,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(clean, () => initialState),
+);

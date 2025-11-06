@@ -6,14 +6,14 @@
 <div mat-dialog-actions class="card-actions">
   <div class="spacer"></div>
   @if (data.small) {
-    <button (click)="onNoClick" mat-fab>
+    <button (click)="onNoClick()" mat-fab>
       <mat-icon>clear</mat-icon>
     </button>
-    <button (click)="doAction" cdkFocusInitial color="primary" mat-fab>
+    <button (click)="doAction()" cdkFocusInitial color="primary" mat-fab>
       <mat-icon>forward</mat-icon>
     </button>
   } @else {
-    <button (click)="onNoClick" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
-    <button (click)="doAction" cdkFocusInitial color="primary" mat-fab extended class="icon-button">Ok</button>
+    <button (click)="onNoClick()" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+    <button (click)="doAction()" cdkFocusInitial color="primary" mat-fab extended class="icon-button">Ok</button>
   }
 </div>

@@ -10,7 +10,7 @@ import { AppState, selectAccountState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
-import * as fromActionsAccount from '../../../store/account.actions';
+import { clean, getTransactionsByAccountId } from '../../../store/account.actions';
 import { detailExpandAnimation } from '../../../util/animation';
 import { newDateTimestamp } from '../../../util/dates';
 import { AuthUserService } from '../../../services/auth-user.service';
@@ -22,7 +22,7 @@ import { BalanceComponent } from '../../balance/balance.component';
   templateUrl: './transaction-view.component.html',
   styleUrls: ['./transaction-view.component.scss'],
   animations: [detailExpandAnimation],
-  imports: [SharedModule, BalanceComponent]
+  imports: [SharedModule, BalanceComponent],
 })
 export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -30,7 +30,7 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
   hasAdminRole: boolean;
 
   displayedColumns: string[] = [
-    'position', 'timestamp', 'amount', 'amountGifted', 'payment.status', 'payment.type', 'actions'
+    'position', 'timestamp', 'amount', 'amountGifted', 'payment.status', 'payment.type', 'actions',
   ];
   dataSource: any = new MatTableDataSource<Pagination<ITransaction>>();
 
@@ -49,11 +49,11 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
   private getState: Observable<any>;
 
   constructor(private route: ActivatedRoute, private store: Store<AppState>, private cdRef: ChangeDetectorRef,
-              breakpointObserver: BreakpointObserver, private translate: TranslateService,
+    breakpointObserver: BreakpointObserver, private translate: TranslateService,
               private authUserService: AuthUserService) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
-      Breakpoints.Small
+      Breakpoints.Small,
     ]).subscribe(result => {
       if (result.matches) {
         this.pageSize = MOBILE_PAGE_SIZE;
@@ -64,7 +64,7 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
     this.dateFormat = this.translate.currentLang;
     this.language = this.translate.currentLang;
     this.authUserServiceSubscription = this.authUserService.authUser.subscribe(
-      value => this.hasAdminRole = value.hasAdminRole
+      value => this.hasAdminRole = value.hasAdminRole,
     );
   }
 
@@ -97,25 +97,25 @@ export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestro
     this.cdRef.detectChanges();
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsAccount.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private getTransactions = (page: number = 0): void => this.store.dispatch(
-    new fromActionsAccount.AccountFindTransactions({
-      active: this.sort.active,
+    getTransactionsByAccountId({
+      id: this.accountId!,
+      page: page,
+      sort: this.sort.active,
       direction: this.sort.direction,
       size: this.pageSize,
-      accountId: this.accountId,
-      page
-    })
+    }),
   );
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.data?.account) {
         this.account = state.data.account;
       }
       this.dataSource = state.data?.transactions?.content?.map((it: ITransaction) =>
-        Object.assign({}, it, { date: newDateTimestamp(it.payment?.timestamp) })
+        Object.assign({}, it, { date: newDateTimestamp(it.payment?.timestamp) }),
       );
       this.resultsLength = state.data?.transactions?.totalElements || 0;
       if (!this.paginatorSubscription && this.resultsLength) {

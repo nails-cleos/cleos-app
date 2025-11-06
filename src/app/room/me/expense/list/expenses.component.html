@@ -173,8 +173,8 @@
               <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
               <mat-list-item role="list">
                 @if (!expense.deleted) {
-                  <button [routerLink]="['/', language, 'rooms', roomId, 'expenses', expense.id]" color="primary"
-                          mat-icon-button>
+                  <button (click)="edit(expense)" mat-icon-button color="primary"
+                          matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
                     <mat-icon matListItemIcon>edit</mat-icon>
                   </button>
                   <button (click)="delete(expense)" color="warn" mat-icon-button>

@@ -1,186 +1,177 @@
 import { Pagination } from '../../interfaces/pagination';
-import { All, RoomActionTypes } from '../room.actions';
+import {
+  clean,
+  createRoom,
+  customerInfoSuccess,
+  deleteRoom,
+  getAllCustomersInfo,
+  getAllRoomsInfo,
+  getRoom,
+  getRoomsPage,
+  getServices,
+  roomFailure,
+  roomInfoSuccess,
+  roomSaveSuccess,
+  roomSelected,
+  roomServiceSelected,
+  roomSuccess,
+  updateRoom,
+  updateServices,
+} from '../room.actions';
 import { IRoom, IRoomCustomer, IRoomService } from '../../interfaces/room';
 import { IUser } from '../../interfaces/user';
 import { ICurrency } from '../../interfaces/currency';
+import { IError, IResponseSuccess } from '../../interfaces/common';
+
+import { createReducer, on } from '@ngrx/store';
 
 export interface State {
-  data: IRoom | Pagination<IRoom> | null;
-  services: IRoomService | null;
-  professionals: IUser[] | null;
-  currencies: ICurrency[] | null;
-  offices: IUser[] | null;
-  customers: IRoomCustomer[] | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  selected: IRoom | null;
-  message: string | null;
+  response?: IResponseSuccess;
+  data?: IRoom | Pagination<IRoom>;
+  services?: IRoomService;
+  professionals?: IUser[];
+  currencies?: ICurrency[];
+  offices?: IUser[];
+  customers?: IRoomCustomer[];
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
+  selected?: IRoom;
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  data: null,
-  services: null,
-  professionals: null,
-  currencies: null,
-  offices: null,
-  customers: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  selected: null,
-  message: null,
-  isLoading: false
+  data: undefined,
+  services: undefined,
+  professionals: undefined,
+  currencies: undefined,
+  offices: undefined,
+  customers: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  selected: undefined,
+  response: undefined,
+  isLoading: false,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case RoomActionTypes.getAll: {
-      return {
-        ...state,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        data: { content: [{}, {}, {}], totalElements: 3 },
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case RoomActionTypes.getRoomInfo: {
-      return {
-        ...state,
-        professionals: null,
-        currencies: null,
-        offices: null,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case RoomActionTypes.roomFind: {
-      return {
-        ...state,
-        data: {} as IRoom,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case RoomActionTypes.getMyService: {
-      return {
-        ...state,
-        services: {
-          currency: {},
-          treatments: [],
-          selectedTreatments: [],
-          additionalList: [],
-          selectedAdditionalList: []
-        } as IRoomService,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case RoomActionTypes.roomInfoSuccess: {
-      return {
-        ...state,
-        professionals: action.payload.professionals,
-        offices: action.payload.offices,
-        currencies: action.payload.currencies,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case RoomActionTypes.roomSuccess: {
-      return {
-        ...state,
-        data: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case RoomActionTypes.roomSaveSuccess: {
-      return {
-        ...state,
-        message: action.payload.message,
-        errorMessage: null,
-        selected: null,
-        subErrors: null,
-        isLoading: false
-      };
-    }
-    case RoomActionTypes.roomSelected: {
-      return {
-        ...state,
-        selected: action.payload.roomInfo,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case RoomActionTypes.roomServiceSelected: {
-      return {
-        ...state,
-        services: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case RoomActionTypes.roomFailure: {
-      return {
-        ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
-        message: null,
-        isLoading: false
-      };
-    }
-    case RoomActionTypes.roomServiceUpdate:
-    case RoomActionTypes.roomUpdate:
-    case RoomActionTypes.roomSave:
-    case RoomActionTypes.roomDelete: {
-      return {
-        ...state,
-        selected: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
-        isLoading: true
-      };
-    }
-    case RoomActionTypes.getCustomerInfo: {
-      return {
-        ...state,
-        customers: [{}, {}, {}],
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case RoomActionTypes.customerInfoSuccess: {
-      return {
-        ...state,
-        customers: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case RoomActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const roomReducer = createReducer(
+  initialState,
+  on(getRoomsPage, (state) => ({
+    ...state,
+    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IRoom>,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getAllRoomsInfo, (state) => ({
+    ...state,
+    professionals: undefined,
+    currencies: undefined,
+    offices: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getRoom, (state) => ({
+    ...state,
+    data: {} as IRoom,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getServices, (state) => ({
+    ...state,
+    services: {
+      currency: {},
+      treatments: [],
+      selectedTreatments: [],
+      additionalList: [],
+      selectedAdditionalList: [],
+    } as IRoomService,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(roomInfoSuccess, (state, { roomInfo }) => ({
+    ...state,
+    professionals: roomInfo?.professionals,
+    offices: roomInfo?.offices,
+    currencies: roomInfo?.currencies,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(roomSuccess, (state, { data }) => ({
+    ...state,
+    data,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(roomSaveSuccess, (state, action) => ({
+    ...state,
+    response: action,
+    errorMessage: undefined,
+    selected: undefined,
+    subErrors: undefined,
+    isLoading: false,
+  })),
+  on(roomSelected, (state, { selected }) => ({
+    ...state,
+    selected,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(roomServiceSelected, (state, { services }) => ({
+    ...state,
+    services,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(roomFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error,
+    subErrors: error.subErrors,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(
+    updateServices,
+    updateRoom,
+    createRoom,
+    deleteRoom,
+    (state) => ({
+      ...state,
+      selected: undefined,
+      errorMessage: undefined,
+      subErrors: undefined,
+      response: undefined,
+      isLoading: true,
+    }),
+  ),
+  on(getAllCustomersInfo, (state) => ({
+    ...state,
+    customers: [{}, {}, {}],
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(customerInfoSuccess, (state, { customers }) => ({
+    ...state,
+    customers,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(clean, () => initialState),
+);
+

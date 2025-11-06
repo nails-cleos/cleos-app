@@ -8,7 +8,7 @@ import { ResultSummaryComponent } from '../result-summary/result-summary.compone
   selector: 'app-total-summary',
   templateUrl: './total-summary.component.html',
   styleUrls: ['./total-summary.component.scss'],
-  imports: [SharedModule, ResultSummaryComponent]
+  imports: [SharedModule, ResultSummaryComponent],
 })
 export class TotalSummaryComponent {
   @Input() summaryTotals!: ISummaryTotals;
@@ -16,6 +16,6 @@ export class TotalSummaryComponent {
   @Input() showCash: boolean;
 
   constructor() {
-    this.showCash = false;
+  	this.showCash = false;
   }
 }

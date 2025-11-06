@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import * as fromActionsDashboard from '../../store/dashboard.actions';
+import { clean, getQuarterSummary } from '../../store/dashboard.actions';
 import { FormControl, UntypedFormControl } from '@angular/forms';
 import {
   IMonthSummary,
@@ -8,7 +8,7 @@ import {
   ISummaryTotals,
   MonthSummary,
   SummaryTotals,
-  Total
+  Total,
 } from '../../interfaces/dashboard';
 import { Observable, Subscription } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -35,9 +35,9 @@ import { TotalSummaryComponent } from '../total-summary/total-summary.component'
   templateUrl: './quarter-summary.component.html',
   styleUrls: ['./quarter-summary.component.scss'],
   providers: [
-    { provide: DateAdapter, useClass: YearAdapter }
+    { provide: DateAdapter, useClass: YearAdapter },
   ],
-  imports: [SharedModule, QuarterComponent, TotalSummaryComponent]
+  imports: [SharedModule, QuarterComponent, TotalSummaryComponent],
 })
 export class QuarterSummaryComponent implements OnInit, OnDestroy {
 
@@ -59,7 +59,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
   isHandset$: Observable<boolean> = this.breakpointObserver.observe([
     Breakpoints.XSmall,
     Breakpoints.Small,
-    Breakpoints.Medium
+    Breakpoints.Medium,
   ]).pipe(map(result => result.matches), shareReplay());
 
   private getState: Observable<any>;
@@ -77,11 +77,6 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
       this.showCash = value.showCash;
     });
     this.language = this.translate.currentLang;
-  }
-
-  get goBack(): void {
-    this.router.navigate([this.language, 'dashboard', 'year', 'summary'], { state: { year: this.year } });
-    return;
   }
 
   ngOnInit(): void {
@@ -104,6 +99,11 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+  }
+
+  goBack(): void {
+    this.router.navigate([this.language, 'dashboard', 'year', 'summary'], { state: { year: this.year } });
+    return;
   }
 
   setYear = (normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void => {
@@ -224,9 +224,7 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     this.year = year;
     this.quarter = quarter;
     this.isLoading = true;
-    this.store.dispatch(
-      new fromActionsDashboard.GetQuarterSummary({ year, quarter })
-    );
+    this.store.dispatch(getQuarterSummary({ year, quarter }));
   };
 
   private reset = (): void => {
@@ -234,10 +232,10 @@ export class QuarterSummaryComponent implements OnInit, OnDestroy {
     this.quarterSummaryTotals = new SummaryTotals();
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsDashboard.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.quarterSummaryMap = state.quarterSummaryMap;
       if (this.quarterSummaryMap) {
         if (this.quarterSummaryMap.size === 1) {

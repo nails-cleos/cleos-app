@@ -1,133 +1,121 @@
 import { Pagination } from '../../interfaces/pagination';
-import { AdditionalActionTypes, All } from '../additional.actions';
-import { IAdditional } from '../../interfaces/additional';
+import {
+  additionalFailure,
+  additionalSaveSuccess,
+  additionalSelected,
+  additionalSuccess,
+  clean,
+  createAdditional,
+  deleteAdditional,
+  findGroupsSuccess,
+  getAdditional,
+  getAdditionalList,
+  getAdditionalPage,
+  getAllTreatmentsGroup,
+  updateAdditional,
+} from '../additional.actions';
+import { IAdditional, IAdditionalAll } from '../../interfaces/additional';
 import { ITreatmentGroup } from '../../interfaces/treatment';
+import { IError, IResponseSuccess } from '../../interfaces/common';
+import { createReducer, on } from '@ngrx/store';
 
 export interface State {
-  data: IAdditional | Pagination<IAdditional> | null;
-  groups: ITreatmentGroup[] | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  selected: IAdditional | null;
-  message: string | null;
+  response?: IResponseSuccess;
+  data?: Pagination<IAdditional> | IAdditionalAll[];
+  groups?: ITreatmentGroup[];
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
+  selected?: IAdditional;
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  data: null,
-  groups: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  selected: null,
-  message: null,
-  isLoading: false
+  response: undefined,
+  data: undefined,
+  groups: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  selected: undefined,
+  isLoading: false,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case AdditionalActionTypes.getAll: {
-      return {
-        ...state,
-        data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IAdditional>,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case AdditionalActionTypes.getAdditionalList: {
-      return {
-        ...state,
-        data: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case AdditionalActionTypes.additionalFind: {
-      return {
-        ...state,
-        data: {} as IAdditional,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case AdditionalActionTypes.additionalSuccess: {
-      return {
-        ...state,
-        data: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case AdditionalActionTypes.additionalSaveSuccess: {
-      return {
-        ...state,
-        message: action.payload.message,
-        selected: null,
-        errorMessage: null,
-        subErrors: null,
-        isLoading: false
-      };
-    }
-    case AdditionalActionTypes.additionalSelected: {
-      return {
-        ...state,
-        selected: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case AdditionalActionTypes.additionalFailure: {
-      return {
-        ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
-        message: null,
-        isLoading: false
-      };
-    }
-    case AdditionalActionTypes.additionalUpdate:
-    case AdditionalActionTypes.additionalSave:
-    case AdditionalActionTypes.additionalDelete: {
-      return {
-        ...state,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
-        isLoading: true
-      };
-    }
-    case AdditionalActionTypes.findGroups: {
-      return {
-        ...state,
-        groups: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case AdditionalActionTypes.findGroupsSuccess: {
-      return {
-        ...state,
-        groups: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case AdditionalActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const additionalReducer = createReducer(
+  initialState,
+  on(getAdditionalPage, (state) => ({
+    ...state,
+    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IAdditional>,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+  })),
+
+  on(getAdditionalList, (state) => ({
+    ...state,
+    data: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+
+  on(getAdditional, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: {} as IAdditional,
+  })),
+
+  on(additionalSuccess, (state, { data }) => ({
+    ...state,
+    data: data,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+
+  on(additionalSaveSuccess, (state, action) => ({
+    ...state,
+    response: action,
+    selected: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    isLoading: false,
+  })),
+
+  on(additionalSelected, (state, { selected }) => ({
+    ...state,
+    selected: selected,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+
+  on(additionalFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error: error,
+    subErrors: error.subErrors,
+    isLoading: false,
+  })),
+
+  on(updateAdditional, createAdditional, deleteAdditional, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    subErrors: undefined,
+    isLoading: true,
+  })),
+
+  on(getAllTreatmentsGroup, (state) => ({
+    ...state,
+    groups: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+
+  on(findGroupsSuccess, (state, { groups }) => ({
+    ...state,
+    groups: groups,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+
+  on(clean, () => initialState),
+);

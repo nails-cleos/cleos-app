@@ -4,7 +4,13 @@ import { CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-dro
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectCatalogueState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
-import * as fromActionsCatalogue from '../../store/catalogue.actions';
+import {
+  catalogueSelected,
+  clean,
+  deleteCatalogue,
+  getAllCatalogues,
+  updateCatalogueOrder,
+} from '../../store/catalogue.actions';
 import { ICatalogueAll } from '../../interfaces/catalogue';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
@@ -18,7 +24,7 @@ import { SharedModule } from '../../shared/shared.module';
   selector: 'app-catalogue-list',
   templateUrl: './catalogues.component.html',
   styleUrls: ['./catalogues.component.scss'],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChildren(CdkDropList) dropsQuery!: QueryList<CdkDropList>;
@@ -26,7 +32,7 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(
       map(result => result.matches),
-      shareReplay()
+      shareReplay(),
     );
 
   subscription?: Subscription;
@@ -45,7 +51,7 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get finish(): void {
     return this.store.dispatch(
-      new fromActionsCatalogue.CatalogueUpdateAll(this.catalogues)
+      updateCatalogueOrder({ catalogues: this.catalogues }),
     );
   }
 
@@ -69,41 +75,37 @@ export class CataloguesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   drop = (event: CdkDragDrop<{ title: string; poster: string }[]>): void => moveItemInArray(
-    this.catalogues, event.previousIndex, event.currentIndex
+    this.catalogues, event.previousIndex, event.currentIndex,
   );
 
-  edit = (catalogue: ICatalogueAll): void => this.store.dispatch(
-    new fromActionsCatalogue.CatalogueSelected(catalogue)
-  );
+  edit = (selected: ICatalogueAll): void => this.store.dispatch(catalogueSelected({ selected }));
 
   delete = (catalogue: ICatalogueAll): void => {
     const title = this.translate.instant('CATALOGUE.DELETED.TITLE');
     const content = this.translate.instant('CATALOGUE.DELETED.CONTENT', { name: catalogue.name });
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: catalogue }, result => {
       if (result) {
-        this.store.dispatch(
-          new fromActionsCatalogue.DeleteCatalogue(result)
-        );
+        this.store.dispatch(deleteCatalogue({ id: result.id, name: result.name }));
       }
     });
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsCatalogue.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
-  private getCatalogues = (): void => this.store.dispatch(new fromActionsCatalogue.GetAll());
+  private getCatalogues = (): void => this.store.dispatch(getAllCatalogues());
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {
       if (state.data) {
         this.catalogues = state.data.map((it: ICatalogueAll) => {
           if (it.blob) {
-            return Object.assign({}, it, { image: `data:image/jpeg;base64,${ it.blob }` });
+            return Object.assign({}, it, { image: `data:image/jpeg;base64,${it.blob}` });
           }
           return it;
         });
         this.cdRef.detectChanges();
       }
-      if (state.message) {
+      if (state.response) {
         this.clean();
         this.getCatalogues();
       }

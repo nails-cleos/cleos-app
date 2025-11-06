@@ -64,17 +64,13 @@
   <div class="ssc-square mb"></div>
 }
 
-@if (reservation) {
-  @if (reservation.review) {
-    <div class="divider">
-      <h2>{{ 'RESERVATION.REVIEW.TITLE' | translate }}</h2>
-    </div>
-    <app-rating [detail]="reservation.review.detail" [rating]="reservation.review.rating"
-                color="primary"></app-rating>
-    <mat-divider></mat-divider>
-  }
-} @else {
-  <div class="ssc-square mb"></div>
+@if (review) {
+  <div class="divider">
+    <h2>{{ 'RESERVATION.REVIEW.TITLE' | translate }}</h2>
+  </div>
+  <app-rating [detail]="review.detail" [rating]="review.rating"
+              color="primary"></app-rating>
+  <mat-divider></mat-divider>
 }
 
 @if (payments && payments[0].id) {

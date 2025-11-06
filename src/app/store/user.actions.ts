@@ -1,174 +1,116 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
+import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
+import { Pagination } from '../interfaces/pagination';
+import { IOverview, IUser } from '../interfaces/user';
+import { Role } from '../interfaces/token';
 
-export enum UserActionTypes {
-  getAll = '[User] Get all',
+enum UserActionTypes {
+  getUsersPage = '[User] Get users page',
   getAllCustomers = '[User] Get all customers',
   userSuccess = '[User] Success',
   userFailure = '[User] Failure',
   userSelected = '[User] Selected',
-  userOverview = '[User] Overview',
-  findUser = '[User] Find',
-  findMe = '[User] Me',
+  getCustomerOverview = '[User] Get customer overview',
+  getUser = '[User] Get user by id',
+  getMyUser = '[User] Find me',
   setRole = '[User] Add role',
   saveUser = '[User] Save',
-  updateUser = '[User] Update',
-  updatePhoto = '[User] Update photo',
+  updateMyUser = '[User] Update me',
+  updateMyPhoto = '[User] Update me photo',
   userSaveSuccess = '[User] Save Success',
-  userDelete = '[User] Delete',
-  userRestore = '[User] Restore',
-  resendUserToken = '[User] Resend user token',
-  getAllDisableUsers = '[User] Get all disable users',
+  deleteUser = '[User] Delete user by id',
+  restore = '[User] Restore',
+  resendToken = '[User] Resend token',
+  getAllDisableUsers = '[User] Find all disable users',
   disableUsersSuccess = '[User] Disable users success',
   mergeUsers = '[User] Merge users',
   clean = '[User] Clean'
 }
 
-export class GetAll implements Action {
-  readonly type = UserActionTypes.getAll;
+export const getUsersPage = createAction(
+  UserActionTypes.getUsersPage,
+  props<PageRequest & { filter?: string }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getAllCustomers = createAction(UserActionTypes.getAllCustomers);
 
-export class GetAllCustomers implements Action {
-  readonly type = UserActionTypes.getAllCustomers;
-}
+export const userSuccess = createAction(
+  UserActionTypes.userSuccess,
+  props<{ data: Pagination<IUser> | IUser[] | IOverview }>(),
+);
 
-export class UserSuccess implements Action {
-  readonly type = UserActionTypes.userSuccess;
+export const userFailure = createAction(
+  UserActionTypes.userFailure,
+  props<{ error: IError }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const userSelected = createAction(
+  UserActionTypes.userSelected,
+  props<{ selected?: IUser; profile?: boolean }>(),
+);
 
-export class UserFailure implements Action {
-  readonly type = UserActionTypes.userFailure;
+export const getCustomerOverview = createAction(
+  UserActionTypes.getCustomerOverview,
+  props<{ id: string | null }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getUser = createAction(
+  UserActionTypes.getUser,
+  props<{ id: string }>(),
+);
 
-export class UserSelected implements Action {
-  readonly type = UserActionTypes.userSelected;
+export const getMyUser = createAction(UserActionTypes.getMyUser);
 
-  constructor(public payload: any) {
-  }
-}
+export const saveUser = createAction(
+  UserActionTypes.saveUser,
+  props<{ user: IUser; role?: Role }>(),
+);
 
-export class UserOverview implements Action {
-  readonly type = UserActionTypes.userOverview;
+export const setRole = createAction(
+  UserActionTypes.setRole,
+  props<{ id: string; displayName: string; role: Role; action: 'ADD' | 'REMOVE' }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const updateMyUser = createAction(
+  UserActionTypes.updateMyUser,
+  props<{ user: IUser; redirectUrl?: string; message?: string }>(),
+);
 
-export class FindUser implements Action {
-  readonly type = UserActionTypes.findUser;
+export const updateMyPhoto = createAction(
+  UserActionTypes.updateMyPhoto,
+  props<{ file: string }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const userSaveSuccess = createAction(
+  UserActionTypes.userSaveSuccess,
+  props<IResponseSuccess>(),
+);
 
-export class FindMe implements Action {
-  readonly type = UserActionTypes.findMe;
-}
+export const deleteUser = createAction(
+  UserActionTypes.deleteUser,
+  props<{ id: string; displayName: string }>(),
+);
 
-export class SaveUser implements Action {
-  readonly type = UserActionTypes.saveUser;
+export const restore = createAction(
+  UserActionTypes.restore,
+  props<{ id: string; user: IUser; }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const resendToken = createAction(
+  UserActionTypes.resendToken,
+  props<{ id: string }>(),
+);
 
-export class SetRole implements Action {
-  readonly type = UserActionTypes.setRole;
+export const getAllDisableUsers = createAction(UserActionTypes.getAllDisableUsers);
 
-  constructor(public payload: any) {
-  }
-}
+export const disableUsersSuccess = createAction(
+  UserActionTypes.disableUsersSuccess,
+  props<{ users: IUser[] }>(),
+);
 
-export class UpdateUser implements Action {
-  readonly type = UserActionTypes.updateUser;
+export const mergeUsers = createAction(
+  UserActionTypes.mergeUsers,
+  props<{ oldUserId: string; newUserId: string }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
-
-export class UpdatePhoto implements Action {
-  readonly type = UserActionTypes.updatePhoto;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class UserSaveSuccess implements Action {
-  readonly type = UserActionTypes.userSaveSuccess;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class DeleteUser implements Action {
-  readonly type = UserActionTypes.userDelete;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class RestoreUser implements Action {
-  readonly type = UserActionTypes.userRestore;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class ResendToken implements Action {
-  readonly type = UserActionTypes.resendUserToken;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class GetAllDisableUsers implements Action {
-  readonly type = UserActionTypes.getAllDisableUsers;
-}
-
-export class DisableUsersSuccess implements Action {
-  readonly type = UserActionTypes.disableUsersSuccess;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class MergeUsers implements Action {
-  readonly type = UserActionTypes.mergeUsers;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = UserActionTypes.clean;
-}
-
-export type All =
-  | GetAll
-  | GetAllCustomers
-  | UserSuccess
-  | UserFailure
-  | UserSelected
-  | UserOverview
-  | FindUser
-  | FindMe
-  | SaveUser
-  | SetRole
-  | UpdateUser
-  | UpdatePhoto
-  | UserSaveSuccess
-  | DeleteUser
-  | RestoreUser
-  | ResendToken
-  | GetAllDisableUsers
-  | DisableUsersSuccess
-  | MergeUsers
-  | Clean;
+export const clean = createAction(UserActionTypes.clean);

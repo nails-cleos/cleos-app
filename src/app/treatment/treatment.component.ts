@@ -5,9 +5,15 @@ import {
   UntypedFormControl,
   UntypedFormGroup,
   Validators,
-  ɵTypedOrUntyped
+  ɵTypedOrUntyped,
 } from '@angular/forms';
-import * as fromActionsTreatment from '../store/treatment.actions';
+import {
+  clean,
+  createTreatment,
+  getAllColors,
+  getTreatmentGroup,
+  updateTreatmentGroup,
+} from '../store/treatment.actions';
 import { AppState, selectTreatmentState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
@@ -27,7 +33,7 @@ import { BackButtonDirective } from '../directives/back-button.directive';
   selector: 'app-treatment',
   templateUrl: './treatment.component.html',
   styleUrls: ['./treatment.component.scss'],
-  imports: [SharedModule, BackButtonDirective]
+  imports: [SharedModule, BackButtonDirective],
 })
 export class TreatmentComponent implements OnInit, OnDestroy {
   @ViewChild('inputName') inputName: ElementRef<HTMLInputElement> | undefined;
@@ -51,7 +57,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
   private currentColorIds: string[] = [];
 
   constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
-              private route: ActivatedRoute, private cdRef: ChangeDetectorRef, private translate: TranslateService) {
+    private route: ActivatedRoute, private cdRef: ChangeDetectorRef, private translate: TranslateService) {
     this.isAddMode = true;
     this.getState = this.store.select(selectTreatmentState);
     this.language = this.translate.currentLang;
@@ -84,23 +90,24 @@ export class TreatmentComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const group: ITreatmentGroup = new TreatmentGroup();
-    group.name = fieldChange(this.getForm.name as UntypedFormControl, this.group?.name);
-    group.description = fieldChange(this.getForm.description as UntypedFormControl, this.group?.description);
-    group.priceFrom = fieldChange(this.getForm.priceFrom as UntypedFormControl, this.group?.priceFrom);
-    group.treatments = this.treatments;
+    const treatmentGroup: ITreatmentGroup = new TreatmentGroup();
+    treatmentGroup.name = fieldChange(this.getForm.name as UntypedFormControl, this.group?.name);
+    treatmentGroup.description = fieldChange(this.getForm.description as UntypedFormControl, this.group?.description);
+    treatmentGroup.priceFrom = fieldChange(this.getForm.priceFrom as UntypedFormControl, this.group?.priceFrom);
+    treatmentGroup.treatments = this.treatments;
 
     const newColorIds = this.colors.map(({ id }) => id);
     if (!areEquals(newColorIds, this.currentColorIds)) {
-      group.colorIds = newColorIds;
+      treatmentGroup.colorIds = newColorIds;
     }
 
     if (this.isAddMode) {
-      return this.store.dispatch(new fromActionsTreatment.TreatmentSave(group));
+      this.store.dispatch(createTreatment({ treatmentGroup }));
     } else {
-      group.id = this.id;
-      return this.store.dispatch(new fromActionsTreatment.TreatmentUpdate(group));
+      const id = this.id!;
+      this.store.dispatch(updateTreatmentGroup({ id, treatmentGroup }));
     }
+    return;
   }
 
   get addTab(): void {
@@ -176,41 +183,39 @@ export class TreatmentComponent implements OnInit, OnDestroy {
       name: ['', Validators.required],
       description: [''],
       priceFrom: [''],
-      color: ['']
+      color: [''],
     });
 
     this.filteredColors = this.getForm.color.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value ? value.name : ''),
       map(
-        name => name ? this.filter(name) : (this.allColors ? this.allColors.slice() : this.allColors))
+        name => name ? this.filter(name) : (this.allColors ? this.allColors.slice() : this.allColors)),
     );
   };
 
   private filter = (name: string): IColorAll[] | undefined => this.allColors?.filter(
     option => option?.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private getColors = (): void => this.store.dispatch(new fromActionsTreatment.GetColors());
+  private getColors = (): void => this.store.dispatch(getAllColors());
 
-  private clean = (): void => this.store.dispatch(new fromActionsTreatment.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private getTreatment = (): void => {
     if (!this.group) {
-      this.store.dispatch(
-        new fromActionsTreatment.TreatmentFind({ id: this.id, path: 'edit' })
-      );
+      this.store.dispatch(getTreatmentGroup({ id: this.id!, path: 'edit' }));
     }
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.allColors = state.colors;
       if (state.selected) {
         this.group = {
           id: state.selected.id,
           name: state.selected.name,
           description: state.selected.description,
-          priceFrom: state.selected.priceFrom
+          priceFrom: state.selected.priceFrom,
         } as ITreatmentGroup;
         this.colors = [];
         state.selected.colors?.forEach((color: IColorAll) => {
@@ -230,7 +235,7 @@ export class TreatmentComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
-      } else if (state.message) {
+      } else if (state.response) {
         this.router.navigate([this.translate.currentLang, 'treatments']);
       }
     });

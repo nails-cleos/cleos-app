@@ -11,7 +11,7 @@ import { AppMaterialModule } from '../../../util/app-material.module';
   selector: 'app-customer-edit-reservation-dialog',
   templateUrl: './customer-edit-dialog.component.html',
   styleUrls: ['./customer-edit-dialog.component.scss'],
-  imports: [PriceComponent, AppMaterialModule, TranslatePipe]
+  imports: [PriceComponent, AppMaterialModule, TranslatePipe],
 })
 export class CustomerEditDialogComponent {
   price: IPrice;
@@ -23,11 +23,11 @@ export class CustomerEditDialogComponent {
     this.currency = data.currency;
   }
 
-  get onNoClick(): void {
+  onNoClick(): void {
     return this.dialogRef.close();
   }
 
-  get doAction(): void {
+  doAction(): void {
     return this.dialogRef.close(true);
   }
 }

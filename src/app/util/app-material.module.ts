@@ -71,12 +71,12 @@ const materialModules = [
   MatProgressBar,
   MatStepper,
   MatStep,
-  MatStepLabel
+  MatStepLabel,
 ];
 
 @NgModule({
   imports: [...materialModules],
-  exports: [...materialModules]
+  exports: [...materialModules],
 })
 export class AppMaterialModule {
   constructor(matIconRegistry: MatIconRegistry, private domSanitizer: DomSanitizer) {

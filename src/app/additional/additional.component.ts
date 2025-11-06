@@ -8,11 +8,17 @@ import {
   UntypedFormControl,
   UntypedFormGroup,
   Validators,
-  ɵTypedOrUntyped
+  ɵTypedOrUntyped,
 } from '@angular/forms';
 import { Additional, IAdditional } from '../interfaces/additional';
 import { ActivatedRoute, Router } from '@angular/router';
-import * as fromActionsAdditional from '../store/additional.actions';
+import {
+  clean,
+  createAdditional,
+  getAdditional,
+  getAllTreatmentsGroup,
+  updateAdditional,
+} from '../store/additional.actions';
 import { IGroupService } from '../interfaces/treatment';
 import { fieldChange, valueChange } from '../util/validators';
 import { map, startWith } from 'rxjs/operators';
@@ -27,7 +33,7 @@ import { BackButtonDirective } from '../directives/back-button.directive';
   selector: 'app-additional',
   templateUrl: './additional.component.html',
   styleUrls: ['./additional.component.scss'],
-  imports: [SharedModule, BackButtonDirective]
+  imports: [SharedModule, BackButtonDirective],
 })
 export class AdditionalComponent implements OnInit, OnDestroy {
   @Input() additional?: IAdditional;
@@ -75,12 +81,13 @@ export class AdditionalComponent implements OnInit, OnDestroy {
     }
 
     if (this.isAddMode) {
-      return this.store.dispatch(new fromActionsAdditional.AdditionalSave(additional));
+      this.store.dispatch(createAdditional({ additional }));
     } else {
-      additional.id = this.id;
       this.additional = undefined;
-      return this.store.dispatch(new fromActionsAdditional.AdditionalUpdate(additional));
+      const id = this.id!;
+      this.store.dispatch(updateAdditional({ id, additional }));
     }
+    return;
   }
 
   ngOnInit(): void {
@@ -131,34 +138,34 @@ export class AdditionalComponent implements OnInit, OnDestroy {
       description: [''],
       name: ['', Validators.required],
       duration: ['', Validators.required],
-      group: ['']
+      group: [''],
     });
 
     this.filteredGroup = this.getForm.group.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value ? value.name : ''),
       map(
-        name => name ? this.filterGroup(name) : (this.allGroups ? this.allGroups.slice() : this.allGroups))
+        name => name ? this.filterGroup(name) : (this.allGroups ? this.allGroups.slice() : this.allGroups)),
     );
   };
 
   private filterGroup = (name: string): IGroupService[] | undefined => this.allGroups?.filter(
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private findGroups = (): void => this.store.dispatch(new fromActionsAdditional.FindGroups());
+  private findGroups = (): void => this.store.dispatch(getAllTreatmentsGroup());
 
-  private clean = (): void => this.store.dispatch(new fromActionsAdditional.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private getAdditional = (): void => {
     if (!this.additional) {
       this.store.dispatch(
-        new fromActionsAdditional.AdditionalFind(this.id)
+        getAdditional({ id: this.id! }),
       );
     }
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.allGroups = state.groups;
       if (state.selected) {
         this.additional = {
@@ -166,7 +173,7 @@ export class AdditionalComponent implements OnInit, OnDestroy {
           name: state.selected.name,
           description: state.selected.description,
           duration: formatDuration(state.selected.duration),
-          groupId: state.selected.group?.id
+          groupId: state.selected.group?.id,
         } as IAdditional;
         this.groups = [];
         state.selected.groups?.forEach((group: IGroupService) => {
@@ -181,7 +188,7 @@ export class AdditionalComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
-      } else if (state.message) {
+      } else if (state.response) {
         this.router.navigate([this.language, 'additional']);
       }
     });

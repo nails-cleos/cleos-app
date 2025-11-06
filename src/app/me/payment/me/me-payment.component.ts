@@ -4,13 +4,14 @@ import { AppState, selectPaymentState } from '../../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute } from '@angular/router';
-import * as fromActionsPayment from '../../../store/payment.actions';
+import { clean, getPayment, paymentOptions, updatePaymentById } from '../../../store/payment.actions';
 import {
   getPaymentOptions,
   getPayNlOptions,
   IPaymentAll,
   IPaymentOption,
-  PaymentType
+  PaymentPercentage,
+  PaymentType,
 } from '../../../interfaces/payment';
 import { Analytics, logEvent } from '@angular/fire/analytics';
 import { TranslateService } from '@ngx-translate/core';
@@ -18,12 +19,13 @@ import { SharedModule } from '../../../shared/shared.module';
 import { BankComponent } from '../../../shared/bank/bank.component';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
+import { IReservationPayment } from '../../../interfaces/reservation';
 
 @Component({
   selector: 'app-me-payment',
   templateUrl: './me-payment.component.html',
   styleUrls: ['./me-payment.component.scss'],
-  imports: [SharedModule, BankComponent, BackButtonDirective, CurrencySymbolPipe]
+  imports: [SharedModule, BankComponent, BackButtonDirective, CurrencySymbolPipe],
 })
 export class MePaymentComponent implements OnInit, OnDestroy {
 
@@ -37,7 +39,7 @@ export class MePaymentComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
 
   constructor(private store: Store<AppState>, private formBuilder: FormBuilder, private route: ActivatedRoute,
-              private analytic: Analytics, private translate: TranslateService) {
+    private analytic: Analytics, private translate: TranslateService) {
     this.getState = this.store.select(selectPaymentState);
     this.typeForm = this.formBuilder.group({
       type: new UntypedFormControl(undefined),
@@ -54,17 +56,14 @@ export class MePaymentComponent implements OnInit, OnDestroy {
     const option: IPaymentOption = this.typeForm.get('type')?.value;
     const type = option.type;
     const paymentOptionId = option.bic;
-    const payload = {
-      id: this.payment?.id,
-      payment: { type, paymentOptionId, bic: undefined }
-    };
+    const percentage = PaymentPercentage.total;
+    const payment: IReservationPayment = { type, paymentOptionId, percentage, bic: undefined };
     if (option.subTypes.length) {
-      payload.payment.bic = this.typeForm.get('bank')?.value?.bic;
+      payment.bic = this.typeForm.get('bank')?.value?.bic;
     }
 
-    return this.store.dispatch(
-      new fromActionsPayment.PaymentUpdateLink(payload)
-    );
+    this.store.dispatch(updatePaymentById({ id: this.payment!.id, payment }));
+    return;
   }
 
   ngOnInit(): void {
@@ -74,10 +73,10 @@ export class MePaymentComponent implements OnInit, OnDestroy {
       const paymentId = routeParams.id;
       if (paymentId) {
         logEvent(this.analytic, 'screen_view', {
-          // eslint-disable-next-line @typescript-eslint/naming-convention
+          // eslint-disable-next-line camelcase
           firebase_screen: `Customer missing payment ${ paymentId }`,
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          firebase_screen_class: 'MePaymentComponent'
+          // eslint-disable-next-line camelcase
+          firebase_screen_class: 'MePaymentComponent',
         });
         this.getPayment(paymentId);
       }
@@ -88,14 +87,14 @@ export class MePaymentComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  private getPayment = (paymentId: string): void => this.store.dispatch(new fromActionsPayment.PaymentFind(paymentId));
+  private getPayment = (id: string): void => this.store.dispatch(getPayment({ id }));
 
-  private getOptions = (): void => this.store.dispatch(new fromActionsPayment.PaymentOptions());
+  private getOptions = (): void => this.store.dispatch(paymentOptions());
 
-  private clean = (): void => this.store.dispatch(new fromActionsPayment.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.selected) {
         this.payment = state.selected;
         const reservation = this.payment?.reservation;

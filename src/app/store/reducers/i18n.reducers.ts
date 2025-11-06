@@ -1,28 +1,21 @@
-import { All, I18nActionTypes } from '../i18n.actions';
+import { getLanguage, setLanguage } from '../i18n.actions';
+import { createReducer, on } from '@ngrx/store';
 
 export interface State {
-  data: string | null;
+  language?: string;
 }
 
 export const initialState: State = {
-  data: null
+  language: undefined,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case I18nActionTypes.getLanguage: {
-      return {
-        ...state
-      };
-    }
-    case I18nActionTypes.setLanguage: {
-      return {
-        ...state,
-        data: action.payload
-      };
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const i18nReducer = createReducer(
+  initialState,
+  on(getLanguage, (state) => ({
+    ...state,
+  })),
+  on(setLanguage, (state, { language }) => ({
+    ...state,
+    language: language,
+  })),
+);

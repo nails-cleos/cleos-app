@@ -28,7 +28,7 @@
               <tr>
                 <td class="right">{{ 'ME.RESERVATION.UPCOMING.START' | translate }}</td>
                 <td class="left">{{ upcoming.start | date:'short':upcoming.room.timeZone:dateFormat }}
-                  @if (showTimeZone) {
+                  @if (showTimeZone()) {
                     <button (click)="openDialog(upcoming.start)" mat-icon-button type="button">
                       <mat-icon>info_outline</mat-icon>
                     </button>
@@ -39,7 +39,7 @@
                 <tr>
                   <td class="right">{{ 'ME.RESERVATION.UPCOMING.END' | translate }}</td>
                   <td class="left">{{ upcoming.end | date:'short':upcoming.room.timeZone:dateFormat }}
-                    @if (showTimeZone) {
+                    @if (showTimeZone()) {
                       <button (click)="openDialog(upcoming.end)" mat-icon-button type="button">
                         <mat-icon>info_outline</mat-icon>
                       </button>
@@ -189,11 +189,11 @@
             <span>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</span>
           </button>
         }
-        <button class="hide-gt-xs icon-button" (click)="edit" color="primary"
+        <button class="hide-gt-xs icon-button" (click)="edit()" color="primary"
                 mat-fab>
           <mat-icon>edit_calendar</mat-icon>
         </button>
-        <button class="hide-xs icon-button" (click)="edit" color="primary"
+        <button class="hide-xs icon-button" (click)="edit()" color="primary"
                 mat-fab extended>
           <mat-icon>edit_calendar</mat-icon>
           <span>{{ 'COMMON.BUTTON.EDIT' | translate }}</span>

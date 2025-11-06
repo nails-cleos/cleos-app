@@ -25,27 +25,27 @@ import { Observable } from 'rxjs';
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('user')
+        useClass: TranslateLoaderFactory.forModule('user'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
     EffectsModule.forFeature([UserEffects]),
   ],
   providers: [
-    UserService
-  ]
+    UserService,
+  ],
 })
 export class UserModule {
   constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
     const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe(state => {
+    getI18nState.subscribe((state) => {
       translateService.currentLang = '';
-      this.translateService.use(state.data);
+      this.translateService.use(state.language);
     });
   }
 }

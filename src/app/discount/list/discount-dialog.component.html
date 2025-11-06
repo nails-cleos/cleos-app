@@ -1,4 +1,4 @@
-<button (click)="onNoClick" class="close-button" mat-icon-button>
+<button (click)="onNoClick()" class="close-button" mat-icon-button>
   <mat-icon>close</mat-icon>
 </button>
 <h1 mat-dialog-title>{{ title }}</h1>
@@ -7,7 +7,7 @@
     <mat-form-field class="chip-list">
       <mat-label>{{ 'DISCOUNT.LIST.DIALOG.CUSTOMER' | translate }}</mat-label>
       <mat-chip-grid #chipList aria-label="Customer selection">
-        @for (customer of customers; track customer) {
+        @for (customer of customers; track customer.id) {
           <mat-chip-row (removed)="remove(customer)" [removable]="true">
             {{ customer.displayName }}
             <mat-icon matChipRemove>cancel</mat-icon>
@@ -16,7 +16,7 @@
         <input #customerInput [formControl]="customerCtrl" [matAutocomplete]="auto" [matChipInputFor]="chipList">
       </mat-chip-grid>
       <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-        @for (customer of sortCustomers(filteredCustomers | async); track customer) {
+        @for (customer of sortCustomers(filteredCustomers | async); track customer.id) {
           <mat-option [value]="customer">{{ customer.displayName }}</mat-option>
         }
       </mat-autocomplete>
@@ -25,8 +25,8 @@
 }
 <div mat-dialog-actions class="card-actions">
   <div class="spacer"></div>
-  <button (click)="doAction" cdkFocusInitial color="primary"
+  <button (click)="doAction()" cdkFocusInitial color="primary"
           mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.DISCOUNT.SEND' | translate }}
   </button>
-  <button (click)="onNoClick" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+  <button (click)="onNoClick()" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
 </div>

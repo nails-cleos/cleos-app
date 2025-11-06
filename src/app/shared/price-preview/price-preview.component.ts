@@ -9,7 +9,7 @@ import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
   templateUrl: './price-preview.component.html',
   styleUrls: ['./price-preview.component.scss'],
   animations: [transitionAnimation],
-  imports: [SharedModule, CurrencySymbolPipe]
+  imports: [SharedModule, CurrencySymbolPipe],
 })
 export class PricePreviewComponent {
   @Input() price?: IPrice;

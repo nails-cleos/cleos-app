@@ -1,0 +1,25 @@
+<div class="toast" [ngClass]="'toast-' + data.type">
+  <div class="toast-icon">
+    <mat-icon>{{ getIcon() }}</mat-icon>
+  </div>
+  <div class="toast-content">
+    <div class="toast-message">{{ data.message }}</div>
+  </div>
+  <div class="toast-actions">
+    <button mat-icon-button (click)="onDismiss()">
+      <mat-icon>close</mat-icon>
+    </button>
+    @switch (data.actionType) {
+      @case ('link') {
+        <a mat-button [href]="data.action" target="_blank" rel="noopener">
+          <mat-icon>open_in_new</mat-icon>
+        </a>
+      }
+      @case ('button') {
+        <button mat-button (click)="onAction()">
+          <mat-icon>{{ data.action || 'done_all' }}</mat-icon>
+        </button>
+      }
+    }
+  </div>
+</div>

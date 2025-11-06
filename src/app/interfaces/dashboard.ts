@@ -326,7 +326,7 @@ export class MonthSummary implements IMonthSummary {
       totalBTW,
       totalWithoutGross,
       totalWithoutNet,
-      totalWithoutBTW
+      totalWithoutBTW,
     } = total.reduce((totals: any, next: ISummaryTotal) => {
       const by = next.type === 'EXPENSE' ? -1 : 1;
       totals.totalGross += next.gross * by;
@@ -381,7 +381,7 @@ export class SummaryTotals implements ISummaryTotals {
 
 
   constructor(income: ITotal = new Total(), expense: ITotal = new Total(), cash: ITotal = new Total(),
-              totalsWithoutCash: ITotal = new Total(), totals: ITotal = new Total()) {
+    totalsWithoutCash: ITotal = new Total(), totals: ITotal = new Total()) {
     this.income = income;
     this.expense = expense;
     this.cash = cash;

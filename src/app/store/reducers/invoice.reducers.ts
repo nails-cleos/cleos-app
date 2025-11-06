@@ -1,100 +1,84 @@
-import { All, InvoiceActionTypes } from '../invoice.actions';
-import { IOfficeAll } from '../../interfaces/office';
+import {
+  clean,
+  getAllMyOffices,
+  getOfficeToInvoice,
+  invoiceFailure,
+  invoiceOfficesSuccess,
+  invoiceSuccess,
+  updateOfficeById,
+} from '../invoice.actions';
+import { IOffice } from '../../interfaces/office';
 import { IInvoice } from '../../interfaces/invoice';
+import { IError } from '../../interfaces/common';
+import { createReducer, on } from '@ngrx/store';
 
 export interface State {
-  data: IInvoice[] | null;
-  offices: IOfficeAll[] | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  message: string | null;
+  data?: IInvoice[];
+  offices?: IOffice[];
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
   isLoading: boolean;
   changes: boolean;
 }
 
 export const initialState: State = {
-  data: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  offices: null,
-  message: null,
+  data: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  offices: undefined,
   isLoading: false,
-  changes: true
+  changes: true,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case InvoiceActionTypes.invoiceFind: {
-      return {
-        ...state,
-        data: [{} as IInvoice, {} as IInvoice, {} as IInvoice],
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
-        changes: true
-      };
-    }
-    case InvoiceActionTypes.invoiceSuccess: {
-      return {
-        ...state,
-        data: action.payload,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
-        changes: true
-      };
-    }
-    case InvoiceActionTypes.invoiceFindMyOffices: {
-      return {
-        ...state,
-        offices: null,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
-        changes: false
-      };
-    }
-    case InvoiceActionTypes.invoiceOfficesSuccess: {
-      return {
-        ...state,
-        offices: action.payload,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
-        changes: false
-      };
-    }
-    case InvoiceActionTypes.invoiceFailure: {
-      return {
-        ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
-        message: null,
-        changes: false
-      };
-    }
-    case InvoiceActionTypes.invoiceUpdateOffice: {
-      return {
-        ...state,
-        errorMessage: null,
-        error: null,
-        subErrors: null,
-        message: null,
-        changes: false
-      };
-    }
-    case InvoiceActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const invoiceReducer = createReducer(
+  initialState,
+  on(getOfficeToInvoice, (state) => ({
+    ...state,
+    data: [{} as IInvoice, {} as IInvoice, {} as IInvoice],
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    changes: true,
+  })),
+  on(invoiceSuccess, (state, { data }) => ({
+    ...state,
+    data: data,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    changes: true,
+  })),
+  on(getAllMyOffices, (state) => ({
+    ...state,
+    offices: undefined,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    changes: false,
+  })),
+  on(invoiceOfficesSuccess, (state, { offices }) => ({
+    ...state,
+    offices: offices,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    changes: false,
+  })),
+  on(invoiceFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error: error,
+    subErrors: error.subErrors,
+    changes: false,
+  })),
+  on(updateOfficeById, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    error: undefined,
+    subErrors: undefined,
+    changes: false,
+  })),
+  on(clean, () => initialState),
+);

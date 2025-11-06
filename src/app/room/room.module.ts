@@ -9,7 +9,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { RoomEffects } from '../store/effects/room.effects';
 import { RoomService } from '../services/room.service';
 import { UserService } from '../services/user.service';
-import { AddServiceComponent, PriceDialogComponent } from './me/add-service/add-service.component';
+import { AddServiceComponent } from './me/add-service/add-service.component';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { ExpenseService } from '../services/expense.service';
 import { ExpensesComponent } from './me/expense/list/expenses.component';
@@ -18,6 +18,7 @@ import { ExpenseEffects } from '../store/effects/expense.effects';
 import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
+import { PriceDialogComponent } from './me/add-service/price-dialog.component';
 
 @NgModule({
   imports: [
@@ -32,29 +33,29 @@ import { Observable } from 'rxjs';
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('room')
+        useClass: TranslateLoaderFactory.forModule('room'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
-    EffectsModule.forFeature([RoomEffects, ExpenseEffects])
+    EffectsModule.forFeature([RoomEffects, ExpenseEffects]),
   ],
   providers: [
     RoomService,
     UserService,
-    ExpenseService
-  ]
+    ExpenseService,
+  ],
 })
 export class RoomModule {
   constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
     const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe(state => {
+    getI18nState.subscribe((state) => {
       translateService.currentLang = '';
-      this.translateService.use(state.data);
+      this.translateService.use(state.language);
     });
   }
 }

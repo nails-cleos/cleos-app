@@ -1,46 +1,37 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { AppState, selectAuthState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
-import * as fromActionsLogin from '../../store/auth.actions';
+import { clean, signupSuccess } from '../../store/auth.actions';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
 import { sendPasswordResetEmail } from '@firebase/auth';
 import { TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../../shared/shared.module';
 import { BackButtonDirective } from '../../directives/back-button.directive';
+import { ResponseSuccess } from '../../interfaces/common';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],
-  imports: [SharedModule, BackButtonDirective]
+  imports: [SharedModule, BackButtonDirective],
 })
 export class ForgotPasswordComponent implements OnInit, OnDestroy {
+  private store: Store<AppState> = inject(Store<AppState>);
+  private toastService: ToastService = inject(ToastService);
+  private formBuilder: UntypedFormBuilder = inject(UntypedFormBuilder);
+  private router: Router = inject(Router);
+  private auth: Auth = inject(Auth);
+  private translate: TranslateService = inject(TranslateService);
 
-  getState: Observable<any>;
+  getState: Observable<any> = this.store.select(selectAuthState);
   subscription?: Subscription;
 
   form!: UntypedFormGroup;
-  language: string;
-
-  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private snackBar: MatSnackBar,
-              private router: Router, private auth: Auth, private translate: TranslateService) {
-    this.getState = this.store.select(selectAuthState);
-    this.language = this.translate.currentLang;
-  }
-
-  get forgotPassword(): void {
-    sendPasswordResetEmail(this.auth, this.form.get('email')?.value.trim()).then(() => {
-      const message = this.translate.instant('AUTH.FORGOT_PASSWORD.MESSAGE');
-      this.store.dispatch(
-        new fromActionsLogin.SignUpSuccess({ message })
-      );
-    }).catch(e => console.error(`Error sending reset password. ${ e }`));
-    return;
-  }
+  language: string = this.translate.currentLang;
 
   ngOnInit(): void {
     this.clean();
@@ -52,25 +43,30 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  private clean = (): void => this.store.dispatch(new fromActionsLogin.Clean());
+  forgotPassword(): void {
+    sendPasswordResetEmail(this.auth, this.form.get('email')?.value.trim()).then(() => {
+      const message = this.translate.instant('AUTH.FORGOT_PASSWORD.MESSAGE');
+      this.store.dispatch(signupSuccess({ message }));
+    }).catch(e => console.error(`Error sending reset password. ${e}`));
+    return;
+  }
+
+  private clean = (): void => this.store.dispatch(clean());
 
   private createForm = (): void => {
     this.form = this.formBuilder.group({
-      email: ['', Validators.required]
+      email: ['', Validators.required],
     });
   };
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {
-      if (state.errorMessage || state.message) {
-        const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
-          duration: 5000
-        });
-        if (state.message) {
-          snackBarRef.afterDismissed().subscribe(() => {
-            this.router.navigate([this.language, 'auth']);
-          });
-        }
+      if (state.errorMessage) {
+        this.toastService.error(state.errorMessage);
+      } else if (state.response) {
+        const response: ResponseSuccess = state.response;
+        const toastRef = this.toastService.show(response.message, response.toastType, 5000, 'button');
+        toastRef.onAction().subscribe(() => this.router.navigate([this.language, 'auth']));
       }
     });
   };

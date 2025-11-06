@@ -4,7 +4,7 @@ import { snakeToCamel } from '../util/helper';
 
 @Pipe({
   name: 'reservationIcon',
-  standalone: true
+  standalone: true,
 })
 export class ReservationIconPipe implements PipeTransform {
 

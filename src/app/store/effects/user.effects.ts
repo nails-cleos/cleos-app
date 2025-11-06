@@ -1,212 +1,216 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import * as fromActionsUser from '../user.actions';
+import { catchError, switchMap, tap } from 'rxjs/operators';
+import {
+  deleteUser,
+  disableUsersSuccess,
+  getAllCustomers,
+  getAllDisableUsers,
+  getCustomerOverview,
+  getMyUser,
+  getUser,
+  getUsersPage,
+  mergeUsers,
+  resendToken,
+  restore,
+  saveUser,
+  setRole,
+  updateMyPhoto,
+  updateMyUser,
+  userFailure,
+  userSaveSuccess,
+  userSelected,
+  userSuccess,
+} from '../user.actions';
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Role } from '../../interfaces/token';
-import { LoginSuccess } from '../auth.actions';
+import { Role, Token } from '../../interfaces/token';
 import { getLocale } from '../../util/helper';
+import { Pagination } from '../../interfaces/pagination';
+import { IOverview, IUser } from '../../interfaces/user';
+import { IApiResponse, success } from '../../interfaces/common';
+import { ToastType } from '../../shared/toast/toast.model';
+import { loginSuccess } from '../auth.actions';
 
 @Injectable()
 export class UserEffects {
-  getAll$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.getAll)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.userService.getAll(payload.active, payload.direction, payload.page,
-      payload.size, payload.filter).pipe(
-      switchMap((response: any) => of(new fromActionsUser.UserSuccess(response ? response : {
-        content: [],
-        totalElements: 0
-      }))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
-    ))
+  translate: TranslateService = inject(TranslateService);
+  actions: Actions = inject(Actions);
+  userService: UserService = inject(UserService);
+  router: Router = inject(Router);
+
+  getAll$ = createEffect(() => this.actions.pipe(
+    ofType(getUsersPage),
+    switchMap(({ page, sort, direction, size, filter }) =>
+      this.userService.getUsersPage(page, sort, direction, size, filter).pipe(
+        switchMap((data: Pagination<IUser>) => of(userSuccess({ data }))),
+        catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
+      )),
   ));
 
-  getAllCustomers$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.getAllCustomers)).pipe(
-      map((action: any) => action.payload),
-      switchMap(() => this.userService.getAllCustomers().pipe(
-        switchMap((response: any) => of(new fromActionsUser.UserSuccess(response))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
-      ))
-    ));
-
-  findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.findUser)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.userService.getById(payload).pipe(
-      switchMap((response: any) => of(new fromActionsUser.UserSelected({ user: response }))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
-    ))
+  getAllCustomers$ = createEffect(() => this.actions.pipe(
+    ofType(getAllCustomers),
+    switchMap(() =>
+      this.userService.getCustomers().pipe(
+        switchMap((data: IUser[]) => of(userSuccess({ data }))),
+        catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
+      )),
   ));
 
-  findMe$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.findMe)).pipe(
-    map((action: any) => action.payload),
-    switchMap(() => this.userService.getMe().pipe(
-      switchMap((response: any) => of(new fromActionsUser.UserSelected({ user: response, profile: true }))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
-    ))
+  findOne$ = createEffect(() => this.actions.pipe(
+    ofType(getUser),
+    switchMap(({ id }) =>
+      this.userService.getUser(id).pipe(
+        switchMap((selected?: IUser) => of(userSelected({ selected }))),
+        catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
+      )),
   ));
 
-  overviewData$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.userOverview)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.userService.getOverview(payload).pipe(
-      switchMap((response: any) => of(new fromActionsUser.UserSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
-    ))
+  findMe$ = createEffect(() => this.actions.pipe(
+    ofType(getMyUser),
+    switchMap(() =>
+      this.userService.getMyUser().pipe(
+        switchMap((selected?: IUser) => of(userSelected({ selected, profile: true }))),
+        catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
+      )),
   ));
 
-  save$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.saveUser)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => {
-      switch (payload.role) {
-        case Role.customer:
-          return this.userService.addCustomer(payload.user).pipe(
-            switchMap((response: any) => {
-              const message = this.translate.instant('USER.CUSTOMER', { displayName: response.displayName });
-              return of(new fromActionsUser.UserSaveSuccess({ message }));
-            }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
-          );
-        case Role.manager:
-          return this.userService.addManager(payload.user).pipe(
-            switchMap((response: any) => {
-              const message = this.translate.instant('USER.MANAGER', { displayName: response.displayName });
-              return of(new fromActionsUser.UserSaveSuccess({ message }));
-            }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
-          );
-        case Role.professional:
-          return this.userService.addProfessional(payload.user).pipe(
-            switchMap((response: any) => {
-              const message = this.translate.instant('USER.PROFESSIONAL', { displayName: response.displayName });
-              return of(new fromActionsUser.UserSaveSuccess({ message }));
-            }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
-          );
-        default:
-          return this.userService.update(payload.user).pipe(
-            switchMap((response: any) => {
-              const message = this.translate.instant('USER.UPDATED.MESSAGE', { displayName: response.displayName });
-              return of(new fromActionsUser.UserSaveSuccess({ message }));
-            }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
-          );
+  overviewData$ = createEffect(() => this.actions.pipe(
+    ofType(getCustomerOverview),
+    switchMap(({ id }) =>
+      this.userService.getCustomerOverview(id).pipe(
+        switchMap((data: IOverview) => of(userSuccess({ data }))),
+        catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
+      )),
+  ));
+
+  save$ = createEffect(() => this.actions.pipe(
+    ofType(saveUser),
+    switchMap(({ user, role }) =>
+      this.userService.saveUser(user, role).pipe(
+        switchMap((response: { response: IApiResponse, key: string }) => this.requestSuccess(response.key,
+          response.response.name, `users/${ response.response.id }`)),
+        catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
+      )),
+  ));
+
+  setRole$ = createEffect(() => this.actions.pipe(
+    ofType(setRole),
+    switchMap(({ id, role, displayName, action }) =>
+      this.userService.setRole(id, role).pipe(
+        switchMap(() => this.requestSuccess(`USER.ROLES.${ action }`,
+          displayName, `users/${ id }`, this.translate.instant(`COMMON.ROLES.${ role }`))),
+        catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
+      )),
+  ));
+
+  update$ = createEffect(() => this.actions.pipe(
+    ofType(updateMyUser),
+    switchMap(({ user, redirectUrl }) =>
+      this.userService.updateMyUser(user).pipe(
+        switchMap((response: Token) => {
+          const message = this.translate.instant('COMMON.PROFILE.UPDATED.MESSAGE',
+            { displayName: response.user.displayName });
+          const lang = user.lang;
+          return success(userSaveSuccess, message ? message : message, undefined, undefined, undefined,
+            loginSuccess({
+              token: response,
+              queryParams: { state: btoa(JSON.stringify({ returnUrl: redirectUrl, lang })) },
+            }));
+        }),
+        catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
+      )),
+  ));
+
+  updatePhoto$ = createEffect(() => this.actions.pipe(
+    ofType(updateMyPhoto),
+    switchMap(({ file }) =>
+      this.userService.updateMyPhoto(file).pipe(
+        switchMap((response: Token) => {
+          const message = this.translate.instant('COMMON.PROFILE.UPDATED.PHOTO');
+          const lang = getLocale(this.translate.currentLang).language;
+          return success(userSaveSuccess, message, undefined, undefined, undefined,
+            loginSuccess({
+              token: response,
+              queryParams: { state: btoa(JSON.stringify({ returnUrl: `/${ lang }/auth/profile`, lang })) },
+            }));
+        }),
+        catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
+      )),
+  ));
+
+  delete$ = createEffect(() => this.actions.pipe(
+    ofType(deleteUser),
+    switchMap(({ id, displayName }) =>
+      this.userService.deleteUser(id).pipe(
+        switchMap(() =>
+          this.requestSuccess('USER.DELETED.MESSAGE', displayName, undefined, undefined, 'warning')),
+        catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
+      )),
+  ));
+
+  restore$ = createEffect(() => this.actions.pipe(
+    ofType(restore),
+    switchMap(({ id, user }) =>
+      this.userService.restore(id, user).pipe(
+        switchMap((response: IApiResponse) => this.requestSuccess('USER.RESTORE.MESSAGE', response.name)),
+        catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
+      )),
+  ));
+
+  resend$ = createEffect(() => this.actions.pipe(
+    ofType(resendToken),
+    switchMap(({ id }) =>
+      this.userService.resendToken(id).pipe(
+        switchMap(() => this.requestSuccess('USER.ACTIVATION_RESEND.MESSAGE')),
+        catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
+      )),
+  ));
+
+  getAllDisableUsers$ = createEffect(() => this.actions.pipe(
+    ofType(getAllDisableUsers),
+    switchMap(() =>
+      this.userService.getAllDisableUsers().pipe(
+        switchMap((users: IUser[]) => of(disableUsersSuccess(users ? { users } : { users: [] }))),
+        catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
+      )),
+  ));
+
+  mergeUsers$ = createEffect(() => this.actions.pipe(
+    ofType(mergeUsers),
+    switchMap(({ oldUserId, newUserId }) =>
+      this.userService.mergeUsers(oldUserId, newUserId).pipe(
+        switchMap(() => this.requestSuccess('USER.MERGE.SUCCESS')),
+        catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
+      )),
+  ));
+
+  dataSuccess$ = createEffect(() => this.actions.pipe(
+    ofType(userSuccess),
+  ), { dispatch: false });
+
+  selectedData$ = createEffect(() => this.actions.pipe(
+    ofType(userSelected),
+    tap(({ selected, profile }) => {
+      if (!profile) {
+        this.router.navigate([this.translate.currentLang, 'users', selected?.id]);
       }
-    })
-  ));
-
-  setRole$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.setRole)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.userService.setRole(payload.user.id, payload.role).pipe(
-      switchMap(() => {
-        const role = this.translate.instant(`COMMON.ROLES.${ payload.role }`);
-        const message = this.translate.instant(`USER.ROLES.${ payload.action }`,
-          { role, displayName: payload.user.displayName });
-        return of(new fromActionsUser.UserSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
-    ))
-  ));
-
-  update$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.updateUser)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.userService.updateMe(payload.user).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('COMMON.PROFILE.UPDATED.MESSAGE',
-          { displayName: response.user.displayName });
-        const lang = payload.user.lang;
-        return of(new LoginSuccess({
-          response, queryParams: {
-            state: btoa(JSON.stringify({ returnUrl: payload.redirectUrl, lang }))
-          }
-        }), new fromActionsUser.UserSaveSuccess({ message: payload.message ? payload.message : message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
-    ))
-  ));
-
-  updatePhoto$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.updatePhoto)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.userService.updateMePhoto(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('COMMON.PROFILE.UPDATED.PHOTO');
-        const lang = getLocale(this.translate.currentLang).language;
-        return of(new LoginSuccess({
-          response, queryParams: {
-            state: btoa(JSON.stringify({ returnUrl: `/${ lang }/auth/profile`, lang }))
-          }
-        }), new fromActionsUser.UserSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
-    ))
-  ));
-
-  delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.userDelete)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.userService.delete(payload.id).pipe(
-      switchMap(() => {
-        const message = this.translate.instant('USER.DELETED.MESSAGE', { displayName: payload.displayName });
-        return of(new fromActionsUser.UserSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
-    ))
-  ));
-
-  restore$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.userRestore)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.userService.restore(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('USER.RESTORE.MESSAGE', { displayName: response.displayName });
-        return of(new fromActionsUser.UserSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
-    ))
-  ));
-
-  resend$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.resendUserToken)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.userService.resend(payload).pipe(
-      switchMap(() => {
-        const message = this.translate.instant('USER.ACTIVATION_RESEND.MESSAGE');
-        return of(new fromActionsUser.UserSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
-    ))
-  ));
-
-  getAllDisableUsers$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.getAllDisableUsers)).pipe(
-      map((action: any) => action.payload),
-      switchMap(() => this.userService.getAllDisableUsers().pipe(
-        switchMap((response: any) => of(new fromActionsUser.DisableUsersSuccess(response ? response : []))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
-      ))
-    ));
-
-  mergeUsers$ = createEffect(() => this.actions$.pipe(ofType(fromActionsUser.UserActionTypes.mergeUsers)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.userService.mergeUsers(payload).pipe(
-      switchMap(() => {
-        const message = this.translate.instant('USER.MERGE.SUCCESS');
-        return of(new fromActionsUser.UserSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsUser.UserFailure({ error: err.error })))
-    ))
-  ));
-
-  dataSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsUser.UserActionTypes.userSuccess)
+    }),
   ), { dispatch: false });
 
-  selectedData$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsUser.UserActionTypes.userSelected),
-    tap((data: any) => {
-      if (!data.payload.profile) {
-        this.router.navigate([this.translate.currentLang, 'users', data.payload.user.id]);
-      }
-    })
+  saveSuccess$ = createEffect(() => this.actions.pipe(
+    ofType(userSaveSuccess)), { dispatch: false });
+
+  disableUsersSuccess$ = createEffect(() => this.actions.pipe(
+    ofType(disableUsersSuccess),
   ), { dispatch: false });
 
-  saveSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsUser.UserActionTypes.userSaveSuccess)), { dispatch: false });
-
-  disableUsersSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsUser.UserActionTypes.disableUsersSuccess)
-  ), { dispatch: false });
-
-  constructor(private readonly translate: TranslateService, private actions$: Actions, private userService: UserService,
-              private router: Router) {
+  private requestSuccess(key: string, displayName?: string, path?: string, role?: Role,
+    toastType?: ToastType) {
+    const message = this.translate.instant(key, { role, displayName });
+    return success(userSaveSuccess, message, path, undefined, toastType);
   }
 }

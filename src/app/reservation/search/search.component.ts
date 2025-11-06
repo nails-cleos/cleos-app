@@ -9,7 +9,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
-import * as fromActionsReservation from '../../store/reservation.actions';
+import { cancelReservation, clean, getAllFilterReservations, getCustomers } from '../../store/reservation.actions';
 import { getNowTimeZone, isSameTimeZone, newDateTimestamp } from '../../util/dates';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { map, startWith } from 'rxjs/operators';
@@ -28,7 +28,7 @@ import { ReservationIconPipe } from '../../pipes/reservation-icon.pipe';
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
   animations: [detailExpandAnimation],
-  imports: [SharedModule, TimeDetailPipe, ReservationIconPipe]
+  imports: [SharedModule, TimeDetailPipe, ReservationIconPipe],
 })
 export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -61,10 +61,10 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
   private paginatorSubscription: Subscription | undefined;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
+    private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
-      Breakpoints.Small
+      Breakpoints.Small,
     ]).subscribe(result => {
       if (result.matches) {
         this.pageSize = MOBILE_PAGE_SIZE;
@@ -86,7 +86,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     this.filteredCustomer = this.customer.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value ? value.name : ''),
-      map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers)
+      map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers),
     );
     this.customer.valueChanges.subscribe(value => {
       if (value && value.id) {
@@ -117,17 +117,17 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     const date = newDateTimestamp(reservation.timestamp);
     const content = this.translate.instant('RESERVATION.LIST.CANCEL.CONTENT', { date });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: reservation.id }
+      data: { title, content, value: reservation.id },
     });
 
-    dialogRef.afterClosed().subscribe(event => {
-      if (event) {
+    dialogRef.afterClosed().subscribe(reservationId => {
+      if (reservationId) {
         const options = Object.values(CancelOption).filter(co => co !== CancelOption.charge);
         openCancel(this.dialog, reservation.room, this.small, options, result => {
           if (result) {
             this.dataSource = [{}, {}, {}];
             this.store.dispatch(
-              new fromActionsReservation.Cancel({ id: event, paymentCancellation: result })
+              cancelReservation(reservationId, result),
             );
           }
         });
@@ -178,19 +178,19 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     this.cdRef.detectChanges();
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsReservation.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
-  private getCustomers = (): void => this.store.dispatch(new fromActionsReservation.GetAllCustomers());
+  private getCustomers = (): void => this.store.dispatch(getCustomers());
 
   private getReservations = (page: number = 0): void => this.store.dispatch(
-    new fromActionsReservation.GetAllFilterPage({
-      states: this.states,
-      userId: this.userId,
-      active: this.sort.active,
+    getAllFilterReservations({
+      page,
+      sort: this.sort.active,
       direction: this.sort.direction,
       size: this.pageSize,
-      page
-    })
+      userId: this.userId,
+      states: this.states,
+    }),
   );
 
   private filterCustomer = (name: string): IUser[] | undefined => this.customers?.filter(
@@ -200,7 +200,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     state => state.toLowerCase().indexOf(value.toLowerCase()) === 0);
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.customers = state.customers;
       if (state.filter) {
         const now = getNowTimeZone();
@@ -220,7 +220,7 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
           this.paginatorSubscription = undefined;
         }
       }
-      if (state.message) {
+      if (state.response) {
         this.clean();
         this.getReservations();
       }

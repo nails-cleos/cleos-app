@@ -1,134 +1,130 @@
+import { createReducer, on } from '@ngrx/store';
 import { Pagination } from '../../interfaces/pagination';
-import { All, CatalogueActionTypes } from '../catalogue.actions';
 import { ICatalogue } from '../../interfaces/catalogue';
 import { ITreatmentGroup } from '../../interfaces/treatment';
+import { IError, IResponseSuccess } from '../../interfaces/common';
+import {
+  catalogueFailure,
+  catalogueSaveSuccess,
+  catalogueSelected,
+  catalogueSuccess,
+  clean,
+  createCatalogue,
+  deleteCatalogue,
+  findGroupsSuccess,
+  getAllCatalogs,
+  getAllCatalogues,
+  getAllTreatmentsGroup,
+  getCatalogue,
+  updateCatalogue,
+  updateCatalogueOrder,
+} from '../catalogue.actions';
 
 export interface State {
-  data: ICatalogue | ICatalogue[] | Pagination<ICatalogue> | null;
-  groups: ITreatmentGroup[] | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  selected: ICatalogue | null;
-  message: string | null;
+  response?: IResponseSuccess;
+  data?: ICatalogue[] | Pagination<ICatalogue>;
+  groups?: ITreatmentGroup[];
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
+  selected?: ICatalogue;
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  data: null,
-  groups: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  selected: null,
-  message: null,
-  isLoading: false
+  response: undefined,
+  data: undefined,
+  groups: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  selected: undefined,
+  isLoading: false,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case CatalogueActionTypes.getAllCatalogs:
-    case CatalogueActionTypes.getAll: {
-      return {
-        ...state,
-        data: [{}, {}, {}],
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case CatalogueActionTypes.catalogueFind: {
-      return {
-        ...state,
-        data: {} as ICatalogue,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case CatalogueActionTypes.catalogueSuccess: {
-      return {
-        ...state,
-        data: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case CatalogueActionTypes.catalogueSaveSuccess: {
-      return {
-        ...state,
-        message: action.payload.message,
-        selected: null,
-        errorMessage: null,
-        subErrors: null,
-        isLoading: false
-      };
-    }
-    case CatalogueActionTypes.catalogueSelected: {
-      return {
-        ...state,
-        selected: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case CatalogueActionTypes.catalogueFailure: {
-      return {
-        ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
-        message: null,
-        isLoading: false
-      };
-    }
-    case CatalogueActionTypes.catalogueUpdateAll: {
-      return {
-        ...state,
-        data: [{}, {}, {}],
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case CatalogueActionTypes.catalogueUpdate:
-    case CatalogueActionTypes.catalogueSave:
-    case CatalogueActionTypes.catalogueDelete: {
-      return {
-        ...state,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
-        isLoading: true
-      };
-    }
-    case CatalogueActionTypes.findGroups: {
-      return {
-        ...state,
-        groups: null,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case CatalogueActionTypes.findGroupsSuccess: {
-      return {
-        ...state,
-        groups: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case CatalogueActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const catalogueReducer = createReducer(
+  initialState,
+  on(
+    getAllCatalogues,
+    getAllCatalogs,
+    (state) => ({
+      ...state,
+      data: [{}, {}, {}],
+      response: undefined,
+      errorMessage: undefined,
+      subErrors: undefined,
+      selected: undefined,
+    }),
+  ),
+  on(getCatalogue, (state) => ({
+    ...state,
+    selected: {} as ICatalogue,
+    response: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+  on(catalogueSuccess, (state, { data }) => ({
+    ...state,
+    data,
+    response: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+  on(catalogueSaveSuccess, (state, action) => ({
+    ...state,
+    response: action,
+    selected: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    isLoading: false,
+  })),
+  on(catalogueSelected, (state, { selected }) => ({
+    ...state,
+    selected,
+    response: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+  on(catalogueFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error,
+    subErrors: error.subErrors,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(updateCatalogueOrder, (state) => ({
+    ...state,
+    data: [{}, {}, {}],
+    response: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+  on(
+    createCatalogue,
+    updateCatalogue,
+    deleteCatalogue,
+    (state) => ({
+      ...state,
+      response: undefined,
+      errorMessage: undefined,
+      subErrors: undefined,
+      isLoading: true,
+    }),
+  ),
+  on(getAllTreatmentsGroup, (state) => ({
+    ...state,
+    response: undefined,
+    groups: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+  on(findGroupsSuccess, (state, { groups }) => ({
+    ...state,
+    groups,
+    response: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+  on(clean, () => initialState),
+);

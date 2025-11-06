@@ -18,7 +18,7 @@ export class Step implements IStep {
   next?: IStep;
 
   constructor(order: number, name: string, call: (goNext: boolean) => void, next?: IStep, optional: boolean = false,
-              enable: boolean = true) {
+    enable: boolean = true) {
     this.order = order;
     this.name = name;
     this.enable = enable;

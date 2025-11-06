@@ -22,18 +22,17 @@ import {
   selectRoomState,
   selectTreatmentState,
   selectUnavailableState,
-  selectUserState
+  selectUserState,
 } from '../store/app.states';
 import { IMenu, IUser, IUserAll, User } from '../interfaces/user';
-import * as fromActionsLogin from '../store/auth.actions';
-import * as fromActionsNotification from '../store/notification.actions';
-import * as fromActionsUser from '../store/user.actions';
+import { logOut, redirect } from '../store/auth.actions';
+import { getNotificationsPage, readNotification } from '../store/notification.actions';
+import { updateMyUser } from '../store/user.actions';
 import { INotification } from '../interfaces/notification';
 import { TranslateService } from '@ngx-translate/core';
 import { MessagingService } from '../services/messaging.service';
 import { environment } from '../../environments/environment';
 import { getDisplayNameInitials, getUserImage } from '../util/helper';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { NavigationService } from '../services/navigation.service';
 import { TokenService } from '../services/token.service';
 import { CookieService } from 'ngx-cookie-service';
@@ -47,12 +46,15 @@ import { SharedModule } from '../shared/shared.module';
 import { MenuItemComponent } from './menu-item/menu-item.component';
 import { ErrorComponent } from '../shared/error/error.component';
 import { MatRipple } from '@angular/material/core';
+import { ResponseSuccess } from '../interfaces/common';
+import { ToastService } from '../services/toast.service';
+import { PAGE_SIZE } from '../interfaces/pagination';
 
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.scss'],
-  imports: [SharedModule, MenuItemComponent, RouterLinkActive, RouterOutlet, ErrorComponent, MatRipple]
+  imports: [SharedModule, MenuItemComponent, RouterLinkActive, RouterOutlet, ErrorComponent, MatRipple],
 })
 export class NavComponent implements OnInit, OnDestroy {
   private tokenService: TokenService = inject(TokenService);
@@ -61,7 +63,7 @@ export class NavComponent implements OnInit, OnDestroy {
   private router: Router = inject(Router);
   private store: Store<AppState> = inject(Store<AppState>);
   private messagingService: MessagingService = inject(MessagingService);
-  private snackBar: MatSnackBar = inject(MatSnackBar);
+  private toastService: ToastService = inject(ToastService);
   private navigationService: NavigationService = inject(NavigationService);
   private cookieService: CookieService = inject(CookieService);
   private overlayContainer: OverlayContainer = inject(OverlayContainer);
@@ -74,7 +76,7 @@ export class NavComponent implements OnInit, OnDestroy {
   isHandset$: Observable<boolean> = this.breakpointObserver.observe([
     Breakpoints.XSmall,
     Breakpoints.Small,
-    Breakpoints.Medium
+    Breakpoints.Medium,
   ]).pipe(map(result => result.matches), shareReplay());
   menuItems: IMenu[] = [];
   notifications: INotification[] = [];
@@ -118,9 +120,7 @@ export class NavComponent implements OnInit, OnDestroy {
   }
 
   get logout(): void {
-    return this.store.dispatch(
-      new fromActionsLogin.LogOut()
-    );
+    return this.store.dispatch(logOut());
   }
 
   get changeTheme(): void {
@@ -132,9 +132,7 @@ export class NavComponent implements OnInit, OnDestroy {
     const redirectUrl = this.router.url;
     const message = this.translate.instant(
       `COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode.toString().toUpperCase() }`);
-    return this.store.dispatch(
-      new fromActionsUser.UpdateUser({ user, redirectUrl, message })
-    );
+    return this.store.dispatch(updateMyUser({ user, redirectUrl, message }));
   }
 
   ngOnInit(): void {
@@ -168,16 +166,8 @@ export class NavComponent implements OnInit, OnDestroy {
         }
         return value;
       });
-      this.store.dispatch(
-        new fromActionsNotification.NotificationRead(notification)
-      );
+      this.store.dispatch(readNotification({ id: notification.id }));
     }
-  };
-
-  navigate = (menu: IMenu, drawer?: any): void => {
-    drawer?.toggle();
-    this.error = undefined;
-    this.router.navigate([this.language].concat(menu.path.split('/')));
   };
 
   private selectStore = (states: any[]): void => states.forEach(
@@ -185,16 +175,21 @@ export class NavComponent implements OnInit, OnDestroy {
       this.isLoading = state.isLoading;
       if (!state.subErrors) {
         this.error = state.error;
-        if (state.errorMessage || state.message) {
-          const snackBarRef = this.snackBar.open(state.errorMessage || state.message, 'OK', {
-            duration: 5000
+        if (state.errorMessage) {
+          this.toastService.error(state.errorMessage);
+        } else if (state.response) {
+          const response: ResponseSuccess = state.response;
+          const path = response.path ? `/${ this.language }/${ response.path }` : undefined;
+          const toastAction = path ? 'link' : 'none';
+          const toastRef = this.toastService.show(response.message, response.toastType, 5000, toastAction, path);
+          toastRef.onDismiss().subscribe(() => {
+            if (state.reload) {
+              this.navigationService.reload(this.router.url.split('/'));
+            }
           });
-          if (state.reload) {
-            snackBarRef.afterDismissed().subscribe(() => this.navigationService.reload(this.router.url.split('/')));
-          }
         }
       }
-    })
+    }),
   );
 
   private updateCount = (): void => {
@@ -218,14 +213,7 @@ export class NavComponent implements OnInit, OnDestroy {
 
   private getNotifications = (): void => {
     if (!this.countNotifications) {
-      const payload = {
-        active: 'date',
-        direction: 'desc',
-        page: 0
-      };
-      this.store.dispatch(
-        new fromActionsNotification.GetAllPaged(payload)
-      );
+      this.store.dispatch(getNotificationsPage({ page: 0, sort: 'date', direction: 'desc', size: PAGE_SIZE }));
     }
   };
 
@@ -239,7 +227,7 @@ export class NavComponent implements OnInit, OnDestroy {
         this.getNotifications();
       }
     });
-    this.authSubscription = this.getState.subscribe(state => {
+    this.authSubscription = this.getState.subscribe((state) => {
       this.isAuthorized = state.isAuthenticated;
       this.isLoading = state.isLoading;
       if (state.isAuthenticated) {
@@ -270,7 +258,7 @@ export class NavComponent implements OnInit, OnDestroy {
               message: value.notification.title,
               date: value.data.date,
               navigation: value.data.navigation,
-              read: false
+              read: false,
             } as INotification;
 
             this.notifications = [notification].concat(this.notifications);
@@ -288,9 +276,7 @@ export class NavComponent implements OnInit, OnDestroy {
       this.authSubject.next(this.isAuthorized);
       if (this.router.url === `/${ this.language }`) {
         if (this.isAuthorized && !state.redirect) {
-          this.store.dispatch(
-            new fromActionsLogin.Redirect()
-          );
+          this.store.dispatch(redirect());
         } else {
           this.router.navigate(['/', this.language, 'home']);
         }

@@ -55,7 +55,7 @@
   <mat-drawer-content class="page-wrap">
     <mat-toolbar class="header" color="primary">
       @if ((isHandset$ | async) && showInformation) {
-        <button (click)="drawer.toggle()" aria-label="Toggle sidenav" mat-icon-button type="button">
+        <button (click)="drawer.toggle()" aria-label="Toggle sidenav" mat-icon-button type="button" name="cleosMenu">
           <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
         </button>
       }

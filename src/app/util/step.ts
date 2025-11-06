@@ -3,16 +3,16 @@ import { MatStepper } from '@angular/material/stepper';
 import { Analytics, logEvent } from '@angular/fire/analytics';
 
 export const completeAndNext = (steps: IStep[], myStepper: MatStepper, goNext: boolean,
-                                analytics?: Analytics): void => {
+  analytics?: Analytics): void => {
   setTimeout(() => {
     const step = getStep(steps, myStepper.selectedIndex - (goNext ? 0 : 1));
     if (step) {
       if (analytics) {
         logEvent(analytics, 'screen_view', {
-          // eslint-disable-next-line @typescript-eslint/naming-convention
+          // eslint-disable-next-line camelcase
           firebase_screen: `Customer reservation. Step: ${ step?.name }`,
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          firebase_screen_class: 'MeReservationComponent'
+          // eslint-disable-next-line camelcase
+          firebase_screen_class: 'MeReservationComponent',
         });
       }
       if (goNext) {

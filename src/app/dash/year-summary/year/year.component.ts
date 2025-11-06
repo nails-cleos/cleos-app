@@ -8,7 +8,7 @@ import { QuarterComponent } from '../../quarter-summary/quarter/quarter.componen
   selector: 'app-year',
   templateUrl: './year.component.html',
   styleUrls: ['./year.component.scss'],
-  imports: [SharedModule, QuarterComponent]
+  imports: [SharedModule, QuarterComponent],
 })
 export class YearComponent {
   @Input() quarterSummaries?: IQuarterSummary[];
@@ -20,6 +20,6 @@ export class YearComponent {
   @Input() showCash: boolean;
 
   constructor() {
-    this.showCash = false;
+  	this.showCash = false;
   }
 }

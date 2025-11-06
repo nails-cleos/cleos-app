@@ -1,111 +1,79 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
+import { IExpense, IExpenseInfo } from '../interfaces/expense';
+import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
 
-export enum ExpenseActionTypes {
-  getAll = '[Expense] Get all',
-  getExpenseInfo = '[Expense] Get info',
+enum ExpenseActionTypes {
+  getExpensesPage = '[Expense] Get expenses page',
+  getAllExpensesInfo = '[Expense] Get all expenses info',
   expenseSuccess = '[Expense] Success',
   expenseInfoSuccess = '[Expense] Info success',
-  expenseSave = '[Expense] Save',
-  expenseUpdate = '[Expense] Update',
+  createExpense = '[Expense] Create expense',
+  updateExpense = '[Expense] Update expense by id',
   expenseSaveSuccess = '[Expense] Save Success',
   expenseFailure = '[Expense] Failure',
   expenseSelected = '[Expense] Selected',
-  expenseFind = '[Expense] Find',
-  expenseDelete = '[Expense] Delete',
-  clean = '[Expense] Clean'
+  getExpense = '[Expense] Find expense by id',
+  deleteExpense = '[Expense] Delete expense by id',
+  clean = '[Expense] Clean',
 }
 
-export class GetAll implements Action {
-  readonly type = ExpenseActionTypes.getAll;
+export const getExpensesPage = createAction(
+  ExpenseActionTypes.getExpensesPage,
+  props<PageRequest & {
+    roomId: string;
+    filter?: string;
+    dateFilter?: string;
+  }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getAllExpensesInfo = createAction(
+  ExpenseActionTypes.getAllExpensesInfo,
+  props<{ roomId: string }>(),
+);
 
-export class GetExpenseInfo implements Action {
-  readonly type = ExpenseActionTypes.getExpenseInfo;
+export const expenseSuccess = createAction(
+  ExpenseActionTypes.expenseSuccess,
+  props<{ data: IExpense[] }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const expenseInfoSuccess = createAction(
+  ExpenseActionTypes.expenseInfoSuccess,
+  props<{ info: IExpenseInfo }>(),
+);
 
-export class ExpenseSuccess implements Action {
-  readonly type = ExpenseActionTypes.expenseSuccess;
+export const createExpense = createAction(
+  ExpenseActionTypes.createExpense,
+  props<{ roomId: string; expense: IExpense }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const updateExpense = createAction(
+  ExpenseActionTypes.updateExpense,
+  props<{ id: string; roomId: string; expense: IExpense }>(),
+);
 
-export class ExpenseInfoSuccess implements Action {
-  readonly type = ExpenseActionTypes.expenseInfoSuccess;
+export const expenseSaveSuccess = createAction(
+  ExpenseActionTypes.expenseSaveSuccess,
+  props<IResponseSuccess>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const expenseFailure = createAction(
+  ExpenseActionTypes.expenseFailure,
+  props<{ error: IError }>(),
+);
 
-export class ExpenseSave implements Action {
-  readonly type = ExpenseActionTypes.expenseSave;
+export const expenseSelected = createAction(
+  ExpenseActionTypes.expenseSelected,
+  props<{ selected?: IExpense }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getExpense = createAction(
+  ExpenseActionTypes.getExpense,
+  props<{ roomId: string; id: string }>(),
+);
 
-export class ExpenseUpdate implements Action {
-  readonly type = ExpenseActionTypes.expenseUpdate;
+export const deleteExpense = createAction(
+  ExpenseActionTypes.deleteExpense,
+  props<{ roomId: string; id: string; invoice: string }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
-
-export class ExpenseSaveSuccess implements Action {
-  readonly type = ExpenseActionTypes.expenseSaveSuccess;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class ExpenseFailure implements Action {
-  readonly type = ExpenseActionTypes.expenseFailure;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class ExpenseSelected implements Action {
-  readonly type = ExpenseActionTypes.expenseSelected;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class ExpenseFind implements Action {
-  readonly type = ExpenseActionTypes.expenseFind;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class DeleteExpense implements Action {
-  readonly type = ExpenseActionTypes.expenseDelete;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = ExpenseActionTypes.clean;
-}
-
-export type All =
-  | GetAll
-  | GetExpenseInfo
-  | ExpenseSave
-  | ExpenseUpdate
-  | ExpenseSuccess
-  | ExpenseInfoSuccess
-  | ExpenseSaveSuccess
-  | ExpenseFailure
-  | ExpenseFind
-  | ExpenseSelected
-  | DeleteExpense
-  | Clean;
+export const clean = createAction(ExpenseActionTypes.clean);

@@ -1,165 +1,124 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
+import { IError, IResponseSuccess } from '../interfaces/common';
+import {
+  ICardSummary,
+  IEventSummary,
+  IMonthlyRoomSummary,
+  IMonthlySummaryRequest,
+  IRoomEvents,
+  ITotal,
+  IYearRoomExport,
+  IYearRoomSummary,
+} from '../interfaces/dashboard';
+import { IReservation } from '../interfaces/reservation';
 
-export enum DashboardActionTypes {
-  dashEvents = '[Dash] Get events',
-  dashCards = '[Dash] Get cards',
+enum DashboardActionTypes {
+  getEvents = '[Dash] Events summaries',
+  getCards = '[Dash] Get summaries',
   dashSuccess = '[Dash] Dash Success',
   dashFailure = '[Dash] Dash failure',
-  dashboardEvents = '[Dashboard] Get events',
+  getMyEvent = '[Dashboard] Me event',
   eventSuccess = '[Dashboard] Event success',
-  updateEvent = '[Dashboard] Update event',
-  monthlySummary = '[Dash] Get monthly summary',
+  updateEvent = '[Dashboard] Update event by id',
+  getMonthlySummary = '[Dash] Get monthly summary',
   monthlySummarySuccess = '[Dash] Monthly summary success',
-  saveMonthlySummary = '[Dash] Save Monthly summary',
+  updateMonthlySummary = '[Dash] Update monthly summary',
   saveMonthlySummarySuccess = '[Dash] Save monthly summary success',
-  yearSummary = '[Dash] Get year summary',
+  getYearSummary = '[Dash] Get year summary',
   yearSummarySuccess = '[Dash] Year summary success',
-  yearExport = '[Dash] Get year export',
+  exportYearSummary = '[Dash] Export year summary',
   yearExportSuccess = '[Dash] Year export success',
-  quarterSummary = '[Dash] Get quarter summary',
+  getQuarterSummary = '[Dash] Get quarter summary',
   quarterSummarySuccess = '[Dash] Quarter summary success',
   clean = '[Dash] Clean'
 }
 
-export class GetEvents implements Action {
-  readonly type = DashboardActionTypes.dashEvents;
+export const getEvents = createAction(
+  DashboardActionTypes.getEvents,
+  props<{ date: Date }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getMyEvent = createAction(
+  DashboardActionTypes.getMyEvent,
+  props<{ date: Date }>(),
+);
 
-export class GetDashboardEvents implements Action {
-  readonly type = DashboardActionTypes.dashboardEvents;
+export const eventSuccess = createAction(
+  DashboardActionTypes.eventSuccess,
+  props < { data: IRoomEvents }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getCards = createAction(
+  DashboardActionTypes.getCards,
+  props<{ date: Date }>(),
+);
 
-export class EventSuccess implements Action {
-  readonly type = DashboardActionTypes.eventSuccess;
+export const dashSuccess = createAction(
+  DashboardActionTypes.dashSuccess,
+  props<{ data: IEventSummary | ICardSummary }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const dashFailure = createAction(
+  DashboardActionTypes.dashFailure,
+  props<{ error: IError }>(),
+);
 
-export class GetCards implements Action {
-  readonly type = DashboardActionTypes.dashCards;
+export const updateEvent = createAction(
+  DashboardActionTypes.updateEvent,
+  props<{ reservationId: string, reservation: IReservation }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getMonthlySummary = createAction(
+  DashboardActionTypes.getMonthlySummary,
+  props<{ date: string }>(),
+);
 
-export class DashSuccess implements Action {
-  readonly type = DashboardActionTypes.dashSuccess;
+export const monthlySummarySuccess = createAction(
+  DashboardActionTypes.monthlySummarySuccess,
+  props<{ monthlySummary: IMonthlyRoomSummary[] }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const updateMonthlySummary = createAction(
+  DashboardActionTypes.updateMonthlySummary,
+  props<{
+    date: string, summaryType: string, totals: ITotal[],
+    summaries: IMonthlySummaryRequest[], roomId: string, step: number
+  }>(),
+);
 
-export class DashFailure implements Action {
-  readonly type = DashboardActionTypes.dashFailure;
+export const saveMonthlySummarySuccess = createAction(
+  DashboardActionTypes.saveMonthlySummarySuccess,
+  props<IResponseSuccess & { date: string, step: number }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getYearSummary = createAction(
+  DashboardActionTypes.getYearSummary,
+  props<{ year: number }>(),
+);
 
-export class UpdateEvent implements Action {
-  readonly type = DashboardActionTypes.updateEvent;
+export const yearSummarySuccess = createAction(
+  DashboardActionTypes.yearSummarySuccess,
+  props<{ yearSummary: IYearRoomSummary[] | [] }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const exportYearSummary = createAction(
+  DashboardActionTypes.exportYearSummary,
+  props<{ year: number }>(),
+);
 
-export class GetMonthlySummary implements Action {
-  readonly type = DashboardActionTypes.monthlySummary;
+export const yearExportSuccess = createAction(
+  DashboardActionTypes.yearExportSuccess,
+  props<{ yearExport: IYearRoomExport[] | [] }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getQuarterSummary = createAction(
+  DashboardActionTypes.getQuarterSummary,
+  props<{ year: number, quarter: number }>(),
+);
 
-export class MonthlySummarySuccess implements Action {
-  readonly type = DashboardActionTypes.monthlySummarySuccess;
+export const quarterSummarySuccess = createAction(
+  DashboardActionTypes.quarterSummarySuccess,
+  props<{ quarterSummary: any }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
-
-export class UpdateMonthlySummary implements Action {
-  readonly type = DashboardActionTypes.saveMonthlySummary;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class UpdateMonthlySummarySuccess implements Action {
-  readonly type = DashboardActionTypes.saveMonthlySummarySuccess;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class GetYearSummary implements Action {
-  readonly type = DashboardActionTypes.yearSummary;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class YearSummarySuccess implements Action {
-  readonly type = DashboardActionTypes.yearSummarySuccess;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class GetYearExport implements Action {
-  readonly type = DashboardActionTypes.yearExport;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class YearExportSuccess implements Action {
-  readonly type = DashboardActionTypes.yearExportSuccess;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class GetQuarterSummary implements Action {
-  readonly type = DashboardActionTypes.quarterSummary;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class QuarterSummarySuccess implements Action {
-  readonly type = DashboardActionTypes.quarterSummarySuccess;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = DashboardActionTypes.clean;
-}
-
-export type All =
-  | GetEvents
-  | GetCards
-  | DashSuccess
-  | DashFailure
-  | GetDashboardEvents
-  | EventSuccess
-  | UpdateEvent
-  | GetMonthlySummary
-  | MonthlySummarySuccess
-  | UpdateMonthlySummary
-  | UpdateMonthlySummarySuccess
-  | GetYearSummary
-  | YearSummarySuccess
-  | GetQuarterSummary
-  | QuarterSummarySuccess
-  | GetYearExport
-  | YearExportSuccess
-  | Clean;
+export const clean = createAction(DashboardActionTypes.clean);

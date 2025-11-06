@@ -3,12 +3,12 @@ import {
   DragDropSortingComponent,
   ISorted,
   ISorting,
-  ItemSorting
+  ItemSorting,
 } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
 import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState, selectTreatmentState } from '../../store/app.states';
-import * as fromActionsTreatment from '../../store/treatment.actions';
+import { clean, getAllTreatmentsGroup, sortGroupTreatment } from '../../store/treatment.actions';
 import { ITreatmentGroupAll } from '../../interfaces/treatment';
 import { SharedModule } from '../../shared/shared.module';
 
@@ -16,7 +16,7 @@ import { SharedModule } from '../../shared/shared.module';
   selector: 'app-treatment-group-sorting',
   templateUrl: './treatment-sorting.component.html',
   styleUrls: ['./treatment-group-sorting.component.scss'],
-  imports: [SharedModule, DragDropSortingComponent]
+  imports: [SharedModule, DragDropSortingComponent],
 })
 export class TreatmentGroupSortingComponent implements OnInit, OnDestroy {
 
@@ -39,20 +39,20 @@ export class TreatmentGroupSortingComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  sorted = (sorted: ISorted[]): void => this.store.dispatch(new fromActionsTreatment.TreatmentGroupUpdateSort(sorted));
+  sorted = (groups: ISorted[]): void => this.store.dispatch(sortGroupTreatment({ groups }));
 
-  private clean = (): void => this.store.dispatch(new fromActionsTreatment.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
-  private getTreatments = (): void => this.store.dispatch(new fromActionsTreatment.GetAllGroup());
+  private getTreatments = (): void => this.store.dispatch(getAllTreatmentsGroup());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((stateValue) => {
-      if (stateValue.message) {
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.response) {
         this.clean();
         this.getTreatments();
       }
-      this.items = stateValue?.data?.map((group: ITreatmentGroupAll) => new ItemSorting(
-        group.id, group.name, group.order)
+      this.items = state?.data?.map((group: ITreatmentGroupAll) => new ItemSorting(
+        group.id, group.name, group.order),
       );
     });
   };

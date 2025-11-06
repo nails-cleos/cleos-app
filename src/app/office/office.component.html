@@ -36,7 +36,7 @@
                         <mat-label>{{ 'OFFICE.MANAGER.FIELD' | translate }}</mat-label>
                         <input formControlName="manager" [matAutocomplete]="auto" matInput required type="text">
                         <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-                          @for (manager of filteredOptions | async; track manager) {
+                          @for (manager of filteredOptions | async; track manager.id) {
                             <mat-option [value]="manager">{{ manager.displayName }}</mat-option>
                           }
                         </mat-autocomplete>

@@ -1,11 +1,30 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import { TranslateModule } from '@ngx-translate/core';
+import { of } from 'rxjs';
+import { AuthUserService } from './services/auth-user.service';
+import { Store } from '@ngrx/store';
+import { AppState } from './store/app.states';
 
 describe('AppComponent', () => {
+  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+
   beforeEach(async () => {
+    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
+      authUser: of({
+        locale: 'en',
+        theme: 'dark',
+      }),
+    });
+
     await TestBed.configureTestingModule({
-      imports: [
-        AppComponent
+      imports: [AppComponent, TranslateModule.forRoot()],
+      providers: [
+        { provide: AuthUserService, useValue: authUserServiceSpy },
+        { provide: Store, useValue: storeSpy },
       ],
     }).compileComponents();
   });
@@ -14,12 +33,5 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.content span').textContent).toContain('cleos app is running!');
   });
 });

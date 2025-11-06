@@ -1,12 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { SharedModule } from '../shared.module';
 import { BackButtonDirective } from '../../directives/back-button.directive';
+import { AppMaterialModule } from '../../util/app-material.module';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-error',
   templateUrl: './error.component.html',
   styleUrls: ['./error.component.scss'],
-  imports: [SharedModule, BackButtonDirective]
+  imports: [AppMaterialModule, BackButtonDirective, TranslatePipe],
 })
 export class ErrorComponent implements OnInit {
 

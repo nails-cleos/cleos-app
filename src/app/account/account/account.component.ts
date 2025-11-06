@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AppState, selectAccountState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
-import * as fromActionsAccount from '../../store/account.actions';
+import { getAccountByCustomerId, updateAccount } from '../../store/account.actions';
 import { IAccountAll, ITransaction, Transaction } from '../../interfaces/account';
 import { ICurrency, ICurrencyAll } from '../../interfaces/currency';
 import { map, startWith } from 'rxjs/operators';
@@ -20,7 +20,7 @@ import { BackButtonDirective } from '../../directives/back-button.directive';
   selector: 'app-account',
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.scss'],
-  imports: [SharedModule, BalanceComponent, BackButtonDirective]
+  imports: [SharedModule, BalanceComponent, BackButtonDirective],
 })
 export class AccountComponent implements OnInit, OnDestroy {
   form!: UntypedFormGroup;
@@ -60,14 +60,16 @@ export class AccountComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const id = this.account!.id;
+    const customerId = this.customerId!;
     const transaction: ITransaction = new Transaction();
-    transaction.accountId = this.account?.id;
-    transaction.customerId = this.customerId;
+    transaction.customerId = customerId;
     transaction.currencyId = valueChange(this.getForm.currency.value, this.account?.currency)?.id;
     transaction.gift = this.getForm.gift.value;
-    return this.store.dispatch(
-      new fromActionsAccount.AccountUpdate(transaction)
+    this.store.dispatch(
+      updateAccount({ id, transaction, customerId }),
     );
+    return;
   }
 
   ngOnInit(): void {
@@ -100,27 +102,29 @@ export class AccountComponent implements OnInit, OnDestroy {
     }
   };
 
-  private getAccount = (): void => this.store.dispatch(new fromActionsAccount.AccountFindByCustomer(this.customerId));
+  private getAccount = (): void => this.store.dispatch(
+    getAccountByCustomerId({ customerId: this.customerId! }),
+  );
 
   private createForm = (): void => {
     this.form = this.formBuilder.group({
       currency: ['', [Validators.required, requireMatch]],
-      gift: ['', Validators.required]
+      gift: ['', Validators.required],
     });
     this.filteredCurrencyOptions = this.getForm.currency.valueChanges?.pipe(
       startWith(''),
       map((value: any) => typeof value === 'string' ? value : value.code),
       map((name: string) => name ? this.filterCurrency(name) :
-        this.account?.currencies ? this.account?.currencies.slice() : this.account?.currencies)
+        this.account?.currencies ? this.account?.currencies.slice() : this.account?.currencies),
     );
   };
 
   private filterCurrency = (name: string): ICurrency[] | undefined => this.account?.currencies?.filter(
-    option => option.code?.toLowerCase().indexOf(name.toLowerCase()) === 0
+    option => option.code?.toLowerCase().indexOf(name.toLowerCase()) === 0,
   );
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.selected && !this.account) {
         this.account = state.selected;
         this.form.patchValue(state.selected);
@@ -130,7 +134,7 @@ export class AccountComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
-      } else if (state.message) {
+      } else if (state.response) {
         if (this.hasAdminRole) {
           this.router.navigate([this.language, 'users', this.customerId, 'overview']);
         } else {

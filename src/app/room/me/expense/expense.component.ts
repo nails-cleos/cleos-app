@@ -7,7 +7,7 @@ import {
   UntypedFormControl,
   UntypedFormGroup,
   Validators,
-  ɵTypedOrUntyped
+  ɵTypedOrUntyped,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Expense, IExpense, IExpenseAll, ISupplyStore } from '../../../interfaces/expense';
@@ -15,7 +15,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectExpenseState } from '../../../store/app.states';
 import { Store } from '@ngrx/store';
-import * as fromActionsExpense from '../../../store/expense.actions';
+import { clean, createExpense, getAllExpensesInfo, getExpense, updateExpense } from '../../../store/expense.actions';
 import { API_LOCALE, createNewDateZonedTime, getNowTimeZone } from '../../../util/dates';
 import { fieldChange, noDuplicateDatesValidator } from '../../../util/validators';
 import { map, startWith } from 'rxjs/operators';
@@ -27,37 +27,34 @@ import { BackButtonDirective } from '../../../directives/back-button.directive';
   selector: 'app-expense',
   templateUrl: './expense.component.html',
   styleUrls: ['./expense.component.scss'],
-  imports: [SharedModule, TwoDigitsDirective, BackButtonDirective]
+  imports: [SharedModule, TwoDigitsDirective, BackButtonDirective],
 })
 export class ExpenseComponent implements OnInit, OnDestroy {
   @Input() expense?: IExpenseAll;
   form!: UntypedFormGroup;
   id?: string;
   roomId: string | null = null;
-  isAddMode: boolean;
+  isAddMode: boolean = true;
+  createAnother: boolean = false;
   errors: any = [];
   types: any[] = [];
   currencyIcon?: string;
   roomName?: string;
-  today: Date;
+  today: Date = getNowTimeZone();
   supplyStores?: ISupplyStore[];
   filteredSupplyStore?: Observable<ISupplyStore[] | undefined>;
   totalMap: Map<number, { btwValue: string, net: string }> = new Map();
 
-  private getState: Observable<any>;
+  private timeZone?: string;
+  private getState: Observable<any> = this.store.select(selectExpenseState);
   private subscription?: Subscription;
-  private readonly language: string;
+  private readonly language: string = this.translate.currentLang;
 
   constructor(private readonly translate: TranslateService, private store: Store<AppState>,
-              private formBuilder: FormBuilder,
-              private route: ActivatedRoute, private router: Router) {
-    this.isAddMode = true;
-    this.today = getNowTimeZone();
-    this.getState = this.store.select(selectExpenseState);
-    this.language = this.translate.currentLang;
+    private formBuilder: FormBuilder, private route: ActivatedRoute, private router: Router) {
   }
 
-  get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
+  get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl }> {
     return this.form.controls;
   }
 
@@ -70,11 +67,13 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       return true;
     }
 
-    return this.totals.controls.some(control => control.invalid || !control.get('btw')?.value);
+    return this.totals.controls.some(control => {
+      return control.invalid;
+    });
   }
 
   get submit(): void {
-    if (this.form.invalid) {
+    if (this.form.invalid || !this.roomId) {
       return;
     }
 
@@ -85,17 +84,15 @@ export class ExpenseComponent implements OnInit, OnDestroy {
     expense.expenseTotals = this.totals.value;
     expense.date =
       createNewDateZonedTime(this.getForm.date.value, this.expense?.room?.timeZone).toLocaleString(API_LOCALE);
+    const roomId = this.roomId;
 
     if (this.isAddMode) {
-      return this.store.dispatch(
-        new fromActionsExpense.ExpenseSave({ roomId: this.roomId, expense })
-      );
+      this.store.dispatch(createExpense({ roomId, expense }));
     } else {
-      expense.id = this.id;
-      return this.store.dispatch(
-        new fromActionsExpense.ExpenseUpdate({ roomId: this.roomId, expense })
-      );
+      const id = this.id!;
+      this.store.dispatch(updateExpense({ id, roomId, expense }));
     }
+    return;
   }
 
   get removeSupplyStore(): void {
@@ -152,10 +149,11 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         expense?.setValue(null);
         return;
       }
-      if (min != undefined && value < min) {
-        this.errors[input.id] = this.translate.instant(`EXPENSE.${ input.id.toUpperCase() }.MIN`);
+      const EXPENSE = this.translate.instant('EXPENSE');
+      if (min !== undefined && value < min) {
+        this.errors[input.id] = EXPENSE[id.toUpperCase()].MIN;
       } else if (max && value > max) {
-        this.errors[input.id] = this.translate.instant(`EXPENSE.${ input.id.toUpperCase() }.MAX`);
+        this.errors[input.id] = EXPENSE[id.toUpperCase()].MAX;
       }
 
       if (this.errors[input.id]) {
@@ -179,7 +177,7 @@ export class ExpenseComponent implements OnInit, OnDestroy {
         }
       }
     } else {
-      expense?.setValue(null);
+      expense?.setValue(undefined);
     }
   };
 
@@ -192,58 +190,55 @@ export class ExpenseComponent implements OnInit, OnDestroy {
       invoice: ['', Validators.required],
       supplyStore: ['', Validators.required],
       date: ['', Validators.required],
-      totals: this.formBuilder.array([this.createTotals()], noDuplicateDatesValidator('btw'))
+      totals: this.formBuilder.array([this.createTotals()], noDuplicateDatesValidator('btw')),
     });
 
     this.filteredSupplyStore = this.getForm.supplyStore.valueChanges.pipe(startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(
-        name => name ? this.filterSupplyStore(name) : this.supplyStores ? this.supplyStores.slice() : this.supplyStores)
+      map(name => name ? this.filterSupplyStore(name) :
+        this.supplyStores ? this.supplyStores.slice() : this.supplyStores),
     );
   };
 
   private createTotals = (type: string = '', gross: string = '', btw: string = '',
-                          description: string = ''): FormGroup => {
+    description: string = ''): FormGroup => {
     return this.formBuilder.group({
-      type: [type, Validators.required],
-      gross: [gross, Validators.required],
+      type: [type, [Validators.required]],
+      gross: [gross, [Validators.required]],
+      btw: [btw, [Validators.required]],
       description: [description],
-      btw: [btw]
     });
   };
 
   private filterSupplyStore = (name: string): ISupplyStore[] | undefined => this.supplyStores?.filter(
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private getExpenseInfo = (): void => this.store.dispatch(new fromActionsExpense.GetExpenseInfo(this.roomId));
+  private getExpenseInfo = (): void => this.store.dispatch(getAllExpensesInfo({ roomId: this.roomId! }));
 
-  private getExpense = (): void => this.store.dispatch(
-    new fromActionsExpense.ExpenseFind({ roomId: this.roomId, id: this.id })
-  );
+  private getExpense = (): void => this.store.dispatch(getExpense({ roomId: this.roomId!, id: this.id! }));
 
   private clean = (): void => {
     for (let i = this.totals.length - 1; i >= 0; i--) {
       this.removeExpense(i);
     }
-    this.store.dispatch(
-      new fromActionsExpense.Clean()
-    );
+    this.store.dispatch(clean());
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.supplyStores = state.info?.supplyStores;
       this.types = state.info?.types;
       this.roomName = state.info?.roomName;
       this.currencyIcon = state.info?.currency?.icon;
-      this.today = getNowTimeZone(state.info?.timeZone);
+      this.timeZone = state.info?.timeZone;
+      this.today = getNowTimeZone(this.timeZone);
       this.expense = state.selected;
       if (this.expense?.id) {
         this.form.patchValue(this.expense);
         this.getForm.date.setValue(createNewDateZonedTime(this.expense.timestamp, this.expense.room?.timeZone));
         this.removeExpense(0);
         this.expense.expenseTotals.forEach((it, index) => {
-          let btw = '';
+          let btw = '0';
           const total = { net: '', btwValue: '' };
           if (it.btw !== undefined) {
             btw = it.btw.toFixed(2);
@@ -261,8 +256,22 @@ export class ExpenseComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
-      } else if (state.message) {
-        this.router.navigate([this.language, 'rooms', this.roomId, 'expenses']);
+      } else if (state.response) {
+        if (this.isAddMode && this.createAnother) {
+          this.form.reset();
+          this.form.markAsPristine({ emitEvent: false });
+          this.form.markAsUntouched({ emitEvent: false });
+          this.totals.clear();
+          this.totals.controls.forEach(control => {
+            control.markAsPristine({ emitEvent: false });
+            control.markAsUntouched({ emitEvent: false });
+          });
+          this.totalMap = new Map();
+          this.createForm();
+          this.createAnother = false;
+        } else {
+          this.router.navigate([this.language, 'rooms', this.roomId, 'expenses']);
+        }
       }
     });
   };

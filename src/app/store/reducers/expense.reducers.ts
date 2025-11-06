@@ -1,123 +1,117 @@
+import { createReducer, on } from '@ngrx/store';
+import {
+  clean,
+  createExpense,
+  deleteExpense,
+  expenseFailure,
+  expenseInfoSuccess,
+  expenseSaveSuccess,
+  expenseSelected,
+  expenseSuccess,
+  getAllExpensesInfo,
+  getExpense,
+  getExpensesPage,
+  updateExpense,
+} from '../expense.actions';
 import { Pagination } from '../../interfaces/pagination';
-import { All, ExpenseActionTypes } from '../expense.actions';
 import { IExpense, IExpenseInfo } from '../../interfaces/expense';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 
 export interface State {
-  data: IExpense | Pagination<IExpense> | null;
-  info: IExpenseInfo | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  selected: IExpense | null;
-  message: string | null;
+  response?: IResponseSuccess;
+  data?: Pagination<IExpense> | IExpense[];
+  info?: IExpenseInfo;
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
+  selected?: IExpense;
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  data: null,
-  info: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  selected: null,
-  message: null,
-  isLoading: false
+  response: undefined,
+  data: undefined,
+  info: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  selected: undefined,
+  isLoading: false,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case ExpenseActionTypes.getAll: {
-      return {
-        ...state,
-        data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IExpense>,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case ExpenseActionTypes.getExpenseInfo: {
-      return {
-        ...state,
-        info: null,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case ExpenseActionTypes.expenseFind: {
-      return {
-        ...state,
-        selected: {} as IExpense,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case ExpenseActionTypes.expenseSuccess: {
-      return {
-        ...state,
-        data: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case ExpenseActionTypes.expenseInfoSuccess: {
-      return {
-        ...state,
-        info: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case ExpenseActionTypes.expenseSaveSuccess: {
-      return {
-        ...state,
-        message: action.payload.message,
-        selected: null,
-        errorMessage: null,
-        subErrors: null,
-        isLoading: false
-      };
-    }
-    case ExpenseActionTypes.expenseSelected: {
-      return {
-        ...state,
-        selected: action.payload.expense,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case ExpenseActionTypes.expenseFailure: {
-      return {
-        ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
-        message: null,
-        isLoading: false
-      };
-    }
-    case ExpenseActionTypes.expenseUpdate:
-    case ExpenseActionTypes.expenseSave:
-    case ExpenseActionTypes.expenseDelete: {
-      return {
-        ...state,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
-        isLoading: true
-      };
-    }
-    case ExpenseActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const expenseReducer = createReducer(
+  initialState,
+  on(getExpensesPage, (state) => ({
+    ...state,
+    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IExpense>,
+    response: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+  })),
+  on(getAllExpensesInfo, (state) => ({
+    ...state,
+    response: undefined,
+    info: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+  })),
+  on(getExpense, (state) => ({
+    ...state,
+    selected: {} as IExpense,
+    response: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+  on(expenseSuccess, (state, { data }) => ({
+    ...state,
+    data,
+    response: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+  on(expenseInfoSuccess, (state, { info }) => ({
+    ...state,
+    info,
+    response: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+  on(expenseSaveSuccess, (state, action) => ({
+    ...state,
+    response: action,
+    selected: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    isLoading: false,
+  })),
+  on(expenseSelected, (state, { selected }) => ({
+    ...state,
+    selected,
+    response: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+  })),
+  on(expenseFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error,
+    subErrors: error.subErrors,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(
+    createExpense,
+    updateExpense,
+    deleteExpense,
+    (state) => ({
+      ...state,
+      response: undefined,
+      errorMessage: undefined,
+      subErrors: undefined,
+      isLoading: true,
+    }),
+  ),
+  on(clean, () => initialState),
+);

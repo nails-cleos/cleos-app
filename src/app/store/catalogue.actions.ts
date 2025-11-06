@@ -1,120 +1,79 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
+import { ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
+import { ITreatmentGroup } from '../interfaces/treatment';
+import { IError, IResponseSuccess } from '../interfaces/common';
 
-export enum CatalogueActionTypes {
-  getAll = '[Catalogue] Get all',
+enum CatalogueActionTypes {
+  getAllCatalogues = '[Catalogue] Get all catalogues',
   getAllCatalogs = '[Catalogue] Get all catalogs',
   catalogueSuccess = '[Catalogue] Success',
-  catalogueSave = '[Catalogue] Save',
-  catalogueUpdate = '[Catalogue] Update',
-  catalogueUpdateAll = '[Catalogue] Update all',
+  createCatalogue = '[Catalogue] Create catalogue',
+  updateCatalogue = '[Catalogue] Update catalogue by id',
+  updateCatalogueOrder = '[Catalogue] Update catalogue order',
   catalogueSaveSuccess = '[Catalogue] Save Success',
   catalogueFailure = '[Catalogue] Failure',
   catalogueSelected = '[Catalogue] Selected',
-  catalogueFind = '[Catalogue] Find',
-  catalogueDelete = '[Catalogue] Delete',
-  findGroups = '[Catalogue] Find treatment groups',
+  getCatalogue = '[Catalogue] Catalogue find by id',
+  deleteCatalogue = '[Catalogue] Delete catalogue by id',
+  getAllTreatmentsGroup = '[Catalogue] Get all treatments group',
   findGroupsSuccess = '[Catalogue] Find treatment groups success',
   clean = '[Catalogue] Clean'
 }
 
-export class GetAll implements Action {
-  readonly type = CatalogueActionTypes.getAll;
-}
+export const getAllCatalogues = createAction(CatalogueActionTypes.getAllCatalogues);
 
-export class GetAllCatalogs implements Action {
-  readonly type = CatalogueActionTypes.getAllCatalogs;
-}
+export const getAllCatalogs = createAction(CatalogueActionTypes.getAllCatalogs);
 
-export class CatalogueSuccess implements Action {
-  readonly type = CatalogueActionTypes.catalogueSuccess;
+export const catalogueSuccess = createAction(
+  CatalogueActionTypes.catalogueSuccess,
+  props<{ data: ICatalogue[] }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const catalogueSaveSuccess = createAction(
+  CatalogueActionTypes.catalogueSaveSuccess,
+  props<IResponseSuccess>(),
+);
 
-export class CatalogueSave implements Action {
-  readonly type = CatalogueActionTypes.catalogueSave;
+export const catalogueFailure = createAction(
+  CatalogueActionTypes.catalogueFailure,
+  props<{ error: IError }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const createCatalogue = createAction(
+  CatalogueActionTypes.createCatalogue,
+  props<{ catalogue: ICatalogue; resizedImageDataUrl: string }>(),
+);
 
-export class CatalogueUpdate implements Action {
-  readonly type = CatalogueActionTypes.catalogueUpdate;
+export const updateCatalogue = createAction(
+  CatalogueActionTypes.updateCatalogue,
+  props<{ catalogue: ICatalogue; resizedImageDataUrl: string }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const updateCatalogueOrder = createAction(
+  CatalogueActionTypes.updateCatalogueOrder,
+  props<{ catalogues: ICatalogueAll[] }>(),
+);
 
-export class CatalogueUpdateAll implements Action {
-  readonly type = CatalogueActionTypes.catalogueUpdateAll;
+export const catalogueSelected = createAction(
+  CatalogueActionTypes.catalogueSelected,
+  props<{ selected?: ICatalogue }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getCatalogue = createAction(
+  CatalogueActionTypes.getCatalogue,
+  props<{ id: string }>(),
+);
 
-export class CatalogueSaveSuccess implements Action {
-  readonly type = CatalogueActionTypes.catalogueSaveSuccess;
+export const deleteCatalogue = createAction(
+  CatalogueActionTypes.deleteCatalogue,
+  props<{ id: string; name: string }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getAllTreatmentsGroup = createAction(CatalogueActionTypes.getAllTreatmentsGroup);
 
-export class CatalogueFailure implements Action {
-  readonly type = CatalogueActionTypes.catalogueFailure;
+export const findGroupsSuccess = createAction(
+  CatalogueActionTypes.findGroupsSuccess,
+  props<{ groups: ITreatmentGroup[] }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
-
-export class CatalogueSelected implements Action {
-  readonly type = CatalogueActionTypes.catalogueSelected;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class CatalogueFind implements Action {
-  readonly type = CatalogueActionTypes.catalogueFind;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class DeleteCatalogue implements Action {
-  readonly type = CatalogueActionTypes.catalogueDelete;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class FindGroups implements Action {
-  readonly type = CatalogueActionTypes.findGroups;
-}
-
-export class FindGroupsSuccess implements Action {
-  readonly type = CatalogueActionTypes.findGroupsSuccess;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = CatalogueActionTypes.clean;
-}
-
-export type All =
-  | GetAll
-  | GetAllCatalogs
-  | CatalogueSave
-  | CatalogueUpdate
-  | CatalogueUpdateAll
-  | CatalogueSuccess
-  | CatalogueSaveSuccess
-  | CatalogueFailure
-  | CatalogueFind
-  | CatalogueSelected
-  | DeleteCatalogue
-  | FindGroups
-  | FindGroupsSuccess
-  | Clean;
+export const clean = createAction(CatalogueActionTypes.clean);

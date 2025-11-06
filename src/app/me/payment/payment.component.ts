@@ -1,21 +1,22 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { AppState, selectPaymentState } from '../../store/app.states';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { IPayment, IPaymentAll } from '../../interfaces/payment';
-import * as fromActionsPayment from '../../store/payment.actions';
+import { clean, getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/payment.actions';
 import { MatTableDataSource } from '@angular/material/table';
 import { Pagination } from '../../interfaces/pagination';
 import { TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../../shared/shared.module';
 import { BackButtonDirective } from '../../directives/back-button.directive';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-payment',
   templateUrl: './payment.component.html',
   styleUrls: ['./payment.component.scss'],
-  imports: [SharedModule, BackButtonDirective]
+  imports: [SharedModule, BackButtonDirective],
 })
 export class PaymentComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['position', 'description', 'type', 'amount', 'status', 'actions'];
@@ -23,25 +24,20 @@ export class PaymentComponent implements OnInit, OnDestroy {
 
   errorMessage?: string;
   showError = false;
-  language: string;
+  language!: string;
 
-  private getState: Observable<any>;
-  private subscription?: Subscription;
+  private readonly route: ActivatedRoute = inject(ActivatedRoute);
+  private readonly store: Store<AppState> = inject(Store<AppState>);
+  private readonly router: Router = inject(Router);
+  private readonly translate: TranslateService = inject(TranslateService);
+
+  private getState: Observable<any> = this.store.select(selectPaymentState);
   private id: any;
   private path: any;
-
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private router: Router,
-              translate: TranslateService) {
-    this.getState = this.store.select(selectPaymentState);
-    this.language = translate.currentLang;
-  }
-
-  get close(): void {
-    this.showError = false;
-    return;
-  }
+  private destroy$ = new Subject<void>();
 
   ngOnInit(): void {
+    this.language = this.translate.currentLang;
     this.subscribe();
     this.route.params.subscribe(routeParams => {
       this.id = routeParams.id;
@@ -51,25 +47,30 @@ export class PaymentComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  close(): void {
+    this.showError = false;
   }
 
   pay = (payment: IPaymentAll): void => {
-    if (payment.link || payment.paymentURL) {
-      this.store.dispatch(
-        new fromActionsPayment.PaymentSend(payment.link || payment.paymentURL)
-      );
+    const link = payment.link || payment.paymentURL;
+    if (link) {
+      this.store.dispatch(paymentSend({ link }));
     }
   };
 
   notify = (payment: IPayment): void => {
     this.store.dispatch(
-      new fromActionsPayment.PaymentNotify({
-        id: payment.id, resourceId: this.id,
+      notifyPayment({
+        id: payment.id!,
         path: this.path,
-        preferenceId: payment.preferenceId,
-        type: payment.type
-      })
+        resourceId: this.id,
+        preferenceId: payment.preferenceId!,
+        paymentType: payment.type!,
+      }),
     );
   };
 
@@ -85,24 +86,23 @@ export class PaymentComponent implements OnInit, OnDestroy {
 
   private getPayments = (): void => {
     if (!this.dataSource) {
-      this.store.dispatch(
-        new fromActionsPayment.PaymentFindByResourceId({ id: this.id, path: this.path, redirect: true })
-      );
+      this.store.dispatch(getPaymentByResourceId({ id: this.id, path: this.path, redirect: true }));
     }
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsPayment.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.getState.pipe(takeUntil(this.destroy$)).subscribe((state) => {
       this.dataSource = state.selected;
-      const paths = state.paths;
-      if (state.message && paths) {
+      const path = state.response?.path;
+      const errorMessage = state.subErrors?.[0]?.message;
+      if (path) {
         this.clean();
-        this.router.navigate([this.language].concat(paths));
-      } else if (state.subErrors) {
+        this.router.navigate([`${this.language}/${path}`]);
+      } else if (errorMessage) {
         this.showError = true;
-        this.errorMessage = state.subErrors;
+        this.errorMessage = errorMessage;
       }
     });
   };

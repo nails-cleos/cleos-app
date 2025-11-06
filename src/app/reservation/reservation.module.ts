@@ -55,16 +55,16 @@ import { FormFieldAdderComponent } from '../shared/form-field-adder/form-field-a
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('reservation')
+        useClass: TranslateLoaderFactory.forModule('reservation'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
-    EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects])
+    EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects]),
   ],
   providers: [
     ReservationService,
@@ -76,15 +76,15 @@ import { FormFieldAdderComponent } from '../shared/form-field-adder/form-field-a
     TrackingService,
     ColorService,
     DiscountService,
-    CurrencyService
-  ]
+    CurrencyService,
+  ],
 })
 export class ReservationModule {
   constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
     const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe(state => {
+    getI18nState.subscribe((state) => {
       translateService.currentLang = '';
-      this.translateService.use(state.data);
+      this.translateService.use(state.language);
     });
   }
 }

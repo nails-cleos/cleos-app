@@ -1,9 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { PAGE_SIZE } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { IExpense, IExpenseInfo } from '../interfaces/expense';
 import { createFilter } from '../util/service-helper';
+import { SortDirection } from '@angular/material/sort';
+import { IApiResponse } from '../interfaces/common';
 
 @Injectable()
 export class ExpenseService {
@@ -12,8 +13,8 @@ export class ExpenseService {
 
   private http: HttpClient = inject(HttpClient);
 
-  public getAll = (roomId: string, sort: string, direction: string, page: number, size: number = PAGE_SIZE,
-                   filter?: string, dateFilter?: string): Observable<IExpense[]> => {
+  public getExpensesPage = (roomId: string, sort: string, direction: SortDirection, page: number,
+    size: number, filter?: string, dateFilter?: string): Observable<IExpense[]> => {
     let params = createFilter(page, size, sort, direction, filter);
     if (dateFilter) {
       params = params.append('date', dateFilter);
@@ -22,27 +23,26 @@ export class ExpenseService {
     return this.http.get<IExpense[]>(this.updatePathVariable(roomId, ['pages']), { params });
   };
 
-  getExpenseInfo = (roomId: string): Observable<IExpenseInfo> => this.http.get<IExpenseInfo>(
-    this.updatePathVariable(roomId, ['info'])
+  getAllExpensesInfo = (roomId: string): Observable<IExpenseInfo> => this.http.get<IExpenseInfo>(
+    this.updatePathVariable(roomId, ['info']),
   );
 
-  getById = (roomId: string, id: string): Observable<IExpense | undefined> => this.http.get<IExpense>(
-    this.updatePathVariable(roomId, [id])
+  getExpense = (roomId: string, id: string): Observable<IExpense | undefined> => this.http.get<IExpense>(
+    this.updatePathVariable(roomId, [id]),
   );
 
-  add = (roomId: string, expense: IExpense): Observable<IExpense> => this.http.post<IExpense>(
+  createExpense = (roomId: string, expense: IExpense): Observable<IApiResponse> => this.http.post<IApiResponse>(
     this.updatePathVariable(roomId),
-    expense
+    expense,
   );
 
-  delete = (roomId: string, id: string): Observable<IExpense> => this.http.delete<IExpense>(
-    this.updatePathVariable(roomId, [id])
+  deleteExpense = (roomId: string, id: string): Observable<void> => this.http.delete<void>(
+    this.updatePathVariable(roomId, [id]),
   );
 
-  update = (roomId: string, expense: IExpense): Observable<IExpense> => this.http.patch<IExpense>(
-    this.updatePathVariable(roomId, [expense.id]),
-    expense
-  );
+  updateExpense = (
+    id: string, roomId: string, expense: IExpense,
+  ): Observable<IApiResponse> => this.http.patch<IApiResponse>(this.updatePathVariable(roomId, [id]), expense);
 
   private updatePathVariable(roomId: string, args?: (string | null | undefined)[]): string {
     let url = this.urlV1;

@@ -1,141 +1,136 @@
-import { All, UserActionTypes } from '../user.actions';
+import {
+  clean,
+  deleteUser,
+  disableUsersSuccess,
+  getAllCustomers,
+  getAllDisableUsers,
+  getCustomerOverview,
+  getMyUser,
+  getUser,
+  getUsersPage,
+  mergeUsers,
+  resendToken,
+  restore,
+  saveUser,
+  setRole,
+  updateMyPhoto,
+  updateMyUser,
+  userFailure,
+  userSaveSuccess,
+  userSelected,
+  userSuccess,
+} from '../user.actions';
 import { IOverview, IUser, IUserAll } from '../../interfaces/user';
 import { Pagination } from '../../interfaces/pagination';
+import { IError, IResponseSuccess } from '../../interfaces/common';
+import { createReducer, on } from '@ngrx/store';
 
 export interface State {
-  data: IUser | IUserAll[] | Pagination<IUser> | IOverview | null;
-  users: IUserAll[] | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  selected: IUser | null;
-  message: string | null;
+  response?: IResponseSuccess;
+  data?: IUser[] | Pagination<IUser> | IOverview;
+  users?: IUser[];
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
+  selected?: IUser;
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  data: null,
-  users: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  selected: null,
-  message: null,
-  isLoading: false
+  data: undefined,
+  users: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  selected: undefined,
+  response: undefined,
+  isLoading: false,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case UserActionTypes.getAll: {
-      return {
-        ...state,
-        data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IUser>,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case UserActionTypes.getAllCustomers: {
-      return {
-        ...state,
-        data: [] as IUserAll[],
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case UserActionTypes.userOverview:
-    case UserActionTypes.findMe:
-    case UserActionTypes.findUser: {
-      return {
-        ...state,
-        data: {},
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case UserActionTypes.userSuccess: {
-      return {
-        ...state,
-        data: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case UserActionTypes.userSelected: {
-      return {
-        ...state,
-        selected: action.payload.user,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case UserActionTypes.userSaveSuccess: {
-      return {
-        ...state,
-        message: action.payload.message,
-        selected: null,
-        errorMessage: null,
-        subErrors: null,
-        isLoading: false
-      };
-    }
-    case UserActionTypes.userFailure: {
-      return {
-        ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
-        message: null,
-        isLoading: false
-      };
-    }
-    case UserActionTypes.mergeUsers:
-    case UserActionTypes.setRole:
-    case UserActionTypes.saveUser:
-    case UserActionTypes.updateUser:
-    case UserActionTypes.updatePhoto:
-    case UserActionTypes.resendUserToken:
-    case UserActionTypes.userRestore:
-    case UserActionTypes.userDelete: {
-      return {
-        ...state,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
-        isLoading: true
-      };
-    }
-    case UserActionTypes.getAllDisableUsers: {
-      return {
-        ...state,
-        users: [] as IUserAll[],
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case UserActionTypes.disableUsersSuccess: {
-      return {
-        ...state,
-        users: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case UserActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const userReducer = createReducer(
+  initialState,
+  on(getUsersPage, (state) => ({
+    ...state,
+    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IUser>,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getAllCustomers, (state) => ({
+    ...state,
+    data: [] as IUserAll[],
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getCustomerOverview, (state) => ({
+    ...state,
+    data: {} as IOverview,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getMyUser, getUser, (state) => ({
+    ...state,
+    selected: {},
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(userSuccess, (state, { data }) => ({
+    ...state,
+    data: data,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(userSelected, (state, { selected }) => ({
+    ...state,
+    selected: selected,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(userSaveSuccess, (state, action) => ({
+    ...state,
+    response: action,
+    selected: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    isLoading: false,
+  })),
+  on(userFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error: error,
+    subErrors: error.subErrors,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(mergeUsers, setRole, saveUser, updateMyUser, updateMyPhoto, resendToken, restore, deleteUser, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(getAllDisableUsers, (state) => ({
+    ...state,
+    users: [] as IUserAll[],
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(disableUsersSuccess, (state, { users }) => ({
+    ...state,
+    users: users,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(clean, () => initialState),
+);

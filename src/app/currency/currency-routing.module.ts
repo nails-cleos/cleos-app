@@ -8,24 +8,24 @@ import { CurrencyListComponent } from './list/currency-list.component';
 const routes: Routes = [
   {
     path: '', component: CurrencyListComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin]
-    }
+      roles: [Role.admin],
+    },
   },
   {
     path: 'add', component: CurrencyComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin]
-    }
+      roles: [Role.admin],
+    },
   },
   {
     path: ':id', component: CurrencyComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin]
-    }
-  }
+      roles: [Role.admin],
+    },
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class CurrencyRoutingModule {
 }

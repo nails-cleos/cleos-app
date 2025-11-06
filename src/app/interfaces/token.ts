@@ -1,8 +1,9 @@
-import { IUser } from './user';
+import { IMenu, IUser } from './user';
 
 export interface Token {
   tokenAccess: string;
   user: IUser;
+  menus: IMenu[];
 }
 
 export enum Role {

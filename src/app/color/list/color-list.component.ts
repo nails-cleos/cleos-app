@@ -10,7 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectColorState } from '../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import * as fromActionsColor from '../../store/color.actions';
+import { clean, colorSelected, deleteColor, getColorsPage } from '../../store/color.actions';
 import { executeDialogNoWidth } from '../../util/helper';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { detailExpandAnimation } from '../../util/animation';
@@ -21,7 +21,7 @@ import { SharedModule } from '../../shared/shared.module';
   templateUrl: './color-list.component.html',
   styleUrls: ['./color-list.component.scss'],
   animations: [detailExpandAnimation],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -44,7 +44,7 @@ export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
               private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
-      Breakpoints.Small
+      Breakpoints.Small,
     ]).subscribe(result => {
       if (result.matches) {
         this.pageSize = MOBILE_PAGE_SIZE;
@@ -68,7 +68,7 @@ export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
   }
 
-  edit = (color: IColor): void => this.store.dispatch(new fromActionsColor.ColorSelected(color));
+  edit = (selected: IColor): void => this.store.dispatch(colorSelected({ selected }));
 
   delete = (color: IColor): void => {
     const title = this.translate.instant('COLOR.DELETED.TITLE');
@@ -76,14 +76,12 @@ export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: color }, result => {
       if (result) {
-        this.store.dispatch(
-          new fromActionsColor.DeleteColor(result)
-        );
+        this.store.dispatch(deleteColor({ id: result.id, name: result.name }));
       }
     });
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsColor.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe(() => {
@@ -96,17 +94,17 @@ export class ColorListComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private getColorList = (page: number = 0): void => this.store.dispatch(
-    new fromActionsColor.GetAll({
-      active: this.sort.active,
+    getColorsPage({
+      page: page,
+      sort: this.sort.active,
       direction: this.sort.direction,
       size: this.pageSize,
-      page
-    })
+    }),
   );
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {
-      if (state.message) {
+      if (state.response) {
         this.clean();
         this.getColorList();
       }

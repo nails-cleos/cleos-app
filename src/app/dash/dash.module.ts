@@ -49,16 +49,16 @@ import { TotalSummaryItemComponent } from './total-summary-item/total-summary-it
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('dashboard')
+        useClass: TranslateLoaderFactory.forModule('dashboard'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
-    EffectsModule.forFeature([DashboardEffects, ReservationEffects])
+    EffectsModule.forFeature([DashboardEffects, ReservationEffects]),
   ],
   providers: [
     DashboardService,
@@ -69,16 +69,16 @@ import { TotalSummaryItemComponent } from './total-summary-item/total-summary-it
     UserService,
     AdditionalService,
     TrackingService,
-    ColorService
-  ]
+    ColorService,
+  ],
 })
 export class DashModule {
 
   constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
     const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe(state => {
+    getI18nState.subscribe((state) => {
       translateService.currentLang = '';
-      this.translateService.use(state.data);
+      this.translateService.use(state.language);
     });
   }
 }

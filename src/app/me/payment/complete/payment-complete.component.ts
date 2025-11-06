@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { AppState, selectPaymentState } from '../../../store/app.states';
 import { Store } from '@ngrx/store';
-import * as fromActionsPayment from '../../../store/payment.actions';
+import { paymentNotComplete, paymentSave } from '../../../store/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { PaymentStatus, PaymentType } from '../../../interfaces/payment';
 import { SharedModule } from '../../../shared/shared.module';
@@ -12,7 +12,7 @@ import { SharedModule } from '../../../shared/shared.module';
   selector: 'app-payment-complete',
   templateUrl: './payment-complete.component.html',
   styleUrls: ['./payment-complete.component.scss'],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewInit {
   private subscription?: Subscription;
@@ -26,11 +26,11 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
   private reason: any;
   private orderId: any;
   private orderStatusId: any;
-  private path: string | null = 'reservation';
+  private path: 'reservation' | 'transaction' = 'reservation';
   private readonly language: string;
 
   constructor(private route: ActivatedRoute, private router: Router, private store: Store<AppState>,
-              private translate: TranslateService) {
+    private translate: TranslateService) {
     this.getState = this.store.select(selectPaymentState);
     this.route.queryParams.subscribe(params => {
       this.paymentId = params.payment_id || params.paymentId;
@@ -56,7 +56,10 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
     setTimeout(() => {
       this.id = this.route.snapshot.paramMap.get('id');
       let status = this.route.snapshot.paramMap.get('status');
-      this.path = this.route.snapshot.paramMap.get('path');
+      const pathParam = this.route.snapshot.paramMap.get('path');
+      if (pathParam === 'reservation' || pathParam === 'transaction') {
+        this.path = pathParam;
+      }
       // TODO analytic payment option
       let type;
       let referenceId;
@@ -85,22 +88,21 @@ export class PaymentCompleteComponent implements OnInit, OnDestroy, AfterViewIni
       if (!type || !referenceId) {
         const message = this.translate.instant('ME.PAYMENT.ERROR', { reason: 'incomplete' });
         this.store.dispatch(
-          new fromActionsPayment.PaymentNotComplete({ message })
+          paymentNotComplete({ subError: [{ message }] }),
         );
         // this.router.navigate([this.language, 'me', this.path, this.id, 'payment']);
         return;
       }
       const paymentStatus = new PaymentStatus(this.paymentId, type, referenceId, this.reason);
-      this.store.dispatch(
-        new fromActionsPayment.PaymentSave({ id: this.id, path: this.path, status, paymentStatus })
-      );
+      this.store.dispatch(paymentSave({ id: this.id, path: this.path!, status: status!, paymentStatus }));
     }, 500);
   }
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
-      if (state.paths) {
-        this.router.navigate([this.language].concat(state.paths));
+    this.subscription = this.getState.subscribe((state) => {
+      const path = state.response?.path;
+      if (path) {
+        this.router.navigate([`${ this.language }/${ path }`]);
       } else if (state.subErrors) {
         this.router.navigate([this.language, 'me', this.path, this.id, 'payment']);
       }

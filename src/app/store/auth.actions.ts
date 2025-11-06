@@ -1,84 +1,57 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
+import { Params } from '@angular/router';
+import { IError, IResponseSuccess } from '../interfaces/common';
+import { Token } from '../interfaces/token';
 
-export enum AuthActionTypes {
+enum AuthActionTypes {
   login = '[Auth] Login',
-  refreshToken = '[Auth] Refresh token',
   redirect = '[Auth] Redirect',
   loginSuccess = '[Auth] Login Success',
   loginFailure = '[Auth] Login Failure',
   signupSuccess = '[Auth] Signup Success',
   signupFailure = '[Auth] Signup Failure',
-  logout = '[Auth] Logout',
+  logOut = '[Auth] Logout',
   reLogin = '[Auth] Re login',
   clean = '[Auth] Clean'
 }
 
-export class Login implements Action {
-  readonly type = AuthActionTypes.login;
+export const login = createAction(
+  AuthActionTypes.login,
+  props<{ token: string, queryParams: Params, theme: string, code: string | null }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const redirect = createAction(
+  AuthActionTypes.redirect,
+);
 
-export class RefreshToken implements Action {
-  readonly type = AuthActionTypes.refreshToken;
+export const loginSuccess = createAction(
+  AuthActionTypes.loginSuccess,
+  props<{ token: Token, queryParams: Params, redirect?: boolean }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const loginFailure = createAction(
+  AuthActionTypes.loginFailure,
+  props<{ error: IError }>(),
+);
 
-export class Redirect implements Action {
-  readonly type = AuthActionTypes.redirect;
-}
+export const signupSuccess = createAction(
+  AuthActionTypes.signupSuccess,
+  props<IResponseSuccess>(),
+);
 
-export class LoginSuccess implements Action {
-  readonly type = AuthActionTypes.loginSuccess;
+export const signupFailure = createAction(
+  AuthActionTypes.signupFailure,
+  props<{ error: IError }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const logOut = createAction(
+  AuthActionTypes.logOut,
+);
 
-export class LoginFailure implements Action {
-  readonly type = AuthActionTypes.loginFailure;
+export const reLogin = createAction(
+  AuthActionTypes.reLogin,
+);
 
-  constructor(public payload: any) {
-  }
-}
-
-export class SignUpSuccess implements Action {
-  readonly type = AuthActionTypes.signupSuccess;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class SignUpFailure implements Action {
-  readonly type = AuthActionTypes.signupFailure;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class LogOut implements Action {
-  readonly type = AuthActionTypes.logout;
-}
-
-export class ReLogin implements Action {
-  readonly type = AuthActionTypes.reLogin;
-}
-
-export class Clean implements Action {
-  readonly type = AuthActionTypes.clean;
-}
-
-export type All =
-  | Login
-  | LoginSuccess
-  | RefreshToken
-  | Redirect
-  | LoginFailure
-  | SignUpSuccess
-  | SignUpFailure
-  | LogOut
-  | ReLogin
-  | Clean;
+export const clean = createAction(
+  AuthActionTypes.clean,
+);

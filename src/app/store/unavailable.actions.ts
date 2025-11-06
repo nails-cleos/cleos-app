@@ -1,126 +1,95 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
+import { Pagination } from '../interfaces/pagination';
+import { IUnavailable } from '../interfaces/unavailable';
+import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { IUser } from '../interfaces/user';
+import { IRoom } from '../interfaces/room';
 
-export enum UnavailableActionTypes {
-  getAll = '[Unavailable] Get all',
+enum UnavailableActionTypes {
+  getUnavailablePage = '[Unavailable] Get unavailable page',
   unavailableSuccess = '[Unavailable] Success',
   getAllProfessional = '[Unavailable] Get all professional',
-  getRoom = '[Unavailable] Get room',
+  getAllRoomsByProfessionalId = '[Unavailable] Get all rooms by professional id',
   roomSuccess = '[Unavailable] Get room success',
-  unavailableSave = '[Unavailable] Save',
-  unavailableBlockAgenda = '[Unavailable] Block agenda',
-  unavailableUpdate = '[Unavailable] Update',
+  professionalSuccess = '[Unavailable] Get professional success',
+  createUnavailable = '[Unavailable] Create unavailable',
+  createBlockAgenda = '[Unavailable] Create block agenda',
+  updateUnavailable = '[Unavailable] Update unavailable by id',
   unavailableSaveSuccess = '[Unavailable] Save Success',
   unavailableFailure = '[Unavailable] Failure',
   unavailableSelected = '[Unavailable] Selected',
-  unavailableFind = '[Unavailable] Find',
-  unavailableDelete = '[Unavailable] Delete',
+  getUnavailable = '[Unavailable] Find unavailable by id',
+  deleteUnavailable = '[Unavailable] Delete unavailable by id',
   clean = '[Unavailable] Clean'
 }
 
-export class GetAll implements Action {
-  readonly type = UnavailableActionTypes.getAll;
+export const getUnavailablePage = createAction(
+  UnavailableActionTypes.getUnavailablePage,
+  props<PageRequest>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getAllProfessional = createAction(
+  UnavailableActionTypes.getAllProfessional,
+);
 
-export class GetAllProfessional implements Action {
-  readonly type = UnavailableActionTypes.getAllProfessional;
-}
+export const getAllRoomsByProfessionalId = createAction(
+  UnavailableActionTypes.getAllRoomsByProfessionalId,
+  props<{ professionalId: string }>(),
+);
 
-export class GetRoom implements Action {
-  readonly type = UnavailableActionTypes.getRoom;
+export const unavailableSuccess = createAction(
+  UnavailableActionTypes.unavailableSuccess,
+  props<{ data: Pagination<IUnavailable> }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const roomSuccess = createAction(
+  UnavailableActionTypes.roomSuccess,
+  props<{ rooms: IRoom[] }>(),
+);
 
-export class UnavailableSuccess implements Action {
-  readonly type = UnavailableActionTypes.unavailableSuccess;
+export const professionalSuccess = createAction(
+  UnavailableActionTypes.professionalSuccess,
+  props<{ professionals: IUser[] }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const createUnavailable = createAction(
+  UnavailableActionTypes.createUnavailable,
+  props<{ unavailable: IUnavailable }>(),
+);
 
-export class RoomSuccess implements Action {
-  readonly type = UnavailableActionTypes.roomSuccess;
+export const createBlockAgenda = createAction(
+  UnavailableActionTypes.createBlockAgenda,
+  props<{ unavailable: IUnavailable }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const updateUnavailable = createAction(
+  UnavailableActionTypes.updateUnavailable,
+  props<{ id: string; unavailable: IUnavailable; path: string }>(),
+);
 
-export class UnavailableSave implements Action {
-  readonly type = UnavailableActionTypes.unavailableSave;
+export const unavailableSaveSuccess = createAction(
+  UnavailableActionTypes.unavailableSaveSuccess,
+  props<ResponseSuccess>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const unavailableFailure = createAction(
+  UnavailableActionTypes.unavailableFailure,
+  props<{ error: IError }>(),
+);
 
-export class BlockAgenda implements Action {
-  readonly type = UnavailableActionTypes.unavailableBlockAgenda;
+export const unavailableSelected = createAction(
+  UnavailableActionTypes.unavailableSelected,
+  props<{ selected?: IUnavailable }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getUnavailable = createAction(
+  UnavailableActionTypes.getUnavailable,
+  props<{ id: string }>(),
+);
 
-export class UnavailableUpdate implements Action {
-  readonly type = UnavailableActionTypes.unavailableUpdate;
+export const deleteUnavailable = createAction(
+  UnavailableActionTypes.deleteUnavailable,
+  props<{ id: string; timestamp: number; timeZone?: string }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
-
-export class UnavailableSaveSuccess implements Action {
-  readonly type = UnavailableActionTypes.unavailableSaveSuccess;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class UnavailableFailure implements Action {
-  readonly type = UnavailableActionTypes.unavailableFailure;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class UnavailableSelected implements Action {
-  readonly type = UnavailableActionTypes.unavailableSelected;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class UnavailableFind implements Action {
-  readonly type = UnavailableActionTypes.unavailableFind;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class DeleteUnavailable implements Action {
-  readonly type = UnavailableActionTypes.unavailableDelete;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = UnavailableActionTypes.clean;
-}
-
-export type All =
-  | GetAll
-  | GetAllProfessional
-  | GetRoom
-  | UnavailableSave
-  | BlockAgenda
-  | UnavailableUpdate
-  | UnavailableSuccess
-  | RoomSuccess
-  | UnavailableSaveSuccess
-  | UnavailableFailure
-  | UnavailableFind
-  | UnavailableSelected
-  | DeleteUnavailable
-  | Clean;
+export const clean = createAction(UnavailableActionTypes.clean);

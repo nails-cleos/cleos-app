@@ -1,10 +1,10 @@
 <div class="fab-menu" [class.open]="menuOpen">
-  <button mat-fab color="primary" (click)="toggleMenu" [@iconChange]="menuOpen ? 'open' : 'closed'">
+  <button mat-fab color="primary" (click)="toggleMenu()" [@iconChange]="menuOpen ? 'open' : 'closed'">
     <mat-icon>all_out</mat-icon>
   </button>
   @if (menuOpen) {
     <div class="menu-items" [@listAnimation]="fabMenus.length">
-      @for (item of fabMenus; track item) {
+      @for (item of fabMenus; track item.icon) {
         <button mat-fab (click)="handleMenuItemClick(item)" matTooltip="{{ item.tooltip }}" [color]="item.color"
                 matTooltipPosition="left">
           <mat-icon>{{ item.icon }}</mat-icon>

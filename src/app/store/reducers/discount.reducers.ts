@@ -1,167 +1,152 @@
 import { Pagination } from '../../interfaces/pagination';
-import { All, DiscountActionTypes } from '../discount.actions';
+import {
+  clean,
+  createDiscount,
+  currencySuccess,
+  deleteDiscount,
+  discountFailure,
+  discountSaveSuccess,
+  discountSelected,
+  discountSuccess,
+  getAllCurrency,
+  getDiscount,
+  getDiscountsPage,
+  getMyDiscountsPage,
+  getMyReferrals,
+  getUserDiscountByCustomerId,
+  referralSuccess,
+  sendDiscountToCustomers,
+  updateDiscount,
+} from '../discount.actions';
 import { IDiscount, IReferral, IUserDiscount } from '../../interfaces/discount';
 import { ICurrency } from '../../interfaces/currency';
+import { IError, IResponseSuccess } from '../../interfaces/common';
+import { createReducer, on } from '@ngrx/store';
 
 export interface State {
-  data: IDiscount | Pagination<IDiscount> | Pagination<IUserDiscount> | IUserDiscount[] | null;
-  referrals: IReferral[] | null;
-  currencies: ICurrency[] | null;
-  errorMessage: string | null;
-  error: any;
-  subErrors: any;
-  selected: IDiscount | null;
-  message: string | null;
+  response?: IResponseSuccess;
+  data: IDiscount | Pagination<IDiscount> | Pagination<IUserDiscount> | IUserDiscount[] | undefined;
+  referrals?: IReferral[];
+  currencies?: ICurrency[];
+  errorMessage?: string;
+  error?: IError;
+  subErrors?: IError[];
+  selected?: IDiscount;
   isLoading: boolean;
 }
 
 export const initialState: State = {
-  data: null,
-  referrals: null,
-  currencies: null,
-  errorMessage: null,
-  error: null,
-  subErrors: null,
-  selected: null,
-  message: null,
-  isLoading: false
+  data: undefined,
+  referrals: undefined,
+  currencies: undefined,
+  errorMessage: undefined,
+  error: undefined,
+  subErrors: undefined,
+  selected: undefined,
+  response: undefined,
+  isLoading: false,
 };
 
-export const reducer = (state = initialState, action: All): State => {
-  switch (action.type) {
-    case DiscountActionTypes.getMyDiscounts:
-    case DiscountActionTypes.getAll: {
-      return {
-        ...state,
-        data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IDiscount>,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case DiscountActionTypes.getReferrals: {
-      return {
-        ...state,
-        referrals: [],
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case DiscountActionTypes.getCurrencies: {
-      return {
-        ...state,
-        currencies: [],
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case DiscountActionTypes.addDiscount: {
-      return {
-        ...state,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null,
-        isLoading: true
-      };
-    }
-    case DiscountActionTypes.discountFind: {
-      return {
-        ...state,
-        data: {} as IDiscount,
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case DiscountActionTypes.discountFindByCustomer: {
-      return {
-        ...state,
-        data: [],
-        errorMessage: null,
-        subErrors: null,
-        selected: null,
-        message: null
-      };
-    }
-    case DiscountActionTypes.discountSuccess: {
-      return {
-        ...state,
-        data: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case DiscountActionTypes.referralSuccess: {
-      return {
-        ...state,
-        referrals: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case DiscountActionTypes.currencySuccess: {
-      return {
-        ...state,
-        currencies: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case DiscountActionTypes.discountSaveSuccess: {
-      return {
-        ...state,
-        message: action.payload.message,
-        selected: null,
-        errorMessage: null,
-        subErrors: null,
-        isLoading: false
-      };
-    }
-    case DiscountActionTypes.discountSelected: {
-      return {
-        ...state,
-        selected: action.payload,
-        errorMessage: null,
-        subErrors: null,
-        message: null
-      };
-    }
-    case DiscountActionTypes.discountFailure: {
-      return {
-        ...state,
-        errorMessage: action.payload.error.message,
-        error: action.payload.error,
-        subErrors: action.payload.error.subErrors,
-        message: null,
-        isLoading: false
-      };
-    }
-    case DiscountActionTypes.discountUpdate:
-    case DiscountActionTypes.discountSave:
-    case DiscountActionTypes.discountDelete: {
-      return {
-        ...state,
-        errorMessage: null,
-        subErrors: null,
-        message: null,
-        isLoading: true
-      };
-    }
-    case DiscountActionTypes.clean: {
-      return initialState;
-    }
-    default: {
-      return state;
-    }
-  }
-};
+export const discountReducer = createReducer(
+  initialState,
+  on(getMyDiscountsPage, getDiscountsPage, (state) => ({
+    ...state,
+    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IDiscount>,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getMyReferrals, (state) => ({
+    ...state,
+    referrals: [],
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getAllCurrency, (state) => ({
+    ...state,
+    currencies: [],
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(sendDiscountToCustomers, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(getDiscount, (state) => ({
+    ...state,
+    data: {} as IDiscount,
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(getUserDiscountByCustomerId, (state) => ({
+    ...state,
+    data: [],
+    errorMessage: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
+  on(discountSuccess, (state, { data }) => ({
+    ...state,
+    data: data,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(referralSuccess, (state, { referrals }) => ({
+    ...state,
+    referrals: referrals,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(currencySuccess, (state, { currencies }) => ({
+    ...state,
+    currencies: currencies,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(discountSaveSuccess, (state, action) => ({
+    ...state,
+    response: action,
+    selected: undefined,
+    errorMessage: undefined,
+    subErrors: undefined,
+    isLoading: false,
+  })),
+  on(discountSelected, (state, { selected }) => ({
+    ...state,
+    selected: selected,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(discountFailure, (state, { error }) => ({
+    ...state,
+    errorMessage: error.message,
+    error: error,
+    subErrors: error.subErrors,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(updateDiscount, createDiscount, deleteDiscount, (state) => ({
+    ...state,
+    errorMessage: undefined,
+    subErrors: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(clean, () => initialState),
+);

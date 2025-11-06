@@ -1,21 +1,12 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
 
-export enum I18nActionTypes {
+enum I18nActionTypes {
   getLanguage = '[Language] Get',
   setLanguage = '[Language] Set'
 }
 
-export class GetLanguage implements Action {
-  readonly type = I18nActionTypes.getLanguage;
-}
-
-export class SetLanguage implements Action {
-  readonly type = I18nActionTypes.setLanguage;
-
-  constructor(public payload: any) {
-  }
-}
-
-export type All =
-  | GetLanguage
-  | SetLanguage;
+export const getLanguage = createAction(I18nActionTypes.getLanguage);
+export const setLanguage = createAction(
+  I18nActionTypes.setLanguage,
+  props<{ language: string }>(),
+);

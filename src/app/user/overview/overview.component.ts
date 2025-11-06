@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import { getDisplayNameInitials, getUserImage } from '../../util/helper';
 import { Observable, Subscription } from 'rxjs';
-import * as fromActionsUser from '../../store/user.actions';
+import { getCustomerOverview } from '../../store/user.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IReservationOverview } from '../../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
@@ -25,7 +25,7 @@ import { BackButtonDirective } from '../../directives/back-button.directive';
   selector: 'app-overview',
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.scss'],
-  imports: [SharedModule, ErrorComponent, CardComponent, ChartComponent, GoogleMapComponent, BackButtonDirective]
+  imports: [SharedModule, ErrorComponent, CardComponent, ChartComponent, GoogleMapComponent, BackButtonDirective],
 })
 export class OverviewComponent implements OnInit, OnDestroy {
   error: any;
@@ -42,7 +42,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
 
   layout = this.breakpointObserver.observe([
     Breakpoints.XSmall,
-    Breakpoints.Small
+    Breakpoints.Small,
   ]).pipe(
     map((r) => {
       if (r.matches) {
@@ -51,7 +51,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
           miniCardInfo: { cols: 1, rows: 2 },
           miniCardAccount: { cols: 1, rows: 1 },
           miniCard: { cols: 1, rows: 1 },
-          chart: { cols: 1, rows: 2 }
+          chart: { cols: 1, rows: 2 },
         };
       }
 
@@ -60,9 +60,9 @@ export class OverviewComponent implements OnInit, OnDestroy {
         miniCardInfo: { cols: 2, rows: 2 },
         miniCardAccount: { cols: 1, rows: 1 },
         miniCard: { cols: 1, rows: 1 },
-        chart: { cols: 2, rows: 2 }
+        chart: { cols: 2, rows: 2 },
       };
-    })
+    }),
   );
 
   private subscription?: Subscription;
@@ -71,8 +71,8 @@ export class OverviewComponent implements OnInit, OnDestroy {
   private hasAdminRole: boolean;
 
   constructor(private breakpointObserver: BreakpointObserver, private route: ActivatedRoute,
-              private store: Store<AppState>,
-              private translate: TranslateService, private router: Router, private authUserService: AuthUserService) {
+    private store: Store<AppState>, private translate: TranslateService, private router: Router,
+    private authUserService: AuthUserService) {
     this.getState = this.store.select(selectUserState);
     this.language = this.translate.currentLang;
     this.hasAdminRole = false;
@@ -108,7 +108,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
       message += this.translate.instant('WHATSAPP.SEND.ATTENTION');
     }
     const userPhone = this.customer?.phone;
-    window.open(`https://api.whatsapp.com/send?phone=+${ userPhone }&text=${ message }`, '_blank');
+    window.open(`https://api.whatsapp.com/send?phone=+${userPhone}&text=${message}`, '_blank');
     return;
   }
 
@@ -125,9 +125,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
   private getUserOverview = (): void => {
     if (!this.account) {
       const id = this.route.snapshot.paramMap.get('id');
-      this.store.dispatch(
-        new fromActionsUser.UserOverview(id)
-      );
+      this.store.dispatch(getCustomerOverview({ id }));
     }
   };
 
@@ -146,7 +144,7 @@ export class OverviewComponent implements OnInit, OnDestroy {
             if (ro.primaryId || ro.secondaryId) {
               return Object.assign({}, ro, {
                 link: (id: string | undefined) => !id ||
-                  this.router.navigate([this.translate.currentLang, 'reservation', id])
+                  this.router.navigate([this.translate.currentLang, 'reservation', id]),
               });
             }
             return ro;

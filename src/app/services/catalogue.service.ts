@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
 import { dataURLToBlob } from '../util/file';
 import { toUrl } from '../util/helper';
+import { IApiResponse } from '../interfaces/common';
 
 @Injectable()
 export class CatalogueService {
@@ -13,15 +14,17 @@ export class CatalogueService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getAll = (): Observable<ICatalogue[]> => this.http.get<ICatalogue[]>(this.urlV1);
+  getAllCatalogues = (): Observable<ICatalogue[]> => this.http.get<ICatalogue[]>(this.urlV1);
 
-  getAllCatalogs = (): Observable<ICatalogue[]> => this.getCatalogue('catalog');
+  getAllCatalogs = (): Observable<ICatalogue[]> => this.findCatalogue('catalog');
 
-  getAllHome = (): Observable<ICatalogue[]> => this.getCatalogue('home');
+  getAllHome = (): Observable<ICatalogue[]> => this.findCatalogue('home');
 
-  getById = (id: string): Observable<ICatalogue | undefined> => this.http.get<ICatalogue>(toUrl(this.urlV1, id));
+  getCatalogue = (id: string): Observable<ICatalogue | undefined> => this.http.get<ICatalogue>(
+    toUrl(this.urlV1, id),
+  );
 
-  add = (catalogue: any, resizedImageDataUrl: string): Observable<ICatalogue> => {
+  createCatalogue = (catalogue: ICatalogue, resizedImageDataUrl: string): Observable<IApiResponse> => {
     const fileBlob = dataURLToBlob(resizedImageDataUrl);
     const formData = new FormData();
     formData.append('file', fileBlob, 'resized-image.jpg');
@@ -29,12 +32,12 @@ export class CatalogueService {
     formData.append('catalogue', blob);
 
     const headers = new HttpHeaders().set('Upload', 'true');
-    return this.http.post<ICatalogue>(this.urlV1, formData, { headers });
+    return this.http.post<IApiResponse>(this.urlV1, formData, { headers });
   };
 
-  delete = (id: string): Observable<ICatalogue> => this.http.delete<ICatalogue>(toUrl(this.urlV1, id));
+  deleteCatalogue = (id: string): Observable<ICatalogue> => this.http.delete<ICatalogue>(toUrl(this.urlV1, id));
 
-  update = (catalogue: ICatalogue, resizedImageDataUrl: string): Observable<ICatalogue> => {
+  updateCatalogue = (catalogue: ICatalogue, resizedImageDataUrl: string): Observable<IApiResponse> => {
     const url = `${ this.urlV1 }/${ catalogue.id }`;
     const fileBlob = dataURLToBlob(resizedImageDataUrl);
     const formData = new FormData();
@@ -43,24 +46,24 @@ export class CatalogueService {
     const blob = new Blob([JSON.stringify(catalogue)], { type: 'application/json' });
     formData.append('catalogue', blob);
     const headers = new HttpHeaders().set('Upload', 'true');
-    return this.http.patch<ICatalogue>(url, formData, { headers });
+    return this.http.patch<IApiResponse>(url, formData, { headers });
   };
 
-  updateAll = (catalogues: ICatalogueAll[]): Observable<ICatalogueAll[]> => {
+  updateCatalogueOrder = (catalogues: ICatalogueAll[]): Observable<void> => {
     let data: ICatalogue[] = [];
     catalogues.map((value, index) => {
       const catalogue = {
         id: value.id,
-        order: index
+        order: index,
       } as ICatalogue;
       data = [...data, catalogue];
     });
 
-    return this.http.put<ICatalogueAll[]>(`${ this.urlV1 }/order`, data);
+    return this.http.put<void>(`${ this.urlV1 }/order`, data);
   };
 
-  private getCatalogue = (key: string) => this.http.get<ICatalogue[]>(
+  private findCatalogue = (key: string) => this.http.get<ICatalogue[]>(
     this.urlV1,
-    { params: new HttpParams().set(key, String(true)) }
+    { params: new HttpParams().set(key, String(true)) },
   );
 }

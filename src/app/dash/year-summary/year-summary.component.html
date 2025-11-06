@@ -34,7 +34,7 @@
 
 @if (!isLoading) {
   @if (date.value) {
-    <button [class.spinner]="isExportLoading" (click)="exportAction"
+    <button [class.spinner]="isExportLoading" (click)="exportAction()"
             [disabled]="isExportLoading || (export && (!yearExport || sheetData.length === 0))" color="accent"
             mat-fab extended style="width: 100%; margin: 10px">
       <ng-container>

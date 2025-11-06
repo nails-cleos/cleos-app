@@ -8,24 +8,24 @@ import { CatalogueComponent } from './catalogue.component';
 const routes: Routes = [
   {
     path: '', component: CataloguesComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin]
-    }
+      roles: [Role.admin],
+    },
   },
   {
     path: 'add', component: CatalogueComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin]
-    }
+      roles: [Role.admin],
+    },
   },
   {
     path: ':id', component: CatalogueComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin]
-    }
-  }
+      roles: [Role.admin],
+    },
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class CatalogueRoutingModule {
 }

@@ -8,7 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../../store/app.states';
-import * as fromActionsUnavailable from '../../store/unavailable.actions';
+import { clean, deleteUnavailable, getUnavailablePage, unavailableSelected } from '../../store/unavailable.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { isSameTimeZone, newDateTimestamp } from '../../util/dates';
 import { IUnavailable, IUnavailableAll } from '../../interfaces/unavailable';
@@ -24,7 +24,7 @@ import { DurationTimePipe } from '../../pipes/durationTime.pipe';
   templateUrl: './unavailable-list.component.html',
   styleUrls: ['./unavailable-list.component.scss'],
   animations: [detailExpandAnimation],
-  imports: [SharedModule, TimeDetailPipe, DurationTimePipe]
+  imports: [SharedModule, TimeDetailPipe, DurationTimePipe],
 })
 export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -47,10 +47,10 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
+    private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
-      Breakpoints.Small
+      Breakpoints.Small,
     ]).subscribe(result => {
       if (result.matches) {
         this.pageSize = MOBILE_PAGE_SIZE;
@@ -75,22 +75,20 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
     this.paginatorSubscription?.unsubscribe();
   }
 
-  edit = (unavailable: IUnavailable): void => this.store.dispatch(
-    new fromActionsUnavailable.UnavailableSelected(unavailable)
-  );
+  edit = (selected: IUnavailable): void => this.store.dispatch(unavailableSelected({ selected }));
 
   delete = (unavailable: IUnavailable): void => {
     const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
     const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT',
       { date: newDateTimestamp(unavailable.timestamp) });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: unavailable }
+      data: { title, content, value: unavailable },
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsUnavailable.DeleteUnavailable(result)
+          deleteUnavailable({ id: result.id, timestamp: result.timestamp, timeZone: result.timeZone }),
         );
       }
     });
@@ -105,7 +103,7 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
     createDialog('PROFESSIONAL_INFO', name, this.dateFormat, this.translate, this.dialog, timeZone, time);
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsUnavailable.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe(() => {
@@ -119,18 +117,18 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
   };
 
   private getUnavailableList = (page: number = 0): void => this.store.dispatch(
-    new fromActionsUnavailable.GetAll({
-      active: this.sort.active,
+    getUnavailablePage({
+      page,
+      sort: this.sort.active,
       direction: this.sort.direction,
       size: this.pageSize,
-      page
-    })
+    }),
   );
 
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {
-      if (state.message) {
+      if (state.response) {
         this.clean();
         this.getUnavailableList();
       }

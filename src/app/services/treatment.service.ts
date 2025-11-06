@@ -1,11 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ITreatment, ITreatmentAll, ITreatmentDiscountDTO, ITreatmentGroup } from '../interfaces/treatment';
-import { PAGE_SIZE } from '../interfaces/pagination';
+import { ITreatmentAll, ITreatmentDiscountDTO, ITreatmentGroup } from '../interfaces/treatment';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
+import { SortDirection } from '@angular/material/sort';
+import { Pagination } from '../interfaces/pagination';
+import { IApiResponse } from '../interfaces/common';
 
 @Injectable()
 export class TreatmentService {
@@ -15,18 +17,18 @@ export class TreatmentService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getAll = (
-    sort: string,
-    direction: string,
+  getTreatmentsPage = (
     page: number,
-    size: number = PAGE_SIZE
-  ): Observable<ITreatmentGroup[]> => this.http.get<ITreatmentGroup[]>(
+    sort: string,
+    direction: SortDirection,
+    size: number,
+  ): Observable<Pagination<ITreatmentGroup>> => this.http.get<Pagination<ITreatmentGroup>>(
     toUrl(this.urlV1, 'pages'),
-    { params: createFilter(page, size, sort, direction) }
+    { params: createFilter(page, size, sort, direction) },
   );
 
-  getAllTreatmentGroup = (): Observable<ITreatmentGroup[]> => this.http.get<ITreatmentGroup[]>(
-    toUrl(this.urlV1, 'groups')
+  getAllTreatmentsGroup = (): Observable<ITreatmentGroup[]> => this.http.get<ITreatmentGroup[]>(
+    toUrl(this.urlV1, 'groups'),
   );
 
   getAllTreatments = (roomId: string, customerId?: string): Observable<ITreatmentDiscountDTO[]> => {
@@ -37,36 +39,38 @@ export class TreatmentService {
     return this.http.get<ITreatmentDiscountDTO[]>(this.urlV1, { params });
   };
 
-  getTreatmentList = (): Observable<ITreatmentGroup[]> => this.http.get<ITreatmentGroup[]>(toUrl(this.urlV1, 'list'));
+  getListTreatmentsGroup = (): Observable<ITreatmentGroup[]> => this.http.get<ITreatmentGroup[]>(
+    toUrl(this.urlV1, 'list'));
 
-  getById = (
-    id: string
+  getTreatmentGroup = (
+    id: string,
   ): Observable<ITreatmentGroup | undefined> => this.http.get<ITreatmentGroup>(toUrl(this.urlV1, id));
 
-  add = (
-    treatment: ITreatmentGroup
-  ): Observable<ITreatmentGroup> => this.http.post<ITreatmentGroup>(this.urlV1, treatment);
+  createTreatment = (
+    treatmentGroup: ITreatmentGroup,
+  ): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1, treatmentGroup);
 
-  delete = (
-    id: string
+  deleteTreatmentGroup = (
+    id: string,
   ): Observable<ITreatmentGroup> => this.http.delete<ITreatmentGroup>(toUrl(this.urlV1, id));
 
-  update = (
-    treatment: ITreatmentGroup
-  ): Observable<ITreatmentGroup> => this.http.patch<ITreatmentGroup>(toUrl(this.urlV1, treatment.id!), treatment);
+  updateTreatmentGroup = (
+    id: string,
+    treatmentGroup: ITreatmentGroup,
+  ): Observable<IApiResponse> => this.http.patch<IApiResponse>(toUrl(this.urlV1, id), treatmentGroup);
 
-  updateSort = (
-    treatments: ISorted[]
-  ): Observable<ITreatment[]> => this.http.patch<ITreatment[]>(toUrl(this.urlV1, 'sort'), treatments);
+  sortTreatment = (
+    treatments: ISorted[],
+  ): Observable<void> => this.http.patch<void>(toUrl(this.urlV1, 'sort'), treatments);
 
-  updateGroupSort = (
-    groups: ISorted[]
+  sortGroupTreatment = (
+    groups: ISorted[],
   ): Observable<ITreatmentGroup[]> => this.http.patch<ITreatmentGroup[]>(toUrl(this.urlV1, 'groups', 'sort'), groups);
 
-  getHistory = (
+  getAllTreatmentsHistory = (
     groupId: string,
-    treatmentId: string
-  ): Observable<ITreatmentAll[] | undefined> => this.http.get<ITreatmentAll[]>(
-    toUrl(this.urlV1, groupId, 'treatments', treatmentId, 'histories')
+    treatmentId: string,
+  ): Observable<ITreatmentAll[]> => this.http.get<ITreatmentAll[]>(
+    toUrl(this.urlV1, groupId, 'treatments', treatmentId, 'histories'),
   );
 }

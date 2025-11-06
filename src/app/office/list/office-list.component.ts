@@ -10,7 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectOfficeState } from '../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import * as fromActionsOffice from '../../store/office.actions';
+import { clean, deleteOffice, getOfficesPage, officeSelected } from '../../store/office.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { detailExpandAnimation } from '../../util/animation';
 import { SharedModule } from '../../shared/shared.module';
@@ -20,7 +20,7 @@ import { SharedModule } from '../../shared/shared.module';
   templateUrl: './office-list.component.html',
   styleUrls: ['./office-list.component.scss'],
   animations: [detailExpandAnimation],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -39,10 +39,10 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
   private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
+    private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
-      Breakpoints.Small
+      Breakpoints.Small,
     ]).subscribe(result => {
       if (result.matches) {
         this.pageSize = MOBILE_PAGE_SIZE;
@@ -66,26 +66,23 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
   }
 
-  edit = (office: IOffice): void => this.store.dispatch(
-    new fromActionsOffice.OfficeSelected({ office, redirect: true }));
+  edit = (selected: IOffice): void => this.store.dispatch(officeSelected({ selected }));
 
   delete = (office: IOffice): void => {
     const title = this.translate.instant('OFFICE.DELETED.TITLE');
     const content = this.translate.instant('OFFICE.DELETED.CONTENT', { name: office.name });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: office }
+      data: { title, content, value: office },
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.store.dispatch(
-          new fromActionsOffice.DeleteOffice(result)
-        );
+        this.store.dispatch(deleteOffice({ id: result.id, name: result.name }));
       }
     });
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsOffice.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe(() => {
@@ -98,17 +95,17 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private getOffices = (page: number = 0): void => this.store.dispatch(
-    new fromActionsOffice.GetAll({
-      active: this.sort.active,
+    getOfficesPage({
+      page: page,
+      sort: this.sort.active,
       direction: this.sort.direction,
       size: this.pageSize,
-      page
-    })
+    }),
   );
 
   private subscribe = (): void => {
     this.subscription = this.getState.subscribe((state) => {
-      if (state.message) {
+      if (state.response) {
         this.clean();
         this.getOffices();
       }

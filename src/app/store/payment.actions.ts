@@ -1,144 +1,103 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
+import { IError, IResponseSuccess, ResponseSuccess } from '../interfaces/common';
+import { IPayment, IPaymentOption, IPaymentRequest, PaymentStatus } from '../interfaces/payment';
+import { IReservationPayment } from '../interfaces/reservation';
 
-export enum PaymentActionTypes {
+enum PaymentActionTypes {
   paymentSuccess = '[Payment] Success',
   paymentSave = '[Payment] Save',
-  paymentUpdate = '[Payment] Update',
-  paymentUpdateLink = '[Payment] Update link',
+  adjustPayments = '[Payment] Adjust Payments',
+  updatePaymentById = '[Payment] Update payment by id',
   paymentSend = '[Payment] Send',
-  paymentNotify = '[Payment] Notify',
-  paymentRecreate = '[Payment] Recreate',
+  notifyPayment = '[Payment] Notify',
+  recreate = '[Payment] Recreate',
   paymentSaveSuccess = '[Payment] Save Success',
   paymentNotComplete = '[Payment] Not complete',
   paymentFailure = '[Payment] Failure',
   paymentSelected = '[Payment] Selected',
-  paymentByResource = '[Payment] Find by resource',
-  paymentFind = '[Payment] Find',
-  paymentOptions = '[Payment] Options',
-  paymentCreate = '[Payment] Create',
-  clean = '[Payment] Clean'
+  getPaymentByResourceId = '[Payment] Find by resource',
+  getPayment = '[Payment] Find payment by ID',
+  getPaymentOptions = '[Payment] Payment options',
+  createPaymentLinkByReservationId = '[Payment] Create payment link',
+  clean = '[Payment] Clean',
 }
 
-export class PaymentSuccess implements Action {
-  readonly type = PaymentActionTypes.paymentSuccess;
+export const paymentSuccess = createAction(
+  PaymentActionTypes.paymentSuccess,
+  props<{ data?: IPaymentOption[] }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const paymentNotComplete = createAction(
+  PaymentActionTypes.paymentNotComplete,
+  props<{ subError: IError[]; response?: IResponseSuccess }>(),
+);
 
-export class PaymentNotComplete implements Action {
-  readonly type = PaymentActionTypes.paymentNotComplete;
+export const paymentSave = createAction(
+  PaymentActionTypes.paymentSave,
+  props<{ id: string; path: 'reservation' | 'transaction'; status: string; paymentStatus: PaymentStatus }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const adjustPayments = createAction(
+  PaymentActionTypes.adjustPayments,
+  props<{ payments: IPaymentRequest[] }>(),
+);
 
-export class PaymentSave implements Action {
-  readonly type = PaymentActionTypes.paymentSave;
+export const updatePaymentById = createAction(
+  PaymentActionTypes.updatePaymentById,
+  props<{ id: string; payment: IReservationPayment }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const paymentSend = createAction(
+  PaymentActionTypes.paymentSend,
+  props<{ link?: string }>(),
+);
 
-export class PaymentUpdate implements Action {
-  readonly type = PaymentActionTypes.paymentUpdate;
+export const recreate = createAction(
+  PaymentActionTypes.recreate,
+  props<{ id: string; paymentType: string }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const notifyPayment = createAction(
+  PaymentActionTypes.notifyPayment,
+  props<{
+    id: string;
+    path: 'reservation' | 'transaction';
+    resourceId: string;
+    preferenceId: string;
+    paymentType: string;
+  }>(),
+);
 
-export class PaymentUpdateLink implements Action {
-  readonly type = PaymentActionTypes.paymentUpdateLink;
+export const paymentSaveSuccess = createAction(
+  PaymentActionTypes.paymentSaveSuccess,
+  props<ResponseSuccess>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const paymentFailure = createAction(
+  PaymentActionTypes.paymentFailure,
+  props<{ error: IError }>(),
+);
 
-export class PaymentSend implements Action {
-  readonly type = PaymentActionTypes.paymentSend;
+export const paymentSelected = createAction(
+  PaymentActionTypes.paymentSelected,
+  props<{ selected?: IPayment | IPayment[]; redirect?: boolean }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getPaymentByResourceId = createAction(
+  PaymentActionTypes.getPaymentByResourceId,
+  props<{ id: string; path: 'reservation' | 'transaction'; redirect?: boolean }>(),
+);
 
-export class PaymentRecreate implements Action {
-  readonly type = PaymentActionTypes.paymentRecreate;
+export const getPayment = createAction(
+  PaymentActionTypes.getPayment,
+  props<{ id: string }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const paymentOptions = createAction(PaymentActionTypes.getPaymentOptions);
 
-export class PaymentNotify implements Action {
-  readonly type = PaymentActionTypes.paymentNotify;
+export const createPaymentLinkByReservationId = createAction(
+  PaymentActionTypes.createPaymentLinkByReservationId,
+  props<{ reservationId: string; payment: IReservationPayment }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
-
-export class PaymentSaveSuccess implements Action {
-  readonly type = PaymentActionTypes.paymentSaveSuccess;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class PaymentFailure implements Action {
-  readonly type = PaymentActionTypes.paymentFailure;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class PaymentSelected implements Action {
-  readonly type = PaymentActionTypes.paymentSelected;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class PaymentFindByResourceId implements Action {
-  readonly type = PaymentActionTypes.paymentByResource;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class PaymentFind implements Action {
-  readonly type = PaymentActionTypes.paymentFind;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class PaymentOptions implements Action {
-  readonly type = PaymentActionTypes.paymentOptions;
-}
-
-export class PaymentCreate implements Action {
-  readonly type = PaymentActionTypes.paymentCreate;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = PaymentActionTypes.clean;
-}
-
-export type All =
-  | PaymentSave
-  | PaymentUpdate
-  | PaymentUpdateLink
-  | PaymentSend
-  | PaymentRecreate
-  | PaymentNotify
-  | PaymentSuccess
-  | PaymentSaveSuccess
-  | PaymentNotComplete
-  | PaymentFailure
-  | PaymentFindByResourceId
-  | PaymentFind
-  | PaymentSelected
-  | PaymentCreate
-  | PaymentOptions
-  | Clean;
+export const clean = createAction(PaymentActionTypes.clean);

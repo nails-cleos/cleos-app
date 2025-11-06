@@ -6,12 +6,20 @@ import {
   UntypedFormControl,
   UntypedFormGroup,
   Validators,
-  ɵTypedOrUntyped
+  ɵTypedOrUntyped,
 } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState, selectUnavailableState } from '../store/app.states';
 import { IUnavailable, Unavailable } from '../interfaces/unavailable';
-import * as fromActionsUnavailable from '../store/unavailable.actions';
+import {
+  clean,
+  createUnavailable,
+  deleteUnavailable,
+  getAllProfessional,
+  getAllRoomsByProfessionalId,
+  getUnavailable,
+  updateUnavailable,
+} from '../store/unavailable.actions';
 import { IUser, IUserAll } from '../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
 import {
@@ -29,7 +37,7 @@ import {
   getTime,
   getTimeNumber,
   newDate,
-  zoneDateToDate
+  zoneDateToDate,
 } from '../util/dates';
 import { IRoomAll } from '../interfaces/room';
 import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
@@ -46,7 +54,7 @@ import { BackButtonDirective } from '../directives/back-button.directive';
   selector: 'app-unavailable',
   templateUrl: './unavailable.component.html',
   styleUrls: ['./unavailable.component.scss'],
-  imports: [SharedModule, BackButtonDirective]
+  imports: [SharedModule, BackButtonDirective],
 })
 export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() unavailable?: IUnavailable;
@@ -76,14 +84,14 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly timeZone: string;
 
   constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
-              private route: ActivatedRoute, private translate: TranslateService, public dialog: MatDialog) {
+    private route: ActivatedRoute, private translate: TranslateService, public dialog: MatDialog) {
     this.isAddMode = true;
     this.getState = this.store.select(selectUnavailableState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
     this.timeZone = getCurrentTimeZone();
   }
 
-  get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
+  get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl }> {
     return this.form.controls;
   }
 
@@ -114,16 +122,13 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     if (this.isAddMode) {
-      return this.store.dispatch(
-        new fromActionsUnavailable.UnavailableSave(unavailable)
-      );
+      this.store.dispatch(createUnavailable({ unavailable }));
     } else {
-      unavailable.id = this.id;
+      const id = this.id!;
       this.unavailable = undefined;
-      return this.store.dispatch(
-        new fromActionsUnavailable.UnavailableUpdate(unavailable)
-      );
+      this.store.dispatch(updateUnavailable({ id, unavailable, path: 'unavailable' }));
     }
+    return;
   }
 
   get delete(): void {
@@ -135,7 +140,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
     return executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: this.unavailable }, result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsUnavailable.DeleteUnavailable(result)
+          deleteUnavailable({ id: result.id, timestamp: result.timestamp, timeZone: result.timeZone }),
         );
       }
     });
@@ -197,7 +202,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.roomAvailability);
 
-  getRoom = (user: IUser): void => this.store.dispatch(new fromActionsUnavailable.GetRoom(user.id));
+  getRoom = (user: IUser): void => this.store.dispatch(getAllRoomsByProfessionalId({ professionalId: user.id! }));
 
   keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
@@ -207,7 +212,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private setValues = (startDate?: any, startTime?: any, minTime?: string, maxTime?: string,
-                       showDuration: boolean = false, durationMax?: any, roomAvailability?: IRoomAll): void => {
+    showDuration: boolean = false, durationMax?: any, roomAvailability?: IRoomAll): void => {
     this.getForm.startDate.setValue(startDate);
     this.getForm.startTime.setValue(startTime);
     this.minTime = minTime;
@@ -231,12 +236,12 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
       duration: ['', Validators.required],
       repeat: ['', Validators.required],
       allDay: [''],
-      endDate: ['']
+      endDate: [''],
     });
     this.filteredOptions = this.getForm.professional.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals)
+      map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals),
     );
     this.formValueChange();
   };
@@ -320,38 +325,36 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsUnavailable.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
-  private getProfessionals = (): void => this.store.dispatch(new fromActionsUnavailable.GetAllProfessional());
+  private getProfessionals = (): void => this.store.dispatch(getAllProfessional());
 
   private filter = (name: string): IUser[] | undefined => this.professionals?.filter(
-    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0
+    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0,
   );
 
   private getUnavailable = (): void => {
     if (!this.unavailable) {
-      this.store.dispatch(
-        new fromActionsUnavailable.UnavailableFind(this.id)
-      );
+      this.store.dispatch(getUnavailable({ id: this.id! }));
     }
   };
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.professionals) {
         this.professionals = state.professionals;
         if (this.isAddMode && this.professionals?.length === 1 && !this.getForm.professional.value) {
           this.getForm.professional.setValue(this.professionals[0]);
         }
       }
-      if (state.room && !this.rooms?.length) {
-        this.rooms = state.room;
+      if (state.rooms && !this.rooms?.length) {
+        this.rooms = state.rooms;
         const startDate = this.getForm.startDate.value;
         if (startDate) {
-          this.setMaxMin(startDate, state.room);
+          this.setMaxMin(startDate, state.rooms);
         }
       }
-      if (state.selected && !this.unavailable) {
+      if (state.selected?.id && !this.unavailable) {
         const date = zoneDateToDate(state.selected.timestamp);
         this.unavailable = {
           id: state.selected.id,
@@ -365,7 +368,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
           startTime: getTime(date),
           duration: state.selected.duration ? formatDuration(state.selected.duration) : '',
           repeat: state.selected.repeat,
-          allDay: state.selected.allDay
+          allDay: state.selected.allDay,
         } as IUnavailable;
         this.form.patchValue(this.unavailable);
       }
@@ -374,7 +377,7 @@ export class UnavailableComponent implements OnInit, AfterViewInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
-      } else if (state.message) {
+      } else if (state.response) {
         this.router.navigate([this.translate.currentLang, 'unavailable']);
       }
     });

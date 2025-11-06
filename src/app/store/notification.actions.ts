@@ -1,84 +1,58 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
+import { IError, PageRequest } from '../interfaces/common';
+import { Pagination } from '../interfaces/pagination';
+import { INotification } from '../interfaces/notification';
 
-export enum NotificationActionTypes {
-  notificationPage = '[Notification] Get all paged',
+enum NotificationActionTypes {
+  getNotificationsPage = '[Notification] Get notifications page',
   notificationSuccess = '[Notification] Notifications success',
   notificationFailure = '[Notification] Failure',
-  notificationRead = '[Notification] Notification read',
-  notificationDelete = '[Notification] Notification delete',
+  readNotification = '[Notification] Read notification by id',
+  deleteNotification = '[Notification] Delete notification by id',
   notificationDeleteSuccess = '[Notification] Notifications delete success',
   notificationReadSuccess = '[Notification] Notification read success',
-  notificationSubscribe = '[Notification] Notification subscribe',
+  subscribeNotification = '[Notification] Subscribe notification',
   clean = '[Notification] Clean'
 }
 
-export class GetAllPaged implements Action {
-  readonly type = NotificationActionTypes.notificationPage;
+export const getNotificationsPage = createAction(
+  NotificationActionTypes.getNotificationsPage,
+  props<PageRequest>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const notificationSuccess = createAction(
+  NotificationActionTypes.notificationSuccess,
+  props<{ data: Pagination<INotification> | string }>(),
+);
 
-export class NotificationSuccess implements Action {
-  readonly type = NotificationActionTypes.notificationSuccess;
+export const notificationFailure = createAction(
+  NotificationActionTypes.notificationFailure,
+  props<{ error: IError }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const readNotification = createAction(
+  NotificationActionTypes.readNotification,
+  props<{ id: string }>(),
+);
 
-export class NotificationFailure implements Action {
-  readonly type = NotificationActionTypes.notificationFailure;
+export const deleteNotification = createAction(
+  NotificationActionTypes.deleteNotification,
+  props<{ notification: INotification }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const notificationDeleteSuccess = createAction(
+  NotificationActionTypes.notificationDeleteSuccess,
+  props<{ data: INotification }>(),
+);
 
-export class NotificationRead implements Action {
-  readonly type = NotificationActionTypes.notificationRead;
+export const notificationReadSuccess = createAction(
+  NotificationActionTypes.notificationReadSuccess,
+  props<{ data?: INotification }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const subscribeNotification = createAction(
+  NotificationActionTypes.subscribeNotification,
+  props<{ token: string }>(),
+);
 
-export class NotificationDelete implements Action {
-  readonly type = NotificationActionTypes.notificationDelete;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class NotificationDeleteSuccess implements Action {
-  readonly type = NotificationActionTypes.notificationDeleteSuccess;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class NotificationSubscribe implements Action {
-  readonly type = NotificationActionTypes.notificationSubscribe;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class NotificationReadSuccess implements Action {
-  readonly type = NotificationActionTypes.notificationReadSuccess;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = NotificationActionTypes.clean;
-}
-
-export type All =
-  | GetAllPaged
-  | NotificationSuccess
-  | NotificationFailure
-  | NotificationRead
-  | NotificationDelete
-  | NotificationDeleteSuccess
-  | NotificationReadSuccess
-  | NotificationSubscribe
-  | Clean;
+export const clean = createAction(NotificationActionTypes.clean);

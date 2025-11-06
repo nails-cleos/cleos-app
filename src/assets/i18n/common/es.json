@@ -245,7 +245,7 @@
       "LOGIN": {
         "ACCEPT": "Al continuar, indicas que aceptas nuestros <a href='{{tos}}'>Términos<br>de Servicio</a> y nuestra <a href='{{privacyPolicy}}'>Política de Privacidad</a>.",
         "ACCOUNT": {
-          "TITLE":"Ya tienes una cuenta.",
+          "TITLE": "Ya tienes una cuenta.",
           "MESSAGE": "Ya has utilizado <span class=bold>{{email}}</span>. Inicia sesión con Google para continuar."
         }
       },
@@ -342,7 +342,8 @@
       "STATE": {
         "APPROVE": "La reserva fue aprobada",
         "START": "La reserva se inició",
-        "COMPLETE": "La reserva se completó"
+        "COMPLETE": "La reserva se completó",
+        "CANCEL": "La reserva se canceló"
       },
       "EDIT": {
         "TITLE": "Editar reserva",
@@ -451,7 +452,6 @@
         "value_19": "Recuerda mis palabras",
         "value_20": "Ejemplo de crecimiento de la uña protegida por BIAB TREATMENT",
         "value_21": "Después de las 4 semanas, probablemente estarás deseando cortar tus uñas debido a la incomodidad causada por su excesiva longitud.",
-
         "value_23": "¿Las uñas necesitan descansar durante el tratamiento Biab?",
         "value_24": "Es una pregunta frecuente, pero su respuesta es sencilla:",
         "value_25": "&#11088; Encuentra el centro que trate tus uñas<br>con el cuidado que merecen...",
@@ -468,7 +468,6 @@
         "value_36": "BIAB encapsula su esencia en esta ecuación:",
         "value_37": "Una de las principales ventajas que resalto al promocionar el BIAB TREATMENT,  comparandolo con otros geles convencionales y el acrilico, es que se trata de un producto VEGANO y LIBRE DE CRUELDAD ANIMAL, además de 10-free, lo que significa menos químicos no deseados. Ofrece una gama de colores mayormente naturales y claros para reflejar la preocupación por minimizar el daño y mantener la naturalidad del producto.",
         "value_38": "BIAB ofrece una paleta de colores elegantes que, al aplicarse, brinda un acabado homogéneo y natural sin desperdicios. Como siempre digo, una vez que lo pruebas,",
-
         "value_40": "¡No hay vuelta atrás!",
         "value_41": "A diferencia de otros productos, The GelBottle Inc.  ofrece una gama de geles Biab HEMA FREE, con aún menos componentes químicos. Esto es ideal para clientes con sensibilidad, alergias o simplemente para aquellos que desean tomar precauciones adicionales al cuidar sus uñas.",
         "value_42": "Y una vez más traigo al Biab con otra fortaleza relativa a la <span class='bold'>frecuencia con la que tenes que volver por tu nuevo set de Biab</span>, que mencioné anteriormente.",

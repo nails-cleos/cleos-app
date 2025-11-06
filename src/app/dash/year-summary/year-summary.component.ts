@@ -18,9 +18,9 @@ import {
   MonthSummary,
   QuarterSummary,
   SummaryTotals,
-  Total
+  Total,
 } from '../../interfaces/dashboard';
-import * as fromActionsDashboard from '../../store/dashboard.actions';
+import { clean, exportYearSummary, getYearSummary } from '../../store/dashboard.actions';
 import { Router } from '@angular/router';
 import { AuthUserService } from '../../services/auth-user.service';
 import { allElementsHaveSameKeyFilterValue, currencySymbol } from '../../util/helper';
@@ -37,9 +37,9 @@ import { TotalSummaryComponent } from '../total-summary/total-summary.component'
   templateUrl: './year-summary.component.html',
   styleUrls: ['./year-summary.component.scss'],
   providers: [
-    { provide: DateAdapter, useClass: YearAdapter }
+    { provide: DateAdapter, useClass: YearAdapter },
   ],
-  imports: [SharedModule, YearComponent, TotalSummaryComponent]
+  imports: [SharedModule, YearComponent, TotalSummaryComponent],
 })
 export class YearSummaryComponent implements OnInit, OnDestroy {
   date = new FormControl<Date | null>(null);
@@ -62,7 +62,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
   isHandset$: Observable<boolean> = this.breakpointObserver.observe([
     Breakpoints.XSmall,
     Breakpoints.Small,
-    Breakpoints.Medium
+    Breakpoints.Medium,
   ]).pipe(map(result => result.matches), shareReplay());
 
   private getState: Observable<any>;
@@ -82,17 +82,6 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
     this.language = this.translate.currentLang;
   }
 
-  get exportAction(): void {
-    if (this.date.value) {
-      if (this.export) {
-        this.exportToExcel();
-      } else {
-        this.getExportData(this.date.value.getFullYear());
-      }
-    }
-    return;
-  }
-
   ngOnInit(): void {
     this.subscribe();
     this.clean();
@@ -107,6 +96,17 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+  }
+
+  exportAction(): void {
+    if (this.date.value) {
+      if (this.export) {
+        this.exportToExcel();
+      } else {
+        this.getExportData(this.date.value.getFullYear());
+      }
+    }
+    return;
   }
 
   setYear = (normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void => {
@@ -184,7 +184,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
 
   private getAllQuarterSummaries = (
     quarterSummaries: IQuarterSummary[],
-    result: IQuarterSummary[]
+    result: IQuarterSummary[],
   ): IQuarterSummary[] => result.map(q => {
     const quarter = quarterSummaries.find(it => it.quarter === q.quarter);
     return new QuarterSummary(q.quarter, q.monthSummaries.map(m => {
@@ -217,7 +217,7 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
                 month,
                 saleSummary: [...saleSummary],
                 expenseSummary: [...expenseSummary],
-                cashSummary: [...cashSummary]
+                cashSummary: [...cashSummary],
               });
             }
           });
@@ -270,22 +270,18 @@ export class YearSummaryComponent implements OnInit, OnDestroy {
   private getSummary = (year: number): void => {
     this.reset();
     this.isLoading = true;
-    this.store.dispatch(
-      new fromActionsDashboard.GetYearSummary(year)
-    );
+    this.store.dispatch(getYearSummary({ year }));
   };
 
   private getExportData = (year: number): void => {
     this.isExportLoading = true;
-    this.store.dispatch(
-      new fromActionsDashboard.GetYearExport(year)
-    );
+    this.store.dispatch(exportYearSummary({ year }));
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsDashboard.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (!this.yearSummaryMap) {
         this.yearSummaryMap = state.yearSummaryMap;
         if (this.yearSummaryMap) {

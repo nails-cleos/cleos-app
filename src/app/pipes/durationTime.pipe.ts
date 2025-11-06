@@ -3,12 +3,12 @@ import { API_LOCALE, formatDuration } from '../util/dates';
 
 @Pipe({
   name: 'durationTime',
-  standalone: true
+  standalone: true,
 })
 export class DurationTimePipe implements PipeTransform {
 
   transform = (
     duration?: string,
-    locale: string = API_LOCALE
+    locale: string = API_LOCALE,
   ): string => duration ? formatDuration(duration, locale) : '';
 }

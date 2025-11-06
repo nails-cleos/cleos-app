@@ -6,12 +6,12 @@ import {
   UntypedFormControl,
   UntypedFormGroup,
   Validators,
-  ɵTypedOrUntyped
+  ɵTypedOrUntyped,
 } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState } from '../store/app.states';
 import { Discount, DiscountType, IDiscount, IDiscountAll } from '../interfaces/discount';
-import * as fromActionsDiscount from '../store/discount.actions';
+import { clean, createDiscount, getAllCurrency, getDiscount, updateDiscount } from '../store/discount.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ICurrency, ICurrencyAll } from '../interfaces/currency';
 import { fieldChange, valueChange } from '../util/validators';
@@ -24,7 +24,7 @@ import { BackButtonDirective } from '../directives/back-button.directive';
   selector: 'app-discount',
   templateUrl: './discount.component.html',
   styleUrls: ['./discount.component.scss'],
-  imports: [SharedModule, BackButtonDirective]
+  imports: [SharedModule, BackButtonDirective],
 })
 export class DiscountComponent implements OnInit, OnDestroy {
   @Input() discount?: IDiscountAll;
@@ -67,12 +67,13 @@ export class DiscountComponent implements OnInit, OnDestroy {
 
     if (this.isAddMode) {
       discount.currencyId = this.getForm.currency.value.id;
-      return this.store.dispatch(new fromActionsDiscount.DiscountSave(discount));
+      this.store.dispatch(createDiscount({ discount }));
     } else {
-      discount.id = this.id;
       this.discount = undefined;
-      return this.store.dispatch(new fromActionsDiscount.DiscountUpdate(discount));
+      const id = this.id!;
+      this.store.dispatch(updateDiscount({ id, discount }));
     }
+    return;
   }
 
   get addCurrency(): void {
@@ -115,33 +116,31 @@ export class DiscountComponent implements OnInit, OnDestroy {
       currency: ['', [Validators.required]],
       description: [''],
       amount: ['', [Validators.required, Validators.min(1)]],
-      type: ['', [Validators.required]]
+      type: ['', [Validators.required]],
     });
     this.filteredCurrencyOptions = this.getForm.currency.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.code),
-      map(name => name ? this.filterCurrency(name) : this.currencies ? this.currencies.slice() : this.currencies)
+      map(name => name ? this.filterCurrency(name) : this.currencies ? this.currencies.slice() : this.currencies),
     );
   };
 
   private filterCurrency = (name: string): ICurrency[] | undefined => this.currencies?.filter(
     option => option.code?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private getDiscount = (): void => {
     if (!this.discount) {
-      const id = this.route.snapshot.paramMap.get('id');
-      this.store.dispatch(
-        new fromActionsDiscount.DiscountFind(id)
-      );
+      const id = this.route.snapshot.paramMap.get('id')!;
+      this.store.dispatch(getDiscount({ id }));
     }
   };
 
-  private getCurrencies = (): void => this.store.dispatch(new fromActionsDiscount.GetCurrencies());
+  private getCurrencies = (): void => this.store.dispatch(getAllCurrency());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.selected) {
         this.discount = {
           id: state.selected.id,
@@ -149,7 +148,7 @@ export class DiscountComponent implements OnInit, OnDestroy {
           description: state.selected.description,
           amount: state.selected.amount,
           type: state.selected.type,
-          currency: state.selected.currency
+          currency: state.selected.currency,
         } as IDiscountAll;
         this.form.patchValue(this.discount);
         this.getForm.type.setValue(state.selected.type);
@@ -160,7 +159,7 @@ export class DiscountComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
-      } else if (state.message) {
+      } else if (state.response) {
         this.router.navigate([this.language, 'discounts']);
       }
     });

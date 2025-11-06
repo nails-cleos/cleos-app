@@ -4,7 +4,7 @@ import {
   UntypedFormBuilder,
   UntypedFormControl,
   UntypedFormGroup,
-  Validators
+  Validators,
 } from '@angular/forms';
 import { IColorAll } from '../../interfaces/color';
 import { Observable, Subscription } from 'rxjs';
@@ -13,7 +13,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../store/app.states';
 import { map, startWith } from 'rxjs/operators';
-import * as fromActionsReservation from '../../store/reservation.actions';
+import { getColorsByTreatmentId } from '../../store/reservation.actions';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AsyncPipe } from '@angular/common';
@@ -21,14 +21,14 @@ import { AsyncPipe } from '@angular/common';
 @Component({
   selector: 'app-change-color-dialog-component',
   templateUrl: './change-color-dialog.component.html',
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe, AsyncPipe]
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe, AsyncPipe],
 })
 export class ChangeColorDialogComponent implements OnInit, OnDestroy {
   colorForm!: UntypedFormGroup;
   colors?: IColorAll[];
   filteredColor?: Observable<IColorAll[] | undefined>;
   color: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch
+    Validators.required, requireMatch,
   ]);
 
   private getState: Observable<any>;
@@ -36,7 +36,7 @@ export class ChangeColorDialogComponent implements OnInit, OnDestroy {
   private readonly treatmentId: string;
 
   constructor(public dialogRef: MatDialogRef<ChangeColorDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-              private store: Store<AppState>, private formBuilder: UntypedFormBuilder) {
+    private store: Store<AppState>, private formBuilder: UntypedFormBuilder) {
     this.getState = this.store.select(selectReservationState);
     this.treatmentId = data.treatmentId;
   }
@@ -70,7 +70,7 @@ export class ChangeColorDialogComponent implements OnInit, OnDestroy {
 
   private createForm = (): void => {
     this.colorForm = this.formBuilder.group({
-      color: this.color
+      color: this.color,
     });
   };
 
@@ -78,19 +78,17 @@ export class ChangeColorDialogComponent implements OnInit, OnDestroy {
     this.filteredColor = this.color.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterColor(name) : this.colors ? this.colors.slice() : this.colors)
+      map(name => name ? this.filterColor(name) : this.colors ? this.colors.slice() : this.colors),
     );
   };
 
   private filterColor = (name: string): IColorAll[] | undefined => this.colors?.filter(
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private getColors = (): void => this.store.dispatch(
-    new fromActionsReservation.GetAllColorsByTreatmentId(this.treatmentId)
-  );
+  private getColors = (): void => this.store.dispatch(getColorsByTreatmentId({ treatmentId: this.treatmentId }));
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.colors = state.colors;
       this.color.setValue(this.colors?.find(color => color.id === this.data.colorId));
     });

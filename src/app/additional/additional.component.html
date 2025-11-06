@@ -62,7 +62,7 @@
                       <mat-form-field class="chip-list">
                         <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
                         <mat-chip-grid #chipList aria-label="Group selection">
-                          @for (group of groups; track group) {
+                          @for (group of groups; track group.id) {
                             <mat-chip-row (removed)="remove(group)" [removable]="true">
                               {{ group.name }}
                               <mat-icon matChipRemove>cancel</mat-icon>
@@ -72,7 +72,7 @@
                                  [matChipInputFor]="chipList">
                         </mat-chip-grid>
                         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedGroup($event)">
-                          @for (group of sortGroups(filteredGroup | async); track group) {
+                          @for (group of sortGroups(filteredGroup | async); track group.id) {
                             <mat-option [value]="group">
                               {{ group.name }}
                             </mat-option>

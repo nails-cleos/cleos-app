@@ -17,6 +17,7 @@ export interface IUnavailable {
   allDay?: boolean;
   timeZone?: string;
   timestamp?: number;
+  type?: string;
 }
 
 export interface IUnavailableAll {

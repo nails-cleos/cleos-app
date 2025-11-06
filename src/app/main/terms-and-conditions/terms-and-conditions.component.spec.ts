@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TermsAndConditionsComponent } from './terms-and-conditions.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 describe('TermAndConditionComponent', () => {
   let component: TermsAndConditionsComponent;
@@ -8,12 +9,9 @@ describe('TermAndConditionComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-    imports: [TermsAndConditionsComponent]
-})
-    .compileComponents();
-  });
+      imports: [TermsAndConditionsComponent, TranslateModule.forRoot()],
+    }).compileComponents();
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(TermsAndConditionsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

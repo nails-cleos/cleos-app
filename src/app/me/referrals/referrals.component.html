@@ -32,10 +32,10 @@
         </mat-card-content>
         <mat-card-actions class="card-actions">
           <div class="spacer"></div>
-          <button (click)="openBottomSheetShare" [disabled]="!showShare" color="primary"
+          <button (click)="openBottomSheetShare()" [disabled]="!showShare" color="primary"
                   mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.SHARE' | translate }}
           </button>
-          <button (click)="openBottomSheetReferral" [disabled]="!showInvites" mat-fab extended class="icon-button">
+          <button (click)="openBottomSheetReferral()" [disabled]="!showInvites" mat-fab extended class="icon-button">
             {{ 'ME.REFERRAL.INVITE.TITLE' | translate }}
           </button>
         </mat-card-actions>

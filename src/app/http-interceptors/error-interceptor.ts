@@ -4,7 +4,7 @@ import { Observable, retry, throwError } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { AppState } from '../store/app.states';
-import * as fromActionsLogin from '../store/auth.actions';
+import { reLogin } from '../store/auth.actions';
 
 import { genericRetryStrategy } from '../util/rxjs';
 import { AuthUserService } from '../services/auth-user.service';
@@ -14,7 +14,7 @@ export const errorInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn)
   const store = inject(Store<AppState>);
   return next(req).pipe(retry({
     count: 3,
-    delay: genericRetryStrategy({})
+    delay: genericRetryStrategy({}),
   }), catchError(err => {
     if ([0].indexOf(err.status) !== -1) {
       const message = err?.error?.message || err.statusText;
@@ -24,10 +24,10 @@ export const errorInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn)
       return authService.authUser.pipe(
         switchMap(value => {
           if (value.isAuthenticated) {
-            store.dispatch(new fromActionsLogin.ReLogin());
+            store.dispatch(reLogin());
           }
           return throwError(err);
-        })
+        }),
       );
     }
 

@@ -17,6 +17,6 @@ export class CustomDateFormatter extends CalendarNativeDateFormatter {
 
   dayViewHour = ({ date, locale }: DateFormatterParams): string => new Intl.DateTimeFormat(locale, {
     hour: 'numeric',
-    minute: 'numeric'
+    minute: 'numeric',
   }).format(date);
 }

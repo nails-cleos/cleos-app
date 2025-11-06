@@ -3,7 +3,17 @@ import { IUser, IUserAll, User } from '../../interfaces/user';
 import { Store } from '@ngrx/store';
 import { AppState, selectUserState } from '../../store/app.states';
 import { Observable, Subscription } from 'rxjs';
-import * as fromActionsUser from '../../store/user.actions';
+import {
+  clean,
+  deleteUser,
+  getAllDisableUsers,
+  getUsersPage,
+  mergeUsers,
+  resendToken,
+  restore,
+  setRole,
+  userSelected,
+} from '../../store/user.actions';
 import { MatTableDataSource } from '@angular/material/table';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
@@ -22,7 +32,7 @@ import {
   UntypedFormBuilder,
   UntypedFormControl,
   UntypedFormGroup,
-  Validators
+  Validators,
 } from '@angular/forms';
 import { requireMatch } from '../../util/validators';
 import { map, startWith } from 'rxjs/operators';
@@ -35,7 +45,7 @@ import { AppMaterialModule } from '../../util/app-material.module';
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.scss'],
   animations: [detailExpandAnimation],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -58,10 +68,10 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   private smallScreen = false;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private router: Router, private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
+    private router: Router, private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
-      Breakpoints.Small
+      Breakpoints.Small,
     ]).subscribe(result => {
       if (result.matches) {
         this.pageSize = MOBILE_PAGE_SIZE;
@@ -92,21 +102,19 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getUsers(0);
   };
 
-  edit = (user: IUser): void => this.store.dispatch(new fromActionsUser.UserSelected({ user, profile: false }));
+  edit = (selected: IUser): void => this.store.dispatch(userSelected({ selected }));
 
   delete = (user: IUser): void => {
     this.noExpanded(user);
     const title = this.translate.instant('USER.DELETED.TITLE');
     const content = this.translate.instant('USER.DELETED.CONTENT', { displayName: user.displayName });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: user }
+      data: { title, content, value: user },
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.store.dispatch(
-          new fromActionsUser.DeleteUser(result)
-        );
+        this.store.dispatch(deleteUser({ id: result.id, displayName: result.displayName }));
       }
     });
   };
@@ -116,13 +124,13 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     const title = this.translate.instant('USER.ACTIVATION_RESEND.TITLE');
     const content = this.translate.instant('USER.ACTIVATION_RESEND.CONTENT', { displayName: user.displayName });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: user }
+      data: { title, content, value: user },
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsUser.ResendToken(result.id)
+          resendToken({ id: result.id }),
         );
       }
     });
@@ -133,7 +141,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     const title = this.translate.instant('USER.RESTORE.TITLE');
     const content = this.translate.instant('USER.RESTORE.CONTENT', { displayName: user.displayName });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: user }
+      data: { title, content, value: user },
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -142,7 +150,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
         restoreUser.id = result.id;
         restoreUser.deleted = false;
         this.store.dispatch(
-          new fromActionsUser.RestoreUser(restoreUser)
+          restore({ id: restoreUser.id!, user: restoreUser }),
         );
       }
     });
@@ -152,13 +160,13 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     this.noExpanded(user);
     const data = {
       small: this.smallScreen,
-      newUser: user
+      newUser: user,
     };
 
     executeDialogNoWidth(this.dialog, SelectUserDialogComponent, data, result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsUser.MergeUsers({ oldUserId: result.id, newUserId: user.id })
+          mergeUsers({ oldUserId: result.id, newUserId: user.id! }),
         );
       }
     }, true);
@@ -170,11 +178,11 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   addRole = (user: IUserAll, role: Role): void => this.store.dispatch(
-    new fromActionsUser.SetRole({ user, role, action: 'ADD' })
+    setRole({ id: user.id, displayName: user.displayName, role, action: 'ADD' }),
   );
 
-  removeRole = (user: IUserAll, role: string): void => this.store.dispatch(
-    new fromActionsUser.SetRole({ user, role, action: 'REMOVE' })
+  removeRole = (user: IUserAll, role: Role): void => this.store.dispatch(
+    setRole({ id: user.id, displayName: user.displayName, role, action: 'REMOVE' }),
   );
 
   book = (customer: IUser): void => {
@@ -182,7 +190,7 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate([this.translate.currentLang, 'reservation'], { state: data });
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsUser.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe(() => {
@@ -203,29 +211,29 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private getUsers = (page: number = 0): void => this.store.dispatch(
-    new fromActionsUser.GetAll({
-      active: this.sort.active,
+    getUsersPage({
+      page: page,
+      sort: this.sort.active,
       direction: this.sort.direction,
       size: this.pageSize,
       filter: this.filter,
-      page
-    })
+    }),
   );
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((stateValue) => {
-      if (stateValue.message) {
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.response) {
         this.clean();
         this.getUsers();
       }
-      this.dataSource = stateValue.data?.content?.map((user: IUserAll) => {
+      this.dataSource = state.data?.content?.map((user: IUserAll) => {
         if (user.authorities) {
           const missing = this.allRole.filter(au => !user.authorities.some(u => u.authority === au));
           return Object.assign({}, user, { missing });
         }
         return user;
       });
-      this.resultsLength = stateValue.data?.totalElements;
+      this.resultsLength = state.data?.totalElements;
       if (this.resultsLength && !this.paginatorSubscription) {
         this.createPageSubscriptions();
       } else if (!this.resultsLength) {
@@ -239,14 +247,14 @@ export class UsersComponent implements OnInit, AfterViewInit, OnDestroy {
 @Component({
   selector: 'app-select-user-dialog-component',
   templateUrl: './select-user-dialog.component.html',
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe, AsyncPipe]
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe, AsyncPipe],
 })
 export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestroy {
   userForm!: UntypedFormGroup;
   users?: IUser[];
   filteredUser?: Observable<IUser[] | undefined>;
   user: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch
+    Validators.required, requireMatch,
   ]);
 
   newUser: IUserAll;
@@ -255,8 +263,8 @@ export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestr
   private subscription?: Subscription;
 
   constructor(public dialogRef: MatDialogRef<SelectUserDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-              private formBuilder: UntypedFormBuilder, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef) {
+    private formBuilder: UntypedFormBuilder, private store: Store<AppState>,
+    private cdRef: ChangeDetectorRef) {
     this.newUser = data.newUser;
     this.getState = this.store.select(selectUserState);
   }
@@ -300,17 +308,17 @@ export class SelectUserDialogComponent implements OnInit, AfterViewInit, OnDestr
     this.filteredUser = this.user.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value ? value.name : ''),
-      map(name => name ? this.filterUser(name) : this.users ? this.users.slice() : this.users)
+      map(name => name ? this.filterUser(name) : this.users ? this.users.slice() : this.users),
     );
   };
 
   private filterUser = (name: string): IUser[] | undefined => this.users?.filter(
     option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private getOldUsers = (): void => this.store.dispatch(new fromActionsUser.GetAllDisableUsers());
+  private getOldUsers = (): void => this.store.dispatch(getAllDisableUsers());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.users = state.users?.filter((it: IUser) => it.id !== this.newUser.id);
       this.user.setValue(null);
     });

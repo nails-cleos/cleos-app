@@ -13,52 +13,52 @@ import { InvoiceComponent } from '../invoice/invoice.component';
 const routes: Routes = [
   {
     path: 'search', component: SearchComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager, Role.professional]
-    }
+      roles: [Role.admin, Role.manager, Role.professional],
+    },
   },
   {
     path: 'invoices', component: InvoiceComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager, Role.professional]
-    }
+      roles: [Role.admin, Role.manager, Role.professional],
+    },
   },
   {
     path: 'calendar', component: CalendarComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager, Role.professional]
-    }
+      roles: [Role.admin, Role.manager, Role.professional],
+    },
   },
   {
     path: '', component: ReservationComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] // Customer not allowed
-    }
+      roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional], // Customer not allowed
+    },
   },
   {
     path: ':id/edit', component: ReservationComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] // Customer not allowed
-    }
+      roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional], // Customer not allowed
+    },
   },
   {
     path: ':id', component: ReservationDetailComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional, Role.customer]
-    }, runGuardsAndResolvers: 'always'
+      roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional, Role.customer],
+    }, runGuardsAndResolvers: 'always',
   },
   {
     path: ':id/rooms/:roomId/customer/:customerId/complete',
     component: ReservationCompleteComponent,
     canActivate: [authGuard],
     data: {
-      roles: [Role.professional, Role.roomAdmin]
+      roles: [Role.professional, Role.roomAdmin],
     },
-    runGuardsAndResolvers: 'always'
+    runGuardsAndResolvers: 'always',
   },
   {
     path: ':id/more-info', component: MoreInfoComponent, canActivate: [authGuard], data: {
-      roles: [Role.professional, Role.manager, Role.roomAdmin]
-    }, runGuardsAndResolvers: 'always'
+      roles: [Role.professional, Role.manager, Role.roomAdmin],
+    }, runGuardsAndResolvers: 'always',
   }];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class ReservationRoutingModule {
 }

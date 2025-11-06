@@ -1,74 +1,82 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import * as fromActionsNotification from '../notification.actions';
+import {
+  deleteNotification,
+  getNotificationsPage,
+  notificationDeleteSuccess,
+  notificationFailure,
+  notificationReadSuccess,
+  notificationSuccess,
+  readNotification,
+  subscribeNotification,
+} from '../notification.actions';
 import { NotificationService } from '../../services/notification.service';
 import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { Pagination } from '../../interfaces/pagination';
+import { INotification } from '../../interfaces/notification';
 
 @Injectable()
 export class NotificationEffects {
+  private readonly actions: Actions = inject(Actions);
+  private readonly notificationService: NotificationService = inject(NotificationService);
+  private readonly router: Router = inject(Router);
 
-  getAll$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.notificationPage)).pipe(
-      map((action: any) => action.payload),
-      switchMap(
-        (payload: any) => this.notificationService.getAll(payload.active, payload.direction, payload.page, payload.size)
-          .pipe(
-            switchMap((response: any) => of(
-              new fromActionsNotification.NotificationSuccess(response ? response : { page: { content: [] } }))),
-            catchError(
-              (err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({ error: err.error })))
-          ))
-    ));
+  getAll$ = createEffect(() => this.actions.pipe(
+    ofType(getNotificationsPage),
+    switchMap(({ page, sort, direction, size }) =>
+      this.notificationService.getNotificationsPage(page, sort, direction, size).pipe(
+        map((data: Pagination<INotification>) =>
+          notificationSuccess(
+            data ? { data } : {
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              data: { page: { content: [] } },
+            },
+          )),
+        catchError((err: HttpErrorResponse) => of(notificationFailure({ error: err.error }))),
+      )),
+  ));
 
-  read$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.notificationRead)).pipe(
-      map((action: any) => action.payload),
-      switchMap((payload: any) => this.notificationService.readNotification(payload.id).pipe(
-        switchMap(() => of(new fromActionsNotification.NotificationReadSuccess(payload))),
-        catchError(
-          (err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({ error: err.error })))
-      ))
-    ));
+  read$ = createEffect(() => this.actions.pipe(
+    ofType(readNotification),
+    switchMap(({ id }) =>
+      this.notificationService.readNotification(id).pipe(
+        map((data?: INotification) => notificationReadSuccess({ data })),
+        catchError((err: HttpErrorResponse) => of(notificationFailure({ error: err.error }))),
+      )),
+  ));
 
-  delete$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsNotification.NotificationActionTypes.notificationDelete)).pipe(
-      map((action: any) => action.payload),
-      switchMap((payload: any) => this.notificationService.deleteNotification(payload.id).pipe(
-        switchMap(() => of(new fromActionsNotification.NotificationDeleteSuccess(payload))),
-        catchError(
-          (err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({ error: err.error })))
-      ))
-    ));
+  delete$ = createEffect(() => this.actions.pipe(
+    ofType(deleteNotification),
+    switchMap(({ notification }) =>
+      this.notificationService.deleteNotification(notification.id).pipe(
+        map(() => notificationDeleteSuccess({ data: notification })),
+        catchError((err: HttpErrorResponse) => of(notificationFailure({ error: err.error }))),
+      )),
+  ));
 
-  notificationSubscribe$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsNotification.NotificationActionTypes.notificationSubscribe))
-    .pipe(map((action: any) => action.payload),
-      switchMap((payload: any) => this.notificationService.subscribe(payload).pipe(
-        switchMap(() => of(new fromActionsNotification.NotificationSuccess(payload))),
-        catchError(
-          (err: HttpErrorResponse) => of(new fromActionsNotification.NotificationFailure({ error: err.error })))
-      ))
-    ));
+  notificationSubscribe$ = createEffect(() => this.actions.pipe(
+    ofType(subscribeNotification),
+    switchMap(({ token }) =>
+      this.notificationService.subscribeNotification(token).pipe(
+        map(() => notificationSuccess({ data: token })),
+        catchError((err: HttpErrorResponse) => of(notificationFailure({ error: err.error }))),
+      )),
+  ));
 
-  notificationSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsNotification.NotificationActionTypes.notificationSuccess)
+  notificationSuccess$ = createEffect(() => this.actions.pipe(
+    ofType(notificationSuccess),
   ), { dispatch: false });
 
-  notificationDelete$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsNotification.NotificationActionTypes.notificationDeleteSuccess)
+  notificationDelete$ = createEffect(() => this.actions.pipe(
+    ofType(notificationDeleteSuccess),
   ), { dispatch: false });
 
-  notificationReadSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsNotification.NotificationActionTypes.notificationReadSuccess),
-    tap((data: any) => this.router.navigate([data.payload.navigation]))
+  notificationReadSuccess$ = createEffect(() => this.actions.pipe(
+    ofType(notificationReadSuccess),
+    tap(({ data }) => this.router.navigate([data?.navigation])),
   ), { dispatch: false });
-
-  constructor(private readonly translate: TranslateService, private actions$: Actions,
-              private notificationService: NotificationService,
-              private router: Router) {
-  }
 }

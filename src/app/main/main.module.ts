@@ -4,7 +4,7 @@ import { MainRoutingModule } from './main-routing.module';
 import { EffectsModule } from '@ngrx/effects';
 
 import { MainComponent } from './main.component';
-import { BottomSheetBookAppointmentComponent, MainContentComponent } from './main-content/main-content.component';
+import { MainContentComponent } from './main-content/main-content.component';
 import { CatalogComponent } from './catalog/catalog.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-conditions.component';
@@ -22,6 +22,7 @@ import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from '../store/app.states';
 import { Observable } from 'rxjs';
+import { BottomSheetBookAppointmentComponent } from './main-content/bottom-sheet-book-appointment';
 
 @NgModule({
   imports: [
@@ -35,14 +36,14 @@ import { Observable } from 'rxjs';
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('main')
+        useClass: TranslateLoaderFactory.forModule('main'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
     EffectsModule.forFeature([MainEffects, CatalogueEffects, UserEffects, LoginEffects]),
   ],
@@ -54,16 +55,16 @@ import { Observable } from 'rxjs';
     AuthService,
     {
       provide: LocationStrategy,
-      useClass: HashLocationStrategy
-    }
-  ]
+      useClass: HashLocationStrategy,
+    },
+  ],
 })
 export class MainModule {
   constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
     const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe(state => {
+    getI18nState.subscribe((state) => {
       translateService.currentLang = '';
-      this.translateService.use(state.data);
+      this.translateService.use(state.language);
     });
   }
 }

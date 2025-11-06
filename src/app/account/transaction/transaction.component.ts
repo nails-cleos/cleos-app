@@ -1,12 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import * as fromActionsAccount from '../../store/account.actions';
+import { createTransaction, getAccount, paymentOptions } from '../../store/account.actions';
 import { FormBuilder, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState, selectAccountState } from '../../store/app.states';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Observable, Subscription } from 'rxjs';
-import { IAccountAll } from '../../interfaces/account';
+import { IAccountAll, ITransaction } from '../../interfaces/account';
 import { getPayNlOptions, IPaymentOption, PaymentOption, PaymentType } from '../../interfaces/payment';
 import { currencySymbol } from '../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
@@ -19,7 +19,7 @@ import { BankComponent } from '../../shared/bank/bank.component';
   selector: 'app-transaction',
   templateUrl: './transaction.component.html',
   styleUrls: ['./transaction.component.scss'],
-  imports: [SharedModule, BalanceComponent, BackButtonDirective, BankComponent]
+  imports: [SharedModule, BalanceComponent, BackButtonDirective, BankComponent],
 })
 export class TransactionComponent implements OnInit, OnDestroy {
   form!: UntypedFormGroup;
@@ -82,16 +82,14 @@ export class TransactionComponent implements OnInit, OnDestroy {
       type = option;
     }
     const transfer = this.getForm.transfer.value;
-    const payload = {
+    const transaction: ITransaction = {
       customerId,
       amount,
-      paymentRequest: { type, paymentOptionId, transfer, bic }
+      paymentRequest: { type, paymentOptionId, transfer, bic },
     };
-    return this.store.dispatch(
-      new fromActionsAccount.AccountSave({
-        transaction: payload, accountId: this.accountId, hasAdminRole: this.hasAdminRole
-      })
-    );
+    const id = this.accountId!;
+    this.store.dispatch(createTransaction({ id, transaction }));
+    return;
   }
 
   ngOnInit(): void {
@@ -114,22 +112,22 @@ export class TransactionComponent implements OnInit, OnDestroy {
       amount: ['', [Validators.required, Validators.min(this.amountMin)]],
       type: ['', Validators.required],
       transfer: [''],
-      bank: ['']
+      bank: [''],
     });
   };
 
   private getAccount = (): void => {
     if (!this.account) {
       this.store.dispatch(
-        new fromActionsAccount.AccountFind(this.accountId)
+        getAccount({ id: this.accountId! }),
       );
     }
   };
 
-  private getOptions = (): void => this.store.dispatch(new fromActionsAccount.PaymentOptions());
+  private getOptions = (): void => this.store.dispatch(paymentOptions());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.selected) {
         this.account = state.selected;
       }
@@ -141,7 +139,7 @@ export class TransactionComponent implements OnInit, OnDestroy {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
-      } else if (state.message) {
+      } else if (state.response) {
         if (this.hasAdminRole) {
           this.router.navigate([this.language, 'users', this.account?.customer?.id, 'overview']);
         } else {

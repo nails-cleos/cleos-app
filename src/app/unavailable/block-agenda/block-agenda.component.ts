@@ -5,7 +5,7 @@ import {
   UntypedFormControl,
   UntypedFormGroup,
   Validators,
-  ɵTypedOrUntyped
+  ɵTypedOrUntyped,
 } from '@angular/forms';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { IRoomAll } from '../../interfaces/room';
@@ -29,9 +29,17 @@ import {
   getTime,
   getTimeNumber,
   newDate,
-  zoneDateToDate
+  zoneDateToDate,
 } from '../../util/dates';
-import * as fromActionsUnavailable from '../../store/unavailable.actions';
+import {
+  clean,
+  createBlockAgenda,
+  deleteUnavailable,
+  getAllProfessional,
+  getAllRoomsByProfessionalId,
+  getUnavailable,
+  updateUnavailable,
+} from '../../store/unavailable.actions';
 import { executeDialogNoWidth } from '../../util/helper';
 import { map, startWith } from 'rxjs/operators';
 import { closest } from '../../util/numbers';
@@ -45,7 +53,7 @@ import { BackButtonDirective } from '../../directives/back-button.directive';
   selector: 'app-block-agenda',
   templateUrl: './block-agenda.component.html',
   styleUrls: ['./block-agenda.component.scss'],
-  imports: [SharedModule, BackButtonDirective]
+  imports: [SharedModule, BackButtonDirective],
 })
 export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() unavailable?: IUnavailable;
@@ -71,7 +79,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
   private readonly timeZone: string;
 
   constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
-              private route: ActivatedRoute, private translate: TranslateService, public dialog: MatDialog) {
+    private route: ActivatedRoute, private translate: TranslateService, public dialog: MatDialog) {
     this.isAddMode = true;
     this.getState = this.store.select(selectUnavailableState);
     this.extras = this.router.getCurrentNavigation()?.extras.state;
@@ -97,16 +105,15 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
     unavailable.time = fieldChange(this.getForm.duration as UntypedFormControl, this.unavailable?.duration);
 
     if (this.isAddMode) {
-      return this.store.dispatch(
-        new fromActionsUnavailable.BlockAgenda(unavailable)
+      this.store.dispatch(
+        createBlockAgenda({ unavailable }),
       );
     } else {
-      unavailable.id = this.id;
+      const id = this.id!;
       this.unavailable = undefined;
-      return this.store.dispatch(
-        new fromActionsUnavailable.UnavailableUpdate(unavailable)
-      );
+      this.store.dispatch(updateUnavailable({ id, unavailable, path: 'unavailable/block-agenda' }));
     }
+    return;
   }
 
   get focusin(): void {
@@ -133,7 +140,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
     return executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: this.unavailable }, result => {
       if (result) {
         this.store.dispatch(
-          new fromActionsUnavailable.DeleteUnavailable(result)
+          deleteUnavailable({ id: result.id, timestamp: result.timestamp, timeZone: result.timeZone }),
         );
       }
     });
@@ -178,7 +185,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.roomAvailability);
 
-  getRoom = (user: IUser): void => this.store.dispatch(new fromActionsUnavailable.GetRoom(user.id));
+  getRoom = (user: IUser): void => this.store.dispatch(getAllRoomsByProfessionalId({ professionalId: user.id! }));
 
   keyDownHandler = (event: any): void => {
     if (event.code === 'Backspace') {
@@ -188,7 +195,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
   };
 
   private setValues = (startDate?: any, startTime?: any, minTime?: string, maxTime?: string,
-                       showDuration: boolean = false, durationMax?: any, roomAvailability?: IRoomAll): void => {
+    showDuration: boolean = false, durationMax?: any, roomAvailability?: IRoomAll): void => {
     this.getForm.startDate.setValue(startDate);
     this.getForm.startTime.setValue(startTime);
     this.minTime = minTime;
@@ -210,7 +217,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
     this.filteredOptions = this.getForm.professional.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals)
+      map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals),
     );
     this.valueChange();
   };
@@ -269,33 +276,33 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsUnavailable.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
-  private getProfessionals = (): void => this.store.dispatch(new fromActionsUnavailable.GetAllProfessional());
+  private getProfessionals = (): void => this.store.dispatch(getAllProfessional());
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       if (state.professionals) {
         this.professionals = state.professionals;
         if (this.isAddMode && this.professionals?.length === 1 && !this.getForm.professional.value) {
           this.getForm.professional.setValue(this.professionals[0]);
         }
       }
-      if (state.room && !this.rooms?.length) {
-        this.rooms = state.room;
+      if (state.rooms && !this.rooms?.length) {
+        this.rooms = state.rooms;
         const startDate = this.getForm.startDate.value;
         if (startDate) {
-          this.setMaxMin(startDate, state.room);
+          this.setMaxMin(startDate, state.rooms);
         }
       }
-      if (state.selected && !this.unavailable) {
+      if (state.selected?.id && !this.unavailable) {
         const date = zoneDateToDate(state.selected.timestamp);
         this.unavailable = {
           id: state.selected.id,
           professional: state.selected.professional,
           startDate: date,
           startTime: getTime(date),
-          duration: state.selected.duration ? formatDuration(state.selected.duration) : ''
+          duration: state.selected.duration ? formatDuration(state.selected.duration) : '',
         } as IUnavailable;
         this.form.patchValue(this.unavailable);
       }
@@ -304,7 +311,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
           this.errors[value.field] = value.message;
           this.form.controls[value.field].setErrors({ incorrect: true });
         });
-      } else if (state.message) {
+      } else if (state.response) {
         this.router.navigate([this.translate.currentLang, 'unavailable']);
       }
     });
@@ -315,9 +322,7 @@ export class BlockAgendaComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private getBlockAgenda = (): void => {
     if (!this.unavailable) {
-      this.store.dispatch(
-        new fromActionsUnavailable.UnavailableFind(this.id)
-      );
+      this.store.dispatch(getUnavailable({ id: this.id! }));
     }
   };
 }

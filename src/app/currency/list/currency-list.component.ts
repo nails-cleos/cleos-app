@@ -9,7 +9,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { AppState, selectCurrencyState } from '../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import * as fromActionsCurrency from '../../store/currency.actions';
+import { clean, currencySelected, deleteCurrency, getCurrenciesPage } from '../../store/currency.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { detailExpandAnimation } from '../../util/animation';
@@ -21,7 +21,7 @@ import { SharedModule } from '../../shared/shared.module';
   templateUrl: './currency-list.component.html',
   styleUrls: ['./currency-list.component.scss'],
   animations: [detailExpandAnimation],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -43,7 +43,7 @@ export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
               private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
-      Breakpoints.Small
+      Breakpoints.Small,
     ]).subscribe(result => {
       if (result.matches) {
         this.pageSize = MOBILE_PAGE_SIZE;
@@ -67,21 +67,19 @@ export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginatorSubscription?.unsubscribe();
   }
 
-  edit = (currency: ICurrency): void => this.store.dispatch(new fromActionsCurrency.CurrencySelected(currency));
+  edit = (selected: ICurrency): void => this.store.dispatch(currencySelected({ selected }));
 
   delete = (currency: ICurrency): void => {
     const title = this.translate.instant('CURRENCY.DELETED.TITLE');
     const content = this.translate.instant('CURRENCY.DELETED.CONTENT', { code: currency.code });
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: currency }, result => {
       if (result) {
-        this.store.dispatch(
-          new fromActionsCurrency.DeleteCurrency(result)
-        );
+        this.store.dispatch(deleteCurrency({ id: result.id, code: result.code }));
       }
     });
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsCurrency.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe(() => {
@@ -94,17 +92,12 @@ export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private getCurrency = (page: number = 0): void => this.store.dispatch(
-    new fromActionsCurrency.GetAll({
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    })
+    getCurrenciesPage({ page: page, sort: this.sort.active, direction: this.sort.direction, size: this.pageSize }),
   );
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
-      if (state.message) {
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.response) {
         this.clean();
         this.getCurrency();
       }

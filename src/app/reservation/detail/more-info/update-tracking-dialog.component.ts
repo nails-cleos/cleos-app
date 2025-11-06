@@ -6,10 +6,10 @@ import { AppMaterialModule } from '../../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
-    selector: 'app-update-tracking-dialog',
-    templateUrl: './update-tracking-dialog.component.html',
-    styleUrl: './update-tracking-dialog.component.scss',
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe]
+  selector: 'app-update-tracking-dialog',
+  templateUrl: './update-tracking-dialog.component.html',
+  styleUrl: './update-tracking-dialog.component.scss',
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
 })
 export class UpdateTrackingDialogComponent implements OnInit {
   trackingForm!: UntypedFormGroup;
@@ -33,11 +33,15 @@ export class UpdateTrackingDialogComponent implements OnInit {
     this.completedTime.setValue(getTime(completedDateTime));
   }
 
-  get onNoClick(): void {
+  ngOnInit(): void {
+    this.createForm();
+  }
+
+  onNoClick(): void {
     return this.dialogRef.close();
   }
 
-  get doAction(): void {
+  doAction(): void {
     let started;
     let completed;
     if (this.startedDateTime?.getTime() !== this.startedDate.value?.getTime()) {
@@ -53,10 +57,6 @@ export class UpdateTrackingDialogComponent implements OnInit {
     return this.dialogRef.close();
   }
 
-  ngOnInit(): void {
-    this.createForm();
-  }
-
   timeChange = ($event: string, dateForm: FormControl): void => {
     const time = getTimeNumber($event);
     dateForm.value.setHours(time?.hour || 0, time?.minute || 0);
@@ -67,7 +67,7 @@ export class UpdateTrackingDialogComponent implements OnInit {
       startedDate: this.startedDate,
       startedTime: this.startedTime,
       completedDate: this.completedDate,
-      completedTime: this.completedTime
+      completedTime: this.completedTime,
     });
   };
 }

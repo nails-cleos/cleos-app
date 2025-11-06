@@ -9,7 +9,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AppState, selectTreatmentState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
-import * as fromActionsTreatment from '../../store/treatment.actions';
+import { clean, deleteTreatmentGroup, getTreatmentsPage } from '../../store/treatment.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
@@ -21,7 +21,7 @@ import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
   templateUrl: './treatments.component.html',
   styleUrls: ['./treatments.component.scss'],
   animations: [detailExpandAnimation],
-  imports: [SharedModule, CurrencySymbolPipe]
+  imports: [SharedModule, CurrencySymbolPipe],
 })
 export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -42,10 +42,10 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
   private getState: Observable<any>;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
+    private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
-      Breakpoints.Small
+      Breakpoints.Small,
     ]).subscribe(result => {
       if (result.matches) {
         this.pageSize = MOBILE_PAGE_SIZE;
@@ -74,14 +74,12 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
     const title = this.translate.instant('TREATMENT.DELETED.TITLE');
     const content = this.translate.instant('TREATMENT.DELETED.CONTENT', { name: treatment.name });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: treatment }
+      data: { title, content, value: treatment },
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.store.dispatch(
-          new fromActionsTreatment.DeleteTreatment(result)
-        );
+        this.store.dispatch(deleteTreatmentGroup({ id: result.id, name: result.name }));
       }
     });
   };
@@ -96,25 +94,25 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cdRef.detectChanges();
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsTreatment.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private getTreatments = (page: number = 0): void => this.store.dispatch(
-    new fromActionsTreatment.GetAll({
-      active: this.sort.active,
+    getTreatmentsPage({
+      page: page,
+      sort: this.sort.active,
       direction: this.sort.direction,
       size: this.pageSize,
-      page
-    })
+    }),
   );
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((stateValue) => {
-      if (stateValue.message) {
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.response) {
         this.clean();
         this.getTreatments();
       }
-      this.dataSource = stateValue.data?.content;
-      this.resultsLength = stateValue.data?.totalElements;
+      this.dataSource = state.data?.content;
+      this.resultsLength = state.data?.totalElements;
       if (!this.paginatorSubscription && this.resultsLength) {
         this.createPageSubscriptions();
       }

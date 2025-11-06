@@ -10,7 +10,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectReservationState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import * as fromActionsReservation from '../../../store/reservation.actions';
+import {
+
+  createReview,
+  clean,
+  getCustomerReservations,
+} from '../../../store/reservation.actions';
 import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
 import { executeDialogNoWidth, openDialog } from '../../../util/helper';
 import { stampAnimation, transitionAnimation } from '../../../util/animation';
@@ -31,7 +36,7 @@ import { ErrorComponent } from '../../../shared/error/error.component';
   animations: [transitionAnimation, stampAnimation],
   templateUrl: './reservations.component.html',
   styleUrls: ['./reservations.component.scss'],
-  imports: [SharedModule, UpcomingComponent, TimeDetailPipe, ReservationIconPipe, ErrorComponent]
+  imports: [SharedModule, UpcomingComponent, TimeDetailPipe, ReservationIconPipe, ErrorComponent],
 })
 export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -57,14 +62,14 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
   private subscription?: Subscription;
 
   constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private router: Router, breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef,
-              private analytic: Analytics) {
+    private router: Router, breakpointObserver: BreakpointObserver, private cdRef: ChangeDetectorRef,
+    private analytic: Analytics) {
     this.getState = this.store.select(selectReservationState);
     this.dateFormat = this.translate.currentLang;
     this.language = this.translate.currentLang;
     breakpointObserver.observe([
       Breakpoints.XSmall,
-      Breakpoints.Small
+      Breakpoints.Small,
     ]).subscribe(result => {
       if (result.matches) {
         this.small = true;
@@ -72,10 +77,10 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
       }
     });
     logEvent(this.analytic, 'screen_view', {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
+      // eslint-disable-next-line camelcase
       firebase_screen: 'Main reservation page',
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      firebase_screen_class: 'ReservationsComponent'
+      // eslint-disable-next-line camelcase
+      firebase_screen_class: 'ReservationsComponent',
     });
   }
 
@@ -107,12 +112,11 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
       if (result && result.rating) {
         const review: IReview = new Review(result.rating);
         review.reservationId = reservation?.id;
-        review.detail = result.detail ? result.detail : this.translate.instant(`ME.REVIEW.RATING.${ result.rating }`);
-        this.store.dispatch(
-          new fromActionsReservation.ReservationReview(review)
-        );
+        review.detail = result.detail ? result.detail :
+          this.translate.instant(`ME.REVIEW.RATING.${ result.rating }`);
+        this.store.dispatch(createReview({ review }));
       }
-    }
+    },
   );
 
   openDialog = (reservation: IReservationAll): void => {
@@ -120,19 +124,19 @@ export class ReservationsComponent implements AfterViewInit, OnInit, OnDestroy {
     openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsReservation.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private getReservations = (page: number = 0): void => this.store.dispatch(
-    new fromActionsReservation.GetCustomerReservations({
-      active: this.sort.active,
+    getCustomerReservations({
+      page,
+      sort: this.sort.active,
       direction: this.sort.direction,
       size: this.pageSize,
-      page
-    })
+    }),
   );
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
+    this.subscription = this.getState.subscribe((state) => {
       this.error = state.error;
       this.data = state.customerReservation;
       if (this.data) {

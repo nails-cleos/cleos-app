@@ -42,7 +42,7 @@ export class TokenService {
       this.myTokenCache = myTimer.pipe(
         takeUntil(myStopTimer),
         switchMap(() => user(this.auth)),
-        shareReplay(this.cacheSize)
+        shareReplay(this.cacheSize),
       );
 
       this.myTokenSubscription = this.myTokenCache.subscribe({
@@ -57,7 +57,7 @@ export class TokenService {
           });
         },
         error: () => this.clear(),
-        complete: () => this.clear()
+        complete: () => this.clear(),
       });
     }
   }

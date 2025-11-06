@@ -1,19 +1,18 @@
-import { Component, Inject, Input, OnDestroy } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
-import { createChart, IChartUtil } from '../../util/chart';
+import { Component, Input, OnDestroy } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { createChart } from '../../util/chart';
 import { IChart } from '../../interfaces/dashboard';
 import { ICurrency } from '../../interfaces/currency';
 import { Subscription } from 'rxjs';
 import { AuthUserService } from '../../services/auth-user.service';
 import { SharedModule } from '../shared.module';
-import { AppMaterialModule } from '../../util/app-material.module';
-import { BaseChartDirective } from 'ng2-charts';
+import { CardChartComponent } from './card-chart.component';
 
 @Component({
   selector: 'app-card',
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.scss'],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class CardComponent implements OnDestroy {
   @Input() title: string | undefined;
@@ -32,7 +31,11 @@ export class CardComponent implements OnDestroy {
       this.authUserService.authUser.subscribe(value => this.isDarkMode = value.isDarkMode);
   }
 
-  get onClick(): void {
+  ngOnDestroy(): void {
+    this.authUserServiceSubscription.unsubscribe();
+  }
+
+  onClick(): void {
     if (this.chart) {
       const chart = createChart(this.chart, this.currency, this.isDarkMode, this.locale, this.timeZone);
       this.dialog.open(CardChartComponent, {
@@ -40,27 +43,10 @@ export class CardComponent implements OnDestroy {
         width: '70vw',
         data: {
           chart,
-          title: this.title
-        }
+          title: this.title,
+        },
       });
     }
     return;
   }
-
-  ngOnDestroy(): void {
-    this.authUserServiceSubscription.unsubscribe();
-  }
 }
-
-@Component({
-    selector: 'app-card-chart-component',
-    templateUrl: './card-chart-component.html',
-    styleUrls: ['./card-chart-component.scss'],
-  imports: [AppMaterialModule, BaseChartDirective]
-})
-export class CardChartComponent {
-  constructor(
-    @Inject(MAT_DIALOG_DATA) public data: { chart: IChartUtil; title: string }) {
-  }
-}
-

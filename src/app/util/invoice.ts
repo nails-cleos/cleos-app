@@ -6,15 +6,15 @@ import { environment } from '../../environments/environment';
 import { IOfficeAll } from '../interfaces/office';
 
 const createHeader = (index: number, titleDate: string, date: string, titleSubject: string = '', subject: string = '',
-                      titleKVK: string = '', kvkNr: string = '', titleAccount: string = '', accountNr: string = '',
-                      titleBTW: string = '', btwNr: string = ''): any => {
+  titleKVK: string = '', kvkNr: string = '', titleAccount: string = '', accountNr: string = '',
+  titleBTW: string = '', btwNr: string = ''): any => {
   const image = {
     image: 'logo',
     width: '*',
     fit: [180, 180],
     margin: [0, -40, 0, 0],
     alignment: 'right',
-    pageBreak: 'none'
+    pageBreak: 'none',
   };
 
   const data = {
@@ -23,30 +23,30 @@ const createHeader = (index: number, titleDate: string, date: string, titleSubje
       {
         columns: [
           { text: titleDate, style: 'header' },
-          { text: date, style: 'field' }
-        ]
+          { text: date, style: 'field' },
+        ],
       }, {
         columns: [
           { text: titleSubject, style: 'header' },
-          { text: subject, style: 'field' }
-        ]
+          { text: subject, style: 'field' },
+        ],
       }, {
         columns: [
           { text: titleKVK, style: 'header' },
-          { text: kvkNr, style: 'field' }
-        ]
+          { text: kvkNr, style: 'field' },
+        ],
       }, {
         columns: [
           { text: titleAccount, style: 'header' },
-          { text: accountNr, style: 'field' }
-        ]
+          { text: accountNr, style: 'field' },
+        ],
       }, {
         columns: [
           { text: titleBTW, style: 'header' },
-          { text: btwNr, style: 'field' }
-        ]
-      }
-    ]
+          { text: btwNr, style: 'field' },
+        ],
+      },
+    ],
   };
 
   if (index > 0) {
@@ -55,30 +55,30 @@ const createHeader = (index: number, titleDate: string, date: string, titleSubje
   }
 
   return {
-    columns: [[data], image]
+    columns: [[data], image],
   };
 };
 
 const companyName = (room: IRoomInvoice, titleAddress: string, titlePhone: string, titleEmail: string,
-                     billAddress?: string): any => {
+  billAddress?: string): any => {
   const phone = room.phone || '';
   const email = room.email || '';
   const address = billAddress || room.addressName;
   return [{
     columns: [
       { text: titleAddress, style: 'header' },
-      { text: address, style: ['field', 'fieldMargin'] }
-    ]
+      { text: address, style: ['field', 'fieldMargin'] },
+    ],
   }, {
     columns: [
       { text: titlePhone, style: 'header' },
-      { text: phone, style: ['field', 'fieldMargin'] }
-    ]
+      { text: phone, style: ['field', 'fieldMargin'] },
+    ],
   }, {
     columns: [
       { text: titleEmail, style: 'header' },
-      { text: email, style: ['field', 'fieldMargin'] }
-    ]
+      { text: email, style: ['field', 'fieldMargin'] },
+    ],
   }];
 };
 
@@ -88,13 +88,13 @@ const clientName = (customer: IUserAll, titleClient: string, titleContact: strin
   return [{
     columns: [
       { text: titleClient, style: 'header' },
-      { text: client, style: 'field' }
-    ]
+      { text: client, style: 'field' },
+    ],
   }, {
     columns: [
       { text: titleContact, style: 'header' },
-      { text: contact, style: 'field' }
-    ]
+      { text: contact, style: 'field' },
+    ],
   }];
 };
 
@@ -104,7 +104,7 @@ const createItemTitle = (titleDescription: string, titleItem: string, titleBTW: 
   { text: titleDescription, style: ['itemTitle', 'itemMargin'], border: [false, true, false, true] },
   { text: titleItem, style: ['itemTitle', 'item'], border: [false, true, false, true] },
   { text: titleBTW, style: ['itemTitle', 'itemMargin'], border: [false, true, false, true] },
-  { text: titleTotal, style: ['itemTitle', 'item'], border: [false, true, false, true] }
+  { text: titleTotal, style: ['itemTitle', 'item'], border: [false, true, false, true] },
 ];
 
 const itemBody = (name: string, neto: number, bruto: number, symbol: string): any => [
@@ -112,18 +112,18 @@ const itemBody = (name: string, neto: number, bruto: number, symbol: string): an
   {
     text: `${ symbol } ${ neto.toFixed(2) }`,
     style: ['item', 'amountKey', 'amount'],
-    border: [false, false, false, true]
+    border: [false, false, false, true],
   },
   {
     text: `${ symbol } ${ (bruto - neto).toFixed(2) }`,
     style: ['item', 'amountKey', 'amount'],
-    border: [false, false, false, true]
+    border: [false, false, false, true],
   },
   {
     text: `${ symbol } ${ bruto.toFixed(2) }`,
     style: ['item', 'amountKey', 'amount'],
-    border: [false, false, false, true]
-  }
+    border: [false, false, false, true],
+  },
 ];
 
 const createItems = (itemTitle: any, itemList: IItem[], currency: string): any => {
@@ -150,20 +150,20 @@ const createItems = (itemTitle: any, itemList: IItem[], currency: string): any =
     table: {
       headerRows: 1,
       widths: ['*', 80, 45, 80],
-      body
-    }
+      body,
+    },
   };
 };
 
 const createTotals = (totals: ITotals, currency: string, titleSubTotal: string, titleExclBTW: string,
-                      titleBTW21: string, titleTotal: string, titleDiscount: string): any => {
+  titleBTW21: string, titleTotal: string, titleDiscount: string): any => {
   const subTotal = [
     { text: titleSubTotal, style: ['item', 'amountKey'], border: [false, false, false, true] },
     {
       text: `${ currency } ${ totals.subTotal.toFixed(2) }`,
       style: ['item', 'amountKey', 'amount'],
-      border: [false, false, false, true]
-    }
+      border: [false, false, false, true],
+    },
   ];
 
   const excBTW = [
@@ -171,8 +171,8 @@ const createTotals = (totals: ITotals, currency: string, titleSubTotal: string, 
     {
       text: `${ currency } ${ totals.excBTW.toFixed(2) }`,
       style: ['item', 'amountKey', 'amount'],
-      border: [false, false, false, true]
-    }
+      border: [false, false, false, true],
+    },
   ];
 
   const btw = [
@@ -180,8 +180,8 @@ const createTotals = (totals: ITotals, currency: string, titleSubTotal: string, 
     {
       text: `${ currency } ${ totals.btw.toFixed(2) }`,
       style: ['item', 'amountKey', 'amount'],
-      border: [false, false, false, true]
-    }
+      border: [false, false, false, true],
+    },
   ];
 
   const total = [
@@ -190,8 +190,8 @@ const createTotals = (totals: ITotals, currency: string, titleSubTotal: string, 
       text: `${ currency } ${ totals.totalPaid.toFixed(2) }`,
       style: ['item', 'amountKey', 'amount'],
       border: [false, true, false, true],
-      fontSize: 20
-    }
+      fontSize: 20,
+    },
   ];
 
   let body = [total, btw, excBTW];
@@ -202,8 +202,8 @@ const createTotals = (totals: ITotals, currency: string, titleSubTotal: string, 
       {
         text: `(${ currency } ${ totals.discount.toFixed(2) })`,
         style: ['item', 'amountKey', 'amount', 'discount'],
-        border: [false, false, false, true]
-      }
+        border: [false, false, false, true],
+      },
     ];
     body = [subTotal, discount, total, btw, excBTW];
   }
@@ -225,8 +225,8 @@ const createTotals = (totals: ITotals, currency: string, titleSubTotal: string, 
     table: {
       headerRows: 1,
       widths: ['*', 80],
-      body
-    }
+      body,
+    },
   };
 };
 
@@ -274,7 +274,7 @@ export const pdf = (invoices: IInvoice[], office: IOfficeAll, start: number, sta
 
     content = [...content, header, {
       columns: [clientName(invoice.customer, titleClient, titleContact),
-        companyName(invoice.room, titleAddress, titlePhone, titleEmail, office.billingAddress)]
+        companyName(invoice.room, titleAddress, titlePhone, titleEmail, office.billingAddress)],
     }, '\n\n', invoiceNro, items, totals];
   });
 
@@ -283,57 +283,57 @@ export const pdf = (invoices: IInvoice[], office: IOfficeAll, start: number, sta
       fileName: `${ invoiceTitle(startDate) } - ${ invoiceTitle(endDate) }`,
       title: `${ invoiceTitle(startDate) } - ${ invoiceTitle(endDate) }`,
       author: office.manager.displayName,
-      subject: office.subject
+      subject: office.subject,
     },
     content,
     styles: {
       header: {
         color: '#aaaaab',
         width: 80,
-        bold: true
+        bold: true,
       },
       field: {
         color: '#333333',
-        width: 'auto'
+        width: 'auto',
       },
       fieldMargin: {
-        margin: [-40, 0, 0, 0]
+        margin: [-40, 0, 0, 0],
       },
       invoiceNro: {
         width: 'auto',
         alignment: 'center',
         fontSize: 15,
-        margin: [0, 10, 0, 10]
+        margin: [0, 10, 0, 10],
       },
       itemTitle: {
         alignment: 'center',
-        fillColor: '#b5ac9e'
+        fillColor: '#b5ac9e',
       },
       itemMargin: {
         width: '*',
-        margin: [0, 12, 0, 5]
+        margin: [0, 12, 0, 5],
       },
       item: {
         width: '*',
-        margin: [0, 5, 0, 5]
+        margin: [0, 5, 0, 5],
       },
       amount: {
-        fillColor: '#eee4e1'
+        fillColor: '#eee4e1',
       },
       discount: {
-        color: '#d28d8c'
+        color: '#d28d8c',
       },
       amountKey: {
-        alignment: 'right'
-      }
+        alignment: 'right',
+      },
     },
     watermark: { text: 'Nails Cleos', color: '#000000', opacity: 0.1 },
     images: {
-      logo: `${ environment.appServer }/assets/icons/icon-512x512.png`
+      logo: `${ environment.appServer }/assets/icons/icon-512x512.png`,
     },
     defaultStyle: {
-      font: 'EBGaramond'
+      font: 'EBGaramond',
     },
-    pageSize: 'A4'
+    pageSize: 'A4',
   };
 };

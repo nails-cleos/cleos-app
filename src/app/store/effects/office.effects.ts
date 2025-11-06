@@ -1,87 +1,111 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import * as fromActionsOffice from '../office.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { OfficeService } from '../../services/office.service';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
+import { Pagination } from '../../interfaces/pagination';
+import {
+  createOffice,
+  deleteOffice,
+  getAllManager,
+  getOffice,
+  getOfficesPage,
+  managerSuccess,
+  officeFailure,
+  officeSaveSuccess,
+  officeSelected,
+  officeSuccess,
+  updateOffice,
+} from '../office.actions';
+import { IOffice } from '../../interfaces/office';
+import { IUser } from '../../interfaces/user';
+import { IApiResponse, success } from '../../interfaces/common';
+import { ToastType } from '../../shared/toast/toast.model';
 
 @Injectable()
 export class OfficeEffects {
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly actions: Actions = inject(Actions);
+  private readonly officeService: OfficeService = inject(OfficeService);
+  private readonly userService: UserService = inject(UserService);
+  private readonly router: Router = inject(Router);
 
-  getAll$ = createEffect(() => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.getAll)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.officeService.getAll(payload.active, payload.direction, payload.page,
-      payload.size).pipe(
-      switchMap((response: any) => of(new fromActionsOffice.OfficeSuccess(response))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({ error: err.error })))
-    ))
+  getAll$ = createEffect(() => this.actions.pipe(
+    ofType(getOfficesPage),
+    switchMap(({ page, sort, direction, size }) =>
+      this.officeService.getOfficesPage(page, sort, direction, size).pipe(
+        map((data: Pagination<IOffice>) => officeSuccess({ data })),
+        catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
+      )),
   ));
 
-  getAllManager$ = createEffect(
-    () => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.getAllManager)).pipe(
-      map((action: any) => action.payload),
-      switchMap(() => this.userService.getAllManagers().pipe(
-        switchMap((response: any) => of(new fromActionsOffice.OfficeSuccess(response ? response : []))),
-        catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({ error: err.error })))
-      ))
-    ));
-
-  findOne$ = createEffect(() => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.officeFind)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.officeService.getById(payload).pipe(
-      switchMap((office: any) => of(new fromActionsOffice.OfficeSelected({ office }))),
-      catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({ error: err.error })))
-    ))
+  getAllManager$ = createEffect(() => this.actions.pipe(
+    ofType(getAllManager),
+    switchMap(() =>
+      this.userService.getManagers().pipe(
+        map((managers: IUser[]) => managerSuccess(managers ? { managers } : { managers: [] })),
+        catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
+      )),
   ));
 
-  save$ = createEffect(() => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.officeSave)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.officeService.add(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('OFFICE.CREATED', { name: response.name });
-        return of(new fromActionsOffice.OfficeSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({ error: err.error })))
-    ))
+  findOne$ = createEffect(() => this.actions.pipe(
+    ofType(getOffice),
+    switchMap(({ id }) =>
+      this.officeService.getOffice(id).pipe(
+        map((selected?: IOffice) => officeSelected({ selected })),
+        catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
+      )),
   ));
 
-  update = createEffect(() => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.officeUpdate)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.officeService.update(payload).pipe(
-      switchMap((response: any) => {
-        const message = this.translate.instant('OFFICE.UPDATED.MESSAGE', { name: response.name });
-        return of(new fromActionsOffice.OfficeSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({ error: err.error })))
-    ))
+  save$ = createEffect(() => this.actions.pipe(
+    ofType(createOffice),
+    switchMap(({ office }) =>
+      this.officeService.createOffice(office).pipe(
+        switchMap((response: IApiResponse) => this.requestSuccess('OFFICE.CREATED', response.name, response.id)),
+        catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
+      )),
   ));
 
-  delete$ = createEffect(() => this.actions$.pipe(ofType(fromActionsOffice.OfficeActionTypes.officeDelete)).pipe(
-    map((action: any) => action.payload),
-    switchMap((payload: any) => this.officeService.delete(payload.id).pipe(
-      switchMap(() => {
-        const message = this.translate.instant('OFFICE.DELETED.MESSAGE', { name: payload.name });
-        return of(new fromActionsOffice.OfficeSaveSuccess({ message }));
-      }), catchError((err: HttpErrorResponse) => of(new fromActionsOffice.OfficeFailure({ error: err.error })))
-    ))
+  update$ = createEffect(() => this.actions.pipe(
+    ofType(updateOffice),
+    switchMap(({ id, office }) =>
+      this.officeService.updateOffice(id, office).pipe(
+        switchMap((response: IApiResponse) =>
+          this.requestSuccess('OFFICE.UPDATED.MESSAGE', response.name, response.id)),
+        catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
+      )),
   ));
 
-  selectedData$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsOffice.OfficeActionTypes.officeSelected),
-    tap((data: any) => this.router.navigate([this.translate.currentLang, 'offices', data.payload.office.id]))
+  delete$ = createEffect(() => this.actions.pipe(
+    ofType(deleteOffice),
+    switchMap(({ id, name }) =>
+      this.officeService.deleteOffice(id).pipe(
+        switchMap(() => this.requestSuccess('OFFICE.DELETED.MESSAGE', name, undefined, 'warning')),
+        catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
+      )),
+  ));
+
+  selectedData$ = createEffect(() => this.actions.pipe(
+    ofType(officeSelected),
+    tap(({ selected }) => this.router
+      .navigate([this.translate.currentLang, 'offices', selected?.id])),
   ), { dispatch: false });
 
-  dataSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsOffice.OfficeActionTypes.officeSuccess)
+  dataSuccess$ = createEffect(() => this.actions.pipe(
+    ofType(officeSuccess),
   ), { dispatch: false });
 
-  saveSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(fromActionsOffice.OfficeActionTypes.officeSaveSuccess)
+  saveSuccess$ = createEffect(() => this.actions.pipe(
+    ofType(officeSaveSuccess),
   ), { dispatch: false });
 
-  constructor(private readonly translate: TranslateService, private actions$: Actions,
-              private officeService: OfficeService, private userService: UserService, private router: Router) {
+  private requestSuccess(key: string, name?: string, id?: string, toastType?: ToastType) {
+    const message = this.translate.instant(key, { name });
+    const path = id ? `offices/${ id }` : undefined;
+    return success(officeSaveSuccess, message, path, undefined, toastType);
   }
 }

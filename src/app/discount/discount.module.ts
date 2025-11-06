@@ -3,7 +3,8 @@ import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateS
 import { DiscountRoutingModule } from './discount-routing.module';
 
 import { DiscountComponent } from './discount.component';
-import { DiscountDialogComponent, DiscountsComponent } from './list/discounts.component';
+import { DiscountsComponent } from './list/discounts.component';
+import { DiscountDialogComponent } from './list/discount-dialog.component';
 import { EffectsModule } from '@ngrx/effects';
 import { DiscountEffects } from '../store/effects/discount.effects';
 import { DiscountService } from '../services/discount.service';
@@ -24,29 +25,29 @@ import { Observable } from 'rxjs';
     TranslateModule.forChild({
       loader: {
         provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('discount')
+        useClass: TranslateLoaderFactory.forModule('discount'),
       },
       missingTranslationHandler: {
         provide: MissingTranslationHandler,
         useClass: MissingTranslateHandler,
       },
       isolate: false,
-      extend: true
+      extend: true,
     }),
-    EffectsModule.forFeature([DiscountEffects, UserEffects])
+    EffectsModule.forFeature([DiscountEffects, UserEffects]),
   ],
   providers: [
     DiscountService,
     UserService,
-    CurrencyService
-  ]
+    CurrencyService,
+  ],
 })
 export class DiscountModule {
   constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
     const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe(state => {
+    getI18nState.subscribe((state) => {
       translateService.currentLang = '';
-      this.translateService.use(state.data);
+      this.translateService.use(state.language);
     });
   }
 }

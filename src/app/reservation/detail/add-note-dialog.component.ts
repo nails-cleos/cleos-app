@@ -7,7 +7,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 @Component({
   selector: 'app-add-note-dialog-component',
   templateUrl: './add-note-dialog.component.html',
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe]
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
 })
 export class AddNoteDialogComponent implements OnInit {
   noteForm!: UntypedFormGroup;
@@ -28,7 +28,7 @@ export class AddNoteDialogComponent implements OnInit {
 
   get doAction(): void {
     return this.dialogRef.close({
-      note: this.getNoteValue(this.note.value), customerNote: this.getNoteValue(this.customerNote.value)
+      note: this.getNoteValue(this.note.value), customerNote: this.getNoteValue(this.customerNote.value),
     });
   }
 
@@ -39,7 +39,7 @@ export class AddNoteDialogComponent implements OnInit {
   private createForm = (): void => {
     this.noteForm = this.formBuilder.group({
       note: this.note,
-      customerNote: this.customerNote
+      customerNote: this.customerNote,
     });
   };
 

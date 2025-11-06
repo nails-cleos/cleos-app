@@ -13,7 +13,7 @@ import { PaymentType } from '../../interfaces/payment';
   templateUrl: './form-field-adder.component.html',
   styleUrl: './form-field-adder.component.scss',
   animations: [detailExpandAnimation],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class FormFieldAdderComponent implements OnInit {
   @Input() key!: string;
@@ -29,7 +29,24 @@ export class FormFieldAdderComponent implements OnInit {
   expanded?: IExtras;
   allPaymentTypes: string[] = Object.keys(PaymentType);
 
-  get addRow(): void {
+  constructor(private formBuilder: FormBuilder) {
+  }
+
+  ngOnInit(): void {
+    this.formGroup = this.formBuilder.group({
+      items: this.formBuilder.array([]),
+    });
+    if (this.split) {
+      this.displayedColumns = [...this.displayedColumns, 'paymentType'];
+    }
+    this.displayedColumns = [...this.displayedColumns, 'actions'];
+  }
+
+  total() {
+    return this.dataSource.data.map(t => t.price).reduce((acc, value) => acc + value, 0);
+  }
+
+  addRow(): void {
     const element: IExtras = { description: undefined, price: 0 };
     if (this.split) {
       element.paymentType = undefined;
@@ -41,28 +58,11 @@ export class FormFieldAdderComponent implements OnInit {
     return this.subscribeToFormChanges();
   }
 
-  get total() {
-    return this.dataSource.data.map(t => t.price).reduce((acc, value) => acc + value, 0);
-  }
-
-  get remainsToBeSplit(): number | null {
+  remainsToBeSplit(): number | null {
     if (this.split) {
-      return (this.toPaid || 0) - this.total;
+      return (this.toPaid || 0) - this.total();
     }
     return null;
-  }
-
-  constructor(private formBuilder: FormBuilder) {
-  }
-
-  ngOnInit(): void {
-    this.formGroup = this.formBuilder.group({
-      items: this.formBuilder.array([])
-    });
-    if (this.split) {
-      this.displayedColumns = [...this.displayedColumns, 'paymentType'];
-    }
-    this.displayedColumns = [...this.displayedColumns, 'actions'];
   }
 
   deleteRow = (index: number): void => {
@@ -78,12 +78,12 @@ export class FormFieldAdderComponent implements OnInit {
       return this.formBuilder.group({
         description: ['', Validators.required],
         price: ['', Validators.required],
-        paymentType: ['', Validators.required]
+        paymentType: ['', Validators.required],
       });
     }
     return this.formBuilder.group({
       description: ['', Validators.required],
-      price: ['', Validators.required]
+      price: ['', Validators.required],
     });
   };
 
@@ -94,18 +94,19 @@ export class FormFieldAdderComponent implements OnInit {
     if (!this.split) {
       this.isValid.emit(!this.formGroup.invalid);
     } else {
-      this.isValid.emit(this.total === this.toPaid && !this.formGroup.invalid);
+      this.isValid.emit(this.total() === this.toPaid && !this.formGroup.invalid);
     }
   };
 
   private subscribeToFormChanges = (): void => {
     this.formArray.controls.forEach((control, index) => {
-      control.get('description')?.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe((newValue) => {
-        const newData = [...this.dataSource.data];
-        newData[index].description = newValue;
-        this.dataSource = new MatTableDataSource<IExtras>(newData);
-        this.emitRowChange();
-      });
+      control.get('description')?.valueChanges.pipe(debounceTime(300), distinctUntilChanged())
+        .subscribe((newValue) => {
+          const newData = [...this.dataSource.data];
+          newData[index].description = newValue;
+          this.dataSource = new MatTableDataSource<IExtras>(newData);
+          this.emitRowChange();
+        });
 
       control.get('price')?.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe((newValue) => {
         const newData = [...this.dataSource.data];

@@ -12,8 +12,8 @@ import { Observable, Subscription } from 'rxjs';
 import { SeoService } from './services/seo.service';
 import { Store } from '@ngrx/store';
 import { AppState, selectI18nState } from './store/app.states';
-import * as fromActionsI18n from './store/i18n.actions';
 import { RouterOutlet } from '@angular/router';
+import { setLanguage } from './store/i18n.actions';
 
 
 @Component({
@@ -22,9 +22,9 @@ import { RouterOutlet } from '@angular/router';
   styleUrls: ['./app.component.scss'],
   providers: [{
     provide: DateAdapter,
-    useClass: YearMonthDateAdapter
+    useClass: YearMonthDateAdapter,
   }],
-  imports: [RouterOutlet]
+  imports: [RouterOutlet],
 })
 export class AppComponent implements OnInit, OnDestroy {
 
@@ -47,7 +47,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.i18nSubscription = this.getI18nState.subscribe(state => this.translate.use(state.data));
+    this.i18nSubscription = this.getI18nState.subscribe((state) => this.translate.use(state.data));
   }
 
   ngOnDestroy(): void {
@@ -64,6 +64,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.locale = locale;
     const currentLocale = getLocale(this.locale);
     this.dateAdapter.setLocale(currentLocale.language);
-    this.store.dispatch(new fromActionsI18n.SetLanguage(currentLocale.language));
+    this.store.dispatch(setLanguage({ language: currentLocale.language }));
   };
 }

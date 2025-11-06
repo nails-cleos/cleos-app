@@ -2,13 +2,14 @@ import { Component, Inject } from '@angular/core';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { NOT_INSTALL_PWA } from '../../services/pwa.service';
 import { CookieService } from 'ngx-cookie-service';
-import { SharedModule } from '../shared.module';
+import { AppMaterialModule } from '../../util/app-material.module';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-prompt-component',
   templateUrl: './prompt.component.html',
   styleUrls: ['./prompt.component.scss'],
-  imports: [SharedModule]
+  imports: [AppMaterialModule, TranslatePipe],
 })
 export class PromptComponent {
 

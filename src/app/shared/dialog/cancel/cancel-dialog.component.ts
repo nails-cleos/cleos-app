@@ -5,7 +5,7 @@ import {
   ReactiveFormsModule,
   UntypedFormControl,
   UntypedFormGroup,
-  Validators
+  Validators,
 } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { IPrice } from '../../../interfaces/treatment';
@@ -20,7 +20,7 @@ import { TranslatePipe } from '@ngx-translate/core';
   templateUrl: './cancel-dialog.component.html',
   styleUrls: ['./cancel-dialog.component.scss'],
   imports: [PriceComponent, AppMaterialModule, ReactiveFormsModule, TranslatePipe],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CancelDialogComponent implements OnInit {
   readonly dialogRef = inject(MatDialogRef<CancelDialogComponent>);
@@ -32,7 +32,7 @@ export class CancelDialogComponent implements OnInit {
   paymentOptions: IPaymentOption[] = this.data.paymentOptions;
 
   paymentCancellation: FormControl = new UntypedFormControl('', [
-    Validators.required
+    Validators.required,
   ]);
 
   options: string[] = this.data.options;
@@ -48,7 +48,7 @@ export class CancelDialogComponent implements OnInit {
 
     this.typeForm = this.formBuilder.group({
       type: new UntypedFormControl(undefined),
-      bank: new UntypedFormControl(undefined)
+      bank: new UntypedFormControl(undefined),
     });
   }
 
@@ -66,11 +66,12 @@ export class CancelDialogComponent implements OnInit {
     const option: IPaymentOption = this.typeForm.get('type')?.value;
     const type = option?.type;
     const paymentOptionId = option?.bic;
-    const payload = { cancelOption, type, paymentOptionId, bic: undefined };
+    const cancelRequest = { cancelOption, type, paymentOptionId, bic: undefined };
     if (option?.subTypes?.length) {
-      payload.bic = this.typeForm.get('bank')?.value?.bic;
+      cancelRequest.bic = this.typeForm.get('bank')?.value?.bic;
     }
-    return this.dialogRef.close(payload);
+    this.dialogRef.close(cancelRequest);
+    return;
   }
 
   ngOnInit(): void {
@@ -79,7 +80,7 @@ export class CancelDialogComponent implements OnInit {
 
   private createForm = (): void => {
     this.cancelForm = this.formBuilder.group({
-      paymentCancellation: this.paymentCancellation
+      paymentCancellation: this.paymentCancellation,
     });
   };
 }

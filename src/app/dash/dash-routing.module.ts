@@ -10,29 +10,29 @@ import { QuarterSummaryComponent } from './quarter-summary/quarter-summary.compo
 const routes: Routes = [
   {
     path: '', component: DashComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager, Role.professional]
-    }
+      roles: [Role.admin, Role.manager, Role.professional],
+    },
   },
   {
     path: 'monthly/summary', component: MonthSummaryComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager]
-    }
+      roles: [Role.admin, Role.manager],
+    },
   },
   {
     path: 'year/summary', component: YearSummaryComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager]
-    }
+      roles: [Role.admin, Role.manager],
+    },
   },
   {
     path: 'quarter/summary', component: QuarterSummaryComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager]
-    }
-  }
+      roles: [Role.admin, Role.manager],
+    },
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class DashRoutingModule {
 }

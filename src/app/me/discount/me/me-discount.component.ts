@@ -9,17 +9,18 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { AppState, selectDiscountState } from '../../../store/app.states';
-import * as fromActionsDiscount from '../../../store/discount.actions';
+import { clean, getMyDiscountsPage } from '../../../store/discount.actions';
 import { Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Analytics, logEvent } from '@angular/fire/analytics';
 import { SharedModule } from '../../../shared/shared.module';
+import { currencySymbol } from '../../../util/helper';
 
 @Component({
   selector: 'app-me-discount',
   templateUrl: './me-discount.component.html',
   styleUrls: ['./me-discount.component.scss'],
-  imports: [SharedModule]
+  imports: [SharedModule],
 })
 export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -41,7 +42,7 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
               breakpointObserver: BreakpointObserver) {
     breakpointObserver.observe([
       Breakpoints.XSmall,
-      Breakpoints.Small
+      Breakpoints.Small,
     ]).subscribe(result => {
       if (result.matches) {
         this.pageSize = MOBILE_PAGE_SIZE;
@@ -49,10 +50,10 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.getState = this.store.select(selectDiscountState);
     logEvent(this.analytic, 'screen_view', {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
+      // eslint-disable-next-line camelcase
       firebase_screen: 'Referral page',
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      firebase_screen_class: 'ReferralsComponent'
+      // eslint-disable-next-line camelcase
+      firebase_screen_class: 'ReferralsComponent',
     });
     this.language = this.translate.currentLang;
   }
@@ -76,7 +77,7 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate([this.language, 'me', 'reservation'], { state: data });
   };
 
-  private clean = (): void => this.store.dispatch(new fromActionsDiscount.Clean());
+  private clean = (): void => this.store.dispatch(clean());
 
   private createPageSubscriptions = (): void => {
     this.sort.sortChange.subscribe(() => {
@@ -89,17 +90,18 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private getDiscounts = (page: number = 0): void => this.store.dispatch(
-    new fromActionsDiscount.GetMyDiscounts({
-      active: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      page
-    })
+    getMyDiscountsPage(
+      {
+        page: page,
+        sort: this.sort.active,
+        direction: this.sort.direction,
+        size: this.pageSize,
+      }),
   );
 
   private subscribe = (): void => {
-    this.subscription = this.getState.subscribe(state => {
-      if (state.message) {
+    this.subscription = this.getState.subscribe((state) => {
+      if (state.response) {
         this.clean();
         this.getDiscounts();
       }
@@ -108,10 +110,10 @@ export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
           let symbol;
           switch (ud.discountCustomer.type) {
             case DiscountType.money:
-              symbol = `$ ${ ud.discountCustomer.amount }`;
+              symbol = currencySymbol(ud.discountCustomer.discount?.currency);
               break;
             case DiscountType.percentage:
-              symbol = `${ ud.discountCustomer.amount } %`;
+              symbol = '%';
               break;
           }
           return Object.assign({}, ud, { symbol });

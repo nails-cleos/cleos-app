@@ -1,99 +1,76 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
+import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { Pagination } from '../interfaces/pagination';
+import { IOffice } from '../interfaces/office';
+import { IUser } from '../interfaces/user';
 
-export enum OfficeActionTypes {
-  getAll = '[Office] Get all',
+enum OfficeActionTypes {
+  getOfficesPage = '[Office] Get offices page',
   getAllManager = '[Office] Get all manager',
   officeSuccess = '[Office] Success',
-  officeSave = '[Office] Save',
-  officeUpdate = '[Office] Update',
-  officeSaveSuccess = '[Office] Save Success',
+  managerSuccess = '[Office] Manager Success',
+  createOffice = '[Office] Create office',
+  updateOffice = '[Office] Update office by id',
+  officeSaveSuccess = '[Office] Save success',
   officeFailure = '[Office] Failure',
   officeSelected = '[Office] Selected',
-  officeFind = '[Office] Find',
-  officeDelete = '[Office] Delete',
-  clean = '[Office] Clean'
+  getOffice = '[Office] Find office by id',
+  deleteOffice = '[Office] Delete office by id',
+  clean = '[Office] Clean',
 }
 
-export class GetAll implements Action {
-  readonly type = OfficeActionTypes.getAll;
+export const getOfficesPage = createAction(
+  OfficeActionTypes.getOfficesPage,
+  props<PageRequest>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const getAllManager = createAction(
+  OfficeActionTypes.getAllManager,
+);
 
-export class GetAllManagers implements Action {
-  readonly type = OfficeActionTypes.getAllManager;
-}
+export const officeSuccess = createAction(
+  OfficeActionTypes.officeSuccess,
+  props<{ data: Pagination<IOffice> }>(),
+);
 
-export class OfficeSuccess implements Action {
-  readonly type = OfficeActionTypes.officeSuccess;
+export const managerSuccess = createAction(
+  OfficeActionTypes.managerSuccess,
+  props<{ managers: IUser[] }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const createOffice = createAction(
+  OfficeActionTypes.createOffice,
+  props<{ office: IOffice }>(),
+);
 
-export class OfficeSave implements Action {
-  readonly type = OfficeActionTypes.officeSave;
+export const updateOffice = createAction(
+  OfficeActionTypes.updateOffice,
+  props<{ id: string; office: IOffice }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const officeSaveSuccess = createAction(
+  OfficeActionTypes.officeSaveSuccess,
+  props<ResponseSuccess>(),
+);
 
-export class OfficeUpdate implements Action {
-  readonly type = OfficeActionTypes.officeUpdate;
+export const officeFailure = createAction(
+  OfficeActionTypes.officeFailure,
+  props<{ error: IError }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const officeSelected = createAction(
+  OfficeActionTypes.officeSelected,
+  props<{ selected?: IOffice }>(),
+);
 
-export class OfficeSaveSuccess implements Action {
-  readonly type = OfficeActionTypes.officeSaveSuccess;
+export const getOffice = createAction(
+  OfficeActionTypes.getOffice,
+  props<{ id: string }>(),
+);
 
-  constructor(public payload: any) {
-  }
-}
+export const deleteOffice = createAction(
+  OfficeActionTypes.deleteOffice,
+  props<{ id: string; name: string }>(),
+);
 
-export class OfficeFailure implements Action {
-  readonly type = OfficeActionTypes.officeFailure;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class OfficeSelected implements Action {
-  readonly type = OfficeActionTypes.officeSelected;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class OfficeFind implements Action {
-  readonly type = OfficeActionTypes.officeFind;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class DeleteOffice implements Action {
-  readonly type = OfficeActionTypes.officeDelete;
-
-  constructor(public payload: any) {
-  }
-}
-
-export class Clean implements Action {
-  readonly type = OfficeActionTypes.clean;
-}
-
-export type All =
-  | GetAll
-  | GetAllManagers
-  | OfficeSave
-  | OfficeUpdate
-  | OfficeSuccess
-  | OfficeSaveSuccess
-  | OfficeFailure
-  | OfficeFind
-  | OfficeSelected
-  | DeleteOffice
-  | Clean;
+export const clean = createAction(OfficeActionTypes.clean);
