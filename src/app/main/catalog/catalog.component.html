@@ -1,7 +1,7 @@
 <div class="content">
   <section class="section-style">
     <div class="frame flex-wrap">
-      @for (catalogue of catalogues; track catalogue) {
+      @for (catalogue of catalogues(); track catalogue) {
         <mat-card appearance="outlined" class="catalogue-card flex-item">
           @if (catalogue.treatmentGroup) {
             <mat-card-header>

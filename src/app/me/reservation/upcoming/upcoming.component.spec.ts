@@ -42,7 +42,13 @@ describe('UpcomingComponent', () => {
           y: 2.2,
         },
       },
-      office: {},
+      office: {
+        id: 'office-id',
+        name: 'Main Office',
+        manager: {
+          id: 'manager-id',
+        },
+      },
       paymentTypes: [],
       primary: false,
     },
@@ -107,9 +113,9 @@ describe('UpcomingComponent', () => {
 
     fixture = TestBed.createComponent(UpcomingComponent);
     component = fixture.componentInstance;
-    component.small = false;
+    fixture.componentRef.setInput('small', false);
 
-    dialogSpy = spyOn(component.dialog, 'open');
+    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   it('should create', () => {
@@ -117,21 +123,20 @@ describe('UpcomingComponent', () => {
   });
 
   it('should calculate rowSpan, price, start and end in ngOnChanges', () => {
-    component.upcoming = upcoming;
-    component.ngOnChanges({});
-    expect(component.upcoming?.rowSpan).toBeGreaterThan(0);
-    expect(component.upcoming?.start).toBeDefined();
-    expect(component.upcoming?.end).toBeDefined();
-    expect(component.upcoming?.price).toBeDefined();
+    fixture.componentRef.setInput('upcoming', upcoming);
+    expect(component.upcomingComputed()?.rowSpan).toBeGreaterThan(0);
+    expect(component.upcomingComputed()?.start).toBeDefined();
+    expect(component.upcomingComputed()?.end).toBeDefined();
+    expect(component.upcomingComputed()?.price).toBeDefined();
   });
 
   it('should return true for showTimeZone if time zones differ', () => {
-    component.upcoming = upcoming;
+    fixture.componentRef.setInput('upcoming', upcoming);
     expect(component.showTimeZone()).toBeTrue();
   });
 
   it('should navigate when edit and canEdit is true', () => {
-    component.upcoming = upcoming;
+    fixture.componentRef.setInput('upcoming', upcoming);
 
     component.edit();
     expect(routerSpyObj.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'reservation', '1']);
@@ -139,13 +144,13 @@ describe('UpcomingComponent', () => {
 
   it('should handle openDialog call when upcoming is defined', () => {
     const reservationDate = new Date();
-    component.upcoming = upcoming;
+    fixture.componentRef.setInput('upcoming', upcoming);
     expect(() => component.openDialog(reservationDate)).not.toThrowError();
   });
 
   it('should open dialog when openDialog is called', () => {
     const reservationDate = new Date();
-    component.upcoming = upcoming;
+    fixture.componentRef.setInput('upcoming', upcoming);
     component.openDialog(reservationDate);
     expect(dialogSpy).toHaveBeenCalledWith(
       jasmine.any(Function),

@@ -129,11 +129,11 @@ Cypress.Commands.add('openMenu', (breakpoint: string, menus: string[]) => {
 Cypress.Commands.add('buttonClickOnTable', (breakpoint: string, column: string, rowClass: string, rowExpandedClass,
   button: string, otherButtons?: string[]) => {
   if (['XSmall', 'Small'].includes(breakpoint)) {
-    cy.get(`tr.${ rowClass }`).contains('td', column).then($cell => {
+    cy.get(`tr.${rowClass}`).contains('td', column).then($cell => {
       const $row = $cell.closest('tr');
       cy.wrap($row).click({ force: true });
 
-      cy.wrap($row).next(`tr.${ rowExpandedClass }`).should('be.visible').within(() => {
+      cy.wrap($row).next(`tr.${rowExpandedClass}`).should('be.visible').within(() => {
         otherButtons?.forEach(otherButton => {
           cy.get('button[mat-icon-button]').contains(otherButton).should('exist');
         });
@@ -149,8 +149,8 @@ Cypress.Commands.add('buttonClickOnTable', (breakpoint: string, column: string, 
 });
 
 Cypress.Commands.add('selectOption', (id: string, option: string) => {
-  cy.get(`#${ id }`).should('be.visible');
-  cy.get(`#${ id }`).click({ force: true });
+  cy.get(`#${id}`).should('be.visible');
+  cy.get(`#${id}`).click({ force: true });
 
   cy.get('mat-option').should('exist').and('be.visible');
   cy.get('mat-option').contains(option).click({ force: true });
@@ -164,8 +164,8 @@ Cypress.Commands.add('selectChip', (chipName: string) => {
 });
 
 Cypress.Commands.add('formControlType', (formControlName: string, value: any, type: string = 'input') => {
-  cy.get(`${ type }[formControlName="${ formControlName }"]`).scrollIntoView().should('be.visible');
-  cy.get(`${ type }[formControlName="${ formControlName }"]`).clear().type(value);
+  cy.get(`[data-cy="${formControlName}-${type}"]`).scrollIntoView().should('be.visible');
+  cy.get(`[data-cy="${formControlName}-${type}"]`).clear().type(value);
 });
 
 Cypress.Commands.add('setTime', (hour: number | string, minute: number | string = 0) => {
@@ -191,7 +191,7 @@ const dashboardNoContent = (displayName: string, messageKey: string) => ({
   professionalId: 'a6f7c7d1-1b7f-4e47-8f45-3a5c7c2bb4f8',
   error: {
     status: 'NO_CONTENT_ERROR',
-    message: `${ messageKey } no content`,
+    message: `${messageKey} no content`,
   },
   timeZone: 'Europe/Amsterdam',
 });
@@ -421,7 +421,7 @@ Cypress.Commands.add('mockCustomerReservations', () => {
 Cypress.Commands.add('mockAdminDashboard', (date: Date, displayName: string) => {
   cy.intercept(
     'GET',
-    `**/api/v1/dashboard/cards?date=${ date.toISOString().slice(0, 10) }`,
+    `**/api/v1/dashboard/cards?date=${date.toISOString().slice(0, 10)}`,
     {
       statusCode: 200,
       body: [dashboardNoContent(displayName, 'Reservations')],
@@ -430,7 +430,7 @@ Cypress.Commands.add('mockAdminDashboard', (date: Date, displayName: string) => 
 
   cy.intercept(
     'GET',
-    `**/api/v1/dashboard/events?date=${ date.toISOString().slice(0, 10) }`,
+    `**/api/v1/dashboard/events?date=${date.toISOString().slice(0, 10)}`,
     {
       statusCode: 200,
       body: [dashboardNoContent(displayName, 'Events')],
@@ -441,7 +441,7 @@ Cypress.Commands.add('mockAdminDashboard', (date: Date, displayName: string) => 
 Cypress.Commands.add('mockRoomAdminDashboard', (date: Date, displayName: string) => {
   cy.intercept(
     'GET',
-    `**/api/v1/dashboard/me/events?date=${ date.toISOString().slice(0, 10) }`,
+    `**/api/v1/dashboard/me/events?date=${date.toISOString().slice(0, 10)}`,
     {
       statusCode: 200,
       body: [dashboardNoContent(displayName, 'Events')],
@@ -465,7 +465,7 @@ Cypress.Commands.add('mockCustomersData', (customerId: string, treatmentId: stri
     const treatment = treatments.find((treatment: { id: string; }) => treatment.id === treatmentId);
     cy.intercept(
       'GET',
-      `**/api/v1/customers/${ customerId }/info`,
+      `**/api/v1/customers/${customerId}/info`,
       {
         statusCode: 200,
         body: {
@@ -494,7 +494,7 @@ Cypress.Commands.add('mockRoomData', (customerId: string) => {
   cy.fixture('rooms').then((roomData) => {
     cy.intercept(
       'GET',
-      `**/api/v1/rooms?customerId=${ customerId }`,
+      `**/api/v1/rooms?customerId=${customerId}`,
       {
         statusCode: 200,
         body: roomData,
@@ -509,7 +509,7 @@ Cypress.Commands.add('mockSearch', (
   cy.fixture('treatmentSearch').then((treatments) => {
     cy.intercept(
       'GET',
-      `**/api/v1/treatments?roomId=${ roomId }&customerId=${ customerId }`,
+      `**/api/v1/treatments?roomId=${roomId}&customerId=${customerId}`,
       {
         statusCode: 200,
         body: {
@@ -523,7 +523,7 @@ Cypress.Commands.add('mockSearch', (
   cy.fixture('additional').then((additionalList) => {
     cy.intercept(
       'GET',
-      `**/api/v1/additional/groups?roomId=${ roomId }&groupId=${ groupId }`,
+      `**/api/v1/additional/groups?roomId=${roomId}&groupId=${groupId}`,
       {
         statusCode: 200,
         body: additionalList,
@@ -540,7 +540,7 @@ Cypress.Commands.add('mockSearch', (
           const professional = usersData.find((user: { id: string; }) => user.id === professionalId);
           cy.intercept(
             'GET',
-            `**/api/v1/reservations/rooms/${ roomId }?days=${ days }&dates=${ dateFormatted }&professionalId=${ professionalId }`,
+            `**/api/v1/reservations/rooms/${roomId}?days=${days}&dates=${dateFormatted}&professionalId=${professionalId}`,
             {
               statusCode: 200,
               body: [
@@ -647,7 +647,7 @@ Cypress.Commands.add('mockCreateReservation', (
             });
           cy.intercept(
             'GET',
-            `**/api/v1/reservations/${ reservationId }`,
+            `**/api/v1/reservations/${reservationId}`,
             {
               statusCode: 200,
               body: {
@@ -674,7 +674,7 @@ Cypress.Commands.add('mockCreateReservation', (
 
           cy.intercept(
             'GET',
-            `**/api/v1/reservations/${ reservationId }/payments`,
+            `**/api/v1/reservations/${reservationId}/payments`,
             {
               statusCode: 204,
               body: [],
@@ -683,7 +683,7 @@ Cypress.Commands.add('mockCreateReservation', (
 
           cy.intercept(
             'GET',
-            `**/api/v1/reservations/${ reservationId }/history`,
+            `**/api/v1/reservations/${reservationId}/history`,
             {
               statusCode: 204,
               body: [],
@@ -718,7 +718,7 @@ Cypress.Commands.add('mockUser', (id: string, selectedUser?: any) => {
   cy.fixture('users').then((userData) => {
     cy.intercept(
       'GET',
-      `**/api/v1/users/${ selectedUser?.id ?? id }`,
+      `**/api/v1/users/${selectedUser?.id ?? id}`,
       {
         statusCode: 200,
         body: selectedUser ?? userData.find((u: any) => u.id === id),
@@ -789,7 +789,7 @@ Cypress.Commands.add('mockTreatment', (id: string, selectedTreatment?: any) => {
   cy.fixture('treatments').then((treatmentData) => {
     cy.intercept(
       'GET',
-      `**/api/v1/treatments/${ selectedTreatment?.id ?? id }`,
+      `**/api/v1/treatments/${selectedTreatment?.id ?? id}`,
       {
         statusCode: 200,
         body: selectedTreatment ?? treatmentData.find((t: any) => t.id === id),
@@ -802,7 +802,7 @@ Cypress.Commands.add('mockAdditional', (id: string, selectedAdditional?: any) =>
   return cy.fixture('additional').then((additionalData) => {
     cy.intercept(
       'GET',
-      `**/api/v1/additional/${ selectedAdditional?.id ?? id }`,
+      `**/api/v1/additional/${selectedAdditional?.id ?? id}`,
       {
         statusCode: 200,
         body: selectedAdditional ?? additionalData.find((t: any) => t.id === id),
@@ -815,7 +815,7 @@ Cypress.Commands.add('mockColor', (id: string, selectedColor?: any) => {
   cy.fixture('colors').then((colorData) => {
     cy.intercept(
       'GET',
-      `**/api/v1/colors/${ selectedColor?.id ?? id }`,
+      `**/api/v1/colors/${selectedColor?.id ?? id}`,
       {
         statusCode: 200,
         body: selectedColor ?? colorData.find((t: any) => t.id === id),
@@ -828,7 +828,7 @@ Cypress.Commands.add('mockCurrency', (id: string, selectedCurrency?: any) => {
   cy.fixture('currency').then((currencyData) => {
     cy.intercept(
       'GET',
-      `**/api/v1/currency/${ selectedCurrency?.id ?? id }`,
+      `**/api/v1/currency/${selectedCurrency?.id ?? id}`,
       {
         statusCode: 200,
         body: selectedCurrency ?? currencyData.find((t: any) => t.id === id),
@@ -848,7 +848,7 @@ const mockPage = (
   total?: number,
 ) => {
   const url = new RegExp(
-    page ? `/api/v1/${ pageUrl }\\?page=0&size=\\d+&sort=${ sort }&direction=${ direction }` : `/api/v1/${ baseUrl }`);
+    page ? `/api/v1/${pageUrl}\\?page=0&size=\\d+&sort=${sort}&direction=${direction}` : `/api/v1/${baseUrl}`);
   const content = data.slice(0, total ?? data.length);
   const body = page ? {
     content: content,

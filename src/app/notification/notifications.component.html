@@ -2,19 +2,20 @@
   <div class="card-container">
     <div class="card-content">
       <mat-card appearance="outlined">
+        @let currentNotifications = notifications();
         <mat-card-header>
           <mat-card-title [matBadgeHidden]="badge <= 0" [matBadge]="badge" matBadgeColor="warn"
                           [matBadgeOverlap]="false">
             {{ 'NOTIFICATION.TITLE' | translate }}
           </mat-card-title>
-          @if (!notifications.length) {
+          @if (!currentNotifications.length) {
             <mat-card-subtitle>{{ 'COMMON.NOTIFICATION.NO' | translate }}</mat-card-subtitle>
           }
         </mat-card-header>
         <mat-card-content>
-          @if (notifications.length) {
+          @if (currentNotifications.length) {
             <div class="inner-container" @list>
-              @for (not of notifications; let last = $last; let first = $first; let i = $index; track not) {
+              @for (not of currentNotifications; let last = $last; let first = $first; let i = $index; track not) {
                 <mat-list @items matRipple style="padding: 0">
                   @if (first) {
                     <mat-divider></mat-divider>
@@ -47,7 +48,7 @@
                 }
                 @if (showMore) {
                   <mat-list-item>
-                    <button (click)="getNotifications()" color="primary" mat-button>
+                    <button (click)="getMoreNotifications()" color="primary" mat-button>
                       {{ 'COMMON.NOTIFICATION.LOAD_MORE' | translate }}
                     </button>
                   </mat-list-item>

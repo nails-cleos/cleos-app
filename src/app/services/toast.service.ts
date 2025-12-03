@@ -76,7 +76,7 @@ export class ToastService {
 
     if (duration > 0) {
       setTimeout(() => {
-        this.dismissSpecific(overlayRef);
+        toastDismissed.next();
       }, duration);
     }
 

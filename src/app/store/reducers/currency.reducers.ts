@@ -9,30 +9,33 @@ import {
   deleteCurrency,
   getCurrenciesPage,
   getCurrency,
+  setCurrentCurrencyId,
   updateCurrency,
 } from '../currency.actions';
 import { ICurrency } from '../../interfaces/currency';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
 
-export interface State {
+export const CURRENCY_FEATURE_KEY = 'currency';
+
+export interface CurrencyState {
   response?: IResponseSuccess;
   data?: Pagination<ICurrency>;
-  errorMessage?: string;
   error?: IError;
   subErrors?: IError[];
   selected?: ICurrency;
   isLoading: boolean;
+  currentCurrencyId?: string;
 }
 
-export const initialState: State = {
+export const initialState: CurrencyState = {
   data: undefined,
-  errorMessage: undefined,
   error: undefined,
   subErrors: undefined,
   selected: undefined,
   response: undefined,
   isLoading: false,
+  currentCurrencyId: undefined,
 };
 
 export const currencyReducer = createReducer(
@@ -40,14 +43,12 @@ export const currencyReducer = createReducer(
   on(getCurrenciesPage, (state) => ({
     ...state,
     data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<ICurrency>,
-    errorMessage: undefined,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
   })),
   on(getCurrency, (state) => ({
     ...state,
-    errorMessage: undefined,
     subErrors: undefined,
     selected: {} as ICurrency,
     response: undefined,
@@ -55,7 +56,6 @@ export const currencyReducer = createReducer(
   on(currencySuccess, (state, { data }) => ({
     ...state,
     data: data,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
@@ -63,20 +63,17 @@ export const currencyReducer = createReducer(
     ...state,
     response: action,
     selected: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     isLoading: false,
   })),
   on(currencySelected, (state, { selected }) => ({
     ...state,
     selected: selected,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(currencyFailure, (state, { error }) => ({
     ...state,
-    errorMessage: error.message,
     error: error,
     subErrors: error.subErrors,
     response: undefined,
@@ -84,10 +81,14 @@ export const currencyReducer = createReducer(
   })),
   on(updateCurrency, createCurrency, deleteCurrency, (state) => ({
     ...state,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
     isLoading: true,
+    selected: undefined,
+  })),
+  on(setCurrentCurrencyId, (state, { currencyId }) => ({
+    ...state,
+    currentCurrencyId: currencyId,
   })),
   on(clean, () => initialState),
 );

@@ -20,7 +20,7 @@ import { NoteService } from '../../services/note.service';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { INote } from '../../interfaces/note';
-import { IUser } from '../../interfaces/user';
+import { IUserAll } from '../../interfaces/user';
 import { IApiResponse, success } from '../../interfaces/common';
 
 @Injectable()
@@ -80,7 +80,7 @@ export class NoteEffects {
     ofType(getAllProfessional),
     switchMap(() =>
       this.userService.getProfessionals().pipe(
-        map((data: IUser[]) => noteSuccess({ data })),
+        map((data: IUserAll[]) => noteSuccess({ data })),
         catchError((err: HttpErrorResponse) => of(noteFailure({ error: err.error }))),
       )),
   ));
@@ -99,8 +99,8 @@ export class NoteEffects {
   ), { dispatch: false });
 
   private requestSuccess(key: string, description?: string, id?: string) {
-    const message = this.translate.instant(`NOTE.${ key }.MESSAGE`, { description });
-    const path = id ? `notes/${ id }` : undefined;
+    const message = this.translate.instant(`NOTE.${key}.MESSAGE`, { description });
+    const path = id ? `notes/${id}` : undefined;
     return success(noteSaveSuccess, message, path);
   }
 }

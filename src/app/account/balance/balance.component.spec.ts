@@ -29,84 +29,84 @@ describe('BalanceComponent', () => {
         customer: {} as any,
         currency: {} as any,
       };
-      component.account = mockAccount;
-      expect(component.account).toEqual(mockAccount);
+      fixture.componentRef.setInput('account', mockAccount);
+      expect(component.account()).toEqual(mockAccount);
     });
 
     it('should accept showAdd input', () => {
-      component.showAdd = true;
-      expect(component.showAdd).toBeTrue();
+      fixture.componentRef.setInput('showAdd', true);
+      expect(component.showAdd()).toBeTrue();
     });
 
     it('should accept showView input', () => {
-      component.showView = false;
-      expect(component.showView).toBeFalse();
+      fixture.componentRef.setInput('showView', false);
+      expect(component.showView()).toBeFalse();
     });
 
     it('should accept showUser input', () => {
-      component.showUser = true;
-      expect(component.showUser).toBeTrue();
+      fixture.componentRef.setInput('showUser', true);
+      expect(component.showUser()).toBeTrue();
     });
 
     it('should accept language input', () => {
-      component.language = 'en';
-      expect(component.language).toBe('en');
+      fixture.componentRef.setInput('language', 'en');
+      expect(component.language()).toBe('en');
     });
   });
 
   describe('balancePercentage getter', () => {
     it('should return 0 when account is undefined', () => {
-      component.account = undefined;
+      fixture.componentRef.setInput('account', undefined);
       expect(component.balancePercentage).toBe(0);
     });
 
     it('should return 100 when balance is greater than 2000', () => {
-      component.account = {
+      fixture.componentRef.setInput('account', {
         id: '1',
         balance: 2500,
         customer: {} as any,
         currency: {} as any,
-      };
+      });
       expect(component.balancePercentage).toBe(100);
     });
 
     it('should return 100 when balance equals 2000', () => {
-      component.account = {
+      fixture.componentRef.setInput('account', {
         id: '1',
         balance: 2000,
         customer: {} as any,
         currency: {} as any,
-      };
+      });
       expect(component.balancePercentage).toBe(100);
     });
 
     it('should calculate correct percentage when balance is less than 2000', () => {
-      component.account = {
+      fixture.componentRef.setInput('account', {
         id: '1',
         balance: 1000,
         customer: {} as any,
         currency: {} as any,
-      };
+      });
       expect(component.balancePercentage).toBe(50);
     });
 
     it('should return 0 when balance is 0', () => {
-      component.account = {
+      fixture.componentRef.setInput('account', {
         id: '1',
         balance: 0,
         customer: {} as any,
         currency: {} as any,
-      };
+      });
       expect(component.balancePercentage).toBe(0);
     });
 
     it('should calculate correct percentage for fractional results', () => {
-      component.account = {
+      fixture.componentRef.setInput('account', {
         id: '1',
         balance: 500,
         customer: {} as any,
         currency: {} as any,
-      };
+      });
       expect(component.balancePercentage).toBe(25);
     });
   });

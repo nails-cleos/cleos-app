@@ -1,124 +1,121 @@
-import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import {
-  AbstractControl,
-  UntypedFormBuilder,
-  UntypedFormControl,
-  UntypedFormGroup,
-  Validators,
-  ɵTypedOrUntyped,
-} from '@angular/forms';
-import { Observable, Subscription } from 'rxjs';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { AppState, selectColorState } from '../store/app.states';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Color, IColor } from '../interfaces/color';
-import { clean, createColor, getColor, updateColor } from '../store/color.actions';
+import { createColor, getColor, updateColor } from '../store/color.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { fieldChange, valueChange } from '../util/validators';
 import { SharedModule } from '../shared/shared.module';
 import { BackButtonDirective } from '../directives/back-button.directive';
+import {
+  getCurrentColorIdPipe,
+  getColorResponsePipe,
+  getSelectedColorPipe,
+  getSubErrorsPipe,
+} from '../store/selectors/color.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { IError } from '../interfaces/common';
+import { ColorState } from '../store/reducers/color.reducers';
+
+type ColorForm = {
+  name: FormControl<string>;
+  description: FormControl<string | undefined>;
+}
 
 @Component({
   selector: 'app-colors',
   templateUrl: './color.component.html',
   styleUrls: ['./color.component.scss'],
   imports: [SharedModule, BackButtonDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ColorComponent implements OnInit, OnDestroy {
-  @Input() color?: IColor;
+export class ColorComponent {
+  private readonly store: Store<ColorState> = inject(Store<ColorState>);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly router: Router = inject(Router);
+  private readonly translate: TranslateService = inject(TranslateService);
 
-  id?: string;
-  isAddMode: boolean;
-  form!: UntypedFormGroup;
+  private colorId$ = this.store.pipe(getCurrentColorIdPipe);
+  private selectedColor$ = this.store.pipe(getSelectedColorPipe);
+  private subErrors$ = this.store.pipe(getSubErrorsPipe);
+  private response$ = this.store.pipe(getColorResponsePipe);
 
-  errors: any = [];
+  private colorIdSignal = toSignal(this.colorId$);
+  private subErrorsSignal = toSignal(this.subErrors$);
+  private responseSignal = toSignal(this.response$);
 
-  private getState: Observable<any>;
-  private subscription: Subscription | undefined;
-  private readonly language: string;
+  colorSignal = toSignal(this.selectedColor$);
+  isAddModeSignal = computed(() => !this.colorIdSignal());
+  errors = signal<Record<string, unknown>>({});
 
-  constructor(private store: Store<AppState>, private formBuilder: UntypedFormBuilder, private router: Router,
-              private translate: TranslateService, private route: ActivatedRoute, private cdRef: ChangeDetectorRef) {
-    this.isAddMode = true;
-    this.getState = this.store.select(selectColorState);
-    this.language = this.translate.currentLang;
+  form: FormGroup<ColorForm> = this.formBuilder.group<ColorForm>({
+    name: this.formBuilder.control('', {
+      validators: [Validators.required],
+    }),
+    description: this.formBuilder.control(undefined),
+  });
+
+  private readonly language: string = this.translate.currentLang;
+
+  constructor() {
+    effect(() => {
+      const selected = this.colorSignal();
+      if (selected?.id) {
+        this.form.patchValue(selected);
+      }
+    });
+
+    effect(() => {
+      const subErrors = this.subErrorsSignal();
+      if (subErrors) {
+        const errorMap: Record<string, unknown> = {};
+        subErrors.forEach((error: IError) => {
+          const field = error.field as keyof ColorForm | undefined;
+
+          if (field && field in this.form.controls) {
+            errorMap[field] = error.message;
+            this.form.controls[field].setErrors({ incorrect: true });
+          }
+        });
+        this.errors.set(errorMap);
+      }
+    });
+
+    effect(() => {
+      if (this.responseSignal()) {
+        this.router.navigate([this.language, 'colors']);
+      }
+    });
+
+    effect(() => {
+      const id = this.colorIdSignal();
+      if (id) {
+        this.store.dispatch(getColor({ id }));
+      }
+    });
   }
 
-  get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
+  get getForm(): ColorForm {
     return this.form.controls;
   }
 
-  get submit(): void {
+  submit(): void {
     if (this.form.invalid) {
       return;
     }
 
+    const colorSignal = this.colorSignal();
     const color: IColor = new Color();
-    color.name = fieldChange(this.getForm.name as UntypedFormControl, this.color?.name);
-    color.description = valueChange(this.getForm.description.value, this.color?.description);
+    color.name = fieldChange(this.getForm.name, colorSignal?.name);
+    color.description = valueChange(this.getForm.description.value, colorSignal?.description);
 
-    if (this.isAddMode) {
+    if (this.isAddModeSignal()) {
       this.store.dispatch(createColor({ color }));
     } else {
-      this.color = undefined;
-      const id = this.id!;
+      const id = this.colorIdSignal()!;
       this.store.dispatch(updateColor({ id, color }));
     }
     return;
   }
-
-  ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.id = id;
-    }
-    this.clean();
-    this.createForm();
-    this.subscribe();
-    this.isAddMode = !this.id;
-    if (!this.isAddMode) {
-      this.getColor();
-    }
-    this.cdRef.detectChanges();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  private createForm = (): void => {
-    this.form = this.formBuilder.group({
-      name: ['', [Validators.required]],
-      description: [''],
-    });
-  };
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private getColor = (): void => {
-    if (!this.color) {
-      this.store.dispatch(getColor({ id: this.id! }));
-    }
-  };
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.selected) {
-        this.color = {
-          id: state.selected.id,
-          name: state.selected.name,
-          description: state.selected.description,
-        } as IColor;
-        this.form.patchValue(this.color);
-      }
-      if (state.subErrors) {
-        state.subErrors.forEach((value: any) => {
-          this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({ incorrect: true });
-        });
-      } else if (state.response) {
-        this.router.navigate([this.language, 'colors']);
-      }
-    });
-  };
 }

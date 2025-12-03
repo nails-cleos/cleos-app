@@ -1,16 +1,38 @@
 import { HideMissingDirective } from './hide-missing.directive';
-import { ElementRef } from '@angular/core';
+import { Component } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+
+@Component({
+  template: '<img appHideMissing src="test.jpg" />',
+  imports: [HideMissingDirective],
+})
+class HostComponent {}
 
 describe('HideMissingDirective', () => {
+  let fixture: ComponentFixture<HostComponent>;
+  let directive: HideMissingDirective;
+  let imgElement: HTMLImageElement;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HostComponent],
+    });
+
+    fixture = TestBed.createComponent(HostComponent);
+    fixture.detectChanges();
+
+    const debugEl = fixture.debugElement.query(By.directive(HideMissingDirective));
+    directive = debugEl.injector.get(HideMissingDirective);
+    imgElement = debugEl.nativeElement as HTMLImageElement;
+  });
+
   it('should create an instance', () => {
-    const directive = new HideMissingDirective(new ElementRef(null));
     expect(directive).toBeTruthy();
   });
 
   it('should hide the element on error', () => {
-    const element = document.createElement('img');
-    const directive = new HideMissingDirective(new ElementRef(element));
     directive.onError();
-    expect(element.style.display).toBe('none');
+    expect(imgElement.style.display).toBe('none');
   });
 });

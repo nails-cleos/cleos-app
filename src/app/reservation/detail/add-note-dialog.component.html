@@ -1,4 +1,4 @@
-<form (ngSubmit)="doAction" [formGroup]="noteForm" novalidate (keydown.enter)="$event.preventDefault()">
+<form (ngSubmit)="doAction()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
   <h1 mat-dialog-title>{{ 'RESERVATION.NOTE.ADD' | translate }}</h1>
   <div mat-dialog-content>
     @if (!data.isCustomer) {
@@ -6,7 +6,7 @@
       <mat-form-field appearance="outline" class="full">
         <mat-label>{{ 'RESERVATION.NOTE.FIELD' | translate }}</mat-label>
         <label>
-          <textarea #message [formControl]="note" matInput [maxlength]="256"></textarea>
+          <textarea #message [formControl]="getForm.note" matInput [maxlength]="256"></textarea>
         </label>
         <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
       </mat-form-field>
@@ -15,15 +15,16 @@
     <mat-form-field appearance="outline" class="full">
       <mat-label>{{ 'RESERVATION.NOTE.' + (data.isCustomer ? 'FIELD' : 'CUSTOMER') | translate }}</mat-label>
       <label>
-        <textarea #customerMessage [formControl]="customerNote" matInput [maxlength]="256"></textarea>
+        <textarea #customerMessage [formControl]="getForm.customerNote" matInput [maxlength]="256"></textarea>
       </label>
       <mat-hint align="end">{{ customerMessage.value.length }} / 256</mat-hint>
     </mat-form-field>
   </div>
   <div mat-dialog-actions>
-    <button (click)="onNoClick" color="accent" mat-fab extended class="icon-button"
-            type="button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
-    <button [disabled]="noteForm.invalid || noteForm.pristine" cdkFocusInitial color="primary" mat-fab extended
+    <button (click)="onNoClick()" color="accent" mat-fab extended class="icon-button"
+            type="button">{{ 'COMMON.BUTTON.CANCEL' | translate }}
+    </button>
+    <button [disabled]="form.invalid || form.pristine" cdkFocusInitial color="primary" mat-fab extended
             class="icon-button" type="submit">Ok
     </button>
   </div>

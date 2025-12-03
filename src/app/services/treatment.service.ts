@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ITreatmentAll, ITreatmentDiscountDTO, ITreatmentGroup } from '../interfaces/treatment';
+import { ITreatmentAll, ITreatmentDiscountDTO, ITreatmentGroup, ITreatmentGroupAll } from '../interfaces/treatment';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
@@ -13,7 +13,7 @@ import { IApiResponse } from '../interfaces/common';
 export class TreatmentService {
 
   private url = 'treatments';
-  private urlV1 = `v1/${ this.url }`;
+  private urlV1 = `v1/${this.url}`;
 
   private http: HttpClient = inject(HttpClient);
 
@@ -22,21 +22,21 @@ export class TreatmentService {
     sort: string,
     direction: SortDirection,
     size: number,
-  ): Observable<Pagination<ITreatmentGroup>> => this.http.get<Pagination<ITreatmentGroup>>(
+  ): Observable<Pagination<ITreatmentGroupAll>> => this.http.get<Pagination<ITreatmentGroupAll>>(
     toUrl(this.urlV1, 'pages'),
     { params: createFilter(page, size, sort, direction) },
   );
 
-  getAllTreatmentsGroup = (): Observable<ITreatmentGroup[]> => this.http.get<ITreatmentGroup[]>(
+  getAllTreatmentsGroup = (): Observable<ITreatmentGroupAll[]> => this.http.get<ITreatmentGroupAll[]>(
     toUrl(this.urlV1, 'groups'),
   );
 
-  getAllTreatments = (roomId: string, customerId?: string): Observable<ITreatmentDiscountDTO[]> => {
+  getAllTreatments = (roomId: string, customerId?: string): Observable<ITreatmentDiscountDTO> => {
     let params = new HttpParams().set('roomId', roomId);
     if (customerId) {
       params = params.append('customerId', customerId);
     }
-    return this.http.get<ITreatmentDiscountDTO[]>(this.urlV1, { params });
+    return this.http.get<ITreatmentDiscountDTO>(this.urlV1, { params });
   };
 
   getListTreatmentsGroup = (): Observable<ITreatmentGroup[]> => this.http.get<ITreatmentGroup[]>(
@@ -44,7 +44,7 @@ export class TreatmentService {
 
   getTreatmentGroup = (
     id: string,
-  ): Observable<ITreatmentGroup | undefined> => this.http.get<ITreatmentGroup>(toUrl(this.urlV1, id));
+  ): Observable<ITreatmentGroupAll | undefined> => this.http.get<ITreatmentGroupAll>(toUrl(this.urlV1, id));
 
   createTreatment = (
     treatmentGroup: ITreatmentGroup,

@@ -1,4 +1,4 @@
-import { IAvailability, IAvailabilityAll, IRoom, IRoomAll } from '../interfaces/room';
+import { IAvailability, IAvailabilityAll, IRoom, IRoomAll, IService } from '../interfaces/room';
 import {
   addDays,
   addMinutes,
@@ -76,7 +76,7 @@ export const reservationDuration = (reservation?: IReservationAll): IDuration =>
   return sumDurations(durations);
 };
 
-export const totalDuration = (treatment: ITreatmentAll, additional?: IAdditionalAll[]) => {
+export const totalDuration = (treatment: ITreatmentAll | IService, additional?: IAdditionalAll[]) => {
   let additionalDuration: IDuration = new Duration();
   if (additional && additional.length) {
     additionalDuration = sumDurations(additional.map(value => convertDuration(value.duration)));
@@ -226,7 +226,7 @@ export const getDiffTime = (maxDate: Date, minDate: Date): string => {
   const formattedHours = String(hours).padStart(2, '0');
   const formattedMinutes = String(minutes).padStart(2, '0');
 
-  return `${ sign }${ formattedHours }:${ formattedMinutes }`;
+  return `${sign}${formattedHours}:${formattedMinutes}`;
 };
 
 export const getAvailability = (room: IRoom): any => {
@@ -407,7 +407,7 @@ export const backendFormatDate = (date?: Date): string | undefined => {
   if (date) {
     const month = String(date.getMonth() + 1).padStart(2, '0');  // Months are zero-indexed in JS
     const day = String(date.getDate()).padStart(2, '0');
-    return `${ date?.getFullYear() }-${ month }-${ day }`;
+    return `${date?.getFullYear()}-${month}-${day}`;
   }
   return date;
 };
@@ -497,14 +497,14 @@ export const getDateQuarter = (date: Date): number => getQuarter(date);
 
 export const getMonth = (quarter: number, key: number): number => ((quarter - 1) * 3) + key;
 
-export const getTimeNumber = (date: any) => {
+export const getTimeNumber = (date?: Date | string) => {
   if (date) {
     if (date instanceof Date) {
       return convertDuration(getTime(date));
     }
     const time = date.split(':');
     let hour = Number(time[0]);
-    if (isNaN(time[1])) {
+    if (isNaN(Number(time[1]))) {
       const format = time[1].slice(2).trim();
       if (format.toLowerCase() === 'pm' || format.toLowerCase() === 'p.m.') {
         hour += 12;
@@ -517,7 +517,7 @@ export const getTimeNumber = (date: any) => {
   return undefined;
 };
 
-export const dateToTimestamp = (date: Date = getNowTimeZone()): number => parseInt(`${ date.getTime() / 1000 }`, 10);
+export const dateToTimestamp = (date: Date = getNowTimeZone()): number => parseInt(`${date.getTime() / 1000}`, 10);
 
 export const isSameTimeZone = (timeZone: string = getCurrentTimeZone()): boolean => {
   if (getCurrentTimeZone() === timeZone) {
@@ -613,10 +613,10 @@ export const getTimeZoneFromDate = (date: Date, timezone?: string): ITimeZone =>
 
   if (timezone) {
     const gmt = getGMT(timezone, date);
-    return new TimeZone(`${ timezone } (${ gmt })`, timezone, gmt !== currentGMT ? gmt : '');
+    return new TimeZone(`${timezone} (${gmt})`, timezone, gmt !== currentGMT ? gmt : '');
   }
 
-  return new TimeZone(`${ currentTimeZone } (${ currentGMT })`, currentTimeZone);
+  return new TimeZone(`${currentTimeZone} (${currentGMT})`, currentTimeZone);
 };
 
 export const getTimeZone = (timezone?: string): ITimeZone => {
@@ -668,7 +668,7 @@ const timeConvert = (time: number, hour: number = 0) => {
 const getGMT = (timeZone: string, date: Date): string => {
   let gmt = date.toLocaleTimeString('en-US', { timeZone, timeZoneName: 'short' }).split(' ')[2];
   if (gmt.indexOf(':') === -1) {
-    gmt = `${ gmt }:00`;
+    gmt = `${gmt}:00`;
   }
 
   if (gmt.length === 8) {
@@ -721,10 +721,10 @@ export const getDateFormat = (date?: Date | null): string => {
   if (!date) {
     return '';
   }
-  const month = (`0${ (date.getMonth()) + 1 }`).slice(-2);
+  const month = (`0${(date.getMonth()) + 1}`).slice(-2);
   const year = date.getFullYear();
 
-  return `${ month }-${ year }`;
+  return `${month}-${year}`;
 };
 
 export const datesInSameWeek = (date1: Date, date2: Date): boolean => {

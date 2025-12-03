@@ -1,11 +1,13 @@
 import { getLanguage, setLanguage } from '../i18n.actions';
 import { createReducer, on } from '@ngrx/store';
 
-export interface State {
+export const I18N_FEATURE_KEY = 'i18n';
+
+export interface I18NState {
   language?: string;
 }
 
-export const initialState: State = {
+export const initialState: I18NState = {
   language: undefined,
 };
 

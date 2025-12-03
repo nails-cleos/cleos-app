@@ -4,14 +4,16 @@ import { CatalogueRoutingModule } from './catalogue-routing.module';
 
 import { CatalogueComponent } from './catalogue.component';
 import { CataloguesComponent } from './list/catalogues.component';
-import { EffectsModule } from '@ngrx/effects';
+import { provideEffects } from '@ngrx/effects';
 import { CatalogueEffects } from '../store/effects/catalogue.effects';
 import { CatalogueService } from '../services/catalogue.service';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { TreatmentService } from '../services/treatment.service';
-import { Store } from '@ngrx/store';
-import { AppState, selectI18nState } from '../store/app.states';
-import { Observable } from 'rxjs';
+import { provideState, Store } from '@ngrx/store';
+import { CatalogueNavigationEffects } from './catalogue-navigation.effects';
+import { CATALOGUE_FEATURE_KEY, catalogueReducer } from '../store/reducers/catalogue.reducers';
+import { I18NState } from '../store/reducers/i18n.reducers';
+import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
 
 @NgModule({
   imports: [
@@ -30,19 +32,19 @@ import { Observable } from 'rxjs';
       isolate: false,
       extend: true,
     }),
-    EffectsModule.forFeature([CatalogueEffects]),
   ],
   providers: [
     CatalogueService,
     TreatmentService,
+    provideState(CATALOGUE_FEATURE_KEY, catalogueReducer),
+    provideEffects(CatalogueEffects, CatalogueNavigationEffects),
   ],
 })
 export class CatalogueModule {
-  constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
-    const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe((state) => {
+  constructor(private readonly store: Store<I18NState>, protected translateService: TranslateService) {
+    this.store.pipe(getI18NLanguagePipe).subscribe((language) => {
       translateService.currentLang = '';
-      this.translateService.use(state.language);
+      this.translateService.use(language);
     });
   }
 }

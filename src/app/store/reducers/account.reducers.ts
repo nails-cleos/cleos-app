@@ -13,33 +13,42 @@ import {
   paymentOptions,
   paymentOptionsSuccess,
   paymentSend,
+  setCurrentAccountId,
+  setCurrentCustomerId,
+  setCurrentTransactionId,
   updateAccount,
 } from '../account.actions';
 
 import { Pagination } from '../../interfaces/pagination';
-import { IAccount, IAccountTransaction, ITransaction } from '../../interfaces/account';
+import { IAccount, IAccountAll, IAccountTransaction, ITransaction } from '../../interfaces/account';
 import { IPaymentOption } from '../../interfaces/payment';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 
-export interface State {
+export const ACCOUNT_FEATURE_KEY = 'accounts';
+
+export interface AccountState {
   response?: IResponseSuccess;
   data?: IAccount | IAccountTransaction | ITransaction[];
   paymentOptions?: IPaymentOption[];
-  errorMessage?: string;
   error?: IError;
   subErrors?: IError[];
-  selected?: IAccount;
+  selected?: IAccountAll | ITransaction;
+  currentAccountId?: string;
+  currentTransactionId?: string;
+  currentCustomerId?: string;
   isLoading: boolean;
 }
 
-export const initialState: State = {
+export const initialState: AccountState = {
   response: undefined,
   data: undefined,
   paymentOptions: undefined,
-  errorMessage: undefined,
   error: undefined,
   subErrors: undefined,
   selected: undefined,
+  currentAccountId: undefined,
+  currentTransactionId: undefined,
+  currentCustomerId: undefined,
   isLoading: false,
 };
 
@@ -49,16 +58,14 @@ export const accountReducer = createReducer(
   on(getTransaction, getAccountByCustomerId, getAccount, (state) => ({
     ...state,
     response: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
-    selected: {} as IAccount,
+    selected: {} as IAccountAll,
   })),
 
   on(paymentOptions, (state) => ({
     ...state,
     response: undefined,
     paymentOptions: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
 
@@ -69,7 +76,6 @@ export const accountReducer = createReducer(
       account: undefined,
     },
     response: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
 
@@ -77,7 +83,6 @@ export const accountReducer = createReducer(
     ...state,
     data,
     response: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
 
@@ -85,7 +90,6 @@ export const accountReducer = createReducer(
     ...state,
     paymentOptions,
     response: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
 
@@ -93,7 +97,6 @@ export const accountReducer = createReducer(
     ...state,
     response: action,
     selected: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     isLoading: false,
   })),
@@ -102,7 +105,6 @@ export const accountReducer = createReducer(
     ...state,
     selected,
     response: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
 
@@ -110,7 +112,6 @@ export const accountReducer = createReducer(
     ...state,
     errorMessage: error.message,
     error,
-    subErrors: error.subErrors,
     response: undefined,
     isLoading: false,
   })),
@@ -118,10 +119,29 @@ export const accountReducer = createReducer(
   on(paymentSend, updateAccount, createTransaction, (state) => ({
     ...state,
     response: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     isLoading: true,
   })),
 
-  on(clean, () => initialState),
+  on(setCurrentAccountId, (state, { accountId }) => ({
+    ...state,
+    currentAccountId: accountId,
+  })),
+
+  on(setCurrentTransactionId, (state, { transactionId }) => ({
+    ...state,
+    currentTransactionId: transactionId,
+  })),
+
+  on(setCurrentCustomerId, (state, { customerId }) => ({
+    ...state,
+    currentCustomerId: customerId,
+  })),
+
+  on(clean, (state) => ({
+    ...initialState,
+    currentAccountId: state.currentAccountId,
+    currentTransactionId: state.currentTransactionId,
+    currentCustomerId: state.currentCustomerId,
+  })),
 );

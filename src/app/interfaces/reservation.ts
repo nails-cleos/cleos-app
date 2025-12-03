@@ -104,6 +104,7 @@ export interface IRoomReservation {
   unavailableList: IUnavailableAll[];
   birthdays: IUserAll[];
   notes: INoteAll[];
+  date: string;
 }
 
 export interface ICustomerReservation {
@@ -111,6 +112,7 @@ export interface ICustomerReservation {
   upcoming: IUpcomingAll[];
   isFirstTime: boolean;
   phone?: string;
+  balance?: number;
 }
 
 export interface IAvailableDTO {
@@ -171,6 +173,8 @@ export interface ICustomerLastReservation {
   days: number;
   professionalName: string;
   additionalIds: string[];
+  roomId: string;
+  professionalId: string;
 }
 
 export class Reservation implements IReservation {
@@ -185,8 +189,13 @@ export class Day implements IDay {
   dayEndMinute: number;
   excludeDays: number[];
 
-  constructor(startDate: Date = createNewDate(getNowTimeZone(), 9), endDate: Date = createNewDate(getNowTimeZone(), 18),
-    today: Date = getNowTimeZone(), excludeDays: number[] = [], plusHour: number = 0) {
+  constructor(
+    startDate: Date = createNewDate(getNowTimeZone(), 9),
+    endDate: Date = createNewDate(getNowTimeZone(), 18),
+    today: Date = getNowTimeZone(),
+    excludeDays: number[] = [],
+    plusHour: number = 0,
+  ) {
     const startView = addHours(startDate, -plusHour);
     const endView = addHours(endDate, plusHour);
     this.dayStartHour = startView.getHours();
@@ -227,8 +236,6 @@ export enum CancelOption {
   charge = 'CHARGE',
   none = 'NONE'
 }
-
-export type StatesKey = keyof typeof States;
 
 export const MAX_RESERVATION_MONTH = 12;
 export const MAX_RESERVATION_CUSTOMER_MONTH = 2;

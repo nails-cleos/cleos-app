@@ -1,9 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { SelectProfessionalDialogComponent } from './select-professional-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { UntypedFormBuilder } from '@angular/forms';
-import { IUser } from '../interfaces/user';
 import { TranslateModule } from '@ngx-translate/core';
+import { SelectProfessionalDialogComponent } from './select-professional-dialog.component';
+import { IUserAll } from '../interfaces/user';
 
 describe('SelectProfessionalDialogComponent', () => {
   let component: SelectProfessionalDialogComponent;
@@ -11,10 +10,15 @@ describe('SelectProfessionalDialogComponent', () => {
 
   let dialogRefSpy: jasmine.SpyObj<MatDialogRef<SelectProfessionalDialogComponent>>;
 
-  const mockProfessionals: IUser[] = [
-    { displayName: 'Alice', id: '1' } as IUser,
-    { displayName: 'Bob', id: '2' } as IUser,
+  const mockProfessionals: IUserAll[] = [
+    { id: 'a', displayName: 'Alice' } as IUserAll,
+    { id: 'b', displayName: 'Bob' } as IUserAll,
   ];
+
+  const mockProfessionalDialogData = {
+    professionals: mockProfessionals,
+    small: true,
+  };
 
   beforeEach(async () => {
     dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
@@ -22,67 +26,51 @@ describe('SelectProfessionalDialogComponent', () => {
     await TestBed.configureTestingModule({
       imports: [SelectProfessionalDialogComponent, TranslateModule.forRoot()],
       providers: [
-        UntypedFormBuilder,
+        {
+          provide: MAT_DIALOG_DATA,
+          useFactory: () => (mockProfessionalDialogData),
+        },
         { provide: MatDialogRef, useValue: dialogRefSpy },
-        { provide: MAT_DIALOG_DATA, useValue: { professionals: mockProfessionals } },
       ],
     }).compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(SelectProfessionalDialogComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
-  it('should create the component', () => {
+  it('should create component', () => {
+    fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 
-  it('should initialize form and filters on ngOnInit', () => {
-    component.ngOnInit();
-    expect(component.professionalForm).toBeDefined();
-    expect(component.filteredProfessional).toBeDefined();
+  it('should update customersWritableSignal when store emits', () => {
+    expect(component.professionals()).toEqual(mockProfessionals);
   });
 
-  it('should close dialog on onNoClick', () => {
+  it('should filter customers', () => {
+    const result = component['filterProfessional']('Bo', mockProfessionals);
+    expect(result!.length).toBe(1);
+    expect(result![0].displayName).toBe('Bob');
+  });
+
+  it('should close dialog with selected customers', () => {
+    component.getForm.professional.setValue(mockProfessionals[0]);
+
+    component.doAction();
+
+    expect(dialogRefSpy.close).toHaveBeenCalledWith({ professional: mockProfessionals[0] });
+  });
+
+  it('should close dialog on cancel', () => {
     component.onNoClick();
     expect(dialogRefSpy.close).toHaveBeenCalled();
   });
 
-  it('should close dialog with professional on doAction', () => {
-    component.professional.setValue(mockProfessionals[0]);
-    component.doAction();
-    expect(dialogRefSpy.close).toHaveBeenCalledWith({ professional: mockProfessionals[0] });
-  });
+  it('should clear customer form control when keyDownHandler is called with Backspace', () => {
+    component.getForm.professional.setValue(mockProfessionals[0]);
 
-  it('should display user name correctly', () => {
-    const user: IUser = { displayName: 'Alice' } as IUser;
-    expect(component.displayFnUser(user)).toBe('Alice');
-    expect(component.displayFnUser({} as IUser)).toBe('');
-  });
+    component.keyDownHandler({ code: 'Backspace' } as KeyboardEvent);
 
-  it('should clear professional input on Backspace', () => {
-    component.professional.setValue('test');
-    const event = { code: 'Backspace' };
-    component.keyDownHandler(event);
-    expect(component.professional.value).toBe('');
-  });
-
-  it('should filter professionals correctly', (done) => {
-    let emissionCount = 0;
-    component.filteredProfessional?.subscribe(filtered => {
-      emissionCount++;
-      // Skip the first emission (startWith('')) and check the second emission with 'T'
-      if (emissionCount === 2) {
-        expect(filtered?.length).toBe(1);
-        expect(filtered).toEqual([
-          { displayName: 'Alice', id: '1' } as IUser,
-        ]);
-        done();
-      }
-    });
-
-    component.professional.setValue('A');
+    expect(component.getForm.professional.value).toBe(undefined);
   });
 });

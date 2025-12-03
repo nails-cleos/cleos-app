@@ -1,6 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import {
-  clean,
+  cleanNotification,
   deleteNotification,
   getNotificationsPage,
   notificationDeleteSuccess,
@@ -13,19 +13,19 @@ import { INotification, INotificationDTO } from '../../interfaces/notification';
 import { Pagination } from '../../interfaces/pagination';
 import { IError } from '../../interfaces/common';
 
-export interface State {
+export const NOTIFICATION_FEATURE_KEY = 'notification';
+
+export interface NotificationState {
   data?: INotificationDTO | Pagination<INotification> | string;
-  dataDeleted?: INotificationDTO | INotification;
-  errorMessage?: string;
+  dataDeleted?: INotification;
   error?: IError;
   subErrors?: IError[];
   isLoading: boolean;
 }
 
-export const initialState: State = {
+export const initialState: NotificationState = {
   data: undefined,
   dataDeleted: undefined,
-  errorMessage: undefined,
   error: undefined,
   subErrors: undefined,
   isLoading: false,
@@ -33,52 +33,45 @@ export const initialState: State = {
 
 export const notificationReducer = createReducer(
   initialState,
-  on(getNotificationsPage, (state): State => ({
+  on(getNotificationsPage, (state): NotificationState => ({
     ...state,
-    data: { page: { content: [{}, {}, {}] } as Pagination<INotification>, unread: -1 },
+    data: { page: { content: [{}, {}, {}] } as Pagination<INotification>, unread: -1, workDay: [] },
     dataDeleted: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
-  on(notificationSuccess, (state, { data }): State => ({
+  on(notificationSuccess, (state, { data }): NotificationState => ({
     ...state,
     data,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
-  on(notificationReadSuccess, (state): State => ({
+  on(notificationReadSuccess, (state): NotificationState => ({
     ...state,
-    errorMessage: undefined,
     subErrors: undefined,
     isLoading: false,
   })),
-  on(notificationFailure, (state, { error }): State => ({
+  on(notificationFailure, (state, { error }): NotificationState => ({
     ...state,
-    errorMessage: error?.message,
     error,
     subErrors: error?.subErrors,
     isLoading: false,
   })),
-  on(readNotification, (state): State => ({
+  on(readNotification, (state): NotificationState => ({
     ...state,
     data: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     isLoading: true,
   })),
-  on(deleteNotification, (state): State => ({
+  on(deleteNotification, (state): NotificationState => ({
     ...state,
     dataDeleted: undefined,
     data: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     isLoading: false,
   })),
-  on(notificationDeleteSuccess, (state, { data }): State => ({
+  on(notificationDeleteSuccess, (state, { data }): NotificationState => ({
     ...state,
     dataDeleted: data,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
-  on(clean, (): State => initialState),
+  on(cleanNotification, (): NotificationState => initialState),
 );

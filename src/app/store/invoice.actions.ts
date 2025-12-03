@@ -1,7 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 import { IError } from '../interfaces/common';
 import { IInvoice } from '../interfaces/invoice';
-import { IOffice } from '../interfaces/office';
+import { IOffice, IOfficeAll } from '../interfaces/office';
 
 enum InvoiceActionTypes {
   getOfficeToInvoice = '[Invoice] Find office to invoice',
@@ -35,7 +35,7 @@ export const getAllMyOffices = createAction(
 
 export const invoiceOfficesSuccess = createAction(
   InvoiceActionTypes.invoiceOfficesSuccess,
-  props<{ offices: IOffice[] }>(),
+  props<{ offices: IOfficeAll[] }>(),
 );
 
 export const updateOfficeById = createAction(

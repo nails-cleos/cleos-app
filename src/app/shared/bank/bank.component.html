@@ -1,24 +1,26 @@
-<form [formGroup]="formGroup" novalidate (keydown.enter)="$event.preventDefault()">
+<form [formGroup]="form()" novalidate (keydown.enter)="$event.preventDefault()">
+  @let isFirstTime = firstTime();
   <div class="link-container">
-    @if (!firstTime) {
+    @if (!isFirstTime) {
       <div class="no-content bold"
            [innerHTML]="'COMMON.RESERVATION.PAYMENT_MESSAGE' | translate: {professional: professionalName}">
       </div>
     }
     <mat-form-field appearance="outline">
-      @if (type && type.icon) {
-        <mat-icon matPrefix>{{ type.icon }}</mat-icon>
-      } @else if (type && !type.icon) {
-        <mat-icon matPrefix [svgIcon]="type.svgIcon" class="svg-icon"></mat-icon>
-      } @else if (!type?.svgIcon) {
+      @let currentType = type();
+      @if (currentType && currentType.icon) {
+        <mat-icon matPrefix>{{ currentType.icon }}</mat-icon>
+      } @else if (currentType && !currentType.icon) {
+        <mat-icon matPrefix [svgIcon]="currentType.svgIcon" class="svg-icon"></mat-icon>
+      } @else if (!currentType?.svgIcon) {
         <mat-icon matPrefix>account_balance</mat-icon>
       }
       <mat-label>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</mat-label>
-      <mat-select [formControlName]="'type'" [required]="firstTime">
-        @if (!firstTime) {
+      <mat-select [formControl]="getForm.type" [required]="isFirstTime">
+        @if (!isFirstTime) {
           <mat-option>--</mat-option>
         }
-        @for (t of options; track t) {
+        @for (t of options(); track t) {
           <mat-option [value]="t">
             @if (t.icon) {
               <mat-icon>{{ t.icon }}</mat-icon>
@@ -29,41 +31,41 @@
           </mat-option>
         }
       </mat-select>
-      @if (formGroup.get('type')?.hasError('required')) {
+      @if (getForm.type.hasError('required')) {
         <mat-error [innerHTML]="'COMMON.PAYMENT.TYPE.FIELD.REQUIRED' | translate"></mat-error>
       }
     </mat-form-field>
     @if (bankList.length) {
       <mat-form-field appearance="outline">
-        @if (formGroup.get('bank')?.value?.icon) {
+        @if (getForm.bank.value?.icon) {
           <mat-icon>
-            <img [src]="formGroup.get('bank')?.value?.icon" alt="icon" style="width:24px; height:24px;">
+            <img [src]="getForm.bank.value?.icon" alt="icon" style="width:24px; height:24px;">
           </mat-icon>
-        } @else if (formGroup.get('bank')?.value?.svgIcon) {
-          <mat-icon matPrefix [svgIcon]="formGroup.get('bank')?.value?.svgIcon" class="svg-icon"></mat-icon>
-        } @else if (!formGroup.get('bank')?.value?.svgIcon) {
+        } @else if (getForm.bank.value && getForm.bank.value.svgIcon) {
+          <mat-icon matPrefix [svgIcon]="getForm.bank.value.svgIcon" class="svg-icon"></mat-icon>
+        } @else if (!getForm.bank.value?.svgIcon) {
           <mat-icon matPrefix>account_balance</mat-icon>
         }
         <mat-label>{{ 'COMMON.PAYMENT.BANK.FIELD' | translate }}</mat-label>
-        <input (keydown)="keyDownHandler($event)" [formControlName]="'bank'" [matAutocomplete]="autoBank" matInput
+        <input (keydown)="keyDownHandler($event)" [formControl]="getForm.bank" [matAutocomplete]="autoBank" matInput
                required type="text">
         <mat-autocomplete #autoBank="matAutocomplete" [displayWith]="displayFnBank">
-          @for (bank of filteredBank | async; track bank) {
+          @for (bank of filteredBankSignal(); track bank) {
             <mat-option [value]="bank">
               <mat-icon [svgIcon]="bank.svgIcon" class="svg-icon"></mat-icon>
               {{ bank.name }}
             </mat-option>
           }
         </mat-autocomplete>
-        @if (formGroup.get('bank')?.hasError('required')) {
+        @if (getForm.bank.hasError('required')) {
           <mat-error [innerHTML]="'COMMON.PAYMENT.BANK.REQUIRED' | translate"></mat-error>
-        } @else if (formGroup.get('bank')?.hasError('requireMatch')) {
+        } @else if (getForm.bank.hasError('requireMatch')) {
           <mat-error [innerHTML]="'COMMON.PAYMENT.BANK.INVALID' | translate"></mat-error>
         }
       </mat-form-field>
     }
-    @if (formGroup.get('percentage') && formGroup.get('type')?.value && !formGroup.get('type')?.value.hidePercentage) {
-      <mat-radio-group [formControlName]="'percentage'" aria-label="Select an option" required>
+    @if (getForm.percentage && getForm.type.value && !getForm.type.value.hidePercentage) {
+      <mat-radio-group [formControl]="getForm.percentage" aria-label="Select an option" required>
         <mat-radio-button value="DEPOSIT_50">{{ 'COMMON.PAYMENT.DEPOSIT_50' | translate }}</mat-radio-button>
         <mat-radio-button value="TOTAL">{{ 'COMMON.PAYMENT.TOTAL' | translate }}</mat-radio-button>
       </mat-radio-group>

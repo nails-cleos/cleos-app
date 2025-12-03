@@ -20,6 +20,7 @@ enum RoomActionTypes {
   deleteRoom = '[Room] Delete room by id',
   getAllCustomersInfo = '[Room] Get all customers info',
   customerInfoSuccess = '[Room] Customer info Success',
+  setCurrentRoomId = '[Room] set current room id',
   clean = '[Room] Clean',
 }
 
@@ -100,4 +101,9 @@ export const customerInfoSuccess = createAction(
   props<{ customers: IRoomCustomer[] }>(),
 );
 
-export const clean = createAction(RoomActionTypes.clean);
+export const setCurrentRoomId = createAction(
+  RoomActionTypes.setCurrentRoomId,
+  props<{ roomId: string }>(),
+);
+
+export const cleanRoom = createAction(RoomActionTypes.clean);

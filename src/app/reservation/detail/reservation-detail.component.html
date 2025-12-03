@@ -1,20 +1,22 @@
 <mat-card appearance="outlined">
-  @if (reservation) {
-    <mat-card-header [class.row-is-canceled]="reservation.state === 'CANCELLED'">
+  @if (reservation(); as reservation) {
+    @let currentIsCustomer = isCustomer();
+    @let currentState = state();
+    <mat-card-header [class.row-is-canceled]="currentState === 'CANCELLED'">
       <mat-card-title>{{ 'RESERVATION.CUSTOMER.DETAIL' | translate }}</mat-card-title>
       <mat-card-subtitle>
-        @if (isCustomer) {
+        @if (currentIsCustomer) {
           <a [routerLink]="['/', language, 'me', 'overview']">{{ reservation.customer.displayName }}</a>
         } @else {
           <a [routerLink]="['/', language, 'users', reservation.customer.id, 'overview']">
             {{ reservation.customer.displayName }}
           </a>
         }
-        <button (click)="addNote" mat-icon-button type="button" color="accent">
+        <button (click)="addNote()" mat-icon-button type="button" color="accent">
           <mat-icon>note_add</mat-icon>
         </button>
-        @if (isReservationAdmin && reservation.state === 'APPROVED') {
-          <button (click)="addDiscount" mat-icon-button type="button" color="accent">
+        @if (isReservationAdmin && currentState === 'APPROVED') {
+          <button (click)="addDiscount()" mat-icon-button type="button" color="accent">
             <mat-icon>switch_access_shortcut_add</mat-icon>
           </button>
         }
@@ -33,7 +35,7 @@
       }
       @if (reservation.note || reservation.customerNote) {
         <mat-list class="note">
-          @if (reservation.note && !isCustomer) {
+          @if (reservation.note && !currentIsCustomer) {
             <mat-list-item>
               <div matListItemTitle>{{ 'RESERVATION.NOTE.FIELD' | translate }}</div>
               <div matListItemLine>{{ reservation.note }}</div>
@@ -44,7 +46,8 @@
           }
           @if (reservation.customerNote) {
             <mat-list-item>
-              <div matListItemTitle>{{ 'RESERVATION.NOTE.' + (isCustomer ? 'FIELD' : 'CUSTOMER') | translate }}</div>
+              <div matListItemTitle>{{ 'RESERVATION.NOTE.' + (currentIsCustomer ? 'FIELD' : 'CUSTOMER') | translate }}
+              </div>
               <div matListItemLine>{{ reservation.customerNote }}</div>
             </mat-list-item>
           }
@@ -97,9 +100,9 @@
           </div>
         </mat-list-item>
         <mat-list-item>
-          <mat-icon matListItemIcon>{{ state | reservationIcon }}</mat-icon>
-          <div matListItemTitle>{{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate }}</div>
-          @if (state === 'EDIT_CANCELLED') {
+          <mat-icon matListItemIcon>{{ currentState | reservationIcon }}</mat-icon>
+          <div matListItemTitle>{{ 'COMMON.STATUS.RESERVATION.' + currentState | translate }}</div>
+          @if (currentState === 'EDIT_CANCELLED') {
             <a matListItemLine [routerLink]="['/', language, 'reservation', reservation.relatedReservationId]">
               {{ reservation.relatedReservationId }}
             </a>
@@ -146,13 +149,15 @@
                              [currencyIcon]="reservation.room.currency.icon" [isEditing]="false"></app-price-preview>
         }
       </mat-list>
-      @if (paymentPaid && paymentPaid.length) {
+      @let currentPaymentPaid = paymentPaid();
+      @if (currentPaymentPaid?.length) {
         <mat-list>
+          @let currentProfessionalId = professionalId();
           <mat-divider></mat-divider>
           <div class="divider">
             <h1>{{ 'RESERVATION.PAYMENT.TITLE' | translate }}</h1>
           </div>
-          <table [dataSource]="paymentPaid" mat-table matSort matSortActive="status" multiTemplateDataRows>
+          <table [dataSource]="currentPaymentPaid" mat-table matSort matSortActive="status" multiTemplateDataRows>
             <ng-container matColumnDef="position">
               <th *matHeaderCellDef mat-header-cell>#</th>
               <td *matCellDef="let payment; let i = dataIndex;" mat-cell>
@@ -193,7 +198,7 @@
               <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
               <td *matCellDef="let payment; let i = dataIndex;" class="hide-xs" mat-cell>
                 @if (payment.id) {
-                  @if (professionalId && ['CASH', 'TRANSFER'].includes(payment.type)) {
+                  @if (currentProfessionalId && ['CASH', 'TRANSFER'].includes(payment.type)) {
                     <div [formGroup]="form">
                       <ng-container formArrayName="payments">
                         <div [formGroupName]="i">
@@ -257,7 +262,7 @@
               <td *matCellDef="let payment; let i = dataIndex;" mat-cell>
                 @if (payment.id) {
                   @if (payment.transactionAmount >= 0) {
-                    @if (professionalId && ['CASH', 'TRANSFER'].includes(payment.type)) {
+                    @if (currentProfessionalId && ['CASH', 'TRANSFER'].includes(payment.type)) {
                       <div [formGroup]="form">
                         <ng-container formArrayName="payments">
                           <div [formGroupName]="i">
@@ -291,7 +296,7 @@
                 <div [@detailExpand]="payment === paymentExpanded ? 'expanded' : 'collapsed'" class="detail hide-gt-xs">
                   <mat-list>
                     <div mat-subheader>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
-                    @if (professionalId && ['CASH', 'TRANSFER'].includes(payment.type)) {
+                    @if (currentProfessionalId && ['CASH', 'TRANSFER'].includes(payment.type)) {
                       <div [formGroup]="form">
                         <ng-container formArrayName="payments">
                           <div [formGroupName]="i">
@@ -359,14 +364,14 @@
           </table>
           <div style="margin-top: 5px" class="card-actions">
             <div class="spacer"></div>
-            <button [disabled]="disableUpdateButton" (click)="updatePayment" color="accent" mat-fab extended
+            <button [disabled]="disableUpdateButton()" (click)="updatePayment()" color="accent" mat-fab extended
                     type="button">
               {{ 'COMMON.BUTTON.UPDATE' | translate }}
             </button>
           </div>
         </mat-list>
       }
-      @if (history) {
+      @if (dataSource(); as dataSource) {
         <mat-list>
           <mat-divider></mat-divider>
           <div class="divider">
@@ -377,7 +382,7 @@
               <th *matHeaderCellDef class="hide-xs" mat-header-cell>#</th>
               <td *matCellDef="let history; let i = dataIndex;" class="hide-xs" mat-cell>
                 @if (history.id) {
-                  {{ ((paginator?.pageIndex || 0) * pageSize) + i + 1 }}
+                  {{ (paginatorPageIndex() * pageSize) + i + 1 }}
                 } @else {
                   <div class="ssc-line"></div>
                 }
@@ -470,7 +475,7 @@
               </td>
             </ng-container>
 
-            <tr *matFooterRowDef="['noContent']" [hidden]="history.length > 0" mat-footer-row></tr>
+            <tr *matFooterRowDef="['noContent']" [hidden]="historyLength > 0" mat-footer-row></tr>
 
             <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
             <tr (click)="expanded = expanded === history ? null : history"
@@ -478,14 +483,16 @@
             <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
           </table>
 
-          <mat-paginator [pageSize]="pageSize" showFirstLastButtons></mat-paginator>
+          <mat-paginator [pageSize]="pageSize" [length]="historyLength"
+                         (page)="paginatorPageIndex.set($event.pageIndex)" showFirstLastButtons>
+          </mat-paginator>
         </mat-list>
       }
     </mat-card-content>
     <mat-divider></mat-divider>
     <mat-card-actions class="card-actions">
       <div class="spacer"></div>
-      <button appBackButton [date]="start" [step]="step" color="accent" mat-fab extended
+      <button appBackButton [date]="start" [step]="step()" color="accent" mat-fab extended
               type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
       </button>
     </mat-card-actions>

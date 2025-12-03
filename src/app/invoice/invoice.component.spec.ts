@@ -1,39 +1,392 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { InvoiceComponent } from './invoice.component';
-import { TranslateModule } from '@ngx-translate/core';
-import { Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { InvoiceComponent } from './invoice.component';
+import { IInvoice, IRoomInvoice } from '../interfaces/invoice';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../interfaces/pagination';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { IOfficeAll } from '../interfaces/office';
+import { backendFormatDate, getNowTimeZone } from '../util/dates';
+import { getOfficeToInvoice } from '../store/invoice.actions';
+import { IUserAll } from '../interfaces/user';
+import { addDays } from 'date-fns';
+import { PaymentType } from '../interfaces/payment';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { InvoiceState } from '../store/reducers/invoice.reducers';
 
 describe('InvoiceComponent', () => {
   let component: InvoiceComponent;
   let fixture: ComponentFixture<InvoiceComponent>;
+  let storeSpy: jasmine.SpyObj<Store<InvoiceState>>;
+  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let translate: TranslateService;
 
-  let state$: Subject<any>;
+  const mockOffice: IOfficeAll = {
+    id: '1',
+    manager: { id: '1', displayName: 'Officer' },
+    name: 'Office 1',
+  };
 
-  let storeSpy: jasmine.SpyObj<Store<any>>;
+  const customer: IUserAll = {
+    authorities: [],
+    displayName: 'customer 1',
+    email: 'customer@1.comn',
+    id: '1',
+    locale: 'en-GB',
+    timeZone: 'Europe/Amsterdam',
+  };
+
+  const room: IRoomInvoice = {
+    timeZone: 'Europe/Amsterdam',
+    addressName: 'room address',
+    currencyCode: 'EUR',
+    email: 'room@euro.com',
+    phone: '123456789',
+  };
+
+  const mockInvoice: IInvoice[] = [
+    {
+      id: '1',
+      paths: ['invoice', '1'],
+      customer,
+      room,
+      items: [{
+        name: 'item 1',
+        netPrice: 100,
+        grossPrice: 121,
+        order: 0,
+      }],
+      timestamp: getNowTimeZone().getTime() / 1000,
+      totals: {
+        subTotal: 121,
+        discount: 0,
+        price: 100,
+        totalPaid: 121,
+        excBTW: 100,
+        btw: 21,
+      },
+      discounts: [],
+      position: 0,
+    },
+    {
+      id: '2',
+      paths: ['invoice', '2'],
+      customer,
+      room,
+      items: [{
+        name: 'item 2',
+        netPrice: 100,
+        grossPrice: 121,
+        order: 0,
+      }],
+      timestamp: getNowTimeZone().getTime() / 1000,
+      totals: {
+        subTotal: 121,
+        discount: 0,
+        price: 100,
+        totalPaid: 121,
+        excBTW: 100,
+        btw: 21,
+      },
+      discounts: [],
+      position: 1,
+    },
+  ];
+
+  let officeList$: BehaviorSubject<any>;
+  let invoiceList$: BehaviorSubject<any>;
+  let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    state$ = new Subject();
+    officeList$ = new BehaviorSubject(undefined);
+    invoiceList$ = new BehaviorSubject(undefined);
+    breakpoint$ = new BehaviorSubject<any>({
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
+      },
+    });
 
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
-    storeSpy.select.and.returnValue(state$.asObservable());
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      snapshot: {
+        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+      },
+    });
+
+    let pipeCallIndex = 0;
+    storeSpy.pipe.and.callFake(() => {
+      pipeCallIndex++;
+      switch (pipeCallIndex) {
+        case 1:
+          return officeList$.asObservable();
+        case 2:
+          return invoiceList$.asObservable();
+        default:
+          return new BehaviorSubject(undefined).asObservable();
+      }
+    });
+
+    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
+
     await TestBed.configureTestingModule({
-      imports: [InvoiceComponent, TranslateModule.forRoot()],
-      providers:[
+      imports: [InvoiceComponent, TranslateModule.forRoot(), NoopAnimationsModule],
+      providers: [
         { provide: Store, useValue: storeSpy },
+        { provide: BreakpointObserver, useValue: breakpointObserverSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(InvoiceComponent);
     component = fixture.componentInstance;
+
+    translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en');
+    translate.use('en');
+
     fixture.detectChanges();
   });
 
-  afterEach(() => state$.complete());
+  afterEach(() => {
+    officeList$.complete();
+    invoiceList$.complete();
+    breakpoint$.complete();
+  });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should compute dataSourceSignal correctly', () => {
+    invoiceList$.next(mockInvoice);
+    fixture.detectChanges();
+
+    const data = component.dataSourceSignal() as any;
+    expect(data?.length).toBe(2);
+  });
+
+  it('should compute resultsLengthSignal correctly', () => {
+    invoiceList$.next(mockInvoice);
+    fixture.detectChanges();
+
+    expect(component.resultsLengthSignal()).toBe(2);
+  });
+
+  it('should set mobile page size when small breakpoint matches', () => {
+    breakpoint$.next({
+      matches: true,
+      breakpoints: {
+        [Breakpoints.XSmall]: true,
+        [Breakpoints.Small]: true,
+      },
+    });
+    fixture.detectChanges();
+
+    expect(component.pageSizeSignal()).toBe(MOBILE_PAGE_SIZE);
+  });
+
+  it('should keep default page size when breakpoint does not match', () => {
+    breakpoint$.next({
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
+      },
+    });
+    fixture.detectChanges();
+
+    expect(component.pageSizeSignal()).toBe(PAGE_SIZE);
+  });
+
+  it('should dispatch getInvoice when office, start and endDate is set', () => {
+    const date = getNowTimeZone();
+    const start = addDays(date, -10);
+    const end = date;
+    component.getForm.office.setValue(mockOffice);
+    component.getDateRangeForm.startDate.setValue(start);
+    component.getDateRangeForm.endDate.setValue(end);
+    fixture.detectChanges();
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(
+      getOfficeToInvoice({
+        officeId: mockOffice.id,
+        start: backendFormatDate(start)!,
+        end: backendFormatDate(end)!,
+        types: [PaymentType.transfer, PaymentType.paynl],
+      }),
+    );
+  });
+
+  it('should display office name with displayFnOffice', () => {
+    const result = component.displayFnOffice(mockOffice);
+    expect(result).toBe('Office 1');
+  });
+
+  it('should return empty string when displayFnOffice receives undefined', () => {
+    const result = component.displayFnOffice(undefined as any);
+    expect(result).toBe('');
+  });
+
+  it('should clear office value on Backspace key', () => {
+    component.getForm.office.setValue(mockOffice);
+    const event = { code: 'Backspace' } as KeyboardEvent;
+    component.keyDownHandler(event);
+    expect(component.getForm.office.value).toBeUndefined();
+  });
+
+  it('should not clear office value on other keys', () => {
+    component.getForm.office.setValue(mockOffice);
+    const event = { code: 'Enter' } as KeyboardEvent;
+    component.keyDownHandler(event);
+    expect(component.getForm.office.value).toBe(mockOffice);
+  });
+
+  it('should add payment type to selected when selected is called', () => {
+    const event = {
+      option: { value: 'cash' },
+    } as MatAutocompleteSelectedEvent;
+
+    component.selected(event);
+
+    expect(component.selectedPaymentTypesSignal()).toContain(PaymentType.cash);
+  });
+
+  it('should remove payment type from available types when selected', () => {
+    component.allPaymentTypesWritableSignal.set([PaymentType.cash, PaymentType.transfer]);
+    const event = {
+      option: { value: 'cash' },
+    } as MatAutocompleteSelectedEvent;
+
+    component.selected(event);
+    fixture.detectChanges();
+
+    expect(component.allPaymentTypesWritableSignal()).not.toContain(PaymentType.cash);
+  });
+
+  it('should remove payment type from selected when remove is called', () => {
+    component.selectedPaymentTypesSignal.set([PaymentType.cash, PaymentType.transfer]);
+
+    component.remove(PaymentType.cash);
+
+    expect(component.selectedPaymentTypesSignal()).not.toContain(PaymentType.cash);
+  });
+
+  it('should add payment type back to available types when removed', () => {
+    component.allPaymentTypesWritableSignal.set(['transfer']);
+    component.selectedPaymentTypesSignal.set([PaymentType.cash, PaymentType.transfer]);
+
+    component.remove(PaymentType.cash);
+
+    expect(component.allPaymentTypesWritableSignal()).toContain(PaymentType.cash);
+  });
+
+  it('should return true when all rows are selected', () => {
+    invoiceList$.next(mockInvoice);
+    fixture.detectChanges();
+    component.selection.select(...mockInvoice);
+
+    expect(component.isAllSelected()).toBe(true);
+  });
+
+  it('should return false when not all rows are selected', () => {
+    invoiceList$.next(mockInvoice);
+    fixture.detectChanges();
+    component.selection.select(mockInvoice[0]);
+
+    expect(component.isAllSelected()).toBe(false);
+  });
+
+  it('should select all rows when toggleAllRows is called and not all selected', () => {
+    invoiceList$.next(mockInvoice);
+    fixture.detectChanges();
+
+    component.toggleAllRows();
+
+    expect(component.selection.selected.length).toBe(2);
+  });
+
+  it('should clear selection when toggleAllRows is called and all selected', () => {
+    invoiceList$.next(mockInvoice);
+    fixture.detectChanges();
+    component.selection.select(...mockInvoice);
+
+    component.toggleAllRows();
+
+    expect(component.selection.selected.length).toBe(0);
+  });
+
+  it('should return "select all" label when no row provided and not all selected', () => {
+    invoiceList$.next(mockInvoice);
+    fixture.detectChanges();
+
+    const label = component.checkboxLabel();
+
+    expect(label).toBe('select all');
+  });
+
+  it('should return "deselect all" label when no row provided and all selected', () => {
+    invoiceList$.next(mockInvoice);
+    fixture.detectChanges();
+    component.selection.select(...mockInvoice);
+
+    const label = component.checkboxLabel();
+
+    expect(label).toBe('deselect all');
+  });
+
+  it('should return "select row X" label when row provided and not selected', () => {
+    invoiceList$.next(mockInvoice);
+    fixture.detectChanges();
+
+    const label = component.checkboxLabel(mockInvoice[0]);
+
+    expect(label).toBe('select row 1');
+  });
+
+  it('should return "deselect row X" label when row provided and selected', () => {
+    invoiceList$.next(mockInvoice);
+    fixture.detectChanges();
+    component.selection.select(mockInvoice[0]);
+
+    const label = component.checkboxLabel(mockInvoice[0]);
+
+    expect(label).toBe('deselect row 1');
+  });
+
+  it('should navigate to invoice path when goToPath is called', () => {
+    component.goToPath(mockInvoice[0]);
+
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['invoice', '1']);
+  });
+
+  it('should auto-select office when only one office is available', () => {
+    const singleOffice = [mockOffice];
+    officeList$.next(singleOffice);
+    fixture.detectChanges();
+
+    expect(component.getForm.office.value).toBe(mockOffice);
+  });
+
+  it('should set startNumber when office has lastInvoiceNumber', () => {
+    const officeWithLastInvoice = {
+      ...mockOffice,
+      lastInvoiceNumber: 100,
+    };
+
+    component.getForm.office.setValue(officeWithLastInvoice);
+    fixture.detectChanges();
+
+    expect(component.getForm.startNumber.value).toBe(101);
   });
 });

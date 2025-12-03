@@ -22,7 +22,7 @@ import {
 } from './helper';
 import { Role } from '../interfaces/token';
 import { IUser, IUserAll } from '../interfaces/user';
-import { IAddress, IRoom, IRoomAll, ServiceType } from '../interfaces/room';
+import { IAddress, IRoomAll, ServiceType } from '../interfaces/room';
 import { ICurrency, ICurrencyAll } from '../interfaces/currency';
 import { GroupService, IPrice, ITreatmentAll, Price } from '../interfaces/treatment';
 import { IExtras, IReservationAll } from '../interfaces/reservation';
@@ -71,7 +71,13 @@ describe('Helper Utils', () => {
       icon: 'euro',
       name: 'Euro',
     },
-    office: {},
+    office: {
+      id: 'office-id',
+      name: 'office-name',
+      manager: {
+        id: 'manager-id',
+      },
+    },
     timeZone: getCurrentTimeZone(),
     paymentTypes: [PaymentType.transfer],
     primary: true,
@@ -79,11 +85,11 @@ describe('Helper Utils', () => {
 
   describe('hasRoomAdmin', () => {
     it('should return true if user has room admin role', () => {
-      expect(hasRoomAdmin([{ authority: Role.roomAdmin }])).toBeTruthy();
+      expect(hasRoomAdmin([{ authority: Role.roomAdmin }])).toBeTrue();
     });
 
     it('should return false if user does not have room admin role', () => {
-      expect(hasRoomAdmin([{ authority: Role.admin }])).toBeFalsy();
+      expect(hasRoomAdmin([{ authority: Role.admin }])).toBeFalse();
     });
   });
 
@@ -698,11 +704,10 @@ describe('Helper Utils', () => {
       name,
     } as IOffice);
 
-    const makeRoom = (id: string, office?: IOffice): IRoom => ({
+    const makeRoom = (id: string, office?: IOffice): IRoomAll => ({
       id,
-      name: `Room ${id}`,
       office,
-    } as IRoom);
+    } as IRoomAll);
 
     it('should return undefined if rooms is undefined', () => {
       const result = createRoomOffice();
@@ -718,7 +723,7 @@ describe('Helper Utils', () => {
     it('should group rooms by office id', () => {
       const officeA = makeOffice('A', 'Office A');
       const officeB = makeOffice('B', 'Office B');
-      const rooms: IRoom[] = [
+      const rooms: IRoomAll[] = [
         makeRoom('1', officeA),
         makeRoom('2', officeA),
         makeRoom('3', officeB),
@@ -742,7 +747,7 @@ describe('Helper Utils', () => {
     });
 
     it('should ignore rooms without office or office id', () => {
-      const rooms: IRoom[] = [
+      const rooms: IRoomAll[] = [
         makeRoom('1', makeOffice('A')),
         makeRoom('2', undefined), // no office
         makeRoom('3', { id: '', name: 'Invalid Office' } as IOffice), // no id

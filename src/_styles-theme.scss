@@ -683,8 +683,14 @@
     color: mat.m2-get-color-from-palette($warn-palette);
   }
 
-  .contrast-text {
-    color: mat.m2-get-color-from-palette($foreground, contrast) !important;
+  @if $isDark {
+    .contrast-text {
+      color: #fafafa !important;
+    }
+  } @else {
+    .contrast-text {
+      color: #000 !important;
+    }
   }
 
   .mini-dashboard-card {
@@ -714,6 +720,12 @@
     .success,
     .green-text {
       color: #008b00;
+    }
+    .green-text-contrast {
+      color: #c3f69d;
+    }
+    .red-text-contrast {
+      color: mat.m2-get-color-from-palette($warn-palette, 900);
     }
 
     .stamp-paid {
@@ -750,6 +762,12 @@
     .success,
     .green-text {
       color: #c3f69d;
+    }
+    .green-text-contrast {
+      color: #008b00;
+    }
+    .red-text-contrast {
+      color: mat.m2-get-color-from-palette($warn-palette, 200);
     }
 
     .stamp-paid {

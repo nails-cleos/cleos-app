@@ -1,78 +1,79 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output } from '@angular/core';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Availability, IAvailability, IAvailabilityDate } from '../../interfaces/room';
 import { createDate, getCurrentTimeZone, getTime } from '../../util/dates';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../shared/shared.module';
+import { AppMaterialModule } from '../../util/app-material.module';
+import { TranslatePipe } from '@ngx-translate/core';
+
+type AvailabilityForm = {
+  start: FormControl<string>;
+  end: FormControl<string>;
+  startLunch: FormControl<string | undefined>;
+  endLunch: FormControl<string | undefined>;
+}
 
 @Component({
   selector: 'app-availability',
   templateUrl: './availability.component.html',
   styleUrls: ['./availability.component.scss'],
-  imports: [SharedModule],
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AvailabilityComponent implements OnChanges {
-  @Input() dates?: IAvailabilityDate;
-  @Input() day!: string;
-  @Output() availability = new EventEmitter<IAvailability>();
-  @Output() ignore = new EventEmitter();
+export class AvailabilityComponent {
+  private formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  day = input.required<string>();
+  dates = input<IAvailabilityDate>();
+  availability = output<IAvailability>();
+  ignore = output();
 
-  availabilityForm!: UntypedFormGroup;
-  start: UntypedFormControl;
-  end: UntypedFormControl;
-  startLunch: UntypedFormControl;
-  endLunch: UntypedFormControl;
-  checked!: boolean;
+  form: FormGroup<AvailabilityForm> = this.formBuilder.group<AvailabilityForm>({
+    start: this.formBuilder.control<string>('', {
+      validators: [Validators.required],
+    }),
+    end: this.formBuilder.control<string>('', {
+      validators: [Validators.required],
+    }),
+    startLunch: this.formBuilder.control<string | undefined>(undefined),
+    endLunch: this.formBuilder.control<string | undefined>(undefined),
+  });
 
-  constructor(private formBuilder: UntypedFormBuilder, private translate: TranslateService) {
-  	this.start = new UntypedFormControl('', [
-  		Validators.required,
-  	]);
+  checked: boolean = false;
 
-  	this.end = new UntypedFormControl('', [
-  		Validators.required,
-  	]);
+  constructor() {
+    effect(() => {
+      const dates = this.dates();
+      const timeZone = getCurrentTimeZone();
+      const start = dates?.startDate || createDate(timeZone, 9, 0);
+      const end = dates?.endDate || createDate(timeZone, 18, 0);
+      const startLunch = dates?.startLunchDate || createDate(timeZone, 13, 0);
+      const endLunch = dates?.endLunchDate || createDate(timeZone, 14, 0);
 
-  	this.startLunch = new UntypedFormControl();
-  	this.endLunch = new UntypedFormControl();
+      this.getForm.start.setValue(getTime(start, 'es'));
+      this.getForm.end.setValue(getTime(end, 'es'));
 
-  	this.availabilityForm = this.formBuilder.group({
-  		start: this.start,
-  		end: this.end,
-  		startLunch: this.startLunch,
-  		endLunch: this.endLunch,
-  	});
+      if (dates?.startLunchDate && dates?.endLunchDate) {
+        this.checked = true;
+        this.getForm.startLunch.setValue(getTime(startLunch, 'es'));
+        this.getForm.endLunch.setValue(getTime(endLunch, 'es'));
+      }
+    });
   }
 
-  get create(): void {
-  	const availability: IAvailability = new Availability();
-  	availability.day = this.day;
-  	availability.start = this.start.value;
-  	availability.end = this.end.value;
-
-  	if (this.checked) {
-  		availability.startLunch = this.startLunch.value;
-  		availability.endLunch = this.endLunch.value;
-  	}
-
-  	return this.availability.emit(availability);
+  get getForm(): AvailabilityForm {
+    return this.form.controls;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ngOnChanges(_changes: SimpleChanges): void {
-  	const timeZone = getCurrentTimeZone();
-  	const start = this.dates?.startDate || createDate(timeZone, 9, 0);
-  	const end = this.dates?.endDate || createDate(timeZone, 18, 0);
-  	const startLunch = this.dates?.startLunchDate || createDate(timeZone, 13, 0);
-  	const endLunch = this.dates?.endLunchDate || createDate(timeZone, 14, 0);
+  create(): void {
+    const availability: IAvailability = new Availability();
+    availability.day = this.day();
+    availability.start = this.getForm.start.value;
+    availability.end = this.getForm.end.value;
 
-  	this.start.setValue(getTime(start, 'es'));
-  	this.end.setValue(getTime(end, 'es'));
+    if (this.checked) {
+      availability.startLunch = this.getForm.startLunch.value;
+      availability.endLunch = this.getForm.endLunch.value;
+    }
 
-  	if (this.dates?.startLunchDate && this.dates?.endLunchDate) {
-  		this.checked = true;
-  		this.startLunch.setValue(getTime(startLunch, 'es'));
-  		this.endLunch.setValue(getTime(endLunch, 'es'));
-  	}
+    return this.availability.emit(availability);
   }
 }

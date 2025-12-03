@@ -1,24 +1,34 @@
 import { TwoDigitsDirective } from './two-digits.directive';
-import { ElementRef } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { Component } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+
+@Component({
+  template: '<input appTwoDigits [allowNegatives]="allowNegatives" />',
+  imports: [TwoDigitsDirective],
+})
+class HostComponent {
+  allowNegatives = false;
+}
 
 describe('TwoDigitsDirective', () => {
+  let fixture: ComponentFixture<HostComponent>;
+  let hostComp: HostComponent;
   let directive: TwoDigitsDirective;
-  let mockElementRef: ElementRef;
-  let mockInputElement: HTMLInputElement;
+  let inputElement: HTMLInputElement;
 
   beforeEach(() => {
-    mockInputElement = document.createElement('input');
-    mockElementRef = new ElementRef(mockInputElement);
-
     TestBed.configureTestingModule({
-      providers: [
-        TwoDigitsDirective,
-        { provide: ElementRef, useValue: mockElementRef },
-      ],
+      imports: [HostComponent],
     });
 
-    directive = TestBed.inject(TwoDigitsDirective);
+    fixture = TestBed.createComponent(HostComponent);
+    hostComp = fixture.componentInstance;
+    fixture.detectChanges();
+
+    const debugEl = fixture.debugElement.query(By.directive(TwoDigitsDirective));
+    directive = debugEl.injector.get(TwoDigitsDirective);
+    inputElement = debugEl.nativeElement as HTMLInputElement;
   });
 
   it('should create an instance', () => {
@@ -26,176 +36,177 @@ describe('TwoDigitsDirective', () => {
   });
 
   it('should initialize with default values', () => {
-    expect(directive.allowNegatives).toBeFalse();
+    expect(directive.allowNegatives()).toBeFalse();
   });
 
   it('should allow special keys', () => {
     const specialKeys = ['Backspace', 'Tab', 'End', 'Home', 'ArrowLeft', 'ArrowRight', 'Del', 'Delete'];
-    
+
     specialKeys.forEach(key => {
       const event = new KeyboardEvent('keydown', { key });
       spyOn(event, 'preventDefault');
-      
+
       directive.onKeyDown(event);
-      
+
       expect(event.preventDefault).not.toHaveBeenCalled();
     });
   });
 
   it('should allow valid numeric input', () => {
     const validInputs = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
-    
+
     validInputs.forEach(key => {
-      mockInputElement.value = '';
-      mockInputElement.selectionStart = 0;
-      
+      inputElement.value = '';
+      inputElement.selectionStart = 0;
+
       const event = new KeyboardEvent('keydown', { key });
       spyOn(event, 'preventDefault');
-      
+
       directive.onKeyDown(event);
-      
+
       expect(event.preventDefault).not.toHaveBeenCalled();
     });
   });
 
   it('should allow decimal point', () => {
-    mockInputElement.value = '12';
-    mockInputElement.selectionStart = 2;
-    
+    inputElement.value = '12';
+    inputElement.selectionStart = 2;
+
     const event = new KeyboardEvent('keydown', { key: '.' });
     spyOn(event, 'preventDefault');
-    
+
     directive.onKeyDown(event);
-    
+
     expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
   it('should handle Decimal key as decimal point', () => {
-    mockInputElement.value = '12';
-    mockInputElement.selectionStart = 2;
-    
+    inputElement.value = '12';
+    inputElement.selectionStart = 2;
+
     const event = new KeyboardEvent('keydown', { key: 'Decimal' });
     spyOn(event, 'preventDefault');
-    
+
     directive.onKeyDown(event);
-    
+
     expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
   it('should allow up to 2 decimal places', () => {
-    mockInputElement.value = '12.3';
-    mockInputElement.selectionStart = 4;
-    
+    inputElement.value = '12.3';
+    inputElement.selectionStart = 4;
+
     const event = new KeyboardEvent('keydown', { key: '4' });
     spyOn(event, 'preventDefault');
-    
+
     directive.onKeyDown(event);
-    
+
     expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
   it('should prevent more than 2 decimal places', () => {
-    mockInputElement.value = '12.34';
-    mockInputElement.selectionStart = 5;
-    
+    inputElement.value = '12.34';
+    inputElement.selectionStart = 5;
+
     const event = new KeyboardEvent('keydown', { key: '5' });
     spyOn(event, 'preventDefault');
-    
+
     directive.onKeyDown(event);
-    
+
     expect(event.preventDefault).toHaveBeenCalled();
   });
 
   it('should prevent multiple decimal points', () => {
-    mockInputElement.value = '12.34';
-    mockInputElement.selectionStart = 5;
-    
+    inputElement.value = '12.34';
+    inputElement.selectionStart = 5;
+
     const event = new KeyboardEvent('keydown', { key: '.' });
     spyOn(event, 'preventDefault');
-    
+
     directive.onKeyDown(event);
-    
+
     expect(event.preventDefault).toHaveBeenCalled();
   });
 
   it('should prevent leading zeros followed by digits', () => {
-    mockInputElement.value = '0';
-    mockInputElement.selectionStart = 1;
-    
+    inputElement.value = '0';
+    inputElement.selectionStart = 1;
+
     const event = new KeyboardEvent('keydown', { key: '1' });
     spyOn(event, 'preventDefault');
-    
+
     directive.onKeyDown(event);
-    
+
     expect(event.preventDefault).toHaveBeenCalled();
   });
 
   it('should allow leading zero followed by decimal', () => {
-    mockInputElement.value = '0';
-    mockInputElement.selectionStart = 1;
-    
+    inputElement.value = '0';
+    inputElement.selectionStart = 1;
+
     const event = new KeyboardEvent('keydown', { key: '.' });
     spyOn(event, 'preventDefault');
-    
+
     directive.onKeyDown(event);
-    
+
     expect(event.preventDefault).not.toHaveBeenCalled();
   });
 
   it('should prevent non-numeric characters', () => {
     const invalidKeys = ['a', 'b', 'c', '!', '@', '#', '$', '%'];
-    
+
     invalidKeys.forEach(key => {
-      mockInputElement.value = '12';
-      mockInputElement.selectionStart = 2;
-      
+      inputElement.value = '12';
+      inputElement.selectionStart = 2;
+
       const event = new KeyboardEvent('keydown', { key });
       spyOn(event, 'preventDefault');
-      
+
       directive.onKeyDown(event);
-      
+
       expect(event.preventDefault).toHaveBeenCalled();
     });
   });
 
   describe('with allowNegatives enabled', () => {
     beforeEach(() => {
-      directive.allowNegatives = true;
+      hostComp.allowNegatives = true;
+      fixture.detectChanges();
     });
 
     it('should allow negative numbers when allowNegatives is true', () => {
-      mockInputElement.value = '';
-      mockInputElement.selectionStart = 0;
-      
+      inputElement.value = '';
+      inputElement.selectionStart = 0;
+
       const event = new KeyboardEvent('keydown', { key: '-' });
       spyOn(event, 'preventDefault');
-      
+
       directive.onKeyDown(event);
-      
+
       expect(event.preventDefault).not.toHaveBeenCalled();
     });
 
     it('should allow digits after negative sign', () => {
-      mockInputElement.value = '-';
-      mockInputElement.selectionStart = 1;
-      
+      inputElement.value = '-';
+      inputElement.selectionStart = 1;
+
       const event = new KeyboardEvent('keydown', { key: '5' });
       spyOn(event, 'preventDefault');
-      
+
       directive.onKeyDown(event);
-      
+
       expect(event.preventDefault).not.toHaveBeenCalled();
     });
 
     it('should allow negative decimal numbers', () => {
-      mockInputElement.value = '-12';
-      mockInputElement.selectionStart = 3;
-      
+      inputElement.value = '-12';
+      inputElement.selectionStart = 3;
+
       const event = new KeyboardEvent('keydown', { key: '.' });
       spyOn(event, 'preventDefault');
-      
+
       directive.onKeyDown(event);
-      
+
       expect(event.preventDefault).not.toHaveBeenCalled();
     });
   });

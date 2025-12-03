@@ -2,6 +2,8 @@
   <div class="card-container">
     <div class="card-content">
       <mat-card appearance="outlined">
+        @let catalogue = catalogueSignal();
+        @let isAddMode = isAddModeSignal();
         @if (isAddMode) {
           <mat-card-header>
             <mat-card-title>{{ 'CATALOGUE.TITLE' | translate }}</mat-card-title>
@@ -16,41 +18,41 @@
             }
           </mat-card-header>
         }
-        <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+        <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
           <mat-card-content>
             <div class="inner-container">
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'CATALOGUE.NAME.FIELD' | translate }}</mat-label>
                 <label>
-                  <input formControlName="name" autocomplete="name" matInput required>
+                  <input [formControl]="getForm.name" autocomplete="name" matInput required>
                 </label>
                 @if (getForm.name.hasError('required')) {
                   <mat-error [innerHTML]="'CATALOGUE.NAME.REQUIRED' | translate"></mat-error>
-                } @else if (errors['name']) {
-                  <mat-error>{{ errors['name'] }}</mat-error>
+                } @else if (errors()['name']) {
+                  <mat-error>{{ errors()['name'] }}</mat-error>
                 }
               </mat-form-field>
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'CATALOGUE.DESCRIPTION.FIELD' | translate }}</mat-label>
                 <label>
-                  <textarea #message formControlName="description" matInput maxlength="256"></textarea>
+                  <textarea #message [formControl]="getForm.description" matInput maxlength="256"></textarea>
                 </label>
                 <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
               </mat-form-field>
-              @if (groups) {
+              @if (filteredGroupSignal(); as groups) {
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
-                  <input (keydown)="keyDownGroup($event)" formControlName="group" [matAutocomplete]="autoGroup"
+                  <input (keydown)="keyDownGroup($event)" [formControl]="getForm.group" [matAutocomplete]="autoGroup"
                          matInput type="text">
                   <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
-                    @for (group of filteredGroup | async | sortBy: 'asc':'name'; track group) {
+                    @for (group of groups | sortBy: 'asc':'name'; track group) {
                       <mat-option [value]="group">{{ group.name }}</mat-option>
                     }
                   </mat-autocomplete>
                   @if (getForm.group.hasError('requireMatch')) {
                     <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate"></mat-error>
-                  } @else if (errors['group']) {
-                    <mat-error>{{ errors['group'] }}</mat-error>
+                  } @else if (errors()['group']) {
+                    <mat-error>{{ errors()['group'] }}</mat-error>
                   }
                 </mat-form-field>
               } @else {
@@ -58,17 +60,17 @@
               }
 
               <div>
-                <mat-checkbox formControlName="home" color="primary">
+                <mat-checkbox [formControl]="getForm.home" color="primary">
                   {{ 'CATALOGUE.SHOW.HOME' | translate }}
                 </mat-checkbox>
-                <mat-checkbox formControlName="catalog" color="primary">
+                <mat-checkbox [formControl]="getForm.catalog" color="primary">
                   {{ 'CATALOGUE.SHOW.CATALOG' | translate }}
                 </mat-checkbox>
               </div>
-              @if (!file && !resizedImageDataUrl) {
+              @if (!file() && !resizedImageDataUrl()) {
                 <div (fileDropped)="onFileDropped($event)" appDragDrop
                      class="container hide-xs">
-                  <input #fileDropRef (change)="fileBrowseHandler($event)" [multiple]="false" id="fileDropRef"
+                  <input #fileDropRef (change)="fileBrowseHandler($event.target)" [multiple]="false" id="fileDropRef"
                          type="file" accept="image/*"/>
                   <canvas #canvas></canvas>
                   <svg height="64" viewBox="0 0 63 64" width="63" xmlns="http://www.w3.org/2000/svg">
@@ -93,39 +95,40 @@
                 <button (click)="fileInput.click()" color="accent" mat-fab extended class="icon-button"
                         type="button">{{ 'CATALOGUE.FILE.CHOOSE' | translate }}
                 </button>
-                <input #fileInput (change)="fileBrowseHandler($event)" [multiple]="false" hidden id="file" type="file"
+                <input #fileInput (change)="fileBrowseHandler($event.target)" [multiple]="false" hidden id="file" type="file"
                        accept="image/*">
                 <canvas #canvasXs></canvas>
               </div>
 
-              @if (file && !resizedImageDataUrl) {
+              @if (file(); as currentFile) {
                 <mat-card appearance="outlined" class="divider">
                   <mat-card-header>
                     <mat-icon class="icon-display" mat-card-avatar>image</mat-icon>
                     <mat-card-title-group>
-                      <mat-card-title style="margin-left: 20px;">{{ file.name }}</mat-card-title>
-                      <mat-card-subtitle> {{ formatBytes(file.size, 0) }}</mat-card-subtitle>
+                      <mat-card-title style="margin-left: 20px;">{{ currentFile.name }}</mat-card-title>
+                      <mat-card-subtitle> {{ formatBytes(currentFile.size, 0) }}</mat-card-subtitle>
                     </mat-card-title-group>
                     <div class="spacer"></div>
-                    <button (click)="deleteFile" color="warn" mat-icon-button type="button">
+                    <button (click)="deleteImg()" color="warn" mat-icon-button type="button">
                       <mat-icon>delete</mat-icon>
                     </button>
                   </mat-card-header>
-                  <mat-card-content>
-                    <mat-progress-bar [value]="file.progress"></mat-progress-bar>
-                    <div>
-                      <div class="spacer"></div>
-                      {{ file.progress / 100 | percent }}
-                    </div>
-                  </mat-card-content>
+                  @if (!resizedImageDataUrl()) {
+                    <mat-card-content>
+                      <mat-progress-bar [value]="currentFile.progress" [mode]="'determinate'"></mat-progress-bar>
+                      <div>
+                        <div class="spacer"></div>
+                        {{ currentFile.progress / 100 | percent }}
+                      </div>
+                    </mat-card-content>
+                  }
                 </mat-card>
               }
             </div>
-            @if (resizedImageDataUrl) {
+            @if (resizedImageDataUrl(); as currentImage) {
               <div class="divider">
                 <div class="container">
-                  <mat-icon (click)="deleteImg" class="delete-img" color="warn" type="button">delete</mat-icon>
-                  <img [alt]="catalogue?.name" [src]="resizedImageDataUrl" mat-card-image>
+                  <img [alt]="catalogue?.name" [src]="currentImage" mat-card-image>
                 </div>
               </div>
             }
@@ -136,11 +139,11 @@
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
             </button>
             @if (isAddMode) {
-              <button [disabled]="form.invalid || file?.progress !== 100" color="primary" mat-fab extended
+              <button [disabled]="form.invalid || file()?.progress !== 100" color="primary" mat-fab extended
                       class="icon-button" type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}
               </button>
             } @else {
-              <button [disabled]="form.invalid || (!resizedImageDataUrl && file?.progress !== 100)" color="primary"
+              <button [disabled]="form.invalid || (!resizedImageDataUrl() && file()?.progress !== 100)" color="primary"
                       mat-fab extended class="icon-button" type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}
               </button>
             }

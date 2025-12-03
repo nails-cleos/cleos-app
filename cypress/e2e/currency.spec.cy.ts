@@ -59,8 +59,8 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
         cy.get('mat-card-title').contains('Update currency');
         cy.get('mat-card-subtitle').contains(currency.code);
-        cy.get('input[formControlName="code"]').should('have.value', currency.code);
-        cy.get('input[formControlName="name"]').should('have.value', currency.name);
+        cy.get('[data-cy="name-input"]').should('have.value', currency.name);
+        cy.get('[data-cy="code-input"]').should('have.value', currency.code);
         cy.get('#select-icon').contains(currency.icon);
 
         // Updates

@@ -47,7 +47,7 @@ export class DashboardEffects {
   getDashEvents$ = createEffect(() => this.actions.pipe(
     ofType(getEvents),
     switchMap(({ date }) => this.dashboardService.getEvents(date).pipe(
-      map((data: IEventSummary) => dashSuccess(data ? { data } : { data: [] as IEventSummary })),
+      map((data: IEventSummary[]) => dashSuccess(data ? { data } : { data: [] })),
       catchError((err: HttpErrorResponse) => of(dashFailure({ error: err.error }))),
     )),
   ));
@@ -72,7 +72,7 @@ export class DashboardEffects {
   getCards$ = createEffect(() => this.actions.pipe(
     ofType(getCards),
     switchMap(({ date }) => this.dashboardService.getCards(date).pipe(
-      map((data: ICardSummary) => dashSuccess(data ? { data } : { data: [] as ICardSummary })),
+      map((data: ICardSummary[]) => dashSuccess(data ? { data } : { data: [] })),
       catchError((err: HttpErrorResponse) => of(dashFailure({ error: err.error }))),
     )),
   ));

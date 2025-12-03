@@ -22,7 +22,7 @@ import {
   updateOffice,
 } from '../office.actions';
 import { IOffice } from '../../interfaces/office';
-import { IUser } from '../../interfaces/user';
+import { IUserAll } from '../../interfaces/user';
 import { IApiResponse, success } from '../../interfaces/common';
 import { ToastType } from '../../shared/toast/toast.model';
 
@@ -47,7 +47,7 @@ export class OfficeEffects {
     ofType(getAllManager),
     switchMap(() =>
       this.userService.getManagers().pipe(
-        map((managers: IUser[]) => managerSuccess(managers ? { managers } : { managers: [] })),
+        map((managers: IUserAll[]) => managerSuccess(managers ? { managers } : { managers: [] })),
         catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
       )),
   ));
@@ -105,7 +105,7 @@ export class OfficeEffects {
 
   private requestSuccess(key: string, name?: string, id?: string, toastType?: ToastType) {
     const message = this.translate.instant(key, { name });
-    const path = id ? `offices/${ id }` : undefined;
+    const path = id ? `offices/${id}` : undefined;
     return success(officeSaveSuccess, message, path, undefined, toastType);
   }
 }

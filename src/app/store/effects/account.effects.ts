@@ -21,7 +21,7 @@ import {
 import { TranslateService } from '@ngx-translate/core';
 import { AccountService } from '../../services/account.service';
 import { PaymentService } from '../../services/payment.service';
-import { IAccount, ITransaction } from '../../interfaces/account';
+import { IAccountAll, ITransaction } from '../../interfaces/account';
 import { IPaymentOption } from '../../interfaces/payment';
 import { IApiResponse, success } from '../../interfaces/common';
 
@@ -36,7 +36,7 @@ export class AccountEffects {
     ofType(getAccount),
     switchMap(({ id }) =>
       this.accountService.getAccount(id).pipe(
-        map((selected?: IAccount) => accountSelected({ selected })),
+        map((selected?: IAccountAll) => accountSelected({ selected })),
         catchError((err: HttpErrorResponse) => of(accountFailure({ error: err.error }))),
       )),
   ));
@@ -72,7 +72,7 @@ export class AccountEffects {
     ofType(getAccountByCustomerId),
     switchMap(({ customerId }) =>
       this.accountService.getAccountByCustomerId(customerId).pipe(
-        map((selected?: IAccount) => accountSelected({ selected })),
+        map((selected?: IAccountAll) => accountSelected({ selected })),
         catchError((err: HttpErrorResponse) => of(accountFailure({ error: err.error }))),
       )),
   ));

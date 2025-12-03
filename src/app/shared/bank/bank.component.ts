@@ -1,108 +1,154 @@
-import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
-import { Observable } from 'rxjs';
-import { FormsModule, ReactiveFormsModule, UntypedFormGroup, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { requireMatch } from '../../util/validators';
-import { map, startWith } from 'rxjs/operators';
-import { IPaymentOption } from '../../interfaces/payment';
+import { IPaymentOption, PaymentPercentage } from '../../interfaces/payment';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
+import { map, startWith } from 'rxjs/operators';
+
+export type BankForm = {
+  type: FormControl<IPaymentOption | undefined>;
+  bank: FormControl<IPaymentOption | undefined>;
+  percentage: FormControl<PaymentPercentage | undefined>;
+};
 
 @Component({
   selector: 'app-bank',
   templateUrl: './bank.component.html',
   styleUrls: ['./bank.component.scss'],
   imports: [CommonModule, AppMaterialModule, TranslateModule, ReactiveFormsModule, FormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BankComponent implements AfterViewInit {
-  @Input() formGroup!: UntypedFormGroup;
-  @Input() options?: IPaymentOption[];
-  @Input() firstTime: boolean;
-  @Input() professionalName?: string;
-  @Output() percentageEmitter = new EventEmitter<number>();
+export class BankComponent {
+  form = input.required<FormGroup<BankForm>>();
+  options = input<IPaymentOption[]>();
+  professionalName = input<string>();
+  firstTime = input<boolean>(false);
+  percentageEmitter = output<number>();
 
-  bankList: IPaymentOption[];
-  filteredBank?: Observable<IPaymentOption[] | undefined>;
+  bankList: IPaymentOption[] = [];
+  filteredBankSignal = signal<IPaymentOption[] | undefined>(undefined);
+  private selectedType = signal<IPaymentOption | undefined>(undefined);
+  private selectedPercentage = signal<PaymentPercentage | undefined>(undefined);
 
-  type?: IPaymentOption;
+  type = computed(() => {
+    const form = this.form();
+    return form?.controls.type.value;
+  });
 
   constructor() {
-  	this.firstTime = false;
-  	this.bankList = [];
+    // Subscribe to form valueChanges once form is available
+    effect(() => {
+      const form = this.form();
+      if (!form) {
+        return;
+      }
+
+      // Subscribe to type changes
+      form.controls.type.valueChanges.subscribe(value => {
+        this.selectedType.set(value);
+      });
+
+      // Subscribe to percentage changes
+      form.controls.percentage.valueChanges.subscribe(value => {
+        this.selectedPercentage.set(value);
+      });
+
+      // Subscribe to bank changes for filtering
+      form.controls.bank.valueChanges.pipe(
+        startWith(''),
+        map(value => typeof value === 'string' ? value : value?.name),
+        map(name => name ? this.filterBank(name) : this.bankList ? this.bankList.slice() : this.bankList),
+      ).subscribe(filtered => {
+        this.filteredBankSignal.set(filtered);
+      });
+    });
+
+    effect(() => {
+      const form = this.form();
+      if (!form) {
+        return;
+      }
+
+      const firstTime = this.firstTime();
+      this.getForm.percentage.setValue(PaymentPercentage.total);
+      if (firstTime) {
+        this.getForm.type.setValidators([Validators.required]);
+        this.getForm.type.updateValueAndValidity();
+        this.getForm.percentage.setValidators([Validators.required]);
+        this.getForm.percentage.updateValueAndValidity();
+
+        const options = this.options();
+        if (options?.length === 1) {
+          this.getForm.type.setValue(options[0]);
+        }
+      }
+    });
+
+    effect(() => {
+      const form = this.form();
+      if (!form) {
+        return;
+      }
+
+      const type = this.selectedType();
+      if (type) {
+        if (type.subTypes?.length) {
+          this.bankList = type.subTypes;
+          this.getForm.bank.setValidators([Validators.required, requireMatch]);
+        } else {
+          this.getForm.bank.setValidators([]);
+          this.bankList = [];
+        }
+        if (type.hidePercentage) {
+          this.getForm.percentage.setValidators([]);
+        } else {
+          this.getForm.percentage.setValidators([Validators.required]);
+        }
+      } else {
+        this.getForm.bank.setValidators([]);
+        this.getForm.percentage.setValidators([]);
+        this.bankList = [];
+      }
+      this.getForm.percentage.updateValueAndValidity();
+      this.getForm.bank.updateValueAndValidity();
+    });
+
+    effect(() => {
+      const form = this.form();
+      if (!form) {
+        return;
+      }
+
+      const value = this.selectedPercentage();
+      let percentage;
+      switch (value) {
+        case 'TOTAL':
+          percentage = 100;
+          break;
+        case 'DEPOSIT_50':
+          percentage = 50;
+          break;
+        default:
+          percentage = 0;
+      }
+      this.percentageEmitter.emit(percentage);
+    });
   }
 
-  ngAfterViewInit(): void {
-  	this.formChanges();
-  	this.createFilter();
+  get getForm(): BankForm {
+    return this.form().controls;
   }
 
-  displayFnBank = (bank: IPaymentOption): string => bank ? `${ bank.name }` : '';
+  displayFnBank = (bank: IPaymentOption): string => bank ? `${bank.name}` : '';
 
-  keyDownHandler = (event: any): void => {
-  	if (event.code === 'Backspace') {
-  		this.formGroup.get('bank')?.setValue('');
-  	}
-  };
-
-  private formChanges = (): void => {
-  	this.formGroup.get('percentage')?.setValue('TOTAL');
-  	if (this.firstTime) {
-  		this.formGroup.get('type')?.setValidators([Validators.required]);
-  		this.formGroup.get('type')?.updateValueAndValidity();
-  		this.formGroup.get('percentage')?.setValidators([Validators.required]);
-  		this.formGroup.get('percentage')?.updateValueAndValidity();
-  	}
-
-  	this.formGroup.get('type')?.valueChanges.subscribe(value => {
-  		this.type = value;
-  		if (this.type) {
-  			if (this.type.subTypes?.length) {
-  				this.bankList = this.type.subTypes;
-  				this.formGroup.get('bank')?.setValidators([Validators.required, requireMatch]);
-  			} else {
-  				this.formGroup.get('bank')?.setValidators([]);
-  				this.bankList = [];
-  			}
-  			if (this.type.hidePercentage) {
-  				this.formGroup.get('percentage')?.setValidators([]);
-  			} else {
-  				this.formGroup.get('percentage')?.setValidators([Validators.required]);
-  			}
-  		} else {
-  			this.formGroup.get('bank')?.setValidators([]);
-  			this.formGroup.get('percentage')?.setValidators([]);
-  			this.bankList = [];
-  		}
-  		this.formGroup.get('percentage')?.updateValueAndValidity();
-  		this.formGroup.get('bank')?.updateValueAndValidity();
-  	});
-
-  	this.formGroup.get('percentage')?.valueChanges.subscribe(value => {
-  		let percentage;
-  		switch (value) {
-  		case 'TOTAL':
-  			percentage = 100;
-  			break;
-  		case 'DEPOSIT_50':
-  			percentage = 50;
-  			break;
-  		default:
-  			percentage = 0;
-  		}
-  		this.percentageEmitter.emit(percentage);
-  	});
-  };
-
-  private createFilter = (): void => {
-  	this.filteredBank = this.formGroup.get('bank')?.valueChanges.pipe(startWith(''),
-  		map(value => typeof value === 'string' ? value : value.name),
-  		map(name => name ? this.filterBank(name) : this.bankList ? this.bankList.slice() : this.bankList));
-
-  	if (this.firstTime && this.options?.length === 1) {
-  		this.formGroup.get('type')?.setValue(this.options[0]);
-  	}
+  keyDownHandler = (event: KeyboardEvent): void => {
+    if (event.code === 'Backspace') {
+      this.getForm.bank.setValue(undefined);
+    }
   };
 
   private filterBank = (name: string): IPaymentOption[] | undefined => this.bankList?.filter(
-  	option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 }

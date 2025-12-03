@@ -19,7 +19,7 @@ import { TreatmentService } from '../../services/treatment.service';
 import { MainService } from '../../services/main.service';
 import { UserService } from '../../services/user.service';
 import { Token } from '../../interfaces/token';
-import { ICatalogue } from '../../interfaces/catalogue';
+import { ICatalogueAll } from '../../interfaces/catalogue';
 import { ITreatmentGroup } from '../../interfaces/treatment';
 import { success } from '../../interfaces/common';
 import { loginSuccess } from '../auth.actions';
@@ -37,7 +37,7 @@ export class MainEffects {
     ofType(getAllCatalogue),
     switchMap(() =>
       this.catalogueService.getAllHome().pipe(
-        switchMap((catalogues: ICatalogue[]) => of(catalogueSuccess({ catalogues }))),
+        switchMap((catalogues: ICatalogueAll[]) => of(catalogueSuccess({ catalogues }))),
         catchError((err: HttpErrorResponse) => of(requestFailure({ error: err.error }))),
       )),
   ));

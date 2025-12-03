@@ -2,7 +2,7 @@
 <div [innerHTML]="data.content" mat-dialog-content></div>
 <div mat-dialog-actions>
   @if (!data.hideNoButton) {
-    <button (click)="onNoClick" cdkFocusInitial mat-button>
+    <button (click)="onNoClick()" cdkFocusInitial mat-button>
       {{ 'COMMON.BUTTON.NO' | translate }}
     </button>
   }

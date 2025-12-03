@@ -1,41 +1,300 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { SearchComponent } from './search.component';
-import { TranslateModule } from '@ngx-translate/core';
+import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { Subject } from 'rxjs';
-import { AppState } from '../../store/app.states';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { IReservationAll, States } from '../../interfaces/reservation';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { getAllFilterReservations } from '../../store/reservation.actions';
+import { ActivatedRoute } from '@angular/router';
+import { signal } from '@angular/core';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { SearchComponent } from './search.component';
+import { IUserAll } from '../../interfaces/user';
+import { getNowTimeZone } from '../../util/dates';
+import { ICurrencyAll } from '../../interfaces/currency';
+import { PaymentType } from '../../interfaces/payment';
+import { ServiceType } from '../../interfaces/room';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { ReservationState } from '../../store/reducers/reservation.reducers';
 
 describe('SearchComponent', () => {
   let component: SearchComponent;
   let fixture: ComponentFixture<SearchComponent>;
+  let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
+  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let translate: TranslateService;
 
-  let state$: Subject<any>;
+  const professional: IUserAll = {
+    id: 'prof-123',
+    displayName: 'Pro 1',
+    email: '',
+    authorities: [],
+    locale: 'en',
+    timeZone: 'Europe/Amsterdam',
+  };
 
-  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  const mockDate = getNowTimeZone();
+  const mockCurrency: ICurrencyAll = { id: 'c-1', icon: '€', code: 'EUR', name: 'Euro' };
+
+  const mockCustomers: IUserAll[] = [
+    { id: 'a', displayName: 'Alice' } as IUserAll,
+    { id: 'b', displayName: 'Bob' } as IUserAll,
+  ];
+
+  const mockReservation: IReservationAll = {
+    start: mockDate,
+    id: 'reservation-123',
+    state: States.created,
+    timestamp: mockDate.getTime() / 1000,
+    customer: {
+      id: 'customer-123',
+      displayName: 'John Doe',
+      email: 'john@example.com',
+      phone: '1234567890',
+      authorities: [],
+      locale: 'en',
+      timeZone: 'Europe/Amsterdam',
+    },
+    room: {
+      id: 'room-123',
+      timeZone: 'Europe/Amsterdam',
+      currency: mockCurrency,
+      professionals: [professional],
+      paymentTypes: [PaymentType.cash, PaymentType.transfer],
+      availabilities: [],
+      address: { name: 'address', location: { x: 1.0, y: 1.0 }, id: 1 },
+      office: { id: 'office-1', name: 'Office 1', manager: professional },
+      primary: true,
+    },
+    treatment: {
+      id: '1',
+      key: 'treatment-123',
+      name: 'Treatment 1',
+      price: 100,
+      groupId: 'group-1',
+      color: { id: 'color-1', name: 'Blue' },
+      group: { id: 'group-1', name: 'Group 1' },
+      duration: 'PT1H30M',
+      type: ServiceType.treatment,
+    },
+    professional,
+    additional: [],
+    canEdit: true,
+    paymentRequired: false,
+    configurationCanCustomerChange: true,
+    note: 'Test note',
+    customerNote: 'Customer note',
+    paymentLink: 'https://payment.link',
+  };
+
+  const mockPagination = {
+    content: [mockReservation, mockReservation],
+    totalElements: 2,
+  };
+
+  let reservationList$: BehaviorSubject<any>;
+  let customerList$: BehaviorSubject<any>;
+  let breakpoint$: BehaviorSubject<any>;
+  let response$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    state$ = new Subject<any>();
+    reservationList$ = new BehaviorSubject(mockPagination);
+    customerList$ = new BehaviorSubject(undefined);
+    response$ = new BehaviorSubject<any>(undefined);
+    breakpoint$ = new BehaviorSubject<any>({
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
+      },
+    });
 
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
 
-    storeSpy.select.and.returnValue(state$.asObservable());
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      snapshot: {
+        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+      },
+    });
+
+    let pipeCallIndex = 0;
+    storeSpy.pipe.and.callFake(() => {
+      pipeCallIndex++;
+      switch (pipeCallIndex) {
+        case 1:
+          return reservationList$.asObservable();
+        case 2:
+          return customerList$.asObservable();
+        case 3:
+          return response$.asObservable();
+        default:
+          return new BehaviorSubject(undefined).asObservable();
+      }
+    });
+
+    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [SearchComponent, TranslateModule.forRoot()],
+      imports: [SearchComponent, TranslateModule.forRoot(), NoopAnimationsModule],
       providers: [
         { provide: Store, useValue: storeSpy },
+        { provide: BreakpointObserver, useValue: breakpointObserverSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SearchComponent);
     component = fixture.componentInstance;
+
+    translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en');
+    translate.use('en');
+
     fixture.detectChanges();
   });
 
-  afterEach(() => state$.complete());
+  afterEach(() => {
+    reservationList$.complete();
+    customerList$.complete();
+    response$.complete();
+    breakpoint$.complete();
+  });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should compute dataSourceSignal correctly', () => {
+    reservationList$.next(mockPagination);
+    fixture.detectChanges();
+
+    const data = component.dataSourceSignal() as any;
+    expect(data?.length).toBe(2);
+  });
+
+  it('should compute resultsLengthSignal correctly', () => {
+    reservationList$.next(mockPagination);
+    fixture.detectChanges();
+
+    expect(component.resultsLengthSignal()).toBe(2);
+  });
+
+  it('should set mobile page size when small breakpoint matches', () => {
+    breakpoint$.next({
+      matches: true,
+      breakpoints: {
+        [Breakpoints.XSmall]: true,
+        [Breakpoints.Small]: true,
+      },
+    });
+    fixture.detectChanges();
+
+    expect(component.pageSizeSignal()).toBe(MOBILE_PAGE_SIZE);
+  });
+
+  it('should keep default page size when breakpoint does not match', () => {
+    breakpoint$.next({
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
+      },
+    });
+    fixture.detectChanges();
+
+    expect(component.pageSizeSignal()).toBe(PAGE_SIZE);
+  });
+
+  it('should dispatch getColorPage when paginatorPageIndex changes', () => {
+    component.paginatorPageIndex.set(1);
+    fixture.detectChanges();
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(
+      getAllFilterReservations({
+        page: 1,
+        sort: 'timestamp',
+        direction: 'desc',
+        size: PAGE_SIZE,
+        userId: component['selectCustomerSignal']()?.id,
+        states: component.selectedStatesSignal(),
+      }),
+    );
+  });
+
+  it('should dispatch clean and reset paginator when responseSignal emits', () => {
+    const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
+    component['paginator'] = signal(paginatorMock);
+
+    response$.next({ success: true });
+    fixture.detectChanges();
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(
+      getAllFilterReservations({
+        page: 0,
+        sort: 'timestamp',
+        direction: 'desc',
+        size: PAGE_SIZE,
+        userId: component['selectCustomerSignal']()?.id,
+        states: component.selectedStatesSignal(),
+      }),
+    );
+  });
+
+  it('should update allCustomersWritableSignal when store emits', async () => {
+    customerList$.next(mockCustomers);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(component.customerListSignal()).toEqual(mockCustomers);
+  });
+
+  it('should filter customers', () => {
+    const result = component['filterCustomer']('Ali', mockCustomers);
+    expect(result!.length).toBe(1);
+    expect(result![0].displayName).toBe('Alice');
+  });
+
+  it('should update allStatesWritableSignal when store emits', () => {
+    expect(component.allStatesWritableSignal()).toEqual(Object.values(States));
+  });
+
+  it('should filter states', () => {
+    const result = component['filterStates']('cre', Object.values(States));
+    expect(result!.length).toBe(1);
+    expect(result![0]).toBe(States.created);
+  });
+
+  it('should remove a state', () => {
+    component.selectedStatesSignal.set([Object.values(States)[0]]);
+    component.allStatesWritableSignal.set([...Object.values(States)]);
+
+    component.remove(Object.values(States)[0]);
+
+    expect(component.selectedStatesSignal().length).toBe(0);
+    expect(component.allStatesWritableSignal()!.length).toBe(10);
+  });
+
+  it('should add selected customer and clear input', () => {
+    component.allStatesWritableSignal.set(Object.values(States));
+    fixture.detectChanges();
+
+    component.getForm.state.setValue = jasmine.createSpy('setValue');
+    component.stateInput().nativeElement.value = 'something';
+
+    const mockEvent = {
+      option: { value: Object.values(States)[2] },
+    } as unknown as MatAutocompleteSelectedEvent;
+
+    component.selected(mockEvent);
+
+    expect(component.selectedStatesSignal()).toContain(Object.values(States)[2]);
+
+    expect(component.allStatesWritableSignal())
+      .toEqual(Object.values(States).filter(s => s !== Object.values(States)[2]));
+
+    expect(component.getForm.state.setValue).toHaveBeenCalledWith(undefined);
   });
 });

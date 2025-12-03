@@ -1,52 +1,46 @@
-import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { createChart, IChartUtil } from '../../util/chart';
 import { IChart } from '../../interfaces/dashboard';
 import { ICurrency } from '../../interfaces/currency';
-import { Subscription } from 'rxjs';
 import { AuthUserService } from '../../services/auth-user.service';
 import { ErrorComponent } from '../error/error.component';
 import { BaseChartDirective } from 'ng2-charts';
+import { IError } from '../../interfaces/common';
 
 @Component({
   selector: 'app-chart',
   templateUrl: './chart.component.html',
   styleUrls: ['./chart.component.scss'],
   imports: [ErrorComponent, BaseChartDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ChartComponent implements OnChanges, OnDestroy {
-  @Input() error: any;
-  @Input() chartSummary?: IChart;
-  @Input() isLoading: any | boolean;
-  @Input() currency?: ICurrency;
-  @Input() locale?: string;
-  @Input() timeZone?: string;
+export class ChartComponent {
+  chartSummary = input<IChart>();
+  currency = input<ICurrency>();
+  locale = input<string>();
+  timeZone = input<string>();
+  isLoading = input<boolean>(false);
+  error = input<IError>();
 
-  chart: IChartUtil | undefined;
+  private readonly authUserService: AuthUserService = inject(AuthUserService);
 
-  private authUserServiceSubscription: Subscription;
-  private isDarkMode: boolean;
+  private authUserSignal = this.authUserService.authUser;
 
-  constructor(private authUserService: AuthUserService) {
-  	this.isDarkMode = false;
-  	this.authUserServiceSubscription =
-      this.authUserService.authUser.subscribe(value => this.isDarkMode = value.isDarkMode);
+  private isDarkMode = computed(() => this.authUserSignal()?.isDarkMode ?? false);
+
+  errorSignal = signal(this.error());
+
+  chart = signal<IChartUtil | undefined>(undefined);
+
+  constructor() {
+    effect(() => {
+      const chartSummary = this.chartSummary();
+      if (!chartSummary || this.error() || !chartSummary.type) {
+        this.errorSignal.set({ status: 'NO_CONTENT' });
+        return;
+      }
+      this.errorSignal.set(undefined);
+      this.chart.set(createChart(chartSummary, this.currency(), this.isDarkMode(), this.locale(), this.timeZone()));
+    });
   }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ngOnChanges(_changes: SimpleChanges): void {
-  	this.createChart();
-  }
-
-  ngOnDestroy(): void {
-  	this.authUserServiceSubscription.unsubscribe();
-  }
-
-  private createChart = (): void => {
-  	if (!this.chartSummary || this.error || !this.chartSummary.type) {
-  		this.error = { status: 'NO_CONTENT' };
-  		return;
-  	}
-  	this.error = undefined;
-  	this.chart = createChart(this.chartSummary, this.currency, this.isDarkMode, this.locale, this.timeZone);
-  };
 }

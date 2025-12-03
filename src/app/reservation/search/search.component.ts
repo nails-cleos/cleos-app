@@ -1,27 +1,48 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import { CancelOption, IReservation, IReservationAll, States, StatesKey } from '../../interfaces/reservation';
-import { Observable, Subscription } from 'rxjs';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  Signal,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { CancelOption, IReservation, IReservationAll, States } from '../../interfaces/reservation';
+import { combineLatestWith } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { AppState, selectReservationState } from '../../store/app.states';
-import { cancelReservation, clean, getAllFilterReservations, getCustomers } from '../../store/reservation.actions';
+import { cancelReservation, cleanReservation, getAllFilterReservations } from '../../store/reservation.actions';
 import { getNowTimeZone, isSameTimeZone, newDateTimestamp } from '../../util/dates';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { map, startWith } from 'rxjs/operators';
 import { IUser, IUserAll } from '../../interfaces/user';
-import { UntypedFormControl } from '@angular/forms';
-import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { openCancel, openDialog } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
 import { SharedModule } from '../../shared/shared.module';
 import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
 import { ReservationIconPipe } from '../../pipes/reservation-icon.pipe';
+import {
+  getCustomersPipe,
+  getFilteredReservationsPipe,
+  getReservationResponsePipe,
+} from '../../store/selectors/reservation.selectors';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { ReservationState } from '../../store/reducers/reservation.reducers';
+import { requireMatch } from '../../util/validators';
+
+type SearchForm = {
+  customer: FormControl<IUserAll | undefined>;
+  state: FormControl<string | undefined>;
+}
 
 @Component({
   selector: 'app-search',
@@ -29,80 +50,139 @@ import { ReservationIconPipe } from '../../pipes/reservation-icon.pipe';
   styleUrls: ['./search.component.scss'],
   animations: [detailExpandAnimation],
   imports: [SharedModule, TimeDetailPipe, ReservationIconPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild('stateInput') stateInput!: ElementRef<HTMLInputElement>;
-  @ViewChild('auto') matAutocomplete!: MatAutocomplete;
+export class SearchComponent {
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly dialog: MatDialog = inject(MatDialog);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+
+  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private reservationList$ = this.store.pipe(getFilteredReservationsPipe);
+  private customerList$ = this.store.pipe(getCustomersPipe);
+  private response$ = this.store.pipe(getReservationResponsePipe);
+
+  private paginator = viewChild(MatPaginator);
+  private sort = viewChild(MatSort);
+
+  private reservationListSignal = toSignal(this.reservationList$);
+  private responseSignal = toSignal(this.response$);
+  private breakpointsSignal = toSignal(
+    this.breakpointObserver$, {
+      initialValue: {
+        matches: false,
+        breakpoints: {
+          [Breakpoints.XSmall]: false,
+          [Breakpoints.Small]: false,
+        },
+      },
+    },
+  );
+
+  private sortActive = computed(() => this.sort()?.active ?? 'timestamp');
+  private sortDirection = computed(() => this.sort()?.direction ?? 'desc');
+
+  paginatorPageIndex = signal(0);
+  dataSourceSignal = computed(() => {
+    const now = getNowTimeZone();
+    return this.reservationListSignal()?.content?.map((reservation: IReservationAll) => {
+      const reservationStart = newDateTimestamp(reservation.timestamp);
+      if (reservationStart && [String(States.created), String(States.approved)].includes(reservation.state)) {
+        const deadLine = reservationStart < now;
+        return Object.assign({}, reservation, { deadLine });
+      }
+      return reservation;
+    });
+  });
+  resultsLengthSignal = computed(() => this.reservationListSignal()?.totalElements || 0);
+  pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
+
+  private smallSignal = computed(() => this.breakpointsSignal()?.matches ?? false);
 
   displayedColumns: string[] = ['position', 'customer', 'timestamp', 'state', 'treatment', 'actions'];
-  dataSource: any = new MatTableDataSource<Pagination<IReservationAll>>();
-  expandedReservation: IReservation | undefined;
-  resultsLength = DEFAULT_LENGTH;
-  pageSize = PAGE_SIZE;
+  expandedReservation?: IReservation;
 
-  dateFormat: string;
-  language: string;
+  dateFormat: string = this.translate.currentLang;
+  language: string = this.translate.currentLang;
 
-  filteredCustomer: Observable<IUser[] | undefined> | undefined;
-  customer: UntypedFormControl = new UntypedFormControl();
+  form: FormGroup<SearchForm> = this.formBuilder.group<SearchForm>({
+    customer: this.formBuilder.control(undefined, {
+      validators: [requireMatch],
+    }),
+    state: this.formBuilder.control(undefined),
+  });
 
-  state = new UntypedFormControl();
-  filteredStates: Observable<string[]>;
-  states: string[] = [];
+  private selectCustomerSignal = toSignal(this.getForm.customer.valueChanges);
+  private userId = computed(() => this.selectCustomerSignal()?.id);
 
-  private allStates: string[] = Object.keys(States);
-  private userId: string | undefined;
-  private customers: IUserAll[] | undefined;
-  private small = false;
-  private getState: Observable<any>;
-  private subscription: Subscription | undefined;
-  private paginatorSubscription: Subscription | undefined;
+  customerListSignal = toSignal(this.customerList$);
+  filteredCustomerSignal: Signal<IUserAll[] | undefined> = toSignal(
+    this.getForm.customer.valueChanges.pipe(
+      startWith(undefined),
+      map((value) => !value || typeof value === 'string' ? value : value.displayName),
+      combineLatestWith(this.customerList$),
+      map(([name, customers]) => {
+        if (!customers) {
+          return [];
+        }
 
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-    private cdRef: ChangeDetectorRef, private breakpointObserver: BreakpointObserver) {
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small,
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.pageSize = MOBILE_PAGE_SIZE;
-        this.small = true;
+        return name ? this.filterCustomer(name, customers) : customers.slice();
+      })),
+  );
+
+  stateInput = viewChild.required<ElementRef<HTMLInputElement>>('stateInput');
+  selectedStatesSignal = signal<string[]>([]);
+  allStatesWritableSignal = signal<string[]>(Object.values(States));
+  filteredStateSignal: Signal<string[] | undefined> = toSignal(
+    this.getForm.state.valueChanges.pipe(
+      startWith(undefined),
+      map((value: any) => !value || typeof value === 'string' ? value : value.name),
+      combineLatestWith(toObservable(this.allStatesWritableSignal)),
+      map(([name, states]) => {
+        if (!states) {
+          return [];
+        }
+
+        return name ? this.filterStates(name, states) : states.slice();
+      })),
+  );
+
+  constructor() {
+    effect((onCleanup) => {
+      const paginator = this.paginator();
+      if (paginator) {
+        const sub = paginator.page.subscribe((pageEvent) => {
+          this.paginatorPageIndex.set(pageEvent.pageIndex);
+        });
+        onCleanup(() => sub.unsubscribe());
       }
     });
-    this.getState = this.store.select(selectReservationState);
-    this.dateFormat = this.translate.currentLang;
-    this.language = this.translate.currentLang;
-    this.filteredStates = this.state.valueChanges.pipe(
-      startWith(null),
-      map((state: string | null) => state ? this.filterStates(state) : this.allStates.slice()));
-  }
 
-  ngOnInit(): void {
-    this.clean();
-    this.subscribe();
-    this.getCustomers();
-    this.filteredCustomer = this.customer.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value ? value.name : ''),
-      map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers),
-    );
-    this.customer.valueChanges.subscribe(value => {
-      if (value && value.id) {
-        this.userId = value.id;
-        this.getReservations();
+    effect(() => {
+      this.store.dispatch(
+        getAllFilterReservations({
+          page: this.paginatorPageIndex(),
+          sort: this.sortActive(),
+          direction: this.sortDirection(),
+          size: this.pageSizeSignal(),
+          userId: this.userId(),
+          states: this.selectedStatesSignal(),
+        }),
+      );
+    });
+
+    effect(() => {
+      if (this.responseSignal()) {
+        this.store.dispatch(cleanReservation());
+        this.paginator()?.firstPage();
       }
     });
   }
 
-  ngAfterViewInit(): void {
-    this.getReservations();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.paginatorSubscription?.unsubscribe();
+  get getForm(): SearchForm {
+    return this.form.controls;
   }
 
   openDialog = (reservation: IReservationAll): void => {
@@ -123,12 +203,9 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(reservationId => {
       if (reservationId) {
         const options = Object.values(CancelOption).filter(co => co !== CancelOption.charge);
-        openCancel(this.dialog, reservation.room, this.small, options, result => {
+        openCancel(this.dialog, reservation.room, this.smallSignal(), options, result => {
           if (result) {
-            this.dataSource = [{}, {}, {}];
-            this.store.dispatch(
-              cancelReservation(reservationId, result),
-            );
+            this.store.dispatch(cancelReservation(reservationId, result));
           }
         });
       }
@@ -137,94 +214,35 @@ export class SearchComponent implements AfterViewInit, OnInit, OnDestroy {
 
   displayFnUser = (user: IUser): string => user?.displayName ? user.displayName : '';
 
-  keyDownHandler = (event: any): void => {
+  keyDownHandler = (event: KeyboardEvent): void => {
     if (event.code === 'Backspace') {
-      this.customer.setValue(null);
-      this.userId = undefined;
-      this.getReservations();
+      this.getForm.customer.setValue(undefined);
     }
   };
 
   remove = (state: string): void => {
-    const index = this.states.indexOf(state);
+    this.selectedStatesSignal.update((current) => current.filter((c) => c !== state));
+    this.allStatesWritableSignal.update((current) => current ? [...current, state] : [state]);
 
-    if (index >= 0) {
-      this.states = this.states.filter(s => s !== state);
-      this.allStates = Object.keys(States).filter(s => !this.states.includes(s.toUpperCase()));
-
-      this.state.setValue(null);
-      this.getReservations();
-    }
+    this.getForm.state.setValue(undefined);
   };
 
   selected = (event: MatAutocompleteSelectedEvent): void => {
-    const state = States[event.option.value as StatesKey];
-    this.states = [...this.states, state];
-    this.allStates = this.allStates.filter(s => States[s as StatesKey] !== state);
-    this.stateInput.nativeElement.value = '';
-    this.state.setValue(null);
-    this.getReservations();
+    const state = event.option.value as string;
+
+    this.selectedStatesSignal.update((current) => [...current, state]);
+    this.allStatesWritableSignal.update((current) => current?.filter((c) => c !== state));
+
+    if (this.stateInput()) {
+      this.stateInput().nativeElement.value = '';
+    }
+    this.getForm.state.setValue(undefined);
   };
 
-  private createPageSubscriptions = (): void => {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getReservations();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => {
-      this.getReservations(this.paginator.pageIndex);
-    });
-
-    this.cdRef.detectChanges();
-  };
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private getCustomers = (): void => this.store.dispatch(getCustomers());
-
-  private getReservations = (page: number = 0): void => this.store.dispatch(
-    getAllFilterReservations({
-      page,
-      sort: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-      userId: this.userId,
-      states: this.states,
-    }),
-  );
-
-  private filterCustomer = (name: string): IUser[] | undefined => this.customers?.filter(
+  private filterCustomer = (name: string, customers: IUserAll[]): IUserAll[] | undefined => customers?.filter(
     option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private filterStates = (value: string): string[] => this.allStates.filter(
+  private filterStates = (value: string, allStates: string[]): string[] => allStates.filter(
     state => state.toLowerCase().indexOf(value.toLowerCase()) === 0);
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      this.customers = state.customers;
-      if (state.filter) {
-        const now = getNowTimeZone();
-        this.dataSource = state.filter.content?.map((reservation: IReservationAll) => {
-          const reservationStart = newDateTimestamp(reservation.timestamp);
-          if (reservationStart && [String(States.created), String(States.approved)].includes(reservation.state)) {
-            const deadLine = reservationStart < now;
-            return Object.assign({}, reservation, { deadLine });
-          }
-          return reservation;
-        });
-        this.resultsLength = state.filter?.totalElements;
-        if (!this.paginatorSubscription && this.resultsLength) {
-          this.createPageSubscriptions();
-        } else if (!this.resultsLength) {
-          this.paginatorSubscription?.unsubscribe();
-          this.paginatorSubscription = undefined;
-        }
-      }
-      if (state.response) {
-        this.clean();
-        this.getReservations();
-      }
-    });
-  };
 }
 

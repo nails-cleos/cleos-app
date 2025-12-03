@@ -2,37 +2,38 @@ import { inject, Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
 import { IUser } from '../interfaces/user';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState } from '../store/app.states';
-import { Observable } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { redirect } from '../store/auth.actions';
 import { ToastService } from './toast.service';
+import { getUserPipe } from '../store/selectors/auth.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { AuthState } from '../store/reducers/auth.reducers';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PermissionsService {
-  private toastService: ToastService = inject(ToastService);
-  private router: Router = inject(Router);
-  private store: Store<AppState> = inject(Store<AppState>);
-  private translate: TranslateService = inject(TranslateService);
+  private readonly toastService: ToastService = inject(ToastService);
+  private readonly router: Router = inject(Router);
+  private readonly store: Store<AuthState> = inject(Store<AuthState>);
+  private readonly translate: TranslateService = inject(TranslateService);
 
-  getState: Observable<any> = this.store.select(selectAuthState);
-  currentUser?: IUser;
-  token!: string;
+  private user$ = this.store.pipe(getUserPipe);
+
+  private currentUser = toSignal(this.user$);
 
   private readonly data: any = this.router.getCurrentNavigation()?.extras?.state;
 
   constructor() {
-    this.getState.subscribe((state) => this.currentUser = state.user);
   }
 
   private static hasRole = (route: ActivatedRouteSnapshot, user: IUser): boolean => route.data.roles &&
   user.authorities ? user.authorities.some(au => route.data.roles.includes(au.authority)) : false;
 
   canActivate = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean => {
-    if (this.currentUser) {
-      if (PermissionsService.hasRole(route, this.currentUser)) {
+    const user = this.currentUser();
+    if (user) {
+      if (PermissionsService.hasRole(route, user)) {
         return true;
       } else {
         let message;

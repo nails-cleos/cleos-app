@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IPay, IPayment, IPaymentOption, IPaymentRequest, IPaymentStatus } from '../interfaces/payment';
+import { IPay, IPayment, IPaymentAll, IPaymentOption, IPaymentRequest, IPaymentStatus } from '../interfaces/payment';
 import { IReservationPayment } from '../interfaces/reservation';
 import { toUrl } from '../util/helper';
 import { IApiResponse } from '../interfaces/common';
@@ -52,7 +52,7 @@ export class PaymentService {
   getPaymentByResourceId = (
     id: string,
     path: 'reservation' | 'transaction',
-  ): Observable<IPayment[]> => this.http.get<IPayment[]>(toUrl(this.getKey(path), id, this.url));
+  ): Observable<IPaymentAll[]> => this.http.get<IPaymentAll[]>(toUrl(this.getKey(path), id, this.url));
 
   public notifyPayment = (
     id: string,

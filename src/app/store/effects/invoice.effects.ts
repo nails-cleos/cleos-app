@@ -15,7 +15,7 @@ import {
 import { InvoiceService } from '../../services/invoice.service';
 import { OfficeService } from '../../services/office.service';
 import { IInvoice } from '../../interfaces/invoice';
-import { IOffice } from '../../interfaces/office';
+import { IOfficeAll } from '../../interfaces/office';
 
 @Injectable()
 export class InvoiceEffects {
@@ -36,7 +36,7 @@ export class InvoiceEffects {
     ofType(getAllMyOffices),
     switchMap(() =>
       this.invoiceService.getAllMyOffices().pipe(
-        map((offices: IOffice[]) => invoiceOfficesSuccess(offices ? { offices } : { offices: [] })),
+        map((offices: IOfficeAll[]) => invoiceOfficesSuccess(offices ? { offices } : { offices: [] })),
         catchError((err: HttpErrorResponse) => of(invoiceFailure({ error: err.error }))),
       )),
   ));

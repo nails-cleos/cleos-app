@@ -1,4 +1,4 @@
-@if (items) {
+@if (itemsSignal(); as items) {
   <app-drag-drop-sorting [title]="'TREATMENT.DETAIL' | translate" [items]="items"
                          (sorted)="sorted($event)"></app-drag-drop-sorting>
 } @else {

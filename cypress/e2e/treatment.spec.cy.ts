@@ -91,9 +91,9 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
         cy.get('mat-card-title').contains('Update treatments');
         cy.get('mat-card-subtitle').contains(treatment.name);
-        cy.get('input[formControlName="name"]').should('have.value', treatment.name);
-        cy.get('textarea[formControlName="description"]').should('have.value', treatment.description);
-        cy.get('input[formControlName="priceFrom"]').should('have.value', treatment.priceFrom);
+        cy.get('[data-cy="name-input"]').should('have.value', treatment.name);
+        cy.get('[data-cy="description-textarea"]').should('have.value', treatment.description);
+        cy.get('[data-cy="priceFrom-input"]').should('have.value', treatment.priceFrom);
 
         treatment.colors.forEach((color: any) => {
           cy.get('mat-chip-row').contains(color.name).scrollIntoView().should('be.visible');
@@ -165,6 +165,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
               order: index,
               time: convertSecondsToTime(treatmentData.duration),
               errors: {},
+              primary: false,
             })), newTreatmentExpected];
           expect(body.treatments).to.have.deep.members(currentTreatment);
         });

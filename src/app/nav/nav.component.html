@@ -1,28 +1,29 @@
-<mat-drawer-container [hasBackdrop]="(isHandset$ | async)" autosize>
-  <mat-drawer #drawer [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-              [mode]="(isHandset$ | async) ? 'over' : 'side'"
-              [opened]="(isHandset$ | async) === false"
+<mat-drawer-container [hasBackdrop]="isHandsetSignal()" autosize>
+  <mat-drawer #drawer [attr.role]="isHandsetSignal() ? 'dialog' : 'navigation'"
+              [mode]="isHandsetSignal() ? 'over' : 'side'"
+              [opened]="!isHandsetSignal()"
               class="sidenav">
-    @if (showInformation) {
+    @let currentUser = currentUserSignal();
+    @if (showInformation()) {
       <mat-card appearance="outlined" class="mat-elevation-z0">
         @if (currentUser) {
           <mat-card-header>
-            <div class="circle pointer-only" mat-card-avatar [routerLink]="['/', language, 'auth', 'profile']">
+            <div class="circle pointer-only" mat-card-avatar [routerLink]="['/', language(), 'auth', 'profile']">
               @if (image) {
                 <img alt="profile" src="{{image}}">
               } @else {
                 <div class="initials">{{ initials | uppercase }}</div>
               }
             </div>
-            <mat-card-title class="pointer-only" [routerLink]="['/', language, 'auth', 'profile']">
+            <mat-card-title class="pointer-only" [routerLink]="['/', language(), 'auth', 'profile']">
               {{ currentUser.displayName | uppercase }}
             </mat-card-title>
-            <mat-card-subtitle class="pointer-only" [routerLink]="['/', language, 'auth', 'profile']">
+            <mat-card-subtitle class="pointer-only" [routerLink]="['/', language(), 'auth', 'profile']">
               {{ currentUser.email }}
             </mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
-            <app-menu-item [drawer]="drawer" [items]="menuItems"></app-menu-item>
+            <app-menu-item [drawer]="drawer" [items]="menuItems()"></app-menu-item>
           </mat-card-content>
         } @else {
           <mat-card-header>
@@ -35,13 +36,13 @@
           <mat-divider></mat-divider>
           <mat-card-content>
             <mat-nav-list>
-              @if (isHandset$ | async) {
-                <mat-list-item (click)="drawer.toggle()" [routerLink]="['/', language, 'home']">
+              @if (isHandsetSignal()) {
+                <mat-list-item (click)="drawer.toggle()" [routerLink]="['/', language(), 'home']">
                   <mat-icon matListItemIcon>home</mat-icon>
                   <div matListItemTitle>{{ 'COMMON.DASHBOARD.HOME' | translate }}</div>
                 </mat-list-item>
               } @else {
-                <mat-list-item [routerLinkActive]="['active-link']" [routerLink]="['/', language, 'home']">
+                <mat-list-item [routerLinkActive]="['active-link']" [routerLink]="['/', language(), 'home']">
                   <mat-icon matListItemIcon>home</mat-icon>
                   <div matListItemTitle>{{ 'COMMON.DASHBOARD.HOME' | translate }}</div>
                 </mat-list-item>
@@ -54,37 +55,37 @@
   </mat-drawer>
   <mat-drawer-content class="page-wrap">
     <mat-toolbar class="header" color="primary">
-      @if ((isHandset$ | async) && showInformation) {
+      @if (isHandsetSignal() && showInformation()) {
         <button (click)="drawer.toggle()" aria-label="Toggle sidenav" mat-icon-button type="button" name="cleosMenu">
           <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
         </button>
       }
-      <img alt="logo" src="assets/icons/icon-512x512.png" (click)="goToHome" class="pointer-only">
-      <span (click)="goToHome" class="pointer-only">{{ title }}</span>
+      <img alt="logo" src="assets/icons/icon-512x512.png" (click)="goToHome()" class="pointer-only">
+      <span (click)="goToHome()" class="pointer-only">{{ title }}</span>
       <span class="align-right"></span>
       @if (currentUser?.email) {
         <div>
-          @if (isProfessional && workDay.length) {
+          @if (isProfessional() && workDay.length) {
             <button [matMenuTriggerFor]="menuWorkDay" class="badge-padding" mat-icon-button>
               <mat-icon [matBadgeHidden]="!workDay.length" [matBadgeOverlap]="true" [matBadge]="workDay.length"
                         matBadgeColor="warn" aria-hidden="false">work
               </mat-icon>
             </button>
-          } @else if (isProfessional) {
+          } @else if (isProfessional()) {
             <button class="badge-padding" mat-icon-button>
               <mat-icon>work_off</mat-icon>
             </button>
           }
-          @if (notifications.length && showInformation) {
+          @if (notifications().length && showInformation()) {
             <button [matMenuTriggerFor]="menuNotification" class="badge-padding" mat-icon-button>
-              <mat-icon [matBadgeHidden]="!countNotifications" [matBadgeOverlap]="true"
-                        [matBadge]="plusNotification ? plusNotification : countNotifications"
+              <mat-icon [matBadgeHidden]="!countNotifications()" [matBadgeOverlap]="true"
+                        [matBadge]="plusNotification ? plusNotification : countNotifications()"
                         matBadgeColor="warn" aria-hidden="false">
                 notifications
               </mat-icon>
             </button>
           } @else {
-            @if (showInformation) {
+            @if (showInformation()) {
               <button [matMenuTriggerFor]="menuNoNotification" class="badge-padding" mat-icon-button>
                 <mat-icon>notifications</mat-icon>
               </button>
@@ -99,7 +100,7 @@
           }
           <mat-menu #menuNotification="matMenu" xPosition="before">
             <mat-list>
-              @for (not of notifications; track not) {
+              @for (not of notifications(); track not) {
                 <mat-list-item (click)="notification(not)" class="pointer" matRipple>
                   <div [matTooltip]="not.message" [ngClass]="{ 'gray-text': not.read}" matListItemTitle>
                     @if (!not.read) {
@@ -114,7 +115,7 @@
                 </mat-list-item>
               }
               <mat-list-item>
-                <button color="primary" mat-button [routerLink]="['/', language, 'notifications']">
+                <button color="primary" mat-button [routerLink]="['/', language(), 'notifications']">
                   {{ 'COMMON.NOTIFICATION.LOAD_MORE' | translate }}
                 </button>
               </mat-list-item>
@@ -122,7 +123,7 @@
           </mat-menu>
           <mat-menu #menuWorkDay="matMenu" xPosition="before">
             <mat-list>
-              @for (not of workDay; track not; let isLast = $last) {
+              @for (not of workDay(); track not; let isLast = $last) {
                 <mat-list-item (click)="notification(not)" class="pointer" matRipple>
                   <div [matTooltip]="not.message" matListItemTitle>{{ not.message }}</div>
                 </mat-list-item>
@@ -133,7 +134,8 @@
             </mat-list>
           </mat-menu>
 
-          <button [matMenuTriggerFor]="menuLogged" [ngClass]="{'badge-padding': incomplete}" mat-icon-button name="settings">
+          <button [matMenuTriggerFor]="menuLogged" [ngClass]="{'badge-padding': incomplete}" mat-icon-button
+                  name="settings">
             <mat-icon [matBadgeHidden]="!incomplete" [matBadgeOverlap]="true" [matBadge]="'*'" matBadgeColor="warn"
                       aria-hidden="false">
               settings
@@ -141,12 +143,12 @@
           </button>
           <mat-menu #menuLogged="matMenu">
             <mat-nav-list>
-              <mat-list-item [routerLinkActive]="['active']" [routerLink]="['/', language, 'home']">
+              <mat-list-item [routerLinkActive]="['active']" [routerLink]="['/', language(), 'home']">
                 <mat-icon matListItemIcon>home</mat-icon>
                 <div matListItemTitle>{{ 'COMMON.DASHBOARD.HOME' | translate }}</div>
               </mat-list-item>
               <mat-divider></mat-divider>
-              <mat-list-item [routerLink]="['/', language, 'auth', 'profile']">
+              <mat-list-item [routerLink]="['/', language(), 'auth', 'profile']">
                 @if (incomplete) {
                   <mat-icon matListItemIcon matBadgeColor="warn" [matBadge]="'*'" [matBadgeOverlap]="true"
                             aria-hidden="false">badge
@@ -157,59 +159,60 @@
                 <div matListItemTitle>{{ 'COMMON.DASHBOARD.PROFILE' | translate }}</div>
               </mat-list-item>
               <mat-divider></mat-divider>
-              <mat-list-item (click)="changeTheme">
-                <mat-icon matListItemIcon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
-                <div matListItemTitle>{{ 'COMMON.DASHBOARD.' + (isDarkMode ? 'LIGHT_MODE' : 'DARK_MODE') | translate }}
+              <mat-list-item (click)="changeTheme()">
+                <mat-icon matListItemIcon>{{ isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+                <div
+                  matListItemTitle>{{ 'COMMON.DASHBOARD.' + (isDarkMode() ? 'LIGHT_MODE' : 'DARK_MODE') | translate }}
                 </div>
               </mat-list-item>
               <mat-divider></mat-divider>
-              <mat-list-item (click)="logout">
+              <mat-list-item (click)="logout()">
                 <mat-icon matListItemIcon>exit_to_app</mat-icon>
                 <div matListItemTitle>{{ 'COMMON.DASHBOARD.SIGN_OUT' | translate }}</div>
               </mat-list-item>
             </mat-nav-list>
           </mat-menu>
         </div>
-      } @else if ((isHandset$ | async) === false) {
-        <button color="accent" mat-fab extended [routerLink]="['/', language, 'home']">
+      } @else if (!isHandsetSignal()) {
+        <button color="accent" mat-fab extended [routerLink]="['/', language(), 'home']">
           <mat-icon>home</mat-icon>
           <span>{{ 'COMMON.DASHBOARD.HOME' | translate }}</span>
         </button>
       } @else {
-        <button color="accent" mat-fab [routerLink]="['/', language, 'home']">
+        <button color="accent" mat-fab [routerLink]="['/', language(), 'home']">
           <mat-icon>home</mat-icon>
         </button>
       }
     </mat-toolbar>
-    <main [ngClass]="{'loading': isLoading}" class="content">
-      @if (isLoading) {
+    <main [ngClass]="{'loading': isLoading()}" class="content">
+      @if (isLoading()) {
         <div class="spinner-vertical" style="z-index: 999">
           <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
         </div>
       }
       <div class="grid-container">
-        @if (!error) {
-          <router-outlet></router-outlet>
-        } @else {
+        @if (error(); as error) {
           <app-error [error]="error"></app-error>
+        } @else {
+          <router-outlet></router-outlet>
         }
       </div>
     </main>
-    @if ((isHandset$ | async) && (isProfessional || isManager || isAdmin)) {
+    @if (isHandsetSignal() && (isProfessional() || isManager() || isAdmin())) {
       <footer>
         <mat-toolbar class="footer">
-          <a [routerLinkActive]="['active-link']" [routerLink]="['/', language, 'reservation', 'calendar']">
+          <a [routerLinkActive]="['active-link']" [routerLink]="['/', language(), 'reservation', 'calendar']">
             <mat-icon>event</mat-icon>
           </a>
-          <a [routerLinkActive]="['active-link']" [routerLink]="['/', language, 'dashboard']">
+          <a [routerLinkActive]="['active-link']" [routerLink]="['/', language(), 'dashboard']">
             <mat-icon>dashboard</mat-icon>
           </a>
-          @if (isAdmin) {
-            <a [routerLinkActive]="['active-link']" [routerLink]="['/', language, 'reservation', 'search']">
+          @if (isAdmin()) {
+            <a [routerLinkActive]="['active-link']" [routerLink]="['/', language(), 'reservation', 'search']">
               <mat-icon>find_in_page</mat-icon>
             </a>
           }
-          <a [routerLinkActive]="['active-link']" [routerLink]="['/', language, 'unavailable', 'add']">
+          <a [routerLinkActive]="['active-link']" [routerLink]="['/', language(), 'unavailable', 'add']">
             <mat-icon>event_busy</mat-icon>
           </a>
         </mat-toolbar>

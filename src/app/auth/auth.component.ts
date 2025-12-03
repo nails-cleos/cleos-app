@@ -1,13 +1,12 @@
-import { Component, inject, OnDestroy, OnInit, Optional } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal, untracked } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { clean, login, redirect, signupSuccess } from '../store/auth.actions';
-import { AppState, selectAuthState } from '../store/app.states';
+import { clean, login, redirect, setCurrentCode, signupSuccess } from '../store/auth.actions';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, Subscription } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 import {
   Auth,
   createUserWithEmailAndPassword,
+  GoogleAuthProvider,
   sendEmailVerification,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -15,174 +14,210 @@ import {
 } from '@angular/fire/auth';
 import { VERIFICATION_EMAIL } from '../util/helper';
 import { THEME } from '../util/theme';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from '../../environments/environment';
-import { GoogleAuthProvider } from 'firebase/auth';
 import { user } from 'rxfire/auth';
 import { fetchSignInMethodsForEmail } from '@firebase/auth';
 import { SharedModule } from '../shared/shared.module';
 import { ToastService } from '../services/toast.service';
-import { ResponseSuccess } from '../interfaces/common';
+import {
+  getAuthErrorPipe,
+  getCurrentCodePipe,
+  getIsAuthenticatedPipe,
+  getQueryParamsPipe,
+  getRedirectPipe,
+  getResponsePipe,
+} from '../store/selectors/auth.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { AuthState } from '../store/reducers/auth.reducers';
+
+type AuthForm = {
+  email: FormControl<string>;
+  password: FormControl<string>;
+  code: FormControl<string | undefined>;
+  displayName: FormControl<string | undefined>;
+}
 
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.scss'],
   imports: [SharedModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AuthComponent implements OnInit, OnDestroy {
+export class AuthComponent {
+  private readonly auth: Auth = inject(Auth);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly store: Store<AuthState> = inject(Store<AuthState>);
+  private readonly route: ActivatedRoute = inject(ActivatedRoute);
+  private readonly toastService: ToastService = inject(ToastService);
+  private readonly cookieService: CookieService = inject(CookieService);
+  private readonly translate: TranslateService = inject(TranslateService);
 
-  @Optional() private auth: Auth = inject(Auth);
-  private formBuilder: FormBuilder = inject(FormBuilder);
-  private store: Store<AppState> = inject(Store<AppState>);
-  private route: ActivatedRoute = inject(ActivatedRoute);
-  private toastService: ToastService = inject(ToastService);
-  private cookieService: CookieService = inject(CookieService);
-  private translate: TranslateService = inject(TranslateService);
+  private currentCode$ = this.store.pipe(getCurrentCodePipe);
+  private isAuthenticated$ = this.store.pipe(getIsAuthenticatedPipe);
+  private redirect$ = this.store.pipe(getRedirectPipe);
+  private queryParams$ = this.store.pipe(getQueryParamsPipe);
 
-  loginForm: FormGroup = this.formBuilder.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', Validators.required],
-    code: [''],
-    displayName: [''],
+  private error$ = this.store.pipe(getAuthErrorPipe);
+  private response$ = this.store.pipe(getResponsePipe);
+
+  private isAuthenticatedSignal = toSignal(this.isAuthenticated$);
+  private redirectSignal = toSignal(this.redirect$);
+  private queryParamsSignal = toSignal(this.queryParams$);
+  private errorSignal = toSignal(this.error$);
+  private responseSignal = toSignal(this.response$);
+  private codeSignal = toSignal(this.currentCode$);
+  private userSignal = toSignal(user(this.auth), { initialValue: null });
+
+  statusSignal = signal('init');
+
+  form: FormGroup<AuthForm> = this.formBuilder.group<AuthForm>({
+    email: this.formBuilder.control('', {
+      validators: [Validators.required, Validators.email],
+    }),
+    password: this.formBuilder.control('', {
+      validators: [Validators.required],
+    }),
+    code: this.formBuilder.control(this.codeSignal()),
+    displayName: this.formBuilder.control(undefined),
   });
+  private emailSignal = toSignal(this.getForm.email.valueChanges, { initialValue: '' });
 
-  code: string | null = null;
   language: string = this.translate.currentLang;
   showForm: boolean = false;
-  status: string = 'init';
   tos: string = `${environment.appServer}/${this.language}/term-and-conditions`;
   privacyPolicy: string = `${environment.appServer}/${this.language}/privacy`;
 
-  private subscription?: Subscription;
-  private getState: Observable<any> = this.store.select(selectAuthState);
-  private authSubscription?: Subscription;
-
-  get onSubmit(): void {
-    if (this.loginForm.valid) {
-      const { email, password, displayName } = this.loginForm.value;
-      if (displayName) {
-        createUserWithEmailAndPassword(this.auth, email, password).catch(err => {
-          console.error('An error happen trying to createUserWithEmailAndPassword', err);
-          switch (err.code) {
-            case 'auth/invalid-email':
-              this.loginForm.get('email')?.setErrors({ email: true });
-              break;
-            case 'auth/weak-password':
-              this.loginForm.get('password')?.setErrors({ week: true });
-              break;
-            default:
-              this.loginForm.get('password')?.setErrors({ error: err.message });
-              break;
-          }
-        });
-      } else {
-        signInWithEmailAndPassword(this.auth, email, password).catch(err => {
-          console.error('An error happen trying to signInWithEmailAndPassword', err);
-          if (err.code === 'auth/wrong-password') {
-            this.loginForm.get('password')?.setErrors({ wrong: true });
-          } else {
-            this.loginForm.get('password')?.setErrors({ error: err.message });
-          }
-        });
-      }
-    }
-    return;
-  }
-
-  get loginWithGoogle(): void {
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(this.auth, provider).catch(err => console.error('An error happen trying to signInWithPopup', err));
-    return;
-  }
-
-  get validateEmail(): void {
-    fetchSignInMethodsForEmail(this.auth, this.loginForm.get('email')?.value).then(response => {
-      const displayNameControl = this.loginForm.get('displayName');
-      if (!response.length) {
-        displayNameControl?.setValidators([Validators.required]);
-      } else {
-        displayNameControl?.setValue('');
-        displayNameControl?.clearValidators();
-      }
-      displayNameControl?.updateValueAndValidity();
-      this.status = response.join('|');
-    }).catch(err => console.error('An error happen trying to fetchSignInMethodsForEmail', err));
-    return;
-  }
-
-  ngOnInit(): void {
-    this.clean();
-    this.subscribe();
-    this.code = this.route.snapshot.queryParamMap.get('code');
-    this.loginForm.get('code')?.setValue(this.code);
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.authSubscription?.unsubscribe();
-  }
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private subscribe = (): void => {
-    this.loginForm.get('code')?.valueChanges.subscribe(value => {
-      if (value) {
-        localStorage.setItem('CODE', value);
-      }
-    });
-    this.loginForm.get('email')?.valueChanges.subscribe(() => {
-      if (this.status !== 'init') {
-        this.status = 'init';
-      }
-    });
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.isAuthenticated) {
+  constructor() {
+    effect(() => {
+      if (this.isAuthenticatedSignal()) {
+        const queryParams = this.queryParamsSignal();
         let returnUrl;
-        if (state.queryParams?.state) {
-          returnUrl = JSON.parse(atob(state.queryParams.state))?.returnUrl;
+        if (queryParams?.state) {
+          returnUrl = JSON.parse(atob(queryParams.state))?.returnUrl;
         }
-        if (!state.redirect && !returnUrl) {
+        if (!this.redirectSignal() && !returnUrl) {
           this.store.dispatch(redirect());
         }
       }
-      if (!state.subErrors || !state.subErrors.length) {
-        if (state.errorMessage) {
-          this.toastService.error(state.errorMessage);
-        } else if (state.response) {
-          const response: ResponseSuccess = state.response;
-          const toastRef = this.toastService.show(response.message, response.toastType, 5000, 'button');
-          toastRef.onAction().subscribe(() => this.clean());
+    });
+    effect(() => {
+      const error = this.errorSignal();
+      if (!error?.subErrors || !error.subErrors.length) {
+        if (error?.message) {
+          this.toastService.error(error.message);
         }
       }
     });
-    this.authSubscription = user(this.auth).subscribe(user => {
-      if (user) {
-        const displayName = this.loginForm.get('displayName')?.value;
+    effect(() => {
+      const response = this.responseSignal();
+      if (response) {
+        const toastRef = this.toastService.show(response.message, response.toastType, 5000, 'button');
+        toastRef.onAction().subscribe(() => this.store.dispatch(clean()));
+      }
+    });
+
+    effect(() => {
+      const user = this.userSignal();
+      if (!user) {
+        return;
+      }
+
+      untracked(() => {
+        const displayName = this.getForm.displayName.value;
+
         if (displayName) {
-          updateProfile(user, { displayName });
+          updateProfile(user, { displayName }).catch(console.error);
         }
+
         if (!user.emailVerified && !this.cookieService.get(VERIFICATION_EMAIL)) {
           sendEmailVerification(user).then(() => {
             const message = this.translate.instant('AUTH.ACTIVATE_ACCOUNT.MESSAGE');
             this.store.dispatch(signupSuccess(message));
             this.cookieService.set(VERIFICATION_EMAIL, 'sent');
-          }).catch(e => console.error(`Error sending email verification. ${e}`));
-        } else {
-          user.getIdToken().then(idToken => {
-            localStorage.removeItem('CODE');
-            this.store.dispatch(
-              login({
-                token: idToken,
-                queryParams: this.route.snapshot.queryParams,
-                theme: this.cookieService.get(THEME),
-                code: localStorage.getItem('CODE'),
-              }),
-            );
-          });
+          }).catch(console.error);
+          return;
         }
+
+        user.getIdToken().then(idToken => {
+          this.store.dispatch(
+            login({
+              token: idToken,
+              queryParams: this.route.snapshot.queryParams,
+              theme: this.cookieService.get(THEME),
+              code: this.codeSignal(),
+            }),
+          );
+        });
+      });
+    });
+
+    effect(() => {
+      const code = this.getForm.code.value;
+      if (code) {
+        this.store.dispatch(setCurrentCode({ code }));
       }
     });
-  };
+    effect(() => {
+      this.emailSignal();
+      this.statusSignal.set('init');
+    });
+  }
+
+  get getForm(): AuthForm {
+    return this.form.controls;
+  }
+
+  onSubmit(): void {
+    if (this.form.valid) {
+      const displayName = this.getForm.displayName.value;
+      if (displayName) {
+        createUserWithEmailAndPassword(this.auth, this.getForm.email.value, this.getForm.password.value)
+          .catch(err => {
+            console.error('An error happen trying to createUserWithEmailAndPassword', err);
+            switch (err.code) {
+              case 'auth/invalid-email':
+                this.getForm.email.setErrors({ email: true });
+                break;
+              case 'auth/weak-password':
+                this.getForm.password.setErrors({ week: true });
+                break;
+              default:
+                this.getForm.password.setErrors({ error: err.message });
+                break;
+            }
+          });
+      } else {
+        signInWithEmailAndPassword(this.auth, this.getForm.email.value, this.getForm.password.value).catch(err => {
+          console.error('An error happen trying to signInWithEmailAndPassword', err);
+          if (err.code === 'auth/wrong-password') {
+            this.getForm.password.setErrors({ wrong: true });
+          } else {
+            this.getForm.password.setErrors({ error: err.message });
+          }
+        });
+      }
+    }
+  }
+
+  loginWithGoogle(): void {
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(this.auth, provider).catch(err => console.error('An error happen trying to signInWithPopup', err));
+  }
+
+  validateEmail(): void {
+    fetchSignInMethodsForEmail(this.auth, this.getForm.email.value).then(response => {
+      const displayNameControl = this.getForm.displayName;
+      if (!response.length) {
+        displayNameControl?.setValidators([Validators.required]);
+      } else {
+        displayNameControl?.setValue(undefined);
+        displayNameControl?.clearValidators();
+      }
+      displayNameControl?.updateValueAndValidity();
+      this.statusSignal.set(response.join('|'));
+    }).catch(err => console.error('An error happen trying to fetchSignInMethodsForEmail', err));
+  }
 }

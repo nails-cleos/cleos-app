@@ -1,21 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReservationCloneDialogComponent } from './reservation-clone-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { UntypedFormBuilder } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
-import { getCurrentTimeZone, getNowTimeZone } from '../../util/dates';
 import { addMonths } from 'date-fns';
+import { getCurrentTimeZone, getNowTimeZone } from '../../util/dates';
 import { MAX_RESERVATION_MONTH } from '../../interfaces/reservation';
 import { IRoomAll } from '../../interfaces/room';
 import { PaymentType } from '../../interfaces/payment';
+import { TranslateModule } from '@ngx-translate/core';
 
 describe('ReservationCloneDialogComponent', () => {
   let component: ReservationCloneDialogComponent;
   let fixture: ComponentFixture<ReservationCloneDialogComponent>;
+  let dialogRef: jasmine.SpyObj<MatDialogRef<ReservationCloneDialogComponent>>;
 
-  let dialogRefSpy: jasmine.SpyObj<MatDialogRef<any>>;
-
-  const room: IRoomAll = {
+  const mockRoom: IRoomAll = {
     id: 'room-id',
     availabilities: [{ day: 'MONDAY', start: '09:00', end: '17:00' }],
     address: {
@@ -24,84 +22,106 @@ describe('ReservationCloneDialogComponent', () => {
       location: { x: 0, y: 0 },
     },
     currency: { code: 'EUR', name: 'Euro', id: 'eur', icon: '€' },
-    office: {},
+    office: {
+      id: 'office-id',
+      name: 'Main Office',
+      manager: {
+        id: 'manager-id',
+      },
+    },
     timeZone: getCurrentTimeZone(),
-    paymentTypes: [PaymentType.transfer],
+    paymentTypes: [PaymentType.cash],
     primary: true,
   };
 
+  const dialogData = {
+    room: mockRoom,
+    small: false,
+  };
+
   beforeEach(async () => {
-    dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
+    dialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
 
     await TestBed.configureTestingModule({
       imports: [ReservationCloneDialogComponent, TranslateModule.forRoot()],
       providers: [
-        UntypedFormBuilder,
-        { provide: MatDialogRef, useValue: dialogRefSpy },
-        { provide: MAT_DIALOG_DATA, useValue: { room } },
+        { provide: MAT_DIALOG_DATA, useValue: dialogData },
+        { provide: MatDialogRef, useValue: dialogRef },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ReservationCloneDialogComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+
+    fixture.detectChanges(); // triggers effect()
   });
 
-  it('should create component', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize form with date and start controls', () => {
-    expect(component.form.contains('date')).toBeTrue();
-    expect(component.form.contains('start')).toBeTrue();
+  it('should initialize the form', () => {
+    expect(component.getForm.date.value).toBeNull();
+    expect(component.getForm.time.value).toBe('09:00');
+    expect(component.getForm.date.valid).toBeFalse();
   });
 
-  it('should set maxCalendarDate based on getNowTimeZone and MAX_RESERVATION_MONTH', () => {
-    const expectedDate = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
-    expect(Math.abs(component.maxCalendarDate.getTime() - expectedDate.getTime())).toBeLessThan(1000);
+  it('should compute maxCalendarDate correctly', () => {
+    const expected = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
+    expect(component.maxCalendarDate.toDateString()).toEqual(expected.toDateString());
   });
 
-  it('should close dialog when onNoClick is called', () => {
+  it('should set minDate and maxDate signals from availability', () => {
+    expect(component.minDate()).toBe('09:00');
+    expect(component.maxDate()).toBe('17:00');
+  });
+
+  it('should set time control to min time', () => {
+    expect(component.getForm.time.value).toBe('09:00');
+  });
+
+  it('onNoClick should close dialog without data', () => {
     component.onNoClick();
-    expect(dialogRefSpy.close).toHaveBeenCalled();
+    expect(dialogRef.close).toHaveBeenCalledWith();
   });
 
-  it('should close dialog with form values when doAction is called', () => {
-    component.date.setValue('2025-10-14');
-    component.time.setValue('10:00');
+  it('doAction should close dialog with form values', () => {
+    const date = new Date('2025-01-10');
+
+    component.getForm.date.setValue(date);
+    component.getForm.time.setValue('10:30');
+
     component.doAction();
-    expect(dialogRefSpy.close).toHaveBeenCalledWith({
-      date: '2025-10-14',
-      time: '10:00',
+
+    expect(dialogRef.close).toHaveBeenCalledWith({
+      date,
+      time: '10:30',
     });
   });
 
-  it('should have minDate and maxDate set after initialization', () => {
-    expect(component.minDate).toBeTruthy();
-    expect(component.maxDate).toBeTruthy();
-    expect(component.time.value).toBe(component.minDate);
-  });
-
-  it('myFilter should filter the valid date', () => {
+  it('myFilter should delegate to filterDateRoom', () => {
     const today = new Date();
     const daysUntilMonday = (1 + 7 - today.getDay()) % 7 || 7;
 
     const nextMonday = new Date(today);
     nextMonday.setDate(today.getDate() + daysUntilMonday);
     nextMonday.setHours(12, 0, 0, 0);
+
     const result = component.myFilter(nextMonday);
 
     expect(result).toBeTrue();
   });
 
-  it('myFilter should not filter an invalid date', () => {
+  it('myFilter should not delegate to filterDateRoom', () => {
     const today = new Date();
+
     const daysUntilTuesday = (2 + 7 - today.getDay()) % 7 || 7;
 
-    const nextMonday = new Date(today);
-    nextMonday.setDate(today.getDate() + daysUntilTuesday);
-    nextMonday.setHours(12, 0, 0, 0);
-    const result = component.myFilter(nextMonday);
+    const nextTuesday = new Date(today);
+    nextTuesday.setDate(today.getDate() + daysUntilTuesday);
+    nextTuesday.setHours(12, 0, 0, 0);
+
+    const result = component.myFilter(nextTuesday);
 
     expect(result).toBeFalse();
   });

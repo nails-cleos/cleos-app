@@ -1,5 +1,5 @@
 <mat-nav-list style="width: 300px">
-  @for (menu of items; track menu; let i = $index) {
+  @for (menu of items(); track menu; let i = $index) {
     @if (menu.subMenus && menu.subMenus.length) {
       <div>
         <mat-list-item (click)="toggleSubMenu(i)">
@@ -24,9 +24,9 @@
                   @if (isSubSubMenuOpen(i, j)) {
                     <mat-nav-list>
                       @for (subSubMenu of subMenu.subMenus; track subSubMenu) {
-                        @if (isHandset$ | async) {
+                        @if (isHandsetSignal()) {
                           <mat-list-item
-                            class="sub-sub-menu" (click)="navigate(subSubMenu, drawer)"
+                            class="sub-sub-menu" (click)="navigate(subSubMenu, drawer())"
                             [routerLinkActive]="['active-link']" [routerLink]="'/'+language+'/'+subSubMenu.path">
                             <mat-icon matListItemIcon>{{ subSubMenu.icon }}</mat-icon>
                             <div matListItemTitle>{{ subSubMenu.name }}</div>
@@ -43,8 +43,8 @@
                   }
                 </div>
               } @else {
-                @if (isHandset$ | async) {
-                  <mat-list-item class="sub-menu" (click)="navigate(subMenu, drawer)"
+                @if (isHandsetSignal()) {
+                  <mat-list-item class="sub-menu" (click)="navigate(subMenu, drawer())"
                                  [routerLinkActive]="['active-link']" [routerLink]="'/'+language+'/'+subMenu.path">
                     <mat-icon matListItemIcon>{{ subMenu.icon }}</mat-icon>
                     <div matListItemTitle>{{ subMenu.name }}</div>
@@ -62,8 +62,8 @@
         }
       </div>
     } @else {
-      @if (isHandset$ | async) {
-        <mat-list-item (click)="navigate(menu, drawer)" [routerLinkActive]="['active-link']"
+      @if (isHandsetSignal()) {
+        <mat-list-item (click)="navigate(menu, drawer())" [routerLinkActive]="['active-link']"
                        [routerLink]="'/'+language+'/'+menu.path">
           <mat-icon matListItemIcon>{{ menu.icon }}</mat-icon>
           <div matListItemTitle>{{ menu.name }}</div>

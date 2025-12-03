@@ -41,8 +41,15 @@ export class PaymentOption implements IPaymentOption {
   hidePercentage?: boolean;
   icon?: string;
 
-  constructor(name: string, type: PaymentType, svgIcon: string, icon?: string, bic?: string,
-    subTypes?: IPaymentOption[], hidePercentage: boolean = false) {
+  constructor(
+    name: string,
+    type: PaymentType,
+    svgIcon: string,
+    icon?: string,
+    bic?: string,
+    subTypes?: IPaymentOption[],
+    hidePercentage: boolean = false,
+  ) {
     this.name = name;
     this.type = type;
     this.svgIcon = svgIcon;
@@ -61,7 +68,7 @@ export const getPaymentOptions = (
   if (it === PaymentType.ideal) {
     subTypes = iDealBanks();
   }
-  const name = translate.instant(`COMMON.PAYMENT.TYPE.${ it }`);
+  const name = translate.instant(`COMMON.PAYMENT.TYPE.${it}`);
   let svgIcon = '';
   switch (it) {
     case PaymentType.ideal:
@@ -178,7 +185,8 @@ export interface IPaymentAll {
   amount: number;
   transactionAmount?: number;
   status: string;
-  type: string;
+  timestamp: number;
+  type: PaymentType;
   paymentId: string;
   preferenceId: string;
   reservation?: IReservationAll;

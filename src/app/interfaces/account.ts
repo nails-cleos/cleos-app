@@ -12,7 +12,6 @@ export interface IAccount {
   currency?: ICurrency;
   currencyId?: string;
   gift?: number;
-
 }
 
 export interface IAccountAll {
@@ -21,6 +20,7 @@ export interface IAccountAll {
   customer: IUserAll;
   currency: ICurrencyAll;
   currencies?: ICurrencyAll[];
+  gift?: number;
 }
 
 export interface IPaymentRequest {

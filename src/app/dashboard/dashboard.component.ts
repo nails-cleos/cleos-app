@@ -1,207 +1,386 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { CalendarEvent, CalendarModule } from 'angular-calendar';
-import { Observable, Subscription } from 'rxjs';
-import { AppState, selectDashboardState } from '../store/app.states';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { Store } from '@ngrx/store';
+import { getCards, getEvents } from '../store/dashboard.actions';
+import { IReservationSummary, States } from '../interfaces/reservation';
+import { TranslateService } from '@ngx-translate/core';
 import {
-  addPeriod,
-  API_LOCALE,
-  createNewDate,
-  dateToTimestamp,
-  endOfPeriod,
-  getCurrentTimeZone,
   getDurationOrUndefined,
   getEnd,
   getEndWithDuration,
-  getMinutesBetweenTimesABS,
   getNowTimeZone,
-  getRoomStartEndDay,
-  isBetween,
-  newDate,
+  greaterOrEqualsThan,
   newDateTimestamp,
-  startOfPeriod,
-  subPeriod,
 } from '../util/dates';
-import { Store } from '@ngrx/store';
-import { TranslateService } from '@ngx-translate/core';
-import { IProfessionalEvent, IRoomEvents } from '../interfaces/dashboard';
-import { clean, getMyEvent, updateEvent } from '../store/dashboard.actions';
-import { approveReservation, startReservation } from '../store/reservation.actions';
-import { DayViewSchedulerComponent, IProfessional, Professional } from './day-view-scheduler.component';
-import { EventColor } from 'calendar-utils';
-import { Day, IReservation, MAX_RESERVATION_MONTH, States } from '../interfaces/reservation';
-import { addMonths, isSameDay, isToday } from 'date-fns';
+import { CalendarEvent, CalendarModule, CalendarMonthViewDay, CalendarView } from 'angular-calendar';
+import { findStateColor, getStateOrder } from '../util/theme';
+import { allDayEvent, DataEvent, IDataEvent, IMeta, Meta, monthEvent } from '../util/event';
 import { Router } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
-import { createEventColor, getProfessionalColor } from '../util/color';
+import { isSameDay, isSameMonth } from 'date-fns';
+import { ICalendarNote, ICalendarSummary, IChart } from '../interfaces/dashboard';
+import { FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
+import { IRoom } from '../interfaces/room';
 import { CalendarDialogComponent } from '../shared/dialog/calendar/calendar-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
+import { numberFormat } from '../util/numbers';
+import { ICurrency } from '../interfaces/currency';
 import { AuthUserService } from '../services/auth-user.service';
 import { SharedModule } from '../shared/shared.module';
-import { CounterComponent } from '../util/counter/counter.component';
-import { findStateColor } from '../util/theme';
-import { DataEvent, IDataEvent } from '../util/event';
+import { MiniCardComponent } from './mini-card/mini-card.component';
+import { ReservationTableComponent } from './reservation/table/reservation-table.component';
+import { CardComponent } from '../shared/card/card.component';
+import { ChartComponent } from '../shared/chart/chart.component';
+import { IError } from '../interfaces/common';
+import {
+  getDashboardMapPipe,
+  getDashboardNavigationParamsPipe,
+  getErrorPipe,
+} from '../store/selectors/dashboard.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { DashboardState } from '../store/reducers/dashboard.reducers';
+
+type DashboardForm = {
+  selectedDash: FormControl<string | undefined>;
+}
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  imports: [SharedModule, CalendarModule, DayViewSchedulerComponent, CounterComponent],
+  imports: [SharedModule, CalendarModule, MiniCardComponent, ReservationTableComponent, CardComponent, ChartComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardComponent implements OnInit, OnDestroy {
-  @ViewChild('picker') picker: any;
+export class DashboardComponent {
+  private readonly dialog: MatDialog = inject(MatDialog);
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly store: Store<DashboardState> = inject(Store<DashboardState>);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly router: Router = inject(Router);
+  private readonly authUserService: AuthUserService = inject(AuthUserService);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  viewDate: Date = getNowTimeZone();
-  endDate: Date = getNowTimeZone();
-  startDate: Date = getNowTimeZone();
-  today: Date = createNewDate(getNowTimeZone());
-  maxDate: Date;
-  day: Day;
-  dashboard?: IRoomEvents;
+  form: FormGroup<DashboardForm> = this.formBuilder.group<DashboardForm>({
+    selectedDash: this.formBuilder.control(undefined),
+  });
 
-  professionals: IProfessional[] = [];
-  calendar: IDataEvent = new DataEvent([], 0, this.viewDate, 0, false);
+  private navigationParams$ = this.store.pipe(getDashboardNavigationParamsPipe);
+  private dashboardMap$ = this.store.pipe(getDashboardMapPipe);
+  private error$ = this.store.pipe(getErrorPipe);
+  private breakpointObserver$ = this.breakpointObserver.observe(
+    [Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium]);
 
-  isDarkMode?: boolean;
-  locale: string;
+  private navigationParams = toSignal(this.navigationParams$);
+  private authUserSignal = this.authUserService.authUser;
+  private breakpointsSignal = toSignal(
+    this.breakpointObserver$, {
+      initialValue: {
+        matches: false,
+        breakpoints: {
+          [Breakpoints.XSmall]: false,
+          [Breakpoints.Small]: false,
+          [Breakpoints.Medium]: false,
+        },
+      },
+    },
+  );
 
-  prevBtnDisabled = false;
-  nextBtnDisabled = false;
+  private isDarkMode = computed(() => this.authUserSignal()?.isDarkMode ?? false);
+  private selectDashboardSignal = toSignal(this.getForm.selectedDash.valueChanges);
+  private dashboardSelection = computed(() => {
+    const selected = this.selectDashboardSignal();
+    const dashboardData = this.dashboardMapSignal();
+    return { selected, dashboardData };
+  });
 
-  private readonly approveText: string;
-  private readonly startText: string;
-  private readonly completeText: string;
-  private readonly viewText: string;
-  private readonly moreText: string;
-  private readonly startedText: string;
-  private readonly elapsedText: string;
-  private readonly finishInText: string;
-  private readonly language: string;
+  dashboardMapSignal = toSignal(this.dashboardMap$);
+  errorSignal = toSignal(this.error$);
+  cardLayoutSignal = computed(() => {
+    const breakpointState = this.breakpointsSignal();
+    const authUser = this.authUserSignal();
+    const miniCard = authUser?.isAdmin || authUser?.isManager ? { cols: 1, rows: 1 } : { cols: 0, rows: 0 };
 
-  private getState: Observable<any>;
-  private subscription?: Subscription;
-  private authUserServiceSubscription: Subscription;
-  private dashboardReady = false;
-  private calendarReady = false;
-
-  constructor(private store: Store<AppState>, private readonly translate: TranslateService, private router: Router,
-    public dialog: MatDialog, private authUserService: AuthUserService) {
-    this.getState = this.store.select(selectDashboardState);
-    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
-      const darkMode: boolean = value.isDarkMode;
-      if (this.isDarkMode !== undefined && darkMode !== this.isDarkMode) {
-        this.tryCreateEvents(darkMode);
-      }
-      this.isDarkMode = darkMode;
-    });
-    this.locale = translate.currentLang;
-    this.language = this.translate.currentLang;
-    this.day = new Day();
-    this.maxDate = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
-    this.approveText = translate.instant('DASHBOARD.ROOM.APPROVE') ?? 'APPROVE';
-    this.startText = translate.instant('DASHBOARD.ROOM.START');
-    this.completeText = translate.instant('DASHBOARD.ROOM.COMPLETE');
-    this.viewText = translate.instant('DASHBOARD.ROOM.VIEW');
-    this.moreText = translate.instant('DASHBOARD.ROOM.MORE_INFO');
-    this.startedText = translate.instant('DASHBOARD.ROOM.STARTED');
-    this.elapsedText = translate.instant('DASHBOARD.ROOM.ELAPSED');
-    this.finishInText = translate.instant('DASHBOARD.ROOM.FINISH_IN');
-    this.dateOrViewChanged();
-  }
-
-  get increment(): void {
-    return this.picker.select(addPeriod('day', this.viewDate, 1));
-  }
-
-  get decrement(): void {
-    return this.picker.select(subPeriod('day', this.viewDate, 1));
-  }
-
-  private static getProfessionalImage = (professional: IProfessionalEvent): string => {
-    let image;
-    if (professional.imageUrl) {
-      if (professional.imageUrl.indexOf('http') >= 0) {
-        image = professional.imageUrl;
-      }
-    } else if (professional.image) {
-      image = `data:image/jpg;base64,${ professional.image }`;
+    if (breakpointState.breakpoints[Breakpoints.Medium]) {
+      return {
+        columns: 2,
+        rowHeight: '250px',
+        miniCard,
+        calendar: { cols: 2, rows: 4 },
+        chart: { cols: 2, rows: 2 },
+        table: { cols: 2, rows: 4 },
+      };
     }
 
-    return image || 'assets/icons/icon-512x512.png';
+    if (breakpointState.matches) {
+      return {
+        columns: 1,
+        rowHeight: '250px',
+        miniCard,
+        calendar: { cols: 1, rows: 4 },
+        chart: { cols: 1, rows: 1.5 },
+        table: { cols: 1, rows: 4.5 },
+      };
+    }
+
+    return {
+      columns: 4,
+      rowHeight: '250px',
+      miniCard,
+      calendar: { cols: 4, rows: 4 },
+      chart: { cols: 2, rows: 2 },
+      table: { cols: 4, rows: 4 },
+    };
+  });
+
+  calendarSummary?: ICalendarSummary;
+  error?: IError;
+  roomId?: string;
+  professionalId?: string;
+
+  timeZone?: string;
+  view: CalendarView = CalendarView.Month;
+  viewDate = signal(getNowTimeZone(this.timeZone));
+  activeDayIsOpen = false;
+  dateFormat: string = this.translate.currentLang;
+  calendar: IDataEvent = new DataEvent([], 0, this.viewDate()!, 0, false);
+  isCalendarLoading = true;
+  isLoading = true;
+
+  currency?: ICurrency;
+  all = false;
+  thisMonthTotal: string = numberFormat(0, this.currency, this.dateFormat);
+
+  miniCardData: IReservationSummary[] = [{} as IReservationSummary, {} as IReservationSummary,
+    {} as IReservationSummary, {} as IReservationSummary];
+
+  charts: IChart[] = [{} as IChart, {} as IChart, {} as IChart,
+    {} as IChart, {} as IChart, {} as IChart, {} as IChart, {} as IChart];
+
+  private previousDarkMode?: boolean;
+  private periodStart?: Date;
+  private readonly language: string = this.translate.currentLang;
+
+  constructor() {
+    effect(() => {
+      const params = this.navigationParams();
+      if (params?.date) {
+        this.viewDate.set(params.date);
+      }
+      this.activeDayIsOpen = params?.activeDayIsOpen ?? false;
+    });
+
+    effect(() => {
+      const { selected, dashboardData } = this.dashboardSelection();
+
+      if (!dashboardData) {
+        return;
+      }
+      let roomSelected: string;
+      if (!selected) {
+        const primaryKey = Object.entries(dashboardData).find(([, val]) => val?.primary)?.[0];
+        if (primaryKey) {
+          this.getForm.selectedDash.setValue(primaryKey, { emitEvent: false });
+          roomSelected = primaryKey;
+        } else {
+          return;
+        }
+      } else {
+        roomSelected = selected;
+      }
+      const dashboard = dashboardData[roomSelected];
+      this.isCalendarLoading = true;
+      this.isLoading = true;
+      if (dashboard) {
+        this.isCalendarLoading = false;
+        this.error = dashboard.error;
+        this.roomId = dashboard.roomId;
+        this.professionalId = dashboard.professionalId;
+        this.currency = dashboard.currency;
+        this.calendarSummary = dashboard.calendarSummary;
+        this.all = dashboard.all ?? false;
+        this.timeZone = dashboard.timeZone;
+        this.thisMonthTotal = numberFormat(dashboard.thisMonthTotal || 0, this.currency, this.dateFormat);
+        this.createEvents(this.isDarkMode());
+        if (!dashboard.chartSummaries && !dashboard.miniCardSummaries) {
+          this.isLoading = false;
+          this.charts = [{} as IChart, {} as IChart, {} as IChart,
+            {} as IChart, {} as IChart, {} as IChart, {} as IChart, {} as IChart];
+          this.miniCardError('NO_CONTENT');
+        } else {
+          if (dashboard.chartSummaries && dashboard.chartSummaries.length) {
+            this.charts = dashboard.chartSummaries;
+            this.isLoading = false;
+          } else {
+            if (dashboard.error) {
+              this.isLoading = false;
+            }
+            this.charts = [{} as IChart, {} as IChart, {} as IChart,
+              {} as IChart, {} as IChart, {} as IChart, {} as IChart, {} as IChart];
+          }
+          if (dashboard.miniCardSummaries && dashboard.miniCardSummaries.length) {
+            this.miniCardData = dashboard.miniCardSummaries.map(miniCard => {
+              if (miniCard.isCurrency && miniCard.value) {
+                let value;
+                let previousPeriodValue;
+                if (miniCard.value) {
+                  value = numberFormat(miniCard.value, this.currency, this.dateFormat);
+                }
+                if (miniCard.previousPeriodValue) {
+                  previousPeriodValue = numberFormat(miniCard.previousPeriodValue, this.currency, this.dateFormat);
+                }
+                return Object.assign({}, miniCard, { value, previousPeriodValue });
+              }
+              return miniCard;
+            });
+          } else {
+            this.miniCardError('NO_CONTENT');
+          }
+        }
+      }
+    });
+
+    effect(() => {
+      const current = this.isDarkMode();
+      if (this.previousDarkMode !== undefined && current !== this.previousDarkMode) {
+        this.createEvents(current);
+      }
+      this.previousDarkMode = current;
+    });
+
+    effect(() => {
+      const error = this.errorSignal();
+      if (error?.message) {
+        this.miniCardError(error.message);
+      }
+    });
+
+    effect(() => {
+      const date = this.viewDate();
+      this.calendar.resetEvents();
+      this.isLoading = true;
+      this.isCalendarLoading = true;
+      this.store.dispatch(getEvents({ date }));
+      this.store.dispatch(getCards({ date }));
+    });
+  }
+
+  get getForm(): DashboardForm {
+    return this.form.controls;
+  }
+
+  get completed(): number {
+    return this.calendar.calendarEvents?.filter(
+      (event: CalendarEvent) => DashboardComponent.completedByMonth(event, this.viewDate())).length ?? 0;
+  }
+
+  get completedTotal(): string {
+    const total = this.calendar.calendarEvents?.filter(
+      (event: CalendarEvent) => DashboardComponent.completedByMonth(event, this.viewDate()))
+      .reduce((a, b) => a + b.meta.total || 0, 0);
+
+    return numberFormat(total, this.currency, this.dateFormat);
+  }
+
+  get upcoming(): number {
+    return this.calendar.calendarEvents?.filter(
+      (event: CalendarEvent) => DashboardComponent.upcomingByMonth(event, this.viewDate())).length;
+  }
+
+  get upcomingTotal(): string {
+    const total = this.calendar.calendarEvents?.filter(
+      (event: CalendarEvent) => DashboardComponent.upcomingByMonth(event, this.viewDate()))
+      .reduce((a, b) => a + b.meta.total || 0, 0);
+
+    return numberFormat(total, this.currency, this.dateFormat);
+  }
+
+  get transaction(): number {
+    return this.calendar.calendarEvents?.filter(
+      (event: CalendarEvent) => DashboardComponent.transactionByMonth(event, this.viewDate())).length;
+  }
+
+  get transactionTotal(): string {
+    const total = this.calendar.calendarEvents?.filter(
+      (event: CalendarEvent) => DashboardComponent.transactionByMonth(event, this.viewDate()))
+      .reduce((a, b) => a + b.meta.total || 0, 0);
+
+    return numberFormat(total, this.currency, this.dateFormat);
+  }
+
+  private static createErrorMiniCard = (title: string, message: string): IReservationSummary => ({
+    title: `DASHBOARD.MINI_CARD.${title}`,
+    error: {
+      status: message,
+    },
+  });
+
+  private static completedByMonth = (
+    event: CalendarEvent,
+    viewDate: Date,
+  ): boolean => event.meta.state === States.completed && isSameMonth(event.start, viewDate);
+
+  private static upcomingByMonth = (
+    event: CalendarEvent,
+    viewDate: Date,
+  ): boolean => isSameMonth(event.start, viewDate) && event.meta.state
+    && [States.created, States.approved, States.partiallyPaid, States.paid].includes(event.meta.state);
+
+  private static transactionByMonth = (
+    event: CalendarEvent,
+    viewDate: Date,
+  ): boolean => event.meta.state === 'TRANSACTION' && isSameMonth(event.start, viewDate);
+
+  closeOpenMonthViewDay(date: Date): void {
+    this.activeDayIsOpen = false;
+    this.viewDate.set(date);
+  }
+
+  handleEvent = (event: CalendarEvent): void => {
+    this.router.navigate(event.meta.route);
   };
 
-  private static getColor = (
-    professional: IProfessionalEvent,
-    isDark: boolean,
-  ): EventColor => getProfessionalColor(isDark, professional.darkColor, professional.lightColor);
+  dayClicked = ({ date, events }: { date: Date; events: CalendarEvent[] }): void => {
+    if (isSameMonth(date, this.viewDate())) {
+      this.activeDayIsOpen = !((isSameDay(this.viewDate(), date) && this.activeDayIsOpen) || events.length === 0);
+      this.viewDate.set(date);
+    }
+    if (events.length === 0) {
+      const room = { id: this.roomId };
+      this.segmentClick(date, room);
+    }
+  };
 
-  ngOnInit(): void {
-    this.clean();
-    this.getEvents();
-    this.subscribe();
-  }
+  cellClick = (date: any): void => {
+    const room = { id: this.roomId };
+    this.segmentClick(date, room);
+  };
 
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.authUserServiceSubscription.unsubscribe();
-  }
-
-  beforeMonthViewRender = ({ period }: any): void => {
+  beforeMonthViewRender = ({ body, period }: { body: CalendarMonthViewDay<IMeta>[]; period: any }): void => {
+    this.periodStart = period.start;
     this.calendar.calendarStart = period.start;
     this.calendar.calendarEnd = period.end;
     this.calendar.createRecurring();
-    this.calendarReady = true;
-    this.tryCreateEvents();
+    body.forEach((cell) => {
+      const groups: Record<string, CalendarEvent<IMeta>[]> = {};
+      cell.events.forEach((event: CalendarEvent<IMeta>) => {
+        if (!event.meta?.state) {
+          return;
+        }
+        groups[event.meta.state] = groups[event.meta.state] || [];
+        groups[event.meta.state].push(event);
+      });
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      cell.eventGroups = Object.entries(groups);
+    });
   };
 
-  selectDate = (event: any): void => {
-    this.changeDate(newDate(event.value));
-    this.getEvents();
-  };
+  sortBy = (eventGroups: CalendarEvent<IMeta>[]): any => eventGroups.sort(
+    (a: any, b: any) => getStateOrder(a[0]) - getStateOrder(b[0]));
 
-  eventTimesChanged = ({ event, newStart, newEnd }: any): void => {
-    event.start = newStart;
-    event.end = newEnd;
-    this.calendar.refresh();
-    this.updateEvent(event.id, event.start);
-  };
-
-  professionalChanged = ({ event, newProfessional }: any): void => {
-    const endTime = event.end ? event.end.getTime() / 1000 : 0;
-    const startTime = event.start.getTime() / 1000;
-    const time = Math.abs(endTime - startTime);
-    const oldIndex = this.professionals.findIndex((professional) => professional.id === event.meta.professional.id);
-    if (oldIndex > -1) {
-      const professional: IProfessional = this.professionals[oldIndex];
-      professional.reservations -= 1;
-      professional.time = professional.time ? professional.time - time : 0;
-    }
-    const newIndex = this.professionals.findIndex((professional) => professional.id === newProfessional.id);
-    if (newIndex > -1) {
-      const professional = this.professionals[newIndex];
-      professional.reservations += 1;
-      professional.time = professional.time ? professional.time + time : time;
-    }
-    this.professionals = [...this.professionals];
-    event.color = newProfessional.color;
-    event.meta.professional = newProfessional;
-    this.calendar.refresh();
-    setTimeout(() => this.updateEvent(event.id, undefined, newProfessional.id), 500);
-  };
-
-  refreshViewDate = (now: Date): void => {
-    if (isSameDay(now, this.viewDate)) {
-      if (now.getSeconds() === 0) {
-        const newEvents = this.calendar.calendarEvents.map((event: CalendarEvent) => this.createTitle(event));
-        this.calendar.resetEvents();
-        this.calendar.addEvents(newEvents);
-      }
-      this.viewDate = now;
-    }
-  };
-
-  segmentClick = (date: Date, professionalId: string): void => {
-    const data = { date, professionalId, isDashboard: true };
-    if (date && professionalId && this.dateIsValid(date)) {
+  private segmentClick = (date: Date, room?: IRoom): void => {
+    if (date && room) {
+      const data = { date, roomId: room.id };
       executeDialogNoWidth(this.dialog, CalendarDialogComponent, null, result => {
         if (result) {
           this.router.navigate([this.language].concat(result.split(',')), { state: data });
@@ -210,291 +389,121 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   };
 
-  private createTitle = (calendarEvent: CalendarEvent, now: Date = getNowTimeZone()): CalendarEvent => {
-    const matcher = calendarEvent.title.match(/(?<=<b>\s*).*?(?=\s*<\/b>)/gs);
-    const title = matcher ? `<b>${ matcher[0] }</b>` : calendarEvent.title;
+  private miniCardError = (error: string): void => {
+    const revenue = DashboardComponent.createErrorMiniCard('TOTAL_TREATMENT_SALES', error);
 
-    if (calendarEvent.meta.state === States.started && calendarEvent.end) {
-      const dateTime = calendarEvent.meta.started instanceof Date ? calendarEvent.meta.started
-        : newDateTimestamp(calendarEvent.meta.started);
-      const startTime = calendarEvent.start.getTime();
-      const startedTime = dateTime.getTime();
-      const nowTime = now.getTime();
-      const endTime = calendarEvent.end.getTime();
+    const treatments = DashboardComponent.createErrorMiniCard('AVERAGE_TREATMENT_VALUE', error);
 
-      const diffStart = getMinutesBetweenTimesABS(calendarEvent.start, dateTime);
-      let startText;
-      if (startTime > startedTime) {
-        startText = `<span class="green-text"><b id="start">-${ diffStart } min.</b></span>`;
-      } else if (startTime < startedTime) {
-        startText = `<span class="red-text"><b id="start">+${ diffStart } min.</b></span>`;
-      } else {
-        startText = '<span><b id="start">0 min.</b></span>';
-      }
+    const totalTreatments = DashboardComponent.createErrorMiniCard('TOTAL_TREATMENTS', error);
 
-      const start = this.startedText.replace('{startText}', startText);
-
-      const diffElapsed = getMinutesBetweenTimesABS(now, dateTime);
-      const duration = getMinutesBetweenTimesABS(calendarEvent.end, calendarEvent.start);
-
-      let elapsedText;
-      if (duration > diffElapsed) {
-        elapsedText = `<span class="green-text"><b id="elapsed">${ diffElapsed } min.</b></span>`;
-      } else if (duration < diffElapsed) {
-        elapsedText = `<span class="red-text"><b id="elapsed">+${ diffElapsed } min.</b></span>`;
-      } else {
-        elapsedText = '<span><b id="elapsed">0 min.</b></span>';
-      }
-
-      const timeElapsed = this.elapsedText.replace('{elapsedText}', elapsedText);
-
-      const diffFinish = getMinutesBetweenTimesABS(calendarEvent.end, now);
-      let finishText;
-      if (endTime > nowTime) {
-        finishText = `<span class="green-text"><b id="finish">-${ diffFinish } min.</b></span>`;
-      } else if (endTime < nowTime) {
-        finishText = `<span class="red-text"><b id="finish">+${ diffFinish } min.</b></span>`;
-      } else {
-        finishText = '<span><b id="finish">0 min.</b></span>';
-      }
-
-      const timeFinish = this.finishInText.replace('{finishText}', finishText);
-
-      calendarEvent.title = `${ title } <div class="timing"> ${ start } ${ timeElapsed } ${ timeFinish }</div>`;
-    }
-
-    const isNow = isToday(calendarEvent.start);
-    const showStart = isNow && [States.approved, States.partiallyPaid, States.paid].indexOf(calendarEvent.meta.state) >=
-      0;
-    const showComplete = isNow && [States.started].indexOf(calendarEvent.meta.state) >= 0;
-    const showApprove = [States.created].indexOf(calendarEvent.meta.state) >= 0;
-
-    if (!calendarEvent.actions) {
-      calendarEvent.actions = [{
-        label: this.createLabel('visibility', this.viewText),
-        onClick: ({ event }: { event: CalendarEvent }): void => {
-          this.eventClick(event, 'VIEW');
-        },
-      }, {
-        label: this.createLabel('read_more', this.moreText),
-        onClick: ({ event }: { event: CalendarEvent }): void => {
-          this.eventClick(event, 'MORE_INFO');
-        },
-      }];
-
-      if (showApprove) {
-        calendarEvent.actions = [{
-          label: this.createLabel('check_circle', this.approveText),
-          onClick: ({ event }: { event: CalendarEvent }): void => {
-            this.eventClick(event, 'APPROVE');
-          },
-        }, ...calendarEvent.actions];
-      }
-
-      if (showStart) {
-        calendarEvent.actions = [{
-          label: this.createLabel('play_arrow', this.startText),
-          onClick: ({ event }: { event: CalendarEvent }): void => {
-            this.eventClick(event, 'START');
-          },
-        }, ...calendarEvent.actions];
-      }
-
-      if (showComplete) {
-        calendarEvent.actions = [{
-          label: this.createLabel('done_all', this.completeText),
-          onClick: ({ event }: { event: CalendarEvent }): void => {
-            this.eventClick(event, 'COMPLETE');
-          },
-        }, ...calendarEvent.actions];
-      }
-    }
-
-    return calendarEvent;
+    const customer = DashboardComponent.createErrorMiniCard('NEW_CUSTOMERS_RESERVATION', error);
+    this.miniCardData = [revenue, treatments, totalTreatments, customer];
   };
-
-  private updateEvent = (id: string, dateStart?: Date, professionalId?: string): void => {
-    const reservation: IReservation = { id };
-    if (dateStart) {
-      const start = dateStart.toLocaleString(API_LOCALE);
-      const timeZone = getCurrentTimeZone();
-      reservation.start = start;
-      reservation.timeZone = timeZone;
-    }
-    if (professionalId) {
-      reservation.professionalId = professionalId;
-    }
-    this.store.dispatch(updateEvent({ reservationId: id, reservation }));
-  };
-
-  private changeDate = (date: Date): void => {
-    this.viewDate = createNewDate(date, this.viewDate.getHours(), this.viewDate.getMinutes());
-    this.endDate = createNewDate(date, this.endDate.getHours(), this.endDate.getMinutes());
-    this.startDate = createNewDate(date, this.startDate.getHours(), this.startDate.getMinutes());
-    this.dateOrViewChanged();
-  };
-
-  private dateOrViewChanged = (): void => {
-    this.prevBtnDisabled = !this.dateIsValid(
-      endOfPeriod('day', subPeriod('day', this.viewDate, 1)),
-    );
-    this.nextBtnDisabled = !this.dateIsValid(
-      startOfPeriod('day', addPeriod('day', this.viewDate, 1)),
-    );
-    if (this.viewDate < this.today) {
-      this.changeDate(this.today);
-    } else if (this.viewDate > this.maxDate) {
-      this.changeDate(this.maxDate);
-    }
-  };
-
-  private dateIsValid = (date: Date): boolean => isBetween(this.today, this.maxDate, date);
 
   private createEvents = (darkMode: boolean = false): void => {
     this.calendar.resetEvents();
-    this.professionals = [];
-    if (this.dashboard?.professionals) {
-      const { min, max } = getRoomStartEndDay(this.dashboard.availability, this.dashboard.timeZone, this.viewDate);
-      this.day = new Day(min, max, this.viewDate, []);
-      this.endDate = createNewDate(this.endDate, this.day.dayEndHour, this.day.dayEndMinute);
-      this.startDate = createNewDate(this.startDate, this.day.dayStartHour, this.day.dayStartMinute);
-      this.dashboard.professionals.forEach((professionalEvent: IProfessionalEvent) => {
-        const professional = new Professional(professionalEvent.id, professionalEvent.name,
-          DashboardComponent.getProfessionalImage(professionalEvent),
-          DashboardComponent.getColor(professionalEvent, darkMode));
+    const calendarSummary = this.calendarSummary;
+    if (calendarSummary) {
+      calendarSummary.reservations?.forEach(it => {
+        const start = newDateTimestamp(it.start);
+        const end = it.end ? newDateTimestamp(it.end) : null;
+        this.activeDayIsOpen = this.activeDayIsOpen
+          ? this.activeDayIsOpen : isSameDay(start, getNowTimeZone(this.timeZone));
 
-        let reservations = 0;
-        let seconds = 0;
-        professionalEvent.calendarSummary.reservations?.forEach(it => {
-          const color: EventColor = professional.color;
-          const title: string = it.title;
-          if (it.state !== States.completed) {
-            reservations++;
-            seconds += Math.abs(it.end - it.start);
-          }
-          const draggable = ![States.completed, States.started, States.cancelled]
-            .some(state => state === it.state);
-          const start = newDateTimestamp(it.start);
-          const end = it.end ? newDateTimestamp(it.end) : null;
-          const started = it.started ? newDateTimestamp(it.started) : null;
-
-          const event = {
-            start, end, color, title, draggable, id: it.reservationId,
-            meta: {
-              professional,
-              started,
-              time: true,
-              customerId: it.customerId,
-              state: it.state,
-              viewDate: this.viewDate,
-            },
-            resizable: { beforeStart: true, afterEnd: true },
-          } as CalendarEvent;
-
-          this.calendar.addEvent(this.createTitle(event));
-        });
-        professional.reservations = reservations;
-        professional.time = seconds;
-        this.professionals = [...this.professionals, professional];
-
-        professionalEvent.calendarSummary.unavailable?.forEach(it => {
-          const start = newDateTimestamp(it.start);
-          const title = it.duration ?
-            it.title : `${ this.translate.instant('COMMON.ALL_DAY.CHECK') } - ${ it.title }`;
-
-          let path = `${ this.language }/unavailable/`;
-          if (it.type === 'BLOCK_AGENDA') {
-            path += 'block-agenda/';
-          }
-          if (it.repeat === FrequencyEnum.none) {
-            const end = getEnd(start, it.duration);
-            const event = {
-              start, end, title: it.title, id: it.unavailableId, color: professional.color, draggable: true,
-              meta: { professional, time: true }, resizable: { beforeStart: true, afterEnd: true },
-            } as CalendarEvent;
-
-            this.calendar.addEvent(event);
-          } else {
-            this.calendar.recurringEvent?.addFrequency(it.repeat, start, it.unavailableId, title, 'UNAVAILABLE',
-              path, (date, recurring) => this.createUnavailableEvent(date, recurring, professional, darkMode),
-              getDurationOrUndefined(it.duration));
-          }
-        });
+        const event = monthEvent(it.title, start, end, it.reservationId, findStateColor(it.state, darkMode),
+          new Meta(true, this.timeZone, it.state, [this.language, 'reservation', it.reservationId], undefined,
+            it.total,
+          ), darkMode,
+        );
+        this.calendar.addEvent(event);
       });
+      calendarSummary.unavailable?.forEach(it => {
+        if (it.type === 'BLOCK_AGENDA') {
+          return;
+        }
+        const start = newDateTimestamp(it.start);
+        this.activeDayIsOpen = this.activeDayIsOpen
+          ? this.activeDayIsOpen : isSameDay(start, getNowTimeZone(this.timeZone));
+        const title = it.duration ? it.title : `${this.translate.instant('COMMON.ALL_DAY.CHECK')} - ${it.title}`;
+
+        if (it.repeat === FrequencyEnum.none) {
+          const end = getEnd(start, it.duration);
+          const event = monthEvent(title, start, end, it.unavailableId, findStateColor('DEFAULT', darkMode),
+            new Meta(!!it.duration, this.timeZone, 'UNAVAILABLE', [this.language, 'unavailable', it.unavailableId]),
+            darkMode,
+          );
+          if (event) {
+            this.calendar.addEvent(event);
+          }
+        } else {
+          this.calendar.recurringEvent?.addFrequency(it.repeat, start, it.unavailableId, title, 'UNAVAILABLE',
+            `${this.language}/unavailable/`, (date, recurring) => this.createEvent(date, recurring, darkMode),
+            getDurationOrUndefined(it.duration), undefined, it.allDay,
+          );
+        }
+      });
+
+      calendarSummary.birthdays?.forEach(it => {
+        const startDate = newDateTimestamp(it.date);
+        startDate.setFullYear(getNowTimeZone(this.timeZone).getFullYear());
+        const color = findStateColor('BIRTHDAY', darkMode);
+        const event = allDayEvent(it.title, color, startDate, darkMode, `${this.language}/users/${it.userId}`,
+          new Meta(false, this.timeZone, 'BIRTHDAY', [this.language, 'users', it.userId]),
+        );
+        this.calendar.addEvent(event);
+      });
+
+      calendarSummary.transactions?.forEach(it => {
+        const startDate = newDateTimestamp(it.createdAt);
+        startDate.setFullYear(getNowTimeZone(this.timeZone).getFullYear());
+        const color = findStateColor('TRANSACTION', darkMode);
+        const event = allDayEvent(it.title, color, startDate, darkMode,
+          `${this.language}/accounts/${it.accountId}/transactions/ ${it.transactionId}`,
+          new Meta(false, this.timeZone, 'TRANSACTION',
+            [this.language, 'accounts', it.accountId, 'transactions', it.transactionId], undefined, it.total,
+          ),
+        );
+        this.calendar.addEvent(event);
+      });
+
+      calendarSummary.notes.forEach(it => {
+        const startDate = newDateTimestamp(it.date, this.timeZone);
+        if (it.repeat === FrequencyEnum.none) {
+          this.createNoteEvent(it, startDate, darkMode);
+        } else {
+          let repeatDate: Date;
+          if (this.periodStart && greaterOrEqualsThan(this.periodStart, startDate)) {
+            repeatDate = this.periodStart;
+            repeatDate.setDate(startDate.getDate());
+          } else {
+            repeatDate = startDate;
+          }
+          this.calendar.recurringEvent?.addFrequency(it.repeat, repeatDate, it.noteId, it.title, 'NOTE',
+            `${this.language}/notes/`,
+            (date, recurring) => this.createEvent(date, recurring, darkMode), undefined, undefined, true,
+          );
+        }
+      });
+
+      this.isCalendarLoading = false;
       this.calendar.recurringEvent?.execute();
     }
+    this.calendar.sortEvents();
   };
 
-  private createLabel = (icon: string, text: string) => `<div class="mat-raised-button">
-                   <div class="custom-material-icons material-icons">${ icon }</div>&nbsp;${ text }
-               </div>`;
-
-  private createUnavailableEvent = (start: Date, recurring: any, professional: Professional, darkMode: boolean) => {
-    const end = getEndWithDuration(start, recurring.duration);
-    const color = findStateColor(recurring.state, darkMode);
-    const event = {
-      start,
-      end,
-      title: recurring.title,
-      id: recurring.id,
-      color: createEventColor(color, darkMode),
-      draggable: true,
-      meta: { professional, time: true },
-      resizable: { beforeStart: true, afterEnd: true },
-    } as CalendarEvent;
+  private createEvent = (date: Date, recurring: any, darkMode: boolean) => {
+    const end = getEndWithDuration(date, recurring.duration);
+    const event = monthEvent(recurring.title, date, end, recurring.id, findStateColor(recurring.state, darkMode),
+      new Meta(!!recurring.duration, this.timeZone, recurring.state, [recurring.path, recurring.id]), darkMode,
+    );
     this.calendar.addEvent(event);
   };
 
-  private clean = (): void => this.store.dispatch(clean());
-
-  private getEvents = (): void => {
-    this.calendar.resetEvents();
-    this.store.dispatch(getMyEvent({ date: this.viewDate }));
-  };
-
-  private eventClick = (event: CalendarEvent, type: string): void => {
-    const reservationId = `${ event.id! }`;
-    switch (type) {
-      case 'VIEW':
-        this.router.navigate([this.language, 'reservation', reservationId]);
-        break;
-      case 'APPROVE':
-        this.calendar.filterEvent(event);
-        this.store.dispatch(approveReservation(reservationId));
-        event.meta.state = States.approved;
-        setTimeout(() => this.calendar.addEvent(event), 1);
-        break;
-      case 'START':
-        this.calendar.filterEvent(event);
-        this.store.dispatch(startReservation(reservationId));
-        event.meta.state = States.started;
-        event.meta.started = dateToTimestamp();
-        event.draggable = false;
-        event.actions = undefined;
-        setTimeout(() => this.calendar.addEvent(this.createTitle(event)), 1);
-        break;
-      case 'COMPLETE':
-        this.router.navigate([this.language, 'reservation', reservationId, 'rooms', this.dashboard?.roomId,
-          'customer', event.meta.customerId, 'complete'], { state: { data: { isDashboard: true } } });
-        break;
-      case 'MORE_INFO':
-        this.router.navigate([this.language, 'reservation', reservationId, 'more-info']);
-    }
-  };
-
-  private tryCreateEvents = (darkMode = this.isDarkMode): void => {
-    if (this.dashboardReady && this.calendarReady) {
-      this.createEvents(darkMode);
-      this.calendarReady = false;
-      this.dashboardReady = false;
-    }
-  };
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      this.dashboard = state.dashboard;
-      this.dashboardReady = true;
-      this.tryCreateEvents();
-    });
+  private createNoteEvent = (note: ICalendarNote, date: Date, darkMode: boolean): void => {
+    const color = findStateColor('NOTE', darkMode);
+    const event = allDayEvent(note.title, color, date, darkMode, `${this.language}/notes/${note.noteId}`,
+      new Meta(false, this.timeZone, 'NOTE', [this.language, 'notes', note.noteId]),
+    );
+    this.calendar.addEvent(event);
   };
 }

@@ -1,130 +1,160 @@
 import {
-  AfterViewInit,
-  ChangeDetectorRef,
+  ChangeDetectionStrategy,
   Component,
+  effect,
   ElementRef,
-  Inject,
-  OnDestroy,
-  OnInit,
-  ViewChild,
+  inject,
+  signal,
+  Signal,
+  viewChild,
 } from '@angular/core';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
-import { AsyncPipe } from '@angular/common';
-import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { Observable, Subject } from 'rxjs';
-import { IUser, IUserAll } from '../../interfaces/user';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { combineLatestWith } from 'rxjs';
+import { IUserAll } from '../../interfaces/user';
 import { DiscountType, IDiscountAll } from '../../interfaces/discount';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { AppState, selectUserState } from '../../store/app.states';
-import { map, startWith, takeUntil } from 'rxjs/operators';
+import { map, startWith } from 'rxjs/operators';
 import { currencySymbol } from '../../util/helper';
-import { clean, getAllCustomers } from '../../store/user.actions';
+import { cleanUser, getAllCustomers } from '../../store/user.actions';
+import { getAllCustomersPipe } from '../../store/selectors/user.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { UserState } from '../../store/reducers/user.reducers';
+
+export type DiscountDialogData = {
+  discount: IDiscountAll;
+};
+
+type DiscountDialogForm = {
+  customers: FormControl<IUserAll[] | undefined>;
+};
 
 @Component({
   selector: 'app-discount-dialog-component',
   templateUrl: './discount-dialog.component.html',
   styleUrls: ['./discount-dialog.component.scss'],
-  imports: [AppMaterialModule, TranslatePipe, ReactiveFormsModule, AsyncPipe],
+  imports: [AppMaterialModule, TranslatePipe, ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DiscountDialogComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('customerInput') customerInput!: ElementRef<HTMLInputElement>;
-  @ViewChild('auto') matAutocomplete!: MatAutocomplete;
+export class DiscountDialogComponent {
+  private readonly store: Store<UserState> = inject(Store<UserState>);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly dialogRef = inject(MatDialogRef<DiscountDialogComponent>);
+  private readonly data = inject<DiscountDialogData>(MAT_DIALOG_DATA);
+
+  private allCustomers$ = this.store.pipe(getAllCustomersPipe);
+  private allCustomersSignal = toSignal(this.allCustomers$);
+
+  form: FormGroup<DiscountDialogForm> = this.formBuilder.group<DiscountDialogForm>({
+    customers: this.formBuilder.control(undefined),
+  });
+
+  filteredCustomerSignal: Signal<IUserAll[] | undefined> = toSignal(
+    this.getForm.customers.valueChanges.pipe(
+      startWith('' as string),
+      map((value: any) => !value || typeof value === 'string' ? value : value.name),
+      combineLatestWith(this.allCustomers$),
+      map(([name, customers]) => {
+        if (!customers) {
+          return [];
+        }
+
+        return name ? this.filter(name, customers) : customers.slice();
+      })),
+  );
+
+  selectedCustomersSignal = signal<IUserAll[]>([]);
+  allCustomersWritableSignal = signal<IUserAll[] | undefined>(undefined);
+
+  customerInput = viewChild.required<ElementRef<HTMLInputElement>>('customerInput');
 
   title?: string;
-  customerCtrl = new UntypedFormControl();
-  filteredCustomers?: Observable<IUser[] | undefined>;
-  customers: IUserAll[] = [];
-  allCustomers?: IUserAll[];
 
-  private getState: Observable<any>;
-  private destroy$ = new Subject<void>();
-  private discount: IDiscountAll;
-
-  constructor(public dialogRef: MatDialogRef<DiscountDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-              private store: Store<AppState>, private cdRef: ChangeDetectorRef) {
-    this.getState = this.store.select(selectUserState);
-    this.discount = data.discount;
+  constructor() {
     this.setSymbol();
+
+    this.store.dispatch(cleanUser());
+    this.store.dispatch(getAllCustomers());
+
+    const initial = this.allCustomersSignal();
+    this.allCustomersWritableSignal.set(initial ? [...initial] : []);
+
+    effect(() => {
+      const customers = this.allCustomersSignal();
+      if (!customers) {
+        return;
+      }
+
+      this.allCustomersWritableSignal.set(customers);
+    });
   }
 
-  ngOnInit(): void {
-    this.clean();
-    this.subscribe();
-    this.getCustomers();
-    this.filteredCustomers = this.customerCtrl.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value ? value.displayName : ''),
-      map(name => name ? this.filter(name) : (this.allCustomers ? this.allCustomers.slice() : this.allCustomers)),
-    );
-  }
-
-  ngAfterViewInit(): void {
-    this.cdRef.detectChanges();
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+  get getForm(): DiscountDialogForm {
+    return this.form.controls;
   }
 
   onNoClick(): void {
-    return this.dialogRef.close();
+    this.dialogRef.close();
   }
 
   doAction(): void {
-    const customerIds = this.customers.map(({ id }) => id);
-    return this.dialogRef.close({ discountId: this.discount.id, customerIds });
+    const customerIds = this.selectedCustomersSignal().map(({ id }) => id);
+    this.dialogRef.close({
+      discountId: this.data.discount.id,
+      customerIds,
+    });
   }
 
   remove = (customer: IUserAll): void => {
-    const index = this.customers.indexOf(customer);
-    if (index >= 0) {
-      this.customers.splice(index, 1);
-      this.allCustomers?.push(customer);
-      this.customerCtrl.setValue(null);
-    }
+    this.selectedCustomersSignal.update((current) =>
+      current.filter((c) => c.id !== customer.id));
+
+    this.allCustomersWritableSignal.update((current) =>
+      current ? [...current, customer] : [customer]);
+
+    this.getForm.customers.setValue(undefined);
   };
 
   selected = (event: MatAutocompleteSelectedEvent): void => {
-    const customer = event.option.value;
-    this.customers.push(customer);
-    this.allCustomers = this.allCustomers?.filter(c => c.id !== customer.id);
-    this.customerInput.nativeElement.value = '';
-    this.customerCtrl.setValue(null);
+    const customer = event.option.value as IUserAll;
+
+    this.selectedCustomersSignal.update((current) => [...current, customer]);
+
+    this.allCustomersWritableSignal.update((current) =>
+      current?.filter((c) => c.id !== customer.id));
+
+    if (this.customerInput()) {
+      this.customerInput().nativeElement.value = '';
+    }
+    this.getForm.customers.setValue(undefined);
   };
 
-  sortCustomers = (data: any): IUser[] => data.sort((a: any, b: any) => {
-    const aName = a.displayName?.toUpperCase();
-    const bName = b.displayName?.toUpperCase();
-    return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
-  });
+  sortCustomers = (data?: IUserAll[]): IUserAll[] | undefined =>
+    data?.sort((a: IUserAll, b: IUserAll) => {
+      const aName = a.displayName.toUpperCase();
+      const bName = b.displayName.toUpperCase();
+      return aName.localeCompare(bName);
+    });
 
   private setSymbol = (): void => {
-    this.title = this.discount.name;
-    switch (this.discount.type) {
+    const discount = this.data.discount;
+    this.title = discount.name;
+
+    switch (discount.type) {
       case DiscountType.money:
-        this.title = `${currencySymbol(this.discount.currency)} ${this.discount.amount} ${this.title}`;
+        this.title = `${currencySymbol(discount.currency)} ${discount.amount} ${this.title}`;
         break;
+
       case DiscountType.percentage:
-        this.title = `${this.discount.amount} % ${this.title}`;
+        this.title = `${discount.amount}% ${this.title}`;
         break;
     }
   };
 
-  private getCustomers = (): void => this.store.dispatch(getAllCustomers());
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private filter = (name: string): IUserAll[] | undefined => this.allCustomers?.filter(
-    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
-
-  private subscribe = (): void => {
-    this.getState.pipe(takeUntil(this.destroy$)).subscribe((state) => {
-      this.allCustomers = state.data;
-      this.customerCtrl.setValue(null);
-    });
-  };
+  private filter = (name: string, allCustomers: IUserAll[]): IUserAll[] =>
+    allCustomers.filter((option) =>
+      option.displayName?.toLowerCase().startsWith(name.toLowerCase()));
 }

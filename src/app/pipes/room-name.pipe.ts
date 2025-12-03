@@ -4,7 +4,6 @@ import { roomCurrency, roomGMT } from '../util/helper';
 
 @Pipe({
   name: 'roomName',
-  standalone: true,
 })
 export class RoomNamePipe implements PipeTransform {
 

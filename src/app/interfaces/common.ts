@@ -12,7 +12,11 @@ export interface IApiResponse {
 }
 
 export interface IError {
+  object?: string;
+  field?: string;
+  rejectedValue?: any;
   message?: string;
+  status?: string;
   subErrors?: IError[];
 }
 
@@ -60,3 +64,6 @@ export const success = <T extends (...args: any[]) => any>(
   const mainAction = actionCreator({ message, path, reload, toastType });
   return of(mainAction, ...additionalActions);
 };
+
+
+export const isString = (x: unknown): x is string => typeof x === 'string';

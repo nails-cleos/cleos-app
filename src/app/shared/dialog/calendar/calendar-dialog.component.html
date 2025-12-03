@@ -1,15 +1,18 @@
-<h1 mat-dialog-title>{{'COMMON.COLUMN.ACTIONS' | translate}}</h1>
-<div mat-dialog-content>
-  <mat-radio-group [formControl]="radio" aria-label="Select an option">
-    <mat-radio-button value="reservation">{{'COMMON.BUTTON.BOOK' | translate}}</mat-radio-button>
-    <mat-radio-button value="unavailable,block-agenda,add">{{'COMMON.BUTTON.BLOCK_AGENDA' | translate}}</mat-radio-button>
-    <mat-radio-button value="unavailable,add">{{'COMMON.BUTTON.UNAVAILABLE' | translate}}</mat-radio-button>
-    <mat-radio-button value="notes,add">{{'COMMON.BUTTON.NOTE' | translate}}</mat-radio-button>
-  </mat-radio-group>
-</div>
-<div mat-dialog-actions>
-  <button (click)="onNoClick" mat-button>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
-  <button [mat-dialog-close]="radio.value" cdkFocusInitial color="primary"
-          mat-button>Ok
-  </button>
-</div>
+<h1 mat-dialog-title>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</h1>
+<form [formGroup]="form" (ngSubmit)="onNoClick()">
+  <div mat-dialog-content>
+    <mat-radio-group [formControl]="getForm.radio" aria-label="Select an option">
+      <mat-radio-button value="reservation">{{ 'COMMON.BUTTON.BOOK' | translate }}</mat-radio-button>
+      <mat-radio-button value="unavailable,block-agenda,add">{{ 'COMMON.BUTTON.BLOCK_AGENDA' | translate }}
+      </mat-radio-button>
+      <mat-radio-button value="unavailable,add">{{ 'COMMON.BUTTON.UNAVAILABLE' | translate }}</mat-radio-button>
+      <mat-radio-button value="notes,add">{{ 'COMMON.BUTTON.NOTE' | translate }}</mat-radio-button>
+    </mat-radio-group>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button type="submit">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+    <button [mat-dialog-close]="getForm.radio.value" cdkFocusInitial color="primary"
+            mat-button>Ok
+    </button>
+  </div>
+</form>

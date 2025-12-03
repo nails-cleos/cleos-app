@@ -5,8 +5,10 @@ import {
   ICardSummary,
   IEventSummary,
   IMonthlyRoomSummary,
-  IMonthlySummaryRequest, IQuarterRoomSummary,
-  IRoomEvents, ITotal,
+  IMonthlySummaryRequest,
+  IQuarterRoomSummary,
+  IRoomEvents,
+  ITotal,
   IYearRoomExport,
   IYearRoomSummary,
 } from '../interfaces/dashboard';
@@ -17,13 +19,13 @@ import { toUrl } from '../util/helper';
 export class DashboardService {
 
   private url = 'dashboard';
-  private urlV1 = `v1/${ this.url }`;
+  private urlV1 = `v1/${this.url}`;
 
   private http: HttpClient = inject(HttpClient);
 
-  getCards = (date: Date): Observable<ICardSummary> => this.getSummaryData<ICardSummary>(date, 'cards');
+  getCards = (date: Date): Observable<ICardSummary[]> => this.getSummaryData<ICardSummary[]>(date, 'cards');
 
-  getEvents = (date: Date): Observable<IEventSummary> => this.getSummaryData<IEventSummary>(date, 'events');
+  getEvents = (date: Date): Observable<IEventSummary[]> => this.getSummaryData<IEventSummary[]>(date, 'events');
 
   getMyEvent = (date: Date): Observable<IRoomEvents> => this.getSummaryData<IRoomEvents>(date, 'me', 'events');
 
@@ -45,16 +47,16 @@ export class DashboardService {
   );
 
   getYearSummary = (year: number): Observable<IYearRoomSummary[]> => this.http.get<IYearRoomSummary[]>(
-    toUrl(this.urlV1, 'years', `${ year }`));
+    toUrl(this.urlV1, 'years', `${year}`));
 
   exportYearSummary = (year: number): Observable<IYearRoomExport[]> => this.http.get<IYearRoomExport[]>(
-    toUrl(this.urlV1, 'years', `${ year }`, 'export'),
+    toUrl(this.urlV1, 'years', `${year}`, 'export'),
   );
 
   getQuarterSummary = (
     year: number, quarter: number,
   ): Observable<IQuarterRoomSummary[]> => this.http.get<IQuarterRoomSummary[]>(
-    toUrl(this.urlV1, 'years', `${ year }`, 'quarters', `${ quarter }`));
+    toUrl(this.urlV1, 'years', `${year}`, 'quarters', `${quarter}`));
 
   private getSummaryData = <T>(date: Date, ...url: string[]): Observable<T> => this.http.get<T>(
     toUrl(this.urlV1, ...url),

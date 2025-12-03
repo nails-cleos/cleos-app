@@ -1,12 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  ReactiveFormsModule,
-  UntypedFormControl,
-  UntypedFormGroup,
-  Validators,
-} from '@angular/forms';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { IPrice } from '../../../interfaces/treatment';
 import { ICurrency } from '../../../interfaces/currency';
@@ -14,6 +7,20 @@ import { IPaymentOption, PENALTY } from '../../../interfaces/payment';
 import { PriceComponent } from '../../price/price.component';
 import { AppMaterialModule } from '../../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
+import { BankForm } from '../../bank/bank.component';
+
+type CancelForm = {
+  paymentCancellation: FormControl<any>,
+}
+
+type CancelDialogData = {
+  options: string[],
+  paymentOptions?: IPaymentOption[],
+  price?: IPrice,
+  currency: ICurrency,
+  showPenalty?: boolean,
+  small?: boolean,
+}
 
 @Component({
   selector: 'app-cancel-dialog',
@@ -22,18 +29,22 @@ import { TranslatePipe } from '@ngx-translate/core';
   imports: [PriceComponent, AppMaterialModule, ReactiveFormsModule, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CancelDialogComponent implements OnInit {
-  readonly dialogRef = inject(MatDialogRef<CancelDialogComponent>);
-  readonly data = inject<any>(MAT_DIALOG_DATA);
-  private formBuilder: FormBuilder = inject(FormBuilder);
+export class CancelDialogComponent {
+  private readonly dialogRef = inject(MatDialogRef<CancelDialogComponent>);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  readonly data = inject<CancelDialogData>(MAT_DIALOG_DATA);
 
-  cancelForm!: UntypedFormGroup;
-  typeForm!: UntypedFormGroup;
-  paymentOptions: IPaymentOption[] = this.data.paymentOptions;
-
-  paymentCancellation: FormControl = new UntypedFormControl('', [
-    Validators.required,
-  ]);
+  form: FormGroup<CancelForm> = this.formBuilder.group<CancelForm>({
+    paymentCancellation: this.formBuilder.control(undefined, {
+      validators: [Validators.required],
+    }),
+  });
+  typeForm: FormGroup<BankForm> = this.formBuilder.group<BankForm>({
+    type: this.formBuilder.control(undefined),
+    bank: this.formBuilder.control(undefined),
+    percentage: this.formBuilder.control(undefined),
+  });
+  paymentOptions?: IPaymentOption[] = this.data.paymentOptions;
 
   options: string[] = this.data.options;
   price?: IPrice = this.data.price;
@@ -43,44 +54,40 @@ export class CancelDialogComponent implements OnInit {
 
   constructor() {
     if (this.options.length === 1) {
-      this.paymentCancellation.setValue(this.options[0]);
+      this.getForm.paymentCancellation.setValue(this.options[0]);
     }
-
-    this.typeForm = this.formBuilder.group({
-      type: new UntypedFormControl(undefined),
-      bank: new UntypedFormControl(undefined),
-    });
   }
 
-  get onNoClick(): void {
-    return this.dialogRef.close();
+  get getForm(): CancelForm {
+    return this.form.controls;
   }
 
-  get doAction(): void {
-    if (this.cancelForm.invalid || this.typeForm.invalid) {
+  get getTypeForm(): BankForm {
+    return this.typeForm.controls;
+  }
+
+  onNoClick() {
+    this.dialogRef.close();
+  }
+
+  doAction(): void {
+    if (this.form.invalid || this.typeForm.invalid) {
       return;
     }
     // if we want to only charge, it is the same use CHARGE_WITH_DISCOUNT or CHARGE_WITH_REFUND
-    const cancelOption = this.paymentCancellation.value === 'CHARGE' ? 'CHARGE_WITH_DISCOUNT' :
-      this.paymentCancellation.value;
-    const option: IPaymentOption = this.typeForm.get('type')?.value;
+    const cancelOption = this.getForm.paymentCancellation.value === 'CHARGE' ? 'CHARGE_WITH_DISCOUNT' :
+      this.getForm.paymentCancellation.value;
+    const option = this.getTypeForm.type.value;
     const type = option?.type;
     const paymentOptionId = option?.bic;
-    const cancelRequest = { cancelOption, type, paymentOptionId, bic: undefined };
+    const bic = this.getTypeForm.bank.value?.bic;
+    let cancelRequest;
     if (option?.subTypes?.length) {
-      cancelRequest.bic = this.typeForm.get('bank')?.value?.bic;
+      cancelRequest = { cancelOption, type, paymentOptionId, bic };
+    } else {
+      cancelRequest = { cancelOption, type, paymentOptionId };
     }
     this.dialogRef.close(cancelRequest);
     return;
   }
-
-  ngOnInit(): void {
-    this.createForm();
-  }
-
-  private createForm = (): void => {
-    this.cancelForm = this.formBuilder.group({
-      paymentCancellation: this.paymentCancellation,
-    });
-  };
 }

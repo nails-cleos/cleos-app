@@ -1,34 +1,29 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { ActivatedRoute, ParamMap } from '@angular/router';
-import { of, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ChangeDetectorRef } from '@angular/core';
-import { BreakpointObserver } from '@angular/cdk/layout';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BehaviorSubject } from 'rxjs';
 
 import { TransactionViewComponent } from './transaction-view.component';
-import { AuthUserService } from '../../../services/auth-user.service';
+import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
 import { IAccountAll, ITransaction } from '../../../interfaces/account';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
-import { clean, getTransactionsByAccountId } from '../../../store/account.actions';
-import { AppState } from '../../../store/app.states';
+import { ActivatedRoute, ParamMap } from '@angular/router';
+import { AccountState } from '../../../store/reducers/account.reducers';
+import { signal } from '@angular/core';
 
 describe('TransactionViewComponent', () => {
   let component: TransactionViewComponent;
   let fixture: ComponentFixture<TransactionViewComponent>;
 
-  let state$: Subject<any>;
-  let breakpoint$: Subject<any>;
-  let authUser$: Subject<any>;
+  let accountId$: BehaviorSubject<string | undefined>;
+  let accountTransaction$: BehaviorSubject<any>;
+  let breakpoint$: BehaviorSubject<any>;
+  const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let storeSpy: jasmine.SpyObj<Store<AccountState>>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let paramMapSpy: jasmine.SpyObj<ParamMap>;
-  let changeDetectorSpy: jasmine.SpyObj<ChangeDetectorRef>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
 
@@ -77,25 +72,40 @@ describe('TransactionViewComponent', () => {
   ];
 
   beforeEach(async () => {
-    state$ = new Subject();
-    breakpoint$ = new Subject();
-    authUser$ = new Subject();
-
-    changeDetectorSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: paramMapSpy,
+    accountId$ = new BehaviorSubject<string | undefined>(undefined);
+    accountTransaction$ = new BehaviorSubject<any>(undefined);
+    breakpoint$ = new BehaviorSubject<any>({
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
       },
     });
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      snapshot: {
+        paramMap: jasmine.createSpyObj<ParamMap>('ParamMap', ['get']),
+      },
+    });
+    authUserSignal.update(prev => ({ ...prev, hasAdminRole: false, customerId: 'user-1' }));
+
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
-      authUser: authUser$.asObservable(),
+      authUser: authUserSignal.asReadonly(),
     });
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
 
-    paramMapSpy.get.and.returnValue('account-123');
-    storeSpy.select.and.returnValue(state$.asObservable());
+    let pipeCallCount = 0;
+    storeSpy.pipe.and.callFake(() => {
+      pipeCallCount++;
+      if (pipeCallCount === 1) {
+        return accountId$.asObservable();
+      }
+      if (pipeCallCount === 2) {
+        return accountTransaction$.asObservable();
+      }
+      return new BehaviorSubject(undefined).asObservable();
+    });
+
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
@@ -107,7 +117,6 @@ describe('TransactionViewComponent', () => {
       providers: [
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Store, useValue: storeSpy },
-        { provide: ChangeDetectorRef, useValue: changeDetectorSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
       ],
@@ -119,12 +128,7 @@ describe('TransactionViewComponent', () => {
 
     fixture = TestBed.createComponent(TransactionViewComponent);
     component = fixture.componentInstance;
-  });
-
-  afterEach(() => {
-    state$.complete();
-    breakpoint$.complete();
-    authUser$.complete();
+    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -132,279 +136,105 @@ describe('TransactionViewComponent', () => {
   });
 
   it('should initialize with default values', () => {
-    expect(component.hasAdminRole).toBeFalse();
-    expect(component.pageSize).toBe(PAGE_SIZE);
+    expect(component.hasAdminRole()).toBeFalse();
+    expect(component.pageSizeSignal()).toBe(PAGE_SIZE);
     expect(component.dateFormat).toBe('en-GB');
     expect(component.language).toBe('en-GB');
     expect(component.displayedColumns).toEqual([
       'position', 'timestamp', 'amount', 'amountGifted', 'payment.status', 'payment.type', 'actions',
     ]);
-    expect(component.dataSource).toBeInstanceOf(MatTableDataSource);
   });
 
   it('should set mobile page size when small breakpoint matches', () => {
-    breakpoint$.next({ matches: true });
+    breakpoint$.next({
+      matches: true,
+      breakpoints: {
+        [Breakpoints.XSmall]: true,
+        [Breakpoints.Small]: true,
+      },
+    });
+    fixture.detectChanges();
 
-    expect(component.pageSize).toBe(MOBILE_PAGE_SIZE);
+    expect(component.pageSizeSignal()).toBe(MOBILE_PAGE_SIZE);
   });
 
   it('should keep default page size when breakpoint does not match', () => {
-    breakpoint$.next({ matches: false });
-
-    expect(component.pageSize).toBe(PAGE_SIZE);
-  });
-
-  it('should update hasAdminRole based on auth user service', () => {
-    authUser$.next({ hasAdminRole: true });
-
-    expect(component.hasAdminRole).toBeTrue();
-
-    authUser$.next({ hasAdminRole: false });
-
-    expect(component.hasAdminRole).toBeFalse();
-  });
-
-  it('should extract account ID from route and dispatch Clean on init', () => {
-    // Ensure the route parameter is correctly mocked
-    paramMapSpy.get.and.callFake((key: string) => {
-      if (key === 'id') {
-        return 'account-123';
-      }
-      return null;
+    breakpoint$.next({
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
+      },
     });
+    fixture.detectChanges();
 
-    // Reset dispatch calls and initialize
-    storeSpy.dispatch.calls.reset();
-    component.ngOnInit();
-
-    expect(component.accountId).toEqual('account-123');
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
+    expect(component.pageSizeSignal()).toBe(PAGE_SIZE);
   });
 
-  it('should dispatch GetTransactionsByAccountId after view init', () => {
-    component.accountId = 'account-123';
-    expect(component.accountId).toBe('account-123');
-    component.sort = { active: 'timestamp', direction: 'desc' } as MatSort;
+  it('should update hasAdminRole signal based on auth user', () => {
+    authUserSignal.update(prev => ({ ...prev, hasAdminRole: true, customerId: 'user-1' }));
+    fixture.detectChanges();
 
-    component.ngAfterViewInit();
+    expect(component.hasAdminRole()).toBeTrue();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getTransactionsByAccountId(
-        {
-          id: 'account-123',
-          page: 0,
-          sort: 'timestamp',
-          direction: 'desc',
-          size: PAGE_SIZE,
-        },
-      ),
-    );
+    authUserSignal.update(prev => ({ ...prev, hasAdminRole: false, customerId: 'user-2' }));
+    fixture.detectChanges();
+
+    expect(component.hasAdminRole()).toBeFalse();
   });
 
-  it('should update account and transactions from state', () => {
-    // Mock paginator and sort to prevent subscription errors
-    component.paginator = {
-      pageIndex: 0,
-      page: of({}),
-    } as MatPaginator;
-    component.sort = {
-      active: 'timestamp',
-      direction: 'desc',
-      sortChange: of({}),
-    } as MatSort;
+  it('should dispatch getTransactionsByAccountId when accountId changes', () => {
+    (storeSpy.dispatch as jasmine.Spy).calls.reset();
 
-    component.ngOnInit();
+    accountId$.next('account-123');
+    fixture.detectChanges();
 
-    const stateWithData = {
-      data: {
-        account: mockAccount,
-        transactions: {
-          content: mockTransactions,
-          totalElements: 2,
-        },
+    expect(storeSpy.dispatch).toHaveBeenCalled();
+  });
+
+  it('should update account and transactions from accountTransactionSignal', () => {
+    const mockData = {
+      account: mockAccount,
+      transactions: {
+        content: mockTransactions,
+        totalElements: 2,
       },
     };
 
-    state$.next(stateWithData);
+    accountTransaction$.next(mockData);
+    fixture.detectChanges();
 
-    expect(component.account).toEqual(mockAccount);
-    expect(component.dataSource.length).toBe(2);
-    expect(component.resultsLength).toBe(2);
+    expect(component.accountSignal()).toEqual(mockAccount);
+    expect(component.dataSourceSignal()?.length).toBe(2);
+    expect(component.resultsLengthSignal()).toBe(2);
   });
 
-  it('should handle empty state gracefully', () => {
-    component.ngOnInit();
+  it('should handle empty accountTransaction signal gracefully', () => {
+    accountTransaction$.next(undefined);
+    fixture.detectChanges();
 
-    state$.next({});
-
-    expect(component.account).toBeUndefined();
-    expect(component.dataSource).toBeUndefined();
-    expect(component.resultsLength).toBe(0);
+    expect(component.accountSignal()).toBeUndefined();
+    expect(component.dataSourceSignal()).toBeUndefined();
+    expect(component.resultsLengthSignal()).toBe(0);
   });
 
   it('should transform transactions with date timestamp', () => {
-    // Mock paginator and sort to prevent subscription errors
-    component.paginator = {
-      pageIndex: 0,
-      page: of({}),
-    } as MatPaginator;
-    component.sort = {
-      active: 'timestamp',
-      direction: 'desc',
-      sortChange: of({}),
-    } as MatSort;
-
-    component.ngOnInit();
-
-    const stateWithData = {
-      data: {
-        transactions: {
-          content: mockTransactions,
-          totalElements: 2,
-        },
+    const mockData = {
+      transactions: {
+        content: mockTransactions,
+        totalElements: 2,
       },
     };
 
-    state$.next(stateWithData);
+    accountTransaction$.next(mockData);
+    fixture.detectChanges();
 
-    expect(component.dataSource[0].date).toBeDefined();
-    expect(component.dataSource[1].date).toBeDefined();
-  });
-
-  it('should create page subscriptions when results are available', () => {
-    const mockPageObservable = of({ pageIndex: 1 });
-    const mockSortObservable = of({ active: 'amount', direction: 'asc' });
-
-    component.paginator = {
-      pageIndex: 0,
-      page: mockPageObservable,
-    } as MatPaginator;
-    component.sort = {
-      active: 'timestamp',
-      direction: 'desc',
-      sortChange: mockSortObservable,
-    } as MatSort;
-
-    component.ngOnInit();
-
-    const stateWithData = {
-      data: {
-        transactions: {
-          content: mockTransactions,
-          totalElements: 2,
-        },
-      },
-    };
-
-    expect(component['paginatorSubscription']).toBeUndefined();
-
-    state$.next(stateWithData);
-
-    expect(component['paginatorSubscription']).toBeDefined();
-  });
-
-  it('should reset paginator index and get transactions on sort change', () => {
-    component.accountId = 'account-123';
-    const sortChangeSubject = new Subject();
-    const pageSubject = new Subject();
-
-    component.paginator = {
-      pageIndex: 5,
-      page: pageSubject,
-    } as MatPaginator;
-    component.sort = {
-      active: 'amount', // This is what getTransactions() will use
-      direction: 'asc',  // This is what getTransactions() will use
-      sortChange: sortChangeSubject,
-    } as MatSort;
-
-    component['createPageSubscriptions']();
-
-    // Update sort properties to simulate what actually happens in sort change
-    component.sort.active = 'amount';
-    component.sort.direction = 'asc';
-
-    sortChangeSubject.next({ active: 'amount', direction: 'asc' });
-
-    expect(component.paginator.pageIndex).toBe(0);
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getTransactionsByAccountId({
-        id: 'account-123',
-        page: 0,
-        sort: 'amount',
-        direction: 'asc',
-        size: PAGE_SIZE,
-      }),
-    );
-  });
-
-  it('should get transactions with correct page on paginator page change', () => {
-    component.accountId = 'account-123';
-    const pageSubject = new Subject();
-    const sortChangeSubject = new Subject();
-
-    component.paginator = {
-      pageIndex: 2, // This is what getTransactions(pageIndex) will use
-      page: pageSubject,
-    } as MatPaginator;
-    component.sort = {
-      active: 'timestamp',
-      direction: 'desc',
-      sortChange: sortChangeSubject,
-    } as MatSort;
-
-    component['createPageSubscriptions']();
-
-    // Update paginator pageIndex to the expected value
-    component.paginator.pageIndex = 2;
-
-    pageSubject.next({ pageIndex: 2 });
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getTransactionsByAccountId({
-        id: 'account-123',
-        page: 2,
-        sort: 'timestamp',
-        direction: 'desc',
-        size: PAGE_SIZE,
-      }),
-    );
-  });
-
-  it('should handle case when account ID is not provided', () => {
-    paramMapSpy.get.and.returnValue(null);
-
-    component.ngOnInit();
-
-    expect(component.accountId).toBeUndefined();
-  });
-
-  it('should unsubscribe from all subscriptions on destroy', () => {
-    component['subscription'] = jasmine.createSpyObj('Subscription', ['unsubscribe']);
-    component['paginatorSubscription'] = jasmine.createSpyObj('Subscription', ['unsubscribe']);
-    component['authUserServiceSubscription'] = jasmine.createSpyObj('Subscription', ['unsubscribe']);
-
-    component.ngOnDestroy();
-
-    expect(component['subscription']!.unsubscribe).toHaveBeenCalled();
-    expect(component['paginatorSubscription']!.unsubscribe).toHaveBeenCalled();
-    expect(component['authUserServiceSubscription'].unsubscribe).toHaveBeenCalled();
+    const dataSource = component.dataSourceSignal();
+    expect(dataSource?.[0].date).toBeDefined();
+    expect(dataSource?.[1].date).toBeDefined();
   });
 
   it('should handle null payment timestamp gracefully', () => {
-    // Mock paginator and sort to prevent subscription errors
-    component.paginator = {
-      pageIndex: 0,
-      page: of({}),
-    } as MatPaginator;
-    component.sort = {
-      active: 'timestamp',
-      direction: 'desc',
-      sortChange: of({}),
-    } as MatSort;
-
-    component.ngOnInit();
-
     const transactionWithoutTimestamp: ITransaction = {
       id: 'transaction-3',
       amount: 300,
@@ -415,17 +245,63 @@ describe('TransactionViewComponent', () => {
       },
     };
 
-    const stateWithData = {
-      data: {
-        transactions: {
-          content: [transactionWithoutTimestamp],
-          totalElements: 1,
-        },
+    const mockData = {
+      transactions: {
+        content: [transactionWithoutTimestamp],
+        totalElements: 1,
       },
     };
 
-    state$.next(stateWithData);
+    accountTransaction$.next(mockData);
+    fixture.detectChanges();
 
-    expect(component.dataSource[0].date).toBeDefined();
+    const dataSource = component.dataSourceSignal();
+    expect(dataSource?.[0].date).toBeDefined();
+  });
+
+  it('should compute sortActive from sort viewChild', () => {
+    expect(component['sortActive']()).toBe('timestamp');
+  });
+
+  it('should compute sortDirection from sort viewChild', () => {
+    expect(component['sortDirection']()).toBe('asc');
+  });
+
+  it('should have paginatorPageIndex signal initialized to 0', () => {
+    expect(component.paginatorPageIndex()).toBe(0);
+  });
+
+  it('should compute transactionsSignal from accountTransactionSignal', () => {
+    const mockData = {
+      transactions: {
+        content: mockTransactions,
+        totalElements: 2,
+      },
+    };
+
+    accountTransaction$.next(mockData);
+    fixture.detectChanges();
+
+    expect(component['transactionsSignal']()).toEqual(jasmine.objectContaining({
+      content: mockTransactions,
+      totalElements: 2,
+    }));
+  });
+
+  it('should return 0 for resultsLengthSignal when no transactions', () => {
+    accountTransaction$.next({ transactions: undefined });
+    fixture.detectChanges();
+
+    expect(component.resultsLengthSignal()).toBe(0);
+  });
+
+  it('should compute authUserSignal from authUser observable', () => {
+    authUserSignal.update(prev => ({ ...prev, hasAdminRole: true, customerId: 'admin-1' }));
+    fixture.detectChanges();
+
+    expect(component['authUserSignal']()).toEqual(jasmine.objectContaining({
+      hasAdminRole: true,
+      customerId: 'admin-1',
+    }));
   });
 });

@@ -2,7 +2,7 @@ import '../support/commands';
 import { breakpointToButtons, devices, zeroPad } from '../support/utils';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
-  describe(`Additional with ${ name }`, () => {
+  describe(`Additional with ${name}`, () => {
     beforeEach(() => cy.viewport(width, height));
 
     beforeEach(() => {
@@ -32,9 +32,9 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       const minute = '30';
 
       cy.formControlType('name', additionalName);
-      cy.formControlType('description', `${ additionalName } Description`, 'textarea');
+      cy.formControlType('description', `${additionalName} Description`, 'textarea');
 
-      cy.get('input[formControlName="duration"]').click({ force: true });
+      cy.get('[data-cy="duration-input"]').click({ force: true });
       cy.setTime(hour, minute);
 
       cy.selectChip('Biab Treatment');
@@ -45,10 +45,10 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.wait('@saveAdditional').then(additionalData => {
         const body = additionalData.request.body;
         expect(body.name).to.eq(additionalName);
-        expect(body.description).to.eq(`${ additionalName } Description`);
+        expect(body.description).to.eq(`${additionalName} Description`);
         expect(body.groupIds).to.have.deep
           .members(['9c44aaf0-82c0-4e09-a8f9-bcc915d23ed3', '62f3c0db-7545-4afe-8238-08fac393dcf4']);
-        expect(body.duration).to.eq(`${ zeroPad(hour) }:${ zeroPad(minute) }`);
+        expect(body.duration).to.eq(`${zeroPad(hour)}:${zeroPad(minute)}`);
         cy.url().should('include', '/additional');
       });
     });
@@ -60,7 +60,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
       cy.get('@selectedAdditional').then((additional: any) => {
         cy.mockAdditional(additional.id, additional).then(() => {
-          cy.intercept('PATCH', `**/api/v1/additional/${ additional.id }`, (req) => req.alias = 'updateAdditional');
+          cy.intercept('PATCH', `**/api/v1/additional/${additional.id}`, (req) => req.alias = 'updateAdditional');
 
           cy.buttonClickOnTable(breakpoints, additional.name, 'row', 'detail-row', 'edit',
             breakpointToButtons(breakpoints, ['delete']));
@@ -69,9 +69,9 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
           cy.get('mat-card-title').contains('Update additional');
           cy.get('mat-card-subtitle').contains(additional.name);
-          cy.get('input[formControlName="name"]').should('have.value', additional.name);
-          cy.get('textarea[formControlName="description"]').should('have.value', additional.description);
-          cy.get('input[formControlName="duration"]').should('have.value', additional.duration.slice(0, 5));
+          cy.get('[data-cy="name-input"]').should('have.value', additional.name);
+          cy.get('[data-cy="description-textarea"]').should('have.value', additional.description);
+          cy.get('[data-cy="duration-input"]').should('have.value', additional.duration.slice(0, 5));
 
           additional.groups.forEach((groups: any) => {
             cy.get('mat-chip-row').contains(groups.name).scrollIntoView().should('be.visible');
@@ -82,8 +82,8 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           const hour = '00';
           const minute = '30';
           cy.formControlType('name', additionalName);
-          cy.formControlType('description', `${ additionalName } Description`, 'textarea');
-          cy.get('input[formControlName="duration"]').click({ force: true });
+          cy.formControlType('description', `${additionalName} Description`, 'textarea');
+          cy.get('[data-cy="duration-input"]').click({ force: true });
           cy.setTime(hour, minute);
 
           // Remove one treatment group
@@ -95,8 +95,8 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           cy.wait('@updateAdditional').then(additionalData => {
             const body = additionalData.request.body;
             expect(body.name).to.eq(additionalName);
-            expect(body.description).to.eq(`${ additionalName } Description`);
-            expect(body.duration).to.eq(`${ zeroPad(hour) }:${ zeroPad(minute) }`);
+            expect(body.description).to.eq(`${additionalName} Description`);
+            expect(body.duration).to.eq(`${zeroPad(hour)}:${zeroPad(minute)}`);
             const expectedGroupIds = additional.groups.filter((group: { name: string }) => group.name !== 'GelPolish')
               .map((group: { id: string }) => group.id);
             expect(body.groupIds).to.include.deep.members(expectedGroupIds);

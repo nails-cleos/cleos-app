@@ -1,75 +1,83 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { IMenu } from '../../interfaces/user';
-import { Router, RouterLinkActive } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { map, shareReplay } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../shared/shared.module';
+import { MatDrawer } from '@angular/material/sidenav';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { AppMaterialModule } from '../../util/app-material.module';
 
 @Component({
   selector: 'app-menu-item',
   templateUrl: './menu-item.component.html',
   styleUrls: ['./menu-item.component.scss'],
-  imports: [SharedModule, RouterLinkActive],
+  imports: [AppMaterialModule, RouterLinkActive, RouterLink],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MenuItemComponent implements OnInit {
+export class MenuItemComponent {
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly router: Router = inject(Router);
+  private readonly translate: TranslateService = inject(TranslateService);
 
-  @Input() items!: IMenu[];
-  @ViewChild('childMenu') public childMenu!: IMenu;
-  @Input() drawer: any;
-  step = 0;
+  items = input.required<IMenu[]>();
+  drawer = input<MatDrawer>();
+
+  private breakpointObserver$ = this.breakpointObserver.observe(
+    [Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium]);
+
+  private breakpointsSignal = toSignal(
+    this.breakpointObserver$, {
+      initialValue: {
+        matches: false,
+        breakpoints: {
+          [Breakpoints.XSmall]: false,
+          [Breakpoints.Small]: false,
+          [Breakpoints.Medium]: false,
+        },
+      },
+    },
+  );
+
+  isHandsetSignal = computed(() => this.breakpointsSignal()?.matches ?? false);
+
   openSubMenus: { [key: number]: boolean } = {};
   openSubSubMenus: { [key: number]: { [key: number]: boolean } } = {};
 
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe([
-  	Breakpoints.XSmall,
-  	Breakpoints.Small,
-  	Breakpoints.Medium,
-  ]).pipe(map(result => result.matches), shareReplay());
+  language: string = this.translate.currentLang;
 
-  language: string;
-
-  constructor(private breakpointObserver: BreakpointObserver, public router: Router,
-              private translate: TranslateService) {
-  	this.language = this.translate.currentLang;
+  constructor() {
   }
 
-  ngOnInit(): void {
-  }
-
-  navigate = (menu: IMenu, drawer?: any): void => {
-  	drawer?.toggle();
-  	this.router.navigate([this.language].concat(menu.path.split('/')));
+  navigate = (menu: IMenu, drawer?: MatDrawer): void => {
+    drawer?.toggle();
+    this.router.navigate([this.language].concat(menu.path.split('/')));
   };
 
   toggleSubMenu = (index: number) => {
-  	// Close all other submenus
-  	for (const key in this.openSubMenus) {
-  		if (Number(key) !== index) {
-  			this.openSubMenus[key] = false;
-  		}
-  	}
-  	this.openSubMenus[index] = !this.openSubMenus[index];
+    for (const key in this.openSubMenus) {
+      if (Number(key) !== index) {
+        this.openSubMenus[key] = false;
+      }
+    }
+    this.openSubMenus[index] = !this.openSubMenus[index];
   };
 
   isSubMenuOpen = (index: number): boolean => this.openSubMenus[index] || false;
 
   toggleSubSubMenu = (index: number, subIndex: number) => {
-  	if (!this.openSubSubMenus[index]) {
-  		this.openSubSubMenus[index] = {};
-  	}
-  	// Close all other sub-submenus within the same sub-menu
-  	for (const key in this.openSubSubMenus[index]) {
-  		if (Number(key) !== subIndex) {
-  			this.openSubSubMenus[index][key] = false;
-  		}
-  	}
-  	this.openSubSubMenus[index][subIndex] = !this.openSubSubMenus[index][subIndex];
+    if (!this.openSubSubMenus[index]) {
+      this.openSubSubMenus[index] = {};
+    }
+    for (const key in this.openSubSubMenus[index]) {
+      if (Number(key) !== subIndex) {
+        this.openSubSubMenus[index][key] = false;
+      }
+    }
+    this.openSubSubMenus[index][subIndex] = !this.openSubSubMenus[index][subIndex];
   };
 
   isSubSubMenuOpen = (
-  	index: number,
-  	subIndex: number,
+    index: number,
+    subIndex: number,
   ): boolean => (this.openSubSubMenus[index] && this.openSubSubMenus[index][subIndex]) || false;
 }

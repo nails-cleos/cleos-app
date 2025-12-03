@@ -1,17 +1,19 @@
-@if (!isLoading) {
+@if (!isLoading()) {
   <div class="chartContainer">
-    @if (chart && !error) {
-      <div>
-        <canvas [type]="chart.type"
-                [datasets]="chart.charData.datasets"
-                [labels]="chart.labels"
-                [legend]="true"
-                [options]="chart.options"
-                baseChart class="block">
-        </canvas>
-      </div>
-    } @else {
+    @if (errorSignal(); as error) {
       <app-error [error]="error" [isCard]="true"></app-error>
+    } @else {
+      @if (chart(); as chart) {
+        <div>
+          <canvas [type]="chart.type"
+                  [datasets]="chart.charData.datasets"
+                  [labels]="chart.labels"
+                  [legend]="true"
+                  [options]="chart.options"
+                  baseChart class="block">
+          </canvas>
+        </div>
+      }
     }
   </div>
 } @else {

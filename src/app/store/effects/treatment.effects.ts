@@ -26,8 +26,8 @@ import { TreatmentService } from '../../services/treatment.service';
 import { Router } from '@angular/router';
 import { ColorService } from '../../services/color.service';
 import { Pagination } from '../../interfaces/pagination';
-import { ITreatmentAll, ITreatmentGroup } from '../../interfaces/treatment';
-import { IColor } from '../../interfaces/color';
+import { ITreatmentAll, ITreatmentGroupAll } from '../../interfaces/treatment';
+import { IColorAll } from '../../interfaces/color';
 import { IApiResponse, success } from '../../interfaces/common';
 import { ToastType } from '../../shared/toast/toast.model';
 
@@ -43,7 +43,7 @@ export class TreatmentEffects {
     ofType(getTreatmentsPage),
     switchMap(({ page, sort, direction, size }) =>
       this.treatmentService.getTreatmentsPage(page, sort, direction, size).pipe(
-        map((data: Pagination<ITreatmentGroup>) => treatmentSuccess({ data })),
+        map((data: Pagination<ITreatmentGroupAll>) => treatmentSuccess({ data })),
         catchError((err: HttpErrorResponse) => of(treatmentFailure({ error: err.error }))),
       )),
   ));
@@ -51,7 +51,7 @@ export class TreatmentEffects {
   findGroups$ = createEffect(() => this.actions.pipe(
     ofType(getAllTreatmentsGroup),
     switchMap(() => this.treatmentService.getAllTreatmentsGroup().pipe(
-      map((data: ITreatmentGroup[]) => treatmentSuccess({ data })),
+      map((data: ITreatmentGroupAll[]) => treatmentSuccess({ data })),
       catchError((err: HttpErrorResponse) => of(treatmentFailure({ error: err.error }))),
     )),
   ));
@@ -59,7 +59,7 @@ export class TreatmentEffects {
   findColors$ = createEffect(() => this.actions.pipe(
     ofType(getAllColors),
     switchMap(() => this.colorService.getAllColors().pipe(
-      map((colors: IColor[]) => colorSuccess(colors ? { colors } : { colors: [] })),
+      map((colors: IColorAll[]) => colorSuccess(colors ? { colors } : { colors: [] })),
       catchError((err: HttpErrorResponse) => of(treatmentFailure({ error: err.error }))),
     )),
   ));
@@ -67,7 +67,7 @@ export class TreatmentEffects {
   findOne$ = createEffect(() => this.actions.pipe(
     ofType(getTreatmentGroup),
     switchMap(({ id, path }) => this.treatmentService.getTreatmentGroup(id).pipe(
-      map((selected?: ITreatmentGroup) => treatmentSelected({ selected, path })),
+      map((selected?: ITreatmentGroupAll) => treatmentSelected({ selected, path })),
       catchError((err: HttpErrorResponse) => of(treatmentFailure({ error: err.error }))),
     )),
   ));
@@ -145,7 +145,7 @@ export class TreatmentEffects {
 
   private requestSuccess(key: string, name?: string, id?: string, toastType?: ToastType) {
     const message = this.translate.instant(key, { name });
-    const path = id ? `treatments/${ id }/view` : undefined;
+    const path = id ? `treatments/${id}/view` : undefined;
     return success(treatmentSaveSuccess, message, path, undefined, toastType);
   }
 }

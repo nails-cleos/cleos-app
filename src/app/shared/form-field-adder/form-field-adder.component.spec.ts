@@ -1,28 +1,27 @@
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormFieldAdderComponent } from './form-field-adder.component';
-import { FormBuilder } from '@angular/forms';
 import { PaymentType } from '../../interfaces/payment';
-import { ICurrencyAll } from '../../interfaces/currency';
 import { TranslateModule } from '@ngx-translate/core';
 
 describe('FormFieldAdderComponent', () => {
   let component: FormFieldAdderComponent;
   let fixture: ComponentFixture<FormFieldAdderComponent>;
 
-  const currency = {
-    code: 'EUR',
-    name: 'EURO',
-  } as ICurrencyAll;
-
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [FormFieldAdderComponent, TranslateModule.forRoot()],
-      providers: [FormBuilder],
     }).compileComponents();
 
     fixture = TestBed.createComponent(FormFieldAdderComponent);
     component = fixture.componentInstance;
-    component.currency = currency;
+
+    // Provide required inputs
+    fixture.componentRef.setInput('allPaymentTypes', [PaymentType.cash, PaymentType.transfer]);
+    fixture.componentRef.setInput('key', 'test');
+    fixture.componentRef.setInput('currency', { code: 'EUR', icon: '€' });
+    fixture.componentRef.setInput('split', false);
+    fixture.componentRef.setInput('toPaid', 100);
+
     fixture.detectChanges();
   });
 
@@ -30,121 +29,76 @@ describe('FormFieldAdderComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize form and columns on ngOnInit', () => {
-    component.split = true;
-    component.ngOnInit();
-    expect(component.formGroup).toBeDefined();
-    expect(component.displayedColumns).toContain('paymentType');
-    expect(component.displayedColumns).toContain('actions');
+  it('should add a row', () => {
+    expect(component['formArray'].length).toBe(0);
+    component.addRow();
+    fixture.detectChanges();
+    expect(component['formArray'].length).toBe(1);
+
+    const row = component['formArray'].at(0).value;
+    expect(row.description).toBe('');
+    expect(row.price).toBe(0);
   });
 
-  it('should add a row and subscribe to value changes', fakeAsync(() => {
-    spyOn(component as any, 'emitRowChange');
-    component.split = true;
-    component.ngOnInit();
-
+  it('should delete a row', () => {
     component.addRow();
-
-    expect(component.dataSource.data.length).toBe(1);
-    const fg = component.getFormGroup(0);
-    fg.get('description')?.setValue('Test');
-    fg.get('price')?.setValue(100);
-    fg.get('paymentType')?.setValue(PaymentType.transfer);
-
-    tick(300);
-    expect(component['emitRowChange']).toHaveBeenCalled();
-    expect(component.total()).toBe(100);
-  }));
-
-  it('should delete a row and emit changes', () => {
-    component.split = false;
-    component.ngOnInit();
     component.addRow();
+    fixture.detectChanges();
 
-    expect(component.dataSource.data.length).toBe(1);
-
-    const spy = spyOn(component as any, 'emitRowChange');
+    expect(component['formArray'].length).toBe(2);
     component.deleteRow(0);
+    fixture.detectChanges();
 
-    expect(component.dataSource.data.length).toBe(0);
-    expect(spy).toHaveBeenCalled();
+    expect(component['formArray'].length).toBe(1);
   });
 
-  it('should calculate total correctly', fakeAsync(() => {
-    component.split = false;
-    component.ngOnInit();
+  it('should update extras on updateExtra', () => {
     component.addRow();
-    const fg = component.getFormGroup(0);
-    fg.get('price')?.setValue(50);
-
-    tick(300);
     fixture.detectChanges();
+
+    const group = component.getFormGroup(0);
+    group.controls.description.setValue('Test description');
+    group.controls.price.setValue(42);
+
+    component.updateExtra(0);
+
+    const extras = component.extras();
+    expect(extras.length).toBe(1);
+    expect(extras[0].description).toBe('Test description');
+    expect(extras[0].price).toBe(42);
+  });
+
+  it('should emit onChange and isValid', () => {
+    spyOn(component.onChange, 'emit');
+    spyOn(component.isValid, 'emit');
+
+    component.addRow();
+    fixture.detectChanges();
+
+    const group = component.getFormGroup(0);
+    group.controls.description.setValue('A');
+    group.controls.price.setValue(10);
+
+    component.updateExtra(0);
+    fixture.detectChanges();
+
+    expect(component.onChange.emit).toHaveBeenCalledWith(component.extras());
+    expect(component.isValid.emit).toHaveBeenCalledWith(true);
+  });
+
+  it('should calculate total correctly', () => {
+    component.addRow();
+    component.addRow();
+
+    const group1 = component.getFormGroup(0);
+    const group2 = component.getFormGroup(1);
+
+    group1.controls.price.setValue(30);
+    group2.controls.price.setValue(20);
+
+    component.updateExtra(0);
+    component.updateExtra(1);
+
     expect(component.total()).toBe(50);
-  }));
-
-  it('should calculate remainsToBeSplit correctly', fakeAsync(() => {
-    component.split = true;
-    component.toPaid = 200;
-    component.ngOnInit();
-
-    component.addRow();
-    const fg = component.getFormGroup(0);
-    fg.get('price')?.setValue(50);
-
-    tick(300);
-    fixture.detectChanges();
-    expect(component.remainsToBeSplit()).toBe(150);
-  }));
-
-  it('should calculate remainsToBeSplit correctly when toPaid is undefined', fakeAsync(() => {
-    component.split = true;
-    component.toPaid = undefined;
-    component.ngOnInit();
-
-    component.addRow();
-    const fg = component.getFormGroup(0);
-    fg.get('price')?.setValue(50);
-
-    tick(300);
-    fixture.detectChanges();
-    expect(component.remainsToBeSplit()).toBe(-50);
-  }));
-
-  it('should not calculate remainsToBeSplit if split is false', () => {
-    component.split = false;
-    component.toPaid = 200;
-    const result = component['remainsToBeSplit']();
-    expect(result).toBe(null);
   });
-
-  it('should emit onChange and isValid correctly', () => {
-    component.split = false;
-    component.ngOnInit();
-    component.addRow();
-
-    const onChangeSpy = spyOn(component.onChange, 'emit');
-    const isValidSpy = spyOn(component.isValid, 'emit');
-
-    component['emitRowChange']();
-    expect(onChangeSpy).not.toHaveBeenCalled();
-    expect(isValidSpy).toHaveBeenCalledWith(false);
-
-    const fg = component.getFormGroup(0);
-    fg.get('description')?.setValue('Test desc');
-    fg.get('price')?.setValue(100);
-
-    component['emitRowChange']();
-    expect(onChangeSpy).toHaveBeenCalledWith(component.dataSource.data);
-    expect(isValidSpy).toHaveBeenCalledWith(true);
-
-    component.split = true;
-    component.toPaid = 100;
-    component['emitRowChange']();
-    expect(isValidSpy).toHaveBeenCalledWith(true);
-
-    component.dataSource.data[0].price = 50;
-    component['emitRowChange']();
-    expect(isValidSpy).toHaveBeenCalledWith(false);
-  });
-
 });

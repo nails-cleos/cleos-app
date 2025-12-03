@@ -1,7 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
-import { IOverview, IUser } from '../interfaces/user';
+import { IOverview, IUser, IUserAll } from '../interfaces/user';
 import { Role } from '../interfaces/token';
 
 enum UserActionTypes {
@@ -24,6 +24,8 @@ enum UserActionTypes {
   getAllDisableUsers = '[User] Find all disable users',
   disableUsersSuccess = '[User] Disable users success',
   mergeUsers = '[User] Merge users',
+  setCurrentUserId = '[User] Set current user id',
+  setUserNavigationParams = '[User] Set user navigation params',
   clean = '[User] Clean'
 }
 
@@ -36,7 +38,7 @@ export const getAllCustomers = createAction(UserActionTypes.getAllCustomers);
 
 export const userSuccess = createAction(
   UserActionTypes.userSuccess,
-  props<{ data: Pagination<IUser> | IUser[] | IOverview }>(),
+  props<{ data: Pagination<IUserAll> | IUserAll[] | IOverview }>(),
 );
 
 export const userFailure = createAction(
@@ -46,12 +48,12 @@ export const userFailure = createAction(
 
 export const userSelected = createAction(
   UserActionTypes.userSelected,
-  props<{ selected?: IUser; profile?: boolean }>(),
+  props<{ selected?: IUserAll; profile?: boolean }>(),
 );
 
 export const getCustomerOverview = createAction(
   UserActionTypes.getCustomerOverview,
-  props<{ id: string | null }>(),
+  props<{ id: string }>(),
 );
 
 export const getUser = createAction(
@@ -105,7 +107,7 @@ export const getAllDisableUsers = createAction(UserActionTypes.getAllDisableUser
 
 export const disableUsersSuccess = createAction(
   UserActionTypes.disableUsersSuccess,
-  props<{ users: IUser[] }>(),
+  props<{ users: IUserAll[] }>(),
 );
 
 export const mergeUsers = createAction(
@@ -113,4 +115,14 @@ export const mergeUsers = createAction(
   props<{ oldUserId: string; newUserId: string }>(),
 );
 
-export const clean = createAction(UserActionTypes.clean);
+export const setCurrentUserId = createAction(
+  UserActionTypes.setCurrentUserId,
+  props<{ userId: string }>(),
+);
+
+export const setUserNavigationParams = createAction(
+  UserActionTypes.setUserNavigationParams,
+  props<{ role?: Role }>(),
+);
+
+export const cleanUser = createAction(UserActionTypes.clean);

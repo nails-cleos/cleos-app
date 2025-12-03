@@ -21,6 +21,7 @@ enum DiscountActionTypes {
   getDiscount = '[Discount] Find discount by id',
   getUserDiscountByCustomerId = '[Discount] Find user discount by customer id',
   deleteDiscount = '[Discount] Delete discount by id',
+  setCurrentDiscountId = '[Discount] Set current discount id',
   clean = '[Discount] Clean'
 }
 
@@ -103,6 +104,11 @@ export const deleteDiscount = createAction(
   props<{ id: string; name: string }>(),
 );
 
-export const clean = createAction(
+export const setCurrentDiscountId = createAction(
+  DiscountActionTypes.setCurrentDiscountId,
+  props<{ discountId: string }>(),
+);
+
+export const cleanDiscount = createAction(
   DiscountActionTypes.clean,
 );

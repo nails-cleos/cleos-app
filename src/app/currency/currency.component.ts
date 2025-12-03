@@ -1,131 +1,132 @@
-import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import {
-  AbstractControl,
-  UntypedFormBuilder,
-  UntypedFormControl,
-  UntypedFormGroup,
-  Validators,
-  ɵTypedOrUntyped,
-} from '@angular/forms';
-import { Observable, Subscription } from 'rxjs';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { NonNullableFormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { AppState, selectCurrencyState } from '../store/app.states';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Currency, ICurrency } from '../interfaces/currency';
-import { clean, createCurrency, getCurrency, updateCurrency } from '../store/currency.actions';
+import { createCurrency, getCurrency, updateCurrency } from '../store/currency.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { fieldChange } from '../util/validators';
 import { SharedModule } from '../shared/shared.module';
 import { BackButtonDirective } from '../directives/back-button.directive';
+import {
+  getCurrentCurrencyIdPipe,
+  getCurrencyResponsePipe,
+  getSelectedCurrencyPipe,
+  getSubErrorsPipe,
+} from '../store/selectors/currency.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { IError } from '../interfaces/common';
+import { CurrencyState } from '../store/reducers/currency.reducers';
+
+type CurrencyForm = {
+  code: FormControl<string>;
+  name: FormControl<string | undefined>;
+  icon: FormControl<string | undefined>;
+}
 
 @Component({
   selector: 'app-currency',
   templateUrl: './currency.component.html',
   styleUrls: ['./currency.component.scss'],
   imports: [SharedModule, BackButtonDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CurrencyComponent implements OnInit, OnDestroy {
-  @Input() currency?: ICurrency;
+export class CurrencyComponent {
+  private readonly store: Store<CurrencyState> = inject(Store<CurrencyState>);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly router: Router = inject(Router);
+  private readonly translate: TranslateService = inject(TranslateService);
 
-  id?: string;
-  isAddMode: boolean;
-  form!: UntypedFormGroup;
+  private currencyId$ = this.store.pipe(getCurrentCurrencyIdPipe);
+  private selectedCurrency$ = this.store.pipe(getSelectedCurrencyPipe);
+  private subErrors$ = this.store.pipe(getSubErrorsPipe);
+  private response$ = this.store.pipe(getCurrencyResponsePipe);
 
-  errors: any = [];
+  private currencyIdSignal = toSignal(this.currencyId$);
+  private selectedCurrencySignal = toSignal(this.selectedCurrency$);
+  private subErrorsSignal = toSignal(this.subErrors$);
+  private responseSignal = toSignal(this.response$);
+
+  private currencyId = computed(() => this.currencyIdSignal());
+
+  currencySignal = computed(() => this.selectedCurrencySignal());
+
+  isAddModeSignal = computed(() => !this.currencyId());
+  errors = signal<Record<string, unknown>>({});
+
+  form: FormGroup<CurrencyForm> = this.formBuilder.group<CurrencyForm>({
+    code: this.formBuilder.control('', {
+      validators: [Validators.required],
+    }),
+    name: this.formBuilder.control(undefined),
+    icon: this.formBuilder.control(undefined),
+  });
+
   icons = ['attach_money', 'euro', 'currency_pound'];
+  private readonly language: string = this.translate.currentLang;
 
-  private getState: Observable<any>;
-  private subscription: Subscription | undefined;
-  private readonly language: string;
+  constructor() {
+    effect(() => {
+      const selected = this.selectedCurrencySignal();
+      if (selected?.id) {
+        this.form.patchValue(selected);
+      }
+    });
 
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>,
-              private formBuilder: UntypedFormBuilder, private router: Router, private route: ActivatedRoute,
-              private cdRef: ChangeDetectorRef) {
-    this.isAddMode = true;
-    this.getState = this.store.select(selectCurrencyState);
-    this.language = this.translate.currentLang;
+
+    effect(() => {
+      const subErrors = this.subErrorsSignal();
+      if (subErrors) {
+        const errorMap: Record<string, unknown> = {};
+        subErrors.forEach((error: IError) => {
+          const field = error.field as keyof CurrencyForm | undefined;
+
+          if (field && field in this.form.controls) {
+            errorMap[field] = error.message;
+            this.form.controls[field].setErrors({ incorrect: true });
+          }
+        });
+        this.errors.set(errorMap);
+      }
+    });
+
+    effect(() => {
+      if (this.responseSignal()) {
+        this.router.navigate([this.language, 'currency']);
+      }
+    });
+
+    effect(() => {
+      const id = this.currencyId();
+      if (id) {
+        this.store.dispatch(getCurrency({ id }));
+      }
+    });
   }
 
-  get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
+  get getForm(): CurrencyForm {
     return this.form.controls;
   }
 
-  get submit(): void {
+  submit(): void {
     if (this.form.invalid) {
       return;
     }
 
+    const currencySignal = this.currencySignal();
     const currency: ICurrency = new Currency();
-    currency.code = fieldChange(this.getForm.code as UntypedFormControl, this.currency?.code);
-    currency.name = fieldChange(this.getForm.name as UntypedFormControl, this.currency?.name);
-    currency.icon = fieldChange(this.getForm.icon as UntypedFormControl, this.currency?.icon);
+    currency.code = fieldChange(this.getForm.code, currencySignal?.code);
+    currency.name = fieldChange(this.getForm.name, currencySignal?.name);
+    currency.icon = fieldChange(this.getForm.icon, currencySignal?.icon);
 
-    if (this.isAddMode) {
+    if (this.isAddModeSignal()) {
       this.store.dispatch(
         createCurrency({ currency }),
       );
     } else {
-      this.currency = undefined;
-      const id = this.id!;
+      const id = this.currencyId()!;
       this.store.dispatch(updateCurrency({ id, currency }));
     }
     return;
   }
-
-  ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.id = id;
-    }
-    this.clean();
-    this.createForm();
-    this.subscribe();
-    this.isAddMode = !this.id;
-    if (!this.isAddMode) {
-      this.getCurrency();
-    }
-    this.cdRef.detectChanges();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  private createForm = (): void => {
-    this.form = this.formBuilder.group({
-      name: [''],
-      code: ['', [Validators.required]],
-      icon: [''],
-    });
-  };
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private getCurrency = (): void => {
-    if (!this.currency) {
-      this.store.dispatch(getCurrency({ id: this.id! }));
-    }
-  };
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.selected) {
-        this.currency = {
-          id: state.selected.id,
-          name: state.selected.name,
-          icon: state.selected.icon,
-          code: state.selected.code,
-        } as ICurrency;
-        this.form.patchValue(this.currency);
-      }
-      if (state.subErrors) {
-        state.subErrors.forEach((value: any) => {
-          this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({ incorrect: true });
-        });
-      } else if (state.response) {
-        this.router.navigate([this.language, 'currency']);
-      }
-    });
-  };
 }

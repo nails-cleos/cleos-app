@@ -1,20 +1,20 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import { ITreatment, ITreatmentGroup } from '../../interfaces/treatment';
-import { Observable, Subscription } from 'rxjs';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { ITreatmentGroup, ITreatmentGroupAll } from '../../interfaces/treatment';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { AppState, selectTreatmentState } from '../../store/app.states';
 import { Store } from '@ngrx/store';
-import { clean, deleteTreatmentGroup, getTreatmentsPage } from '../../store/treatment.actions';
+import { cleanTreatment, deleteTreatmentGroup, getTreatmentsPage } from '../../store/treatment.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
 import { SharedModule } from '../../shared/shared.module';
 import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
+import { TreatmentState } from '../../store/reducers/treatment.reducers';
+import { getTreatmentResponsePipe, getTreatmentPaginationPipe } from '../../store/selectors/treatment.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-treatments',
@@ -22,55 +22,82 @@ import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
   styleUrls: ['./treatments.component.scss'],
   animations: [detailExpandAnimation],
   imports: [SharedModule, CurrencySymbolPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+export class TreatmentsComponent {
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly store: Store<TreatmentState> = inject(Store<TreatmentState>);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly dialog: MatDialog = inject(MatDialog);
+
+  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private treatmentList$ = this.store.pipe(getTreatmentPaginationPipe);
+  private response$ = this.store.pipe(getTreatmentResponsePipe);
+
+  private paginator = viewChild(MatPaginator);
+  private sort = viewChild(MatSort);
+
+  private treatmentListSignal = toSignal(this.treatmentList$);
+  private responseSignal = toSignal(this.response$);
+  private breakpointsSignal = toSignal(
+    this.breakpointObserver$, {
+      initialValue: {
+        matches: false,
+        breakpoints: {
+          [Breakpoints.XSmall]: false,
+          [Breakpoints.Small]: false,
+        },
+      },
+    },
+  );
+
+  private sortActive = computed(() => this.sort()?.active ?? 'order');
+  private sortDirection = computed(() => this.sort()?.direction ?? 'asc');
+
+  paginatorPageIndex = signal(0);
+  dataSourceSignal = computed(() => this.treatmentListSignal()?.content);
+  resultsLengthSignal = computed(() => this.treatmentListSignal()?.totalElements || 0);
+  pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
   displayedColumns: string[] = ['order', 'name', 'priceFrom', 'actions'];
-  dataSource: any = new MatTableDataSource<Pagination<ITreatmentGroup>>();
-
-  resultsLength = DEFAULT_LENGTH;
-  pageSize = PAGE_SIZE;
 
   expanded?: ITreatmentGroup;
-  dateFormat: string;
-  language: string;
 
-  private subscription?: Subscription;
-  private paginatorSubscription?: Subscription;
-  private getState: Observable<any>;
+  dateFormat: string = this.translate.currentLang;
+  language: string = this.translate.currentLang;
 
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-    private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small,
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.pageSize = MOBILE_PAGE_SIZE;
+  constructor() {
+    effect((onCleanup) => {
+      const paginator = this.paginator();
+      if (paginator) {
+        const sub = paginator.page.subscribe((pageEvent) => {
+          this.paginatorPageIndex.set(pageEvent.pageIndex);
+        });
+        onCleanup(() => sub.unsubscribe());
       }
     });
-    this.dateFormat = this.translate.currentLang;
-    this.language = this.translate.currentLang;
-    this.getState = this.store.select(selectTreatmentState);
+
+    effect(() => {
+      const page = this.paginatorPageIndex();
+      this.store.dispatch(
+        getTreatmentsPage({
+          page: page,
+          sort: this.sortActive(),
+          direction: this.sortDirection(),
+          size: this.pageSizeSignal(),
+        }),
+      );
+    });
+
+    effect(() => {
+      if (this.responseSignal()) {
+        this.store.dispatch(cleanTreatment());
+        this.paginator()?.firstPage();
+      }
+    });
   }
 
-  ngAfterViewInit(): void {
-    this.getTreatments();
-  }
-
-  ngOnInit(): void {
-    this.clean();
-    this.subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.paginatorSubscription?.unsubscribe();
-  }
-
-  delete = (treatment: ITreatment): void => {
+  delete = (treatment: ITreatmentGroupAll): void => {
     const title = this.translate.instant('TREATMENT.DELETED.TITLE');
     const content = this.translate.instant('TREATMENT.DELETED.CONTENT', { name: treatment.name });
     const dialogRef = this.dialog.open(DialogComponent, {
@@ -80,41 +107,6 @@ export class TreatmentsComponent implements OnInit, AfterViewInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.store.dispatch(deleteTreatmentGroup({ id: result.id, name: result.name }));
-      }
-    });
-  };
-
-  private createPageSubscriptions = (): void => {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getTreatments();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getTreatments(this.paginator.pageIndex));
-
-    this.cdRef.detectChanges();
-  };
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private getTreatments = (page: number = 0): void => this.store.dispatch(
-    getTreatmentsPage({
-      page: page,
-      sort: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-    }),
-  );
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.response) {
-        this.clean();
-        this.getTreatments();
-      }
-      this.dataSource = state.data?.content;
-      this.resultsLength = state.data?.totalElements;
-      if (!this.paginatorSubscription && this.resultsLength) {
-        this.createPageSubscriptions();
       }
     });
   };

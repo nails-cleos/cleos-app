@@ -1,25 +1,56 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Store } from '@ngrx/store';
-import { Subject } from 'rxjs';
-import { clean, getAllTreatmentsGroup, sortGroupTreatment } from '../../store/treatment.actions';
-import { ITreatmentGroupAll } from '../../interfaces/treatment';
 import { TreatmentGroupSortingComponent } from './treatment-group-sorting.component';
+import { Store } from '@ngrx/store';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { ITreatmentGroupAll } from '../../interfaces/treatment';
+import { ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
 import { TranslateModule } from '@ngx-translate/core';
-import { ISorted } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
+import { TreatmentState } from '../../store/reducers/treatment.reducers';
+import { getAllTreatmentsGroup, sortGroupTreatment } from '../../store/treatment.actions';
 
 describe('TreatmentGroupSortingComponent', () => {
   let component: TreatmentGroupSortingComponent;
   let fixture: ComponentFixture<TreatmentGroupSortingComponent>;
 
-  let state$: Subject<any>;
+  let treatmentGroupList$: Subject<ITreatmentGroupAll[]>;
+  let response$: Subject<any>;
 
-  let storeSpy: jasmine.SpyObj<Store<any>>;
+  let storeSpy: jasmine.SpyObj<Store<TreatmentState>>;
+
+  const mockTreatmentGroupList: ITreatmentGroupAll[] = [
+    {
+      id: '1',
+      name: 'TreatmentGroup 1',
+      description: '1 treatmentGroup',
+      order: 1,
+    },
+    {
+      id: '2',
+      name: 'TreatmentGroup 2',
+      description: '2 treatmentGroup',
+      order: 2,
+    },
+  ];
 
   beforeEach(async () => {
-    state$ = new Subject();
+    treatmentGroupList$ = new Subject<ITreatmentGroupAll[]>();
+    response$ = new Subject<any>();
 
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    storeSpy.select.and.returnValue(state$.asObservable());
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+
+    // Define order of .pipe() calls
+    let pipeCallIndex = 0;
+    storeSpy.pipe.and.callFake(() => {
+      pipeCallIndex++;
+      switch (pipeCallIndex) {
+        case 1:
+          return treatmentGroupList$.asObservable();
+        case 2:
+          return response$.asObservable();
+        default:
+          return new BehaviorSubject(undefined).asObservable();
+      }
+    });
 
     await TestBed.configureTestingModule({
       imports: [TreatmentGroupSortingComponent, TranslateModule.forRoot()],
@@ -28,55 +59,47 @@ describe('TreatmentGroupSortingComponent', () => {
 
     fixture = TestBed.createComponent(TreatmentGroupSortingComponent);
     component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
-  afterEach(() => state$.complete());
+  afterEach(() => {
+    treatmentGroupList$.complete();
+    response$.complete();
+  });
 
   it('should create', () => {
-    fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 
-  it('should dispatch Clean and GetAllTreatmentsGroup on init', () => {
+  it('should compute itemsSignal from treatmentGroupListSignal', () => {
+    treatmentGroupList$.next(mockTreatmentGroupList);
     fixture.detectChanges();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllTreatmentsGroup());
+
+    const result = component.itemsSignal();
+
+    expect(result).toEqual([
+      new ItemSorting('1', 'TreatmentGroup 1', 1),
+      new ItemSorting('2', 'TreatmentGroup 2', 2),
+    ]);
   });
 
-  it('should dispatch SortGroupTreatment when sorted() is called', () => {
-    const groups: ISorted[] = [{ key: '1', order: 1 }];
-    component.sorted(groups);
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(sortGroupTreatment({ groups }));
-  });
-
-  it('should update items when state emits data', () => {
-    fixture.detectChanges();
-    const mockGroups: ITreatmentGroupAll[] = [
-      { id: '1', name: 'Group 1', order: 2 },
-      { id: '2', name: 'Group 2', order: 1 },
+  it('should dispatch sortTreatmentGroup when sorted() is called', () => {
+    const sorted = [
+      { order: 1, key: 'key1' },
+      { order: 2, key: 'key2' },
     ];
 
-    state$.next({ data: mockGroups });
-    fixture.detectChanges();
+    component.sorted(sorted);
 
-    expect(component.items?.length).toBe(2);
-    expect(component.items?.[0].key).toBe('1');
-    expect(component.items?.[1].key).toBe('2');
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(sortGroupTreatment({ groups: sorted }));
   });
 
-  it('should clean and get treatments again if response is true', () => {
-    fixture.detectChanges();
-    state$.next({ response: true, data: [] });
+  it('should dispatch getTreatmentGroupList when responseSignal emits', () => {
+    storeSpy.dispatch.calls.reset();
+
+    response$.next({ success: true });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllTreatmentsGroup());
-  });
-
-  it('should unsubscribe on destroy', () => {
-    fixture.detectChanges();
-    const spyUnsub = spyOn((component as any).subscription, 'unsubscribe');
-    component.ngOnDestroy();
-    expect(spyUnsub).toHaveBeenCalled();
   });
 });

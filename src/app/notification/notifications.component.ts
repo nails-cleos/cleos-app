@@ -1,7 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AppState, selectNotificationState } from '../store/app.states';
-import { Observable, Subscription } from 'rxjs';
 import { INotification } from '../interfaces/notification';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -10,8 +8,11 @@ import { zoneDateToDate } from '../util/dates';
 import { addRemoveItemList, insertItemList } from '../util/animation';
 import { SharedModule } from '../shared/shared.module';
 import { MatRipple } from '@angular/material/core';
-import { clean, deleteNotification, getNotificationsPage, readNotification } from '../store/notification.actions';
+import { deleteNotification, getNotificationsPage, readNotification } from '../store/notification.actions';
 import { PAGE_SIZE } from '../interfaces/pagination';
+import { getNotificationsPipe } from '../store/selectors/notification.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { NotificationState } from '../store/reducers/notification.reducers';
 
 @Component({
   selector: 'app-notifications',
@@ -19,33 +20,50 @@ import { PAGE_SIZE } from '../interfaces/pagination';
   styleUrls: ['./notifications.component.scss'],
   animations: [insertItemList, addRemoveItemList],
   imports: [SharedModule, MatRipple],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NotificationsComponent implements OnInit, OnDestroy {
-  notifications: INotification[] = [];
-  dateFormat: string;
+export class NotificationsComponent {
+  private readonly router: Router = inject(Router);
+  private readonly store: Store<NotificationState> = inject(Store<NotificationState>);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
+
+  private notifications$ = this.store.pipe(getNotificationsPipe);
+
+  private notificationsSignal = toSignal(this.notifications$);
+
+  notifications = signal<INotification[]>([]);
+  dateFormat: string = this.translate.currentLang;
   showMore = false;
-  loadingNotifications?: [];
+  loadingNotifications?: Array<INotification>;
   badge = 0;
 
-  private getState: Observable<any>;
-  private subscription?: Subscription;
-  private page: number;
+  private page = signal(0);
 
-  constructor(private router: Router, private store: Store<AppState>, private translate: TranslateService,
-    private navigationService: NavigationService) {
-    this.dateFormat = this.translate.currentLang;
-    this.getState = this.store.select(selectNotificationState);
-    this.page = -1;
-  }
+  constructor() {
+    effect(() => {
+      const page = this.page();
+      this.store.dispatch(getNotificationsPage({ page: page, sort: 'date', direction: 'desc', size: PAGE_SIZE }));
+    });
 
-  ngOnInit(): void {
-    this.clean();
-    this.subscribe();
-    this.getNotifications();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+    effect(() => {
+      const notifications = this.notificationsSignal();
+      if (notifications) {
+        if (notifications.page?.content?.length) {
+          if (notifications.page?.content[0]?.id) {
+            this.loadingNotifications = undefined;
+            this.notifications.update(currents => currents.concat(notifications.page.content
+              .map((not: any) => Object.assign({}, not, { date: zoneDateToDate(not.date) }))));
+            this.showMore = !notifications.page.last;
+            this.badge = notifications.unread;
+          } else {
+            this.loadingNotifications = notifications.page.content;
+          }
+        } else {
+          this.loadingNotifications = undefined;
+        }
+      }
+    });
   }
 
   notification = (notification: INotification): void => {
@@ -57,46 +75,36 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     }
   };
 
-  getNotifications = (): void => this.store.dispatch(
-    getNotificationsPage({ page: ++this.page, sort: 'date', direction: 'desc', size: PAGE_SIZE }),
-  );
+  getMoreNotifications = () => {
+    this.page.update((n) => n + 1);
+  };
 
   remove = (index: number): void => {
-    if (!this.notifications.length) {
+    if (!this.notifications().length) {
       return;
     }
-    const notification = this.notifications.splice(index, 1)[0];
-    this.store.dispatch(deleteNotification({ notification: Object.assign({}, notification, { deleted: true }) }));
-    if (!notification.read) {
-      --this.badge;
-    }
-    if (this.notifications.length === 0 && this.showMore) {
-      this.page = -1;
-      this.getNotifications();
-    }
-  };
 
-  private clean = (): void => this.store.dispatch(clean());
+    this.notifications.update(currents => {
+      const updated = [...currents];
+      const notification = updated[index];
 
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.data) {
-        if (state.data.page?.content?.length) {
-          if (state.data.page?.content[0]?.id) {
-            this.loadingNotifications = undefined;
-            if (!state.dataDeleted) {
-              this.notifications = this.notifications.concat(state.data.page.content
-                .map((not: any) => Object.assign({}, not, { date: zoneDateToDate(not.date) })));
-              this.showMore = !state.data.page.last;
-              this.badge = state.data.unread;
-            }
-          } else {
-            this.loadingNotifications = state.data.page.content;
-          }
-        } else {
-          this.loadingNotifications = undefined;
+      if (notification) {
+        updated[index] = { ...notification, deleted: true };
+        this.store.dispatch(deleteNotification({ notification: updated[index] }));
+
+        if (!notification.read) {
+          --this.badge;
+        }
+
+        const visibleNotifications = updated.filter(n => !n.deleted);
+        if (visibleNotifications.length === 0 && this.showMore) {
+          this.page.set(0);
+          this.getMoreNotifications();
         }
       }
+
+      return updated;
     });
   };
+
 }

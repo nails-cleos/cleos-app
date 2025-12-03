@@ -1,270 +1,99 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
-import { AppMaterialModule } from '../../util/app-material.module';
+import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { Subject } from 'rxjs';
-import { getColorsByTreatmentId } from '../../store/reservation.actions';
 import { ChangeColorDialogComponent } from './change-color-dialog.component';
 import { IColorAll } from '../../interfaces/color';
+import { ReservationState } from '../../store/reducers/reservation.reducers';
+import { getColorsByTreatmentId } from '../../store/reservation.actions';
 
 describe('ChangeColorDialogComponent', () => {
   let component: ChangeColorDialogComponent;
   let fixture: ComponentFixture<ChangeColorDialogComponent>;
-  let state$: Subject<any>;
 
-  let mockDialogRef: jasmine.SpyObj<MatDialogRef<ChangeColorDialogComponent>>;
-  let storeSpy: jasmine.SpyObj<Store>;
+  let colors$: BehaviorSubject<IColorAll[] | undefined>;
 
-  const mockData = {
-    treatmentId: 'treatment-id',
+  let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
+  let dialogRefSpy: jasmine.SpyObj<MatDialogRef<ChangeColorDialogComponent>>;
+
+  const mockChangeColor = {
+    treatmentId: 'treatment1',
+    small: true,
   };
 
-  beforeEach(async () => {
-    state$ = new Subject();
-    mockDialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+  const mockColors: IColorAll[] = [
+    { id: '1', name: 'Green' },
+    { id: '2', name: 'Blue' },
+  ];
 
-    storeSpy.select.and.returnValue(state$.asObservable());
+  beforeEach(async () => {
+    colors$ = new BehaviorSubject<IColorAll[] | undefined>(undefined);
+
+    dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    storeSpy.pipe.and.returnValue(colors$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [ChangeColorDialogComponent, TranslateModule.forRoot(), AppMaterialModule],
+      imports: [ChangeColorDialogComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: MatDialogRef, useValue: mockDialogRef },
-        { provide: MAT_DIALOG_DATA, useValue: { ...mockData } },
+        {
+          provide: MAT_DIALOG_DATA,
+          useFactory: () => (mockChangeColor),
+        },
+        { provide: MatDialogRef, useValue: dialogRefSpy },
         { provide: Store, useValue: storeSpy },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ChangeColorDialogComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
-  afterEach(() => state$.complete());
+  afterEach(() => colors$.complete());
 
-  it('should create', () => {
+  it('should create component', () => {
+    fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 
-  it('should have data injected', () => {
-    expect(component.data).toEqual(mockData);
+  it('should dispatch clean and getAllColors on init', () => {
+    fixture.detectChanges();
+    expect(storeSpy.dispatch)
+      .toHaveBeenCalledWith(getColorsByTreatmentId({ treatmentId: mockChangeColor.treatmentId }));
   });
 
-  it('onNoClick should close the dialog', () => {
-    void component.onNoClick;
-    expect(mockDialogRef.close).toHaveBeenCalled();
-  });
-
-  it('doAction should close the dialog', () => {
-    const colorId = '123';
-    component.colorForm.get('color')?.setValue({ id: colorId, name: 'Blue' } as IColorAll);
-
-    void component.doAction;
-    expect(mockDialogRef.close).toHaveBeenCalledWith({ colorId });
-  });
-
-  it('should render the dialog title', () => {
-    const compiled = fixture.nativeElement;
-    const titleElement = compiled.querySelector('h1[mat-dialog-title]');
-    expect(titleElement.textContent).toBe('RESERVATION.TREATMENT.COLOR.CHANGE');
-  });
-
-  it('should show both buttons when both hideNoButton and hideOkButton are false', () => {
-    const compiled = fixture.nativeElement;
-    const buttons = compiled.querySelectorAll('button');
-    expect(buttons.length).toBe(2);
-  });
-
-  it('should pass correct value to mat-dialog-close directive', () => {
-    const testValue = 'test-value';
-    component.data.treatmentId = testValue;
+  it('should update colorsWritableSignal when store emits', () => {
+    colors$.next(mockColors);
     fixture.detectChanges();
 
-    // The Yes button should have the mat-dialog-close directive with the correct treatmentId
-    // This is tested through the component's data binding
-    expect(component.data.treatmentId).toBe(testValue);
+    expect(component.colorsSignal()).toEqual(mockColors);
   });
 
-  it('should call dialogRef.close when No button is clicked', () => {
-    const compiled = fixture.nativeElement;
-    const buttons = Array.from(compiled.querySelectorAll('button')) as HTMLButtonElement[];
-    const noButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.CANCEL'));
-    expect(noButton).toBeTruthy();
-    noButton?.click();
-
-    expect(mockDialogRef.close).toHaveBeenCalled();
+  it('should filter customers', () => {
+    const result = component['filterColor']('Blue', mockColors);
+    expect(result!.length).toBe(1);
+    expect(result![0].name).toBe('Blue');
   });
 
-  it('should display translated button texts', () => {
-    const compiled = fixture.nativeElement;
-    const buttons = Array.from(compiled.querySelectorAll('button')) as HTMLButtonElement[];
+  it('should close dialog with selected customers', () => {
+    component.getForm.color.setValue(mockColors[0]);
 
-    const noButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.CANCEL'));
-    const yesButton = buttons.find(btn => btn.textContent?.includes('RESERVATION.TREATMENT.COLOR.UPDATE'));
+    component.doAction();
 
-    expect(noButton?.textContent?.trim()).toContain('COMMON.BUTTON.CANCEL');
-    expect(yesButton?.textContent?.trim()).toContain('RESERVATION.TREATMENT.COLOR.UPDATE');
+    expect(dialogRefSpy.close).toHaveBeenCalledWith({ colorId: mockColors[0].id });
   });
 
-  it('should initialize form with empty values', () => {
-    component.ngOnInit();
-
-    expect(component.colorForm.get('color')?.value).toBe('');
-  });
-
-  it('should validate form correctly', () => {
-    component.ngOnInit();
-
-    expect(component.colorForm.invalid).toBeTrue();
-
-    component.colorForm.get('color')?.setValue({ id: '1', name: 'Red' } as IColorAll);
-    expect(component.colorForm.valid).toBeTrue();
-  });
-
-  it('should handle state subscription correctly', () => {
-    component.ngOnInit();
-
-    expect(storeSpy.select).toHaveBeenCalled();
-  });
-
-  it('should update color list when state changes', () => {
-    const mockColors: IColorAll[] = [
-      { id: '1', name: 'Red' },
-      { id: '2', name: 'Blue' },
-      { id: '3', name: 'Green' },
-    ];
-
-    state$.next({
-      colors: mockColors,
-    });
-
-    expect(component.colors).toEqual(mockColors);
-  });
-
-  it('should dispatch GetColor action when getColors is called', () => {
-    storeSpy.dispatch.calls.reset();
-
-    component['getColors']();
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getColorsByTreatmentId({ treatmentId: mockData.treatmentId }));
-  });
-
-  it('should filter colors correctly when filterColor is called', () => {
-    component.colors = [
-      { id: '1', name: 'Red' },
-      { id: '2', name: 'Blue' },
-      { id: '3', name: 'Green' },
-    ] as IColorAll[];
-
-    const result = component['filterColor']('Red');
-
-    expect(result?.length).toBe(1);
-    expect(result?.[0].name).toBe('Red');
-  });
-
-  it('should return undefined when filterColor is called with no colors', () => {
-    component.colors = undefined;
-    fixture.detectChanges();
-
-    const result = component['filterColor']('Gray');
-
-    expect(result).toBeUndefined();
-  });
-
-  it('should filter color options based on form input', (done) => {
-    component.colors = [
-      { name: 'Test Color 1', id: '1' },
-      { name: 'Another Color', id: '2' },
-      { name: 'Test Color 2', id: '3' },
-    ] as any[];
-    component['createForm']();
-
-    let emissionCount = 0;
-    component.filteredColor?.subscribe(filtered => {
-      emissionCount++;
-      // Skip the first emission (startWith('')) and check the second emission with 'T'
-      if (emissionCount === 2) {
-        expect(filtered).toEqual([
-          { name: 'Test Color 1', id: '1' },
-          { name: 'Test Color 2', id: '3' },
-        ]);
-        done();
-      }
-    });
-
-    component.colorForm.get('color')?.setValue('T');
-  });
-
-  it('should filter color options based on color form input', (done) => {
-    component.colors = [
-      { name: 'Test Color 1', id: '1' },
-      { name: 'Another Color', id: '2' },
-      { name: 'Test Color 2', id: '3' },
-    ] as any[];
-    component['createForm']();
-
-    let emissionCount = 0;
-    component.filteredColor?.subscribe(filtered => {
-      emissionCount++;
-      // Skip the first emission (startWith('')) and check the second emission with 'T'
-      if (emissionCount === 2) {
-        expect(filtered).toEqual([
-          { name: 'Another Color', id: '2' },
-        ]);
-        done();
-      }
-    });
-
-    component.colorForm.get('color')?.setValue({ name: 'Another Color', id: '2' });
-  });
-
-  it('should return the color when filter is empty string', (done) => {
-    const colors = [
-      { name: 'Test Color 1', id: '1' },
-      { name: 'Another Color', id: '2' },
-      { name: 'Test Color 2', id: '3' },
-    ] as IColorAll[];
-    component.colors = colors;
-    component['createForm']();
-
-    component.colorForm.get('color')?.setValue('');
-
-    component.filteredColor?.subscribe(filtered => {
-      expect(filtered).toEqual(colors);
-      done();
-    });
+  it('should close dialog on cancel', () => {
+    component.onNoClick();
+    expect(dialogRefSpy.close).toHaveBeenCalled();
   });
 
   it('should clear color form control when keyDownHandler is called with Backspace', () => {
-    component.ngOnInit();
-    component.colorForm.get('color')?.setValue('test value');
+    component.getForm.color.setValue(mockColors[0]);
 
-    component.keyDownHandler({ code: 'Backspace' });
+    component.keyDownHandler({ code: 'Backspace' } as KeyboardEvent);
 
-    expect(component.colorForm.get('color')?.value).toBe('');
-  });
-
-  it('should not clear color form control when keyDownHandler is called with other key', () => {
-    component.ngOnInit();
-    component.colorForm.get('color')?.setValue('test value');
-
-    component.keyDownHandler({ code: 'Enter' });
-
-    expect(component.colorForm.get('color')?.value).toBe('test value');
-  });
-
-  it('should return color name when displayFnColor is called with color', () => {
-    const color = { name: 'Blue', id: '1' } as IColorAll;
-
-    const result = component.displayFnColor(color);
-
-    expect(result).toBe(color.name);
-  });
-
-  it('should return empty string when displayFnColor is called with null', () => {
-    const result = component.displayFnColor(null as any);
-
-    expect(result).toBe('');
+    expect(component.getForm.color.value).toBe(undefined);
   });
 });

@@ -1,8 +1,8 @@
-@if (price) {
+@if (price(); as price) {
   @if (price.total || price.total === 0) {
     <mat-list-item>
-      <mat-icon style="margin-top: 32px" matListItemIcon>{{ currencyIcon }}</mat-icon>
-      <div matListItemTitle [innerHTML]="label | translate"></div>
+      <mat-icon style="margin-top: 32px" matListItemIcon>{{ currencyIcon() }}</mat-icon>
+      <div matListItemTitle [innerHTML]="label() | translate"></div>
       @if (price.total !== price.totalWithoutDiscount) {
         @if (!isEditing) {
           <div matListItemLine>
@@ -12,7 +12,7 @@
         } @else {
           <div matListItemLine>
             <span>{{ price.total | number:'1.2-2' }}</span>
-            @if (discountKey) {
+            @if (discountKey(); as discountKey) {
               <span class="raised-button bold">{{ discountKey | translate }}</span>
             }
           </div>
@@ -23,11 +23,12 @@
     </mat-list-item>
   }
   @if (!price.isPaid && (price.balance || price.totalPaid)) {
+    @let currentCurrencyIcon = currencyIcon();
     @if (price.totalPaid) {
       <mat-list-item>
         <div matListItemTitle [innerHTML]="'COMMON.PAYMENT.OPTIONS.PAID' | translate: {
                          amount: price.totalPaid | number:'1.2-2',
-                         symbol: currencyIcon | currencySymbol
+                         symbol: currentCurrencyIcon | currencySymbol
                          }">
         </div>
       </mat-list-item>
@@ -36,7 +37,7 @@
       <mat-list-item>
         <div matListItemTitle [innerHTML]="'COMMON.PAYMENT.OPTIONS.ACCOUNT' | translate: {
                          amount: price.balance | number:'1.2-2',
-                         symbol: currencyIcon | currencySymbol
+                         symbol: currentCurrencyIcon | currencySymbol
                          }">
         </div>
       </mat-list-item>
@@ -44,7 +45,7 @@
     <mat-list-item>
       <div matListItemTitle [innerHTML]="'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate: {
                          amount: price.toPaid | number:'1.2-2',
-                         symbol: currencyIcon | currencySymbol
+                         symbol: currentCurrencyIcon | currencySymbol
                          }">
       </div>
     </mat-list-item>

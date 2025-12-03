@@ -1,6 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 import { ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
-import { ITreatmentGroup } from '../interfaces/treatment';
+import { ITreatmentGroupAll } from '../interfaces/treatment';
 import { IError, IResponseSuccess } from '../interfaces/common';
 
 enum CatalogueActionTypes {
@@ -17,8 +17,14 @@ enum CatalogueActionTypes {
   deleteCatalogue = '[Catalogue] Delete catalogue by id',
   getAllTreatmentsGroup = '[Catalogue] Get all treatments group',
   findGroupsSuccess = '[Catalogue] Find treatment groups success',
+  setCurrentCatalogueId = '[Catalogue] Set current catalogue id',
   clean = '[Catalogue] Clean'
 }
+
+export const setCurrentCatalogueId = createAction(
+  CatalogueActionTypes.setCurrentCatalogueId,
+  props<{ catalogueId: string }>(),
+);
 
 export const getAllCatalogues = createAction(CatalogueActionTypes.getAllCatalogues);
 
@@ -26,7 +32,7 @@ export const getAllCatalogs = createAction(CatalogueActionTypes.getAllCatalogs);
 
 export const catalogueSuccess = createAction(
   CatalogueActionTypes.catalogueSuccess,
-  props<{ data: ICatalogue[] }>(),
+  props<{ data: ICatalogueAll[] }>(),
 );
 
 export const catalogueSaveSuccess = createAction(
@@ -46,7 +52,7 @@ export const createCatalogue = createAction(
 
 export const updateCatalogue = createAction(
   CatalogueActionTypes.updateCatalogue,
-  props<{ catalogue: ICatalogue; resizedImageDataUrl: string }>(),
+  props<{ id: string, catalogue: ICatalogue; resizedImageDataUrl: string }>(),
 );
 
 export const updateCatalogueOrder = createAction(
@@ -56,7 +62,7 @@ export const updateCatalogueOrder = createAction(
 
 export const catalogueSelected = createAction(
   CatalogueActionTypes.catalogueSelected,
-  props<{ selected?: ICatalogue }>(),
+  props<{ selected?: ICatalogueAll }>(),
 );
 
 export const getCatalogue = createAction(
@@ -73,7 +79,7 @@ export const getAllTreatmentsGroup = createAction(CatalogueActionTypes.getAllTre
 
 export const findGroupsSuccess = createAction(
   CatalogueActionTypes.findGroupsSuccess,
-  props<{ groups: ITreatmentGroup[] }>(),
+  props<{ groups: ITreatmentGroupAll[] }>(),
 );
 
-export const clean = createAction(CatalogueActionTypes.clean);
+export const cleanCatalogue = createAction(CatalogueActionTypes.clean);

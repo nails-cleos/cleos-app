@@ -1,6 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import {
-  clean,
+  cleanExpense,
   createExpense,
   deleteExpense,
   expenseFailure,
@@ -11,31 +11,36 @@ import {
   getAllExpensesInfo,
   getExpense,
   getExpensesPage,
+  setCurrentExpenseId,
   updateExpense,
 } from '../expense.actions';
 import { Pagination } from '../../interfaces/pagination';
-import { IExpense, IExpenseInfo } from '../../interfaces/expense';
+import { IExpense, IExpenseAll, IExpenseInfo } from '../../interfaces/expense';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 
-export interface State {
+export const EXPENSE_FEATURE_KEY = 'expense';
+
+export interface ExpenseState {
   response?: IResponseSuccess;
-  data?: Pagination<IExpense> | IExpense[];
+  data?: Pagination<IExpenseAll> | IExpense[];
   info?: IExpenseInfo;
-  errorMessage?: string;
   error?: IError;
   subErrors?: IError[];
-  selected?: IExpense;
+  selected?: IExpenseAll;
+  currentRoomId?: string;
+  currentExpenseId?: string;
   isLoading: boolean;
 }
 
-export const initialState: State = {
+export const initialState: ExpenseState = {
   response: undefined,
   data: undefined,
   info: undefined,
-  errorMessage: undefined,
   error: undefined,
   subErrors: undefined,
   selected: undefined,
+  currentRoomId: undefined,
+  currentExpenseId: undefined,
   isLoading: false,
 };
 
@@ -43,9 +48,8 @@ export const expenseReducer = createReducer(
   initialState,
   on(getExpensesPage, (state) => ({
     ...state,
-    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IExpense>,
+    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IExpenseAll>,
     response: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     selected: undefined,
   })),
@@ -53,36 +57,31 @@ export const expenseReducer = createReducer(
     ...state,
     response: undefined,
     info: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     selected: undefined,
   })),
   on(getExpense, (state) => ({
     ...state,
-    selected: {} as IExpense,
+    selected: {} as IExpenseAll,
     response: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
   on(expenseSuccess, (state, { data }) => ({
     ...state,
     data,
     response: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
   on(expenseInfoSuccess, (state, { info }) => ({
     ...state,
     info,
     response: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
   on(expenseSaveSuccess, (state, action) => ({
     ...state,
     response: action,
     selected: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     isLoading: false,
   })),
@@ -90,12 +89,10 @@ export const expenseReducer = createReducer(
     ...state,
     selected,
     response: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
   on(expenseFailure, (state, { error }) => ({
     ...state,
-    errorMessage: error.message,
     error,
     subErrors: error.subErrors,
     response: undefined,
@@ -113,5 +110,9 @@ export const expenseReducer = createReducer(
       isLoading: true,
     }),
   ),
-  on(clean, () => initialState),
+  on(setCurrentExpenseId, (state, { expenseId }) => ({
+    ...state,
+    currentExpenseId: expenseId,
+  })),
+  on(cleanExpense, () => initialState),
 );

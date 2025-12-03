@@ -26,7 +26,7 @@ describe('ErrorComponent', () => {
 
     fixture = TestBed.createComponent(ErrorComponent);
     component = fixture.componentInstance;
-    component.error = error;
+    fixture.componentRef.setInput('error', error);
   });
 
   it('should create', () => {

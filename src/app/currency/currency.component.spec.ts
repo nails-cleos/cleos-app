@@ -1,29 +1,28 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { BehaviorSubject } from 'rxjs';
 
 import { CurrencyComponent } from './currency.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Subject } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { ChangeDetectorRef } from '@angular/core';
-import { ICurrency } from '../interfaces/currency';
-import { ReactiveFormsModule, UntypedFormBuilder } from '@angular/forms';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { clean, getCurrency } from '../store/currency.actions';
+import { getCurrency } from '../store/currency.actions';
+import { ICurrencyAll } from '../interfaces/currency';
+import { CurrencyState } from '../store/reducers/currency.reducers';
 
 describe('CurrencyComponent', () => {
   let component: CurrencyComponent;
   let fixture: ComponentFixture<CurrencyComponent>;
 
-  let state$: Subject<any>;
-  
-  let storeSpy: jasmine.SpyObj<Store>;
-  let routerSpy: jasmine.SpyObj<Router>;
+  let storeSpy: jasmine.SpyObj<Store<CurrencyState>>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
-  let paramMapSpy: jasmine.SpyObj<ParamMap>;
+  let navigateSpy: jasmine.Spy;
 
-  const mockCurrency: ICurrency = {
+  let currencyId$: BehaviorSubject<any>;
+  let selectedCurrency$: BehaviorSubject<any>;
+  let subErrors$: BehaviorSubject<any>;
+  let response$: BehaviorSubject<any>;
+
+  const mockCurrency: ICurrencyAll = {
     id: '1',
     name: 'Test Currency',
     code: 'EUR',
@@ -31,286 +30,172 @@ describe('CurrencyComponent', () => {
   };
 
   beforeEach(async () => {
-    state$ = new Subject();
+    currencyId$ = new BehaviorSubject<any>(null);
+    selectedCurrency$ = new BehaviorSubject<any>(undefined);
+    subErrors$ = new BehaviorSubject<any>(undefined);
+    response$ = new BehaviorSubject<any>(undefined);
 
-    paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
-        paramMap: paramMapSpy,
+        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
       },
     });
 
-    paramMapSpy.get.and.returnValue(null);
-    storeSpy.select.and.returnValue(state$.asObservable());
+    let pipeCallIndex = 0;
+    storeSpy.pipe.and.callFake(() => {
+      pipeCallIndex++;
+      switch (pipeCallIndex) {
+        case 1:
+          return currencyId$.asObservable();
+        case 2:
+          return selectedCurrency$.asObservable();
+        case 3:
+          return subErrors$.asObservable();
+        case 4:
+          return response$.asObservable();
+        default:
+          return new BehaviorSubject(undefined).asObservable();
+      }
+    });
 
     await TestBed.configureTestingModule({
-      imports: [
-        CurrencyComponent,
-        TranslateModule.forRoot(),
-        ReactiveFormsModule,
-        NoopAnimationsModule,
-      ],
+      imports: [CurrencyComponent, TranslateModule.forRoot()],
       providers: [
-        UntypedFormBuilder,
         { provide: Store, useValue: storeSpy },
-        { provide: Router, useValue: routerSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
-        { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
       ],
     }).compileComponents();
 
+    // Spy router.navigate
+    const router = TestBed.inject(Router);
+    navigateSpy = spyOn(router, 'navigate');
+
+    // Make sure translate has a language so component.language is meaningful
     const translate = TestBed.inject(TranslateService);
     translate.setDefaultLang('en-GB');
     translate.use('en-GB');
 
     fixture = TestBed.createComponent(CurrencyComponent);
     component = fixture.componentInstance;
+    fixture.detectChanges();
   });
-  
-  afterEach(() => state$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize in add mode when no id is provided', () => {
-    paramMapSpy.get.and.returnValue(null);
-
-    component.ngOnInit();
-
-    expect(component.isAddMode).toBeTrue();
-    expect(component.id).toBeUndefined();
-  });
-
-  it('should initialize in edit mode when id is provided', () => {
-    const testId = '123';
-    paramMapSpy.get.and.returnValue(testId);
-
-    component.ngOnInit();
-
-    expect(component.isAddMode).toBeFalse();
-    expect(component.id).toBe(testId);
-  });
-
-  it('should create form with required name field', () => {
-    component.ngOnInit();
-
-    expect(component.form).toBeDefined();
-    expect(component.form.get('name')).toBeDefined();
-    expect(component.form.get('code')).toBeDefined();
-    expect(component.form.get('icon')).toBeDefined();
-    expect(component.form.get('code')?.hasError('required')).toBeTrue();
-  });
-
-  it('should dispatch Clean action on initialization', () => {
-    component.ngOnInit();
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
-  });
-
-  it('should dispatch GetCurrency action when in edit mode', () => {
-    const testId = '123';
-    paramMapSpy.get.and.returnValue(testId);
-
-    component.ngOnInit();
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getCurrency({ id: testId }));
-  });
-
-  it('should patch form when currency is selected from state', () => {
-    component.ngOnInit();
-
-    state$.next({
-      selected: mockCurrency,
-    });
-
-    expect(component.currency).toEqual(mockCurrency);
-    expect(component.form.get('name')?.value).toBe(mockCurrency.name);
-    expect(component.form.get('code')?.value).toBe(mockCurrency.code);
-    expect(component.form.get('icon')?.value).toBe(mockCurrency.icon);
-  });
-
-  it('should handle form errors from state', () => {
-    component.ngOnInit();
-
-    const mockErrors = [
-      { field: 'name', message: 'Name is required' },
-      { field: 'code', message: 'Code is required' },
-    ];
-
-    state$.next({
-      subErrors: mockErrors,
-    });
-
-    expect(component.errors['code']).toBe('Code is required');
-    expect(component.form.get('code')?.hasError('incorrect')).toBeTrue();
-  });
-
-  it('should navigate to currency list on successful response', () => {
-    component.ngOnInit();
-
-    state$.next({
-      response: true,
-    });
-
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'currency']);
-  });
-
-  it('should not dispatch action when form is invalid', () => {
-    component.ngOnInit();
-    component.form.get('name')?.setValue('');
+  it('should dispatch getCurrency when currencyId emits a value', () => {
+    // reset calls
     storeSpy.dispatch.calls.reset();
 
-    void component.submit;
+    // emit an id (simulate edit mode)
+    currencyId$.next('123');
+    fixture.detectChanges();
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getCurrency({ id: '123' }));
+  });
+
+  it('should patch form when selectedCurrency emits', () => {
+    selectedCurrency$.next(mockCurrency);
+    fixture.detectChanges();
+
+    expect(component.getForm.code.value).toBe(mockCurrency.code);
+    expect(component.getForm.name.value).toBe(mockCurrency.name);
+    expect(component.getForm.icon.value).toBe(mockCurrency.icon);
+  });
+
+  it('should handle form errors from subErrorsSignal', () => {
+    const errors = [
+      { field: 'code', message: 'Code required' },
+    ];
+
+    subErrors$.next(errors);
+    fixture.detectChanges();
+
+    const errs = component.errors();
+    expect(errs['code']).toBe('Code required');
+    expect(component.getForm.code.hasError('incorrect')).toBeTrue();
+  });
+
+  it('should navigate to currency list when response emits', () => {
+    response$.next(true);
+    fixture.detectChanges();
+
+    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'currency']);
+  });
+
+  it('should not dispatch when form invalid on submit', () => {
+    storeSpy.dispatch.calls.reset();
+
+    // ensure form invalid
+    (component.getForm.code as any).setValue(undefined);
+    fixture.detectChanges();
+
+    component.submit();
 
     expect(storeSpy.dispatch).not.toHaveBeenCalled();
   });
 
-  it('should dispatch CreateCurrency action when in add mode and form is valid', () => {
-    component.ngOnInit();
-    const nameControl = component.form.get('name')!;
-    const codeControl = component.form.get('code')!;
-    const iconControl = component.form.get('icon')!;
-
-    nameControl.setValue('New Currency');
-    nameControl.markAsDirty();
-
-    codeControl.setValue('EUR');
-    codeControl.markAsDirty();
-
-    iconControl.setValue('euro');
-    iconControl.markAsDirty();
-
+  it('should dispatch createCurrency when in add mode and form valid', () => {
     storeSpy.dispatch.calls.reset();
 
-    void component.submit;
-    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
-    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+    const nameControl = component.getForm.name;
+    nameControl.setValue('New Currency');
+    nameControl.markAsDirty();
+    const codeControl = component.getForm.code;
+    codeControl.setValue('New Code');
+    codeControl.markAsDirty();
+    const iconControl = component.getForm.icon;
+    iconControl.setValue('New Icon');
+    iconControl.markAsDirty();
+
+    component.submit();
+
+    expect(component.form.valid).toBeTrue();
+    const dispatched = storeSpy.dispatch.calls.mostRecent().args[0];
+    expect(dispatched).toEqual(jasmine.objectContaining({
       currency: jasmine.objectContaining({
         name: 'New Currency',
-        code: 'EUR',
-        icon: 'euro',
+        code: 'New Code',
+        icon: 'New Icon',
       }),
       type: '[Currency] Create currency',
     }));
   });
 
-  it('should dispatch UpdateCurrency action when in edit mode and form is valid', () => {
-    const testId = '123';
-    paramMapSpy.get.and.returnValue(testId);
-    component.currency = mockCurrency;
-
-    component.ngOnInit();
-    const nameControl = component.form.get('name')!;
-    const codeControl = component.form.get('code')!;
-    const iconControl = component.form.get('icon')!;
-
-    nameControl.setValue('Updated Currency');
-    nameControl.markAsDirty();
-
-    codeControl.setValue('ARS');
-    codeControl.markAsDirty();
-
-    iconControl.setValue('cash');
-    iconControl.markAsDirty();
-
+  it('should dispatch updateCurrency when in edit mode and form valid', () => {
     storeSpy.dispatch.calls.reset();
 
-    void component.submit;
-    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
-    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+    // simulate edit mode
+    currencyId$.next('abc-123');
+    fixture.detectChanges();
+    selectedCurrency$.next({ name: 'Old', code: 'old', icon: 'Old' });
+    fixture.detectChanges();
+
+    const nameControl = component.getForm.name;
+    nameControl.setValue('Updated Currency');
+    nameControl.markAsDirty();
+    const codeControl = component.getForm.code;
+    codeControl.setValue('Updated Code');
+    codeControl.markAsDirty();
+    const iconControl = component.getForm.icon;
+    iconControl.setValue('Updated Icon');
+    iconControl.markAsDirty();
+
+    component.submit();
+
+    expect(component.form.valid).toBeTrue();
+    const dispatched = storeSpy.dispatch.calls.mostRecent().args[0];
+
+    expect(dispatched).toEqual(jasmine.objectContaining({
+      id: 'abc-123',
       currency: jasmine.objectContaining({
+        code: 'Updated Code',
         name: 'Updated Currency',
-        code: 'ARS',
-        icon: 'cash',
+        icon: 'Updated Icon',
       }),
       type: '[Currency] Update currency by id',
     }));
-  });
-
-  it('should return form controls from getForm getter', () => {
-    component.ngOnInit();
-
-    const controls = component.getForm;
-
-    expect(controls).toBe(component.form.controls);
-  });
-
-  it('should unsubscribe on destroy', () => {
-    component.ngOnInit();
-    const subscription = component['subscription'];
-    spyOn(subscription!, 'unsubscribe');
-
-    component.ngOnDestroy();
-
-    expect(subscription!.unsubscribe).toHaveBeenCalled();
-  });
-
-  it('should handle subscription when no subscription exists', () => {
-    expect(() => component.ngOnDestroy()).not.toThrow();
-  });
-
-  it('should call detectChanges when needed', () => {
-    expect(changeDetectorRefSpy.detectChanges).not.toHaveBeenCalled();
-  });
-
-  it('should handle undefined currency in edit mode', () => {
-    const testId = '123';
-    paramMapSpy.get.and.returnValue(testId);
-    component.currency = undefined;
-
-    component.ngOnInit();
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getCurrency({ id: testId }));
-  });
-
-  it('should clear currency when updating in edit mode', () => {
-    const testId = '123';
-    paramMapSpy.get.and.returnValue(testId);
-    component.currency = mockCurrency;
-
-    component.ngOnInit();
-    component.form.get('code')?.setValue('Updated Currency');
-
-    void component.submit;
-
-    expect(component.currency).toBeUndefined();
-  });
-
-  it('should initialize form with empty values', () => {
-    component.ngOnInit();
-
-    expect(component.form.get('name')?.value).toBe('');
-    expect(component.form.get('code')?.value).toBe('');
-    expect(component.form.get('icon')?.value).toBe('');
-  });
-
-  it('should validate form correctly', () => {
-    component.ngOnInit();
-
-    expect(component.form.invalid).toBeTrue();
-
-    component.form.get('code')?.setValue('Test code');
-    expect(component.form.valid).toBeTrue();
-  });
-
-  it('should handle state subscription correctly', () => {
-    component.ngOnInit();
-
-    expect(storeSpy.select).toHaveBeenCalled();
-  });
-
-  it('should clean state and get currency list on response', () => {
-    component.ngOnInit();
-    storeSpy.dispatch.calls.reset();
-
-    state$.next({
-      response: true,
-    });
-
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'currency']);
   });
 });

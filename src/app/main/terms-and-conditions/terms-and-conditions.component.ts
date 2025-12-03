@@ -1,21 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { MainContentService } from '../main-content.service';
+import { MainContentService } from '../../services/main-content.service';
 import { TranslateService } from '@ngx-translate/core';
 import { SeoService } from '../../services/seo.service';
-import { SharedModule } from '../../shared/shared.module';
 
 @Component({
   selector: 'app-terms-and-conditions',
   templateUrl: './terms-and-conditions.component.html',
   styleUrls: ['./terms-and-conditions.component.scss'],
-  imports: [SharedModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TermsAndConditionsComponent implements OnInit {
+  private readonly mainContent: MainContentService = inject(MainContentService);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly seoService: SeoService = inject(SeoService);
+
   url = environment.appServer;
 
-  constructor(private mainContent: MainContentService, private translate: TranslateService,
-              private seoService: SeoService) {
+  constructor() {
     this.mainContent.configure(false, 'open');
   }
 

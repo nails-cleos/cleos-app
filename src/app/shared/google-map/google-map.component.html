@@ -1,11 +1,11 @@
-@if (addressFormGroup) {
+@if (addressFormGroup(); as addressFormGroup) {
   <div [formGroup]="addressFormGroup" class="divider inner-container">
     <mat-form-field appearance="outline" hidden>
       <mat-label>{{ 'COMMON.ADDRESS.FIELD' | translate }}</mat-label>
       <label>
-        <input formControlName="address" matInput #addressText type="address">
+        <input [formControl]="addressFormGroup.controls.address" matInput #addressText type="address">
       </label>
-      @if (addressFormGroup.get('address')?.hasError('requireMatch')) {
+      @if (addressFormGroup.controls.address.hasError('requireMatch')) {
         <mat-error [innerHTML]="'COMMON.CURRENCY.INVALID' | translate"></mat-error>
       }
     </mat-form-field>
@@ -13,7 +13,8 @@
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
         <label>
-          <textarea #message formControlName="addressDescription" matInput maxlength="256"></textarea>
+          <textarea #message [formControl]="addressFormGroup.controls.addressDescription" matInput
+                    maxlength="256"></textarea>
         </label>
         <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
       </mat-form-field>
@@ -22,7 +23,7 @@
 }
 @switch (mapStatus) {
   @case (0) {
-    <google-map [zoom]="zoom" class="divider" [center]="center" [height]="height" [width]="width" [options]="options"
+    <google-map [zoom]="zoom" class="divider" [center]="center" [height]="height()" [width]="width()" [options]="options"
                 style="display: flex; justify-content: center;">
       @if (markerPosition) {
         <map-marker #marker="mapMarker" [position]="markerPosition"

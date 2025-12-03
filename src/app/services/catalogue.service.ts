@@ -10,17 +10,17 @@ import { IApiResponse } from '../interfaces/common';
 export class CatalogueService {
 
   private url = 'catalogues';
-  private urlV1 = `v1/${ this.url }`;
+  private urlV1 = `v1/${this.url}`;
 
   private http: HttpClient = inject(HttpClient);
 
-  getAllCatalogues = (): Observable<ICatalogue[]> => this.http.get<ICatalogue[]>(this.urlV1);
+  getAllCatalogues = (): Observable<ICatalogueAll[]> => this.http.get<ICatalogueAll[]>(this.urlV1);
 
-  getAllCatalogs = (): Observable<ICatalogue[]> => this.findCatalogue('catalog');
+  getAllCatalogs = (): Observable<ICatalogueAll[]> => this.findCatalogue('catalog');
 
-  getAllHome = (): Observable<ICatalogue[]> => this.findCatalogue('home');
+  getAllHome = (): Observable<ICatalogueAll[]> => this.findCatalogue('home');
 
-  getCatalogue = (id: string): Observable<ICatalogue | undefined> => this.http.get<ICatalogue>(
+  getCatalogue = (id: string): Observable<ICatalogueAll | undefined> => this.http.get<ICatalogueAll>(
     toUrl(this.urlV1, id),
   );
 
@@ -37,8 +37,8 @@ export class CatalogueService {
 
   deleteCatalogue = (id: string): Observable<ICatalogue> => this.http.delete<ICatalogue>(toUrl(this.urlV1, id));
 
-  updateCatalogue = (catalogue: ICatalogue, resizedImageDataUrl: string): Observable<IApiResponse> => {
-    const url = `${ this.urlV1 }/${ catalogue.id }`;
+  updateCatalogue = (id: string, catalogue: ICatalogue, resizedImageDataUrl: string): Observable<IApiResponse> => {
+    const url = `${this.urlV1}/${id}`;
     const fileBlob = dataURLToBlob(resizedImageDataUrl);
     const formData = new FormData();
     formData.append('file', fileBlob, 'resized-image.jpg');
@@ -59,10 +59,10 @@ export class CatalogueService {
       data = [...data, catalogue];
     });
 
-    return this.http.put<void>(`${ this.urlV1 }/order`, data);
+    return this.http.put<void>(`${this.urlV1}/orders`, data);
   };
 
-  private findCatalogue = (key: string) => this.http.get<ICatalogue[]>(
+  private findCatalogue = (key: string) => this.http.get<ICatalogueAll[]>(
     this.urlV1,
     { params: new HttpParams().set(key, String(true)) },
   );

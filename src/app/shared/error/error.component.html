@@ -2,7 +2,7 @@
   <div>
     <div class="flex-container">
       <div class="card-container">
-        @if (isCard) {
+        @if (isCard()) {
           <div>
             <img alt="error" class="error" src="{{imageSrc}}">
           </div>
@@ -22,7 +22,7 @@
           {{ 'COMMON.BUTTON.BACK' | translate }}
         </button>
         @if (retry) {
-          <button (click)="reload" color="primary" mat-fab extended class="icon-button" type="button">
+          <button (click)="reload()" color="primary" mat-fab extended class="icon-button" type="button">
             {{ 'COMMON.BUTTON.RELOAD' | translate }}
           </button>
         }
@@ -32,7 +32,7 @@
 } @else {
   <div class="flex-container">
     <div class="card-container">
-      @if (isCard) {
+      @if (isCard()) {
         <div class="card-content">
           <div class="no-content bold">
             {{ 'COMMON.ERROR.NO_CONTENT' | translate }}

@@ -1,47 +1,49 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AppMaterialModule } from '../../../util/app-material.module';
-import {
-  ReactiveFormsModule,
-  UntypedFormBuilder,
-  UntypedFormControl,
-  UntypedFormGroup,
-  Validators,
-} from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ServiceType } from '../../../interfaces/room';
+
+type PriceDialogData = {
+  name: string;
+  type: ServiceType;
+  currentPrice?: number;
+};
+
+type PriceForm = {
+  price: FormControl<number>;
+};
 
 @Component({
   selector: 'app-price-dialog',
   templateUrl: 'price-dialog.html',
   imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PriceDialogComponent implements OnInit {
+export class PriceDialogComponent {
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly dialogRef: MatDialogRef<PriceDialogComponent> = inject(MatDialogRef<PriceDialogComponent>);
 
-  form!: UntypedFormGroup;
-  price: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required,
-  ]);
+  readonly data = inject<PriceDialogData>(MAT_DIALOG_DATA);
 
-  constructor(public dialogRef: MatDialogRef<PriceDialogComponent>, private formBuilder: UntypedFormBuilder,
-              @Inject(MAT_DIALOG_DATA) public data: { name: string; price: number; currentPrice?: number }) {
+  form: FormGroup<PriceForm> = this.formBuilder.group<PriceForm>({
+    price: this.formBuilder.control(this.data.currentPrice ?? 0, { validators: [Validators.required] }),
+  });
+
+  get getForm(): PriceForm {
+    return this.form.controls;
   }
 
-  get onNoClick(): void {
-    return this.dialogRef.close();
+  onNoClick() {
+    this.dialogRef.close();
   }
 
-  get submit(): void {
-    this.data.price = this.price.value;
-    return this.dialogRef.close(this.data);
-  }
-
-  ngOnInit(): void {
-    this.form = this.formBuilder.group({
-      price: this.price,
-    });
-
-    if (this.data.currentPrice) {
-      this.price.setValue(this.data.currentPrice);
-    }
+  submit() {
+    const data = {
+      price: this.getForm.price.value,
+      type: this.data.type,
+    };
+    this.dialogRef.close(data);
   }
 }

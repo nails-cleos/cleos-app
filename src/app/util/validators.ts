@@ -1,7 +1,7 @@
-import { AbstractControl, FormArray, UntypedFormControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { AbstractControl, FormArray, FormControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 
-export const fieldChange = (formControl: UntypedFormControl, value: any | undefined): any | undefined =>
+export const fieldChange = (formControl: FormControl, value?: any): any | undefined =>
   formControl && formControl.dirty && value !== formControl.value ? formControl.value : null;
 
 export const valueChange = (newValue: any, oldValue: any | undefined): any | undefined => oldValue !== newValue ?
@@ -15,10 +15,11 @@ export const requireMatch = (control: AbstractControl): any => {
   return null;
 };
 
+// TODO: remove Observable when migration to async validators is complete
 export const requireMatchAsync = (control: AbstractControl): Observable<ValidationErrors | null> => of(
   requireMatch(control));
 
-export function noDuplicateDatesValidator(key: string = 'date'): ValidatorFn {
+export const noDuplicateDatesValidator = (key: string = 'date'): ValidatorFn => {
   return (formArray: AbstractControl): { [key: string]: any } | null => {
     if (!(formArray instanceof FormArray)) {
       throw new Error('Validator must be applied to a FormArray');
@@ -49,7 +50,7 @@ export function noDuplicateDatesValidator(key: string = 'date'): ValidatorFn {
     }
 
     if (duplicateIndex !== null) {
-      const errorKey = `duplicate${ key.charAt(0).toUpperCase() + key.slice(1) }`;
+      const errorKey = `duplicate${key.charAt(0).toUpperCase() + key.slice(1)}`;
       const duplicateControl = formArray.controls[duplicateIndex];
       duplicateControl.get(key)?.setErrors({ [errorKey]: true });
       return { [errorKey]: duplicateIndex };
@@ -57,9 +58,9 @@ export function noDuplicateDatesValidator(key: string = 'date'): ValidatorFn {
 
     return null;
   };
-}
+};
 
-export const validColorValidator = (): ValidatorFn  => {
+export const validColorValidator = (): ValidatorFn => {
   return (control: AbstractControl): ValidationErrors | null => {
     const value = control.value;
 

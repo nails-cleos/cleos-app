@@ -1,6 +1,6 @@
 import { Pagination } from '../../interfaces/pagination';
 import {
-  clean,
+  cleanRoom,
   createRoom,
   customerInfoSuccess,
   deleteRoom,
@@ -15,43 +15,47 @@ import {
   roomSelected,
   roomServiceSelected,
   roomSuccess,
+  setCurrentRoomId,
   updateRoom,
   updateServices,
 } from '../room.actions';
 import { IRoom, IRoomCustomer, IRoomService } from '../../interfaces/room';
-import { IUser } from '../../interfaces/user';
-import { ICurrency } from '../../interfaces/currency';
+import { IUserAll } from '../../interfaces/user';
+import { ICurrencyAll } from '../../interfaces/currency';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 
 import { createReducer, on } from '@ngrx/store';
+import { IOfficeAll } from '../../interfaces/office';
 
-export interface State {
+export const ROOM_FEATURE_KEY = 'room';
+
+export interface RoomState {
   response?: IResponseSuccess;
   data?: IRoom | Pagination<IRoom>;
   services?: IRoomService;
-  professionals?: IUser[];
-  currencies?: ICurrency[];
-  offices?: IUser[];
+  professionals?: IUserAll[];
+  currencies?: ICurrencyAll[];
+  offices?: IOfficeAll[];
   customers?: IRoomCustomer[];
-  errorMessage?: string;
   error?: IError;
   subErrors?: IError[];
   selected?: IRoom;
+  currentRoomId?: string;
   isLoading: boolean;
 }
 
-export const initialState: State = {
+export const initialState: RoomState = {
   data: undefined,
   services: undefined,
   professionals: undefined,
   currencies: undefined,
   offices: undefined,
   customers: undefined,
-  errorMessage: undefined,
   error: undefined,
   subErrors: undefined,
   selected: undefined,
   response: undefined,
+  currentRoomId: undefined,
   isLoading: false,
 };
 
@@ -60,7 +64,6 @@ export const roomReducer = createReducer(
   on(getRoomsPage, (state) => ({
     ...state,
     data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IRoom>,
-    errorMessage: undefined,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
@@ -70,7 +73,6 @@ export const roomReducer = createReducer(
     professionals: undefined,
     currencies: undefined,
     offices: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
@@ -78,21 +80,13 @@ export const roomReducer = createReducer(
   on(getRoom, (state) => ({
     ...state,
     data: {} as IRoom,
-    errorMessage: undefined,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
   })),
   on(getServices, (state) => ({
     ...state,
-    services: {
-      currency: {},
-      treatments: [],
-      selectedTreatments: [],
-      additionalList: [],
-      selectedAdditionalList: [],
-    } as IRoomService,
-    errorMessage: undefined,
+    services: {} as IRoomService,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
@@ -102,21 +96,18 @@ export const roomReducer = createReducer(
     professionals: roomInfo?.professionals,
     offices: roomInfo?.offices,
     currencies: roomInfo?.currencies,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(roomSuccess, (state, { data }) => ({
     ...state,
     data,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(roomSaveSuccess, (state, action) => ({
     ...state,
     response: action,
-    errorMessage: undefined,
     selected: undefined,
     subErrors: undefined,
     isLoading: false,
@@ -124,20 +115,17 @@ export const roomReducer = createReducer(
   on(roomSelected, (state, { selected }) => ({
     ...state,
     selected,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(roomServiceSelected, (state, { services }) => ({
     ...state,
     services,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(roomFailure, (state, { error }) => ({
     ...state,
-    errorMessage: error.message,
     error,
     subErrors: error.subErrors,
     response: undefined,
@@ -151,7 +139,6 @@ export const roomReducer = createReducer(
     (state) => ({
       ...state,
       selected: undefined,
-      errorMessage: undefined,
       subErrors: undefined,
       response: undefined,
       isLoading: true,
@@ -160,7 +147,6 @@ export const roomReducer = createReducer(
   on(getAllCustomersInfo, (state) => ({
     ...state,
     customers: [{}, {}, {}],
-    errorMessage: undefined,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
@@ -168,10 +154,13 @@ export const roomReducer = createReducer(
   on(customerInfoSuccess, (state, { customers }) => ({
     ...state,
     customers,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
-  on(clean, () => initialState),
+  on(setCurrentRoomId, (state, { roomId }) => ({
+    ...state,
+    currentRoomId: roomId,
+  })),
+  on(cleanRoom, () => initialState),
 );
 

@@ -12,8 +12,8 @@ describe('AddNoteDialogComponent', () => {
 
   const mockData = {
     isCustomer: false,
-    note: null,
-    customerNote: null,
+    note: undefined,
+    customerNote: undefined,
   };
 
   beforeEach(async () => {
@@ -41,18 +41,8 @@ describe('AddNoteDialogComponent', () => {
   });
 
   it('onNoClick should close the dialog', () => {
-    void component.onNoClick;
+    component.onNoClick();
     expect(mockDialogRef.close).toHaveBeenCalled();
-  });
-
-  it('onNoClick should close the dialog', () => {
-    const note = '';
-    const customerNote = 'Customer Note';
-    component.noteForm.get('note')?.setValue(note);
-    component.noteForm.get('customerNote')?.setValue(customerNote);
-
-    void component.doAction;
-    expect(mockDialogRef.close).toHaveBeenCalledWith({ note: null, customerNote });
   });
 
   it('should render the dialog title', () => {
@@ -71,7 +61,7 @@ describe('AddNoteDialogComponent', () => {
     component.data.isCustomer = true;
     fixture.detectChanges();
 
-    expect(component.noteForm?.get('note')?.value).toBe(null);
+    expect(component.getForm.note.value).toBeNull();
   });
 
   it('should call dialogRef.close when No button is clicked', () => {
@@ -96,9 +86,17 @@ describe('AddNoteDialogComponent', () => {
   });
 
   it('should initialize form with empty values', () => {
-    component.ngOnInit();
+    expect(component.getForm.note.value).toBeNull();
+    expect(component.getForm.customerNote.value).toBeNull();
+  });
 
-    expect(component.noteForm.get('note')?.value).toBe(null);
-    expect(component.noteForm.get('customerNote')?.value).toBe(null);
+  it('onNoClick should close the dialog', () => {
+    const note = '';
+    const customerNote = 'Customer Note';
+    component.getForm.note?.setValue(note);
+    component.getForm.customerNote?.setValue(customerNote);
+
+    component.doAction();
+    expect(mockDialogRef.close).toHaveBeenCalledWith({ note: undefined, customerNote });
   });
 });

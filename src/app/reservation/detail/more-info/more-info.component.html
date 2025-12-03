@@ -1,7 +1,7 @@
 <div class="divider">
   <h2>{{ 'RESERVATION.TRACKING.TITLE' | translate }}</h2>
 </div>
-@if (tracking) {
+@if (trackingSignal(); as tracking) {
   <div class="stepper-wrapper">
     <div class="stepper-item"
          [ngClass]="{'active': tracking.reservation.state === 'CREATED', 'completed': tracking.approvedTimestamp}">
@@ -41,19 +41,19 @@
       <div class="step-name">{{ 'COMMON.STATUS.RESERVATION.COMPLETED' | translate }}</div>
     </div>
   </div>
-  @if (totalTime) {
-    <h4 class="bold" [innerHTML]="'RESERVATION.TRACKING.DURATION' | translate: {totalTime: totalTime}"></h4>
+  @if (totalTime(); as time) {
+    <h4 class="bold" [innerHTML]="'RESERVATION.TRACKING.DURATION' | translate: {totalTime: time}"></h4>
   }
   <div class="card-actions">
     <div class="spacer"></div>
     @if (!tracking.process && tracking.completedTimestamp) {
-      <button type="button" (click)="execute" mat-fab extended class="icon-button">
+      <button type="button" (click)="execute()" mat-fab extended class="icon-button">
         <mat-icon>sync_problem</mat-icon>
         {{ 'RESERVATION.TRACKING.SYNC' | translate }}
       </button>
     }
     @if (tracking.completedTimestamp) {
-      <button type="button" (click)="update" mat-fab extended class="icon-button" color="">
+      <button type="button" (click)="update()" mat-fab extended class="icon-button" color="">
         <mat-icon>update</mat-icon>
         {{ 'RESERVATION.TRACKING.UPDATE' | translate }}
       </button>
@@ -64,7 +64,7 @@
   <div class="ssc-square mb"></div>
 }
 
-@if (review) {
+@if (reviewSignal(); as review) {
   <div class="divider">
     <h2>{{ 'RESERVATION.REVIEW.TITLE' | translate }}</h2>
   </div>
@@ -73,7 +73,7 @@
   <mat-divider></mat-divider>
 }
 
-@if (payments && payments[0].id) {
+@if (paymentsSignal(); as payments) {
   <div class="divider">
     <h2>{{ 'RESERVATION.PAYMENT.TITLE' | translate }}</h2>
   </div>

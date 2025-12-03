@@ -2,10 +2,12 @@ import { TestBed } from '@angular/core/testing';
 
 import { AccountService } from './account.service';
 import { HttpClient } from '@angular/common/http';
-import { IAccount, ITransaction } from '../interfaces/account';
+import { IAccountAll, ITransaction } from '../interfaces/account';
 import { of } from 'rxjs';
 import { IApiResponse } from '../interfaces/common';
 import { createFilter } from '../util/service-helper';
+import { IUserAll } from '../interfaces/user';
+import { ICurrencyAll } from '../interfaces/currency';
 
 describe('AccountService', () => {
   let service: AccountService;
@@ -15,8 +17,27 @@ describe('AccountService', () => {
     id: '1',
   };
 
-  const mockAccount: IAccount = {
+  const mockCustomer: IUserAll = {
+    id: 'customer-id',
+    displayName: 'John Doe',
+    email: 'user@test.com',
+    authorities: [{ authority: 'ROLE_CUSTOMER' }],
+    locale: 'en',
+    timeZone: 'UTC',
+  };
+
+  const mockCurrency: ICurrencyAll = {
     id: '1',
+    name: 'Euro',
+    code: 'EUR',
+    icon: '€',
+  };
+
+  const mockAccount: IAccountAll = {
+    id: '1',
+    balance: 100,
+    customer: mockCustomer,
+    currency: mockCurrency,
   };
 
   const mockApiResponse: IApiResponse = {

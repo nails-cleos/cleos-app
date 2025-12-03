@@ -1,68 +1,62 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { FormControl, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { AppState, selectDiscountState } from '../../store/app.states';
-import { clean, getUserDiscountByCustomerId } from '../../store/discount.actions';
-import { IUserDiscount } from '../../interfaces/discount';
+import { cleanDiscount, getUserDiscountByCustomerId } from '../../store/discount.actions';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
+import { DiscountState } from '../../store/reducers/discount.reducers';
+import { getUserDiscountsPipe } from '../../store/selectors/discount.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+
+type DiscountForm = {
+  discount: FormControl<string>;
+}
+
+type DiscountDialogData = {
+  customerId: string,
+}
 
 @Component({
   selector: 'app-add-discount-dialog-component',
   templateUrl: './add-discount-dialog.component.html',
   imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AddDiscountDialogComponent implements OnInit, OnDestroy {
-  discountForm!: UntypedFormGroup;
-  discount: FormControl<string | null> = new FormControl('', [
-    Validators.required,
-  ]);
+export class AddDiscountDialogComponent {
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly store: Store<DiscountState> = inject(Store<DiscountState>);
+  private readonly dialogRef: MatDialogRef<AddDiscountDialogComponent> = inject(
+    MatDialogRef<AddDiscountDialogComponent>);
+  private readonly data = inject<DiscountDialogData>(MAT_DIALOG_DATA);
 
-  customerId: string;
+  private userDiscounts$ = this.store.pipe(getUserDiscountsPipe);
 
-  discounts: IUserDiscount[] = [];
+  userDiscountsSignal = toSignal(this.userDiscounts$);
 
-  private getState: Observable<any>;
-  private subscription?: Subscription;
+  form: FormGroup<DiscountForm> = this.formBuilder.group<DiscountForm>({
+    discount: this.formBuilder.control('', { validators: [Validators.required] }),
+  });
 
-  constructor(public dialogRef: MatDialogRef<AddDiscountDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-              private store: Store<AppState>, private formBuilder: UntypedFormBuilder) {
-    this.getState = this.store.select(selectDiscountState);
-    this.customerId = data.customerId;
+  customerId = computed(() => this.data.customerId);
+
+  constructor() {
+    effect(() => {
+      const customerId = this.customerId();
+      this.store.dispatch(cleanDiscount());
+      this.store.dispatch(getUserDiscountByCustomerId({ customerId }));
+    });
   }
 
-  get onNoClick(): void {
+  get getForm(): DiscountForm {
+    return this.form.controls;
+  }
+
+  onNoClick(): void {
     return this.dialogRef.close();
   }
 
-  get doAction(): void {
-    return this.dialogRef.close({ discountId: this.discount.value });
+  doAction(): void {
+    return this.dialogRef.close({ discountId: this.getForm.discount.value });
   }
-
-  ngOnInit(): void {
-    this.clean();
-    this.createForm();
-    this.subscribe();
-    this.getDiscounts();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  private createForm = (): void => {
-    this.discountForm = this.formBuilder.group({
-      discount: this.discount,
-    });
-  };
-
-  private getDiscounts = (): void => this.store.dispatch(getUserDiscountByCustomerId({ customerId: this.customerId }));
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => this.discounts = state.data);
-  };
 }

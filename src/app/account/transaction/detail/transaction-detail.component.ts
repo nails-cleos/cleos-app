@@ -1,52 +1,87 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
-import { AppState, selectAccountState } from '../../../store/app.states';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ITransaction } from '../../../interfaces/account';
+import { Router } from '@angular/router';
 import { getTransaction } from '../../../store/account.actions';
 import { TranslateService } from '@ngx-translate/core';
-import {
-  paymentSend,
-  notifyPayment,
-} from '../../../store/payment.actions';
+import { notifyPayment, paymentSend } from '../../../store/payment.actions';
 import { newDateTimestamp } from '../../../util/dates';
 import { SharedModule } from '../../../shared/shared.module';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
+import {
+  getCurrentAccountIdPipe,
+  getCurrentTransactionIdPipe,
+  getAccountResponsePipe,
+  getSelectedTransactionPipe,
+  getSubErrorsPipe,
+} from '../../../store/selectors/account.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { AccountState } from '../../../store/reducers/account.reducers';
+import { PaymentState } from '../../../store/reducers/payment.reducers';
 
 @Component({
   selector: 'app-transaction-detail',
   templateUrl: './transaction-detail.component.html',
   styleUrls: ['./transaction-detail.component.scss'],
   imports: [SharedModule, BackButtonDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TransactionDetailComponent implements OnInit, OnDestroy {
+export class TransactionDetailComponent {
+  private readonly store: Store<AccountState | PaymentState> = inject(Store<AccountState | PaymentState>);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly router: Router = inject(Router);
 
-  transaction?: ITransaction;
-  dateFormat: string;
-  step?: number;
-  language: string;
+  private accountId$ = this.store.pipe(getCurrentAccountIdPipe);
+  private transactionId$ = this.store.pipe(getCurrentTransactionIdPipe);
+  private selectedTransaction$ = this.store.pipe(getSelectedTransactionPipe);
+  private response$ = this.store.pipe(getAccountResponsePipe);
+  private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
-  private getState: Observable<any>;
-  private subscription?: Subscription;
-  private id: string | null = null;
-  private transactionId: string | null = null;
+  private accountIdSignal = toSignal(this.accountId$);
+  private transactionIdSignal = toSignal(this.transactionId$);
+  private selectedTransactionSignal = toSignal(this.selectedTransaction$);
+  private responseSignal = toSignal(this.response$);
+  private subErrorsSignal = toSignal(this.subErrors$);
 
-  constructor(private store: Store<AppState>, private route: ActivatedRoute, private translate: TranslateService,
-    private router: Router) {
-    this.getState = this.store.select(selectAccountState);
-    this.dateFormat = this.translate.currentLang;
-    this.step = this.router.getCurrentNavigation()?.extras.state?.step;
-    this.language = this.translate.currentLang;
+  transactionSignal = computed(() => {
+    const transaction = this.selectedTransactionSignal();
+    if (transaction) {
+      Object.assign(
+        {}, transaction, { date: newDateTimestamp(transaction.payment?.timestamp) },
+      );
+    }
+    return transaction;
+  });
+
+  dateFormat = this.translate.currentLang;
+  step?: number = this.router.getCurrentNavigation()?.extras.state?.step;
+  language = this.translate.currentLang;
+
+  constructor() {
+    effect(() => {
+      const id = this.accountIdSignal();
+      const transactionId = this.transactionIdSignal();
+      if (id && transactionId) {
+        this.store.dispatch(getTransaction({ id, transactionId }));
+      }
+    });
+
+    effect(() => {
+      const path = this.responseSignal()?.path;
+      if (path) {
+        this.router.navigate([`${this.language}/${path}`]);
+      } else if (this.subErrorsSignal()?.[0]?.message) {
+        this.router.navigate([this.language, 'me', 'transaction', this.transactionIdSignal(), 'payment']);
+      }
+    });
   }
 
-  get pay(): void {
-    return this.store.dispatch(paymentSend({ link: this.transaction?.payment?.paymentURL }));
+  pay(): void {
+    this.store.dispatch(paymentSend({ link: this.transactionSignal()?.payment?.paymentURL }));
   }
 
-  get notify(): void {
-    const transaction = this.transaction!;
-    return this.store.dispatch(
+  notify(): void {
+    const transaction = this.transactionSignal()!;
+    this.store.dispatch(
       notifyPayment({
         id: transaction.payment!.id!,
         path: 'transaction',
@@ -56,35 +91,4 @@ export class TransactionDetailComponent implements OnInit, OnDestroy {
       }),
     );
   }
-
-  ngOnInit(): void {
-    this.id = this.route.snapshot.paramMap.get('id');
-    this.transactionId = this.route.snapshot.paramMap.get('transactionId');
-    this.getTransaction();
-    this.subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  private getTransaction = (): void => this.store.dispatch(
-    getTransaction({ id: this.id!, transactionId: this.transactionId! }),
-  );
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.selected) {
-        this.transaction = Object.assign(
-          {}, state.selected, { date: newDateTimestamp(state.selected.payment.timestamp) },
-        );
-      }
-      const path = state.response?.path;
-      if (path) {
-        this.router.navigate([`${ this.language }/${ path }`]);
-      } else if (state.subErrors?.[0]?.message) {
-        this.router.navigate([this.language, 'me', 'transaction', this.id, 'payment']);
-      }
-    });
-  };
 }

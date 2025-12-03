@@ -3,20 +3,23 @@ import { SortDirection } from '@angular/material/sort';
 import { IError, PageRequest } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
 import {
+  IAvailableDTO,
   ICustomerLastReservation,
   ICustomerReservation,
   IReservation,
+  IReservationAll,
   IRoomReservation,
   ITracking,
+  IUpcomingAll,
 } from '../interfaces/reservation';
-import { IUser } from '../interfaces/user';
+import { IUserAll } from '../interfaces/user';
 import { ITreatmentDiscountDTO } from '../interfaces/treatment';
-import { IRoom } from '../interfaces/room';
-import { IAdditional } from '../interfaces/additional';
-import { IPayment, IPaymentOption } from '../interfaces/payment';
+import { IRoomAll } from '../interfaces/room';
+import { IAdditionalAll } from '../interfaces/additional';
+import { IPaymentAll, IPaymentOption } from '../interfaces/payment';
 import { Role } from '../interfaces/token';
 import { IReview } from '../interfaces/review';
-import { IColor } from '../interfaces/color';
+import { IColorAll } from '../interfaces/color';
 import { ToastType } from '../shared/toast/toast.model';
 
 enum ReservationActionTypes {
@@ -28,7 +31,6 @@ enum ReservationActionTypes {
   getCustomerInformation = '[Reservation] Get customer info',
   getAllTreatments = '[Reservation] Get all treatments',
   getAllRooms = '[Reservation] Get all rooms',
-  findRooms = '[Reservation] Find rooms',
   getAllAdditionalByGroupId = '[Reservation] find all additional by group id',
   getUpcomingReservation = '[Reservation] Get upcoming reservation',
   searchAvailability = '[Reservation] Search availability',
@@ -77,6 +79,11 @@ enum ReservationActionTypes {
   updateReservationTimestamp = '[Reservation] Update timestamp by reservation id',
   paymentOptions = '[Reservation] Payment options',
   paymentOptionsSuccess = '[Reservation] Payment options success',
+  setMeReservationParams = '[Reservation] Set me reservation params',
+  setCurrentReservationId = '[Reservation] Set current reservation id',
+  setCurrentCompleteReservation = '[Reservation] Set current complete reservation',
+  setDetailReservationParams = '[Reservation] Set detail reservation params',
+  setReservationParams = '[Reservation] Set reservation params',
   clean = '[Reservation] Clean'
 }
 
@@ -142,11 +149,6 @@ export const getAllRooms = createAction(
   props<{ customerId?: string }>(),
 );
 
-export const findRooms = createAction(
-  ReservationActionTypes.findRooms,
-  props<{ customerId?: string }>(),
-);
-
 export const getAllAdditionalByGroupId = createAction(
   ReservationActionTypes.getAllAdditionalByGroupId,
   props<{ roomId: string; groupId: string }>(),
@@ -156,22 +158,22 @@ export const getUpcomingReservation = createAction(ReservationActionTypes.getUpc
 
 export const reservationSuccess = createAction(
   ReservationActionTypes.reservationSuccess,
-  props<{ data: IRoomReservation | IRoomReservation[] | [] }>(),
+  props<{ data: IRoomReservation[] | IAvailableDTO[] }>(),
 );
 
 export const reservationPageSuccess = createAction(
   ReservationActionTypes.reservationPageSuccess,
-  props<{ page: Pagination<IReservation> }>(),
+  props<{ page: Pagination<IReservationAll> }>(),
 );
 
 export const reservationFilterPageSuccess = createAction(
   ReservationActionTypes.reservationFilterPageSuccess,
-  props<{ filter: Pagination<IReservation> }>(),
+  props<{ filter: Pagination<IReservationAll> }>(),
 );
 
 export const customersSuccess = createAction(
   ReservationActionTypes.customersSuccess,
-  props<{ customers: IUser[] }>(),
+  props<{ customers: IUserAll[] }>(),
 );
 
 export const customerSuccess = createAction(
@@ -181,27 +183,27 @@ export const customerSuccess = createAction(
 
 export const reservationTreatmentsSuccess = createAction(
   ReservationActionTypes.reservationTreatmentsSuccess,
-  props<{ treatmentDiscount: ITreatmentDiscountDTO[] }>(),
+  props<{ treatmentDiscount: ITreatmentDiscountDTO }>(),
 );
 
 export const reservationRoomsSuccess = createAction(
   ReservationActionTypes.reservationRoomsSuccess,
-  props<{ rooms: IRoom[] }>(),
+  props<{ rooms: IRoomAll[] }>(),
 );
 
 export const reservationAdditionalSuccess = createAction(
   ReservationActionTypes.reservationAdditionalSuccess,
-  props<{ additional: IAdditional[] }>(),
+  props<{ additional: IAdditionalAll[] }>(),
 );
 
 export const reservationPaymentsSuccess = createAction(
   ReservationActionTypes.reservationPaymentsSuccess,
-  props<{ payments: IPayment[] }>(),
+  props<{ payments: IPaymentAll[] }>(),
 );
 
 export const reservationHistorySuccess = createAction(
   ReservationActionTypes.reservationHistorySuccess,
-  props<{ history: IReservation[] }>(),
+  props<{ history: IReservationAll[] }>(),
 );
 
 export const createReservation = createAction(
@@ -235,7 +237,7 @@ export const reservationFailure = createAction(
 
 export const reservationSelected = createAction(
   ReservationActionTypes.reservationSelected,
-  props<{ selected?: IReservation }>(),
+  props<{ selected?: IUpcomingAll }>(),
 );
 
 export const getReservation = createAction(
@@ -391,7 +393,7 @@ export const getColorsByTreatmentId = createAction(
 
 export const colorsCompleteSuccess = createAction(
   ReservationActionTypes.colorsCompleteSuccess,
-  props<{ colors: IColor[] }>(),
+  props<{ colors: IColorAll[] }>(),
 );
 
 export const updateReservationNote = createAction(
@@ -424,4 +426,46 @@ export const paymentOptionsSuccess = createAction(
   props<{ paymentOptions?: IPaymentOption[] }>(),
 );
 
-export const clean = createAction(ReservationActionTypes.clean);
+export const setMeReservationParams = createAction(
+  ReservationActionTypes.setMeReservationParams,
+  props<{
+    treatmentId?: string;
+    roomId?: string;
+    professionalId?: string;
+    date?: Date;
+    discountId?: string
+  }>(),
+);
+
+export const setCurrentReservationId = createAction(
+  ReservationActionTypes.setCurrentReservationId,
+  props<{ reservationId: string; }>(),
+);
+
+export const setCurrentCompleteReservation = createAction(
+  ReservationActionTypes.setCurrentCompleteReservation,
+  props<{ reservationId: string; roomId: string; customerId: string; isDashboard: boolean }>(),
+);
+
+export const setDetailReservationParams = createAction(
+  ReservationActionTypes.setDetailReservationParams,
+  props<{ step?: number }>(),
+);
+
+export const setReservationParams = createAction(
+  ReservationActionTypes.setReservationParams,
+  props<{
+    isDashboard: boolean;
+    skip: boolean;
+    customerId?: string;
+    roomId?: string;
+    treatmentId?: string;
+    groupId?: string;
+    professionalId?: string;
+    additionalIds?: string[];
+    date?: Date;
+    discountId?: string;
+  }>(),
+);
+
+export const cleanReservation = createAction(ReservationActionTypes.clean);

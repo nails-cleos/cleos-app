@@ -12,12 +12,18 @@ enum AuthActionTypes {
   signupFailure = '[Auth] Signup Failure',
   logOut = '[Auth] Logout',
   reLogin = '[Auth] Re login',
+  setCurrentCode = '[Auth] Set current code',
   clean = '[Auth] Clean'
 }
 
+export const setCurrentCode = createAction(
+  AuthActionTypes.setCurrentCode,
+  props<{ code: string }>(),
+);
+
 export const login = createAction(
   AuthActionTypes.login,
-  props<{ token: string, queryParams: Params, theme: string, code: string | null }>(),
+  props<{ token: string, queryParams: Params, theme: string, code?: string }>(),
 );
 
 export const redirect = createAction(

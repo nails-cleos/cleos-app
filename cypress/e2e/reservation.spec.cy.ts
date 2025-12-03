@@ -48,23 +48,24 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
       cy.wait('@getRooms').its('response.statusCode').should('eq', 200);
       cy.wait('@getTreatmentSearch').its('response.statusCode').should('eq', 200);
+      cy.get('button[name="toStepThree"]').click({ force: true });
 
       // Select treatment and date time
       const formattedDate = reservationDate.toLocaleDateString('en-GB');
 
-      cy.get('input[formControlName="date"]').click({ force: true });
+      cy.get('[data-cy="date-picker"]').click({ force: true });
       cy.get('.mat-calendar-next-button').click({ force: true });
 
       cy.wait(50);
       cy.get(`button[aria-label="${ formattedDate }"]`).click({ force: true });
 
-      cy.get('input[formControlName="start"]').click({ force: true });
+      cy.get('[data-cy="start-picker"]').click({ force: true });
       cy.setTime(hourFormat, minuteFormat);
 
-      cy.get('input[formControlName="date"]').should('have.value', formattedDate);
-      cy.get('input[formControlName="start"]').should('have.value', reservationTime);
-      cy.get('input[formControlName="group"]').should('have.value', 'Biab Treatment ');
-      cy.get('input[formControlName="treatment"]').should('have.value', 'Biab + Single Color ');
+      cy.get('[data-cy="date-picker"]').should('have.value', formattedDate);
+      cy.get('[data-cy="start-picker"]').should('have.value', reservationTime);
+      cy.get('[data-cy="group-input"]').should('have.value', 'Biab Treatment ');
+      cy.get('[data-cy="treatment-input"]').should('have.value', 'Biab + Single Color ');
 
       cy.get('button[name="toStepFour"]').click({ force: true });
 
