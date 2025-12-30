@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
@@ -16,13 +16,11 @@ describe('AdditionalComponent', () => {
 
   let storeSpy: jasmine.SpyObj<Store<AdditionalState>>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let navigateSpy: jasmine.Spy;
 
   let additionalId$: BehaviorSubject<any>;
   let selectedAdditional$: BehaviorSubject<any>;
   let allGroups$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
 
   const mockGroup = {
     id: 'g1',
@@ -44,7 +42,6 @@ describe('AdditionalComponent', () => {
     selectedAdditional$ = new BehaviorSubject<any>(undefined);
     allGroups$ = new BehaviorSubject<any>(undefined);
     subErrors$ = new BehaviorSubject<any>(undefined);
-    response$ = new BehaviorSubject<any>(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -65,8 +62,6 @@ describe('AdditionalComponent', () => {
           return allGroups$.asObservable();
         case 4:
           return subErrors$.asObservable();
-        case 5:
-          return response$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -83,10 +78,6 @@ describe('AdditionalComponent', () => {
     fixture =
       TestBed.overrideTemplate(AdditionalComponent, '<input #groupInput />').createComponent(AdditionalComponent);
     component = fixture.componentInstance;
-
-    // Spy router.navigate
-    const router = TestBed.inject(Router);
-    navigateSpy = spyOn(router, 'navigate');
 
     // Make sure translate has a language so component.language is meaningful
     const translate = TestBed.inject(TranslateService);
@@ -139,15 +130,6 @@ describe('AdditionalComponent', () => {
     expect(component.getForm.name.hasError('incorrect')).toBeTrue();
     expect(errs['duration']).toBe('Duration required');
     expect(component.getForm.duration.hasError('incorrect')).toBeTrue();
-  });
-
-  it('should navigate to additional list when response emits', () => {
-    component.language = 'en-GB';
-
-    response$.next(true);
-    fixture.detectChanges();
-
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'additional']);
   });
 
   it('should not dispatch when form invalid on submit', () => {

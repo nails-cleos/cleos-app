@@ -43,7 +43,7 @@ export const getSubErrorsPipe = pipe(
   filter((val): val is IError[] => val !== undefined),
 );
 
-const selectColorResponse = createSelector(
+export const selectColorResponse = createSelector(
   selectColorState,
   (state: ColorState) => state?.response,
 );
@@ -52,20 +52,12 @@ export const getColorResponsePipe = pipe(
   filter((val): val is ResponseSuccess => val !== undefined),
 );
 
-const selectColorError = createSelector(
+export const selectColorError = createSelector(
   selectColorState,
   (state: ColorState) => state?.error,
 );
-export const getColorErrorPipe = pipe(
-  select(selectColorError),
-  filter((val): val is IError => val !== undefined),
-);
 
-const selectColorIsLoading = createSelector(
+export const selectColorIsLoading = createSelector(
   selectColorState,
   (state: ColorState) => state?.isLoading,
-);
-export const getColorIsLoadingPipe = pipe(
-  select(selectColorIsLoading),
-  filter((val): val is boolean => val !== undefined),
 );

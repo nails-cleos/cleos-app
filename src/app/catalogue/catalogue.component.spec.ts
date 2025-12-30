@@ -16,7 +16,6 @@ describe('CatalogueComponent', () => {
   let catalogueId$: BehaviorSubject<string | null>;
   let selectedCatalogue$: BehaviorSubject<ICatalogueAll | undefined>;
   let subErrors$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<boolean | undefined>;
   let allGroups$: BehaviorSubject<ITreatmentGroupAll[]>;
   let action$: BehaviorSubject<void>;
 
@@ -43,7 +42,6 @@ describe('CatalogueComponent', () => {
     catalogueId$ = new BehaviorSubject<string | null>(null);
     selectedCatalogue$ = new BehaviorSubject<ICatalogueAll | undefined>(undefined);
     subErrors$ = new BehaviorSubject<any>([]);
-    response$ = new BehaviorSubject<boolean | undefined>(false);
     allGroups$ = new BehaviorSubject<ITreatmentGroupAll[]>([]);
     action$ = new BehaviorSubject<void>(void 0);
 
@@ -68,8 +66,6 @@ describe('CatalogueComponent', () => {
           return allGroups$.asObservable();
         case 4:
           return subErrors$.asObservable();
-        case 5:
-          return response$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -137,13 +133,6 @@ describe('CatalogueComponent', () => {
     expect(component.getForm.group.hasError('incorrect')).toBeTrue();
     expect(component.errors()['name']).toBe('Name required');
     expect(component.errors()['group']).toBe('Group invalid');
-  });
-
-  it('should navigate when response emits true', () => {
-    response$.next(true);
-    fixture.detectChanges();
-
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'catalogues']);
   });
 
   it('should filter groups correctly using filteredGroupSignal', () => {

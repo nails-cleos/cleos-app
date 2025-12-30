@@ -23,7 +23,7 @@ import { AdditionalService } from '../../services/additional.service';
 import { Router } from '@angular/router';
 import { TreatmentService } from '../../services/treatment.service';
 import { IAdditional, IAdditionalAll } from '../../interfaces/additional';
-import { IApiResponse, success } from '../../interfaces/common';
+import { IApiResponse, success, successResponse } from '../../interfaces/common';
 import { Pagination } from '../../interfaces/pagination';
 
 @Injectable()
@@ -67,8 +67,8 @@ export class AdditionalEffects {
       this.additionalService.createAdditional(additional).pipe(
         switchMap((response: IApiResponse) => {
           const message = this.translate.instant('ADDITIONAL.CREATED', { name: response.name });
-          const path = `additional/${ response.id }`;
-          return success(additionalSaveSuccess, message, path);
+          const path = `additional/${response.id}`;
+          return successResponse(additionalSaveSuccess, message, path, 'additional');
         }),
         catchError((err: HttpErrorResponse) => of(additionalFailure({ error: err.error }))),
       )),
@@ -80,8 +80,8 @@ export class AdditionalEffects {
       this.additionalService.updateAdditional(id, additional).pipe(
         switchMap((response: IAdditional) => {
           const message = this.translate.instant('ADDITIONAL.UPDATED.MESSAGE', { name: response.name });
-          const path = `additional/${ response.id }`;
-          return success(additionalSaveSuccess, message, path);
+          const path = `additional/${response.id}`;
+          return successResponse(additionalSaveSuccess, message, path, 'additional');
         }),
         catchError((err: HttpErrorResponse) => of(additionalFailure({ error: err.error }))),
       )),

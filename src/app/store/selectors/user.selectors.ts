@@ -79,7 +79,7 @@ export const getSubErrorsPipe = pipe(
   filter((val): val is IError[] => val !== undefined),
 );
 
-const selectUserResponse = createSelector(
+export const selectUserResponse = createSelector(
   selectUserState,
   (state: UserState) => state?.response,
 );
@@ -88,7 +88,7 @@ export const getUserResponsePipe = pipe(
   filter((val): val is ResponseSuccess => val !== undefined),
 );
 
-const selectUserError = createSelector(
+export const selectUserError = createSelector(
   selectUserState,
   (state: UserState) => state?.error,
 );
@@ -97,11 +97,7 @@ export const getUserErrorPipe = pipe(
   filter((val): val is IError => val !== undefined),
 );
 
-const selectUserIsLoading = createSelector(
+export const selectUserIsLoading = createSelector(
   selectUserState,
   (state: UserState) => state?.isLoading,
-);
-export const getUserIsLoadingPipe = pipe(
-  select(selectUserIsLoading),
-  filter((val): val is boolean => val !== undefined),
 );

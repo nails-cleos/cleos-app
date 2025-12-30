@@ -10,12 +10,11 @@ import {
   viewChild,
 } from '@angular/core';
 import { combineLatestWith, interval } from 'rxjs';
-import { NonNullableFormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { createCatalogue, getCatalogue, updateCatalogue } from '../store/catalogue.actions';
 import { Catalogue, ICatalogue } from '../interfaces/catalogue';
 import { formatBytes, resizeImage } from '../util/file';
-import { Router } from '@angular/router';
 import { fieldChange, requireMatch, valueChange } from '../util/validators';
 import { TranslateService } from '@ngx-translate/core';
 import { ITreatmentGroup, ITreatmentGroupAll } from '../interfaces/treatment';
@@ -28,7 +27,6 @@ import { ToastService } from '../services/toast.service';
 import {
   getCurrentCatalogueIdPipe,
   getGroupPipe,
-  getCatalogueResponsePipe,
   getSelectedCataloguePipe,
   getSubErrorsPipe,
 } from '../store/selectors/catalogue.selectors';
@@ -54,7 +52,6 @@ type CatalogueForm = {
 export class CatalogueComponent {
   private readonly store: Store<CatalogueState> = inject(Store<CatalogueState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly destroyRef: DestroyRef = inject(DestroyRef);
@@ -63,12 +60,10 @@ export class CatalogueComponent {
   private selectedCatalogue$ = this.store.pipe(getSelectedCataloguePipe);
   private allGroups$ = this.store.pipe(getGroupPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getCatalogueResponsePipe);
 
   private catalogueIdSignal = toSignal(this.catalogueId$, { initialValue: null });
   private selectedCatalogueSignal = toSignal(this.selectedCatalogue$);
   private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
 
   private catalogueId = computed(() => this.catalogueIdSignal());
 
@@ -109,8 +104,6 @@ export class CatalogueComponent {
   resizedImageDataUrl = signal<string | undefined>(undefined);
   file = signal<{ name: string; size: number; progress: number; raw: File } | undefined>(undefined);
 
-  private readonly language: string = this.translate.currentLang;
-
   constructor() {
     effect(() => {
       const subErrors = this.subErrorsSignal();
@@ -125,12 +118,6 @@ export class CatalogueComponent {
           }
         });
         this.errors.set(errorMap);
-      }
-    });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.router.navigate([this.language, 'catalogues']);
       }
     });
 

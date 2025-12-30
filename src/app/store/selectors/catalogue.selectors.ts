@@ -52,7 +52,7 @@ export const getGroupPipe = pipe(
   filter((val): val is ITreatmentGroupAll[] => val !== undefined),
 );
 
-const selectCatalogueResponse = createSelector(
+export const selectCatalogueResponse = createSelector(
   selectCatalogueState,
   (state: CatalogueState) => state?.response,
 );
@@ -61,20 +61,12 @@ export const getCatalogueResponsePipe = pipe(
   filter((val): val is ResponseSuccess => val !== undefined),
 );
 
-const selectCatalogueError = createSelector(
+export const selectCatalogueError = createSelector(
   selectCatalogueState,
   (state: CatalogueState) => state?.error,
 );
-export const getCatalogueErrorPipe = pipe(
-  select(selectCatalogueError),
-  filter((val): val is IError => val !== undefined),
-);
 
-const selectCatalogueIsLoading = createSelector(
+export const selectCatalogueIsLoading = createSelector(
   selectCatalogueState,
   (state: CatalogueState) => state?.isLoading,
-);
-export const getCatalogueIsLoadingPipe = pipe(
-  select(selectCatalogueIsLoading),
-  filter((val): val is boolean => val !== undefined),
 );

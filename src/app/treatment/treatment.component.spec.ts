@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
@@ -16,13 +16,11 @@ describe('TreatmentComponent', () => {
 
   let storeSpy: jasmine.SpyObj<Store<TreatmentState>>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let navigateSpy: jasmine.Spy;
 
   let treatmentId$: BehaviorSubject<any>;
   let selectedTreatment$: BehaviorSubject<any>;
   let allColors$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
 
   const mockColor = {
     id: 'g1',
@@ -41,7 +39,6 @@ describe('TreatmentComponent', () => {
     selectedTreatment$ = new BehaviorSubject<any>(undefined);
     allColors$ = new BehaviorSubject<any>(undefined);
     subErrors$ = new BehaviorSubject<any>(undefined);
-    response$ = new BehaviorSubject<any>(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -62,8 +59,6 @@ describe('TreatmentComponent', () => {
           return allColors$.asObservable();
         case 4:
           return subErrors$.asObservable();
-        case 5:
-          return response$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -82,16 +77,11 @@ describe('TreatmentComponent', () => {
         .createComponent(TreatmentComponent);
     component = fixture.componentInstance;
 
-    // Spy router.navigate
-    const router = TestBed.inject(Router);
-    navigateSpy = spyOn(router, 'navigate');
-
-    // Make sure translate has a language so component.language is meaningful
     const translate = TestBed.inject(TranslateService);
     translate.setDefaultLang('en-GB');
     translate.use('en-GB');
 
-    fixture.detectChanges(); // kick off effects / toSignal subscriptions
+    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -134,15 +124,6 @@ describe('TreatmentComponent', () => {
     const errs = component.errors();
     expect(errs['name']).toBe('Name required');
     expect(component.getForm.name.hasError('incorrect')).toBeTrue();
-  });
-
-  it('should navigate to treatment list when response emits', () => {
-    component.language = 'en-GB';
-
-    response$.next(true);
-    fixture.detectChanges();
-
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'treatments']);
   });
 
   it('should not dispatch when form invalid on submit', () => {

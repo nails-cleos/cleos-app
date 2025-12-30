@@ -31,7 +31,6 @@ import {
 } from '../util/dates';
 import { IRoomAll } from '../interfaces/room';
 import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
-import { Router } from '@angular/router';
 import { closest } from '../util/numbers';
 import { fieldChange, requireMatch, valueChange } from '../util/validators';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
@@ -49,7 +48,6 @@ import {
   getSelectedUnavailablePipe,
   getSubErrorsPipe,
   getUnavailableParamsPipe,
-  getUnavailableResponsePipe,
 } from '../store/selectors/unavailable.selectors';
 import { IError } from '../interfaces/common';
 
@@ -74,7 +72,6 @@ type UnavailableForm = {
 export class UnavailableComponent {
   private readonly store: Store<UnavailableState> = inject(Store<UnavailableState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly dialog: MatDialog = inject(MatDialog);
@@ -85,13 +82,11 @@ export class UnavailableComponent {
   private allProfessionals$ = this.store.pipe(getProfessionalsPipe);
   private allRooms$ = this.store.pipe(getRoomsPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getUnavailableResponsePipe);
 
   private navigationParams = toSignal(this.navigationParams$);
   private unavailableIdSignal = toSignal(this.unavailableId$);
   private allRoomsSignal = toSignal(this.allRooms$);
   private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
 
   unavailableSignal = toSignal(this.selectedUnavailable$);
   allProfessionalsSignal = toSignal(this.allProfessionals$);
@@ -208,12 +203,6 @@ export class UnavailableComponent {
           }
         });
         this.errors.set(errorMap);
-      }
-    });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.router.navigate([this.translate.currentLang, 'unavailable']);
       }
     });
 

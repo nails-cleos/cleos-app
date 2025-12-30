@@ -9,7 +9,6 @@ import { UserState } from '../store/reducers/user.reducers';
 import { UserComponent } from './user.component';
 import { Role } from '../interfaces/token';
 import { getUser } from '../store/user.actions';
-import { Router } from '@angular/router';
 import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
@@ -23,20 +22,17 @@ describe('UserComponent', () => {
   let selectedUser$: BehaviorSubject<any>;
   let navigationParams$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   let storeSpy: jasmine.SpyObj<Store<UserState>>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let geocodeServiceSpy: jasmine.SpyObj<GeocodeService>;
-  let navigateSpy: jasmine.Spy;
 
   beforeEach(async () => {
     userId$ = new BehaviorSubject(undefined);
     selectedUser$ = new BehaviorSubject(undefined);
     navigationParams$ = new BehaviorSubject(undefined);
     subErrors$ = new BehaviorSubject(undefined);
-    response$ = new BehaviorSubject(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
@@ -58,8 +54,6 @@ describe('UserComponent', () => {
           return navigationParams$.asObservable();
         case 4:
           return subErrors$.asObservable();
-        case 5:
-          return response$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -75,9 +69,6 @@ describe('UserComponent', () => {
         provideHttpClientTesting(),
       ],
     }).compileComponents();
-
-    const router = TestBed.inject(Router);
-    navigateSpy = spyOn(router, 'navigate');
 
     const translate = TestBed.inject(TranslateService);
     translate.setDefaultLang('en-GB');
@@ -179,13 +170,6 @@ describe('UserComponent', () => {
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getUser({ id: '123' }));
-  });
-
-  it('should navigate to user list when response emits', () => {
-    response$.next(true);
-    fixture.detectChanges();
-
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'users']);
   });
 
   it('should not dispatch when form invalid on submit', () => {

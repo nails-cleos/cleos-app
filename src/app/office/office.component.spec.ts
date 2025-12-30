@@ -23,7 +23,6 @@ describe('OfficeComponent', () => {
   let selectedOffice$: BehaviorSubject<any>;
   let allManagers$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
 
   const mockManager: Partial<IUser> = {
     id: 'mgr-1',
@@ -40,7 +39,6 @@ describe('OfficeComponent', () => {
     selectedOffice$ = new BehaviorSubject<any>(undefined);
     allManagers$ = new BehaviorSubject<any>(undefined);
     subErrors$ = new BehaviorSubject<any>(undefined);
-    response$ = new BehaviorSubject<any>(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -61,8 +59,6 @@ describe('OfficeComponent', () => {
           return allManagers$.asObservable();
         case 4:
           return subErrors$.asObservable();
-        case 5:
-          return response$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -123,13 +119,6 @@ describe('OfficeComponent', () => {
     const errs = component.errors();
     expect(errs['name']).toBe('Name required');
     expect(component.getForm.name.hasError('incorrect')).toBeTrue();
-  });
-
-  it('should navigate to office list when response emits', () => {
-    response$.next(true);
-    fixture.detectChanges();
-
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'offices']);
   });
 
   it('should not dispatch when form invalid on submit', () => {

@@ -48,7 +48,6 @@ import {
   getCurrentRoomIdPipe,
   getOfficesPipe,
   getProfessionalsPipe,
-  getRoomResponsePipe,
   getSelectedRoomPipe,
   getSubErrorsPipe,
 } from '../store/selectors/room.selectors';
@@ -95,12 +94,10 @@ export class RoomComponent {
   private currencies$ = this.store.pipe(getCurrenciesPipe);
   private offices$ = this.store.pipe(getOfficesPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getRoomResponsePipe);
 
   private roomIdSignal = toSignal(this.roomId$);
   private professionalsSignal = toSignal(this.professionals$);
   private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
 
   roomSignal = toSignal(this.selectedRoom$);
   isAddModeSignal = computed(() => !this.roomIdSignal());
@@ -284,12 +281,6 @@ export class RoomComponent {
           }
         });
         this.errors.set(errorMap);
-      }
-    });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.router.navigate([this.language, 'rooms']);
       }
     });
 

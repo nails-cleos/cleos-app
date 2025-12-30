@@ -799,7 +799,7 @@ export class ReservationComponent {
       const reservation = this.selectedReservationSignal();
       if (additionalList?.length) {
         const additionalIndex = enableStep(this.steps, 'post_add');
-        if (this.customerAdditionalIds?.length && !this.additionalSelected.length &&
+        if (this.customerAdditionalIds?.length && !this.additionalSelected().length &&
           this.myStepper?.selectedIndex === additionalIndex) {
           const selected = additionalList.filter(ad => this.customerAdditionalIds?.includes(ad.id))
             .map(ad => Object.assign({}, ad, { id: ad.id }));
@@ -1346,9 +1346,8 @@ export class ReservationComponent {
   };
 
   onChange = (options: MatListOption[]): void => {
-    const additionalSelected = options.map(o => o.value);
-    this.additionalSelected.set(additionalSelected);
-    this.price = newAdditional(this.price, additionalSelected, this.treatmentDiscount);
+    this.additionalSelected.set(options.map(o => o.value));
+    this.price = newAdditional(this.price, this.additionalSelected(), this.treatmentDiscount);
     this.cleanEvent();
   };
 

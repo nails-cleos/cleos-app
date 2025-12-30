@@ -27,8 +27,7 @@ import { Router } from '@angular/router';
 import { roomName } from '../../util/helper';
 import { Pagination } from '../../interfaces/pagination';
 import { IRoom, IRoomCustomer, IRoomInfo, IRoomService } from '../../interfaces/room';
-import { IApiResponse, success } from '../../interfaces/common';
-import { ToastType } from '../../shared/toast/toast.model';
+import { IApiResponse, success, successResponse } from '../../interfaces/common';
 
 @Injectable()
 export class RoomEffects {
@@ -73,7 +72,11 @@ export class RoomEffects {
   save$ = createEffect(() => this.actions.pipe(
     ofType(createRoom),
     switchMap(({ room }) => this.roomService.createRoom(room).pipe(
-      switchMap((response: IApiResponse) => this.requestSuccess('ROOM.CREATED', response.name, response.id)),
+      switchMap((response: IApiResponse) => {
+        const message = this.translate.instant('ROOM.CREATED', { name: response.name });
+        const path = `rooms/${response.id}`;
+        return successResponse(roomSaveSuccess, message, path, 'rooms');
+      }),
       catchError((err: HttpErrorResponse) => of(roomFailure({ error: err.error }))),
     )),
   ));
@@ -81,7 +84,11 @@ export class RoomEffects {
   update$ = createEffect(() => this.actions.pipe(
     ofType(updateRoom),
     switchMap(({ id, room }) => this.roomService.updateRoom(id, room).pipe(
-      switchMap((response: IApiResponse) => this.requestSuccess('ROOM.UPDATED.MESSAGE', response.name, response.id)),
+      switchMap((response: IApiResponse) => {
+        const message = this.translate.instant('ROOM.UPDATED.MESSAGE', { name: response.name });
+        const path = `rooms/${response.id}`;
+        return successResponse(roomSaveSuccess, message, path, 'rooms');
+      }),
       catchError((err: HttpErrorResponse) => of(roomFailure({ error: err.error }))),
     )),
   ));
@@ -89,7 +96,10 @@ export class RoomEffects {
   updateServices$ = createEffect(() => this.actions.pipe(
     ofType(updateServices),
     switchMap(({ id, prices }) => this.roomService.updateServices(id, prices).pipe(
-      switchMap(() => this.requestSuccess('ROOM.ME.SERVICES.UPDATE.MESSAGE')),
+      switchMap(() => {
+        const message = this.translate.instant('ROOM.ME.SERVICES.UPDATE.MESSAGE');
+        return success(roomSaveSuccess, message);
+      }),
       catchError((err: HttpErrorResponse) => of(roomFailure({ error: err.error }))),
     )),
   ));
@@ -97,7 +107,10 @@ export class RoomEffects {
   delete$ = createEffect(() => this.actions.pipe(
     ofType(deleteRoom),
     switchMap(({ id, room }) => this.roomService.deleteRoom(id).pipe(
-      switchMap(() => this.requestSuccess('ROOM.DELETED.MESSAGE', roomName(room), undefined, 'warning')),
+      switchMap(() => {
+        const message = this.translate.instant('ROOM.DELETED.MESSAGE', { name: roomName(room) });
+        return success(roomSaveSuccess, message, undefined, false, 'warning');
+      }),
       catchError((err: HttpErrorResponse) => of(roomFailure({ error: err.error }))),
     )),
   ));
@@ -126,10 +139,4 @@ export class RoomEffects {
   saveSuccess$ = createEffect(() => this.actions.pipe(
     ofType(roomSaveSuccess),
   ), { dispatch: false });
-
-  private requestSuccess(key: string, name?: string, id?: string, toastType?: ToastType) {
-    const message = this.translate.instant(key, { name });
-    const path = id ? `rooms/${ id }` : undefined;
-    return success(roomSaveSuccess, message, path, undefined, toastType);
-  }
 }

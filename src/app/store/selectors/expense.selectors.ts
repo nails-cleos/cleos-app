@@ -52,7 +52,7 @@ export const getSubErrorsPipe = pipe(
   filter((val): val is IError[] => val !== undefined),
 );
 
-const selectExpenseResponse = createSelector(
+export const selectExpenseResponse = createSelector(
   selectExpenseState,
   (state: ExpenseState) => state?.response,
 );
@@ -61,20 +61,12 @@ export const getExpenseResponsePipe = pipe(
   filter((val): val is ResponseSuccess => val !== undefined),
 );
 
-const selectExpenseError = createSelector(
+export const selectExpenseError = createSelector(
   selectExpenseState,
   (state: ExpenseState) => state?.error,
 );
-export const getExpenseErrorPipe = pipe(
-  select(selectExpenseError),
-  filter((val): val is IError => val !== undefined),
-);
 
-const selectExpenseIsLoading = createSelector(
+export const selectExpenseIsLoading = createSelector(
   selectExpenseState,
   (state: ExpenseState) => state?.isLoading,
-);
-export const getExpenseIsLoadingPipe = pipe(
-  select(selectExpenseIsLoading),
-  filter((val): val is boolean => val !== undefined),
 );

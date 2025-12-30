@@ -79,7 +79,7 @@ export const getSelectPaymentOptionsPipe = pipe(
   filter((val): val is IPaymentOption[] => val !== undefined),
 );
 
-const selectAccountResponse = createSelector(
+export const selectAccountResponse = createSelector(
   selectAccountState,
   (state: AccountState) => state?.response,
 );
@@ -88,20 +88,12 @@ export const getAccountResponsePipe = pipe(
   filter((val): val is ResponseSuccess => val !== undefined),
 );
 
-const selectAccountError = createSelector(
+export const selectAccountError = createSelector(
   selectAccountState,
   (state: AccountState) => state?.error,
 );
-export const getAccountErrorPipe = pipe(
-  select(selectAccountError),
-  filter((val): val is IError => val !== undefined),
-);
 
-const selectAccountIsLoading = createSelector(
+export const selectAccountIsLoading = createSelector(
   selectAccountState,
   (state: AccountState) => state?.isLoading,
-);
-export const getAccountIsLoadingPipe = pipe(
-  select(selectAccountIsLoading),
-  filter((val): val is boolean => val !== undefined),
 );

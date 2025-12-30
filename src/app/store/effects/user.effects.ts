@@ -31,7 +31,7 @@ import { Role, Token } from '../../interfaces/token';
 import { getLocale } from '../../util/helper';
 import { Pagination } from '../../interfaces/pagination';
 import { IOverview, IUserAll } from '../../interfaces/user';
-import { IApiResponse, success } from '../../interfaces/common';
+import { IApiResponse, success, successResponse } from '../../interfaces/common';
 import { ToastType } from '../../shared/toast/toast.model';
 import { loginSuccess } from '../auth.actions';
 
@@ -91,8 +91,11 @@ export class UserEffects {
     ofType(saveUser),
     switchMap(({ user, role }) =>
       this.userService.saveUser(user, role).pipe(
-        switchMap((response: { response: IApiResponse, key: string }) => this.requestSuccess(response.key,
-          response.response.name, `users/${response.response.id}`)),
+        switchMap((response: { response: IApiResponse, key: string }) => {
+          const message = this.translate.instant(response.key, { displayName: response.response.name });
+          const path = `users/${response.response.id}`;
+          return successResponse(userSaveSuccess, message, path, 'users');
+        }),
         catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
       )),
   ));

@@ -24,7 +24,6 @@ describe('NoteComponent', () => {
   let selectedNote$: BehaviorSubject<any>;
   let allProfessionals$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
 
   const mockProfessional: IUserAll = {
     id: 'p1',
@@ -51,7 +50,6 @@ describe('NoteComponent', () => {
     selectedNote$ = new BehaviorSubject(undefined);
     allProfessionals$ = new BehaviorSubject(undefined);
     subErrors$ = new BehaviorSubject(undefined);
-    response$ = new BehaviorSubject(undefined);
 
     let pipeCallIndex = 0;
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
@@ -68,8 +66,6 @@ describe('NoteComponent', () => {
           return allProfessionals$.asObservable();
         case 5:
           return subErrors$.asObservable();
-        case 6:
-          return response$.asObservable();
         default:
           return of(undefined);
       }
@@ -121,12 +117,6 @@ describe('NoteComponent', () => {
 
     expect(component.errors()['description']).toBe('Required');
     expect(component.getForm.description.hasError('incorrect')).toBeTrue();
-  });
-
-  it('should navigate on response signal', () => {
-    response$.next(true);
-    fixture.detectChanges();
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'reservation', 'calendar']);
   });
 
   it('should submit a new note in add mode', () => {

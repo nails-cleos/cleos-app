@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
@@ -15,12 +15,10 @@ describe('ColorComponent', () => {
 
   let storeSpy: jasmine.SpyObj<Store<ColorState>>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let navigateSpy: jasmine.Spy;
 
   let colorId$: BehaviorSubject<any>;
   let selectedColor$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
 
   const mockColor: Partial<IColorAll> = {
     id: '1',
@@ -32,7 +30,6 @@ describe('ColorComponent', () => {
     colorId$ = new BehaviorSubject<any>(null);
     selectedColor$ = new BehaviorSubject<any>(undefined);
     subErrors$ = new BehaviorSubject<any>(undefined);
-    response$ = new BehaviorSubject<any>(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -51,8 +48,6 @@ describe('ColorComponent', () => {
           return selectedColor$.asObservable();
         case 3:
           return subErrors$.asObservable();
-        case 4:
-          return response$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -65,9 +60,6 @@ describe('ColorComponent', () => {
         { provide: Store, useValue: storeSpy },
       ],
     }).compileComponents();
-
-    const router = TestBed.inject(Router);
-    navigateSpy = spyOn(router, 'navigate');
 
     const translate = TestBed.inject(TranslateService);
     translate.setDefaultLang('en-GB');
@@ -112,13 +104,6 @@ describe('ColorComponent', () => {
     const errs = component.errors();
     expect(errs['name']).toBe('Name required');
     expect(component.getForm.name.hasError('incorrect')).toBeTrue();
-  });
-
-  it('should navigate to color list when response emits', () => {
-    response$.next(true);
-    fixture.detectChanges();
-
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'colors']);
   });
 
   it('should not dispatch when form invalid on submit', () => {

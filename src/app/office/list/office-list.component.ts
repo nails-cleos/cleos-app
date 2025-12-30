@@ -12,8 +12,7 @@ import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { detailExpandAnimation } from '../../util/animation';
 import { SharedModule } from '../../shared/shared.module';
 import { OfficeState } from '../../store/reducers/office.reducers';
-import { getColorResponsePipe } from '../../store/selectors/color.selectors';
-import { getOfficePaginationPipe } from '../../store/selectors/office.selectors';
+import { getOfficePaginationPipe, getOfficeResponsePipe } from '../../store/selectors/office.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -32,7 +31,7 @@ export class OfficeListComponent {
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
   private officeList$ = this.store.pipe(getOfficePaginationPipe);
-  private response$ = this.store.pipe(getColorResponsePipe);
+  private response$ = this.store.pipe(getOfficeResponsePipe);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);

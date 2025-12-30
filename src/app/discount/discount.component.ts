@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
-import { NonNullableFormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Discount, DiscountType, IDiscount } from '../interfaces/discount';
 import { createDiscount, getDiscount, updateDiscount } from '../store/discount.actions';
@@ -14,7 +14,6 @@ import { BackButtonDirective } from '../directives/back-button.directive';
 import {
   getCurrenciesPipe,
   getCurrentDiscountIdPipe,
-  getDiscountResponsePipe,
   getSelectedDiscountPipe,
   getSubErrorsPipe,
 } from '../store/selectors/discount.selectors';
@@ -47,12 +46,10 @@ export class DiscountComponent {
   private selectedDiscount$ = this.store.pipe(getSelectedDiscountPipe);
   private allCurrencies$ = this.store.pipe(getCurrenciesPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getDiscountResponsePipe);
 
   private discountIdSignal = toSignal(this.discountId$, { initialValue: null });
   private selectedDiscountSignal = toSignal(this.selectedDiscount$);
   private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
 
   form: FormGroup<DiscountForm> = this.formBuilder.group<DiscountForm>({
     name: this.formBuilder.control('', {
@@ -114,12 +111,6 @@ export class DiscountComponent {
           }
         });
         this.errors.set(errorMap);
-      }
-    });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.router.navigate([this.language, 'discounts']);
       }
     });
 

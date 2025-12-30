@@ -16,7 +16,6 @@ import { OfficeState } from '../store/reducers/office.reducers';
 import {
   getCurrentOfficeIdPipe,
   getManagersPipe,
-  getOfficeResponsePipe,
   getSelectedOfficePipe,
   getSubErrorsPipe,
 } from '../store/selectors/office.selectors';
@@ -50,11 +49,9 @@ export class OfficeComponent {
   private selectedOffice$ = this.store.pipe(getSelectedOfficePipe);
   private allManagers$ = this.store.pipe(getManagersPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getOfficeResponsePipe);
 
   private officeIdSignal = toSignal(this.officeId$, { initialValue: null });
   private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
 
   allManagersSignal = toSignal(this.allManagers$);
   officeSignal = toSignal(this.selectedOffice$);
@@ -112,12 +109,6 @@ export class OfficeComponent {
           }
         });
         this.errors.set(errorMap);
-      }
-    });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.router.navigate([this.language, 'offices']);
       }
     });
 

@@ -1,16 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { NonNullableFormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { Router } from '@angular/router';
 import { Currency, ICurrency } from '../interfaces/currency';
 import { createCurrency, getCurrency, updateCurrency } from '../store/currency.actions';
-import { TranslateService } from '@ngx-translate/core';
 import { fieldChange } from '../util/validators';
 import { SharedModule } from '../shared/shared.module';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import {
   getCurrentCurrencyIdPipe,
-  getCurrencyResponsePipe,
   getSelectedCurrencyPipe,
   getSubErrorsPipe,
 } from '../store/selectors/currency.selectors';
@@ -34,18 +31,14 @@ type CurrencyForm = {
 export class CurrencyComponent {
   private readonly store: Store<CurrencyState> = inject(Store<CurrencyState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
 
   private currencyId$ = this.store.pipe(getCurrentCurrencyIdPipe);
   private selectedCurrency$ = this.store.pipe(getSelectedCurrencyPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getCurrencyResponsePipe);
 
   private currencyIdSignal = toSignal(this.currencyId$);
   private selectedCurrencySignal = toSignal(this.selectedCurrency$);
   private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
 
   private currencyId = computed(() => this.currencyIdSignal());
 
@@ -63,7 +56,6 @@ export class CurrencyComponent {
   });
 
   icons = ['attach_money', 'euro', 'currency_pound'];
-  private readonly language: string = this.translate.currentLang;
 
   constructor() {
     effect(() => {
@@ -87,12 +79,6 @@ export class CurrencyComponent {
           }
         });
         this.errors.set(errorMap);
-      }
-    });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.router.navigate([this.language, 'currency']);
       }
     });
 

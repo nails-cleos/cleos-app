@@ -24,79 +24,19 @@ import { SharedModule } from '../shared/shared.module';
 import { MenuItemComponent } from './menu-item/menu-item.component';
 import { ErrorComponent } from '../shared/error/error.component';
 import { MatRipple } from '@angular/material/core';
-import { IError, ResponseSuccess } from '../interfaces/common';
 import { ToastService } from '../services/toast.service';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
   getIsAuthenticatedPipe,
-  getIsLoadingPipe,
   getMenusPipe,
   getRedirectPipe,
   getTokenPipe,
   getUserPipe,
 } from '../store/selectors/auth.selectors';
-import {
-  getDataDeletedPipe,
-  getNotificationIsLoadingPipe,
-  getNotificationsPipe,
-} from '../store/selectors/notification.selectors';
-import { Observable, of, Subject, takeUntil, UnaryFunction } from 'rxjs';
-import { getRoomErrorPipe, getRoomIsLoadingPipe, getRoomResponsePipe } from '../store/selectors/room.selectors';
-import {
-  getTreatmentErrorPipe,
-  getTreatmentIsLoadingPipe,
-  getTreatmentResponsePipe,
-} from '../store/selectors/treatment.selectors';
-import {
-  getCatalogueErrorPipe,
-  getCatalogueIsLoadingPipe,
-  getCatalogueResponsePipe,
-} from '../store/selectors/catalogue.selectors';
-import {
-  getDiscountErrorPipe,
-  getDiscountIsLoadingPipe,
-  getDiscountResponsePipe,
-} from '../store/selectors/discount.selectors';
-import {
-  getUnavailableErrorPipe,
-  getUnavailableIsLoadingPipe,
-  getUnavailableResponsePipe,
-} from '../store/selectors/unavailable.selectors';
-import { getUserErrorPipe, getUserIsLoadingPipe, getUserResponsePipe } from '../store/selectors/user.selectors';
-import {
-  getReservationErrorPipe,
-  getReservationIsLoadingPipe,
-  getReservationResponsePipe,
-} from '../store/selectors/reservation.selectors';
-import {
-  getPaymentErrorPipe,
-  getPaymentIsLoadingPipe,
-  getPaymentResponsePipe,
-} from '../store/selectors/payment.selectors';
-import {
-  getAdditionalErrorPipe,
-  getAdditionalIsLoadingPipe,
-  getAdditionalResponsePipe,
-} from '../store/selectors/additional.selectors';
-import {
-  getCurrencyErrorPipe,
-  getCurrencyIsLoadingPipe,
-  getCurrencyResponsePipe,
-} from '../store/selectors/currency.selectors';
-import { getOfficeErrorPipe, getOfficeIsLoadingPipe, getOfficeResponsePipe } from '../store/selectors/office.selectors';
-import { getColorErrorPipe, getColorIsLoadingPipe, getColorResponsePipe } from '../store/selectors/color.selectors';
-import {
-  getExpenseErrorPipe,
-  getExpenseIsLoadingPipe,
-  getExpenseResponsePipe,
-} from '../store/selectors/expense.selectors';
-import { getNoteErrorPipe, getNoteIsLoadingPipe, getNoteResponsePipe } from '../store/selectors/note.selectors';
-import {
-  getAccountErrorPipe,
-  getAccountIsLoadingPipe,
-  getAccountResponsePipe,
-} from '../store/selectors/account.selectors';
+import { getDataDeletedPipe, getNotificationsPipe } from '../store/selectors/notification.selectors';
+import { of, Subject } from 'rxjs';
+import { selectGlobalError, selectGlobalIsLoading, selectGlobalResponse } from '../store/selectors/global.selectors';
 
 @Component({
   selector: 'app-nav',
@@ -128,10 +68,8 @@ export class NavComponent implements OnDestroy {
   private token$ = this.store.pipe(getTokenPipe);
   private menus$ = this.store.pipe(getMenusPipe);
   private redirect$ = this.store.pipe(getRedirectPipe);
-  private isLoading$ = this.store.pipe(getIsLoadingPipe);
   private dataDeleted$ = this.store.pipe(getDataDeletedPipe);
   private notification$ = this.store.pipe(getNotificationsPipe);
-  private notificationIsLoading$ = this.store.pipe(getNotificationIsLoadingPipe);
 
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
@@ -149,14 +87,15 @@ export class NavComponent implements OnDestroy {
   title = environment.title;
 
   private isAuthenticatedSignal = toSignal(this.isAuthenticated$);
-  private isLoadingSignal = toSignal(this.isLoading$);
   private redirectSignal = toSignal(this.redirect$);
   private tokenSignal = toSignal(this.token$);
   private menuItemsSignal = toSignal(this.menus$);
   private dataDeletedSignal = toSignal(this.dataDeleted$);
   private notificationSignal = toSignal(this.notification$);
-  private notificationIsLoadingSignal = toSignal(this.notificationIsLoading$);
   private messageSignal = toSignal(this.messagingService.message$ ?? of(undefined));
+  private globalIsLoadingSignal = toSignal(this.store.select(selectGlobalIsLoading), { initialValue: true });
+  private globalResponseSignal = toSignal(this.store.select(selectGlobalResponse));
+  private globalErrorSignal = toSignal(this.store.select(selectGlobalError));
 
   currentUserSignal = toSignal(this.user$);
 
@@ -176,13 +115,13 @@ export class NavComponent implements OnDestroy {
     return getLocale(user?.locale || this.route.snapshot.paramMap.get('lang') || this.translate.currentLang).language;
   });
 
-
   isDarkMode = signal(this.authUserSignal().isDarkMode || isDarkMode(this.cookieService.get(THEME) as Theme));
-  isLoading = signal((this.isLoadingSignal() || this.notificationIsLoadingSignal()) ?? true);
+  isLoading = computed(() => this.globalIsLoadingSignal());
+  response = computed(() => this.globalResponseSignal());
+  error = computed(() => this.globalErrorSignal());
   notifications = signal<INotification[]>([]);
   workDay = signal<INotification[]>([]);
   countNotifications = signal(0);
-  error = signal<IError | undefined>(undefined);
 
   dateFormat: string = this.translate.currentLang;
   image?: string;
@@ -194,28 +133,41 @@ export class NavComponent implements OnDestroy {
   private cssClass?: string;
 
   constructor() {
-    this.registerFeature(getRoomResponsePipe, getRoomErrorPipe, getRoomIsLoadingPipe);
-    this.registerFeature(getTreatmentResponsePipe, getTreatmentErrorPipe, getTreatmentIsLoadingPipe);
-    this.registerFeature(getCatalogueResponsePipe, getCatalogueErrorPipe, getCatalogueIsLoadingPipe);
-    this.registerFeature(getDiscountResponsePipe, getDiscountErrorPipe, getDiscountIsLoadingPipe);
-    this.registerFeature(getUnavailableResponsePipe, getUnavailableErrorPipe, getUnavailableIsLoadingPipe);
-    this.registerFeature(getUserResponsePipe, getUserErrorPipe, getUserIsLoadingPipe);
-    this.registerFeature(getReservationResponsePipe, getReservationErrorPipe, getReservationIsLoadingPipe);
-    this.registerFeature(getPaymentResponsePipe, getPaymentErrorPipe, getPaymentIsLoadingPipe);
-    this.registerFeature(getAdditionalResponsePipe, getAdditionalErrorPipe, getAdditionalIsLoadingPipe);
-    this.registerFeature(getCurrencyResponsePipe, getCurrencyErrorPipe, getCurrencyIsLoadingPipe);
-    this.registerFeature(getOfficeResponsePipe, getOfficeErrorPipe, getOfficeIsLoadingPipe);
-    this.registerFeature(getColorResponsePipe, getColorErrorPipe, getColorIsLoadingPipe);
-    this.registerFeature(getExpenseResponsePipe, getExpenseErrorPipe, getExpenseIsLoadingPipe);
-    this.registerFeature(getNoteResponsePipe, getNoteErrorPipe, getNoteIsLoadingPipe);
-    this.registerFeature(getAccountResponsePipe, getAccountErrorPipe, getAccountIsLoadingPipe);
-
     this.navigationService.subscribe();
     this.authUserService.cookieConsent(this.translate);
 
     const meta = this.translate.instant('DASHBOARD.META');
     this.seoService.setMetaDescription(meta.CONTENT);
     this.seoService.setMetaTitle(meta.TITLE);
+
+    effect(() => {
+      const res = this.response();
+      if (!res) {
+        return;
+      }
+
+      if (res.redirect) {
+        this.router.navigate([`/${this.language()}/${res.redirect}`]);
+      }
+
+      const path = res.path ? `/${this.language()}/${res.path}` : undefined;
+      const toastRef = this.toastService.show(res.message, res.toastType, 5000, path ? 'link' : 'none', path);
+
+      toastRef.onDismiss().subscribe(() => {
+        if (res.reload) {
+          this.navigationService.reload(this.router.url.split('/'));
+        }
+      });
+    });
+
+    effect(() => {
+      const err = this.error();
+      if (!err?.message) {
+        return;
+      }
+
+      this.toastService.error(err.message);
+    });
 
     effect(() => {
       this.authUserService.reloadUser(this.currentUserSignal());
@@ -361,49 +313,6 @@ export class NavComponent implements OnDestroy {
       this.store.dispatch(readNotification({ id: notification.id }));
     }
   };
-
-  private registerFeature(
-    responsePipe: UnaryFunction<Observable<object>, Observable<ResponseSuccess>>,
-    errorPipe: UnaryFunction<Observable<object>, Observable<IError>>,
-    isLoadingPipe: UnaryFunction<Observable<object>, Observable<boolean>>,
-  ) {
-    // Loading
-    this.store.pipe(isLoadingPipe, takeUntil(this.destroy$)).subscribe((loading) => {
-      if (this.isLoading() !== loading) {
-        this.isLoading.set(loading);
-      }
-    });
-
-    // Error
-    this.store.pipe(errorPipe, takeUntil(this.destroy$)).subscribe((error) => {
-      if (!error) {
-        return;
-      }
-
-      this.error.set(error);
-      if (!error.message) {
-        return;
-      }
-      this.toastService.error(error.message);
-    });
-
-    // Success response
-    this.store.pipe(responsePipe, takeUntil(this.destroy$)).subscribe((response) => {
-      if (!response) {
-        return;
-      }
-
-      const path = response.path ? `/${this.language()}/${response.path}` : undefined;
-
-      const toastRef = this.toastService.show(response.message, response.toastType, 5000, path ? 'link' : 'none', path);
-
-      toastRef.onDismiss().subscribe(() => {
-        if (response.reload) {
-          this.navigationService.reload(this.router.url.split('/'));
-        }
-      });
-    });
-  }
 
   ngOnDestroy(): void {
     this.destroy$.next();

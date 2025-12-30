@@ -6,7 +6,6 @@ import { combineLatestWith } from 'rxjs';
 import { fieldChange, requireMatch, valueChange } from '../../util/validators';
 import { IUnavailable, Unavailable } from '../../interfaces/unavailable';
 import { Store } from '@ngrx/store';
-import { Router } from '@angular/router';
 import {
   API_LOCALE,
   createNewDate,
@@ -43,7 +42,6 @@ import { UnavailableState } from '../../store/reducers/unavailable.reducers';
 import {
   getCurrentUnavailableIdPipe,
   getProfessionalsPipe,
-  getUnavailableResponsePipe,
   getRoomsPipe,
   getSelectedUnavailablePipe,
   getSubErrorsPipe,
@@ -69,7 +67,6 @@ type BlockAgendaForm = {
 export class BlockAgendaComponent {
   private readonly store: Store<UnavailableState> = inject(Store<UnavailableState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly dialog: MatDialog = inject(MatDialog);
@@ -80,13 +77,11 @@ export class BlockAgendaComponent {
   private allProfessionals$ = this.store.pipe(getProfessionalsPipe);
   private allRooms$ = this.store.pipe(getRoomsPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getUnavailableResponsePipe);
 
   private navigationParams = toSignal(this.navigationParams$);
   private unavailableIdSignal = toSignal(this.unavailableId$);
   private allRoomsSignal = toSignal(this.allRooms$);
   private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
 
   unavailableSignal = toSignal(this.selectedUnavailable$);
   allProfessionalsSignal = toSignal(this.allProfessionals$);
@@ -193,12 +188,6 @@ export class BlockAgendaComponent {
     });
 
     effect(() => {
-      if (this.responseSignal()) {
-        this.router.navigate([this.translate.currentLang, 'unavailable']);
-      }
-    });
-
-    effect(() => {
       const id = this.unavailableIdSignal();
       if (id) {
         this.store.dispatch(getUnavailable({ id }));
@@ -274,9 +263,7 @@ export class BlockAgendaComponent {
     const isRoomAdmin = this.isRoomAdmin();
     const id = this.unavailableIdSignal();
     if (!id) {
-      this.store.dispatch(
-        createBlockAgenda({ unavailable, isRoomAdmin }),
-      );
+      this.store.dispatch(createBlockAgenda({ unavailable, isRoomAdmin }));
     } else {
       this.store.dispatch(
         updateUnavailable({ id, unavailable, path: isRoomAdmin ? 'dashboard/events' : 'unavailable/block-agenda' }),

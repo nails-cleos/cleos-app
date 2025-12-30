@@ -8,10 +8,9 @@ import { sendPasswordResetEmail } from '@firebase/auth';
 import { TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../../shared/shared.module';
 import { BackButtonDirective } from '../../directives/back-button.directive';
-import { ResponseSuccess } from '../../interfaces/common';
 import { ToastService } from '../../services/toast.service';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { getAuthErrorPipe, getResponsePipe } from '../../store/selectors/auth.selectors';
+import { getAuthErrorPipe, getAuthResponsePipe } from '../../store/selectors/auth.selectors';
 import { AuthState } from '../../store/reducers/auth.reducers';
 
 type ForgotPasswordForm = {
@@ -34,7 +33,7 @@ export class ForgotPasswordComponent {
   private readonly translate: TranslateService = inject(TranslateService);
 
   private error$ = this.store.pipe(getAuthErrorPipe);
-  private response$ = this.store.pipe(getResponsePipe);
+  private response$ = this.store.pipe(getAuthResponsePipe);
 
   private errorSignal = toSignal(this.error$);
   private responseSignal = toSignal(this.response$);
@@ -55,7 +54,7 @@ export class ForgotPasswordComponent {
     });
 
     effect(() => {
-      const response: ResponseSuccess | undefined = this.responseSignal();
+      const response = this.responseSignal();
       if (response) {
         const toastRef = this.toastService.show(response.message, response.toastType, 5000, 'button');
         toastRef.onAction().subscribe(() => this.router.navigate([this.language, 'auth']));

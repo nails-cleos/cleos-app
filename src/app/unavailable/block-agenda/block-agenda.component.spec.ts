@@ -3,7 +3,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BlockAgendaComponent } from './block-agenda.component';
 import { BehaviorSubject } from 'rxjs';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ChangeDetectorRef, signal } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -27,13 +26,11 @@ describe('BlockAgendaComponent', () => {
   let allProfessionals$: BehaviorSubject<any>;
   let allRooms$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   let storeSpy: jasmine.SpyObj<Store<UnavailableState>>;
   let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
-  let navigateSpy: jasmine.Spy;
 
   const mockProfessionals: IUserAll[] = [
     { id: 'a', displayName: 'Alice' } as IUserAll,
@@ -102,7 +99,6 @@ describe('BlockAgendaComponent', () => {
     allProfessionals$ = new BehaviorSubject(undefined);
     allRooms$ = new BehaviorSubject(undefined);
     subErrors$ = new BehaviorSubject(undefined);
-    response$ = new BehaviorSubject(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['select', 'pipe', 'dispatch']);
     changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
@@ -126,8 +122,6 @@ describe('BlockAgendaComponent', () => {
           return allRooms$.asObservable();
         case 6:
           return subErrors$.asObservable();
-        case 7:
-          return response$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -146,9 +140,6 @@ describe('BlockAgendaComponent', () => {
         { provide: AuthUserService, useValue: authUserServiceSpy },
       ],
     }).compileComponents();
-
-    const router = TestBed.inject(Router);
-    navigateSpy = spyOn(router, 'navigate');
 
     const translate = TestBed.inject(TranslateService);
     translate.setDefaultLang('en-GB');
@@ -231,14 +222,6 @@ describe('BlockAgendaComponent', () => {
     expect(component.getForm.professional?.hasError('incorrect')).toBeTrue();
     expect(component.errors()['duration']).toBe('Duration is required');
     expect(component.getForm.duration?.hasError('incorrect')).toBeTrue();
-  });
-
-  it('should navigate to unavailable list on successful response', () => {
-    response$.next({ response: true });
-
-    fixture.detectChanges();
-
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'unavailable']);
   });
 
   it('should set mix and max when room is set', () => {
@@ -382,16 +365,6 @@ describe('BlockAgendaComponent', () => {
     component.getForm.startTime.setValue('10:00');
     component.getForm.duration.setValue('00:30');
     expect(component.form.valid).toBeTrue();
-  });
-
-  it('should clean state and get unavailable list on response', () => {
-    storeSpy.dispatch.calls.reset();
-
-    response$.next({ success: true });
-
-    fixture.detectChanges();
-
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'unavailable']);
   });
 
   it('should filter professionals correctly when filter is called', () => {

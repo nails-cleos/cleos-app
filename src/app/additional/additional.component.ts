@@ -11,9 +11,8 @@ import {
 } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { NonNullableFormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { Additional, IAdditional } from '../interfaces/additional';
-import { Router } from '@angular/router';
 import { createAdditional, getAdditional, updateAdditional } from '../store/additional.actions';
 import { ITreatmentGroupAll } from '../interfaces/treatment';
 import { fieldChange, valueChange } from '../util/validators';
@@ -28,7 +27,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import {
   getCurrentAdditionalIdPipe,
   getGroupPipe,
-  getAdditionalResponsePipe,
   getSelectedAdditionalPipe,
   getSubErrorsPipe,
 } from '../store/selectors/additional.selectors';
@@ -52,20 +50,17 @@ type AdditionalForm = {
 export class AdditionalComponent {
   private readonly store: Store<AdditionalState> = inject(Store<AdditionalState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
 
   private additionalId$ = this.store.pipe(getCurrentAdditionalIdPipe);
   private selectedAdditional$ = this.store.pipe(getSelectedAdditionalPipe);
   private allGroups$ = this.store.pipe(getGroupPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getAdditionalResponsePipe);
 
   private additionalIdSignal = toSignal(this.additionalId$);
   private selectedAdditionalSignal = toSignal(this.selectedAdditional$);
   private allGroupsSignal = toSignal(this.allGroups$);
   private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
 
   private additionalId = computed(() => this.additionalIdSignal());
 
@@ -132,12 +127,6 @@ export class AdditionalComponent {
           }
         });
         this.errors.set(errorMap);
-      }
-    });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.router.navigate([this.language, 'additional']);
       }
     });
 

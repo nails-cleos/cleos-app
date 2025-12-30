@@ -23,11 +23,7 @@ export const getDataDeletedPipe = pipe(
   filter((val): val is INotification => val !== undefined),
 );
 
-const selectNotificationIsLoading = createSelector(
+export const selectNotificationIsLoading = createSelector(
   selectNotificationState,
   (state: NotificationState) => state?.isLoading,
-);
-export const getNotificationIsLoadingPipe = pipe(
-  select(selectNotificationIsLoading),
-  filter((val): val is boolean => val !== undefined),
 );

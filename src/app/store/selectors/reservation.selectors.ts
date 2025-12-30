@@ -249,7 +249,7 @@ export const getSubErrorsPipe = pipe(
   filter((val): val is IError[] => val !== undefined),
 );
 
-const selectReservationResponse = createSelector(
+export const selectReservationResponse = createSelector(
   selectReservationState,
   (state: ReservationState) => state?.response,
 );
@@ -258,7 +258,7 @@ export const getReservationResponsePipe = pipe(
   filter((val): val is ResponseSuccess => val !== undefined),
 );
 
-const selectReservationError = createSelector(
+export const selectReservationError = createSelector(
   selectReservationState,
   (state: ReservationState) => state?.error,
 );
@@ -267,11 +267,7 @@ export const getReservationErrorPipe = pipe(
   filter((val): val is IError => val !== undefined),
 );
 
-const selectReservationIsLoading = createSelector(
+export const selectReservationIsLoading = createSelector(
   selectReservationState,
   (state: ReservationState) => state?.isLoading,
-);
-export const getReservationIsLoadingPipe = pipe(
-  select(selectReservationIsLoading),
-  filter((val): val is boolean => val !== undefined),
 );

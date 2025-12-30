@@ -27,7 +27,7 @@ import {
   getIsAuthenticatedPipe,
   getQueryParamsPipe,
   getRedirectPipe,
-  getResponsePipe,
+  getAuthResponsePipe,
 } from '../store/selectors/auth.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthState } from '../store/reducers/auth.reducers';
@@ -61,7 +61,7 @@ export class AuthComponent {
   private queryParams$ = this.store.pipe(getQueryParamsPipe);
 
   private error$ = this.store.pipe(getAuthErrorPipe);
-  private response$ = this.store.pipe(getResponsePipe);
+  private response$ = this.store.pipe(getAuthResponsePipe);
 
   private isAuthenticatedSignal = toSignal(this.isAuthenticated$);
   private redirectSignal = toSignal(this.redirect$);
@@ -135,7 +135,7 @@ export class AuthComponent {
         if (!user.emailVerified && !this.cookieService.get(VERIFICATION_EMAIL)) {
           sendEmailVerification(user).then(() => {
             const message = this.translate.instant('AUTH.ACTIVATE_ACCOUNT.MESSAGE');
-            this.store.dispatch(signupSuccess(message));
+            this.store.dispatch(signupSuccess({ message }));
             this.cookieService.set(VERIFICATION_EMAIL, 'sent');
           }).catch(console.error);
           return;

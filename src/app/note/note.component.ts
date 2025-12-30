@@ -1,9 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, Signal, signal } from '@angular/core';
-import { NonNullableFormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { combineLatestWith } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
-import { Router } from '@angular/router';
 import { backendFormatDate, createDateFromString } from '../util/dates';
 import { fieldChange, requireMatch, valueChange } from '../util/validators';
 import { createNote, deleteNote, getNote, updateNote } from '../store/note.actions';
@@ -20,7 +19,6 @@ import {
   getAllProfessionalsPipe,
   getCurrentNoteIdPipe,
   getNavigationParamsPipe,
-  getNoteResponsePipe,
   getSelectedNotePipe,
   getSubErrorsPipe,
 } from '../store/selectors/note.selectors';
@@ -44,7 +42,6 @@ type NoteForm = {
 export class NoteComponent {
   private readonly store: Store<NoteState> = inject(Store<NoteState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
 
@@ -53,12 +50,10 @@ export class NoteComponent {
   private selectedNote$ = this.store.pipe(getSelectedNotePipe);
   private allProfessionals$ = this.store.pipe(getAllProfessionalsPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getNoteResponsePipe);
 
   private noteIdSignal = toSignal(this.noteId$, { initialValue: null });
   private navigationParams = toSignal(this.navigationParams$);
   private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
 
   allProfessionalsSignal = toSignal(this.allProfessionals$);
   noteSignal = toSignal(this.selectedNote$);
@@ -95,8 +90,6 @@ export class NoteComponent {
   );
 
   repeats = [FrequencyEnum.none, FrequencyEnum.onceAWeek, FrequencyEnum.onceAMonth, FrequencyEnum.onceAYear];
-
-  private readonly language: string = this.translate.currentLang;
 
   constructor() {
     effect(() => {
@@ -138,12 +131,6 @@ export class NoteComponent {
     });
 
     effect(() => {
-      if (this.responseSignal()) {
-        this.router.navigate([this.language, 'reservation', 'calendar']);
-      }
-    });
-
-    effect(() => {
       const id = this.noteIdSignal();
       if (id) {
         this.store.dispatch(getNote({ id }));
@@ -167,10 +154,10 @@ export class NoteComponent {
     note.repeat = fieldChange(this.getForm.repeat, noteSignal?.repeat);
     note.date = backendFormatDate(this.getForm.date.value);
 
-    if (this.isAddModeSignal()) {
+    const id = this.noteIdSignal();
+    if (!id) {
       this.store.dispatch(createNote({ note }));
     } else {
-      const id = this.noteIdSignal()!;
       this.store.dispatch(updateNote({ id, note }));
     }
     return;

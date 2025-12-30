@@ -29,7 +29,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import {
   getColorsPipe,
   getCurrentTreatmentIdPipe,
-  getTreatmentResponsePipe,
   getSelectedTreatmentPipe,
   getSubErrorsPipe,
 } from '../store/selectors/treatment.selectors';
@@ -59,13 +58,11 @@ export class TreatmentComponent {
   private selectedTreatment$ = this.store.pipe(getSelectedTreatmentPipe);
   private allColors$ = this.store.pipe(getColorsPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getTreatmentResponsePipe);
 
   private treatmentIdSignal = toSignal(this.treatmentId$);
   private selectedTreatmentSignal = toSignal(this.selectedTreatment$);
   private allColorsSignal = toSignal(this.allColors$);
   private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
 
   private treatmentId = computed(() => this.treatmentIdSignal());
 
@@ -146,12 +143,6 @@ export class TreatmentComponent {
           }
         });
         this.errors.set(errorMap);
-      }
-    });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.router.navigate([this.language, 'treatments']);
       }
     });
 

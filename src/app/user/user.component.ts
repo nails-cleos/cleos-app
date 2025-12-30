@@ -161,12 +161,6 @@ export class UserComponent {
     });
 
     effect(() => {
-      if (this.responseSignal()) {
-        this.router.navigate([this.translate.currentLang, 'users']);
-      }
-    });
-
-    effect(() => {
       const id = this.userIdSignal();
       if (id) {
         this.store.dispatch(getUser({ id }));

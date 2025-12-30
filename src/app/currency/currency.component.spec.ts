@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
@@ -15,12 +15,10 @@ describe('CurrencyComponent', () => {
 
   let storeSpy: jasmine.SpyObj<Store<CurrencyState>>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let navigateSpy: jasmine.Spy;
 
   let currencyId$: BehaviorSubject<any>;
   let selectedCurrency$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
 
   const mockCurrency: ICurrencyAll = {
     id: '1',
@@ -33,7 +31,6 @@ describe('CurrencyComponent', () => {
     currencyId$ = new BehaviorSubject<any>(null);
     selectedCurrency$ = new BehaviorSubject<any>(undefined);
     subErrors$ = new BehaviorSubject<any>(undefined);
-    response$ = new BehaviorSubject<any>(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -52,8 +49,6 @@ describe('CurrencyComponent', () => {
           return selectedCurrency$.asObservable();
         case 3:
           return subErrors$.asObservable();
-        case 4:
-          return response$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -67,11 +62,6 @@ describe('CurrencyComponent', () => {
       ],
     }).compileComponents();
 
-    // Spy router.navigate
-    const router = TestBed.inject(Router);
-    navigateSpy = spyOn(router, 'navigate');
-
-    // Make sure translate has a language so component.language is meaningful
     const translate = TestBed.inject(TranslateService);
     translate.setDefaultLang('en-GB');
     translate.use('en-GB');
@@ -116,13 +106,6 @@ describe('CurrencyComponent', () => {
     const errs = component.errors();
     expect(errs['code']).toBe('Code required');
     expect(component.getForm.code.hasError('incorrect')).toBeTrue();
-  });
-
-  it('should navigate to currency list when response emits', () => {
-    response$.next(true);
-    fixture.detectChanges();
-
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'currency']);
   });
 
   it('should not dispatch when form invalid on submit', () => {

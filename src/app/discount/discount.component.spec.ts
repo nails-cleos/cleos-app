@@ -16,7 +16,6 @@ describe('DiscountComponent', () => {
   let discountId$: BehaviorSubject<string | null>;
   let selectedDiscount$: BehaviorSubject<IDiscountAll | undefined>;
   let subErrors$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<boolean | undefined>;
   let allCurrencies$: BehaviorSubject<ICurrency[]>;
   let action$: BehaviorSubject<void>;
 
@@ -45,7 +44,6 @@ describe('DiscountComponent', () => {
     discountId$ = new BehaviorSubject<string | null>(null);
     selectedDiscount$ = new BehaviorSubject<IDiscountAll | undefined>(undefined);
     subErrors$ = new BehaviorSubject<any>([]);
-    response$ = new BehaviorSubject<boolean | undefined>(false);
     allCurrencies$ = new BehaviorSubject<ICurrency[]>([]);
     action$ = new BehaviorSubject<void>(void 0);
 
@@ -70,8 +68,6 @@ describe('DiscountComponent', () => {
           return allCurrencies$.asObservable();
         case 4:
           return subErrors$.asObservable();
-        case 5:
-          return response$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -142,13 +138,6 @@ describe('DiscountComponent', () => {
     expect(component.errors()['name']).toBe('Name required');
     expect(component.errors()['currency']).toBe('Currency invalid');
     expect(component.errors()['type']).toBe('Type required');
-  });
-
-  it('should navigate when response emits true', () => {
-    response$.next(true);
-    fixture.detectChanges();
-
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'discounts']);
   });
 
   it('should filter groups correctly using filteredCurrencySignal', () => {

@@ -80,7 +80,7 @@ export const getSubErrorsPipe = pipe(
   filter((val): val is IError[] => val !== undefined),
 );
 
-const selectPaymentResponse = createSelector(
+export const selectPaymentResponse = createSelector(
   selectPaymentState,
   (state: PaymentState) => state?.response,
 );
@@ -89,20 +89,12 @@ export const getPaymentResponsePipe = pipe(
   filter((val): val is ResponseSuccess => val !== undefined),
 );
 
-const selectPaymentError = createSelector(
+export const selectPaymentError = createSelector(
   selectPaymentState,
   (state: PaymentState) => state?.error,
 );
-export const getPaymentErrorPipe = pipe(
-  select(selectPaymentError),
-  filter((val): val is IError => val !== undefined),
-);
 
-const selectPaymentIsLoading = createSelector(
+export const selectPaymentIsLoading = createSelector(
   selectPaymentState,
   (state: PaymentState) => state?.isLoading,
-);
-export const getPaymentIsLoadingPipe = pipe(
-  select(selectPaymentIsLoading),
-  filter((val): val is boolean => val !== undefined),
 );

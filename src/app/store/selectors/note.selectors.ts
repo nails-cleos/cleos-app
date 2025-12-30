@@ -52,7 +52,7 @@ export const getSubErrorsPipe = pipe(
   filter((val): val is IError[] => val !== undefined),
 );
 
-const selectNoteResponse = createSelector(
+export const selectNoteResponse = createSelector(
   selectNoteState,
   (state: NoteState) => state?.response,
 );
@@ -61,20 +61,12 @@ export const getNoteResponsePipe = pipe(
   filter((val): val is ResponseSuccess => val !== undefined),
 );
 
-const selectNoteError = createSelector(
+export const selectNoteError = createSelector(
   selectNoteState,
   (state: NoteState) => state?.error,
 );
-export const getNoteErrorPipe = pipe(
-  select(selectNoteError),
-  filter((val): val is IError => val !== undefined),
-);
 
-const selectNoteIsLoading = createSelector(
+export const selectNoteIsLoading = createSelector(
   selectNoteState,
   (state: NoteState) => state?.isLoading,
-);
-export const getNoteIsLoadingPipe = pipe(
-  select(selectNoteIsLoading),
-  filter((val): val is boolean => val !== undefined),
 );

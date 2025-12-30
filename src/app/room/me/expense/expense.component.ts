@@ -14,11 +14,12 @@ import { TwoDigitsDirective } from '../../../directives/two-digits.directive';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { ExpenseState } from '../../../store/reducers/expense.reducers';
 import { RoomState } from '../../../store/reducers/room.reducers';
-import { getColorResponsePipe, getSubErrorsPipe } from '../../../store/selectors/color.selectors';
 import {
   getCurrentExpenseIdPipe,
+  getExpenseResponsePipe,
   getInfoPipe,
   getSelectedExpensePipe,
+  getSubErrorsPipe,
 } from '../../../store/selectors/expense.selectors';
 import { getCurrentRoomIdPipe } from '../../../store/selectors/room.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -56,7 +57,7 @@ export class ExpenseComponent {
   private selectedExpense$ = this.store.pipe(getSelectedExpensePipe);
   private info$ = this.store.pipe(getInfoPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getColorResponsePipe);
+  private response$ = this.store.pipe(getExpenseResponsePipe);
 
   private expenseIdSignal = toSignal(this.expenseId$);
   private roomIdSignal = toSignal(this.roomId$);

@@ -1,9 +1,9 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
-import { IError, ResponseSuccess } from '../../interfaces/common';
 import { AUTH_FEATURE_KEY, AuthState } from '../reducers/auth.reducers';
 import { IMenu, IUserAll } from '../../interfaces/user';
 import { Params } from '@angular/router';
+import { IError, ResponseSuccess } from '../../interfaces/common';
 
 const selectAuthState = createFeatureSelector<AuthState>(AUTH_FEATURE_KEY);
 
@@ -13,15 +13,6 @@ const selectRedirect = createSelector(
 );
 export const getRedirectPipe = pipe(
   select(selectRedirect),
-  filter((val): val is boolean => val !== undefined),
-);
-
-const selectIsLoading = createSelector(
-  selectAuthState,
-  (state: AuthState) => state?.isLoading,
-);
-export const getIsLoadingPipe = pipe(
-  select(selectIsLoading),
   filter((val): val is boolean => val !== undefined),
 );
 
@@ -70,7 +61,25 @@ export const getMenusPipe = pipe(
   filter((val): val is IMenu[] => val !== undefined),
 );
 
-const selectAuthError = createSelector(
+const selectCurrentCode = createSelector(
+  selectAuthState,
+  (state: AuthState) => state?.currentCode,
+);
+export const getCurrentCodePipe = pipe(
+  select(selectCurrentCode),
+  filter((val): val is string => val !== undefined),
+);
+
+export const selectAuthResponse = createSelector(
+  selectAuthState,
+  (state: AuthState) => state?.response,
+);
+export const getAuthResponsePipe = pipe(
+  select(selectAuthResponse),
+  filter((val): val is ResponseSuccess => val !== undefined),
+);
+
+export const selectAuthError = createSelector(
   selectAuthState,
   (state: AuthState) => state?.error,
 );
@@ -79,29 +88,7 @@ export const getAuthErrorPipe = pipe(
   filter((val): val is IError => val !== undefined),
 );
 
-const selectSubErrors = createSelector(
+export const selectAuthIsLoading = createSelector(
   selectAuthState,
-  (state: AuthState) => state?.subErrors,
-);
-export const getSubErrorsPipe = pipe(
-  select(selectSubErrors),
-  filter((val): val is IError[] => val !== undefined),
-);
-
-const selectResponse = createSelector(
-  selectAuthState,
-  (state: AuthState) => state?.response,
-);
-export const getResponsePipe = pipe(
-  select(selectResponse),
-  filter((val): val is ResponseSuccess => val !== undefined),
-);
-
-const selectCurrentCode = createSelector(
-  selectAuthState,
-  (state: AuthState) => state?.currentCode,
-);
-export const getCurrentCodePipe = pipe(
-  select(selectCurrentCode),
-  filter((val): val is string => val !== undefined),
+  (state: AuthState) => state?.isLoading,
 );

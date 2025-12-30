@@ -53,7 +53,7 @@ export const getSubErrorsPipe = pipe(
   filter((val): val is IError[] => val !== undefined),
 );
 
-const selectOfficeResponse = createSelector(
+export const selectOfficeResponse = createSelector(
   selectOfficeState,
   (state: OfficeState) => state?.response,
 );
@@ -62,20 +62,12 @@ export const getOfficeResponsePipe = pipe(
   filter((val): val is ResponseSuccess => val !== undefined),
 );
 
-const selectOfficeError = createSelector(
+export const selectOfficeError = createSelector(
   selectOfficeState,
   (state: OfficeState) => state?.error,
 );
-export const getOfficeErrorPipe = pipe(
-  select(selectOfficeError),
-  filter((val): val is IError => val !== undefined),
-);
 
-const selectOfficeIsLoading = createSelector(
+export const selectOfficeIsLoading = createSelector(
   selectOfficeState,
   (state: OfficeState) => state?.isLoading,
-);
-export const getOfficeIsLoadingPipe = pipe(
-  select(selectOfficeIsLoading),
-  filter((val): val is boolean => val !== undefined),
 );

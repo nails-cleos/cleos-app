@@ -71,7 +71,7 @@ export const getSubErrorsPipe = pipe(
   filter((val): val is IError[] => val !== undefined),
 );
 
-const selectTreatmentResponse = createSelector(
+export const selectTreatmentResponse = createSelector(
   selectTreatmentState,
   (state: TreatmentState) => state?.response,
 );
@@ -80,20 +80,12 @@ export const getTreatmentResponsePipe = pipe(
   filter((val): val is ResponseSuccess => val !== undefined),
 );
 
-const selectTreatmentError = createSelector(
+export const selectTreatmentError = createSelector(
   selectTreatmentState,
   (state: TreatmentState) => state?.error,
 );
-export const getTreatmentErrorPipe = pipe(
-  select(selectTreatmentError),
-  filter((val): val is IError => val !== undefined),
-);
 
-const selectTreatmentIsLoading = createSelector(
+export const selectTreatmentIsLoading = createSelector(
   selectTreatmentState,
   (state: TreatmentState) => state?.isLoading,
-);
-export const getTreatmentIsLoadingPipe = pipe(
-  select(selectTreatmentIsLoading),
-  filter((val): val is boolean => val !== undefined),
 );

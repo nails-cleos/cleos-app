@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NavComponent } from './nav.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TokenService } from '../services/token.service';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { MessagingService } from '../services/messaging.service';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
@@ -24,13 +24,14 @@ describe('NavComponent', () => {
   let fixture: ComponentFixture<NavComponent>;
 
   let state$: BehaviorSubject<any>;
+  let isLoading$: BehaviorSubject<any>;
+  let error$: BehaviorSubject<any>;
   let message$: BehaviorSubject<any>;
   let isAuthenticated$: BehaviorSubject<any>;
   let user$: BehaviorSubject<any>;
   let token$: BehaviorSubject<any>;
   let menus$: BehaviorSubject<any>;
   let redirect$: BehaviorSubject<any>;
-  let isLoading$: BehaviorSubject<any>;
   let dataDeleted$: BehaviorSubject<any>;
   let notification$: BehaviorSubject<any>;
 
@@ -77,6 +78,8 @@ describe('NavComponent', () => {
 
   beforeEach(async () => {
     state$ = new BehaviorSubject(undefined);
+    isLoading$ = new BehaviorSubject(true);
+    error$ = new BehaviorSubject(undefined);
     message$ = new BehaviorSubject(undefined);
     notification$ = new BehaviorSubject(undefined);
     isAuthenticated$ = new BehaviorSubject(undefined);
@@ -84,13 +87,12 @@ describe('NavComponent', () => {
     token$ = new BehaviorSubject(undefined);
     menus$ = new BehaviorSubject(undefined);
     redirect$ = new BehaviorSubject(undefined);
-    isLoading$ = new BehaviorSubject(undefined);
     dataDeleted$ = new BehaviorSubject(undefined);
 
     const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
     cookieServiceSpy = jasmine.createSpyObj('CookieService', ['get', 'set']);
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['subscribe', 'attachLang']);
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'select', 'dispatch']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['cookieConsent', 'reloadUser'], {
       authUser: authUserSignal.asReadonly(),
     });
@@ -110,6 +112,20 @@ describe('NavComponent', () => {
     navigationServiceSpy.subscribe.and.returnValue({} as any);
     navigationServiceSpy.attachLang.and.returnValue('en-GB');
 
+    storeSpy.select.and.callFake((selector: any) => {
+      const name = selector?.name ?? '';
+
+      if (name.includes('IsLoading')) {
+        return isLoading$.asObservable();
+      } else if (name.includes('Response')) {
+        return state$.asObservable();
+      } else if (name.includes('Error')) {
+        return error$.asObservable();
+      } else {
+        return of(undefined);
+      }
+    });
+
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
       pipeCallIndex++;
@@ -125,10 +141,8 @@ describe('NavComponent', () => {
         case 5:
           return redirect$.asObservable();
         case 6:
-          return isLoading$.asObservable();
-        case 7:
           return dataDeleted$.asObservable();
-        case 8:
+        case 7:
           return notification$.asObservable();
         default:
           return state$.asObservable();

@@ -80,7 +80,7 @@ export const getSubErrorsPipe = pipe(
   filter((val): val is IError[] => val !== undefined),
 );
 
-const selectDiscountResponse = createSelector(
+export const selectDiscountResponse = createSelector(
   selectDiscountState,
   (state: DiscountState) => state?.response,
 );
@@ -89,20 +89,12 @@ export const getDiscountResponsePipe = pipe(
   filter((val): val is ResponseSuccess => val !== undefined),
 );
 
-const selectDiscountError = createSelector(
+export const selectDiscountError = createSelector(
   selectDiscountState,
   (state: DiscountState) => state?.error,
 );
-export const getDiscountErrorPipe = pipe(
-  select(selectDiscountError),
-  filter((val): val is IError => val !== undefined),
-);
 
-const selectDiscountIsLoading = createSelector(
+export const selectDiscountIsLoading = createSelector(
   selectDiscountState,
   (state: DiscountState) => state?.isLoading,
-);
-export const getDiscountIsLoadingPipe = pipe(
-  select(selectDiscountIsLoading),
-  filter((val): val is boolean => val !== undefined),
 );

@@ -62,7 +62,7 @@ export const getGroupPipe = pipe(
   filter((val): val is ITreatmentGroupAll[] => val !== undefined),
 );
 
-const selectAdditionalResponse = createSelector(
+export const selectAdditionalResponse = createSelector(
   selectAdditionalState,
   (state: AdditionalState) => state?.response,
 );
@@ -71,20 +71,12 @@ export const getAdditionalResponsePipe = pipe(
   filter((val): val is ResponseSuccess => val !== undefined),
 );
 
-const selectAdditionalError = createSelector(
+export const selectAdditionalError = createSelector(
   selectAdditionalState,
   (state: AdditionalState) => state?.error,
 );
-export const getAdditionalErrorPipe = pipe(
-  select(selectAdditionalError),
-  filter((val): val is IError => val !== undefined),
-);
 
-const selectAdditionalIsLoading = createSelector(
+export const selectAdditionalIsLoading = createSelector(
   selectAdditionalState,
   (state: AdditionalState) => state?.isLoading,
-);
-export const getAdditionalIsLoadingPipe = pipe(
-  select(selectAdditionalIsLoading),
-  filter((val): val is boolean => val !== undefined),
 );

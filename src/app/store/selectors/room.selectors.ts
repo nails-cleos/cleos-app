@@ -91,7 +91,7 @@ export const getSubErrorsPipe = pipe(
   filter((val): val is IError[] => val !== undefined),
 );
 
-const selectRoomResponse = createSelector(
+export const selectRoomResponse = createSelector(
   selectRoomState,
   (state: RoomState) => state?.response,
 );
@@ -100,20 +100,12 @@ export const getRoomResponsePipe = pipe(
   filter((val): val is ResponseSuccess => val !== undefined),
 );
 
-const selectRoomError = createSelector(
+export const selectRoomError = createSelector(
   selectRoomState,
   (state: RoomState) => state?.error,
 );
-export const getRoomErrorPipe = pipe(
-  select(selectRoomError),
-  filter((val): val is IError => val !== undefined),
-);
 
-const selectRoomIsLoading = createSelector(
+export const selectRoomIsLoading = createSelector(
   selectRoomState,
   (state: RoomState) => state?.isLoading,
-);
-export const getRoomIsLoadingPipe = pipe(
-  select(selectRoomIsLoading),
-  filter((val): val is boolean => val !== undefined),
 );

@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { ChangeDetectorRef, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -28,14 +28,12 @@ describe('RoomComponent', () => {
   let currencies$: BehaviorSubject<any>;
   let offices$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
 
   let storeSpy: jasmine.SpyObj<Store>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
   let geocodeServiceSpy: jasmine.SpyObj<GeocodeService>;
   let authUserService: jasmine.SpyObj<AuthUserService>;
-  let navigateSpy: jasmine.Spy;
 
   const monday: IAvailability = { day: 'MONDAY', start: '09:00', end: '18:00' };
   const tuesday: IAvailability = { day: 'TUESDAY' };
@@ -93,7 +91,6 @@ describe('RoomComponent', () => {
     currencies$ = new BehaviorSubject(undefined);
     offices$ = new BehaviorSubject(undefined);
     subErrors$ = new BehaviorSubject(undefined);
-    response$ = new BehaviorSubject(undefined);
     authUserSignal.update(prev => ({
       ...prev,
       isDarkMode: false,
@@ -129,8 +126,6 @@ describe('RoomComponent', () => {
           return offices$.asObservable();
         case 6:
           return subErrors$.asObservable();
-        case 7:
-          return response$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -148,9 +143,6 @@ describe('RoomComponent', () => {
         provideHttpClientTesting(),
       ],
     }).compileComponents();
-
-    const router = TestBed.inject(Router);
-    navigateSpy = spyOn(router, 'navigate');
 
     const translate = TestBed.inject(TranslateService);
     translate.setDefaultLang('en-GB');
@@ -202,13 +194,6 @@ describe('RoomComponent', () => {
     expect(component.getForm.currency.hasError('required')).toBeTrue();
     expect(errs['office']).toBe('Office required');
     expect(component.getForm.office.hasError('required')).toBeTrue();
-  });
-
-  it('should navigate to room list when response emits', () => {
-    response$.next(true);
-    fixture.detectChanges();
-
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'rooms']);
   });
 
   it('should not dispatch when form invalid on submit', () => {

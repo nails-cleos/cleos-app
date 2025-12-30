@@ -43,7 +43,7 @@ export const getSubErrorsPipe = pipe(
   filter((val): val is IError[] => val !== undefined),
 );
 
-const selectCurrencyResponse = createSelector(
+export const selectCurrencyResponse = createSelector(
   selectCurrencyState,
   (state: CurrencyState) => state?.response,
 );
@@ -52,20 +52,12 @@ export const getCurrencyResponsePipe = pipe(
   filter((val): val is ResponseSuccess => val !== undefined),
 );
 
-const selectCurrencyError = createSelector(
+export const selectCurrencyError = createSelector(
   selectCurrencyState,
   (state: CurrencyState) => state?.error,
 );
-export const getCurrencyErrorPipe = pipe(
-  select(selectCurrencyError),
-  filter((val): val is IError => val !== undefined),
-);
 
-const selectCurrencyIsLoading = createSelector(
+export const selectCurrencyIsLoading = createSelector(
   selectCurrencyState,
   (state: CurrencyState) => state?.isLoading,
-);
-export const getCurrencyIsLoadingPipe = pipe(
-  select(selectCurrencyIsLoading),
-  filter((val): val is boolean => val !== undefined),
 );

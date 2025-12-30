@@ -72,7 +72,7 @@ export const getSubErrorsPipe = pipe(
   filter((val): val is IError[] => val !== undefined),
 );
 
-const selectUnavailableResponse = createSelector(
+export const selectUnavailableResponse = createSelector(
   selectUnavailableState,
   (state: UnavailableState) => state?.response,
 );
@@ -81,20 +81,12 @@ export const getUnavailableResponsePipe = pipe(
   filter((val): val is ResponseSuccess => val !== undefined),
 );
 
-const selectUnavailableError = createSelector(
+export const selectUnavailableError = createSelector(
   selectUnavailableState,
   (state: UnavailableState) => state?.error,
 );
-export const getUnavailableErrorPipe = pipe(
-  select(selectUnavailableError),
-  filter((val): val is IError => val !== undefined),
-);
 
-const selectUnavailableIsLoading = createSelector(
+export const selectUnavailableIsLoading = createSelector(
   selectUnavailableState,
   (state: UnavailableState) => state?.isLoading,
-);
-export const getUnavailableIsLoadingPipe = pipe(
-  select(selectUnavailableIsLoading),
-  filter((val): val is boolean => val !== undefined),
 );

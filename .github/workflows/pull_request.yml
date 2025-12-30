@@ -102,6 +102,7 @@ jobs:
           wait-on: 'http://localhost:4300'
           record: true
           parallel: true
+          ci-build-id: ${{ github.run_id }}
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

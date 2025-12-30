@@ -1,19 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { Router } from '@angular/router';
 import { Color, IColor } from '../interfaces/color';
 import { createColor, getColor, updateColor } from '../store/color.actions';
-import { TranslateService } from '@ngx-translate/core';
 import { fieldChange, valueChange } from '../util/validators';
 import { SharedModule } from '../shared/shared.module';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import {
-  getCurrentColorIdPipe,
-  getColorResponsePipe,
-  getSelectedColorPipe,
-  getSubErrorsPipe,
-} from '../store/selectors/color.selectors';
+import { getCurrentColorIdPipe, getSelectedColorPipe, getSubErrorsPipe } from '../store/selectors/color.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../interfaces/common';
 import { ColorState } from '../store/reducers/color.reducers';
@@ -33,17 +26,13 @@ type ColorForm = {
 export class ColorComponent {
   private readonly store: Store<ColorState> = inject(Store<ColorState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
 
   private colorId$ = this.store.pipe(getCurrentColorIdPipe);
   private selectedColor$ = this.store.pipe(getSelectedColorPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getColorResponsePipe);
 
   private colorIdSignal = toSignal(this.colorId$);
   private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
 
   colorSignal = toSignal(this.selectedColor$);
   isAddModeSignal = computed(() => !this.colorIdSignal());
@@ -55,8 +44,6 @@ export class ColorComponent {
     }),
     description: this.formBuilder.control(undefined),
   });
-
-  private readonly language: string = this.translate.currentLang;
 
   constructor() {
     effect(() => {
@@ -79,12 +66,6 @@ export class ColorComponent {
           }
         });
         this.errors.set(errorMap);
-      }
-    });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.router.navigate([this.language, 'colors']);
       }
     });
 

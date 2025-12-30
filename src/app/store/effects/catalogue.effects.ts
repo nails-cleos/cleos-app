@@ -24,7 +24,7 @@ import { Router } from '@angular/router';
 import { TreatmentService } from '../../services/treatment.service';
 import { ICatalogueAll } from '../../interfaces/catalogue';
 import { ITreatmentGroupAll } from '../../interfaces/treatment';
-import { IApiResponse, success } from '../../interfaces/common';
+import { IApiResponse, success, successResponse } from '../../interfaces/common';
 
 @Injectable()
 export class CatalogueEffects {
@@ -65,7 +65,7 @@ export class CatalogueEffects {
         switchMap((response: IApiResponse) => {
           const message = this.translate.instant('CATALOGUE.CREATED', { name: response.name });
           const path = `catalogues/${response.id}`;
-          return success(catalogueSaveSuccess, message, path);
+          return successResponse(catalogueSaveSuccess, message, path, 'catalogues');
         }),
         catchError((err: HttpErrorResponse) => of(catalogueFailure({ error: err.error }))),
       )),
@@ -78,7 +78,7 @@ export class CatalogueEffects {
         switchMap((response: IApiResponse) => {
           const message = this.translate.instant('CATALOGUE.UPDATED.MESSAGE', { name: response.name });
           const path = `catalogues/${response.id}`;
-          return success(catalogueSaveSuccess, message, path);
+          return successResponse(catalogueSaveSuccess, message, path, 'catalogues');
         }),
         catchError((err: HttpErrorResponse) => of(catalogueFailure({ error: err.error }))),
       )),
