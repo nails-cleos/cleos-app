@@ -1,31 +1,38 @@
-@if (price) {
-  <div [innerHTML]="'COMMON.PAYMENT.OPTIONS.PAID' | translate: {amount: price.totalPaid | number:'1.2-2',
-                   symbol: currency | currencySymbol}"></div>
+@let currentPrice = price();
+@let currentCurrency = currency();
+@let currentShowBank = showBank();
+@let currentFirstTime = firstTime();
+@let form = typeForm();
+@let currentOptions = options();
+@let currentProfessionalName = professionalName();
+@if (currentPrice) {
+  <div [innerHTML]="'COMMON.PAYMENT.OPTIONS.PAID' | translate: {amount: currentPrice.totalPaid | number:'1.2-2',
+                   symbol: currentCurrency | currencySymbol}"></div>
 
-  <div [innerHTML]="'COMMON.PAYMENT.OPTIONS.PENALTY' | translate: {amount: price.penalty | number:'1.2-2',
-                   symbol: currency | currencySymbol}"></div>
+  <div [innerHTML]="'COMMON.PAYMENT.OPTIONS.PENALTY' | translate: {amount: currentPrice.penalty | number:'1.2-2',
+                   symbol: currentCurrency | currencySymbol}"></div>
 
-  @if (showPenalty) {
-    @if (price.totalPaid - price.penalty > 0) {
+  @if (showPenalty()) {
+    @if (currentPrice.totalPaid - currentPrice.penalty > 0) {
       <div [innerHTML]="'COMMON.PAYMENT.OPTIONS.D_OR_R' | translate: {
-          amount: (price.totalPaid - price.penalty )| number:'1.2-2', symbol: currency | currencySymbol}"></div>
+          amount: (currentPrice.totalPaid - currentPrice.penalty )| number:'1.2-2', symbol: currentCurrency | currencySymbol}"></div>
     }
 
-    @if (price.penalty - price.totalPaid > 0) {
+    @if (currentPrice.penalty - currentPrice.totalPaid > 0) {
       <div [innerHTML]="'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate: {
-          amount: (price.penalty - price.totalPaid) | number:'1.2-2', symbol: currency | currencySymbol}"></div>
+          amount: (currentPrice.penalty - currentPrice.totalPaid) | number:'1.2-2', symbol: currentCurrency | currencySymbol}"></div>
     }
 
-    @if (showBank && price.penalty > price.totalPaid) {
-      <app-bank [firstTime]="firstTime" [formGroup]="typeForm" [options]="options" [professionalName]="professionalName"
-                (percentageEmitter)="emitter($event)"></app-bank>
+    @if (currentShowBank && currentPrice.penalty > currentPrice.totalPaid) {
+      <app-bank [firstTime]="currentFirstTime" [form]="form" [options]="currentOptions"
+                [professionalName]="currentProfessionalName" (percentageEmitter)="emitter($event)"></app-bank>
     }
   }
 
-  @if (showBank) {
+  @if (currentShowBank) {
     <mat-divider></mat-divider>
   }
-} @else if (showBank) {
-  <app-bank [firstTime]="firstTime" [formGroup]="typeForm" [options]="options" [professionalName]="professionalName"
-            (percentageEmitter)="emitter($event)"></app-bank>
+} @else if (currentShowBank) {
+  <app-bank [firstTime]="currentFirstTime" [form]="form" [options]="currentOptions"
+            [professionalName]="currentProfessionalName" (percentageEmitter)="emitter($event)"></app-bank>
 }

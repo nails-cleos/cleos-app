@@ -119,7 +119,13 @@ describe('dates utility', () => {
     },
     timeZone: 'UTC',
     availabilities: [monday, tuesday, wednesday, thursday, friday, saturday, sunday],
-    office: {},
+    office: {
+      id: 'office-123',
+      name: '',
+      manager: {
+        id: 'manager-123',
+      },
+    },
     paymentTypes: [],
     primary: false,
   };
@@ -319,9 +325,7 @@ describe('dates utility', () => {
     it('should format time in API_LOCALE', () => {
       const date = new Date(2024, 0, 1, 14, 30);
       const time = getTime(date);
-      expect(time).toBeTruthy();
-      expect(time).toContain('14');
-      expect(time).toContain('30');
+      expect(time).toBe('14:30');
     });
   });
 
@@ -329,7 +333,7 @@ describe('dates utility', () => {
     it('should format full date and time', () => {
       const date = new Date(2024, 0, 1, 14, 30);
       const formatted = formatFullDateTime(date, 'en-US');
-      expect(formatted).toBeTruthy();
+      expect(formatted).toBe('Monday, January 1, 2024 at 02:30 PM');
     });
   });
 
@@ -337,7 +341,7 @@ describe('dates utility', () => {
     it('should format full date with time', () => {
       const date = new Date(2024, 0, 1, 14, 30);
       const formatted = formatFullDate(date, 'en-US');
-      expect(formatted).toBeTruthy();
+      expect(formatted).toBe('01/01/2024, 02:30 PM');
     });
   });
 
@@ -345,7 +349,7 @@ describe('dates utility', () => {
     it('should format date time with capitalized first letter', () => {
       const date = new Date(2024, 0, 1, 14, 30);
       const formatted = formatDateTime(date, 'en-US');
-      expect(formatted).toBeTruthy();
+      expect(formatted).toBe('Monday, January 1 at 02:30 PM');
       expect(formatted.charAt(0)).toBe(formatted.charAt(0).toUpperCase());
     });
   });
@@ -363,14 +367,14 @@ describe('dates utility', () => {
     it('should format month in long format', () => {
       const date = new Date(2024, 0, 1);
       const title = monthTitle(date, 'en', 'long');
-      expect(title).toBeTruthy();
+      expect(title).toBe('January');
       expect(title.charAt(0)).toBe(title.charAt(0).toUpperCase());
     });
 
     it('should format month in short format', () => {
       const date = new Date(2024, 0, 1);
       const title = monthTitle(date, 'en', 'short');
-      expect(title).toBeTruthy();
+      expect(title).toBe('Jan');
       expect(title.charAt(0)).toBe(title.charAt(0).toUpperCase());
     });
   });
@@ -389,7 +393,7 @@ describe('dates utility', () => {
     it('should format weekday name', () => {
       const date = new Date(2024, 0, 1); // Monday
       const header = columnHeader(date, 'en');
-      expect(header).toBeTruthy();
+      expect(header).toBe('Monday');
       expect(header.charAt(0)).toBe(header.charAt(0).toUpperCase());
     });
   });
@@ -398,7 +402,7 @@ describe('dates utility', () => {
     it('should format day view title', () => {
       const date = new Date(2024, 0, 1);
       const title = dayViewTitle(date, 'en');
-      expect(title).toBeTruthy();
+      expect(title).toBe('Monday, January 1, 2024');
       expect(title.charAt(0)).toBe(title.charAt(0).toUpperCase());
     });
   });
@@ -407,7 +411,7 @@ describe('dates utility', () => {
     it('should format hour and minute', () => {
       const date = new Date(2024, 0, 1, 14, 30);
       const formatted = formatDateHourMinute(date, 'en');
-      expect(formatted).toBeTruthy();
+      expect(formatted).toBe('02:30 PM');
       expect(formatted.charAt(0)).toBe(formatted.charAt(0).toUpperCase());
     });
   });
@@ -434,7 +438,7 @@ describe('dates utility', () => {
   describe('formatDuration', () => {
     it('should format PT duration string', () => {
       const formatted = formatDuration('PT2H30M');
-      expect(formatted).toBeTruthy();
+      expect(formatted).toBe('02:30');
     });
   });
 
@@ -442,7 +446,7 @@ describe('dates utility', () => {
     it('should format time from duration', () => {
       const duration = new Duration(14, 30);
       const formatted = formatTime(duration);
-      expect(formatted).toBeTruthy();
+      expect(formatted).toBe('14:30');
     });
   });
 
@@ -1044,9 +1048,9 @@ describe('dates utility', () => {
     });
     it('should return min and max dates for monday', () => {
       const result = getMinMaxDate(1, new Date(), [room]);
-      expect(result.minDate.getHours()).toBe(11);
+      expect(result.minDate.getHours()).toBe(10);
       expect(result.minDate.getMinutes()).toBe(0);
-      expect(result.maxDate.getHours()).toBe(20);
+      expect(result.maxDate.getHours()).toBe(19);
       expect(result.maxDate.getMinutes()).toBe(0);
     });
 
@@ -1060,17 +1064,17 @@ describe('dates utility', () => {
 
     it('should return min and max dates for wednesday', () => {
       const result = getMinMaxDate(3, new Date(), [room]);
-      expect(result.minDate.getHours()).toBe(12);
+      expect(result.minDate.getHours()).toBe(11);
       expect(result.minDate.getMinutes()).toBe(0);
-      expect(result.maxDate.getHours()).toBe(21);
+      expect(result.maxDate.getHours()).toBe(20);
       expect(result.maxDate.getMinutes()).toBe(0);
     });
 
     it('should return min and max dates for thursday', () => {
       const result = getMinMaxDate(4, new Date(), [room]);
-      expect(result.minDate.getHours()).toBe(11);
+      expect(result.minDate.getHours()).toBe(10);
       expect(result.minDate.getMinutes()).toBe(0);
-      expect(result.maxDate.getHours()).toBe(20);
+      expect(result.maxDate.getHours()).toBe(19);
       expect(result.maxDate.getMinutes()).toBe(0);
     });
 
@@ -1084,9 +1088,9 @@ describe('dates utility', () => {
 
     it('should return min and max dates for saturday', () => {
       const result = getMinMaxDate(6, new Date(), [room]);
-      expect(result.minDate.getHours()).toBe(12);
+      expect(result.minDate.getHours()).toBe(11);
       expect(result.minDate.getMinutes()).toBe(0);
-      expect(result.maxDate.getHours()).toBe(18);
+      expect(result.maxDate.getHours()).toBe(17);
       expect(result.maxDate.getMinutes()).toBe(0);
     });
 

@@ -1,21 +1,21 @@
 <h1 mat-dialog-title>{{ 'RESERVATION.CUSTOMER.CHANGE' | translate }}</h1>
 <div mat-dialog-content>
-  <form [formGroup]="customerForm" (keydown.enter)="$event.preventDefault()">
-    @if (customers) {
+  <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
+    @if (customersSignal()) {
       <mat-form-field appearance="outline">
         <mat-label>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</mat-label>
         <label>
-          <input (keydown)="keyDownHandler($event)" [formControl]="customer" [matAutocomplete]="autoCustomer"
+          <input (keydown)="keyDownHandler($event)" [formControl]="getForm.customer" [matAutocomplete]="autoCustomer"
                  autocomplete="off" matInput required type="text">
         </label>
         <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
-          @for (customer of filteredCustomer | async; track customer.id) {
+          @for (customer of filteredCustomerSignal(); track customer.id) {
             <mat-option [value]="customer">{{ customer.displayName }}</mat-option>
           }
         </mat-autocomplete>
-        @if (customer.hasError('required')) {
+        @if (getForm.customer.hasError('required')) {
           <mat-error [innerHTML]="'RESERVATION.CUSTOMER.REQUIRED' | translate"></mat-error>
-        } @else if (customer.hasError('requireMatch')) {
+        } @else if (getForm.customer.hasError('requireMatch')) {
           <mat-error [innerHTML]="'RESERVATION.CUSTOMER.INVALID' | translate"></mat-error>
         }
       </mat-form-field>
@@ -27,15 +27,15 @@
 <div mat-dialog-actions class="card-actions">
   <div class="spacer"></div>
   @if (data.small) {
-    <button (click)="onNoClick" mat-icon-button>
+    <button (click)="onNoClick()" mat-icon-button>
       <mat-icon>clear</mat-icon>
     </button>
-    <button (click)="doAction" color="primary" [disabled]="customerForm.invalid" mat-icon-button>
+    <button (click)="doAction()" color="primary" [disabled]="form.invalid" mat-icon-button>
       <mat-icon>published_with_changes</mat-icon>
     </button>
   } @else {
-    <button (click)="onNoClick" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
-    <button (click)="doAction" color="primary" [disabled]="customerForm.invalid" mat-fab extended class="icon-button">
+    <button (click)="onNoClick()" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+    <button (click)="doAction()" color="primary" [disabled]="form.invalid" mat-fab extended class="icon-button">
       {{ 'RESERVATION.CUSTOMER.UPDATE' | translate }}
     </button>
   }

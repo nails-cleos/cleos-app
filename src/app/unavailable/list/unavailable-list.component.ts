@@ -1,14 +1,16 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import { Observable, Subscription } from 'rxjs';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { AppState, selectUnavailableState } from '../../store/app.states';
-import { clean, deleteUnavailable, getUnavailablePage, unavailableSelected } from '../../store/unavailable.actions';
+import {
+  cleanUnavailable,
+  deleteUnavailable,
+  getUnavailablePage,
+  unavailableSelected,
+} from '../../store/unavailable.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { isSameTimeZone, newDateTimestamp } from '../../util/dates';
 import { IUnavailable, IUnavailableAll } from '../../interfaces/unavailable';
@@ -18,6 +20,9 @@ import { createDialog } from '../../util/helper';
 import { SharedModule } from '../../shared/shared.module';
 import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
 import { DurationTimePipe } from '../../pipes/durationTime.pipe';
+import { ColorState } from '../../store/reducers/color.reducers';
+import { getUnavailableResponsePipe, getUnavailablePaginationPipe } from '../../store/selectors/unavailable.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-unavailable-list',
@@ -25,59 +30,85 @@ import { DurationTimePipe } from '../../pipes/durationTime.pipe';
   styleUrls: ['./unavailable-list.component.scss'],
   animations: [detailExpandAnimation],
   imports: [SharedModule, TimeDetailPipe, DurationTimePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+export class UnavailableListComponent {
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly store: Store<ColorState> = inject(Store<ColorState>);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly dialog: MatDialog = inject(MatDialog);
+
+  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private unavailableList$ = this.store.pipe(getUnavailablePaginationPipe);
+  private response$ = this.store.pipe(getUnavailableResponsePipe);
+
+  private paginator = viewChild(MatPaginator);
+  private sort = viewChild(MatSort);
+
+  private unavailableListSignal = toSignal(this.unavailableList$);
+  private responseSignal = toSignal(this.response$);
+  private breakpointsSignal = toSignal(
+    this.breakpointObserver$, {
+      initialValue: {
+        matches: false,
+        breakpoints: {
+          [Breakpoints.XSmall]: false,
+          [Breakpoints.Small]: false,
+        },
+      },
+    },
+  );
+
+  private sortActive = computed(() => this.sort()?.active ?? 'timestamp');
+  private sortDirection = computed(() => this.sort()?.direction ?? 'desc');
+
+  paginatorPageIndex = signal(0);
+  dataSourceSignal = computed(() => this.unavailableListSignal()?.content);
+  resultsLengthSignal = computed(() => this.unavailableListSignal()?.totalElements || 0);
+  pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
   displayedColumns: string[] = ['position', 'professional', 'description', 'timestamp', 'duration', 'repeat',
     'actions'];
-  dataSource: any = new MatTableDataSource<Pagination<IUnavailable>>();
 
   expandedUnavailable?: IUnavailable;
 
-  resultsLength = DEFAULT_LENGTH;
-  pageSize = PAGE_SIZE;
+  dateFormat: string = this.translate.currentLang;
+  language: string = this.translate.currentLang;
 
-  dateFormat: string;
-  language: string;
-
-  private subscription?: Subscription;
-  private paginatorSubscription?: Subscription;
-  private getState: Observable<any>;
-
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-    private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small,
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.pageSize = MOBILE_PAGE_SIZE;
+  constructor() {
+    effect((onCleanup) => {
+      const paginator = this.paginator();
+      if (paginator) {
+        const sub = paginator.page.subscribe((pageEvent) => {
+          this.paginatorPageIndex.set(pageEvent.pageIndex);
+        });
+        onCleanup(() => sub.unsubscribe());
       }
     });
-    this.getState = this.store.select(selectUnavailableState);
-    this.dateFormat = this.translate.currentLang;
-    this.language = this.translate.currentLang;
+
+    effect(() => {
+      const page = this.paginatorPageIndex();
+      this.store.dispatch(
+        getUnavailablePage({
+          page: page,
+          sort: this.sortActive(),
+          direction: this.sortDirection(),
+          size: this.pageSizeSignal(),
+        }),
+      );
+    });
+
+    effect(() => {
+      if (this.responseSignal()) {
+        this.store.dispatch(cleanUnavailable());
+        this.paginator()?.firstPage();
+      }
+    });
   }
 
-  ngAfterViewInit(): void {
-    this.getUnavailableList();
-  }
+  edit = (selected: IUnavailableAll): void => this.store.dispatch(unavailableSelected({ selected }));
 
-  ngOnInit(): void {
-    this.clean();
-    this.subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.paginatorSubscription?.unsubscribe();
-  }
-
-  edit = (selected: IUnavailable): void => this.store.dispatch(unavailableSelected({ selected }));
-
-  delete = (unavailable: IUnavailable): void => {
+  delete = (unavailable: IUnavailableAll): void => {
     const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
     const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT',
       { date: newDateTimestamp(unavailable.timestamp) });
@@ -101,42 +132,5 @@ export class UnavailableListComponent implements OnInit, AfterViewInit, OnDestro
     const name = unavailable.professional.displayName;
     const timeZone = unavailable.professional.timeZone;
     createDialog('PROFESSIONAL_INFO', name, this.dateFormat, this.translate, this.dialog, timeZone, time);
-  };
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private createPageSubscriptions = (): void => {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getUnavailableList();
-    });
-    this.paginatorSubscription =
-      this.paginator?.page.subscribe(() => this.getUnavailableList(this.paginator.pageIndex));
-
-    this.cdRef.detectChanges();
-  };
-
-  private getUnavailableList = (page: number = 0): void => this.store.dispatch(
-    getUnavailablePage({
-      page,
-      sort: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-    }),
-  );
-
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.response) {
-        this.clean();
-        this.getUnavailableList();
-      }
-      this.dataSource = state.data?.content;
-      this.resultsLength = state.data?.totalElements;
-      if (!this.paginatorSubscription && this.resultsLength) {
-        this.createPageSubscriptions();
-      }
-    });
   };
 }

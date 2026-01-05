@@ -16,7 +16,6 @@ import {
   customerSuccess,
   deleteReservation,
   executeTrackingByReservationId,
-  findRooms,
   getAllAdditionalByGroupId,
   getAllFilterReservations,
   getAllGroupingByRoom,
@@ -76,20 +75,23 @@ import { Role } from '../../interfaces/token';
 import { ColorService } from '../../services/color.service';
 import { Pagination } from '../../interfaces/pagination';
 import {
+  IAvailableDTO,
   ICustomerLastReservation,
   ICustomerReservation,
   IReservation,
+  IReservationAll,
   IRoomReservation,
   ITracking,
+  IUpcomingAll,
 } from '../../interfaces/reservation';
-import { IUser } from '../../interfaces/user';
+import { IUserAll } from '../../interfaces/user';
 import { ITreatmentDiscountDTO } from '../../interfaces/treatment';
-import { IRoom } from '../../interfaces/room';
-import { IAdditional } from '../../interfaces/additional';
-import { IPayment, IPaymentOption } from '../../interfaces/payment';
+import { IRoomAll } from '../../interfaces/room';
+import { IAdditionalAll } from '../../interfaces/additional';
+import { IPaymentAll, IPaymentOption } from '../../interfaces/payment';
 import { IApiResponse } from '../../interfaces/common';
 import { IReview } from '../../interfaces/review';
-import { IColor } from '../../interfaces/color';
+import { IColorAll } from '../../interfaces/color';
 import { ToastType } from '../../shared/toast/toast.model';
 
 @Injectable()
@@ -110,7 +112,7 @@ export class ReservationEffects {
     ofType(getPage),
     switchMap(({ page, sort, direction, size, all, roomId, professionalId }) =>
       this.reservationService.getPage(page, sort, direction, size, all, roomId, professionalId).pipe(
-        map((page: Pagination<IReservation>) =>
+        map((page: Pagination<IReservationAll>) =>
           reservationPageSuccess(page ? { page } : { page: { content: [] } } as any)),
         catchError((err: HttpErrorResponse) => of(reservationFailure({ error: err.error }))),
       )),
@@ -129,7 +131,7 @@ export class ReservationEffects {
     ofType(getAllFilterReservations),
     switchMap(({ page, sort, direction, size, userId, states }) =>
       this.reservationService.getAllFilterReservations(sort, direction, page, size, userId, states).pipe(
-        map((filter: Pagination<IReservation>) =>
+        map((filter: Pagination<IReservationAll>) =>
           reservationFilterPageSuccess(filter ? { filter } : { filter: { content: [] } } as any)),
         catchError((err: HttpErrorResponse) => of(reservationFailure({ error: err.error }))),
       )),
@@ -139,7 +141,8 @@ export class ReservationEffects {
     ofType(getAllGroupingByRoom),
     switchMap(({ days, date, roomId, professionalId }) =>
       this.reservationService.getAllGroupingByRoom(days, date, roomId, professionalId).pipe(
-        map((response: IRoomReservation[]) => reservationSuccess(response ? { data: response[0] } : { data: [] })),
+        map((response: IRoomReservation[]) => reservationSuccess(
+          response ? { data: response } : { data: [] as IRoomReservation[] })),
         catchError((err: HttpErrorResponse) => of(reservationFailure({ error: err.error }))),
       )),
   ));
@@ -157,7 +160,7 @@ export class ReservationEffects {
     ofType(customerSearchReservation),
     switchMap(({ roomId, treatmentId, date, professionalId, additionalIds }) =>
       this.reservationService.customerSearch(roomId, treatmentId, date, professionalId, additionalIds).pipe(
-        map((data: IRoomReservation) => reservationSuccess(data ? { data } : { data: [] })),
+        map((data: IAvailableDTO[]) => reservationSuccess(data ? { data } : { data: [] })),
         catchError((err: HttpErrorResponse) => of(reservationFailure({ error: err.error }))),
       )),
   ));
@@ -165,7 +168,7 @@ export class ReservationEffects {
   getAllCustomers$ = createEffect(() => this.actions.pipe(
     ofType(getCustomers),
     switchMap(() => this.userService.getCustomers().pipe(
-      map((customers: IUser[]) => customersSuccess({ customers })),
+      map((customers: IUserAll[]) => customersSuccess({ customers })),
       catchError((err: HttpErrorResponse) => of(reservationFailure({ error: err.error }))),
     )),
   ));
@@ -181,15 +184,15 @@ export class ReservationEffects {
   getAllTreatments$ = createEffect(() => this.actions.pipe(
     ofType(getAllTreatments),
     switchMap(({ roomId, customerId }) => this.treatmentService.getAllTreatments(roomId, customerId).pipe(
-      map((treatmentDiscount: ITreatmentDiscountDTO[]) => reservationTreatmentsSuccess({ treatmentDiscount })),
+      map((treatmentDiscount: ITreatmentDiscountDTO) => reservationTreatmentsSuccess({ treatmentDiscount })),
       catchError((err: HttpErrorResponse) => of(reservationFailure({ error: err.error }))),
     )),
   ));
 
   getAllRooms$ = createEffect(() => this.actions.pipe(
-    ofType(getAllRooms, findRooms),
+    ofType(getAllRooms),
     switchMap(({ customerId }) => this.roomService.getAllRooms(customerId).pipe(
-      map((rooms: IRoom[]) => reservationRoomsSuccess({ rooms })),
+      map((rooms: IRoomAll[]) => reservationRoomsSuccess({ rooms })),
       catchError((err: HttpErrorResponse) => of(reservationFailure({ error: err.error }))),
     )),
   ));
@@ -197,7 +200,7 @@ export class ReservationEffects {
   getAllAdditional$ = createEffect(() => this.actions.pipe(
     ofType(getAllAdditionalByGroupId),
     switchMap(({ roomId, groupId }) => this.additionalService.getAllAdditionalByGroupId(roomId, groupId).pipe(
-      map((additional: IAdditional[]) => reservationAdditionalSuccess({ additional })),
+      map((additional: IAdditionalAll[]) => reservationAdditionalSuccess({ additional })),
       catchError((err: HttpErrorResponse) => of(reservationFailure({ error: err.error }))),
     )),
   ));
@@ -214,7 +217,7 @@ export class ReservationEffects {
     ofType(getReservation, getEditReservation),
     switchMap(({ id, editPath }) =>
       this.reservationService.getReservation(id, editPath).pipe(
-        map((selected?: IReservation) => reservationSelected({ selected })),
+        map((selected?: IUpcomingAll) => reservationSelected({ selected })),
         catchError((err: HttpErrorResponse) => of(reservationFailure({ error: err.error }))),
       )),
   ));
@@ -223,7 +226,7 @@ export class ReservationEffects {
     ofType(reservationFindPayments),
     switchMap(({ id }) =>
       this.paymentService.getPaymentByResourceId(id, 'reservation').pipe(
-        map((payments: IPayment[]) => reservationPaymentsSuccess(payments ? { payments } : { payments: [] })),
+        map((payments: IPaymentAll[]) => reservationPaymentsSuccess(payments ? { payments } : { payments: [] })),
         catchError((err: HttpErrorResponse) => of(reservationFailure({ error: err.error }))),
       )),
   ));
@@ -231,7 +234,7 @@ export class ReservationEffects {
   findHistory$ = createEffect(() => this.actions.pipe(
     ofType(getReservationHistory),
     switchMap(({ id }) => this.reservationService.getReservationHistory(id).pipe(
-      map((history: IReservation[]) => reservationHistorySuccess(history ? { history } : { history: [] })),
+      map((history: IReservationAll[]) => reservationHistorySuccess(history ? { history } : { history: [] })),
       catchError((err: HttpErrorResponse) => of(reservationFailure({ error: err.error }))),
     )),
   ));
@@ -321,7 +324,7 @@ export class ReservationEffects {
   review$ = createEffect(() => this.actions.pipe(
     ofType(createReview),
     switchMap(({ review }) => this.reservationService.createReview(review).pipe(
-      map((response: IApiResponse) => this.requestSuccess('ME.REVIEW.CREATED', true, Role.customer, response.id)),
+      map(() => this.requestSuccess('ME.REVIEW.CREATED', true, Role.customer)),
       catchError((err: HttpErrorResponse) => of(reservationFailure({ error: err.error }))),
     )),
   ));
@@ -337,7 +340,7 @@ export class ReservationEffects {
   getAllColorsByTreatmentId$ = createEffect(() => this.actions.pipe(
     ofType(getColorsByTreatmentId),
     switchMap(({ treatmentId }) => this.colorService.getColorsByTreatmentId(treatmentId).pipe(
-      map((colors: IColor[]) => colorsCompleteSuccess({ colors })),
+      map((colors: IColorAll[]) => colorsCompleteSuccess({ colors })),
       catchError((err: HttpErrorResponse) => of(reservationFailure({ error: err.error }))),
     )),
   ));
@@ -438,7 +441,7 @@ export class ReservationEffects {
               deleted ? [...navigation, 'dashboard'] : [...navigation, 'reservation', id!];
             break;
           case Role.roomAdmin:
-            navigation = [...navigation, 'events'];
+            navigation = [...navigation, 'dashboard', 'events'];
             break;
         }
         this.router.navigate(navigation);
@@ -455,7 +458,7 @@ export class ReservationEffects {
       }
       if (isDashboard !== undefined) {
         this.router.navigate(isDashboard ?
-          [this.translate.currentLang, 'events'] : [this.translate.currentLang, 'reservation', id]);
+          [this.translate.currentLang, 'dashboard', 'events'] : [this.translate.currentLang, 'reservation', id]);
       }
     }),
   ), { dispatch: false });
@@ -476,10 +479,12 @@ export class ReservationEffects {
     ofType(reservationPaymentsSuccess),
   ), { dispatch: false });
 
-  private requestSuccess(key: string, navigate: boolean, role: Role, id?: string, date?: Date,
-    paymentLink?: string, deleted?: boolean, toastType?: ToastType) {
+  private requestSuccess(
+    key: string, navigate: boolean, role: Role, id?: string, date?: Date,
+    paymentLink?: string, deleted?: boolean, toastType?: ToastType,
+  ) {
     const message = this.translate.instant(key, { date });
-    const path = id ? `reservation/${ id }` : undefined;
+    const path = id ? `reservation/${id}` : undefined;
 
     return reservationSaveSuccess({ message, navigate, path, role, paymentLink, deleted, id, toastType });
   }
@@ -488,7 +493,7 @@ export class ReservationEffects {
     return this.reservationService.changeState(id, state, extras).pipe(
       map((response: IReservation | void) =>
         stateSuccess({
-          message: this.translate.instant(`COMMON.RESERVATION.STATE.${ key }`),
+          message: this.translate.instant(`COMMON.RESERVATION.STATE.${key}`),
           id,
           paymentLink: response?.paymentLink,
           isDashboard,

@@ -1,51 +1,64 @@
-import { AfterViewInit, Component, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ITreatmentAll } from '../../interfaces/treatment';
-import { DEFAULT_LENGTH, PAGE_SIZE } from '../../interfaces/pagination';
 import { convertDuration } from '../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../../shared/shared.module';
+import { PAGE_SIZE } from '../../interfaces/pagination';
 
 @Component({
   selector: 'app-treatment-table',
   templateUrl: './treatment-table.component.html',
   styleUrls: ['./treatment-table.component.scss'],
   imports: [SharedModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TreatmentTableComponent implements OnInit, AfterViewInit, OnChanges {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
-  @Input() treatment: ITreatmentAll[] = [];
+export class TreatmentTableComponent {
+  private readonly translate = inject(TranslateService);
+
+  treatment = input<ITreatmentAll[]>([]);
+
+  private paginator = viewChild(MatPaginator);
+  private sort = viewChild(MatSort);
 
   displayedColumns: string[] = ['date', 'price', 'duration'];
-  dataSource: any = new MatTableDataSource<ITreatmentAll>();
 
-  resultsLength = DEFAULT_LENGTH;
-  pageSize = PAGE_SIZE;
-  dateFormat!: string;
+  paginatorPageIndex = signal(0);
 
-  private translate = inject(TranslateService);
+  dataSource = computed(() => new MatTableDataSource(this.treatment().map(p => {
+    if (p.duration) {
+      const duration = convertDuration(p.duration);
 
-  ngOnInit(): void {
-    this.dateFormat = this.translate.currentLang;
-  }
+      return Object.assign({}, p, { hour: duration.hour, minute: duration.minute });
+    }
+    return p;
+  })));
+  resultsLengthSignal = computed(() => this.dataSource().data.length);
+  pageSizeSignal = computed(() => PAGE_SIZE);
 
-  ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
-  }
+  dateFormat: string = this.translate.currentLang;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ngOnChanges(_changes: SimpleChanges): void {
-    this.dataSource.data = this.treatment.map(p => {
-      if (p.duration) {
-        const duration = convertDuration(p.duration);
-
-        return Object.assign({}, p, { hour: duration.hour, minute: duration.minute });
+  constructor() {
+    effect((onCleanup) => {
+      const paginator = this.paginator();
+      if (paginator) {
+        const sub = paginator.page.subscribe((pageEvent) => {
+          this.paginatorPageIndex.set(pageEvent.pageIndex);
+        });
+        onCleanup(() => sub.unsubscribe());
       }
-      return p;
     });
-    this.resultsLength = this.treatment.length;
+
+    effect(() => {
+      const dataSource = this.dataSource();
+      const paginator = this.paginator();
+      const sort = this.sort();
+      if (dataSource && paginator && sort) {
+        dataSource.paginator = paginator;
+        dataSource.sort = sort;
+      }
+    });
   }
 }

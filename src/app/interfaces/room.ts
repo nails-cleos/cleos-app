@@ -1,8 +1,8 @@
-import { IUser } from './user';
+import { IUser, IUserAll } from './user';
 import { ICurrency, ICurrencyAll } from './currency';
-import { ITreatment } from './treatment';
-import { IAdditional } from './additional';
-import { IOffice } from './office';
+import { ITreatmentAll } from './treatment';
+import { IAdditionalAll } from './additional';
+import { IOffice, IOfficeAll } from './office';
 import { PaymentType } from './payment';
 
 export interface IRoom {
@@ -23,17 +23,17 @@ export interface IRoom {
 }
 
 export interface IRoomService {
-  currency: ICurrency;
-  treatments: ITreatment[];
-  selectedTreatments: ITreatment[];
-  additionalList: IAdditional[];
-  selectedAdditionalList: IAdditional[];
+  currency: ICurrencyAll;
+  treatments: ITreatmentAll[];
+  selectedTreatments: ITreatmentAll[];
+  additionalList: IAdditionalAll[];
+  selectedAdditionalList: IAdditionalAll[];
 }
 
 export interface IRoomInfo {
-  currencies: ICurrency[];
-  professionals: IUser[];
-  offices: IOffice[];
+  currencies: ICurrencyAll[];
+  professionals: IUserAll[];
+  offices: IOfficeAll[];
 }
 
 export interface IServicePrice {
@@ -43,6 +43,7 @@ export interface IServicePrice {
 }
 
 export interface IService {
+  duration: string;
   key: string;
   groupId?: string;
   id: string;
@@ -50,6 +51,9 @@ export interface IService {
   currency?: string;
   price: number;
   type: ServiceType;
+  description?: string;
+  hour?: number;
+  minute?: number;
 
   order?: number;
 }
@@ -62,11 +66,11 @@ export enum ServiceType {
 export interface IRoomAll {
   id: string;
   professionalIds?: string[];
-  professionals?: IUser[];
+  professionals?: IUserAll[];
   availabilities: IAvailability[];
   address: IAddress;
   currency: ICurrencyAll;
-  office: IOffice;
+  office: IOfficeAll;
   timeZone: string;
   paymentTypes: PaymentType[];
   primary: boolean;

@@ -5,7 +5,7 @@ import { of, throwError } from 'rxjs';
 import { PaymentService } from './payment.service';
 import {
   IPay,
-  IPayment,
+  IPaymentAll,
   IPaymentOption,
   IPaymentRequest,
   IPaymentStatus,
@@ -19,7 +19,9 @@ describe('PaymentService', () => {
   let service: PaymentService;
   let httpSpy: jasmine.SpyObj<HttpClient>;
 
-  const mockPayment: IPayment = {
+  const mockPayment: IPaymentAll = {
+    description: 'description',
+    paymentId: 'paymentId',
     id: 'payment-123',
     status: 'completed',
     type: PaymentType.paynl,

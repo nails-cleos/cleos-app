@@ -3,10 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 
 import { UserService } from './user.service';
-import { IOverview, IUser, IUserAll } from '../interfaces/user';
+import { IOverview, IUserAll } from '../interfaces/user';
 import { Role, Token } from '../interfaces/token';
 import { Pagination } from '../interfaces/pagination';
-import { IRoom } from '../interfaces/room';
+import { IRoomAll } from '../interfaces/room';
 import { ICustomerLastReservation } from '../interfaces/reservation';
 import { IApiResponse } from '../interfaces/common';
 
@@ -14,7 +14,7 @@ describe('UserService', () => {
   let service: UserService;
   let httpSpy: jasmine.SpyObj<HttpClient>;
 
-  const mockUser: IUser = {
+  const mockUser: IUserAll = {
     id: 'user-123',
     displayName: 'John Doe',
     email: 'john@example.com',
@@ -24,9 +24,10 @@ describe('UserService', () => {
     enabled: true,
     verified: true,
     imageUrl: 'http://example.com/image.jpg',
+    timeZone: 'Europa/Amsterdam',
   };
 
-  const mockPagination: Pagination<IUser> = {
+  const mockPagination: Pagination<IUserAll> = {
     content: [mockUser],
     totalElements: 1,
     totalPages: 1,
@@ -45,7 +46,17 @@ describe('UserService', () => {
   };
 
   const mockOverview: IOverview = {
-    customer: mockUser as IUserAll,
+    account: {
+      id: 'account-123',
+      balance: 0,
+      customer: mockUser,
+      currency: {
+        id: 'eur',
+        name: 'Euro',
+        code: 'EUR',
+        icon: '€',
+      },
+    },
     miniCardOverview: [
       {
         title: 'Total Reservations',
@@ -64,7 +75,7 @@ describe('UserService', () => {
     ],
   };
 
-  const mockRoom: IRoom = {
+  const mockRoom: IRoomAll = {
     id: 'room-123',
     address: {
       id: 1,
@@ -79,7 +90,11 @@ describe('UserService', () => {
     },
     timeZone: 'UTC',
     availabilities: [],
-    office: {},
+    office: {
+      id: 'office-123',
+      name: 'Main Office',
+      manager: {},
+    },
     paymentTypes: [],
     primary: false,
   };
@@ -104,6 +119,8 @@ describe('UserService', () => {
     days: 5,
     professionalName: 'Jane Smith',
     additionalIds: ['add-1', 'add-2'],
+    roomId: 'room-123',
+    professionalId: 'prof-123',
   };
 
   beforeEach(() => {
@@ -286,7 +303,7 @@ describe('UserService', () => {
     it('should get current customer overview when id is null', () => {
       httpSpy.get.and.returnValue(of(mockOverview));
 
-      service.getCustomerOverview(null).subscribe(result => {
+      service.getCustomerOverview('me').subscribe(result => {
         expect(result).toEqual(mockOverview);
       });
 

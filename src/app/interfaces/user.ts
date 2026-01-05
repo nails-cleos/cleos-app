@@ -2,6 +2,7 @@ import { IReservationOverview } from './reservation';
 import { Theme } from '../util/theme';
 import { IChart } from './dashboard';
 import { IAddress } from './room';
+import { IAccountAll } from './account';
 
 export interface IUser {
   id?: string;
@@ -20,7 +21,7 @@ export interface IUser {
   image?: any;
   code?: string | null;
   referralMax?: number;
-  isCompleted?: boolean;
+  completed?: boolean;
   theme?: Theme;
   timeZone?: string;
   lightColor?: string;
@@ -41,6 +42,8 @@ export interface IUserAll {
   locale: string;
   phone?: string;
   dob?: string;
+  enabled?: boolean;
+  verified?: boolean;
   referralMax?: number;
   theme?: Theme;
   timeZone: string;
@@ -48,6 +51,7 @@ export interface IUserAll {
   darkColor?: string;
   address?: IAddress;
   showCash?: boolean;
+  completed?: boolean;
 }
 
 export interface IAuthority {
@@ -64,9 +68,10 @@ export interface IMenu {
 }
 
 export interface IOverview {
-  customer: IUserAll;
   miniCardOverview: IReservationOverview[];
   chartOverview: IChart[];
+  account: IAccountAll;
+  upcomingList?: number[];
 }
 
 export class User implements IUser {

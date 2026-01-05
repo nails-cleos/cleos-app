@@ -1,41 +1,39 @@
-import { Component, Input } from '@angular/core';
-import { SharedModule } from '../../../shared/shared.module';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { AppMaterialModule } from '../../../util/app-material.module';
 
 @Component({
   selector: 'app-share-buttons',
   templateUrl: './share-buttons.component.html',
   styleUrls: ['./share-buttons.component.scss'],
-  imports: [SharedModule],
+  imports: [AppMaterialModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShareButtonsComponent {
-  @Input() message = '';
-  @Input() url = '';
+  message = input<string>('');
+  url = input<string>('');
 
-  constructor() {
+  shareOnWhatsApp(): void {
+    window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(this.message()));
+    return;
   }
 
-  get shareOnWhatsApp(): void {
-  	window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(this.message));
-  	return;
+  shareOnMessenger(): void {
+    window.open('fb-messenger://share/?link=' + encodeURIComponent(this.message()));
+    return;
   }
 
-  get shareOnMessenger(): void {
-  	window.open('fb-messenger://share/?link=' + encodeURIComponent(this.message));
-  	return;
+  shareViaSMS(): void {
+    window.open('sms:?&body=' + encodeURIComponent(this.message()));
+    return;
   }
 
-  get shareViaSMS(): void {
-  	window.open('sms:?&body=' + encodeURIComponent(this.message));
-  	return;
+  shareViaEmail(): void {
+    window.open('mailto:?body=' + encodeURIComponent(this.message()));
+    return;
   }
 
-  get shareViaEmail(): void {
-  	window.open('mailto:?body=' + encodeURIComponent(this.message));
-  	return;
-  }
-
-  get copyLink(): void {
-  	navigator.clipboard.writeText(this.url);
-  	return;
+  copyLink(): void {
+    navigator.clipboard.writeText(this.url());
+    return;
   }
 }

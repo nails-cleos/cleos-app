@@ -55,4 +55,4 @@ export const subscribeNotification = createAction(
   props<{ token: string }>(),
 );
 
-export const clean = createAction(NotificationActionTypes.clean);
+export const cleanNotification = createAction(NotificationActionTypes.clean);

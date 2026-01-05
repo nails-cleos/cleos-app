@@ -1,0 +1,54 @@
+@let currentViewDate = viewDate();
+<div class="divider">
+  <button class="hide-gt-xs" (click)="decrement()" [disabled]="prevBtnDisabled" color="accent" mat-fab>
+    <mat-icon>navigate_before</mat-icon>
+  </button>
+  <button class="hide-xs" (click)="decrement()" [disabled]="prevBtnDisabled" color="accent" mat-fab extended>
+    <mat-icon>navigate_before</mat-icon>
+    <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
+  </button>
+  <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [max]="maxDate" [min]="today"
+         [value]="currentViewDate"
+         hidden matInput>
+  <mat-datepicker #picker touchUi></mat-datepicker>
+  <button class="hide-gt-xs" (click)="picker.open()" color="primary" mat-fab>
+    <mat-icon>today</mat-icon>
+  </button>
+  <button class="hide-xs" (click)="picker.open()" color="primary" mat-fab extended>
+    <mat-icon>today</mat-icon>
+    <span>{{ 'COMMON.BUTTON.GOTO' | translate }}</span>
+  </button>
+  <button class="hide-gt-xs" (click)="increment()" [disabled]="nextBtnDisabled" color="accent" mat-fab>
+    <mat-icon>navigate_next</mat-icon>
+  </button>
+  <button class="hide-xs" (click)="increment()" [disabled]="nextBtnDisabled" color="accent" mat-fab extended>
+    <mat-icon>navigate_next</mat-icon>
+    <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+  </button>
+  <div class="spacer"></div>
+  <div>
+    <h2 style="margin: 0">{{ displayDate | calendarDate:'dayViewTitle':locale }}</h2>
+    <app-counter style="text-align: center" (refreshViewDate)="refreshViewDate($event)"></app-counter>
+  </div>
+</div>
+@if (availability()) {
+  <!--  @if (dashboardReady && calendarReady) {-->
+  <div class="row">
+    <div class="divider">
+      <app-mwl-day-view-scheduler
+        (segmentClicked)="segmentClick($event.date, $event.professionalId)"
+        (eventTimesChanged)="eventTimesChanged($event)" (professionalChanged)="professionalChanged($event)"
+        (beforeViewRender)="beforeMonthViewRender($event)"
+        [day]="day" [events]="calendar.calendarEvents" [professionals]="professionals" [locale]="locale"
+        [viewDate]="currentViewDate">
+      </app-mwl-day-view-scheduler>
+    </div>
+  </div>
+  <!--  } @else {-->
+    <!--    <div class="ssc-square mb"></div>-->
+    <!--  }-->
+} @else {
+  <h2 style="text-align: center">
+    {{ 'DASHBOARD.ROOM.NO_OPEN' | translate:{ date: currentViewDate | calendarDate:'dayViewTitle':locale } }}
+  </h2>
+}

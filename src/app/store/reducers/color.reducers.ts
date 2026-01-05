@@ -1,6 +1,6 @@
 import { Pagination } from '../../interfaces/pagination';
 import {
-  clean,
+  cleanColor,
   colorFailure,
   colorSaveSuccess,
   colorSelected,
@@ -9,29 +9,32 @@ import {
   deleteColor,
   getColor,
   getColorsPage,
+  setCurrentColorId,
   updateColor,
 } from '../color.actions';
 import { IColor } from '../../interfaces/color';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
 
-export interface State {
+export const COLOR_FEATURE_KEY = 'color';
+
+export interface ColorState {
   response?: IResponseSuccess;
   data?: Pagination<IColor>;
-  errorMessage?: string;
   error?: IError;
   subErrors?: IError[];
   selected?: IColor;
+  currentColorId?: string;
   isLoading: boolean;
 }
 
-export const initialState: State = {
+export const initialState: ColorState = {
+  response: undefined,
   data: undefined,
-  errorMessage: undefined,
   error: undefined,
   subErrors: undefined,
   selected: undefined,
-  response: undefined,
+  currentColorId: undefined,
   isLoading: false,
 };
 
@@ -40,14 +43,12 @@ export const colorReducer = createReducer(
   on(getColorsPage, (state) => ({
     ...state,
     data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IColor>,
-    errorMessage: undefined,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
   })),
   on(getColor, (state) => ({
     ...state,
-    errorMessage: undefined,
     subErrors: undefined,
     selected: {} as IColor,
     response: undefined,
@@ -55,7 +56,6 @@ export const colorReducer = createReducer(
   on(colorSuccess, (state, { data }) => ({
     ...state,
     data: data,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
@@ -63,20 +63,17 @@ export const colorReducer = createReducer(
     ...state,
     response: action,
     selected: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     isLoading: false,
   })),
   on(colorSelected, (state, { selected }) => ({
     ...state,
     selected: selected,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(colorFailure, (state, { error }) => ({
     ...state,
-    errorMessage: error.message,
     error: error,
     subErrors: error.subErrors,
     response: undefined,
@@ -84,10 +81,14 @@ export const colorReducer = createReducer(
   })),
   on(updateColor, createColor, deleteColor, (state) => ({
     ...state,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
     isLoading: true,
+    selected: undefined,
   })),
-  on(clean, () => initialState),
+  on(setCurrentColorId, (state, { colorId }) => ({
+    ...state,
+    currentColorId: colorId,
+  })),
+  on(cleanColor, () => initialState),
 );

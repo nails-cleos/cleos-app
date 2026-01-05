@@ -1,46 +1,68 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AppMaterialModule } from '../../util/app-material.module';
+
+type ContactKey = 'whatsapp' | 'instagram' | 'facebook' | 'phone' | 'email';
 
 @Component({
   selector: 'app-bottom-sheet-book-appointment',
   templateUrl: 'bottom-sheet-book-appointment.html',
   imports: [AppMaterialModule, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BottomSheetBookAppointmentComponent {
-  private bottomSheetRef: MatBottomSheetRef<BottomSheetBookAppointmentComponent> = inject(
-    MatBottomSheetRef<BottomSheetBookAppointmentComponent>);
-  private translate: TranslateService = inject(TranslateService);
+  private readonly bottomSheetRef = inject(MatBottomSheetRef<BottomSheetBookAppointmentComponent>);
+  private readonly translate = inject(TranslateService);
 
-  openLink = (event: MouseEvent, key: 'whatsapp' | 'instagram' | 'facebook' | 'phone' | 'email'): void => {
-    this.bottomSheetRef.dismiss();
-    event.preventDefault();
-    setTimeout(() => {
-      let url;
-      switch (key) {
-        case 'whatsapp':
-          const phone = this.translate.instant('MAIN.CONTACT.SEND.PHONE');
-          const message = this.translate.instant('MAIN.CONTACT.SEND.HELLO');
+  private readonly actionSignal = signal<ContactKey | undefined>(undefined);
+
+  constructor() {
+    effect(() => {
+      const action = this.actionSignal();
+      if (!action) {
+        return;
+      }
+
+      const contact = this.translate.instant('MAIN.CONTACT');
+      let url = '';
+
+      switch (action) {
+        case 'whatsapp': {
+          const phone = contact.SEND.PHONE;
+          const message = contact.SEND.HELLO;
           url = `https://api.whatsapp.com/send?phone=${phone}&text=${message}`;
           break;
-        case 'phone':
-          const tel = this.translate.instant('MAIN.CONTACT.SEND.PHONE');
-          url = `tel:${tel}`;
+        }
+        case 'phone': {
+          url = `tel:${contact.SEND.PHONE}`;
           break;
+        }
         case 'instagram':
           url = 'https://ig.me/m/carlanailscleos.nl';
           break;
-        case 'facebook':
-          const message2 = this.translate.instant('MAIN.CONTACT.SEND.HELLO');
-          url = `https://m.me/carlanailscleos.nl?text=${message2}`;
+
+        case 'facebook': {
+          const msg = contact.SEND.HELLO;
+          url = `https://m.me/carlanailscleos.nl?text=${msg}`;
           break;
+        }
+
         case 'email':
-          const mail = this.translate.instant('MAIN.CONTACT.MAIL');
-          url = `mailto:${mail}`;
+          url = `mailto:${contact.MAIL}`;
           break;
       }
+
       window.open(url, '_blank');
-    }, 500);
-  };
+
+      this.actionSignal.set(undefined);
+    });
+  }
+
+  openLink(event: MouseEvent, key: ContactKey): void {
+    event.preventDefault();
+    this.bottomSheetRef.dismiss();
+
+    this.actionSignal.set(key);
+  }
 }

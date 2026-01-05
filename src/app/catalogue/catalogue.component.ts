@@ -1,247 +1,272 @@
-import { ChangeDetectorRef, Component, ElementRef, inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
 import {
-  AbstractControl,
-  UntypedFormBuilder,
-  UntypedFormControl,
-  UntypedFormGroup,
-  Validators,
-  ɵTypedOrUntyped,
-} from '@angular/forms';
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  ElementRef,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { combineLatestWith, interval } from 'rxjs';
+import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { AppState, selectCatalogueState } from '../store/app.states';
-import {
-  clean,
-  createCatalogue,
-  getAllTreatmentsGroup,
-  getCatalogue,
-  updateCatalogue,
-} from '../store/catalogue.actions';
+import { createCatalogue, getCatalogue, updateCatalogue } from '../store/catalogue.actions';
 import { Catalogue, ICatalogue } from '../interfaces/catalogue';
 import { formatBytes, resizeImage } from '../util/file';
-import { ActivatedRoute, Router } from '@angular/router';
 import { fieldChange, requireMatch, valueChange } from '../util/validators';
 import { TranslateService } from '@ngx-translate/core';
-import { IGroupService, ITreatmentGroup } from '../interfaces/treatment';
+import { ITreatmentGroup, ITreatmentGroupAll } from '../interfaces/treatment';
 import { map, startWith } from 'rxjs/operators';
 import { SharedModule } from '../shared/shared.module';
 import { DragDropDirective } from '../directives/drag-drop.directive';
 import { SortByPipe } from '../pipes/sort-by.pipe';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { ToastService } from '../services/toast.service';
+import {
+  getCurrentCatalogueIdPipe,
+  getGroupPipe,
+  getSelectedCataloguePipe,
+  getSubErrorsPipe,
+} from '../store/selectors/catalogue.selectors';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { IError } from '../interfaces/common';
+import { CatalogueState } from '../store/reducers/catalogue.reducers';
+
+type CatalogueForm = {
+  name: FormControl<string>;
+  description: FormControl<string | undefined>;
+  home: FormControl<boolean>;
+  catalog: FormControl<boolean>;
+  group: FormControl<ITreatmentGroupAll | undefined>;
+};
 
 @Component({
   selector: 'app-catalogue',
   templateUrl: './catalogue.component.html',
   styleUrls: ['./catalogue.component.scss'],
   imports: [SharedModule, DragDropDirective, SortByPipe, BackButtonDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CatalogueComponent implements OnInit, OnDestroy {
-  @ViewChild('canvas', { static: false }) canvas?: ElementRef<HTMLCanvasElement>;
-  @ViewChild('canvasXs', { static: false }) canvasXs?: ElementRef<HTMLCanvasElement>;
-  @ViewChild('resizedImage', { static: false }) resizedImage?: ElementRef<HTMLImageElement>;
-  @Input() catalogue?: ICatalogue;
+export class CatalogueComponent {
+  private readonly store: Store<CatalogueState> = inject(Store<CatalogueState>);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly toastService: ToastService = inject(ToastService);
+  private readonly destroyRef: DestroyRef = inject(DestroyRef);
 
-  private route: ActivatedRoute = inject(ActivatedRoute);
-  private store: Store<AppState> = inject(Store<AppState>);
-  private formBuilder: UntypedFormBuilder = inject(UntypedFormBuilder);
-  private router: Router = inject(Router);
-  private translate: TranslateService = inject(TranslateService);
-  private toastService: ToastService = inject(ToastService);
-  private cdRef: ChangeDetectorRef = inject(ChangeDetectorRef);
+  private catalogueId$ = this.store.pipe(getCurrentCatalogueIdPipe);
+  private selectedCatalogue$ = this.store.pipe(getSelectedCataloguePipe);
+  private allGroups$ = this.store.pipe(getGroupPipe);
+  private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
-  form!: UntypedFormGroup;
-  id?: string;
-  isAddMode: boolean = true;
-  file: any;
-  resizedImageDataUrl?: string;
+  private catalogueIdSignal = toSignal(this.catalogueId$, { initialValue: null });
+  private selectedCatalogueSignal = toSignal(this.selectedCatalogue$);
+  private subErrorsSignal = toSignal(this.subErrors$);
 
-  groups?: IGroupService[];
-  filteredGroup?: Observable<IGroupService[] | undefined>;
-  errors: any = [];
-  private getState: Observable<any> = this.store.select(selectCatalogueState);
-  private subscription?: Subscription;
-  private readonly language: string = this.translate.currentLang;
+  private catalogueId = computed(() => this.catalogueIdSignal());
 
-  get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
+  private canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
+  private canvasXs = viewChild<ElementRef<HTMLCanvasElement>>('canvasXs');
+  private resizedImage = viewChild<ElementRef<HTMLImageElement>>('resizedImage');
+
+  form: FormGroup<CatalogueForm> = this.formBuilder.group<CatalogueForm>({
+    name: this.formBuilder.control('', {
+      validators: [Validators.required],
+    }),
+    description: this.formBuilder.control(undefined),
+    home: this.formBuilder.control(false),
+    catalog: this.formBuilder.control(false),
+    group: this.formBuilder.control(undefined, {
+      validators: [requireMatch],
+    }),
+  });
+
+  catalogueSignal = computed(() => this.selectedCatalogueSignal());
+
+  filteredGroupSignal = toSignal(
+    this.getForm.group.valueChanges.pipe(
+      startWith(''),
+      map((value: any) => !value || typeof value === 'string' ? value : value.code),
+      combineLatestWith(this.allGroups$),
+      map(([name, groups]) => {
+        if (name) {
+          return this.filterGroup(name, groups);
+        } else {
+          return groups ? groups.slice() : groups;
+        }
+      }),
+    ),
+  );
+  isAddModeSignal = computed(() => !this.catalogueId());
+  errors = signal<Record<string, unknown>>({});
+  resizedImageDataUrl = signal<string | undefined>(undefined);
+  file = signal<{ name: string; size: number; progress: number; raw: File } | undefined>(undefined);
+
+  constructor() {
+    effect(() => {
+      const subErrors = this.subErrorsSignal();
+      if (subErrors) {
+        const errorMap: Record<string, unknown> = {};
+        subErrors.forEach((error: IError) => {
+          const field = error.field as keyof CatalogueForm | undefined;
+
+          if (field && field in this.form.controls) {
+            errorMap[field] = error.message;
+            this.form.controls[field].setErrors({ incorrect: true });
+          }
+        });
+        this.errors.set(errorMap);
+      }
+    });
+
+    effect(() => {
+      const id = this.catalogueId();
+      if (id) {
+        this.store.dispatch(getCatalogue({ id }));
+      }
+    });
+
+    effect(() => {
+      const catalogue = this.selectedCatalogueSignal();
+      if (catalogue?.id) {
+        this.form.patchValue(catalogue);
+        this.resizedImageDataUrl.set(`data:${catalogue.contentType};base64,${catalogue.blob}`);
+        this.getForm.group.setValue(catalogue.treatmentGroup);
+      }
+    });
+  }
+
+  get getForm(): CatalogueForm {
     return this.form.controls;
   }
 
-  get submit(): void {
+  submit(): void {
     if (this.form.invalid) {
       return;
     }
 
+    const catalogueSignal = this.catalogueSignal();
     const catalogue: ICatalogue = new Catalogue();
-    catalogue.name = fieldChange(this.getForm.name as UntypedFormControl, this.catalogue?.name);
-    catalogue.description = valueChange(this.getForm.description.value, this.catalogue?.description);
-    catalogue.home = fieldChange(this.getForm.home as UntypedFormControl, this.catalogue?.home);
-    catalogue.catalog = fieldChange(this.getForm.catalog as UntypedFormControl, this.catalogue?.catalog);
+    catalogue.name = fieldChange(this.getForm.name, catalogueSignal?.name);
+    catalogue.description = valueChange(this.getForm.description.value, catalogueSignal?.description);
+    catalogue.home = fieldChange(this.getForm.home, catalogueSignal?.home);
+    catalogue.catalog = fieldChange(this.getForm.catalog, catalogueSignal?.catalog);
     catalogue.groupId = this.getForm.group.value?.id;
 
-    if (this.isAddMode) {
-      this.store.dispatch(createCatalogue({ catalogue, resizedImageDataUrl: this.resizedImageDataUrl! }));
+    if (this.isAddModeSignal()) {
+      this.store.dispatch(createCatalogue({ catalogue, resizedImageDataUrl: this.resizedImageDataUrl()! }));
     } else {
-      catalogue.id = this.id;
-      this.catalogue = undefined;
-      this.store.dispatch(updateCatalogue({ catalogue, resizedImageDataUrl: this.resizedImageDataUrl! }));
+      const id = this.catalogueId()!;
+      this.store.dispatch(updateCatalogue({ id, catalogue, resizedImageDataUrl: this.resizedImageDataUrl()! }));
     }
-    return;
   }
 
-  get deleteFile(): void {
-    this.file = undefined;
-    return;
-  }
-
-  get deleteImg(): void {
-    if (this.isAddMode) {
-      this.file = undefined;
-      this.resizedImageDataUrl = undefined;
+  deleteImg(): void {
+    this.file.set(undefined);
+    if (this.isAddModeSignal()) {
+      this.file.set(undefined);
+      this.resizedImageDataUrl.set(undefined);
     } else {
-      const content = this.translate.instant('CATALOGUE.DELETE.MESSAGE', { name: this.catalogue?.name });
+      const content = this.translate.instant('CATALOGUE.DELETE.MESSAGE', { name: this.catalogueSignal()?.name });
       const toastRef = this.toastService.warning(content, 5000, 'button', 'undo');
-      const image = this.resizedImageDataUrl;
+      const image = this.resizedImageDataUrl();
       toastRef.onAction().subscribe(() => {
-        this.resizedImageDataUrl = image;
+        this.resizedImageDataUrl.set(image);
       });
 
-      this.resizedImageDataUrl = undefined;
+      this.resizedImageDataUrl.set(undefined);
     }
     return;
-  }
-
-  ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.id = id;
-    }
-    this.clean();
-    this.findGroups();
-    this.createForm();
-    this.subscribe();
-    this.isAddMode = !this.id;
-    if (!this.isAddMode) {
-      this.getCatalogue();
-    }
-    this.cdRef.detectChanges();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
   }
 
   displayFnGroup = (group: ITreatmentGroup): string => group ? `${group.name}` : '';
 
-  keyDownGroup = (event: any): void => {
+  keyDownGroup = (event: KeyboardEvent): void => {
     if (event.code === 'Backspace') {
-      this.getForm.group.setValue('');
+      this.getForm.group.setValue(undefined);
     }
   };
 
-  onFileDropped = (files: any): void => {
-    files[0].progress = 0;
-    this.file = files[0];
+  onFileDropped = (files: FileList): void => {
+    const rawFile = files[0];
+    this.file.set({
+      name: rawFile.name,
+      size: rawFile.size,
+      progress: 0,
+      raw: rawFile,
+    });
     this.uploadFilesSimulator();
   };
 
-  fileBrowseHandler = ($event: any): void => {
-    $event.target.files[0].progress = 0;
-    this.file = $event.target.files[0];
-    this.uploadFilesSimulator();
+  fileBrowseHandler = (target: EventTarget | null): void => {
+    const rawFile = (target as HTMLInputElement)?.files?.[0];
+    if (rawFile) {
+      this.file.set({
+        name: rawFile.name,
+        size: rawFile.size,
+        progress: 0,
+        raw: rawFile,
+      });
+      this.uploadFilesSimulator();
+    }
   };
 
   formatBytes = (bytes: any, decimals: number): string => formatBytes(bytes, decimals);
 
-  private createForm = (): void => {
-    this.form = this.formBuilder.group({
-      name: ['', Validators.required],
-      description: [''],
-      home: [''],
-      catalog: [''],
-      group: ['', requireMatch],
-    });
-
-    this.filteredGroup = this.getForm.group.valueChanges.pipe(startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterGroup(name) : this.groups ? this.groups.slice() : this.groups),
-    );
-  };
-
-  private filterGroup = (name: string): IGroupService[] | undefined => this.groups?.filter(
+  private filterGroup = (
+    name: string,
+    groups: ITreatmentGroupAll[],
+  ): ITreatmentGroupAll[] | undefined => groups?.filter(
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0,
   );
 
   private uploadFilesSimulator = (): void => {
-    const fileSizeInMB = this.file.size / (1024 * 1024); // Convert file size to MB
-    const baseInterval = 200; // Base interval in milliseconds
-
-    const interval = Math.ceil(baseInterval * (fileSizeInMB / 10)); // Calculate interval based on file size
-
-    setTimeout(() => {
-      const progressInterval = setInterval(() => {
-        if (this.file.progress === 100) {
-          const reader = new FileReader();
-          reader.onload = (e: any) => {
-            const img = new Image();
-            img.onload = () => {
-              this.processImage(img);
-            };
-            img.src = e.target.result;
-          };
-          reader.readAsDataURL(this.file);
-          clearInterval(progressInterval);
-        } else {
-          this.file.progress += 5;
-        }
-      }, interval); // Use calculated interval
-    }, 1000);
-  };
-
-  private processImage = (img: HTMLImageElement): void => {
-    this.resizedImageDataUrl = resizeImage(img, this.canvas?.nativeElement || this.canvasXs?.nativeElement);
-    if (this.resizedImage) {
-      this.resizedImage.nativeElement.src = this.resizedImageDataUrl;
+    const currentFile = this.file();
+    if (!currentFile) {
+      return;
     }
-  };
 
-  private clean = (): void => this.store.dispatch(clean());
+    const totalSteps = 10;
+    const baseTime = 400;
+    const stepTime = baseTime / totalSteps;
 
-  private findGroups = (): void => this.store.dispatch(getAllTreatmentsGroup());
-
-  private getCatalogue = (): void => {
-    if (!this.catalogue) {
-      const id = this.route.snapshot.paramMap.get('id')!;
-      this.store.dispatch(getCatalogue({ id }));
-    }
-  };
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      this.groups = state.groups;
-      if (state.selected) {
-        this.catalogue = {
-          id: state.selected.id,
-          name: state.selected.name,
-          description: state.selected.description,
-          home: state.selected.home,
-          catalog: state.selected.catalog,
-          groupId: state.selected.treatmentGroup?.id,
-        } as ICatalogue;
-        this.resizedImageDataUrl = `data:${state.selected.contentType};base64,${state.selected.blob}`;
-        this.form.patchValue(this.catalogue);
-        if (state.selected.treatmentGroup) {
-          this.getForm.group.setValue(state.selected.treatmentGroup);
+    interval(stepTime)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        const file = this.file();
+        if (!file) {
+          return;
         }
-      }
-      if (state.subErrors) {
-        state.subErrors.forEach((value: any) => {
-          this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({ incorrect: true });
-        });
-      } else if (state.response) {
-        this.router.navigate([this.language, 'catalogues']);
-      }
-    });
+
+        if (file.progress >= 100) {
+          this.file.update(f => f ? { ...f, progress: 100 } : f);
+          this.processImageFromFile();
+          return;
+        }
+        this.file.update(f => f ? { ...f, progress: f.progress + 1 } : f);
+      });
   };
+
+  private processImageFromFile(): void {
+    const currentFile = this.file();
+    if (!currentFile) {
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      const img = new Image();
+      img.onload = () => {
+        this.resizedImageDataUrl.set(resizeImage(img, this.canvas()?.nativeElement || this.canvasXs()?.nativeElement));
+        const resizedImage = this.resizedImage();
+        if (resizedImage) {
+          resizedImage.nativeElement.src = this.resizedImageDataUrl()!;
+        }
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(currentFile.raw);
+  }
 }

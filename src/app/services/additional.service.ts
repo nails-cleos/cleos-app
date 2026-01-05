@@ -26,8 +26,8 @@ export class AdditionalService {
     toUrl(this.urlV1, 'pages'), { params: createFilter(page, size, sort, direction) },
   );
 
-  getAllAdditionalByGroupId = (roomId: string, groupId: string): Observable<IAdditional[]> =>
-    this.http.get<IAdditional[]>(toUrl(this.urlV1, 'groups'),
+  getAllAdditionalByGroupId = (roomId: string, groupId: string): Observable<IAdditionalAll[]> =>
+    this.http.get<IAdditionalAll[]>(toUrl(this.urlV1, 'groups'),
       { params: new HttpParams().set('roomId', roomId).set('groupId', groupId) },
     );
 

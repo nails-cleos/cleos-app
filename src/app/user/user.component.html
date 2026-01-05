@@ -1,7 +1,9 @@
 <div class="flex-container">
   <div class="card-container">
     <div class="card-content" style="width: 80%">
-      <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+      <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+        @let isAddMode = isAddModeSignal();
+        @let user = userSignal();
         <mat-card appearance="outlined">
           @if (isAddMode) {
             <mat-card-header>
@@ -23,7 +25,7 @@
                 @if (isAddMode) {
                   <mat-form-field appearance="outline">
                     <mat-label>{{ 'USER.ROLE.FIELD' | translate }}</mat-label>
-                    <mat-select formControlName="role" required id="select-role">
+                    <mat-select [formControl]="getForm.role" required id="select-role">
                       <mat-option value="ROLE_CUSTOMER">{{ 'COMMON.ROLES.ROLE_CUSTOMER' | translate }}</mat-option>
                       <mat-option
                         value="ROLE_PROFESSIONAL">{{ 'COMMON.ROLES.ROLE_PROFESSIONAL' | translate }}
@@ -36,23 +38,23 @@
                 }
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.USER.EMAIL.FIELD' | translate }}</mat-label>
-                  <input formControlName="email" autocomplete="email" matInput required>
+                  <input [formControl]="getForm.email" autocomplete="email" matInput required data-cy="email-input">
                   @if (getForm.email.hasError('email')) {
                     <mat-error [innerHTML]="'COMMON.USER.EMAIL.VALID' | translate"></mat-error>
                   } @else if (getForm.email.hasError('required')) {
                     <mat-error [innerHTML]="'COMMON.USER.EMAIL.REQUIRED' | translate"></mat-error>
-                  } @else if (errors['email']) {
-                    <mat-error>{{ errors['email'] }}</mat-error>
+                  } @else if (errors()['email']) {
+                    <mat-error>{{ errors()['email'] }}</mat-error>
                   }
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.USER.LANG.FIELD' | translate }}</mat-label>
                   @if (select.value) {
-                    <ng-icon [svg]="select.value.flag" class="icon-margin" matPrefix/>
+                    <ng-icon [svg]="selectedFlag()" class="icon-margin" matPrefix/>
                   }
-                  <mat-select #select formControlName="lang" required id="select-lang">
+                  <mat-select #select [formControl]="getForm.lang" required id="select-lang">
                     @for (lang of flagList; track lang) {
-                      <mat-option [value]="lang">
+                      <mat-option [value]="lang.value">
                         <ng-icon [svg]="lang.flag" class="icon-margin"/>
                         {{ 'COMMON.LANG.' + lang.text | translate }}
                       </mat-option>
@@ -62,31 +64,33 @@
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.USER.DISPLAY_NAME.FIELD' | translate }}</mat-label>
-                  <input formControlName="displayName" autocomplete="given-name" matInput required>
+                  <input [formControl]="getForm.displayName" autocomplete="given-name" matInput required
+                         data-cy="displayName-input">
                   @if (getForm.displayName.hasError('required')) {
                     <mat-error [innerHTML]="'COMMON.USER.DISPLAY_NAME.REQUIRED' | translate"></mat-error>
-                  } @else if (errors['displayName']) {
-                    <mat-error>{{ errors['displayName'] }}</mat-error>
+                  } @else if (errors()['displayName']) {
+                    <mat-error>{{ errors()['displayName'] }}</mat-error>
                   }
                 </mat-form-field>
                 <ngx-material-intl-tel-input id="phone" style="margin-bottom: 22px !important;" [includeDialCode]="true"
                                              [emojiFlags]="true" [enablePlaceholder]="true" [enableSearch]="true"
                                              [required]="true" [preferredCountries]="['nl']" fieldControlName="phone"
-                                             [appearance]="'outline'" [textLabels]="labels" [autoSelectCountry]="false">
+                                             [appearance]="'outline'" [textLabels]="labels()"
+                                             [autoSelectCountry]="false">
                 </ngx-material-intl-tel-input>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.USER.DOB.FIELD' | translate }}</mat-label>
                   <button (click)="picker.open()" mat-icon-button matPrefix type="button">
                     <mat-icon>today</mat-icon>
                   </button>
-                  <input (focus)="picker.open()" formControlName="dob" [matDatepicker]="picker" matInput>
+                  <input (focus)="picker.open()" [formControl]="getForm.dob" [matDatepicker]="picker" matInput data-cy="dob-picker">
                   <mat-datepicker #picker startView="multi-year" touchUi></mat-datepicker>
-                  @let dobError = errors['dob'];
+                  @let dobError = errors()['dob'];
                   @if (dobError) {
                     <mat-error>{{ dobError }}</mat-error>
                   }
                 </mat-form-field>
-                <app-google-map [addressFormGroup]="form" (addressEmitter)="getAddress($event)"
+                <app-google-map [addressFormGroup]="googleMapForm" (addressEmitter)="getAddress($event)"
                                 [latitudeMarker]="geometry?.location?.lat() || user?.address?.location?.y"
                                 [longitudeMarker]="geometry?.location?.lng() || user?.address?.location?.x"
                                 [markInfo]="'<b>' + (formattedAddress || user?.address?.name) + '</b>'">
@@ -97,8 +101,8 @@
                     <input matInput [cpOutputFormat]="'hex'" [colorPicker]="getForm.darkColor.value"
                            (colorPickerChange)="getForm.darkColor.setValue($event)"
                            [style.background]="getForm.darkColor.value" [style.color]="'#000'"
-                           formControlName="darkColor" #darkColorInput [cpPosition]="'top'"
-                           style="margin-right: 5px"/>
+                           [formControl]="getForm.darkColor" #darkColorInput [cpPosition]="'top'"
+                           style="margin-right: 5px" data-cy="dark-color-picker"/>
 
                     <mat-icon matSuffix style="cursor: pointer" (click)="darkColorPicker.openDialog(darkColorInput)"
                               id="darkColorIcon">
@@ -116,8 +120,8 @@
                     <input matInput [cpOutputFormat]="'hex'" [colorPicker]="getForm.lightColor.value"
                            (colorPickerChange)="getForm.lightColor.setValue($event)"
                            [style.background]="getForm.lightColor.value" [style.color]="'#fff'"
-                           formControlName="lightColor" #lightColorInput [cpPosition]="'top'"
-                           style="margin-right: 5px"/>
+                           [formControl]="getForm.lightColor" #lightColorInput [cpPosition]="'top'"
+                           style="margin-right: 5px"data-cy="light-color-picker"/>
 
                     <mat-icon matSuffix style="cursor: pointer" (click)="lightColorPicker.openDialog(lightColorInput)"
                               id="lightColorIcon">

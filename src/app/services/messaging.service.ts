@@ -1,6 +1,5 @@
-import { inject, Injectable, Optional } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
-import { AppState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import { subscribeNotification } from '../store/notification.actions';
 import { Auth } from '@angular/fire/auth';
@@ -8,16 +7,17 @@ import { Database, ref, update } from '@angular/fire/database';
 import { getToken, Messaging, onMessage } from '@angular/fire/messaging';
 import { AppCheck, getToken as getTokenAppCheck } from '@angular/fire/app-check';
 import { environment } from '../../environments/environment';
+import { NotificationState } from '../store/reducers/notification.reducers';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MessagingService {
-  private store: Store<AppState> = inject(Store<AppState>);
-  @Optional() private messaging: Messaging = inject(Messaging);
-  @Optional() private auth: Auth = inject(Auth);
-  private database: Database = inject(Database);
-  private appCheck: AppCheck = inject(AppCheck);
+  private readonly store: Store<NotificationState> = inject(Store<NotificationState>);
+  private readonly messaging: Messaging = inject(Messaging);
+  private readonly auth: Auth = inject(Auth);
+  private readonly database: Database = inject(Database);
+  private readonly appCheck: AppCheck = inject(AppCheck);
 
   message$: Observable<any> = EMPTY;
 

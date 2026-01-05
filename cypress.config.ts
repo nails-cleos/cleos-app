@@ -2,17 +2,11 @@ import { defineConfig } from 'cypress';
 
 export default defineConfig({
   projectId: 'wr2ba6',
+
   e2e: {
     baseUrl: 'http://localhost:4300',
     defaultCommandTimeout: 8000,
-  },
-
-  component: {
-    devServer: {
-      framework: 'angular',
-      bundler: 'webpack',
-    },
-    specPattern: '**/*.cy.ts',
+    specPattern: 'cypress/e2e/**/*.cy.ts',
   },
 
   reporter: 'mocha-multi-reporters',

@@ -75,14 +75,14 @@ describe('AdditionalService', () => {
     });
   });
 
-  it('should fetch all additionals by group id with correct parameters', () => {
+  it('should fetch all additionalList by group id with correct parameters', () => {
     const roomId = 'roomId';
     const groupId = 'groupId';
-    const mockAdditionals = [mockAdditional];
-    httpSpy.get.and.returnValue(of(mockAdditionals));
+    const additionalList = [mockAdditionalAll];
+    httpSpy.get.and.returnValue(of(additionalList));
 
     service.getAllAdditionalByGroupId(roomId, groupId).subscribe((result) => {
-      expect(result).toEqual(mockAdditionals);
+      expect(result).toEqual(additionalList);
     });
 
     expect(httpSpy.get).toHaveBeenCalledWith('v1/additional/groups', {
@@ -91,11 +91,11 @@ describe('AdditionalService', () => {
   });
 
   it('should fetch all additional list', () => {
-    const mockAdditionalsList = [mockAdditionalAll];
-    httpSpy.get.and.returnValue(of(mockAdditionalsList));
+    const mockAdditionalList = [mockAdditionalAll];
+    httpSpy.get.and.returnValue(of(mockAdditionalList));
 
     service.getAdditionalList().subscribe((result) => {
-      expect(result).toEqual(mockAdditionalsList);
+      expect(result).toEqual(mockAdditionalList);
     });
 
     expect(httpSpy.get).toHaveBeenCalledWith('v1/additional');

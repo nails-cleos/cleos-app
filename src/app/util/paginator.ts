@@ -1,10 +1,9 @@
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { TranslateService } from '@ngx-translate/core';
+import { inject } from '@angular/core';
 
 export class PaginatorI18n {
-
-  constructor(private readonly translate: TranslateService) {
-  }
+  private readonly translate: TranslateService = inject(TranslateService);
 
   getPaginatorIntl = (): MatPaginatorIntl => {
     const paginatorIntl = new MatPaginatorIntl();

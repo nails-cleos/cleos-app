@@ -1,41 +1,62 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import {
-  ReactiveFormsModule,
-  UntypedFormBuilder,
-  UntypedFormControl,
-  UntypedFormGroup,
-  Validators,
-} from '@angular/forms';
-import { IUser } from '../interfaces/user';
-import { Observable } from 'rxjs';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { IUser, IUserAll } from '../interfaces/user';
+import { combineLatestWith } from 'rxjs';
 import { requireMatch } from '../util/validators';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { map, startWith } from 'rxjs/operators';
-import { AsyncPipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AppMaterialModule } from '../util/app-material.module';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+
+type ProfessionalForm = {
+  professional: FormControl<IUserAll | undefined>;
+}
+
+type ProfessionalDialogData = {
+  professionals: IUserAll[],
+  small: boolean;
+}
 
 @Component({
   selector: 'app-select-professional-dialog-component',
   templateUrl: './select-professional-dialog.component.html',
-  imports: [AppMaterialModule, AsyncPipe, TranslatePipe, ReactiveFormsModule],
+  imports: [AppMaterialModule, TranslatePipe, ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SelectProfessionalDialogComponent implements OnInit {
-  professionalForm!: UntypedFormGroup;
-  professionals?: IUser[];
-  filteredProfessional?: Observable<IUser[] | undefined>;
-  professional: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch,
-  ]);
+export class SelectProfessionalDialogComponent {
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly dialogRef: MatDialogRef<SelectProfessionalDialogComponent> = inject(
+    MatDialogRef<SelectProfessionalDialogComponent>);
+  readonly data = inject<ProfessionalDialogData>(MAT_DIALOG_DATA);
 
-  constructor(public dialogRef: MatDialogRef<SelectProfessionalDialogComponent>,
-              @Inject(MAT_DIALOG_DATA) public data: any, private formBuilder: UntypedFormBuilder) {
-    this.professionals = data.professionals;
+  form: FormGroup<ProfessionalForm> = this.formBuilder.group<ProfessionalForm>({
+    professional: this.formBuilder.control<IUserAll | undefined>(undefined, {
+      validators: [Validators.required, requireMatch],
+    }),
+  });
+
+  professionals = computed(() => this.data.professionals);
+  filteredProfessionalSignal = toSignal(
+    this.getForm.professional.valueChanges.pipe(
+      startWith(undefined),
+      map(value => typeof value === 'string' ? value : value?.displayName),
+      combineLatestWith(toObservable(this.professionals)),
+      map(([name, professionalList]) => {
+        if (name) {
+          return this.filterProfessional(name, professionalList);
+        } else {
+          return professionalList ? professionalList.slice() : professionalList;
+        }
+      }),
+    ),
+  );
+
+  constructor() {
   }
 
-  ngOnInit(): void {
-    this.createForm();
-    this.createFilters();
+  get getForm(): ProfessionalForm {
+    return this.form.controls;
   }
 
   onNoClick(): void {
@@ -43,32 +64,20 @@ export class SelectProfessionalDialogComponent implements OnInit {
   }
 
   doAction(): void {
-    return this.dialogRef.close({ professional: this.professional.value });
+    return this.dialogRef.close({ professional: this.getForm.professional.value });
   }
 
   displayFnUser = (user: IUser): string => user?.displayName ? user.displayName : '';
 
-  keyDownHandler = (event: any): void => {
+  keyDownHandler = (event: KeyboardEvent): void => {
     if (event.code === 'Backspace') {
-      this.professional.setValue('');
+      this.getForm.professional.setValue(undefined);
     }
   };
 
-  private createForm = (): void => {
-    this.professionalForm = this.formBuilder.group({
-      professional: this.professional,
-    });
-  };
-
-  private createFilters = (): void => {
-    this.filteredProfessional = this.professional.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterProfessional(
-        name) : this.professionals ? this.professionals.slice() : this.professionals),
-    );
-  };
-
-  private filterProfessional = (name: string): IUser[] | undefined => this.professionals?.filter(
+  private filterProfessional = (
+    name: string,
+    professionals?: IUserAll[],
+  ): IUserAll[] | undefined => professionals?.filter(
     option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 }

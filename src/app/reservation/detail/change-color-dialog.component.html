@@ -1,22 +1,22 @@
 <h1 mat-dialog-title>{{ 'RESERVATION.TREATMENT.COLOR.CHANGE' | translate }}</h1>
 <div mat-dialog-content>
-  <form [formGroup]="colorForm" (keydown.enter)="$event.preventDefault()">
-    @if (colors) {
+  <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
+    @if (colorsSignal()) {
       <mat-form-field appearance="outline">
         <mat-label>{{ 'RESERVATION.TREATMENT.COLOR.FIELD' | translate }}</mat-label>
         <label>
-          <input (keydown)="keyDownHandler($event)" [formControl]="color" [matAutocomplete]="autoColor"
+          <input (keydown)="keyDownHandler($event)" [formControl]="getForm.color" [matAutocomplete]="autoColor"
                  autocomplete="off" matInput required type="text">
         </label>
         <mat-autocomplete #autoColor="matAutocomplete" [displayWith]="displayFnColor">
-          @for (color of filteredColor | async; track color) {
+          @for (color of filteredColorSignal(); track color) {
             <mat-option [value]="color">{{ color.name }}</mat-option>
           }
         </mat-autocomplete>
-        @if (color.hasError('required')) {
+        @if (getForm.color.hasError('required')) {
           <mat-error [innerHTML]="'RESERVATION.TREATMENT.COLOR.REQUIRED' | translate"></mat-error>
         }
-        @if (color.hasError('requireMatch')) {
+        @if (getForm.color.hasError('requireMatch')) {
           <mat-error [innerHTML]="'RESERVATION.TREATMENT.COLOR.INVALID' | translate"></mat-error>
         }
       </mat-form-field>
@@ -29,17 +29,17 @@
   <div class="spacer"></div>
   @if (data.small) {
     <div>
-      <button (click)="onNoClick" mat-icon-button>
+      <button (click)="onNoClick()" mat-icon-button>
         <mat-icon>clear</mat-icon>
       </button>
-      <button (click)="doAction" cdkFocusInitial color="primary" [disabled]="colorForm.invalid"
+      <button (click)="doAction()" cdkFocusInitial color="primary" [disabled]="form.invalid"
               mat-icon-button>
         <mat-icon>published_with_changes</mat-icon>
       </button>
     </div>
   } @else {
-    <button (click)="onNoClick" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
-    <button (click)="doAction" cdkFocusInitial color="primary" [disabled]="colorForm.invalid" mat-fab extended
+    <button (click)="onNoClick()" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+    <button (click)="doAction()" cdkFocusInitial color="primary" [disabled]="form.invalid" mat-fab extended
             class="icon-button">{{ 'RESERVATION.TREATMENT.COLOR.UPDATE' | translate }}
     </button>
   }

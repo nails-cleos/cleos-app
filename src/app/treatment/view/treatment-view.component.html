@@ -2,6 +2,7 @@
   <div class="card-container">
     <div class="card-content">
       <mat-card appearance="outlined">
+        @let group = treatmentGroup();
         @if (group) {
           <mat-card-header>
             <mat-card-title>{{ group.name }}</mat-card-title>
@@ -29,13 +30,13 @@
                 </label>
               </mat-form-field>
 
-              @if (colors) {
+              @if (group.colors) {
                 <div>
                   <mat-list>
                     <div mat-subheader>{{ 'TREATMENT.COLORS' | translate }}</div>
                   </mat-list>
                   <mat-chip-listbox>
-                    @for (color of colors; track color) {
+                    @for (color of group.colors; track color) {
                       <mat-chip color="accent">{{ color.name }}</mat-chip>
                     }
                   </mat-chip-listbox>
@@ -99,7 +100,7 @@
             <button appBackButton color="accent" mat-fab extended class="icon-button" type="button">
               {{ 'COMMON.BUTTON.BACK' | translate }}
             </button>
-            <button (click)="edit" color="primary" mat-fab extended class="icon-button" type="button">
+            <button (click)="edit()" color="primary" mat-fab extended class="icon-button" type="button">
               {{ 'COMMON.BUTTON.EDIT' | translate }}
             </button>
           </mat-card-actions>

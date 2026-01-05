@@ -19,8 +19,7 @@ import { CurrencyService } from '../../services/currency.service';
 import { Router } from '@angular/router';
 import { Pagination } from '../../interfaces/pagination';
 import { ICurrency } from '../../interfaces/currency';
-import { IApiResponse, success } from '../../interfaces/common';
-import { ToastType } from '../../shared/toast/toast.model';
+import { IApiResponse, successResponse } from '../../interfaces/common';
 
 @Injectable()
 export class CurrencyEffects {
@@ -51,7 +50,11 @@ export class CurrencyEffects {
     ofType(createCurrency),
     switchMap(({ currency }) =>
       this.currencyService.createCurrency(currency).pipe(
-        switchMap((response: ICurrency) => this.requestSuccess('CURRENCY.CREATED', response.name!, response.id)),
+        switchMap((response: ICurrency) => {
+          const message = this.translate.instant('CURRENCY.CREATED', { code: response.name });
+          const path = `currency/${response.id}`;
+          return successResponse(currencySaveSuccess, message, path, 'currency');
+        }),
         catchError((err: HttpErrorResponse) => of(currencyFailure({ error: err.error }))),
       )),
   ));
@@ -60,8 +63,11 @@ export class CurrencyEffects {
     ofType(updateCurrency),
     switchMap(({ id, currency }) =>
       this.currencyService.updateCurrency(id, currency).pipe(
-        switchMap((response: IApiResponse) =>
-          this.requestSuccess('CURRENCY.UPDATED.MESSAGE', response.name!, response.id)),
+        switchMap((response: IApiResponse) => {
+          const message = this.translate.instant('CURRENCY.UPDATED.MESSAGE', { code: response.name });
+          const path = `currency/${response.id}`;
+          return successResponse(currencySaveSuccess, message, path, 'currency');
+        }),
         catchError((err: HttpErrorResponse) => of(currencyFailure({ error: err.error }))),
       )),
   ));
@@ -70,7 +76,10 @@ export class CurrencyEffects {
     ofType(deleteCurrency),
     switchMap(({ id, code }) =>
       this.currencyService.deleteCurrency(id).pipe(
-        switchMap(() => this.requestSuccess('CURRENCY.DELETED.MESSAGE', code!, undefined, 'warning')),
+        switchMap(() => {
+          const message = this.translate.instant('CURRENCY.DELETED.MESSAGE', { code });
+          return successResponse(currencySaveSuccess, message, undefined, 'currency', undefined, 'warning');
+        }),
         catchError((err: HttpErrorResponse) => of(currencyFailure({ error: err.error }))),
       )),
   ));
@@ -87,10 +96,4 @@ export class CurrencyEffects {
   saveSuccess$ = createEffect(() => this.actions.pipe(
     ofType(currencySaveSuccess),
   ), { dispatch: false });
-
-  private requestSuccess(key: string, code: string, id?: string, toastType?: ToastType) {
-    const message = this.translate.instant(key, { code });
-    const path = id ? `currency/${ id }` : undefined;
-    return success(currencySaveSuccess, message, path, undefined, toastType);
-  }
 }

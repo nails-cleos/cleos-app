@@ -4,16 +4,18 @@ import { AdditionalRoutingModule } from './additional-routing.module';
 import { AdditionalComponent } from './additional.component';
 import { AdditionalListComponent } from './list/additional-list.component';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { EffectsModule } from '@ngrx/effects';
+import { provideEffects } from '@ngrx/effects';
 import { AdditionalEffects } from '../store/effects/additional.effects';
 import { AdditionalService } from '../services/additional.service';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { TreatmentService } from '../services/treatment.service';
 import { AdditionalSortingComponent } from './sorting/additional-sorting.component';
 import { DragDropSortingComponent } from '../util/drag-drop-sorting/drag-drop-sorting.component';
-import { Store } from '@ngrx/store';
-import { AppState, selectI18nState } from '../store/app.states';
-import { Observable } from 'rxjs';
+import { provideState, Store } from '@ngrx/store';
+import { AdditionalNavigationEffects } from './additional-navigation.effects';
+import { ADDITIONAL_FEATURE_KEY, additionalReducer } from '../store/reducers/additional.reducers';
+import { I18NState } from '../store/reducers/i18n.reducers';
+import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
 
 @NgModule({
   imports: [
@@ -34,19 +36,19 @@ import { Observable } from 'rxjs';
       isolate: false,
       extend: true,
     }),
-    EffectsModule.forFeature([AdditionalEffects]),
   ],
   providers: [
     AdditionalService,
     TreatmentService,
+    provideState(ADDITIONAL_FEATURE_KEY, additionalReducer),
+    provideEffects(AdditionalEffects, AdditionalNavigationEffects),
   ],
 })
 export class AdditionalModule {
-  constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
-    const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe((state) => {
+  constructor(private readonly store: Store<I18NState>, protected translateService: TranslateService) {
+    this.store.pipe(getI18NLanguagePipe).subscribe((language) => {
       translateService.currentLang = '';
-      this.translateService.use(state.language);
+      this.translateService.use(language);
     });
   }
 }

@@ -1,21 +1,20 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../../interfaces/pagination';
-import { IAccountAll, ITransaction } from '../../../interfaces/account';
-import { ActivatedRoute } from '@angular/router';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
+import { ITransaction } from '../../../interfaces/account';
 import { Store } from '@ngrx/store';
-import { AppState, selectAccountState } from '../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateService } from '@ngx-translate/core';
-import { Observable, Subscription } from 'rxjs';
-import { clean, getTransactionsByAccountId } from '../../../store/account.actions';
+import { getTransactionsByAccountId } from '../../../store/account.actions';
 import { detailExpandAnimation } from '../../../util/animation';
 import { newDateTimestamp } from '../../../util/dates';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { SharedModule } from '../../../shared/shared.module';
 import { BalanceComponent } from '../../balance/balance.component';
+import { getAccountTransactionPipe, getCurrentAccountIdPipe } from '../../../store/selectors/account.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { AccountState } from '../../../store/reducers/account.reducers';
 
 @Component({
   selector: 'app-transaction-view',
@@ -23,104 +22,90 @@ import { BalanceComponent } from '../../balance/balance.component';
   styleUrls: ['./transaction-view.component.scss'],
   animations: [detailExpandAnimation],
   imports: [SharedModule, BalanceComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TransactionViewComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
-  hasAdminRole: boolean;
+export class TransactionViewComponent {
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly store: Store<AccountState> = inject(Store<AccountState>);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly authUserService: AuthUserService = inject(AuthUserService);
+
+  private accountId$ = this.store.pipe(getCurrentAccountIdPipe);
+  private accountTransaction$ = this.store.pipe(getAccountTransactionPipe);
+  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+
+  private paginator = viewChild(MatPaginator);
+  private sort = viewChild(MatSort);
+
+  private accountIdSignal = toSignal(this.accountId$);
+  private accountTransactionSignal = toSignal(this.accountTransaction$);
+  private authUserSignal = this.authUserService.authUser;
+  private breakpointsSignal = toSignal(
+    this.breakpointObserver$, {
+      initialValue: {
+        matches: false,
+        breakpoints: {
+          [Breakpoints.XSmall]: false,
+          [Breakpoints.Small]: false,
+        },
+      },
+    },
+  );
+
+  private sortActive = computed(() => this.sort()?.active ?? 'timestamp');
+  private sortDirection = computed(() => this.sort()?.direction ?? 'asc');
+  private transactionsSignal = computed(() => this.accountTransactionSignal()?.transactions);
+
+  paginatorPageIndex = signal(0);
+  dataSourceSignal = computed(() => this.transactionsSignal()?.content?.map((it: ITransaction) =>
+    Object.assign({}, it, { date: newDateTimestamp(it.payment?.timestamp) }),
+  ));
+  resultsLengthSignal = computed(() => this.transactionsSignal()?.totalElements || 0);
+  accountSignal = computed(() => this.accountTransactionSignal()?.account);
+  pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
+  hasAdminRole = computed(() => this.authUserSignal()?.hasAdminRole ?? false);
 
   displayedColumns: string[] = [
     'position', 'timestamp', 'amount', 'amountGifted', 'payment.status', 'payment.type', 'actions',
   ];
-  dataSource: any = new MatTableDataSource<Pagination<ITransaction>>();
 
   expandedTransaction?: ITransaction;
+  dateFormat = this.translate.currentLang;
+  language = this.translate.currentLang;
 
-  resultsLength = DEFAULT_LENGTH;
-  pageSize = PAGE_SIZE;
-  dateFormat: string;
-  accountId?: string;
-  account?: IAccountAll;
-  language: string;
-
-  private subscription?: Subscription;
-  private paginatorSubscription?: Subscription;
-  private authUserServiceSubscription: Subscription;
-  private getState: Observable<any>;
-
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private cdRef: ChangeDetectorRef,
-    breakpointObserver: BreakpointObserver, private translate: TranslateService,
-              private authUserService: AuthUserService) {
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small,
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.pageSize = MOBILE_PAGE_SIZE;
+  constructor() {
+    effect((onCleanup) => {
+      const paginator = this.paginator();
+      if (paginator) {
+        const sub = paginator.page.subscribe((pageEvent) => {
+          this.paginatorPageIndex.set(pageEvent.pageIndex);
+        });
+        onCleanup(() => sub.unsubscribe());
       }
     });
-    this.hasAdminRole = false;
-    this.getState = this.store.select(selectAccountState);
-    this.dateFormat = this.translate.currentLang;
-    this.language = this.translate.currentLang;
-    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(
-      value => this.hasAdminRole = value.hasAdminRole,
-    );
-  }
 
-  ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    this.clean();
-    this.subscribe();
-    if (id) {
-      this.accountId = id;
-    }
-  }
+    effect(() => {
+      const page = this.paginatorPageIndex();
+      const accountId = this.accountIdSignal();
 
-  ngAfterViewInit(): void {
-    this.getTransactions();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.paginatorSubscription?.unsubscribe();
-    this.authUserServiceSubscription.unsubscribe();
-  }
-
-  private createPageSubscriptions = (): void => {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getTransactions();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getTransactions(this.paginator.pageIndex));
-
-    this.cdRef.detectChanges();
-  };
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private getTransactions = (page: number = 0): void => this.store.dispatch(
-    getTransactionsByAccountId({
-      id: this.accountId!,
-      page: page,
-      sort: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-    }),
-  );
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.data?.account) {
-        this.account = state.data.account;
+      if (accountId) {
+        this.getTransactions(page);
       }
-      this.dataSource = state.data?.transactions?.content?.map((it: ITransaction) =>
-        Object.assign({}, it, { date: newDateTimestamp(it.payment?.timestamp) }),
+    });
+  }
+
+  private getTransactions = (page: number = 0): void => {
+    const accountId = this.accountIdSignal();
+    if (accountId) {
+      this.store.dispatch(
+        getTransactionsByAccountId({
+          id: accountId,
+          page: page,
+          sort: this.sortActive(),
+          direction: this.sortDirection(),
+          size: this.pageSizeSignal(),
+        }),
       );
-      this.resultsLength = state.data?.transactions?.totalElements || 0;
-      if (!this.paginatorSubscription && this.resultsLength) {
-        this.createPageSubscriptions();
-      }
-    });
+    }
   };
 }

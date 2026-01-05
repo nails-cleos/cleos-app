@@ -2,19 +2,21 @@ import { TestBed } from '@angular/core/testing';
 import { NavigationEnd, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 import { NavigationService } from './navigation.service';
-import { AppState } from '../store/app.states';
 import { IUser, User } from '../interfaces/user';
 import { updateMyUser } from '../store/user.actions';
 import { setLanguage } from '../store/i18n.actions';
+import { I18NState } from '../store/reducers/i18n.reducers';
 
 describe('NavigationService', () => {
   let service: NavigationService;
-  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let storeSpy: jasmine.SpyObj<Store<I18NState>>;
   let routerSpy: jasmine.SpyObj<Router>;
   let routerEventsSubject: Subject<any>;
+
+  let lang: BehaviorSubject<any>;
 
   const mockUser: IUser = {
     id: 'user-123',
@@ -25,9 +27,10 @@ describe('NavigationService', () => {
   };
 
   beforeEach(() => {
+    lang = new BehaviorSubject('en-GB');
     routerEventsSubject = new Subject();
 
-    storeSpy = jasmine.createSpyObj('Store', ['dispatch']);
+    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl'], {
       events: routerEventsSubject.asObservable(),
       url: '/test/path',
@@ -36,6 +39,7 @@ describe('NavigationService', () => {
     // Mock router methods to return promises
     routerSpy.navigate.and.returnValue(Promise.resolve(true));
     routerSpy.navigateByUrl.and.returnValue(Promise.resolve(true));
+    storeSpy.pipe.and.returnValue(lang.asObservable());
 
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot()],
@@ -262,7 +266,7 @@ describe('NavigationService', () => {
     });
 
     it('should handle null language parameter', () => {
-      const result = service.attachLang(null);
+      const result = service.attachLang(undefined);
 
       expect(result).toBe('en-GB'); // Default language from getLocale mock
     });

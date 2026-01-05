@@ -1,10 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { IPrice } from '../../interfaces/treatment';
 import { ICurrency } from '../../interfaces/currency';
-import { UntypedFormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { IPaymentOption } from '../../interfaces/payment';
 import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
-import { BankComponent } from '../bank/bank.component';
+import { BankComponent, BankForm } from '../bank/bank.component';
 import { TranslatePipe } from '@ngx-translate/core';
 import { DecimalPipe } from '@angular/common';
 import { MatDivider } from '@angular/material/divider';
@@ -14,23 +14,18 @@ import { MatDivider } from '@angular/material/divider';
   templateUrl: './price.component.html',
   styleUrls: ['./price.component.scss'],
   imports: [CurrencySymbolPipe, BankComponent, TranslatePipe, DecimalPipe, MatDivider],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PriceComponent {
-  @Input() typeForm!: UntypedFormGroup;
-  @Input() price?: IPrice;
-  @Input() currency!: ICurrency;
-  @Input() firstTime: boolean;
-  @Input() showPenalty: boolean;
-  @Input() showBank: boolean;
-  @Input() options?: IPaymentOption[];
-  @Input() professionalName?: string;
-  @Output() percentageEmitter = new EventEmitter<number>();
-
-  constructor() {
-  	this.firstTime = false;
-  	this.showBank = false;
-  	this.showPenalty = false;
-  }
+  typeForm = input.required<FormGroup<BankForm>>();
+  currency = input.required<ICurrency>();
+  price = input<IPrice>();
+  options = input<IPaymentOption[]>();
+  professionalName = input<string>();
+  firstTime = input<boolean>(false);
+  showPenalty = input<boolean>(false);
+  showBank = input<boolean>(false);
+  percentageEmitter = output<number>();
 
   emitter = (percentage: number): void => this.percentageEmitter.emit(percentage);
 }

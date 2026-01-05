@@ -1,5 +1,5 @@
 import { IUser } from './user';
-import { IRoom } from './room';
+import { IRoom, IRoomAll } from './room';
 
 export interface IOffice {
   id?: string;
@@ -27,6 +27,7 @@ export interface IOfficeAll {
   btw?: string;
   billingAddress?: string;
   lastInvoiceNumber?: number;
+  rooms?: IRoomAll[];
 }
 
 export class Office implements IOffice {

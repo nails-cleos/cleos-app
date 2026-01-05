@@ -1,11 +1,12 @@
-@if (customers) {
+@let pageSize = pageSizeSignal();
+@if (dataSource(); as dataSource) {
   <table [dataSource]="dataSource" mat-table multiTemplateDataRows matSort matSortActive="days" matSortDisableClear
          matSortDirection="asc">
     <ng-container matColumnDef="position">
       <th *matHeaderCellDef mat-header-cell>#</th>
       <td *matCellDef="let customer; let i = dataIndex;" mat-cell>
         @if (customer.reservationId) {
-          {{ ((paginator.pageIndex || 0) * pageSize) + i + 1 }}
+          <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
         } @else {
           <div class="ssc-line"></div>
         }

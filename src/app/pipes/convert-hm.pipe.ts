@@ -2,7 +2,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'convertHM',
-  standalone: true,
 })
 export class ConvertHMPipe implements PipeTransform {
 

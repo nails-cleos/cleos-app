@@ -1,69 +1,83 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import { BehaviorSubject, of } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { TranslateModule } from '@ngx-translate/core';
-import { BreakpointObserver } from '@angular/cdk/layout';
-import { ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute, ParamMap } from '@angular/router';
-import { of, Subject } from 'rxjs';
-
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TreatmentsComponent } from './treatments.component';
-import { ITreatment, ITreatmentGroup } from '../../interfaces/treatment';
-import { PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import { clean, deleteTreatmentGroup, getTreatmentsPage } from '../../store/treatment.actions';
-import { AppState } from '../../store/app.states';
+import { ITreatmentGroupAll } from '../../interfaces/treatment';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
+import { deleteTreatmentGroup, getTreatmentsPage } from '../../store/treatment.actions';
+import { ActivatedRoute } from '@angular/router';
+import { signal } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { TreatmentState } from '../../store/reducers/treatment.reducers';
 
 describe('TreatmentsComponent', () => {
   let component: TreatmentsComponent;
   let fixture: ComponentFixture<TreatmentsComponent>;
-
-  let state$: Subject<any>;
-
-  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let storeSpy: jasmine.SpyObj<Store<TreatmentState>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let dialogSpy: jasmine.Spy<any>;
+  let translate: TranslateService;
+  let dialogSpy: jasmine.SpyObj<any>;
 
-  const mockTreatments: ITreatmentGroup[] = [
+  const mockTreatments: ITreatmentGroupAll[] = [
     { id: '1', name: 'Treatment Red', description: 'Red treatment' },
     { id: '2', name: 'Treatment Blue', description: 'Blue treatment' },
     { id: '3', name: 'Treatment Green', description: 'Green treatment' },
   ];
 
-  const mockPagination: Pagination<ITreatmentGroup> = {
+  const mockPagination: Pagination<ITreatmentGroupAll> = {
     content: mockTreatments,
     totalElements: 3,
     totalPages: 1,
     number: 0,
   };
 
-  beforeEach(async () => {
-    state$ = new Subject();
+  let treatmentList$: BehaviorSubject<any>;
+  let breakpoint$: BehaviorSubject<any>;
+  let response$: BehaviorSubject<any>;
 
-    const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: paramMapSpy,
+  beforeEach(async () => {
+    treatmentList$ = new BehaviorSubject(mockPagination);
+    response$ = new BehaviorSubject<any>(undefined);
+    breakpoint$ = new BehaviorSubject<any>({
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
       },
     });
 
-    paramMapSpy.get.and.returnValue(null);
-    storeSpy.select.and.returnValue(state$.asObservable());
-    breakpointObserverSpy.observe.and.returnValue(of({ matches: false, breakpoints: {} }));
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      snapshot: {
+        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+      },
+    });
+
+    let pipeCallIndex = 0;
+    storeSpy.pipe.and.callFake(() => {
+      pipeCallIndex++;
+      switch (pipeCallIndex) {
+        case 1:
+          return treatmentList$.asObservable();
+        case 2:
+          return response$.asObservable();
+        default:
+          return new BehaviorSubject(undefined).asObservable();
+      }
+    });
+
+    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [TreatmentsComponent, TranslateModule.forRoot(), NoopAnimationsModule],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
-        { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
     }).compileComponents();
@@ -71,234 +85,106 @@ describe('TreatmentsComponent', () => {
     fixture = TestBed.createComponent(TreatmentsComponent);
     component = fixture.componentInstance;
 
-    // Set up mock paginator and sort before initialization to prevent errors
-    component.paginator = {
-      pageIndex: 0,
-      page: of({ pageIndex: 0, pageSize: PAGE_SIZE }),
-    } as unknown as MatPaginator;
+    translate = TestBed.inject(TranslateService);
+    translate.setDefaultLang('en');
+    translate.use('en');
 
-    component.sort = {
-      sortChange: of(),
-      active: 'name',
-      direction: 'asc',
-    } as unknown as MatSort;
+    fixture.detectChanges();
 
-    dialogSpy = spyOn(component.dialog, 'open');
+    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
-  afterEach(() => state$.complete());
+  afterEach(() => {
+    treatmentList$.complete();
+    response$.complete();
+    breakpoint$.complete();
+  });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize with default values', () => {
-    expect(component.displayedColumns).toEqual(['order', 'name', 'priceFrom', 'actions']);
-    expect(component.dataSource).toBeInstanceOf(MatTableDataSource);
-    expect(component.pageSize).toBe(PAGE_SIZE);
+  it('should compute dataSourceSignal correctly', () => {
+    treatmentList$.next(mockPagination);
+    fixture.detectChanges();
+
+    const data = component.dataSourceSignal() as any;
+    expect(data?.length).toBe(3);
   });
 
-  it('should dispatch Clean action on initialization', () => {
-    // Reset to check only the initialization call
-    storeSpy.dispatch.calls.reset();
-    component.ngOnInit();
+  it('should compute resultsLengthSignal correctly', () => {
+    treatmentList$.next(mockPagination);
+    fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
+    expect(component.resultsLengthSignal()).toBe(3);
   });
 
-  it('should call getTreatments after view init', () => {
-    spyOn(component as any, 'getTreatments');
-
-    component.ngAfterViewInit();
-
-    expect(component['getTreatments']).toHaveBeenCalled();
-  });
-
-  it('should update data source when state changes', () => {
-    component.ngOnInit();
-
-    state$.next({
-      data: mockPagination,
+  it('should set mobile page size when small breakpoint matches', () => {
+    breakpoint$.next({
+      matches: true,
+      breakpoints: {
+        [Breakpoints.XSmall]: true,
+        [Breakpoints.Small]: true,
+      },
     });
+    fixture.detectChanges();
 
-    expect(component.dataSource).toBe(mockTreatments);
-    expect(component.resultsLength).toBe(3);
+    expect(component.pageSizeSignal()).toBe(MOBILE_PAGE_SIZE);
   });
 
-  it('should clean and get treatment list on response', () => {
-    component.ngOnInit();
-    component.ngAfterViewInit();
-
-    state$.next({
-      response: true,
+  it('should keep default page size when breakpoint does not match', () => {
+    breakpoint$.next({
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
+      },
     });
+    fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getTreatmentsPage({
-      page: 0,
-      sort: 'name',
-      direction: 'asc',
-      size: PAGE_SIZE,
-    }));
+    expect(component.pageSizeSignal()).toBe(PAGE_SIZE);
   });
 
-  it('should create page subscriptions when results length is available', () => {
-    component.ngOnInit();
+  it('should dispatch getTreatmentPage when paginatorPageIndex changes', () => {
+    component.paginatorPageIndex.set(1);
+    fixture.detectChanges();
 
-    component.paginator = {
-      pageIndex: 0,
-      page: of({ pageIndex: 0, pageSize: PAGE_SIZE }),
-    } as unknown as MatPaginator;
-
-    component.sort = {
-      sortChange: of({ active: 'name', direction: 'asc' }),
-      active: 'name',
-      direction: 'asc',
-    } as unknown as MatSort;
-
-    spyOn(component as any, 'createPageSubscriptions');
-
-    state$.next({
-      data: mockPagination,
-    });
-
-    expect(component['createPageSubscriptions']).toHaveBeenCalled();
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(
+      getTreatmentsPage({
+        page: 1,
+        sort: 'order',
+        direction: 'asc',
+        size: PAGE_SIZE,
+      }),
+    );
   });
 
-  it('should unsubscribe from subscriptions on destroy', () => {
-    const subscription = jasmine.createSpy('subscription');
-    const paginatorSubscription = jasmine.createSpy('paginatorSubscription');
+  it('should dispatch clean and reset paginator when responseSignal emits', () => {
+    const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
 
-    component['subscription'] = { unsubscribe: subscription } as any;
-    component['paginatorSubscription'] = { unsubscribe: paginatorSubscription } as any;
+    component['paginator'] = signal(paginatorMock);
 
-    component.ngOnDestroy();
+    response$.next({ success: true });
 
-    expect(subscription).toHaveBeenCalled();
-    expect(paginatorSubscription).toHaveBeenCalled();
+    fixture.detectChanges();
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(
+      getTreatmentsPage({
+        page: 0,
+        sort: 'order',
+        direction: 'asc',
+        size: PAGE_SIZE,
+      }),
+    );
   });
 
-  it('should handle missing subscriptions on destroy', () => {
-    component['subscription'] = undefined;
-    component['paginatorSubscription'] = undefined;
-
-    expect(() => component.ngOnDestroy()).not.toThrow();
-  });
-
-  it('should reset paginator page index when sort changes', () => {
-    const sortChangeSubject = new Subject();
-
-    component.paginator = {
-      pageIndex: 5,
-      page: of({ pageIndex: 0, pageSize: PAGE_SIZE }),
-    } as unknown as MatPaginator;
-
-    component.sort = {
-      sortChange: sortChangeSubject.asObservable(),
-      active: 'name',
-      direction: 'asc',
-    } as unknown as MatSort;
-
-    spyOn(component as any, 'getTreatments');
-    component['createPageSubscriptions']();
-
-    sortChangeSubject.next({ active: 'description', direction: 'desc' });
-
-    expect(component.paginator.pageIndex).toBe(0);
-    expect(component['getTreatments']).toHaveBeenCalled();
-  });
-
-  it('should handle paginator page changes', () => {
-    const pageSubject = new Subject();
-    component.paginator = {
-      pageIndex: 1,
-      page: pageSubject.asObservable(),
-    } as unknown as MatPaginator;
-
-    component.sort = {
-      sortChange: of(),
-      active: 'name',
-      direction: 'asc',
-    } as unknown as MatSort;
-
-    spyOn(component as any, 'getTreatments');
-    component['createPageSubscriptions']();
-
-    pageSubject.next({ pageIndex: 1, pageSize: PAGE_SIZE });
-
-    expect(component['getTreatments']).toHaveBeenCalled();
-  });
-
-  it('should dispatch GetTreatmentsPage action with correct parameters', () => {
-    component.sort = {
-      active: 'name',
-      direction: 'asc',
-    } as unknown as MatSort;
-
-    component['getTreatments'](2);
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getTreatmentsPage(
-      { page: 2, size: PAGE_SIZE, sort: 'name', direction: 'asc' },
-    ));
-  });
-
-  it('should handle undefined expanded treatment', () => {
-    expect(component.expanded).toBeUndefined();
-
-    component.expanded = mockTreatments[0];
-    expect(component.expanded).toBe(mockTreatments[0]);
-  });
-
-  it('should handle state subscription errors gracefully', () => {
-    expect(() => {
-      state$.next({
-        data: null,
-      });
-    }).not.toThrow();
-  });
-
-  it('should handle empty pagination data', () => {
-    component.ngOnInit();
-    const emptyPagination: Pagination<ITreatmentGroup> = {
-      content: [],
-      totalElements: 0,
-      totalPages: 0,
-      number: 0,
-    };
-
-    state$.next({
-      data: emptyPagination,
-    });
-
-    expect(component.dataSource).toEqual([]);
-    expect(component.resultsLength).toBe(0);
-  });
-
-  it('should initialize with correct state observable', () => {
-    expect(storeSpy.select).toHaveBeenCalled();
-  });
-
-  it('should maintain correct displayedColumns order', () => {
-    const expectedColumns = ['order', 'name', 'priceFrom', 'actions'];
-    expect(component.displayedColumns).toEqual(expectedColumns);
-  });
-
-  it('should handle mobile breakpoint adjustment', () => {
-    // Test is handled by component initialization with BreakpointObserver
-    // The mobile adjustment happens in constructor based on breakpoint observer
-    expect(component.pageSize).toBeDefined();
-  });
-
-  it('should call delete method without errors', () => {
-    component.ngOnInit();
-
-    const testTreatment: ITreatment = { id: '1', name: 'Treatment Red', description: 'Red treatment', primary: true };
-
+  it('should dispatch deleteTreatment when dialog returns a result', () => {
+    const item = mockTreatments[0];
     dialogSpy.and.returnValue({
-      afterClosed: () => of(testTreatment),
-    });
+      afterClosed: () => of(item),
+    } as any);
 
-    component.delete(testTreatment);
+    component.delete(item);
 
     expect(dialogSpy).toHaveBeenCalledWith(
       jasmine.any(Function),
@@ -306,12 +192,10 @@ describe('TreatmentsComponent', () => {
         data: {
           title: 'TREATMENT.DELETED.TITLE',
           content: 'TREATMENT.DELETED.CONTENT',
-          value: testTreatment,
+          value: item,
         },
       }));
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteTreatmentGroup(
-      { id: testTreatment.id!, name: testTreatment.name! }),
-    );
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteTreatmentGroup({ id: item.id!, name: item.name! }));
   });
 });

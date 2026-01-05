@@ -17,8 +17,8 @@ describe('ShareButtonsComponent', () => {
     component = fixture.componentInstance;
 
     // default input values
-    component.message = 'Hello World!';
-    component.url = 'https://example.com';
+    fixture.componentRef.setInput('message', 'Hello World!');
+    fixture.componentRef.setInput('url', 'https://example.com');
 
     // spy on window.open
     windowOpenSpy = spyOn(window, 'open');
@@ -26,28 +26,28 @@ describe('ShareButtonsComponent', () => {
   });
 
   it('should open WhatsApp share link', () => {
-    void component.shareOnWhatsApp;
+    component.shareOnWhatsApp();
     expect(windowOpenSpy).toHaveBeenCalledWith(
       'https://api.whatsapp.com/send?text=' + encodeURIComponent('Hello World!'),
     );
   });
 
   it('should open Messenger share link', () => {
-    void component.shareOnMessenger;
+    component.shareOnMessenger();
     expect(windowOpenSpy).toHaveBeenCalledWith(
       'fb-messenger://share/?link=' + encodeURIComponent('Hello World!'),
     );
   });
 
   it('should open SMS share link', () => {
-    void component.shareViaSMS;
+    component.shareViaSMS();
     expect(windowOpenSpy).toHaveBeenCalledWith(
       'sms:?&body=' + encodeURIComponent('Hello World!'),
     );
   });
 
   it('should open Email share link', () => {
-    void component.shareViaEmail;
+    component.shareViaEmail();
     expect(windowOpenSpy).toHaveBeenCalledWith(
       'mailto:?body=' + encodeURIComponent('Hello World!'),
     );
@@ -56,7 +56,7 @@ describe('ShareButtonsComponent', () => {
   it('should copy url to clipboard', async () => {
     const clipboardSpy = spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.resolve());
 
-    void component.copyLink;
+    component.copyLink();
     expect(clipboardSpy).toHaveBeenCalledWith('https://example.com');
   });
 });

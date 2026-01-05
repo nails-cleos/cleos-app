@@ -42,7 +42,7 @@ describe('DialogComponent', () => {
   });
 
   it('onNoClick should close the dialog', () => {
-    void component.onNoClick;
+    component.onNoClick();
     expect(mockDialogRef.close).toHaveBeenCalled();
   });
 
@@ -84,7 +84,7 @@ describe('DialogComponent', () => {
     const testValue = 'test-value';
     component.data.value = testValue;
     fixture.detectChanges();
-    
+
     // The Yes button should have the mat-dialog-close directive with the correct value
     // This is tested through the component's data binding
     expect(component.data.value).toBe(testValue);
@@ -96,7 +96,7 @@ describe('DialogComponent', () => {
     const noButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.NO'));
     expect(noButton).toBeTruthy();
     noButton?.click();
-    
+
     expect(mockDialogRef.close).toHaveBeenCalled();
   });
 
@@ -111,10 +111,10 @@ describe('DialogComponent', () => {
   it('should display translated button texts', () => {
     const compiled = fixture.nativeElement;
     const buttons = Array.from(compiled.querySelectorAll('button')) as HTMLButtonElement[];
-    
+
     const noButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.NO'));
     const yesButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.YES'));
-    
+
     expect(noButton?.textContent?.trim()).toContain('COMMON.BUTTON.NO');
     expect(yesButton?.textContent?.trim()).toContain('COMMON.BUTTON.YES');
   });

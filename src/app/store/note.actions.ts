@@ -1,7 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 import { IError, ResponseSuccess } from '../interfaces/common';
 import { INote } from '../interfaces/note';
-import { IUser } from '../interfaces/user';
+import { IUserAll } from '../interfaces/user';
 
 enum NoteActionTypes {
   getAllProfessional = '[Note] Get all professional',
@@ -14,6 +14,8 @@ enum NoteActionTypes {
   getNote = '[Note] Find note by id',
   deleteNote = '[Note] Delete note by id',
   completeNote = '[Note] Complete',
+  setCurrentNoteId = '[Note] Set current note id',
+  setNoteNavigationParams = '[Note] Set note navigation params',
   clean = '[Note] Clean'
 }
 
@@ -23,7 +25,7 @@ export const getAllProfessional = createAction(
 
 export const noteSuccess = createAction(
   NoteActionTypes.noteSuccess,
-  props<{ data: IUser[] }>(),
+  props<{ data: IUserAll[] }>(),
 );
 
 export const createNote = createAction(
@@ -66,4 +68,14 @@ export const completeNote = createAction(
   props<{ id: string }>(),
 );
 
-export const clean = createAction(NoteActionTypes.clean);
+export const setCurrentNoteId = createAction(
+  NoteActionTypes.setCurrentNoteId,
+  props<{ noteId: string }>(),
+);
+
+export const setNoteNavigationParams = createAction(
+  NoteActionTypes.setNoteNavigationParams,
+  props<{ date?: Date; professional?: IUserAll }>(),
+);
+
+export const cleanNote = createAction(NoteActionTypes.clean);

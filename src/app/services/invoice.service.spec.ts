@@ -3,15 +3,17 @@ import { TestBed } from '@angular/core/testing';
 import { InvoiceService } from './invoice.service';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { of } from 'rxjs';
-import { IOffice } from '../interfaces/office';
+import { IOfficeAll } from '../interfaces/office';
 import { IInvoice } from '../interfaces/invoice';
 
 describe('InvoiceService', () => {
   let service: InvoiceService;
   let httpSpy: jasmine.SpyObj<HttpClient>;
 
-  const office: IOffice = {
+  const mockOffice: IOfficeAll = {
     id: '1',
+    manager: { id: '1', displayName: 'Officer' },
+    name: 'Office 1',
   };
 
   const invoice: IInvoice = {
@@ -62,10 +64,10 @@ describe('InvoiceService', () => {
   });
 
   it('should fetch all office', () => {
-    httpSpy.get.and.returnValue(of([office]));
+    httpSpy.get.and.returnValue(of([mockOffice]));
 
     service.getAllMyOffices().subscribe((result) => {
-      expect(result).toEqual([office]);
+      expect(result).toEqual([mockOffice]);
     });
 
     expect(httpSpy.get).toHaveBeenCalledWith('v1/invoices/offices');

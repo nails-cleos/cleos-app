@@ -1,21 +1,23 @@
 import { inject, Injectable } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { getLocale } from '../util/helper';
-import { TranslateService } from '@ngx-translate/core';
 import { IUser, User } from '../interfaces/user';
 import { updateMyUser } from '../store/user.actions';
-import { AppState } from '../store/app.states';
 import { Store } from '@ngrx/store';
 import { setLanguage } from '../store/i18n.actions';
+import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { I18NState } from '../store/reducers/i18n.reducers';
 
 @Injectable({
   providedIn: 'root',
 })
 export class NavigationService {
 
-  private store: Store<AppState> = inject(Store<AppState>);
+  private store: Store<I18NState> = inject(Store<I18NState>);
   private router: Router = inject(Router);
-  private translate: TranslateService = inject(TranslateService);
+
+  private readonly languageSignal = toSignal(this.store.pipe(getI18NLanguagePipe));
 
   private history: string[] = [];
 
@@ -41,32 +43,37 @@ export class NavigationService {
   };
 
   reload = (url: string[], data?: any, queryParams?: any, reloadURL = '/auth/redirect', lang?: string): void => {
-    const navigateUrl = `/${ lang || getLocale(this.translate.currentLang).language }${ reloadURL }`;
+    const currentLang = getLocale(this.languageSignal()).language;
+    const navigateUrl = `/${lang || currentLang}${reloadURL}`;
     this.router.navigateByUrl(navigateUrl, { skipLocationChange: true }).then(() =>
       this.router.navigate(url.filter(path => path), { state: data, queryParams }));
   };
 
-  reloadPage = (url: string = `/${ getLocale(this.translate.currentLang).language }`): void => {
-    this.router.navigateByUrl(url).then(() => window.location.reload());
+  reloadPage = (url?: string): void => {
+    const currentLang = getLocale(this.languageSignal()).language;
+    const currentUrl = url ?? `/${currentLang}`;
+    this.router.navigateByUrl(currentUrl).then(() => window.location.reload());
   };
 
-  attachLang = (lang: string | null, currentUser?: IUser): string => {
+  attachLang = (lang?: string, currentUser?: IUser): string => {
     const language = getLocale(lang).language;
-    if (language !== getLocale(this.translate.currentLang).language) {
+    const currentLang = this.languageSignal();
+
+    if (language === currentLang) {
+      return language;
+    }
+
+    this.store.dispatch(setLanguage({ language }));
+
+    const userLanguage = getLocale(currentUser?.locale).language;
+
+    if (userLanguage !== language) {
       const user: IUser = new User();
       user.lang = language;
-      const redirectUrl = this.router.url;
-      let userLanguage;
-      if (currentUser?.locale) {
-        userLanguage = getLocale(currentUser.locale);
-      }
-      this.store.dispatch(setLanguage({ language }));
-      if (userLanguage?.language !== language) {
-        this.store.dispatch(
-          updateMyUser({ user, redirectUrl }),
-        );
-      }
+
+      this.store.dispatch(updateMyUser({ user, redirectUrl: this.router.url }));
     }
+
     return language;
   };
 }

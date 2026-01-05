@@ -10,7 +10,7 @@ import { ReferralsComponent } from './referrals/referrals.component';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { ReviewDialogComponent } from './reservation/review/review-dialog.component';
 import { UpcomingComponent } from './reservation/upcoming/upcoming.component';
-import { EffectsModule } from '@ngrx/effects';
+import { provideEffects } from '@ngrx/effects';
 import { PaymentEffects } from '../store/effects/payment.effects';
 import { PaymentService } from '../services/payment.service';
 import { ReservationService } from '../services/reservation.service';
@@ -28,12 +28,15 @@ import { CurrencyEffects } from '../store/effects/currency.effects';
 import { OptionComponent } from './payment/option/option.component';
 import { MePaymentComponent } from './payment/me/me-payment.component';
 import { ColorService } from '../services/color.service';
-import { Store } from '@ngrx/store';
-import { AppState, selectI18nState } from '../store/app.states';
-import { Observable } from 'rxjs';
+import { provideState, Store } from '@ngrx/store';
 import { ShareButtonsComponent } from './referrals/share-buttons/share-buttons.component';
 import { BottomSheetShareComponent } from './referrals/bottom-sheet-share.component';
 import { BottomSheetReferralComponent } from './referrals/bottom-sheet-referral.component';
+import { DISCOUNT_FEATURE_KEY, discountReducer } from '../store/reducers/discount.reducers';
+import { MeNavigationEffects } from './me-navigation.effects';
+import { CustomerEditDialogComponent } from '../shared/dialog/customer-edit/customer-edit-dialog.component';
+import { I18NState } from '../store/reducers/i18n.reducers';
+import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
 
 @NgModule({
   imports: [
@@ -50,6 +53,7 @@ import { BottomSheetReferralComponent } from './referrals/bottom-sheet-referral.
     OptionComponent,
     MePaymentComponent,
     ShareButtonsComponent,
+    CustomerEditDialogComponent,
     MeRoutingModule,
     TranslateModule.forChild({
       loader: {
@@ -63,7 +67,6 @@ import { BottomSheetReferralComponent } from './referrals/bottom-sheet-referral.
       isolate: false,
       extend: true,
     }),
-    EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects, CurrencyEffects]),
   ],
   providers: [
     ReservationService,
@@ -76,14 +79,15 @@ import { BottomSheetReferralComponent } from './referrals/bottom-sheet-referral.
     DiscountService,
     CurrencyService,
     ColorService,
+    provideState(DISCOUNT_FEATURE_KEY, discountReducer),
+    provideEffects(ReservationEffects, PaymentEffects, DiscountEffects, CurrencyEffects, MeNavigationEffects),
   ],
 })
 export class MeModule {
-  constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
-    const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe((state) => {
+  constructor(private readonly store: Store<I18NState>, protected translateService: TranslateService) {
+    this.store.pipe(getI18NLanguagePipe).subscribe((language) => {
       translateService.currentLang = '';
-      this.translateService.use(state.language);
+      this.translateService.use(language);
     });
   }
 }

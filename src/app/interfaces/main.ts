@@ -1,5 +1,5 @@
-import { BehaviorSubject } from 'rxjs';
 import { ITreatmentGroup } from './treatment';
+import { WritableSignal } from '@angular/core';
 
 export interface ISlide {
   id: string;
@@ -20,7 +20,7 @@ export interface ISocialLink {
 
 export interface IAnimation {
   id: string;
-  state: BehaviorSubject<'open' | 'close'>;
+  state: WritableSignal<'open' | 'close'>;
   delay: string;
   text: string;
 }

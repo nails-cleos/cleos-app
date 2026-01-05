@@ -3,7 +3,6 @@ import { API_LOCALE, formatDuration } from '../util/dates';
 
 @Pipe({
   name: 'durationTime',
-  standalone: true,
 })
 export class DurationTimePipe implements PipeTransform {
 

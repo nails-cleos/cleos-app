@@ -1,19 +1,19 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { IOffice } from '../../interfaces/office';
-import { Observable, Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { AppState, selectOfficeState } from '../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { clean, deleteOffice, getOfficesPage, officeSelected } from '../../store/office.actions';
+import { cleanOffice, deleteOffice, getOfficesPage, officeSelected } from '../../store/office.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { detailExpandAnimation } from '../../util/animation';
 import { SharedModule } from '../../shared/shared.module';
+import { OfficeState } from '../../store/reducers/office.reducers';
+import { getOfficePaginationPipe, getOfficeResponsePipe } from '../../store/selectors/office.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-office-list',
@@ -21,49 +21,77 @@ import { SharedModule } from '../../shared/shared.module';
   styleUrls: ['./office-list.component.scss'],
   animations: [detailExpandAnimation],
   imports: [SharedModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+export class OfficeListComponent {
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly store: Store<OfficeState> = inject(Store<OfficeState>);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly dialog: MatDialog = inject(MatDialog);
+
+  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private officeList$ = this.store.pipe(getOfficePaginationPipe);
+  private response$ = this.store.pipe(getOfficeResponsePipe);
+
+  private paginator = viewChild(MatPaginator);
+  private sort = viewChild(MatSort);
+
+  private officeListSignal = toSignal(this.officeList$);
+  private responseSignal = toSignal(this.response$);
+  private breakpointsSignal = toSignal(
+    this.breakpointObserver$, {
+      initialValue: {
+        matches: false,
+        breakpoints: {
+          [Breakpoints.XSmall]: false,
+          [Breakpoints.Small]: false,
+        },
+      },
+    },
+  );
+
+  private sortActive = computed(() => this.sort()?.active ?? 'name');
+  private sortDirection = computed(() => this.sort()?.direction ?? 'asc');
+
+  paginatorPageIndex = signal(0);
+  dataSourceSignal = computed(() => this.officeListSignal()?.content);
+  resultsLengthSignal = computed(() => this.officeListSignal()?.totalElements || 0);
+  pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
   displayedColumns: string[] = ['position', 'name', 'manager', 'subject', 'actions'];
-  dataSource: any = new MatTableDataSource<Pagination<IOffice>>();
   expanded?: IOffice;
 
-  resultsLength = DEFAULT_LENGTH;
-  pageSize = PAGE_SIZE;
-  language: string;
+  language: string = this.translate.currentLang;
 
-  private subscription: Subscription | undefined;
-  private paginatorSubscription: Subscription | undefined;
-  private getState: Observable<any>;
-
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-    private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small,
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.pageSize = MOBILE_PAGE_SIZE;
+  constructor() {
+    effect((onCleanup) => {
+      const paginator = this.paginator();
+      if (paginator) {
+        const sub = paginator.page.subscribe((pageEvent) => {
+          this.paginatorPageIndex.set(pageEvent.pageIndex);
+        });
+        onCleanup(() => sub.unsubscribe());
       }
     });
-    this.getState = this.store.select(selectOfficeState);
-    this.language = this.translate.currentLang;
-  }
 
-  ngAfterViewInit(): void {
-    this.getOffices();
-  }
+    effect(() => {
+      const page = this.paginatorPageIndex();
+      this.store.dispatch(
+        getOfficesPage({
+          page: page,
+          sort: this.sortActive(),
+          direction: this.sortDirection(),
+          size: this.pageSizeSignal(),
+        }),
+      );
+    });
 
-  ngOnInit(): void {
-    this.clean();
-    this.subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.paginatorSubscription?.unsubscribe();
+    effect(() => {
+      if (this.responseSignal()) {
+        this.store.dispatch(cleanOffice());
+        this.paginator()?.firstPage();
+      }
+    });
   }
 
   edit = (selected: IOffice): void => this.store.dispatch(officeSelected({ selected }));
@@ -78,41 +106,6 @@ export class OfficeListComponent implements OnInit, AfterViewInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.store.dispatch(deleteOffice({ id: result.id, name: result.name }));
-      }
-    });
-  };
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private createPageSubscriptions = (): void => {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getOffices();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getOffices(this.paginator.pageIndex));
-
-    this.cdRef.detectChanges();
-  };
-
-  private getOffices = (page: number = 0): void => this.store.dispatch(
-    getOfficesPage({
-      page: page,
-      sort: this.sort.active,
-      direction: this.sort.direction,
-      size: this.pageSize,
-    }),
-  );
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.response) {
-        this.clean();
-        this.getOffices();
-      }
-      this.dataSource = state.data?.content;
-      this.resultsLength = state.data?.totalElements;
-      if (!this.paginatorSubscription && this.resultsLength) {
-        this.createPageSubscriptions();
       }
     });
   };

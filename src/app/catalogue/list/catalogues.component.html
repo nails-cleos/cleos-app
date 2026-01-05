@@ -1,6 +1,7 @@
-@if (catalogues.length) {
+@let catalogueList = catalogues();
+@if (catalogueList.length) {
   <div class="drop-list" cdkDropList (cdkDropListDropped)="drop($event)">
-    @for (catalogue of catalogues; track catalogue) {
+    @for (catalogue of catalogueList; track catalogue) {
       <mat-card appearance="outlined" cdkDrag class="catalogue-card">
         <mat-card-header>
           <div mat-card-avatar>
@@ -33,7 +34,7 @@
     }
   </div>
   <div class="divider">
-    <button (click)="finish" color="primary" mat-fab extended class="icon-button">
+    <button (click)="finish()" color="primary" mat-fab extended class="icon-button">
       {{ 'COMMON.BUTTON.UPDATE' | translate }}
     </button>
   </div>

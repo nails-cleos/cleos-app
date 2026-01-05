@@ -1,18 +1,27 @@
-import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  Signal,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { combineLatestWith } from 'rxjs';
+import { AbstractControl, FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { AppState, selectRoomState } from '../store/app.states';
-import { clean, createRoom, getAllRoomsInfo, getRoom, updateRoom } from '../store/room.actions';
-import { AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, IRoomAll, Room } from '../interfaces/room';
+import { createRoom, getRoom, updateRoom } from '../store/room.actions';
+import { AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, Room } from '../interfaces/room';
 import { IUser, IUserAll } from '../interfaces/user';
-import { map, startWith, takeUntil } from 'rxjs/operators';
+import { map, startWith } from 'rxjs/operators';
 import { requireMatch, valueChange } from '../util/validators';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Role } from '../interfaces/token';
 import { RoomIconName } from '../util/icon';
-import { ICurrency, ICurrencyAll } from '../interfaces/currency';
-import { IOffice, IOfficeAll } from '../interfaces/office';
+import { ICurrencyAll } from '../interfaces/currency';
+import { IOfficeAll } from '../interfaces/office';
 import { MatListOption } from '@angular/material/list';
 import { IPaymentType, paymentOptions } from '../interfaces/payment';
 import timezones, { TimeZone } from 'timezones-list';
@@ -31,8 +40,19 @@ import { areEquals, createAddress } from '../util/helper';
 import { TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../shared/shared.module';
 import { AvailabilityComponent } from './availability/availability.component';
-import { GoogleMapComponent } from '../shared/google-map/google-map.component';
+import { GoogleMapComponent, GoogleMapForm } from '../shared/google-map/google-map.component';
 import { BackButtonDirective } from '../directives/back-button.directive';
+import { RoomState } from '../store/reducers/room.reducers';
+import {
+  getCurrenciesPipe,
+  getCurrentRoomIdPipe,
+  getOfficesPipe,
+  getProfessionalsPipe,
+  getSelectedRoomPipe,
+  getSubErrorsPipe,
+} from '../store/selectors/room.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { IError, isString } from '../interfaces/common';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 
@@ -46,21 +66,69 @@ export interface IIcon {
   sunday: RoomIconName;
 }
 
+type RoomForm = {
+  professional: FormControl<IUserAll | undefined>;
+  currency: FormControl<ICurrencyAll | undefined>;
+  office: FormControl<IOfficeAll | undefined>;
+  timeZone: FormControl<TimeZone | undefined>;
+  closeDate: FormControl<Date | undefined>;
+  addressForm: FormGroup<GoogleMapForm>;
+}
+
 @Component({
   selector: 'app-room',
   templateUrl: './room.component.html',
   styleUrls: ['./room.component.scss'],
   imports: [SharedModule, AvailabilityComponent, GoogleMapComponent, BackButtonDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RoomComponent implements OnInit, OnDestroy {
-  @ViewChild('professionalInput') professionalInput!: ElementRef<HTMLInputElement>;
-  @Input() room?: IRoom;
+export class RoomComponent {
+  private readonly store: Store<RoomState> = inject(Store<RoomState>);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly router: Router = inject(Router);
+  private readonly translate: TranslateService = inject(TranslateService);
 
-  form!: UntypedFormGroup;
-  id?: string;
-  isAddMode: boolean;
+  private roomId$ = this.store.pipe(getCurrentRoomIdPipe);
+  private selectedRoom$ = this.store.pipe(getSelectedRoomPipe);
+  private professionals$ = this.store.pipe(getProfessionalsPipe);
+  private currencies$ = this.store.pipe(getCurrenciesPipe);
+  private offices$ = this.store.pipe(getOfficesPipe);
+  private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
-  errors: any = [];
+  private roomIdSignal = toSignal(this.roomId$);
+  private professionalsSignal = toSignal(this.professionals$);
+  private subErrorsSignal = toSignal(this.subErrors$);
+
+  roomSignal = toSignal(this.selectedRoom$);
+  isAddModeSignal = computed(() => !this.roomIdSignal());
+  errors = signal<Record<string, unknown>>({});
+
+  timeZoneList = timezones;
+
+  googleMapForm: FormGroup<GoogleMapForm> = this.formBuilder.group<GoogleMapForm>({
+    address: this.formBuilder.control('', {
+      validators: [Validators.required],
+    }),
+    addressDescription: this.formBuilder.control(undefined),
+  });
+
+  form: FormGroup<RoomForm> = this.formBuilder.group<RoomForm>({
+    professional: this.formBuilder.control(undefined, {
+      validators: [requireMatch],
+    }),
+    currency: this.formBuilder.control(undefined, {
+      validators: [Validators.required, requireMatch],
+    }),
+    office: this.formBuilder.control(undefined, {
+      validators: [Validators.required, requireMatch],
+    }),
+    timeZone: this.formBuilder.control(this.timeZoneList.find(
+      timeZone => timeZone.label.toLowerCase().indexOf(getCurrentTimeZone().toLowerCase()) === 0), {
+      validators: [Validators.required, requireMatch],
+    }),
+    closeDate: this.formBuilder.control(undefined),
+    addressForm: this.googleMapForm,
+  });
 
   step = 0;
   icons: IIcon = {
@@ -81,100 +149,167 @@ export class RoomComponent implements OnInit, OnDestroy {
   satDate?: IAvailabilityDate;
   sunDate?: IAvailabilityDate;
 
-  primary: boolean;
-  today: Date;
+  primary: boolean = false;
+  today: Date = createDate(this.getForm.timeZone.value?.tzCode);
 
-  filteredProfessionals?: Observable<IUser[] | undefined>;
-  professionals: IUserAll[] = [];
-  allProfessional?: IUserAll[];
+  filteredProfessionalSignal: Signal<IUserAll[] | undefined> = toSignal(
+    this.getForm.professional.valueChanges.pipe(
+      startWith(''),
+      map((value) => !value || typeof value === 'string' ? value : value.displayName),
+      combineLatestWith(this.professionals$),
+      map(([name, professionals]) => {
+        if (!professionals) {
+          return [];
+        }
 
-  currencies?: ICurrencyAll[];
-  filteredCurrencyOptions?: Observable<ICurrency[] | undefined>;
+        return name ? this.filter(name, professionals) : professionals.slice();
+      })),
+  );
 
-  offices?: IOfficeAll[];
-  filteredOfficeOptions?: Observable<IOffice[] | undefined>;
+  selectedProfessionalsSignal = signal<IUserAll[]>([]);
+  professionalsWritableSignal = signal<IUserAll[] | undefined>(undefined);
 
-  timeZoneList = timezones;
-  filteredTimeZoneOptions?: Observable<any[] | undefined>;
+  professionalInput = viewChild<ElementRef<HTMLInputElement>>('professionalInput');
+
+  filteredCurrencySignal: Signal<ICurrencyAll[] | undefined> = toSignal(
+    this.getForm.currency.valueChanges.pipe(
+      startWith(''),
+      map((value) => !value || typeof value === 'string' ? value : value.code),
+      combineLatestWith(this.currencies$),
+      map(([name, currencies]) => {
+        if (!currencies) {
+          return [];
+        }
+
+        return name ? this.filterCurrency(name, currencies) : currencies.slice();
+      })),
+  );
+
+  filteredOfficeSignal: Signal<IOfficeAll[] | undefined> = toSignal(
+    this.getForm.office.valueChanges.pipe(
+      startWith(''),
+      map((value) => !value || typeof value === 'string' ? value : value.name),
+      combineLatestWith(this.offices$),
+      map(([name, offices]) => {
+        if (!offices) {
+          return [];
+        }
+
+        return name ? this.filterOffice(name, offices) : offices.slice();
+      })),
+  );
+
+  filteredTimeZoneSignal: Signal<TimeZone[] | undefined> = toSignal(
+    this.getForm.timeZone.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value?.label),
+      map(
+        name => name ? this.filterTimeZone(name, this.timeZoneList) :
+          this.timeZoneList ? this.timeZoneList.slice() : this.timeZoneList,
+      )),
+  );
 
   paymentOptions: IPaymentType[] = paymentOptions();
 
-  private getState: Observable<any>;
   private availabilities: IAvailability[] = [];
   private paymentTypes: string[] = [];
   private geometry?: PlaceGeometry;
   private formattedAddress?: string;
   private currentAvailabilities: IAvailability[] = [];
-  private currentPaymentTypes: string[] = [];
   private currentProfessionalIds: string[] = [];
-  private readonly language: string;
-  private destroy$ = new Subject<void>();
+  private readonly language: string = this.translate.currentLang;
 
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>,
-              private route: ActivatedRoute, private formBuilder: UntypedFormBuilder, private router: Router) {
-    this.isAddMode = true;
-    this.primary = false;
-    this.today = createDate();
-    this.getState = this.store.select(selectRoomState);
-    this.language = this.translate.currentLang;
+  constructor() {
+    effect(() => {
+      const selected = this.roomSignal();
+      if (selected?.id) {
+        const timeZone = this.timeZoneList.find(
+          timeZone => timeZone.label.toLowerCase().indexOf(getTimeZone(selected.timeZone).label.toLowerCase()) === 0);
+        const room = {
+          currency: selected.currency,
+          office: selected.office,
+          timeZone: timeZone,
+          address: selected.address.name,
+          addressDescription: selected.address.description,
+          closeDate: typeof selected.closeDate === 'string' ? createDateFromString(selected.closeDate) :
+            selected.closeDate,
+        };
+        this.primary = selected.primary;
+        this.paymentTypes = selected.paymentTypes;
+        this.form.patchValue(room);
+        this.getAvailabilities(selected.availabilities);
+      }
+    });
+
+    effect(() => {
+      const room = this.roomSignal();
+      const professionals = this.professionalsSignal();
+
+      // Update allGroups from store
+      this.professionalsWritableSignal.set(professionals);
+
+      if (room) {
+        // Reset groups
+        this.selectedProfessionalsSignal.set([]);
+
+        // Create a fresh copy of allGroups to filter
+        let filteredProfessionals = professionals ? [...professionals] : undefined;
+
+        // Process selected groups
+        const selectedProfessionals: IUserAll[] = [];
+        room.professionals?.forEach((group: IUserAll) => {
+          selectedProfessionals.push(group);
+          filteredProfessionals = filteredProfessionals?.filter(c => c.id !== group.id);
+        });
+
+        this.selectedProfessionalsSignal.set(selectedProfessionals);
+        this.professionalsWritableSignal.set(filteredProfessionals);
+        this.currentProfessionalIds = selectedProfessionals.map(({ id }) => id).filter(isString);
+      }
+    });
+
+    effect(() => {
+      const subErrors = this.subErrorsSignal();
+      if (subErrors) {
+        const errorMap: Record<string, unknown> = {};
+        subErrors.forEach((error: IError) => {
+          const field = error.field as keyof RoomForm | undefined;
+
+          if (field && field in this.form.controls) {
+            errorMap[field] = error.message;
+            this.form.controls[field].setErrors({ incorrect: true });
+          }
+        });
+        this.errors.set(errorMap);
+      }
+    });
+
+    effect(() => {
+      const id = this.roomIdSignal();
+      if (id) {
+        this.store.dispatch(getRoom({ id, redirect: true }));
+      }
+    });
+
+    const initial = this.professionalsSignal();
+    this.professionalsWritableSignal.set(initial ? [...initial] : []);
+
+    effect(() => {
+      const customers = this.professionalsSignal();
+      if (!customers) {
+        return;
+      }
+
+      this.professionalsWritableSignal.set(customers);
+    });
   }
 
-  get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
+  get getForm(): RoomForm {
     return this.form.controls;
   }
 
-  get submit(): void {
-    if (!this.validate()) {
-      return;
-    }
-
-    const room: IRoom = new Room();
-    room.officeId = valueChange(this.getForm.office.value, this.room?.office)?.id;
-    room.currencyId = valueChange(this.getForm.currency.value, this.room?.currency)?.id;
-    room.timeZone = this.getForm.timeZone.value.tzCode;
-    room.primary = this.primary;
-
-    const newProfessionalIds = this.professionals.map(({ id }) => id);
-    if (!areEquals(newProfessionalIds, this.currentProfessionalIds)) {
-      room.professionalIds = newProfessionalIds;
-    }
-
-    if (this.paymentTypes !== this.currentPaymentTypes) {
-      room.paymentTypes = this.paymentTypes;
-    }
-    if (!areEquals(this.availabilities, this.currentAvailabilities)) {
-      room.availabilities = this.availabilities;
-    }
-
-    room.address = createAddress(this.formattedAddress, this.geometry?.location, this.room?.address,
-      this.getForm.addressDescription.value);
-
-    if (this.getForm.closeDate.value) {
-      room.closeDateString = createNewDate(this.getForm.closeDate.value).toLocaleString(API_LOCALE);
-    }
-
-    if (this.isAddMode) {
-      this.store.dispatch(createRoom({ room }));
-    } else {
-      const id = this.id!;
-      this.store.dispatch(updateRoom({ id, room }));
-    }
-    return;
-  }
-
-  get addProfessional(): void {
-    this.router.navigate([this.language, 'users', 'add'], { state: { role: Role.professional } });
-    return;
-  }
-
-  get addCurrency(): void {
-    this.router.navigate([this.language, 'currency', 'add']);
-    return;
-  }
-
-  get addOffice(): void {
-    this.router.navigate([this.language, 'offices', 'add']);
-    return;
+  get getGoogleMapForm(): GoogleMapForm {
+    return this.googleMapForm.controls;
   }
 
   private static createAv = (date?: string, timeZone?: string): Date | undefined => {
@@ -185,24 +320,59 @@ export class RoomComponent implements OnInit, OnDestroy {
     return undefined;
   };
 
-  ngOnInit(): void {
-    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(param => {
-      const id = param.get('id');
-      if (id) {
-        this.id = id;
-        this.getRoom(id);
-      }
-      this.isAddMode = !this.id;
-      this.getRoomInfo(); // TODO needs manager role
-    });
-    this.createForm();
-    this.clean();
-    this.subscribe();
+  submit(): void {
+    if (!this.validate()) {
+      return;
+    }
+
+    const roomSignal = this.roomSignal();
+    const room: IRoom = new Room();
+    room.officeId = valueChange(this.getForm.office.value, roomSignal?.office)?.id;
+    room.currencyId = valueChange(this.getForm.currency.value, roomSignal?.currency)?.id;
+    room.timeZone = this.getForm.timeZone.value?.tzCode;
+    room.primary = this.primary;
+
+    const newProfessionalIds: string[] = this.selectedProfessionalsSignal().map(({ id }) => id).filter(isString);
+    if (!areEquals(newProfessionalIds, this.currentProfessionalIds)) {
+      room.professionalIds = newProfessionalIds;
+    }
+
+    if (this.paymentTypes !== roomSignal?.paymentTypes) {
+      room.paymentTypes = this.paymentTypes;
+    }
+    if (!areEquals(this.availabilities, this.currentAvailabilities)) {
+      room.availabilities = this.availabilities;
+    }
+
+    room.address = createAddress(this.formattedAddress, this.geometry?.location, roomSignal?.address,
+      this.getGoogleMapForm.addressDescription.value);
+
+    if (this.getForm.closeDate.value) {
+      room.closeDateString = createNewDate(this.getForm.closeDate.value).toLocaleString(API_LOCALE);
+    }
+
+    const id = this.roomIdSignal();
+    if (!id) {
+      this.store.dispatch(createRoom({ room }));
+    } else {
+      this.store.dispatch(updateRoom({ id, room }));
+    }
+    return;
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+  addProfessional(): void {
+    this.router.navigate([this.language, 'users', 'add'], { state: { role: Role.professional } });
+    return;
+  }
+
+  addCurrency(): void {
+    this.router.navigate([this.language, 'currency', 'add']);
+    return;
+  }
+
+  addOffice(): void {
+    this.router.navigate([this.language, 'offices', 'add']);
+    return;
   }
 
   setStep = (index: number): void => {
@@ -215,7 +385,7 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   displayTimeZoneFn = (timeZone?: TimeZone): string => timeZone ? timeZone.label : '';
 
-  keyDownHandler = (event: any, form: AbstractControl): void => {
+  keyDownHandler = (event: KeyboardEvent, form: AbstractControl): void => {
     if (event.code === 'Backspace') {
       form.setValue('');
     }
@@ -249,20 +419,28 @@ export class RoomComponent implements OnInit, OnDestroy {
   isSelected = (it: IPaymentType): boolean => it.checked || this.paymentTypes.includes(it.name);
 
   remove = (professional: IUserAll): void => {
-    const index = this.professionals.indexOf(professional);
-    if (index >= 0) {
-      this.professionals.splice(index, 1);
-      this.allProfessional?.push(professional);
-      this.getForm.professional.setValue(null);
-    }
+    this.selectedProfessionalsSignal.update((current) =>
+      current.filter((c) => c.id !== professional.id));
+
+    this.professionalsWritableSignal.update((current) =>
+      current ? [...current, professional] : [professional]);
+
+    this.getForm.professional.setValue(undefined);
   };
 
   selected = (event: MatAutocompleteSelectedEvent): void => {
-    const professional = event.option.value;
-    this.professionals.push(professional);
-    this.allProfessional = this.allProfessional?.filter(c => c.id !== professional.id);
-    this.professionalInput.nativeElement.value = '';
-    this.getForm.professional.setValue(null);
+    const professional = event.option.value as IUserAll;
+
+    this.selectedProfessionalsSignal.update((current) => [...current, professional]);
+
+    this.professionalsWritableSignal.update((current) =>
+      current?.filter((c) => c.id !== professional.id));
+
+    const input = this.professionalInput();
+    if (input) {
+      input.nativeElement.value = '';
+    }
+    this.getForm.professional.setValue(undefined);
   };
 
   sortProfessionals = (data: any): IUser[] => data.sort((a: any, b: any) => {
@@ -275,49 +453,6 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.geometry = placeResult.geometry;
     this.formattedAddress = placeResult.formatted_address;
   };
-
-  private createForm = (): void => {
-    this.form = this.formBuilder.group({
-      professional: [''],
-      currency: ['', [Validators.required, requireMatch]],
-      office: ['', [Validators.required, requireMatch]],
-      timeZone: ['', [Validators.required, requireMatch]],
-      address: ['', Validators.required],
-      addressDescription: [''],
-      closeDate: [''],
-    });
-    const currentTimeZone = getCurrentTimeZone().toLowerCase();
-    this.getForm.timeZone.setValue(
-      this.timeZoneList.find(timeZone => timeZone.label.toLowerCase().indexOf(currentTimeZone) === 0));
-    this.today = createDate(this.getForm.timeZone.value.tzCode);
-    this.filteredProfessionals = this.getForm.professional.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value ? value.name : ''),
-      map(name => name ? this.filter(name) :
-        (this.allProfessional ? this.allProfessional.slice() : this.allProfessional)),
-    );
-    this.filteredCurrencyOptions = this.getForm.currency.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.code),
-      map(name => name ? this.filterCurrency(name) : this.currencies ? this.currencies.slice() : this.currencies),
-    );
-    this.filteredOfficeOptions = this.getForm.office.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.namme),
-      map(name => name ? this.filterOffice(name) : this.offices ? this.offices.slice() : this.offices),
-    );
-    this.filteredTimeZoneOptions = this.getForm.timeZone.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.label),
-      map(
-        name => name ? this.filterTimeZone(name) : this.timeZoneList ? this.timeZoneList.slice() : this.timeZoneList,
-      ),
-    );
-  };
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private getRoomInfo = (): void => this.store.dispatch(getAllRoomsInfo());
 
   private setIcon = (day: string, icon: RoomIconName): void => {
     switch (day) {
@@ -350,7 +485,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.addAvailability(av, 0);
 
     const availability: IAvailabilityDate = new AvailabilityDate();
-    const timeZone = this.getForm.timeZone.value.tzCode;
+    const timeZone = this.getForm.timeZone.value?.tzCode;
     availability.startDate = RoomComponent.createAv(av.start, timeZone);
     availability.endDate = RoomComponent.createAv(av.end, timeZone);
     availability.startLunchDate = RoomComponent.createAv(av.startLunch, timeZone);
@@ -385,15 +520,13 @@ export class RoomComponent implements OnInit, OnDestroy {
       goTo('fields');
       return false;
     }
-    this.errors = [];
-    if (this.professionals.length === 0) {
-      this.errors.professionals = true;
+    if (this.selectedProfessionalsSignal().length === 0) {
+      this.errors.update((prev) => ({ ...prev, professionals: true }));
       goTo('professionals');
       return false;
     }
 
     let step = -1;
-    this.errors = [];
     switch (RoomIconName.calendarToday) {
       case this.icons.monday:
         step = 0;
@@ -418,14 +551,18 @@ export class RoomComponent implements OnInit, OnDestroy {
         break;
     }
     if (step > -1) {
-      this.errors[`day${step}`] = true;
+      this.errors.update((prev) => {
+        const newErrors = { ...prev };
+        newErrors[`day${step}`] = true;
+        return newErrors;
+      });
       this.setStep(step);
       goTo('availabilities');
       return false;
     }
 
     if (this.availabilities.length === 0) {
-      this.errors.availability = true;
+      this.errors.update((prev) => ({ ...prev, availability: true }));
       goTo('availabilities');
       this.setStep(0);
       return false;
@@ -434,61 +571,18 @@ export class RoomComponent implements OnInit, OnDestroy {
     return true;
   };
 
-  private filter = (name: string): IUserAll[] | undefined => this.allProfessional?.filter(
+  private filter = (name: string, allProfessional?: IUserAll[]): IUserAll[] | undefined => allProfessional?.filter(
     option => option.displayName?.toLowerCase().indexOf(name.toString()) === 0);
 
-  private filterCurrency = (name: string): ICurrency[] | undefined => this.currencies?.filter(
+  private filterCurrency = (
+    name: string,
+    currencies?: ICurrencyAll[],
+  ): ICurrencyAll[] | undefined => currencies?.filter(
     option => option.code?.toLowerCase().indexOf(name.toString()) === 0);
 
-  private filterOffice = (name: string): IOffice[] | undefined => this.offices?.filter(
+  private filterOffice = (name: string, offices?: IOfficeAll[]): IOfficeAll[] | undefined => offices?.filter(
     option => option.name?.toLowerCase().indexOf(name.toString()) === 0);
 
-  private filterTimeZone = (name: string): any[] | undefined => this.timeZoneList?.filter(
+  private filterTimeZone = (name: string, timeZoneList?: any[]): any[] | undefined => timeZoneList?.filter(
     option => option.label?.toLowerCase().indexOf(name.toString()) >= 0);
-
-  private getRoom = (id: string): void => {
-    this.store.dispatch(getRoom({ id, redirect: true }));
-  };
-
-  private subscribe = (): void => {
-    this.getState.pipe(takeUntil(this.destroy$)).subscribe((state) => {
-      this.allProfessional = state.professionals;
-      this.currencies = state.currencies;
-      this.offices = state.offices;
-      if (state.selected && !this.room) {
-        const roomTimeZone = getTimeZone(state.selected.timeZone);
-        this.room = {
-          id: state.selected.id,
-          address: state.selected.address,
-          currency: state.selected.currency,
-          office: state.selected.office,
-          timeZone: roomTimeZone.label,
-        } as IRoomAll;
-        if (state.selected.closeDate) {
-          this.room.closeDate = createDateFromString(state.selected.closeDate);
-        }
-        this.primary = state.selected.primary;
-        this.currentPaymentTypes = state.selected.paymentTypes;
-        this.paymentTypes = state.selected.paymentTypes;
-        state.selected.professionals?.forEach((professional: IUserAll) => {
-          this.professionals.push(professional);
-          this.allProfessional = this.allProfessional?.filter(c => c.id !== professional.id);
-        });
-        this.currentProfessionalIds = this.professionals.map(({ id }) => id);
-        this.form.patchValue(this.room);
-        this.getForm.addressDescription.setValue(this.room.address?.description);
-        this.getForm.address.setValue(this.room.address?.name);
-        this.getForm.timeZone.setValue(roomTimeZone);
-        this.getAvailabilities(state.selected.availabilities);
-      }
-      if (state.subErrors) {
-        state.subErrors.forEach((value: any) => {
-          this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({ incorrect: true });
-        });
-      } else if (state.response) {
-        this.router.navigate([this.language, 'rooms']);
-      }
-    });
-  };
 }

@@ -12,7 +12,11 @@ export interface IApiResponse {
 }
 
 export interface IError {
+  object?: string;
+  field?: string;
+  rejectedValue?: any;
   message?: string;
+  status?: string;
   subErrors?: IError[];
 }
 
@@ -21,18 +25,29 @@ export class ResponseSuccess implements IResponseSuccess {
   path?: string;
   reload: boolean;
   toastType: ToastType;
+  redirect?: string;
 
-  constructor(message: string, path?: string, reload: boolean = false, toastType: ToastType = 'success') {
+  constructor(
+    message: string,
+    path?: string,
+    reload: boolean = false,
+    toastType: ToastType = 'success',
+    redirect?: string,
+  ) {
     this.message = message;
     this.path = path;
     this.reload = reload;
     this.toastType = toastType;
+    this.redirect = redirect;
   }
 }
 
 export interface IResponseSuccess {
   message: string;
   path?: string;
+  reload?: boolean;
+  toastType?: ToastType;
+  redirect?: string;
 }
 
 export class PageRequest {
@@ -55,8 +70,21 @@ export const success = <T extends (...args: any[]) => any>(
   path?: string,
   reload: boolean = false,
   toastType: ToastType = 'success',
+  ...extraActions: any[]
+): Observable<ReturnType<T>> => successResponse(actionCreator, message, path, undefined, reload, toastType,
+    ...extraActions);
+
+export const successResponse = <T extends (...args: any[]) => any>(
+  actionCreator: T,
+  message: string,
+  path?: string,
+  redirect?: string,
+  reload: boolean = false,
+  toastType: ToastType = 'success',
   ...additionalActions: any[]
 ): Observable<ReturnType<T>> => {
-  const mainAction = actionCreator({ message, path, reload, toastType });
+  const mainAction = actionCreator({ message, path, reload, toastType, redirect });
   return of(mainAction, ...additionalActions);
 };
+
+export const isString = (x: unknown): x is string => typeof x === 'string';

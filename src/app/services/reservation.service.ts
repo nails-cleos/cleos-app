@@ -1,7 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ICustomerReservation, IReservation, IRoomReservation } from '../interfaces/reservation';
+import {
+  IAvailableDTO,
+  ICustomerReservation,
+  IReservation, IReservationAll,
+  IRoomReservation,
+  IUpcomingAll,
+} from '../interfaces/reservation';
 import { Pagination } from '../interfaces/pagination';
 import { IReview } from '../interfaces/review';
 import { createFilter } from '../util/service-helper';
@@ -25,7 +31,7 @@ export class ReservationService {
     all?: boolean,
     roomId?: string,
     professionalId?: string,
-  ): Observable<Pagination<IReservation>> => {
+  ): Observable<Pagination<IReservationAll>> => {
     const params = createFilter(page, size, sort, direction);
 
     let baseUrl = this.urlV1;
@@ -37,7 +43,7 @@ export class ReservationService {
       }
     }
 
-    return this.http.get<Pagination<IReservation>>(`${baseUrl}/pages`, { params });
+    return this.http.get<Pagination<IReservationAll>>(`${baseUrl}/pages`, { params });
   };
 
   getCustomerReservations = (
@@ -64,7 +70,7 @@ export class ReservationService {
     size: number,
     userId?: string,
     states?: string[],
-  ): Observable<Pagination<IReservation>> => {
+  ): Observable<Pagination<IReservationAll>> => {
     let params = createFilter(page, size, sort, direction);
     if (userId) {
       params = params.append('userId', userId);
@@ -74,8 +80,7 @@ export class ReservationService {
         params = params.append('states', state);
       });
     }
-
-    return this.http.get<Pagination<IReservation>>(toUrl(this.urlV1, 'filter'), { params });
+    return this.http.get<Pagination<IReservationAll>>(toUrl(this.urlV1, 'filter'), { params });
   };
 
   getAllGroupingByRoom = (
@@ -114,7 +119,7 @@ export class ReservationService {
     date: Date,
     professionalId: string,
     additionalIds?: string[],
-  ): Observable<IRoomReservation> => {
+  ): Observable<IAvailableDTO[]> => {
     let params = new HttpParams().set('date', date.toISOString().slice(0, 10));
     params = params.append('roomId', roomId);
     params = params.append('treatmentId', treatmentId);
@@ -125,15 +130,15 @@ export class ReservationService {
     }
     params = params.append('professionalId', professionalId);
 
-    return this.http.get<IRoomReservation>(toUrl(this.urlV1, 'search'), { params });
+    return this.http.get<IAvailableDTO[]>(toUrl(this.urlV1, 'search'), { params });
   };
 
-  getReservation = (id: string, editPath?: string): Observable<IReservation | undefined> => {
+  getReservation = (id: string, editPath?: string): Observable<IUpcomingAll | undefined> => {
     const url = toUrl(this.urlV1, id);
-    return this.http.get<IReservation>(editPath ? `${url}/${editPath}` : url);
+    return this.http.get<IUpcomingAll>(editPath ? `${url}/${editPath}` : url);
   };
 
-  getReservationHistory = (id: string): Observable<IReservation[]> => this.http.get<IReservation[]>(
+  getReservationHistory = (id: string): Observable<IReservationAll[]> => this.http.get<IReservationAll[]>(
     toUrl(this.urlV1, id, 'history'),
   );
 

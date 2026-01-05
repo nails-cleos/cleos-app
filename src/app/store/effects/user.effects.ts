@@ -30,8 +30,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { Role, Token } from '../../interfaces/token';
 import { getLocale } from '../../util/helper';
 import { Pagination } from '../../interfaces/pagination';
-import { IOverview, IUser } from '../../interfaces/user';
-import { IApiResponse, success } from '../../interfaces/common';
+import { IOverview, IUserAll } from '../../interfaces/user';
+import { IApiResponse, success, successResponse } from '../../interfaces/common';
 import { ToastType } from '../../shared/toast/toast.model';
 import { loginSuccess } from '../auth.actions';
 
@@ -46,7 +46,7 @@ export class UserEffects {
     ofType(getUsersPage),
     switchMap(({ page, sort, direction, size, filter }) =>
       this.userService.getUsersPage(page, sort, direction, size, filter).pipe(
-        switchMap((data: Pagination<IUser>) => of(userSuccess({ data }))),
+        switchMap((data: Pagination<IUserAll>) => of(userSuccess({ data }))),
         catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
       )),
   ));
@@ -55,7 +55,7 @@ export class UserEffects {
     ofType(getAllCustomers),
     switchMap(() =>
       this.userService.getCustomers().pipe(
-        switchMap((data: IUser[]) => of(userSuccess({ data }))),
+        switchMap((data: IUserAll[]) => of(userSuccess({ data }))),
         catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
       )),
   ));
@@ -64,7 +64,7 @@ export class UserEffects {
     ofType(getUser),
     switchMap(({ id }) =>
       this.userService.getUser(id).pipe(
-        switchMap((selected?: IUser) => of(userSelected({ selected }))),
+        switchMap((selected?: IUserAll) => of(userSelected({ selected }))),
         catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
       )),
   ));
@@ -73,7 +73,7 @@ export class UserEffects {
     ofType(getMyUser),
     switchMap(() =>
       this.userService.getMyUser().pipe(
-        switchMap((selected?: IUser) => of(userSelected({ selected, profile: true }))),
+        switchMap((selected?: IUserAll) => of(userSelected({ selected, profile: true }))),
         catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
       )),
   ));
@@ -91,8 +91,11 @@ export class UserEffects {
     ofType(saveUser),
     switchMap(({ user, role }) =>
       this.userService.saveUser(user, role).pipe(
-        switchMap((response: { response: IApiResponse, key: string }) => this.requestSuccess(response.key,
-          response.response.name, `users/${ response.response.id }`)),
+        switchMap((response: { response: IApiResponse, key: string }) => {
+          const message = this.translate.instant(response.key, { displayName: response.response.name });
+          const path = `users/${response.response.id}`;
+          return successResponse(userSaveSuccess, message, path, 'users');
+        }),
         catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
       )),
   ));
@@ -101,8 +104,8 @@ export class UserEffects {
     ofType(setRole),
     switchMap(({ id, role, displayName, action }) =>
       this.userService.setRole(id, role).pipe(
-        switchMap(() => this.requestSuccess(`USER.ROLES.${ action }`,
-          displayName, `users/${ id }`, this.translate.instant(`COMMON.ROLES.${ role }`))),
+        switchMap(() => this.requestSuccess(`USER.ROLES.${action}`,
+          displayName, `users/${id}`, this.translate.instant(`COMMON.ROLES.${role}`))),
         catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
       )),
   ));
@@ -135,7 +138,7 @@ export class UserEffects {
           return success(userSaveSuccess, message, undefined, undefined, undefined,
             loginSuccess({
               token: response,
-              queryParams: { state: btoa(JSON.stringify({ returnUrl: `/${ lang }/auth/profile`, lang })) },
+              queryParams: { state: btoa(JSON.stringify({ returnUrl: `/${lang}/auth/profile`, lang })) },
             }));
         }),
         catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
@@ -174,7 +177,7 @@ export class UserEffects {
     ofType(getAllDisableUsers),
     switchMap(() =>
       this.userService.getAllDisableUsers().pipe(
-        switchMap((users: IUser[]) => of(disableUsersSuccess(users ? { users } : { users: [] }))),
+        switchMap((users: IUserAll[]) => of(disableUsersSuccess(users ? { users } : { users: [] }))),
         catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
       )),
   ));
@@ -208,8 +211,13 @@ export class UserEffects {
     ofType(disableUsersSuccess),
   ), { dispatch: false });
 
-  private requestSuccess(key: string, displayName?: string, path?: string, role?: Role,
-    toastType?: ToastType) {
+  private requestSuccess(
+    key: string,
+    displayName?: string,
+    path?: string,
+    role?: Role,
+    toastType?: ToastType,
+  ) {
     const message = this.translate.instant(key, { role, displayName });
     return success(userSaveSuccess, message, path, undefined, toastType);
   }

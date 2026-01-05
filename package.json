@@ -50,6 +50,7 @@
     "@ng-icons/flag-icons": "^31.2.0",
     "@ngrx/effects": "^19.0.1",
     "@ngrx/store": "^19.0.1",
+    "@ngrx/router-store": "^19.0.1",
     "@ngx-translate/core": "^16.0.4",
     "@ngx-translate/http-loader": "^16.0.1",
     "angular-calendar": "^0.31.1",

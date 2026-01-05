@@ -1,54 +1,87 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { AppState, selectPaymentState } from '../../store/app.states';
-import { Observable, Subject } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { IPayment, IPaymentAll } from '../../interfaces/payment';
-import { clean, getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/payment.actions';
-import { MatTableDataSource } from '@angular/material/table';
-import { Pagination } from '../../interfaces/pagination';
+import { cleanPayment, getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../../shared/shared.module';
 import { BackButtonDirective } from '../../directives/back-button.directive';
-import { takeUntil } from 'rxjs/operators';
+import {
+  getCurrentPathIdPipe,
+  getPaymentsPipe,
+  getPaymentResponsePipe,
+  getSubErrorsPipe,
+} from '../../store/selectors/payment.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { PaymentState } from '../../store/reducers/payment.reducers';
 
 @Component({
   selector: 'app-payment',
   templateUrl: './payment.component.html',
   styleUrls: ['./payment.component.scss'],
   imports: [SharedModule, BackButtonDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PaymentComponent implements OnInit, OnDestroy {
-  displayedColumns: string[] = ['position', 'description', 'type', 'amount', 'status', 'actions'];
-  dataSource: any = new MatTableDataSource<Pagination<IPayment>>();
-
-  errorMessage?: string;
-  showError = false;
-  language!: string;
-
-  private readonly route: ActivatedRoute = inject(ActivatedRoute);
-  private readonly store: Store<AppState> = inject(Store<AppState>);
+export class PaymentComponent {
+  private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private getState: Observable<any> = this.store.select(selectPaymentState);
-  private id: any;
-  private path: any;
-  private destroy$ = new Subject<void>();
+  private currentPath$ = this.store.pipe(getCurrentPathIdPipe);
+  private paymentList$ = this.store.pipe(getPaymentsPipe);
+  private response$ = this.store.pipe(getPaymentResponsePipe);
+  private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
-  ngOnInit(): void {
-    this.language = this.translate.currentLang;
-    this.subscribe();
-    this.route.params.subscribe(routeParams => {
-      this.id = routeParams.id;
-      this.path = routeParams.path;
-      this.getPayments();
+  private currentPath = toSignal(this.currentPath$);
+  private paymentListSignal = toSignal(this.paymentList$);
+  private subErrorsSignal = toSignal(this.subErrors$);
+  private responseSignal = toSignal(this.response$);
+
+  dataSourceSignal = computed(() => this.paymentListSignal());
+  hiddenSignal = computed(() => {
+    const list = this.paymentListSignal();
+    return !!list?.length;
+  });
+
+  displayedColumns: string[] = ['position', 'description', 'type', 'amount', 'status', 'actions'];
+
+  errorMessage?: string;
+  showError = false;
+  language: string = this.translate.currentLang;
+
+  private id?: string;
+  private path?: 'reservation' | 'transaction';
+
+  constructor() {
+    effect(() => {
+      const currentPath = this.currentPath();
+      if (currentPath) {
+        const path = currentPath.path;
+        const id = currentPath.id;
+        this.path = path;
+        this.id = id;
+        this.store.dispatch(getPaymentByResourceId({ id, path, redirect: true }));
+      }
     });
-  }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    effect(() => {
+      const response = this.responseSignal();
+      if (response?.path) {
+        this.store.dispatch(cleanPayment());
+        this.router.navigate([`${this.language}/${response.path}`]);
+      }
+    });
+
+    effect(() => {
+      const subErrors = this.subErrorsSignal();
+      if (subErrors?.length) {
+        const errorMessage = subErrors[0].message;
+        if (errorMessage) {
+          this.errorMessage = errorMessage;
+          this.showError = true;
+        }
+      }
+    });
   }
 
   close(): void {
@@ -66,8 +99,8 @@ export class PaymentComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       notifyPayment({
         id: payment.id!,
-        path: this.path,
-        resourceId: this.id,
+        path: this.path!,
+        resourceId: this.id!,
         preferenceId: payment.preferenceId!,
         paymentType: payment.type!,
       }),
@@ -82,28 +115,5 @@ export class PaymentComponent implements OnInit, OnDestroy {
       icon = payment.transaction.account.currency.icon;
     }
     return icon;
-  };
-
-  private getPayments = (): void => {
-    if (!this.dataSource) {
-      this.store.dispatch(getPaymentByResourceId({ id: this.id, path: this.path, redirect: true }));
-    }
-  };
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private subscribe = (): void => {
-    this.getState.pipe(takeUntil(this.destroy$)).subscribe((state) => {
-      this.dataSource = state.selected;
-      const path = state.response?.path;
-      const errorMessage = state.subErrors?.[0]?.message;
-      if (path) {
-        this.clean();
-        this.router.navigate([`${this.language}/${path}`]);
-      } else if (errorMessage) {
-        this.showError = true;
-        this.errorMessage = errorMessage;
-      }
-    });
   };
 }

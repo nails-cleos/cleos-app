@@ -4,14 +4,14 @@
       <mat-card appearance="outlined">
         <mat-card-content>
           <h2>{{ 'ROOM.ME.SERVICES.ADDITIONAL.TITLE' | translate }}</h2>
-          @if ((selectedAdditional.length && !additional.length) || (!selectedAdditional.length && additional.length) || (selectedAdditional.length && additional.length)) {
+          @if ((selectedAdditional().length && !additional().length) || (!selectedAdditional().length && additional().length) || (selectedAdditional().length && additional().length)) {
             <div class="inner-row-container">
               <div class="drag-container">
                 <div class="section-heading">{{ 'ROOM.ME.SERVICES.ALL' | translate }}</div>
-                <div #additionalList="cdkDropList" (cdkDropListDropped)="drop($event, false)"
-                     [cdkDropListConnectedTo]="[selectedAdditionalList]" [cdkDropListData]="additional" cdkDropList
+                <div #additionalList="cdkDropList" (cdkDropListDropped)="dropAdditional($event, false)"
+                     [cdkDropListConnectedTo]="[selectedAdditionalList]" [cdkDropListData]="additional()" cdkDropList
                      class="item-list">
-                  @for (item of additional; track item.id) {
+                  @for (item of additional(); track item.id) {
                     <div cdkDrag class="item-box">{{ item.name }}</div>
                   }
                 </div>
@@ -19,10 +19,10 @@
 
               <div class="drag-container">
                 <div class="section-heading">{{ 'ROOM.ME.SERVICES.SELECTED' | translate }}</div>
-                <div #selectedAdditionalList="cdkDropList" (cdkDropListDropped)="drop($event,true)"
-                     [cdkDropListConnectedTo]="[additionalList]" [cdkDropListData]="selectedAdditional" cdkDropList
-                     class="item-list">
-                  @for (item of selectedAdditional; track item.id) {
+                <div #selectedAdditionalList="cdkDropList" (cdkDropListDropped)="dropAdditional($event,true)"
+                     [cdkDropListConnectedTo]="[additionalList]" [cdkDropListData]="selectedAdditional()"
+                     cdkDropList class="item-list">
+                  @for (item of selectedAdditional(); track item.id) {
                     <div (click)="changePrice(item)" cdkDrag class="item-box">
                       <div>
                         <div>{{ item.name }}</div>
@@ -37,12 +37,12 @@
             <div class="ssc-square mb"></div>
           }
           <h2>{{ 'ROOM.ME.SERVICES.TREATMENT.TITLE' | translate }}</h2>
-          @if (groups.size) {
+          @if (groups(); as groups) {
             @for (group of groups | keyvalue; track group) {
               <div class="inner-row-container">
                 <div class="drag-container">
                   <div class="section-heading">{{ group.value.name }}</div>
-                  <div #treatmentList="cdkDropList" (cdkDropListDropped)="drop($event, false)"
+                  <div #treatmentList="cdkDropList" (cdkDropListDropped)="dropTreatment($event, false)"
                        [cdkDropListConnectedTo]="[selectedTreatmentList]" [cdkDropListData]="group.value.treatments"
                        cdkDropList class="item-list">
                     @for (item of group.value.treatments; track item.id) {
@@ -52,7 +52,7 @@
                 </div>
                 <div class="drag-container">
                   <div class="section-heading">{{ group.value.name }}</div>
-                  <div #selectedTreatmentList="cdkDropList" (cdkDropListDropped)="drop($event,true)"
+                  <div #selectedTreatmentList="cdkDropList" (cdkDropListDropped)="dropTreatment($event,true)"
                        [cdkDropListConnectedTo]="[treatmentList]" [cdkDropListData]="group.value.selectedTreatments"
                        cdkDropList class="item-list">
                     @for (item of group.value.selectedTreatments; track item.id) {
@@ -76,7 +76,7 @@
           <button appBackButton class="margin-right-eight icon-button" color="accent" mat-fab extended type="button">
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
-          <button (click)="save" class="margin-right-eight icon-button" color="primary" mat-fab extended>
+          <button (click)="save()" class="margin-right-eight icon-button" color="primary" mat-fab extended>
             {{ 'COMMON.BUTTON.UPDATE' | translate }}
           </button>
         </mat-card-actions>

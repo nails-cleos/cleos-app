@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { IUpcomingAll } from '../../../interfaces/reservation';
 import { customerEditDialog, getPrice, openDialog } from '../../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
@@ -16,64 +16,65 @@ import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
   templateUrl: './upcoming.component.html',
   styleUrls: ['./upcoming.component.scss'],
   imports: [SharedModule, RoomNamePipe, CurrencySymbolPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UpcomingComponent implements OnChanges {
-  @Input() upcoming: IUpcomingAll | undefined;
-  @Input() small!: boolean;
+export class UpcomingComponent {
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly dialog: MatDialog = inject(MatDialog);
+  private readonly router: Router = inject(Router);
 
-  dateFormat: string;
-  language: string;
+  small = input.required<boolean>();
+  upcoming = input<IUpcomingAll>();
 
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private router: Router) {
-  	this.dateFormat = this.translate.currentLang;
-  	this.language = this.translate.currentLang;
-  }
+  dateFormat: string = this.translate.currentLang;
+  language: string = this.translate.currentLang;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ngOnChanges(_changes: SimpleChanges): void {
-  	this.loadUpcoming();
+  upcomingComputed = computed(() => {
+    const upcoming = this.upcoming();
+    if (!upcoming || !upcoming.id) {
+      return undefined;
+    }
+    let rowSpan = 0;
+    if (upcoming.additional) {
+      if (upcoming.additional.length) {
+        if (upcoming.additional.length > 1) {
+          rowSpan = (upcoming.additional.length / 2) >> 0;
+        } else {
+          rowSpan = 1;
+        }
+      }
+    }
+    const price = getPrice(upcoming, upcoming.payments);
+    const duration = reservationDuration(upcoming);
+    const start = newDateTimestamp(upcoming.timestamp);
+    const end = createNewDate(start, start.getHours() + duration.hour,
+      start.getMinutes() + duration.minute);
+
+    return Object.assign({}, upcoming, { rowSpan, price, end, start });
+  });
+
+  constructor() {
   }
 
   edit(): void {
-    if (this.upcoming && !this.upcoming.canEdit) {
-      customerEditDialog(this.dialog, this.router, this.upcoming.id, this.upcoming.room.currency, this.small,
-        this.language,
-        this.upcoming.price);
+    const upcoming = this.upcoming();
+    if (upcoming && !upcoming.canEdit) {
+      customerEditDialog(this.dialog, this.router, upcoming.id, upcoming.room.currency, this.small(),
+        this.language, upcoming.price);
     } else {
-      this.router.navigate([this.language, 'me', 'reservation', this.upcoming?.id]);
+      this.router.navigate([this.language, 'me', 'reservation', upcoming?.id]);
     }
-    return;
   }
 
   showTimeZone(): boolean {
-    return this.upcoming ? !isSameTimeZone(this.upcoming.room.timeZone) : false;
+    const upcoming = this.upcoming();
+    return upcoming ? !isSameTimeZone(upcoming.room.timeZone) : false;
   }
 
   openDialog = (reservationDate: Date): void => {
-  	if (this.upcoming) {
-  		openDialog(this.upcoming.room, this.dateFormat, this.translate, this.dialog, reservationDate);
-  	}
-  };
-
-  private loadUpcoming = (): void => {
-  	if (this.upcoming && this.upcoming.id) {
-  		let rowSpan = 0;
-  		if (this.upcoming.additional) {
-  			if (this.upcoming.additional.length) {
-  				if (this.upcoming.additional.length > 1) {
-  					rowSpan = (this.upcoming.additional.length / 2) >> 0;
-  				} else {
-  					rowSpan = 1;
-  				}
-  			}
-  		}
-  		const price = getPrice(this.upcoming, this.upcoming.payments);
-  		const duration = reservationDuration(this.upcoming);
-  		const start = newDateTimestamp(this.upcoming.timestamp);
-  		const end = createNewDate(start, start.getHours() + duration.hour,
-  			start.getMinutes() + duration.minute);
-
-  		this.upcoming = Object.assign({}, this.upcoming, { rowSpan, price, end, start });
-  	}
+    const upcoming = this.upcoming();
+    if (upcoming) {
+      openDialog(upcoming.room, this.dateFormat, this.translate, this.dialog, reservationDate);
+    }
   };
 }

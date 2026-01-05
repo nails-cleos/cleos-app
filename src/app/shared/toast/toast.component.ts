@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Subject } from 'rxjs';
@@ -12,16 +12,14 @@ import { toastAnimation } from '../../util/animation';
   templateUrl: './toast.component.html',
   styleUrl: './toast.component.scss',
   animations: [toastAnimation],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ToastComponent implements OnInit {
+export class ToastComponent {
   constructor(
     @Inject('TOAST_DATA') public data: ToastData,
     @Inject('TOAST_DISMISS') public dismiss$: Subject<void>,
     @Inject('TOAST_ACTION') public action$: Subject<void>,
   ) {
-  }
-
-  ngOnInit() {
   }
 
   getIcon(): string {

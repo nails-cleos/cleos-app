@@ -1,6 +1,7 @@
 import { createAction, props } from '@ngrx/store';
-import { IExpense, IExpenseInfo } from '../interfaces/expense';
+import { IExpense, IExpenseAll, IExpenseInfo } from '../interfaces/expense';
 import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
+import { Pagination } from '../interfaces/pagination';
 
 enum ExpenseActionTypes {
   getExpensesPage = '[Expense] Get expenses page',
@@ -14,6 +15,7 @@ enum ExpenseActionTypes {
   expenseSelected = '[Expense] Selected',
   getExpense = '[Expense] Find expense by id',
   deleteExpense = '[Expense] Delete expense by id',
+  setCurrentExpenseId = '[Expense] Set current expense id',
   clean = '[Expense] Clean',
 }
 
@@ -33,7 +35,7 @@ export const getAllExpensesInfo = createAction(
 
 export const expenseSuccess = createAction(
   ExpenseActionTypes.expenseSuccess,
-  props<{ data: IExpense[] }>(),
+  props<{ data: Pagination<IExpenseAll> }>(),
 );
 
 export const expenseInfoSuccess = createAction(
@@ -63,7 +65,7 @@ export const expenseFailure = createAction(
 
 export const expenseSelected = createAction(
   ExpenseActionTypes.expenseSelected,
-  props<{ selected?: IExpense }>(),
+  props<{ selected?: IExpenseAll }>(),
 );
 
 export const getExpense = createAction(
@@ -76,4 +78,9 @@ export const deleteExpense = createAction(
   props<{ roomId: string; id: string; invoice: string }>(),
 );
 
-export const clean = createAction(ExpenseActionTypes.clean);
+export const setCurrentExpenseId = createAction(
+  ExpenseActionTypes.setCurrentExpenseId,
+  props<{ expenseId: string }>(),
+);
+
+export const cleanExpense = createAction(ExpenseActionTypes.clean);

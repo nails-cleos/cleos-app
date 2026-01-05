@@ -41,7 +41,8 @@ export const flags = (): IFlag[] => [
   },
 ];
 
-export const findFlag = (flagList: IFlag[], lang: string): IFlag => {
+export const findFlag = (lang: string): IFlag => {
+  const flagList = flags();
   let value = flagList.find(flag => flag.value === lang);
   if (!value) {
     const locale = getLocale(lang).flag;
@@ -52,5 +53,5 @@ export const findFlag = (flagList: IFlag[], lang: string): IFlag => {
       );
     }
   }
-  return value ? value : findFlag(flagList, 'en');
+  return value ? value : findFlag('en');
 };

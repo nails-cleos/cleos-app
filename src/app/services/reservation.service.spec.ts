@@ -3,12 +3,19 @@ import { HttpClient } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 
 import { ReservationService } from './reservation.service';
-import { ICustomerReservation, IReservation, IReservationAll, IRoomReservation } from '../interfaces/reservation';
+import {
+  ICustomerReservation,
+  IReservation,
+  IReservationAll,
+  IRoomReservation,
+  IUpcomingAll,
+} from '../interfaces/reservation';
 import { Pagination } from '../interfaces/pagination';
 import { IReview } from '../interfaces/review';
 import { IApiResponse } from '../interfaces/common';
 import { ICurrencyAll } from '../interfaces/currency';
 import { ServiceType } from '../interfaces/room';
+import { dateToTimestamp, getNowTimeZone } from '../util/dates';
 
 describe('ReservationService', () => {
   let service: ReservationService;
@@ -52,7 +59,13 @@ describe('ReservationService', () => {
       currency: currency,
       timeZone: 'UTC',
       availabilities: [],
-      office: {},
+      office: {
+        id: 'office-123',
+        name: 'Downtown Office',
+        manager: {
+          id: 'manager-123',
+        },
+      },
       paymentTypes: [],
       primary: false,
     },
@@ -71,8 +84,8 @@ describe('ReservationService', () => {
 
   const mockReservation = mockReservationAll as unknown as IReservation;
 
-  const mockPagination: Pagination<IReservation> = {
-    content: [mockReservation],
+  const mockPagination: Pagination<IReservationAll> = {
+    content: [mockReservationAll],
     totalElements: 1,
     totalPages: 1,
     number: 0,
@@ -100,10 +113,17 @@ describe('ReservationService', () => {
       currency: currency,
       timeZone: 'UTC',
       availabilities: [],
-      office: {},
+      office: {
+        id: 'office-123',
+        name: 'Downtown Office',
+        manager: {
+          id: 'manager-123',
+        },
+      },
       paymentTypes: [],
       primary: false,
     },
+    date: '01-01-2025',
     reservations: [mockReservationAll],
     unavailableList: [],
     birthdays: [],
@@ -294,7 +314,8 @@ describe('ReservationService', () => {
   describe('customerSearch', () => {
     it('should search for customer with additional services', () => {
       const date = new Date('2024-01-15');
-      httpSpy.get.and.returnValue(of(mockRoomReservation));
+      const availabilities = [{ dateTime: dateToTimestamp(getNowTimeZone()) }];
+      httpSpy.get.and.returnValue(of(availabilities));
 
       service.customerSearch(
         'room-123',
@@ -303,7 +324,7 @@ describe('ReservationService', () => {
         'prof-123',
         ['add-1', 'add-2'],
       ).subscribe(result => {
-        expect(result).toEqual(mockRoomReservation);
+        expect(result).toEqual(availabilities);
       });
 
       expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/search', jasmine.objectContaining({
@@ -313,10 +334,11 @@ describe('ReservationService', () => {
 
     it('should search for customer without additional services', () => {
       const date = new Date('2024-01-15');
-      httpSpy.get.and.returnValue(of(mockRoomReservation));
+      const availabilities = [{ dateTime: dateToTimestamp(getNowTimeZone()) }];
+      httpSpy.get.and.returnValue(of(availabilities));
 
       service.customerSearch('room-123', 'treatment-123', date, 'prof-123').subscribe(result => {
-        expect(result).toEqual(mockRoomReservation);
+        expect(result).toEqual(availabilities);
       });
 
       expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/search', jasmine.objectContaining({
@@ -330,7 +352,7 @@ describe('ReservationService', () => {
       httpSpy.get.and.returnValue(of(mockReservation));
 
       service.getReservation('res-123').subscribe(result => {
-        expect(result).toEqual(mockReservation);
+        expect(result).toEqual(mockReservationAll as IUpcomingAll);
       });
 
       expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123');
@@ -340,7 +362,7 @@ describe('ReservationService', () => {
       httpSpy.get.and.returnValue(of(mockReservation));
 
       service.getReservation('res-123', 'edit').subscribe(result => {
-        expect(result).toEqual(mockReservation);
+        expect(result).toEqual(mockReservationAll as IUpcomingAll);
       });
 
       expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123/edit');
@@ -349,7 +371,7 @@ describe('ReservationService', () => {
 
   describe('getReservationHistory', () => {
     it('should get reservation history', () => {
-      const history = [mockReservation];
+      const history = [mockReservationAll];
       httpSpy.get.and.returnValue(of(history));
 
       service.getReservationHistory('res-123').subscribe(result => {

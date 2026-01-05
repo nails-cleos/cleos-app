@@ -3,7 +3,6 @@ import { newDateTimestamp } from '../util/dates';
 
 @Pipe({
   name: 'timeDetail',
-  standalone: true,
 })
 export class TimeDetailPipe implements PipeTransform {
 

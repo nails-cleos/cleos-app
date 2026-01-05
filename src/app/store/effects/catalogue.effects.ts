@@ -22,9 +22,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { CatalogueService } from '../../services/catalogue.service';
 import { Router } from '@angular/router';
 import { TreatmentService } from '../../services/treatment.service';
-import { ICatalogue } from '../../interfaces/catalogue';
-import { ITreatmentGroup } from '../../interfaces/treatment';
-import { IApiResponse, success } from '../../interfaces/common';
+import { ICatalogueAll } from '../../interfaces/catalogue';
+import { ITreatmentGroupAll } from '../../interfaces/treatment';
+import { IApiResponse, success, successResponse } from '../../interfaces/common';
 
 @Injectable()
 export class CatalogueEffects {
@@ -37,7 +37,7 @@ export class CatalogueEffects {
   getAll$ = createEffect(() => this.actions.pipe(
     ofType(getAllCatalogues),
     switchMap(() => this.catalogueService.getAllCatalogues().pipe(
-      map((data: ICatalogue[]) => catalogueSuccess(data ? { data } : { data: [] })),
+      map((data: ICatalogueAll[]) => catalogueSuccess(data ? { data } : { data: [] })),
       catchError((err: HttpErrorResponse) => of(catalogueFailure({ error: err.error }))),
     )),
   ));
@@ -45,7 +45,7 @@ export class CatalogueEffects {
   getAllCatalogs$ = createEffect(() => this.actions.pipe(
     ofType(getAllCatalogs),
     switchMap(() => this.catalogueService.getAllCatalogs().pipe(
-      map((data: ICatalogue[]) => catalogueSuccess(data ? { data } : { data: [] })),
+      map((data: ICatalogueAll[]) => catalogueSuccess(data ? { data } : { data: [] })),
       catchError((err: HttpErrorResponse) => of(catalogueFailure({ error: err.error }))),
     )),
   ));
@@ -53,7 +53,7 @@ export class CatalogueEffects {
   findOne$ = createEffect(() => this.actions.pipe(
     ofType(getCatalogue),
     switchMap(({ id }) => this.catalogueService.getCatalogue(id).pipe(
-      map((selected?: ICatalogue) => catalogueSelected({ selected })),
+      map((selected?: ICatalogueAll) => catalogueSelected({ selected })),
       catchError((err: HttpErrorResponse) => of(catalogueFailure({ error: err.error }))),
     )),
   ));
@@ -64,8 +64,8 @@ export class CatalogueEffects {
       this.catalogueService.createCatalogue(catalogue, resizedImageDataUrl).pipe(
         switchMap((response: IApiResponse) => {
           const message = this.translate.instant('CATALOGUE.CREATED', { name: response.name });
-          const path = `catalogues/${ response.id }`;
-          return success(catalogueSaveSuccess, message, path);
+          const path = `catalogues/${response.id}`;
+          return successResponse(catalogueSaveSuccess, message, path, 'catalogues');
         }),
         catchError((err: HttpErrorResponse) => of(catalogueFailure({ error: err.error }))),
       )),
@@ -73,12 +73,12 @@ export class CatalogueEffects {
 
   update$ = createEffect(() => this.actions.pipe(
     ofType(updateCatalogue),
-    switchMap(({ catalogue, resizedImageDataUrl }) =>
-      this.catalogueService.updateCatalogue(catalogue, resizedImageDataUrl).pipe(
+    switchMap(({ id, catalogue, resizedImageDataUrl }) =>
+      this.catalogueService.updateCatalogue(id, catalogue, resizedImageDataUrl).pipe(
         switchMap((response: IApiResponse) => {
           const message = this.translate.instant('CATALOGUE.UPDATED.MESSAGE', { name: response.name });
-          const path = `catalogues/${ response.id }`;
-          return success(catalogueSaveSuccess, message, path);
+          const path = `catalogues/${response.id}`;
+          return successResponse(catalogueSaveSuccess, message, path, 'catalogues');
         }),
         catchError((err: HttpErrorResponse) => of(catalogueFailure({ error: err.error }))),
       )),
@@ -111,7 +111,7 @@ export class CatalogueEffects {
   findGroups$ = createEffect(() => this.actions.pipe(
     ofType(getAllTreatmentsGroup),
     switchMap(() => this.treatmentService.getAllTreatmentsGroup().pipe(
-      map((groups: ITreatmentGroup[]) => findGroupsSuccess({ groups })),
+      map((groups: ITreatmentGroupAll[]) => findGroupsSuccess({ groups })),
       catchError((err: HttpErrorResponse) => of(catalogueFailure({ error: err.error }))),
     )),
   ));

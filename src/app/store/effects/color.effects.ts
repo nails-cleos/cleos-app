@@ -18,7 +18,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { ColorService } from '../../services/color.service';
 import { Router } from '@angular/router';
 import { IColor } from '../../interfaces/color';
-import { IApiResponse, success } from '../../interfaces/common';
+import { IApiResponse, success, successResponse } from '../../interfaces/common';
 import { Pagination } from '../../interfaces/pagination';
 
 @Injectable()
@@ -53,7 +53,7 @@ export class ColorEffects {
         switchMap((response: IApiResponse) => {
           const message = this.translate.instant('COLOR.CREATED', { name: response.name });
           const path = `colors/${ response.id }`;
-          return success(colorSaveSuccess, message, path);
+          return successResponse(colorSaveSuccess, message, path, 'colors');
         }),
         catchError((err: HttpErrorResponse) => of(colorFailure({ error: err.error }))),
       )),
@@ -66,7 +66,7 @@ export class ColorEffects {
         switchMap((response: IApiResponse) => {
           const message = this.translate.instant('COLOR.UPDATED.MESSAGE', { name: response.name });
           const path = `colors/${ response.id }`;
-          return success(colorSaveSuccess, message, path);
+          return successResponse(colorSaveSuccess, message, path, 'colors');
         }),
         catchError((err: HttpErrorResponse) => of(colorFailure({ error: err.error }))),
       )),

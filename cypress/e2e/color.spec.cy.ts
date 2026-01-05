@@ -55,8 +55,8 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
         cy.get('mat-card-title').contains('Update Color');
         cy.get('mat-card-subtitle').contains(color.name);
-        cy.get('input[formControlName="name"]').should('have.value', color.name);
-        cy.get('textarea[formControlName="description"]').should('have.value', color.description);
+        cy.get('[data-cy="name-input"]').should('have.value', color.name);
+        cy.get('[data-cy="description-textarea"]').should('have.value', color.description);
 
         // Updates
         const colorName = 'New Color';

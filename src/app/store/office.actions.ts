@@ -2,7 +2,7 @@ import { createAction, props } from '@ngrx/store';
 import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
 import { IOffice } from '../interfaces/office';
-import { IUser } from '../interfaces/user';
+import { IUserAll } from '../interfaces/user';
 
 enum OfficeActionTypes {
   getOfficesPage = '[Office] Get offices page',
@@ -16,6 +16,7 @@ enum OfficeActionTypes {
   officeSelected = '[Office] Selected',
   getOffice = '[Office] Find office by id',
   deleteOffice = '[Office] Delete office by id',
+  setCurrentOfficeId = '[Office] set current office id',
   clean = '[Office] Clean',
 }
 
@@ -35,7 +36,7 @@ export const officeSuccess = createAction(
 
 export const managerSuccess = createAction(
   OfficeActionTypes.managerSuccess,
-  props<{ managers: IUser[] }>(),
+  props<{ managers: IUserAll[] }>(),
 );
 
 export const createOffice = createAction(
@@ -73,4 +74,9 @@ export const deleteOffice = createAction(
   props<{ id: string; name: string }>(),
 );
 
-export const clean = createAction(OfficeActionTypes.clean);
+export const setCurrentOfficeId = createAction(
+  OfficeActionTypes.setCurrentOfficeId,
+  props<{ officeId: string }>(),
+);
+
+export const cleanOffice = createAction(OfficeActionTypes.clean);

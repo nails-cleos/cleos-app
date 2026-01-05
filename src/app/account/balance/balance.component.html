@@ -1,24 +1,26 @@
 <mat-card appearance="outlined" class="style-card">
-  @if (account) {
+  @let userAccount = account();
+  @if (userAccount) {
+    @let lang = language();
     <mat-card-header>
       <mat-card-title style="font-size: 2em">{{ 'ACCOUNT.BALANCE' | translate }}</mat-card-title>
-      <mat-card-subtitle>{{ 'ACCOUNT.TITLE' | translate }} {{ account.id }}</mat-card-subtitle>
+      <mat-card-subtitle>{{ 'ACCOUNT.TITLE' | translate }} {{ userAccount.id }}</mat-card-subtitle>
       <div class="spacer"></div>
-      @if (showAdd) {
+      @if (showAdd()) {
         <button mat-icon-button [color]="'primary'"
-                [routerLink]="['/', language, 'accounts', account.id, 'transactions', 'add']">
+                [routerLink]="['/', lang, 'accounts', userAccount.id, 'transactions', 'add']">
           <mat-icon>add</mat-icon>
         </button>
       }
-      @if (showView) {
+      @if (showView()) {
         <button mat-icon-button [color]="'primary'"
-                [routerLink]="['/', language, 'accounts', account.id, 'transactions', 'view']">
+                [routerLink]="['/', lang, 'accounts', userAccount.id, 'transactions', 'view']">
           <mat-icon>account_balance</mat-icon>
         </button>
       }
-      @if (showUser) {
+      @if (showUser() && userAccount.customer) {
         <button mat-icon-button [color]="'primary'"
-                [routerLink]="['/', language, 'accounts', 'customers', account.customer.id]">
+                [routerLink]="['/', lang, 'accounts', 'customers', userAccount.customer.id]">
           <mat-icon>account_circle</mat-icon>
         </button>
       }
@@ -27,12 +29,12 @@
     <div class="card-margin ssc-head-line"></div>
   }
   <mat-card-content>
-    @if (account && account.currency) {
+    @if (userAccount && userAccount.currency) {
       <div id="account-spinner" class="spinner-parent-center">
         <mat-progress-spinner [color]="'primary'" [mode]="'determinate'" [value]="balancePercentage" [diameter]="200"/>
       </div>
       <div class="spinner-text-inside">
-        <h1>{{ account.balance | currency: account.currency.code: 'symbol': '1.2-2' }}</h1>
+        <h1>{{ userAccount.balance | currency: userAccount.currency.code: 'symbol': '1.2-2' }}</h1>
       </div>
     } @else {
       <div style="height: 80px" class="ssc-square mb"></div>

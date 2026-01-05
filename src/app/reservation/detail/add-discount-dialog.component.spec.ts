@@ -1,173 +1,81 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
 import { AddDiscountDialogComponent } from './add-discount-dialog.component';
-import { AppMaterialModule } from '../../util/app-material.module';
-import { Store } from '@ngrx/store';
-import { Subject } from 'rxjs';
-import { clean } from '../../store/discount.actions';
-import { DiscountType, IUserDiscount } from '../../interfaces/discount';
-import { AppState } from '../../store/app.states';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { cleanDiscount, getUserDiscountByCustomerId } from '../../store/discount.actions';
+import { DiscountState } from '../../store/reducers/discount.reducers';
+import { TranslateModule } from '@ngx-translate/core';
 
 describe('AddDiscountDialogComponent', () => {
   let component: AddDiscountDialogComponent;
   let fixture: ComponentFixture<AddDiscountDialogComponent>;
+  let store: MockStore<DiscountState>;
+  let dialogRef: jasmine.SpyObj<MatDialogRef<AddDiscountDialogComponent>>;
 
-  let state$: Subject<any>;
-
-  let mockDialogRef: jasmine.SpyObj<MatDialogRef<AddDiscountDialogComponent>>;
-
-  let storeSpy: jasmine.SpyObj<Store<AppState>>;
-
-  const mockData = {
-    customerId: 'customer-id',
+  const dialogData = {
+    customerId: 'customer-123',
   };
 
   beforeEach(async () => {
-    state$ = new Subject();
-    mockDialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-
-    storeSpy.select.and.returnValue(state$.asObservable());
+    dialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
 
     await TestBed.configureTestingModule({
-      imports: [AddDiscountDialogComponent, TranslateModule.forRoot(), AppMaterialModule],
+      imports: [
+        AddDiscountDialogComponent,
+        TranslateModule.forRoot(),
+      ],
       providers: [
-        { provide: MatDialogRef, useValue: mockDialogRef },
-        { provide: MAT_DIALOG_DATA, useValue: { ...mockData } },
-        { provide: Store, useValue: storeSpy },
+        provideMockStore(),
+        {
+          provide: MAT_DIALOG_DATA,
+          useValue: dialogData,
+        },
+        {
+          provide: MatDialogRef,
+          useValue: dialogRef,
+        },
       ],
     }).compileComponents();
 
+    store = TestBed.inject(MockStore);
+    spyOn(store, 'dispatch');
+
     fixture = TestBed.createComponent(AddDiscountDialogComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
 
-  afterEach(() => state$.complete());
+    fixture.detectChanges(); // triggers constructor + effect
+  });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should have data injected', () => {
-    expect(component.data).toEqual(mockData);
+  it('should initialize the form with empty discount', () => {
+    expect(component.form).toBeDefined();
+    expect(component.getForm.discount.value).toBe('');
+    expect(component.getForm.discount.valid).toBeFalse();
   });
 
-  it('onNoClick should close the dialog', () => {
-    void component.onNoClick;
-    expect(mockDialogRef.close).toHaveBeenCalled();
+  it('should compute customerId from dialog data', () => {
+    expect(component.customerId()).toBe('customer-123');
   });
 
-  it('onNoClick should close the dialog', () => {
-    const discountId = '123';
-    component.discountForm.get('discount')?.setValue(discountId);
-
-    void component.doAction;
-    expect(mockDialogRef.close).toHaveBeenCalledWith({ discountId });
+  it('should dispatch cleanDiscount and getUserDiscountByCustomerId on init', () => {
+    expect(store.dispatch).toHaveBeenCalledWith(cleanDiscount());
+    expect(store.dispatch).toHaveBeenCalledWith(getUserDiscountByCustomerId({ customerId: 'customer-123' }));
   });
 
-  it('should render the dialog title', () => {
-    const compiled = fixture.nativeElement;
-    const titleElement = compiled.querySelector('h1[mat-dialog-title]');
-    expect(titleElement.textContent).toBe('RESERVATION.DISCOUNT.ADD');
+  it('onNoClick should close the dialog without data', () => {
+    component.onNoClick();
+
+    expect(dialogRef.close).toHaveBeenCalledWith();
   });
 
-  it('should show both buttons when both hideNoButton and hideOkButton are false', () => {
-    const compiled = fixture.nativeElement;
-    const buttons = compiled.querySelectorAll('button');
-    expect(buttons.length).toBe(2);
-  });
+  it('doAction should close the dialog with discountId', () => {
+    component.getForm.discount.setValue('discount-456');
 
-  it('should pass correct value to mat-dialog-close directive', () => {
-    const testValue = 'test-value';
-    component.data.value = testValue;
-    fixture.detectChanges();
+    component.doAction();
 
-    // The Yes button should have the mat-dialog-close directive with the correct value
-    // This is tested through the component's data binding
-    expect(component.data.value).toBe(testValue);
-  });
-
-  it('should call dialogRef.close when No button is clicked', () => {
-    const compiled = fixture.nativeElement;
-    const buttons = Array.from(compiled.querySelectorAll('button')) as HTMLButtonElement[];
-    const noButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.CANCEL'));
-    expect(noButton).toBeTruthy();
-    noButton?.click();
-
-    expect(mockDialogRef.close).toHaveBeenCalled();
-  });
-
-  it('should display translated button texts', () => {
-    const compiled = fixture.nativeElement;
-    const buttons = Array.from(compiled.querySelectorAll('button')) as HTMLButtonElement[];
-
-    const noButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.CANCEL'));
-    const yesButton = buttons.find(btn => btn.textContent?.includes('Ok'));
-
-    expect(noButton?.textContent?.trim()).toContain('COMMON.BUTTON.CANCEL');
-    expect(yesButton?.textContent?.trim()).toContain('Ok');
-  });
-
-  it('should dispatch Clean action on initialization', () => {
-    // Reset to check only the initialization call
-    storeSpy.dispatch.calls.reset();
-    component.ngOnInit();
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
-  });
-
-  it('should initialize form with empty values', () => {
-    component.ngOnInit();
-
-    expect(component.discountForm.get('discount')?.value).toBe('');
-  });
-
-  it('should validate form correctly', () => {
-    component.ngOnInit();
-
-    expect(component.discountForm.invalid).toBeTrue();
-
-    component.discountForm.get('discount')?.setValue('Test Name');
-    expect(component.discountForm.valid).toBeTrue();
-  });
-
-  it('should handle state subscription correctly', () => {
-    component.ngOnInit();
-
-    expect(storeSpy.select).toHaveBeenCalled();
-  });
-
-  it('should update discount list when state changes', () => {
-    const mockDiscounts: IUserDiscount[] = [
-      {
-        id: '1', title: 'Discount 1', used: false, discountCustomer: {
-          name: 'Discount Customer 1', id: 'dc1', amount: 10, type: DiscountType.percentage, currency: {
-            id: 'c1', name: 'EUR', code: 'EUR', icon: '$',
-          },
-        },
-      },
-      {
-        id: '2', title: 'Discount 2', used: false, discountCustomer: {
-          name: 'Discount Customer 2', id: 'dc2', amount: 10, type: DiscountType.percentage, currency: {
-            id: 'c1', name: 'EUR', code: 'EUR', icon: '$',
-          },
-        },
-      },
-      {
-        id: '3', title: 'Discount 3', used: false, discountCustomer: {
-          name: 'Discount Customer 3', id: 'dc3', amount: 10, type: DiscountType.percentage, currency: {
-            id: 'c1', name: 'EUR', code: 'EUR', icon: '$',
-          },
-        },
-      },
-    ];
-
-    state$.next({
-      data: mockDiscounts,
-    });
-
-    expect(component.discounts).toBe(mockDiscounts);
+    expect(dialogRef.close).toHaveBeenCalledWith({ discountId: 'discount-456' });
   });
 });

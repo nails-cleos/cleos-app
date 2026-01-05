@@ -1,66 +1,41 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { ICatalogueAll } from '../../interfaces/catalogue';
 import { Store } from '@ngrx/store';
-import { AppState, selectCatalogueState } from '../../store/app.states';
-import { clean, getAllCatalogs } from '../../store/catalogue.actions';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { map, shareReplay } from 'rxjs/operators';
-import { MainContentService } from '../main-content.service';
+import { MainContentService } from '../../services/main-content.service';
 import { getImage } from '../../util/file';
-import { SharedModule } from '../../shared/shared.module';
+import { getCatalogueListPipe } from '../../store/selectors/catalogue.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { AppMaterialModule } from '../../util/app-material.module';
+import { TranslatePipe } from '@ngx-translate/core';
+import { CatalogueState } from '../../store/reducers/catalogue.reducers';
 
 @Component({
   selector: 'app-catalog',
   templateUrl: './catalog.component.html',
   styleUrls: ['./catalog.component.scss'],
-  imports: [SharedModule],
+  imports: [AppMaterialModule, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CatalogComponent implements OnInit, OnDestroy {
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
-    .pipe(
-      map(result => result.matches),
-      shareReplay(),
-    );
+export class CatalogComponent {
+  private readonly store: Store<CatalogueState> = inject(Store<CatalogueState>);
+  private readonly mainContent: MainContentService = inject(MainContentService);
 
-  subscription?: Subscription;
-  getState: Observable<any>;
+  private catalogues$ = this.store.pipe(getCatalogueListPipe);
 
-  catalogues: ICatalogueAll[] = [];
+  private cataloguesSignal = toSignal(this.catalogues$);
 
-  constructor(private breakpointObserver: BreakpointObserver, private store: Store<AppState>,
-              private mainContent: MainContentService) {
-    this.getState = this.store.select(selectCatalogueState);
-  }
-
-  ngOnInit(): void {
-    this.subscribe();
-    this.clean();
-    this.getCatalogs();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private getCatalogs = (): void => this.store.dispatch(getAllCatalogs());
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.data) {
-        state.data.forEach((it?: ICatalogueAll) => {
-          if (it && it.blob) {
-            const image = getImage(it.blob, it.contentType);
-            this.catalogues.push(Object.assign({}, it, { image }));
-          }
-        });
-        if (this.catalogues?.length) {
-          this.mainContent.configure(false, 'open');
-        }
+  catalogues = computed(() => {
+    const catalogues: ICatalogueAll[] = [];
+    this.cataloguesSignal()?.forEach((it?: ICatalogueAll) => {
+      if (it?.blob) {
+        const image = getImage(it.blob, it.contentType);
+        catalogues.push(Object.assign({}, it, { image }));
       }
     });
-  };
+    if (catalogues.length) {
+      this.mainContent.configure(false, 'open');
+    }
+    return catalogues;
+  });
 }
 

@@ -1,7 +1,9 @@
 <div class="flex-container">
   <div class="card-container">
     <div class="card-content">
-      <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+      <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+        @let isAddMode = isAddModeSignal();
+        @let currency = currencySignal();
         <mat-card appearance="outlined">
           @if (isAddMode) {
             <mat-card-header>
@@ -22,24 +24,24 @@
               <div class="inner-container">
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'CURRENCY.CODE.FIELD' | translate }}</mat-label>
-                  <input formControlName="code" matInput required>
+                  <input [formControl]="getForm.code" matInput required data-cy="code-input">
                   @if (getForm.code.hasError('required')) {
                     <mat-error [innerHTML]="'CURRENCY.CODE.REQUIRED' | translate"></mat-error>
-                  } @else if (errors['code']) {
-                    <mat-error>{{ errors['code'] }}</mat-error>
+                  } @else if (errors()['code']) {
+                    <mat-error>{{ errors()['code'] }}</mat-error>
                   }
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'CURRENCY.NAME.FIELD' | translate }}</mat-label>
-                  <input formControlName="name" matInput>
-                  @let nameError = errors['name'];
+                  <input [formControl]="getForm.name" matInput data-cy="name-input">
+                  @let nameError = errors()['name'];
                   @if (nameError) {
                     <mat-error>{{ nameError }}</mat-error>
                   }
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'CURRENCY.ICON.FIELD' | translate }}</mat-label>
-                  <mat-select formControlName="icon" id="select-icon">
+                  <mat-select [formControl]="getForm.icon" id="select-icon" data-cy="icon-input">
                     <mat-select-trigger>
                       <mat-icon>{{ getForm.icon.value }}</mat-icon>
                     </mat-select-trigger>

@@ -1,4 +1,4 @@
-import { findFlag, flags, IFlag } from './flags';
+import { findFlag, flags } from './flags';
 import { flagEs, flagGb } from '@ng-icons/flag-icons';
 
 describe('Flags Utils', () => {
@@ -23,22 +23,20 @@ describe('Flags Utils', () => {
   });
 
   describe('findFlag', () => {
-    const flagList: IFlag[] = flags();
-
     it('should find flag by exact value', () => {
-      const result = findFlag(flagList, 'es');
+      const result = findFlag('es');
       expect(result.value).toBe('es');
     });
 
     it('should fallback to locale from getLocale if exact match not found', () => {
-      const result = findFlag(flagList, 'fr');
+      const result = findFlag('fr');
       expect(result.value).toBe('en_GB');
     });
 
     it('should fallback to navigator.language if still not found', () => {
       const originalLang = navigator.language;
       Object.defineProperty(navigator, 'language', { value: 'es', configurable: true });
-      const result = findFlag(flagList, 'unknown_lang');
+      const result = findFlag('unknown_lang');
       expect(result.value).toBe('es');
       Object.defineProperty(navigator, 'language', { value: originalLang });
     });

@@ -14,6 +14,8 @@ describe('OverviewChartComponent (with real createChart)', () => {
 
     fixture = TestBed.createComponent(OverviewChartComponent);
     component = fixture.componentInstance;
+
+    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -39,31 +41,24 @@ describe('OverviewChartComponent (with real createChart)', () => {
 
     const currency: ICurrency = { code: 'EUR', symbol: '€' } as any;
 
-    component.chartSummary = chartSummary;
-    component.currency = currency;
-    component.isDark = false;
+    fixture.componentRef.setInput('chartSummary', chartSummary);
+    fixture.componentRef.setInput('currency', currency);
+    fixture.componentRef.setInput('isDark', false);
 
-    component.ngOnChanges({
-      chartSummary: {
-        currentValue: chartSummary,
-        previousValue: null,
-        firstChange: true,
-        isFirstChange: () => true,
-      },
-    });
+    fixture.detectChanges();
 
-    // ✅ Verify chart was created
-    expect(component.chart).toBeDefined();
-    expect(component.chart?.type).toBe('bar');
-    expect(component.chart?.labels).toEqual(['Jan', 'Feb']);
-    expect(component.chart?.charData?.datasets?.length).toBe(1);
+    const chart = component.chartSignal();
+    expect(chart).toBeDefined();
+    expect(chart?.type).toBe('bar');
+    expect(chart?.labels).toEqual(['Jan', 'Feb']);
+    expect(chart?.charData?.datasets?.length).toBe(1);
   });
 
   it('should not create chart when chartSummary is undefined', () => {
-    component.chartSummary = undefined;
+    fixture.componentRef.setInput('chartSummary', undefined);
 
-    component.ngOnChanges({});
+    fixture.detectChanges();
 
-    expect(component.chart).toBeUndefined();
+    expect(component.chartSignal()).toBeUndefined();
   });
 });

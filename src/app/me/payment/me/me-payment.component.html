@@ -1,7 +1,8 @@
 <div class="flex-container">
   <div class="card-container">
     <div class="card-content">
-      <form (ngSubmit)="update" [formGroup]="typeForm" novalidate (keydown.enter)="$event.preventDefault()">
+      @let payment = paymentSignal();
+      <form (ngSubmit)="update()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
         <mat-card appearance="outlined">
           <mat-card-header>
             <mat-card-title
@@ -20,15 +21,15 @@
           </mat-card-header>
           <mat-card-content>
             <div class="inner-container">
-              <app-bank [firstTime]="true" [formGroup]="typeForm" [options]="options"></app-bank>
+              <app-bank [firstTime]="true" [form]="form" [options]="options()"></app-bank>
             </div>
           </mat-card-content>
           <mat-card-actions class="card-actions">
             <div class="spacer"></div>
-            <button [form]="typeForm" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
+            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
               {{ 'COMMON.BUTTON.BACK' | translate }}
             </button>
-            <button [disabled]="typeForm.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
+            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
               {{ 'COMMON.BUTTON.PAYMENT' | translate }}
             </button>
           </mat-card-actions>

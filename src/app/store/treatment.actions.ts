@@ -1,7 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
-import { ITreatmentAll, ITreatmentGroup } from '../interfaces/treatment';
-import { IColor } from '../interfaces/color';
+import { ITreatmentAll, ITreatmentGroup, ITreatmentGroupAll } from '../interfaces/treatment';
+import { IColorAll } from '../interfaces/color';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { Pagination } from '../interfaces/pagination';
 
@@ -22,6 +22,7 @@ enum TreatmentActionTypes {
   deleteTreatmentGroup = '[Treatment] Delete treatment group by id',
   getAllTreatmentsHistory = '[Treatment] Get all treatments history',
   treatmentHistorySuccess = '[Treatment] History success',
+  setCurrentTreatmentId = '[Treatment] Set current treatment id',
   clean = '[Treatment] Clean'
 }
 
@@ -40,12 +41,12 @@ export const getAllColors = createAction(
 
 export const treatmentSuccess = createAction(
   TreatmentActionTypes.treatmentSuccess,
-  props<{ data: ITreatmentGroup[] | Pagination<ITreatmentGroup> }>(),
+  props<{ data: ITreatmentGroupAll[] | Pagination<ITreatmentGroupAll> }>(),
 );
 
 export const colorSuccess = createAction(
   TreatmentActionTypes.colorSuccess,
-  props<{ colors: IColor[] }>(),
+  props<{ colors: IColorAll[] }>(),
 );
 
 export const createTreatment = createAction(
@@ -80,7 +81,7 @@ export const treatmentFailure = createAction(
 
 export const treatmentSelected = createAction(
   TreatmentActionTypes.treatmentSelected,
-  props<{ selected?: ITreatmentGroup; path?: string }>(),
+  props<{ selected?: ITreatmentGroupAll; path?: string }>(),
 );
 
 export const getTreatmentGroup = createAction(
@@ -103,4 +104,9 @@ export const treatmentHistorySuccess = createAction(
   props<{ history: ITreatmentAll[] }>(),
 );
 
-export const clean = createAction(TreatmentActionTypes.clean);
+export const setCurrentTreatmentId = createAction(
+  TreatmentActionTypes.setCurrentTreatmentId,
+  props<{ treatmentId: string }>(),
+);
+
+export const cleanTreatment = createAction(TreatmentActionTypes.clean);

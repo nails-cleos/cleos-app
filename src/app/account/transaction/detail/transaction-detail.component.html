@@ -1,6 +1,7 @@
 <div class="flex-container">
   <div class="card-container">
     <div class="card-content">
+      @let transaction = transactionSignal();
       <mat-card appearance="outlined">
         @if (transaction) {
           <mat-card-header>
@@ -89,21 +90,21 @@
               @switch (transaction.payment.status) {
                 @case ('CREATED') {
                   @if (transaction.payment.type) {
-                    <button class="hide-gt-xs icon-button" (click)="pay" mat-fab color="primary">
+                    <button class="hide-gt-xs icon-button" (click)="pay()" mat-fab color="primary">
                       <mat-icon [svgIcon]="transaction.payment.type" class="svg-icon"></mat-icon>
                     </button>
-                    <button (click)="pay" mat-fab extended color="primary" class="icon-button hide-xs">
+                    <button (click)="pay()" mat-fab extended color="primary" class="icon-button hide-xs">
                       <mat-icon matIconPrefix>payment</mat-icon>
                       {{ 'COMMON.BUTTON.PAYMENT' | translate }}
                     </button>
                   }
                 }
                 @case ('PENDING') {
-                  <button class="hide-gt-xs icon-button" (click)="notify" mat-fab>
+                  <button class="hide-gt-xs icon-button" (click)="notify()" mat-fab>
                     <mat-icon color="primary">published_with_changes</mat-icon>
                   </button>
 
-                  <button (click)="notify" color="primary" mat-fab extended class="icon-button hide-xs">
+                  <button (click)="notify()" color="primary" mat-fab extended class="icon-button hide-xs">
                     <mat-icon matIconPrefix>published_with_changes</mat-icon>
                     {{ 'COMMON.BUTTON.NOTIFY' | translate }}
                   </button>

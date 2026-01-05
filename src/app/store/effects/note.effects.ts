@@ -20,8 +20,8 @@ import { NoteService } from '../../services/note.service';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { INote } from '../../interfaces/note';
-import { IUser } from '../../interfaces/user';
-import { IApiResponse, success } from '../../interfaces/common';
+import { IUserAll } from '../../interfaces/user';
+import { IApiResponse, success, successResponse } from '../../interfaces/common';
 
 @Injectable()
 export class NoteEffects {
@@ -44,7 +44,11 @@ export class NoteEffects {
     ofType(createNote),
     switchMap(({ note }) =>
       this.noteService.createNote(note).pipe(
-        switchMap((response: IApiResponse) => this.requestSuccess('CREATED', response.name, response.id)),
+        switchMap((response: IApiResponse) => {
+          const message = this.translate.instant('NOTE.CREATED.MESSAGE', { description: response.name });
+          const path = `notes/${response.id}`;
+          return successResponse(noteSaveSuccess, message, path, 'reservation/calendar');
+        }),
         catchError((err: HttpErrorResponse) => of(noteFailure({ error: err.error }))),
       )),
   ));
@@ -53,7 +57,11 @@ export class NoteEffects {
     ofType(updateNote),
     switchMap(({ id, note }) =>
       this.noteService.updateNote(id, note).pipe(
-        switchMap((response: IApiResponse) => this.requestSuccess('UPDATED', response.name, response.id)),
+        switchMap((response: IApiResponse) => {
+          const message = this.translate.instant('NOTE.UPDATED.MESSAGE', { description: response.name });
+          const path = `notes/${response.id}`;
+          return successResponse(noteSaveSuccess, message, path, 'reservation/calendar');
+        }),
         catchError((err: HttpErrorResponse) => of(noteFailure({ error: err.error }))),
       )),
   ));
@@ -62,7 +70,10 @@ export class NoteEffects {
     ofType(deleteNote),
     switchMap(({ id, description }) =>
       this.noteService.deleteNote(id).pipe(
-        switchMap(() => this.requestSuccess('DELETED', description)),
+        switchMap(() => {
+          const message = this.translate.instant('NOTE.UPDATED.MESSAGE', { description });
+          return success(noteSaveSuccess, message, undefined, false, 'warning');
+        }),
         catchError((err: HttpErrorResponse) => of(noteFailure({ error: err.error }))),
       )),
   ));
@@ -71,7 +82,11 @@ export class NoteEffects {
     ofType(completeNote),
     switchMap(({ id }) =>
       this.noteService.completeNote(id).pipe(
-        switchMap((response: INote) => this.requestSuccess('COMPLETED', response.description!, response.id)),
+        switchMap((response: IApiResponse) => {
+          const message = this.translate.instant('NOTE.COMPLETED.MESSAGE', { description: response.name });
+          const path = `notes/${response.id}`;
+          return successResponse(noteSaveSuccess, message, path, 'reservation/calendar');
+        }),
         catchError((err: HttpErrorResponse) => of(noteFailure({ error: err.error }))),
       )),
   ));
@@ -80,7 +95,7 @@ export class NoteEffects {
     ofType(getAllProfessional),
     switchMap(() =>
       this.userService.getProfessionals().pipe(
-        map((data: IUser[]) => noteSuccess({ data })),
+        map((data: IUserAll[]) => noteSuccess({ data })),
         catchError((err: HttpErrorResponse) => of(noteFailure({ error: err.error }))),
       )),
   ));
@@ -97,10 +112,4 @@ export class NoteEffects {
   saveSuccess$ = createEffect(() => this.actions.pipe(
     ofType(noteSaveSuccess),
   ), { dispatch: false });
-
-  private requestSuccess(key: string, description?: string, id?: string) {
-    const message = this.translate.instant(`NOTE.${ key }.MESSAGE`, { description });
-    const path = id ? `notes/${ id }` : undefined;
-    return success(noteSaveSuccess, message, path);
-  }
 }

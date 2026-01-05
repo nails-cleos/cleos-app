@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
-import { IOverview, IUser } from '../interfaces/user';
+import { IOverview, IUser, IUserAll } from '../interfaces/user';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Role, Token } from '../interfaces/token';
-import { IRoom } from '../interfaces/room';
+import { IRoomAll } from '../interfaces/room';
 import { Pagination } from '../interfaces/pagination';
 import { ICustomerLastReservation } from '../interfaces/reservation';
 import { createFilter } from '../util/service-helper';
@@ -30,7 +30,7 @@ export class UserService {
 
   getUsersPage = (
     page: number, sort: string, direction: SortDirection, size: number, filter?: string,
-  ): Observable<Pagination<IUser>> => this.http.get<Pagination<IUser>>(
+  ): Observable<Pagination<IUserAll>> => this.http.get<Pagination<IUserAll>>(
     toUrl(this.userUrlV1, 'pages'),
     { params: createFilter(page, size, sort, direction, filter) },
   );
@@ -56,11 +56,9 @@ export class UserService {
     }
   };
 
-  getUser = (
-    id: string,
-  ): Observable<IUser | undefined> => this.http.get<IUser>(toUrl(this.userUrlV1, id));
+  getUser = (id: string): Observable<IUserAll | undefined> => this.http.get<IUserAll>(toUrl(this.userUrlV1, id));
 
-  getMyUser = (): Observable<IUser | undefined> => this.http.get<IUser>(toUrl(this.userUrlV1, 'me'));
+  getMyUser = (): Observable<IUserAll | undefined> => this.http.get<IUserAll>(toUrl(this.userUrlV1, 'me'));
 
   updateUser = (
     user: IUser,
@@ -81,8 +79,8 @@ export class UserService {
   createCustomer = (user: IUser): Observable<IApiResponse> => this.http.post<IApiResponse>(this.customerUrlV1, user);
 
   getCustomerOverview = (
-    id: string | null,
-  ): Observable<IOverview> => this.http.get<IOverview>(toUrl(this.customerUrlV1, id ? id : 'me', 'reservations'));
+    id: string,
+  ): Observable<IOverview> => this.http.get<IOverview>(toUrl(this.customerUrlV1, id, 'reservations'));
 
   addProfessional = (user: IUser): Observable<IApiResponse> => this.http.post<IApiResponse>(this.professionalUrlV1,
     user);
@@ -96,11 +94,11 @@ export class UserService {
 
   resendToken = (id: string): Observable<void> => this.http.post<void>(toUrl(this.userUrlV1, id, 'token'), null);
 
-  getProfessionals = (): Observable<IUser[]> => this.http.get<IUser[]>(this.professionalUrlV1);
+  getProfessionals = (): Observable<IUserAll[]> => this.http.get<IUserAll[]>(this.professionalUrlV1);
 
-  getManagers = (): Observable<IUser[]> => this.http.get<IUser[]>(this.officeUrlV1);
+  getManagers = (): Observable<IUserAll[]> => this.http.get<IUserAll[]>(this.officeUrlV1);
 
-  getCustomers = (): Observable<IUser[]> => this.http.get<IUser[]>(this.customerUrlV1);
+  getCustomers = (): Observable<IUserAll[]> => this.http.get<IUserAll[]>(this.customerUrlV1);
 
   getCustomerInformation = (
     id: string,
@@ -129,9 +127,9 @@ export class UserService {
 
   getAllRoomsByProfessionalId = (
     id: string,
-  ): Observable<IRoom[]> => this.http.get<IRoom[]>(`${this.professionalUrlV1}/${id}/rooms`);
+  ): Observable<IRoomAll[]> => this.http.get<IRoomAll[]>(`${this.professionalUrlV1}/${id}/rooms`);
 
-  getAllDisableUsers = (): Observable<IUser[]> => this.http.get<IUser[]>(this.userUrlV1);
+  getAllDisableUsers = (): Observable<IUserAll[]> => this.http.get<IUserAll[]>(this.userUrlV1);
 
   mergeUsers = (
     oldUserId: string, newUserId: string,

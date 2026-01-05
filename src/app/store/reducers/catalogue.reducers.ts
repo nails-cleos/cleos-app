@@ -1,14 +1,13 @@
 import { createReducer, on } from '@ngrx/store';
-import { Pagination } from '../../interfaces/pagination';
-import { ICatalogue } from '../../interfaces/catalogue';
-import { ITreatmentGroup } from '../../interfaces/treatment';
+import { ICatalogueAll } from '../../interfaces/catalogue';
+import { ITreatmentGroupAll } from '../../interfaces/treatment';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import {
   catalogueFailure,
   catalogueSaveSuccess,
   catalogueSelected,
   catalogueSuccess,
-  clean,
+  cleanCatalogue,
   createCatalogue,
   deleteCatalogue,
   findGroupsSuccess,
@@ -16,30 +15,33 @@ import {
   getAllCatalogues,
   getAllTreatmentsGroup,
   getCatalogue,
+  setCurrentCatalogueId,
   updateCatalogue,
   updateCatalogueOrder,
 } from '../catalogue.actions';
 
-export interface State {
+export const CATALOGUE_FEATURE_KEY = 'catalogue';
+
+export interface CatalogueState {
   response?: IResponseSuccess;
-  data?: ICatalogue[] | Pagination<ICatalogue>;
-  groups?: ITreatmentGroup[];
-  errorMessage?: string;
+  data?: ICatalogueAll[];
+  groups?: ITreatmentGroupAll[];
   error?: IError;
   subErrors?: IError[];
-  selected?: ICatalogue;
+  selected?: ICatalogueAll;
   isLoading: boolean;
+  currentCatalogueId?: string;
 }
 
-export const initialState: State = {
+export const initialState: CatalogueState = {
   response: undefined,
   data: undefined,
   groups: undefined,
-  errorMessage: undefined,
   error: undefined,
   subErrors: undefined,
   selected: undefined,
   isLoading: false,
+  currentCatalogueId: undefined,
 };
 
 export const catalogueReducer = createReducer(
@@ -49,32 +51,28 @@ export const catalogueReducer = createReducer(
     getAllCatalogs,
     (state) => ({
       ...state,
-      data: [{}, {}, {}],
+      data: [{} as ICatalogueAll, {} as ICatalogueAll, {} as ICatalogueAll],
       response: undefined,
-      errorMessage: undefined,
       subErrors: undefined,
       selected: undefined,
     }),
   ),
   on(getCatalogue, (state) => ({
     ...state,
-    selected: {} as ICatalogue,
+    selected: {} as ICatalogueAll,
     response: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
   on(catalogueSuccess, (state, { data }) => ({
     ...state,
     data,
     response: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
   on(catalogueSaveSuccess, (state, action) => ({
     ...state,
     response: action,
     selected: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     isLoading: false,
   })),
@@ -82,12 +80,10 @@ export const catalogueReducer = createReducer(
     ...state,
     selected,
     response: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
   on(catalogueFailure, (state, { error }) => ({
     ...state,
-    errorMessage: error.message,
     error,
     subErrors: error.subErrors,
     response: undefined,
@@ -95,9 +91,8 @@ export const catalogueReducer = createReducer(
   })),
   on(updateCatalogueOrder, (state) => ({
     ...state,
-    data: [{}, {}, {}],
+    data: [{} as ICatalogueAll, {} as ICatalogueAll, {} as ICatalogueAll],
     response: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
   on(
@@ -110,21 +105,25 @@ export const catalogueReducer = createReducer(
       errorMessage: undefined,
       subErrors: undefined,
       isLoading: true,
+      selected: undefined,
     }),
   ),
   on(getAllTreatmentsGroup, (state) => ({
     ...state,
     response: undefined,
     groups: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
   on(findGroupsSuccess, (state, { groups }) => ({
     ...state,
     groups,
     response: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
-  on(clean, () => initialState),
+
+  on(setCurrentCatalogueId, (state, { catalogueId }) => ({
+    ...state,
+    currentCatalogueId: catalogueId,
+  })),
+  on(cleanCatalogue, () => initialState),
 );

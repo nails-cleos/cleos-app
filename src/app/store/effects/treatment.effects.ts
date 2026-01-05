@@ -26,10 +26,9 @@ import { TreatmentService } from '../../services/treatment.service';
 import { Router } from '@angular/router';
 import { ColorService } from '../../services/color.service';
 import { Pagination } from '../../interfaces/pagination';
-import { ITreatmentAll, ITreatmentGroup } from '../../interfaces/treatment';
-import { IColor } from '../../interfaces/color';
-import { IApiResponse, success } from '../../interfaces/common';
-import { ToastType } from '../../shared/toast/toast.model';
+import { ITreatmentAll, ITreatmentGroupAll } from '../../interfaces/treatment';
+import { IColorAll } from '../../interfaces/color';
+import { IApiResponse, success, successResponse } from '../../interfaces/common';
 
 @Injectable()
 export class TreatmentEffects {
@@ -43,7 +42,7 @@ export class TreatmentEffects {
     ofType(getTreatmentsPage),
     switchMap(({ page, sort, direction, size }) =>
       this.treatmentService.getTreatmentsPage(page, sort, direction, size).pipe(
-        map((data: Pagination<ITreatmentGroup>) => treatmentSuccess({ data })),
+        map((data: Pagination<ITreatmentGroupAll>) => treatmentSuccess({ data })),
         catchError((err: HttpErrorResponse) => of(treatmentFailure({ error: err.error }))),
       )),
   ));
@@ -51,7 +50,7 @@ export class TreatmentEffects {
   findGroups$ = createEffect(() => this.actions.pipe(
     ofType(getAllTreatmentsGroup),
     switchMap(() => this.treatmentService.getAllTreatmentsGroup().pipe(
-      map((data: ITreatmentGroup[]) => treatmentSuccess({ data })),
+      map((data: ITreatmentGroupAll[]) => treatmentSuccess({ data })),
       catchError((err: HttpErrorResponse) => of(treatmentFailure({ error: err.error }))),
     )),
   ));
@@ -59,7 +58,7 @@ export class TreatmentEffects {
   findColors$ = createEffect(() => this.actions.pipe(
     ofType(getAllColors),
     switchMap(() => this.colorService.getAllColors().pipe(
-      map((colors: IColor[]) => colorSuccess(colors ? { colors } : { colors: [] })),
+      map((colors: IColorAll[]) => colorSuccess(colors ? { colors } : { colors: [] })),
       catchError((err: HttpErrorResponse) => of(treatmentFailure({ error: err.error }))),
     )),
   ));
@@ -67,7 +66,7 @@ export class TreatmentEffects {
   findOne$ = createEffect(() => this.actions.pipe(
     ofType(getTreatmentGroup),
     switchMap(({ id, path }) => this.treatmentService.getTreatmentGroup(id).pipe(
-      map((selected?: ITreatmentGroup) => treatmentSelected({ selected, path })),
+      map((selected?: ITreatmentGroupAll) => treatmentSelected({ selected, path })),
       catchError((err: HttpErrorResponse) => of(treatmentFailure({ error: err.error }))),
     )),
   ));
@@ -75,7 +74,11 @@ export class TreatmentEffects {
   save$ = createEffect(() => this.actions.pipe(
     ofType(createTreatment),
     switchMap(({ treatmentGroup }) => this.treatmentService.createTreatment(treatmentGroup).pipe(
-      switchMap((response: IApiResponse) => this.requestSuccess('TREATMENT.CREATED', response.name, response.id)),
+      switchMap((response: IApiResponse) => {
+        const message = this.translate.instant('TREATMENT.CREATED', { name: response.name });
+        const path = `treatments/${response.id}/view`;
+        return successResponse(treatmentSaveSuccess, message, path, 'treatments');
+      }),
       catchError((err: HttpErrorResponse) => of(treatmentFailure({ error: err.error }))),
     )),
   ));
@@ -83,8 +86,11 @@ export class TreatmentEffects {
   update$ = createEffect(() => this.actions.pipe(
     ofType(updateTreatmentGroup),
     switchMap(({ id, treatmentGroup }) => this.treatmentService.updateTreatmentGroup(id, treatmentGroup).pipe(
-      switchMap((response: IApiResponse) =>
-        this.requestSuccess('TREATMENT.UPDATED.MESSAGE', response.name, response.id)),
+      switchMap((response: IApiResponse) => {
+        const message = this.translate.instant('TREATMENT.UPDATED.MESSAGE', { name: response.name });
+        const path = `treatments/${response.id}/view`;
+        return successResponse(treatmentSaveSuccess, message, path, 'treatments');
+      }),
       catchError((err: HttpErrorResponse) => of(treatmentFailure({ error: err.error }))),
     )),
   ));
@@ -92,7 +98,10 @@ export class TreatmentEffects {
   updateSort$ = createEffect(() => this.actions.pipe(
     ofType(sortTreatment),
     switchMap(({ treatments }) => this.treatmentService.sortTreatment(treatments).pipe(
-      switchMap(() => this.requestSuccess('TREATMENT.SORTED.MESSAGE')),
+      switchMap(() => {
+        const message = this.translate.instant('TREATMENT.SORTED.MESSAGE');
+        return success(treatmentSaveSuccess, message);
+      }),
       catchError((err: HttpErrorResponse) => of(treatmentFailure({ error: err.error }))),
     )),
   ));
@@ -100,7 +109,10 @@ export class TreatmentEffects {
   updateGroupSort$ = createEffect(() => this.actions.pipe(
     ofType(sortGroupTreatment),
     switchMap(({ groups }) => this.treatmentService.sortGroupTreatment(groups).pipe(
-      switchMap(() => this.requestSuccess('TREATMENT.SORTED.MESSAGE')),
+      switchMap(() => {
+        const message = this.translate.instant('TREATMENT.SORTED.MESSAGE');
+        return success(treatmentSaveSuccess, message);
+      }),
       catchError((err: HttpErrorResponse) => of(treatmentFailure({ error: err.error }))),
     )),
   ));
@@ -108,7 +120,10 @@ export class TreatmentEffects {
   delete$ = createEffect(() => this.actions.pipe(
     ofType(deleteTreatmentGroup),
     switchMap(({ id, name }) => this.treatmentService.deleteTreatmentGroup(id).pipe(
-      switchMap(() => this.requestSuccess('TREATMENT.DELETED.MESSAGE', name, undefined, 'warning')),
+      switchMap(() => {
+        const message = this.translate.instant('TREATMENT.DELETED.MESSAGE', { name });
+        return success(treatmentSaveSuccess, message, undefined, false, 'warning');
+      }),
       catchError((err: HttpErrorResponse) => of(treatmentFailure({ error: err.error }))),
     )),
   ));
@@ -142,10 +157,4 @@ export class TreatmentEffects {
   historySuccess$ = createEffect(() => this.actions.pipe(
     ofType(treatmentHistorySuccess),
   ), { dispatch: false });
-
-  private requestSuccess(key: string, name?: string, id?: string, toastType?: ToastType) {
-    const message = this.translate.instant(key, { name });
-    const path = id ? `treatments/${ id }/view` : undefined;
-    return success(treatmentSaveSuccess, message, path, undefined, toastType);
-  }
 }

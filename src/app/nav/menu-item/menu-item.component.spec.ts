@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MenuItemComponent } from './menu-item.component';
 import { Router } from '@angular/router';
-import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
+import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
+import { MatDrawer } from '@angular/material/sidenav';
 
 describe('MenuItemComponent', () => {
   let component: MenuItemComponent;
@@ -34,12 +35,15 @@ describe('MenuItemComponent', () => {
 
     fixture = TestBed.createComponent(MenuItemComponent);
     component = fixture.componentInstance;
+
+    fixture.componentRef.setInput('items', []);
+
+    fixture.detectChanges();
   });
 
   afterEach(() => breakpoint$.complete());
 
   it('should create', () => {
-    fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 
@@ -49,7 +53,7 @@ describe('MenuItemComponent', () => {
 
   it('should call router.navigate and drawer.toggle when navigate is called', () => {
     const menu = { path: 'dashboard/home' } as any;
-    const drawer = { toggle: jasmine.createSpy('toggle') };
+    const drawer = { toggle: jasmine.createSpy('toggle') } as unknown as MatDrawer;
 
     component.navigate(menu, drawer);
 
@@ -140,12 +144,26 @@ describe('MenuItemComponent', () => {
   });
 
   it('should update isHandset$ when breakpoint changes', () => {
-    const emittedValues: boolean[] = [];
-    component.isHandset$.subscribe(value => emittedValues.push(value));
+    breakpoint$.next({
+      matches: true,
+      breakpoints: {
+        [Breakpoints.XSmall]: true,
+        [Breakpoints.Small]: true,
+        [Breakpoints.Medium]: true,
+      },
+    });
+    fixture.detectChanges();
+    expect(component.isHandsetSignal()).toBeTrue();
 
-    breakpoint$.next({ matches: true } as BreakpointState);
-    breakpoint$.next({ matches: false } as BreakpointState);
-
-    expect(emittedValues).toEqual([true, false]);
+    breakpoint$.next({
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
+        [Breakpoints.Medium]: false,
+      },
+    });
+    fixture.detectChanges();
+    expect(component.isHandsetSignal()).toBeFalse();
   });
 });

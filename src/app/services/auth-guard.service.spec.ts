@@ -1,24 +1,26 @@
 import { TestBed } from '@angular/core/testing';
 
-import { authGuard, PermissionsService } from './auth-guard.service';
-import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
+import { PermissionsService } from './auth-guard.service';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ToastService } from './toast.service';
-import { of } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 describe('authGuard', () => {
   let service: PermissionsService;
-  let guard: CanActivateFn;
   let router: jasmine.SpyObj<Router>;
 
+  let user$: BehaviorSubject<any>;
+
   beforeEach(() => {
+    user$ = new BehaviorSubject({ authorities: [{ authority: 'ROLE_USER' }] });
     const routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
-    const storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    const storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     const toastSpy = jasmine.createSpyObj('ToastService', ['info']);
 
     routerSpy.getCurrentNavigation.and.returnValue(null);
-    storeSpy.select.and.returnValue(of({ user: { authorities: [{ authority: 'ROLE_USER' }] } }));
+    storeSpy.pipe.and.returnValue(user$.asObservable());
 
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot()],
@@ -36,15 +38,15 @@ describe('authGuard', () => {
     const translate = TestBed.inject(TranslateService);
     translate.setDefaultLang('en-GB');
     translate.use('en-GB');
-    guard = authGuard;
   });
 
   it('should allow activation if user has the required role', () => {
     const route = { data: { roles: ['ROLE_USER'] } } as unknown as ActivatedRouteSnapshot;
     const state = {} as RouterStateSnapshot;
 
+
     TestBed.runInInjectionContext(() => {
-      expect(guard(route, state)).toBeTruthy();
+      expect(service.canActivate(route, state)).toBeTrue();
     });
   });
 
@@ -53,17 +55,17 @@ describe('authGuard', () => {
     const state = {} as RouterStateSnapshot;
 
     TestBed.runInInjectionContext(() => {
-      expect(guard(route, state)).toBeFalsy();
+      expect(service.canActivate(route, state)).toBeFalse();
     });
   });
 
   it('should deny activation and redirect if user is not logged in', () => {
-    service.currentUser = undefined;
+    user$.next(undefined);
     const route = {} as ActivatedRouteSnapshot;
     const state = { url: '/test' } as RouterStateSnapshot;
 
     TestBed.runInInjectionContext(() => {
-      expect(guard(route, state)).toBeFalsy();
+      expect(service.canActivate(route, state)).toBeFalse();
       expect(router.navigate).toHaveBeenCalledWith(['en-GB', 'auth'], { queryParams: { state: jasmine.any(String) } });
     });
   });

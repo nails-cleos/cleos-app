@@ -4,6 +4,7 @@ export interface Pagination<T> {
   totalPages: number;
   // eslint-disable-next-line id-blacklist
   number: number; // Page number
+  last?: boolean;
 }
 
 export const PAGE_SIZE = 10;

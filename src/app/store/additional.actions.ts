@@ -1,15 +1,15 @@
 import { createAction, props } from '@ngrx/store';
 import { IAdditional, IAdditionalAll } from '../interfaces/additional';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
-import { ITreatmentGroup } from '../interfaces/treatment';
 import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
+import { ITreatmentGroupAll } from '../interfaces/treatment';
 
 enum AdditionalActionTypes {
   getAdditionalPage = '[Additional] Get additional page',
   getAdditionalList = '[Additional] Get additional list',
   additionalSuccess = '[Additional] Success',
-  createAdditional = '[Additional] create additional',
+  createAdditional = '[Additional] Create additional',
   updateAdditional = '[Additional] Update additional by id',
   sortAdditional = '[Additional] Sort additional',
   additionalSaveSuccess = '[Additional] Save Success',
@@ -19,8 +19,14 @@ enum AdditionalActionTypes {
   deleteAdditional = '[Additional] Delete additional by id',
   getAllTreatmentsGroup = '[Additional] Get all treatments group',
   findGroupsSuccess = '[Additional] Find treatment groups success',
+  setCurrentAdditionalId = '[Additional] Set current additional id',
   clean = '[Additional] Clean'
 }
+
+export const setCurrentAdditionalId = createAction(
+  AdditionalActionTypes.setCurrentAdditionalId,
+  props<{ additionalId: string }>(),
+);
 
 export const getAdditionalPage = createAction(
   AdditionalActionTypes.getAdditionalPage,
@@ -82,9 +88,9 @@ export const getAllTreatmentsGroup = createAction(
 
 export const findGroupsSuccess = createAction(
   AdditionalActionTypes.findGroupsSuccess,
-  props<{ groups: ITreatmentGroup[] }>(),
+  props<{ groups: ITreatmentGroupAll[] }>(),
 );
 
-export const clean = createAction(
+export const cleanAdditional = createAction(
   AdditionalActionTypes.clean,
 );

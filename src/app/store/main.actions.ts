@@ -1,6 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 import { IError, IResponseSuccess } from '../interfaces/common';
-import { ICatalogue } from '../interfaces/catalogue';
+import { ICatalogueAll } from '../interfaces/catalogue';
 import { ITreatmentGroup } from '../interfaces/treatment';
 import { ISendMessage } from '../../main';
 import { IUser } from '../interfaces/user';
@@ -14,6 +14,8 @@ enum MainActionTypes {
   treatmentSuccess = '[Main] Treatment success',
   requestSuccess = '[Main] Success',
   requestFailure = '[Main] Failure',
+  setCurrentLang = '[Main] Set current lang',
+  setCurrentTreatmentId = '[Main] Set current treatment id',
   clean = '[Main] Clean'
 }
 
@@ -33,7 +35,7 @@ export const updateMyUser = createAction(
 
 export const catalogueSuccess = createAction(
   MainActionTypes.catalogueSuccess,
-  props<{ catalogues: ICatalogue[] }>(),
+  props<{ catalogues: ICatalogueAll[] }>(),
 );
 
 export const treatmentSuccess = createAction(
@@ -51,4 +53,14 @@ export const requestFailure = createAction(
   props<{ error: IError }>(),
 );
 
-export const clean = createAction(MainActionTypes.clean);
+export const setCurrentLang = createAction(
+  MainActionTypes.setCurrentLang,
+  props<{ lang: string }>(),
+);
+
+export const setCurrentTreatmentId = createAction(
+  MainActionTypes.setCurrentTreatmentId,
+  props<{ treatmentId: string }>(),
+);
+
+export const cleanMain = createAction(MainActionTypes.clean);

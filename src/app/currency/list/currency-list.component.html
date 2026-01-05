@@ -1,107 +1,111 @@
 <div class="mat-elevation-z8">
-  <table [dataSource]="dataSource" mat-table matSort matSortActive="code" matSortDirection="asc" matSortDisableClear
-         multiTemplateDataRows>
-    <ng-container matColumnDef="position">
-      <th *matHeaderCellDef mat-header-cell>#</th>
-      <td *matCellDef="let currency; let i = dataIndex;" mat-cell>
-        @if (currency.id) {
-          <div>{{ (paginator.pageIndex * pageSize) + i + 1 }}</div>
-        } @else {
-          <div class="ssc-line"></div>
-        }
-      </td>
-    </ng-container>
+  @let resultsLength = resultsLengthSignal();
+  @let pageSize = pageSizeSignal();
+  @if (dataSourceSignal(); as dataSource) {
+    <table [dataSource]="dataSource" mat-table matSort matSortActive="code" matSortDirection="asc" matSortDisableClear
+           multiTemplateDataRows>
+      <ng-container matColumnDef="position">
+        <th *matHeaderCellDef mat-header-cell>#</th>
+        <td *matCellDef="let currency; let i = dataIndex;" mat-cell>
+          @if (currency.id) {
+            <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="code">
-      <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'CURRENCY.LIST.COLUMN.CODE' | translate }}</th>
-      <td *matCellDef="let currency" mat-cell>
-        @if (currency.id) {
-          <div>{{ currency.code }}</div>
-        } @else {
-          <div class="ssc-line"></div>
-        }
-      </td>
-    </ng-container>
+      <ng-container matColumnDef="code">
+        <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'CURRENCY.LIST.COLUMN.CODE' | translate }}</th>
+        <td *matCellDef="let currency" mat-cell>
+          @if (currency.id) {
+            <div>{{ currency.code }}</div>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="name">
-      <th *matHeaderCellDef class="hide-xs" mat-header-cell
-          mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}
-      </th>
-      <td *matCellDef="let currency" class="hide-xs" mat-cell>
-        @if (currency.id) {
-          <div>{{ currency.name }}</div>
-        } @else {
-          <div class="ssc-line"></div>
-        }
-      </td>
-    </ng-container>
+      <ng-container matColumnDef="name">
+        <th *matHeaderCellDef class="hide-xs" mat-header-cell
+            mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}
+        </th>
+        <td *matCellDef="let currency" class="hide-xs" mat-cell>
+          @if (currency.id) {
+            <div>{{ currency.name }}</div>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="actions">
-      <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-      <td *matCellDef="let currency" class="hide-xs" mat-cell>
-        @if (currency.id) {
-          <div>
-            @if (!currency.deleted) {
-              <button (click)="edit(currency)" mat-icon-button
-                      matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
-                <mat-icon color="primary">edit</mat-icon>
-              </button>
-              <button (click)="delete(currency)" mat-icon-button
-                      matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
-                <mat-icon color="warn">delete</mat-icon>
-              </button>
-            }
-          </div>
-        } @else {
-          <div class="ssc-line"></div>
-        }
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="expandedDetail">
-      <td *matCellDef="let currency" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
-        <div [@detailExpand]="currency === expanded ? 'expanded' : 'collapsed'" class="detail hide-gt-xs">
-          <mat-list>
-            <mat-list-item role="list">
-              <div matListItemTitle>{{ 'COMMON.COLUMN.NAME' | translate }}</div>
-              <mat-icon matListItemIcon>{{ currency.icon }}</mat-icon>
-              <div matListItemLine>{{ currency.name }}</div>
-            </mat-list-item>
-            <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
-            <mat-list-item role="list">
+      <ng-container matColumnDef="actions">
+        <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+        <td *matCellDef="let currency" class="hide-xs" mat-cell>
+          @if (currency.id) {
+            <div>
               @if (!currency.deleted) {
-                <button (click)="edit(currency)" color="primary" mat-icon-button>
-                  <mat-icon>edit</mat-icon>
+                <button (click)="edit(currency)" mat-icon-button
+                        matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+                  <mat-icon color="primary">edit</mat-icon>
                 </button>
-                <button (click)="delete(currency)" color="warn" mat-icon-button>
-                  <mat-icon>delete</mat-icon>
+                <button (click)="delete(currency)" mat-icon-button
+                        matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
+                  <mat-icon color="warn">delete</mat-icon>
                 </button>
               }
-            </mat-list-item>
-          </mat-list>
-        </div>
-      </td>
-    </ng-container>
+            </div>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="noContent">
-      <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-        {{ 'CURRENCY.LIST.ERROR.NO_CONTENT' | translate }}
-      </td>
-    </ng-container>
+      <ng-container matColumnDef="expandedDetail">
+        <td *matCellDef="let currency" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
+          <div [@detailExpand]="currency === expanded ? 'expanded' : 'collapsed'" class="detail hide-gt-xs">
+            <mat-list>
+              <mat-list-item role="list">
+                <div matListItemTitle>{{ 'COMMON.COLUMN.NAME' | translate }}</div>
+                <mat-icon matListItemIcon>{{ currency.icon }}</mat-icon>
+                <div matListItemLine>{{ currency.name }}</div>
+              </mat-list-item>
+              <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+              <mat-list-item role="list">
+                @if (!currency.deleted) {
+                  <button (click)="edit(currency)" color="primary" mat-icon-button>
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button (click)="delete(currency)" color="warn" mat-icon-button>
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                }
+              </mat-list-item>
+            </mat-list>
+          </div>
+        </td>
+      </ng-container>
 
-    <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-    <tr (click)="expanded = expanded === currency ? null : currency"
-        *matRowDef="let currency; columns: displayedColumns;" class="row" mat-row></tr>
-    <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
+      <ng-container matColumnDef="noContent">
+        <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+          {{ 'CURRENCY.LIST.ERROR.NO_CONTENT' | translate }}
+        </td>
+      </ng-container>
 
-    <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
-  </table>
-  @if (resultsLength) {
-    <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+      <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+      <tr (click)="expanded = expanded === currency ? null : currency"
+          *matRowDef="let currency; columns: displayedColumns;" class="row" mat-row></tr>
+      <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
+
+      <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+    </table>
+    @if (resultsLength) {
+      <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+    }
+
+    <button color="accent" id="add-button" mat-fab matTooltip="{{ 'CURRENCY.TITLE' | translate }}"
+            [routerLink]="['/', language, 'currency', 'add']">
+      <mat-icon>add</mat-icon>
+    </button>
   }
-
-  <button color="accent" id="add-button" mat-fab matTooltip="{{ 'CURRENCY.TITLE' | translate }}"
-          [routerLink]="['/', language, 'currency', 'add']">
-    <mat-icon>add</mat-icon>
-  </button>
 </div>

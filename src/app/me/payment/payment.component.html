@@ -7,97 +7,99 @@
 }
 
 <div class="mat-elevation-z8">
-  <table [dataSource]="dataSource" mat-table>
-    <ng-container matColumnDef="position">
-      <th *matHeaderCellDef mat-header-cell>#</th>
-      <td *matCellDef="let payment; let i = index;" mat-cell>
-        @if (payment.id) {
-          <div>{{ i + 1 }}</div>
-        } @else {
-          <div class="ssc-line"></div>
-        }
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="description">
-      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
-      <td *matCellDef="let payment" class="column-large-text" mat-cell>
-        @if (payment.id) {
-          <div>{{ payment.description }}</div>
-        } @else {
-          <div class="ssc-line"></div>
-        }
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="type">
-      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
-      <td *matCellDef="let payment" class="column-large-text" mat-cell>
-        @if (payment.id) {
-          <div>{{ 'COMMON.PAYMENT.TYPE.' + (payment.type || 'NONE') | translate }}</div>
-        } @else {
-          <div class="ssc-line"></div>
-        }
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="amount">
-      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
-      <td *matCellDef="let payment" mat-cell>
-        @if (payment.id) {
-          <mat-icon matPrefix>{{ getCurrency(payment) }}</mat-icon>&nbsp;{{ payment.amount | number:'1.2-2' }}
-        } @else {
-          <div class="ssc-line"></div>
-        }
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="status">
-      <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
-      <td *matCellDef="let payment" class="hide-xs" mat-cell>
-        @if (payment.id) {
-          {{ 'COMMON.STATUS.PAYMENT.' + (payment.status || 'NONE') | translate }}
-        } @else {
-          <div class="ssc-line"></div>
-        }
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="actions">
-      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-      <td *matCellDef="let payment" mat-cell>
-        @if (payment.id) {
-          @switch (payment.status) {
-            @case ('CREATED') {
-              <button (click)="pay(payment)" mat-icon-button
-                      matTooltip="{{ 'COMMON.BUTTON.' + payment.type | translate }}" matTooltipPosition="above">
-                <mat-icon [svgIcon]="payment.type" class="svg-icon"></mat-icon>
-              </button>
-            }
-            @case ('PENDING') {
-              <button (click)="notify(payment)" mat-icon-button
-                      matTooltip="{{ 'COMMON.BUTTON.NOTIFY'| translate }}" matTooltipPosition="above">
-                <mat-icon color="primary">published_with_changes</mat-icon>
-              </button>
-            }
+  @if (dataSourceSignal(); as dataSource) {
+    <table [dataSource]="dataSource" mat-table>
+      <ng-container matColumnDef="position">
+        <th *matHeaderCellDef mat-header-cell>#</th>
+        <td *matCellDef="let payment; let i = index;" mat-cell>
+          @if (payment.id) {
+            <div>{{ i + 1 }}</div>
+          } @else {
+            <div class="ssc-line"></div>
           }
-        } @else {
-          <div class="ssc-line"></div>
-        }
-      </td>
-    </ng-container>
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="noContent">
-      <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-        {{ 'ME.PAYMENT.LIST.ERROR.NO_CONTENT' | translate }}
-      </td>
-    </ng-container>
+      <ng-container matColumnDef="description">
+        <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
+        <td *matCellDef="let payment" class="column-large-text" mat-cell>
+          @if (payment.id) {
+            <div>{{ payment.description }}</div>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
 
-    <tr *matFooterRowDef="['noContent']" [hidden]="dataSource?.length > 0" mat-footer-row></tr>
+      <ng-container matColumnDef="type">
+        <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
+        <td *matCellDef="let payment" class="column-large-text" mat-cell>
+          @if (payment.id) {
+            <div>{{ 'COMMON.PAYMENT.TYPE.' + (payment.type || 'NONE') | translate }}</div>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
 
-    <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-    <tr *matRowDef="let row; columns: displayedColumns;" class="{{row.status}}" mat-row></tr>
-  </table>
+      <ng-container matColumnDef="amount">
+        <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
+        <td *matCellDef="let payment" mat-cell>
+          @if (payment.id) {
+            <mat-icon matPrefix>{{ getCurrency(payment) }}</mat-icon>&nbsp;{{ payment.amount | number:'1.2-2' }}
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
+        <td *matCellDef="let payment" class="hide-xs" mat-cell>
+          @if (payment.id) {
+            {{ 'COMMON.STATUS.PAYMENT.' + (payment.status || 'NONE') | translate }}
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+        <td *matCellDef="let payment" mat-cell>
+          @if (payment.id) {
+            @switch (payment.status) {
+              @case ('CREATED') {
+                <button (click)="pay(payment)" mat-icon-button
+                        matTooltip="{{ 'COMMON.BUTTON.' + payment.type | translate }}" matTooltipPosition="above">
+                  <mat-icon [svgIcon]="payment.type" class="svg-icon"></mat-icon>
+                </button>
+              }
+              @case ('PENDING') {
+                <button (click)="notify(payment)" mat-icon-button
+                        matTooltip="{{ 'COMMON.BUTTON.NOTIFY'| translate }}" matTooltipPosition="above">
+                  <mat-icon color="primary">published_with_changes</mat-icon>
+                </button>
+              }
+            }
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="noContent">
+        <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+          {{ 'ME.PAYMENT.LIST.ERROR.NO_CONTENT' | translate }}
+        </td>
+      </ng-container>
+
+      <tr *matFooterRowDef="['noContent']" [hidden]="hiddenSignal()" mat-footer-row></tr>
+
+      <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+      <tr *matRowDef="let row; columns: displayedColumns;" class="{{row.status}}" mat-row></tr>
+    </table>
+  }
 </div>
 <div class="top card-actions">
   <div class="spacer"></div>

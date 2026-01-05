@@ -11,7 +11,7 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
-import { BehaviorSubject } from 'rxjs';
+import { WritableSignal } from '@angular/core';
 
 // const right = [
 //   query(':enter, :leave',
@@ -79,8 +79,8 @@ export const slideAnimation = trigger('slideAnimation', [
 ]);
 
 export const fadeInUpDown = (translate: string = '20px', duration: string = '2000ms') => sequence([
-  animate(`${ duration } ease-in-out`, keyframes([
-    style({ opacity: 0, transform: `translateY(${ translate })`, offset: 0 }),
+  animate(`${duration} ease-in-out`, keyframes([
+    style({ opacity: 0, transform: `translateY(${translate})`, offset: 0 }),
     style({ opacity: 1, transform: 'translateY(0)', offset: 1 }),
   ])),
 ]);
@@ -106,7 +106,7 @@ export const rubberBand = sequence([
 ]);
 
 export const bounceInDownAnimation = (duration: string, delay: string = '0ms') => animate(
-  `${ duration } ${ delay } ease-in-out`,
+  `${duration} ${delay} ease-in-out`,
   keyframes([
     style({ opacity: 0, transform: 'translateY(-100vh)', offset: 0 }),
     style({ opacity: 1, transform: 'translateY(30px)', offset: 0.6 }),
@@ -116,25 +116,27 @@ export const bounceInDownAnimation = (duration: string, delay: string = '0ms') =
 );
 
 export const scaleIn = (delay: string = '0ms') => sequence([
-  animate(`500ms ${ delay } ease-in-out`, keyframes([
+  animate(`500ms ${delay} ease-in-out`, keyframes([
     style({ opacity: 0, transform: 'scale(2', offset: 0 }),
     style({ opacity: 1, transform: 'scale(1)', offset: 1 }),
   ])),
 ]);
 
 export const slideInX = trigger('slideInX', [
-  transition(':enter', [
-    style({ transform: 'translateX({{translate}})', opacity: 0 }),
-    animate('{{duration}} {{delay}} ease-in-out', style({ transform: 'translateX(0)', opacity: 1 })),
-  ], { params: { translate: '-2000px', duration: '1500ms', delay: '0ms' } },
+  transition(':enter',
+    [
+      style({ transform: 'translateX({{translate}})', opacity: 0 }),
+      animate('{{duration}} {{delay}} ease-in-out', style({ transform: 'translateX(0)', opacity: 1 })),
+    ], { params: { translate: '-2000px', duration: '1500ms', delay: '0ms' } },
   ),
 ]);
 
 export const slideInY = trigger('slideInY', [
-  transition(':enter', [
-    style({ transform: 'translateY({{translate}})', opacity: 0 }),
-    animate('{{duration}} {{delay}} ease-in-out', style({ transform: 'translateY(0)', opacity: 1 })),
-  ], { params: { translate: '-2000px', duration: '1500ms', delay: '0ms' } },
+  transition(':enter',
+    [
+      style({ transform: 'translateY({{translate}})', opacity: 0 }),
+      animate('{{duration}} {{delay}} ease-in-out', style({ transform: 'translateY(0)', opacity: 1 })),
+    ], { params: { translate: '-2000px', duration: '1500ms', delay: '0ms' } },
   ),
 ]);
 
@@ -313,28 +315,29 @@ export const goTo = (elementId: string | HTMLElement): void => {
   element?.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
 };
 
-export const observeElement = (animationState: BehaviorSubject<'open' | 'close'>, el?: HTMLElement | Element | null,
-  reopen: boolean = false, threshold: number = 1): IntersectionObserver | undefined => {
+export const observeElementSignal = (
+  animationState: WritableSignal<'open' | 'close'>,
+  el?: HTMLElement | Element | null,
+  reopen: boolean = false,
+  threshold: number = 1,
+): IntersectionObserver | undefined => {
   let observer: IntersectionObserver | undefined;
   if (el) {
     const rootMargin = '0px';
-    observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            animationState.next('close');
-            if (!reopen) {
-              observer?.disconnect();
-            }
-          } else {
-            animationState.next('open');
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          animationState.set('close');
+          if (!reopen) {
+            observer?.disconnect();
           }
-        });
-      }, { threshold, rootMargin },
-    );
+        } else {
+          animationState.set('open');
+        }
+      });
+    }, { threshold, rootMargin });
     observer.observe(el);
   }
-
   return observer;
 };
 

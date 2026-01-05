@@ -1,96 +1,102 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import {
-  ReactiveFormsModule,
-  UntypedFormBuilder,
-  UntypedFormControl,
-  UntypedFormGroup,
-  Validators,
-} from '@angular/forms';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IColorAll } from '../../interfaces/color';
-import { Observable, Subscription } from 'rxjs';
+import { combineLatestWith } from 'rxjs';
 import { requireMatch } from '../../util/validators';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { AppState, selectReservationState } from '../../store/app.states';
 import { map, startWith } from 'rxjs/operators';
 import { getColorsByTreatmentId } from '../../store/reservation.actions';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
-import { AsyncPipe } from '@angular/common';
+import { ReservationState } from '../../store/reducers/reservation.reducers';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { getColorsPipe } from '../../store/selectors/reservation.selectors';
+
+type ChangeColorForm = {
+  color: FormControl<IColorAll | undefined>,
+}
+
+type ChangeColorDialogData = {
+  treatmentId: string,
+  small: boolean;
+  colorId?: string,
+}
 
 @Component({
   selector: 'app-change-color-dialog-component',
   templateUrl: './change-color-dialog.component.html',
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe, AsyncPipe],
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ChangeColorDialogComponent implements OnInit, OnDestroy {
-  colorForm!: UntypedFormGroup;
-  colors?: IColorAll[];
-  filteredColor?: Observable<IColorAll[] | undefined>;
-  color: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch,
-  ]);
+export class ChangeColorDialogComponent {
+  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly dialogRef: MatDialogRef<ChangeColorDialogComponent> = inject(
+    MatDialogRef<ChangeColorDialogComponent>);
+  readonly data = inject<ChangeColorDialogData>(MAT_DIALOG_DATA);
 
-  private getState: Observable<any>;
-  private subscription?: Subscription;
-  private readonly treatmentId: string;
+  private colors$ = this.store.pipe(getColorsPipe);
 
-  constructor(public dialogRef: MatDialogRef<ChangeColorDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-    private store: Store<AppState>, private formBuilder: UntypedFormBuilder) {
-    this.getState = this.store.select(selectReservationState);
-    this.treatmentId = data.treatmentId;
+  colorsSignal = toSignal(this.colors$);
+
+  form: FormGroup<ChangeColorForm> = this.formBuilder.group<ChangeColorForm>({
+    color: this.formBuilder.control<IColorAll | undefined>(undefined, {
+      validators: [Validators.required, requireMatch],
+    }),
+  });
+
+  filteredColorSignal = toSignal(
+    this.getForm.color.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value?.name),
+      combineLatestWith(this.colors$),
+      map(([name, colorList]) => {
+        if (name) {
+          return this.filterColor(name, colorList);
+        } else {
+          return colorList ? colorList.slice() : colorList;
+        }
+      }),
+    ),
+  );
+
+  private readonly treatmentId = computed(() => this.data.treatmentId);
+
+  constructor() {
+    effect(() => {
+      const treatmentId = this.treatmentId();
+      this.store.dispatch(getColorsByTreatmentId({ treatmentId }));
+    });
+
+    effect(() => {
+      const colors = this.colorsSignal();
+      if (colors && this.data.colorId) {
+        this.getForm.color.setValue(colors.find(color => color.id === this.data.colorId));
+      }
+    });
   }
 
-  get onNoClick(): void {
-    return this.dialogRef.close();
+  get getForm(): ChangeColorForm {
+    return this.form.controls;
   }
 
-  get doAction(): void {
-    return this.dialogRef.close({ colorId: this.color.value.id });
+  onNoClick() {
+    this.dialogRef.close();
   }
 
-  ngOnInit(): void {
-    this.createForm();
-    this.createFilters();
-    this.subscribe();
-    this.getColors();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+  doAction() {
+    this.dialogRef.close({ colorId: this.getForm.color.value?.id });
   }
 
   displayFnColor = (color: IColorAll): string => color ? color.name : '';
 
-  keyDownHandler = (event: any): void => {
+  keyDownHandler = (event: KeyboardEvent): void => {
     if (event.code === 'Backspace') {
-      this.color.setValue('');
+      this.getForm.color.setValue(undefined);
     }
   };
 
-  private createForm = (): void => {
-    this.colorForm = this.formBuilder.group({
-      color: this.color,
-    });
-  };
-
-  private createFilters = (): void => {
-    this.filteredColor = this.color.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterColor(name) : this.colors ? this.colors.slice() : this.colors),
-    );
-  };
-
-  private filterColor = (name: string): IColorAll[] | undefined => this.colors?.filter(
+  private filterColor = (name: string, colors: IColorAll[]): IColorAll[] | undefined => colors?.filter(
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
-
-  private getColors = (): void => this.store.dispatch(getColorsByTreatmentId({ treatmentId: this.treatmentId }));
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      this.colors = state.colors;
-      this.color.setValue(this.colors?.find(color => color.id === this.data.colorId));
-    });
-  };
 }

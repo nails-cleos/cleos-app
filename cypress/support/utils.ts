@@ -60,5 +60,5 @@ export const zeroPad = (n: number | string) => String(n).padStart(2, '0');
 export const convertSecondsToTime = (seconds: number) => {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
-  return `${ zeroPad(hours) }:${ zeroPad(minutes) }`;
+  return `${zeroPad(hours)}:${zeroPad(minutes)}`;
 };
