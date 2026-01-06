@@ -185,10 +185,10 @@ export class AdditionalComponent {
       additional.groupIds = newGroupIds;
     }
 
-    if (this.isAddModeSignal()) {
+    const id = this.additionalId();
+    if (!id) {
       this.store.dispatch(createAdditional({ additional }));
     } else {
-      const id = this.additionalId()!;
       this.store.dispatch(updateAdditional({ id, additional }));
     }
     return;

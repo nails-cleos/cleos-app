@@ -14,6 +14,7 @@ export interface IOffice {
   account?: string;
   btw?: string;
   billingAddress?: string;
+  driveFolder?: string;
   lastInvoiceNumber?: number;
 }
 
@@ -26,6 +27,7 @@ export interface IOfficeAll {
   account?: string;
   btw?: string;
   billingAddress?: string;
+  driveFolder?: string;
   lastInvoiceNumber?: number;
   rooms?: IRoomAll[];
 }

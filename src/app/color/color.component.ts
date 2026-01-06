@@ -91,10 +91,10 @@ export class ColorComponent {
     color.name = fieldChange(this.getForm.name, colorSignal?.name);
     color.description = valueChange(this.getForm.description.value, colorSignal?.description);
 
-    if (this.isAddModeSignal()) {
+    const id = this.colorIdSignal();
+    if (!id) {
       this.store.dispatch(createColor({ color }));
     } else {
-      const id = this.colorIdSignal()!;
       this.store.dispatch(updateColor({ id, color }));
     }
     return;

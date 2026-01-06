@@ -52,6 +52,15 @@ export const getTokenPipe = pipe(
   filter((val): val is string => val !== undefined),
 );
 
+const selectDriveToken = createSelector(
+  selectAuthState,
+  (state: AuthState) => state?.driveToken,
+);
+export const getDriveTokenPipe = pipe(
+  select(selectDriveToken),
+  filter((val): val is string => val !== undefined),
+);
+
 const selectMenus = createSelector(
   selectAuthState,
   (state: AuthState) => state?.menus,

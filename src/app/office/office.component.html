@@ -107,6 +107,14 @@
                     <mat-error>{{ billingAddressError }}</mat-error>
                   }
                 </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'OFFICE.DRIVE_FOLDER.FIELD' | translate }}</mat-label>
+                  <input [formControl]="getForm.driveFolder" matInput>
+                  @let driveFolderError = errors()['driveFolder'];
+                  @if (driveFolderError) {
+                    <mat-error>{{ driveFolderError }}</mat-error>
+                  }
+                </mat-form-field>
               </div>
             </mat-card-content>
             <mat-card-actions class="card-actions">

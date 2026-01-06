@@ -10,10 +10,10 @@ import { OfficeService } from '../services/office.service';
 import { UserService } from '../services/user.service';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { provideState, Store } from '@ngrx/store';
-import { ColorNavigationEffects } from '../color/color-navigation.effects';
 import { OFFICE_FEATURE_KEY, officeReducer } from '../store/reducers/office.reducers';
 import { I18NState } from '../store/reducers/i18n.reducers';
 import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
+import { OfficeNavigationEffects } from './office-navigation.effects';
 
 @NgModule({
   imports: [
@@ -37,7 +37,7 @@ import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
     OfficeService,
     UserService,
     provideState(OFFICE_FEATURE_KEY, officeReducer),
-    provideEffects(OfficeEffects, ColorNavigationEffects),
+    provideEffects(OfficeEffects, OfficeNavigationEffects),
   ],
 })
 export class OfficeModule {

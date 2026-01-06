@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { NavRoutingModule } from './nav-routing.module';
-
 import { NavComponent } from './nav.component';
 import { provideEffects } from '@ngrx/effects';
 import { LoginEffects } from '../store/effects/auth.effects';
@@ -59,6 +58,8 @@ import { ExpenseService } from '../services/expense.service';
 import { NoteService } from '../services/note.service';
 import { AccountService } from '../services/account.service';
 import { TrackingService } from '../services/tracking.service';
+import { AWS_FEATURE_KEY, awsReducer } from '../store/reducers/aws.reducers';
+import { AwsLambdaService } from '../services/aws-lambda.service';
 
 @NgModule({
   imports: [
@@ -97,6 +98,7 @@ import { TrackingService } from '../services/tracking.service';
     NoteService,
     AccountService,
     TrackingService,
+    AwsLambdaService,
     provideState(AUTH_FEATURE_KEY, authReducer),
     provideState(NOTIFICATION_FEATURE_KEY, notificationReducer),
     provideState(USER_FEATURE_KEY, userReducer),
@@ -114,6 +116,7 @@ import { TrackingService } from '../services/tracking.service';
     provideState(EXPENSE_FEATURE_KEY, expenseReducer),
     provideState(NOTE_FEATURE_KEY, noteReducer),
     provideState(ACCOUNT_FEATURE_KEY, accountReducer),
+    provideState(AWS_FEATURE_KEY, awsReducer),
     provideEffects(
       LoginEffects,
       NotificationEffects,
@@ -132,6 +135,7 @@ import { TrackingService } from '../services/tracking.service';
       ExpenseEffects,
       NoteEffects,
       AccountEffects,
+      AwsLambdaService,
     ),
   ],
 })

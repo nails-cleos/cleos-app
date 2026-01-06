@@ -24,6 +24,17 @@ import {
 import { getCurrentRoomIdPipe } from '../../../store/selectors/room.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../../../interfaces/common';
+import { FileDropComponent, UploadFile } from '../../../shared/file-drop/file-drop.component';
+import { AwsState } from '../../../store/reducers/aws.reducers';
+import { AuthState } from '../../../store/reducers/auth.reducers';
+import { getAwsPipe } from '../../../store/selectors/aws.selectors';
+import { getDriveTokenPipe, getTokenPipe } from '../../../store/selectors/auth.selectors';
+import { awsExtractToNumberFormat } from '../../../interfaces/aws';
+import { calculateBTW, calculateNet } from '../../../util/numbers';
+import { Auth, GoogleAuthProvider, signInWithPopup } from '@angular/fire/auth';
+import { setDriveToken } from '../../../store/auth.actions';
+import { callAwsLambda } from '../../../store/aws.actions';
+import { AuthUserService } from '../../../services/auth-user.service';
 
 type TotalsForm = {
   type: FormControl<string>;
@@ -43,14 +54,17 @@ type ExpenseForm = {
   selector: 'app-expense',
   templateUrl: './expense.component.html',
   styleUrls: ['./expense.component.scss'],
-  imports: [SharedModule, TwoDigitsDirective, BackButtonDirective],
+  imports: [SharedModule, TwoDigitsDirective, BackButtonDirective, FileDropComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExpenseComponent {
-  private readonly store: Store<ExpenseState | RoomState> = inject(Store<ExpenseState | RoomState>);
+  private readonly auth: Auth = inject(Auth);
+  private readonly store: Store<ExpenseState | RoomState | AwsState | AuthState> = inject(
+    Store<ExpenseState | RoomState | AwsState | AuthState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
+  private readonly authUserService: AuthUserService = inject(AuthUserService);
 
   private roomId$ = this.store.pipe(getCurrentRoomIdPipe);
   private expenseId$ = this.store.pipe(getCurrentExpenseIdPipe);
@@ -58,6 +72,14 @@ export class ExpenseComponent {
   private info$ = this.store.pipe(getInfoPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
   private response$ = this.store.pipe(getExpenseResponsePipe);
+  private aws$ = this.store.pipe(getAwsPipe);
+  private token$ = this.store.pipe(getTokenPipe);
+  private driveToken$ = this.store.pipe(getDriveTokenPipe);
+
+  private awsSignal = toSignal(this.aws$);
+  private tokenSignal = toSignal(this.token$);
+  private driveTokenSignal = toSignal(this.driveToken$);
+  private userId = computed(() => this.authUserService.authUser().userId);
 
   private expenseIdSignal = toSignal(this.expenseId$);
   private roomIdSignal = toSignal(this.roomId$);
@@ -107,6 +129,9 @@ export class ExpenseComponent {
   totalMap: Map<number, { btwValue: string, net: string }> = new Map();
 
   private timeZone = computed(() => this.infoSignal()?.timeZone || '');
+  private file = signal<UploadFile | undefined>(undefined);
+  private selectedSupplyStore = toSignal(this.getForm.supplyStore.valueChanges);
+  private tokenRequested: boolean = false;
 
   private readonly language: string = this.translate.currentLang;
 
@@ -117,19 +142,9 @@ export class ExpenseComponent {
         this.form.patchValue(selected);
         this.getForm.date.setValue(createNewDateZonedTime(selected.timestamp, selected.room?.timeZone));
         this.removeExpense(0);
-        selected.expenseTotals.forEach((it, index) => {
-          let btw = '0';
-          const total = { net: '', btwValue: '' };
-          if (it.btw !== undefined) {
-            btw = it.btw.toFixed(2);
-            total.net = (it.gross / (it.btw + 100) * 100).toFixed(2);
-          } else {
-            total.net = it.gross.toFixed(2);
-          }
-          this.totals.push(this.createTotals(it.type, it.gross.toFixed(2), btw, it.description));
-          total.btwValue = (it.gross - parseFloat(total.net)).toFixed(2);
-          this.totalMap.set(index, total);
-        });
+        selected.expenseTotals.forEach(
+          (it, index) => this.addTotal(true, index, it.gross, it.btw, it.description, it.type),
+        );
       }
     });
 
@@ -178,6 +193,63 @@ export class ExpenseComponent {
         }
       }
     });
+
+    effect(() => {
+      const file = this.file()?.raw;
+      if (!file) {
+        this.form.reset();
+        this.removeExpense(0);
+        this.totalMap = new Map();
+        return;
+      }
+      const token = this.tokenSignal();
+      if (token) {
+        this.store.dispatch(callAwsLambda({ token, file, userId: this.userId() }));
+      }
+    });
+
+    effect(() => {
+      const aws = this.awsSignal();
+      if (aws) {
+        this.setSupplierOrName(aws.VENDOR_NAME);
+        if (aws.INVOICE_RECEIPT_DATE) {
+          const date = new Date(aws.INVOICE_RECEIPT_DATE);
+          if (!isNaN(date.getTime())) {
+            this.getForm.date.setValue(date);
+          }
+        }
+        if (aws.INVOICE_RECEIPT_ID) {
+          this.getForm.invoice.setValue(aws.INVOICE_RECEIPT_ID);
+        }
+        let total = awsExtractToNumberFormat(aws.TOTAL);
+        const btwValue = awsExtractToNumberFormat(aws.TAX);
+        const subtotal = awsExtractToNumberFormat(aws.SUBTOTAL);
+
+        let btwPercentage = 0;
+        if (!total && subtotal && btwValue) {
+          total = subtotal + btwValue;
+        }
+        if (total) {
+          btwPercentage = subtotal ? calculateBTW(total, subtotal) : 0;
+          this.addTotal(true, 0, total, btwPercentage);
+        }
+      }
+    });
+
+    effect(() => {
+      const supplyStore = this.selectedSupplyStore();
+      if (supplyStore && typeof supplyStore === 'string') {
+        this.getForm.supplyStore.setValue({ id: '', name: supplyStore });
+      }
+    });
+
+    effect(() => {
+      const driveToken = this.driveTokenSignal();
+      if (!driveToken && !this.tokenRequested) {
+        this.tokenRequested = true;
+        this.requestDriveAccess();
+      }
+    });
   }
 
   get getForm(): ExpenseForm {
@@ -213,10 +285,11 @@ export class ExpenseComponent {
     expense.expenseTotals = this.totals.getRawValue() as unknown as ITotalExpense[];
     expense.date = createNewDateZonedTime(date, expenseSignal?.room?.timeZone).toLocaleString(API_LOCALE);
 
-    if (this.isAddModeSignal()) {
-      this.store.dispatch(createExpense({ roomId, expense }));
+    const id = this.expenseIdSignal();
+    if (!id) {
+      const driveToken = this.driveTokenSignal();
+      this.store.dispatch(createExpense({ roomId, expense, file: this.file()?.raw, driveToken }));
     } else {
-      const id = this.expenseIdSignal()!;
       this.store.dispatch(updateExpense({ id, roomId, expense }));
     }
   }
@@ -280,15 +353,11 @@ export class ExpenseComponent {
         if (grossValue) {
           const btwValue = this.totals.at(index)?.get('btw')?.value;
           const gross = parseFloat(grossValue);
-          const total = this.totalMap.get(index) ?? { net: '', btwValue: '' };
+          let btw = 0;
           if (btwValue) {
-            const btw = parseFloat(btwValue);
-            total.net = (gross / (btw + 100) * 100).toFixed(2);
-          } else {
-            total.net = grossValue;
+            btw = parseFloat(btwValue);
           }
-          total.btwValue = (gross - parseFloat(total.net)).toFixed(2);
-          this.totalMap.set(index, total);
+          this.addTotal(false, index, gross, btw);
         }
       }
     } else {
@@ -305,18 +374,57 @@ export class ExpenseComponent {
     gross: string = '',
     btw: string = '',
     description: string = '',
-  ): FormGroup => {
-    return this.formBuilder.group({
-      type: [type, [Validators.required]],
-      gross: [gross, [Validators.required]],
-      btw: [btw, [Validators.required]],
-      description: [description],
-    });
-  };
+  ): FormGroup => this.formBuilder.group({
+    type: [type, [Validators.required]],
+    gross: [gross, [Validators.required]],
+    btw: [btw, [Validators.required]],
+    description: [description],
+  });
 
   private filterSupplyStore = (
     name: string,
     supplyStores: ISupplyStore[],
   ): ISupplyStore[] | undefined => supplyStores?.filter(
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+
+  onSelectedFile(currentFile?: UploadFile) {
+    this.file.set(currentFile);
+  }
+
+  private setSupplierOrName(supplyStore: string = '') {
+    const supplier = this.supplyStores().find(it => it.name.toLowerCase() === supplyStore?.toLowerCase());
+    if (supplier) {
+      this.getForm.supplyStore.setValue(supplier);
+    } else {
+      this.getForm.supplyStore.setValue(supplyStore);
+    }
+  }
+
+  private addTotal(add: boolean, index: number, gross: number, btw?: number, description?: string, type?: string) {
+    const total = this.totalMap.get(index) ?? { net: '', btwValue: '' };
+    const grossValue = gross.toFixed(2);
+    if (btw) {
+      total.net = calculateNet(gross, btw).toFixed(2);
+    } else {
+      total.net = grossValue;
+    }
+    if (add) {
+      this.totals.push(this.createTotals(type, grossValue, (btw ?? 0).toFixed(2), description));
+    }
+    total.btwValue = (gross - parseFloat(total.net)).toFixed(2);
+    this.totalMap.set(index, total);
+  }
+
+  private requestDriveAccess(): void {
+    const provider = new GoogleAuthProvider();
+    provider.addScope('https://www.googleapis.com/auth/drive');
+
+    signInWithPopup(this.auth, provider)
+      .then(result => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        if (credential?.accessToken) {
+          this.store.dispatch(setDriveToken({ token: credential.accessToken }));
+        }
+      });
+  }
 }

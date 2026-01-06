@@ -25,6 +25,8 @@ export const environment = {
     vapidKey: 'BJOQTLLmUxq8uJ3aE19sB7Hhda7MAx0K7aI5A9BXfA2TJyaMHU7rbLDyAGTSe-8dahCyj7zJVK8VqWHeE3PFTc8',
     databaseURL: 'https://nails-cleos-dev-default-rtdb.europe-west1.firebasedatabase.app',
   },
+  awsIdentityPoolId: 'eu-central-1:e77fb0cd-db20-4959-8010-e5d71ca4ef52',
+  awsLoginsKey: 'securetoken.google.com/nails-cleos-dev',
   googleMapKey: 'AIzaSyAkKXZ_Qi3MLge6Jjhi1bw0OXawDAbJgXc',
   showMap: false,
 };

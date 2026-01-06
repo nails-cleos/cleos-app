@@ -13,6 +13,7 @@ enum AuthActionTypes {
   logOut = '[Auth] Logout',
   reLogin = '[Auth] Re login',
   setCurrentCode = '[Auth] Set current code',
+  setDriveToken = '[Auth] Set drive token',
   clean = '[Auth] Clean'
 }
 
@@ -21,9 +22,14 @@ export const setCurrentCode = createAction(
   props<{ code: string }>(),
 );
 
+export const setDriveToken = createAction(
+  AuthActionTypes.setDriveToken,
+  props<{ token: string }>(),
+);
+
 export const login = createAction(
   AuthActionTypes.login,
-  props<{ token: string, queryParams: Params, theme: string, code?: string }>(),
+  props<{ token: string; queryParams: Params; theme: string; code?: string }>(),
 );
 
 export const redirect = createAction(
@@ -32,7 +38,7 @@ export const redirect = createAction(
 
 export const loginSuccess = createAction(
   AuthActionTypes.loginSuccess,
-  props<{ token: Token, queryParams: Params, redirect?: boolean }>(),
+  props<{ token: Token; queryParams: Params; redirect?: boolean }>(),
 );
 
 export const loginFailure = createAction(

@@ -105,12 +105,10 @@ export class CurrencyComponent {
     currency.name = fieldChange(this.getForm.name, currencySignal?.name);
     currency.icon = fieldChange(this.getForm.icon, currencySignal?.icon);
 
-    if (this.isAddModeSignal()) {
-      this.store.dispatch(
-        createCurrency({ currency }),
-      );
+    const id = this.currencyId();
+    if (!id) {
+      this.store.dispatch(createCurrency({ currency }));
     } else {
-      const id = this.currencyId()!;
       this.store.dispatch(updateCurrency({ id, currency }));
     }
     return;

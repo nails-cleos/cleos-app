@@ -138,11 +138,11 @@ export class DiscountComponent {
     discount.type = fieldChange(this.getForm.type, discountSignal?.type);
     discount.amount = fieldChange(this.getForm.amount, discountSignal?.amount);
 
-    if (this.isAddModeSignal()) {
+    const id = this.discountIdSignal();
+    if (!id) {
       discount.currencyId = this.getForm.currency.value?.id;
       this.store.dispatch(createDiscount({ discount }));
     } else {
-      const id = this.discountIdSignal()!;
       this.store.dispatch(updateDiscount({ id, discount }));
     }
   }

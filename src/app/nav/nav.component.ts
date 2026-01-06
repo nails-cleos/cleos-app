@@ -221,9 +221,8 @@ export class NavComponent implements OnDestroy {
       const isAuthorized = this.isAuthorized();
       const redirectSignal = this.redirectSignal();
       const language = this.language();
-      const token = this.tokenSignal();
-      if (isAuthorized && token) {
-        this.getNotifications();
+      if (isAuthorized) {
+        this.store.dispatch(getNotificationsPage({ page: 0, sort: 'date', direction: 'desc', size: PAGE_SIZE }));
       }
       if (this.router.url === `/${language}`) {
         if (isAuthorized && !redirectSignal) {
@@ -336,12 +335,6 @@ export class NavComponent implements OnDestroy {
       } else {
         (navigator as any)?.clearAppBadge();
       }
-    }
-  };
-
-  private getNotifications = (): void => {
-    if (!this.countNotifications()) {
-      this.store.dispatch(getNotificationsPage({ page: 0, sort: 'date', direction: 'desc', size: PAGE_SIZE }));
     }
   };
 

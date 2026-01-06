@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IExpense, IExpenseAll, IExpenseInfo } from '../interfaces/expense';
 import { createFilter } from '../util/service-helper';
@@ -39,10 +39,25 @@ export class ExpenseService {
     this.updatePathVariable(roomId, [id]),
   );
 
-  createExpense = (roomId: string, expense: IExpense): Observable<IApiResponse> => this.http.post<IApiResponse>(
-    this.updatePathVariable(roomId),
-    expense,
-  );
+  createExpense = (
+    roomId: string,
+    expense: IExpense,
+    file?: File,
+    driveToken?: string,
+  ): Observable<IApiResponse> => {
+    const formData = new FormData();
+    if (file) {
+      formData.append('file', file, file.name);
+    }
+    const blob = new Blob([JSON.stringify(expense)], { type: 'application/json' });
+    formData.append('expense', blob);
+
+    let headers = new HttpHeaders().set('Upload', 'true');
+    if (driveToken) {
+      headers = headers.set('X-Google-Drive-Token', driveToken);
+    }
+    return this.http.post<IApiResponse>(this.updatePathVariable(roomId), formData, { headers });
+  };
 
   deleteExpense = (roomId: string, id: string): Observable<void> => this.http.delete<void>(
     this.updatePathVariable(roomId, [id]),

@@ -16,11 +16,13 @@ import { selectNoteError, selectNoteIsLoading, selectNoteResponse } from './note
 import { selectAccountError, selectAccountIsLoading, selectAccountResponse } from './account.selectors';
 import { selectAuthError, selectAuthIsLoading, selectAuthResponse } from './auth.selectors';
 import { selectNotificationIsLoading } from './notification.selectors';
+import { selectAwsIsLoading } from './aws.selectors';
 
 export const selectGlobalIsLoading = createSelector(
   selectAccountIsLoading,
   selectAdditionalIsLoading,
   selectAuthIsLoading,
+  selectAwsIsLoading,
   selectCatalogueIsLoading,
   selectColorIsLoading,
   selectCurrencyIsLoading,
@@ -42,6 +44,7 @@ export const selectGlobalResponse = createSelector(
   selectAccountResponse,
   selectAdditionalResponse,
   selectAuthResponse,
+
   selectCatalogueResponse,
   selectColorResponse,
   selectCurrencyResponse,
@@ -64,6 +67,7 @@ export const selectGlobalError = createSelector(
   selectAccountError,
   selectAdditionalError,
   selectAuthError,
+
   selectCatalogueError,
   selectColorError,
   selectCurrencyError,

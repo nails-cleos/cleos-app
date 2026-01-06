@@ -21,6 +21,10 @@ import { ROOM_FEATURE_KEY, roomReducer } from '../store/reducers/room.reducers';
 import { RoomNavigationEffects } from './room-navigation.effects';
 import { I18NState } from '../store/reducers/i18n.reducers';
 import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
+import { TokenService } from '../services/token.service';
+import { AwsLambdaService } from '../services/aws-lambda.service';
+import { AWS_FEATURE_KEY, awsReducer } from '../store/reducers/aws.reducers';
+import { AwsEffects } from '../store/effects/aws.effects';
 
 @NgModule({
   imports: [
@@ -49,8 +53,11 @@ import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
     RoomService,
     UserService,
     ExpenseService,
+    TokenService,
+    AwsLambdaService,
     provideState(ROOM_FEATURE_KEY, roomReducer),
-    provideEffects(RoomEffects, ExpenseEffects, RoomNavigationEffects),
+    provideState(AWS_FEATURE_KEY, awsReducer),
+    provideEffects(RoomEffects, ExpenseEffects, AwsEffects, RoomNavigationEffects),
   ],
 })
 export class RoomModule {

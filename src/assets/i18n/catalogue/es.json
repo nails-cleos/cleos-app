@@ -14,16 +14,6 @@
       "HOME": "Mostar en principal",
       "CATALOG": "Mostrar en catálogo"
     },
-    "FILE": {
-      "DRAG_DROP": "Arrastrar y soltar el archivo aquí",
-      "OR": "o",
-      "CHOOSE": "Elegí un archivo"
-    },
-    "DELETE": {
-      "BUTTON": "Eliminar imagen {{name}}",
-      "MESSAGE": "Imagen {{name}} eliminada",
-      "UNDO": "Deshacer"
-    },
     "DELETED": {
       "TITLE": "Eliminar catálogo",
       "CONTENT": "¿Está seguro de eliminar el catálogo {{name}}?",
