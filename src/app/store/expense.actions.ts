@@ -45,7 +45,7 @@ export const expenseInfoSuccess = createAction(
 
 export const createExpense = createAction(
   ExpenseActionTypes.createExpense,
-  props<{ roomId: string; expense: IExpense }>(),
+  props<{ roomId: string; expense: IExpense; file?: File; driveToken?: string }>(),
 );
 
 export const updateExpense = createAction(

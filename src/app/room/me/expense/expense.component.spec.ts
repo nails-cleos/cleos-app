@@ -6,9 +6,13 @@ import { BehaviorSubject } from 'rxjs';
 import { ExpenseComponent } from './expense.component';
 import { ExpenseState } from '../../../store/reducers/expense.reducers';
 import { RoomState } from '../../../store/reducers/room.reducers';
-import { IExpenseAll } from '../../../interfaces/expense';
+import { IExpenseAll, ISupplyStore } from '../../../interfaces/expense';
 import { getExpense } from '../../../store/expense.actions';
 import { getNowTimeZone } from '../../../util/dates';
+import { signal } from '@angular/core';
+import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
+import { Auth } from '@angular/fire/auth';
+import { callAwsLambda } from '../../../store/aws.actions';
 
 describe('ExpenseComponent', () => {
   let component: ExpenseComponent;
@@ -17,6 +21,8 @@ describe('ExpenseComponent', () => {
   let storeSpy: jasmine.SpyObj<Store<ExpenseState | RoomState>>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let navigateSpy: jasmine.Spy;
+  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let authSpy: jasmine.SpyObj<Auth>;
 
   let roomId$: BehaviorSubject<any>;
   let expenseId$: BehaviorSubject<any>;
@@ -24,6 +30,9 @@ describe('ExpenseComponent', () => {
   let info$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
   let response$: BehaviorSubject<any>;
+  let aws$: BehaviorSubject<any>;
+  let token$: BehaviorSubject<any>;
+  let driveToken$: BehaviorSubject<any>;
 
   const mockExpense: Partial<IExpenseAll> = {
     id: '1',
@@ -34,6 +43,16 @@ describe('ExpenseComponent', () => {
     ],
   };
 
+  const mockFile = new File(
+    ['dummy content'],
+    'invoice.pdf',
+    { type: 'application/pdf' },
+  );
+
+  const mockSuppliers: ISupplyStore[] = [{ id: '1', name: 'vendor_name' }];
+
+  const authUserSignal = signal<IAuthUser>(initialAuthUser);
+
   beforeEach(async () => {
     roomId$ = new BehaviorSubject<any>(undefined);
     expenseId$ = new BehaviorSubject<any>(undefined);
@@ -41,12 +60,32 @@ describe('ExpenseComponent', () => {
     info$ = new BehaviorSubject<any>(undefined);
     subErrors$ = new BehaviorSubject<any>(undefined);
     response$ = new BehaviorSubject<any>(undefined);
+    aws$ = new BehaviorSubject<any>(undefined);
+    token$ = new BehaviorSubject<any>('token');
+    driveToken$ = new BehaviorSubject<any>('driveToken');
+
+    authUserSignal.update(prev => ({
+      ...prev,
+      userId: 'user-123',
+    }));
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
       },
+    });
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
+      authUser: authUserSignal.asReadonly(),
+    });
+    authSpy = jasmine.createSpyObj('Auth', ['onIdTokenChanged'], {
+      currentUser: null,
+    });
+
+    authSpy.onIdTokenChanged.and.callFake((callback: any) => {
+      callback(null);
+      return () => {
+      };
     });
 
     let pipeCallIndex = 0;
@@ -65,6 +104,12 @@ describe('ExpenseComponent', () => {
           return subErrors$.asObservable();
         case 6:
           return response$.asObservable();
+        case 7:
+          return aws$.asObservable();
+        case 8:
+          return token$.asObservable();
+        case 9:
+          return driveToken$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -75,6 +120,8 @@ describe('ExpenseComponent', () => {
       providers: [
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Store, useValue: storeSpy },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
+        { provide: Auth, useValue: authSpy },
       ],
     }).compileComponents();
 
@@ -84,6 +131,18 @@ describe('ExpenseComponent', () => {
     const translate = TestBed.inject(TranslateService);
     translate.setDefaultLang('en-GB');
     translate.use('en-GB');
+    translate.setTranslation('en-GB', {
+      EXPENSE: {
+        GROSS: {
+          MIN: 'Gross is below minimum',
+          MAX: 'Gross exceeds maximum',
+        },
+        BTW: {
+          MIN: 'BTW is below minimum',
+          MAX: 'BTW exceeds maximum',
+        },
+      },
+    });
 
     fixture = TestBed.createComponent(ExpenseComponent);
     component = fixture.componentInstance;
@@ -175,6 +234,34 @@ describe('ExpenseComponent', () => {
     }));
   });
 
+  it('should create expense and clean the form when createAnother is tick', () => {
+    roomId$.next('room-123');
+    fixture.detectChanges();
+    storeSpy.dispatch.calls.reset();
+
+    const supplyStoreControl = component.getForm.supplyStore;
+    supplyStoreControl.setValue('New Expense');
+    supplyStoreControl.markAsDirty();
+    const invoiceControl = component.getForm.invoice;
+    invoiceControl.setValue('New Description');
+    invoiceControl.markAsDirty();
+    const dateControl = component.getForm.date;
+    dateControl.setValue(getNowTimeZone());
+    dateControl.markAsDirty();
+    prepareSingleTotal();
+
+    component.createAnother = true;
+    expect(component.totals.length).toBe(1);
+
+    response$.next({ success: true });
+    fixture.detectChanges();
+
+    expect(supplyStoreControl.value).toBe('');
+    expect(invoiceControl.value).toBe('');
+    expect(dateControl.value).toBeNull();
+    expect(component.totals.length).toBe(0);
+  });
+
   it('should dispatch updateExpense when in edit mode and form valid', () => {
     storeSpy.dispatch.calls.reset();
 
@@ -208,4 +295,173 @@ describe('ExpenseComponent', () => {
       type: '[Expense] Update expense by id',
     }));
   });
+
+  it('should call aws upload on file upload', () => {
+    component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: mockFile });
+    token$.next('aws-token');
+    fixture.detectChanges();
+
+    expect(storeSpy.dispatch)
+      .toHaveBeenCalledWith(callAwsLambda({ token: 'aws-token', file: mockFile, userId: 'user-123' }));
+  });
+
+  it('should set full aws data', () => {
+    const awsData = {
+      VENDOR_NAME: 'VENDOR_NAME',
+      INVOICE_RECEIPT_DATE: '2025-10-10',
+      INVOICE_RECEIPT_ID: 'INV-123',
+      TOTAL: '€ 121,00',
+      SUBTOTAL: '€ 100.00',
+      TAX: '€ 21',
+    };
+    aws$.next(awsData);
+    fixture.detectChanges();
+
+    expect(component.getForm.supplyStore.value).toEqual({ id: '', name: awsData.VENDOR_NAME });
+    expect(component.getForm.invoice.value).toBe(awsData.INVOICE_RECEIPT_ID);
+    expect(component.getForm.date.value).toEqual(new Date(awsData.INVOICE_RECEIPT_DATE));
+    const totals = component.totals.getRawValue();
+    expect(totals.length).toBe(1);
+    expect(totals[0].gross).toBe('121.00');
+    expect(totals[0].btw).toBe('21.00');
+    expect(component.totalMap.get(0)).toEqual({ net: '100.00', btwValue: '21.00' });
+  });
+
+  it('should set correct data when receive partial aws data', () => {
+    const awsData = {
+      VENDOR_NAME: 'VENDOR_NAME',
+      SUBTOTAL: '€ 100.00',
+      TAX: '€ 21',
+    };
+
+    aws$.next(awsData);
+    info$.next({ supplyStores: mockSuppliers });
+    fixture.detectChanges();
+
+    expect(component.getForm.supplyStore.value).toEqual(mockSuppliers[0]);
+    const totals = component.totals.getRawValue();
+    expect(totals.length).toBe(1);
+    expect(totals[0].gross).toBe('121.00');
+    expect(totals[0].btw).toBe('21.00');
+    expect(component.totalMap.get(0)).toEqual({ net: '100.00', btwValue: '21.00' });
+  });
+
+  it('should remove supplier', () => {
+    info$.next({ supplyStores: mockSuppliers });
+    fixture.detectChanges();
+
+    component.getForm.supplyStore.setValue(mockSuppliers[0]);
+    expect(component.getForm.supplyStore.value).toEqual(mockSuppliers[0]);
+
+    component.removeSupplyStore();
+
+    expect(component.getForm.supplyStore.value).toBe('');
+  });
+
+  it('should create an empty total when addDate is fire', () => {
+    component.addDate();
+    const totals = component.totals.getRawValue();
+    expect(totals.length).toBe(1);
+    expect(totals[0].gross).toBe('');
+    expect(totals[0].btw).toBe('');
+  });
+
+  it('should set formatted value and update totals when input is valid', () => {
+    prepareSingleTotal();
+
+    const input = createInput('gross0', '100');
+
+    component.validateInputValue(input, 0);
+
+    expect(component.totals.at(0).get('gross')?.value).toBe('100.00');
+    expect(component.totalMap.get(0)).toEqual({
+      net: '100.00',
+      btwValue: '0.00',
+    });
+  });
+
+  it('should set error when value is below min', () => {
+    prepareSingleTotal();
+
+    const input = createInput('gross0', '5');
+
+    component.validateInputValue(input, 0, 10);
+
+    expect(component.errors()['gross0']).toBeDefined();
+    expect(component.totals.at(0).get('gross')?.hasError('incorrect')).toBeTrue();
+  });
+
+  it('should set error when value exceeds max', () => {
+    prepareSingleTotal();
+
+    const input = createInput('gross0', '200');
+
+    component.validateInputValue(input, 0, undefined, 100);
+
+    expect(component.errors()['gross0']).toBeDefined();
+    expect(component.totals.at(0).get('gross')?.hasError('incorrect')).toBeTrue();
+  });
+
+  it('should clear value when input is NaN', () => {
+    prepareSingleTotal();
+
+    const input = createInput('gross0', 'abc');
+
+    component.validateInputValue(input, 0);
+
+    expect(component.totals.at(0).get('gross')?.value).toBeNull();
+  });
+
+  it('should clear value when input is empty', () => {
+    prepareSingleTotal();
+
+    const input = createInput('gross0', '');
+
+    component.validateInputValue(input, 0);
+
+    expect(component.totals.at(0).get('gross')?.value).toBeUndefined();
+  });
+
+  it('should recalculate net and btw when gross and btw are present', () => {
+    prepareSingleTotal();
+
+    component.totals.at(0).get('btw')?.setValue('21');
+
+    const input = createInput('gross0', '121');
+
+    component.validateInputValue(input, 0);
+
+    expect(component.totalMap.get(0)).toEqual({
+      net: '100.00',
+      btwValue: '21.00',
+    });
+  });
+
+  const createInput = (id: string, value: string): HTMLInputElement => {
+    const input = document.createElement('input');
+    input.id = id;
+    input.value = value;
+    return input;
+  };
+
+  const prepareSingleTotal = () => {
+    component.addDate();
+    component.totals.at(0).patchValue({
+      type: 'expense',
+      gross: '0',
+      btw: '0',
+      description: '',
+    });
+  };
+
+  it('should request drive access when token is missing', () => {
+    spyOn(component as any, 'requestDriveAccess');
+
+    driveToken$.next(undefined);
+    fixture.detectChanges();
+
+    expect(component['requestDriveAccess']).toHaveBeenCalledTimes(1);
+    expect(component['tokenRequested']).toBeTrue();
+  });
+
 });

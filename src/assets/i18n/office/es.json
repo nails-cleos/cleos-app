@@ -37,6 +37,9 @@
     "ADDRESS": {
       "FIELD": "Dirección de facturación"
     },
+    "DRIVE_FOLDER": {
+      "FIELD": "Carpeta drive"
+    },
     "DELETED": {
       "TITLE": "Eliminar oficina",
       "CONTENT": "¿Está seguro de eliminar la oficina {{name}}?",

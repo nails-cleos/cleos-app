@@ -30,6 +30,7 @@ type OfficeForm = {
   account: FormControl<string | undefined>,
   btw: FormControl<string | undefined>,
   billingAddress: FormControl<string | undefined>,
+  driveFolder: FormControl<string | undefined>,
 }
 
 @Component({
@@ -70,6 +71,7 @@ export class OfficeComponent {
     account: this.formBuilder.control(undefined),
     btw: this.formBuilder.control(undefined),
     billingAddress: this.formBuilder.control(undefined),
+    driveFolder: this.formBuilder.control(undefined),
   });
 
   filteredManagerSignal: Signal<IUser[] | undefined> = toSignal(
@@ -142,12 +144,13 @@ export class OfficeComponent {
     office.account = fieldChange(this.getForm.account, officeSignal?.account);
     office.btw = fieldChange(this.getForm.btw, officeSignal?.btw);
     office.billingAddress = fieldChange(this.getForm.billingAddress, officeSignal?.billingAddress);
+    office.driveFolder = fieldChange(this.getForm.driveFolder, officeSignal?.driveFolder);
 
-    if (this.isAddModeSignal()) {
+    const id = this.officeIdSignal();
+    if (!id) {
       office.managerId = this.getForm.manager.value?.id;
       this.store.dispatch(createOffice({ office }));
     } else {
-      const id = this.officeIdSignal()!;
       this.store.dispatch(updateOffice({ id, office }));
     }
     return;

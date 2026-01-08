@@ -10,3 +10,7 @@ export const numberFormat = (
 
 export const closest = (goal: number, counts: number[] = [0, 15, 30, 45]): number => counts
   .reduce((prev, curr) => (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev));
+
+export const calculateNet = (gross: number, btw: number): number => (gross / (btw + 100) * 100);
+
+export const calculateBTW = (total: number, subtotal: number): number => ((total - subtotal) / subtotal) * 100;

@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { getUser, saveUser } from '../store/user.actions';
 import { IUser, User } from '../interfaces/user';
@@ -22,7 +21,6 @@ import { UserState } from '../store/reducers/user.reducers';
 import {
   getCurrentUserIdPipe,
   getNavigationParamsPipe,
-  getUserResponsePipe,
   getSelectedUserPipe,
   getSubErrorsPipe,
 } from '../store/selectors/user.selectors';
@@ -54,18 +52,15 @@ export class UserComponent {
   private readonly store: Store<UserState> = inject(Store<UserState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly translate: TranslateService = inject(TranslateService);
-  private readonly router: Router = inject(Router);
 
   private userId$ = this.store.pipe(getCurrentUserIdPipe);
   private selectedUser$ = this.store.pipe(getSelectedUserPipe);
   private navigationParams$ = this.store.pipe(getNavigationParamsPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getUserResponsePipe);
 
   private navigationParams = toSignal(this.navigationParams$);
   private userIdSignal = toSignal(this.userId$);
   private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
   private langChangeSignal = toSignal<LangChangeEvent>(this.translate.onLangChange);
 
   isAddModeSignal = computed(() => !this.userIdSignal());

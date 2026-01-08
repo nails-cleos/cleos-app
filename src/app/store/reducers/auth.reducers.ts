@@ -8,6 +8,7 @@ import {
   redirect,
   reLogin,
   setCurrentCode,
+  setDriveToken,
   signupFailure,
   signupSuccess,
 } from '../auth.actions';
@@ -27,6 +28,7 @@ export interface AuthState {
   error?: IError;
   response?: IResponseSuccess;
   subErrors?: IError[];
+  driveToken?: string;
   queryParams?: Params;
   currentCode?: string;
 }
@@ -41,6 +43,7 @@ export const initialState: AuthState = {
   error: undefined,
   response: undefined,
   subErrors: undefined,
+  driveToken: undefined,
   queryParams: {},
   currentCode: undefined,
 };
@@ -90,6 +93,10 @@ export const authReducer = createReducer(
   on(setCurrentCode, (state, { code }) => ({
     ...state,
     currentCode: code,
+  })),
+  on(setDriveToken, (state, { token }) => ({
+    ...state,
+    driveToken: token,
   })),
   on(reLogin, clean, logOut, () => initialState),
 );

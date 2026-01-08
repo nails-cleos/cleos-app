@@ -23,11 +23,11 @@ import { SharedModule } from '../shared/shared.module';
 import { ToastService } from '../services/toast.service';
 import {
   getAuthErrorPipe,
+  getAuthResponsePipe,
   getCurrentCodePipe,
   getIsAuthenticatedPipe,
   getQueryParamsPipe,
   getRedirectPipe,
-  getAuthResponsePipe,
 } from '../store/selectors/auth.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthState } from '../store/reducers/auth.reducers';
