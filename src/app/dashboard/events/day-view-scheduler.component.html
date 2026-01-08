@@ -20,9 +20,9 @@
   <div (dragEnter)="dragEnter('time')" (dragLeave)="dragLeave('time')" class="cal-time-events" mwlDroppable>
     @if (view.hourColumns.length > 0) {
       <div class="cal-time-label-column">
-        @for (hour of view.hourColumns[0].hours; track trackByHour($index, hour); let odd = $odd) {
+        @for (hour of view.hourColumns[0].hours; track hour; let odd = $odd) {
           <div [class.cal-hour-odd]="odd" class="cal-hour">
-            @for (segment of hour.segments; track trackByHourSegment($index, segment)) {
+            @for (segment of hour.segments; track segment.date) {
               <mwl-calendar-week-view-hour-segment
                 [customTemplate]="hourSegmentTemplate" [isTimeLabel]="true" [locale]="locale"
                 [segmentHeight]="hourSegmentHeight" [segment]="segment" [style.height.px]="hourSegmentHeight">
@@ -34,7 +34,7 @@
     }
 
     <div #dayColumns [class.cal-resize-active]="timeEventResizes.size > 0" class="cal-day-columns">
-      @for (column of view.hourColumns; track trackByHourColumn(i, column); let i = $index; ) {
+      @for (column of view.hourColumns; track column.date; let i = $index) {
         <div class="cal-day-column">
           <mwl-calendar-week-view-current-time-marker
             [columnDate]="column.date"
@@ -45,7 +45,7 @@
             [dayStartMinute]="dayStartMinute"
             [hourSegmentHeight]="hourSegmentHeight"
             [hourSegments]="hourSegments"></mwl-calendar-week-view-current-time-marker>
-          @for (timeEvent of column.events; track trackByWeekTimeEvent($index, timeEvent)) {
+          @for (timeEvent of column.events; track timeEvent.event.id ?? timeEvent.event.start) {
             <div #event (dragEnd)="dragEnded(timeEvent, $event, dayColumnWidth, true)"
                  (dragStart)="dragStarted(dayColumns, event, timeEvent, true)" (dragging)="dragMove(timeEvent, $event)"
                  (resizeEnd)="timeEventResizeEnded(timeEvent)"
@@ -58,7 +58,7 @@
                  [dragSnapGrid]="snapDraggedEvents ? { x: dayColumnWidth, y: eventSnapSize || hourSegmentHeight } : {}"
                  [dropData]="{ event: timeEvent.event, calendarId: calendarId }" [ghostDragEnabled]="!snapDraggedEvents"
                  [hidden]="timeEvent.height === 0 && timeEvent.width === 0"
-                 [ngClass]="timeEvent.event.cssClass ? timeEvent.event.cssClass : ''"
+                 [ngClass]="timeEvent.event.cssClass ?? ''"
                  [resizeSnapGrid]="{left: dayColumnWidth, right: dayColumnWidth, top: eventSnapSize || hourSegmentHeight, bottom: eventSnapSize || hourSegmentHeight}"
                  [style.height.px]="timeEvent.height" [style.left.%]="timeEvent.left" [style.top.px]="timeEvent.top"
                  [style.width.%]="timeEvent.width" [validateDrag]="validateDrag" [validateResize]="validateResize"
@@ -81,13 +81,13 @@
             </div>
           }
 
-          @for (hour of column.hours; track trackByHour($index, hour); let odd = $odd) {
+          @for (hour of column.hours; track hour; let odd = $odd) {
             <div [class.cal-hour-odd]="odd" class="cal-hour">
-              @for (segment of hour.segments; track trackByHourSegment($index, segment)) {
+              @for (segment of hour.segments; track segment.date) {
                 <mwl-calendar-week-view-hour-segment
                   (click)="segmentClick(segment.date, i)" (drop)="eventDropped($event, segment.date, false)"
                   (mwlClick)="hourSegmentClicked.emit({date: segment.date, sourceEvent: $event})"
-                  [clickListenerDisabled]="hourSegmentClicked.observers.length === 0"
+                  [clickListenerDisabled]="!hourSegmentClicked.observed"
                   [customTemplate]="hourSegmentTemplate"
                   [dragOverClass]="!dragActive || !snapDraggedEvents ? 'cal-drag-over' : ''" [locale]="locale"
                   [segmentHeight]="hourSegmentHeight" [segment]="segment" [style.height.px]="hourSegmentHeight"

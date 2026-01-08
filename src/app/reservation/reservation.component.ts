@@ -38,7 +38,7 @@ import {
   MAX_RESERVATION_MONTH,
   Reservation,
 } from '../interfaces/reservation';
-import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarModule } from 'angular-calendar';
+import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarWeekViewComponent } from 'angular-calendar';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
@@ -214,7 +214,7 @@ type ReservationErrors = {
   templateUrl: './reservation.component.html',
   styleUrls: ['./reservation.component.scss'],
   imports: [SharedModule, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe, PricePreviewComponent,
-    CalendarModule, BackButtonDirective, GoogleMapComponent],
+    BackButtonDirective, GoogleMapComponent, CalendarWeekViewComponent],
   providers: [{
     provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false },
   }],

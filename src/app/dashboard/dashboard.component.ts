@@ -12,7 +12,17 @@ import {
   greaterOrEqualsThan,
   newDateTimestamp,
 } from '../util/dates';
-import { CalendarEvent, CalendarModule, CalendarMonthViewDay, CalendarView } from 'angular-calendar';
+import {
+  CalendarDatePipe,
+  CalendarEvent,
+  CalendarMonthViewComponent,
+  CalendarMonthViewDay,
+  CalendarNextViewDirective,
+  CalendarPreviousViewDirective,
+  CalendarTodayDirective,
+  CalendarView,
+  ClickDirective,
+} from 'angular-calendar';
 import { findStateColor, getStateOrder } from '../util/theme';
 import { allDayEvent, DataEvent, IDataEvent, IMeta, Meta, monthEvent } from '../util/event';
 import { Router } from '@angular/router';
@@ -48,7 +58,9 @@ type DashboardForm = {
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  imports: [SharedModule, CalendarModule, MiniCardComponent, ReservationTableComponent, CardComponent, ChartComponent],
+  imports: [SharedModule, MiniCardComponent, ReservationTableComponent, CardComponent, ChartComponent, CalendarDatePipe,
+    CalendarNextViewDirective, CalendarTodayDirective, CalendarPreviousViewDirective, CalendarMonthViewComponent,
+    ClickDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent {

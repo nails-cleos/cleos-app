@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
-import { CalendarEvent, CalendarModule } from 'angular-calendar';
+import { CalendarDatePipe, CalendarEvent } from 'angular-calendar';
 import {
   addPeriod,
   API_LOCALE,
@@ -53,7 +53,7 @@ import { ReservationState } from '../../store/reducers/reservation.reducers';
   selector: 'app-dashboard',
   templateUrl: './dashboard-event.component.html',
   styleUrls: ['./dashboard-event.component.scss'],
-  imports: [SharedModule, CalendarModule, DayViewSchedulerComponent, CounterComponent],
+  imports: [SharedModule, DayViewSchedulerComponent, CounterComponent, CalendarDatePipe],
   providers: [DayViewSchedulerCalendarUtils],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

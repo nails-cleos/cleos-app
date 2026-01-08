@@ -1,20 +1,16 @@
+import { ChangeDetectionStrategy, Component, effect, Injectable, input, output } from '@angular/core';
 import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  effect,
-  ElementRef,
-  Injectable,
-  input,
-  output,
-} from '@angular/core';
-import {
-  CalendarModule,
   CalendarUtils,
   CalendarWeekViewComponent,
+  CalendarWeekViewCurrentTimeMarkerComponent,
+  CalendarWeekViewEventComponent,
+  CalendarWeekViewHourSegmentComponent,
+  ClickDirective,
   DateAdapter,
   getWeekViewPeriod,
+  provideCalendar,
 } from 'angular-calendar';
+import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import {
   CalendarEvent,
   EventColor,
@@ -23,12 +19,12 @@ import {
   WeekViewAllDayEvent,
   WeekViewTimeEvent,
 } from 'calendar-utils';
-import { DragEndEvent, DragMoveEvent } from 'angular-draggable-droppable';
-import { TranslateService } from '@ngx-translate/core';
+import { DragEndEvent, DraggableDirective, DragMoveEvent, DroppableDirective } from 'angular-draggable-droppable';
 import { Day } from '../../interfaces/reservation';
 import { ConvertHMPipe } from '../../pipes/convert-hm.pipe';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { NgClass, TitleCasePipe } from '@angular/common';
+import { ResizableDirective, ResizeHandleDirective } from 'angular-resizable-element';
 
 export interface IProfessional {
   id: string;
@@ -103,7 +99,19 @@ export class DayViewSchedulerCalendarUtils extends CalendarUtils {
   selector: 'app-mwl-day-view-scheduler',
   templateUrl: './day-view-scheduler.component.html',
   styleUrls: ['./dashboard-event.component.scss'],
-  imports: [AppMaterialModule, CalendarModule, ConvertHMPipe, NgClass, TitleCasePipe],
+  imports: [AppMaterialModule, ConvertHMPipe, NgClass, TitleCasePipe, CalendarWeekViewHourSegmentComponent,
+    CalendarWeekViewCurrentTimeMarkerComponent, DroppableDirective, DraggableDirective, ResizableDirective,
+    ResizeHandleDirective, CalendarWeekViewEventComponent, ClickDirective],
+  providers: [
+    provideCalendar({
+      provide: DateAdapter,
+      useFactory: adapterFactory,
+    }),
+    {
+      provide: CalendarUtils,
+      useClass: DayViewSchedulerCalendarUtils,
+    },
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DayViewSchedulerComponent extends CalendarWeekViewComponent {
@@ -117,11 +125,8 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent {
 
   daysInWeek = 1;
 
-  constructor(protected translateService: TranslateService, protected cdr: ChangeDetectorRef,
-              protected utils: DayViewSchedulerCalendarUtils, protected dateAdapter: DateAdapter,
-              protected element: ElementRef<HTMLElement>) {
-    super(cdr, utils, translateService.currentLang, dateAdapter, element);
-
+  constructor() {
+    super();
     effect(() => {
       this.professionals();
       this.refreshBody();
@@ -180,33 +185,35 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent {
     this.dayEndHour = day.dayEndHour;
     this.dayEndMinute = day.dayEndMinute;
     this.hourSegments = 4;
-    return this.utils.getWeekView({
-      events,
+    return {
       professionals: this.professionals(),
-      viewDate: this.viewDate,
-      weekStartsOn: this.weekStartsOn,
-      excluded: this.excludeDays,
-      precision: this.precision,
-      absolutePositionedEvents: true,
-      hourSegments: this.hourSegments,
-      dayStart: {
-        hour: this.dayStartHour,
-        minute: this.dayStartMinute,
-      },
-      dayEnd: {
-        hour: this.dayEndHour,
-        minute: this.dayEndMinute,
-      },
-      segmentHeight: this.hourSegmentHeight,
-      weekendDays: this.weekendDays,
-      ...getWeekViewPeriod(
-        this.dateAdapter,
-        this.viewDate,
-        this.weekStartsOn,
-        this.excludeDays,
-        this.daysInWeek,
-      ),
-    });
+      ...this.utils.getWeekView({
+        events,
+        viewDate: this.viewDate,
+        weekStartsOn: this.weekStartsOn,
+        excluded: this.excludeDays,
+        precision: this.precision,
+        absolutePositionedEvents: true,
+        hourSegments: this.hourSegments,
+        dayStart: {
+          hour: this.dayStartHour,
+          minute: this.dayStartMinute,
+        },
+        dayEnd: {
+          hour: this.dayEndHour,
+          minute: this.dayEndMinute,
+        },
+        segmentHeight: this.hourSegmentHeight,
+        weekendDays: this.weekendDays,
+        ...getWeekViewPeriod(
+          this.dateAdapter,
+          this.viewDate,
+          this.weekStartsOn,
+          this.excludeDays,
+          this.daysInWeek,
+        ),
+      }),
+    };
   };
 
   private getDraggedProfessionalColumn = (

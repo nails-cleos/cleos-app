@@ -326,7 +326,7 @@
               <div matListItemTitle>{{ 'ME.RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</div>
               <div matListItemLine>{{ treatment?.duration | durationTime }}</div>
             </mat-list-item>
-            @if (additionalSelected.length) {
+            @if (additionalSelected().length) {
               <mat-list-item>
                 <mat-icon matListItemIcon>{{ room?.currency?.icon }}</mat-icon>
                 <div matListItemTitle>{{ 'ME.RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</div>
@@ -379,7 +379,7 @@
                 }
               </div>
             </mat-list-item>
-            @if (additionalSelected.length) {
+            @if (additionalSelected().length) {
               <mat-list-item>
                 <mat-icon matListItemIcon>timer</mat-icon>
                 <div matListItemTitle>{{ 'ME.RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</div>

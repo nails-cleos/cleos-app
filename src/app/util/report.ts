@@ -457,7 +457,7 @@ const addData = (worksheet: Worksheet, key: string, cellNumber: number, column4N
   const init = ++cellNumber;
   if (rowData.length) {
     const rows = worksheet.addRows(rowData);
-    rows.forEach(row => setLinkFont(row));
+    rows.forEach((row: any) => setLinkFont(row));
     cellNumber += rowData.length;
     setBorder(worksheet, init, cellNumber - 1, monthCells);
 
@@ -764,9 +764,9 @@ const setBorder = (worksheet: Worksheet, start: number, end: number, cellList: s
 };
 
 const resizeColumn = (worksheet: Worksheet) => {
-  worksheet.columns.forEach(column => {
+  worksheet.columns.forEach((column: any) => {
     if (column.values) {
-      const lengths = column.values.map(v => {
+      const lengths = column.values.map((v: any) => {
         let length;
         if (v && typeof v === 'object' && 'text' in v) {
           length = v.text?.toString()?.length || 0;
@@ -775,7 +775,7 @@ const resizeColumn = (worksheet: Worksheet) => {
         }
         return length;
       });
-      column.width = Math.max(...lengths.filter(v => typeof v === 'number'));
+      column.width = Math.max(...lengths.filter((v: any) => typeof v === 'number'));
     }
   });
 };

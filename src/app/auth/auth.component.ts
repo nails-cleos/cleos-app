@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import {
   Auth,
+  authState,
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   sendEmailVerification,
@@ -17,7 +18,6 @@ import { THEME } from '../util/theme';
 import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from '../../environments/environment';
-import { user } from 'rxfire/auth';
 import { fetchSignInMethodsForEmail } from '@firebase/auth';
 import { SharedModule } from '../shared/shared.module';
 import { ToastService } from '../services/toast.service';
@@ -69,7 +69,7 @@ export class AuthComponent {
   private errorSignal = toSignal(this.error$);
   private responseSignal = toSignal(this.response$);
   private codeSignal = toSignal(this.currentCode$);
-  private userSignal = toSignal(user(this.auth), { initialValue: null });
+  private userSignal = toSignal(authState(this.auth), { initialValue: null });
 
   statusSignal = signal('init');
 

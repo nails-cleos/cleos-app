@@ -325,7 +325,7 @@ export class YearSummaryComponent {
       workbook.created = getNowTimeZone(this.timeZone());
 
       // Generate & Save Excel File
-      workbook.xlsx.writeBuffer().then((content) => {
+      workbook.xlsx.writeBuffer().then((content: any) => {
         const blob = new Blob([content], {
           type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         });

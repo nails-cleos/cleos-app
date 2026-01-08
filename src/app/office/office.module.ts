@@ -43,7 +43,6 @@ import { OfficeNavigationEffects } from './office-navigation.effects';
 export class OfficeModule {
   constructor(private readonly store: Store<I18NState>, protected translateService: TranslateService) {
     this.store.pipe(getI18NLanguagePipe).subscribe((language) => {
-      translateService.currentLang = '';
       this.translateService.use(language);
     });
   }
