@@ -24,7 +24,6 @@ describe('BottomSheetBookAppointmentComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.setDefaultLang('en-GB');
     translateService.use('en-GB');
     translateService.setTranslation('en-GB', {
       MAIN: {

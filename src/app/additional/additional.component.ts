@@ -98,7 +98,7 @@ export class AdditionalComponent {
 
   groupInput = viewChild.required<ElementRef<HTMLInputElement>>('groupInput');
 
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   private currentGroupIds: string[] = [];
 

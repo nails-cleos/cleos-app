@@ -32,5 +32,5 @@ export class MiniCardComponent {
   isLoading = input<boolean>();
   error = input<IError>();
 
-  locale: string = this.translate.currentLang;
+  locale: string = this.translate.getCurrentLang();
 }

@@ -43,20 +43,21 @@ export class ForgotPasswordComponent {
       validators: [Validators.required],
     }),
   });
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect(() => {
       const error = this.errorSignal();
       if (error?.message) {
-        this.toastService.error(error.message);
+        this.toastService.show(error.message, 'error');
       }
     });
 
     effect(() => {
       const response = this.responseSignal();
       if (response) {
-        const toastRef = this.toastService.show(response.message, response.toastType, 5000, 'button');
+        const actionType = 'button';
+        const toastRef = this.toastService.show(response.message, response.toastType, 5000, { actionType });
         toastRef.onAction().subscribe(() => this.router.navigate([this.language, 'auth']));
       }
     });

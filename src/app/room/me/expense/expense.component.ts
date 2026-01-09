@@ -28,13 +28,12 @@ import { FileDropComponent, UploadFile } from '../../../shared/file-drop/file-dr
 import { AwsState } from '../../../store/reducers/aws.reducers';
 import { AuthState } from '../../../store/reducers/auth.reducers';
 import { getAwsPipe } from '../../../store/selectors/aws.selectors';
-import { getDriveTokenPipe, getTokenPipe } from '../../../store/selectors/auth.selectors';
+import { getTokenPipe } from '../../../store/selectors/auth.selectors';
 import { awsExtractToNumberFormat } from '../../../interfaces/aws';
 import { calculateBTW, calculateNet } from '../../../util/numbers';
-import { Auth, GoogleAuthProvider, signInWithPopup } from '@angular/fire/auth';
-import { setDriveToken } from '../../../store/auth.actions';
 import { callAwsLambda } from '../../../store/aws.actions';
 import { AuthUserService } from '../../../services/auth-user.service';
+import { DriveAccessService } from '../../../services/drive-access.service';
 
 type TotalsForm = {
   type: FormControl<string>;
@@ -58,13 +57,13 @@ type ExpenseForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExpenseComponent {
-  private readonly auth: Auth = inject(Auth);
   private readonly store: Store<ExpenseState | RoomState | AwsState | AuthState> = inject(
     Store<ExpenseState | RoomState | AwsState | AuthState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
+  private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
 
   private roomId$ = this.store.pipe(getCurrentRoomIdPipe);
   private expenseId$ = this.store.pipe(getCurrentExpenseIdPipe);
@@ -74,11 +73,9 @@ export class ExpenseComponent {
   private response$ = this.store.pipe(getExpenseResponsePipe);
   private aws$ = this.store.pipe(getAwsPipe);
   private token$ = this.store.pipe(getTokenPipe);
-  private driveToken$ = this.store.pipe(getDriveTokenPipe);
 
   private awsSignal = toSignal(this.aws$);
   private tokenSignal = toSignal(this.token$);
-  private driveTokenSignal = toSignal(this.driveToken$);
   private userId = computed(() => this.authUserService.authUser().userId);
 
   private expenseIdSignal = toSignal(this.expenseId$);
@@ -131,9 +128,8 @@ export class ExpenseComponent {
   private timeZone = computed(() => this.infoSignal()?.timeZone || '');
   private file = signal<UploadFile | undefined>(undefined);
   private selectedSupplyStore = toSignal(this.getForm.supplyStore.valueChanges);
-  private tokenRequested: boolean = false;
 
-  private readonly language: string = this.translate.currentLang;
+  private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect(() => {
@@ -186,11 +182,15 @@ export class ExpenseComponent {
     effect(() => {
       const id = this.expenseIdSignal();
       const roomId = this.roomIdSignal();
+      if (roomId && id) {
+        this.store.dispatch(getExpense({ roomId, id }));
+      }
+    });
+
+    effect(() => {
+      const roomId = this.roomIdSignal();
       if (roomId) {
         this.store.dispatch(getAllExpensesInfo({ roomId }));
-        if (id) {
-          this.store.dispatch(getExpense({ roomId, id }));
-        }
       }
     });
 
@@ -244,11 +244,7 @@ export class ExpenseComponent {
     });
 
     effect(() => {
-      const driveToken = this.driveTokenSignal();
-      if (!driveToken && !this.tokenRequested) {
-        this.tokenRequested = true;
-        this.requestDriveAccess();
-      }
+      this.driveAccessService.requestAccessIfNeeded(this.isAddModeSignal());
     });
   }
 
@@ -287,7 +283,7 @@ export class ExpenseComponent {
 
     const id = this.expenseIdSignal();
     if (!id) {
-      const driveToken = this.driveTokenSignal();
+      const driveToken = this.driveAccessService.driveTokenSignal();
       this.store.dispatch(createExpense({ roomId, expense, file: this.file()?.raw, driveToken }));
     } else {
       this.store.dispatch(updateExpense({ id, roomId, expense }));
@@ -413,18 +409,5 @@ export class ExpenseComponent {
     }
     total.btwValue = (gross - parseFloat(total.net)).toFixed(2);
     this.totalMap.set(index, total);
-  }
-
-  private requestDriveAccess(): void {
-    const provider = new GoogleAuthProvider();
-    provider.addScope('https://www.googleapis.com/auth/drive');
-
-    signInWithPopup(this.auth, provider)
-      .then(result => {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        if (credential?.accessToken) {
-          this.store.dispatch(setDriveToken({ token: credential.accessToken }));
-        }
-      });
   }
 }

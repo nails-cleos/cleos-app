@@ -14,13 +14,11 @@ describe('MenuItemComponent', () => {
 
   let routerSpy: jasmine.SpyObj<Router>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let translateSpy: jasmine.SpyObj<TranslateService>;
 
   beforeEach(async () => {
     breakpoint$ = new Subject<BreakpointState>();
 
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    translateSpy = jasmine.createSpyObj('TranslateService', [], { currentLang: 'en' });
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
@@ -29,9 +27,11 @@ describe('MenuItemComponent', () => {
       providers: [
         { provide: Router, useValue: routerSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     }).compileComponents();
+
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
 
     fixture = TestBed.createComponent(MenuItemComponent);
     component = fixture.componentInstance;
@@ -48,7 +48,7 @@ describe('MenuItemComponent', () => {
   });
 
   it('should set language from TranslateService', () => {
-    expect(component.language).toBe('en');
+    expect(component.language).toBe('en-GB');
   });
 
   it('should call router.navigate and drawer.toggle when navigate is called', () => {
@@ -58,13 +58,13 @@ describe('MenuItemComponent', () => {
     component.navigate(menu, drawer);
 
     expect(drawer.toggle).toHaveBeenCalled();
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en', 'dashboard', 'home']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'dashboard', 'home']);
   });
 
   it('should call router.navigate without drawer when drawer is not provided', () => {
     const menu = { path: 'settings/account' } as any;
     component.navigate(menu);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en', 'settings', 'account']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'settings', 'account']);
   });
 
   describe('toggleSubMenu', () => {

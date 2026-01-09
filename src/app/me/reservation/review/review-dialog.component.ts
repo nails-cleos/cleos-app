@@ -31,7 +31,7 @@ export class ReviewDialogComponent {
 
   reservation?: IReservationAll;
   end?: Date;
-  dateFormat: string = this.translate.currentLang;
+  dateFormat: string = this.translate.getCurrentLang();
 
   price: IPrice = getPrice(this.data);
   rating = -1;

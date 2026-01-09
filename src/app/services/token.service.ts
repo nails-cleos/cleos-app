@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, Injector, runInInjectionContext } from '@angular/core';
 import { BehaviorSubject, Observable, Subject, Subscription, timer } from 'rxjs';
 import { shareReplay, switchMap, takeUntil } from 'rxjs/operators';
 import { Router } from '@angular/router';
@@ -7,9 +7,16 @@ import { Auth, user } from '@angular/fire/auth';
 import { User } from '@firebase/auth';
 import { getNowTimeZone, newDate, plusMinutes } from '../util/dates';
 import { TranslateService } from '@ngx-translate/core';
+import { Store } from '@ngrx/store';
+import { getTokenPipe, getUserPipe } from '../store/selectors/auth.selectors';
+import { AuthState } from '../store/reducers/auth.reducers';
 
 @Injectable({ providedIn: 'root' })
 export class TokenService {
+  private readonly injector = inject(Injector);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly store: Store<AuthState> = inject(Store<AuthState>);
+
   private myTokenCache?: Observable<User | null>;
   private readonly cacheSize: number = 1;
   private readonly refreshInterval: number = 55 * 60 * 1000; // 5 min;
@@ -17,9 +24,23 @@ export class TokenService {
   private myTokenSubscription?: Subscription;
   private stopTimer?: Subject<boolean>;
   private _token$: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
-  private translate: TranslateService = inject(TranslateService);
   private router: Router = inject(Router);
   private auth: Auth = inject(Auth);
+  private readonly firebaseUser$ = user(this.auth);
+
+  constructor() {
+    this.store.pipe(getTokenPipe).subscribe(token => {
+      if (token && !this._token$.value) {
+        this.token = token;
+      }
+    });
+
+    this.store.pipe(getUserPipe).subscribe(user => {
+      if (user && !this.myUser) {
+        this.myUser = user;
+      }
+    });
+  }
 
   get user(): IUserAll {
     return this.myUser;
@@ -41,19 +62,28 @@ export class TokenService {
       const myTimer = timer(0, this.refreshInterval);
       this.myTokenCache = myTimer.pipe(
         takeUntil(myStopTimer),
-        switchMap(() => user(this.auth)),
+        switchMap(() => this.firebaseUser$),
         shareReplay(this.cacheSize),
       );
 
       this.myTokenSubscription = this.myTokenCache.subscribe({
         next: (firebaseUser) => {
-          firebaseUser?.getIdTokenResult().then(tokenResult => {
-            const expirationTime = plusMinutes(newDate(tokenResult.expirationTime), -10);
-            if (getNowTimeZone() >= expirationTime) {
-              firebaseUser.getIdToken(true).then(newToken => {
-                this._token$.next(newToken);
-              });
-            }
+          if (!firebaseUser) {
+            return;
+          }
+          runInInjectionContext(this.injector, () => {
+            firebaseUser.getIdTokenResult().then(tokenResult => {
+              const expirationTime = plusMinutes(
+                newDate(tokenResult.expirationTime),
+                -10,
+              );
+
+              if (getNowTimeZone() >= expirationTime) {
+                firebaseUser.getIdToken(true).then(newToken => {
+                  this._token$.next(newToken);
+                });
+              }
+            });
           });
         },
         error: () => this.clear(),

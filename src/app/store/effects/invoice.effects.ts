@@ -8,20 +8,24 @@ import {
   getOfficeToInvoice,
   invoiceFailure,
   invoiceOfficesSuccess,
+  invoiceSaveSuccess,
   invoiceSuccess,
   invoiceUpdateOfficeSuccess,
   updateOfficeById,
+  uploadInvoices,
 } from '../invoice.actions';
 import { InvoiceService } from '../../services/invoice.service';
 import { OfficeService } from '../../services/office.service';
 import { IInvoice } from '../../interfaces/invoice';
 import { IOfficeAll } from '../../interfaces/office';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
 export class InvoiceEffects {
   private readonly actions: Actions = inject(Actions);
   private readonly invoiceService: InvoiceService = inject(InvoiceService);
   private readonly officeService: OfficeService = inject(OfficeService);
+  private readonly translateService: TranslateService = inject(TranslateService);
 
   findInvoiceReservation$ = createEffect(() => this.actions.pipe(
     ofType(getOfficeToInvoice),
@@ -46,6 +50,18 @@ export class InvoiceEffects {
     switchMap(({ id, office }) =>
       this.officeService.updateOffice(id, office).pipe(
         map(() => invoiceUpdateOfficeSuccess()),
+        catchError((err: HttpErrorResponse) => of(invoiceFailure({ error: err.error }))),
+      )),
+  ));
+
+  uploadInvoices$ = createEffect(() => this.actions.pipe(
+    ofType(uploadInvoices),
+    switchMap(({ officeId, blob, fileName, driveToken }) =>
+      this.invoiceService.uploadInvoices(officeId, blob, fileName, driveToken).pipe(
+        map(() => {
+          const message = this.translateService.instant('INVOICE.UPLOAD_SUCCESS', { name: fileName });
+          return invoiceSaveSuccess({ message, blob });
+        }),
         catchError((err: HttpErrorResponse) => of(invoiceFailure({ error: err.error }))),
       )),
   ));

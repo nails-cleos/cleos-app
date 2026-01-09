@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Store } from '@ngrx/store';
-import { TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule, provideNoopAnimations } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
 import { MonthSummaryComponent } from './month-summary.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
@@ -96,16 +96,11 @@ describe('MonthSummaryComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [
-        MonthSummaryComponent,
-        TranslateModule.forRoot({
-          loader: { provide: TranslateLoader, useClass: TranslateFakeLoader },
-        }),
-        BrowserAnimationsModule,
-      ],
+      imports: [MonthSummaryComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
+        provideNoopAnimations(),
       ],
     }).compileComponents();
 
@@ -114,9 +109,8 @@ describe('MonthSummaryComponent', () => {
     navigateSpy = spyOn(router, 'navigate');
 
     // Make sure translate has a language so component.language is meaningful
-    const translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en-GB');
-    translate.use('en-GB');
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
 
     fixture = TestBed.createComponent(MonthSummaryComponent);
     component = fixture.componentInstance;

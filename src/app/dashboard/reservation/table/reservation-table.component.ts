@@ -75,8 +75,8 @@ export class ReservationTableComponent {
   displayedColumns: string[] = ['position', 'customer', 'professional', 'timestamp', 'treatment', 'state', 'actions'];
   expanded?: IReservationAll;
 
-  dateFormat: string = this.translate.currentLang;
-  language: string = this.translate.currentLang;
+  dateFormat: string = this.translate.getCurrentLang();
+  language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect((onCleanup) => {

@@ -1,5 +1,5 @@
 <mat-nav-list style="width: 300px">
-  @for (menu of items(); track menu; let i = $index) {
+  @for (menu of items(); track menu.name; let i = $index) {
     @if (menu.subMenus && menu.subMenus.length) {
       <div>
         <mat-list-item (click)="toggleSubMenu(i)">

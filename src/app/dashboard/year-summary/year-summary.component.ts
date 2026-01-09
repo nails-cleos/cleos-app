@@ -132,7 +132,7 @@ export class YearSummaryComponent {
 
   isExportLoading = signal<boolean>(false);
   isLoading = signal<boolean>(false);
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect(() => {

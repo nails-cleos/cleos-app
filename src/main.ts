@@ -156,7 +156,7 @@ const providers = [
   importProvidersFrom(
     BrowserModule,
     TranslateModule.forRoot({
-      defaultLanguage: 'en',
+      fallbackLang: 'en',
       loader: {
         provide: TranslateLoader,
         useClass: TranslateLoaderFactory.forModule('common'),

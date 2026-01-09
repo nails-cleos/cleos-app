@@ -73,9 +73,8 @@ describe('ReservationsComponent', () => {
       ],
     }).compileComponents();
 
-    const translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en-GB');
-    translate.use('en-GB');
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
 
     fixture = TestBed.createComponent(ReservationsComponent);
     component = fixture.componentInstance;

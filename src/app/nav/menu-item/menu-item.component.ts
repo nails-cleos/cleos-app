@@ -43,7 +43,7 @@ export class MenuItemComponent {
   openSubMenus: { [key: number]: boolean } = {};
   openSubSubMenus: { [key: number]: { [key: number]: boolean } } = {};
 
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   constructor() {
   }

@@ -11,8 +11,8 @@ import {
 import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { combineLatestWith, of } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { getOfficeToInvoice, updateOfficeById } from '../store/invoice.actions';
-import { backendFormatDate, datesInSameWeek, newDateTimestamp } from '../util/dates';
+import { getOfficeToInvoice, updateOfficeById, uploadInvoices } from '../store/invoice.actions';
+import { backendFormatDate, datesInSameWeek, invoiceFormat, newDateTimestamp } from '../util/dates';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { PaymentType, PaymentTypeKey } from '../interfaces/payment';
 import { map, startWith } from 'rxjs/operators';
@@ -20,12 +20,12 @@ import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { TranslateService } from '@ngx-translate/core';
 import { detailExpandAnimation } from '../util/animation';
 import { SelectionModel } from '@angular/cdk/collections';
-import pdfMake, { fonts } from 'pdfmake/build/pdfmake';
+import pdfMake from 'pdfmake/build/pdfmake';
+import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { IInvoice } from '../interfaces/invoice';
 import { IOffice, IOfficeAll, Office } from '../interfaces/office';
 import { pdf } from '../util/invoice';
 import { requireMatch } from '../util/validators';
-import { environment } from '../../environments/environment';
 import { SharedModule } from '../shared/shared.module';
 import { TimeDetailPipe } from '../pipes/time-detail.pipe';
 import { getInvoicesPipe, getOfficesPipe } from '../store/selectors/invoice.selectors';
@@ -35,27 +35,22 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../interfaces/pagination';
 import { InvoiceState } from '../store/reducers/invoice.reducers';
 import { MAT_DATE_RANGE_SELECTION_STRATEGY } from '@angular/material/datepicker';
 import { MonthPeriodAdapter } from '../util/adapter/month-period-adapter.service';
+import { DriveAccessService } from '../services/drive-access.service';
 
-pdfMake.fonts = {
-  EBGaramond: {
-    normal: `${environment.appServer}/assets/fonts/EBGaramond-Regular.ttf`,
-    bold: `${environment.appServer}/assets/fonts/EBGaramond-Bold.ttf`,
-    italics: `${environment.appServer}/assets/fonts/EBGaramond-Italic.ttf`,
-    bolditalics: `${environment.appServer}/assets/fonts/EBGaramond-BoldItalic.ttf`,
-  },
-};
+// Set up VFS fonts for pdfMake (provides fallback Roboto fonts)
+(pdfMake as any).vfs = (pdfFonts as any).pdfMake?.vfs || pdfFonts;
 
 type InvoiceForm = {
   office: FormControl<IOfficeAll | undefined>;
   dateRange: FormGroup<DateRangeForm>;
   type: FormControl<PaymentType | ''>;
   startNumber: FormControl<number>;
-}
+};
 
 type DateRangeForm = {
   startDate: FormControl<Date | undefined>;
   endDate: FormControl<Date | undefined>;
-}
+};
 
 @Component({
   selector: 'app-invoice',
@@ -77,6 +72,7 @@ export class InvoiceComponent {
   private readonly store: Store<InvoiceState> = inject(Store<InvoiceState>);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly router: Router = inject(Router);
+  private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
 
   private allOffices$ = this.store.pipe(getOfficesPipe);
   private invoiceList$ = this.store.pipe(getInvoicesPipe);
@@ -162,7 +158,7 @@ export class InvoiceComponent {
       return invoice;
     });
   });
-  resultsLengthSignal = computed(() => this.invoiceListSignal()?.length || 0);
+  resultsLengthSignal = computed(() => this.dataSourceSignal()?.length || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
   typeInput = viewChild.required<ElementRef<HTMLInputElement>>('typeInput');
@@ -170,10 +166,12 @@ export class InvoiceComponent {
   displayedColumns: string[] = ['select', 'position', 'customer', 'timestamp', 'description', 'actions'];
   expandedInvoice?: IInvoice;
 
-  selection = new SelectionModel<IInvoice>(true, []);
+  selectionSignal = signal<SelectionModel<IInvoice>>(new SelectionModel<IInvoice>(true, []));
+  isAllSelected = computed(() => this.selectionSignal().selected.length === this.resultsLengthSignal());
+  isIndeterminate = computed(() => this.selectionSignal().selected.length > 0 && !this.isAllSelected());
 
-  dateFormat: string = this.translate.currentLang;
-  language: string = this.translate.currentLang;
+  dateFormat: string = this.translate.getCurrentLang();
+  language: string = this.translate.getCurrentLang();
 
   constructor() {
     const initial = this.allPaymentTypesSignal();
@@ -211,6 +209,10 @@ export class InvoiceComponent {
         this.store.dispatch(getOfficeToInvoice({ officeId, start, end, types }));
       }
     });
+
+    effect(() => {
+      this.driveAccessService.requestAccessIfNeeded();
+    });
   }
 
   get getForm(): InvoiceForm {
@@ -221,24 +223,27 @@ export class InvoiceComponent {
     return this.getForm.dateRange.controls;
   }
 
-  print(): void {
+  async print() {
     const start = this.getForm.startNumber.value;
 
     const selectedOffice = this.getForm.office.value;
     if (!selectedOffice) {
       return;
     }
-    if (this.selection.selected.length === this.resultsLengthSignal()) {
-      const lastInvoiceNumber = start + this.selection.selected.length;
+    if (this.selectionSignal().selected.length === this.resultsLengthSignal()) {
       const office: IOffice = new Office();
-      const id = selectedOffice.id;
-      office.lastInvoiceNumber = lastInvoiceNumber;
-      this.store.dispatch(updateOfficeById({ id, office }));
+      office.lastInvoiceNumber = start + this.selectionSignal().selected.length;
+
+      this.store.dispatch(updateOfficeById({ id: selectedOffice.id, office }));
     }
-    const printPdf = pdf(this.selection.selected, selectedOffice, start, this.getDateRangeForm.startDate.value!,
-      this.getDateRangeForm.endDate.value!);
-    pdfMake.createPdf(printPdf, undefined, fonts).open();
-    return;
+    await this.loadFonts();
+    const fileName = `Sales ${invoiceFormat(this.getDateRangeForm.startDate.value!)}.pdf`;
+    const printPdf: any = pdfMake.createPdf(pdf(this.selectionSignal().selected, selectedOffice, start, fileName));
+
+    const driveToken = this.driveAccessService.driveTokenSignal();
+    printPdf.getBlob().then((blob: Blob) => this.store.dispatch(
+      uploadInvoices({ officeId: selectedOffice.id, blob, fileName, driveToken }),
+    ));
   }
 
   keyDownHandler = (event: KeyboardEvent): void => {
@@ -271,21 +276,29 @@ export class InvoiceComponent {
     this.getForm.type.setValue('');
   };
 
-  // numSelected === numRows
-  isAllSelected = (): boolean => this.selection.selected.length === this.resultsLengthSignal();
-
   toggleAllRows = (): void => {
-    if (this.isAllSelected()) {
-      this.selection.clear();
-      return;
-    }
+    const invoiceList = this.dataSourceSignal() || [];
+    const current = this.selectionSignal();
 
-    this.selection.select(...this.invoiceListSignal()!);
+    if (current.selected.length === invoiceList.length) {
+      this.selectionSignal.set(new SelectionModel<IInvoice>(true, []));
+    } else {
+      this.selectionSignal.set(new SelectionModel<IInvoice>(true, [...invoiceList]));
+    }
+  };
+
+  toggleRow = (row: IInvoice): void => {
+    const current = this.selectionSignal();
+    if (current.isSelected(row)) {
+      this.selectionSignal.set(new SelectionModel<IInvoice>(true, current.selected.filter(prev => prev !== row)));
+    } else {
+      this.selectionSignal.set(new SelectionModel<IInvoice>(true, [...current.selected, row]));
+    }
   };
 
   checkboxLabel = (row?: IInvoice): string =>
     !row ? `${this.isAllSelected() ? 'deselect' : 'select'} all` :
-      `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.position + 1}`;
+      `${this.selectionSignal().isSelected(row) ? 'deselect' : 'select'} row ${row.position + 1}`;
 
   goToPath = (invoice: IInvoice): void => {
     this.router.navigate(invoice.paths);
@@ -298,4 +311,36 @@ export class InvoiceComponent {
 
   private filterOffice = (name: string, offices: IOfficeAll[]): IOfficeAll[] | undefined => offices?.filter(
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+
+  private loadFonts = async () => {
+    await this.loadFont('EBGaramond-Regular.ttf', '/assets/fonts/EBGaramond-Regular.ttf');
+    await this.loadFont('EBGaramond-Bold.ttf', '/assets/fonts/EBGaramond-Bold.ttf');
+    await this.loadFont('EBGaramond-Italic.ttf', '/assets/fonts/EBGaramond-Italic.ttf');
+    await this.loadFont('EBGaramond-BoldItalic.ttf', '/assets/fonts/EBGaramond-BoldItalic.ttf');
+
+    // Configure fonts after loading
+    pdfMake.fonts = {
+      EBGaramond: {
+        normal: 'EBGaramond-Regular.ttf',
+        bold: 'EBGaramond-Bold.ttf',
+        italics: 'EBGaramond-Italic.ttf',
+        bolditalics: 'EBGaramond-BoldItalic.ttf',
+      },
+      Roboto: {
+        normal: 'Roboto-Regular.ttf',
+        bold: 'Roboto-Medium.ttf',
+        italics: 'Roboto-Italic.ttf',
+        bolditalics: 'Roboto-MediumItalic.ttf',
+      },
+    };
+  };
+
+  private loadFont = async (name: string, url: string) => {
+    const res = await fetch(url);
+    const buffer = await res.arrayBuffer();
+    pdfMake.vfs[name] = btoa(
+      new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), ''),
+    );
+    (pdfMake as any).virtualfs.storage[name] = new Uint8Array(buffer);
+  };
 }

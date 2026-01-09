@@ -203,8 +203,8 @@ export class CalendarComponent {
   calendarEventsSignal = signal<CalendarEvent[]>([]);
   calendarDaySignal = signal<IDay | undefined>(undefined);
   calendarRoomSignal = signal<IRoomAll | undefined>(undefined);
-  locale: string = this.translate.currentLang;
-  language: string = this.translate.currentLang;
+  locale: string = this.translate.getCurrentLang();
+  language: string = this.translate.getCurrentLang();
   professionalId?: string;
 
   refresh: Subject<any> = new Subject();

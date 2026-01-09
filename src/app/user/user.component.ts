@@ -197,7 +197,7 @@ export class UserComponent {
     }
     const userSignal = this.userSignal();
     const user: IUser = new User();
-    user.lang = valueChange(this.getForm.lang.value, userSignal?.locale) || this.translate.currentLang;
+    user.lang = valueChange(this.getForm.lang.value, userSignal?.locale) || this.translate.getCurrentLang();
     user.email = fieldChange(this.getForm.email, userSignal?.email);
     user.displayName = fieldChange(this.getForm.displayName, userSignal?.displayName);
     user.phone = fieldChange(this.getForm.phone, userSignal?.phone);

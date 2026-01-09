@@ -88,7 +88,7 @@ export class OfficeComponent {
       })),
   );
 
-  private readonly language: string = this.translate.currentLang;
+  private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect(() => {

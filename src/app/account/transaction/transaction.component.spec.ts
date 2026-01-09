@@ -1,15 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { TransactionComponent } from './transaction.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { IAccountAll, ITransaction } from '../../interfaces/account';
-import { PaymentOption, PaymentType } from '../../interfaces/payment';
+import { IPaymentOption, PaymentOption, PaymentType } from '../../interfaces/payment';
 import { createTransaction, getAccount, paymentOptions } from '../../store/account.actions';
 import { AccountState } from '../../store/reducers/account.reducers';
 import { signal } from '@angular/core';
@@ -87,12 +85,7 @@ describe('TransactionComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [
-        TransactionComponent,
-        TranslateModule.forRoot(),
-        ReactiveFormsModule,
-        BrowserAnimationsModule,
-      ],
+      imports: [TransactionComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
@@ -102,7 +95,6 @@ describe('TransactionComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.setDefaultLang('en-GB');
     translateService.use('en-GB');
 
     fixture = TestBed.createComponent(TransactionComponent);
@@ -124,10 +116,9 @@ describe('TransactionComponent', () => {
   });
 
   it('should initialize with default values', () => {
-    expect(component.hasAdminRole()).toBeFalse();
     expect(component.amountMin).toBe(100);
     expect(component.language).toBe('en-GB');
-    expect(component.types).toEqual([PaymentType.cash, PaymentType.transfer]);
+    expect(component.types).toEqual([{ type: PaymentType.cash }, { type: PaymentType.transfer }] as IPaymentOption[]);
     expect(component.errors()).toEqual({});
   });
 
@@ -344,7 +335,14 @@ describe('TransactionComponent', () => {
   it('should dispatch paymentOptions action when hasAdminRole() is false and computed runs', () => {
     storeSpy.dispatch.calls.reset();
 
+    authUserSignal.update(prev => ({ ...prev, hasAdminRole: true }));
+    fixture.detectChanges();
+
+    expect(component.hasAdminRole()).toBeTrue();
+    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(paymentOptions());
+
     authUserSignal.update(prev => ({ ...prev, hasAdminRole: false }));
+    fixture.detectChanges();
 
     expect(component.hasAdminRole()).toBeFalse();
 

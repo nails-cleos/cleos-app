@@ -61,9 +61,8 @@ describe('ColorComponent', () => {
       ],
     }).compileComponents();
 
-    const translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en-GB');
-    translate.use('en-GB');
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
 
     fixture = TestBed.createComponent(ColorComponent);
     component = fixture.componentInstance;

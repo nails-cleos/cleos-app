@@ -22,6 +22,7 @@
     "PAYMENT": {
       "SEARCH": "Buscar por tipo de pago",
       "FIELD": "Tipo de pago"
-    }
+    },
+    "UPLOAD_SUCCESS": "Factura {{name}} subida exitosamente"
   }
 }

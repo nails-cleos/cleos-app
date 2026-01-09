@@ -34,7 +34,9 @@
       @if (isAddMode || expense) {
         <mat-card-content>
           <div class="inner-container">
-            <app-file-drop (fileSelected)="onSelectedFile($event)" [animate]="false"></app-file-drop>
+            @if (isAddMode) {
+              <app-file-drop (fileSelected)="onSelectedFile($event)" [animate]="false"></app-file-drop>
+            }
             <div class="side-by-side-fields">
               <mat-form-field appearance="outline" class="field">
                 <mat-label>{{ 'EXPENSE.INVOICE.FIELD' | translate }}</mat-label>
@@ -86,87 +88,85 @@
             </div>
           </div>
 
-          <div class="link-container">
-            <div formArrayName="totals" class="array-form">
-              @for (typeGroup of totals.controls; track typeGroup; let i = $index) {
-                @let totalForm = typeGroup.controls;
-                <div [formGroupName]="i" class="array-group top">
-                  <div class="side-by-side-fields">
-                    <mat-form-field appearance="outline" class="field" style="height: 50%">
-                      <mat-label>{{ 'EXPENSE.TYPE.FIELD' | translate }}</mat-label>
-                      <mat-select [formControl]="totalForm.type" required>
-                        @for (group of types() | keyvalue; track group) {
-                          <mat-optgroup [label]="'COMMON.EXPENSE.TYPE.' + group.key | translate">
-                            @for (type of group.value; track type) {
-                              <mat-option [value]="type">{{ 'COMMON.EXPENSE.TYPE.' + type | translate }}
-                              </mat-option>
-                            }
-                          </mat-optgroup>
-                        }
-                      </mat-select>
-                      @if (totalForm.type.hasError('required')) {
-                        <mat-error [innerHTML]="'EXPENSE.TYPE.REQUIRED' | translate"></mat-error>
-                      } @else if (errors()['type']) {
-                        <mat-error>{{ errors()['type'] }}</mat-error>
+          <div formArrayName="totals" class="array-form">
+            @for (typeGroup of totals.controls; track typeGroup; let i = $index) {
+              @let totalForm = typeGroup.controls;
+              <div [formGroupName]="i" class="array-group top">
+                <div class="side-by-side-fields">
+                  <mat-form-field appearance="outline" class="field" style="height: 50%">
+                    <mat-label>{{ 'EXPENSE.TYPE.FIELD' | translate }}</mat-label>
+                    <mat-select [formControl]="totalForm.type" required>
+                      @for (group of types() | keyvalue; track group) {
+                        <mat-optgroup [label]="'COMMON.EXPENSE.TYPE.' + group.key | translate">
+                          @for (type of group.value; track type) {
+                            <mat-option [value]="type">{{ 'COMMON.EXPENSE.TYPE.' + type | translate }}
+                            </mat-option>
+                          }
+                        </mat-optgroup>
                       }
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="field">
-                      <mat-label>{{ 'EXPENSE.DESCRIPTION.FIELD' | translate }}</mat-label>
-                      <textarea #message [formControl]="totalForm.description" matInput maxlength="256"></textarea>
-                      <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
-                    </mat-form-field>
-                  </div>
-                  <div class="side-by-side-fields">
-                    <mat-form-field appearance="outline" class="field">
-                      <mat-label>{{ 'EXPENSE.GROSS.FIELD' | translate }}</mat-label>
-                      <input [id]="'gross' + i" [formControl]="totalForm.gross" matInput required appTwoDigits
-                             [allowNegatives]="true" #gross (focusout)="validateInputValue(gross, i)">
-                      <mat-icon matPrefix>{{ currentCurrencyIcon }}</mat-icon>
-                      @if (totalForm.gross.hasError('required')) {
-                        <mat-error [innerHTML]="'EXPENSE.GROSS.REQUIRED' | translate"></mat-error>
-                      } @else if (errors()['gross' + i]) {
-                        <mat-error>{{ errors()['gross' + i] }}</mat-error>
-                      }
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="field">
-                      <mat-label>{{ 'EXPENSE.BTW.FIELD' | translate }}</mat-label>
-                      <input [id]="'btw' + i" [formControl]="totalForm.btw" matInput required appTwoDigits #btw
-                             (focusout)="validateInputValue(btw, i, 0, 100)">
-                      <mat-icon matSuffix>percent</mat-icon>
-                      @if (totalForm.btw.hasError('required')) {
-                        <mat-error [innerHTML]="'EXPENSE.BTW.REQUIRED' | translate"></mat-error>
-                      } @else if (errors()['btw' + i]) {
-                        <mat-error>{{ errors()['btw' + i] }}</mat-error>
-                      } @else if (totalForm.btw.hasError('duplicateBtw')) {
-                        <mat-error [innerHTML]="'EXPENSE.BTW.DUPLICATED' | translate"></mat-error>
-                      }
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="field">
-                      <mat-label>{{ 'EXPENSE.NET.FIELD' | translate }}</mat-label>
-                      <input disabled [value]="totalMap.get(i)?.net" matInput appTwoDigits>
-                      <mat-icon matPrefix>{{ currentCurrencyIcon }}</mat-icon>
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="field">
-                      <mat-label>{{ 'EXPENSE.BTW.FIELD' | translate }}</mat-label>
-                      <input disabled [value]="totalMap.get(i)?.btwValue" matInput appTwoDigits>
-                      <mat-icon matPrefix>{{ currentCurrencyIcon }}</mat-icon>
-                    </mat-form-field>
-                  </div>
-                  <div class="remove-button" style="margin: 0 10px 10px 0">
-                    <button [disabled]="totals.controls.length === 1" (click)="removeExpense(i)" mat-fab
-                            color="warn">
-                      <mat-icon matIconPrefix>delete</mat-icon>
-                    </button>
-                  </div>
+                    </mat-select>
+                    @if (totalForm.type.hasError('required')) {
+                      <mat-error [innerHTML]="'EXPENSE.TYPE.REQUIRED' | translate"></mat-error>
+                    } @else if (errors()['type']) {
+                      <mat-error>{{ errors()['type'] }}</mat-error>
+                    }
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="field">
+                    <mat-label>{{ 'EXPENSE.DESCRIPTION.FIELD' | translate }}</mat-label>
+                    <textarea #message [formControl]="totalForm.description" matInput maxlength="256"></textarea>
+                    <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
+                  </mat-form-field>
                 </div>
-              }
-
-              <div class="add-button-container">
-                <button (click)="addDate()" [disabled]="isAddButtonDisabled" mat-fab color="primary"
-                        class="add-button">
-                  <mat-icon matIconPrefix>list_alt_add</mat-icon>
-                </button>
+                <div class="side-by-side-fields">
+                  <mat-form-field appearance="outline" class="field">
+                    <mat-label>{{ 'EXPENSE.GROSS.FIELD' | translate }}</mat-label>
+                    <input [id]="'gross' + i" [formControl]="totalForm.gross" matInput required appTwoDigits
+                           [allowNegatives]="true" #gross (focusout)="validateInputValue(gross, i)">
+                    <mat-icon matPrefix>{{ currentCurrencyIcon }}</mat-icon>
+                    @if (totalForm.gross.hasError('required')) {
+                      <mat-error [innerHTML]="'EXPENSE.GROSS.REQUIRED' | translate"></mat-error>
+                    } @else if (errors()['gross' + i]) {
+                      <mat-error>{{ errors()['gross' + i] }}</mat-error>
+                    }
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="field">
+                    <mat-label>{{ 'EXPENSE.BTW.FIELD' | translate }}</mat-label>
+                    <input [id]="'btw' + i" [formControl]="totalForm.btw" matInput required appTwoDigits #btw
+                           (focusout)="validateInputValue(btw, i, 0, 100)">
+                    <mat-icon matSuffix>percent</mat-icon>
+                    @if (totalForm.btw.hasError('required')) {
+                      <mat-error [innerHTML]="'EXPENSE.BTW.REQUIRED' | translate"></mat-error>
+                    } @else if (errors()['btw' + i]) {
+                      <mat-error>{{ errors()['btw' + i] }}</mat-error>
+                    } @else if (totalForm.btw.hasError('duplicateBtw')) {
+                      <mat-error [innerHTML]="'EXPENSE.BTW.DUPLICATED' | translate"></mat-error>
+                    }
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="field">
+                    <mat-label>{{ 'EXPENSE.NET.FIELD' | translate }}</mat-label>
+                    <input disabled [value]="totalMap.get(i)?.net" matInput appTwoDigits>
+                    <mat-icon matPrefix>{{ currentCurrencyIcon }}</mat-icon>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="field">
+                    <mat-label>{{ 'EXPENSE.BTW.FIELD' | translate }}</mat-label>
+                    <input disabled [value]="totalMap.get(i)?.btwValue" matInput appTwoDigits>
+                    <mat-icon matPrefix>{{ currentCurrencyIcon }}</mat-icon>
+                  </mat-form-field>
+                </div>
+                <div class="remove-button" style="margin: 0 10px 10px 0">
+                  <button [disabled]="totals.controls.length === 1" (click)="removeExpense(i)" mat-fab
+                          color="warn">
+                    <mat-icon matIconPrefix>delete</mat-icon>
+                  </button>
+                </div>
               </div>
+            }
+
+            <div class="add-button-container">
+              <button (click)="addDate()" [disabled]="isAddButtonDisabled" mat-fab color="primary"
+                      class="add-button">
+                <mat-icon matIconPrefix>list_alt_add</mat-icon>
+              </button>
             </div>
           </div>
           <div class="side-by-side-fields top">

@@ -87,7 +87,7 @@ export class OptionComponent {
   private readonly steps: IStep[];
 
   private reservationId?: string;
-  private readonly language: string = this.translate.currentLang;
+  private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
     const preview = new Step(1, 'preview', () => this.pay());

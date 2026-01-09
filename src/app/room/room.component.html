@@ -113,7 +113,7 @@
                            [matChipInputFor]="chipList">
                   </mat-chip-grid>
                   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-                    @for (professional of sortProfessionals(filteredProfessionalSignal()); track professional) {
+                    @for (professional of sortProfessionals(filteredProfessionalSignal()); track professional.id) {
                       <mat-option [value]="professional">{{ professional.displayName }}</mat-option>
                     }
                   </mat-autocomplete>
@@ -300,9 +300,11 @@
                 <mat-error [innerHTML]="'ROOM.AVAILABILITY.REQUIRED' | translate" class="divider"></mat-error>
               }
             </mat-list>
-            <app-google-map [addressFormGroup]="googleMapForm" [latitudeMarker]="room?.address?.location?.y"
-                            [longitudeMarker]="room?.address?.location?.x" (addressEmitter)="getAddress($event)"
-                            [markInfo]="'<b>' + room?.address?.name + '</b>'"></app-google-map>
+            @if (room && room.address) {
+              <app-google-map [addressFormGroup]="googleMapForm" [latitudeMarker]="room.address.location.y"
+                              [longitudeMarker]="room.address.location.x" (addressEmitter)="getAddress($event)"
+                              [markInfo]="'<b>' + room.address.name + '</b>'"></app-google-map>
+            }
             @if (errors()['location']) {
               <mat-error class="divider">{{ errors()['location'] }}</mat-error>
             }

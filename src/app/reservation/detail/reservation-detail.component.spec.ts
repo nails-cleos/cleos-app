@@ -139,7 +139,7 @@ describe('ReservationDetailComponent', () => {
     histories$ = new BehaviorSubject(undefined);
     paymentOptions$ = new BehaviorSubject(undefined);
 
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch', 'pipe']);
+    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
@@ -184,7 +184,6 @@ describe('ReservationDetailComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.setDefaultLang('en-GB');
     translateService.use('en-GB');
 
     const router = TestBed.inject(Router);

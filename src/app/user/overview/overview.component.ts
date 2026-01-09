@@ -67,7 +67,7 @@ export class OverviewComponent {
   charts: IChart[] = [{} as IChart, {} as IChart];
 
   upcoming: number[] = [];
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   layoutSignal = computed(() => {
     if (this.breakpointsSignal().matches) {

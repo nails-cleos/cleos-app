@@ -70,8 +70,8 @@ export class TransactionViewComponent {
   ];
 
   expandedTransaction?: ITransaction;
-  dateFormat = this.translate.currentLang;
-  language = this.translate.currentLang;
+  dateFormat = this.translate.getCurrentLang();
+  language = this.translate.getCurrentLang();
 
   constructor() {
     effect((onCleanup) => {

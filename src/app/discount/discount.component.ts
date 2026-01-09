@@ -86,7 +86,7 @@ export class DiscountComponent {
   isAddModeSignal = computed(() => !this.discountIdSignal());
   errors = signal<Record<string, unknown>>({});
 
-  private readonly language: string = this.translate.currentLang;
+  private readonly language: string = this.translate.getCurrentLang();
 
   types = DiscountType;
 

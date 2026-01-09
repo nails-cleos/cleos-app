@@ -88,7 +88,7 @@ export class DashboardEventComponent {
   professionals: IProfessional[] = [];
   calendar: IDataEvent = new DataEvent([], 0, this.viewDate(), 0, false);
 
-  locale: string = this.translate.currentLang;
+  locale: string = this.translate.getCurrentLang();
 
   prevBtnDisabled = false;
   nextBtnDisabled = false;
@@ -101,7 +101,7 @@ export class DashboardEventComponent {
   private readonly startedText: string = this.translate.instant('DASHBOARD.ROOM.STARTED');
   private readonly elapsedText: string = this.translate.instant('DASHBOARD.ROOM.ELAPSED');
   private readonly finishInText: string = this.translate.instant('DASHBOARD.ROOM.FINISH_IN');
-  private readonly language: string = this.translate.currentLang;
+  private readonly language: string = this.translate.getCurrentLang();
 
   private calendarReady = signal(false);
 

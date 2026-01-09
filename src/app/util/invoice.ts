@@ -1,7 +1,7 @@
 import { IUserAll } from '../interfaces/user';
 import { currencySymbol } from './helper';
 import { IInvoice, IItem, IRoomInvoice, ITotals } from '../interfaces/invoice';
-import { API_LOCALE, dayViewTitle, invoiceTitle, newDateTimestamp } from './dates';
+import { API_LOCALE, dayViewTitle, newDateTimestamp } from './dates';
 import { environment } from '../../environments/environment';
 import { IOfficeAll } from '../interfaces/office';
 
@@ -231,7 +231,7 @@ const createTotals = (totals: ITotals, currency: string, titleSubTotal: string, 
 };
 
 // TODO translate
-export const pdf = (invoices: IInvoice[], office: IOfficeAll, start: number, startDate: Date, endDate: Date): any => {
+export const pdf = (invoices: IInvoice[], office: IOfficeAll, start: number, fileName: string): any => {
   let content: any[] = [];
   invoices.map((invoice, index) => {
     const next = start + invoice.position;
@@ -280,8 +280,8 @@ export const pdf = (invoices: IInvoice[], office: IOfficeAll, start: number, sta
 
   return {
     info: {
-      fileName: `${ invoiceTitle(startDate) } - ${ invoiceTitle(endDate) }`,
-      title: `${ invoiceTitle(startDate) } - ${ invoiceTitle(endDate) }`,
+      fileName: fileName,
+      title: fileName,
       author: office.manager.displayName,
       subject: office.subject,
     },

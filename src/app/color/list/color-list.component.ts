@@ -63,7 +63,7 @@ export class ColorListComponent {
 
   expandedColor?: IColor;
 
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect((onCleanup) => {

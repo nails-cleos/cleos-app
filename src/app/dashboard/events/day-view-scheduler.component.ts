@@ -134,6 +134,10 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent {
     });
   }
 
+  private get schedulerUtils(): DayViewSchedulerCalendarUtils {
+    return this.utils as DayViewSchedulerCalendarUtils;
+  }
+
   trackByProfessionalId = (_: number, row: IProfessional) => row.id;
 
   getDayColumnWidth = (
@@ -185,35 +189,33 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent {
     this.dayEndHour = day.dayEndHour;
     this.dayEndMinute = day.dayEndMinute;
     this.hourSegments = 4;
-    return {
+    return this.schedulerUtils.getWeekView({
       professionals: this.professionals(),
-      ...this.utils.getWeekView({
-        events,
-        viewDate: this.viewDate,
-        weekStartsOn: this.weekStartsOn,
-        excluded: this.excludeDays,
-        precision: this.precision,
-        absolutePositionedEvents: true,
-        hourSegments: this.hourSegments,
-        dayStart: {
-          hour: this.dayStartHour,
-          minute: this.dayStartMinute,
-        },
-        dayEnd: {
-          hour: this.dayEndHour,
-          minute: this.dayEndMinute,
-        },
-        segmentHeight: this.hourSegmentHeight,
-        weekendDays: this.weekendDays,
-        ...getWeekViewPeriod(
-          this.dateAdapter,
-          this.viewDate,
-          this.weekStartsOn,
-          this.excludeDays,
-          this.daysInWeek,
-        ),
-      }),
-    };
+      events,
+      viewDate: this.viewDate,
+      weekStartsOn: this.weekStartsOn,
+      excluded: this.excludeDays,
+      precision: this.precision,
+      absolutePositionedEvents: true,
+      hourSegments: this.hourSegments,
+      dayStart: {
+        hour: this.dayStartHour,
+        minute: this.dayStartMinute,
+      },
+      dayEnd: {
+        hour: this.dayEndHour,
+        minute: this.dayEndMinute,
+      },
+      segmentHeight: this.hourSegmentHeight,
+      weekendDays: this.weekendDays,
+      ...getWeekViewPeriod(
+        this.dateAdapter,
+        this.viewDate,
+        this.weekStartsOn,
+        this.excludeDays,
+        this.daysInWeek,
+      ),
+    });
   };
 
   private getDraggedProfessionalColumn = (

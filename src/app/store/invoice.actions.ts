@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { IError } from '../interfaces/common';
+import { IError, IResponseSuccess } from '../interfaces/common';
 import { IInvoice } from '../interfaces/invoice';
 import { IOffice, IOfficeAll } from '../interfaces/office';
 
@@ -10,6 +10,8 @@ enum InvoiceActionTypes {
   invoiceSuccess = '[Invoice] Success',
   updateOfficeById = '[Invoice] Update office by id',
   invoiceUpdateOfficeSuccess = '[Invoice] Update office Success',
+  uploadInvoices = '[Invoice] Upload invoices',
+  invoiceSaveSuccess = '[Invoice] Save Success',
   invoiceFailure = '[Invoice] Failure',
   clean = '[Invoice] Clean'
 }
@@ -41,6 +43,16 @@ export const invoiceOfficesSuccess = createAction(
 export const updateOfficeById = createAction(
   InvoiceActionTypes.updateOfficeById,
   props<{ id: string, office: IOffice }>(),
+);
+
+export const uploadInvoices = createAction(
+  InvoiceActionTypes.uploadInvoices,
+  props<{ officeId: string; blob: Blob; fileName: string; driveToken?: string }>(),
+);
+
+export const invoiceSaveSuccess = createAction(
+  InvoiceActionTypes.invoiceSaveSuccess,
+  props<IResponseSuccess>(),
 );
 
 export const invoiceUpdateOfficeSuccess = createAction(InvoiceActionTypes.invoiceUpdateOfficeSuccess);

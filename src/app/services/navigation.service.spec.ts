@@ -50,7 +50,6 @@ describe('NavigationService', () => {
       ],
     });
     const translateService = TestBed.inject(TranslateService);
-    translateService.setDefaultLang('en-GB');
     translateService.use('en-GB');
 
     service = TestBed.inject(NavigationService);

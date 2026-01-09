@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, Injector, runInInjectionContext } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { subscribeNotification } from '../store/notification.actions';
@@ -13,6 +13,8 @@ import { NotificationState } from '../store/reducers/notification.reducers';
   providedIn: 'root',
 })
 export class MessagingService {
+  private readonly injector = inject(Injector);
+
   private readonly store: Store<NotificationState> = inject(Store<NotificationState>);
   private readonly messaging: Messaging = inject(Messaging);
   private readonly auth: Auth = inject(Auth);
@@ -42,7 +44,9 @@ export class MessagingService {
    * hook method when new notification received in foreground
    */
   receiveMessage = (): void => {
-    this.message$ = new Observable(sub => onMessage(this.messaging, it => sub.next(it)));
+    this.message$ = new Observable(sub =>
+      runInInjectionContext(this.injector, () => onMessage(this.messaging, it => sub.next(it))),
+    );
   };
 
   /**
@@ -51,22 +55,24 @@ export class MessagingService {
    * @param user user
    */
   requestPermission = (user: any): void => {
-    getTokenAppCheck(this.appCheck).then(appCheckToken => {
-      if (appCheckToken) {
-        Notification.requestPermission().then(value => {
-          if (value === 'granted') {
-            navigator.serviceWorker.register(environment.firebaseMessaging, { type: 'module', scope: '__' })
-              .then(serviceWorkerRegistration =>
-                getToken(this.messaging, {
-                  serviceWorkerRegistration,
-                  vapidKey: environment.firebase.vapidKey,
-                }).then(token => {
-                  this.updateToken(user, token);
-                }),
-              );
-          }
-        });
-      }
+    runInInjectionContext(this.injector, () => {
+      getTokenAppCheck(this.appCheck).then(appCheckToken => {
+        if (appCheckToken) {
+          Notification.requestPermission().then(value => {
+            if (value === 'granted') {
+              navigator.serviceWorker.register(environment.firebaseMessaging, { type: 'module', scope: '__' })
+                .then(serviceWorkerRegistration =>
+                  getToken(this.messaging, {
+                    serviceWorkerRegistration,
+                    vapidKey: environment.firebase.vapidKey,
+                  }).then(token => {
+                    this.updateToken(user, token);
+                  }),
+                );
+            }
+          });
+        }
+      });
     });
   };
 }

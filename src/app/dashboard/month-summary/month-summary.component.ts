@@ -124,8 +124,8 @@ export class MonthSummaryComponent {
   locale = 'es';
   isLoading = false;
 
-  dateFormat: string = this.translate.currentLang;
-  readonly language: string = this.translate.currentLang;
+  dateFormat: string = this.translate.getCurrentLang();
+  readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect(() => {

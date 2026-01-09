@@ -33,7 +33,7 @@ export class NotificationsComponent {
   private notificationsSignal = toSignal(this.notifications$);
 
   notifications = signal<INotification[]>([]);
-  dateFormat: string = this.translate.currentLang;
+  dateFormat: string = this.translate.getCurrentLang();
   showMore = false;
   loadingNotifications?: Array<INotification>;
   badge = 0;

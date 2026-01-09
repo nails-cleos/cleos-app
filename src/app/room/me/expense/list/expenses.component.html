@@ -9,7 +9,7 @@
         </label>
       </mat-form-field>
       <mat-form-field appearance="outline">
-        <mat-label>{{ 'SUMMARY.MONTHLY.SELECT.DATE' | translate }}</mat-label>
+        <mat-label>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}</mat-label>
         <input matInput [matDatepicker]="dp" [formControl]="getForm.date" (keydown)="keyDownHandler($event)">
         <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
         <mat-datepicker #dp startView="year" (monthSelected)="setMonthAndYear($event, dp)">

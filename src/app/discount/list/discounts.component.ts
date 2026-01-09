@@ -79,7 +79,7 @@ export class DiscountsComponent {
   displayedColumns: string[] = ['position', 'name', 'description', 'type', 'amount', 'actions'];
   expanded?: IDiscount;
 
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect((onCleanup) => {

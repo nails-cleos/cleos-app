@@ -4,17 +4,20 @@ import {
   getOfficeToInvoice,
   invoiceFailure,
   invoiceOfficesSuccess,
+  invoiceSaveSuccess,
   invoiceSuccess,
   updateOfficeById,
+  uploadInvoices,
 } from '../invoice.actions';
 import { IOfficeAll } from '../../interfaces/office';
 import { IInvoice } from '../../interfaces/invoice';
-import { IError } from '../../interfaces/common';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
 
 export const INVOICE_FEATURE_KEY = 'invoice';
 
 export interface InvoiceState {
+  response?: IResponseSuccess;
   data?: IInvoice[];
   offices?: IOfficeAll[];
   error?: IError;
@@ -23,6 +26,7 @@ export interface InvoiceState {
 }
 
 export const initialState: InvoiceState = {
+  response: undefined,
   data: undefined,
   error: undefined,
   subErrors: undefined,
@@ -37,34 +41,55 @@ export const invoiceReducer = createReducer(
     data: [{} as IInvoice, {} as IInvoice, {} as IInvoice],
     error: undefined,
     subErrors: undefined,
+    response: undefined,
   })),
   on(invoiceSuccess, (state, { data }) => ({
     ...state,
     data: data,
     error: undefined,
     subErrors: undefined,
+    response: undefined,
   })),
   on(getAllMyOffices, (state) => ({
     ...state,
     offices: undefined,
     error: undefined,
     subErrors: undefined,
+    response: undefined,
   })),
   on(invoiceOfficesSuccess, (state, { offices }) => ({
     ...state,
     offices: offices,
     error: undefined,
     subErrors: undefined,
+    response: undefined,
   })),
   on(invoiceFailure, (state, { error }) => ({
     ...state,
     error: error,
     subErrors: error.subErrors,
+    response: undefined,
+    isLoading: false,
   })),
   on(updateOfficeById, (state) => ({
     ...state,
     error: undefined,
     subErrors: undefined,
+    response: undefined,
+  })),
+  on(uploadInvoices, (state) => ({
+    ...state,
+    isLoading: true,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(invoiceSaveSuccess, (state, action) => ({
+    ...state,
+    isLoading: false,
+    error: undefined,
+    subErrors: undefined,
+    response: action,
   })),
   on(clean, () => initialState),
 );

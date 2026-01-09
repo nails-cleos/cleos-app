@@ -104,8 +104,8 @@ export class SearchComponent {
   displayedColumns: string[] = ['position', 'customer', 'timestamp', 'state', 'treatment', 'actions'];
   expandedReservation?: IReservation;
 
-  dateFormat: string = this.translate.currentLang;
-  language: string = this.translate.currentLang;
+  dateFormat: string = this.translate.getCurrentLang();
+  language: string = this.translate.getCurrentLang();
 
   form: FormGroup<SearchForm> = this.formBuilder.group<SearchForm>({
     customer: this.formBuilder.control(undefined, {

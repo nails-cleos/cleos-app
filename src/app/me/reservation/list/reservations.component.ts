@@ -93,8 +93,8 @@ export class ReservationsComponent {
 
   displayedColumns: string[] = ['position', 'professional', 'timestamp', 'treatment', 'state', 'actions'];
 
-  dateFormat: string = this.translate.currentLang;
-  language: string = this.translate.currentLang;
+  dateFormat: string = this.translate.getCurrentLang();
+  language: string = this.translate.getCurrentLang();
 
   private showReview = true;
 

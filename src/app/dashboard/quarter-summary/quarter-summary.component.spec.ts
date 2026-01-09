@@ -112,7 +112,7 @@ describe('QuarterSummaryComponent', () => {
     navigationParams$ = new BehaviorSubject<any>(undefined);
 
     const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch', 'pipe']);
+    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
@@ -154,9 +154,8 @@ describe('QuarterSummaryComponent', () => {
 
     fixture = TestBed.createComponent(QuarterSummaryComponent);
 
-    const translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en-GB');
-    translate.use('en-GB');
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
     component = fixture.componentInstance;
   });
 

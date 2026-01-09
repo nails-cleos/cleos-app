@@ -94,7 +94,7 @@ export class QuarterSummaryComponent {
   quarterSummaryTotals = signal<ISummaryTotals>(new SummaryTotals());
   isLoading = signal<boolean>(false);
 
-  readonly language: string = this.translate.currentLang;
+  readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
     // Effect to handle navigation params

@@ -103,7 +103,7 @@
 @let cardLayout = cardLayoutSignal();
 <mat-grid-list [cols]="cardLayout.columns" [rowHeight]="cardLayout.rowHeight">
   <!--Mini Cards-->
-  @for (mc of miniCardData; track mc) {
+  @for (mc of miniCardData; track mc.title) {
     <mat-grid-tile [colspan]="cardLayout.miniCard.cols" [rowspan]="cardLayout.miniCard.rows">
       <app-mini-card [color]="mc.color" [error]="mc.error" [icon]="mc.icon" [isInfinity]="mc.isInfinity"
                      [isCurrency]="mc.isCurrency" [isIncrease]="mc.isIncrease" [isLoading]="isLoading"
@@ -116,7 +116,7 @@
     </mat-grid-tile>
   }
   <!--Charts-->
-  @for (chart of charts; track chart) {
+  @for (chart of charts; track chart.title) {
     <mat-grid-tile [colspan]="cardLayout.chart.cols" [rowspan]="cardLayout.chart.rows">
       <app-card [chart]="chart" [title]="chart.title" [timeZone]="timeZone">
         <app-chart [chartSummary]="chart" [error]="errorSignal()" [currency]="currency" [isLoading]="isLoading"

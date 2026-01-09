@@ -24,3 +24,17 @@ export const getOfficesPipe = pipe(
   filter((val): val is IOfficeAll[] => val !== undefined),
 );
 
+export const selectInvoiceIsLoading = createSelector(
+  selectInvoiceState,
+  (state: InvoiceState) => state?.isLoading,
+);
+
+export const selectInvoiceError = createSelector(
+  selectInvoiceState,
+  (state: InvoiceState) => state?.error,
+);
+
+export const selectInvoiceResponse = createSelector(
+  selectInvoiceState,
+  (state: InvoiceState) => state?.response,
+);

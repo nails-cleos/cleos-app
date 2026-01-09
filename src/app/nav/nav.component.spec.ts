@@ -166,9 +166,8 @@ describe('NavComponent', () => {
     spyOnProperty(router, 'url', 'get').and.returnValue('/en-GB');
     navigateSpy = spyOn(router, 'navigate');
 
-    const translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en-GB');
-    translate.use('en-GB');
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
 
     fixture = TestBed.createComponent(NavComponent);
 

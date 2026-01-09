@@ -202,7 +202,7 @@ export class MainContentComponent {
     effect(() => {
       const error = this.errorSignal();
       if (error?.message) {
-        this.toastService.error(error.message);
+        this.toastService.show(error.message, 'error');
       }
     });
 

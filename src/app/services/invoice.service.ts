@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IOfficeAll } from '../interfaces/office';
 import { IInvoice } from '../interfaces/invoice';
@@ -31,5 +31,25 @@ export class InvoiceService {
     }
 
     return this.http.get<IInvoice[]>(toUrl(this.urlV1, 'offices', officeId), { params });
+  };
+
+  uploadInvoices = (
+    officeId: string,
+    blob: Blob,
+    fileName: string,
+    driveToken?: string,
+  ): Observable<void> => {
+    const formData = new FormData();
+    const file = new File([blob], fileName, {
+      type: blob.type,
+      lastModified: Date.now(),
+    });
+    formData.append('file', file, file.name);
+
+    let headers = new HttpHeaders().set('Upload', 'true');
+    if (driveToken) {
+      headers = headers.set('X-Google-Drive-Token', driveToken);
+    }
+    return this.http.post<void>(toUrl(this.urlV1, 'offices', officeId), formData, { headers });
   };
 }

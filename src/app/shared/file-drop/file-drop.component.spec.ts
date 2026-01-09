@@ -15,9 +15,9 @@ describe('FileDropComponent', () => {
   beforeEach(async () => {
     action$ = new BehaviorSubject<void>(void 0);
 
-    toastServiceSpy = jasmine.createSpyObj('ToastService', ['warning', 'show']);
+    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
 
-    toastServiceSpy.warning.and.returnValue({
+    toastServiceSpy.show.and.returnValue({
       onAction: () => action$.asObservable(),
       onDismiss: () => of(void 0),
     });
@@ -29,9 +29,8 @@ describe('FileDropComponent', () => {
       ],
     }).compileComponents();
 
-    const translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en-GB');
-    translate.use('en-GB');
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
 
     fixture = TestBed.createComponent(FileDropComponent);
     component = fixture.componentInstance;
@@ -106,7 +105,8 @@ describe('FileDropComponent', () => {
 
     component.delete();
 
-    expect(toastServiceSpy.warning).toHaveBeenCalledWith('COMMON.FILE.DELETE.MESSAGE', 5000, 'button', 'undo');
+    expect(toastServiceSpy.show).toHaveBeenCalledWith('COMMON.FILE.DELETE.MESSAGE', 'warning', 5000,
+      { actionType: 'button', action: 'undo' });
     action$.next();
 
     expect(component.file()?.image).toBe('data:image/jpeg;base64,AAA');

@@ -48,6 +48,7 @@ export interface IResponseSuccess {
   reload?: boolean;
   toastType?: ToastType;
   redirect?: string;
+  blob?: Blob;
 }
 
 export class PageRequest {

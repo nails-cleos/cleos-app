@@ -13,6 +13,7 @@ import { signal } from '@angular/core';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
 import { Auth } from '@angular/fire/auth';
 import { callAwsLambda } from '../../../store/aws.actions';
+import { DriveAccessService } from '../../../services/drive-access.service';
 
 describe('ExpenseComponent', () => {
   let component: ExpenseComponent;
@@ -23,6 +24,7 @@ describe('ExpenseComponent', () => {
   let navigateSpy: jasmine.Spy;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let authSpy: jasmine.SpyObj<Auth>;
+  let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
 
   let roomId$: BehaviorSubject<any>;
   let expenseId$: BehaviorSubject<any>;
@@ -32,7 +34,6 @@ describe('ExpenseComponent', () => {
   let response$: BehaviorSubject<any>;
   let aws$: BehaviorSubject<any>;
   let token$: BehaviorSubject<any>;
-  let driveToken$: BehaviorSubject<any>;
 
   const mockExpense: Partial<IExpenseAll> = {
     id: '1',
@@ -52,6 +53,7 @@ describe('ExpenseComponent', () => {
   const mockSuppliers: ISupplyStore[] = [{ id: '1', name: 'vendor_name' }];
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
+  const driveTokenSignal = signal<string | undefined>('fake-token');
 
   beforeEach(async () => {
     roomId$ = new BehaviorSubject<any>(undefined);
@@ -62,7 +64,6 @@ describe('ExpenseComponent', () => {
     response$ = new BehaviorSubject<any>(undefined);
     aws$ = new BehaviorSubject<any>(undefined);
     token$ = new BehaviorSubject<any>('token');
-    driveToken$ = new BehaviorSubject<any>('driveToken');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -70,6 +71,8 @@ describe('ExpenseComponent', () => {
     }));
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    driveAccessServiceSpy =
+      jasmine.createSpyObj<DriveAccessService>('DriveAccessService', ['requestAccessIfNeeded'], { driveTokenSignal });
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
@@ -108,8 +111,6 @@ describe('ExpenseComponent', () => {
           return aws$.asObservable();
         case 8:
           return token$.asObservable();
-        case 9:
-          return driveToken$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -122,16 +123,16 @@ describe('ExpenseComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: Auth, useValue: authSpy },
+        { provide: DriveAccessService, useValue: driveAccessServiceSpy },
       ],
     }).compileComponents();
 
     const router = TestBed.inject(Router);
     navigateSpy = spyOn(router, 'navigate');
 
-    const translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en-GB');
-    translate.use('en-GB');
-    translate.setTranslation('en-GB', {
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
+    translateService.setTranslation('en-GB', {
       EXPENSE: {
         GROSS: {
           MIN: 'Gross is below minimum',
@@ -151,6 +152,7 @@ describe('ExpenseComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+    expect(typeof driveAccessServiceSpy.driveTokenSignal).toBe('function');
   });
 
   it('should dispatch getExpense when expenseId emits a value', () => {
@@ -453,15 +455,4 @@ describe('ExpenseComponent', () => {
       description: '',
     });
   };
-
-  it('should request drive access when token is missing', () => {
-    spyOn(component as any, 'requestDriveAccess');
-
-    driveToken$.next(undefined);
-    fixture.detectChanges();
-
-    expect(component['requestDriveAccess']).toHaveBeenCalledTimes(1);
-    expect(component['tokenRequested']).toBeTrue();
-  });
-
 });

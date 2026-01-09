@@ -7,7 +7,6 @@ import { InvoiceComponent } from './invoice.component';
 import { IInvoice, IRoomInvoice } from '../interfaces/invoice';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../interfaces/pagination';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { IOfficeAll } from '../interfaces/office';
 import { backendFormatDate, getNowTimeZone } from '../util/dates';
 import { getOfficeToInvoice } from '../store/invoice.actions';
@@ -16,6 +15,9 @@ import { addDays } from 'date-fns';
 import { PaymentType } from '../interfaces/payment';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { InvoiceState } from '../store/reducers/invoice.reducers';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { DriveAccessService } from '../services/drive-access.service';
+import { signal } from '@angular/core';
 
 describe('InvoiceComponent', () => {
   let component: InvoiceComponent;
@@ -24,6 +26,7 @@ describe('InvoiceComponent', () => {
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let routerSpy: jasmine.SpyObj<Router>;
+  let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
   let translate: TranslateService;
 
   const mockOffice: IOfficeAll = {
@@ -113,10 +116,12 @@ describe('InvoiceComponent', () => {
       },
     });
 
+    const driveTokenSignal = signal<string>('fake-token');
+
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-
+    driveAccessServiceSpy = jasmine.createSpyObj('DriveAccessService', ['requestAccessIfNeeded'], { driveTokenSignal });
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
@@ -139,12 +144,14 @@ describe('InvoiceComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [InvoiceComponent, TranslateModule.forRoot(), NoopAnimationsModule],
+      imports: [InvoiceComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Router, useValue: routerSpy },
+        { provide: DriveAccessService, useValue: driveAccessServiceSpy },
+        provideNoopAnimations(),
       ],
     }).compileComponents();
 
@@ -166,6 +173,7 @@ describe('InvoiceComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+    expect(typeof driveAccessServiceSpy.driveTokenSignal).toBe('function');
   });
 
   it('should compute dataSourceSignal correctly', () => {
@@ -294,7 +302,7 @@ describe('InvoiceComponent', () => {
   it('should return true when all rows are selected', () => {
     invoiceList$.next(mockInvoice);
     fixture.detectChanges();
-    component.selection.select(...mockInvoice);
+    component.toggleAllRows();
 
     expect(component.isAllSelected()).toBe(true);
   });
@@ -302,7 +310,7 @@ describe('InvoiceComponent', () => {
   it('should return false when not all rows are selected', () => {
     invoiceList$.next(mockInvoice);
     fixture.detectChanges();
-    component.selection.select(mockInvoice[0]);
+    component.selectionSignal().select(mockInvoice[0]);
 
     expect(component.isAllSelected()).toBe(false);
   });
@@ -313,17 +321,17 @@ describe('InvoiceComponent', () => {
 
     component.toggleAllRows();
 
-    expect(component.selection.selected.length).toBe(2);
+    expect(component.selectionSignal().selected.length).toBe(2);
   });
 
   it('should clear selection when toggleAllRows is called and all selected', () => {
     invoiceList$.next(mockInvoice);
     fixture.detectChanges();
-    component.selection.select(...mockInvoice);
+    component.selectionSignal().select(...mockInvoice);
 
     component.toggleAllRows();
 
-    expect(component.selection.selected.length).toBe(0);
+    expect(component.selectionSignal().selected.length).toBe(0);
   });
 
   it('should return "select all" label when no row provided and not all selected', () => {
@@ -338,7 +346,9 @@ describe('InvoiceComponent', () => {
   it('should return "deselect all" label when no row provided and all selected', () => {
     invoiceList$.next(mockInvoice);
     fixture.detectChanges();
-    component.selection.select(...mockInvoice);
+
+    component.toggleAllRows();
+    fixture.detectChanges();
 
     const label = component.checkboxLabel();
 
@@ -357,7 +367,7 @@ describe('InvoiceComponent', () => {
   it('should return "deselect row X" label when row provided and selected', () => {
     invoiceList$.next(mockInvoice);
     fixture.detectChanges();
-    component.selection.select(mockInvoice[0]);
+    component.selectionSignal().select(mockInvoice[0]);
 
     const label = component.checkboxLabel(mockInvoice[0]);
 

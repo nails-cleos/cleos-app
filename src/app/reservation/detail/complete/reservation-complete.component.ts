@@ -173,7 +173,7 @@ export class ReservationCompleteComponent {
   types: string[] = [PaymentType.cash, PaymentType.transfer];
   price: WritableSignal<IPrice> = signal(new Price());
 
-  dateFormat: string = this.translate.currentLang;
+  dateFormat: string = this.translate.getCurrentLang();
   split: boolean = false;
   isValid: boolean = true;
   isValidSplit: boolean = true;

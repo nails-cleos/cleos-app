@@ -469,7 +469,7 @@ export class ReservationComponent {
   day: IDay = new Day();
   refresh: Subject<any> = new Subject();
 
-  dateFormat: string = this.translate.currentLang;
+  dateFormat: string = this.translate.getCurrentLang();
   isPreview = false;
   totalDurationFormatted?: string;
 
@@ -507,7 +507,7 @@ export class ReservationComponent {
   private alreadyCreated = false;
   private groupId?: string;
   private isDashboard = false;
-  private readonly language: string = this.translate.currentLang;
+  private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
     const preview = new Step(6, 'preview', () => this.create());
@@ -677,8 +677,7 @@ export class ReservationComponent {
           const localDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.LOCAL', { date: localDate });
           const roomDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.ROOM', { date: timeZoneDate });
           const message = `${warning} - ${localDateLabel} / ${roomDateLabel}`;
-          const toastRef = this.toastService.warning(message, 0, 'button',
-            this.translate.instant('COMMON.TIME_ZONE.ACTION'));
+          const toastRef = this.toastService.show(message, 'warning', 0, { actionType: 'button' });
           toastRef.onAction().subscribe(() => {
             this.dismiss = true;
           });

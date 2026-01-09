@@ -15,6 +15,11 @@
           <mat-icon>open_in_new</mat-icon>
         </a>
       }
+      @case ('file') {
+        <a mat-button (click)="navigateAction()" download>
+          <mat-icon>file_open</mat-icon>
+        </a>
+      }
       @case ('button') {
         <button mat-button (click)="onAction()">
           <mat-icon>{{ data.action || 'done_all' }}</mat-icon>

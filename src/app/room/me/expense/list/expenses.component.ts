@@ -85,8 +85,8 @@ export class ExpensesComponent {
     'totalNet', 'actions'];
   expanded?: IExpenseAll;
 
-  dateFormat: string = this.translate.currentLang;
-  language: string = this.translate.currentLang;
+  dateFormat: string = this.translate.getCurrentLang();
+  language: string = this.translate.getCurrentLang();
 
   form: FormGroup<ExpensesForm> = this.formBuilder.group<ExpensesForm>({
     date: this.formBuilder.control(undefined),
