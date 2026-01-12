@@ -26,6 +26,7 @@ export class ResponseSuccess implements IResponseSuccess {
   reload: boolean;
   toastType: ToastType;
   redirect?: string;
+  blob?: Blob;
 
   constructor(
     message: string,
@@ -33,12 +34,14 @@ export class ResponseSuccess implements IResponseSuccess {
     reload: boolean = false,
     toastType: ToastType = 'success',
     redirect?: string,
+    blob?: Blob,
   ) {
     this.message = message;
     this.path = path;
     this.reload = reload;
     this.toastType = toastType;
     this.redirect = redirect;
+    this.blob = blob;
   }
 }
 

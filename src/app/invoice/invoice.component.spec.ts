@@ -18,6 +18,8 @@ import { InvoiceState } from '../store/reducers/invoice.reducers';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { DriveAccessService } from '../services/drive-access.service';
 import { signal } from '@angular/core';
+import pdfMake from 'pdfmake/build/pdfmake';
+import { SelectionModel } from '@angular/cdk/collections';
 
 describe('InvoiceComponent', () => {
   let component: InvoiceComponent;
@@ -101,6 +103,8 @@ describe('InvoiceComponent', () => {
     },
   ];
 
+  const fakeBlob = new Blob(['test'], { type: 'application/pdf' });
+
   let officeList$: BehaviorSubject<any>;
   let invoiceList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
@@ -159,8 +163,16 @@ describe('InvoiceComponent', () => {
     component = fixture.componentInstance;
 
     translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en');
-    translate.use('en');
+    translate.use('en-GB');
+
+    spyOn(globalThis, 'fetch').and.callFake(() =>
+      Promise.resolve({
+        arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
+      } as Response));
+
+    spyOn(pdfMake, 'createPdf').and.returnValue({
+      getBlob: () => Promise.resolve(fakeBlob),
+    } as any);
 
     fixture.detectChanges();
   });
@@ -334,6 +346,19 @@ describe('InvoiceComponent', () => {
     expect(component.selectionSignal().selected.length).toBe(0);
   });
 
+  it('should toggle selection of a row when toggleRow is called', () => {
+    invoiceList$.next(mockInvoice);
+    fixture.detectChanges();
+
+    component.toggleRow(mockInvoice[0]);
+
+    expect(component.selectionSignal().isSelected(mockInvoice[0])).toBe(true);
+
+    component.toggleRow(mockInvoice[0]);
+
+    expect(component.selectionSignal().isSelected(mockInvoice[0])).toBe(false);
+  });
+
   it('should return "select all" label when no row provided and not all selected', () => {
     invoiceList$.next(mockInvoice);
     fixture.detectChanges();
@@ -398,5 +423,71 @@ describe('InvoiceComponent', () => {
     fixture.detectChanges();
 
     expect(component.getForm.startNumber.value).toBe(101);
+  });
+
+  it('should generate PDF and upload invoices when print is called', async () => {
+    // Arrange
+    const startDate = new Date(2024, 0, 1);
+    invoiceList$.next(mockInvoice);
+    fixture.detectChanges();
+
+    component.getForm.office.setValue(mockOffice);
+    component.getForm.startNumber.setValue(10);
+    component.getDateRangeForm.startDate.setValue(startDate);
+    fixture.detectChanges();
+
+    component.selectionSignal.set(new SelectionModel<IInvoice>(true, [...mockInvoice]));
+
+    // Act
+    await component.print();
+
+    // Assert: updateOfficeById dispatched
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(
+      jasmine.objectContaining({
+        type: '[Invoice] Update office by id',
+      }),
+    );
+
+    // Assert: uploadInvoices dispatched
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(
+      jasmine.objectContaining({
+        type: '[Invoice] Upload invoices',
+        officeId: mockOffice.id,
+        blob: fakeBlob,
+        fileName: jasmine.stringMatching(/Sales .*\.pdf/),
+        driveToken: 'fake-token',
+      }),
+    );
+
+    // Assert: pdfMake used
+    expect(pdfMake.createPdf).toHaveBeenCalled();
+  });
+
+  it('should NOT print when no office is selected', async () => {
+    component.getForm.office.setValue(undefined);
+
+    await component.print();
+
+    expect(pdfMake.createPdf).not.toHaveBeenCalled();
+    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+  });
+
+  it('should NOT update office when not all invoices are selected', async () => {
+    const startDate = new Date(2024, 0, 1);
+    invoiceList$.next(mockInvoice);
+    fixture.detectChanges();
+
+    component.getForm.office.setValue(mockOffice);
+    component.getDateRangeForm.startDate.setValue(startDate);
+    component.selectionSignal.set(new SelectionModel<IInvoice>(true, [mockInvoice[0]]));
+    fixture.detectChanges();
+
+    await component.print();
+
+    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(
+      jasmine.objectContaining({
+        type: '[Invoice] Update Office By Id',
+      }),
+    );
   });
 });

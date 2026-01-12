@@ -88,8 +88,7 @@ describe('UsersComponent', () => {
     component = fixture.componentInstance;
 
     translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en');
-    translate.use('en');
+    translate.use('en-GB');
 
     fixture.detectChanges();
 

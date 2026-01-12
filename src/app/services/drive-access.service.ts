@@ -19,13 +19,7 @@ export class DriveAccessService {
     const provider = new GoogleAuthProvider();
     provider.addScope('https://www.googleapis.com/auth/drive');
 
-    signInWithPopup(this.auth, provider)
-      .then(result => {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        if (credential?.accessToken) {
-          this.store.dispatch(setDriveToken({ token: credential.accessToken }));
-        }
-      });
+    this.callSignInWithPopup(provider);
   }
 
   requestAccessIfNeeded(shouldRequest: boolean = true): void {
@@ -34,5 +28,15 @@ export class DriveAccessService {
       this.tokenRequested = true;
       this.requestDriveAccess();
     }
+  }
+
+  private callSignInWithPopup(provider: GoogleAuthProvider) {
+    signInWithPopup(this.auth, provider)
+      .then(result => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        if (credential?.accessToken) {
+          this.store.dispatch(setDriveToken({ token: credential.accessToken }));
+        }
+      });
   }
 }
