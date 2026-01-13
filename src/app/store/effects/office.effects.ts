@@ -12,6 +12,7 @@ import {
   createOffice,
   deleteOffice,
   getAllManager,
+  getAllMyOffices,
   getOffice,
   getOfficesPage,
   managerSuccess,
@@ -21,7 +22,7 @@ import {
   officeSuccess,
   updateOffice,
 } from '../office.actions';
-import { IOffice } from '../../interfaces/office';
+import { IOffice, IOfficeAll } from '../../interfaces/office';
 import { IUserAll } from '../../interfaces/user';
 import { IApiResponse, successResponse } from '../../interfaces/common';
 
@@ -47,6 +48,15 @@ export class OfficeEffects {
     switchMap(() =>
       this.userService.getManagers().pipe(
         map((managers: IUserAll[]) => managerSuccess(managers ? { managers } : { managers: [] })),
+        catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
+      )),
+  ));
+
+  findMyOffices$ = createEffect(() => this.actions.pipe(
+    ofType(getAllMyOffices),
+    switchMap(() =>
+      this.officeService.getAllMyOffices().pipe(
+        map((data: IOfficeAll[]) => officeSuccess(data ? { data } : { data: [] })),
         catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
       )),
   ));
@@ -101,7 +111,7 @@ export class OfficeEffects {
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(officeSelected),
     tap(({ selected }) => this.router
-      .navigate([this.translate.currentLang, 'offices', selected?.id])),
+      .navigate([this.translate.getCurrentLang(), 'offices', selected?.id])),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions.pipe(

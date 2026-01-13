@@ -67,7 +67,7 @@ export class ShortcutComponent {
           break;
       }
 
-      this.router.navigate([this.translate.currentLang, ...redirect]);
+      this.router.navigate([this.translate.getCurrentLang(), ...redirect]);
     });
   }
 }

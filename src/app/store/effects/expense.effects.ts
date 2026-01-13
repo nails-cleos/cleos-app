@@ -98,7 +98,7 @@ export class ExpenseEffects {
   selectedData$ = createEffect(() => this.actions$.pipe(
     ofType(expenseSelected),
     tap(({ selected }) => this.router.navigate(
-      [this.translate.currentLang, 'rooms', selected?.room?.id, 'expenses', selected?.id])),
+      [this.translate.getCurrentLang(), 'rooms', selected?.room?.id, 'expenses', selected?.id])),
   ), { dispatch: false });
 
   infoSuccess$ = createEffect(() => this.actions$.pipe(

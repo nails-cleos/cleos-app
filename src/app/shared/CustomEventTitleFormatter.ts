@@ -36,14 +36,14 @@ export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
       if (!event.end) {
         return `<b>${this.translate.instant('COMMON.ALL_DAY.CHECK')}</b> ${event.title}`;
       }
-      return CustomEventTitleFormatter.eventTitle(event, this.translate.currentLang);
+      return CustomEventTitleFormatter.eventTitle(event, this.translate.getCurrentLang());
     } else {
       return event.title;
     }
   };
 
   week = (event: CalendarEvent): string => {
-    let result = CustomEventTitleFormatter.eventTitle(event, this.translate.currentLang);
+    let result = CustomEventTitleFormatter.eventTitle(event, this.translate.getCurrentLang());
     if (event.meta.state) {
       result = `<div class="custom-material-icons material-icons">
         ${ReservationIconName[snakeToCamel(event.meta.state) as ReservationIconKey]}
@@ -52,5 +52,5 @@ export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
     return result;
   };
 
-  day = (event: CalendarEvent): string => CustomEventTitleFormatter.eventTitle(event, this.translate.currentLang);
+  day = (event: CalendarEvent): string => CustomEventTitleFormatter.eventTitle(event, this.translate.getCurrentLang());
 }

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { IOfficeAll } from '../interfaces/office';
 import { IInvoice, IInvoiceData } from '../interfaces/invoice';
 import { toUrl } from '../util/helper';
-import { Pagination } from '../interfaces/pagination';
+import { paginated, Pagination } from '../interfaces/pagination';
 import { SortDirection } from '@angular/material/sort';
 import { createFilter } from '../util/service-helper';
 
@@ -29,7 +29,7 @@ export class InvoiceService {
     size: number,
   ): Observable<Pagination<IInvoiceData>> => this.http.get<Pagination<IInvoiceData>>(
     toUrl(this.urlV1, this.officeUrl, officeId, 'pages'),
-    { params: createFilter(page, size, sort, direction) },
+    { ...paginated(), params: createFilter(page, size, sort, direction) },
   );
 
   view = (

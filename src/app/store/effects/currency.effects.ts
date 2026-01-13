@@ -86,7 +86,7 @@ export class CurrencyEffects {
 
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(currencySelected),
-    tap(({ selected }) => this.router.navigate([this.translate.currentLang, 'currency', selected?.id])),
+    tap(({ selected }) => this.router.navigate([this.translate.getCurrentLang(), 'currency', selected?.id])),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions.pipe(

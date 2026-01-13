@@ -39,7 +39,7 @@ export class RedirectComponent {
 
   constructor() {
     effect(() => {
-      const lang = getLocale(this.translate.currentLang).language;
+      const lang = getLocale(this.translate.getCurrentLang()).language;
       let redirectUrl = ['/', lang];
       if (this.redirectSignal()) {
         const user = this.userSignal();

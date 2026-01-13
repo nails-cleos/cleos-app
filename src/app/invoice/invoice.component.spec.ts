@@ -413,6 +413,30 @@ describe('InvoiceComponent', () => {
     expect(component.getForm.office.value).toBe(mockOffice);
   });
 
+  it('should clear office form control when keyDownHandler is called with Backspace', () => {
+    component.getForm.office.setValue(mockOffice);
+
+    component.keyDownHandler({ code: 'Backspace' } as KeyboardEvent);
+
+    expect(component.getForm.office.value).toBe(undefined);
+  });
+
+  it('should filter office correctly using filteredOfficeSignal', () => {
+    officeList$.next([mockOffice, { id: '2', name: 'Another Office', manager: { id: '1', displayName: 'Officer' } }]);
+    (component.getForm.office as any).setValue('A');
+    fixture.detectChanges();
+
+    const filtered = component.filteredOfficeSignal();
+    expect(filtered?.length).toBe(1);
+    expect(filtered?.[0].name).toBe('Another Office');
+  });
+
+  it('displayFnOffice should return office name', () => {
+    const office = { name: 'Test Office' } as IOfficeAll;
+    expect(component.displayFnOffice(office)).toBe('Test Office');
+    expect(component.displayFnOffice(null as any)).toBe('');
+  });
+
   it('should set startNumber when office has lastInvoiceNumber', () => {
     const officeWithLastInvoice = {
       ...mockOffice,

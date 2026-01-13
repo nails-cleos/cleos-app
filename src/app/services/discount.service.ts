@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IDiscount, IReferral, IUserDiscount } from '../interfaces/discount';
-import { Pagination } from '../interfaces/pagination';
+import { paginated, Pagination } from '../interfaces/pagination';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
 import { SortDirection } from '@angular/material/sort';
@@ -23,7 +23,7 @@ export class DiscountService {
     size: number,
   ): Observable<Pagination<IDiscount>> => this.http.get<Pagination<IDiscount>>(
     toUrl(this.urlV1, 'pages'),
-    { params: createFilter(page, size, sort, direction) },
+    { ...paginated(), params: createFilter(page, size, sort, direction) },
   );
 
   getMyDiscountsPage = (
@@ -33,7 +33,7 @@ export class DiscountService {
     size: number,
   ): Observable<Pagination<IUserDiscount>> => this.http.get<Pagination<IUserDiscount>>(
     toUrl(this.urlV1, 'me'),
-    { params: createFilter(page, size, sort, direction) },
+    { ...paginated(), params: createFilter(page, size, sort, direction) },
   );
 
   getMyReferrals = (): Observable<IReferral[]> => this.http.get<IReferral[]>(

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Role, Token } from '../interfaces/token';
 import { IRoomAll } from '../interfaces/room';
-import { Pagination } from '../interfaces/pagination';
+import { paginated, Pagination } from '../interfaces/pagination';
 import { ICustomerLastReservation } from '../interfaces/reservation';
 import { createFilter } from '../util/service-helper';
 import { dataURLToBlob } from '../util/file';
@@ -32,7 +32,7 @@ export class UserService {
     page: number, sort: string, direction: SortDirection, size: number, filter?: string,
   ): Observable<Pagination<IUserAll>> => this.http.get<Pagination<IUserAll>>(
     toUrl(this.userUrlV1, 'pages'),
-    { params: createFilter(page, size, sort, direction, filter) },
+    { ...paginated(), params: createFilter(page, size, sort, direction, filter) },
   );
 
   saveUser = (user: IUser, role?: Role): Observable<{ response: IApiResponse, key: string }> => {

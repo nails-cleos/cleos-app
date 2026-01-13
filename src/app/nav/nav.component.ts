@@ -114,7 +114,7 @@ export class NavComponent implements OnDestroy {
   readonly language = computed(() => {
     const user = this.currentUserSignal();
 
-    return getLocale(user?.locale || this.route.snapshot.paramMap.get('lang') || this.translate.currentLang).language;
+    return getLocale(user?.locale || this.route.snapshot.paramMap.get('lang') || this.translate.getCurrentLang()).language;
   });
 
   isDarkMode = signal(this.authUserSignal().isDarkMode || isDarkMode(this.cookieService.get(THEME) as Theme));

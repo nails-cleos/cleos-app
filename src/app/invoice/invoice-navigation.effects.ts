@@ -2,7 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATED, RouterNavigatedAction } from '@ngrx/router-store';
 import { concatMap } from 'rxjs/operators';
-import { clean, getAllMyOffices } from '../store/invoice.actions';
+import { cleanInvoice } from '../store/invoice.actions';
+import { getAllMyOffices } from '../store/office.actions';
 
 @Injectable()
 export class InvoiceNavigationEffects {
@@ -14,10 +15,16 @@ export class InvoiceNavigationEffects {
       concatMap((action: RouterNavigatedAction) => {
         const url = action.payload.routerState.url;
 
-        // 1) /invoices
+        // 1) /invoices/add
+        const addMatch = url.match(/\/invoices\/add$/);
+        if (addMatch) {
+          return [cleanInvoice(), getAllMyOffices()];
+        }
+
+        // 2) /invoices
         const invoicesMatch = url.match(/\/invoices\/?$/);
         if (invoicesMatch) {
-          return [clean(), getAllMyOffices()];
+          return [cleanInvoice(), getAllMyOffices()];
         }
 
         return [];

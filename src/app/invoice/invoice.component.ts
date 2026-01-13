@@ -28,7 +28,7 @@ import { pdf } from '../util/invoice';
 import { requireMatch } from '../util/validators';
 import { SharedModule } from '../shared/shared.module';
 import { TimeDetailPipe } from '../pipes/time-detail.pipe';
-import { getInvoicesPipe, getOfficesPipe } from '../store/selectors/invoice.selectors';
+import { getInvoicesPipe } from '../store/selectors/invoice.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../interfaces/pagination';
@@ -36,7 +36,9 @@ import { InvoiceState } from '../store/reducers/invoice.reducers';
 import { MAT_DATE_RANGE_SELECTION_STRATEGY } from '@angular/material/datepicker';
 import { MonthPeriodAdapter } from '../util/adapter/month-period-adapter.service';
 import { DriveAccessService } from '../services/drive-access.service';
-import { InvoicesComponent } from './invoices/invoices.component';
+import { BackButtonDirective } from '../directives/back-button.directive';
+import { getMyOfficesPipe } from '../store/selectors/office.selectors';
+import { OfficeState } from '../store/reducers/office.reducers';
 
 // Set up VFS fonts for pdfMake (provides fallback Roboto fonts)
 (pdfMake as any).vfs = (pdfFonts as any).pdfMake?.vfs || pdfFonts;
@@ -58,7 +60,7 @@ type DateRangeForm = {
   templateUrl: './invoice.component.html',
   styleUrls: ['./invoice.component.scss'],
   animations: [detailExpandAnimation],
-  imports: [SharedModule, TimeDetailPipe, InvoicesComponent],
+  imports: [SharedModule, TimeDetailPipe, BackButtonDirective],
   providers: [
     {
       provide: MAT_DATE_RANGE_SELECTION_STRATEGY,
@@ -70,12 +72,12 @@ type DateRangeForm = {
 export class InvoiceComponent {
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<InvoiceState> = inject(Store<InvoiceState>);
+  private readonly store: Store<InvoiceState | OfficeState> = inject(Store<InvoiceState | OfficeState>);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly router: Router = inject(Router);
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
 
-  private allOffices$ = this.store.pipe(getOfficesPipe);
+  private allOffices$ = this.store.pipe(getMyOfficesPipe);
   private invoiceList$ = this.store.pipe(getInvoicesPipe);
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
   private allPaymentTypes$ = of(Object.keys(PaymentType));

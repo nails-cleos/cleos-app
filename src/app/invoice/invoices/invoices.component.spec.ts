@@ -12,6 +12,7 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { InvoiceState } from '../../store/reducers/invoice.reducers';
 import { InvoicesComponent } from './invoices.component';
 import { DriveAccessService } from '../../services/drive-access.service';
+import { IOfficeAll } from '../../interfaces/office';
 
 describe('InvoicesComponent', () => {
   let component: InvoicesComponent;
@@ -20,6 +21,12 @@ describe('InvoicesComponent', () => {
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
+
+  const mockOffice: IOfficeAll = {
+    id: '1',
+    manager: { id: '1', displayName: 'Officer' },
+    name: 'Office 1',
+  };
 
   const mockInvoice: IInvoiceData[] = [
     { id: '1', name: 'Invoice 1', date: new Date(2024, 2, 1) },
@@ -34,13 +41,14 @@ describe('InvoicesComponent', () => {
   let invoiceList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
   let response$: BehaviorSubject<any>;
+  let officeList$: BehaviorSubject<any>;
 
-  const officeId = 'officeId-123';
   const driveTokenSignal = signal<string>('fake-token');
 
   beforeEach(async () => {
     invoiceList$ = new BehaviorSubject(mockPagination);
     response$ = new BehaviorSubject<any>(undefined);
+    officeList$ = new BehaviorSubject(undefined);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -67,6 +75,8 @@ describe('InvoicesComponent', () => {
           return invoiceList$.asObservable();
         case 2:
           return response$.asObservable();
+        case 3:
+          return officeList$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -91,8 +101,6 @@ describe('InvoicesComponent', () => {
     const translate = TestBed.inject(TranslateService);
     translate.use('en-GB');
 
-    fixture.componentRef.setInput('officeId', officeId);
-
     fixture.detectChanges();
   });
 
@@ -107,6 +115,7 @@ describe('InvoicesComponent', () => {
   });
 
   it('should compute dataSourceSignal correctly', () => {
+    officeList$.next([mockOffice]);
     invoiceList$.next(mockPagination);
     fixture.detectChanges();
 
@@ -115,6 +124,7 @@ describe('InvoicesComponent', () => {
   });
 
   it('should compute resultsLengthSignal correctly', () => {
+    officeList$.next([mockOffice]);
     invoiceList$.next(mockPagination);
     fixture.detectChanges();
 
@@ -148,12 +158,14 @@ describe('InvoicesComponent', () => {
   });
 
   it('should dispatch getInvoicePage when paginatorPageIndex changes', () => {
+    officeList$.next([mockOffice]);
+    fixture.detectChanges();
     component.paginatorPageIndex.set(1);
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(
       getInvoicesPage({
-        officeId: officeId,
+        officeId: mockOffice.id,
         page: 1,
         sort: 'date',
         direction: 'desc',
@@ -163,6 +175,8 @@ describe('InvoicesComponent', () => {
   });
 
   it('should dispatch clean and reset paginator when responseSignal emits', () => {
+    officeList$.next([mockOffice]);
+    fixture.detectChanges();
     const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
 
     component['paginator'] = signal(paginatorMock);
@@ -173,7 +187,7 @@ describe('InvoicesComponent', () => {
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(
       getInvoicesPage({
-        officeId: officeId,
+        officeId: mockOffice.id,
         page: 0,
         sort: 'date',
         direction: 'desc',
@@ -188,5 +202,37 @@ describe('InvoicesComponent', () => {
 
     expect(storeSpy.dispatch)
       .toHaveBeenCalledWith(invoiceView({ id: item.id, fileName: item.name, driveToken: driveTokenSignal() }));
+  });
+
+  it('should auto-select office when only one office is available', () => {
+    const singleOffice = [mockOffice];
+    officeList$.next(singleOffice);
+    fixture.detectChanges();
+
+    expect(component.getForm.office.value).toBe(mockOffice);
+  });
+
+  it('should clear office form control when keyDownHandler is called with Backspace', () => {
+    component.getForm.office.setValue(mockOffice);
+
+    component.keyDownHandler({ code: 'Backspace' } as KeyboardEvent);
+
+    expect(component.getForm.office.value).toBe(undefined);
+  });
+
+  it('should filter office correctly using filteredOfficeSignal', () => {
+    officeList$.next([mockOffice, { id: '2', name: 'Another Office', manager: { id: '1', displayName: 'Officer' } }]);
+    (component.getForm.office as any).setValue('A');
+    fixture.detectChanges();
+
+    const filtered = component.filteredOfficeSignal();
+    expect(filtered?.length).toBe(1);
+    expect(filtered?.[0].name).toBe('Another Office');
+  });
+
+  it('displayFnOffice should return office name', () => {
+    const office = { name: 'Test Office' } as IOfficeAll;
+    expect(component.displayFnOffice(office)).toBe('Test Office');
+    expect(component.displayFnOffice(null as any)).toBe('');
   });
 });

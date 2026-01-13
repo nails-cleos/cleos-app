@@ -13,7 +13,7 @@ export class TranslationLoaderResolver implements Resolve<void> {
 
   resolve(): void {
     this.store.pipe(getI18NLanguagePipe).pipe(take(1)).subscribe(lang => {
-      if (lang && this.translate.currentLang !== lang) {
+      if (lang && this.translate.getCurrentLang() !== lang) {
         this.translate.use(lang);
       }
     });

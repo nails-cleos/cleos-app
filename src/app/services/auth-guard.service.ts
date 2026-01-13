@@ -37,7 +37,7 @@ export class PermissionsService {
         return true;
       } else {
         let message;
-        if (this.translate.currentLang.startsWith('es')) {
+        if (this.translate.getCurrentLang().startsWith('es')) {
           message = 'El usuario no tiene los permisos necesarios';
         } else {
           message = 'User not have the necessary permissions';
@@ -49,7 +49,7 @@ export class PermissionsService {
     }
     // not logged in so redirect to auth page with the return url and extra data
     const queryParams = btoa(JSON.stringify({ returnUrl: state.url, data: this.data }));
-    this.router.navigate([this.translate.currentLang, 'auth'], { queryParams: { state: queryParams } });
+    this.router.navigate([this.translate.getCurrentLang(), 'auth'], { queryParams: { state: queryParams } });
 
     return false;
   };

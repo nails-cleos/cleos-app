@@ -25,7 +25,7 @@ import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { newDateTimestamp } from '../../util/dates';
 import { Pagination } from '../../interfaces/pagination';
-import { IUnavailable, IUnavailableAll } from '../../interfaces/unavailable';
+import { IUnavailableAll } from '../../interfaces/unavailable';
 import { IUserAll } from '../../interfaces/user';
 import { IRoomAll } from '../../interfaces/room';
 import { IApiResponse, success, successResponse } from '../../interfaces/common';
@@ -42,7 +42,7 @@ export class UnavailableEffects {
     ofType(getUnavailablePage),
     switchMap(({ page, sort, direction, size }) =>
       this.unavailableService.getUnavailablePage(page, sort, direction, size).pipe(
-        map((data: Pagination<IUnavailable>) => unavailableSuccess({ data })),
+        map((data: Pagination<IUnavailableAll>) => unavailableSuccess({ data })),
         catchError((err: HttpErrorResponse) => of(unavailableFailure({ error: err.error }))),
       )),
   ));
@@ -114,7 +114,7 @@ export class UnavailableEffects {
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(unavailableSelected),
     tap(({ selected }) => {
-      let path = [this.translate.currentLang, 'unavailable'];
+      let path = [this.translate.getCurrentLang(), 'unavailable'];
       if (selected?.type === 'BLOCK_AGENDA') {
         path = [...path, 'block-agenda'];
       }

@@ -41,7 +41,7 @@ export const getAllRoomsByProfessionalId = createAction(
 
 export const unavailableSuccess = createAction(
   UnavailableActionTypes.unavailableSuccess,
-  props<{ data: Pagination<IUnavailable> }>(),
+  props<{ data: Pagination<IUnavailableAll> }>(),
 );
 
 export const roomSuccess = createAction(

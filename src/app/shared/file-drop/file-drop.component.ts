@@ -40,6 +40,7 @@ export class FileDropComponent {
   private readonly toastService: ToastService = inject(ToastService);
 
   accept = input<string>('*');
+  fileName = input<string>();
   multiple = input<boolean>(false);
   undo = input<boolean>(false);
   animate = input<boolean>(true);

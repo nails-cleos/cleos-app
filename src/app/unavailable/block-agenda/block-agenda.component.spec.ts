@@ -1,13 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BlockAgendaComponent } from './block-agenda.component';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { ChangeDetectorRef, signal } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { API_LOCALE, createNewDate, formatDuration, getTime, zoneDateToDate } from '../../util/dates';
-import { getUnavailable } from '../../store/unavailable.actions';
+import { deleteUnavailable, getUnavailable } from '../../store/unavailable.actions';
 import { IUnavailableAll } from '../../interfaces/unavailable';
 import { IUserAll } from '../../interfaces/user';
 import { IAvailability, IRoomAll } from '../../interfaces/room';
@@ -30,6 +30,7 @@ describe('BlockAgendaComponent', () => {
   let storeSpy: jasmine.SpyObj<Store<UnavailableState>>;
   let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let dialogSpy: jasmine.SpyObj<any>;
 
   const mockProfessionals: IUserAll[] = [
     { id: 'a', displayName: 'Alice' } as IUserAll,
@@ -143,6 +144,8 @@ describe('BlockAgendaComponent', () => {
     component = fixture.componentInstance;
 
     fixture.detectChanges();
+
+    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   it('should create', () => {
@@ -445,5 +448,31 @@ describe('BlockAgendaComponent', () => {
     expect(component.getForm.startDate.value).toBe(nextMonday);
     expect(component.getForm.startTime.value).toBe('12:00');
     expect(component.getForm.duration.value).toBeUndefined();
+  });
+
+  it('should dispatch deleteUnavailable when dialog returns a result', () => {
+    selectedUnavailable$.next(mockUnavailable);
+    fixture.detectChanges();
+    dialogSpy.and.returnValue({
+      afterClosed: () => of(mockUnavailable),
+    } as any);
+
+    component.delete();
+
+    expect(dialogSpy).toHaveBeenCalledWith(
+      jasmine.any(Function),
+      jasmine.objectContaining({
+        data: {
+          title: 'UNAVAILABLE.DELETED.TITLE',
+          content: 'UNAVAILABLE.DELETED.CONTENT',
+          value: mockUnavailable,
+        },
+      }));
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteUnavailable({
+      id: mockUnavailable.id!,
+      timestamp: mockUnavailable.timestamp!,
+      timeZone: mockUnavailable.timeZone,
+    }));
   });
 });

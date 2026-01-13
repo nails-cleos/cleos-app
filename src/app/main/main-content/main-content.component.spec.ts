@@ -154,7 +154,7 @@ describe('MainContentComponent', () => {
 
   it('should navigate to biab treatment', () => {
     component.goToTreatment('biab');
-    expect(routerSpy.navigate).toHaveBeenCalledWith([translateService.currentLang, 'home', 'biab', 'treatment']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([translateService.getCurrentLang(), 'home', 'biab', 'treatment']);
   });
 
   it('should not navigate for other treatments', () => {

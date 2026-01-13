@@ -527,8 +527,8 @@ export class MeReservationComponent {
       if (room) {
         if (!this.dismiss && !isSameTimeZone(room.timeZone)) {
           const now = getNowTimeZone();
-          const localDate = localeTimeZoneDate(this.translate.currentLang, now);
-          const timeZoneDate = localeTimeZoneDate(this.translate.currentLang, now, room.timeZone);
+          const localDate = localeTimeZoneDate(this.translate.getCurrentLang(), now);
+          const timeZoneDate = localeTimeZoneDate(this.translate.getCurrentLang(), now, room.timeZone);
           const warning = this.translate.instant('COMMON.TIME_ZONE.WARNING');
           const localDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.LOCAL', { date: localDate });
           const roomDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.ROOM', { date: timeZoneDate });
@@ -648,7 +648,7 @@ export class MeReservationComponent {
       if (customerReservation?.upcoming && customerReservation.upcoming.length >=
         MAX_UPCOMING_RESERVATION) {
         const dates = customerReservation.upcoming.map((upcoming: IReservationAll) => formatFullDateTime(
-          newDateTimestamp(upcoming.timestamp, upcoming.room.timeZone), this.translate.currentLang));
+          newDateTimestamp(upcoming.timestamp, upcoming.room.timeZone), this.translate.getCurrentLang()));
         const message = this.translate.instant('ME.RESERVATION.UPCOMING.ERROR.CUSTOMER',
           { date1: dates[0], date2: dates[1], date3: dates[2] });
         this.canNotContinue(message, 'create');
@@ -928,7 +928,7 @@ export class MeReservationComponent {
   displayFnProfessional = (professional: IUser): string => professional?.displayName ? professional.displayName : '';
 
   dateNoContent = (date?: Date): string => formatDateName(
-    createNewDate(date ? date : this.getTreatmentForm.startDate.value!), this.translate.currentLang, this.measure,
+    createNewDate(date ? date : this.getTreatmentForm.startDate.value!), this.translate.getCurrentLang(), this.measure,
   );
 
   selectDate = (datetime: AvailabilityData): void => {
@@ -948,8 +948,8 @@ export class MeReservationComponent {
 
   formatKey = (key: string): string => {
     const date = newDate(key);
-    const formattedDate = this.smallScreen() ? formatDateTwoDigit(date, this.translate.currentLang)
-      : formatDateName(date, this.translate.currentLang, this.measure);
+    const formattedDate = this.smallScreen() ? formatDateTwoDigit(date, this.translate.getCurrentLang())
+      : formatDateName(date, this.translate.getCurrentLang(), this.measure);
 
     return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
   };

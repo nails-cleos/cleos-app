@@ -22,7 +22,7 @@
         </th>
         <td *matCellDef="let unavailable" class="hide-xs" mat-cell>
           @if (unavailable.id) {
-            <div>{{ unavailable.professional?.displayName }}</div>
+            <div>{{ unavailable.professional.displayName }}</div>
           } @else {
             <div class="ssc-line"></div>
           }
@@ -119,7 +119,7 @@
             <mat-list>
               <mat-list-item class="hide-gt-xs" role="list">
                 <div class="hide-gt-xs" matListItemTitle>{{ 'UNAVAILABLE.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
-                <div matListItemLine>{{ unavailable?.professional?.displayName }}</div>
+                <div matListItemLine>{{ unavailable.professional.displayName }}</div>
               </mat-list-item>
               @if (unavailable.description) {
                 <mat-list-item class="hide-gt-xs" role="list">

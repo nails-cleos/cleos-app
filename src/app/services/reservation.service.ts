@@ -8,7 +8,7 @@ import {
   IRoomReservation,
   IUpcomingAll,
 } from '../interfaces/reservation';
-import { Pagination } from '../interfaces/pagination';
+import { paginated, Pagination } from '../interfaces/pagination';
 import { IReview } from '../interfaces/review';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
@@ -43,7 +43,7 @@ export class ReservationService {
       }
     }
 
-    return this.http.get<Pagination<IReservationAll>>(`${baseUrl}/pages`, { params });
+    return this.http.get<Pagination<IReservationAll>>(`${baseUrl}/pages`, { ...paginated(), params });
   };
 
   getCustomerReservations = (
@@ -80,7 +80,7 @@ export class ReservationService {
         params = params.append('states', state);
       });
     }
-    return this.http.get<Pagination<IReservationAll>>(toUrl(this.urlV1, 'filter'), { params });
+    return this.http.get<Pagination<IReservationAll>>(toUrl(this.urlV1, 'filter'), { ...paginated(), params });
   };
 
   getAllGroupingByRoom = (

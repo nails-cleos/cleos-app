@@ -6,7 +6,7 @@ import { TranslateService } from '@ngx-translate/core';
 @Injectable()
 export class MonthPeriodAdapter<D> implements MatDateRangeSelectionStrategy<D> {
   constructor(translate: TranslateService, private dateAdapter: DateAdapter<D>) {
-    this.dateAdapter.setLocale(translate.currentLang);
+    this.dateAdapter.setLocale(translate.getCurrentLang());
   }
 
   selectionFinished = (date: D | null): DateRange<D> => this.createPeriodRange(date);

@@ -1,0 +1,123 @@
+<mat-form-field appearance="outline" style="width: 80%">
+  <mat-label>{{ 'STATEMENT.OFFICE.SEARCH' | translate }}</mat-label>
+  <input (keydown)="keyDownHandler($event)" [formControl]="getForm.office" [matAutocomplete]="autoOffice"
+         autocomplete="off" matInput placeholder="{{ 'STATEMENT.OFFICE.FIELD' | translate }}"
+         type="text" required>
+  <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
+    @for (office of filteredOfficeSignal(); track office.id) {
+      <mat-option [value]="office">
+        {{ office.name }}
+      </mat-option>
+    }
+  </mat-autocomplete>
+  @if (getForm.office.hasError('required')) {
+    <mat-error [innerHTML]="'STATEMENT.OFFICE.REQUIRED' | translate"></mat-error>
+  } @else if (getForm.office.hasError('requireMatch')) {
+    <mat-error [innerHTML]="'STATEMENT.OFFICE.INVALID' | translate"></mat-error>
+  }
+</mat-form-field>
+<div class="mat-elevation-z8">
+  @let resultsLength = resultsLengthSignal();
+  @let pageSize = pageSizeSignal();
+  @if (dataSourceSignal(); as dataSource) {
+    <table [dataSource]="dataSource" mat-table matSort matSortActive="date" matSortDirection="desc" matSortDisableClear
+           multiTemplateDataRows>
+      <ng-container matColumnDef="position">
+        <th *matHeaderCellDef mat-header-cell>#</th>
+        <td *matCellDef="let statement; let i = dataIndex;" mat-cell>
+          @if (statement.id) {
+            <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
+        <td *matCellDef="let statement" mat-cell>
+          @if (statement.id) {
+            <div>{{ statement.name }}</div>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="date">
+        <th *matHeaderCellDef class="hide-xs" mat-header-cell
+            mat-sort-header>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}
+        </th>
+        <td *matCellDef="let statement" class="hide-xs" mat-cell>
+          @if (statement.id) {
+            <div>{{ statement.date | date:'MM-yyyy' }}</div>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+        <td *matCellDef="let statement" class="hide-xs" mat-cell>
+          @if (statement.id) {
+            <div>
+              @if (!statement.deleted) {
+                <button (click)="download(statement)" mat-icon-button
+                        matTooltip="{{ 'COMMON.BUTTON.DOWNLOAD' | translate }}" matTooltipPosition="left">
+                  <mat-icon color="primary">file_download</mat-icon>
+                </button>
+              }
+            </div>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="expandedDetail">
+        <td *matCellDef="let statement" [attr.colspan]="displayedColumns.length" class="hide-gt-xs" mat-cell>
+          <div [@detailExpand]="statement === expandedStatement ? 'expanded' : 'collapsed'"
+               class="detail hide-gt-xs">
+            <mat-list>
+              @if (statement.date) {
+                <mat-list-item role="list">
+                  <div matListItemTitle>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}</div>
+                  <div matListItemLine>{{ statement.date | date:'MM-yyyy' }}</div>
+                </mat-list-item>
+              }
+              @if (!statement.deleted) {
+                <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+                <mat-list-item role="list">
+                  <button (click)="download(statement)" color="primary" mat-icon-button>
+                    <mat-icon matListItemIcon>file_download</mat-icon>
+                  </button>
+                </mat-list-item>
+              }
+            </mat-list>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="noContent">
+        <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+          {{ 'STATEMENT.LIST.ERROR.NO_CONTENT' | translate }}
+        </td>
+      </ng-container>
+
+      <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+      <tr (click)="expandedStatement = expandedStatement === statement ? null : statement"
+          *matRowDef="let statement; columns: displayedColumns;" class="row" mat-row></tr>
+      <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
+
+      <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+    </table>
+    @if (resultsLength) {
+      <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+    }
+  }
+</div>
+<button color="accent" id="add-button" mat-fab matTooltip="{{ 'STATEMENT.TITLE' | translate }}"
+        [routerLink]="['/', language, 'statements', 'add']">
+  <mat-icon>request_quote</mat-icon>
+</button>

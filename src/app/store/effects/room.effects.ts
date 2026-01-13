@@ -127,7 +127,7 @@ export class RoomEffects {
     ofType(roomSelected),
     tap(({ selected, redirect }) => {
       if (redirect) {
-        this.router.navigate([this.translate.currentLang, 'rooms', selected?.id]);
+        this.router.navigate([this.translate.getCurrentLang(), 'rooms', selected?.id]);
       }
     }),
   ), { dispatch: false });

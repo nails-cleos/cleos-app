@@ -110,7 +110,7 @@ export class OverviewComponent {
             if (ro.primaryId || ro.secondaryId) {
               return Object.assign({}, ro, {
                 link: (id: string | undefined) => !id ||
-                  this.router.navigate([this.translate.currentLang, 'reservation', id]),
+                  this.router.navigate([this.translate.getCurrentLang(), 'reservation', id]),
               });
             }
             return ro;
