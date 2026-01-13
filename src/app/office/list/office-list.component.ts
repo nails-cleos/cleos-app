@@ -61,7 +61,7 @@ export class OfficeListComponent {
   displayedColumns: string[] = ['position', 'name', 'manager', 'subject', 'actions'];
   expanded?: IOffice;
 
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect((onCleanup) => {

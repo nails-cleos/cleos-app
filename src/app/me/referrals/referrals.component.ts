@@ -75,7 +75,7 @@ export class ReferralsComponent {
     const userId = this.userId();
     if (userId) {
       this.clipboard.copy(userId);
-      this.toastService.info(this.translate.instant('ME.REFERRAL.COPY'));
+      this.toastService.show(this.translate.instant('ME.REFERRAL.COPY'), 'info');
     }
   }
 

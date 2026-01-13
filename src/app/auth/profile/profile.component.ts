@@ -216,7 +216,7 @@ export class ProfileComponent {
     }
     const selectedUser = this.selectedUserSignal();
 
-    const lang = valueChange(this.getForm.lang.value, selectedUser?.locale) || this.translate.currentLang;
+    const lang = valueChange(this.getForm.lang.value, selectedUser?.locale) || this.translate.getCurrentLang();
     const user: IUser = new User();
     user.lang = lang;
     user.displayName = fieldChange(this.getForm.displayName, selectedUser?.displayName);

@@ -24,8 +24,7 @@ describe('YearSummaryComponent', () => {
   let saveAsSpy: jasmine.Spy;
 
   beforeEach(async () => {
-
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch', 'pipe']);
+    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
@@ -51,6 +50,7 @@ describe('YearSummaryComponent', () => {
     component = fixture.componentInstance;
 
     saveAsSpy = spyOn(fs as any, 'saveAs').and.callFake((blob: Blob, filename?: string) => {
+      // no-op
     });
   });
 
@@ -179,7 +179,6 @@ describe('YearSummaryComponent', () => {
       expect(blob instanceof Blob).toBeTrue();
       expect(blob.type).toBe('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     }));
-
   });
 
   describe('exportAction', () => {

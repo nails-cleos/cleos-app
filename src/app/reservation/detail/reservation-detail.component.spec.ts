@@ -20,7 +20,7 @@ import {
   updateReservationColor,
   updateReservationCustomer,
 } from '../../store/reservation.actions';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { notifyPayment, paymentSend } from '../../store/payment.actions';
 import { ServiceType } from '../../interfaces/room';
 import { IUserAll } from '../../interfaces/user';
@@ -139,7 +139,7 @@ describe('ReservationDetailComponent', () => {
     histories$ = new BehaviorSubject(undefined);
     paymentOptions$ = new BehaviorSubject(undefined);
 
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch', 'pipe']);
+    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
@@ -171,20 +171,16 @@ describe('ReservationDetailComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [
-        ReservationDetailComponent,
-        TranslateModule.forRoot(),
-        NoopAnimationsModule,
-      ],
+      imports: [ReservationDetailComponent, TranslateModule.forRoot()],
       providers: [
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
+        provideNoopAnimations(),
       ],
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.setDefaultLang('en-GB');
     translateService.use('en-GB');
 
     const router = TestBed.inject(Router);

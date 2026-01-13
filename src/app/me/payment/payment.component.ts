@@ -47,7 +47,7 @@ export class PaymentComponent {
 
   errorMessage?: string;
   showError = false;
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   private id?: string;
   private path?: 'reservation' | 'transaction';

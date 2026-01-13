@@ -12,7 +12,17 @@ import {
   greaterOrEqualsThan,
   newDateTimestamp,
 } from '../util/dates';
-import { CalendarEvent, CalendarModule, CalendarMonthViewDay, CalendarView } from 'angular-calendar';
+import {
+  CalendarDatePipe,
+  CalendarEvent,
+  CalendarMonthViewComponent,
+  CalendarMonthViewDay,
+  CalendarNextViewDirective,
+  CalendarPreviousViewDirective,
+  CalendarTodayDirective,
+  CalendarView,
+  ClickDirective,
+} from 'angular-calendar';
 import { findStateColor, getStateOrder } from '../util/theme';
 import { allDayEvent, DataEvent, IDataEvent, IMeta, Meta, monthEvent } from '../util/event';
 import { Router } from '@angular/router';
@@ -48,7 +58,9 @@ type DashboardForm = {
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  imports: [SharedModule, CalendarModule, MiniCardComponent, ReservationTableComponent, CardComponent, ChartComponent],
+  imports: [SharedModule, MiniCardComponent, ReservationTableComponent, CardComponent, ChartComponent, CalendarDatePipe,
+    CalendarNextViewDirective, CalendarTodayDirective, CalendarPreviousViewDirective, CalendarMonthViewComponent,
+    ClickDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent {
@@ -141,7 +153,7 @@ export class DashboardComponent {
   view: CalendarView = CalendarView.Month;
   viewDate = signal(getNowTimeZone(this.timeZone));
   activeDayIsOpen = false;
-  dateFormat: string = this.translate.currentLang;
+  dateFormat: string = this.translate.getCurrentLang();
   calendar: IDataEvent = new DataEvent([], 0, this.viewDate()!, 0, false);
   isCalendarLoading = true;
   isLoading = true;
@@ -158,7 +170,7 @@ export class DashboardComponent {
 
   private previousDarkMode?: boolean;
   private periodStart?: Date;
-  private readonly language: string = this.translate.currentLang;
+  private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect(() => {
@@ -219,18 +231,18 @@ export class DashboardComponent {
           }
           if (dashboard.miniCardSummaries && dashboard.miniCardSummaries.length) {
             this.miniCardData = dashboard.miniCardSummaries.map(miniCard => {
-              if (miniCard.isCurrency && miniCard.value) {
-                let value;
-                let previousPeriodValue;
-                if (miniCard.value) {
-                  value = numberFormat(miniCard.value, this.currency, this.dateFormat);
-                }
-                if (miniCard.previousPeriodValue) {
-                  previousPeriodValue = numberFormat(miniCard.previousPeriodValue, this.currency, this.dateFormat);
-                }
-                return Object.assign({}, miniCard, { value, previousPeriodValue });
+              if (!miniCard.isCurrency) {
+                return miniCard;
               }
-              return miniCard;
+              return {
+                ...miniCard,
+                value: miniCard.value
+                  ? numberFormat(miniCard.value, this.currency, this.dateFormat)
+                  : miniCard.value,
+                previousPeriodValue: miniCard.previousPeriodValue
+                  ? numberFormat(miniCard.previousPeriodValue, this.currency, this.dateFormat)
+                  : miniCard.previousPeriodValue,
+              };
             });
           } else {
             this.miniCardError('NO_CONTENT');

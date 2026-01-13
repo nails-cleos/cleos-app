@@ -1,7 +1,7 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import { IDiscount, IDiscountAll, IReferral, IUserDiscount } from '../../interfaces/discount';
-import { IError, ResponseSuccess } from '../../interfaces/common';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 import { DISCOUNT_FEATURE_KEY, DiscountState } from '../reducers/discount.reducers';
 import { Pagination } from '../../interfaces/pagination';
 import { ICurrency } from '../../interfaces/currency';
@@ -86,7 +86,7 @@ export const selectDiscountResponse = createSelector(
 );
 export const getDiscountResponsePipe = pipe(
   select(selectDiscountResponse),
-  filter((val): val is ResponseSuccess => val !== undefined),
+  filter((val): val is IResponseSuccess => val !== undefined),
 );
 
 export const selectDiscountError = createSelector(

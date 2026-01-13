@@ -216,7 +216,10 @@
     "LABEL": {
       "FILTER": "Filtrar",
       "PRICE": "Precio",
-      "TOTAL": "Total"
+      "TOTAL": "Total",
+      "MONTHLY": {
+        "DATE": "Mes y año"
+      }
     },
     "SEARCH": {
       "TITLE": "Búsqueda"

@@ -3,7 +3,7 @@ import { BankComponent, BankForm } from './bank.component';
 import { FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { IPaymentOption, PaymentPercentage, PaymentType } from '../../interfaces/payment';
 import { requireMatch } from '../../util/validators';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { TranslateModule } from '@ngx-translate/core';
 
 describe('BankComponent', () => {
@@ -33,7 +33,8 @@ describe('BankComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BankComponent, NoopAnimationsModule, TranslateModule.forRoot()],
+      imports: [BankComponent, TranslateModule.forRoot()],
+      providers: [provideNoopAnimations()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(BankComponent);

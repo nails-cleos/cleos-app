@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { IError, ResponseSuccess } from '../interfaces/common';
+import { IError, IResponseSuccess } from '../interfaces/common';
 import { INote } from '../interfaces/note';
 import { IUserAll } from '../interfaces/user';
 
@@ -40,7 +40,7 @@ export const updateNote = createAction(
 
 export const noteSaveSuccess = createAction(
   NoteActionTypes.noteSaveSuccess,
-  props<ResponseSuccess>(),
+  props<IResponseSuccess>(),
 );
 
 export const noteFailure = createAction(

@@ -132,7 +132,7 @@ export class YearSummaryComponent {
 
   isExportLoading = signal<boolean>(false);
   isLoading = signal<boolean>(false);
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect(() => {
@@ -325,7 +325,7 @@ export class YearSummaryComponent {
       workbook.created = getNowTimeZone(this.timeZone());
 
       // Generate & Save Excel File
-      workbook.xlsx.writeBuffer().then((content) => {
+      workbook.xlsx.writeBuffer().then((content: any) => {
         const blob = new Blob([content], {
           type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         });

@@ -37,6 +37,8 @@ import {
 import { getDataDeletedPipe, getNotificationsPipe } from '../store/selectors/notification.selectors';
 import { of, Subject } from 'rxjs';
 import { selectGlobalError, selectGlobalIsLoading, selectGlobalResponse } from '../store/selectors/global.selectors';
+import { ToastOptions } from '../shared/toast/toast.model';
+import { IResponseSuccess } from '../interfaces/common';
 
 @Component({
   selector: 'app-nav',
@@ -123,7 +125,7 @@ export class NavComponent implements OnDestroy {
   workDay = signal<INotification[]>([]);
   countNotifications = signal(0);
 
-  dateFormat: string = this.translate.currentLang;
+  dateFormat: string = this.translate.getCurrentLang();
   image?: string;
   initials?: string;
   plusNotification?: string;
@@ -141,23 +143,37 @@ export class NavComponent implements OnDestroy {
     this.seoService.setMetaTitle(meta.TITLE);
 
     effect(() => {
-      const res = this.response();
-      if (!res) {
+      const response = this.response();
+      if (!response) {
         return;
       }
 
-      if (res.redirect) {
-        this.router.navigate([`/${this.language()}/${res.redirect}`]);
+      if (response.redirect) {
+        this.router.navigate([`/${this.language()}/${response.redirect}`]);
       }
 
-      const path = res.path ? `/${this.language()}/${res.path}` : undefined;
-      const toastRef = this.toastService.show(res.message, res.toastType, 5000, path ? 'link' : 'none', path);
+      if (response.blob) {
+        const url = URL.createObjectURL(response.blob);
 
-      toastRef.onDismiss().subscribe(() => {
-        if (res.reload) {
-          this.navigationService.reload(this.router.url.split('/'));
-        }
-      });
+        // download
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = response.fileName;
+        a.click();
+
+        URL.revokeObjectURL(url);
+      }
+
+      if (response.message) {
+        const options = this.getToastOptions(response);
+        const toastRef = this.toastService.show(response.message, response.toastType, 5000, options);
+
+        toastRef.onDismiss().subscribe(() => {
+          if (response.reload) {
+            this.navigationService.reload(this.router.url.split('/'));
+          }
+        });
+      }
     });
 
     effect(() => {
@@ -166,7 +182,7 @@ export class NavComponent implements OnDestroy {
         return;
       }
 
-      this.toastService.error(err.message);
+      this.toastService.show(err.message, 'error');
     });
 
     effect(() => {
@@ -340,5 +356,12 @@ export class NavComponent implements OnDestroy {
 
   private resetTheme = (theme?: Theme): void => {
     this.cssClass = resetTheme(this.overlayContainer, this.cookieService, this.themeService, theme, this.cssClass);
+  };
+
+  private getToastOptions = (res: IResponseSuccess): ToastOptions => {
+    if (res.path) {
+      return { actionType: 'link', action: `/${this.language()}/${res.path}` };
+    }
+    return { actionType: 'none' };
   };
 }

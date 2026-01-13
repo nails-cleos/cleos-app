@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
-import { CalendarEvent, CalendarModule } from 'angular-calendar';
+import { CalendarDatePipe, CalendarEvent } from 'angular-calendar';
 import {
   addPeriod,
   API_LOCALE,
@@ -53,7 +53,7 @@ import { ReservationState } from '../../store/reducers/reservation.reducers';
   selector: 'app-dashboard',
   templateUrl: './dashboard-event.component.html',
   styleUrls: ['./dashboard-event.component.scss'],
-  imports: [SharedModule, CalendarModule, DayViewSchedulerComponent, CounterComponent],
+  imports: [SharedModule, DayViewSchedulerComponent, CounterComponent, CalendarDatePipe],
   providers: [DayViewSchedulerCalendarUtils],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -88,7 +88,7 @@ export class DashboardEventComponent {
   professionals: IProfessional[] = [];
   calendar: IDataEvent = new DataEvent([], 0, this.viewDate(), 0, false);
 
-  locale: string = this.translate.currentLang;
+  locale: string = this.translate.getCurrentLang();
 
   prevBtnDisabled = false;
   nextBtnDisabled = false;
@@ -101,7 +101,7 @@ export class DashboardEventComponent {
   private readonly startedText: string = this.translate.instant('DASHBOARD.ROOM.STARTED');
   private readonly elapsedText: string = this.translate.instant('DASHBOARD.ROOM.ELAPSED');
   private readonly finishInText: string = this.translate.instant('DASHBOARD.ROOM.FINISH_IN');
-  private readonly language: string = this.translate.currentLang;
+  private readonly language: string = this.translate.getCurrentLang();
 
   private calendarReady = signal(false);
 

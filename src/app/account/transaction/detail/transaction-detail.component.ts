@@ -52,9 +52,9 @@ export class TransactionDetailComponent {
     return transaction;
   });
 
-  dateFormat = this.translate.currentLang;
+  dateFormat = this.translate.getCurrentLang();
   step?: number = this.router.getCurrentNavigation()?.extras.state?.step;
-  language = this.translate.currentLang;
+  language = this.translate.getCurrentLang();
 
   constructor() {
     effect(() => {

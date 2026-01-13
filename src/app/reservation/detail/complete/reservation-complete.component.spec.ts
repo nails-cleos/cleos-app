@@ -116,7 +116,7 @@ describe('ReservationCompleteComponent', () => {
     additionalList$ = new BehaviorSubject(mockAdditionalList);
     payments$ = new BehaviorSubject(mockPayments);
 
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch', 'pipe']);
+    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
@@ -145,9 +145,8 @@ describe('ReservationCompleteComponent', () => {
       ],
     }).compileComponents();
 
-    const translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en-GB');
-    translate.use('en-GB');
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
 
     fixture = TestBed.createComponent(ReservationCompleteComponent);
     component = fixture.componentInstance;

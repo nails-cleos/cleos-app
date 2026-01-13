@@ -57,7 +57,7 @@ export class MoreInfoComponent {
 
   displayedColumns: string[] = ['position', 'description', 'amount', 'type', 'status', 'actions'];
 
-  dateFormat: string = this.translate.currentLang;
+  dateFormat: string = this.translate.getCurrentLang();
 
   totalTime = computed(() => {
     const tracking = this.trackingSignal();
@@ -110,7 +110,7 @@ export class MoreInfoComponent {
   copy = (payment: IPaymentAll): void => {
     if (payment.link) {
       this.clipboard.copy(payment.link);
-      this.toastService.info(this.translate.instant('PAYMENT.COPY'));
+      this.toastService.show(this.translate.instant('PAYMENT.COPY'), 'info');
     }
   };
 }

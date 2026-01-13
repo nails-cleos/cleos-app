@@ -44,7 +44,7 @@ describe('MainContentComponent', () => {
       authUser: authUserSignal.asReadonly(),
     });
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show', 'error']);
+    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
     bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
     mainContentServiceSpy = jasmine.createSpyObj('MainContentService', ['configure']);
 
@@ -77,7 +77,6 @@ describe('MainContentComponent', () => {
     }).compileComponents();
 
     translateService = TestBed.inject(TranslateService);
-    translateService.setDefaultLang('en-GB');
     translateService.use('en-GB');
     translateService.setTranslation('en-GB', {
       TREATMENTS: [{

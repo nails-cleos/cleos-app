@@ -158,7 +158,7 @@ export class ReservationDetailComponent {
   start: Date = getNowTimeZone();
   end: Date = getNowTimeZone();
   state = signal<string | undefined>(undefined);
-  dateFormat: string = this.translate.currentLang;
+  dateFormat: string = this.translate.getCurrentLang();
   changeState: IFabMenu[] = [];
 
   displayedColumns: string[] = ['position', 'professional', 'start', 'treatment', 'state'];
@@ -200,7 +200,7 @@ export class ReservationDetailComponent {
   isReservationAdmin?: boolean;
   isCustomer = signal(false);
   step = computed(() => this.navigationParams()?.step);
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   private static stateMachineDefinition: any;
   private machine: any;

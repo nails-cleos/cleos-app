@@ -124,8 +124,8 @@ export class MonthSummaryComponent {
   locale = 'es';
   isLoading = false;
 
-  dateFormat: string = this.translate.currentLang;
-  readonly language: string = this.translate.currentLang;
+  dateFormat: string = this.translate.getCurrentLang();
+  readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect(() => {
@@ -489,7 +489,7 @@ export class MonthSummaryComponent {
     workbook.created = getNowTimeZone(this.timeZone());
 
     // Generate & Save Excel File
-    workbook.xlsx.writeBuffer().then((content) => {
+    workbook.xlsx.writeBuffer().then((content: any) => {
       const blob = new Blob([content], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
@@ -531,7 +531,7 @@ export class MonthSummaryComponent {
       workbook.created = getNowTimeZone(this.timeZone());
 
       // Generate & Save Excel File
-      workbook.xlsx.writeBuffer().then((content) => {
+      workbook.xlsx.writeBuffer().then((content: any) => {
         const blob = new Blob([content], {
           type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         });

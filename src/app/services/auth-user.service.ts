@@ -3,9 +3,8 @@ import { IUserAll } from '../interfaces/user';
 import { isDarkMode, Theme } from '../util/theme';
 import { hasRoomAdmin } from '../util/helper';
 import { Role } from '../interfaces/token';
-import { NgcContentOptions } from 'ngx-cookieconsent/lib/model/content-options';
 import { TranslateService } from '@ngx-translate/core';
-import { NgcCookieConsentService } from 'ngx-cookieconsent';
+import { NgcContentOptions, NgcCookieConsentService } from 'ngx-cookieconsent';
 
 export interface IAuthUser {
   isDarkMode: boolean;

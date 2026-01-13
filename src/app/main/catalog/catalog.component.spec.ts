@@ -44,7 +44,6 @@ describe('CatalogComponent', () => {
     fixture = TestBed.createComponent(CatalogComponent);
     component = fixture.componentInstance;
     translateService = TestBed.inject(TranslateService);
-    translateService.setDefaultLang('en-GB');
     translateService.use('en-GB');
   });
 

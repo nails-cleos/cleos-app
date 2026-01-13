@@ -91,7 +91,7 @@ export class UsersComponent {
 
   expandedUser?: IUserAll;
 
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   form: FormGroup<UsersForm> = this.formBuilder.group<UsersForm>({
     filter: this.formBuilder.control(undefined),

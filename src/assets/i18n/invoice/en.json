@@ -22,6 +22,7 @@
     "PAYMENT": {
       "SEARCH": "Find by payment type",
       "FIELD": "Payment type"
-    }
+    },
+    "UPLOAD_SUCCESS": "Invoice {{fileName}} uploaded successfully"
   }
 }

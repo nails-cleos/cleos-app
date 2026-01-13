@@ -217,7 +217,7 @@ export class RoomComponent {
   private formattedAddress?: string;
   private currentAvailabilities: IAvailability[] = [];
   private currentProfessionalIds: string[] = [];
-  private readonly language: string = this.translate.currentLang;
+  private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect(() => {
@@ -229,14 +229,16 @@ export class RoomComponent {
           currency: selected.currency,
           office: selected.office,
           timeZone: timeZone,
-          address: selected.address.name,
-          addressDescription: selected.address.description,
           closeDate: typeof selected.closeDate === 'string' ? createDateFromString(selected.closeDate) :
             selected.closeDate,
         };
         this.primary = selected.primary;
         this.paymentTypes = selected.paymentTypes;
         this.form.patchValue(room);
+        this.googleMapForm.patchValue({
+          address: selected.address.name,
+          addressDescription: selected.address.description,
+        });
         this.getAvailabilities(selected.availabilities);
       }
     });

@@ -80,9 +80,8 @@ describe('AdditionalComponent', () => {
     component = fixture.componentInstance;
 
     // Make sure translate has a language so component.language is meaningful
-    const translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en-GB');
-    translate.use('en-GB');
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
 
     fixture.detectChanges(); // kick off effects / toSignal subscriptions
   });

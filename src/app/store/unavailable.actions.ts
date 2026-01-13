@@ -1,7 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 import { Pagination } from '../interfaces/pagination';
 import { IUnavailable, IUnavailableAll } from '../interfaces/unavailable';
-import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { IError, PageRequest, IResponseSuccess } from '../interfaces/common';
 import { IUserAll } from '../interfaces/user';
 import { IRoomAll } from '../interfaces/room';
 
@@ -71,7 +71,7 @@ export const updateUnavailable = createAction(
 
 export const unavailableSaveSuccess = createAction(
   UnavailableActionTypes.unavailableSaveSuccess,
-  props<ResponseSuccess>(),
+  props<IResponseSuccess>(),
 );
 
 export const unavailableFailure = createAction(

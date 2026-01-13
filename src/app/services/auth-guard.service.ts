@@ -42,7 +42,7 @@ export class PermissionsService {
         } else {
           message = 'User not have the necessary permissions';
         }
-        this.toastService.info(message);
+        this.toastService.show(message, 'info');
         this.store.dispatch(redirect());
         return false;
       }

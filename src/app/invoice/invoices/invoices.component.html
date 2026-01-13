@@ -1,0 +1,106 @@
+<div class="mat-elevation-z8">
+  @let resultsLength = resultsLengthSignal();
+  @let pageSize = pageSizeSignal();
+  @if (dataSourceSignal(); as dataSource) {
+    <table [dataSource]="dataSource" mat-table matSort matSortActive="date" matSortDirection="desc" matSortDisableClear
+           multiTemplateDataRows>
+      <ng-container matColumnDef="position">
+        <th *matHeaderCellDef mat-header-cell>#</th>
+        <td *matCellDef="let invoice; let i = dataIndex;" mat-cell>
+          @if (invoice.id) {
+            <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
+        <td *matCellDef="let invoice" mat-cell>
+          @if (invoice.id) {
+            <div>{{ invoice.name }}</div>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="date">
+        <th *matHeaderCellDef class="hide-xs" mat-header-cell
+            mat-sort-header>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}
+        </th>
+        <td *matCellDef="let invoice" class="hide-xs" mat-cell>
+          @if (invoice.id) {
+            <div>{{ invoice.date | date:'MM-yyyy' }}</div>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+        <td *matCellDef="let invoice" class="hide-xs" mat-cell>
+          @if (invoice.id) {
+            <div>
+              @if (!invoice.deleted) {
+                <button (click)="view(invoice)" mat-icon-button
+                        matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
+                  <mat-icon color="primary">file_download</mat-icon>
+                </button>
+              }
+            </div>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="expandedDetail">
+        <td *matCellDef="let invoice" [attr.colspan]="displayedColumns.length" class="hide-gt-xs" mat-cell>
+          <div [@detailExpand]="invoice === expandedInvoice ? 'expanded' : 'collapsed'"
+               class="detail hide-gt-xs">
+            <mat-list>
+              @if (invoice.date) {
+                <mat-list-item role="list">
+                  <div matListItemTitle>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}</div>
+                  <div matListItemLine>{{ invoice.date | date:'MM-yyyy' }}</div>
+                </mat-list-item>
+              }
+              @if (!invoice.deleted) {
+                <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+                <mat-list-item role="list">
+                  <button (click)="view(invoice)" color="primary" mat-icon-button>
+                    <mat-icon matListItemIcon>file_download</mat-icon>
+                  </button>
+                </mat-list-item>
+              }
+            </mat-list>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="noContent">
+        <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+          {{ 'COLOR.LIST.ERROR.NO_CONTENT' | translate }}
+        </td>
+      </ng-container>
+
+      <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+      <tr (click)="expandedInvoice = expandedInvoice === invoice ? null : invoice"
+          *matRowDef="let invoice; columns: displayedColumns;" class="row" mat-row></tr>
+      <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
+
+      <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+    </table>
+    @if (resultsLength) {
+      <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+    }
+
+    <button color="accent" id="add-button" mat-fab matTooltip="{{ 'COLOR.TITLE' | translate }}"
+            [routerLink]="['/', language, 'invoices', 'add']">
+      <mat-icon>add</mat-icon>
+    </button>
+  }
+</div>

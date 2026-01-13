@@ -67,7 +67,7 @@ describe('MoreInfoComponent', () => {
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     clipboardSpy = jasmine.createSpyObj('Clipboard', ['copy']);
-    toastServiceSpy = jasmine.createSpyObj('ToastService', ['info']);
+    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
@@ -230,7 +230,7 @@ describe('MoreInfoComponent', () => {
 
     component.copy(payment);
 
-    expect(toastServiceSpy.info).not.toHaveBeenCalled();
+    expect(toastServiceSpy.show).not.toHaveBeenCalled();
     expect(clipboardSpy.copy).not.toHaveBeenCalled();
   });
 
@@ -240,7 +240,7 @@ describe('MoreInfoComponent', () => {
 
     component.copy(payment);
 
-    expect(toastServiceSpy.info).toHaveBeenCalledWith('PAYMENT.COPY');
+    expect(toastServiceSpy.show).toHaveBeenCalledWith('PAYMENT.COPY', 'info');
     expect(clipboardSpy.copy).toHaveBeenCalledWith(link);
   });
 });

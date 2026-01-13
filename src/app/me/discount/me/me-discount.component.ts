@@ -74,7 +74,7 @@ export class MeDiscountComponent {
 
   displayedColumns: string[] = ['position', 'discountCustomer.name', 'discountCustomer.amount', 'used', 'actions'];
 
-  private readonly language: string = this.translate.currentLang;
+  private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
     logEvent(this.analytic, 'screen_view', {

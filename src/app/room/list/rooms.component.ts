@@ -71,7 +71,7 @@ export class RoomsComponent {
   displayedColumns: string[] = ['position', 'currency', 'office', 'address', 'timeZone', 'availability', 'actions'];
   expanded?: IRoom;
 
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect((onCleanup) => {

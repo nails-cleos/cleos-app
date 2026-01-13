@@ -1,7 +1,7 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import { IOffice, IOfficeAll } from '../../interfaces/office';
-import { IError, ResponseSuccess } from '../../interfaces/common';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 import { OFFICE_FEATURE_KEY, OfficeState } from '../reducers/office.reducers';
 import { Pagination } from '../../interfaces/pagination';
 import { IUserAll } from '../../interfaces/user';
@@ -59,7 +59,7 @@ export const selectOfficeResponse = createSelector(
 );
 export const getOfficeResponsePipe = pipe(
   select(selectOfficeResponse),
-  filter((val): val is ResponseSuccess => val !== undefined),
+  filter((val): val is IResponseSuccess => val !== undefined),
 );
 
 export const selectOfficeError = createSelector(

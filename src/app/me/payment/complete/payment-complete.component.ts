@@ -79,7 +79,7 @@ export class PaymentCompleteComponent {
 
       }
     });
-    this.language = this.translate.currentLang;
+    this.language = this.translate.getCurrentLang();
 
 
     effect(() => {

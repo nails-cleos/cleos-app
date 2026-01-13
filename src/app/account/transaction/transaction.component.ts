@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AuthUserService } from '../../services/auth-user.service';
 import { ITransaction } from '../../interfaces/account';
-import { getPayNlOptions, PaymentType } from '../../interfaces/payment';
+import { getPayNlOptions, IPaymentOption, PaymentType } from '../../interfaces/payment';
 import { currencySymbol } from '../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../../shared/shared.module';
@@ -15,8 +15,8 @@ import { BankComponent, BankForm } from '../../shared/bank/bank.component';
 import { IError } from '../../interfaces/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
-  getCurrentAccountIdPipe,
   getAccountResponsePipe,
+  getCurrentAccountIdPipe,
   getSelectedAccountPipe,
   getSelectPaymentOptionsPipe,
   getSubErrorsPipe,
@@ -61,17 +61,11 @@ export class TransactionComponent {
   accountSignal = computed(() => this.selectedAccountSignal());
   optionsSignal = computed(() =>
     this.paymentOptionsSignal() ? getPayNlOptions(this.paymentOptionsSignal()!) : undefined);
-  hasAdminRole = computed(() => {
-    const hasAdmin = this.authUserSignal().hasAdminRole;
-    if (!hasAdmin) {
-      this.store.dispatch(paymentOptions());
-    }
-    return hasAdmin;
-  });
+  hasAdminRole = computed(() => this.authUserSignal().hasAdminRole);
 
-  types: string[] = [PaymentType.cash, PaymentType.transfer];
+  types = [{ type: PaymentType.cash }, { type: PaymentType.transfer }] as IPaymentOption[];
   amountMin: number = 100;
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   bankForm = this.formBuilder.group<BankForm>({
     bank: this.formBuilder.control(undefined),
@@ -92,6 +86,11 @@ export class TransactionComponent {
   transfer = PaymentType.transfer;
 
   constructor() {
+    effect(() => {
+      if (!this.hasAdminRole()) {
+        this.store.dispatch(paymentOptions());
+      }
+    });
     effect(() => {
       const subErrors = this.subErrorsSignal();
       if (subErrors) {

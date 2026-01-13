@@ -48,7 +48,6 @@ describe('BackButtonDirective', () => {
     directive = debugEl.injector.get(BackButtonDirective);
 
     translateService = TestBed.inject(TranslateService);
-    translateService.setDefaultLang('en-GB');
     translateService.use('en-GB');
 
     dialogSpy = spyOn(directive.dialog, 'open');

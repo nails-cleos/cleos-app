@@ -413,7 +413,7 @@ export class MeReservationComponent {
   private steps: IStep[];
   private dismiss = false;
   private treatmentDiscount?: IDiscount;
-  private readonly language: string = this.translate.currentLang;
+  private readonly language: string = this.translate.getCurrentLang();
 
   smallScreen = computed(() => this.breakpointsSignal()?.matches);
 
@@ -446,7 +446,7 @@ export class MeReservationComponent {
   selectedIndex = 1;
   isPreview = false;
   isPayment = false;
-  dateFormat: string = this.translate.currentLang;
+  dateFormat: string = this.translate.getCurrentLang();
 
   isEditing = false;
   canCreate = true;
@@ -533,8 +533,7 @@ export class MeReservationComponent {
           const localDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.LOCAL', { date: localDate });
           const roomDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.ROOM', { date: timeZoneDate });
           const message = `${warning} - ${localDateLabel} / ${roomDateLabel}`;
-          const toastRef = this.toastService.warning(message, 0, 'button',
-            this.translate.instant('COMMON.TIME_ZONE.ACTION'));
+          const toastRef = this.toastService.show(message, 'warning', 0, { actionType: 'button' });
           toastRef.onAction().subscribe(() => {
             this.dismiss = true;
           });

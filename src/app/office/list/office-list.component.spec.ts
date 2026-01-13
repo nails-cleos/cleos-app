@@ -9,7 +9,7 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { deleteOffice, getOfficesPage, officeSelected } from '../../store/office.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { OfficeState } from '../../store/reducers/office.reducers';
 
 describe('OfficeListComponent', () => {
@@ -72,11 +72,12 @@ describe('OfficeListComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [OfficeListComponent, TranslateModule.forRoot(), NoopAnimationsModule],
+      imports: [OfficeListComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        provideNoopAnimations(),
       ],
     }).compileComponents();
 
@@ -84,8 +85,7 @@ describe('OfficeListComponent', () => {
     component = fixture.componentInstance;
 
     translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en');
-    translate.use('en');
+    translate.use('en-GB');
 
     fixture.detectChanges();
 

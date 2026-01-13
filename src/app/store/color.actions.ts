@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
 import { IColor } from '../interfaces/color';
 import { Pagination } from '../interfaces/pagination';
 
@@ -44,7 +44,7 @@ export const updateColor = createAction(
 
 export const colorSaveSuccess = createAction(
   ColorActionTypes.colorSaveSuccess,
-  props<ResponseSuccess>(),
+  props<IResponseSuccess>(),
 );
 
 export const colorFailure = createAction(

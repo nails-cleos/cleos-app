@@ -1,7 +1,7 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import { IColor, IColorAll } from '../../interfaces/color';
-import { IError, ResponseSuccess } from '../../interfaces/common';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 import { COLOR_FEATURE_KEY, ColorState } from '../reducers/color.reducers';
 import { Pagination } from '../../interfaces/pagination';
 
@@ -49,7 +49,7 @@ export const selectColorResponse = createSelector(
 );
 export const getColorResponsePipe = pipe(
   select(selectColorResponse),
-  filter((val): val is ResponseSuccess => val !== undefined),
+  filter((val): val is IResponseSuccess => val !== undefined),
 );
 
 export const selectColorError = createSelector(

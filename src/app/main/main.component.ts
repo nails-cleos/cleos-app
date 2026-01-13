@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  Injector,
+  runInInjectionContext,
+  signal,
+} from '@angular/core';
 import { environment } from '../../environments/environment';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -31,6 +40,7 @@ import { MainState } from '../store/reducers/main.reducers';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainComponent {
+  private readonly injector = inject(Injector);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly store: Store<MainState> = inject(Store<MainState>);
   private readonly router: Router = inject(Router);
@@ -73,7 +83,7 @@ export class MainComponent {
 
   cssClass?: string;
   backgroundColor: string = this.isDarkMode() ? '126, 119, 105' : '169, 163, 151';
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
   showArrow: boolean = false;
 
   private navigationObserve?: IntersectionObserver;
@@ -116,8 +126,10 @@ export class MainComponent {
     effect(() => {
       const currentUser = this.userSignal();
       if (currentUser) {
-        currentUser.getIdToken().then((idToken) => {
-          this.tokenService.token = idToken;
+        runInInjectionContext(this.injector, () => {
+          currentUser.getIdToken().then((idToken) => {
+            this.tokenService.token = idToken;
+          });
         });
       }
     });

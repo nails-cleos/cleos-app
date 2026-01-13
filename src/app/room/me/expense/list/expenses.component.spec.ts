@@ -4,7 +4,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, of } from 'rxjs';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { ExpensesComponent } from './expenses.component';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../../interfaces/pagination';
@@ -159,11 +159,12 @@ describe('ExpensesComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [ExpensesComponent, TranslateModule.forRoot(), NoopAnimationsModule],
+      imports: [ExpensesComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        provideNoopAnimations(),
       ],
     }).compileComponents();
 
@@ -171,8 +172,7 @@ describe('ExpensesComponent', () => {
     component = fixture.componentInstance;
 
     translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en');
-    translate.use('en');
+    translate.use('en-GB');
 
     fixture.detectChanges();
 

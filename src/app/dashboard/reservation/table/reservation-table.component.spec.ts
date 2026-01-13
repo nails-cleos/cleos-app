@@ -7,7 +7,7 @@ import { IReservation } from '../../../interfaces/reservation';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { deleteReservation, getPage } from '../../../store/reservation.actions';
 import { ActivatedRoute } from '@angular/router';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { ReservationTableComponent } from './reservation-table.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
 import { IUser } from '../../../interfaces/user';
@@ -101,12 +101,13 @@ describe('ReservationTableComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [ReservationTableComponent, TranslateModule.forRoot(), NoopAnimationsModule],
+      imports: [ReservationTableComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
+        provideNoopAnimations(),
       ],
     }).compileComponents();
 
@@ -114,8 +115,7 @@ describe('ReservationTableComponent', () => {
     component = fixture.componentInstance;
 
     translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en');
-    translate.use('en');
+    translate.use('en-GB');
 
     fixture.detectChanges();
 

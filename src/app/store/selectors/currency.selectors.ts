@@ -1,7 +1,7 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import { ICurrency, ICurrencyAll } from '../../interfaces/currency';
-import { IError, ResponseSuccess } from '../../interfaces/common';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 import { CURRENCY_FEATURE_KEY, CurrencyState } from '../reducers/currency.reducers';
 import { Pagination } from '../../interfaces/pagination';
 
@@ -49,7 +49,7 @@ export const selectCurrencyResponse = createSelector(
 );
 export const getCurrencyResponsePipe = pipe(
   select(selectCurrencyResponse),
-  filter((val): val is ResponseSuccess => val !== undefined),
+  filter((val): val is IResponseSuccess => val !== undefined),
 );
 
 export const selectCurrencyError = createSelector(

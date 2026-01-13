@@ -4,7 +4,7 @@
       <mat-icon style="margin-top: 32px" matListItemIcon>{{ currencyIcon() }}</mat-icon>
       <div matListItemTitle [innerHTML]="label() | translate"></div>
       @if (price.total !== price.totalWithoutDiscount) {
-        @if (!isEditing) {
+        @if (!isEditing()) {
           <div matListItemLine>
             <span [class.strikethrough]="price.discount">{{ price.totalWithoutDiscount | number:'1.2-2' }}</span>
             <span @discountAnimation class="raised-button bold">{{ price.total | number:'1.2-2' }}</span>

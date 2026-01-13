@@ -36,7 +36,7 @@ import {
   OUT_OF_WORK_ALL_DAY,
 } from '../../util/event';
 import { Router } from '@angular/router';
-import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarModule } from 'angular-calendar';
+import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarWeekViewComponent } from 'angular-calendar';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
@@ -90,7 +90,7 @@ type CalendarForm = {
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
-  imports: [SharedModule, RoomNamePipe, CalendarModule],
+  imports: [SharedModule, RoomNamePipe, CalendarWeekViewComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CalendarComponent {
@@ -203,8 +203,8 @@ export class CalendarComponent {
   calendarEventsSignal = signal<CalendarEvent[]>([]);
   calendarDaySignal = signal<IDay | undefined>(undefined);
   calendarRoomSignal = signal<IRoomAll | undefined>(undefined);
-  locale: string = this.translate.currentLang;
-  language: string = this.translate.currentLang;
+  locale: string = this.translate.getCurrentLang();
+  language: string = this.translate.getCurrentLang();
   professionalId?: string;
 
   refresh: Subject<any> = new Subject();

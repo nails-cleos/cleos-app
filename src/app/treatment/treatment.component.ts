@@ -103,7 +103,7 @@ export class TreatmentComponent {
 
   treatmentsSignal = signal<ITreatment[]>([]);
 
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   private currentColorIds: string[] = [];
 

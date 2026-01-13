@@ -123,7 +123,6 @@ describe('TransactionViewComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.setDefaultLang('en-GB');
     translateService.use('en-GB');
 
     fixture = TestBed.createComponent(TransactionViewComponent);

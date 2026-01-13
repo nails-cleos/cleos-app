@@ -1,7 +1,7 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import { ITreatmentAll, ITreatmentGroupAll } from '../../interfaces/treatment';
-import { IError, ResponseSuccess } from '../../interfaces/common';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 import { TREATMENT_FEATURE_KEY, TreatmentState } from '../reducers/treatment.reducers';
 import { Pagination } from '../../interfaces/pagination';
 import { IColorAll } from '../../interfaces/color';
@@ -77,7 +77,7 @@ export const selectTreatmentResponse = createSelector(
 );
 export const getTreatmentResponsePipe = pipe(
   select(selectTreatmentResponse),
-  filter((val): val is ResponseSuccess => val !== undefined),
+  filter((val): val is IResponseSuccess => val !== undefined),
 );
 
 export const selectTreatmentError = createSelector(

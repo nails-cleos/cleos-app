@@ -191,9 +191,8 @@ describe('ReservationComponent', () => {
 
     storeSpy = TestBed.inject(Store) as jasmine.SpyObj<Store>;
     routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-    const translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en-GB');
-    translate.use('en-GB');
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
 
     fixture = TestBed.createComponent(ReservationComponent);
     component = fixture.componentInstance;

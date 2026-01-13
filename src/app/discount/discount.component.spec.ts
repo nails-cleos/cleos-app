@@ -49,7 +49,7 @@ describe('DiscountComponent', () => {
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    toastServiceSpy = jasmine.createSpyObj('ToastService', ['warning', 'show']);
+    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
@@ -73,7 +73,7 @@ describe('DiscountComponent', () => {
       }
     });
 
-    toastServiceSpy.warning.and.returnValue({
+    toastServiceSpy.show.and.returnValue({
       onAction: () => action$.asObservable(),
       onDismiss: () => of(void 0),
     });
@@ -88,9 +88,8 @@ describe('DiscountComponent', () => {
       ],
     }).compileComponents();
 
-    const translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en-GB');
-    translate.use('en-GB');
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
 
     fixture = TestBed.createComponent(DiscountComponent);
     component = fixture.componentInstance;

@@ -77,9 +77,8 @@ describe('TreatmentComponent', () => {
         .createComponent(TreatmentComponent);
     component = fixture.componentInstance;
 
-    const translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en-GB');
-    translate.use('en-GB');
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
 
     fixture.detectChanges();
   });

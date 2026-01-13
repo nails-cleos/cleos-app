@@ -65,6 +65,7 @@ describe('AppComponent', () => {
 
   it('should dispatch setLanguage when authUser emits', () => {
     authUserSignal.update(prev => ({ ...prev, locale: 'es', theme: 'dark-theme' }));
+    fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({ language: 'es' }));
   });

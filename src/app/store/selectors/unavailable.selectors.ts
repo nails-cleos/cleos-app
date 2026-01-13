@@ -1,7 +1,7 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import { IUnavailable, IUnavailableAll } from '../../interfaces/unavailable';
-import { IError, ResponseSuccess } from '../../interfaces/common';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 import { UNAVAILABLE_FEATURE_KEY, UnavailableState } from '../reducers/unavailable.reducers';
 import { Pagination } from '../../interfaces/pagination';
 import { IUserAll } from '../../interfaces/user';
@@ -78,7 +78,7 @@ export const selectUnavailableResponse = createSelector(
 );
 export const getUnavailableResponsePipe = pipe(
   select(selectUnavailableResponse),
-  filter((val): val is ResponseSuccess => val !== undefined),
+  filter((val): val is IResponseSuccess => val !== undefined),
 );
 
 export const selectUnavailableError = createSelector(

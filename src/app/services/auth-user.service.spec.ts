@@ -81,7 +81,6 @@ describe('AuthUserService', () => {
     service = TestBed.inject(AuthUserService);
     cookieConsentService = TestBed.inject(NgcCookieConsentService) as jasmine.SpyObj<NgcCookieConsentService>;
     translateService = TestBed.inject(TranslateService);
-    translateService.setDefaultLang('en-GB');
     translateService.use('en-GB');
   });
 

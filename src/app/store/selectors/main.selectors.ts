@@ -1,7 +1,7 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import { MAIN_FEATURE_KEY, MainState } from '../reducers/main.reducers';
-import { IError, ResponseSuccess } from '../../interfaces/common';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 
 const selectMainState = createFeatureSelector<MainState>(MAIN_FEATURE_KEY);
 
@@ -38,5 +38,5 @@ const selectResponse = createSelector(
 );
 export const getResponsePipe = pipe(
   select(selectResponse),
-  filter((val): val is ResponseSuccess => val !== undefined),
+  filter((val): val is IResponseSuccess => val !== undefined),
 );

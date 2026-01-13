@@ -5,22 +5,29 @@ import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/ro
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ToastService } from './toast.service';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 
 describe('authGuard', () => {
   let service: PermissionsService;
   let router: jasmine.SpyObj<Router>;
 
   let user$: BehaviorSubject<any>;
+  let action$: BehaviorSubject<any>;
 
   beforeEach(() => {
     user$ = new BehaviorSubject({ authorities: [{ authority: 'ROLE_USER' }] });
+    action$ = new BehaviorSubject(undefined);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
     const storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    const toastSpy = jasmine.createSpyObj('ToastService', ['info']);
+    const toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
 
     routerSpy.getCurrentNavigation.and.returnValue(null);
     storeSpy.pipe.and.returnValue(user$.asObservable());
+
+    toastServiceSpy.show.and.returnValue({
+      onAction: () => action$.asObservable(),
+      onDismiss: () => of(void 0),
+    });
 
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot()],
@@ -28,16 +35,15 @@ describe('authGuard', () => {
         PermissionsService,
         { provide: Router, useValue: routerSpy },
         { provide: Store, useValue: storeSpy },
-        { provide: ToastService, useValue: toastSpy },
+        { provide: ToastService, useValue: toastServiceSpy },
       ],
     });
 
     service = TestBed.inject(PermissionsService);
     router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
 
-    const translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en-GB');
-    translate.use('en-GB');
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
   });
 
   it('should allow activation if user has the required role', () => {

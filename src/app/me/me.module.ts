@@ -86,7 +86,6 @@ import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
 export class MeModule {
   constructor(private readonly store: Store<I18NState>, protected translateService: TranslateService) {
     this.store.pipe(getI18NLanguagePipe).subscribe((language) => {
-      translateService.currentLang = '';
       this.translateService.use(language);
     });
   }

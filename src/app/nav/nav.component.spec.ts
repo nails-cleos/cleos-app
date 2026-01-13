@@ -18,12 +18,14 @@ import { getNotificationsPage, readNotification } from '../store/notification.ac
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { signal } from '@angular/core';
 import { getNowTimeZone } from '../util/dates';
+import { IResponseSuccess } from '../interfaces/common';
+import { ToastService } from '../services/toast.service';
 
 describe('NavComponent', () => {
   let component: NavComponent;
   let fixture: ComponentFixture<NavComponent>;
 
-  let state$: BehaviorSubject<any>;
+  let response$: BehaviorSubject<any>;
   let isLoading$: BehaviorSubject<any>;
   let error$: BehaviorSubject<any>;
   let message$: BehaviorSubject<any>;
@@ -34,6 +36,7 @@ describe('NavComponent', () => {
   let redirect$: BehaviorSubject<any>;
   let dataDeleted$: BehaviorSubject<any>;
   let notification$: BehaviorSubject<any>;
+  let action$: BehaviorSubject<any>;
 
   let navigateSpy: jasmine.Spy;
   let cookieServiceSpy: jasmine.SpyObj<CookieService>;
@@ -43,6 +46,7 @@ describe('NavComponent', () => {
   let storeSpy: jasmine.SpyObj<Store>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let messagingServiceSpy: jasmine.SpyObj<MessagingService>;
+  let toastServiceSpy: jasmine.SpyObj<ToastService>;
 
   const authUserSignal = signal<IAuthUser>(
     {
@@ -77,7 +81,7 @@ describe('NavComponent', () => {
   };
 
   beforeEach(async () => {
-    state$ = new BehaviorSubject(undefined);
+    response$ = new BehaviorSubject(undefined);
     isLoading$ = new BehaviorSubject(true);
     error$ = new BehaviorSubject(undefined);
     message$ = new BehaviorSubject(undefined);
@@ -88,11 +92,13 @@ describe('NavComponent', () => {
     menus$ = new BehaviorSubject(undefined);
     redirect$ = new BehaviorSubject(undefined);
     dataDeleted$ = new BehaviorSubject(undefined);
+    action$ = new BehaviorSubject(undefined);
 
     const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
     cookieServiceSpy = jasmine.createSpyObj('CookieService', ['get', 'set']);
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['subscribe', 'attachLang']);
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'select', 'dispatch']);
+    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['cookieConsent', 'reloadUser'], {
       authUser: authUserSignal.asReadonly(),
     });
@@ -112,17 +118,18 @@ describe('NavComponent', () => {
     navigationServiceSpy.subscribe.and.returnValue({} as any);
     navigationServiceSpy.attachLang.and.returnValue('en-GB');
 
-    storeSpy.select.and.callFake((selector: any) => {
-      const name = selector?.name ?? '';
-
-      if (name.includes('IsLoading')) {
-        return isLoading$.asObservable();
-      } else if (name.includes('Response')) {
-        return state$.asObservable();
-      } else if (name.includes('Error')) {
-        return error$.asObservable();
-      } else {
-        return of(undefined);
+    let selectCallIndex = 0;
+    storeSpy.select.and.callFake(() => {
+      selectCallIndex++;
+      switch (selectCallIndex) {
+        case 1:
+          return isLoading$.asObservable();
+        case 2:
+          return response$.asObservable();
+        case 3:
+          return error$.asObservable();
+        default:
+          return new BehaviorSubject(undefined).asObservable();
       }
     });
 
@@ -145,7 +152,7 @@ describe('NavComponent', () => {
         case 7:
           return notification$.asObservable();
         default:
-          return state$.asObservable();
+          return new BehaviorSubject(undefined).asObservable();
       }
     });
 
@@ -159,6 +166,7 @@ describe('NavComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: CookieService, useValue: cookieServiceSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: ToastService, useValue: toastServiceSpy },
       ],
     }).compileComponents();
 
@@ -166,11 +174,15 @@ describe('NavComponent', () => {
     spyOnProperty(router, 'url', 'get').and.returnValue('/en-GB');
     navigateSpy = spyOn(router, 'navigate');
 
-    const translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en-GB');
-    translate.use('en-GB');
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
 
     fixture = TestBed.createComponent(NavComponent);
+
+    toastServiceSpy.show.and.returnValue({
+      onAction: () => action$.asObservable(),
+      onDismiss: () => of(void 0),
+    });
 
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -394,5 +406,60 @@ describe('NavComponent', () => {
       jasmine.objectContaining({ id: '1', read: true }),
       jasmine.objectContaining({ id: '2', read: false }),
     ]);
+  });
+
+  it('should create response and navigate', () => {
+    const response: IResponseSuccess = {
+      message: 'Operation successful',
+      path: 'path/to/resource',
+      reload: false,
+      toastType: 'warning',
+      redirect: 'path/to/redirect',
+    };
+    response$.next(response);
+    fixture.detectChanges();
+
+    expect(navigateSpy).toHaveBeenCalledWith([`/en-GB/${response.redirect}`]);
+
+    expect(toastServiceSpy.show).toHaveBeenCalledWith(response.message, response.toastType, 5000,
+      { actionType: 'link', action: `/en-GB/${response.path}` });
+  });
+
+  it('should create response with blob', () => {
+    const fakeBlob = new Blob(['test'], { type: 'application/pdf' });
+    const response: IResponseSuccess = {
+      path: undefined,
+      reload: false,
+      toastType: 'warning',
+      redirect: 'path',
+      blob: fakeBlob,
+      fileName: 'test.pdf',
+    };
+
+    const fakeUrl = 'blob:http://localhost/fake-url';
+
+    // 🔹 Spy on URL APIs
+    spyOn(URL, 'createObjectURL').and.returnValue(fakeUrl);
+    spyOn(URL, 'revokeObjectURL');
+
+    // 🔹 Fake <a> element
+    const clickSpy = jasmine.createSpy('click');
+    const anchorMock = {
+      href: '',
+      download: '',
+      click: clickSpy,
+    } as unknown as HTMLAnchorElement;
+
+    spyOn(document, 'createElement').and.returnValue(anchorMock);
+
+    response$.next(response);
+    fixture.detectChanges();
+
+    expect(URL.createObjectURL).toHaveBeenCalledWith(response.blob);
+    expect(document.createElement).toHaveBeenCalledWith('a');
+    expect(anchorMock.href).toBe(fakeUrl);
+    expect(anchorMock.download).toBe(response.fileName);
+    expect(clickSpy).toHaveBeenCalled();
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith(fakeUrl);
   });
 });

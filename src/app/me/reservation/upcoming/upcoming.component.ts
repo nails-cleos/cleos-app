@@ -26,8 +26,8 @@ export class UpcomingComponent {
   small = input.required<boolean>();
   upcoming = input<IUpcomingAll>();
 
-  dateFormat: string = this.translate.currentLang;
-  language: string = this.translate.currentLang;
+  dateFormat: string = this.translate.getCurrentLang();
+  language: string = this.translate.getCurrentLang();
 
   upcomingComputed = computed(() => {
     const upcoming = this.upcoming();

@@ -94,7 +94,7 @@ export class FileDropComponent {
       this.fileSelected.emit(undefined);
     } else {
       const content = this.translate.instant('COMMON.FILE.DELETE.MESSAGE', { name: file?.name });
-      const toastRef = this.toastService.warning(content, 5000, 'button', 'undo');
+      const toastRef = this.toastService.show(content, 'warning', 5000, { actionType: 'button', action: 'undo' });
       toastRef.onAction().subscribe(() => {
         this.file.set(file);
         this.fileSelected.emit(file);

@@ -1,9 +1,12 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IOfficeAll } from '../interfaces/office';
-import { IInvoice } from '../interfaces/invoice';
+import { IInvoice, IInvoiceData } from '../interfaces/invoice';
 import { toUrl } from '../util/helper';
+import { Pagination } from '../interfaces/pagination';
+import { SortDirection } from '@angular/material/sort';
+import { createFilter } from '../util/service-helper';
 
 @Injectable({
   providedIn: 'root',
@@ -12,10 +15,35 @@ export class InvoiceService {
 
   private url = 'invoices';
   private urlV1 = `v1/${this.url}`;
+  private officeUrl = 'offices';
 
   private http: HttpClient = inject(HttpClient);
 
-  getAllMyOffices = (): Observable<IOfficeAll[]> => this.http.get<IOfficeAll[]>(toUrl(this.urlV1, 'offices'));
+  getAllMyOffices = (): Observable<IOfficeAll[]> => this.http.get<IOfficeAll[]>(toUrl(this.urlV1, this.officeUrl));
+
+  getInvoicesPage = (
+    officeId: string,
+    page: number,
+    sort: string,
+    direction: SortDirection,
+    size: number,
+  ): Observable<Pagination<IInvoiceData>> => this.http.get<Pagination<IInvoiceData>>(
+    toUrl(this.urlV1, this.officeUrl, officeId, 'pages'),
+    { params: createFilter(page, size, sort, direction) },
+  );
+
+  view = (
+    id: string,
+    driveToken?: string,
+  ): Observable<Blob> => {
+    let headers = new HttpHeaders({
+      Accept: 'application/octet-stream',
+    });
+    if (driveToken) {
+      headers = headers.set('X-Google-Drive-Token', driveToken);
+    }
+    return this.http.get(toUrl(this.urlV1, id), { headers, responseType: 'blob' });
+  };
 
   getOfficeToInvoice = (
     officeId: string,
@@ -30,6 +58,26 @@ export class InvoiceService {
       });
     }
 
-    return this.http.get<IInvoice[]>(toUrl(this.urlV1, 'offices', officeId), { params });
+    return this.http.get<IInvoice[]>(toUrl(this.urlV1, this.officeUrl, officeId), { params });
+  };
+
+  uploadInvoices = (
+    officeId: string,
+    blob: Blob,
+    fileName: string,
+    driveToken?: string,
+  ): Observable<void> => {
+    const formData = new FormData();
+    const file = new File([blob], fileName, {
+      type: blob.type,
+      lastModified: Date.now(),
+    });
+    formData.append('file', file, file.name);
+
+    let headers = new HttpHeaders().set('Upload', 'true');
+    if (driveToken) {
+      headers = headers.set('X-Google-Drive-Token', driveToken);
+    }
+    return this.http.post<void>(toUrl(this.urlV1, this.officeUrl, officeId), formData, { headers });
   };
 }

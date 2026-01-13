@@ -25,7 +25,7 @@ export class MonthComponent {
   income?: ISummaryTotal;
   expense?: ISummaryTotal;
   cash?: ISummaryTotal;
-  private readonly language: string = this.translate.currentLang;
+  private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect(() => {

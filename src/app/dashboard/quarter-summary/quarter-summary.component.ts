@@ -94,7 +94,7 @@ export class QuarterSummaryComponent {
   quarterSummaryTotals = signal<ISummaryTotals>(new SummaryTotals());
   isLoading = signal<boolean>(false);
 
-  readonly language: string = this.translate.currentLang;
+  readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
     // Effect to handle navigation params
@@ -246,7 +246,7 @@ export class QuarterSummaryComponent {
       workbook.created = getNowTimeZone();
 
       // Generate & Save Excel File
-      workbook.xlsx.writeBuffer().then((content) => {
+      workbook.xlsx.writeBuffer().then((content: any) => {
         const blob = new Blob([content], {
           type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         });

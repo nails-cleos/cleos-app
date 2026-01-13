@@ -20,35 +20,28 @@ export interface IError {
   subErrors?: IError[];
 }
 
-export class ResponseSuccess implements IResponseSuccess {
-  message: string;
-  path?: string;
-  reload: boolean;
-  toastType: ToastType;
-  redirect?: string;
-
-  constructor(
-    message: string,
-    path?: string,
-    reload: boolean = false,
-    toastType: ToastType = 'success',
-    redirect?: string,
-  ) {
-    this.message = message;
-    this.path = path;
-    this.reload = reload;
-    this.toastType = toastType;
-    this.redirect = redirect;
-  }
-}
-
-export interface IResponseSuccess {
-  message: string;
+interface IBaseResponseMeta {
   path?: string;
   reload?: boolean;
   toastType?: ToastType;
   redirect?: string;
 }
+
+interface IResponseWithMessage extends IBaseResponseMeta {
+  message: string;
+  blob?: undefined;
+  fileName?: undefined;
+}
+
+interface IResponseWithFile extends IBaseResponseMeta {
+  blob: Blob;
+  fileName: string;
+  message?: undefined;
+}
+
+export type IResponseSuccess =
+  | IResponseWithMessage
+  | IResponseWithFile;
 
 export class PageRequest {
   page: number;

@@ -38,7 +38,7 @@ export class TreatmentTableComponent {
   resultsLengthSignal = computed(() => this.dataSource().data.length);
   pageSizeSignal = computed(() => PAGE_SIZE);
 
-  dateFormat: string = this.translate.currentLang;
+  dateFormat: string = this.translate.getCurrentLang();
 
   constructor() {
     effect((onCleanup) => {

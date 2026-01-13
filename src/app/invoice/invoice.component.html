@@ -1,26 +1,30 @@
 <div>
+  <mat-form-field appearance="outline" class="full-select">
+    <mat-label>{{ 'INVOICE.OFFICE.SEARCH' | translate }}</mat-label>
+    <input (keydown)="keyDownHandler($event)" [formControl]="getForm.office" [matAutocomplete]="autoOffice"
+           autocomplete="off" matInput placeholder="{{ 'INVOICE.OFFICE.FIELD' | translate }}"
+           type="text" required>
+    <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
+      @for (office of filteredOfficeSignal(); track office.id) {
+        <mat-option [value]="office">
+          {{ office.name }}
+        </mat-option>
+      }
+    </mat-autocomplete>
+    @if (getForm.office.hasError('required')) {
+      <mat-error [innerHTML]="'INVOICE.OFFICE.REQUIRED' | translate"></mat-error>
+    } @else if (getForm.office.hasError('requireMatch')) {
+      <mat-error [innerHTML]="'INVOICE.OFFICE.INVALID' | translate"></mat-error>
+    }
+  </mat-form-field>
+  @if (getForm.office.value?.id) {
+    <app-invoices [officeId]="getForm.office.value!.id"/>
+  }
   <fieldset>
     <legend>{{ 'COMMON.SEARCH.TITLE' | translate }}</legend>
+    @let selection = selectionSignal();
     <form [formGroup]="form" (keydown.enter)="$event.preventDefault()" (ngSubmit)="print()">
       <div class="row-column-space-around-center">
-        <mat-form-field appearance="outline">
-          <mat-label>{{ 'INVOICE.OFFICE.SEARCH' | translate }}</mat-label>
-          <input (keydown)="keyDownHandler($event)" [formControl]="getForm.office" [matAutocomplete]="autoOffice"
-                 autocomplete="off" matInput placeholder="{{ 'INVOICE.OFFICE.FIELD' | translate }}"
-                 type="text" required>
-          <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
-            @for (office of filteredOfficeSignal(); track office.id) {
-              <mat-option [value]="office">
-                {{ office.name }}
-              </mat-option>
-            }
-          </mat-autocomplete>
-          @if (getForm.office.hasError('required')) {
-            <mat-error [innerHTML]="'INVOICE.OFFICE.REQUIRED' | translate"></mat-error>
-          } @else if (getForm.office.hasError('requireMatch')) {
-            <mat-error [innerHTML]="'INVOICE.OFFICE.INVALID' | translate"></mat-error>
-          }
-        </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>{{ 'INVOICE.PAYMENT.SEARCH' | translate }}</mat-label>
           <mat-chip-grid #chipList aria-label="Payment type selection">
@@ -76,16 +80,16 @@
       <table [dataSource]="dataSource" mat-table multiTemplateDataRows>
         <ng-container matColumnDef="select">
           <th mat-header-cell *matHeaderCellDef>
-            <mat-checkbox (change)="$event ? toggleAllRows() : null"
-                          [checked]="selection.hasValue() && isAllSelected()"
-                          [indeterminate]="selection.hasValue() && !isAllSelected()"
+            <mat-checkbox (change)="toggleAllRows()"
+                          [checked]="isAllSelected()"
+                          [indeterminate]="isIndeterminate()"
                           [aria-label]="checkboxLabel()" [disabled]="!resultsLengthSignal()">
             </mat-checkbox>
           </th>
           <td mat-cell *matCellDef="let row">
             <mat-checkbox (click)="$event.stopPropagation()"
-                          (change)="$event ? selection.toggle(row) : null"
-                          [checked]="selection.isSelected(row)"
+                          (change)="toggleRow(row)"
+                          [checked]="selectionSignal().isSelected(row)"
                           [aria-label]="checkboxLabel(row)">
             </mat-checkbox>
           </td>

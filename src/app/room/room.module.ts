@@ -63,7 +63,6 @@ import { AwsEffects } from '../store/effects/aws.effects';
 export class RoomModule {
   constructor(private readonly store: Store<I18NState>, protected translateService: TranslateService) {
     this.store.pipe(getI18NLanguagePipe).subscribe((language) => {
-      translateService.currentLang = '';
       this.translateService.use(language);
     });
   }

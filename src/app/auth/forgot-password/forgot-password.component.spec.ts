@@ -29,7 +29,7 @@ describe('ForgotPasswordComponent', () => {
 
     storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
     authSpy = jasmine.createSpyObj('Auth', ['sendPasswordResetEmail']);
-    toastServiceSpy = jasmine.createSpyObj('ToastService', ['error', 'show']);
+    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     let pipeCallIndex = 0;
@@ -61,7 +61,6 @@ describe('ForgotPasswordComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.setDefaultLang('en-GB');
     translateService.use('en-GB');
 
     fixture = TestBed.createComponent(ForgotPasswordComponent);
@@ -85,7 +84,7 @@ describe('ForgotPasswordComponent', () => {
     error$.next({ message: 'My error!' });
     fixture.detectChanges();
 
-    expect(toastServiceSpy.error).toHaveBeenCalledWith('My error!');
+    expect(toastServiceSpy.show).toHaveBeenCalledWith('My error!', 'error');
   });
 
   it('should show toast and navigate when response emits', () => {
@@ -94,7 +93,7 @@ describe('ForgotPasswordComponent', () => {
 
     action$.next();
 
-    expect(toastServiceSpy.show).toHaveBeenCalledWith('OK', 'success', 5000, 'button');
+    expect(toastServiceSpy.show).toHaveBeenCalledWith('OK', 'success', 5000, { actionType: 'button' });
     expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'auth']);
   });
 });

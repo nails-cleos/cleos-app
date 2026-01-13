@@ -8,10 +8,10 @@ import {
   createPaymentLinkByReservationId,
   getPayment,
   getPaymentByResourceId,
-  paymentOptions,
   notifyPayment,
   paymentFailure,
   paymentNotComplete,
+  paymentOptions,
   paymentSave,
   paymentSaveSuccess,
   paymentSelected,
@@ -24,7 +24,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { PaymentService } from '../../services/payment.service';
 import { Router } from '@angular/router';
 import { IPay, IPayment, IPaymentOption } from '../../interfaces/payment';
-import { IApiResponse, ResponseSuccess, successResponse } from '../../interfaces/common';
+import { IApiResponse, successResponse } from '../../interfaces/common';
 
 @Injectable()
 export class PaymentEffects {
@@ -83,7 +83,7 @@ export class PaymentEffects {
             default:
               const message = this.translate.instant('ME.PAYMENT.ERROR', { reason: response.message });
               return of(paymentNotComplete(
-                { subError: [{ message }], response: new ResponseSuccess(message, path, undefined, 'error', path) }));
+                { subError: [{ message }], response: { message, path, toastType: 'error', redirect: path } }));
           }
         }),
         catchError((err: HttpErrorResponse) => of(paymentFailure({ error: err.error }))),

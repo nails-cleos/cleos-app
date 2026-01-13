@@ -26,8 +26,8 @@ export class QuarterComponent {
   margin = input<boolean>(false);
   showCash = input<boolean>(false);
 
-  dateFormat: string = this.translate.currentLang;
-  private readonly language: string = this.translate.currentLang;
+  dateFormat: string = this.translate.getCurrentLang();
+  private readonly language: string = this.translate.getCurrentLang();
 
   getMonth = (month: number): string => monthTitle(dateMonthYear(month - 1, this.year()), this.dateFormat,
     this.measure());

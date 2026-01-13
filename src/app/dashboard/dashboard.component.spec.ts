@@ -3,9 +3,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DashboardComponent } from './dashboard.component';
 import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
 import { signal } from '@angular/core';
+import { IDashboard } from '../interfaces/dashboard';
+import { ICurrencyAll } from '../interfaces/currency';
 
 describe('DashComponent', () => {
   let component: DashboardComponent;
@@ -15,6 +17,21 @@ describe('DashComponent', () => {
   let dashboardMap$: BehaviorSubject<any>;
   let error$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
+
+  const mockMiniCardSummaries = [
+    { title: 'currency false', isCurrency: false },
+    { title: 'currency true', isCurrency: true },
+    { title: 'currency with values', isCurrency: true, value: 23, previousPeriodValue: 20 },
+  ];
+
+  const mockChartSummaries = [{ title: 'chart' }];
+
+  const currency: ICurrencyAll = {
+    id: '1',
+    name: 'Test Currency',
+    code: 'EUR',
+    icon: 'euro',
+  };
 
   let storeSpy: jasmine.SpyObj<Store<any>>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
@@ -54,13 +71,47 @@ describe('DashComponent', () => {
 
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
 
-  afterEach(() => {
+    const translate = TestBed.inject(TranslateService);
+    translate.use('en-GB');
+
+    fixture.detectChanges();
   });
 
   it('should compile', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should load dashboard', () => {
+    const roomName = 'Test Room';
+    component.getForm.selectedDash.setValue(roomName);
+    const record: Record<string, IDashboard> = {};
+    record[roomName] = { miniCardSummaries: mockMiniCardSummaries, currency };
+    dashboardMap$.next(record);
+
+    fixture.detectChanges();
+
+    expect(component.currency).toBe(currency);
+
+    expect(component.miniCardData.length).toBe(3);
+    expect(component.miniCardData[0].isCurrency).toEqual(mockMiniCardSummaries[0].isCurrency);
+    expect(component.miniCardData[1].isCurrency).toEqual(mockMiniCardSummaries[1].isCurrency);
+    expect(component.miniCardData[2].isCurrency).toEqual(mockMiniCardSummaries[2].isCurrency);
+    expect(component.miniCardData[2].value).toEqual('€23.00');
+    expect(component.miniCardData[2].previousPeriodValue).toEqual('€20.00');
+  });
+
+  it('should load dashboard primary room', () => {
+    const roomName = 'Test Room';
+    const record: Record<string, IDashboard> = {};
+    record[roomName] = { chartSummaries: mockChartSummaries, currency, primary: true };
+    dashboardMap$.next(record);
+
+    fixture.detectChanges();
+
+    expect(component.currency).toBe(currency);
+
+    expect(component.charts.length).toBe(1);
+    expect(component.charts[0].title).toEqual(mockChartSummaries[0].title);
   });
 });

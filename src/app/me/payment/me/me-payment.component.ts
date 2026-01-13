@@ -53,7 +53,7 @@ export class MePaymentComponent {
 
   options = signal<IPaymentOption[] | undefined>(undefined);
 
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect(() => {

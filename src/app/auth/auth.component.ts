@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import {
   Auth,
+  user,
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   sendEmailVerification,
@@ -17,7 +18,6 @@ import { THEME } from '../util/theme';
 import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from '../../environments/environment';
-import { user } from 'rxfire/auth';
 import { fetchSignInMethodsForEmail } from '@firebase/auth';
 import { SharedModule } from '../shared/shared.module';
 import { ToastService } from '../services/toast.service';
@@ -85,7 +85,7 @@ export class AuthComponent {
   });
   private emailSignal = toSignal(this.getForm.email.valueChanges, { initialValue: '' });
 
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
   showForm: boolean = false;
   tos: string = `${environment.appServer}/${this.language}/term-and-conditions`;
   privacyPolicy: string = `${environment.appServer}/${this.language}/privacy`;
@@ -107,14 +107,15 @@ export class AuthComponent {
       const error = this.errorSignal();
       if (!error?.subErrors || !error.subErrors.length) {
         if (error?.message) {
-          this.toastService.error(error.message);
+          this.toastService.show(error.message, 'error');
         }
       }
     });
     effect(() => {
       const response = this.responseSignal();
-      if (response) {
-        const toastRef = this.toastService.show(response.message, response.toastType, 5000, 'button');
+      if (response?.message) {
+        const actionType = 'button';
+        const toastRef = this.toastService.show(response.message, response.toastType, 5000, { actionType });
         toastRef.onAction().subscribe(() => this.store.dispatch(clean()));
       }
     });

@@ -59,7 +59,7 @@ export class CustomersComponent {
   displayedColumns: string[] = ['position', 'customer', 'days', 'lastTime', 'actions'];
   expanded?: IRoomCustomer;
 
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect((onCleanup) => {

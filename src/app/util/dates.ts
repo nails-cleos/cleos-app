@@ -417,6 +417,10 @@ export const exportFormatDate = (date: Date, locale: string = API_LOCALE, timeZo
   day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone,
 }).replace(/\//g, '-').replace(',', '');
 
+export const invoiceFormat = (date: Date, locale: string = API_LOCALE): string => date.toLocaleDateString(locale, {
+  year: 'numeric', month: '2-digit',
+}).replace(/\//g, '-').replace(',', '');
+
 export const formatDuration = (duration: string, locale: string = API_LOCALE): string => {
   const d: IDuration = convertDuration(duration);
   return formatTime(d, undefined, locale);

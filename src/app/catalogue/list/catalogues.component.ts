@@ -41,7 +41,7 @@ export class CataloguesComponent {
     return list.filter(it => it?.id).map(it => it.blob ? { ...it, image: `data:image/jpeg;base64,${it.blob}` } : it);
   });
 
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect(() => {

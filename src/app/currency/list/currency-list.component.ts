@@ -62,7 +62,7 @@ export class CurrencyListComponent {
   displayedColumns: string[] = ['position', 'code', 'name', 'actions'];
   expanded?: ICurrency;
 
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect((onCleanup) => {

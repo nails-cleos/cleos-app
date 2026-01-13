@@ -71,7 +71,7 @@ export class AdditionalListComponent {
 
   expandedAdditional: IAdditional | undefined;
 
-  language: string = this.translate.currentLang;
+  language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect((onCleanup) => {

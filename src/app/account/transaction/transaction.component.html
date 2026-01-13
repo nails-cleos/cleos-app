@@ -34,7 +34,7 @@
                     <mat-label>{{ 'ACCOUNT.TRANSACTION.TYPE.FIELD' | translate }}</mat-label>
                     <mat-select [formControl]="getBankForm.type" [required]="true">
                       @for (t of types; track t) {
-                        <mat-option [value]="t">{{ 'COMMON.PAYMENT.TYPE.' + (t || 'NONE') | translate }}</mat-option>
+                        <mat-option [value]="t">{{ 'COMMON.PAYMENT.TYPE.' + (t.type || 'NONE') | translate }}</mat-option>
                       }
                     </mat-select>
                     @if (getBankForm.type.hasError('required')) {

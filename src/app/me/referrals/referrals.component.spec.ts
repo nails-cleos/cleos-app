@@ -31,7 +31,7 @@ describe('ReferralsComponent', () => {
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     clipboardSpy = jasmine.createSpyObj('Clipboard', ['copy']);
-    toastServiceSpy = jasmine.createSpyObj('ToastService', ['info']);
+    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
     bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
@@ -82,7 +82,7 @@ describe('ReferralsComponent', () => {
     component.copy();
 
     expect(clipboardSpy.copy).toHaveBeenCalledWith('abc123');
-    expect(toastServiceSpy.info).toHaveBeenCalledWith('ME.REFERRAL.COPY');
+    expect(toastServiceSpy.show).toHaveBeenCalledWith('ME.REFERRAL.COPY', 'info');
   });
 
   it('should open share bottom sheet', () => {

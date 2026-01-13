@@ -58,9 +58,8 @@ describe('RedirectComponent', () => {
 
     fixture = TestBed.createComponent(RedirectComponent);
 
-    const translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en-GB');
-    translate.use('en-GB');
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
 
     fixture.detectChanges();
   });
