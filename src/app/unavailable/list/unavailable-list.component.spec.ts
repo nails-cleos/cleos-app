@@ -9,7 +9,7 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { deleteUnavailable, getUnavailablePage, unavailableSelected } from '../../store/unavailable.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { UnavailableState } from '../../store/reducers/unavailable.reducers';
 import { IUserAll } from '../../interfaces/user';
 import { getNowTimeZone } from '../../util/dates';
@@ -102,11 +102,12 @@ describe('UnavailableListComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [UnavailableListComponent, TranslateModule.forRoot(), NoopAnimationsModule],
+      imports: [UnavailableListComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        provideNoopAnimations(),
       ],
     }).compileComponents();
 

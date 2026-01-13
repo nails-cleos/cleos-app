@@ -1,7 +1,7 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import { INoteAll } from '../../interfaces/note';
-import { IError, ResponseSuccess } from '../../interfaces/common';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 import { NOTE_FEATURE_KEY, NoteState } from '../reducers/note.reducers';
 import { IUserAll } from '../../interfaces/user';
 
@@ -58,7 +58,7 @@ export const selectNoteResponse = createSelector(
 );
 export const getNoteResponsePipe = pipe(
   select(selectNoteResponse),
-  filter((val): val is ResponseSuccess => val !== undefined),
+  filter((val): val is IResponseSuccess => val !== undefined),
 );
 
 export const selectNoteError = createSelector(

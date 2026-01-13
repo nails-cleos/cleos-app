@@ -9,7 +9,7 @@ import {
   ITracking,
   IUpcomingAll,
 } from '../../interfaces/reservation';
-import { IError, ResponseSuccess } from '../../interfaces/common';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 import { Pagination } from '../../interfaces/pagination';
 import { RESERVATION_FEATURE_KEY, ReservationState } from '../reducers/reservation.reducers';
 import { ITreatmentDiscountDTO } from '../../interfaces/treatment';
@@ -255,7 +255,7 @@ export const selectReservationResponse = createSelector(
 );
 export const getReservationResponsePipe = pipe(
   select(selectReservationResponse),
-  filter((val): val is ResponseSuccess => val !== undefined),
+  filter((val): val is IResponseSuccess => val !== undefined),
 );
 
 export const selectReservationError = createSelector(

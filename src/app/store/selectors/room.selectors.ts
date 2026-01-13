@@ -1,7 +1,7 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import { IRoom, IRoomAll, IRoomCustomer, IRoomService } from '../../interfaces/room';
-import { IError, ResponseSuccess } from '../../interfaces/common';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 import { ROOM_FEATURE_KEY, RoomState } from '../reducers/room.reducers';
 import { Pagination } from '../../interfaces/pagination';
 import { IUserAll } from '../../interfaces/user';
@@ -97,7 +97,7 @@ export const selectRoomResponse = createSelector(
 );
 export const getRoomResponsePipe = pipe(
   select(selectRoomResponse),
-  filter((val): val is ResponseSuccess => val !== undefined),
+  filter((val): val is IResponseSuccess => val !== undefined),
 );
 
 export const selectRoomError = createSelector(

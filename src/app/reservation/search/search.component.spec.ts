@@ -8,7 +8,7 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { getAllFilterReservations } from '../../store/reservation.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { SearchComponent } from './search.component';
 import { IUserAll } from '../../interfaces/user';
 import { getNowTimeZone } from '../../util/dates';
@@ -138,11 +138,12 @@ describe('SearchComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [SearchComponent, TranslateModule.forRoot(), NoopAnimationsModule],
+      imports: [SearchComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        provideNoopAnimations(),
       ],
     }).compileComponents();
 

@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { IError, PageRequest, IResponseSuccess } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
 import { IDiscount, IReferral, IUserDiscount } from '../interfaces/discount';
 import { ICurrency } from '../interfaces/currency';
@@ -76,7 +76,7 @@ export const updateDiscount = createAction(
 
 export const discountSaveSuccess = createAction(
   DiscountActionTypes.discountSaveSuccess,
-  props<ResponseSuccess>(),
+  props<IResponseSuccess>(),
 );
 
 export const discountFailure = createAction(

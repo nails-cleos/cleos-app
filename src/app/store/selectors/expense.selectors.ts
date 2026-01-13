@@ -1,7 +1,7 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import { IExpenseAll, IExpenseInfo } from '../../interfaces/expense';
-import { IError, ResponseSuccess } from '../../interfaces/common';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 import { EXPENSE_FEATURE_KEY, ExpenseState } from '../reducers/expense.reducers';
 import { Pagination } from '../../interfaces/pagination';
 
@@ -58,7 +58,7 @@ export const selectExpenseResponse = createSelector(
 );
 export const getExpenseResponsePipe = pipe(
   select(selectExpenseResponse),
-  filter((val): val is ResponseSuccess => val !== undefined),
+  filter((val): val is IResponseSuccess => val !== undefined),
 );
 
 export const selectExpenseError = createSelector(

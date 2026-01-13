@@ -42,7 +42,7 @@ describe('DriveAccessService', () => {
   it('should not dispatch when credential has no access token', async () => {
     spyOn(auth.GoogleAuthProvider, 'credentialFromResult').and.returnValue(null);
 
-    service.requestDriveAccess();
+    service['requestDriveAccess']();
     await Promise.resolve();
 
     expect(storeSpy.dispatch).not.toHaveBeenCalled();
@@ -52,7 +52,7 @@ describe('DriveAccessService', () => {
     driveToken$.next('existing-token');
     (service as any).driveTokenSignal = signal('existing-token');
 
-    const spy = spyOn(service, 'requestDriveAccess');
+    const spy = spyOn<any>(service, 'requestDriveAccess');
 
     service.requestAccessIfNeeded();
 
@@ -60,7 +60,7 @@ describe('DriveAccessService', () => {
   });
 
   it('should NOT request access when shouldRequest is false', () => {
-    const spy = spyOn(service, 'requestDriveAccess');
+    const spy = spyOn<any>(service, 'requestDriveAccess');
 
     service.requestAccessIfNeeded(false);
 

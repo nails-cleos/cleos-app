@@ -8,7 +8,7 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { deleteDiscount, discountSelected, getDiscountsPage } from '../../store/discount.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { DiscountsComponent } from './discounts.component';
 import { DiscountState } from '../../store/reducers/discount.reducers';
 
@@ -72,11 +72,12 @@ describe('DiscountsComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [DiscountsComponent, TranslateModule.forRoot(), NoopAnimationsModule],
+      imports: [DiscountsComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        provideNoopAnimations(),
       ],
     }).compileComponents();
 

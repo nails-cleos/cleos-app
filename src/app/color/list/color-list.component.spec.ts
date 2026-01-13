@@ -9,7 +9,7 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { colorSelected, deleteColor, getColorsPage } from '../../store/color.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { ColorState } from '../../store/reducers/color.reducers';
 
 describe('ColorListComponent', () => {
@@ -71,11 +71,12 @@ describe('ColorListComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [ColorListComponent, TranslateModule.forRoot(), NoopAnimationsModule],
+      imports: [ColorListComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        provideNoopAnimations(),
       ],
     }).compileComponents();
 

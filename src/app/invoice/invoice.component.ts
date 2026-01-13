@@ -36,6 +36,7 @@ import { InvoiceState } from '../store/reducers/invoice.reducers';
 import { MAT_DATE_RANGE_SELECTION_STRATEGY } from '@angular/material/datepicker';
 import { MonthPeriodAdapter } from '../util/adapter/month-period-adapter.service';
 import { DriveAccessService } from '../services/drive-access.service';
+import { InvoicesComponent } from './invoices/invoices.component';
 
 // Set up VFS fonts for pdfMake (provides fallback Roboto fonts)
 (pdfMake as any).vfs = (pdfFonts as any).pdfMake?.vfs || pdfFonts;
@@ -57,7 +58,7 @@ type DateRangeForm = {
   templateUrl: './invoice.component.html',
   styleUrls: ['./invoice.component.scss'],
   animations: [detailExpandAnimation],
-  imports: [SharedModule, TimeDetailPipe],
+  imports: [SharedModule, TimeDetailPipe, InvoicesComponent],
   providers: [
     {
       provide: MAT_DATE_RANGE_SELECTION_STRATEGY,

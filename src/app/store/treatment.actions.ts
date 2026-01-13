@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { IError, PageRequest, IResponseSuccess } from '../interfaces/common';
 import { ITreatmentAll, ITreatmentGroup, ITreatmentGroupAll } from '../interfaces/treatment';
 import { IColorAll } from '../interfaces/color';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
@@ -71,7 +71,7 @@ export const sortGroupTreatment = createAction(
 
 export const treatmentSaveSuccess = createAction(
   TreatmentActionTypes.treatmentSaveSuccess,
-  props<ResponseSuccess>(),
+  props<IResponseSuccess>(),
 );
 
 export const treatmentFailure = createAction(

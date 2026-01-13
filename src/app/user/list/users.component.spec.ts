@@ -8,7 +8,7 @@ import { BehaviorSubject, of } from 'rxjs';
 import { UsersComponent } from './users.component';
 import { IUser, IUserAll, User } from '../../interfaces/user';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { UserState } from '../../store/reducers/user.reducers';
 import { deleteUser, getUsersPage, mergeUsers, resendToken, restore, userSelected } from '../../store/user.actions';
 import { signal } from '@angular/core';
@@ -76,11 +76,12 @@ describe('UsersComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [UsersComponent, TranslateModule.forRoot(), NoopAnimationsModule],
+      imports: [UsersComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        provideNoopAnimations(),
       ],
     }).compileComponents();
 

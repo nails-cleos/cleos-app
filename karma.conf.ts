@@ -11,7 +11,7 @@ module.exports = (config: any) => {
       require('karma-jasmine-html-reporter'),
       require('karma-junit-reporter'),
       require('karma-coverage'),
-      
+
     ],
     client: {
       jasmine: {
@@ -45,6 +45,7 @@ module.exports = (config: any) => {
         '**/src/app/**/*.actions.ts',
         '**/src/app/**/*.reducers.ts',
         '**/src/app/**/*.effects.ts',
+        '**/src/app/**/*.selectors.ts',
       ],
     },
     reporters: ['progress', 'kjhtml', 'junit'],

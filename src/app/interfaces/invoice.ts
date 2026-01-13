@@ -44,3 +44,9 @@ export interface IRoomInvoice {
   phone: string;
   email: string;
 }
+
+export interface IInvoiceData {
+  id: string;
+  name: string;
+  date: Date;
+}

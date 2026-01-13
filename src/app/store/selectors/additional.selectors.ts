@@ -1,7 +1,7 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import { IAdditional, IAdditionalAll } from '../../interfaces/additional';
-import { IError, ResponseSuccess } from '../../interfaces/common';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 import { ADDITIONAL_FEATURE_KEY, AdditionalState } from '../reducers/additional.reducers';
 import { Pagination } from '../../interfaces/pagination';
 import { ITreatmentGroupAll } from '../../interfaces/treatment';
@@ -68,7 +68,7 @@ export const selectAdditionalResponse = createSelector(
 );
 export const getAdditionalResponsePipe = pipe(
   select(selectAdditionalResponse),
-  filter((val): val is ResponseSuccess => val !== undefined),
+  filter((val): val is IResponseSuccess => val !== undefined),
 );
 
 export const selectAdditionalError = createSelector(

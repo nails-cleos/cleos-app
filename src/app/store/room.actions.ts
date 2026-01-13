@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { IError, PageRequest, IResponseSuccess } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
 import { IRoom, IRoomCustomer, IRoomInfo, IRoomService, IServicePrice } from '../interfaces/room';
 
@@ -63,7 +63,7 @@ export const updateServices = createAction(
 
 export const roomSaveSuccess = createAction(
   RoomActionTypes.roomSaveSuccess,
-  props<ResponseSuccess>(),
+  props<IResponseSuccess>(),
 );
 
 export const roomFailure = createAction(

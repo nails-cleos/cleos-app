@@ -1,6 +1,6 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
-import { IError, ResponseSuccess } from '../../interfaces/common';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 import { PAYMENT_FEATURE_KEY, PaymentState } from '../reducers/payment.reducers';
 import { IPayment, IPaymentOption } from '../../interfaces/payment';
 
@@ -86,7 +86,7 @@ export const selectPaymentResponse = createSelector(
 );
 export const getPaymentResponsePipe = pipe(
   select(selectPaymentResponse),
-  filter((val): val is ResponseSuccess => val !== undefined),
+  filter((val): val is IResponseSuccess => val !== undefined),
 );
 
 export const selectPaymentError = createSelector(

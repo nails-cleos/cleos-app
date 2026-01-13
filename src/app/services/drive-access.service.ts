@@ -15,7 +15,7 @@ export class DriveAccessService {
 
   private tokenRequested: boolean = false;
 
-  requestDriveAccess(): void {
+  private requestDriveAccess(): void {
     const provider = new GoogleAuthProvider();
     provider.addScope('https://www.googleapis.com/auth/drive');
 

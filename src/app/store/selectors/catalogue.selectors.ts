@@ -1,6 +1,6 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
-import { IError, ResponseSuccess } from '../../interfaces/common';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 import { ITreatmentGroupAll } from '../../interfaces/treatment';
 import { CATALOGUE_FEATURE_KEY, CatalogueState } from '../reducers/catalogue.reducers';
 import { ICatalogueAll } from '../../interfaces/catalogue';
@@ -58,7 +58,7 @@ export const selectCatalogueResponse = createSelector(
 );
 export const getCatalogueResponsePipe = pipe(
   select(selectCatalogueResponse),
-  filter((val): val is ResponseSuccess => val !== undefined),
+  filter((val): val is IResponseSuccess => val !== undefined),
 );
 
 export const selectCatalogueError = createSelector(

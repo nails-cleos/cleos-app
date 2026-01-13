@@ -1,6 +1,6 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
-import { IError, ResponseSuccess } from '../../interfaces/common';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 import { USER_FEATURE_KEY, UserState } from '../reducers/user.reducers';
 import { IOverview, IUserAll } from '../../interfaces/user';
 import { Pagination } from '../../interfaces/pagination';
@@ -85,7 +85,7 @@ export const selectUserResponse = createSelector(
 );
 export const getUserResponsePipe = pipe(
   select(selectUserResponse),
-  filter((val): val is ResponseSuccess => val !== undefined),
+  filter((val): val is IResponseSuccess => val !== undefined),
 );
 
 export const selectUserError = createSelector(

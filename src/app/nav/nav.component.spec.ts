@@ -18,7 +18,7 @@ import { getNotificationsPage, readNotification } from '../store/notification.ac
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { signal } from '@angular/core';
 import { getNowTimeZone } from '../util/dates';
-import { ResponseSuccess } from '../interfaces/common';
+import { IResponseSuccess } from '../interfaces/common';
 import { ToastService } from '../services/toast.service';
 
 describe('NavComponent', () => {
@@ -409,8 +409,13 @@ describe('NavComponent', () => {
   });
 
   it('should create response and navigate', () => {
-    const response = new ResponseSuccess('Operation successful', 'path/to/resource', false, 'warning',
-      'path/to/redirect');
+    const response: IResponseSuccess = {
+      message: 'Operation successful',
+      path: 'path/to/resource',
+      reload: false,
+      toastType: 'warning',
+      redirect: 'path/to/redirect',
+    };
     response$.next(response);
     fixture.detectChanges();
 
@@ -422,12 +427,39 @@ describe('NavComponent', () => {
 
   it('should create response with blob', () => {
     const fakeBlob = new Blob(['test'], { type: 'application/pdf' });
-    const response = new ResponseSuccess('Operation successful', undefined, false, 'warning', 'path',
-      fakeBlob);
+    const response: IResponseSuccess = {
+      path: undefined,
+      reload: false,
+      toastType: 'warning',
+      redirect: 'path',
+      blob: fakeBlob,
+      fileName: 'test.pdf',
+    };
+
+    const fakeUrl = 'blob:http://localhost/fake-url';
+
+    // 🔹 Spy on URL APIs
+    spyOn(URL, 'createObjectURL').and.returnValue(fakeUrl);
+    spyOn(URL, 'revokeObjectURL');
+
+    // 🔹 Fake <a> element
+    const clickSpy = jasmine.createSpy('click');
+    const anchorMock = {
+      href: '',
+      download: '',
+      click: clickSpy,
+    } as unknown as HTMLAnchorElement;
+
+    spyOn(document, 'createElement').and.returnValue(anchorMock);
+
     response$.next(response);
     fixture.detectChanges();
 
-    expect(toastServiceSpy.show).toHaveBeenCalledWith(response.message, response.toastType, 5000,
-      { actionType: 'file', action: fakeBlob });
+    expect(URL.createObjectURL).toHaveBeenCalledWith(response.blob);
+    expect(document.createElement).toHaveBeenCalledWith('a');
+    expect(anchorMock.href).toBe(fakeUrl);
+    expect(anchorMock.download).toBe(response.fileName);
+    expect(clickSpy).toHaveBeenCalled();
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith(fakeUrl);
   });
 });

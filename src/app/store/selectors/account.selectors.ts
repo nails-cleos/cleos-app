@@ -2,7 +2,7 @@ import { ACCOUNT_FEATURE_KEY, AccountState } from '../reducers/account.reducers'
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import { IAccountAll, IAccountTransaction, ITransaction } from '../../interfaces/account';
-import { IError, ResponseSuccess } from '../../interfaces/common';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 import { IPaymentOption } from '../../interfaces/payment';
 
 const selectAccountState = createFeatureSelector<AccountState>(ACCOUNT_FEATURE_KEY);
@@ -85,7 +85,7 @@ export const selectAccountResponse = createSelector(
 );
 export const getAccountResponsePipe = pipe(
   select(selectAccountResponse),
-  filter((val): val is ResponseSuccess => val !== undefined),
+  filter((val): val is IResponseSuccess => val !== undefined),
 );
 
 export const selectAccountError = createSelector(

@@ -3,7 +3,7 @@ import { filter, pipe } from 'rxjs';
 import { AUTH_FEATURE_KEY, AuthState } from '../reducers/auth.reducers';
 import { IMenu, IUserAll } from '../../interfaces/user';
 import { Params } from '@angular/router';
-import { IError, ResponseSuccess } from '../../interfaces/common';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 
 const selectAuthState = createFeatureSelector<AuthState>(AUTH_FEATURE_KEY);
 
@@ -85,7 +85,7 @@ export const selectAuthResponse = createSelector(
 );
 export const getAuthResponsePipe = pipe(
   select(selectAuthResponse),
-  filter((val): val is ResponseSuccess => val !== undefined),
+  filter((val): val is IResponseSuccess => val !== undefined),
 );
 
 export const selectAuthError = createSelector(

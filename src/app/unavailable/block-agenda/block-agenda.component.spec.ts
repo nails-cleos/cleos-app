@@ -2,11 +2,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BlockAgendaComponent } from './block-agenda.component';
 import { BehaviorSubject } from 'rxjs';
-import { ReactiveFormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { ChangeDetectorRef, signal } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { API_LOCALE, createNewDate, formatDuration, getTime, zoneDateToDate } from '../../util/dates';
 import { getUnavailable } from '../../store/unavailable.actions';
 import { IUnavailableAll } from '../../interfaces/unavailable';
@@ -128,16 +127,12 @@ describe('BlockAgendaComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [
-        BlockAgendaComponent,
-        TranslateModule.forRoot(),
-        ReactiveFormsModule,
-        NoopAnimationsModule,
-      ],
+      imports: [BlockAgendaComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
+        provideNoopAnimations(),
       ],
     }).compileComponents();
 

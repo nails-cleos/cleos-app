@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { IError, IResponseSuccess, ResponseSuccess } from '../interfaces/common';
+import { IError, IResponseSuccess } from '../interfaces/common';
 import { IPayment, IPaymentOption, IPaymentRequest, PaymentStatus } from '../interfaces/payment';
 import { IReservationPayment } from '../interfaces/reservation';
 
@@ -73,7 +73,7 @@ export const notifyPayment = createAction(
 
 export const paymentSaveSuccess = createAction(
   PaymentActionTypes.paymentSaveSuccess,
-  props<ResponseSuccess>(),
+  props<IResponseSuccess>(),
 );
 
 export const paymentFailure = createAction(

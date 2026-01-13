@@ -9,7 +9,7 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagina
 import { currencySelected, deleteCurrency, getCurrenciesPage } from '../../store/currency.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { CurrencyState } from '../../store/reducers/currency.reducers';
 
 describe('CurrencyListComponent', () => {
@@ -76,11 +76,12 @@ describe('CurrencyListComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [CurrencyListComponent, TranslateModule.forRoot(), NoopAnimationsModule],
+      imports: [CurrencyListComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        provideNoopAnimations(),
       ],
     }).compileComponents();
 

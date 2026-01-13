@@ -55,7 +55,7 @@ export class ForgotPasswordComponent {
 
     effect(() => {
       const response = this.responseSignal();
-      if (response) {
+      if (response?.message) {
         const actionType = 'button';
         const toastRef = this.toastService.show(response.message, response.toastType, 5000, { actionType });
         toastRef.onAction().subscribe(() => this.router.navigate([this.language, 'auth']));

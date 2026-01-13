@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
 import { IOffice } from '../interfaces/office';
 import { IUserAll } from '../interfaces/user';
@@ -51,7 +51,7 @@ export const updateOffice = createAction(
 
 export const officeSaveSuccess = createAction(
   OfficeActionTypes.officeSaveSuccess,
-  props<ResponseSuccess>(),
+  props<IResponseSuccess>(),
 );
 
 export const officeFailure = createAction(

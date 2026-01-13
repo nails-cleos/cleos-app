@@ -208,7 +208,7 @@ export class MainContentComponent {
 
     effect(() => {
       const response = this.responseSignal();
-      if (response) {
+      if (response?.message) {
         this.toastService.show(response.message, response.toastType);
       }
     });

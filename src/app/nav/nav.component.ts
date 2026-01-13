@@ -152,14 +152,28 @@ export class NavComponent implements OnDestroy {
         this.router.navigate([`/${this.language()}/${response.redirect}`]);
       }
 
-      const options = this.getToastOptions(response);
-      const toastRef = this.toastService.show(response.message, response.toastType, 5000, options);
+      if (response.blob) {
+        const url = URL.createObjectURL(response.blob);
 
-      toastRef.onDismiss().subscribe(() => {
-        if (response.reload) {
-          this.navigationService.reload(this.router.url.split('/'));
-        }
-      });
+        // download
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = response.fileName;
+        a.click();
+
+        URL.revokeObjectURL(url);
+      }
+
+      if (response.message) {
+        const options = this.getToastOptions(response);
+        const toastRef = this.toastService.show(response.message, response.toastType, 5000, options);
+
+        toastRef.onDismiss().subscribe(() => {
+          if (response.reload) {
+            this.navigationService.reload(this.router.url.split('/'));
+          }
+        });
+      }
     });
 
     effect(() => {
@@ -347,9 +361,6 @@ export class NavComponent implements OnDestroy {
   private getToastOptions = (res: IResponseSuccess): ToastOptions => {
     if (res.path) {
       return { actionType: 'link', action: `/${this.language()}/${res.path}` };
-    }
-    if (res.blob) {
-      return { actionType: 'file', action: res.blob };
     }
     return { actionType: 'none' };
   };

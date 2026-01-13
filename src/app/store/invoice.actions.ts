@@ -1,13 +1,17 @@
 import { createAction, props } from '@ngrx/store';
-import { IError, IResponseSuccess } from '../interfaces/common';
-import { IInvoice } from '../interfaces/invoice';
+import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
+import { IInvoice, IInvoiceData } from '../interfaces/invoice';
 import { IOffice, IOfficeAll } from '../interfaces/office';
+import { Pagination } from '../interfaces/pagination';
 
 enum InvoiceActionTypes {
+  getInvoicesPage = '[Invoice] Get invoices page',
   getOfficeToInvoice = '[Invoice] Find office to invoice',
   getAllMyOffices = '[Invoice] Get all my offices',
   invoiceOfficesSuccess = '[Invoice] Offices success',
   invoiceSuccess = '[Invoice] Success',
+  invoicePageSuccess = '[Invoice] Success page',
+  invoiceView = '[Invoice] Invoice view',
   updateOfficeById = '[Invoice] Update office by id',
   invoiceUpdateOfficeSuccess = '[Invoice] Update office Success',
   uploadInvoices = '[Invoice] Upload invoices',
@@ -19,6 +23,21 @@ enum InvoiceActionTypes {
 export const getOfficeToInvoice = createAction(
   InvoiceActionTypes.getOfficeToInvoice,
   props<{ officeId: string, start: string, end: string, types?: string[] }>(),
+);
+
+export const getInvoicesPage = createAction(
+  InvoiceActionTypes.getInvoicesPage,
+  props<{ officeId: string } & PageRequest>(),
+);
+
+export const invoiceView = createAction(
+  InvoiceActionTypes.invoiceView,
+  props<{ id: string; fileName: string; driveToken?: string }>(),
+);
+
+export const invoicePageSuccess = createAction(
+  InvoiceActionTypes.invoicePageSuccess,
+  props<{ page: Pagination<IInvoiceData> }>(),
 );
 
 export const invoiceSuccess = createAction(
