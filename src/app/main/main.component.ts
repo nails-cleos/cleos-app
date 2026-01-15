@@ -152,7 +152,7 @@ export class MainComponent {
 
   treatment(): void {
     goTo('home');
-    this.router.navigate([this.translate.currentLang, 'home', 'biab', 'treatment']);
+    this.router.navigate([this.translate.getCurrentLang(), 'home', 'biab', 'treatment']);
     return;
   }
 

@@ -314,7 +314,7 @@ export class MainContentComponent {
   goToTreatment = (name?: string): void => {
     if (name === 'biab') {
       goTo('home');
-      this.router.navigate([this.translate.currentLang, 'home', name, 'treatment']);
+      this.router.navigate([this.translate.getCurrentLang(), 'home', name, 'treatment']);
     }
   };
 

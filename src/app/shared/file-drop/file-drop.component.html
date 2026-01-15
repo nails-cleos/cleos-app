@@ -43,7 +43,7 @@
         <mat-icon class="icon-display" mat-card-avatar>image</mat-icon>
       }
       <mat-card-title-group>
-        <mat-card-title style="margin-left: 20px;">{{ currentFile.name }}</mat-card-title>
+        <mat-card-title style="margin-left: 20px;">{{ fileName() || currentFile.name }}</mat-card-title>
         @if (currentFile.size) {
           <mat-card-subtitle> {{ formatBytes(currentFile.size, 0) }}</mat-card-subtitle>
         }

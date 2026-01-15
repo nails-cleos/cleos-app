@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CookieService } from 'ngx-cookie-service';
 import { ThemeService } from 'ng2-charts';
@@ -15,7 +15,6 @@ import { signal } from '@angular/core';
 describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;
   let component: AppComponent;
-  let translateSpy: jasmine.SpyObj<TranslateService>;
   let seoSpy: jasmine.SpyObj<SeoService>;
   let overlayContainerSpy: jasmine.SpyObj<OverlayContainer>;
   let themeServiceSpy: jasmine.SpyObj<ThemeService>;
@@ -24,7 +23,6 @@ describe('AppComponent', () => {
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   beforeEach(async () => {
-    translateSpy = jasmine.createSpyObj('TranslateService', ['use', 'instant']);
     overlayContainerSpy = jasmine.createSpyObj('OverlayContainer', ['getContainerElement']);
     themeServiceSpy = jasmine.createSpyObj('ThemeService', ['setColorschemesOptions']);
     seoSpy = jasmine.createSpyObj('SeoService', ['setMetaDescription', 'setMetaTitle']);
@@ -32,7 +30,6 @@ describe('AppComponent', () => {
     cookieServiceSpy = jasmine.createSpyObj('CookieService', ['get', 'set']);
 
     cookieServiceSpy.get.and.returnValue('light-theme');
-    translateSpy.instant.and.returnValue({ CONTENT: 'desc', TITLE: 'title' });
     overlayContainerSpy.getContainerElement.and.returnValue(document.createElement('div'));
     storeSpy.pipe.and.returnValue(of('en'));
 
@@ -41,9 +38,8 @@ describe('AppComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [AppComponent],
+      imports: [AppComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: TranslateService, useValue: translateSpy },
         { provide: SeoService, useValue: seoSpy },
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceMock },
@@ -53,6 +49,10 @@ describe('AppComponent', () => {
         { provide: DateAdapter, useValue: { setLocale: jasmine.createSpy() } },
       ],
     }).compileComponents();
+
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
+    translateService.setTranslation('en-GB', { META: { CONTENT: 'desc', TITLE: 'title' } });
 
     fixture = TestBed.createComponent(AppComponent);
     component = fixture.componentInstance;

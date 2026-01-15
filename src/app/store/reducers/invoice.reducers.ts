@@ -1,10 +1,8 @@
 import {
-  clean,
-  getAllMyOffices,
+  cleanInvoice,
   getInvoicesPage,
   getOfficeToInvoice,
   invoiceFailure,
-  invoiceOfficesSuccess,
   invoicePageSuccess,
   invoiceSaveSuccess,
   invoiceSuccess,
@@ -12,7 +10,6 @@ import {
   updateOfficeById,
   uploadInvoices,
 } from '../invoice.actions';
-import { IOfficeAll } from '../../interfaces/office';
 import { IInvoice, IInvoiceData } from '../../interfaces/invoice';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
@@ -24,7 +21,6 @@ export interface InvoiceState {
   response?: IResponseSuccess;
   data?: IInvoice[];
   page?: Pagination<IInvoiceData>;
-  offices?: IOfficeAll[];
   error?: IError;
   subErrors?: IError[];
   isLoading: boolean;
@@ -36,7 +32,6 @@ export const initialState: InvoiceState = {
   page: undefined,
   error: undefined,
   subErrors: undefined,
-  offices: undefined,
   isLoading: false,
 };
 
@@ -66,20 +61,6 @@ export const invoiceReducer = createReducer(
   on(invoicePageSuccess, (state, { page }) => ({
     ...state,
     page,
-    error: undefined,
-    subErrors: undefined,
-    response: undefined,
-  })),
-  on(getAllMyOffices, (state) => ({
-    ...state,
-    offices: undefined,
-    error: undefined,
-    subErrors: undefined,
-    response: undefined,
-  })),
-  on(invoiceOfficesSuccess, (state, { offices }) => ({
-    ...state,
-    offices: offices,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -118,5 +99,5 @@ export const invoiceReducer = createReducer(
     subErrors: undefined,
     response: action,
   })),
-  on(clean, () => initialState),
+  on(cleanInvoice, () => initialState),
 );

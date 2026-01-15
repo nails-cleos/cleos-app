@@ -6,7 +6,7 @@ import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
 import { SortDirection } from '@angular/material/sort';
-import { Pagination } from '../interfaces/pagination';
+import { paginated, Pagination } from '../interfaces/pagination';
 import { IApiResponse } from '../interfaces/common';
 
 @Injectable()
@@ -24,7 +24,7 @@ export class TreatmentService {
     size: number,
   ): Observable<Pagination<ITreatmentGroupAll>> => this.http.get<Pagination<ITreatmentGroupAll>>(
     toUrl(this.urlV1, 'pages'),
-    { params: createFilter(page, size, sort, direction) },
+    { ...paginated(), params: createFilter(page, size, sort, direction) },
   );
 
   getAllTreatmentsGroup = (): Observable<ITreatmentGroupAll[]> => this.http.get<ITreatmentGroupAll[]>(

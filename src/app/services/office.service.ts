@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Pagination } from '../interfaces/pagination';
+import { paginated, Pagination } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
-import { IOffice } from '../interfaces/office';
+import { IOffice, IOfficeAll } from '../interfaces/office';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
 import { SortDirection } from '@angular/material/sort';
@@ -18,6 +18,8 @@ export class OfficeService {
 
   private http: HttpClient = inject(HttpClient);
 
+  getAllMyOffices = (): Observable<IOfficeAll[]> => this.http.get<IOfficeAll[]>(toUrl(this.urlV1, 'me'));
+
   getOfficesPage = (
     page: number,
     sort: string,
@@ -25,7 +27,7 @@ export class OfficeService {
     size: number,
   ): Observable<Pagination<IOffice>> => this.http.get<Pagination<IOffice>>(
     toUrl(this.urlV1, 'pages'),
-    { params: createFilter(page, size, sort, direction) },
+    { ...paginated(), params: createFilter(page, size, sort, direction) },
   );
 
   getOffice = (id: string): Observable<IOffice | undefined> => this.http.get<IOffice>(toUrl(this.urlV1, id));

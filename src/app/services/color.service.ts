@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Pagination } from '../interfaces/pagination';
+import { paginated, Pagination } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { IColor, IColorAll } from '../interfaces/color';
 import { createFilter } from '../util/service-helper';
@@ -22,7 +22,7 @@ export class ColorService {
     direction: SortDirection,
     size: number,
   ): Observable<Pagination<IColor>> => this.http.get<Pagination<IColor>>(toUrl(this.urlV1, 'pages'),
-    { params: createFilter(page, size, sort, direction) },
+    { ...paginated(), params: createFilter(page, size, sort, direction) },
   );
 
   getColorsByTreatmentId = (treatmentId: string): Observable<IColorAll[]> => this.http.get<IColorAll[]>(

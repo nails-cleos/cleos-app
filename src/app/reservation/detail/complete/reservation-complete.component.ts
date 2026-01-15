@@ -107,7 +107,7 @@ export class ReservationCompleteComponent {
     startTime: this.formBuilder.control('', {
       validators: [Validators.required],
     }),
-    endTime: this.formBuilder.control(getTime(this.endDate, this.translate.currentLang), {
+    endTime: this.formBuilder.control(getTime(this.endDate, this.translate.getCurrentLang()), {
       validators: [Validators.required],
     }),
     color: this.formBuilder.control(undefined, {
@@ -187,7 +187,7 @@ export class ReservationCompleteComponent {
       const reservation = this.selectedReservationSignal();
       if (reservation) {
         this.startDate = newDateTimestamp(reservation.startedTimestamp, reservation.room.timeZone);
-        this.getForm.startTime.setValue(getTime(this.startDate, this.translate.currentLang));
+        this.getForm.startTime.setValue(getTime(this.startDate, this.translate.getCurrentLang()));
         const endDate = newDateTimestamp(reservation.timestamp, reservation.room.timeZone);
         this.endDate.setFullYear(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
         this.price.set(getPrice(reservation, this.payments()));

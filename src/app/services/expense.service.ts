@@ -5,7 +5,7 @@ import { IExpense, IExpenseAll, IExpenseInfo } from '../interfaces/expense';
 import { createFilter } from '../util/service-helper';
 import { SortDirection } from '@angular/material/sort';
 import { IApiResponse } from '../interfaces/common';
-import { Pagination } from '../interfaces/pagination';
+import { paginated, Pagination } from '../interfaces/pagination';
 
 @Injectable()
 export class ExpenseService {
@@ -28,7 +28,7 @@ export class ExpenseService {
       params = params.append('date', dateFilter);
     }
 
-    return this.http.get<Pagination<IExpenseAll>>(this.updatePathVariable(roomId, ['pages']), { params });
+    return this.http.get<Pagination<IExpenseAll>>(this.updatePathVariable(roomId, ['pages']), { ...paginated(), params });
   };
 
   getAllExpensesInfo = (roomId: string): Observable<IExpenseInfo> => this.http.get<IExpenseInfo>(

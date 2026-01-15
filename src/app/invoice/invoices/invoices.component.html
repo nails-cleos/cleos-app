@@ -1,3 +1,21 @@
+<mat-form-field appearance="outline" style="width: 80%">
+  <mat-label>{{ 'INVOICE.OFFICE.SEARCH' | translate }}</mat-label>
+  <input (keydown)="keyDownHandler($event)" [formControl]="getForm.office" [matAutocomplete]="autoOffice"
+         autocomplete="off" matInput placeholder="{{ 'INVOICE.OFFICE.FIELD' | translate }}"
+         type="text" required>
+  <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
+    @for (office of filteredOfficeSignal(); track office.id) {
+      <mat-option [value]="office">
+        {{ office.name }}
+      </mat-option>
+    }
+  </mat-autocomplete>
+  @if (getForm.office.hasError('required')) {
+    <mat-error [innerHTML]="'INVOICE.OFFICE.REQUIRED' | translate"></mat-error>
+  } @else if (getForm.office.hasError('requireMatch')) {
+    <mat-error [innerHTML]="'INVOICE.OFFICE.INVALID' | translate"></mat-error>
+  }
+</mat-form-field>
 <div class="mat-elevation-z8">
   @let resultsLength = resultsLengthSignal();
   @let pageSize = pageSizeSignal();
@@ -83,7 +101,7 @@
 
       <ng-container matColumnDef="noContent">
         <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-          {{ 'COLOR.LIST.ERROR.NO_CONTENT' | translate }}
+          {{ 'INVOICE.LIST.ERROR.NO_CONTENT' | translate }}
         </td>
       </ng-container>
 
@@ -97,10 +115,9 @@
     @if (resultsLength) {
       <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
     }
-
-    <button color="accent" id="add-button" mat-fab matTooltip="{{ 'COLOR.TITLE' | translate }}"
-            [routerLink]="['/', language, 'invoices', 'add']">
-      <mat-icon>add</mat-icon>
-    </button>
   }
 </div>
+<button color="accent" id="add-button" mat-fab matTooltip="{{ 'INVOICE.TITLE' | translate }}"
+        [routerLink]="['/', language, 'invoices', 'add']">
+  <mat-icon>receipt_long</mat-icon>
+</button>

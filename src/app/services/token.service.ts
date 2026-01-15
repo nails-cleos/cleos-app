@@ -103,6 +103,6 @@ export class TokenService {
     this.myTokenCache = undefined;
     this._token$.next(null);
     this.myUser = undefined;
-    this.router.navigate(['/', this.translate.currentLang, 'login']);
+    this.router.navigate(['/', this.translate.getCurrentLang(), 'login']);
   };
 }

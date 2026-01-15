@@ -18,6 +18,7 @@ import { selectAuthError, selectAuthIsLoading, selectAuthResponse } from './auth
 import { selectNotificationIsLoading } from './notification.selectors';
 import { selectAwsIsLoading } from './aws.selectors';
 import { selectInvoiceError, selectInvoiceIsLoading, selectInvoiceResponse } from './invoice.selectors';
+import { selectStatementError, selectStatementIsLoading, selectStatementResponse } from './statement.selectors';
 
 export const selectGlobalIsLoading = createSelector(
   selectAccountIsLoading,
@@ -36,6 +37,7 @@ export const selectGlobalIsLoading = createSelector(
   selectPaymentIsLoading,
   selectReservationIsLoading,
   selectRoomIsLoading,
+  selectStatementIsLoading,
   selectTreatmentIsLoading,
   selectUnavailableIsLoading,
   selectUserIsLoading,
@@ -59,6 +61,7 @@ export const selectGlobalResponse = createSelector(
   selectPaymentResponse,
   selectReservationResponse,
   selectRoomResponse,
+  selectStatementResponse,
   selectTreatmentResponse,
   selectUnavailableResponse,
   selectUserResponse,
@@ -83,6 +86,7 @@ export const selectGlobalError = createSelector(
   selectPaymentError,
   selectReservationError,
   selectRoomError,
+  selectStatementError,
   selectTreatmentError,
   selectUnavailableError,
   selectUserError,

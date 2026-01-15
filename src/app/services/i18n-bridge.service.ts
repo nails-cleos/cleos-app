@@ -10,12 +10,12 @@ export class I18nBridgeService {
   private readonly translate = inject(TranslateService);
 
   private readonly languageSignal = toSignal(this.store.pipe(getI18NLanguagePipe),
-    { initialValue: this.translate.currentLang });
+    { initialValue: this.translate.getCurrentLang() });
 
   constructor() {
     effect(() => {
       const lang = this.languageSignal();
-      if (!lang || this.translate.currentLang === lang) {
+      if (!lang || this.translate.getCurrentLang() === lang) {
         return;
       }
 

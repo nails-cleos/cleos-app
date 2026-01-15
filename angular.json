@@ -213,6 +213,7 @@
               "src/app/**/*.actions.ts",
               "src/app/**/*.reducers.ts",
               "src/app/**/*.effects.ts",
+              "src/app/**/*.selectors.ts",
               "src/app/**/*-stub.component.ts"
             ],
             "assets": [

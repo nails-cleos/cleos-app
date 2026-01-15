@@ -671,8 +671,8 @@ export class ReservationComponent {
       if (room) {
         if (!this.dismiss && !isSameTimeZone(room.timeZone)) {
           const now = getNowTimeZone();
-          const localDate = localeTimeZoneDate(this.translate.currentLang, now);
-          const timeZoneDate = localeTimeZoneDate(this.translate.currentLang, now, room.timeZone);
+          const localDate = localeTimeZoneDate(this.translate.getCurrentLang(), now);
+          const timeZoneDate = localeTimeZoneDate(this.translate.getCurrentLang(), now, room.timeZone);
           const warning = this.translate.instant('COMMON.TIME_ZONE.WARNING');
           const localDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.LOCAL', { date: localDate });
           const roomDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.ROOM', { date: timeZoneDate });

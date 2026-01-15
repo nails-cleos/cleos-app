@@ -14,8 +14,9 @@ import {
   officeSuccess,
   setCurrentOfficeId,
   updateOffice,
+  getAllMyOffices,
 } from '../office.actions';
-import { IOffice } from '../../interfaces/office';
+import { IOffice, IOfficeAll } from '../../interfaces/office';
 import { IUserAll } from '../../interfaces/user';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 
@@ -23,7 +24,7 @@ export const OFFICE_FEATURE_KEY = 'office';
 
 export interface OfficeState {
   response?: IResponseSuccess;
-  data?: IOffice | Pagination<IOffice>;
+  data?: IOffice | Pagination<IOffice> | IOfficeAll[];
   managers?: IUserAll[];
   error?: IError;
   subErrors?: IError[];
@@ -108,6 +109,20 @@ export const officeReducer = createReducer(
   on(setCurrentOfficeId, (state, { officeId }) => ({
     ...state,
     currentOfficeId: officeId,
+  })),
+  on(getAllMyOffices, (state) => ({
+    ...state,
+    data: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(officeSuccess, (state, { data }) => ({
+    ...state,
+    data,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
   })),
   on(cleanOffice, () => initialState),
 );

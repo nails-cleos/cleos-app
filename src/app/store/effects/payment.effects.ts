@@ -141,10 +141,10 @@ export class PaymentEffects {
     tap(({ selected, redirect }) => {
       if (redirect && selected instanceof Array) {
         if (selected[0].transactionId || selected[0].transaction?.id) {
-          this.router.navigate([this.translate.currentLang, 'me', 'transaction',
+          this.router.navigate([this.translate.getCurrentLang(), 'me', 'transaction',
             selected[0].transactionId || selected[0].transaction?.id, 'payment']);
         } else {
-          this.router.navigate([this.translate.currentLang, 'me', 'reservation',
+          this.router.navigate([this.translate.getCurrentLang(), 'me', 'reservation',
             selected[0].reservationId || selected[0].reservation?.id, 'payment']);
         }
       }

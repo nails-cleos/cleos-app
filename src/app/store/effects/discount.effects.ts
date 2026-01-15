@@ -144,7 +144,7 @@ export class DiscountEffects {
 
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(discountSelected),
-    tap(({ selected }) => this.router.navigate([this.translate.currentLang, 'discounts', selected?.id])),
+    tap(({ selected }) => this.router.navigate([this.translate.getCurrentLang(), 'discounts', selected?.id])),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions.pipe(

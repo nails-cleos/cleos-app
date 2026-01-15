@@ -1,6 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import { Pagination } from '../../interfaces/pagination';
-import { IUnavailable, IUnavailableAll } from '../../interfaces/unavailable';
+import { IUnavailableAll } from '../../interfaces/unavailable';
 import { IUserAll } from '../../interfaces/user';
 import { IRoomAll } from '../../interfaces/room';
 import { IError, IResponseSuccess } from '../../interfaces/common';
@@ -28,7 +28,7 @@ export const UNAVAILABLE_FEATURE_KEY = 'unavailable';
 
 export interface UnavailableState {
   response?: IResponseSuccess;
-  data?: Pagination<IUnavailable>;
+  data?: Pagination<IUnavailableAll>;
   professionals?: IUserAll[];
   rooms?: IRoomAll[];
   error?: IError;
@@ -56,7 +56,7 @@ export const unavailableReducer = createReducer(
   initialState,
   on(getUnavailablePage, (state) => ({
     ...state,
-    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IUnavailable>,
+    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IUnavailableAll>,
     subErrors: undefined,
     selected: undefined,
     response: undefined,

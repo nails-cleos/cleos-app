@@ -1,0 +1,44 @@
+<form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+  <div>
+    <div class="row-space-around-container">
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}</mat-label>
+        <input matInput [matDatepicker]="dp" [formControl]="getForm.date">
+        <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
+        <mat-datepicker #dp startView="multi-year" (monthSelected)="setMonthAndYear($event, dp)">
+        </mat-datepicker>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'STATEMENT.OFFICE.SEARCH' | translate }}</mat-label>
+        <input (keydown)="keyDownHandler($event)" [formControl]="getForm.office" [matAutocomplete]="autoOffice"
+               autocomplete="off" matInput placeholder="{{ 'STATEMENT.OFFICE.FIELD' | translate }}"
+               type="text" required>
+        <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
+          @for (office of filteredOfficeSignal(); track office.id) {
+            <mat-option [value]="office">
+              {{ office.name }}
+            </mat-option>
+          }
+        </mat-autocomplete>
+        @if (getForm.office.hasError('required')) {
+          <mat-error [innerHTML]="'STATEMENT.OFFICE.REQUIRED' | translate"></mat-error>
+        } @else if (getForm.office.hasError('requireMatch')) {
+          <mat-error [innerHTML]="'STATEMENT.OFFICE.INVALID' | translate"></mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    @if (!form.invalid) {
+      <app-file-drop (fileSelected)="onSelectedFile($event)" [fileName]="fileName()" [animate]="false"></app-file-drop>
+    }
+  </div>
+  <div class="card-actions top-space">
+    <div class="spacer"></div>
+    <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
+      {{ 'COMMON.BUTTON.BACK' | translate }}
+    </button>
+    <button [disabled]="form.invalid || !blob()" color="primary" mat-fab extended class="icon-button" type="submit">
+      {{ 'COMMON.BUTTON.ADD' | translate }}
+    </button>
+  </div>
+</form>

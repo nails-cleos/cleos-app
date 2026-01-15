@@ -120,7 +120,7 @@ export class AdditionalEffects {
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(additionalSelected),
     tap(({ selected }) => this.router.navigate(
-      [this.translate.currentLang, 'additional', selected?.id])),
+      [this.translate.getCurrentLang(), 'additional', selected?.id])),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions.pipe(

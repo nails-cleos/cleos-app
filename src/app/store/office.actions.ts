@@ -1,13 +1,14 @@
 import { createAction, props } from '@ngrx/store';
 import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
-import { IOffice } from '../interfaces/office';
+import { IOffice, IOfficeAll } from '../interfaces/office';
 import { IUserAll } from '../interfaces/user';
 
 enum OfficeActionTypes {
   getOfficesPage = '[Office] Get offices page',
   getAllManager = '[Office] Get all manager',
-  officeSuccess = '[Office] Success',
+  getAllMyOffices = '[Office] Success',
+  officeSuccess = '[Office] Get all my offices',
   managerSuccess = '[Office] Manager Success',
   createOffice = '[Office] Create office',
   updateOffice = '[Office] Update office by id',
@@ -29,9 +30,13 @@ export const getAllManager = createAction(
   OfficeActionTypes.getAllManager,
 );
 
+export const getAllMyOffices = createAction(
+  OfficeActionTypes.getAllMyOffices,
+);
+
 export const officeSuccess = createAction(
   OfficeActionTypes.officeSuccess,
-  props<{ data: Pagination<IOffice> }>(),
+  props<{ data: Pagination<IOffice>| IOfficeAll[] }>(),
 );
 
 export const managerSuccess = createAction(

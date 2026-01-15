@@ -63,6 +63,9 @@ const routes: Routes = [
         path: 'invoices', loadChildren: () => import('../invoice/invoice.module').then(m => m.InvoiceModule),
       },
       {
+        path: 'statements', loadChildren: () => import('../statement/statement.module').then(m => m.StatementModule),
+      },
+      {
         path: 'notes', loadChildren: () => import('../note/note.module').then(m => m.NoteModule),
       },
       { path: 'shortcut', loadChildren: () => import('../shortcut/shortcut.module').then(m => m.ShortcutModule) },

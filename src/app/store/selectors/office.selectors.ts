@@ -71,3 +71,12 @@ export const selectOfficeIsLoading = createSelector(
   selectOfficeState,
   (state: OfficeState) => state?.isLoading,
 );
+
+const selectMyOffices = createSelector(
+  selectOfficeState,
+  (state: OfficeState) => state?.data,
+);
+export const getMyOfficesPipe = pipe(
+  select(selectMyOffices),
+  filter((val): val is IOfficeAll[] => val !== undefined),
+);

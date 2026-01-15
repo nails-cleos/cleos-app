@@ -23,6 +23,12 @@
       "SEARCH": "Buscar por tipo de pago",
       "FIELD": "Tipo de pago"
     },
-    "UPLOAD_SUCCESS": "Factura {{fileName}} subida exitosamente"
+    "UPLOAD_SUCCESS": "Factura {{fileName}} subida exitosamente",
+    "TITLE": "Crear facturas",
+    "LIST": {
+      "ERROR": {
+        "NO_CONTENT": "No hay facturas"
+      }
+    }
   }
 }

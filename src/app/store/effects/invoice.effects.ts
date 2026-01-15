@@ -4,21 +4,20 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import {
-  getAllMyOffices,
   getInvoicesPage,
   getOfficeToInvoice,
   invoiceFailure,
-  invoiceOfficesSuccess, invoicePageSuccess,
+  invoicePageSuccess,
   invoiceSaveSuccess,
   invoiceSuccess,
-  invoiceUpdateOfficeSuccess, invoiceView,
+  invoiceUpdateOfficeSuccess,
+  invoiceView,
   updateOfficeById,
   uploadInvoices,
 } from '../invoice.actions';
 import { InvoiceService } from '../../services/invoice.service';
 import { OfficeService } from '../../services/office.service';
 import { IInvoice, IInvoiceData } from '../../interfaces/invoice';
-import { IOfficeAll } from '../../interfaces/office';
 import { TranslateService } from '@ngx-translate/core';
 import { Pagination } from '../../interfaces/pagination';
 
@@ -56,15 +55,6 @@ export class InvoiceEffects {
       )),
   ));
 
-  findMyOffices$ = createEffect(() => this.actions.pipe(
-    ofType(getAllMyOffices),
-    switchMap(() =>
-      this.invoiceService.getAllMyOffices().pipe(
-        map((offices: IOfficeAll[]) => invoiceOfficesSuccess(offices ? { offices } : { offices: [] })),
-        catchError((err: HttpErrorResponse) => of(invoiceFailure({ error: err.error }))),
-      )),
-  ));
-
   updateOffices$ = createEffect(() => this.actions.pipe(
     ofType(updateOfficeById),
     switchMap(({ id, office }) =>
@@ -85,10 +75,6 @@ export class InvoiceEffects {
         catchError((err: HttpErrorResponse) => of(invoiceFailure({ error: err.error }))),
       )),
   ));
-
-  officesSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(invoiceOfficesSuccess),
-  ), { dispatch: false });
 
   updateOfficesSuccess$ = createEffect(() => this.actions.pipe(
     ofType(invoiceUpdateOfficeSuccess),

@@ -46,7 +46,7 @@ import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
 import { TwoDigitsDirective } from '../../directives/two-digits.directive';
 import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { YearMonthAdapter } from '../../util/adapter/year-month.adapter';
-import { DateAdapter } from '../../util/adapter/date.adapter';
+import { DateAdapter } from '@angular/material/core';
 
 type MonthlySummaryForm = {
   date: FormControl<Date>;
@@ -258,7 +258,7 @@ export class MonthSummaryComponent {
   }
 
   get dateFormatted(): string {
-    return this.getForm.date.value ? monthViewTitle(this.getForm.date.value, this.translate.currentLang) : '';
+    return this.getForm.date.value ? monthViewTitle(this.getForm.date.value, this.translate.getCurrentLang()) : '';
   }
 
   private static groupSummary = (summaries?: IMonthlySummary[]): Map<string, IMonthlySummary[]> =>

@@ -5,7 +5,7 @@ import { IUnavailable, IUnavailableAll } from '../interfaces/unavailable';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
 import { SortDirection } from '@angular/material/sort';
-import { Pagination } from '../interfaces/pagination';
+import { paginated, Pagination } from '../interfaces/pagination';
 import { IApiResponse } from '../interfaces/common';
 
 @Injectable()
@@ -21,10 +21,10 @@ export class UnavailableService {
     sort: string,
     direction: SortDirection,
     size: number,
-  ): Observable<Pagination<IUnavailable>> {
+  ): Observable<Pagination<IUnavailableAll>> {
     const params = createFilter(page, size, sort, direction);
 
-    return this.http.get<Pagination<IUnavailable>>(toUrl(this.urlV1, 'pages'), { params });
+    return this.http.get<Pagination<IUnavailableAll>>(toUrl(this.urlV1, 'pages'), { ...paginated(), params });
   }
 
   public getUnavailable(id: string): Observable<IUnavailableAll | undefined> {

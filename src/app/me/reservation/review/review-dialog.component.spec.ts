@@ -104,7 +104,7 @@ describe('ReviewDialogComponent', () => {
     expect(component.reservation).toBeDefined();
     expect(component.price).toBeDefined();
     expect(component.end).toBeInstanceOf(Date);
-    expect(component.dateFormat).toBe(translateService.currentLang);
+    expect(component.dateFormat).toBe(translateService.getCurrentLang());
   });
 
   it('should close dialog on onNoClick', () => {

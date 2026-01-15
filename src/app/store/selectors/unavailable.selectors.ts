@@ -1,6 +1,6 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
-import { IUnavailable, IUnavailableAll } from '../../interfaces/unavailable';
+import { IUnavailableAll } from '../../interfaces/unavailable';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { UNAVAILABLE_FEATURE_KEY, UnavailableState } from '../reducers/unavailable.reducers';
 import { Pagination } from '../../interfaces/pagination';
@@ -15,7 +15,7 @@ const selectUnavailablePaginationData = createSelector(
 );
 export const getUnavailablePaginationPipe = pipe(
   select(selectUnavailablePaginationData),
-  filter((val): val is Pagination<IUnavailable> => val !== undefined),
+  filter((val): val is Pagination<IUnavailableAll> => val !== undefined),
 );
 
 const selectCurrentUnavailableId = createSelector(

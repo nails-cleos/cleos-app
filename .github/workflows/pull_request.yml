@@ -71,7 +71,7 @@ jobs:
 
   e2e-tests:
     runs-on: ubuntu-latest
-    needs: [build-and-lint, unit-tests]
+    needs: build-and-lint
     env:
       TZ: "Europe/Amsterdam"
 

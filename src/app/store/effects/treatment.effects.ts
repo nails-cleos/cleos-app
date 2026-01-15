@@ -139,7 +139,7 @@ export class TreatmentEffects {
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(treatmentSelected),
     tap(({ selected, path }) => this.router.navigate(
-      [this.translate.currentLang, 'treatments', selected?.id, path])),
+      [this.translate.getCurrentLang(), 'treatments', selected?.id, path])),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions.pipe(

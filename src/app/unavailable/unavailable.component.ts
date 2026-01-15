@@ -330,8 +330,8 @@ export class UnavailableComponent {
   delete() {
     const unavailable = this.unavailableSignal();
     const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
-    const date = this.getForm.startDate.value ? formatFullDate(this.getForm.startDate.value, this.translate.currentLang)
-      : unavailable?.start;
+    const date = this.getForm.startDate.value ?
+      formatFullDate(this.getForm.startDate.value, this.translate.getCurrentLang()) : unavailable?.start;
     const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', { date });
 
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: unavailable }, result => {

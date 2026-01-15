@@ -4,7 +4,7 @@ import { of } from 'rxjs';
 
 import { AdditionalService } from './additional.service';
 import { IAdditional, IAdditionalAll } from '../interfaces/additional';
-import { Pagination } from '../interfaces/pagination';
+import { paginated, Pagination } from '../interfaces/pagination';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { IApiResponse } from '../interfaces/common';
 import { createFilter } from '../util/service-helper';
@@ -71,7 +71,7 @@ describe('AdditionalService', () => {
     });
 
     expect(httpSpy.get).toHaveBeenCalledWith('v1/additional/pages', {
-      params: createFilter(page, size, sort, direction),
+      params: createFilter(page, size, sort, direction), ...paginated(),
     });
   });
 

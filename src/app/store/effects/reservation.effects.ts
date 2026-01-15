@@ -428,7 +428,7 @@ export class ReservationEffects {
     ofType(reservationSaveSuccess),
     tap(({ navigate, role, paymentLink, deleted, id }) => {
       if (navigate) {
-        let navigation = [this.translate.currentLang];
+        let navigation = [this.translate.getCurrentLang()];
         switch (role) {
           case Role.customer:
             if (paymentLink) {
@@ -458,7 +458,7 @@ export class ReservationEffects {
       }
       if (isDashboard !== undefined) {
         this.router.navigate(isDashboard ?
-          [this.translate.currentLang, 'dashboard', 'events'] : [this.translate.currentLang, 'reservation', id]);
+          [this.translate.getCurrentLang(), 'dashboard', 'events'] : [this.translate.getCurrentLang(), 'reservation', id]);
       }
     }),
   ), { dispatch: false });

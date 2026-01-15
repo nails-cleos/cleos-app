@@ -134,7 +134,7 @@ export class UserEffects {
       this.userService.updateMyPhoto(file).pipe(
         switchMap((response: Token) => {
           const message = this.translate.instant('COMMON.PROFILE.UPDATED.PHOTO');
-          const lang = getLocale(this.translate.currentLang).language;
+          const lang = getLocale(this.translate.getCurrentLang()).language;
           return success(userSaveSuccess, message, undefined, undefined, undefined,
             loginSuccess({
               token: response,
@@ -199,7 +199,7 @@ export class UserEffects {
     ofType(userSelected),
     tap(({ selected, profile }) => {
       if (!profile) {
-        this.router.navigate([this.translate.currentLang, 'users', selected?.id]);
+        this.router.navigate([this.translate.getCurrentLang(), 'users', selected?.id]);
       }
     }),
   ), { dispatch: false });

@@ -90,7 +90,7 @@ export class AccountComponent {
   errors = signal<Record<string, unknown>>({});
   showAdd = computed(() => this.hasAdminRole() && this.customerIdSignal() !== this.userId());
 
-  language: string = getLocale(this.translate.currentLang).language;
+  language: string = getLocale(this.translate.getCurrentLang()).language;
 
   constructor() {
     effect(() => {

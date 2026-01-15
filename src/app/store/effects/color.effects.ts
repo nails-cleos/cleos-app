@@ -86,7 +86,7 @@ export class ColorEffects {
 
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(colorSelected),
-    tap(({ selected }) => this.router.navigate([this.translate.currentLang, 'colors', selected?.id])),
+    tap(({ selected }) => this.router.navigate([this.translate.getCurrentLang(), 'colors', selected?.id])),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions.pipe(

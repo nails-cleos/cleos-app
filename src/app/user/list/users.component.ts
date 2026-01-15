@@ -223,7 +223,7 @@ export class UsersComponent {
 
   book = (customer: IUser): void => {
     const data = { customerId: customer.id };
-    this.router.navigate([this.translate.currentLang, 'reservation'], { state: data });
+    this.router.navigate([this.translate.getCurrentLang(), 'reservation'], { state: data });
   };
 
   private noExpanded = (user: IUserAll): void => {

@@ -2,7 +2,6 @@ import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import { IInvoice, IInvoiceData } from '../../interfaces/invoice';
 import { INVOICE_FEATURE_KEY, InvoiceState } from '../reducers/invoice.reducers';
-import { IOfficeAll } from '../../interfaces/office';
 import { Pagination } from '../../interfaces/pagination';
 import { IResponseSuccess } from '../../interfaces/common';
 
@@ -24,15 +23,6 @@ const selectInvoicesPage = createSelector(
 export const getInvoicesPagePipe = pipe(
   select(selectInvoicesPage),
   filter((val): val is Pagination<IInvoiceData> => val !== undefined),
-);
-
-const selectOffices = createSelector(
-  selectInvoiceState,
-  (state: InvoiceState) => state?.offices,
-);
-export const getOfficesPipe = pipe(
-  select(selectOffices),
-  filter((val): val is IOfficeAll[] => val !== undefined),
 );
 
 export const selectInvoiceIsLoading = createSelector(
