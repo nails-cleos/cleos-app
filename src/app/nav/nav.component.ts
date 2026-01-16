@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, OnDestroy, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ActivatedRoute, Router, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -9,7 +9,6 @@ import { updateMyUser } from '../store/user.actions';
 import { INotification } from '../interfaces/notification';
 import { TranslateService } from '@ngx-translate/core';
 import { MessagingService } from '../services/messaging.service';
-import { environment } from '../../environments/environment';
 import { getDisplayNameInitials, getLocale, getUserImage } from '../util/helper';
 import { NavigationService } from '../services/navigation.service';
 import { TokenService } from '../services/token.service';
@@ -35,10 +34,11 @@ import {
   getUserPipe,
 } from '../store/selectors/auth.selectors';
 import { getDataDeletedPipe, getNotificationsPipe } from '../store/selectors/notification.selectors';
-import { of, Subject } from 'rxjs';
+import { of } from 'rxjs';
 import { selectGlobalError, selectGlobalIsLoading, selectGlobalResponse } from '../store/selectors/global.selectors';
 import { ToastOptions } from '../shared/toast/toast.model';
 import { IResponseSuccess } from '../interfaces/common';
+import { EnvService } from '../services/env.service';
 
 @Component({
   selector: 'app-nav',
@@ -46,8 +46,8 @@ import { IResponseSuccess } from '../interfaces/common';
   styleUrls: ['./nav.component.scss'],
   imports: [SharedModule, MenuItemComponent, RouterLinkActive, RouterOutlet, ErrorComponent, MatRipple],
 })
-export class NavComponent implements OnDestroy {
-  private destroy$ = new Subject<void>();
+export class NavComponent {
+  private readonly env: EnvService = inject(EnvService);
   private readonly tokenService: TokenService = inject(TokenService);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
@@ -86,7 +86,7 @@ export class NavComponent implements OnDestroy {
     },
   );
 
-  title = environment.title;
+  title = this.env.title;
 
   private isAuthenticatedSignal = toSignal(this.isAuthenticated$);
   private redirectSignal = toSignal(this.redirect$);
@@ -114,7 +114,8 @@ export class NavComponent implements OnDestroy {
   readonly language = computed(() => {
     const user = this.currentUserSignal();
 
-    return getLocale(user?.locale || this.route.snapshot.paramMap.get('lang') || this.translate.getCurrentLang()).language;
+    return getLocale(
+      user?.locale || this.route.snapshot.paramMap.get('lang') || this.translate.getCurrentLang()).language;
   });
 
   isDarkMode = signal(this.authUserSignal().isDarkMode || isDarkMode(this.cookieService.get(THEME) as Theme));
@@ -195,8 +196,8 @@ export class NavComponent implements OnDestroy {
         const user = this.currentUserSignal();
         const token = this.tokenSignal();
         if (user && token) {
-          this.tokenService.user = user;
-          this.tokenService.token = token;
+          this.tokenService.setUser = user;
+          this.tokenService.setToken = token;
           this.incomplete = !user.completed;
           this.initials = getDisplayNameInitials(user);
           this.image = getUserImage(user);
@@ -328,11 +329,6 @@ export class NavComponent implements OnDestroy {
       this.store.dispatch(readNotification({ id: notification.id }));
     }
   };
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
 
   private updateCount = (): void => {
     if (this.countNotifications() > 9) {

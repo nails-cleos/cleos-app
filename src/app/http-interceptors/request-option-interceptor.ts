@@ -17,7 +17,7 @@ export const requestOptionInterceptor = (
       req = req.clone({ headers: req.headers.set('Accept', 'application/json') });
     }
 
-    const user = inject(TokenService).user;
+    const user = inject(TokenService).user();
     if (user && user.lang) {
       req = req.clone({ headers: req.headers.set('Accept-Language', user.lang) });
     }

@@ -5,19 +5,18 @@ import { ActivatedRoute } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import {
   Auth,
-  user,
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   sendEmailVerification,
   signInWithEmailAndPassword,
   signInWithPopup,
   updateProfile,
+  user,
 } from '@angular/fire/auth';
 import { VERIFICATION_EMAIL } from '../util/helper';
 import { THEME } from '../util/theme';
 import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { environment } from '../../environments/environment';
 import { fetchSignInMethodsForEmail } from '@firebase/auth';
 import { SharedModule } from '../shared/shared.module';
 import { ToastService } from '../services/toast.service';
@@ -31,6 +30,7 @@ import {
 } from '../store/selectors/auth.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthState } from '../store/reducers/auth.reducers';
+import { EnvService } from '../services/env.service';
 
 type AuthForm = {
   email: FormControl<string>;
@@ -47,6 +47,7 @@ type AuthForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthComponent {
+  private readonly env: EnvService = inject(EnvService);
   private readonly auth: Auth = inject(Auth);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly store: Store<AuthState> = inject(Store<AuthState>);
@@ -87,8 +88,8 @@ export class AuthComponent {
 
   language: string = this.translate.getCurrentLang();
   showForm: boolean = false;
-  tos: string = `${environment.appServer}/${this.language}/term-and-conditions`;
-  privacyPolicy: string = `${environment.appServer}/${this.language}/privacy`;
+  tos: string = `${this.env.appServer}/${this.language}/term-and-conditions`;
+  privacyPolicy: string = `${this.env.appServer}/${this.language}/privacy`;
 
   constructor() {
     effect(() => {

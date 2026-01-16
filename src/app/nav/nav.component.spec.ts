@@ -103,7 +103,7 @@ describe('NavComponent', () => {
       authUser: authUserSignal.asReadonly(),
     });
     tokenServiceSpy = jasmine.createSpyObj('TokenService', ['user'], {
-      token: 'mock-token',
+      setToken: 'mock-token',
     });
     messagingServiceSpy = jasmine.createSpyObj('MessagingService', ['requestPermission', 'receiveMessage'], {
       message$: message$.asObservable(),

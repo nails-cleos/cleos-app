@@ -46,8 +46,8 @@ describe('MainComponent', () => {
     authSpy = jasmine.createSpyObj('Auth', ['onIdTokenChanged'], {
       currentUser: null,
     });
-    tokenServiceSpy = jasmine.createSpyObj('TokenService', ['getToken'], {
-      token: '',
+    tokenServiceSpy = jasmine.createSpyObj('TokenService', ['token'], {
+      setToken: '',
     });
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {

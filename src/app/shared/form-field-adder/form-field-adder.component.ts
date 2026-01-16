@@ -87,7 +87,7 @@ export class FormFieldAdderComponent {
     return this.form.controls;
   }
 
-  addRow(): void {
+  addNewRow(): void {
     const row: IExtras = {
       description: '',
       price: 0,

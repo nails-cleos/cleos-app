@@ -47,6 +47,7 @@ import { TwoDigitsDirective } from '../../directives/two-digits.directive';
 import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { YearMonthAdapter } from '../../util/adapter/year-month.adapter';
 import { DateAdapter } from '@angular/material/core';
+import { EnvService } from '../../services/env.service';
 
 type MonthlySummaryForm = {
   date: FormControl<Date>;
@@ -63,6 +64,7 @@ type MonthlySummaryForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MonthSummaryComponent {
+  private readonly env: EnvService = inject(EnvService);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly store: Store<DashboardState> = inject(Store<DashboardState>);
   private readonly router: Router = inject(Router);
@@ -482,8 +484,8 @@ export class MonthSummaryComponent {
   exportMonthlySummary = (): void => {
     const title = monthViewTitle(this.getForm.date.value || getNowTimeZone(this.timeZone()));
     const workbook = createMonthlySummary(title, this.weeks, currencySymbol(this.currencySignal()), this.translate,
-      this.timeZone(),
-      this.summaryReservations as IMonthlySummarySale[], this.summaryExpenses as IMonthlySummaryExpense[]);
+      this.env, this.timeZone(), this.summaryReservations as IMonthlySummarySale[],
+      this.summaryExpenses as IMonthlySummaryExpense[]);
 
     workbook.creator = this.userName() || '';
     workbook.created = getNowTimeZone(this.timeZone());
@@ -514,16 +516,16 @@ export class MonthSummaryComponent {
         case SummaryType.payment:
           workbook = createMonthlyIncomeWorkbook(header, data as IMonthlySummarySale[], this.weeks,
             name, totalTypes.type, workbookName, this.translate, currencySymbol(this.currencySignal()),
-            this.timeZone());
+            this.env, this.timeZone());
           break;
         case SummaryType.expense:
           workbook = createMonthlyExpenseWorkbook(header, data as IMonthlySummaryExpense[], this.weeks,
-            name, workbookName, this.translate, currencySymbol(this.currencySignal()), this.timeZone());
+            name, workbookName, this.translate, currencySymbol(this.currencySignal()), this.env, this.timeZone());
           break;
         case SummaryType.cash:
           workbook = createMonthlyIncomeWorkbook(header, data as IMonthlySummarySale[], this.weeks,
             name, totalTypes.type, workbookName, this.translate, currencySymbol(this.currencySignal()),
-            this.timeZone());
+            this.env, this.timeZone());
           break;
       }
 

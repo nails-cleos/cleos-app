@@ -5,51 +5,56 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { cleanColor } from '../../store/color.actions';
-import { InvoiceState } from '../../store/reducers/invoice.reducers';
-import { getInvoicesPage, invoiceView } from '../../store/invoice.actions';
-import { getInvoiceResponsePipe, getInvoicesPagePipe } from '../../store/selectors/invoice.selectors';
-import { DriveAccessService } from '../../services/drive-access.service';
-import { IInvoiceData } from '../../interfaces/invoice';
-import { SharedModule } from '../../shared/shared.module';
-import { detailExpandAnimation } from '../../util/animation';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../interfaces/pagination';
+import { DocumentState } from '../store/reducers/document.reducers';
+import { cleanDocument, documentDownloadZip, documentView, getDocumentsPage } from '../store/document.actions';
+import { DriveAccessService } from '../services/drive-access.service';
+import { SharedModule } from '../shared/shared.module';
+import { detailExpandAnimation } from '../util/animation';
 import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { requireMatch } from '../../util/validators';
-import { IOfficeAll } from '../../interfaces/office';
+import { requireMatch } from '../util/validators';
+import { IOfficeAll } from '../interfaces/office';
 import { map, startWith } from 'rxjs/operators';
 import { combineLatestWith } from 'rxjs';
-import { getMyOfficesPipe } from '../../store/selectors/office.selectors';
-import { OfficeState } from '../../store/reducers/office.reducers';
+import { IDocument } from '../interfaces/document';
+import { OfficeState } from '../store/reducers/office.reducers';
+import { getMyOfficesPipe } from '../store/selectors/office.selectors';
+import { getDocumentResponsePipe, getDocumentsPagePipe } from '../store/selectors/document.selectors';
+import { DateAdapter } from '@angular/material/core';
+import { YearMonthAdapter } from '../util/adapter/year-month.adapter';
+import { getDateFormat, getDateQuarter, getNowTimeZone, monthViewTitle } from '../util/dates';
+import { MatDatepicker } from '@angular/material/datepicker';
 
-type InvoicesForm = {
+type DocumentsForm = {
   office: FormControl<IOfficeAll | undefined>;
+  date: FormControl<Date | undefined>;
 };
 
 @Component({
-  selector: 'app-invoices',
+  selector: 'app-document',
   imports: [SharedModule],
   animations: [detailExpandAnimation],
-  templateUrl: './invoices.component.html',
-  styleUrl: './invoices.component.scss',
+  templateUrl: './document.component.html',
+  providers: [{ provide: DateAdapter, useClass: YearMonthAdapter }],
+  styleUrl: './document.component.scss',
 })
-export class InvoicesComponent {
+export class DocumentComponent {
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<InvoiceState | OfficeState> = inject(Store<InvoiceState | OfficeState>);
+  private readonly store: Store<DocumentState | OfficeState> = inject(Store<DocumentState | OfficeState>);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private invoiceList$ = this.store.pipe(getInvoicesPagePipe);
-  private response$ = this.store.pipe(getInvoiceResponsePipe);
+  private documentList$ = this.store.pipe(getDocumentsPagePipe);
+  private response$ = this.store.pipe(getDocumentResponsePipe);
   private allOffices$ = this.store.pipe(getMyOfficesPipe);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
 
   private allOfficesSignal = toSignal(this.allOffices$);
-  private invoiceListSignal = toSignal(this.invoiceList$);
+  private documentListSignal = toSignal(this.documentList$);
   private responseSignal = toSignal(this.response$);
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
@@ -67,19 +72,22 @@ export class InvoicesComponent {
   private sortDirection = computed(() => this.sort()?.direction ?? 'desc');
 
   paginatorPageIndex = signal(0);
-  dataSourceSignal = computed(() => this.invoiceListSignal()?.content);
-  resultsLengthSignal = computed(() => this.invoiceListSignal()?.totalElements || 0);
+  dataSourceSignal = computed(() => this.documentListSignal()?.content ?? []);
+  resultsLengthSignal = computed(() => this.documentListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'name', 'date', 'actions'];
+  displayedColumns: string[] = ['position', 'name', 'date', 'type', 'actions'];
 
-  expandedInvoice?: IInvoiceData;
+  expandedDocument?: IDocument;
 
   language: string = this.translate.getCurrentLang();
 
-  form: FormGroup<InvoicesForm> = this.formBuilder.group<InvoicesForm>({
+  form: FormGroup<DocumentsForm> = this.formBuilder.group<DocumentsForm>({
     office: this.formBuilder.control(undefined, {
       validators: [Validators.required, requireMatch],
+    }),
+    date: this.formBuilder.control(undefined, {
+      validators: [Validators.required],
     }),
   });
 
@@ -99,6 +107,7 @@ export class InvoicesComponent {
   );
 
   private selectedOffice = toSignal(this.getForm.office.valueChanges);
+  private selectedDate = toSignal(this.getForm.date.valueChanges);
 
   constructor() {
     effect((onCleanup) => {
@@ -113,13 +122,15 @@ export class InvoicesComponent {
 
     effect(() => {
       const officeId = this.selectedOffice()?.id;
-      if (!officeId) {
+      const date = this.selectedDate();
+      if (!officeId || !date) {
         return;
       }
       const page = this.paginatorPageIndex();
       this.store.dispatch(
-        getInvoicesPage({
+        getDocumentsPage({
           officeId,
+          date: getDateFormat(date),
           page: page,
           sort: this.sortActive(),
           direction: this.sortDirection(),
@@ -130,7 +141,7 @@ export class InvoicesComponent {
 
     effect(() => {
       if (this.responseSignal()) {
-        this.store.dispatch(cleanColor());
+        this.store.dispatch(cleanDocument());
         this.paginator()?.firstPage();
       }
     });
@@ -151,13 +162,33 @@ export class InvoicesComponent {
     });
   }
 
-  get getForm(): InvoicesForm {
+  get getForm(): DocumentsForm {
     return this.form.controls;
   }
 
-  view = (invoice: IInvoiceData): void => this.store.dispatch(invoiceView(
-    { id: invoice.id, fileName: invoice.name, driveToken: this.driveAccessService.driveTokenSignal() },
-  ));
+  setMonthAndYear = (normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void => {
+    const ctrlValue = new Date(this.getForm.date.value || getNowTimeZone());
+    ctrlValue?.setMonth(normalizedMonthAndYear.getMonth());
+    ctrlValue?.setFullYear(normalizedMonthAndYear.getFullYear());
+
+    this.getForm.date.setValue(ctrlValue);
+
+    datepicker.close();
+  };
+
+  download = (document: IDocument): void => this.store.dispatch(
+    documentView({ id: document.id, fileName: document.name }),
+  );
+
+  downloadZip = (): void => {
+    const office = this.selectedOffice();
+    const date = this.selectedDate();
+    if (!office || !date) {
+      return;
+    }
+    const fileName = `${office.name} Q${getDateQuarter(date)} ${monthViewTitle(date)}.zip`;
+    this.store.dispatch(documentDownloadZip({ officeId: office.id, date: getDateFormat(date), fileName }));
+  };
 
   keyDownHandler = (event: KeyboardEvent): void => {
     if (event.code === 'Backspace') {

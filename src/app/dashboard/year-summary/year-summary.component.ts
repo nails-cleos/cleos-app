@@ -40,6 +40,7 @@ import {
 import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { DateAdapter } from '@angular/material/core';
 import { YearAdapter } from '../../util/adapter/year.adapter';
+import { EnvService } from '../../services/env.service';
 
 type YearSummaryForm = {
   date: FormControl<Date>;
@@ -55,6 +56,7 @@ type YearSummaryForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class YearSummaryComponent {
+  private readonly env: EnvService = inject(EnvService);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly store: Store<DashboardState> = inject(Store<DashboardState>);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
@@ -319,7 +321,7 @@ export class YearSummaryComponent {
     }));
     if (sortedSheetData.length) {
       const workbook = createYearlyWorkbook(sortedSheetData, this.getForm.date.value || getNowTimeZone(this.timeZone()),
-        currencySymbol(this.currencySignal()), this.timeZone(), this.translate);
+        currencySymbol(this.currencySignal()), this.timeZone(), this.translate, this.env);
 
       workbook.creator = this.userName() || '';
       workbook.created = getNowTimeZone(this.timeZone());

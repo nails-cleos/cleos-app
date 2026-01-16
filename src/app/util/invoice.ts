@@ -2,12 +2,22 @@ import { IUserAll } from '../interfaces/user';
 import { currencySymbol } from './helper';
 import { IInvoice, IItem, IRoomInvoice, ITotals } from '../interfaces/invoice';
 import { API_LOCALE, dayViewTitle, newDateTimestamp } from './dates';
-import { environment } from '../../environments/environment';
 import { IOfficeAll } from '../interfaces/office';
+import { EnvService } from '../services/env.service';
 
-const createHeader = (index: number, titleDate: string, date: string, titleSubject: string = '', subject: string = '',
-  titleKVK: string = '', kvkNr: string = '', titleAccount: string = '', accountNr: string = '',
-  titleBTW: string = '', btwNr: string = ''): any => {
+const createHeader = (
+  index: number,
+  titleDate: string,
+  date: string,
+  titleSubject: string = '',
+  subject: string = '',
+  titleKVK: string = '',
+  kvkNr: string = '',
+  titleAccount: string = '',
+  accountNr: string = '',
+  titleBTW: string = '',
+  btwNr: string = '',
+): any => {
   const image = {
     image: 'logo',
     width: '*',
@@ -59,8 +69,13 @@ const createHeader = (index: number, titleDate: string, date: string, titleSubje
   };
 };
 
-const companyName = (room: IRoomInvoice, titleAddress: string, titlePhone: string, titleEmail: string,
-  billAddress?: string): any => {
+const companyName = (
+  room: IRoomInvoice,
+  titleAddress: string,
+  titlePhone: string,
+  titleEmail: string,
+  billAddress?: string,
+): any => {
   const phone = room.phone || '';
   const email = room.email || '';
   const address = billAddress || room.addressName;
@@ -110,17 +125,17 @@ const createItemTitle = (titleDescription: string, titleItem: string, titleBTW: 
 const itemBody = (name: string, neto: number, bruto: number, symbol: string): any => [
   { text: name, style: 'item', border: [false, false, false, true] },
   {
-    text: `${ symbol } ${ neto.toFixed(2) }`,
+    text: `${symbol} ${neto.toFixed(2)}`,
     style: ['item', 'amountKey', 'amount'],
     border: [false, false, false, true],
   },
   {
-    text: `${ symbol } ${ (bruto - neto).toFixed(2) }`,
+    text: `${symbol} ${(bruto - neto).toFixed(2)}`,
     style: ['item', 'amountKey', 'amount'],
     border: [false, false, false, true],
   },
   {
-    text: `${ symbol } ${ bruto.toFixed(2) }`,
+    text: `${symbol} ${bruto.toFixed(2)}`,
     style: ['item', 'amountKey', 'amount'],
     border: [false, false, false, true],
   },
@@ -155,12 +170,19 @@ const createItems = (itemTitle: any, itemList: IItem[], currency: string): any =
   };
 };
 
-const createTotals = (totals: ITotals, currency: string, titleSubTotal: string, titleExclBTW: string,
-  titleBTW21: string, titleTotal: string, titleDiscount: string): any => {
+const createTotals = (
+  totals: ITotals,
+  currency: string,
+  titleSubTotal: string,
+  titleExclBTW: string,
+  titleBTW21: string,
+  titleTotal: string,
+  titleDiscount: string,
+): any => {
   const subTotal = [
     { text: titleSubTotal, style: ['item', 'amountKey'], border: [false, false, false, true] },
     {
-      text: `${ currency } ${ totals.subTotal.toFixed(2) }`,
+      text: `${currency} ${totals.subTotal.toFixed(2)}`,
       style: ['item', 'amountKey', 'amount'],
       border: [false, false, false, true],
     },
@@ -169,7 +191,7 @@ const createTotals = (totals: ITotals, currency: string, titleSubTotal: string, 
   const excBTW = [
     { text: titleExclBTW, style: ['item', 'amountKey'], border: [false, false, false, true] },
     {
-      text: `${ currency } ${ totals.excBTW.toFixed(2) }`,
+      text: `${currency} ${totals.excBTW.toFixed(2)}`,
       style: ['item', 'amountKey', 'amount'],
       border: [false, false, false, true],
     },
@@ -178,7 +200,7 @@ const createTotals = (totals: ITotals, currency: string, titleSubTotal: string, 
   const btw = [
     { text: titleBTW21, style: ['item', 'amountKey'], border: [false, false, false, true] },
     {
-      text: `${ currency } ${ totals.btw.toFixed(2) }`,
+      text: `${currency} ${totals.btw.toFixed(2)}`,
       style: ['item', 'amountKey', 'amount'],
       border: [false, false, false, true],
     },
@@ -187,7 +209,7 @@ const createTotals = (totals: ITotals, currency: string, titleSubTotal: string, 
   const total = [
     { text: titleTotal, style: ['item', 'amountKey'], border: [false, true, false, true], fontSize: 20 },
     {
-      text: `${ currency } ${ totals.totalPaid.toFixed(2) }`,
+      text: `${currency} ${totals.totalPaid.toFixed(2)}`,
       style: ['item', 'amountKey', 'amount'],
       border: [false, true, false, true],
       fontSize: 20,
@@ -200,7 +222,7 @@ const createTotals = (totals: ITotals, currency: string, titleSubTotal: string, 
     const discount = [
       { text: titleDiscount, style: ['item', 'amountKey'], border: [false, false, false, true] },
       {
-        text: `(${ currency } ${ totals.discount.toFixed(2) })`,
+        text: `(${currency} ${totals.discount.toFixed(2)})`,
         style: ['item', 'amountKey', 'amount', 'discount'],
         border: [false, false, false, true],
       },
@@ -231,11 +253,17 @@ const createTotals = (totals: ITotals, currency: string, titleSubTotal: string, 
 };
 
 // TODO translate
-export const pdf = (invoices: IInvoice[], office: IOfficeAll, start: number, fileName: string): any => {
+export const pdf = (
+  invoices: IInvoice[],
+  office: IOfficeAll,
+  start: number,
+  fileName: string,
+  env: EnvService,
+): any => {
   let content: any[] = [];
   invoices.map((invoice, index) => {
     const next = start + invoice.position;
-    const receiptNro = `${ next }`.padStart(5, '0');
+    const receiptNro = `${next}`.padStart(5, '0');
     const date = dayViewTitle(newDateTimestamp(invoice.timestamp, invoice.room.timeZone), API_LOCALE);
     const titleDate = 'Date';
     const titleSubject = 'Subject';
@@ -253,7 +281,7 @@ export const pdf = (invoices: IInvoice[], office: IOfficeAll, start: number, fil
 
     const itemTitle = createItemTitle(titleDescription, titleItem, titleBTW, titleItemTotal);
 
-    const text = `Invoice No. ${ receiptNro }`;
+    const text = `Invoice No. ${receiptNro}`;
     const invoiceNro = createInvoiceNro(text);
     const items = createItems(itemTitle, invoice.items.slice().sort((a, b) => a.order - b.order), currency);
 
@@ -327,9 +355,9 @@ export const pdf = (invoices: IInvoice[], office: IOfficeAll, start: number, fil
         alignment: 'right',
       },
     },
-    watermark: { text: 'Nails Cleos', color: '#000000', opacity: 0.1 },
+    watermark: { text: env.title, color: '#000000', opacity: 0.1 },
     images: {
-      logo: `${ environment.appServer }/assets/icons/icon-512x512.png`,
+      logo: `${env.appServer}/assets/icons/icon-512x512.png`,
     },
     defaultStyle: {
       font: 'EBGaramond',

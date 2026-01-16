@@ -3,24 +3,45 @@ import { TestBed } from '@angular/core/testing';
 import { TokenService } from './token.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
 import { Store } from '@ngrx/store';
 import { AuthState } from '../store/reducers/auth.reducers';
+import { IUserAll } from '../interfaces/user';
 
 describe('TokenService', () => {
   let service: TokenService;
 
   let storeSpy: jasmine.SpyObj<Store<AuthState>>;
 
+  let token$: BehaviorSubject<any>;
+  let user$: BehaviorSubject<any>;
+  let driveToken$: BehaviorSubject<any>;
+
   beforeEach(() => {
-    const routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    token$ = new BehaviorSubject('token');
+    user$ = new BehaviorSubject({ id: 'a', displayName: 'Alice' } as IUserAll);
+    driveToken$ = new BehaviorSubject('driveToken');
+
+    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     const authSpy = jasmine.createSpyObj('Auth', ['select']);
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
 
-    routerSpy.getCurrentNavigation.and.returnValue(null);
     authSpy.select.and.returnValue(of({ user: { authorities: [{ authority: 'ROLE_USER' }] } }));
-    storeSpy.pipe.and.returnValue(of(null));
+    let pipeCallIndex = 0;
+    storeSpy.pipe.and.callFake(() => {
+      pipeCallIndex++;
+      switch (pipeCallIndex) {
+        case 1:
+          return token$.asObservable();
+        case 2:
+          return user$.asObservable();
+        case 3:
+          return driveToken$.asObservable();
+        default:
+          return new BehaviorSubject(undefined).asObservable();
+      }
+    });
 
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot()],
@@ -42,20 +63,37 @@ describe('TokenService', () => {
     expect(service).toBeTruthy();
   });
 
+  it('should set drive token', () => {
+    expect(service.driveToken()).toBe('driveToken');
+  });
+
+  it('should set token', () => {
+    service.setToken = 'newToken';
+
+    expect(service.token()).toBe('newToken');
+  });
+
+  it('should set user', () => {
+    const newUser = { id: 'b', displayName: 'Bob' } as IUserAll;
+    service.setUser = newUser;
+
+    expect(service.user()).toEqual(newUser);
+  });
+
   it('should not recreate token cache if already initialized', () => {
     (service as any).myTokenCache = of(null);
 
-    service.token = 'abc';
-    service.token = 'def';
+    service.setToken = 'abc';
+    service.setToken = 'def';
 
-    expect(service.token).toBe('def');
+    expect(service.token()).toBe('def');
   });
 
   it('should ignore null firebase user', () => {
     (service as any).myTokenCache = of(null);
 
     expect(() => {
-      service.token = 'token';
+      service.setToken = 'token';
     }).not.toThrow();
   });
 
@@ -70,7 +108,7 @@ describe('TokenService', () => {
 
     (service as any).firebaseUser$ = of(fakeUser);
 
-    service.token = 'token';
+    service.setToken = 'token';
 
     await Promise.resolve();
 

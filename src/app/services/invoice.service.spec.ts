@@ -113,7 +113,7 @@ describe('InvoiceService', () => {
   });
 
   describe('uploadInvoices', () => {
-    it('should upload invoice without drive token', () => {
+    it('should upload invoice', () => {
       const officeId = '1';
       const blob = new Blob(['test content'], { type: 'application/pdf' });
       const fileName = 'invoice.pdf';
@@ -137,18 +137,16 @@ describe('InvoiceService', () => {
       const headers = options?.headers as HttpHeaders;
 
       expect(headers.get('Upload')).toBe('true');
-      expect(headers.has('X-Google-Drive-Token')).toBeFalse();
     });
 
-    it('should upload invoice with drive token', () => {
+    it('should upload invoice with', () => {
       const officeId = '1';
       const blob = new Blob(['test content'], { type: 'application/pdf' });
       const fileName = 'invoice.pdf';
-      const driveToken = 'driveToken';
 
       httpSpy.post.and.returnValue(of(void 0));
 
-      service.uploadInvoices(officeId, blob, fileName, driveToken).subscribe();
+      service.uploadInvoices(officeId, blob, fileName).subscribe();
 
       expect(httpSpy.post).toHaveBeenCalled();
 
@@ -165,35 +163,6 @@ describe('InvoiceService', () => {
       const headers = options?.headers as HttpHeaders;
 
       expect(headers.get('Upload')).toBe('true');
-      expect(headers.has('X-Google-Drive-Token')).toBeTrue();
-    });
-  });
-
-  describe('view', () => {
-    it('should download invoice without drive token', () => {
-      const blob = new Blob(['test'], { type: 'application/pdf' });
-      httpSpy.get.and.returnValue(of(blob));
-
-      service.view('123').subscribe(result => {
-        expect(result).toBe(blob);
-      });
-
-      expect(httpSpy.get).toHaveBeenCalledWith(
-        'v1/invoices/123',
-        jasmine.objectContaining({ responseType: 'blob' }),
-      );
-    });
-
-    it('should download invoice with drive token', () => {
-      const blob = new Blob(['test'], { type: 'application/pdf' });
-      httpSpy.get.and.returnValue(of(blob));
-
-      service.view('123', 'drive-token').subscribe();
-
-      const [, options] = httpSpy.get.calls.mostRecent().args;
-      const headers = options?.headers as HttpHeaders;
-
-      expect(headers.get('X-Google-Drive-Token')).toBe('drive-token');
     });
   });
 

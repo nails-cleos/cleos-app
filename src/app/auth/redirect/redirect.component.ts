@@ -44,8 +44,8 @@ export class RedirectComponent {
       if (this.redirectSignal()) {
         const user = this.userSignal();
         if (this.isAuthenticatedSignal() && user) {
-          this.tokenService.token = this.tokenSignal()!;
-          this.tokenService.user = user;
+          this.tokenService.setToken = this.tokenSignal()!;
+          this.tokenService.setUser = user;
           if (RedirectComponent.hasRoomOrAdmin(user.authorities)) {
             redirectUrl = [lang, 'dashboard'];
           } else if (hasRoomAdmin(user.authorities)) {

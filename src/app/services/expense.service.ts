@@ -43,7 +43,6 @@ export class ExpenseService {
     roomId: string,
     expense: IExpense,
     file?: File,
-    driveToken?: string,
   ): Observable<IApiResponse> => {
     const formData = new FormData();
     if (file) {
@@ -52,10 +51,7 @@ export class ExpenseService {
     const blob = new Blob([JSON.stringify(expense)], { type: 'application/json' });
     formData.append('expense', blob);
 
-    let headers = new HttpHeaders().set('Upload', 'true');
-    if (driveToken) {
-      headers = headers.set('X-Google-Drive-Token', driveToken);
-    }
+    const headers = new HttpHeaders().set('Upload', 'true');
     return this.http.post<IApiResponse>(this.updatePathVariable(roomId), formData, { headers });
   };
 

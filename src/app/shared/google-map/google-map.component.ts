@@ -14,6 +14,7 @@ import { GeocodeService, MapStatus } from '../../services/geocode.service';
 import { GoogleMap, MapInfoWindow, MapMarker } from '@angular/google-maps';
 import { AuthUserService } from '../../services/auth-user.service';
 import { SharedModule } from '../shared.module';
+import { EnvService } from '../../services/env.service';
 import PlaceResult = google.maps.places.PlaceResult;
 import MapMouseEvent = google.maps.MapMouseEvent;
 
@@ -47,6 +48,7 @@ export class GoogleMapComponent {
   distanceEmitter = output<number>();
 
   private readonly authUserService: AuthUserService = inject(AuthUserService);
+  private readonly env: EnvService = inject(EnvService);
 
   private authUserSignal = this.authUserService.authUser;
 
@@ -261,7 +263,7 @@ export class GoogleMapComponent {
 
       const address = place.formatted_address ? place.formatted_address : 'link';
 
-      this.info = `<b>${place.name ? place.name : 'Nails Cleos'}</b>
+      this.info = `<b>${place.name ? place.name : this.env.title}</b>
         <div>
             <a href="https://www.google.com/maps/dir/?api=1&z=15&destination=${place.formatted_address}"
                 rel="noreferrer" target="_blank">${address}</a>

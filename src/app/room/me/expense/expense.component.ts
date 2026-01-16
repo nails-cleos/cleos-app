@@ -34,6 +34,7 @@ import { calculateBTW, calculateNet } from '../../../util/numbers';
 import { callAwsLambda } from '../../../store/aws.actions';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { DriveAccessService } from '../../../services/drive-access.service';
+import { EnvService } from '../../../services/env.service';
 
 type TotalsForm = {
   type: FormControl<string>;
@@ -57,6 +58,7 @@ type ExpenseForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExpenseComponent {
+  private readonly env: EnvService = inject(EnvService);
   private readonly store: Store<ExpenseState | RoomState | AwsState | AuthState> = inject(
     Store<ExpenseState | RoomState | AwsState | AuthState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
@@ -203,7 +205,7 @@ export class ExpenseComponent {
         return;
       }
       const token = this.tokenSignal();
-      if (token) {
+      if (token && this.env.awsExtractEnable) {
         this.store.dispatch(callAwsLambda({ token, file, userId: this.userId() }));
       }
     });
@@ -283,8 +285,7 @@ export class ExpenseComponent {
 
     const id = this.expenseIdSignal();
     if (!id) {
-      const driveToken = this.driveAccessService.driveTokenSignal();
-      this.store.dispatch(createExpense({ roomId, expense, file: this.file()?.raw, driveToken }));
+      this.store.dispatch(createExpense({ roomId, expense, file: this.file()?.raw }));
     } else {
       this.store.dispatch(updateExpense({ id, roomId, expense }));
     }

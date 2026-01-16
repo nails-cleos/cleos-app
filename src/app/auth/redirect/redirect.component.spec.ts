@@ -7,6 +7,7 @@ import { TokenService } from '../../services/token.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Role } from '../../interfaces/token';
 import { AuthState } from '../../store/reducers/auth.reducers';
+import { computed, signal } from '@angular/core';
 
 describe('RedirectComponent', () => {
   let fixture: ComponentFixture<RedirectComponent>;
@@ -18,7 +19,23 @@ describe('RedirectComponent', () => {
 
   let storeSpy: jasmine.SpyObj<Store<AuthState>>;
   let navigateServiceSpy: jasmine.SpyObj<NavigationService>;
-  let tokenServiceSpy: jasmine.SpyObj<TokenService>;
+
+  const tokenSignal = signal<string | null>('abc');
+
+  const tokenServiceMock = {
+    token: computed(() => tokenSignal()),
+    user: signal<any>(null),
+  };
+
+  Object.defineProperty(tokenServiceMock, 'setToken', {
+    set: jasmine.createSpy('setToken').and.callFake((t: string) => {
+      tokenSignal.set(t);
+    }),
+  });
+
+  Object.defineProperty(tokenServiceMock, 'setUser', {
+    set: jasmine.createSpy('setUser'),
+  });
 
   beforeEach(async () => {
     redirect$ = new BehaviorSubject(undefined);
@@ -28,7 +45,6 @@ describe('RedirectComponent', () => {
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     navigateServiceSpy = jasmine.createSpyObj('NavigationService', ['reload']);
-    tokenServiceSpy = jasmine.createSpyObj('TokenService', ['token', 'user']);
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
@@ -52,7 +68,7 @@ describe('RedirectComponent', () => {
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: NavigationService, useValue: navigateServiceSpy },
-        { provide: TokenService, useValue: tokenServiceSpy },
+        { provide: TokenService, useValue: tokenServiceMock  },
       ],
     }).compileComponents();
 
@@ -87,7 +103,7 @@ describe('RedirectComponent', () => {
     user$.next({ authorities: [{ authority: Role.admin }] });
     fixture.detectChanges();
 
-    expect(tokenServiceSpy.token).toBe('fake-token');
+    expect(tokenServiceMock.token()).toBe('fake-token');
     expect(navigateServiceSpy.reload).toHaveBeenCalledWith(['en-GB', 'dashboard']);
   });
 

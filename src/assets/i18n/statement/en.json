@@ -1,17 +1,6 @@
 {
   "STATEMENT": {
-    "OFFICE": {
-      "SEARCH": "Find by office",
-      "FIELD": "Office",
-      "REQUIRED": "Office is <b>required</b>",
-      "INVALID": "Office is invalid"
-    },
     "UPLOAD_SUCCESS": "Statement {{fileName}} uploaded successfully",
-    "TITLE": "Add statement",
-    "LIST": {
-      "ERROR": {
-        "NO_CONTENT": "No Statements"
-      }
-    }
+    "TITLE": "Add statement"
   }
 }

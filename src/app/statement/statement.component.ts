@@ -100,8 +100,7 @@ export class StatementComponent {
     if (!blob || !officeId || !fileName) {
       return;
     }
-    const driveToken = this.driveAccessService.driveTokenSignal();
-    this.store.dispatch(uploadStatement({ driveToken, blob, officeId, fileName }));
+    this.store.dispatch(uploadStatement({ blob, officeId, fileName }));
   }
 
   keyDownHandler = (event: KeyboardEvent): void => {
