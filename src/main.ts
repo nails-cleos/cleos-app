@@ -59,6 +59,8 @@ import { expenseReducer } from './app/store/reducers/expense.reducers';
 import { noteReducer } from './app/store/reducers/note.reducers';
 import { accountReducer } from './app/store/reducers/account.reducers';
 import { i18nReducer } from './app/store/reducers/i18n.reducers';
+import { I18NEffects } from './app/store/effects/i18n.effects';
+import { provideEffects } from '@ngrx/effects';
 
 export interface ISendMessage {
   name: string;
@@ -204,6 +206,7 @@ const providers = [
   ScreenTrackingService,
   UserTrackingService,
   provideAnimations(),
+  provideEffects(I18NEffects),
 ];
 
 if (environment.production) {

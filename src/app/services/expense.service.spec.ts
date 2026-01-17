@@ -73,13 +73,13 @@ describe('ExpenseService', () => {
     expect(httpSpy.get).toHaveBeenCalledWith(`v1/rooms/${roomId}/expenses/exp-1`);
   });
 
-  it('should create expense with file and drive token', () => {
+  it('should create expense with file', () => {
     httpSpy.post.and.returnValue(of({ success: true }));
 
     const expense = { amount: 10 } as IExpense;
     const file = new File(['data'], 'receipt.pdf');
 
-    service.createExpense(roomId, expense, file, 'drive-token').subscribe();
+    service.createExpense(roomId, expense, file).subscribe();
 
     expect(httpSpy.post).toHaveBeenCalled();
 
@@ -90,7 +90,6 @@ describe('ExpenseService', () => {
 
     const headers = options?.headers as HttpHeaders;
     expect(headers.get('Upload')).toBe('true');
-    expect(headers.get('X-Google-Drive-Token')).toBe('drive-token');
 
     const formData = body as FormData;
     expect(formData.has('file')).toBeTrue();

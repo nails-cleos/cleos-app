@@ -8,7 +8,6 @@ import {
   runInInjectionContext,
   signal,
 } from '@angular/core';
-import { environment } from '../../environments/environment';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Router, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -30,6 +29,7 @@ import { SharedModule } from '../shared/shared.module';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getCurrentLangPipe } from '../store/selectors/main.selectors';
 import { MainState } from '../store/reducers/main.reducers';
+import { EnvService } from '../services/env.service';
 
 @Component({
   selector: 'app-main',
@@ -40,6 +40,7 @@ import { MainState } from '../store/reducers/main.reducers';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainComponent {
+  private readonly env: EnvService = inject(EnvService);
   private readonly injector = inject(Injector);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly store: Store<MainState> = inject(Store<MainState>);
@@ -76,10 +77,10 @@ export class MainComponent {
   isDarkMode = signal(isDarkMode(this.cookieService.get(THEME) as Theme));
   isAuthenticated = computed(() => !!this.userSignal());
 
-  title = environment.title;
+  title = this.env.title;
   firstSection?: Element | null;
   showLoader: boolean = true;
-  appVersion = environment.version;
+  appVersion = this.env.version;
 
   cssClass?: string;
   backgroundColor: string = this.isDarkMode() ? '126, 119, 105' : '169, 163, 151';
@@ -128,7 +129,7 @@ export class MainComponent {
       if (currentUser) {
         runInInjectionContext(this.injector, () => {
           currentUser.getIdToken().then((idToken) => {
-            this.tokenService.token = idToken;
+            this.tokenService.setToken = idToken;
           });
         });
       }

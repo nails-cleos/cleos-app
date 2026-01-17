@@ -31,7 +31,7 @@ describe('FormFieldAdderComponent', () => {
 
   it('should add a row', () => {
     expect(component['formArray'].length).toBe(0);
-    component.addRow();
+    component.addNewRow();
     fixture.detectChanges();
     expect(component['formArray'].length).toBe(1);
 
@@ -41,8 +41,8 @@ describe('FormFieldAdderComponent', () => {
   });
 
   it('should delete a row', () => {
-    component.addRow();
-    component.addRow();
+    component.addNewRow();
+    component.addNewRow();
     fixture.detectChanges();
 
     expect(component['formArray'].length).toBe(2);
@@ -53,7 +53,7 @@ describe('FormFieldAdderComponent', () => {
   });
 
   it('should update extras on updateExtra', () => {
-    component.addRow();
+    component.addNewRow();
     fixture.detectChanges();
 
     const group = component.getFormGroup(0);
@@ -72,7 +72,7 @@ describe('FormFieldAdderComponent', () => {
     spyOn(component.onChange, 'emit');
     spyOn(component.isValid, 'emit');
 
-    component.addRow();
+    component.addNewRow();
     fixture.detectChanges();
 
     const group = component.getFormGroup(0);
@@ -87,8 +87,8 @@ describe('FormFieldAdderComponent', () => {
   });
 
   it('should calculate total correctly', () => {
-    component.addRow();
-    component.addRow();
+    component.addNewRow();
+    component.addNewRow();
 
     const group1 = component.getFormGroup(0);
     const group2 = component.getFormGroup(1);

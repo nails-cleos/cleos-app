@@ -9,7 +9,6 @@ import { IOfficeAll } from '../interfaces/office';
 import { StatementState } from '../store/reducers/statement.reducers';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { DriveAccessService } from '../services/drive-access.service';
-import { signal } from '@angular/core';
 import { uploadStatement } from '../store/statement.actions';
 
 describe('StatementComponent', () => {
@@ -49,12 +48,10 @@ describe('StatementComponent', () => {
       },
     });
 
-    const driveTokenSignal = signal<string>('fake-token');
-
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    driveAccessServiceSpy = jasmine.createSpyObj('DriveAccessService', ['requestAccessIfNeeded'], { driveTokenSignal });
+    driveAccessServiceSpy = jasmine.createSpyObj('DriveAccessService', ['requestAccessIfNeeded']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
@@ -105,7 +102,6 @@ describe('StatementComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
-    expect(typeof driveAccessServiceSpy.driveTokenSignal).toBe('function');
   });
 
   it('should display office name with displayFnOffice', () => {
@@ -179,7 +175,6 @@ describe('StatementComponent', () => {
     expect(component.fileName()).toBe(fileName);
     expect(component.blob()).toEqual(blob);
     expect(storeSpy.dispatch).toHaveBeenCalledWith(uploadStatement({
-      driveToken: 'fake-token',
       blob,
       officeId: mockOffice.id,
       fileName: fileName,

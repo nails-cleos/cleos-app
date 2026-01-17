@@ -6,15 +6,15 @@ import { Auth } from '@angular/fire/auth';
 import { Database, ref, update } from '@angular/fire/database';
 import { getToken, Messaging, onMessage } from '@angular/fire/messaging';
 import { AppCheck, getToken as getTokenAppCheck } from '@angular/fire/app-check';
-import { environment } from '../../environments/environment';
 import { NotificationState } from '../store/reducers/notification.reducers';
+import { EnvService } from './env.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MessagingService {
+  private readonly env: EnvService = inject(EnvService);
   private readonly injector = inject(Injector);
-
   private readonly store: Store<NotificationState> = inject(Store<NotificationState>);
   private readonly messaging: Messaging = inject(Messaging);
   private readonly auth: Auth = inject(Auth);
@@ -60,11 +60,11 @@ export class MessagingService {
         if (appCheckToken) {
           Notification.requestPermission().then(value => {
             if (value === 'granted') {
-              navigator.serviceWorker.register(environment.firebaseMessaging, { type: 'module', scope: '__' })
+              navigator.serviceWorker.register(this.env.firebaseMessaging, { type: 'module', scope: '__' })
                 .then(serviceWorkerRegistration =>
                   getToken(this.messaging, {
                     serviceWorkerRegistration,
-                    vapidKey: environment.firebase.vapidKey,
+                    vapidKey: this.env.firebase.vapidKey,
                   }).then(token => {
                     this.updateToken(user, token);
                   }),

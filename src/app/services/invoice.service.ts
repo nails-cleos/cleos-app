@@ -32,19 +32,6 @@ export class InvoiceService {
     { ...paginated(), params: createFilter(page, size, sort, direction) },
   );
 
-  view = (
-    id: string,
-    driveToken?: string,
-  ): Observable<Blob> => {
-    let headers = new HttpHeaders({
-      Accept: 'application/octet-stream',
-    });
-    if (driveToken) {
-      headers = headers.set('X-Google-Drive-Token', driveToken);
-    }
-    return this.http.get(toUrl(this.urlV1, id), { headers, responseType: 'blob' });
-  };
-
   getOfficeToInvoice = (
     officeId: string,
     start: string,
@@ -65,7 +52,6 @@ export class InvoiceService {
     officeId: string,
     blob: Blob,
     fileName: string,
-    driveToken?: string,
   ): Observable<void> => {
     const formData = new FormData();
     const file = new File([blob], fileName, {
@@ -74,10 +60,7 @@ export class InvoiceService {
     });
     formData.append('file', file, file.name);
 
-    let headers = new HttpHeaders().set('Upload', 'true');
-    if (driveToken) {
-      headers = headers.set('X-Google-Drive-Token', driveToken);
-    }
+    const headers = new HttpHeaders().set('Upload', 'true');
     return this.http.post<void>(toUrl(this.urlV1, this.officeUrl, officeId), formData, { headers });
   };
 }

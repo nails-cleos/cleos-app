@@ -39,6 +39,7 @@ import { DriveAccessService } from '../services/drive-access.service';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { getMyOfficesPipe } from '../store/selectors/office.selectors';
 import { OfficeState } from '../store/reducers/office.reducers';
+import { EnvService } from '../services/env.service';
 
 // Set up VFS fonts for pdfMake (provides fallback Roboto fonts)
 (pdfMake as any).vfs = (pdfFonts as any).pdfMake?.vfs || pdfFonts;
@@ -70,6 +71,7 @@ type DateRangeForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InvoiceComponent {
+  private readonly env: EnvService = inject(EnvService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly store: Store<InvoiceState | OfficeState> = inject(Store<InvoiceState | OfficeState>);
@@ -241,11 +243,11 @@ export class InvoiceComponent {
     }
     await this.loadFonts();
     const fileName = `Sales ${invoiceFormat(this.getDateRangeForm.startDate.value!)}.pdf`;
-    const printPdf: any = pdfMake.createPdf(pdf(this.selectionSignal().selected, selectedOffice, start, fileName));
+    const createPDF = pdf(this.selectionSignal().selected, selectedOffice, start, fileName, this.env);
+    const printPdf: any = pdfMake.createPdf(createPDF);
 
-    const driveToken = this.driveAccessService.driveTokenSignal();
     printPdf.getBlob().then((blob: Blob) => this.store.dispatch(
-      uploadInvoices({ officeId: selectedOffice.id, blob, fileName, driveToken }),
+      uploadInvoices({ officeId: selectedOffice.id, blob, fileName }),
     ));
   }
 

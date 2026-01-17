@@ -6,7 +6,6 @@ import {
   invoicePageSuccess,
   invoiceSaveSuccess,
   invoiceSuccess,
-  invoiceView,
   updateOfficeById,
   uploadInvoices,
 } from '../invoice.actions';
@@ -74,13 +73,6 @@ export const invoiceReducer = createReducer(
   })),
   on(updateOfficeById, (state) => ({
     ...state,
-    error: undefined,
-    subErrors: undefined,
-    response: undefined,
-  })),
-  on(invoiceView, (state) => ({
-    ...state,
-    isLoading: true,
     error: undefined,
     subErrors: undefined,
     response: undefined,

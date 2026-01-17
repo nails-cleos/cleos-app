@@ -17,7 +17,6 @@ import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { InvoiceState } from '../store/reducers/invoice.reducers';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { DriveAccessService } from '../services/drive-access.service';
-import { signal } from '@angular/core';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { SelectionModel } from '@angular/cdk/collections';
 
@@ -120,12 +119,10 @@ describe('InvoiceComponent', () => {
       },
     });
 
-    const driveTokenSignal = signal<string>('fake-token');
-
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    driveAccessServiceSpy = jasmine.createSpyObj('DriveAccessService', ['requestAccessIfNeeded'], { driveTokenSignal });
+    driveAccessServiceSpy = jasmine.createSpyObj('DriveAccessService', ['requestAccessIfNeeded']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
@@ -185,7 +182,6 @@ describe('InvoiceComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
-    expect(typeof driveAccessServiceSpy.driveTokenSignal).toBe('function');
   });
 
   it('should compute dataSourceSignal correctly', () => {
@@ -479,7 +475,6 @@ describe('InvoiceComponent', () => {
         officeId: mockOffice.id,
         blob: fakeBlob,
         fileName: jasmine.stringMatching(/Sales .*\.pdf/),
-        driveToken: 'fake-token',
       }),
     );
 

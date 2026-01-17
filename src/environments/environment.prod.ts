@@ -9,7 +9,7 @@ export const environment = {
   },
   appDomain: 'nailscleos.nl',
   appServer: 'https://www.nailscleos.nl',
-  title: 'Cleos',
+  title: 'Nails Cleos',
   version: packageJson.version,
   baseUrl: 'https://api.nailscleos.nl/api',
   googleClientId: '174727853234-3pdb4doq776uuklfr7jsfp5ll33ork6c.apps.googleusercontent.com',
@@ -27,6 +27,7 @@ export const environment = {
   },
   awsIdentityPoolId: 'eu-central-1:4827bc2c-64a7-4942-8ec4-2052b86a3b8f',
   awsLoginsKey: 'securetoken.google.com/nails-cleos',
+  awsExtractEnable: false,
   googleMapKey: 'AIzaSyDI-kCD_XD9jNJ3tNcDVmkMuwCqljzudJg',
   showMap: true,
 };

@@ -44,6 +44,7 @@ import { getMainErrorPipe, getResponsePipe } from '../../store/selectors/main.se
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ISendMessage } from '../../../main';
 import { MainState } from '../../store/reducers/main.reducers';
+import { EnvService } from '../../services/env.service';
 
 type MainForm = {
   name: FormControl<string>;
@@ -70,6 +71,7 @@ export class MainContentComponent {
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly router: Router = inject(Router);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly env: EnvService = inject(EnvService);
 
   private treatmentItem = viewChild<ElementRef<HTMLDivElement>>('treatmentItem');
   private storyDescription = viewChild<ElementRef<HTMLDivElement>>('storyDescription');
@@ -107,6 +109,8 @@ export class MainContentComponent {
   treatmentAnimations = signal<AnimationSequenceMetadata[]>([]);
   groups = signal<ITreatmentGroup[]>([]);
   filter = signal<ITreatmentGroup | undefined>(undefined);
+
+  title = this.env.title;
 
   treatmentTitle: AnimationAnimateMetadata = bounceInDownAnimation('500ms');
   storyTitle: AnimationSequenceMetadata = fadeInUpDown('20px', '700ms');

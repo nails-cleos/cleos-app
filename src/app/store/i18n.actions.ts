@@ -6,6 +6,7 @@ enum I18nActionTypes {
 }
 
 export const getLanguage = createAction(I18nActionTypes.getLanguage);
+
 export const setLanguage = createAction(
   I18nActionTypes.setLanguage,
   props<{ language: string }>(),

@@ -15,13 +15,7 @@ export class InvoiceNavigationEffects {
       concatMap((action: RouterNavigatedAction) => {
         const url = action.payload.routerState.url;
 
-        // 1) /invoices/add
-        const addMatch = url.match(/\/invoices\/add$/);
-        if (addMatch) {
-          return [cleanInvoice(), getAllMyOffices()];
-        }
-
-        // 2) /invoices
+        // 1) /invoices
         const invoicesMatch = url.match(/\/invoices\/?$/);
         if (invoicesMatch) {
           return [cleanInvoice(), getAllMyOffices()];

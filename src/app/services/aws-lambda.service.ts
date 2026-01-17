@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { from, interval, map, Observable, switchMap, throwError, timer } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 import { CognitoIdentityCredentialProvider, fromCognitoIdentityPool } from '@aws-sdk/credential-providers';
@@ -8,10 +8,11 @@ import { SignatureV4 } from '@aws-sdk/signature-v4';
 import { HttpRequest } from '@aws-sdk/protocol-http';
 import { Sha256 } from '@aws-crypto/sha256-browser';
 import { IAwsExtract, IAwsLambda } from '../interfaces/aws';
-import { environment } from '../../environments/environment';
+import { EnvService } from './env.service';
 
 @Injectable({ providedIn: 'root' })
 export class AwsLambdaService {
+  private readonly env: EnvService = inject(EnvService);
 
   private readonly region = 'eu-central-1';
   private readonly bucketName = 'nailscleos-textract-bucket';
@@ -66,9 +67,9 @@ export class AwsLambdaService {
     return from([
       fromCognitoIdentityPool({
         clientConfig: { region: this.region },
-        identityPoolId: environment.awsIdentityPoolId,
+        identityPoolId: this.env.awsIdentityPoolId,
         logins: {
-          [environment.awsLoginsKey]: firebaseIdToken,
+          [this.env.awsLoginsKey]: firebaseIdToken,
         },
       }),
     ]);

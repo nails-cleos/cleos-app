@@ -14,6 +14,7 @@ import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/a
 import { Auth } from '@angular/fire/auth';
 import { callAwsLambda } from '../../../store/aws.actions';
 import { DriveAccessService } from '../../../services/drive-access.service';
+import { EnvService } from '../../../services/env.service';
 
 describe('ExpenseComponent', () => {
   let component: ExpenseComponent;
@@ -35,6 +36,8 @@ describe('ExpenseComponent', () => {
   let aws$: BehaviorSubject<any>;
   let token$: BehaviorSubject<any>;
 
+  let env: EnvService;
+
   const mockExpense: Partial<IExpenseAll> = {
     id: '1',
     invoice: 'Test Invoice',
@@ -53,7 +56,6 @@ describe('ExpenseComponent', () => {
   const mockSuppliers: ISupplyStore[] = [{ id: '1', name: 'vendor_name' }];
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
-  const driveTokenSignal = signal<string | undefined>('fake-token');
 
   beforeEach(async () => {
     roomId$ = new BehaviorSubject<any>(undefined);
@@ -72,7 +74,7 @@ describe('ExpenseComponent', () => {
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     driveAccessServiceSpy =
-      jasmine.createSpyObj<DriveAccessService>('DriveAccessService', ['requestAccessIfNeeded'], { driveTokenSignal });
+      jasmine.createSpyObj<DriveAccessService>('DriveAccessService', ['requestAccessIfNeeded']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
@@ -130,6 +132,8 @@ describe('ExpenseComponent', () => {
     const router = TestBed.inject(Router);
     navigateSpy = spyOn(router, 'navigate');
 
+    env = TestBed.inject(EnvService);
+
     const translateService = TestBed.inject(TranslateService);
     translateService.use('en-GB');
     translateService.setTranslation('en-GB', {
@@ -152,7 +156,6 @@ describe('ExpenseComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
-    expect(typeof driveAccessServiceSpy.driveTokenSignal).toBe('function');
   });
 
   it('should dispatch getExpense when expenseId emits a value', () => {
@@ -299,11 +302,25 @@ describe('ExpenseComponent', () => {
   });
 
   it('should call aws upload on file upload', () => {
+    spyOnProperty(env, 'awsExtractEnable', 'get')
+      .and.returnValue(true);
     component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: mockFile });
     token$.next('aws-token');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch)
+      .toHaveBeenCalledWith(callAwsLambda({ token: 'aws-token', file: mockFile, userId: 'user-123' }));
+  });
+
+
+  it('should not call aws upload on file upload when awsExtractEnable flag is disabled', () => {
+    spyOnProperty(env, 'awsExtractEnable', 'get')
+      .and.returnValue(false);
+    component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: mockFile });
+    token$.next('aws-token');
+    fixture.detectChanges();
+
+    expect(storeSpy.dispatch).not
       .toHaveBeenCalledWith(callAwsLambda({ token: 'aws-token', file: mockFile, userId: 'user-123' }));
   });
 

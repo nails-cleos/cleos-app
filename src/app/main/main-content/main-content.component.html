@@ -329,7 +329,7 @@
 
   <!-- Google map -->
   <div appAnimate [animateInAnimation]="contactMap" [stopAnimation]="true">
-    <iframe title="Nails Cleos map" width="100%" height="300" class="map" allowfullscreen="" loading="lazy"
+    <iframe [title]="`${title} map`" width="100%" height="300" class="map" allowfullscreen="" loading="lazy"
             [ngClass]="{'dark-map': isDarkMode()}" referrerpolicy="no-referrer-when-downgrade"
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2459.8286698251877!2d4.476945576894232!3d51.937078579223154!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c5cbae073735b3%3A0xc150afbfa3aeaf88!2sNails%20Cleos!5e0!3m2!1sen!2snl!4v1701072269943!5m2!1sen!2snl">
     </iframe>

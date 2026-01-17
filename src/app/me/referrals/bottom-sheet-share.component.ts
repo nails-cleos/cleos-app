@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ShareButtonsComponent } from './share-buttons/share-buttons.component';
-import { environment } from '../../../environments/environment';
 import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
 import { TranslateService } from '@ngx-translate/core';
+import { EnvService } from '../../services/env.service';
 
 export type BottomSheetShareData = {
   code: string;
@@ -15,10 +15,11 @@ export type BottomSheetShareData = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BottomSheetShareComponent {
+  private readonly env: EnvService = inject(EnvService);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly data = inject<BottomSheetShareData>(MAT_BOTTOM_SHEET_DATA);
 
-  private url = environment.appServer;
+  private url = this.env.appServer;
 
   code: string = `${this.url}/auth?code=${this.data.code}`;
   image = `${this.url}/assets/icons/icon-512x512.png`;

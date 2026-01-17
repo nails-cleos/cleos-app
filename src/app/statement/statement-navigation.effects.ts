@@ -15,13 +15,7 @@ export class StatementNavigationEffects {
       concatMap((action: RouterNavigatedAction) => {
         const url = action.payload.routerState.url;
 
-        // 1) /statements/add
-        const addMatch = url.match(/\/statements\/add$/);
-        if (addMatch) {
-          return [cleanStatement(), getAllMyOffices()];
-        }
-
-        // 2) /statements
+        // 1) /statements
         const statementsMatch = url.match(/\/statements\/?$/);
         if (statementsMatch) {
           return [cleanStatement(), getAllMyOffices()];

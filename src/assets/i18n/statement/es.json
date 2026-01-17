@@ -1,17 +1,6 @@
 {
   "STATEMENT": {
-    "OFFICE": {
-      "SEARCH": "Buscar por oficina",
-      "FIELD": "Oficina",
-      "REQUIRED": "Oficina es <b>requerido</b>",
-      "INVALID": "Oficina no valido"
-    },
     "UPLOAD_SUCCESS": "Declaración {{fileName}} subida exitosamente",
-    "TITLE": "Agregar Declaración",
-    "LIST": {
-      "ERROR": {
-        "NO_CONTENT": "No hay declaraciones"
-      }
-    }
+    "TITLE": "Agregar Declaración"
   }
 }

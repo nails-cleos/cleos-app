@@ -9,7 +9,6 @@ enum InvoiceActionTypes {
   getOfficeToInvoice = '[Invoice] Find office to invoice',
   invoiceSuccess = '[Invoice] Success',
   invoicePageSuccess = '[Invoice] Success page',
-  invoiceView = '[Invoice] Invoice view',
   updateOfficeById = '[Invoice] Update office by id',
   invoiceUpdateOfficeSuccess = '[Invoice] Update office Success',
   uploadInvoices = '[Invoice] Upload invoices',
@@ -26,11 +25,6 @@ export const getOfficeToInvoice = createAction(
 export const getInvoicesPage = createAction(
   InvoiceActionTypes.getInvoicesPage,
   props<{ officeId: string } & PageRequest>(),
-);
-
-export const invoiceView = createAction(
-  InvoiceActionTypes.invoiceView,
-  props<{ id: string; fileName: string; driveToken?: string }>(),
 );
 
 export const invoicePageSuccess = createAction(
@@ -55,7 +49,7 @@ export const updateOfficeById = createAction(
 
 export const uploadInvoices = createAction(
   InvoiceActionTypes.uploadInvoices,
-  props<{ officeId: string; blob: Blob; fileName: string; driveToken?: string }>(),
+  props<{ officeId: string; blob: Blob; fileName: string }>(),
 );
 
 export const invoiceSaveSuccess = createAction(

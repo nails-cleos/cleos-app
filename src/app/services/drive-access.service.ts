@@ -11,16 +11,9 @@ export class DriveAccessService {
   private readonly store: Store = inject(Store);
 
   private driveToken$ = this.store.pipe(getDriveTokenPipe);
-  driveTokenSignal = toSignal(this.driveToken$);
+  private driveTokenSignal = toSignal(this.driveToken$);
 
   private tokenRequested: boolean = false;
-
-  private requestDriveAccess(): void {
-    const provider = new GoogleAuthProvider();
-    provider.addScope('https://www.googleapis.com/auth/drive');
-
-    this.callSignInWithPopup(provider);
-  }
 
   requestAccessIfNeeded(shouldRequest: boolean = true): void {
     const driveToken = this.driveTokenSignal();
@@ -38,5 +31,12 @@ export class DriveAccessService {
           this.store.dispatch(setDriveToken({ token: credential.accessToken }));
         }
       });
+  }
+
+  private requestDriveAccess(): void {
+    const provider = new GoogleAuthProvider();
+    provider.addScope('https://www.googleapis.com/auth/drive');
+
+    this.callSignInWithPopup(provider);
   }
 }

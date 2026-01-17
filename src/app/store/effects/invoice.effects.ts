@@ -7,11 +7,9 @@ import {
   getInvoicesPage,
   getOfficeToInvoice,
   invoiceFailure,
-  invoicePageSuccess,
-  invoiceSaveSuccess,
+  invoicePageSuccess, invoiceSaveSuccess,
   invoiceSuccess,
   invoiceUpdateOfficeSuccess,
-  invoiceView,
   updateOfficeById,
   uploadInvoices,
 } from '../invoice.actions';
@@ -37,15 +35,6 @@ export class InvoiceEffects {
       )),
   ));
 
-  invoiceView$ = createEffect(() => this.actions.pipe(
-    ofType(invoiceView),
-    switchMap(({ id, fileName, driveToken }) =>
-      this.invoiceService.view(id, driveToken).pipe(
-        map((blob: Blob) => invoiceSaveSuccess({ blob, fileName })),
-        catchError((err: HttpErrorResponse) => of(invoiceFailure({ error: err.error }))),
-      )),
-  ));
-
   findInvoiceReservation$ = createEffect(() => this.actions.pipe(
     ofType(getOfficeToInvoice),
     switchMap(({ officeId, start, end, types }) =>
@@ -66,8 +55,8 @@ export class InvoiceEffects {
 
   uploadInvoices$ = createEffect(() => this.actions.pipe(
     ofType(uploadInvoices),
-    switchMap(({ officeId, blob, fileName, driveToken }) =>
-      this.invoiceService.uploadInvoices(officeId, blob, fileName, driveToken).pipe(
+    switchMap(({ officeId, blob, fileName }) =>
+      this.invoiceService.uploadInvoices(officeId, blob, fileName).pipe(
         map(() => {
           const message = this.translateService.instant('INVOICE.UPLOAD_SUCCESS', { fileName });
           return invoiceSaveSuccess({ message, blob, fileName });

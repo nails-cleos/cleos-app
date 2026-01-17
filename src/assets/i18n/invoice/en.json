@@ -24,11 +24,6 @@
       "FIELD": "Payment type"
     },
     "UPLOAD_SUCCESS": "Invoice {{fileName}} uploaded successfully",
-    "TITLE": "Create invoices",
-    "LIST": {
-      "ERROR": {
-        "NO_CONTENT": "No Invoices"
-      }
-    }
+    "TITLE": "Create invoices"
   }
 }

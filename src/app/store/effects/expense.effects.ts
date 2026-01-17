@@ -59,8 +59,8 @@ export class ExpenseEffects {
 
   create$ = createEffect(() => this.actions$.pipe(
     ofType(createExpense),
-    switchMap(({ roomId, expense, file, driveToken }) =>
-      this.expenseService.createExpense(roomId, expense, file, driveToken).pipe(
+    switchMap(({ roomId, expense, file }) =>
+      this.expenseService.createExpense(roomId, expense, file).pipe(
         switchMap((response: IApiResponse) => {
           const message = this.translate.instant('EXPENSE.CREATED', { invoice: response.name });
           const path = `rooms/${roomId}/expenses/${response.id}`;
