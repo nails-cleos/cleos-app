@@ -361,8 +361,8 @@
       "ACTION": "Dismiss",
       "WARNING": "Warning",
       "DATE": {
-        "LOCAL": "Your time {{date}}",
-        "ROOM": "Room time {{date}}"
+        "LOCAL": "Your time <b>{{date}}</b>",
+        "ROOM": "Room time <b>{{date}}</b>"
       }
     },
     "PROFESSIONAL": {

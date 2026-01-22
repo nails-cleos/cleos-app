@@ -599,4 +599,18 @@ describe('ReservationCompleteComponent', () => {
       expect(component.getForm.type.value).toBeUndefined();
     });
   });
+
+  it('should set the valid time', () => {
+    component.totalTime.set('');
+    fixture.detectChanges();
+    expect(component.isValidTime()).toBeFalse();
+
+    component.totalTime.set('01:00');
+    fixture.detectChanges();
+    expect(component.isValidTime()).toBeTrue();
+
+    component.totalTime.set('-01:00');
+    fixture.detectChanges();
+    expect(component.isValidTime()).toBeFalse();
+  });
 });

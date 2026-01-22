@@ -38,7 +38,7 @@ import { provideHttpClient, withInterceptors, withJsonpSupport } from '@angular/
 import { httpInterceptorProviders } from './app/http-interceptors';
 import { provideRouterStore } from '@ngrx/router-store';
 import { localStorageSync } from 'ngrx-store-localstorage';
-import { authReducer } from './app/store/reducers/auth.reducers';
+import { AUTH_FEATURE_KEY, authReducer } from './app/store/reducers/auth.reducers';
 import { userReducer } from './app/store/reducers/user.reducers';
 import { treatmentReducer } from './app/store/reducers/treatment.reducers';
 import { catalogueReducer } from './app/store/reducers/catalogue.reducers';
@@ -93,8 +93,8 @@ const cookieConfig: NgcCookieConsentConfig = {
   },
 };
 
-const localStorageSyncReducer =
-  (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync({ keys: ['auth'], rehydrate: true })(reducer);
+const localStorageSyncReducer = (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync(
+  { keys: [AUTH_FEATURE_KEY], rehydrate: true })(reducer);
 
 registerLocaleData(localeEn, 'en');
 registerLocaleData(localeEnGB, 'en-GB');

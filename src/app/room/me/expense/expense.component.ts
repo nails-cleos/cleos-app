@@ -28,13 +28,13 @@ import { FileDropComponent, UploadFile } from '../../../shared/file-drop/file-dr
 import { AwsState } from '../../../store/reducers/aws.reducers';
 import { AuthState } from '../../../store/reducers/auth.reducers';
 import { getAwsPipe } from '../../../store/selectors/aws.selectors';
-import { getTokenPipe } from '../../../store/selectors/auth.selectors';
 import { awsExtractToNumberFormat } from '../../../interfaces/aws';
 import { calculateBTW, calculateNet } from '../../../util/numbers';
 import { callAwsLambda } from '../../../store/aws.actions';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { DriveAccessService } from '../../../services/drive-access.service';
 import { EnvService } from '../../../services/env.service';
+import { TokenService } from '../../../services/token.service';
 
 type TotalsForm = {
   type: FormControl<string>;
@@ -66,6 +66,7 @@ export class ExpenseComponent {
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
+  private readonly tokenService: TokenService = inject(TokenService);
 
   private roomId$ = this.store.pipe(getCurrentRoomIdPipe);
   private expenseId$ = this.store.pipe(getCurrentExpenseIdPipe);
@@ -74,10 +75,8 @@ export class ExpenseComponent {
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
   private response$ = this.store.pipe(getExpenseResponsePipe);
   private aws$ = this.store.pipe(getAwsPipe);
-  private token$ = this.store.pipe(getTokenPipe);
 
   private awsSignal = toSignal(this.aws$);
-  private tokenSignal = toSignal(this.token$);
   private userId = computed(() => this.authUserService.authUser().userId);
 
   private expenseIdSignal = toSignal(this.expenseId$);
@@ -204,7 +203,7 @@ export class ExpenseComponent {
         this.totalMap = new Map();
         return;
       }
-      const token = this.tokenSignal();
+      const token = this.tokenService.token();
       if (token && this.env.awsExtractEnable) {
         this.store.dispatch(callAwsLambda({ token, file, userId: this.userId() }));
       }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Store } from '@ngrx/store';
 import { getCards, getEvents } from '../store/dashboard.actions';
@@ -26,7 +26,7 @@ import {
 import { findStateColor, getStateOrder } from '../util/theme';
 import { allDayEvent, DataEvent, IDataEvent, IMeta, Meta, monthEvent } from '../util/event';
 import { Router } from '@angular/router';
-import { isSameDay, isSameMonth } from 'date-fns';
+import { isSameDay, isSameMonth, startOfMonth } from 'date-fns';
 import { ICalendarNote, ICalendarSummary, IChart } from '../interfaces/dashboard';
 import { FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
 import { IRoom } from '../interfaces/room';
@@ -46,6 +46,7 @@ import {
   getDashboardMapPipe,
   getDashboardNavigationParamsPipe,
   getErrorPipe,
+  isDashboardLoadingPipe,
 } from '../store/selectors/dashboard.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DashboardState } from '../store/reducers/dashboard.reducers';
@@ -79,6 +80,7 @@ export class DashboardComponent {
   private navigationParams$ = this.store.pipe(getDashboardNavigationParamsPipe);
   private dashboardMap$ = this.store.pipe(getDashboardMapPipe);
   private error$ = this.store.pipe(getErrorPipe);
+  private isLoading$ = this.store.pipe(isDashboardLoadingPipe);
   private breakpointObserver$ = this.breakpointObserver.observe(
     [Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium]);
 
@@ -97,12 +99,14 @@ export class DashboardComponent {
     },
   );
 
-  private isDarkMode = computed(() => this.authUserSignal()?.isDarkMode ?? false);
+  private isDarkMode = computed(() => this.authUserSignal().isDarkMode);
+  private isLoadingSignal = toSignal(this.isLoading$);
   private selectDashboardSignal = toSignal(this.getForm.selectedDash.valueChanges);
   private dashboardSelection = computed(() => {
     const selected = this.selectDashboardSignal();
     const dashboardData = this.dashboardMapSignal();
-    return { selected, dashboardData };
+    const isDarkMode = this.isDarkMode();
+    return { selected, dashboardData, isDarkMode };
   });
 
   dashboardMapSignal = toSignal(this.dashboardMap$);
@@ -152,11 +156,15 @@ export class DashboardComponent {
   timeZone?: string;
   view: CalendarView = CalendarView.Month;
   viewDate = signal(getNowTimeZone(this.timeZone));
+  readonly viewMonth = computed(() => {
+    const date = this.viewDate();
+    return `${date.getFullYear()}-${date.getMonth()}`;
+  });
+  readonly isLoading = computed(() => this.isLoadingSignal() ?? true);
+
   activeDayIsOpen = false;
   dateFormat: string = this.translate.getCurrentLang();
   calendar: IDataEvent = new DataEvent([], 0, this.viewDate()!, 0, false);
-  isCalendarLoading = true;
-  isLoading = true;
 
   currency?: ICurrency;
   all = false;
@@ -168,8 +176,6 @@ export class DashboardComponent {
   charts: IChart[] = [{} as IChart, {} as IChart, {} as IChart,
     {} as IChart, {} as IChart, {} as IChart, {} as IChart, {} as IChart];
 
-  private previousDarkMode?: boolean;
-  private periodStart?: Date;
   private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
@@ -182,7 +188,7 @@ export class DashboardComponent {
     });
 
     effect(() => {
-      const { selected, dashboardData } = this.dashboardSelection();
+      const { selected, dashboardData, isDarkMode } = this.dashboardSelection();
 
       if (!dashboardData) {
         return;
@@ -200,10 +206,7 @@ export class DashboardComponent {
         roomSelected = selected;
       }
       const dashboard = dashboardData[roomSelected];
-      this.isCalendarLoading = true;
-      this.isLoading = true;
       if (dashboard) {
-        this.isCalendarLoading = false;
         this.error = dashboard.error;
         this.roomId = dashboard.roomId;
         this.professionalId = dashboard.professionalId;
@@ -212,20 +215,15 @@ export class DashboardComponent {
         this.all = dashboard.all ?? false;
         this.timeZone = dashboard.timeZone;
         this.thisMonthTotal = numberFormat(dashboard.thisMonthTotal || 0, this.currency, this.dateFormat);
-        this.createEvents(this.isDarkMode());
+        this.createEvents(isDarkMode);
         if (!dashboard.chartSummaries && !dashboard.miniCardSummaries) {
-          this.isLoading = false;
           this.charts = [{} as IChart, {} as IChart, {} as IChart,
             {} as IChart, {} as IChart, {} as IChart, {} as IChart, {} as IChart];
           this.miniCardError('NO_CONTENT');
         } else {
           if (dashboard.chartSummaries && dashboard.chartSummaries.length) {
             this.charts = dashboard.chartSummaries;
-            this.isLoading = false;
           } else {
-            if (dashboard.error) {
-              this.isLoading = false;
-            }
             this.charts = [{} as IChart, {} as IChart, {} as IChart,
               {} as IChart, {} as IChart, {} as IChart, {} as IChart, {} as IChart];
           }
@@ -252,14 +250,6 @@ export class DashboardComponent {
     });
 
     effect(() => {
-      const current = this.isDarkMode();
-      if (this.previousDarkMode !== undefined && current !== this.previousDarkMode) {
-        this.createEvents(current);
-      }
-      this.previousDarkMode = current;
-    });
-
-    effect(() => {
       const error = this.errorSignal();
       if (error?.message) {
         this.miniCardError(error.message);
@@ -267,10 +257,10 @@ export class DashboardComponent {
     });
 
     effect(() => {
-      const date = this.viewDate();
+      this.viewMonth();
+      const date = untracked(() => this.viewDate());
+
       this.calendar.resetEvents();
-      this.isLoading = true;
-      this.isCalendarLoading = true;
       this.store.dispatch(getEvents({ date }));
       this.store.dispatch(getCards({ date }));
     });
@@ -344,7 +334,12 @@ export class DashboardComponent {
 
   closeOpenMonthViewDay(date: Date): void {
     this.activeDayIsOpen = false;
-    this.viewDate.set(date);
+    const now = getNowTimeZone();
+    if (isSameMonth(date, now)) {
+      this.viewDate.set(date);
+    } else {
+      this.viewDate.set(startOfMonth(date));
+    }
   }
 
   handleEvent = (event: CalendarEvent): void => {
@@ -368,7 +363,6 @@ export class DashboardComponent {
   };
 
   beforeMonthViewRender = ({ body, period }: { body: CalendarMonthViewDay<IMeta>[]; period: any }): void => {
-    this.periodStart = period.start;
     this.calendar.calendarStart = period.start;
     this.calendar.calendarEnd = period.end;
     this.calendar.createRecurring();
@@ -416,22 +410,20 @@ export class DashboardComponent {
     this.calendar.resetEvents();
     const calendarSummary = this.calendarSummary;
     if (calendarSummary) {
-      calendarSummary.reservations?.forEach(it => {
+      const reservationEvents = calendarSummary.reservations?.map(it => {
         const start = newDateTimestamp(it.start);
         const end = it.end ? newDateTimestamp(it.end) : null;
         this.activeDayIsOpen = this.activeDayIsOpen
           ? this.activeDayIsOpen : isSameDay(start, getNowTimeZone(this.timeZone));
 
-        const event = monthEvent(it.title, start, end, it.reservationId, findStateColor(it.state, darkMode),
-          new Meta(true, this.timeZone, it.state, [this.language, 'reservation', it.reservationId], undefined,
-            it.total,
-          ), darkMode,
-        );
-        this.calendar.addEvent(event);
+        const meta = new Meta(true, this.timeZone, it.state, [this.language, 'reservation', it.reservationId],
+          undefined, it.total);
+        meta.isReservation = true;
+        return monthEvent(it.title, start, end, it.reservationId, findStateColor(it.state, darkMode), meta, darkMode);
       });
-      calendarSummary.unavailable?.forEach(it => {
+      const unavailableEvents = calendarSummary.unavailable?.map(it => {
         if (it.type === 'BLOCK_AGENDA') {
-          return;
+          return undefined;
         }
         const start = newDateTimestamp(it.start);
         this.activeDayIsOpen = this.activeDayIsOpen
@@ -440,64 +432,62 @@ export class DashboardComponent {
 
         if (it.repeat === FrequencyEnum.none) {
           const end = getEnd(start, it.duration);
-          const event = monthEvent(title, start, end, it.unavailableId, findStateColor('DEFAULT', darkMode),
+          return monthEvent(title, start, end, it.unavailableId, findStateColor('DEFAULT', darkMode),
             new Meta(!!it.duration, this.timeZone, 'UNAVAILABLE', [this.language, 'unavailable', it.unavailableId]),
             darkMode,
           );
-          if (event) {
-            this.calendar.addEvent(event);
-          }
         } else {
           this.calendar.recurringEvent?.addFrequency(it.repeat, start, it.unavailableId, title, 'UNAVAILABLE',
             `${this.language}/unavailable/`, (date, recurring) => this.createEvent(date, recurring, darkMode),
             getDurationOrUndefined(it.duration), undefined, it.allDay,
           );
+          return undefined;
         }
       });
 
-      calendarSummary.birthdays?.forEach(it => {
+      const birthdayEvents = calendarSummary.birthdays?.map(it => {
         const startDate = newDateTimestamp(it.date);
         startDate.setFullYear(getNowTimeZone(this.timeZone).getFullYear());
         const color = findStateColor('BIRTHDAY', darkMode);
-        const event = allDayEvent(it.title, color, startDate, darkMode, `${this.language}/users/${it.userId}`,
+        return allDayEvent(it.title, color, startDate, darkMode, `${this.language}/users/${it.userId}`,
           new Meta(false, this.timeZone, 'BIRTHDAY', [this.language, 'users', it.userId]),
         );
-        this.calendar.addEvent(event);
       });
 
-      calendarSummary.transactions?.forEach(it => {
+      const transactionEvents = calendarSummary.transactions?.map(it => {
         const startDate = newDateTimestamp(it.createdAt);
         startDate.setFullYear(getNowTimeZone(this.timeZone).getFullYear());
         const color = findStateColor('TRANSACTION', darkMode);
-        const event = allDayEvent(it.title, color, startDate, darkMode,
+        return allDayEvent(it.title, color, startDate, darkMode,
           `${this.language}/accounts/${it.accountId}/transactions/ ${it.transactionId}`,
           new Meta(false, this.timeZone, 'TRANSACTION',
             [this.language, 'accounts', it.accountId, 'transactions', it.transactionId], undefined, it.total,
           ),
         );
-        this.calendar.addEvent(event);
       });
 
-      calendarSummary.notes.forEach(it => {
+      const noteEvents = calendarSummary.notes.map(it => {
         const startDate = newDateTimestamp(it.date, this.timeZone);
         if (it.repeat === FrequencyEnum.none) {
-          this.createNoteEvent(it, startDate, darkMode);
-        } else {
-          let repeatDate: Date;
-          if (this.periodStart && greaterOrEqualsThan(this.periodStart, startDate)) {
-            repeatDate = this.periodStart;
-            repeatDate.setDate(startDate.getDate());
-          } else {
-            repeatDate = startDate;
-          }
-          this.calendar.recurringEvent?.addFrequency(it.repeat, repeatDate, it.noteId, it.title, 'NOTE',
-            `${this.language}/notes/`,
-            (date, recurring) => this.createEvent(date, recurring, darkMode), undefined, undefined, true,
-          );
+          return this.createNoteEvent(it, startDate, darkMode);
         }
+        let repeatDate: Date;
+        if (this.calendar.calendarStart && greaterOrEqualsThan(this.calendar.calendarStart, startDate)) {
+          repeatDate = new Date(this.calendar.calendarStart);
+          repeatDate.setDate(startDate.getDate());
+        } else {
+          repeatDate = startDate;
+        }
+        this.calendar.recurringEvent?.addFrequency(it.repeat, repeatDate, it.noteId, it.title, 'NOTE',
+          `${this.language}/notes/`,
+          (date, recurring) => this.createEvent(date, recurring, darkMode), undefined, undefined, true,
+        );
+        return undefined;
       });
 
-      this.isCalendarLoading = false;
+      const allEvents = [...reservationEvents, ...unavailableEvents, ...birthdayEvents, ...transactionEvents,
+        ...noteEvents].filter(it => it !== undefined);
+      this.calendar.addEvents(allEvents);
       this.calendar.recurringEvent?.execute();
     }
     this.calendar.sortEvents();
@@ -505,17 +495,17 @@ export class DashboardComponent {
 
   private createEvent = (date: Date, recurring: any, darkMode: boolean) => {
     const end = getEndWithDuration(date, recurring.duration);
+    const meta = new Meta(!!recurring.duration, this.timeZone, recurring.state, [recurring.path, recurring.id]);
     const event = monthEvent(recurring.title, date, end, recurring.id, findStateColor(recurring.state, darkMode),
-      new Meta(!!recurring.duration, this.timeZone, recurring.state, [recurring.path, recurring.id]), darkMode,
+      meta, darkMode, recurring.allDay,
     );
     this.calendar.addEvent(event);
   };
 
-  private createNoteEvent = (note: ICalendarNote, date: Date, darkMode: boolean): void => {
+  private createNoteEvent = (note: ICalendarNote, date: Date, darkMode: boolean): CalendarEvent => {
     const color = findStateColor('NOTE', darkMode);
-    const event = allDayEvent(note.title, color, date, darkMode, `${this.language}/notes/${note.noteId}`,
+    return allDayEvent(note.title, color, date, darkMode, `${this.language}/notes/${note.noteId}`,
       new Meta(false, this.timeZone, 'NOTE', [this.language, 'notes', note.noteId]),
     );
-    this.calendar.addEvent(event);
   };
 }

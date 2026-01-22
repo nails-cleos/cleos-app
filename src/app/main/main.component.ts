@@ -1,13 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  Injector,
-  runInInjectionContext,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, Injector, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Router, RouterLinkActive, RouterOutlet } from '@angular/router';
@@ -122,17 +113,6 @@ export class MainComponent {
       this.showLoader = state.showPreload;
       this.navigationState.set(state.navigationHeader);
       this.showArrow = state.showArrow;
-    });
-
-    effect(() => {
-      const currentUser = this.userSignal();
-      if (currentUser) {
-        runInInjectionContext(this.injector, () => {
-          currentUser.getIdToken().then((idToken) => {
-            this.tokenService.setToken = idToken;
-          });
-        });
-      }
     });
 
     effect(() => {

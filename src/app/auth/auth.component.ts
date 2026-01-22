@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal, untracked } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { clean, login, redirect, setCurrentCode, signupSuccess } from '../store/auth.actions';
+import { cleanAuth, login, redirect, setCurrentCode, signupSuccess } from '../store/auth.actions';
 import { ActivatedRoute } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import {
@@ -117,7 +117,7 @@ export class AuthComponent {
       if (response?.message) {
         const actionType = 'button';
         const toastRef = this.toastService.show(response.message, response.toastType, 5000, { actionType });
-        toastRef.onAction().subscribe(() => this.store.dispatch(clean()));
+        toastRef.onAction().subscribe(() => this.store.dispatch(cleanAuth()));
       }
     });
 

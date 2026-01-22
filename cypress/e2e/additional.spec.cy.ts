@@ -16,8 +16,16 @@ devices.forEach(({ name, width, height, breakpoints }) => {
     });
 
     it('should create a new additional', () => {
+      const additionalName = 'Additional';
+      const hour = '00';
+      const minute = '30';
+
       cy.mockAdditionalList(0);
-      cy.intercept('POST', '**/api/v1/additional', (req) => req.alias = 'saveAdditional');
+      cy.mockApi('POST', '**/api/v1/additional', {
+        body: { name: additionalName },
+        alias: 'saveAdditional',
+      });
+      cy.intercept('POST', '**/api/v1/additional').as('saveAdditional');
       cy.openMenu(breakpoints, ['Additional', 'Additional']);
       cy.wait('@getAdditionalList');
       cy.get('tr').contains('No additional');
@@ -26,10 +34,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
       cy.wait('@getTreatments');
       cy.get('mat-card-title').contains('Add additional');
-
-      const additionalName = 'Additional';
-      const hour = '00';
-      const minute = '30';
 
       cy.formControlType('name', additionalName);
       cy.formControlType('description', `${additionalName} Description`, 'textarea');
@@ -60,7 +64,16 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
       cy.get('@selectedAdditional').then((additional: any) => {
         cy.mockAdditional(additional.id, additional).then(() => {
-          cy.intercept('PATCH', `**/api/v1/additional/${additional.id}`, (req) => req.alias = 'updateAdditional');
+          // Updates
+          const additionalName = 'Additional Group';
+          const hour = '00';
+          const minute = '30';
+
+          cy.mockApi('PATCH', `**/api/v1/additional/${additional.id}`, {
+            body: { name: additionalName },
+            alias: 'updateAdditional',
+          });
+          cy.intercept('PATCH', `**/api/v1/additional/${additional.id}`).as('updateAdditional');
 
           cy.buttonClickOnTable(breakpoints, additional.name, 'row', 'detail-row', 'edit',
             breakpointToButtons(breakpoints, ['delete']));
@@ -77,10 +90,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
             cy.get('mat-chip-row').contains(groups.name).scrollIntoView().should('be.visible');
           });
 
-          // Updates
-          const additionalName = 'Additional Group';
-          const hour = '00';
-          const minute = '30';
           cy.formControlType('name', additionalName);
           cy.formControlType('description', `${additionalName} Description`, 'textarea');
           cy.get('[data-cy="duration-input"]').click({ force: true });

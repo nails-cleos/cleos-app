@@ -80,17 +80,17 @@ export class ReservationCompleteComponent {
   private additionalList$ = this.store.pipe(getAdditionalListPipe);
   private payments$ = this.store.pipe(getPaymentsPipe);
 
-  private completeReservationSignal = toSignal(this.completeReservation$);
-  private treatmentDiscountSignal = toSignal(this.treatmentDiscount$);
-  private paymentsSignal = toSignal(this.payments$);
+  private readonly completeReservationSignal = toSignal(this.completeReservation$);
+  private readonly treatmentDiscountSignal = toSignal(this.treatmentDiscount$);
+  private readonly paymentsSignal = toSignal(this.payments$);
 
-  selectedReservationSignal = toSignal(this.selectedReservation$);
-  additionalListSignal = toSignal(this.additionalList$);
+  readonly selectedReservationSignal = toSignal(this.selectedReservation$);
+  readonly additionalListSignal = toSignal(this.additionalList$);
 
-  private isDashboard = computed(() => this.completeReservationSignal()?.isDashboard ?? false);
-  private reservationId = computed(() => this.completeReservationSignal()?.reservationId);
-  private roomId = computed(() => this.completeReservationSignal()?.roomId);
-  private customerId = computed(() => this.completeReservationSignal()?.customerId);
+  private readonly isDashboard = computed(() => this.completeReservationSignal()?.isDashboard ?? false);
+  private readonly reservationId = computed(() => this.completeReservationSignal()?.reservationId);
+  private readonly roomId = computed(() => this.completeReservationSignal()?.roomId);
+  private readonly customerId = computed(() => this.completeReservationSignal()?.customerId);
 
   startDate: Date = getNowTimeZone();
   endDate: Date = getNowTimeZone();
@@ -115,15 +115,15 @@ export class ReservationCompleteComponent {
     }),
   });
 
-  private selectGroupSignal = toSignal(this.getForm.group.valueChanges);
-  private selectTreatmentSignal = toSignal(this.getForm.treatment.valueChanges);
+  private readonly selectGroupSignal = toSignal(this.getForm.group.valueChanges);
+  private readonly selectTreatmentSignal = toSignal(this.getForm.treatment.valueChanges);
 
-  private payments = computed(() => this.paymentsSignal());
-  private additionalList = computed(() => this.additionalListSignal());
+  private readonly payments = computed(() => this.paymentsSignal());
+  private readonly additionalList = computed(() => this.additionalListSignal());
   private additionalSelected = signal<IAdditionalAll[]>([]);
 
   groups = signal<IGroupService[] | undefined>(undefined);
-  filteredGroupSignal = toSignal(
+  readonly filteredGroupSignal = toSignal(
     this.getForm.group.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value?.name),
@@ -139,7 +139,7 @@ export class ReservationCompleteComponent {
   );
 
   treatmentList = signal<IService[] | undefined>(undefined);
-  filteredTreatmentSignal = toSignal(
+  readonly filteredTreatmentSignal = toSignal(
     this.getForm.treatment.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value?.name),
@@ -155,7 +155,7 @@ export class ReservationCompleteComponent {
   );
 
   colors = signal<IColorAll[] | undefined>(undefined);
-  filteredColorSignal = toSignal(
+  readonly filteredColorSignal = toSignal(
     this.getForm.color.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value?.name),
@@ -172,12 +172,16 @@ export class ReservationCompleteComponent {
 
   types: string[] = [PaymentType.cash, PaymentType.transfer];
   price: WritableSignal<IPrice> = signal(new Price());
+  totalTime = signal('');
+  readonly isValidTime = computed(() => {
+    const time = this.totalTime();
+    return !!time && !time.includes('-');
+  });
 
   dateFormat: string = this.translate.getCurrentLang();
   split: boolean = false;
   isValid: boolean = true;
   isValidSplit: boolean = true;
-  totalTime?: string;
 
   private currentExtraData?: IExtras[];
   private currentSplitData?: IExtras[];
@@ -370,7 +374,7 @@ export class ReservationCompleteComponent {
 
   private setAppointmentDuration = (): void => {
     if (this.startDate && this.endDate) {
-      this.totalTime = getDiffTime(newDateTimestamp(this.endDate), newDateTimestamp(this.startDate));
+      this.totalTime.set(getDiffTime(newDateTimestamp(this.endDate), newDateTimestamp(this.startDate)));
     }
   };
 

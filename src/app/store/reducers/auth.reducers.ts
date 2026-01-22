@@ -1,6 +1,6 @@
 import { IMenu, IUserAll } from '../../interfaces/user';
 import {
-  clean,
+  cleanAuth,
   login,
   loginFailure,
   loginSuccess,
@@ -23,7 +23,6 @@ export interface AuthState {
   redirect: boolean;
   isLoading: boolean;
   user?: IUserAll;
-  token?: string;
   menus?: IMenu[];
   error?: IError;
   response?: IResponseSuccess;
@@ -38,7 +37,6 @@ export const initialState: AuthState = {
   redirect: false,
   isLoading: false,
   user: undefined,
-  token: undefined,
   menus: undefined,
   error: undefined,
   response: undefined,
@@ -71,7 +69,6 @@ export const authReducer = createReducer(
     isLoading: false,
     isAuthenticated: true,
     user: token.user,
-    token: token.tokenAccess,
     menus: token.menus,
     response: undefined,
     subErrors: undefined,
@@ -98,5 +95,5 @@ export const authReducer = createReducer(
     ...state,
     driveToken: token,
   })),
-  on(reLogin, clean, logOut, () => initialState),
+  on(reLogin, cleanAuth, logOut, () => initialState),
 );

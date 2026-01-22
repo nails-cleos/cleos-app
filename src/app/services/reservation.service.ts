@@ -4,7 +4,8 @@ import { Observable } from 'rxjs';
 import {
   IAvailableDTO,
   ICustomerReservation,
-  IReservation, IReservationAll,
+  IReservation,
+  IReservationAll,
   IRoomReservation,
   IUpcomingAll,
 } from '../interfaces/reservation';
@@ -144,7 +145,7 @@ export class ReservationService {
 
   createReservation = (
     reservation: IReservation,
-  ): Observable<IReservation[]> => this.http.post<IReservation[]>(this.urlV1, reservation);
+  ): Observable<IApiResponse[]> => this.http.post<IApiResponse[]>(this.urlV1, reservation);
 
   deleteReservation = (id: string): Observable<IReservation> => this.http.delete<IReservation>(
     toUrl(this.urlV1, id));
@@ -152,7 +153,7 @@ export class ReservationService {
   updateReservationById = (
     id: string,
     reservation: IReservation,
-  ): Observable<IReservation> => this.http.patch<IReservation>(toUrl(this.urlV1, id), reservation);
+  ): Observable<IApiResponse> => this.http.patch<IApiResponse>(toUrl(this.urlV1, id), reservation);
 
   changeState = (
     reservationId: string,

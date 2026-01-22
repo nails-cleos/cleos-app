@@ -246,8 +246,9 @@
             "lintFilePatterns": [
               "src/**/*.ts",
               "src/**/*.html",
-              "cypress/**/*.ts",
-              "cypress/**/*.js"
+              "cypress/e2e/**/*.ts",
+              "cypress/support/**/*.ts",
+              "cypress/fixtures/**/*.ts"
             ]
           }
         },

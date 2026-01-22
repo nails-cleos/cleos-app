@@ -12,7 +12,7 @@ import {
   unavailableSelected,
 } from '../../store/unavailable.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
-import { isSameTimeZone, newDateTimestamp } from '../../util/dates';
+import { getCurrentTimeZone, isSameTimeZone, newDateTimestamp } from '../../util/dates';
 import { IUnavailable, IUnavailableAll } from '../../interfaces/unavailable';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
@@ -21,7 +21,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
 import { DurationTimePipe } from '../../pipes/durationTime.pipe';
 import { ColorState } from '../../store/reducers/color.reducers';
-import { getUnavailableResponsePipe, getUnavailablePaginationPipe } from '../../store/selectors/unavailable.selectors';
+import { getUnavailablePaginationPipe, getUnavailableResponsePipe } from '../../store/selectors/unavailable.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -125,12 +125,13 @@ export class UnavailableListComponent {
     });
   };
 
-  showTimeZone = (unavailable: IUnavailableAll): boolean => !isSameTimeZone(unavailable.professional.timeZone);
+  showTimeZone = (unavailable: IUnavailableAll): boolean =>
+    !isSameTimeZone(unavailable.timeZone || unavailable.professional.timeZone || getCurrentTimeZone());
 
   openDialog = (unavailable: IUnavailableAll): void => {
     const time = newDateTimestamp(unavailable.timestamp);
     const name = unavailable.professional.displayName;
-    const timeZone = unavailable.professional.timeZone;
+    const timeZone = unavailable.timeZone || unavailable.professional.timeZone;
     createDialog('PROFESSIONAL_INFO', name, this.dateFormat, this.translate, this.dialog, timeZone, time);
   };
 }

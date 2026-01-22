@@ -133,24 +133,6 @@ a, u {
   top: 9% !important;
 }
 
-@media all and (max-device-width: 812px) and (orientation: portrait) {
-  .spinner-vertical {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-}
-
-@media not all and (max-device-width: 812px) and (orientation: portrait) {
-  .spinner-vertical {
-    position: fixed;
-    top: 50%;
-    left: 60%;
-    transform: translate(-50%, -50%);
-  }
-}
-
 .ssc-hr {
   margin: 5px 0 5px 0;
 }

@@ -26,19 +26,14 @@ import { MatRipple } from '@angular/material/core';
 import { ToastService } from '../services/toast.service';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { toSignal } from '@angular/core/rxjs-interop';
-import {
-  getIsAuthenticatedPipe,
-  getMenusPipe,
-  getRedirectPipe,
-  getTokenPipe,
-  getUserPipe,
-} from '../store/selectors/auth.selectors';
+import { getIsAuthenticatedPipe, getMenusPipe, getRedirectPipe, getUserPipe } from '../store/selectors/auth.selectors';
 import { getDataDeletedPipe, getNotificationsPipe } from '../store/selectors/notification.selectors';
 import { of } from 'rxjs';
 import { selectGlobalError, selectGlobalIsLoading, selectGlobalResponse } from '../store/selectors/global.selectors';
 import { ToastOptions } from '../shared/toast/toast.model';
 import { IResponseSuccess } from '../interfaces/common';
 import { EnvService } from '../services/env.service';
+import { LoadingOverlayService } from '../services/loading-overlay.service';
 
 @Component({
   selector: 'app-nav',
@@ -62,12 +57,12 @@ export class NavComponent {
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly seoService: SeoService = inject(SeoService);
   private readonly route: ActivatedRoute = inject(ActivatedRoute);
+  private readonly loadingService = inject(LoadingOverlayService);
 
   private breakpointObserver$ = this.breakpointObserver.observe(
     [Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium]);
   private isAuthenticated$ = this.store.pipe(getIsAuthenticatedPipe);
   private user$ = this.store.pipe(getUserPipe);
-  private token$ = this.store.pipe(getTokenPipe);
   private menus$ = this.store.pipe(getMenusPipe);
   private redirect$ = this.store.pipe(getRedirectPipe);
   private dataDeleted$ = this.store.pipe(getDataDeletedPipe);
@@ -90,7 +85,6 @@ export class NavComponent {
 
   private isAuthenticatedSignal = toSignal(this.isAuthenticated$);
   private redirectSignal = toSignal(this.redirect$);
-  private tokenSignal = toSignal(this.token$);
   private menuItemsSignal = toSignal(this.menus$);
   private dataDeletedSignal = toSignal(this.dataDeleted$);
   private notificationSignal = toSignal(this.notification$);
@@ -119,12 +113,13 @@ export class NavComponent {
   });
 
   isDarkMode = signal(this.authUserSignal().isDarkMode || isDarkMode(this.cookieService.get(THEME) as Theme));
-  isLoading = computed(() => this.globalIsLoadingSignal());
   response = computed(() => this.globalResponseSignal());
   error = computed(() => this.globalErrorSignal());
   notifications = signal<INotification[]>([]);
   workDay = signal<INotification[]>([]);
   countNotifications = signal(0);
+
+  readonly loading = this.loadingService.isLoading;
 
   dateFormat: string = this.translate.getCurrentLang();
   image?: string;
@@ -142,6 +137,14 @@ export class NavComponent {
     const meta = this.translate.instant('DASHBOARD.META');
     this.seoService.setMetaDescription(meta.CONTENT);
     this.seoService.setMetaTitle(meta.TITLE);
+
+    effect(() => {
+      if (this.globalIsLoadingSignal()) {
+        this.loadingService.show();
+      } else {
+        this.loadingService.hide();
+      }
+    });
 
     effect(() => {
       const response = this.response();
@@ -187,17 +190,18 @@ export class NavComponent {
     });
 
     effect(() => {
-      this.authUserService.reloadUser(this.currentUserSignal());
+      const user = this.currentUserSignal();
+      if (user !== undefined) {
+        this.authUserService.reloadUser(user);
+      }
     });
 
     effect(() => {
       const authorized = this.isAuthorized();
       if (authorized) {
         const user = this.currentUserSignal();
-        const token = this.tokenSignal();
-        if (user && token) {
+        if (user) {
           this.tokenService.setUser = user;
-          this.tokenService.setToken = token;
           this.incomplete = !user.completed;
           this.initials = getDisplayNameInitials(user);
           this.image = getUserImage(user);
@@ -221,7 +225,6 @@ export class NavComponent {
         navigation: value.data.navigation,
         read: false,
       } as INotification;
-
 
       untracked(() => {
         this.notifications.update(prev => {

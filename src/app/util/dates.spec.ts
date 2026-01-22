@@ -7,6 +7,7 @@ import {
   createEndDate,
   createFullDate,
   createNewDate,
+  createNewDateZonedTime,
   dateMonthYear,
   datesInSameWeek,
   dateToTimestamp,
@@ -45,14 +46,17 @@ import {
   invoiceTitle,
   isBetween,
   isSameTimeZone,
+  localeTimeZoneDate,
   monthTitle,
   monthViewTitle,
   newDate,
   newDateTimestamp,
   plusMinutes,
   plusMonthDate,
+  reservationDateTime,
   reservationDuration,
   searchDates,
+  secondsToHHMM,
   startOfPeriod,
   subPeriod,
   sumDurations,
@@ -64,6 +68,7 @@ import { IAvailability, IRoom, IRoomAll, ServiceType } from '../interfaces/room'
 import { IReservationAll } from '../interfaces/reservation';
 import { ITreatmentAll } from '../interfaces/treatment';
 import { IAdditionalAll } from '../interfaces/additional';
+import { toZonedTime } from 'date-fns-tz';
 
 describe('dates utility', () => {
   const treatment: ITreatmentAll = {
@@ -1283,4 +1288,87 @@ describe('dates utility', () => {
     });
   });
 
+  describe('secondsToHHMM', () => {
+    it('converts seconds to HH:MM format', () => {
+      const result = secondsToHHMM(3665); // 1 hour, 1 minute, 5 seconds
+      expect(result).toBe('01:01');
+    });
+
+    it('pads single digit hours and minutes with leading zeros', () => {
+      const result = secondsToHHMM(65); // 1 minute, 5 seconds
+      expect(result).toBe('00:01');
+    });
+
+    it('handles zero seconds', () => {
+      const result = secondsToHHMM();
+      expect(result).toBe('00:00');
+    });
+  });
+
+  describe('localeTimeZoneDate', () => {
+    it('should return empty string if no date is provided', () => {
+      const result = localeTimeZoneDate('en-US');
+      expect(result).toBe('');
+    });
+
+    it('should format a date string with default timezone', () => {
+      const dateStr = '2026-01-29T15:00:00Z';
+      const expected = reservationDateTime(new Date(dateStr), 'en-US', getCurrentTimeZone());
+      const result = localeTimeZoneDate('en-US', dateStr);
+      expect(result).toBe(expected);
+    });
+
+    it('should format a Date object with custom timezone', () => {
+      const dateObj = new Date('2026-01-29T15:00:00Z');
+      const timeZone = 'America/New_York';
+      const expected = reservationDateTime(dateObj, 'en-US', timeZone);
+      const result = localeTimeZoneDate('en-US', dateObj, timeZone);
+      expect(result).toBe(expected);
+    });
+
+    it('should format different locales correctly', () => {
+      const dateObj = new Date('2026-01-29T15:00:00Z');
+      const expectedNL = reservationDateTime(dateObj, 'nl-NL', getCurrentTimeZone());
+      const resultNL = localeTimeZoneDate('nl-NL', dateObj);
+      expect(resultNL).toBe(expectedNL);
+    });
+  });
+
+  describe('createNewDateZonedTime', () => {
+    it('should create a Date at midnight in default timezone from string', () => {
+      const input = '2026-01-29T15:00:00Z';
+      const result = createNewDateZonedTime(input);
+      const expected = toZonedTime(createNewDate(newDateTimestamp(input)), getCurrentTimeZone());
+      expect(result.getTime()).toBe(expected.getTime());
+    });
+
+    it('should create a Date with specified hour, minute, second, milli', () => {
+      const input = '2026-01-29T00:00:00Z';
+      const result = createNewDateZonedTime(input, getCurrentTimeZone(), 10, 30, 15, 500);
+      const expected = toZonedTime(createNewDate(newDateTimestamp(input), 10, 30, 15, 500), getCurrentTimeZone());
+      expect(result.getTime()).toBe(expected.getTime());
+    });
+
+    it('should accept a Date object as input', () => {
+      const dateObj = new Date('2026-01-29T12:00:00Z');
+      const result = createNewDateZonedTime(dateObj);
+      const expected = toZonedTime(createNewDate(newDateTimestamp(dateObj)), getCurrentTimeZone());
+      expect(result.getTime()).toBe(expected.getTime());
+    });
+
+    it('should accept a timestamp (number in seconds) as input', () => {
+      const timestamp = 1764796800; // 2026-01-29T00:00:00Z in seconds
+      const result = createNewDateZonedTime(timestamp);
+      const expected = toZonedTime(createNewDate(newDateTimestamp(timestamp)), getCurrentTimeZone());
+      expect(result.getTime()).toBe(expected.getTime());
+    });
+
+    it('should use a custom timezone if provided', () => {
+      const dateObj = new Date('2026-01-29T12:00:00Z');
+      const timeZone = 'America/New_York';
+      const result = createNewDateZonedTime(dateObj, timeZone);
+      const expected = toZonedTime(createNewDate(newDateTimestamp(dateObj, timeZone)), timeZone);
+      expect(result.getTime()).toBe(expected.getTime());
+    });
+  });
 });

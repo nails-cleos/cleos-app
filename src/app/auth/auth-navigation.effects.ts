@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { ROUTER_NAVIGATED, RouterNavigatedAction } from '@ngrx/router-store';
+import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 import { concatMap } from 'rxjs/operators';
 import { cleanUser, getMyUser } from '../store/user.actions';
-import * as authActions from '../store/auth.actions';
+import { cleanAuth, setCurrentCode } from '../store/auth.actions';
 
 @Injectable()
 export class AuthNavigationEffects {
@@ -11,13 +11,13 @@ export class AuthNavigationEffects {
 
   handleAuthNavigation$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ROUTER_NAVIGATED),
-      concatMap((action: RouterNavigatedAction) => {
+      ofType(ROUTER_NAVIGATION),
+      concatMap((action: RouterNavigationAction) => {
         const url = action.payload.routerState.url;
 
         // 1) /auth/forgot-password
         if (url.match(/\/auth\/forgot-password$/)) {
-          return [authActions.clean()];
+          return [cleanAuth()];
         }
 
         // 2) /auth/profile
@@ -35,7 +35,7 @@ export class AuthNavigationEffects {
           const queryParams = action.payload.routerState.root.queryParams;
           const code = queryParams?.['code'] || undefined;
 
-          return [authActions.clean(), authActions.setCurrentCode({ code })];
+          return [cleanAuth(), setCurrentCode({ code })];
         }
 
         return [];

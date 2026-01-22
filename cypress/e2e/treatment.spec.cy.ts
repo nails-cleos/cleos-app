@@ -16,16 +16,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
     });
 
     it('should create a new treatment', () => {
-      cy.mockTreatments(true, 0);
-      cy.intercept('POST', '**/api/v1/treatments', (req) => req.alias = 'saveTreatment');
-      cy.openMenu(breakpoints, ['Treatments', 'Treatments']);
-      cy.wait('@getTreatments');
-      cy.get('tr').contains('No treatments');
-      cy.get('button[id="add-button"]').click({ force: true });
-      cy.url().should('include', '/treatments/add');
-      cy.wait('@getColors');
-      cy.get('mat-card-title').contains('Add treatment');
-
       const treatmentGroupName = 'Treatment Group';
       const priceFrom = 10.00;
       const treatments = [
@@ -34,6 +24,20 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         { name: 'Treatment 3', hour: '00', minute: 15 },
         { name: 'Treatment 4', hour: '3', minute: 0 },
       ];
+
+      cy.mockTreatments(true, 0);
+      cy.mockApi('POST', '**/api/v1/treatments', {
+        body: { name: treatmentGroupName },
+        alias: 'saveTreatment',
+      });
+      cy.intercept('POST', '**/api/v1/treatments').as('saveTreatment');
+      cy.openMenu(breakpoints, ['Treatments', 'Treatments']);
+      cy.wait('@getTreatments');
+      cy.get('tr').contains('No treatments');
+      cy.get('button[id="add-button"]').click({ force: true });
+      cy.url().should('include', '/treatments/add');
+      cy.wait('@getColors');
+      cy.get('mat-card-title').contains('Add treatment');
 
       cy.formControlType('name', treatmentGroupName);
       cy.formControlType('description', `${ treatmentGroupName } Description`, 'textarea');
@@ -81,8 +85,16 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.wait('@getTreatments');
 
       cy.get('@selectedTreatment').then((treatment: any) => {
+        // Updates
+        const treatmentGroupName = 'Treatment Group';
+        const priceFrom = 80.00;
+
         cy.mockTreatment(treatment.id, treatment);
-        cy.intercept('PATCH', `**/api/v1/treatments/${ treatment.id }`, (req) => req.alias = 'updateTreatment');
+        cy.mockApi('PATCH', `**/api/v1/treatments/${ treatment.id }`, {
+          body: { name: treatmentGroupName },
+          alias: 'updateTreatment',
+        });
+        cy.intercept('POST', `**/api/v1/treatments/${ treatment.id }`).as('updateTreatment');
 
         cy.buttonClickOnTable(breakpoints, treatment.name, 'row', 'detail-row', 'edit',
           breakpointToButtons(breakpoints, ['visibility', 'sort', 'delete']));
@@ -106,9 +118,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
             .should('have.value', treatment.description);
         });
 
-        // Updates
-        const treatmentGroupName = 'Treatment Group';
-        const priceFrom = 80.00;
         cy.formControlType('name', treatmentGroupName);
         cy.formControlType('description', `${ treatmentGroupName } Description`, 'textarea');
         cy.formControlType('priceFrom', priceFrom);

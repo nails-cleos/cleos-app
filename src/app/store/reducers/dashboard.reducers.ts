@@ -1,5 +1,5 @@
 import {
-  clean,
+  cleanDashboard,
   dashFailure,
   dashSuccess,
   eventSuccess,
@@ -96,9 +96,17 @@ const mergeDashboard = (
       return;
     }
 
+    // Filter out null/undefined values to avoid overwriting existing data
+    const filteredData = Object.entries(data).reduce((acc, [key, value]) => {
+      if (value !== null && value !== undefined) {
+        acc[key as keyof IDashboard] = value;
+      }
+      return acc;
+    }, {} as IDashboard);
+
     result[dashKey] = {
       ...(result[dashKey] ?? {}),
-      ...data,
+      ...filteredData,
     };
   });
 
@@ -240,6 +248,7 @@ export const dashboardReducer = createReducer(
   on(getEvents, (state) => ({
     ...state,
     data: cleanEventMap(state.data),
+    isLoading: true,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -256,6 +265,7 @@ export const dashboardReducer = createReducer(
   on(getCards, (state) => ({
     ...state,
     data: cleanCardMap(state.data),
+    isLoading: true,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -369,5 +379,5 @@ export const dashboardReducer = createReducer(
     subErrors: undefined,
     response: undefined,
   })),
-  on(clean, () => initialState),
+  on(cleanDashboard, () => initialState),
 );

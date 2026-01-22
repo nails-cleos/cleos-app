@@ -31,7 +31,6 @@ describe('NavComponent', () => {
   let message$: BehaviorSubject<any>;
   let isAuthenticated$: BehaviorSubject<any>;
   let user$: BehaviorSubject<any>;
-  let token$: BehaviorSubject<any>;
   let menus$: BehaviorSubject<any>;
   let redirect$: BehaviorSubject<any>;
   let dataDeleted$: BehaviorSubject<any>;
@@ -88,7 +87,6 @@ describe('NavComponent', () => {
     notification$ = new BehaviorSubject(undefined);
     isAuthenticated$ = new BehaviorSubject(undefined);
     user$ = new BehaviorSubject(undefined);
-    token$ = new BehaviorSubject(undefined);
     menus$ = new BehaviorSubject(undefined);
     redirect$ = new BehaviorSubject(undefined);
     dataDeleted$ = new BehaviorSubject(undefined);
@@ -142,14 +140,12 @@ describe('NavComponent', () => {
         case 2:
           return user$.asObservable();
         case 3:
-          return token$.asObservable();
-        case 4:
           return menus$.asObservable();
-        case 5:
+        case 4:
           return redirect$.asObservable();
-        case 6:
+        case 5:
           return dataDeleted$.asObservable();
-        case 7:
+        case 6:
           return notification$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -240,12 +236,10 @@ describe('NavComponent', () => {
 
   it('should handle auth state changes', () => {
     expect(component.countNotifications()).toBe(0);
-    const mockToken = 'mock-token';
 
     isAuthenticated$.next(true);
     isLoading$.next(false);
     user$.next(mockUser);
-    token$.next(mockToken);
 
     fixture.detectChanges();
 
@@ -318,7 +312,6 @@ describe('NavComponent', () => {
     isLoading$.next(false);
     user$.next(mockUser);
     redirect$.next(false);
-    token$.next('mock-token');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(redirect());
@@ -328,7 +321,6 @@ describe('NavComponent', () => {
     isAuthenticated$.next(false);
     isLoading$.next(false);
     redirect$.next(false);
-    token$.next('mock-token');
     fixture.detectChanges();
 
     expect(navigateSpy).toHaveBeenCalledWith(['/', 'en-GB', 'home']);
@@ -339,7 +331,6 @@ describe('NavComponent', () => {
     isLoading$.next(false);
     user$.next(mockUser);
     redirect$.next(true);
-    token$.next('mock-token');
     fixture.detectChanges();
 
     expect(navigateSpy).toHaveBeenCalledWith(['/', 'en-GB', 'home']);
@@ -438,11 +429,9 @@ describe('NavComponent', () => {
 
     const fakeUrl = 'blob:http://localhost/fake-url';
 
-    // 🔹 Spy on URL APIs
     spyOn(URL, 'createObjectURL').and.returnValue(fakeUrl);
     spyOn(URL, 'revokeObjectURL');
 
-    // 🔹 Fake <a> element
     const clickSpy = jasmine.createSpy('click');
     const anchorMock = {
       href: '',

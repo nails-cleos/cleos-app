@@ -67,7 +67,7 @@ export class LoginEffects {
       signOut(this.auth).then(() => {
         this.authUserService.reloadUser();
         localStorage.removeItem('auth');
-        window.location.href = `/${ getLocale(this.translate.getCurrentLang()).language }/home`;
+        window.location.href = `/${getLocale(this.translate.getCurrentLang()).language}/home`;
       }).catch((error) => {
         console.error('sign out error: ' + error);
       });
@@ -78,7 +78,7 @@ export class LoginEffects {
     ofType(reLogin),
     tap(() => {
       localStorage.removeItem('auth');
-      window.location.href = `/${ this.translate.getCurrentLang() }/auth`;
+      window.location.href = this.router.url;
     }),
   ), { dispatch: false });
 

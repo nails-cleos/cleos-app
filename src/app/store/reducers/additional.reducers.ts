@@ -70,6 +70,7 @@ export const additionalReducer = createReducer(
     ...state,
     data: data,
     subErrors: undefined,
+    isLoading: false,
   })),
 
   on(additionalSaveSuccess, (state, action) => ({
@@ -84,6 +85,7 @@ export const additionalReducer = createReducer(
     ...state,
     selected: selected,
     subErrors: undefined,
+    isLoading: false,
   })),
 
   on(additionalFailure, (state, { error }) => ({

@@ -1,63 +1,66 @@
 #!/bin/bash
 
 PACKAGE_FILENAME="package.json"
-BUILD_REPLACE="/version/c\  \"version\":"
 SNAPSHOT="-rc"
-IS_SNAPSHOT=$1
-VERSION_PART=$2
+VERSION_PART=$1  # optional: major, minor, patch
 
-### Increments the part of the string
-## $1: version itself
-## $2: number of part: 0 – major, 1 – minor, 2 – patch
+# Validate version part if provided
+if [[ -n "$VERSION_PART" && ! "$VERSION_PART" =~ ^(major|minor|patch)$ ]]; then
+    echo "Invalid version part: $VERSION_PART"
+    echo "Valid values: <major|minor|patch>"
+    exit 1
+fi
+
+# Get current package version
+PACKAGE_VERSION=$(jq -r .version "$PACKAGE_FILENAME")
+# Strip any pre-release suffix like -rc
+PACKAGE_VERSION=${PACKAGE_VERSION%-*}
+
+# Function to increment the version
 increment_version() {
-  local delimiter=.
-  local array=($(echo "$1" | tr $delimiter '\n'))
-  array[$2]=$((array[$2]+1))
+    local version="$1"
+    local part="$2"
 
-  for i in 0 1 2
-  do
-    if [ "$2" -lt "$i" ]; then
-      array["$i"]=0
-    fi
-  done
+    IFS='.' read -r major minor patch <<< "$version"
 
-  echo $(local IFS=$delimiter ; echo "${array[*]}")
+    major=${major:-0}
+    minor=${minor:-0}
+    patch=${patch:-0}
+
+    case "$part" in
+        major)
+            ((major++))
+            minor=0
+            patch=0
+            ;;
+        minor)
+            ((minor++))
+            patch=0
+            ;;
+        patch)
+            ((patch++))
+            ;;
+    esac
+
+    echo "$major.$minor.$patch"
 }
 
-replace()
-{
-  local REPLACE=$1
-  local FILENAME=$2
-  local QUERY=$3
-
-  LAST_VERSION=$(echo "$REPLACE" | xargs)
-
-  sed -i "$QUERY \"$LAST_VERSION\"," $FILENAME
-
-  echo "$LAST_VERSION"
+# Function to update version in package.json
+replace_version() {
+    local new_version="$1"
+    jq --arg v "$new_version" '.version = $v' "$PACKAGE_FILENAME" > "$PACKAGE_FILENAME.tmp" && mv "$PACKAGE_FILENAME.tmp" "$PACKAGE_FILENAME"
 }
 
-if [ "$IS_SNAPSHOT" ] && [ -z "$VERSION_PART" ]; then
-  exit 'Error'
-fi
-
-PACKAGE_VERSION=$(cat "$PACKAGE_FILENAME" \
-  | grep version \
-  | head -1 \
-  | awk -F: '{ print $2 }' \
-  | sed 's/[",]//g')
-
-PACKAGE_VERSION=$(echo "$PACKAGE_VERSION" | sed -E 's/(-*?)\-.*/\1/')
-
-# set CURRENT version by extracting version from package.json.
-if [ "$IS_SNAPSHOT" ]; then
-  NEW_VERSION=$(increment_version "$PACKAGE_VERSION" "$VERSION_PART")
-  NEW_VERSION="$NEW_VERSION$SNAPSHOT"
-  replace "$NEW_VERSION" "$PACKAGE_FILENAME" "$BUILD_REPLACE"
-
-## replace "$VERSION_PART_DEFAULT" "$VERSION_PART_FILENAME" "$VERSION_PART_REPLACE"
-
+# Main logic
+if [[ -n "$VERSION_PART" ]]; then
+    # Snapshot: increment version part and append -rc
+    NEW_VERSION=$(increment_version "$PACKAGE_VERSION" "$VERSION_PART")
+    NEW_VERSION="$NEW_VERSION$SNAPSHOT"
 else
-  RELEASE_VERSION=${PACKAGE_VERSION%"$SNAPSHOT"}
-  replace "$RELEASE_VERSION" "$PACKAGE_FILENAME" "$BUILD_REPLACE"
+    # Release: keep current version (strip -rc)
+    NEW_VERSION="$PACKAGE_VERSION"
 fi
+
+replace_version "$NEW_VERSION"
+
+echo "$NEW_VERSION"

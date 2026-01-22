@@ -145,4 +145,4 @@ export const quarterSummarySuccess = createAction(
   props<{ quarterSummary: any }>(),
 );
 
-export const clean = createAction(DashboardActionTypes.clean);
+export const cleanDashboard = createAction(DashboardActionTypes.clean);

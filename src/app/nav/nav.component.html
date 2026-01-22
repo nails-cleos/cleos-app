@@ -1,3 +1,11 @@
+@if (loading()) {
+  <div class="loading-backdrop"></div>
+
+  <div class="spinner-vertical">
+    <mat-progress-spinner diameter="150" mode="indeterminate" color="accent"></mat-progress-spinner>
+  </div>
+}
+
 <mat-drawer-container [hasBackdrop]="isHandsetSignal()" autosize>
   <mat-drawer #drawer [attr.role]="isHandsetSignal() ? 'dialog' : 'navigation'"
               [mode]="isHandsetSignal() ? 'over' : 'side'"
@@ -184,12 +192,7 @@
         </button>
       }
     </mat-toolbar>
-    <main [ngClass]="{'loading': isLoading()}" class="content">
-      @if (isLoading()) {
-        <div class="spinner-vertical" style="z-index: 999">
-          <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
-        </div>
-      }
+    <main class="content">
       <div class="grid-container">
         @if (error(); as error) {
           <app-error [error]="error"></app-error>

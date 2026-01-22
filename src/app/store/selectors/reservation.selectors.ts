@@ -119,7 +119,7 @@ const selectedReservation = createSelector(
 );
 export const getSelectedReservationPipe = pipe(
   select(selectedReservation),
-  filter((val): val is IUpcomingAll => val !== undefined),
+  filter((val): val is IUpcomingAll => val !== null),
 );
 
 const selectAvailable = createSelector(

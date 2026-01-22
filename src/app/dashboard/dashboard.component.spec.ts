@@ -8,6 +8,10 @@ import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-us
 import { signal } from '@angular/core';
 import { IDashboard } from '../interfaces/dashboard';
 import { ICurrencyAll } from '../interfaces/currency';
+import { getNowTimeZone } from '../util/dates';
+import { endOfMonth, startOfMonth } from 'date-fns';
+import { States } from '../interfaces/reservation';
+import { FrequencyEnum } from '../util/helper';
 
 describe('DashComponent', () => {
   let component: DashboardComponent;
@@ -32,6 +36,24 @@ describe('DashComponent', () => {
     code: 'EUR',
     icon: 'euro',
   };
+
+  const calendarSummaryMock = {
+    reservations: [
+      {
+        reservationId: 'r1',
+        title: 'Test reservation',
+        start: Date.now(),
+        end: null,
+        state: States.completed,
+        total: 50,
+      },
+    ],
+    unavailable: [],
+    birthdays: [],
+    transactions: [],
+    notes: [],
+  };
+
 
   let storeSpy: jasmine.SpyObj<Store<any>>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
@@ -113,5 +135,414 @@ describe('DashComponent', () => {
 
     expect(component.charts.length).toBe(1);
     expect(component.charts[0].title).toEqual(mockChartSummaries[0].title);
+  });
+
+  it('should set the current date when call closeOpenMonthViewDay on same month', () => {
+    const date = getNowTimeZone();
+    date.setMonth(date.getMonth(), 10);
+
+    component.closeOpenMonthViewDay(date);
+
+    expect(component.viewDate()).toEqual(date);
+  });
+
+  it('should set the 1st day when call closeOpenMonthViewDay on different month', () => {
+    const date = getNowTimeZone();
+    date.setMonth(date.getMonth() - 10, 10);
+
+    component.closeOpenMonthViewDay(date);
+
+    expect(component.viewDate()).toEqual(startOfMonth(date));
+  });
+
+  it('should create calendar events from calendarSummary', () => {
+    component.calendarSummary = calendarSummaryMock as any;
+    component.timeZone = 'Europe/Amsterdam';
+
+    component['createEvents'](false); // darkMode = false
+
+    const events = component.calendar.calendarEvents;
+
+    expect(events).toBeTruthy();
+    expect(events!.length).toBe(1);
+
+    const event = events![0];
+    expect(event.title).toBe('Test reservation');
+    expect(event.meta.state).toBe(States.completed);
+    expect(event.meta.total).toBe(50);
+  });
+
+  it('should open active day if event is today', () => {
+    const today = getNowTimeZone();
+
+    component.calendarSummary = {
+      reservations: [{
+        reservationId: 'r1',
+        title: 'Today reservation',
+        start: today.getTime() / 1000,
+        state: States.completed,
+      }],
+      unavailable: [],
+      birthdays: [],
+      transactions: [],
+      notes: [],
+    } as any;
+
+    component['createEvents']();
+
+    expect(component.activeDayIsOpen).toBeTrue();
+  });
+
+  it('should create birthday all-day event', () => {
+    component.calendarSummary = {
+      reservations: [],
+      unavailable: [],
+      birthdays: [{
+        userId: 'u1',
+        title: 'Birthday',
+        date: Date.now(),
+      }],
+      transactions: [],
+      notes: [],
+    } as any;
+
+    component['createEvents']();
+
+    const event = component.calendar.calendarEvents![0];
+    expect(event.allDay).toBeTrue();
+    expect(event.meta.state).toBe('BIRTHDAY');
+  });
+
+  it('should register recurring note events', () => {
+    component.calendarSummary = {
+      reservations: [],
+      unavailable: [],
+      birthdays: [],
+      transactions: [],
+      notes: [{
+        noteId: 'n1',
+        title: 'Repeated note',
+        date: Date.now(),
+        repeat: FrequencyEnum.everyDay,
+      }],
+    } as any;
+
+    component['createEvents']();
+
+    // Recurring events are created after execute()
+    expect(component.calendar.recurringEvent).toBeTruthy();
+  });
+
+  it('should set empty charts and mini card error when no chartSummaries and miniCardSummaries', () => {
+    const roomName = 'RoomWithoutContent';
+
+    const record: Record<string, IDashboard> = {};
+    record[roomName] = {
+      currency,
+      roomId: 'r1',
+      professionalId: 'p1',
+      calendarSummary: calendarSummaryMock as any,
+      chartSummaries: undefined,
+      miniCardSummaries: undefined,
+    };
+
+    component.getForm.selectedDash.setValue(roomName);
+
+    dashboardMap$.next(record);
+    fixture.detectChanges();
+
+    expect(component.charts.length).toBe(8);
+
+    component.charts.forEach(chart => {
+      expect(Object.keys(chart).length).toBe(0);
+    });
+
+    expect(component.miniCardData.length).toBe(4);
+
+    component.miniCardData.forEach(card => {
+      expect(card.error).toBeTruthy();
+      expect(card.error?.status).toBe('NO_CONTENT');
+      expect(card.title).toContain('DASHBOARD.MINI_CARD');
+    });
+  });
+
+  it('should ignore BLOCK_AGENDA unavailable events', () => {
+    component.calendarSummary = {
+      unavailable: [
+        {
+          type: 'BLOCK_AGENDA',
+          start: new Date().toISOString(),
+        },
+      ],
+      reservations: [],
+      birthdays: [],
+      transactions: [],
+      notes: [],
+    } as any;
+
+    component['createEvents'](false);
+
+    expect(component.calendar.calendarEvents.length).toBe(0);
+  });
+
+  it('should create event for non-repeating unavailable', () => {
+    component.calendarSummary = {
+      unavailable: [
+        {
+          type: 'UNAVAILABLE',
+          start: new Date().toISOString(),
+          duration: 60,
+          title: 'Vacation',
+          unavailableId: 'u1',
+          repeat: FrequencyEnum.none,
+        },
+      ],
+      reservations: [],
+      birthdays: [],
+      transactions: [],
+      notes: [],
+    } as any;
+
+    component['createEvents'](false);
+
+    const events = component.calendar.calendarEvents;
+
+    expect(events.length).toBe(1);
+    expect(events[0].title).toContain('Vacation');
+    expect(events[0].meta.state).toBe('UNAVAILABLE');
+  });
+
+  it('should register recurring unavailable event', () => {
+    component.calendarSummary = {
+      unavailable: [
+        {
+          type: 'UNAVAILABLE',
+          start: new Date().toISOString(),
+          title: 'Weekly off',
+          unavailableId: 'u2',
+          repeat: FrequencyEnum.onceAWeek,
+          duration: undefined,
+          allDay: true,
+        },
+      ],
+      reservations: [],
+      birthdays: [],
+      transactions: [],
+      notes: [],
+    } as any;
+
+    component['createEvents'](false);
+
+    const events = component.calendar.calendarEvents;
+
+    expect(events.length).toBeGreaterThan(0);
+    expect(events.some(e => e.meta.state === 'UNAVAILABLE')).toBeTrue();
+  });
+
+  it('should set activeDayIsOpen when unavailable is today', () => {
+    const today = new Date();
+
+    component.activeDayIsOpen = false;
+    component.calendarSummary = {
+      unavailable: [
+        {
+          type: 'UNAVAILABLE',
+          start: today.toISOString(),
+          title: 'Today off',
+          unavailableId: 'u3',
+          repeat: FrequencyEnum.none,
+        },
+      ],
+      reservations: [],
+      birthdays: [],
+      transactions: [],
+      notes: [],
+    } as any;
+
+    component['createEvents'](false);
+
+    expect(component.activeDayIsOpen).toBeTrue();
+  });
+
+  it('should create transaction all-day event', () => {
+    const now = new Date();
+
+    component.calendarSummary = {
+      transactions: [
+        {
+          title: 'Payment received',
+          createdAt: now.toISOString(),
+          accountId: 'acc-1',
+          transactionId: 'tx-123',
+          total: 150,
+        },
+      ],
+      unavailable: [],
+      reservations: [],
+      birthdays: [],
+      notes: [],
+    } as any;
+
+    component['createEvents'](false);
+
+    const events = component.calendar.calendarEvents;
+
+    expect(events.length).toBe(1);
+
+    const event = events[0];
+
+    expect(event.title).toBe('Payment received');
+    expect(event.meta.state).toBe('TRANSACTION');
+    expect(event.meta.total).toBe(150);
+
+    // all-day events have same start & end day
+    expect(event.allDay).toBeTrue();
+
+    // year normalized to current year
+    expect(event.start.getFullYear()).toBe(getNowTimeZone().getFullYear());
+
+    // route correctness
+    expect(event.meta.route.join('/')).toContain('accounts/acc-1/transactions/tx-123');
+  });
+
+  it('should create multiple transaction events', () => {
+    component.calendarSummary = {
+      transactions: [
+        { title: 'T1', createdAt: new Date().toISOString(), accountId: 'a1', transactionId: 't1', total: 10 },
+        { title: 'T2', createdAt: new Date().toISOString(), accountId: 'a2', transactionId: 't2', total: 20 },
+      ],
+      unavailable: [],
+      reservations: [],
+      birthdays: [],
+      notes: [],
+    } as any;
+
+    component['createEvents'](false);
+
+    expect(component.calendar.calendarEvents.length).toBe(2);
+  });
+
+  it('should create note event when repeat is none', () => {
+    const date = new Date();
+
+    component.calendarSummary = {
+      reservations: [],
+      unavailable: [],
+      birthdays: [],
+      transactions: [],
+      notes: [
+        {
+          noteId: 'n1',
+          title: 'Single note',
+          date: date.toISOString(),
+          repeat: FrequencyEnum.none,
+        },
+      ],
+    } as any;
+
+    component['createEvents'](false);
+
+    const events = component.calendar.calendarEvents;
+
+    expect(events.length).toBe(1);
+
+    const event = events[0];
+
+    expect(event.title).toBe('Single note');
+    expect(event.allDay).toBeTrue();
+    expect(event.meta.state).toBe('NOTE');
+    expect(event.meta.route.join('/')).toContain('notes/n1');
+  });
+
+  it('should register non recurring note and create event()', () => {
+    const start = new Date();
+    start.setDate(5);
+
+    // Simulate calendar month boundaries
+    component.calendar.calendarStart = new Date(start.getFullYear(), start.getMonth(), 1);
+    component.calendar.calendarEnd = new Date(start.getFullYear(), start.getMonth() + 1, 0);
+
+    component.calendarSummary = {
+      reservations: [],
+      unavailable: [],
+      birthdays: [],
+      transactions: [],
+      notes: [
+        {
+          noteId: 'n-rec',
+          title: 'Non recurring note',
+          date: start.toISOString(),
+          repeat: FrequencyEnum.none,
+        },
+      ],
+    } as any;
+
+    component['createEvents'](false);
+
+    // After createEvents, recurring events are executed
+    const events = component.calendar.calendarEvents;
+
+    expect(events.length).toBeGreaterThan(0);
+
+    const event = events[0];
+    expect(event.title).toBe('Non recurring note');
+    expect(event.meta.state).toBe('NOTE');
+    expect(event.allDay).toBeTrue();
+  });
+
+  it('should register recurring note and create events after execute()', () => {
+    const start = new Date();
+
+    // Simulate calendar month boundaries
+    component.calendar.calendarStart = startOfMonth(start);
+    component.calendar.calendarEnd = endOfMonth(start);
+
+    const noteDate = new Date();
+    noteDate.setFullYear(start.getFullYear(), start.getMonth() -1, 25);
+
+    component.calendarSummary = {
+      reservations: [],
+      unavailable: [],
+      birthdays: [],
+      transactions: [],
+      notes: [
+        {
+          noteId: 'n-rec',
+          title: 'Recurring note',
+          date: noteDate.toISOString(),
+          repeat: FrequencyEnum.everyDay,
+        },
+      ],
+    } as any;
+
+    component['createEvents'](false);
+
+    // After createEvents, recurring events are executed
+    const events = component.calendar.calendarEvents;
+
+    expect(events.length).toBeGreaterThan(0);
+
+    const event = events[0];
+    expect(event.title).toBe('Recurring note');
+    expect(event.meta.state).toBe('NOTE');
+    expect(event.allDay).toBeTrue();
+  });
+
+  it('Should change to dark mode', () => {
+    authUserSignal.update(prev => ({
+      ...prev,
+      isDarkMode: true,
+    }));
+    fixture.detectChanges();
+    expect(component['isDarkMode']()).toBeTrue();
+  });
+
+  it('Should change to light mode', () => {
+    authUserSignal.update(prev => ({
+      ...prev,
+      isDarkMode: false,
+    }));
+    fixture.detectChanges();
+    expect(component['isDarkMode']()).toBeFalse();
   });
 });

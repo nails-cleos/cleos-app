@@ -60,6 +60,16 @@ import { AccountService } from '../services/account.service';
 import { TrackingService } from '../services/tracking.service';
 import { AWS_FEATURE_KEY, awsReducer } from '../store/reducers/aws.reducers';
 import { AwsLambdaService } from '../services/aws-lambda.service';
+import { DOCUMENT_FEATURE_KEY, documentReducer } from '../store/reducers/document.reducers';
+import { STATEMENT_FEATURE_KEY, statementReducer } from '../store/reducers/statement.reducers';
+import { INVOICE_FEATURE_KEY, invoiceReducer } from '../store/reducers/invoice.reducers';
+import { DocumentService } from '../services/document.service';
+import { StatementService } from '../services/statement.service';
+import { InvoiceService } from '../services/invoice.service';
+import { InvoiceEffects } from '../store/effects/invoice.effects';
+import { StatementEffects } from '../store/effects/statement.effects';
+import { DocumentEffects } from '../store/effects/document.effects';
+import { AwsEffects } from '../store/effects/aws.effects';
 
 @NgModule({
   imports: [
@@ -99,6 +109,9 @@ import { AwsLambdaService } from '../services/aws-lambda.service';
     AccountService,
     TrackingService,
     AwsLambdaService,
+    DocumentService,
+    StatementService,
+    InvoiceService,
     provideState(AUTH_FEATURE_KEY, authReducer),
     provideState(NOTIFICATION_FEATURE_KEY, notificationReducer),
     provideState(USER_FEATURE_KEY, userReducer),
@@ -117,6 +130,9 @@ import { AwsLambdaService } from '../services/aws-lambda.service';
     provideState(NOTE_FEATURE_KEY, noteReducer),
     provideState(ACCOUNT_FEATURE_KEY, accountReducer),
     provideState(AWS_FEATURE_KEY, awsReducer),
+    provideState(DOCUMENT_FEATURE_KEY, documentReducer),
+    provideState(STATEMENT_FEATURE_KEY, statementReducer),
+    provideState(INVOICE_FEATURE_KEY, invoiceReducer),
     provideEffects(
       LoginEffects,
       NotificationEffects,
@@ -135,7 +151,10 @@ import { AwsLambdaService } from '../services/aws-lambda.service';
       ExpenseEffects,
       NoteEffects,
       AccountEffects,
-      AwsLambdaService,
+      AwsEffects,
+      DocumentEffects,
+      StatementEffects,
+      InvoiceEffects,
     ),
   ],
 })
