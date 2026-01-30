@@ -1,21 +1,19 @@
 import {
-  AfterViewInit,
-  ChangeDetectorRef,
+  ChangeDetectionStrategy,
   Component,
+  computed,
+  effect,
   ElementRef,
   inject,
-  OnDestroy,
-  OnInit,
-  ViewChild,
+  signal,
+  viewChild,
 } from '@angular/core';
 import { ITreatmentGroup } from '../../interfaces/treatment';
-import { BehaviorSubject, interval, Observable, Subscription } from 'rxjs';
 import { IExperience, ISlide, ISocialLink, IStory, IWork } from '../../interfaces/main';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { NonNullableFormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { AppState, selectMainState } from '../../store/app.states';
 import { TranslateService } from '@ngx-translate/core';
-import { clean, sendMessage } from '../../store/main.actions';
+import { sendMessage } from '../../store/main.actions';
 import { AuthUserService } from '../../services/auth-user.service';
 import {
   bottomTop,
@@ -25,7 +23,7 @@ import {
   gelatine,
   goTo,
   leftRight,
-  observeElement,
+  observeElementSignal,
   rubberBand,
   scaleIn,
   slideAnimation,
@@ -35,14 +33,25 @@ import {
 import { AnimationAnimateMetadata, AnimationSequenceMetadata } from '@angular/animations';
 import { isMobile } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { MainContentService } from '../main-content.service';
+import { MainContentService } from '../../services/main-content.service';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Router } from '@angular/router';
 import { SharedModule } from '../../shared/shared.module';
 import { AnimateDirective } from '../../directives/animate.directive';
-import { ResponseSuccess } from '../../interfaces/common';
 import { ToastService } from '../../services/toast.service';
 import { BottomSheetBookAppointmentComponent } from './bottom-sheet-book-appointment';
+import { getMainErrorPipe, getResponsePipe } from '../../store/selectors/main.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ISendMessage } from '../../../main';
+import { MainState } from '../../store/reducers/main.reducers';
+import { EnvService } from '../../services/env.service';
+
+type MainForm = {
+  name: FormControl<string>;
+  email: FormControl<string>;
+  subject: FormControl<string>;
+  body: FormControl<string>;
+}
 
 @Component({
   selector: 'app-main-content',
@@ -50,32 +59,58 @@ import { BottomSheetBookAppointmentComponent } from './bottom-sheet-book-appoint
   styleUrls: ['./main-content.component.scss'],
   animations: [bottomTop, leftRight, slideInX, slideInY, fadeInOut, slideAnimation],
   imports: [SharedModule, AnimateDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
+export class MainContentComponent {
+  private readonly store: Store<MainState> = inject(Store<MainState>);
+  private readonly toastService: ToastService = inject(ToastService);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly authUserService: AuthUserService = inject(AuthUserService);
+  private readonly mainContent: MainContentService = inject(MainContentService);
+  private readonly bottomSheet: MatBottomSheet = inject(MatBottomSheet);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly router: Router = inject(Router);
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly env: EnvService = inject(EnvService);
 
-  @ViewChild('treatmentItem', { static: false }) private serviceItem?: ElementRef<HTMLDivElement>;
-  @ViewChild('storyDescription', { static: false }) private storyDescription?: ElementRef<HTMLDivElement>;
-  @ViewChild('storyMember', { static: false }) private storyItem6?: ElementRef<HTMLDivElement>;
-  @ViewChild('contactItem1', { static: false }) private contactItem1?: ElementRef<HTMLDivElement>;
-  @ViewChild('contactItem2', { static: false }) private contactItem2?: ElementRef<HTMLDivElement>;
-  @ViewChild('contactItem3', { static: false }) private contactItem3?: ElementRef<HTMLDivElement>;
+  private treatmentItem = viewChild<ElementRef<HTMLDivElement>>('treatmentItem');
+  private storyDescription = viewChild<ElementRef<HTMLDivElement>>('storyDescription');
+  private storyMember = viewChild<ElementRef<HTMLDivElement>>('storyMember');
+  private contactItem1 = viewChild<ElementRef<HTMLDivElement>>('contactItem1');
+  private contactItem2 = viewChild<ElementRef<HTMLDivElement>>('contactItem2');
+  private contactItem3 = viewChild<ElementRef<HTMLDivElement>>('contactItem3');
 
-  private store: Store<AppState> = inject(Store<AppState>);
-  private toastService: ToastService = inject(ToastService);
-  private cdRef: ChangeDetectorRef = inject(ChangeDetectorRef);
-  private formBuilder: UntypedFormBuilder = inject(UntypedFormBuilder);
-  private authUserService: AuthUserService = inject(AuthUserService);
-  private mainContent: MainContentService = inject(MainContentService);
-  private bottomSheet: MatBottomSheet = inject(MatBottomSheet);
-  private translate: TranslateService = inject(TranslateService);
-  private router: Router = inject(Router);
+  private response$ = this.store.pipe(getResponsePipe);
+  private error$ = this.store.pipe(getMainErrorPipe);
+  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
-  treatmentItemState: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('open');
-  storyDescriptionState: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('open');
-  storyMemberState: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('open');
-  contactItem1State: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('open');
-  contactItem2State: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('open');
-  contactItem3State: BehaviorSubject<'open' | 'close'> = new BehaviorSubject<'open' | 'close'>('open');
+  private authUserSignal = this.authUserService.authUser;
+  private responseSignal = toSignal(this.response$);
+  private errorSignal = toSignal(this.error$);
+  private breakpointsSignal = toSignal(this.breakpointObserver$, {
+    initialValue: {
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
+      },
+    },
+  });
+
+  isSmall = computed(() => this.breakpointsSignal()?.matches ?? isMobile());
+  isDarkMode = computed(() => this.authUserSignal()?.isDarkMode ?? false);
+
+  treatmentItemState = signal<'open' | 'close'>('open');
+  storyDescriptionState = signal<'open' | 'close'>('open');
+  storyMemberState = signal<'open' | 'close'>('open');
+  contactItem1State = signal<'open' | 'close'>('open');
+  contactItem2State = signal<'open' | 'close'>('open');
+  contactItem3State = signal<'open' | 'close'>('open');
+  treatmentAnimations = signal<AnimationSequenceMetadata[]>([]);
+  groups = signal<ITreatmentGroup[]>([]);
+  filter = signal<ITreatmentGroup | undefined>(undefined);
+
+  title = this.env.title;
 
   treatmentTitle: AnimationAnimateMetadata = bounceInDownAnimation('500ms');
   storyTitle: AnimationSequenceMetadata = fadeInUpDown('20px', '700ms');
@@ -85,25 +120,13 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   contactText: AnimationSequenceMetadata = rubberBand;
   contactMap: AnimationAnimateMetadata = bounceInDownAnimation('500ms');
 
-  isSmall: boolean = isMobile();
-  isDark: boolean = false;
-  form!: UntypedFormGroup;
-  groups: ITreatmentGroup[] = [];
+  form: FormGroup<MainForm> = this.formBuilder.group<MainForm>({
+    name: this.formBuilder.control('', { validators: [Validators.required] }),
+    email: this.formBuilder.control('', { validators: [Validators.required, Validators.email] }),
+    subject: this.formBuilder.control('', { validators: [Validators.required] }),
+    body: this.formBuilder.control('', { validators: [Validators.required] }),
+  });
 
-  name: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required,
-  ]);
-  email: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, Validators.email,
-  ]);
-  subject: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required,
-  ]);
-  body: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required,
-  ]);
-
-  // Images 768x1024
   slides: ISlide[] = [
     { id: 'c7ae73b1-c6be-4848-9f84-cbf451e8ee59', image: 'assets/home_page/img/b1.webp', order: 0 },
     { id: '3e989461-81b2-4723-9fa3-746c05fd69a2', image: 'assets/home_page/img/b2.webp', order: 1 },
@@ -132,11 +155,11 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   ];
   works: IWork[] = [];
   allWorks: IWork[] = [];
-  filter: BehaviorSubject<ITreatmentGroup | undefined> = new BehaviorSubject<ITreatmentGroup | undefined>(undefined);
+
   experiences: IExperience[] = [
     {
       id: 'experienceItem1',
-      state: new BehaviorSubject<'open' | 'close'>('open'),
+      state: signal<'open' | 'close'>('open'),
       delay: '0ms',
       delayOut: '900ms',
       icon: 'waving_hand',
@@ -144,119 +167,134 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
       text: 'MAIN.EXPERIENCE.TEXT_1',
     }, {
       id: 'experienceItem2',
-      state: new BehaviorSubject<'open' | 'close'>('open'),
-      delay: this.isSmall ? '0ms' : '300ms',
+      state: signal<'open' | 'close'>(this.isSmall() ? 'open' : 'open'), // initial 'open'
+      delay: this.isSmall() ? '0ms' : '300ms',
       delayOut: '600ms',
       icon: 'coffee',
       position: '2°',
       text: 'MAIN.EXPERIENCE.TEXT_2',
     }, {
       id: 'experienceItem3',
-      state: new BehaviorSubject<'open' | 'close'>('open'),
-      delay: this.isSmall ? '0ms' : '600ms',
+      state: signal<'open' | 'close'>(this.isSmall() ? 'open' : 'open'),
+      delay: this.isSmall() ? '0ms' : '600ms',
       delayOut: '300ms',
       icon: 'palette',
       position: '3°',
       text: 'MAIN.EXPERIENCE.TEXT_3',
     }, {
       id: 'experienceItem4',
-      state: new BehaviorSubject<'open' | 'close'>('open'),
-      delay: this.isSmall ? '0ms' : '900ms',
+      state: signal<'open' | 'close'>(this.isSmall() ? 'open' : 'open'),
+      delay: this.isSmall() ? '0ms' : '900ms',
       delayOut: '0ms',
       icon: 'mood',
       position: '4°',
       text: 'MAIN.EXPERIENCE.TEXT_4',
     },
   ];
+
   stories: IStory[] = [
-    {
-      id: 'storyItem1',
-      state: new BehaviorSubject<'open' | 'close'>('open'),
-      delay: '100ms',
-      text: 'MAIN.STORY.TEXT_1',
-    }, {
-      id: 'storyItem2',
-      state: new BehaviorSubject<'open' | 'close'>('open'),
-      delay: '200ms',
-      text: 'MAIN.STORY.TEXT_2',
-    }, {
-      id: 'storyItem3',
-      state: new BehaviorSubject<'open' | 'close'>('open'),
-      delay: '300ms',
-      text: 'MAIN.STORY.TEXT_3',
-    }, {
-      id: 'storyItem4',
-      state: new BehaviorSubject<'open' | 'close'>('open'),
-      delay: '400ms',
-      text: 'MAIN.STORY.TEXT_4',
-    }, {
-      id: 'storyItem5',
-      state: new BehaviorSubject<'open' | 'close'>('open'),
-      delay: '500ms',
-      text: 'MAIN.STORY.TEXT_5',
-    },
+    { id: 'storyItem1', state: signal<'open' | 'close'>('open') as any, delay: '100ms', text: 'MAIN.STORY.TEXT_1' },
+    { id: 'storyItem2', state: signal<'open' | 'close'>('open') as any, delay: '200ms', text: 'MAIN.STORY.TEXT_2' },
+    { id: 'storyItem3', state: signal<'open' | 'close'>('open') as any, delay: '300ms', text: 'MAIN.STORY.TEXT_3' },
+    { id: 'storyItem4', state: signal<'open' | 'close'>('open') as any, delay: '400ms', text: 'MAIN.STORY.TEXT_4' },
+    { id: 'storyItem5', state: signal<'open' | 'close'>('open') as any, delay: '500ms', text: 'MAIN.STORY.TEXT_5' },
   ];
-  currentIndex: number = 0;
 
-  private isAuthenticated = false;
-  private subscription?: Subscription;
-  private authUserServiceSubscription?: Subscription;
-  private sliderSubscription?: Subscription;
-  private filterSubscription?: Subscription;
-  private getState: Observable<any> = this.store.select(selectMainState);
+  currentIndex = signal(0);
 
-  constructor(breakpointObserver: BreakpointObserver) {
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small,
-    ]).subscribe(result => this.isSmall = result.matches);
-  }
-
-  ngOnInit(): void {
-    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
-      this.isAuthenticated = value.isAuthenticated;
-      if (this.isAuthenticated) {
-        this.email.setValue(value.email);
-        this.name.setValue(value.displayName);
+  constructor() {
+    effect(() => {
+      const error = this.errorSignal();
+      if (error?.message) {
+        this.toastService.show(error.message, 'error');
       }
-      this.isDark = value.isDarkMode;
     });
-    this.clean();
-    this.createForm();
-    this.subscribe();
-    this.cdRef.detectChanges();
-    this.filterSubscription = this.filter.subscribe(group => {
-      setTimeout(() => {
-        if (group) {
-          this.works = this.allWorks.filter(p => p.group.id === group.id);
-        } else {
-          this.works = this.allWorks;
+
+    effect(() => {
+      const response = this.responseSignal();
+      if (response?.message) {
+        this.toastService.show(response.message, response.toastType);
+      }
+    });
+
+    effect(() => {
+      const authUser = this.authUserSignal();
+      if (authUser) {
+        this.getForm.email.setValue(authUser.email ?? '');
+        this.getForm.name.setValue(authUser.displayName ?? '');
+      }
+    });
+
+    effect(() => {
+      const treatments = this.translate.instant('TREATMENTS');
+      const groups = Array.isArray(treatments) ? treatments : [];
+      this.groups.set(groups);
+      this.treatmentAnimations.set(
+        groups.map((_, i) => scaleIn(`${i * (this.isSmall() ? 0 : 300)}ms`)),
+      );
+    });
+
+    effect((onCleanup) => {
+      const tEl = this.treatmentItem()?.nativeElement;
+      if (tEl) {
+        const obs = observeElementSignal(this.treatmentItemState, tEl, !this.isSmall());
+        onCleanup(() => obs?.disconnect());
+      }
+
+      const sdEl = this.storyDescription()?.nativeElement;
+      if (sdEl) {
+        const obs = observeElementSignal(this.storyDescriptionState, sdEl, !this.isSmall(), 0.1);
+        onCleanup(() => obs?.disconnect());
+      }
+
+      const smEl = this.storyMember()?.nativeElement;
+      if (smEl) {
+        const obs = observeElementSignal(this.storyMemberState, smEl, !this.isSmall(), 0.1);
+        onCleanup(() => obs?.disconnect());
+      }
+
+      const c1 = this.contactItem1()?.nativeElement;
+      if (c1) {
+        const obs = observeElementSignal(this.contactItem1State, c1, !this.isSmall());
+        onCleanup(() => obs?.disconnect());
+      }
+
+      const c2 = this.contactItem2()?.nativeElement;
+      if (c2) {
+        const obs = observeElementSignal(this.contactItem2State, c2, !this.isSmall());
+        onCleanup(() => obs?.disconnect());
+      }
+
+      const c3 = this.contactItem3()?.nativeElement;
+      if (c3) {
+        const obs = observeElementSignal(this.contactItem3State, c3, !this.isSmall());
+        onCleanup(() => obs?.disconnect());
+      }
+
+      this.experiences.forEach((it) => {
+        const el = document.getElementById(it.id);
+        if (el) {
+          const obs = observeElementSignal(it.state, el, !this.isSmall());
+          onCleanup(() => obs?.disconnect());
         }
-      }, 500);
+      });
+
+      this.stories.forEach((it) => {
+        const el = document.getElementById(it.id);
+        if (el) {
+          const obs = observeElementSignal(it.state, el, !this.isSmall());
+          onCleanup(() => obs?.disconnect());
+        }
+      });
+
+      this.mainContent.configure(false, 'close', true);
     });
-    this.groups = this.translate.instant('TREATMENTS');
+
+    effect(() => queueMicrotask(() => this.moveForwardSlide()));
   }
 
-  ngAfterViewInit(): void {
-    observeElement(this.treatmentItemState, this.serviceItem?.nativeElement, !this.isSmall);
-    observeElement(this.storyDescriptionState, this.storyDescription?.nativeElement, !this.isSmall, 0.1);
-    observeElement(this.storyMemberState, this.storyItem6?.nativeElement, !this.isSmall, 0.1);
-    observeElement(this.contactItem1State, this.contactItem1?.nativeElement, !this.isSmall);
-    observeElement(this.contactItem2State, this.contactItem2?.nativeElement, !this.isSmall);
-    observeElement(this.contactItem3State, this.contactItem3?.nativeElement, !this.isSmall);
-
-    this.experiences.forEach(it => observeElement(it.state, document.getElementById(it.id), !this.isSmall));
-    this.stories.forEach(it => observeElement(it.state, document.getElementById(it.id), !this.isSmall));
-
-    this.automateSlider();
-    this.mainContent.configure(false, 'close', true);
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.sliderSubscription?.unsubscribe();
-    this.filterSubscription?.unsubscribe();
-    this.authUserServiceSubscription?.unsubscribe();
+  get getForm(): MainForm {
+    return this.form.controls;
   }
 
   openBottomSheet(): void {
@@ -265,89 +303,43 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
   sendEmail(): void {
     if (!this.form.invalid) {
-      this.store.dispatch(sendMessage({ sendMessage: this.form.value }));
+      const sendMessageData: ISendMessage = {
+        name: this.getForm.name.value,
+        email: this.getForm.email.value,
+        subject: this.getForm.subject.value,
+        body: this.getForm.body.value,
+      };
+      this.store.dispatch(sendMessage({ sendMessage: sendMessageData }));
     }
   }
 
-  isCurrentSlideIndex = (index: number): boolean => this.currentIndex === index;
-
-  setTreatmentAnimation = (i: number): AnimationSequenceMetadata => scaleIn(`${ i * (this.isSmall ? 0 : 300) }ms`);
+  isCurrentSlideIndex = (index: number): boolean => this.currentIndex() === index;
 
   goToTreatment = (name?: string): void => {
     if (name === 'biab') {
       goTo('home');
-      this.router.navigate([this.translate.currentLang, name, 'treatment']);
+      this.router.navigate([this.translate.getCurrentLang(), 'home', name, 'treatment']);
     }
   };
 
   onHover = (social: ISocialLink, enter: boolean): void => {
     const suffix = enter ? '' : '-NO-COLOR';
-    social.svgIcon = `${ social.name }${ suffix }`;
+    social.svgIcon = `${social.name}${suffix}`;
   };
 
   filterBy = (group?: ITreatmentGroup): void => {
     this.works = [];
-    this.filter?.next(group);
-  };
-
-  private createForm = (): void => {
-    this.form = this.formBuilder.group({
-      name: this.name,
-      email: this.email,
-      subject: this.subject,
-      body: this.body,
-    });
-  };
-
-  private automateSlider = (): void => {
-    // let forward = true;
-    this.sliderSubscription = interval(3000).subscribe(() => this.moveForwardSlide());
+    this.filter.set(group);
   };
 
   private moveForwardSlide = (): void => {
-    if (this.slides?.length) {
-      // Fade in
-      if (this.currentIndex === this.slides.length - 1) {
-        this.currentIndex = 0;
-      } else {
-        this.currentIndex++;
-      }
-
-      // Forward and backward
-      // if (this.currentIndex === this.slides.length - 1) {
-      //   forward = false;
-      // }
-      // if (this.currentIndex === 0 && !forward) {
-      //   forward = true;
-      // }
-      // this.currentIndex = this.currentIndex + (forward ? +1 : -1);
-
-      // Forward
-      // if (this.currentIndex === this.slides.length - 1) {
-      //   this.sliderSubscription?.unsubscribe();
-      //   const back = interval(100).subscribe(() => {
-      //     this.currentIndex--;
-      //     if (this.currentIndex === 0) {
-      //       back.unsubscribe();
-      //       this.automateSlider();
-      //     }
-      //   });
-      // } else {
-      //   this.currentIndex++;
-      // }
+    if (!this.slides?.length) {
+      return;
     }
-  };
 
-  private clean = (): void => this.store.dispatch(clean());
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.errorMessage) {
-        this.toastService.error(state.errorMessage);
-      } else if (state.response) {
-        const response: ResponseSuccess = state.response;
-        this.toastService.show(response.message, response.toastType);
-      }
-    });
+    // update currentIndex signal
+    const idx = this.currentIndex();
+    const next = idx === this.slides.length - 1 ? 0 : idx + 1;
+    this.currentIndex.set(next);
   };
 }

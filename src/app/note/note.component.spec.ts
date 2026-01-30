@@ -1,634 +1,259 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
-import { of, Subject } from 'rxjs';
-
+import { BehaviorSubject, of } from 'rxjs';
 import { NoteComponent } from './note.component';
 import { IUser, IUserAll } from '../interfaces/user';
-import { INoteAll } from '../interfaces/note';
+import { INote, INoteAll } from '../interfaces/note';
 import { FrequencyEnum } from '../util/helper';
-import { clean, deleteNote, getAllProfessional } from '../store/note.actions';
-import { Role } from '../interfaces/token';
-import { backendFormatDate, createNewDateZonedTime, getNowTimeZone } from '../util/dates';
+import { IError } from '../interfaces/common';
+import { backendFormatDate, getNowTimeZone } from '../util/dates';
+import { addDays } from 'date-fns';
 
 describe('NoteComponent', () => {
   let component: NoteComponent;
   let fixture: ComponentFixture<NoteComponent>;
-
-  let state$: Subject<any>;
-
-  let storeSpy: jasmine.SpyObj<Store>;
+  let storeSpy: jasmine.SpyObj<Store<any>>;
   let routerSpy: jasmine.SpyObj<Router>;
-  let dialogSpy: jasmine.Spy<any>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let paramMapSpy: jasmine.SpyObj<ParamMap>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
+
+  let noteId$: BehaviorSubject<any>;
+  let navigationParams$: BehaviorSubject<any>;
+  let selectedNote$: BehaviorSubject<any>;
+  let allProfessionals$: BehaviorSubject<any>;
+  let subErrors$: BehaviorSubject<any>;
 
   const mockProfessional: IUserAll = {
-    id: 'prof-1',
+    id: 'p1',
     displayName: 'Dr. Smith',
-    email: 'smith@example.com',
+    email: '',
     locale: 'en',
-    timeZone: 'Europe/Amsterdam',
-    authorities: [{ authority: Role.professional }],
+    timeZone: '',
+    authorities: [],
   };
 
   const mockNote: INoteAll = {
-    id: 'note-1',
-    description: 'Test note description',
+    id: 'note1',
+    description: 'Test Note',
     professional: mockProfessional,
-    date: '2024-01-15',
+    date: '2024-01-01',
     repeat: FrequencyEnum.none,
     completed: false,
     deleted: false,
   };
 
   beforeEach(async () => {
-    state$ = new Subject();
-
-    const dialogSpyObj = jasmine.createSpyObj('MatDialog', ['open']);
-    paramMapSpy = jasmine.createSpyObj('ParamMap', ['get']);
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: paramMapSpy,
-      },
-    });
-
-    storeSpy.select.and.returnValue(state$.asObservable());
-    routerSpy.getCurrentNavigation.and.returnValue(null);
-    paramMapSpy.get.and.returnValue(null);
-
-    await TestBed.configureTestingModule({
-      imports: [
-        NoteComponent,
-        TranslateModule.forRoot(),
-      ],
-      providers: [
-        { provide: Store, useValue: storeSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
-        { provide: Router, useValue: routerSpy },
-        { provide: MatDialog, useValue: dialogSpyObj },
-      ],
-    }).compileComponents();
-  });
-
-  beforeEach(() => {
-    // Reset the mock to return null before creating component
-    activatedRouteSpy.snapshot.paramMap.get = jasmine.createSpy('get').and.returnValue(null);
-
-    const translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en-GB');
-    translate.use('en-GB');
-
-    fixture = TestBed.createComponent(NoteComponent);
-    component = fixture.componentInstance;
-
-    dialogSpy = spyOn(component.dialog, 'open');
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-
-  describe('Initialization', () => {
-    it('should initialize in add mode when no id is provided', () => {
-      expect(component.isAddMode).toBeTrue();
-      expect(component.id).toBeUndefined();
-    });
-
-    it('should initialize form with required validators', () => {
-      expect(component.form).toBeDefined();
-      expect(component.getForm.description.hasError('required')).toBeTrue();
-      expect(component.getForm.professional.hasError('required')).toBeTrue();
-      expect(component.getForm.date.hasError('required')).toBeTrue();
-      expect(component.getForm.repeat.hasError('required')).toBeTrue();
-    });
-
-    it('should dispatch getAllProfessional action after view init', () => {
-      component.ngAfterViewInit();
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllProfessional());
-    });
-
-    it('should dispatch clean action on init', () => {
-      const newComponent = TestBed.createComponent(NoteComponent).componentInstance;
-      newComponent.ngOnInit();
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
-    });
-  });
-
-  describe('Form Controls', () => {
-    it('should return form controls via getForm getter', () => {
-      const controls = component.getForm;
-      expect(controls.description).toBeDefined();
-      expect(controls.professional).toBeDefined();
-      expect(controls.date).toBeDefined();
-      expect(controls.repeat).toBeDefined();
-    });
-
-    it('should have correct repeat options', () => {
-      expect(component.repeats).toEqual([
-        FrequencyEnum.none,
-        FrequencyEnum.onceAWeek,
-        FrequencyEnum.onceAMonth,
-        FrequencyEnum.onceAYear,
-      ]);
-    });
-  });
-
-  it('should patch form when note is selected from state', () => {
-    component.ngOnInit();
-
-    state$.next({
-      selected: mockNote,
-    });
-
-    expect(component.note).toEqual(mockNote);
-    expect(component.getForm.description.value).toBe(mockNote.description);
-    expect(component.getForm.repeat.value).toBe(mockNote.repeat);
-  });
-
-  it('should handle form errors from state', () => {
-    component.ngOnInit();
-
-    const mockErrors = [
-      { field: 'description', message: 'Description is required' },
-    ];
-
-    state$.next({
-      subErrors: mockErrors,
-    });
-
-    expect(component.errors['description']).toBe('Description is required');
-    expect(component.getForm.description.hasError('incorrect')).toBeTrue();
-  });
-
-  it('should navigate to colors list on successful response', () => {
-    component.ngOnInit();
-
-    state$.next({
-      response: true,
-    });
-
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'reservation', 'calendar']);
-  });
-
-  describe('Submit', () => {
-    it('should dispatch createNote action when in add mode with valid form', () => {
-      component.ngOnInit();
-      const descriptionControl = component.getForm.description;
-      descriptionControl.setValue('New note');
-      descriptionControl.markAsDirty();
-
-      const professionalControl = component.getForm.professional;
-      professionalControl.setValue(mockProfessional);
-      professionalControl.markAsDirty();
-
-      const newDate = getNowTimeZone();
-      const dateControl = component.getForm.date;
-      dateControl.setValue(getNowTimeZone());
-      dateControl.markAsDirty();
-
-      const repeatControl = component.getForm.repeat;
-      repeatControl.setValue(FrequencyEnum.none);
-      repeatControl.markAsDirty();
-
-      storeSpy.dispatch.calls.reset();
-
-      void component.submit;
-      const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
-      expect(dispatchedAction).toEqual(jasmine.objectContaining({
-        note: jasmine.objectContaining({
-          description: 'New note',
-          professionalId: 'prof-1',
-          repeat: FrequencyEnum.none,
-          date: backendFormatDate(newDate),
-        }),
-        type: '[Note] Create note',
-      }));
-    });
-
-    it('should dispatch updateNote action when in edit mode with valid form', () => {
-      const testId = 'note-123';
-      paramMapSpy.get.and.returnValue(testId);
-      component.note = mockNote;
-      component.ngOnInit();
-
-      const descriptionControl = component.getForm.description;
-      descriptionControl.setValue('New note');
-      descriptionControl.markAsDirty();
-
-      const professionalControl = component.getForm.professional;
-      professionalControl.setValue({ ...mockProfessional, id: 'prof-2' });
-      professionalControl.markAsDirty();
-
-      const newDate = getNowTimeZone();
-      const dateControl = component.getForm.date;
-      dateControl.setValue(newDate);
-      dateControl.markAsDirty();
-
-      const repeatControl = component.getForm.repeat;
-      repeatControl.setValue(FrequencyEnum.onceAWeek);
-      repeatControl.markAsDirty();
-
-      void component.submit;
-      const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
-      expect(dispatchedAction).toEqual(jasmine.objectContaining({
-        note: jasmine.objectContaining({
-          description: 'New note',
-          professionalId: 'prof-2',
-          repeat: FrequencyEnum.onceAWeek,
-          date: backendFormatDate(newDate),
-        }),
-        type: '[Note] Update note by id',
-      }));
-    });
-
-    it('should not submit when form is invalid', () => {
-      const dispatchCountBefore = storeSpy.dispatch.calls.count();
-      void component.submit;
-      const dispatchCountAfter = storeSpy.dispatch.calls.count();
-      expect(component.form.invalid).toBeTrue();
-      expect(dispatchCountAfter).toBe(dispatchCountBefore);
-    });
-
-    it('should handle form with valid data', () => {
-      component.getForm.description.setValue('New note');
-      component.getForm.professional.setValue(mockProfessional);
-      component.getForm.date.setValue(new Date('2024-01-15'));
-      component.getForm.repeat.setValue(FrequencyEnum.none);
-      component.isAddMode = true;
-
-      void component.submit;
-
-      expect(storeSpy.dispatch).toHaveBeenCalled();
-    });
-  });
-
-  describe('Display Function', () => {
-    it('should return user display name', () => {
-      const result = component.displayFn(mockProfessional as IUser);
-      expect(result).toBe('Dr. Smith');
-    });
-
-    it('should return empty string for null user', () => {
-      const result = component.displayFn(null as any);
-      expect(result).toBe('');
-    });
-
-    it('should return empty string for user without displayName', () => {
-      const userWithoutName = { id: 'user-1' } as IUser;
-      const result = component.displayFn(userWithoutName);
-      expect(result).toBe('');
-    });
-  });
-
-  describe('Keyboard Event Handler', () => {
-    it('should clear professional field on backspace', () => {
-      component.getForm.professional.setValue(mockProfessional);
-      const event = { code: 'Backspace' };
-
-      component.keyDownHandler(event);
-
-      expect(component.getForm.professional.value).toBe('');
-    });
-
-    it('should not clear professional field on other keys', () => {
-      component.getForm.professional.setValue(mockProfessional);
-      const event = { code: 'Enter' };
-
-      component.keyDownHandler(event);
-
-      expect(component.getForm.professional.value).toEqual(mockProfessional);
-    });
-  });
-
-  describe('Filtered Options', () => {
-    it('should initialize filtered options observable', () => {
-      expect(component.filteredOptions).toBeDefined();
-    });
-
-    it('should filter professionals correctly', () => {
-      component.professionals = [
-        mockProfessional,
-        {
-          id: 'prof-2',
-          displayName: 'Dr. Johnson',
-          email: 'johnson@example.com',
-          locale: 'en',
-          timeZone: 'Europe/Amsterdam',
-          authorities: [{ authority: Role.professional }],
-        },
-      ];
-
-      // Just verify the component has professionals
-      expect(component.professionals.length).toBe(2);
-    });
-  });
-
-  describe('Component Lifecycle', () => {
-    it('should have ngOnDestroy method', () => {
-      expect(component.ngOnDestroy).toBeDefined();
-    });
-
-    it('should unsubscribe on destroy', () => {
-      const subscription = jasmine.createSpyObj('Subscription', ['unsubscribe']);
-      component['subscription'] = subscription;
-
-      component.ngOnDestroy();
-
-      expect(subscription.unsubscribe).toHaveBeenCalled();
-    });
-
-    it('should not throw error when unsubscribing with no subscription', () => {
-      component['subscription'] = undefined;
-      expect(() => component.ngOnDestroy()).not.toThrow();
-    });
-  });
-
-  describe('Edge Cases', () => {
-    it('should handle undefined professionals list', () => {
-      component.professionals = undefined;
-      const result = component.displayFn(mockProfessional as IUser);
-      expect(result).toBe('Dr. Smith');
-    });
-
-    it('should handle empty professionals list', () => {
-      component.professionals = [];
-      expect(component.professionals.length).toBe(0);
-    });
-
-    it('should handle invalid form submission gracefully', () => {
-      component.form.setErrors({ invalid: true });
-      const result = component.submit;
-      expect(result).toBeUndefined();
-    });
-
-    it('should handle null date value', () => {
-      component.getForm.description.setValue('Test');
-      component.getForm.professional.setValue(mockProfessional);
-      component.getForm.date.setValue(null);
-      component.getForm.repeat.setValue(FrequencyEnum.none);
-
-      void component.submit;
-
-      // Should not crash, but form validation should catch it
-      expect(component.form.invalid).toBeTrue();
-    });
-  });
-
-  describe('Form Validation', () => {
-    it('should mark form as invalid when description is empty', () => {
-      component.getForm.description.setValue('');
-      expect(component.getForm.description.hasError('required')).toBeTrue();
-    });
-
-    it('should mark form as invalid when professional is empty', () => {
-      component.getForm.professional.setValue('');
-      expect(component.getForm.professional.hasError('required')).toBeTrue();
-    });
-
-    it('should mark form as invalid when date is empty', () => {
-      component.getForm.date.setValue('');
-      expect(component.getForm.date.hasError('required')).toBeTrue();
-    });
-
-    it('should mark form as invalid when repeat is empty', () => {
-      component.getForm.repeat.setValue('');
-      expect(component.getForm.repeat.hasError('required')).toBeTrue();
-    });
-
-    it('should allow valid description values', () => {
-      component.getForm.description.setValue('Valid note description');
-      expect(component.getForm.description.valid).toBeTrue();
-    });
-
-    it('should allow valid date values', () => {
-      component.getForm.date.setValue(new Date('2024-01-15'));
-      expect(component.getForm.date.valid).toBeTrue();
-    });
-
-    it('should allow valid repeat values', () => {
-      component.getForm.repeat.setValue(FrequencyEnum.none);
-      expect(component.getForm.repeat.valid).toBeTrue();
-    });
-  });
-
-  describe('Professional Selection', () => {
-    it('should update professional field with valid user object', () => {
-      component.getForm.professional.setValue(mockProfessional);
-      expect(component.getForm.professional.value).toEqual(mockProfessional);
-    });
-
-    it('should display professional name in autocomplete', () => {
-      const displayName = component.displayFn(mockProfessional as IUser);
-      expect(displayName).toBe('Dr. Smith');
-    });
-
-    it('should handle professional with missing displayName', () => {
-      const professional = { id: 'prof-1', email: 'test@example.com' } as IUser;
-      const displayName = component.displayFn(professional);
-      expect(displayName).toBe('');
-    });
-  });
-
-  describe('Component Properties', () => {
-    it('should have note property', () => {
-      component.note = mockNote;
-      expect(component.note).toEqual(mockNote);
-    });
-
-    it('should have professionals property', () => {
-      component.professionals = [mockProfessional];
-      expect(component.professionals.length).toBe(1);
-    });
-
-    it('should have errors property', () => {
-      expect(component.errors).toBeDefined();
-    });
-
-    it('should have isAddMode property', () => {
-      expect(component.isAddMode).toBeDefined();
-    });
-  });
-
-  it('should dispatch GetAllTreatmentsGroup action when findGroups is called', () => {
-    storeSpy.dispatch.calls.reset();
-
-    component['getProfessionals']();
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllProfessional());
-  });
-
-  it('should filter professionals correctly when filter is called', () => {
-    component.professionals = [
-      { ...mockProfessional, displayName: 'Test Group 1', id: '1' },
-      { ...mockProfessional, displayName: 'Another Group', id: '2' },
-      { ...mockProfessional, displayName: 'Test Group 2', id: '3' },
-    ] as any[];
-
-    const result = component['filter']('test');
-
-    expect(result?.length).toBe(2);
-    expect(result?.[0].displayName).toBe('Test Group 1');
-    expect(result?.[1].displayName).toBe('Test Group 2');
-  });
-
-  it('should return undefined when filter is called with no professionals', () => {
-    component.professionals = undefined;
-
-    const result = component['filter']('test');
-
-    expect(result).toBeUndefined();
-  });
-
-  it('should filter group options based on form input', (done) => {
-    component.professionals = [
-      { ...mockProfessional, displayName: 'Test Group 1', id: '1' },
-      { ...mockProfessional, displayName: 'Another Group', id: '2' },
-      { ...mockProfessional, displayName: 'Test Group 2', id: '3' },
-    ] as any[];
-    component['createForm']();
-
-    let emissionCount = 0;
-    component.filteredOptions?.subscribe(filtered => {
-      emissionCount++;
-      // Skip the first emission (startWith('')) and check the second emission with 'T'
-      if (emissionCount === 2) {
-        expect(filtered).toEqual([
-          { ...mockProfessional, displayName: 'Test Group 1', id: '1' },
-          { ...mockProfessional, displayName: 'Test Group 2', id: '3' },
-        ]);
-        done();
+    noteId$ = new BehaviorSubject(undefined);
+    navigationParams$ = new BehaviorSubject(undefined);
+    selectedNote$ = new BehaviorSubject(undefined);
+    allProfessionals$ = new BehaviorSubject(undefined);
+    subErrors$ = new BehaviorSubject(undefined);
+
+    let pipeCallIndex = 0;
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    storeSpy.pipe.and.callFake(() => {
+      pipeCallIndex++;
+      switch (pipeCallIndex) {
+        case 1:
+          return noteId$.asObservable();
+        case 2:
+          return navigationParams$.asObservable();
+        case 3:
+          return selectedNote$.asObservable();
+        case 4:
+          return allProfessionals$.asObservable();
+        case 5:
+          return subErrors$.asObservable();
+        default:
+          return of(undefined);
       }
     });
 
-    component.getForm.professional.setValue('T');
+    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
+
+    await TestBed.configureTestingModule({
+      imports: [NoteComponent, TranslateModule.forRoot()],
+      providers: [
+        { provide: Store, useValue: storeSpy },
+        { provide: Router, useValue: routerSpy },
+        { provide: MatDialog, useValue: dialogSpy },
+      ],
+    }).compileComponents();
+
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
+
+    fixture = TestBed.createComponent(NoteComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
-  it('should set date from extras when provided', () => {
-    const mockExtras = {
-      professional: mockProfessional,
-      date: new Date(2024, 0, 15),
-    };
-    routerSpy.getCurrentNavigation.and.returnValue({ extras: { state: mockExtras } } as any);
-
-    const newFixture = TestBed.createComponent(NoteComponent);
-    const newComponent = newFixture.componentInstance;
-    newFixture.detectChanges();
-
-    expect(newComponent.getForm.professional.value).toBe(mockProfessional);
-    expect(newComponent.getForm.date.value).toBeDefined();
+  it('should create component', () => {
+    expect(component).toBeTruthy();
   });
 
-  it('should patch form when note is selected from state', () => {
-    component.ngOnInit();
-
-    state$.next({ selected: mockNote });
-
-    expect(component.note?.id).toEqual(mockNote.id);
-    expect(component.getForm.description?.value).toBe(mockNote.description);
-    expect(component.getForm.repeat?.value).toBe(mockNote.repeat);
-    expect(component.getForm.date?.value).toEqual(createNewDateZonedTime(mockNote.date));
+  it('should initialize in add mode when no noteId', () => {
+    noteId$.next(null);
+    expect(component.isAddModeSignal()).toBeTrue();
   });
 
-  it('should dispatch CreateNote action when in add mode and form is valid', () => {
-    component.ngOnInit();
+  it('should patch form when selectedNote emits', () => {
+    selectedNote$.next(mockNote);
+    fixture.detectChanges();
+
+    expect(component.getForm.description.value).toBe(mockNote.description);
+    expect(component.getForm.professional.value).toEqual(mockNote.professional);
+    expect(component.getForm.repeat.value).toBe(FrequencyEnum.none);
+  });
+
+  it('should handle subErrors and set form errors', () => {
+    const error: IError = { field: 'description', message: 'Required' };
+    subErrors$.next([error]);
+    fixture.detectChanges();
+
+    expect(component.errors()['description']).toBe('Required');
+    expect(component.getForm.description.hasError('incorrect')).toBeTrue();
+  });
+
+  it('should submit a new note in add mode', () => {
+    const descriptionControl = component.getForm.description;
+    descriptionControl.setValue('New Test');
+    descriptionControl.markAsDirty();
+
     const professionalControl = component.getForm.professional;
     professionalControl.setValue(mockProfessional);
     professionalControl.markAsDirty();
 
-    const descriptionControl = component.getForm.description;
-    descriptionControl.setValue('New Description');
-    descriptionControl.markAsDirty();
-
+    const date = getNowTimeZone();
     const dateControl = component.getForm.date;
-    dateControl.setValue(new Date());
+    dateControl.setValue(date);
     dateControl.markAsDirty();
 
     const repeatControl = component.getForm.repeat;
-    repeatControl.setValue(FrequencyEnum.everyDay);
+    repeatControl.setValue(FrequencyEnum.none);
     repeatControl.markAsDirty();
 
-    storeSpy.dispatch.calls.reset();
-    expect(component.form.valid).toBeTrue();
+    component.submit();
 
-    void component.submit;
-
-    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
-    expect(dispatchedAction).toEqual(jasmine.objectContaining({
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
       note: jasmine.objectContaining({
-        description: 'New Description',
-        professionalId: 'prof-1',
-        repeat: FrequencyEnum.everyDay,
-        date: backendFormatDate(component.getForm.date.value),
+        description: 'New Test',
+        professionalId: 'p1',
+        repeat: FrequencyEnum.none,
+        date: backendFormatDate(date),
       }),
       type: '[Note] Create note',
     }));
   });
 
-  it('should dispatch UpdateNote action when in edit mode and form is valid', () => {
-    const testId = '123';
-    paramMapSpy.get.and.returnValue(testId);
-    component.note = mockNote;
+  it('should submit updated note in edit mode', () => {
+    const mockProfessional: IUserAll = {
+      id: 'p2',
+      displayName: 'Dr. Jones',
+      email: '',
+      locale: 'en',
+      timeZone: '',
+      authorities: [],
+    };
+    noteId$.next('note1');
+    selectedNote$.next(mockNote);
+    fixture.detectChanges();
 
-    component.ngOnInit();
-    const professionalControl = component.getForm.professional;
-    professionalControl.setValue({ ...mockProfessional, id: 'prof-2' });
-    professionalControl.markAsDirty();
+    const date = addDays(getNowTimeZone(), 5);
 
     const descriptionControl = component.getForm.description;
-    descriptionControl.setValue('Updated Description');
+    descriptionControl.setValue('Updated Test');
     descriptionControl.markAsDirty();
 
+    const professionalControl = component.getForm.professional;
+    professionalControl.setValue(mockProfessional);
+    professionalControl.markAsDirty();
+
     const dateControl = component.getForm.date;
-    dateControl.setValue(new Date());
+    dateControl.setValue(date);
     dateControl.markAsDirty();
 
     const repeatControl = component.getForm.repeat;
     repeatControl.setValue(FrequencyEnum.everyDay);
     repeatControl.markAsDirty();
-    storeSpy.dispatch.calls.reset();
 
-    void component.submit;
+    component.submit();
 
-    const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
-    expect(dispatchedAction).toEqual(jasmine.objectContaining({
-      id: '123',
-      note: jasmine.objectContaining({
-        description: 'Updated Description',
-        professionalId: 'prof-2',
-        repeat: FrequencyEnum.everyDay,
-        date: backendFormatDate(component.getForm.date.value),
-      }),
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
+      note: jasmine.objectContaining(
+        {
+          description: 'Updated Test',
+          professionalId: 'p2',
+          date: backendFormatDate(date),
+          repeat: FrequencyEnum.everyDay,
+        }),
       type: '[Note] Update note by id',
     }));
   });
 
-  it('should call delete method without errors', () => {
-    state$.next({ selected: mockNote });
+  it('should not submit when form invalid', () => {
+    component.getForm.description.setValue('');
+    component.submit();
+    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+  });
 
-    dialogSpy.and.returnValue({
-      afterClosed: () => of(mockNote),
-    });
+  it('should call deleteNote on delete', () => {
+    const mockProfessional: IUserAll = {
+      id: 'p1',
+      displayName: 'Dr. Smith',
+      email: '',
+      locale: 'en',
+      timeZone: '',
+      authorities: [],
+    };
+    const mockNote: INote = {
+      id: 'note1',
+      description: 'desc',
+      professional: mockProfessional,
+      date: '2024-01-01',
+      repeat: FrequencyEnum.none,
+    };
+    spyOn(component, 'noteSignal').and.returnValue(mockNote as any);
 
-    void component.delete;
+    spyOn(component['dialog'], 'open').and.returnValue({ afterClosed: () => of(mockNote) } as any);
 
-    expect(dialogSpy).toHaveBeenCalledWith(
-      jasmine.any(Function),
-      jasmine.objectContaining({
-        data: {
-          title: 'NOTE.DELETED.TITLE',
-          content: 'NOTE.DELETED.CONTENT',
-          value: mockNote,
-        },
-      }));
+    component.delete();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteNote(
-      { id: mockNote.id!, description: mockNote.description! },
-    ));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
+      id: 'note1',
+      description: 'desc',
+    }));
+  });
+
+  it('should display user displayName correctly', () => {
+    const user: IUser = { displayName: 'Test User', id: 'u1' } as any;
+    expect(component.displayFn(user)).toBe('Test User');
+  });
+
+  it('should clear professional field on backspace', () => {
+    const mockProfessional: IUserAll = {
+      id: 'p1',
+      displayName: 'Dr. Smith',
+      email: '',
+      locale: 'en',
+      timeZone: '',
+      authorities: [],
+    };
+    component.getForm.professional.setValue(mockProfessional);
+    component.keyDownHandler({ code: 'Backspace' } as KeyboardEvent);
+    expect(component.getForm.professional.value).toBeUndefined();
+  });
+
+  it('should filter professionals correctly', () => {
+    const profs: IUserAll[] = [
+      { id: 'p1', displayName: 'Alice', email: '', locale: '', timeZone: '', authorities: [] },
+      { id: 'p2', displayName: 'Bob', email: '', locale: '', timeZone: '', authorities: [] },
+    ];
+    const result = component['filter']('A', profs);
+    expect(result?.length).toBe(1);
+    expect(result?.[0].displayName).toBe('Alice');
   });
 });

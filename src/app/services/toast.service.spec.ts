@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { Injector } from '@angular/core';
+import { DestroyableInjector, Injector } from '@angular/core';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { EMPTY, Subject } from 'rxjs';
@@ -10,7 +10,7 @@ import { ToastActionType, ToastType } from '../shared/toast/toast.model';
 describe('ToastService', () => {
   let service: ToastService;
   let overlay: jasmine.SpyObj<Overlay>;
-  let injector: jasmine.SpyObj<Injector>;
+  let injector: jasmine.SpyObj<DestroyableInjector>;
   let overlayRef: jasmine.SpyObj<OverlayRef>;
   let positionStrategy: jasmine.SpyObj<any>;
 
@@ -47,7 +47,7 @@ describe('ToastService', () => {
 
     service = TestBed.inject(ToastService);
     overlay = TestBed.inject(Overlay) as jasmine.SpyObj<Overlay>;
-    injector = TestBed.inject(Injector) as jasmine.SpyObj<Injector>;
+    injector = TestBed.inject(Injector) as jasmine.SpyObj<DestroyableInjector>;
     overlayRef = overlay.create() as jasmine.SpyObj<OverlayRef>;
     positionStrategy = overlay.position() as jasmine.SpyObj<any>;
 
@@ -86,7 +86,7 @@ describe('ToastService', () => {
       const actionType: ToastActionType = 'button';
       const action = 'Retry';
 
-      service.show(message, type, duration, actionType, action);
+      service.show(message, type, duration, { actionType, action });
 
       expect(Injector.create).toHaveBeenCalledWith({
         parent: injector,
@@ -158,52 +158,6 @@ describe('ToastService', () => {
     });
   });
 
-  describe('convenience methods', () => {
-    beforeEach(() => {
-      spyOn(service, 'show').and.returnValue({
-        onAction: () => EMPTY,
-        onDismiss: () => EMPTY,
-      });
-    });
-
-    it('should call show with success type', () => {
-      const message = 'Success message';
-      const duration = 3000;
-      const actionType: ToastActionType = 'button';
-      const action = 'OK';
-
-      service.success(message, duration, actionType, action);
-
-      expect(service.show).toHaveBeenCalledWith(message, 'success', duration, actionType, action);
-    });
-
-    it('should call show with error type', () => {
-      const message = 'Error message';
-
-      service.error(message);
-
-      expect(service.show).toHaveBeenCalledWith(message, 'error', 5000, 'none', undefined);
-    });
-
-    it('should call show with warning type', () => {
-      const message = 'Warning message';
-      const duration = 7000;
-
-      service.warning(message, duration);
-
-      expect(service.show).toHaveBeenCalledWith(message, 'warning', duration, 'none', undefined);
-    });
-
-    it('should call show with info type', () => {
-      const message = 'Info message';
-      const actionType: ToastActionType = 'link';
-
-      service.info(message, 5000, actionType);
-
-      expect(service.show).toHaveBeenCalledWith(message, 'info', 5000, actionType, undefined);
-    });
-  });
-
   describe('dismissSpecific', () => {
     it('should remove overlay ref and dispose when toast exists', () => {
       // Add a toast to the internal array
@@ -250,7 +204,7 @@ describe('ToastService', () => {
       const actionType: ToastActionType = 'button';
       const action = 'Action';
 
-      service.show(message, type, duration, actionType, action);
+      service.show(message, type, duration, { actionType, action });
 
       expect(Injector.create).toHaveBeenCalledWith(jasmine.objectContaining({
         providers: jasmine.arrayContaining([
@@ -276,20 +230,6 @@ describe('ToastService', () => {
   });
 
   describe('edge cases', () => {
-    it('should handle multiple toasts of different types', () => {
-      // Reset the spy call count before this test
-      overlay.create.calls.reset();
-      overlayRef.attach.calls.reset();
-
-      service.success('Success message');
-      service.error('Error message');
-      service.warning('Warning message');
-      service.info('Info message');
-
-      expect(overlay.create).toHaveBeenCalledTimes(4);
-      expect(overlayRef.attach).toHaveBeenCalledTimes(4);
-    });
-
     it('should handle toast dismissal through subject', () => {
       service.show('Test message');
       spyOn(service, 'dismissSpecific');

@@ -1,4 +1,4 @@
-import { IAvailability, IAvailabilityAll, IRoom, IRoomAll } from '../interfaces/room';
+import { IAvailability, IAvailabilityAll, IRoom, IRoomAll, IService } from '../interfaces/room';
 import {
   addDays,
   addMinutes,
@@ -76,7 +76,7 @@ export const reservationDuration = (reservation?: IReservationAll): IDuration =>
   return sumDurations(durations);
 };
 
-export const totalDuration = (treatment: ITreatmentAll, additional?: IAdditionalAll[]) => {
+export const totalDuration = (treatment: ITreatmentAll | IService, additional?: IAdditionalAll[]) => {
   let additionalDuration: IDuration = new Duration();
   if (additional && additional.length) {
     additionalDuration = sumDurations(additional.map(value => convertDuration(value.duration)));
@@ -132,8 +132,11 @@ export const getEndWithDuration = (start: Date, duration?: IDuration): Date => {
   return createNewDate(start, 23, 59, 59, 99);
 };
 
-export const getRoomStartEndDay = (availability: IAvailability, timeZone: string,
-  viewDate: Date = getNowTimeZone()): { min: Date; max: Date } => {
+export const getRoomStartEndDay = (
+  availability: IAvailability,
+  timeZone: string,
+  viewDate: Date = getNowTimeZone(),
+): { min: Date; max: Date } => {
   const availabilityMinMax = getMinAndMax(availability, viewDate, timeZone);
 
   const min: Date = availabilityMinMax.min;
@@ -142,9 +145,16 @@ export const getRoomStartEndDay = (availability: IAvailability, timeZone: string
   return min && max ? formatMinMax(min, max) : { min, max };
 };
 
-export const getStartEndDay = (monday: IAvailability, tuesday: IAvailability, wednesday: IAvailability,
-  thursday: IAvailability, friday: IAvailability, saturday: IAvailability,
-  sunday: IAvailability, timeZone: string): any => {
+export const getStartEndDay = (
+  monday: IAvailability,
+  tuesday: IAvailability,
+  wednesday: IAvailability,
+  thursday: IAvailability,
+  friday: IAvailability,
+  saturday: IAvailability,
+  sunday: IAvailability,
+  timeZone: string,
+): any => {
   const date: Date = getNowTimeZone(timeZone);
   const mondayMinMax = getMinAndMax(monday, date, timeZone);
   const tuesdayMinMax = getMinAndMax(tuesday, date, timeZone);
@@ -226,7 +236,7 @@ export const getDiffTime = (maxDate: Date, minDate: Date): string => {
   const formattedHours = String(hours).padStart(2, '0');
   const formattedMinutes = String(minutes).padStart(2, '0');
 
-  return `${ sign }${ formattedHours }:${ formattedMinutes }`;
+  return `${sign}${formattedHours}:${formattedMinutes}`;
 };
 
 export const getAvailability = (room: IRoom): any => {
@@ -366,9 +376,11 @@ export const formatDateName = (date: Date, locale: string, measure: any): string
   day: 'numeric', month: measure, weekday: measure, year: 'numeric',
 });
 
-export const localeTimeZoneDate = (locale: string, date?: Date | string,
-  timeZone: string = getCurrentTimeZone()): string =>
-  date ? reservationDateTime(newDate(date), locale, timeZone) : '';
+export const localeTimeZoneDate = (
+  locale: string,
+  date?: Date | string,
+  timeZone: string = getCurrentTimeZone(),
+): string => date ? reservationDateTime(newDate(date), locale, timeZone) : '';
 
 export const reservationDateTime = (date: Date, locale: string, timeZone: string = getCurrentTimeZone()): string =>
   date.toLocaleDateString(locale, {
@@ -407,7 +419,7 @@ export const backendFormatDate = (date?: Date): string | undefined => {
   if (date) {
     const month = String(date.getMonth() + 1).padStart(2, '0');  // Months are zero-indexed in JS
     const day = String(date.getDate()).padStart(2, '0');
-    return `${ date?.getFullYear() }-${ month }-${ day }`;
+    return `${date?.getFullYear()}-${month}-${day}`;
   }
   return date;
 };
@@ -415,6 +427,10 @@ export const backendFormatDate = (date?: Date): string | undefined => {
 export const exportFormatDate = (date: Date, locale: string = API_LOCALE, timeZone: string = getCurrentTimeZone()):
   string => date.toLocaleDateString(locale, {
   day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone,
+}).replace(/\//g, '-').replace(',', '');
+
+export const invoiceFormat = (date: Date, locale: string = API_LOCALE): string => date.toLocaleDateString(locale, {
+  year: 'numeric', month: '2-digit',
 }).replace(/\//g, '-').replace(',', '');
 
 export const formatDuration = (duration: string, locale: string = API_LOCALE): string => {
@@ -427,9 +443,9 @@ export const formatTime = (duration: IDuration, timeZone?: string, locale: strin
 
 export const getNowTimeZone = (timeZone: string = getCurrentTimeZone()): Date => newDateTimestamp(new Date(), timeZone);
 
-export const createDateFromString = (stringDate: string): Date => {
+export const createDateFromString = (stringDate: string, timeZone: string = getCurrentTimeZone()): Date => {
   const date = stringDate.split('-');
-  return new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]));
+  return newDateTimestamp(new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2])), timeZone);
 };
 
 export const createDate = (
@@ -452,8 +468,10 @@ export const createFullDate = (selectDate: Date): Date => {
   return date;
 };
 
-export const newDateTimestamp = (date: string | Date | number = new Date(),
-  timeZone: string = getCurrentTimeZone()): Date => {
+export const newDateTimestamp = (
+  date: string | Date | number = new Date(),
+  timeZone: string = getCurrentTimeZone(),
+): Date => {
   if (typeof date === 'string') {
     return toZonedTime(new Date(date), timeZone);
   } else if (date instanceof Date) {
@@ -497,14 +515,14 @@ export const getDateQuarter = (date: Date): number => getQuarter(date);
 
 export const getMonth = (quarter: number, key: number): number => ((quarter - 1) * 3) + key;
 
-export const getTimeNumber = (date: any) => {
+export const getTimeNumber = (date?: Date | string) => {
   if (date) {
     if (date instanceof Date) {
       return convertDuration(getTime(date));
     }
     const time = date.split(':');
     let hour = Number(time[0]);
-    if (isNaN(time[1])) {
+    if (isNaN(Number(time[1]))) {
       const format = time[1].slice(2).trim();
       if (format.toLowerCase() === 'pm' || format.toLowerCase() === 'p.m.') {
         hour += 12;
@@ -517,7 +535,7 @@ export const getTimeNumber = (date: any) => {
   return undefined;
 };
 
-export const dateToTimestamp = (date: Date = getNowTimeZone()): number => parseInt(`${ date.getTime() / 1000 }`, 10);
+export const dateToTimestamp = (date: Date = getNowTimeZone()): number => parseInt(`${date.getTime() / 1000}`, 10);
 
 export const isSameTimeZone = (timeZone: string = getCurrentTimeZone()): boolean => {
   if (getCurrentTimeZone() === timeZone) {
@@ -613,10 +631,10 @@ export const getTimeZoneFromDate = (date: Date, timezone?: string): ITimeZone =>
 
   if (timezone) {
     const gmt = getGMT(timezone, date);
-    return new TimeZone(`${ timezone } (${ gmt })`, timezone, gmt !== currentGMT ? gmt : '');
+    return new TimeZone(`${timezone} (${gmt})`, timezone, gmt !== currentGMT ? gmt : '');
   }
 
-  return new TimeZone(`${ currentTimeZone } (${ currentGMT })`, currentTimeZone);
+  return new TimeZone(`${currentTimeZone} (${currentGMT})`, currentTimeZone);
 };
 
 export const getTimeZone = (timezone?: string): ITimeZone => {
@@ -668,7 +686,7 @@ const timeConvert = (time: number, hour: number = 0) => {
 const getGMT = (timeZone: string, date: Date): string => {
   let gmt = date.toLocaleTimeString('en-US', { timeZone, timeZoneName: 'short' }).split(' ')[2];
   if (gmt.indexOf(':') === -1) {
-    gmt = `${ gmt }:00`;
+    gmt = `${gmt}:00`;
   }
 
   if (gmt.length === 8) {
@@ -721,10 +739,10 @@ export const getDateFormat = (date?: Date | null): string => {
   if (!date) {
     return '';
   }
-  const month = (`0${ (date.getMonth()) + 1 }`).slice(-2);
+  const month = (`0${(date.getMonth()) + 1}`).slice(-2);
   const year = date.getFullYear();
 
-  return `${ month }-${ year }`;
+  return `${month}-${year}`;
 };
 
 export const datesInSameWeek = (date1: Date, date2: Date): boolean => {
@@ -757,4 +775,11 @@ export const searchDates = (allDay: boolean, start: Date, duration: IDuration): 
   }
 
   return [startSearch, endSearch];
+};
+
+export const secondsToHHMM = (sec: number = 0): string => {
+  const hours = Math.floor(sec / 3600);
+  const minutes = Math.floor((sec % 3600) / 60);
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 };

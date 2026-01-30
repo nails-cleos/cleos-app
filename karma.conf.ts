@@ -1,6 +1,3 @@
-// Karma configuration file, see link for more information
-// https://karma-runner.github.io/1.0/config/configuration-file.html
-
 module.exports = (config: any) => {
   config.set({
     basePath: '',
@@ -11,7 +8,7 @@ module.exports = (config: any) => {
       require('karma-jasmine-html-reporter'),
       require('karma-junit-reporter'),
       require('karma-coverage'),
-      require('@angular-devkit/build-angular/plugins/karma'),
+      require('karma-spec-reporter'),
     ],
     client: {
       jasmine: {
@@ -35,19 +32,28 @@ module.exports = (config: any) => {
       ],
       check: {
         global: {
-          statements: 60,
-          branches: 50,
-          functions: 60,
-          lines: 60,
+          statements: 80,
+          branches: 60,
+          functions: 70,
+          lines: 80,
         },
       },
       exclude: [
         '**/src/app/**/*.actions.ts',
         '**/src/app/**/*.reducers.ts',
         '**/src/app/**/*.effects.ts',
+        '**/src/app/**/*.selectors.ts',
       ],
     },
-    reporters: ['progress', 'kjhtml', 'junit'],
+    reporters: ['progress', 'spec', 'kjhtml', 'junit'],
+    specReporter: {
+      maxLogLines: 5,
+      suppressErrorSummary: false,
+      suppressFailed: false,
+      suppressPassed: true,
+      suppressSkipped: true,
+      showSpecTiming: true,
+    },
     junitReporter: {
       outputDir: 'test-results',
       outputFile: 'junit-report.xml',

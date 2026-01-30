@@ -1,7 +1,9 @@
 <div class="flex-container">
   <div class="card-container">
     <div class="card-content">
-      <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+      @let isAddMode = isAddModeSignal();
+      @let note = noteSignal();
+      <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
         <mat-card appearance="outlined">
           @if (isAddMode) {
             <mat-card-header>
@@ -20,13 +22,13 @@
           @if (isAddMode || note) {
             <mat-card-content>
               <div class="inner-container">
-                @if (professionals) {
+                @if (allProfessionalsSignal()) {
                   <mat-form-field appearance="outline">
                     <mat-label>{{ 'NOTE.PROFESSIONAL.FIELD' | translate }}</mat-label>
-                    <input (keydown)="keyDownHandler($event)" formControlName="professional" [matAutocomplete]="auto"
+                    <input (keydown)="keyDownHandler($event)" [formControl]="getForm.professional" [matAutocomplete]="auto"
                            matInput required type="text">
                     <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-                      @for (professional of filteredOptions | async; track professional.id) {
+                      @for (professional of filteredProfessionalSignal(); track professional.id) {
                         <mat-option [value]="professional">{{ professional.displayName }}</mat-option>
                       }
                     </mat-autocomplete>
@@ -34,8 +36,8 @@
                       <mat-error [innerHTML]="'NOTE.PROFESSIONAL.REQUIRED' | translate"></mat-error>
                     } @else if (getForm.professional.hasError('requireMatch')) {
                       <mat-error [innerHTML]="'NOTE.PROFESSIONAL.INVALID' | translate"></mat-error>
-                    } @else if (errors['professional']) {
-                      <mat-error>{{ errors['professional'] }}</mat-error>
+                    } @else if (errors()['professional']) {
+                      <mat-error>{{ errors()['professional'] }}</mat-error>
                     }
                   </mat-form-field>
                 } @else {
@@ -44,13 +46,13 @@
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'NOTE.DESCRIPTION.FIELD' | translate }}</mat-label>
                   <label>
-                    <textarea #message formControlName="description" matInput maxlength="256" required></textarea>
+                    <textarea #message [formControl]="getForm.description" matInput maxlength="256" required></textarea>
                   </label>
                   <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
                   @if (getForm.description.hasError('required')) {
                     <mat-error [innerHTML]="'NOTE.DESCRIPTION.REQUIRED' | translate"></mat-error>
-                  } @else if (errors['description']) {
-                    <mat-error>{{ errors['description'] }}</mat-error>
+                  } @else if (errors()['description']) {
+                    <mat-error>{{ errors()['description'] }}</mat-error>
                   }
                 </mat-form-field>
                 <div class="row-column-space-evenly-center">
@@ -59,17 +61,17 @@
                     <button (click)="picker.open()" mat-icon-button matPrefix type="button">
                       <mat-icon>today</mat-icon>
                     </button>
-                    <input (focus)="picker.open()" formControlName="date" [matDatepicker]="picker" matInput required>
+                    <input (focus)="picker.open()" [formControl]="getForm.date" [matDatepicker]="picker" matInput required>
                     <mat-datepicker #picker touchUi></mat-datepicker>
                     @if (getForm.date.hasError('required')) {
                       <mat-error [innerHTML]="'NOTE.DATE.REQUIRED' | translate"></mat-error>
-                    } @else if (errors['date']) {
-                      <mat-error>{{ errors['date'] }}</mat-error>
+                    } @else if (errors()['date']) {
+                      <mat-error>{{ errors()['date'] }}</mat-error>
                     }
                   </mat-form-field>
                   <mat-form-field appearance="outline">
                     <mat-label>{{ 'NOTE.REPEAT.FIELD' | translate }}</mat-label>
-                    <mat-select formControlName="repeat" required>
+                    <mat-select [formControl]="getForm.repeat" required>
                       @for (t of repeats | keyvalue; track t) {
                         <mat-option [value]="t.value">{{ 'COMMON.REPEAT.' + t.value | translate }}</mat-option>
                       }
@@ -95,7 +97,7 @@
                         type="submit">
                   {{ 'COMMON.BUTTON.UPDATE' | translate }}
                 </button>
-                <button (click)="delete" color="warn" mat-fab extended class="icon-button" type="button">
+                <button (click)="delete()" color="warn" mat-fab extended class="icon-button" type="button">
                   {{ 'COMMON.BUTTON.DELETE' | translate }}
                 </button>
               }

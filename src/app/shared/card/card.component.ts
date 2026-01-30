@@ -1,49 +1,48 @@
-import { Component, Input, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { createChart } from '../../util/chart';
 import { IChart } from '../../interfaces/dashboard';
 import { ICurrency } from '../../interfaces/currency';
-import { Subscription } from 'rxjs';
 import { AuthUserService } from '../../services/auth-user.service';
-import { SharedModule } from '../shared.module';
 import { CardChartComponent } from './card-chart.component';
+import { AppMaterialModule } from '../../util/app-material.module';
 
 @Component({
   selector: 'app-card',
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.scss'],
-  imports: [SharedModule],
+  imports: [AppMaterialModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CardComponent implements OnDestroy {
-  @Input() title: string | undefined;
-  @Input() expand = true;
-  @Input() chart?: IChart;
-  @Input() currency?: ICurrency;
-  @Input() locale?: string;
-  @Input() timeZone?: string;
+export class CardComponent {
+  title = input<string>();
+  chart = input<IChart>();
+  currency = input<ICurrency>();
+  locale = input<string>();
+  timeZone = input<string>();
+  expand = input<boolean>(true);
 
-  private authUserServiceSubscription: Subscription;
-  private isDarkMode: boolean;
+  private readonly dialog: MatDialog = inject(MatDialog);
+  private readonly authUserService: AuthUserService = inject(AuthUserService);
 
-  constructor(public dialog: MatDialog, private authUserService: AuthUserService) {
-    this.isDarkMode = false;
-    this.authUserServiceSubscription =
-      this.authUserService.authUser.subscribe(value => this.isDarkMode = value.isDarkMode);
-  }
+  private authUserSignal = this.authUserService.authUser;
 
-  ngOnDestroy(): void {
-    this.authUserServiceSubscription.unsubscribe();
-  }
+  private isDarkMode = computed(() => this.authUserSignal()?.isDarkMode ?? false);
 
   onClick(): void {
-    if (this.chart) {
-      const chart = createChart(this.chart, this.currency, this.isDarkMode, this.locale, this.timeZone);
+    const chart = this.chart();
+    const title = this.title();
+    const currency = this.currency();
+    const isDarkMode = this.isDarkMode();
+    const locale = this.locale();
+    const timeZone = this.timeZone();
+    if (chart) {
       this.dialog.open(CardChartComponent, {
         height: '85vh',
         width: '70vw',
         data: {
-          chart,
-          title: this.title,
+          chart: createChart(chart, currency, isDarkMode, locale, timeZone),
+          title: title,
         },
       });
     }

@@ -13,4 +13,5 @@ export interface INotification {
 export interface INotificationDTO {
   unread: number;
   page: Pagination<INotification>;
+  workDay: INotification[]
 }

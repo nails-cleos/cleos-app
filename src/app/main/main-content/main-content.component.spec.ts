@@ -1,28 +1,32 @@
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MainContentComponent } from './main-content.component';
-import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { AuthUserService } from '../../services/auth-user.service';
+import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
-import { provideHttpClient, withJsonpSupport } from '@angular/common/http';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Router } from '@angular/router';
-import { MainContentService } from '../main-content.service';
+import { MainContentService } from '../../services/main-content.service';
 import { ToastService } from '../../services/toast.service';
+import { sendMessage } from '../../store/main.actions';
+import { ISendMessage } from '../../../main';
 import { ISocialLink } from '../../interfaces/main';
-import { clean, sendMessage } from '../../store/main.actions';
-import { AppState } from '../../store/app.states';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { BehaviorSubject } from 'rxjs';
+import { provideHttpClient } from '@angular/common/http';
+import { MainState } from '../../store/reducers/main.reducers';
+import { GoogleMapStubComponent } from '../../shared/google-map/google-map-stub.component';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { signal } from '@angular/core';
 
 describe('MainContentComponent', () => {
   let component: MainContentComponent;
   let fixture: ComponentFixture<MainContentComponent>;
 
-  let state$: Subject<any>;
-  let authUser$: Subject<any>;
+  const authUserSignal = signal<IAuthUser>(initialAuthUser);
+  let response$: BehaviorSubject<any>;
+  let error$: BehaviorSubject<any>;
 
-  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let storeSpy: jasmine.SpyObj<Store<MainState>>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let routerSpy: jasmine.SpyObj<Router>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
@@ -32,22 +36,33 @@ describe('MainContentComponent', () => {
   let translateService: TranslateService;
 
   beforeEach(async () => {
-    state$ = new Subject<any>();
-    authUser$ = new Subject<any>();
+    response$ = new BehaviorSubject(undefined);
+    error$ = new BehaviorSubject(undefined);
 
-    storeSpy = jasmine.createSpyObj<Store<AppState>>('Store', ['dispatch', 'select']);
-    routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate']);
-    toastServiceSpy = jasmine.createSpyObj<ToastService>('ToastService', ['show', 'error']);
-    bottomSheetSpy = jasmine.createSpyObj<MatBottomSheet>('MatBottomSheet', ['open']);
-    mainContentServiceSpy = jasmine.createSpyObj<MainContentService>('MainContentService', ['configure']);
+    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
-      authUser: authUser$.asObservable(),
+      authUser: authUserSignal.asReadonly(),
+    });
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
+    bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
+    mainContentServiceSpy = jasmine.createSpyObj('MainContentService', ['configure']);
+
+    let pipeCallIndex = 0;
+    storeSpy.pipe.and.callFake(() => {
+      pipeCallIndex++;
+      switch (pipeCallIndex) {
+        case 1:
+          return response$.asObservable();
+        case 2:
+          return error$.asObservable();
+        default:
+          return new BehaviorSubject(undefined).asObservable();
+      }
     });
 
-    storeSpy.select.and.returnValue(state$);
-
     await TestBed.configureTestingModule({
-      imports: [MainContentComponent, TranslateModule.forRoot()],
+      imports: [MainContentComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
@@ -56,63 +71,54 @@ describe('MainContentComponent', () => {
         { provide: MainContentService, useValue: mainContentServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
         provideNoopAnimations(),
-        provideHttpClient(withJsonpSupport()),
+        provideHttpClient(),
+        provideHttpClientTesting(),
       ],
     }).compileComponents();
 
     translateService = TestBed.inject(TranslateService);
-    translateService.setDefaultLang('en-GB');
     translateService.use('en-GB');
+    translateService.setTranslation('en-GB', {
+      TREATMENTS: [{
+        TITLE: 'Treatment Title',
+        CONTENT: 'Treatment Content',
+      }],
+    });
 
     fixture = TestBed.createComponent(MainContentComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  afterEach(() => {
-    state$.complete();
-    authUser$.complete();
-  });
-
   it('should create', () => {
-    component.ngOnInit();
     expect(component).toBeTruthy();
   });
 
-  it('should initialize form with authenticated user data', () => {
-    authUser$.next({
-      isAuthenticated: true,
-      email: 'user@test.com',
-      displayName: 'John Doe',
-      isDarkMode: false,
-    });
+  it('should populate form with auth user signal', () => {
+    authUserSignal.update(prev => ({ ...prev, email: 'test@example.com', displayName: 'John Doe', isDarkMode: true }));
+    fixture.detectChanges();
 
-    expect(component.form).toBeDefined();
-    expect(component.email.value).toBe('user@test.com');
-    expect(component.name.value).toBe('John Doe');
-  });
-
-  it('should dispatch Clean action on init', () => {
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
+    expect(component.getForm.email.value).toBe('test@example.com');
+    expect(component.getForm.name.value).toBe('John Doe');
+    expect(component.isDarkMode()).toBeTrue();
   });
 
   it('should dispatch SendMessage action when form is valid', () => {
-    const message = {
+    component.form.patchValue({
       name: 'Test User',
       email: 'test@example.com',
       subject: 'Test Subject',
       body: 'Test Body',
-    };
-    component.form.patchValue(message);
-    expect(component.form.valid).toBeTrue();
+    });
 
     component.sendEmail();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(sendMessage({ sendMessage: component.form.value }));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(
+      sendMessage({ sendMessage: component.form.value as ISendMessage }),
+    );
   });
 
   it('should not dispatch SendMessage action when form is invalid', () => {
-    storeSpy.dispatch.calls.reset();
     component.form.patchValue({
       name: '',
       email: 'invalid-email',
@@ -122,39 +128,42 @@ describe('MainContentComponent', () => {
 
     component.sendEmail();
 
-    const sendMessageCalls = storeSpy.dispatch.calls.all().filter(
-      (call: any) => call.args[0] instanceof sendMessage,
-    );
-    expect(sendMessageCalls.length).toBe(0);
+    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(jasmine.objectContaining({ type: '[Main] Send Message' }));
+  });
+
+  it('should update currentIndex signal when moveForwardSlide is called', () => {
+    component.slides = [
+      { id: '1', image: 'img1.jpg', order: 0 },
+      { id: '2', image: 'img2.jpg', order: 1 },
+    ];
+
+    expect(component.currentIndex()).toBe(1); // constructor do the initial moveBackwardSlide
+
+    component['moveForwardSlide']();
+    expect(component.currentIndex()).toBe(0);
+
+    component['moveForwardSlide']();
+    expect(component.currentIndex()).toBe(1);
   });
 
   it('should check if current slide index matches', () => {
-    component.currentIndex = 1;
-
+    component.currentIndex.set(1);
     expect(component.isCurrentSlideIndex(1)).toBeTrue();
     expect(component.isCurrentSlideIndex(0)).toBeFalse();
   });
 
   it('should navigate to biab treatment', () => {
     component.goToTreatment('biab');
-
-    expect(routerSpy.navigate).toHaveBeenCalledWith([translateService.currentLang, 'biab', 'treatment']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([translateService.getCurrentLang(), 'home', 'biab', 'treatment']);
   });
 
-  it('should not navigate when treatment name is not biab', () => {
+  it('should not navigate for other treatments', () => {
     component.goToTreatment('other');
-
     expect(routerSpy.navigate).not.toHaveBeenCalled();
   });
 
   it('should update social icon on hover', () => {
-    const social: ISocialLink = {
-      name: 'WHATSAPP',
-      delay: '1000ms',
-      href: 'https://api.whatsapp.com/send',
-      svgIcon: 'WHATSAPP-NO-COLOR',
-    };
-
+    const social: ISocialLink = { name: 'WHATSAPP', delay: '0ms', href: '', svgIcon: 'WHATSAPP-NO-COLOR' };
     component.onHover(social, true);
     expect(social.svgIcon).toBe('WHATSAPP');
 
@@ -162,99 +171,24 @@ describe('MainContentComponent', () => {
     expect(social.svgIcon).toBe('WHATSAPP-NO-COLOR');
   });
 
-  it('should filter works by treatment group', fakeAsync(() => {
+  it('should update works signal when filterBy is called', () => {
     const group = { id: '1', name: 'Group 1', order: 1 };
     component.allWorks = [
-      { title: '1', image: 'img1.jpg', group: { id: '1', name: 'Group 1', order: 1 } },
-      { title: '2', image: 'img2.jpg', group: { id: '2', name: 'Group 2', order: 2 } },
-      { title: '3', image: 'img3.jpg', group: { id: '1', name: 'Group 1', order: 1 } },
+      { title: 'Work1', image: '', group },
+      { title: 'Work2', image: '', group: { id: '2', name: 'Group 2', order: 2 } },
     ];
 
     component.filterBy(group);
-    tick(500);
-
-    expect(component.works.length).toBe(2);
-    expect(component.works[0].group.id).toBe('1');
-    expect(component.works[1].group.id).toBe('1');
-  }));
-
-  it('should show all works when filter is cleared', fakeAsync(() => {
-    component.allWorks = [
-      { title: '1', image: 'img1.jpg', group: { id: '1', name: 'Group 1', order: 1 } },
-      { title: '2', image: 'img2.jpg', group: { id: '2', name: 'Group 2', order: 2 } },
-    ];
+    expect(component.filter()).toBe(group);
 
     component.filterBy(undefined);
-    tick(500);
-
-    expect(component.works.length).toBe(2);
-  }));
-
-  it('should move to next slide in slider', () => {
-    component.currentIndex = 0;
-    component.slides = [
-      { id: '1', image: 'img1.jpg', order: 0 },
-      { id: '2', image: 'img2.jpg', order: 1 },
-      { id: '3', image: 'img3.jpg', order: 2 },
-    ];
-
-    component['moveForwardSlide']();
-    expect(component.currentIndex).toBe(1);
-
-    component['moveForwardSlide']();
-    expect(component.currentIndex).toBe(2);
-
-    component['moveForwardSlide']();
-    expect(component.currentIndex).toBe(0); // Loop back to start
+    expect(component.filter()).toBeUndefined();
   });
 
-  it('should display error toast when error message is received', () => {
-    state$.next({ errorMessage: 'Error occurred' });
+  it('should precompute treatment animations when groups are set', () => {
+    fixture.detectChanges();
 
-    expect(toastServiceSpy.error).toHaveBeenCalledWith('Error occurred');
-  });
-
-  it('should display success toast when response is received', () => {
-    state$.next({
-      response: { message: 'Success', toastType: 'success' },
-    });
-
-    expect(toastServiceSpy.show).toHaveBeenCalledWith('Success', 'success');
-  });
-
-  it('should unsubscribe on destroy', () => {
-    spyOn(component['subscription'] as any, 'unsubscribe');
-
-    component.ngOnDestroy();
-
-    expect(component['subscription']?.unsubscribe).toHaveBeenCalled();
-  });
-
-  it('should set dark mode based on auth user', () => {
-    authUser$.next({
-      isAuthenticated: false,
-      email: 'test@test.com',
-      displayName: 'Test',
-      isDarkMode: true,
-    });
-
-    expect(component.isDark).toBeTrue();
-
-    authUser$.next({
-      isAuthenticated: false,
-      email: 'test@test.com',
-      displayName: 'Test',
-      isDarkMode: false,
-    });
-
-    expect(component.isDark).toBeFalse();
-  });
-
-  it('should generate correct treatment animation delay', () => {
-    const animation1 = component.setTreatmentAnimation(0);
-    const animation2 = component.setTreatmentAnimation(1);
-
-    expect(animation1).toBeDefined();
-    expect(animation2).toBeDefined();
+    expect(component.treatmentAnimations()).toBeDefined();
+    expect(component.treatmentAnimations().length).toBe(1);
   });
 });

@@ -47,6 +47,7 @@ export interface IExpenseInfo {
   timeZone: string;
   currency: ICurrencyAll;
   types: any[];
+  supplyStores?: ISupplyStore[];
 }
 
 export interface ISupplyStore {

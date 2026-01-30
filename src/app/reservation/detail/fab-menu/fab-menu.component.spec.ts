@@ -77,11 +77,9 @@ describe('FabMenuComponent', () => {
       component.menuOpen = true;
 
       const event = new MouseEvent('click', { bubbles: true });
-      const nativeElement = mockElementRef.nativeElement;
 
-      (component as any).elementRef = mockElementRef;
-
-      spyOn(nativeElement, 'contains').and.returnValue(true);
+      // Spy on nativeElement.contains
+      spyOn(component['elementRef'].nativeElement, 'contains').and.returnValue(true);
 
       component.clickOutsideMenu(event);
 

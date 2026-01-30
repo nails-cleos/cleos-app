@@ -1,33 +1,39 @@
-import { Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { IPrice } from '../../../interfaces/treatment';
 import { ICurrencyAll } from '../../../interfaces/currency';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PENALTY } from '../../../interfaces/payment';
-import { PriceComponent } from '../../price/price.component';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AppMaterialModule } from '../../../util/app-material.module';
+
+type CustomerEditData = {
+  price: IPrice;
+  currency: ICurrencyAll;
+  small: boolean;
+};
 
 @Component({
   selector: 'app-customer-edit-reservation-dialog',
   templateUrl: './customer-edit-dialog.component.html',
   styleUrls: ['./customer-edit-dialog.component.scss'],
-  imports: [PriceComponent, AppMaterialModule, TranslatePipe],
+  imports: [AppMaterialModule, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomerEditDialogComponent {
-  price: IPrice;
-  currency: ICurrencyAll;
+  private readonly data = inject<CustomerEditData>(MAT_DIALOG_DATA);
+  private readonly dialogRef: MatDialogRef<CustomerEditDialogComponent> = inject(
+    MatDialogRef<CustomerEditDialogComponent>);
+
+  price: IPrice = this.data.price;
+  currency: ICurrencyAll = this.data.currency;
   penalty = PENALTY;
+  small: boolean = this.data.small;
 
-  constructor(public dialogRef: MatDialogRef<CustomerEditDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
-    this.price = data.price;
-    this.currency = data.currency;
+  onNoClick() {
+    this.dialogRef.close();
   }
 
-  onNoClick(): void {
-    return this.dialogRef.close();
-  }
-
-  doAction(): void {
-    return this.dialogRef.close(true);
+  doAction() {
+    this.dialogRef.close(true);
   }
 }

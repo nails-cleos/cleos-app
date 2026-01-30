@@ -1,11 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IRoom, IRoomCustomer, IRoomInfo, IRoomService, IServicePrice } from '../interfaces/room';
+import { IRoom, IRoomAll, IRoomCustomer, IRoomInfo, IRoomService, IServicePrice } from '../interfaces/room';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
 import { SortDirection } from '@angular/material/sort';
-import { Pagination } from '../interfaces/pagination';
+import { paginated, Pagination } from '../interfaces/pagination';
 import { IApiResponse } from '../interfaces/common';
 
 @Injectable()
@@ -23,15 +23,15 @@ export class RoomService {
     size: number,
   ): Observable<Pagination<IRoom>> => this.http.get<Pagination<IRoom>>(
     toUrl(this.urlV1, 'pages'),
-    { params: createFilter(page, size, sort, direction) },
+    { ...paginated(), params: createFilter(page, size, sort, direction) },
   );
 
-  getAllRooms = (customerId?: string): Observable<IRoom[]> => {
+  getAllRooms = (customerId?: string): Observable<IRoomAll[]> => {
     let params;
     if (customerId) {
       params = new HttpParams().set('customerId', customerId);
     }
-    return this.http.get<IRoom[]>(this.urlV1, { params });
+    return this.http.get<IRoomAll[]>(this.urlV1, { params });
   };
 
   getServices = (

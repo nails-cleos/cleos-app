@@ -4,13 +4,14 @@ import { ColorListComponent } from './list/color-list.component';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ColorRoutingModule } from './color-routing.module';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
-import { EffectsModule } from '@ngrx/effects';
+import { provideEffects } from '@ngrx/effects';
 import { ColorEffects } from '../store/effects/color.effects';
 import { ColorService } from '../services/color.service';
-import { Store } from '@ngrx/store';
-import { AppState, selectI18nState } from '../store/app.states';
-import { Observable } from 'rxjs';
-
+import { provideState, Store } from '@ngrx/store';
+import { COLOR_FEATURE_KEY, colorReducer } from '../store/reducers/color.reducers';
+import { ColorNavigationEffects } from './color-navigation.effects';
+import { I18NState } from '../store/reducers/i18n.reducers';
+import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
 
 @NgModule({
   imports: [
@@ -29,18 +30,17 @@ import { Observable } from 'rxjs';
       isolate: false,
       extend: true,
     }),
-    EffectsModule.forFeature([ColorEffects]),
   ],
   providers: [
     ColorService,
+    provideState(COLOR_FEATURE_KEY, colorReducer),
+    provideEffects(ColorEffects, ColorNavigationEffects),
   ],
 })
 export class ColorModule {
-  constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
-    const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe((state) => {
-      translateService.currentLang = '';
-      this.translateService.use(state.language);
+  constructor(private readonly store: Store<I18NState>, protected translateService: TranslateService) {
+    this.store.pipe(getI18NLanguagePipe).subscribe((language) => {
+      this.translateService.use(language);
     });
   }
 }

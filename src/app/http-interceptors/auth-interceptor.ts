@@ -8,10 +8,13 @@ export const authInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn):
   const tokenService = inject(TokenService);
 
   if (!isExternalUrl(req.url) && !req.url.includes('login')) {
-    if (tokenService.token) {
+    const token = tokenService.token();
+    const driveToken= tokenService.driveToken();
+    if (token) {
       req = req.clone({
         setHeaders: {
-          'X-Authorization-Firebase': tokenService.token,
+          'X-Authorization-Firebase': token,
+          'X-Google-Drive-Token': driveToken ?? '',
         },
       });
       return next(req);

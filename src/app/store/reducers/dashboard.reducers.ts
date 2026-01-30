@@ -1,5 +1,5 @@
 import {
-  clean,
+  cleanDashboard,
   dashFailure,
   dashSuccess,
   eventSuccess,
@@ -13,6 +13,10 @@ import {
   monthlySummarySuccess,
   quarterSummarySuccess,
   saveMonthlySummarySuccess,
+  setDashNavigationParams,
+  setMonthlyNavigationParams,
+  setQuarterNavigationParams,
+  setYearNavigationParams,
   updateMonthlySummary,
   yearExportSuccess,
   yearSummarySuccess,
@@ -38,9 +42,11 @@ import { getMonth } from '../../util/dates';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
 
-export interface State {
+export const DASHBOARD_FEATURE_KEY = 'dashboard';
+
+export interface DashboardState {
   response?: IResponseSuccess;
-  data: Map<string, IDashboard>;
+  data: Record<string, IDashboard>;
   dashboard?: IRoomEvents;
   monthlySummaryMap?: Map<ISummaryRoom,
     {
@@ -51,63 +57,95 @@ export interface State {
   yearSummaryMap?: Map<ISummaryRoom, { quarterSummaries: IQuarterSummary[] }>;
   quarterSummaryMap?: Map<ISummaryRoom, { monthSummaries: IMonthSummary[] }>;
   yearExport?: Map<ISummaryRoom, { monthlyExport: IMonthlyExport[]; }>;
-  errorMessage?: string;
+  monthlyNavigationParams?: { step?: number, date: Date | string };
+  quarterNavigationParams?: { year?: number, quarter?: number };
+  yearNavigationParams?: { year?: number };
+  dashNavigationParams?: { date?: Date, activeDayIsOpen: boolean };
   error?: IError;
   subErrors?: IError[];
   isLoading: boolean;
 }
 
-const initialState: State = {
-  data: new Map<string, IDashboard>(),
+const initialState: DashboardState = {
+  response: undefined,
+  data: {},
   dashboard: undefined,
   monthlySummaryMap: undefined,
   yearSummaryMap: undefined,
   quarterSummaryMap: undefined,
   yearExport: undefined,
-  errorMessage: undefined,
+  monthlyNavigationParams: undefined,
+  quarterNavigationParams: undefined,
+  yearNavigationParams: undefined,
+  dashNavigationParams: undefined,
   error: undefined,
   subErrors: undefined,
-  response: undefined,
   isLoading: false,
 };
 
-const getMap = (a: Map<string, IDashboard>, b: IDashboard): Map<string, IDashboard> => {
-  const res = new Map(a);
+const mergeDashboard = (
+  record: Record<string, IDashboard>,
+  dashboards: IDashboard[],
+): Record<string, IDashboard> => {
 
-  Object.keys(b).forEach(key => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    const data = b[key];
+  const result = { ...record };
+
+  dashboards.forEach(data => {
     const dashKey = data.roomName || data.professionalName;
-
-    if (dashKey) {
-      const values = res.get(dashKey) || {};
-      res.set(dashKey, { ...values, ...data });
+    if (!dashKey) {
+      return;
     }
+
+    // Filter out null/undefined values to avoid overwriting existing data
+    const filteredData = Object.entries(data).reduce((acc, [key, value]) => {
+      if (value !== null && value !== undefined) {
+        acc[key as keyof IDashboard] = value;
+      }
+      return acc;
+    }, {} as IDashboard);
+
+    result[dashKey] = {
+      ...(result[dashKey] ?? {}),
+      ...filteredData,
+    };
   });
 
-  return res;
+  return result;
 };
 
-const cleanEventMap = (data: Map<string, IDashboard>): Map<string, IDashboard> => {
-  data.forEach((value, key) => {
-    value.calendarSummary = undefined;
-    data.set(key, value);
+
+const cleanEventMap = (
+  data: Record<string, IDashboard> = {},
+): Record<string, IDashboard> => {
+  const result: Record<string, IDashboard> = { ...data };
+
+  Object.keys(result).forEach(key => {
+    result[key] = {
+      ...result[key],
+      calendarSummary: undefined,
+    };
   });
 
-  return data;
+  return result;
 };
 
-const cleanCardMap = (data: Map<string, IDashboard>): Map<string, IDashboard> => {
-  data.forEach((value, key) => {
-    value.chartSummaries = undefined;
-    value.miniCardSummaries = undefined;
-    value.thisMonthTotal = undefined;
-    data.set(key, value);
+const cleanCardMap = (
+  data: Record<string, IDashboard> = {},
+): Record<string, IDashboard> => {
+  const result: Record<string, IDashboard> = { ...data };
+
+  Object.keys(result).forEach(key => {
+    result[key] = {
+      ...result[key],
+      chartSummaries: undefined,
+      miniCardSummaries: undefined,
+      thisMonthTotal: undefined,
+    };
   });
 
-  return data;
+  return result;
 };
+
 
 const monthSummaryMap = (summaries: IMonthlyRoomSummary[]) => summaries.reduce((map, summary) => {
   map.set({
@@ -210,7 +248,7 @@ export const dashboardReducer = createReducer(
   on(getEvents, (state) => ({
     ...state,
     data: cleanEventMap(state.data),
-    errorMessage: undefined,
+    isLoading: true,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -220,7 +258,6 @@ export const dashboardReducer = createReducer(
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     dashboard: { availability: {} },
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -228,15 +265,14 @@ export const dashboardReducer = createReducer(
   on(getCards, (state) => ({
     ...state,
     data: cleanCardMap(state.data),
-    errorMessage: undefined,
+    isLoading: true,
     error: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(dashSuccess, (state, { data }) => ({
     ...state,
-    data: getMap(state.data, data),
-    errorMessage: undefined,
+    data: mergeDashboard(state.data, data),
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -245,7 +281,6 @@ export const dashboardReducer = createReducer(
   on(eventSuccess, (state, { data }) => ({
     ...state,
     dashboard: data,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -253,16 +288,14 @@ export const dashboardReducer = createReducer(
   })),
   on(dashFailure, (state, { error }) => ({
     ...state,
-    errorMessage: error?.message,
     error: error,
-    subErrors: error?.subErrors,
+    subErrors: error.subErrors,
     response: undefined,
     isLoading: false,
   })),
   on(getMonthlySummary, (state) => ({
     ...state,
     monthlySummaryMap: undefined,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -270,7 +303,6 @@ export const dashboardReducer = createReducer(
   on(monthlySummarySuccess, (state, { monthlySummary }) => ({
     ...state,
     monthlySummaryMap: monthSummaryMap(monthlySummary),
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -278,23 +310,36 @@ export const dashboardReducer = createReducer(
   on(updateMonthlySummary, (state) => ({
     ...state,
     monthlySummaryMap: undefined,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(saveMonthlySummarySuccess, (state, action) => ({
     ...state,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: action,
+  })),
+  on(setMonthlyNavigationParams, (state, { step, date }) => ({
+    ...state,
+    monthlyNavigationParams: { step, date },
+  })),
+  on(setQuarterNavigationParams, (state, { year, quarter }) => ({
+    ...state,
+    quarterNavigationParams: { year, quarter },
+  })),
+  on(setYearNavigationParams, (state, { year }) => ({
+    ...state,
+    yearNavigationParams: { year },
+  })),
+  on(setDashNavigationParams, (state, { date, activeDayIsOpen }) => ({
+    ...state,
+    dashNavigationParams: { date, activeDayIsOpen },
   })),
   on(getYearSummary, (state) => ({
     ...state,
     yearSummaryMap: undefined,
     yearExport: undefined,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -302,7 +347,6 @@ export const dashboardReducer = createReducer(
   on(yearSummarySuccess, (state, { yearSummary }) => ({
     ...state,
     yearSummaryMap: yearSummaryMap(yearSummary),
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -310,7 +354,6 @@ export const dashboardReducer = createReducer(
   on(exportYearSummary, (state) => ({
     ...state,
     yearExport: undefined,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -318,7 +361,6 @@ export const dashboardReducer = createReducer(
   on(yearExportSuccess, (state, { yearExport }) => ({
     ...state,
     yearExport: yearExportMap(yearExport),
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -326,7 +368,6 @@ export const dashboardReducer = createReducer(
   on(getQuarterSummary, (state) => ({
     ...state,
     quarterSummaryMap: undefined,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -334,10 +375,9 @@ export const dashboardReducer = createReducer(
   on(quarterSummarySuccess, (state, { quarterSummary }) => ({
     ...state,
     quarterSummaryMap: quarterSummaryMap(quarterSummary),
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
   })),
-  on(clean, () => initialState),
+  on(cleanDashboard, () => initialState),
 );

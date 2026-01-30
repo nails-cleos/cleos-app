@@ -4,7 +4,7 @@ import {
   additionalSaveSuccess,
   additionalSelected,
   additionalSuccess,
-  clean,
+  cleanAdditional,
   createAdditional,
   deleteAdditional,
   findGroupsSuccess,
@@ -12,33 +12,37 @@ import {
   getAdditionalList,
   getAdditionalPage,
   getAllTreatmentsGroup,
+  setCurrentAdditionalId,
+  sortAdditional,
   updateAdditional,
 } from '../additional.actions';
 import { IAdditional, IAdditionalAll } from '../../interfaces/additional';
-import { ITreatmentGroup } from '../../interfaces/treatment';
+import { ITreatmentGroupAll } from '../../interfaces/treatment';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
 
-export interface State {
+export const ADDITIONAL_FEATURE_KEY = 'additional';
+
+export interface AdditionalState {
   response?: IResponseSuccess;
   data?: Pagination<IAdditional> | IAdditionalAll[];
-  groups?: ITreatmentGroup[];
-  errorMessage?: string;
+  groups?: ITreatmentGroupAll[];
   error?: IError;
   subErrors?: IError[];
   selected?: IAdditional;
   isLoading: boolean;
+  currentAdditionalId?: string;
 }
 
-export const initialState: State = {
+export const initialState: AdditionalState = {
   response: undefined,
   data: undefined,
   groups: undefined,
-  errorMessage: undefined,
   error: undefined,
   subErrors: undefined,
   selected: undefined,
   isLoading: false,
+  currentAdditionalId: undefined,
 };
 
 export const additionalReducer = createReducer(
@@ -46,7 +50,6 @@ export const additionalReducer = createReducer(
   on(getAdditionalPage, (state) => ({
     ...state,
     data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IAdditional>,
-    errorMessage: undefined,
     subErrors: undefined,
     selected: undefined,
   })),
@@ -54,13 +57,11 @@ export const additionalReducer = createReducer(
   on(getAdditionalList, (state) => ({
     ...state,
     data: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
 
   on(getAdditional, (state) => ({
     ...state,
-    errorMessage: undefined,
     subErrors: undefined,
     selected: {} as IAdditional,
   })),
@@ -68,15 +69,14 @@ export const additionalReducer = createReducer(
   on(additionalSuccess, (state, { data }) => ({
     ...state,
     data: data,
-    errorMessage: undefined,
     subErrors: undefined,
+    isLoading: false,
   })),
 
   on(additionalSaveSuccess, (state, action) => ({
     ...state,
     response: action,
     selected: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     isLoading: false,
   })),
@@ -84,13 +84,12 @@ export const additionalReducer = createReducer(
   on(additionalSelected, (state, { selected }) => ({
     ...state,
     selected: selected,
-    errorMessage: undefined,
     subErrors: undefined,
+    isLoading: false,
   })),
 
   on(additionalFailure, (state, { error }) => ({
     ...state,
-    errorMessage: error.message,
     error: error,
     subErrors: error.subErrors,
     isLoading: false,
@@ -98,24 +97,34 @@ export const additionalReducer = createReducer(
 
   on(updateAdditional, createAdditional, deleteAdditional, (state) => ({
     ...state,
-    errorMessage: undefined,
     subErrors: undefined,
     isLoading: true,
+    data: undefined,
   })),
 
   on(getAllTreatmentsGroup, (state) => ({
     ...state,
     groups: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
   })),
 
   on(findGroupsSuccess, (state, { groups }) => ({
     ...state,
-    groups: groups,
-    errorMessage: undefined,
+    groups,
     subErrors: undefined,
   })),
 
-  on(clean, () => initialState),
+  on(sortAdditional, (state) => ({
+    ...state,
+    subErrors: undefined,
+    isLoading: true,
+    data: undefined,
+  })),
+
+  on(setCurrentAdditionalId, (state, { additionalId }) => ({
+    ...state,
+    currentAdditionalId: additionalId,
+  })),
+
+  on(cleanAdditional, () => initialState),
 );

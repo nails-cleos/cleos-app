@@ -4,7 +4,7 @@ import { INotification } from '../interfaces/notification';
 import { HttpClient } from '@angular/common/http';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
-import { Pagination } from '../interfaces/pagination';
+import { paginated, Pagination } from '../interfaces/pagination';
 import { SortDirection } from '@angular/material/sort';
 
 @Injectable()
@@ -21,7 +21,7 @@ export class NotificationService {
     direction: SortDirection,
     size: number,
   ): Observable<Pagination<INotification>> => this.http.get<Pagination<INotification>>(toUrl(this.urlV1, 'pages'),
-    { params: createFilter(page, size, sort, direction) },
+    { ...paginated(), params: createFilter(page, size, sort, direction) },
   );
 
   readNotification = (

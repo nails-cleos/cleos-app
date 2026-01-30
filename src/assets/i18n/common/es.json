@@ -18,6 +18,7 @@
       "CANCEL": "Cancelar",
       "BOOK": "Reservar",
       "VIEW": "Ver",
+      "DOWNLOAD": "Descargar",
       "REVIEW": "Opinar",
       "EDIT": "Editar",
       "DELETE": "Eliminar",
@@ -216,7 +217,10 @@
     "LABEL": {
       "FILTER": "Filtrar",
       "PRICE": "Precio",
-      "TOTAL": "Total"
+      "TOTAL": "Total",
+      "MONTHLY": {
+        "DATE": "Mes y año"
+      }
     },
     "SEARCH": {
       "TITLE": "Búsqueda"
@@ -382,6 +386,14 @@
     "INSTALL": {
       "IOS": "Para instalar esta aplicación web en su dispositivo. Abra en Safari, toque el botón Menú y luego el botón 'Agregar a la pantalla de inicio'",
       "ANDROID": "Añadir a la pantalla principal"
+    },
+    "FILE": {
+      "DRAG_DROP": "Arrastrar y soltar el archivo aquí",
+      "OR": "o",
+      "CHOOSE": "Elegí un archivo",
+      "DELETE": {
+        "MESSAGE": "Imagen {{name}} eliminada"
+      }
     }
   },
   "REVIEW": {

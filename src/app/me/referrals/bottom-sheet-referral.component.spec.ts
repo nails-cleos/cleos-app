@@ -1,5 +1,5 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { BottomSheetReferralComponent } from './bottom-sheet-referral.component';
+import { BottomSheetReferralComponent, BottomSheetReferralData } from './bottom-sheet-referral.component';
 import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -7,7 +7,7 @@ describe('BottomSheetReferralComponent', () => {
   let component: BottomSheetReferralComponent;
   let fixture: ComponentFixture<BottomSheetReferralComponent>;
 
-  const mockData = {
+  const mockData: BottomSheetReferralData = {
     referralMax: 10,
     referrals: 3,
     referralsUsed: 5,
@@ -30,13 +30,13 @@ describe('BottomSheetReferralComponent', () => {
   });
 
   it('should initialize referralMax from data', () => {
-    expect(component.referralMax).toBe(mockData.referralMax);
+    expect(component.referralMax).toBe(mockData.referralMax!);
   });
 
   it('should gradually increase referrals and referralsUsed up to their limits', fakeAsync(() => {
     const data = { referralMax: 10, referrals: 3, referralsUsed: 5 };
 
-    (component as any).delay(data, 0, Math.max(data.referrals, data.referralsUsed));
+    component['delay'](data, 0, Math.max(data.referrals, data.referralsUsed));
 
     for (let i = 1; i <= data.referralsUsed; i++) {
       tick(500);
@@ -52,7 +52,7 @@ describe('BottomSheetReferralComponent', () => {
     const delaySpy = spyOn(component as any, 'delay').and.callThrough();
 
     const data = { referralMax: 10, referrals: 3, referralsUsed: 5 };
-    (component as any).delay(data, 0, Math.max(data.referrals, data.referralsUsed));
+    component['delay'](data, 0, Math.max(data.referrals, data.referralsUsed));
 
     tick(5000);
 

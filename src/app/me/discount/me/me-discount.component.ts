@@ -1,129 +1,120 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../../interfaces/pagination';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
-import { Observable, Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { AppState, selectDiscountState } from '../../../store/app.states';
-import { clean, getMyDiscountsPage } from '../../../store/discount.actions';
-import { Router } from '@angular/router';
+import { cleanDiscount, getMyDiscountsPage } from '../../../store/discount.actions';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Analytics, logEvent } from '@angular/fire/analytics';
 import { SharedModule } from '../../../shared/shared.module';
 import { currencySymbol } from '../../../util/helper';
+import { getMyDiscountPaginationPipe, getDiscountResponsePipe } from '../../../store/selectors/discount.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
+import { DiscountState } from '../../../store/reducers/discount.reducers';
 
 @Component({
   selector: 'app-me-discount',
   templateUrl: './me-discount.component.html',
   styleUrls: ['./me-discount.component.scss'],
   imports: [SharedModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MeDiscountComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+export class MeDiscountComponent {
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly store: Store<DiscountState> = inject(Store<DiscountState>);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly router: Router = inject(Router);
+  private readonly analytic: Analytics = inject(Analytics);
+
+  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private discountList$ = this.store.pipe(getMyDiscountPaginationPipe);
+  private response$ = this.store.pipe(getDiscountResponsePipe);
+
+  private paginator = viewChild(MatPaginator);
+  private sort = viewChild(MatSort);
+
+  private discountListSignal = toSignal(this.discountList$);
+  private responseSignal = toSignal(this.response$);
+  private breakpointsSignal = toSignal(
+    this.breakpointObserver$, {
+      initialValue: {
+        matches: false,
+        breakpoints: {
+          [Breakpoints.XSmall]: false,
+          [Breakpoints.Small]: false,
+        },
+      },
+    },
+  );
+
+  private sortActive = computed(() => this.sort()?.active ?? 'discountCustomer.name');
+  private sortDirection = computed(() => this.sort()?.direction ?? 'asc');
+
+  paginatorPageIndex = signal(0);
+  dataSourceSignal = computed(() => this.discountListSignal()?.content?.map((ud: IUserDiscount) => {
+    if (ud && ud.discountCustomer) {
+      let symbol;
+      switch (ud.discountCustomer.type) {
+        case DiscountType.money:
+          symbol = currencySymbol(ud.discountCustomer.discount?.currency);
+          break;
+        case DiscountType.percentage:
+          symbol = '%';
+          break;
+      }
+      return Object.assign({}, ud, { symbol });
+    }
+    return ud;
+  }));
+  resultsLengthSignal = computed(() => this.discountListSignal()?.totalElements || 0);
+  pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
   displayedColumns: string[] = ['position', 'discountCustomer.name', 'discountCustomer.amount', 'used', 'actions'];
-  dataSource: any = new MatTableDataSource<Pagination<IUserDiscount>>();
 
-  resultsLength = DEFAULT_LENGTH;
-  pageSize = PAGE_SIZE;
+  private readonly language: string = this.translate.getCurrentLang();
 
-  private subscription?: Subscription;
-  private paginatorSubscription?: Subscription;
-  private getState: Observable<any>;
-  private readonly language: string;
-
-  constructor(private translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private router: Router, private cdRef: ChangeDetectorRef, private analytic: Analytics,
-              breakpointObserver: BreakpointObserver) {
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small,
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.pageSize = MOBILE_PAGE_SIZE;
-      }
-    });
-    this.getState = this.store.select(selectDiscountState);
+  constructor() {
     logEvent(this.analytic, 'screen_view', {
       // eslint-disable-next-line camelcase
       firebase_screen: 'Referral page',
       // eslint-disable-next-line camelcase
       firebase_screen_class: 'ReferralsComponent',
     });
-    this.language = this.translate.currentLang;
-  }
+    effect((onCleanup) => {
+      const paginator = this.paginator();
+      if (paginator) {
+        const sub = paginator.page.subscribe((pageEvent) => {
+          this.paginatorPageIndex.set(pageEvent.pageIndex);
+        });
+        onCleanup(() => sub.unsubscribe());
+      }
+    });
 
-  ngAfterViewInit(): void {
-    this.getDiscounts();
-  }
+    effect(() => {
+      const page = this.paginatorPageIndex();
+      this.store.dispatch(
+        getMyDiscountsPage({
+          page: page,
+          sort: this.sortActive(),
+          direction: this.sortDirection(),
+          size: this.pageSizeSignal(),
+        }),
+      );
+    });
 
-  ngOnInit(): void {
-    this.clean();
-    this.subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.paginatorSubscription?.unsubscribe();
+    effect(() => {
+      if (this.responseSignal()) {
+        this.store.dispatch(cleanDiscount());
+        this.paginator()?.firstPage();
+      }
+    });
   }
 
   useDiscount = (discount: IUserDiscount): void => {
-    const data = { discount };
+    const data = { discountId: discount.id };
     this.router.navigate([this.language, 'me', 'reservation'], { state: data });
-  };
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private createPageSubscriptions = (): void => {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getDiscounts();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getDiscounts(this.paginator.pageIndex));
-
-    this.cdRef.detectChanges();
-  };
-
-  private getDiscounts = (page: number = 0): void => this.store.dispatch(
-    getMyDiscountsPage(
-      {
-        page: page,
-        sort: this.sort.active,
-        direction: this.sort.direction,
-        size: this.pageSize,
-      }),
-  );
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.response) {
-        this.clean();
-        this.getDiscounts();
-      }
-      this.dataSource = state.data?.content?.map((ud: IUserDiscount) => {
-        if (ud && ud.discountCustomer) {
-          let symbol;
-          switch (ud.discountCustomer.type) {
-            case DiscountType.money:
-              symbol = currencySymbol(ud.discountCustomer.discount?.currency);
-              break;
-            case DiscountType.percentage:
-              symbol = '%';
-              break;
-          }
-          return Object.assign({}, ud, { symbol });
-        }
-        return ud;
-      });
-      this.resultsLength = state.data?.totalElements;
-      if (!this.paginatorSubscription && this.resultsLength) {
-        this.createPageSubscriptions();
-      }
-    });
   };
 }

@@ -1,8 +1,8 @@
-import { IMenu, IUser } from './user';
+import { IMenu, IUserAll } from './user';
 
 export interface Token {
   tokenAccess: string;
-  user: IUser;
+  user: IUserAll;
   menus: IMenu[];
 }
 

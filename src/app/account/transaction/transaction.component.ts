@@ -1,85 +1,165 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { createTransaction, getAccount, paymentOptions } from '../../store/account.actions';
-import { FormBuilder, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { AppState, selectAccountState } from '../../store/app.states';
 import { AuthUserService } from '../../services/auth-user.service';
-import { Observable, Subscription } from 'rxjs';
-import { IAccountAll, ITransaction } from '../../interfaces/account';
-import { getPayNlOptions, IPaymentOption, PaymentOption, PaymentType } from '../../interfaces/payment';
+import { ITransaction } from '../../interfaces/account';
+import { getPayNlOptions, IPaymentOption, PaymentType } from '../../interfaces/payment';
 import { currencySymbol } from '../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../../shared/shared.module';
 import { BalanceComponent } from '../balance/balance.component';
 import { BackButtonDirective } from '../../directives/back-button.directive';
-import { BankComponent } from '../../shared/bank/bank.component';
+import { BankComponent, BankForm } from '../../shared/bank/bank.component';
+import { IError } from '../../interfaces/common';
+import { toSignal } from '@angular/core/rxjs-interop';
+import {
+  getAccountResponsePipe,
+  getCurrentAccountIdPipe,
+  getSelectedAccountPipe,
+  getSelectPaymentOptionsPipe,
+  getSubErrorsPipe,
+} from '../../store/selectors/account.selectors';
+import { AccountState } from '../../store/reducers/account.reducers';
+
+export type TransactionForm = {
+  amount: FormControl<number>;
+  transfer: FormControl<string | undefined>;
+  bankForm: FormGroup<BankForm>;
+};
 
 @Component({
   selector: 'app-transaction',
   templateUrl: './transaction.component.html',
   styleUrls: ['./transaction.component.scss'],
   imports: [SharedModule, BalanceComponent, BackButtonDirective, BankComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TransactionComponent implements OnInit, OnDestroy {
-  form!: UntypedFormGroup;
-  hasAdminRole: boolean;
-  account?: IAccountAll;
+export class TransactionComponent {
+  private readonly store: Store<AccountState> = inject(Store<AccountState>);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly authUserService: AuthUserService = inject(AuthUserService);
+  private readonly router: Router = inject(Router);
+  private readonly translate: TranslateService = inject(TranslateService);
 
-  types: string[] = [PaymentType.cash, PaymentType.transfer];
-  options?: IPaymentOption[];
-  amountMin: number;
-  language: string;
+  private accountId$ = this.store.pipe(getCurrentAccountIdPipe);
+  private selectedAccount$ = this.store.pipe(getSelectedAccountPipe);
+  private paymentOptions$ = this.store.pipe(getSelectPaymentOptionsPipe);
+  private subErrors$ = this.store.pipe(getSubErrorsPipe);
+  private response$ = this.store.pipe(getAccountResponsePipe);
 
-  errors: any = [];
+  private accountIdSignal = toSignal(this.accountId$, { initialValue: null });
+  private selectedAccountSignal = toSignal(this.selectedAccount$);
+  private paymentOptionsSignal = toSignal(this.paymentOptions$);
+  private subErrorsSignal = toSignal(this.subErrors$);
+  private responseSignal = toSignal(this.response$);
+  private authUserSignal = this.authUserService.authUser;
+  private accountId = computed(() => this.accountIdSignal());
 
-  private subscription?: Subscription;
-  private authUserServiceSubscription: Subscription;
-  private getState: Observable<any>;
-  private accountId?: string;
+  errors = signal<Record<string, unknown>>({});
+  accountSignal = computed(() => this.selectedAccountSignal());
+  optionsSignal = computed(() =>
+    this.paymentOptionsSignal() ? getPayNlOptions(this.paymentOptionsSignal()!) : undefined);
+  hasAdminRole = computed(() => this.authUserSignal().hasAdminRole);
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
-              private authUserService: AuthUserService, private router: Router, private translate: TranslateService) {
-    this.getState = this.store.select(selectAccountState);
-    this.hasAdminRole = false;
-    this.amountMin = 100;
-    this.language = this.translate.currentLang;
-    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
-      this.hasAdminRole = value.hasAdminRole;
-      if (!value.hasAdminRole) {
-        // TODO if payment option change this must to be changed
-        this.getOptions();
+  types = [{ type: PaymentType.cash }, { type: PaymentType.transfer }] as IPaymentOption[];
+  amountMin: number = 100;
+  language: string = this.translate.getCurrentLang();
+
+  bankForm = this.formBuilder.group<BankForm>({
+    bank: this.formBuilder.control(undefined),
+    percentage: this.formBuilder.control(undefined),
+    type: this.formBuilder.control(undefined, {
+      validators: [Validators.required],
+    }),
+  });
+
+  form: FormGroup<TransactionForm> = this.formBuilder.group<TransactionForm>({
+    amount: this.formBuilder.control(0, {
+      validators: [Validators.required, Validators.min(this.amountMin)],
+    }),
+    transfer: this.formBuilder.control(undefined),
+    bankForm: this.bankForm,
+  });
+
+  transfer = PaymentType.transfer;
+
+  constructor() {
+    effect(() => {
+      if (!this.hasAdminRole()) {
+        this.store.dispatch(paymentOptions());
+      }
+    });
+    effect(() => {
+      const subErrors = this.subErrorsSignal();
+      if (subErrors) {
+        const errorMap: Record<string, unknown> = {};
+        subErrors.forEach((error: IError) => {
+          const field = error.field as keyof TransactionForm | undefined;
+
+          if (field && field in this.form.controls) {
+            errorMap[field] = error.message;
+            this.form.controls[field].setErrors({ incorrect: true });
+          }
+          const bankField = error.field as keyof BankForm | undefined;
+
+          if (bankField && bankField in this.bankForm.controls) {
+            errorMap[bankField] = error.message;
+            this.bankForm.controls[bankField].setErrors({ incorrect: true });
+          }
+        });
+        this.errors.set(errorMap);
+      }
+    });
+
+    effect(() => {
+      if (this.responseSignal()) {
+        if (this.hasAdminRole()) {
+          this.router.navigate([this.language, 'users', this.accountSignal()?.customer?.id, 'overview']);
+        } else {
+          this.router.navigate([this.language, 'me', 'overview']);
+        }
+      }
+    });
+
+    effect(() => {
+      const id = this.accountId();
+      if (id) {
+        this.store.dispatch(getAccount({ id }));
       }
     });
   }
 
-  get getForm(): ɵTypedOrUntyped<any, any, any> {
+  get getForm() {
     return this.form.controls;
   }
 
-  get currencyIcon(): string {
-    return currencySymbol(this.account?.currency);
+  get getBankForm() {
+    return this.getForm.bankForm.controls;
   }
 
-  get submit(): void {
+  get currencyIcon(): string {
+    return currencySymbol(this.accountSignal()?.currency);
+  }
+
+  submit(): void {
     if (this.form.invalid) {
       return;
     }
 
-    const option = this.getForm.type?.value;
-    const customerId = this.account?.customer?.id;
+    const option = this.getBankForm.type?.value;
+    const customerId = this.accountSignal()?.customer?.id;
     const amount = this.getForm.amount.value;
     let type;
     let paymentOptionId;
     let bic;
-    if (option instanceof PaymentOption) {
+    if (option) {
       type = option.type;
       paymentOptionId = option.bic;
-      if (option.subTypes.length) {
-        bic = this.getForm.bank?.value?.bic;
+      if (option.subTypes?.length) {
+        bic = this.getBankForm.bank?.value?.bic;
       }
-    } else {
-      type = option;
     }
     const transfer = this.getForm.transfer.value;
     const transaction: ITransaction = {
@@ -87,65 +167,8 @@ export class TransactionComponent implements OnInit, OnDestroy {
       amount,
       paymentRequest: { type, paymentOptionId, transfer, bic },
     };
-    const id = this.accountId!;
+    const id = this.accountIdSignal()!;
     this.store.dispatch(createTransaction({ id, transaction }));
     return;
   }
-
-  ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    this.createForm();
-    this.subscribe();
-    if (id) {
-      this.accountId = id;
-      this.getAccount();
-    }
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.authUserServiceSubscription.unsubscribe();
-  }
-
-  private createForm = (): void => {
-    this.form = this.formBuilder.group({
-      amount: ['', [Validators.required, Validators.min(this.amountMin)]],
-      type: ['', Validators.required],
-      transfer: [''],
-      bank: [''],
-    });
-  };
-
-  private getAccount = (): void => {
-    if (!this.account) {
-      this.store.dispatch(
-        getAccount({ id: this.accountId! }),
-      );
-    }
-  };
-
-  private getOptions = (): void => this.store.dispatch(paymentOptions());
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.selected) {
-        this.account = state.selected;
-      }
-      if (state.paymentOptions) {
-        this.options = getPayNlOptions(state.paymentOptions);
-      }
-      if (state.subErrors) {
-        state.subErrors.forEach((value: any) => {
-          this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({ incorrect: true });
-        });
-      } else if (state.response) {
-        if (this.hasAdminRole) {
-          this.router.navigate([this.language, 'users', this.account?.customer?.id, 'overview']);
-        } else {
-          this.router.navigate([this.language, 'me', 'overview']);
-        }
-      }
-    });
-  };
 }

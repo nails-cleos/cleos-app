@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { EnvService } from './env.service';
 
 declare let google: any;
 
@@ -16,15 +16,15 @@ export enum MapStatus {
   providedIn: 'root',
 })
 export class GeocodeService {
-
+  private readonly env: EnvService = inject(EnvService);
   private http: HttpClient = inject(HttpClient);
 
   createMap = (): Observable<MapStatus> => {
-    const showMap = environment.showMap;
+    const showMap = this.env.showMap;
     if (showMap) {
       const mapUrl = 'https://maps.googleapis.com/maps/api/js';
       return this.http.jsonp(
-        `${ mapUrl }?libraries=geometry,places&key=${ environment.googleMapKey }&sensor=false`, 'callback')
+        `${ mapUrl }?libraries=geometry,places&key=${ this.env.googleMapKey }&sensor=false`, 'callback')
         .pipe(map(() => MapStatus.ready),
           catchError((e) => {
             console.error(e);

@@ -3,20 +3,19 @@ import { EMPTY, Observable } from 'rxjs';
 
 import { MessagingService } from './messaging.service';
 import { Store } from '@ngrx/store';
-import { AppState } from '../store/app.states';
 import { Messaging } from '@angular/fire/messaging';
 import { Auth } from '@angular/fire/auth';
 import { Database } from '@angular/fire/database';
 import { AppCheck } from '@angular/fire/app-check';
 import { subscribeNotification } from '../store/notification.actions';
+import { AppCheckStub, DatabaseStub } from '../util/firebase-stub';
+import { NotificationState } from '../store/reducers/notification.reducers';
 
 describe('MessagingService', () => {
   let service: MessagingService;
-  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let storeSpy: jasmine.SpyObj<Store<NotificationState>>;
   let messagingSpy: jasmine.SpyObj<Messaging>;
   let authSpy: any;
-  let databaseSpy: jasmine.SpyObj<Database>;
-  let appCheckSpy: jasmine.SpyObj<AppCheck>;
 
   const mockUser = {
     id: 'user-123',
@@ -29,8 +28,6 @@ describe('MessagingService', () => {
     authSpy = {
       currentUser: null,
     };
-    databaseSpy = {} as jasmine.SpyObj<Database>;
-    appCheckSpy = {} as jasmine.SpyObj<AppCheck>;
 
     TestBed.configureTestingModule({
       providers: [
@@ -38,8 +35,8 @@ describe('MessagingService', () => {
         { provide: Store, useValue: storeSpy },
         { provide: Messaging, useValue: messagingSpy },
         { provide: Auth, useValue: authSpy },
-        { provide: Database, useValue: databaseSpy },
-        { provide: AppCheck, useValue: appCheckSpy },
+        { provide: Database, useValue: DatabaseStub },
+        { provide: AppCheck, useClass: AppCheckStub },
       ],
     });
     service = TestBed.inject(MessagingService);

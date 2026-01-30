@@ -3,13 +3,15 @@ import { InvoiceRoutingModule } from './invoice-routing.module';
 import { InvoiceComponent } from './invoice.component';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
-import { EffectsModule } from '@ngrx/effects';
+import { provideEffects } from '@ngrx/effects';
 import { InvoiceEffects } from '../store/effects/invoice.effects';
 import { InvoiceService } from '../services/invoice.service';
 import { OfficeService } from '../services/office.service';
-import { Store } from '@ngrx/store';
-import { AppState, selectI18nState } from '../store/app.states';
-import { Observable } from 'rxjs';
+import { provideState, Store } from '@ngrx/store';
+import { InvoiceNavigationEffects } from './invoice-navigation.effects';
+import { INVOICE_FEATURE_KEY, invoiceReducer } from '../store/reducers/invoice.reducers';
+import { I18NState } from '../store/reducers/i18n.reducers';
+import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
 
 @NgModule({
   imports: [
@@ -27,19 +29,18 @@ import { Observable } from 'rxjs';
       isolate: false,
       extend: true,
     }),
-    EffectsModule.forFeature([InvoiceEffects]),
   ],
   providers: [
     InvoiceService,
     OfficeService,
+    provideState(INVOICE_FEATURE_KEY, invoiceReducer),
+    provideEffects(InvoiceEffects, InvoiceNavigationEffects),
   ],
 })
 export class InvoiceModule {
-  constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
-    const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe((state) => {
-      translateService.currentLang = '';
-      this.translateService.use(state.language);
+  constructor(private readonly store: Store<I18NState>, protected translateService: TranslateService) {
+    this.store.pipe(getI18NLanguagePipe).subscribe((language) => {
+      this.translateService.use(language);
     });
   }
 }

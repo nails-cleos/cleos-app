@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { IError, PageRequest, IResponseSuccess } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
 import { IRoom, IRoomCustomer, IRoomInfo, IRoomService, IServicePrice } from '../interfaces/room';
 
@@ -20,6 +20,7 @@ enum RoomActionTypes {
   deleteRoom = '[Room] Delete room by id',
   getAllCustomersInfo = '[Room] Get all customers info',
   customerInfoSuccess = '[Room] Customer info Success',
+  setCurrentRoomId = '[Room] set current room id',
   clean = '[Room] Clean',
 }
 
@@ -62,7 +63,7 @@ export const updateServices = createAction(
 
 export const roomSaveSuccess = createAction(
   RoomActionTypes.roomSaveSuccess,
-  props<ResponseSuccess>(),
+  props<IResponseSuccess>(),
 );
 
 export const roomFailure = createAction(
@@ -100,4 +101,9 @@ export const customerInfoSuccess = createAction(
   props<{ customers: IRoomCustomer[] }>(),
 );
 
-export const clean = createAction(RoomActionTypes.clean);
+export const setCurrentRoomId = createAction(
+  RoomActionTypes.setCurrentRoomId,
+  props<{ roomId: string }>(),
+);
+
+export const cleanRoom = createAction(RoomActionTypes.clean);

@@ -12,6 +12,7 @@ import {
   createOffice,
   deleteOffice,
   getAllManager,
+  getAllMyOffices,
   getOffice,
   getOfficesPage,
   managerSuccess,
@@ -21,10 +22,9 @@ import {
   officeSuccess,
   updateOffice,
 } from '../office.actions';
-import { IOffice } from '../../interfaces/office';
-import { IUser } from '../../interfaces/user';
-import { IApiResponse, success } from '../../interfaces/common';
-import { ToastType } from '../../shared/toast/toast.model';
+import { IOffice, IOfficeAll } from '../../interfaces/office';
+import { IUserAll } from '../../interfaces/user';
+import { IApiResponse, successResponse } from '../../interfaces/common';
 
 @Injectable()
 export class OfficeEffects {
@@ -47,7 +47,16 @@ export class OfficeEffects {
     ofType(getAllManager),
     switchMap(() =>
       this.userService.getManagers().pipe(
-        map((managers: IUser[]) => managerSuccess(managers ? { managers } : { managers: [] })),
+        map((managers: IUserAll[]) => managerSuccess(managers ? { managers } : { managers: [] })),
+        catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
+      )),
+  ));
+
+  findMyOffices$ = createEffect(() => this.actions.pipe(
+    ofType(getAllMyOffices),
+    switchMap(() =>
+      this.officeService.getAllMyOffices().pipe(
+        map((data: IOfficeAll[]) => officeSuccess(data ? { data } : { data: [] })),
         catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
       )),
   ));
@@ -65,7 +74,11 @@ export class OfficeEffects {
     ofType(createOffice),
     switchMap(({ office }) =>
       this.officeService.createOffice(office).pipe(
-        switchMap((response: IApiResponse) => this.requestSuccess('OFFICE.CREATED', response.name, response.id)),
+        switchMap((response: IApiResponse) => {
+          const message = this.translate.instant('OFFICE.CREATED', { name: response.name });
+          const path = `offices/${response.id}`;
+          return successResponse(officeSaveSuccess, message, path, 'offices');
+        }),
         catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
       )),
   ));
@@ -74,8 +87,11 @@ export class OfficeEffects {
     ofType(updateOffice),
     switchMap(({ id, office }) =>
       this.officeService.updateOffice(id, office).pipe(
-        switchMap((response: IApiResponse) =>
-          this.requestSuccess('OFFICE.UPDATED.MESSAGE', response.name, response.id)),
+        switchMap((response: IApiResponse) => {
+          const message = this.translate.instant('OFFICE.UPDATED.MESSAGE', { name: response.name });
+          const path = `offices/${response.id}`;
+          return successResponse(officeSaveSuccess, message, path, 'offices');
+        }),
         catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
       )),
   ));
@@ -84,7 +100,10 @@ export class OfficeEffects {
     ofType(deleteOffice),
     switchMap(({ id, name }) =>
       this.officeService.deleteOffice(id).pipe(
-        switchMap(() => this.requestSuccess('OFFICE.DELETED.MESSAGE', name, undefined, 'warning')),
+        switchMap(() => {
+          const message = this.translate.instant('OFFICE.DELETED.MESSAGE', { name });
+          return successResponse(officeSaveSuccess, message, undefined, 'offices', false, 'warning');
+        }),
         catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
       )),
   ));
@@ -92,7 +111,7 @@ export class OfficeEffects {
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(officeSelected),
     tap(({ selected }) => this.router
-      .navigate([this.translate.currentLang, 'offices', selected?.id])),
+      .navigate([this.translate.getCurrentLang(), 'offices', selected?.id])),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions.pipe(
@@ -102,10 +121,4 @@ export class OfficeEffects {
   saveSuccess$ = createEffect(() => this.actions.pipe(
     ofType(officeSaveSuccess),
   ), { dispatch: false });
-
-  private requestSuccess(key: string, name?: string, id?: string, toastType?: ToastType) {
-    const message = this.translate.instant(key, { name });
-    const path = id ? `offices/${ id }` : undefined;
-    return success(officeSaveSuccess, message, path, undefined, toastType);
-  }
 }

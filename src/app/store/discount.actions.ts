@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { IError, PageRequest, IResponseSuccess } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
 import { IDiscount, IReferral, IUserDiscount } from '../interfaces/discount';
 import { ICurrency } from '../interfaces/currency';
@@ -21,6 +21,7 @@ enum DiscountActionTypes {
   getDiscount = '[Discount] Find discount by id',
   getUserDiscountByCustomerId = '[Discount] Find user discount by customer id',
   deleteDiscount = '[Discount] Delete discount by id',
+  setCurrentDiscountId = '[Discount] Set current discount id',
   clean = '[Discount] Clean'
 }
 
@@ -75,7 +76,7 @@ export const updateDiscount = createAction(
 
 export const discountSaveSuccess = createAction(
   DiscountActionTypes.discountSaveSuccess,
-  props<ResponseSuccess>(),
+  props<IResponseSuccess>(),
 );
 
 export const discountFailure = createAction(
@@ -103,6 +104,11 @@ export const deleteDiscount = createAction(
   props<{ id: string; name: string }>(),
 );
 
-export const clean = createAction(
+export const setCurrentDiscountId = createAction(
+  DiscountActionTypes.setCurrentDiscountId,
+  props<{ discountId: string }>(),
+);
+
+export const cleanDiscount = createAction(
   DiscountActionTypes.clean,
 );

@@ -1,15 +1,13 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AppState, selectPaymentState, selectReservationState } from '../../store/app.states';
-import { Observable, pairwise, Subscription } from 'rxjs';
 import {
   approveReservation,
   cancelReservation,
-  clean,
   customerCancelReservation,
   getReservation,
   getReservationHistory,
   paymentCompleteReservation,
+  paymentOptions,
   reservationFindPayments,
   startReservation,
   updateReservationColor,
@@ -17,8 +15,8 @@ import {
   updateReservationDiscount,
   updateReservationNote,
 } from '../../store/reservation.actions';
-import { CancelOption, IFabMenu, IReservationAll, States } from '../../interfaces/reservation';
-import { ActivatedRoute, Router } from '@angular/router';
+import { CancelOption, IFabMenu, IReservationAll, IUpcomingAll, States } from '../../interfaces/reservation';
+import { Router } from '@angular/router';
 import {
   createNewDate,
   Duration,
@@ -35,7 +33,6 @@ import {
   newDateTimestamp,
   reservationDuration,
 } from '../../util/dates';
-import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
@@ -66,9 +63,9 @@ import {
 import { detailExpandAnimation, transitionAnimation } from '../../util/animation';
 import { isToday, isTomorrow } from 'date-fns';
 import { ReservationIconName } from '../../util/icon';
-import { FormArray, UntypedFormBuilder } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
 import { startWith } from 'rxjs/operators';
-import { adjustPayments, notifyPayment, paymentOptions, paymentSend } from '../../store/payment.actions';
+import { adjustPayments, notifyPayment, paymentSend } from '../../store/payment.actions';
 import { ChangeCustomerDialogComponent } from './change-customer-dialog.component';
 import { ChangeColorDialogComponent } from './change-color-dialog.component';
 import { AddNoteDialogComponent } from './add-note-dialog.component';
@@ -85,6 +82,27 @@ import { TwoDigitsDirective } from '../../directives/two-digits.directive';
 import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { FabMenuComponent } from './fab-menu/fab-menu.component';
+import { ReservationState } from '../../store/reducers/reservation.reducers';
+import { PaymentState } from '../../store/reducers/payment.reducers';
+import { toSignal } from '@angular/core/rxjs-interop';
+import {
+  getCurrentReservationIdPipe,
+  getDetailNavigationParamsPipe,
+  getHistoriesPipe,
+  getPaymentOptionsPipe,
+  getPaymentsPipe,
+  getSelectedReservationPipe,
+} from '../../store/selectors/reservation.selectors';
+import { MatTableDataSource } from '@angular/material/table';
+
+type PaymentForm = {
+  amount: FormControl<string>;
+  type: FormControl<PaymentType>;
+}
+
+type DetailForm = {
+  payments: FormArray<FormGroup<PaymentForm>>;
+}
 
 @Component({
   selector: 'app-reservation-detail',
@@ -93,135 +111,361 @@ import { FabMenuComponent } from './fab-menu/fab-menu.component';
   styleUrls: ['./reservation-detail.component.scss'],
   imports: [SharedModule, RoomNamePipe, ReservationIconPipe, PriceExtrasComponent, PricePreviewComponent,
     TwoDigitsDirective, TimeDetailPipe, BackButtonDirective, FabMenuComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ReservationDetailComponent implements OnInit, OnDestroy {
-  @ViewChild(MatPaginator) paginator?: MatPaginator;
+export class ReservationDetailComponent {
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly dialog: MatDialog = inject(MatDialog);
+  private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
+  private readonly router: Router = inject(Router);
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly authUserService: AuthUserService = inject(AuthUserService);
 
-  reservation?: IReservationAll;
-  history?: IReservationAll[];
+  private paginator = viewChild(MatPaginator);
+
+  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private reservationId$ = this.store.pipe(getCurrentReservationIdPipe);
+  private navigationParams$ = this.store.pipe(getDetailNavigationParamsPipe);
+  private reservationSelected$ = this.store.pipe(getSelectedReservationPipe);
+  private payments$ = this.store.pipe(getPaymentsPipe);
+  private histories$ = this.store.pipe(getHistoriesPipe);
+  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
+
+  private authUserSignal = this.authUserService.authUser;
+  private reservationIdSignal = toSignal(this.reservationId$);
+  private navigationParams = toSignal(this.navigationParams$);
+  private paymentOptionsSignal = toSignal(this.paymentOptions$);
+  private breakpointsSignal = toSignal(
+    this.breakpointObserver$, {
+      initialValue: {
+        matches: false,
+        breakpoints: {
+          [Breakpoints.XSmall]: false,
+          [Breakpoints.Small]: false,
+        },
+      },
+    },
+  );
+
+  historiesSignal = toSignal(this.histories$);
+  paymentsSignal = toSignal(this.payments$);
+
+  paginatorPageIndex = signal(0);
+
+  reservation = toSignal(this.reservationSelected$);
   duration: IDuration = new Duration();
   start: Date = getNowTimeZone();
   end: Date = getNowTimeZone();
-  state?: string;
-  dateFormat: string;
+  state = signal<string | undefined>(undefined);
+  dateFormat: string = this.translate.getCurrentLang();
   changeState: IFabMenu[] = [];
 
   displayedColumns: string[] = ['position', 'professional', 'start', 'treatment', 'state'];
-  dataSource: any;
+  dataSource = computed(() => new MatTableDataSource(this.historiesSignal()));
+
   expanded?: IReservationAll;
   pageSize = 5;
 
-  price: IPrice;
-  options?: IPaymentOption[];
+  price: IPrice = new Price();
+  options = signal<IPaymentOption[] | undefined>(undefined);
 
   showFireworks = false;
 
-  paymentPaid: any;
+  paymentPaid = signal<IPaymentAll[]>([]);
   paymentDisplayedColumns: string[] = ['position', 'description', 'status', 'type', 'amount'];
   paymentExpanded?: IPayment;
 
   allPaymentTypes: string[] = [PaymentType.cash, PaymentType.transfer];
-  professionalId?: string;
 
-  form = this.formBuilder.group({
-    payments: this.formBuilder.array([]),
+  professionalId = computed(() => this.authUserSignal()?.professionalId);
+
+  form: FormGroup<DetailForm> = this.formBuilder.group<DetailForm>({
+    payments: this.formBuilder.array<FormGroup<PaymentForm>>([]),
   });
 
-  disableUpdateButton = true;
-  customerId?: string;
+  readonly paymentsValue = toSignal(this.payments.valueChanges.pipe(startWith(this.payments.getRawValue())));
+  readonly disableUpdateButton = computed(() => {
+    const paymentsValue = this.paymentsValue();
+    if (paymentsValue?.length) {
+      return areEquals(paymentsValue, this.paymentPaid().map(p => ({
+        amount: (p.transactionAmount || 0).toFixed(2),
+        type: p.type,
+      })));
+    }
+    return true;
+  });
+
+  customerId = computed(() => this.authUserSignal()?.customerId);
   isReservationAdmin?: boolean;
-  isCustomer?: boolean;
-  step?: number;
-  language: string;
+  isCustomer = signal(false);
+  step = computed(() => this.navigationParams()?.step);
+  language: string = this.translate.getCurrentLang();
 
   private static stateMachineDefinition: any;
   private machine: any;
-  private getState: Observable<any>;
-  private getPaymentState: Observable<any>;
-  private subscription?: Subscription;
-  private authUserServiceSubscription: Subscription;
-  private paymentSubscription?: Subscription;
-  private small = false;
-  private reservationId?: string;
-  private hasRoomAdmin?: boolean;
+  small = computed(() => this.breakpointsSignal()?.matches);
+  private hasRoomAdmin = computed(() => {
+    const auth = this.authUserSignal();
+    return (auth?.isAdmin || auth?.isManager || auth?.isRoomAdmin) ?? false;
+  });
 
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private route: ActivatedRoute,
-    private store: Store<AppState>, private router: Router, breakpointObserver: BreakpointObserver,
-    private formBuilder: UntypedFormBuilder, private authUserService: AuthUserService) {
-    this.getState = this.store.select(selectReservationState);
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small,
-    ]).subscribe(result => this.small = result.matches);
-    this.language = this.translate.currentLang;
-    this.dateFormat = this.translate.currentLang;
-    this.price = new Price();
-    this.step = this.router.getCurrentNavigation()?.extras.state?.step;
-    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
-      this.professionalId = value.professionalId;
-      this.customerId = value.customerId;
-      this.hasRoomAdmin = value.isAdmin || value.isManager || value.isRoomAdmin;
+  constructor() {
+    this.payments.clear();
+    effect((onCleanup) => {
+      const paginator = this.paginator();
+      if (paginator) {
+        const sub = paginator.page.subscribe((pageEvent) => {
+          this.paginatorPageIndex.set(pageEvent.pageIndex);
+        });
+        onCleanup(() => sub.unsubscribe());
+      }
     });
-    this.getPaymentState = this.store.select(selectPaymentState);
+
+    effect(() => {
+      const dataSource = this.dataSource();
+      const paginator = this.paginator();
+      if (dataSource && paginator) {
+        dataSource.paginator = paginator;
+      }
+    });
+
+    effect(() => {
+      const id = this.reservationIdSignal();
+      if (id) {
+        this.store.dispatch(getReservation({ id }));
+        this.store.dispatch(reservationFindPayments({ id }));
+        this.store.dispatch(getReservationHistory({ id }));
+      }
+    });
+
+    effect(() => {
+      const reservation = this.reservation();
+      if (reservation) {
+        const isCustomer = this.customerId() === reservation.customer.id;
+        this.duration = reservationDuration(reservation);
+        this.start = newDateTimestamp(reservation.timestamp);
+        this.end = createNewDate(this.start, this.start.getHours() + this.duration.hour,
+          this.start.getMinutes() + this.duration.minute);
+        this.state.set(reservation.state);
+        const professionalId = this.professionalId();
+        const isProfessionalAdmin = professionalId &&
+          isProfessional(professionalId, reservation?.room?.professionals);
+        this.isReservationAdmin = isProfessionalAdmin || this.hasRoomAdmin();
+        this.price = getPrice(reservation, this.paymentPaid());
+        if (isProfessionalAdmin) {
+          this.professionalMachine(this);
+          this.changeState = this.machine.next(snakeToCamel(reservation.state));
+        } else if (isCustomer) {
+          const types = reservation.room.paymentTypes.filter(
+            (p: PaymentType) => ![PaymentType.cash, PaymentType.transfer]
+              .includes(p));
+          if (types?.includes(PaymentType.paynl)) {
+            this.getOptions();
+          } else {
+            this.options.set(getPaymentOptions(this.translate, types));
+          }
+          this.customerMachine(this);
+          this.changeState = this.machine.next(snakeToCamel(reservation.state));
+          if (reservation.state === States.completed) {
+            this.showFireworks = true;
+            setTimeout(() => {
+              this.showFireworks = false;
+            }, 5000);
+          }
+        }
+        this.isCustomer.set(isCustomer);
+      }
+    });
+
+    effect(() => {
+      const payments = this.paymentsSignal();
+      if (payments && payments[0].id) {
+        if (this.isCustomer()) {
+          this.paymentPaid.set(payments.map((p) => {
+            if (p.status &&
+              !['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND'].includes(p.status)) {
+              this.addActions();
+            }
+            return p;
+          }).sort((a, b) => a.status.localeCompare(b.status)));
+        } else {
+          if (!this.payments.length) {
+            let arr: any[] = [];
+            this.paymentPaid.set(payments.map((p: IPaymentAll) => {
+              if (p.id) {
+                const amount = (p.transactionAmount || 0).toFixed(2);
+                const paymentForm = this.formBuilder.group({
+                  amount: [amount],
+                  type: [p.type],
+                });
+                arr = [...arr, { amount: amount, type: p.type }];
+                this.payments.push(paymentForm);
+              }
+              return p;
+            }));
+          } else {
+            this.paymentPaid.set(payments);
+          }
+        }
+      } else {
+        this.paymentPaid.set([]);
+      }
+    });
+    effect(() => {
+      const history = this.historiesSignal();
+      const reservation = this.reservation();
+
+      if (!history?.length || !history[0]?.id || !reservation) {
+        return;
+      }
+
+      const allReservations = [...history, reservation]
+        .sort((a, b) => a.timestamp - b.timestamp)
+        .map(r => r.id);
+
+      const currentIndex = allReservations.indexOf(reservation.id);
+
+      if (currentIndex > 0) {
+        const previous = 'previous';
+
+        const previousAction = this.createAction(
+          this.translate.instant('RESERVATION.ACTION.PREVIOUS'),
+          ReservationIconName.previous,
+          previous,
+          'gray',
+        );
+
+        const previousTransition =
+          ReservationDetailComponent.createTransaction(
+            previous,
+            () => this.router.navigate([
+              this.language,
+              'reservation',
+              allReservations[currentIndex - 1],
+            ]),
+          );
+
+        ReservationDetailComponent.addTransitionToAllStates(
+          previous,
+          previousTransition,
+          previousAction,
+          false,
+        );
+      }
+
+      if (currentIndex >= 0 && currentIndex < allReservations.length - 1) {
+        const next = 'next';
+
+        const nextAction = this.createAction(
+          this.translate.instant('RESERVATION.ACTION.NEXT'),
+          ReservationIconName.next,
+          next,
+          'gray',
+        );
+
+        const nextTransition =
+          ReservationDetailComponent.createTransaction(
+            next,
+            () => this.router.navigate([
+              this.language,
+              'reservation',
+              allReservations[currentIndex + 1],
+            ]),
+          );
+
+        ReservationDetailComponent.addTransitionToAllStates(
+          next,
+          nextTransition,
+          nextAction,
+        );
+      }
+    });
+
+    effect(() => {
+      const paymentOptions = this.paymentOptionsSignal();
+      if (paymentOptions) {
+        this.options.set(getPayNlOptions(paymentOptions));
+      }
+    });
   }
 
-  get payments(): FormArray {
-    return this.form.controls.payments as FormArray;
+  get getForm(): DetailForm {
+    return this.form.controls;
+  }
+
+  get payments(): FormArray<FormGroup<PaymentForm>> {
+    return this.form.controls.payments;
   }
 
   get gmt(): string {
-    return getReservationGMT(this.reservation);
+    return getReservationGMT(this.reservation());
   }
 
   get total(): number {
-    return totalPaid(this.paymentPaid);
+    return totalPaid(this.paymentPaid());
   }
 
-  get updatePayment(): void {
+  get historyLength(): number {
+    return this.historiesSignal()?.length || 0;
+  }
+
+  updatePayment() {
     let paymentRequests: IPaymentRequest[] = [];
-    this.paymentPaid.forEach((p: IPayment, i: number) => {
-      const payment = this.payments.at(i).value;
-      if (p.transactionAmount?.toFixed(2) !== payment.amount || p.type !== payment.type) {
-        paymentRequests = [...paymentRequests, {
-          paymentId: p.id!,
-          amount: parseFloat(payment.amount) - parseFloat(p.transactionAmount?.toFixed(2) || '0'),
-          paymentType: payment.type,
-        }];
+    this.paymentPaid().forEach((p, i) => {
+      const payment = this.payments.at(i).getRawValue();
+      const amount = (p.transactionAmount ?? 0).toFixed(2);
+
+      if (amount !== payment.amount || p.type !== payment.type) {
+        paymentRequests = [
+          ...paymentRequests,
+          {
+            paymentId: p.id,
+            amount: parseFloat(payment.amount) - parseFloat(amount),
+            paymentType: payment.type,
+          },
+        ];
       }
     });
-    return this.store.dispatch(adjustPayments({ payments: paymentRequests }));
+
+    this.store.dispatch(adjustPayments({ payments: paymentRequests }));
   }
 
-  get addNote(): void {
-    return executeDialog(this.dialog, AddNoteDialogComponent, {
-      note: this.reservation?.note,
-      customerNote: this.reservation?.customerNote,
-      isCustomer: this.isCustomer,
-    }, result => {
-      if (result) {
-        const reservation = this.reservation!;
-        this.store.dispatch(
-          updateReservationNote({
-            id: reservation.id,
-            role: this.professionalId ? Role.professional : Role.customer,
-            note: result.note,
-            customerNote: result.customerNote,
-            paymentLink: reservation.paymentLink,
-            timestamp: reservation.timestamp,
-            timeZone: reservation.room.timeZone,
-          }),
-        );
-      }
-    }, true);
-  }
-
-  get addDiscount(): void {
-    return executeDialog(this.dialog, AddDiscountDialogComponent, { customerId: this.reservation?.customer.id },
-      result => {
+  addNote() {
+    const reservation = this.reservation();
+    if (reservation) {
+      executeDialog(this.dialog, AddNoteDialogComponent, {
+        note: reservation.note,
+        customerNote: reservation.customerNote,
+        isCustomer: this.isCustomer,
+      }, result => {
         if (result) {
-          this.store.dispatch(updateReservationDiscount({ id: this.reservation!.id, discountId: result.discountId }));
+          this.store.dispatch(
+            updateReservationNote({
+              id: reservation.id,
+              role: this.professionalId() ? Role.professional : Role.customer,
+              note: result.note,
+              customerNote: result.customerNote,
+              paymentLink: reservation.paymentLink,
+              timestamp: reservation.timestamp,
+              timeZone: reservation.room.timeZone,
+            }),
+          );
         }
       }, true);
+    }
+  }
+
+  addDiscount() {
+    const reservation = this.reservation();
+    if (reservation) {
+      executeDialog(this.dialog, AddDiscountDialogComponent, { customerId: reservation.customer.id },
+        result => {
+          if (result) {
+            this.store.dispatch(updateReservationDiscount({ id: reservation.id, discountId: result.discountId }));
+          }
+        }, true);
+    }
   }
 
   private static createMachine = (stateMachineDefinition: any, initialState: any): any => {
@@ -281,52 +525,42 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
 
   private static getDateTimeDetail = (reservation: IReservationAll): Date => newDateTimestamp(reservation.timestamp);
 
-  private static createBullet = (name: string): string => `%0A\uD83D\uDC85\uD83C\uDFFB ${ name }`;
+  private static createBullet = (name: string): string => `%0A\uD83D\uDC85\uD83C\uDFFB ${name}`;
 
   openHistoryDialog = (history: IReservationAll): void => this.openDialog(
     ReservationDetailComponent.getDateTimeDetail(history));
 
   openDialog = (reservationDate: Date): void => {
-    if (this.reservation) {
-      openDialog(this.reservation.room, this.language, this.translate, this.dialog, reservationDate);
+    const reservation = this.reservation();
+    if (reservation) {
+      openDialog(reservation.room, this.language, this.translate, this.dialog, reservationDate);
     }
   };
 
-  showTimeZone = (reservation: IReservationAll | undefined = this.reservation): boolean => !isSameTimeZone(
-    reservation?.room.timeZone);
-
-  ngOnInit(): void {
-    this.subscribe();
-    this.clean();
-    this.route.params.subscribe(routeParams => {
-      this.reservationId = routeParams.id;
-      this.getReservation(this.reservationId!);
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.paymentSubscription?.unsubscribe();
-    this.authUserServiceSubscription.unsubscribe();
-  }
+  showTimeZone = (reservation?: IUpcomingAll): boolean => !isSameTimeZone(
+    (reservation || this.reservation())?.room.timeZone);
 
   onChangeState = (id: string): void => {
     const list = ['send', 'coffee', 'book', 'more', 'change', 'cancel', 'cancel_edit', 'notify', 'pay', 'color',
       'clone', 'previous', 'next'];
-    if (list.indexOf(id) >= 0 && this.reservation) {
-      this.machine.transition(snakeToCamel(this.reservation.state), snakeToCamel(id));
+    const state = this.state();
+    if (!state) {
+      return;
+    }
+    if (list.indexOf(id) >= 0) {
+      this.machine.transition(snakeToCamel(state), snakeToCamel(id));
       return;
     }
     const title = this.translate.instant('RESERVATION.CHANGE_STATE.TITLE');
-    const action = this.translate.instant(`RESERVATION.CHANGE_STATE.ACTION.${ id.toUpperCase() }`);
+    const action = this.translate.instant(`RESERVATION.CHANGE_STATE.ACTION.${id.toUpperCase()}`);
     const content = this.translate.instant('RESERVATION.CHANGE_STATE.CONTENT', { action });
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: id },
     });
 
     dialogRef.afterClosed().subscribe(event => {
-      if (event && this.reservation) {
-        this.machine.transition(snakeToCamel(this.reservation.state), event);
+      if (event) {
+        this.machine.transition(snakeToCamel(state), event);
       }
     });
   };
@@ -342,12 +576,14 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   pay = (payment: IPaymentAll): void => this.store.dispatch(paymentSend({ link: payment.paymentURL || payment.link }));
 
   twoDigit = (i: number): void => {
-    const payment = this.payments.at(i).value;
-    if (!isNaN(payment.amount)) {
-      payment.amount = parseFloat(payment.amount).toFixed(2);
-      this.payments.at(i).setValue(payment);
-    }
+    const payment = this.payments.at(i).getRawValue();
+
+    this.payments.at(i).setValue({
+      ...payment,
+      amount: parseFloat(payment.amount).toFixed(2),
+    });
   };
+
 
   private createAction = (
     tooltip: string,
@@ -356,33 +592,13 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     color?: string,
   ): IFabMenu => ({ tooltip, icon, id, color } as IFabMenu);
 
-  private valueChanges = (arr: any[]): void => {
-    this.payments.valueChanges.pipe(startWith(arr), pairwise()).subscribe(([prev, next]: [any[], any[]]) => {
-      if (!areEquals(prev, next)) {
-        this.disableUpdateButton = false;
-      }
-    });
-  };
-
-  private clean = (): void => {
-    this.payments.clear();
-    this.store.dispatch(clean());
-  };
-
   private getOptions = (): void => this.store.dispatch(paymentOptions());
 
-  private getReservation = (id: string): void => {
-    this.reservation = undefined;
-    this.store.dispatch(getReservation({ id }));
-    this.store.dispatch(reservationFindPayments({ id }));
-    this.store.dispatch(getReservationHistory({ id }));
-  };
-
   private professionalMachine = (self: this): any => {
-    if (!self.reservation) {
+    const reservation = self.reservation();
+    if (!reservation) {
       return;
     }
-    const reservation: IReservationAll = self.reservation;
     const id = reservation.id;
     const roomId = reservation.room.id;
     const customerId = reservation.customer.id;
@@ -437,7 +653,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     approveActions = [...approveActions, more, clone, cancel];
 
     const approveTransaction = ReservationDetailComponent.createTransaction('approved', (): void => {
-      self.reservation = undefined;
       store.dispatch(approveReservation(id));
     });
 
@@ -460,18 +675,17 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
             key = 'APPROVE';
             break;
         }
-        const message = translate.instant(`WHATSAPP.SEND.${ key }`, { date, treatment });
-        window.open(`https://api.whatsapp.com/send?phone=+${ userPhone }&text=${ message }`, '_blank');
+        const message = translate.instant(`WHATSAPP.SEND.${key}`, { date, treatment });
+        window.open(`https://api.whatsapp.com/send?phone=+${userPhone}&text=${message}`, '_blank');
       }
     });
 
     const coffeeMessageTransaction = ReservationDetailComponent.createTransaction('send', (): void => {
       const message = translate.instant('WHATSAPP.SEND.COFFEE');
-      window.open(`https://api.whatsapp.com/send?phone=+${ userPhone }&text=${ message }`, '_blank');
+      window.open(`https://api.whatsapp.com/send?phone=+${userPhone}&text=${message}`, '_blank');
     });
 
     const startTransaction = ReservationDetailComponent.createTransaction('started', (): void => {
-      self.reservation = undefined;
       store.dispatch(startReservation(id));
     });
 
@@ -501,22 +715,20 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const cancelTransaction = ReservationDetailComponent.createTransaction('cancelled', (): void =>
       self.cancel(reservation, options, self.price, result => {
         if (result) {
-          this.reservation = undefined;
           this.store.dispatch(cancelReservation(reservation.id, result));
         }
       }));
 
     const finishTransaction = ReservationDetailComponent.createTransaction('completed', (): void => {
-      self.reservation = undefined;
       self.store.dispatch(paymentCompleteReservation(id));
     });
 
     const bookTransaction = ReservationDetailComponent.createTransaction('booked', (): void => {
-      const customer = reservation.customer;
-      const room = reservation.room;
-      const treatment = reservation.treatment;
-      const professional = reservation.professional;
-      const data = { customer, room, treatment, professional };
+      const customerId = reservation.customer.id;
+      const roomId = reservation.room.id;
+      const treatmentId = reservation.treatment.key;
+      const professionalId = reservation.professional.id;
+      const data = { customerId, roomId, treatmentId, professionalId };
       this.router.navigate([this.language, 'reservation'], { state: data });
     });
 
@@ -595,10 +807,10 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
   };
 
   private customerMachine = (self: this): any => {
-    if (!self.reservation) {
+    const reservation = self.reservation();
+    if (!reservation) {
       return;
     }
-    const reservation: IReservationAll = self.reservation;
     const reservationId = reservation.id;
     const initialState = reservation.state;
     const translate = self.translate;
@@ -639,18 +851,15 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     const cancelTransaction = ReservationDetailComponent.createTransaction('cancelled', (): void =>
       self.cancel(reservation, cancelOptions, price, result => {
         if (result) {
-          this.reservation = undefined;
-          this.store.dispatch(
-            customerCancelReservation(reservation.id, result),
-          );
+          this.store.dispatch(customerCancelReservation(reservation.id, result));
         }
-      }, showPenalty, self.options));
+      }, showPenalty, self.options()));
 
     const bookTransaction = ReservationDetailComponent.createTransaction('booked', (): void => {
-      const room = reservation.room;
-      const treatment = reservation.treatment;
-      const professional = reservation.professional;
-      const data = { room, treatment, professional };
+      const roomId = reservation.room.id;
+      const treatmentId = reservation.treatment.key;
+      const professionalId = reservation.professional.id;
+      const data = { roomId, treatmentId, professionalId };
       this.router.navigate([this.language, 'me', 'reservation'], { state: data });
     });
 
@@ -719,7 +928,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         ReservationIconName.edit, 'cancel_edit', 'accent');
 
       const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void =>
-        customerEditDialog(self.dialog, self.router, reservationId, reservation.room.currency, self.small,
+        customerEditDialog(self.dialog, self.router, reservationId, reservation.room.currency, self.small(),
           self.language, price));
 
       created.transitions.cancelEdit = editTransaction;
@@ -733,7 +942,8 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     }
 
     if (reservation.paymentRequired) {
-      const paymentPending = self.paymentPaid?.filter((p: IPayment) => p.status === 'PENDING')[0];
+      const paymentPaid = self.paymentPaid();
+      const paymentPending = paymentPaid?.filter((p: IPayment) => p.status === 'PENDING')[0];
       if (paymentPending) {
         const notify = this.createAction(translate.instant('RESERVATION.ACTION.NOTIFY'),
           ReservationIconName.notify, 'notify');
@@ -751,7 +961,7 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         cancelledPaymentRequired.transitions.pay =
           ReservationDetailComponent.createTransaction('cancelledPaymentRequired', (): void => {
             this.router.navigate(['/', this.language, 'me', 'payment',
-              self.paymentPaid?.filter((p: IPayment) => p.status !== 'APPROVED')[0]?.id]);
+              paymentPaid?.filter((p: IPayment) => p.status !== 'APPROVED')[0]?.id]);
           });
       }
       self.addActions();
@@ -812,7 +1022,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     },
     result => {
       if (result) {
-        this.reservation = undefined;
         this.store.dispatch(updateReservationCustomer({ id: reservation.id, customerId: result.customerId }));
       }
     },
@@ -829,7 +1038,6 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     },
     result => {
       if (result) {
-        this.reservation = undefined;
         this.store.dispatch(updateReservationColor({ id: reservation.id, colorId: result.colorId }));
       }
     },
@@ -853,13 +1061,12 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
         }
         const state = {
           date: result.date,
-          customer: reservation.customer,
+          customerId: reservation.customer.id,
           professionalId: reservation.professional.id,
           roomId: reservation.room.id,
           treatmentId: reservation.treatment.key,
           groupId: reservation.treatment.groupId,
           additionalIds: reservation.additional?.map(it => it.key),
-          skip: true,
         };
         this.router.navigate([this.language, 'reservation'], { state });
       }
@@ -873,114 +1080,5 @@ export class ReservationDetailComponent implements OnInit, OnDestroy {
     afterClose: (result: any) => void,
     showPenalty?: boolean,
     paymentOptions?: IPaymentOption[],
-  ) => openCancel(this.dialog, reservation.room, this.small, options, afterClose, showPenalty, price, paymentOptions);
-
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      this.isCustomer = this.customerId === state.selected?.customer?.id;
-      if (state.payments && state.payments[0].id) {
-        if (this.isCustomer) {
-          this.paymentPaid = state.payments.map((p: IPayment) => {
-            if (p.status &&
-              !['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND'].includes(p.status)) {
-              this.addActions();
-            }
-            return p;
-          }).sort((a?: IPaymentAll, b?: IPaymentAll) => b?.status && a?.status?.localeCompare(b?.status));
-        } else {
-          if (!this.payments.length) {
-            let arr: any[] = [];
-            this.paymentPaid = state.payments.map((p: IPayment) => {
-              if (p.id) {
-                const paymentForm = this.formBuilder.group({
-                  amount: [p.transactionAmount?.toFixed(2)],
-                  type: [p.type],
-                });
-                arr = [...arr, { amount: p.transactionAmount?.toFixed(2), type: p.type }];
-                this.payments.push(paymentForm);
-              }
-              return p;
-            });
-            this.valueChanges(arr);
-          } else {
-            this.paymentPaid = state.payments;
-          }
-        }
-      } else {
-        this.paymentPaid = [];
-      }
-      if (state.selected) {
-        this.duration = reservationDuration(state.selected);
-        this.start = newDateTimestamp(state.selected.timestamp);
-        this.end = createNewDate(this.start, this.start.getHours() + this.duration.hour,
-          this.start.getMinutes() + this.duration.minute);
-        this.state = state.selected.state;
-        this.reservation = state.selected;
-        const isProfessionalAdmin = this.professionalId &&
-          isProfessional(this.professionalId, this.reservation?.room?.professionals);
-        this.isReservationAdmin = isProfessionalAdmin || this.hasRoomAdmin;
-        if (this.reservation && this.reservation.treatment) {
-          this.price = getPrice(this.reservation, this.paymentPaid);
-        }
-        if (isProfessionalAdmin) {
-          this.professionalMachine(this);
-          this.changeState = this.machine.next(snakeToCamel(this.reservation?.state));
-        } else if (this.isCustomer) {
-          const types = state.selected.room.paymentTypes.filter(
-            (p: PaymentType) => ![PaymentType.cash, PaymentType.transfer]
-              .includes(p));
-          if (types?.includes(PaymentType.paynl)) {
-            this.getOptions();
-          } else {
-            this.options = getPaymentOptions(this.translate, types);
-          }
-          this.customerMachine(this);
-          this.changeState = this.machine.next(snakeToCamel(state.selected.state));
-          if (state.selected.state === States.completed) {
-            this.showFireworks = true;
-            setTimeout(() => {
-              this.showFireworks = false;
-            }, 5000);
-          }
-        }
-      }
-      this.history = state.history;
-      this.dataSource = new MatTableDataSource(state.history);
-      if (this.history && this.history[0]?.id) {
-        this.dataSource.paginator = this.paginator;
-        if (this.reservation) {
-          const allReservations = [...this.history, this.reservation]
-            .sort((a, b) => a.timestamp - b.timestamp).map(reservation => reservation.id);
-
-          const currentIndex = allReservations.indexOf(this.reservation.id);
-          if (currentIndex > 0) {
-            const previous = 'previous';
-            const previousAction = this.createAction(this.translate.instant('RESERVATION.ACTION.PREVIOUS'),
-              ReservationIconName.previous, previous, 'gray');
-            const previousTransition = ReservationDetailComponent.createTransaction(
-              previous, () => this.router.navigate(
-                [this.language, 'reservation', allReservations[currentIndex - 1]],
-              ));
-            ReservationDetailComponent.addTransitionToAllStates(previous, previousTransition, previousAction,
-              false);
-          }
-          if (currentIndex >= 0 && currentIndex < allReservations.length - 1) {
-            const next = 'next';
-            const nextAction = this.createAction(this.translate.instant('RESERVATION.ACTION.NEXT'),
-              ReservationIconName.next, next, 'gray');
-            const nextTransition = ReservationDetailComponent.createTransaction(next,
-              () => this.router.navigate([this.language, 'reservation', allReservations[currentIndex + 1]],
-              ));
-            ReservationDetailComponent.addTransitionToAllStates(next, nextTransition, nextAction);
-          }
-        }
-      }
-      if (state.response) {
-        const id: string | null = this.route.snapshot.paramMap.get('id');
-        this.getReservation(id!);
-      }
-    });
-    this.paymentSubscription = this.getPaymentState.subscribe(state => this.options = getPayNlOptions(state.data));
-  };
+  ) => openCancel(this.dialog, reservation.room, this.small(), options, afterClose, showPenalty, price, paymentOptions);
 }

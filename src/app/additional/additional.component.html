@@ -1,7 +1,9 @@
 <div class="flex-container">
   <div class="card-container">
     <div class="card-content">
-      <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+      <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+        @let isAddMode = isAddModeSignal();
+        @let additional = additionalSignal();
         <mat-card appearance="outlined">
           @if (isAddMode) {
             <mat-card-header>
@@ -23,56 +25,57 @@
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'ADDITIONAL.NAME.FIELD' | translate }}</mat-label>
                   <label>
-                    <input formControlName="name" autocomplete="name" matInput required>
+                    <input [formControl]="getForm.name" autocomplete="name" matInput required data-cy="name-input">
                   </label>
                   @if (getForm.name.hasError('required')) {
                     <mat-error [innerHTML]="'ADDITIONAL.NAME.REQUIRED' | translate"></mat-error>
-                  } @else if (errors['name']) {
+                  } @else if (errors()['name']) {
                     <mat-error>
-                      {{ errors['name'] }}
+                      {{ errors()['name'] }}
                     </mat-error>
                   }
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'ADDITIONAL.DESCRIPTION.FIELD' | translate }}</mat-label>
                   <label>
-                    <textarea #message formControlName="description" matInput maxlength="256"></textarea>
+                    <textarea #message [formControl]="getForm.description" matInput maxlength="256"
+                              data-cy="description-textarea"></textarea>
                   </label>
                   <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'ADDITIONAL.DURATION.FIELD' | translate }}</mat-label>
                   <label>
-                    <input formControlName="duration" [format]="24" [ngxTimepicker]="t" matInput
-                           name="duration" required readonly/>
+                    <input [formControl]="getForm.duration" [format]="24" [ngxTimepicker]="t" matInput
+                           name="duration" required readonly data-cy="duration-input"/>
                   </label>
                   <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
                   <ngx-material-timepicker #t [minutesGap]="15"></ngx-material-timepicker>
                   @if (getForm.duration.hasError('required')) {
                     <mat-error [innerHTML]="'ADDITIONAL.DURATION.REQUIRED' | translate"></mat-error>
-                  } @else if (errors['duration']) {
+                  } @else if (errors()['duration']) {
                     <mat-error>
-                      {{ errors['duration'] }}
+                      {{ errors()['duration'] }}
                     </mat-error>
                   }
                 </mat-form-field>
-                @if (allGroups) {
+                @if (allGroupsWritableSignal(); as allGroups) {
                   <div class="fields-container" id="groups">
-                    @if (allGroups.length || groups.length) {
+                    @if (allGroups!.length || groupsSignal().length) {
                       <mat-form-field class="chip-list">
                         <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
                         <mat-chip-grid #chipList aria-label="Group selection">
-                          @for (group of groups; track group.id) {
+                          @for (group of groupsSignal(); track group.id) {
                             <mat-chip-row (removed)="remove(group)" [removable]="true">
                               {{ group.name }}
                               <mat-icon matChipRemove>cancel</mat-icon>
                             </mat-chip-row>
                           }
-                          <input #groupInput formControlName="group" [matAutocomplete]="auto"
+                          <input #groupInput [formControl]="getForm.group" [matAutocomplete]="auto"
                                  [matChipInputFor]="chipList">
                         </mat-chip-grid>
                         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedGroup($event)">
-                          @for (group of sortGroups(filteredGroup | async); track group.id) {
+                          @for (group of sortGroups(filteredGroupSignal()); track group.id) {
                             <mat-option [value]="group">
                               {{ group.name }}
                             </mat-option>

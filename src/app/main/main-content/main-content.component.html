@@ -1,7 +1,8 @@
 <!-- Home Slider -->
+@let currentIsSmall = isSmall();
 <section id="slider">
   <div class="container slider">
-    <div [@slideAnimation]="currentIndex">
+    <div [@slideAnimation]="currentIndex()">
       @for (slide of slides; track slide; let i = $index) {
         @if (isCurrentSlideIndex(i)) {
           <div class="slider-img" [ngStyle]="{'background-image': 'url(' + slide.image + ')'}"></div>
@@ -54,13 +55,13 @@
     <div class="story-container">
       <div class="section-sub-title story-item">
         <h3 class="text-center" #storyDescription
-            [@leftRight]="{value: storyDescriptionState.value, params: {translate: '-20px'}}">
+            [@leftRight]="{value: storyDescriptionState(), params: {translate: '-20px'}}">
           {{ 'MAIN.STORY.DESCRIPTION' | translate }}
         </h3>
 
         @for (story of stories; track story) {
           <h4 class="text-justify" [id]="story.id" [innerHTML]="story.text | translate"
-              [@leftRight]="{value: story.state.value, params: {translate: '-20px', delay: story.delay}}">
+              [@leftRight]="{value: story.state(), params: {translate: '-20px', delay: story.delay}}">
           </h4>
         }
       </div>
@@ -68,14 +69,14 @@
       <div class="story-member-item" #storyMember>
         <figure class="team-member text-center">
           <div class="member-thumb"
-               [@bottomTop]="{value: storyMemberState.value, params: {translate: '40vh', delayIn: '0ms', delayOut: '600ms'}}">
+               [@bottomTop]="{value: storyMemberState(), params: {translate: '40vh', delayIn: '0ms', delayOut: '600ms'}}">
             <img src="assets/home_page/img/team/member-1.webp" alt="Team Member" class="img-responsive">
           </div>
           <h4
-            [@bottomTop]="{value: storyMemberState.value, params: {translate: '20px', delayIn: '300ms', delayOut: '300ms'}}">
+            [@bottomTop]="{value: storyMemberState(), params: {translate: '20px', delayIn: '300ms', delayOut: '300ms'}}">
             Carla Luján Bonadero</h4>
           <span
-            [@bottomTop]="{value: storyMemberState.value, params: {translate: '20px', delayIn: '600ms', delayOut: '0ms'}}">{{ 'MAIN.STORY.MEMBER' | translate }}</span>
+            [@bottomTop]="{value: storyMemberState(), params: {translate: '20px', delayIn: '600ms', delayOut: '0ms'}}">{{ 'MAIN.STORY.MEMBER' | translate }}</span>
         </figure>
       </div>
     </div>
@@ -94,7 +95,8 @@
         </div>
       </div>
 
-      <div class="work-sub-title text-center" appAnimate [animateInAnimation]="workText" [stopAnimation]="isSmall">
+      <div class="work-sub-title text-center" appAnimate [animateInAnimation]="workText"
+           [stopAnimation]="currentIsSmall">
         <h4>{{ 'MAIN.WORK.TEXT_1' | translate }}</h4>
       </div>
 
@@ -102,13 +104,13 @@
         <ul class="text-center">
           <li>
             <button mat-raised-button (click)="filterBy()" class="work-filter" type="button" aria-label="Filter All"
-                    [ngClass]="{'active': filter.value === undefined}">{{ 'MAIN.WORK.FILTER.ALL' | translate }}
+                    [ngClass]="{'active': filter() === undefined}">{{ 'MAIN.WORK.FILTER.ALL' | translate }}
             </button>
           </li>
-          @for (group of groups; track group) {
+          @for (group of groups(); track group) {
             <li>
               <button (click)="filterBy(group)" class="work-filter" mat-raised-button aria-label="Filter by"
-                      [ngClass]="{'active': filter.value === group}">{{ group.name }}
+                      [ngClass]="{'active': filter() === group}">{{ group.name }}
               </button>
             </li>
           }
@@ -136,9 +138,8 @@
 }
 <!-- End Works -->
 
-
 <!-- Features -->
-@if (groups.length) {
+@if (groups().length) {
   <section id="treatments" class="treatments">
     <div class="section-container">
 
@@ -151,10 +152,10 @@
       <div #treatmentItem></div>
 
       <div class="treatment-container">
-        @for (group of groups; track group; let i = $index) {
+        @for (group of groups(); track group; let i = $index) {
           <div class="work-flex-item">
-            <div class="treatment-item pointer-only" appAnimate [animateInAnimation]="setTreatmentAnimation(i)"
-                 [stopAnimation]="isSmall" (click)="goToTreatment(group.id)">
+            <div class="treatment-item pointer-only" appAnimate [animateInAnimation]="treatmentAnimations()[i]"
+                 [stopAnimation]="currentIsSmall" (click)="goToTreatment(group.id)">
               <div class="treatment-icon">
                 <mat-icon [svgIcon]="'CLEOS-COLOR'"></mat-icon>
               </div>
@@ -212,7 +213,7 @@
     </div>
 
     <div class="section-sub-title text-center" appAnimate [animateInAnimation]="contactText"
-         [stopAnimation]="isSmall">
+         [stopAnimation]="currentIsSmall">
       <p [innerHTML]="'MAIN.CONTACT.DETAIL' | translate"></p>
     </div>
 
@@ -220,7 +221,7 @@
 
       <!-- contact address -->
       <div class="flex-item" #contactItem1>
-        <div class="contact-address" [@leftRight]="contactItem1State.value">
+        <div class="contact-address" [@leftRight]="contactItem1State()">
           <h3>{{ 'MAIN.CONTACT.TITLE' | translate }}</h3>
           <p>
             <mat-icon matPrefix>room</mat-icon>&nbsp;
@@ -246,7 +247,7 @@
       <!-- contact form -->
       <div class="contact--item" #contactItem2>
         <div class="contact-form"
-             [@bottomTop]="{value:contactItem2State.value, params: {delayIn: isSmall ? '0ms' : '500ms', delayOut: '0ms'}}">
+             [@bottomTop]="{value:contactItem2State(), params: {delayIn: currentIsSmall ? '0ms' : '500ms', delayOut: '0ms'}}">
           <h3 class="bold no-content">{{ 'MAIN.CONTACT.SEND.TITLE' | translate }}</h3>
 
           <form (ngSubmit)="sendEmail()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
@@ -254,18 +255,18 @@
               <div class="contact-inner-container">
                 <mat-form-field class="full full-margin">
                   <mat-label>{{ 'MAIN.CONTACT.NAME.FIELD' | translate }}</mat-label>
-                  <input [formControl]="name" autocomplete="name" matInput required>
-                  @if (name.hasError('required')) {
+                  <input [formControl]="getForm.name" autocomplete="name" matInput required>
+                  @if (getForm.name.hasError('required')) {
                     <mat-error [innerHTML]="'MAIN.CONTACT.NAME.REQUIRED' | translate"></mat-error>
                   }
                 </mat-form-field>
                 <mat-form-field class="full">
                   <mat-label>{{ 'MAIN.CONTACT.EMAIL.FIELD' | translate }}</mat-label>
-                  <input [formControl]="email" autocomplete="email" matInput required>
-                  @if (email.hasError('email')) {
+                  <input [formControl]="getForm.email" autocomplete="email" matInput required>
+                  @if (getForm.email.hasError('email')) {
                     <mat-error>{{ 'MAIN.CONTACT.EMAIL.INVALID' | translate }}</mat-error>
                   }
-                  @if (email.hasError('required')) {
+                  @if (getForm.email.hasError('required')) {
                     <mat-error [innerHTML]="'MAIN.CONTACT.EMAIL.REQUIRED' | translate"></mat-error>
                   }
                 </mat-form-field>
@@ -273,16 +274,16 @@
 
               <mat-form-field>
                 <mat-label>{{ 'MAIN.CONTACT.SUBJECT.FIELD' | translate }}</mat-label>
-                <input [formControl]="subject" autocomplete="subject" matInput required>
-                @if (subject.hasError('required')) {
+                <input [formControl]="getForm.subject" autocomplete="subject" matInput required>
+                @if (getForm.subject.hasError('required')) {
                   <mat-error [innerHTML]="'MAIN.CONTACT.SUBJECT.REQUIRED' | translate"></mat-error>
                 }
               </mat-form-field>
               <mat-form-field>
                 <mat-label>{{ 'MAIN.CONTACT.BODY.FIELD' | translate }}</mat-label>
-                <textarea #message [formControl]="body" matInput maxlength="256" required></textarea>
+                <textarea #message [formControl]="getForm.body" matInput maxlength="256" required></textarea>
                 <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
-                @if (body.hasError('required')) {
+                @if (getForm.body.hasError('required')) {
                   <mat-error [innerHTML]="'MAIN.CONTACT.BODY.REQUIRED' | translate"></mat-error>
                 }
               </mat-form-field>
@@ -305,7 +306,7 @@
         <ul class="social-inner-container">
           @for (social of socialLinks; track social) {
             <li
-              [@leftRight]="{value: contactItem3State.value, params: {translate: '100%', delay: isSmall ? '0ms' : social.delay}}">
+              [@leftRight]="{value: contactItem3State(), params: {translate: '100%', delay: currentIsSmall ? '0ms' : social.delay}}">
               @if (social.phone && social.phoneKey && social.phoneText) {
                 <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
                    (mouseleave)="onHover(social, false)" aria-label="Social icon"
@@ -328,8 +329,8 @@
 
   <!-- Google map -->
   <div appAnimate [animateInAnimation]="contactMap" [stopAnimation]="true">
-    <iframe title="Nails Cleos map" width="100%" height="300" class="map" allowfullscreen="" loading="lazy"
-            [ngClass]="{'dark-map': isDark}" referrerpolicy="no-referrer-when-downgrade"
+    <iframe [title]="`${title} map`" width="100%" height="300" class="map" allowfullscreen="" loading="lazy"
+            [ngClass]="{'dark-map': isDarkMode()}" referrerpolicy="no-referrer-when-downgrade"
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2459.8286698251877!2d4.476945576894232!3d51.937078579223154!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c5cbae073735b3%3A0xc150afbfa3aeaf88!2sNails%20Cleos!5e0!3m2!1sen!2snl!4v1701072269943!5m2!1sen!2snl">
     </iframe>
   </div>
@@ -344,8 +345,8 @@
   <span>{{ 'MAIN.BOOK.APPOINTMENT' | translate }}</span>
 </button>
 
-<button color="primary" class="hide-gt-xs book-button raised-book-button" style="height: 64px" (click)="openBottomSheet()"
-        mat-raised-button type="button" aria-label="Book your appointment">
+<button color="primary" class="hide-gt-xs book-button raised-book-button" style="height: 64px"
+        (click)="openBottomSheet()" mat-raised-button type="button" aria-label="Book your appointment">
   <mat-icon matPrefix>book_online</mat-icon>
   <span>{{ 'MAIN.BOOK.APPOINTMENT' | translate }}</span>
 </button>

@@ -1,15 +1,21 @@
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Resolve } from '@angular/router';
+import { take } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { I18NState } from '../store/reducers/i18n.reducers';
+import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
 
-@Injectable()
-export class TranslationLoaderResolver {
-
-  constructor(private translate: TranslateService) {
+@Injectable({ providedIn: 'root' })
+export class TranslationLoaderResolver implements Resolve<void> {
+  constructor(private translate: TranslateService, private store: Store<I18NState>) {
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  resolve = (_route: ActivatedRouteSnapshot, _state: RouterStateSnapshot): Observable<any> =>
-    this.translate.get('APP.TITTLE');
+  resolve(): void {
+    this.store.pipe(getI18NLanguagePipe).pipe(take(1)).subscribe(lang => {
+      if (lang && this.translate.getCurrentLang() !== lang) {
+        this.translate.use(lang);
+      }
+    });
+  }
 }

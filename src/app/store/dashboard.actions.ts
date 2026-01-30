@@ -24,6 +24,10 @@ enum DashboardActionTypes {
   monthlySummarySuccess = '[Dash] Monthly summary success',
   updateMonthlySummary = '[Dash] Update monthly summary',
   saveMonthlySummarySuccess = '[Dash] Save monthly summary success',
+  setMonthlyNavigationParams = '[Dash] Set monthly navigation params',
+  setQuarterNavigationParams = '[Dash] Set quarter navigation params',
+  setYearNavigationParams = '[Dash] Set year navigation params',
+  setDashNavigationParams = '[Dash] Set dashboard navigation params',
   getYearSummary = '[Dash] Get year summary',
   yearSummarySuccess = '[Dash] Year summary success',
   exportYearSummary = '[Dash] Export year summary',
@@ -55,7 +59,7 @@ export const getCards = createAction(
 
 export const dashSuccess = createAction(
   DashboardActionTypes.dashSuccess,
-  props<{ data: IEventSummary | ICardSummary }>(),
+  props<{ data: IEventSummary[] | ICardSummary[] }>(),
 );
 
 export const dashFailure = createAction(
@@ -91,6 +95,26 @@ export const saveMonthlySummarySuccess = createAction(
   props<IResponseSuccess & { date: string, step: number }>(),
 );
 
+export const setMonthlyNavigationParams = createAction(
+  DashboardActionTypes.setMonthlyNavigationParams,
+  props<{ step?: number, date: Date | string }>(),
+);
+
+export const setQuarterNavigationParams = createAction(
+  DashboardActionTypes.setQuarterNavigationParams,
+  props<{ year?: number, quarter?: number }>(),
+);
+
+export const setYearNavigationParams = createAction(
+  DashboardActionTypes.setYearNavigationParams,
+  props<{ year?: number }>(),
+);
+
+export const setDashNavigationParams = createAction(
+  DashboardActionTypes.setDashNavigationParams,
+  props<{ date?: Date, activeDayIsOpen: boolean }>(),
+);
+
 export const getYearSummary = createAction(
   DashboardActionTypes.getYearSummary,
   props<{ year: number }>(),
@@ -121,4 +145,4 @@ export const quarterSummarySuccess = createAction(
   props<{ quarterSummary: any }>(),
 );
 
-export const clean = createAction(DashboardActionTypes.clean);
+export const cleanDashboard = createAction(DashboardActionTypes.clean);

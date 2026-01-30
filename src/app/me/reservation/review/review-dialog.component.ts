@@ -1,11 +1,11 @@
-import { Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { createNewDate, newDateTimestamp, reservationDuration } from '../../../util/dates';
 import { getPrice } from '../../../util/helper';
 import { IReview } from '../../../interfaces/review';
 import { IReservationAll } from '../../../interfaces/reservation';
 import { IPrice } from '../../../interfaces/treatment';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { transitionAnimation } from '../../../util/animation';
 import { Analytics, logEvent } from '@angular/fire/analytics';
@@ -21,31 +21,34 @@ import { AppMaterialModule } from '../../../util/app-material.module';
   styleUrls: ['./review-dialog.component.scss'],
   imports: [RoomNamePipe, RatingComponent, AppMaterialModule, TranslatePipe, DatePipe, DecimalPipe,
     ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReviewDialogComponent {
+  private readonly dialogRef: MatDialogRef<ReviewDialogComponent> = inject(MatDialogRef<ReviewDialogComponent>);
+  private readonly data = inject<IReservationAll>(MAT_DIALOG_DATA);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly analytic: Analytics = inject(Analytics);
+
   reservation?: IReservationAll;
   end?: Date;
-  dateFormat: string;
+  dateFormat: string = this.translate.getCurrentLang();
 
-  price: IPrice;
+  price: IPrice = getPrice(this.data);
   rating = -1;
   hover = -1;
   starCount = 5;
 
-  review?: IReview;
+  review?: IReview = this.data.review;
 
-  detail = new UntypedFormControl();
+  detail = new FormControl<string>('');
 
-  constructor(public dialogRef: MatDialogRef<ReviewDialogComponent>,
-              @Inject(MAT_DIALOG_DATA) public data: IReservationAll, private translate: TranslateService,
-              private analytic: Analytics) {
-    const start = newDateTimestamp(data.timestamp, data.room.timeZone);
-    this.reservation = Object.assign({}, data, { start });
-    this.price = getPrice(data);
-    const duration = reservationDuration(data);
-    this.end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
-    this.review = data.review;
-    this.dateFormat = this.translate.currentLang;
+  constructor() {
+    effect(() => {
+      const start = newDateTimestamp(this.data.timestamp, this.data.room.timeZone);
+      this.reservation = Object.assign({}, this.data, { start });
+      const duration = reservationDuration(this.data);
+      this.end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
+    });
     logEvent(this.analytic, 'screen_view', {
       // eslint-disable-next-line camelcase
       firebase_screen: 'Review page',
@@ -54,19 +57,19 @@ export class ReviewDialogComponent {
     });
   }
 
-  onNoClick(): void {
-    return this.dialogRef.close();
+  onNoClick() {
+    this.dialogRef.close();
   }
 
-  doAction(): void {
-    return this.dialogRef.close({ rating: this.rating, detail: this.detail.value });
+  doAction() {
+    this.dialogRef.close({ rating: this.rating, detail: this.detail.value });
   }
 
-  onRatingHover = (hover: number): void => {
+  onRatingHover = (hover: number) => {
     this.hover = hover;
   };
 
-  onRatingChanged = (rating: number): void => {
+  onRatingChanged = (rating: number) => {
     this.rating = rating;
   };
 }

@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 import { Token } from '../interfaces/token';
+import { IUserAll } from '../interfaces/user';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -15,7 +16,7 @@ describe('AuthService', () => {
       id: '1',
       displayName: 'testuser',
       email: 'testUser@test.com',
-    },
+    } as IUserAll,
     menus: [],
   };
 

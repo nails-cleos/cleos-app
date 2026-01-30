@@ -22,7 +22,11 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
     mapRole.forEach((value, role) => {
       it(`should create a new ${ role }`, () => {
-        cy.intercept('POST', `**/api/v1/${ value.url }`, (req) => req.alias = 'saveUser');
+        cy.mockApi('POST', `**/api/v1/${ value.url }`, {
+          body: { name: value.displayName },
+          alias: 'saveUser',
+        });
+        cy.intercept('POST', `**/api/v1/${ value.url }`).as('saveUser');
 
         cy.openMenu(breakpoints, ['App settings', 'Users']);
         cy.mockUsers(0);
@@ -39,7 +43,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         cy.get('#phone').should('be.visible');
         cy.get('#phone').type('+310625250787');
 
-        cy.get('input[formControlName="dob"]').click({ force: true });
+        cy.get('[data-cy="dob-picker"]').click({ force: true });
         cy.get('.mat-calendar-previous-button').click({ force: true });
         cy.get('td[data-mat-row="1"][data-mat-col="1"]').find('button').click({ force: true });
         cy.get('td[data-mat-row="1"][data-mat-col="1"]').find('button').click({ force: true });
@@ -47,9 +51,9 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
         if (role !== 'Customer') {
           cy.get('#darkColorIcon').click({ force: true });
-          cy.get('input[formControlName="darkColor"]').clear().type('#0f0');
+          cy.get('[data-cy="dark-color-picker"]').clear().type('#0f0');
           cy.get('#lightColorIcon').click({ force: true });
-          cy.get('input[formControlName="lightColor"]').clear().type('#00f');
+          cy.get('[data-cy="light-color-picker"]').clear().type('#00f');
         }
 
         cy.get('button[type="submit"]').click({ force: true });
@@ -67,7 +71,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           }
         });
 
-        cy.url().should('include', '/users/add');
+        cy.url().should('include', '/users');
       });
 
       it(`should edit a ${ role }`, () => {
@@ -76,7 +80,11 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         cy.wait('@getUsers');
 
         cy.get('@selectedUser').then((user: any) => {
-          cy.intercept('PATCH', `**/api/v1/users/${ user.id }`, (req) => req.alias = 'updateUser');
+          cy.mockApi('PATCH', `**/api/v1/users/${ user.id }`, {
+            body: { name: value.displayName },
+            alias: 'updateUser',
+          });
+          cy.intercept('PATCH', `**/api/v1/users/${ user.id }`).as('updateUser');
           cy.mockUser(user.id, user);
 
           cy.buttonClickOnTable(breakpoints, user.displayName, 'user-row', 'user-detail-row.user-expanded-row', 'edit',
@@ -85,15 +93,15 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
           cy.get('mat-card-title').contains('Update user');
           cy.get('mat-card-subtitle').contains(value.displayName);
-          cy.get('input[formControlName="email"]').should('have.value', user.email);
-          cy.get('input[formControlName="displayName"]').should('have.value', user.displayName);
+          cy.get('[data-cy="email-input"]').should('have.value', user.email);
+          cy.get('[data-cy="displayName-input"]').should('have.value', user.displayName);
           cy.get('#select-lang').contains('English');
           cy.get('input[formControlName="numberControl"]').should('have.value', user.phone);
 
           if (user.dob) {
             const dob = new Date(user.dob);
             const formattedDob = dob.toLocaleDateString('en-GB');
-            cy.get('input[formControlName="dob"]').should('have.value', formattedDob);
+            cy.get('[data-cy="dob-picker"]').should('have.value', formattedDob);
           }
 
           const phone = '+31 6 25251524';
@@ -101,7 +109,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           cy.selectOption('select-lang', 'Spanish');
           cy.formControlType('displayName', `${ role } Name`);
           cy.get('#phone').find('input').clear().type(phone);
-          cy.get('input[formControlName="dob"]').clear().click({ force: true });
+          cy.get('[data-cy="dob-picker"]').clear().click({ force: true });
           cy.get('td[data-mat-row="1"][data-mat-col="1"]').find('button').click({ force: true });
           cy.wait(50);
           cy.get('td[data-mat-row="1"][data-mat-col="1"]').find('button').click({ force: true });

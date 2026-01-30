@@ -1,21 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { AdditionalSortingComponent } from './additional-sorting.component';
-import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { IAdditionalAll } from '../../interfaces/additional';
 import { ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
+import { getAdditionalList, sortAdditional } from '../../store/additional.actions';
 import { ServiceType } from '../../interfaces/room';
-import { sortAdditional, clean } from '../../store/additional.actions';
-import { AppState } from '../../store/app.states';
+import { TranslateModule } from '@ngx-translate/core';
+import { AdditionalState } from '../../store/reducers/additional.reducers';
 
 describe('AdditionalSortingComponent', () => {
   let component: AdditionalSortingComponent;
   let fixture: ComponentFixture<AdditionalSortingComponent>;
 
-  let state$: Subject<any>;
+  let additionalList$: Subject<IAdditionalAll[]>;
+  let response$: Subject<any>;
 
-  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let storeSpy: jasmine.SpyObj<Store<AdditionalState>>;
 
   const mockAdditionalList: IAdditionalAll[] = [
     {
@@ -26,6 +27,7 @@ describe('AdditionalSortingComponent', () => {
       duration: 'PT15M',
       type: ServiceType.additional,
       price: 15,
+      order: 1,
     },
     {
       id: '2',
@@ -35,30 +37,33 @@ describe('AdditionalSortingComponent', () => {
       duration: 'PT1H30M',
       type: ServiceType.additional,
       price: 35,
-    },
-    {
-      id: '3',
-      key: 'Key 3',
-      name: 'Additional 3',
-      description: '3 additional',
-      duration: 'PT45M',
-      type: ServiceType.additional,
-      price: 20,
+      order: 2,
     },
   ];
 
   beforeEach(async () => {
-    state$ = new Subject();
+    additionalList$ = new Subject<IAdditionalAll[]>();
+    response$ = new Subject<any>();
 
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
 
-    storeSpy.select.and.returnValue(state$.asObservable());
+    // Define order of .pipe() calls
+    let pipeCallIndex = 0;
+    storeSpy.pipe.and.callFake(() => {
+      pipeCallIndex++;
+      switch (pipeCallIndex) {
+        case 1:
+          return additionalList$.asObservable();
+        case 2:
+          return response$.asObservable();
+        default:
+          return new BehaviorSubject(undefined).asObservable();
+      }
+    });
 
     await TestBed.configureTestingModule({
-      imports: [AdditionalSortingComponent],
-      providers: [
-        { provide: Store, useValue: storeSpy },
-      ],
+      imports: [AdditionalSortingComponent, TranslateModule.forRoot()],
+      providers: [{ provide: Store, useValue: storeSpy }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdditionalSortingComponent);
@@ -66,44 +71,31 @@ describe('AdditionalSortingComponent', () => {
     fixture.detectChanges();
   });
 
-  afterEach(() => state$.complete());
+  afterEach(() => {
+    additionalList$.complete();
+    response$.complete();
+  });
 
   it('should create', () => {
-    component.ngOnInit();
-
     expect(component).toBeTruthy();
   });
 
-  it('should dispatch Clean action on initialization', () => {
-    // Reset to check only the initialization call
-    storeSpy.dispatch.calls.reset();
-    component.ngOnInit();
+  it('should compute itemsSignal from additionalListSignal', () => {
+    additionalList$.next(mockAdditionalList);
+    fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
+    const result = component.itemsSignal();
+
+    expect(result).toEqual([
+      new ItemSorting('1', 'Additional 1', 1),
+      new ItemSorting('2', 'Additional 2', 2),
+    ]);
   });
 
-  it('should call getAdditionalList on initialization', () => {
-    spyOn(component as any, 'getAdditionalList');
-
-    component.ngOnInit();
-
-    expect(component['getAdditionalList']).toHaveBeenCalled();
-  });
-
-  it('should unsubscribe on destroy', () => {
-    component.ngOnInit();
-    const subscription = component['subscription'];
-    spyOn(subscription!, 'unsubscribe');
-
-    component.ngOnDestroy();
-
-    expect(subscription!.unsubscribe).toHaveBeenCalled();
-  });
-
-  it('should dispatch SortAdditional action when sorted is called', () => {
+  it('should dispatch sortAdditional when sorted() is called', () => {
     const sorted = [
-      { order: 1, key: 'key 1' },
-      { order: 2, key: 'key 2' },
+      { order: 1, key: 'key1' },
+      { order: 2, key: 'key2' },
     ];
 
     component.sorted(sorted);
@@ -111,23 +103,12 @@ describe('AdditionalSortingComponent', () => {
     expect(storeSpy.dispatch).toHaveBeenCalledWith(sortAdditional({ additionalList: sorted }));
   });
 
-  it('should update items when state changes', () => {
-    state$.next({
-      data: mockAdditionalList,
-    });
-    expect(component.items).toEqual(mockAdditionalList.map((additional: IAdditionalAll) => new ItemSorting(
-      additional.id, additional.name, additional.order)));
-  });
+  it('should dispatch getAdditionalList when responseSignal emits', () => {
+    storeSpy.dispatch.calls.reset();
 
-  it('should clean and get additional list on response', () => {
-    spyOn(component as any, 'clean');
-    spyOn(component as any, 'getAdditionalList');
+    response$.next({ success: true });
+    fixture.detectChanges();
 
-    state$.next({
-      response: true,
-    });
-
-    expect(component['clean']).toHaveBeenCalled();
-    expect(component['getAdditionalList']).toHaveBeenCalled();
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAdditionalList());
   });
 });

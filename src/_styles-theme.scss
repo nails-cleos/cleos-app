@@ -679,12 +679,14 @@
     color: mat.m2-get-color-from-palette($warn-palette);
   }
 
-  .red-text {
-    color: mat.m2-get-color-from-palette($warn-palette);
-  }
-
-  .contrast-text {
-    color: mat.m2-get-color-from-palette($foreground, contrast) !important;
+  @if $isDark {
+    .contrast-text {
+      color: #fafafa !important;
+    }
+  } @else {
+    .contrast-text {
+      color: #000 !important;
+    }
   }
 
   .mini-dashboard-card {
@@ -715,6 +717,12 @@
     .green-text {
       color: #008b00;
     }
+    .green-text-contrast {
+      color: #c3f69d;
+    }
+    .red-text-contrast {
+      color: mat.m2-get-color-from-palette($warn-palette, 900);
+    }
 
     .stamp-paid {
       box-shadow: 0 0 0 3px #008b00, 0 0 0 2px #008b00 inset;
@@ -734,8 +742,8 @@
     }
 
     .mat-mdc-fab.mat-green {
-      --mdc-fab-container-color: #c3f69d !important;
-      --mdc-fab-icon-color: #000;
+      --mat-fab-container-color: #c3f69d !important;
+      --mat-fab-icon-color: #000;
       --mat-mdc-fab-color: #000;
     }
 
@@ -750,6 +758,12 @@
     .success,
     .green-text {
       color: #c3f69d;
+    }
+    .green-text-contrast {
+      color: #008b00;
+    }
+    .red-text-contrast {
+      color: mat.m2-get-color-from-palette($warn-palette, 200);
     }
 
     .stamp-paid {
@@ -770,8 +784,8 @@
     }
 
     .mat-mdc-fab.mat-green {
-      --mdc-fab-container-color: #008b00 !important;
-      --mdc-fab-icon-color: #fff;
+      --mat-fab-container-color: #008b00 !important;
+      --mat-fab-icon-color: #fff;
       --mat-mdc-fab-color: #fff;
     }
 

@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { IError, PageRequest, ResponseSuccess } from '../interfaces/common';
+import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
 import { IColor } from '../interfaces/color';
 import { Pagination } from '../interfaces/pagination';
 
@@ -13,8 +13,14 @@ enum ColorActionTypes {
   colorSelected = '[Color] Selected',
   getColor = '[Color] Find color by id',
   deleteColor = '[Color] Delete color by id',
+  setCurrentColorId = '[Color] Set current color id',
   clean = '[Color] Clean'
 }
+
+export const setCurrentColorId = createAction(
+  ColorActionTypes.setCurrentColorId,
+  props<{ colorId: string }>(),
+);
 
 export const getColorsPage = createAction(
   ColorActionTypes.getColorsPage,
@@ -38,7 +44,7 @@ export const updateColor = createAction(
 
 export const colorSaveSuccess = createAction(
   ColorActionTypes.colorSaveSuccess,
-  props<ResponseSuccess>(),
+  props<IResponseSuccess>(),
 );
 
 export const colorFailure = createAction(
@@ -61,4 +67,4 @@ export const deleteColor = createAction(
   props<{ id: string, name: string }>(),
 );
 
-export const clean = createAction(ColorActionTypes.clean);
+export const cleanColor = createAction(ColorActionTypes.clean);

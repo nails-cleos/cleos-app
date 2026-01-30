@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MainRoutingModule } from './main-routing.module';
-import { EffectsModule } from '@ngrx/effects';
+import { provideEffects } from '@ngrx/effects';
 
 import { MainComponent } from './main.component';
 import { MainContentComponent } from './main-content/main-content.component';
@@ -19,10 +19,12 @@ import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/trans
 import { LoginEffects } from '../store/effects/auth.effects';
 import { AuthService } from '../services/auth.service';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
-import { Store } from '@ngrx/store';
-import { AppState, selectI18nState } from '../store/app.states';
-import { Observable } from 'rxjs';
+import { provideState, Store } from '@ngrx/store';
 import { BottomSheetBookAppointmentComponent } from './main-content/bottom-sheet-book-appointment';
+import { MAIN_FEATURE_KEY, mainReducer } from '../store/reducers/main.reducers';
+import { MainNavigationEffects } from './main-navigation.effects';
+import { I18NState } from '../store/reducers/i18n.reducers';
+import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
 
 @NgModule({
   imports: [
@@ -45,7 +47,6 @@ import { BottomSheetBookAppointmentComponent } from './main-content/bottom-sheet
       isolate: false,
       extend: true,
     }),
-    EffectsModule.forFeature([MainEffects, CatalogueEffects, UserEffects, LoginEffects]),
   ],
   providers: [
     MainService,
@@ -57,14 +58,14 @@ import { BottomSheetBookAppointmentComponent } from './main-content/bottom-sheet
       provide: LocationStrategy,
       useClass: HashLocationStrategy,
     },
+    provideState(MAIN_FEATURE_KEY, mainReducer),
+    provideEffects(MainEffects, CatalogueEffects, UserEffects, LoginEffects, MainNavigationEffects),
   ],
 })
 export class MainModule {
-  constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
-    const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe((state) => {
-      translateService.currentLang = '';
-      this.translateService.use(state.language);
+  constructor(private readonly store: Store<I18NState>, protected translateService: TranslateService) {
+    this.store.pipe(getI18NLanguagePipe).subscribe((language) => {
+      this.translateService.use(language);
     });
   }
 }

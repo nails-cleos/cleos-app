@@ -2,14 +2,16 @@ import { NgModule } from '@angular/core';
 import { NoteComponent } from './note.component';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
-import { EffectsModule } from '@ngrx/effects';
+import { provideEffects } from '@ngrx/effects';
 import { NoteRoutingModule } from './note-routing.module';
 import { NoteService } from '../services/note.service';
 import { NoteEffects } from '../store/effects/note.effects';
 import { UserService } from '../services/user.service';
-import { Store } from '@ngrx/store';
-import { AppState, selectI18nState } from '../store/app.states';
-import { Observable } from 'rxjs';
+import { provideState, Store } from '@ngrx/store';
+import { NOTE_FEATURE_KEY, noteReducer } from '../store/reducers/note.reducers';
+import { NoteNavigationEffects } from './note-navigation.effects';
+import { I18NState } from '../store/reducers/i18n.reducers';
+import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
 
 @NgModule({
   imports: [
@@ -27,19 +29,18 @@ import { Observable } from 'rxjs';
       isolate: false,
       extend: true,
     }),
-    EffectsModule.forFeature([NoteEffects]),
   ],
   providers: [
     NoteService,
     UserService,
+    provideState(NOTE_FEATURE_KEY, noteReducer),
+    provideEffects(NoteEffects, NoteNavigationEffects),
   ],
 })
 export class NoteModule {
-  constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
-    const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe((state) => {
-      translateService.currentLang = '';
-      this.translateService.use(state.language);
+  constructor(private readonly store: Store<I18NState>, protected translateService: TranslateService) {
+    this.store.pipe(getI18NLanguagePipe).subscribe((language) => {
+      this.translateService.use(language);
     });
   }
 }

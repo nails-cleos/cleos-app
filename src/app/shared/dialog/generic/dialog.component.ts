@@ -15,7 +15,7 @@ export class DialogComponent {
   readonly dialogRef = inject(MatDialogRef<DialogComponent>);
   readonly data = inject<IDialog>(MAT_DIALOG_DATA);
 
-  get onNoClick(): void {
-    return this.dialogRef.close();
+  onNoClick() {
+    this.dialogRef.close();
   }
 }

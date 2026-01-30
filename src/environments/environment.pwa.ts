@@ -9,7 +9,7 @@ export const environment = {
   },
   appDomain: 'typically-optimum-tetra.ngrok-free.app',
   appServer: 'https://typically-optimum-tetra.ngrok-free.app',
-  title: 'Cleos PWA',
+  title: 'Nails Cleos PWA',
   version: packageJson.version + '-pwa',
   baseUrl: 'http://localhost:9999/api',
   googleClientId: '364998384255-kk09n0fq6p79s7oim94ljevf8bb0etip.apps.googleusercontent.com',
@@ -25,6 +25,9 @@ export const environment = {
     vapidKey: 'BJOQTLLmUxq8uJ3aE19sB7Hhda7MAx0K7aI5A9BXfA2TJyaMHU7rbLDyAGTSe-8dahCyj7zJVK8VqWHeE3PFTc8',
     databaseURL: 'https://nails-cleos-dev-default-rtdb.europe-west1.firebasedatabase.app',
   },
+  awsIdentityPoolId: 'eu-central-1:e77fb0cd-db20-4959-8010-e5d71ca4ef52',
+  awsLoginsKey: 'securetoken.google.com/nails-cleos-dev',
+  awsExtractEnable: false,
   googleMapKey: 'AIzaSyAkKXZ_Qi3MLge6Jjhi1bw0OXawDAbJgXc',
   showMap: true,
 };

@@ -6,7 +6,7 @@ import { IReservationAll } from '../interfaces/reservation';
 import { IAdditionalAll } from '../interfaces/additional';
 import { TranslateService } from '@ngx-translate/core';
 import { IAddress, ILocation, IRoom, IRoomAll, ServiceType } from '../interfaces/room';
-import { IOffice } from '../interfaces/office';
+import { IOfficeAll } from '../interfaces/office';
 import { ICurrency, ICurrencyAll } from '../interfaces/currency';
 import { getTime, getTimeZone, localeTimeZoneDate } from './dates';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
@@ -16,6 +16,7 @@ import { Role } from '../interfaces/token';
 import { CancelDialogComponent } from '../shared/dialog/cancel/cancel-dialog.component';
 import { Router } from '@angular/router';
 import { CustomerEditDialogComponent } from '../shared/dialog/customer-edit/customer-edit-dialog.component';
+import { ISummaryRoom } from '../interfaces/dashboard';
 
 export const VERIFICATION_EMAIL = 'verification_email';
 
@@ -40,7 +41,7 @@ export const getUserImage = (user?: IUser | IUserAll): string | undefined => {
     if (user.imageUrl.indexOf('http') >= 0) {
       image = user.imageUrl;
     } else if (user.image) {
-      image = `data:image/jpeg;base64,${ user.image }`;
+      image = `data:image/jpeg;base64,${user.image}`;
     }
   }
 
@@ -208,8 +209,12 @@ export const newPercentage = (price: IPrice, percentage: number): IPrice => new 
   price.extra, price.additional, price.total, price.totalPaid, price.totalWithoutDiscount, price.priceWithDiscount,
   price.priceWithExtras, price.priceWithAdditional, percentage, price.balance);
 
-export const createTreatmentGroupService = (groups: Map<string, GroupService>, list: ITreatmentAll[], currency: string,
-  isSelected: boolean = false): Map<string, GroupService> => {
+export const createTreatmentGroupService = (
+  groups: Map<string, GroupService>,
+  list: ITreatmentAll[],
+  currency: string,
+  isSelected: boolean = false,
+): Map<string, GroupService> => {
   list.forEach((treatment: ITreatmentAll) => {
     const groupId = treatment.group.id;
     const mapGroup = groups.get(groupId);
@@ -219,9 +224,9 @@ export const createTreatmentGroupService = (groups: Map<string, GroupService>, l
     treatment = Object.assign({}, treatment, { currency, type: ServiceType.treatment });
 
     if (isSelected) {
-      keyGroup.selectedTreatments = [...keyGroup.selectedTreatments, treatment];
+      keyGroup.selectedTreatments = keyGroup.selectedTreatments.concat(treatment);
     } else {
-      keyGroup.treatments = [...keyGroup.treatments, treatment];
+      keyGroup.treatments = keyGroup.treatments.concat(treatment);
     }
     groups.set(groupId, keyGroup);
   });
@@ -229,8 +234,8 @@ export const createTreatmentGroupService = (groups: Map<string, GroupService>, l
   return groups;
 };
 
-export const createRoomOffice = (rooms?: IRoom[]): Map<string, IOffice> | undefined =>
-  rooms?.reduce((oMap: Map<string, IOffice>, room: IRoom) => {
+export const createRoomOffice = (rooms?: IRoomAll[]): Map<string, IOfficeAll> | undefined =>
+  rooms?.reduce((oMap: Map<string, IOfficeAll>, room: IRoomAll) => {
     const officeId = room.office?.id;
     if (officeId) {
       let of = oMap.get(officeId);
@@ -244,27 +249,27 @@ export const createRoomOffice = (rooms?: IRoom[]): Map<string, IOffice> | undefi
       oMap.set(officeId, of);
     }
     return oMap;
-  }, new Map<string, IOffice>());
+  }, new Map<string, IOfficeAll>());
 
 export const roomName = (room: IRoom | IRoomAll): string => {
   const gmt = roomGMT(room);
   const currency = roomCurrency(room);
   return room.currency && room.office ?
-    `${ room.office.name } - ${ currency }${ gmt }` : '';
+    `${room.office.name} - ${currency}${gmt}` : '';
 };
 
 export const roomDetail = (room: IRoom | IRoomAll): string => {
   const gmt = roomGMT(room);
   const currency = roomCurrency(room);
-  return `${ currency }${ gmt }`;
+  return `${currency}${gmt}`;
 };
 
 export const roomCurrency = (room: IRoom | IRoomAll): string =>
-  room.currency ? `${ room.currency.code } (${ currencySymbol(room.currency) })` : '';
+  room.currency ? `${room.currency.code} (${currencySymbol(room.currency)})` : '';
 
 export const roomGMT = (room: IRoom | IRoomAll): string => {
   const tz = getTimeZone(room.timeZone);
-  return tz.gmt ? ` - (${ tz.gmt })` : '';
+  return tz.gmt ? ` - (${tz.gmt})` : '';
 };
 
 export const currencySymbol = (currency?: ICurrency | string): string => {
@@ -298,14 +303,17 @@ export const currencySymbol = (currency?: ICurrency | string): string => {
   }
 };
 
-export const openDialog = (myRoom: IRoomAll, locale: string, translate: TranslateService,
+export const openDialog = (
+  myRoom: IRoomAll, locale: string, translate: TranslateService,
   dialog: MatDialog, time?: Date): void => {
   const room = roomName(myRoom);
   createDialog('ROOM_INFO', room, locale, translate, dialog, myRoom.timeZone, time);
 };
 
-export const createDialog = (key: string, value: string, locale: string, translate: TranslateService,
-  dialog: MatDialog, timeZone?: string, time?: Date): void => {
+export const createDialog = (
+  key: string, value: string, locale: string, translate: TranslateService,
+  dialog: MatDialog, timeZone?: string, time?: Date,
+): void => {
   const localDate = new Date(localeTimeZoneDate('en-US', time));
   const date = new Date(localeTimeZoneDate('en-US', time, timeZone));
 
@@ -322,7 +330,7 @@ export const createDialog = (key: string, value: string, locale: string, transla
   }
 
   const title = translate.instant('COMMON.TIME_ZONE.TITLE');
-  const content = translate.instant(`COMMON.TIME_ZONE.${ key }`, { localTime, timeZoneTime, value, arg });
+  const content = translate.instant(`COMMON.TIME_ZONE.${key}`, { localTime, timeZoneTime, value, arg });
   dialog.open(DialogComponent, {
     data: { title, content, hideNoButton: true, hideOkButton: true },
   });
@@ -338,8 +346,7 @@ export const totalPaid = (payments: IPayment[] | undefined): number => payments?
 
 export const areEquals = (array1: any[], array2: any[]): boolean => (array1.length === array2.length &&
   array1.every((element1) => array2.some((element2) =>
-  	Object.keys(element1).every((key) => element1[key] === element2[key]),
-  ),
+    Object.keys(element1).every((key) => element1[key] === element2[key])),
   )
 );
 
@@ -427,7 +434,8 @@ export const executeDialogNoWidth = (
   dialogRef.afterClosed().subscribe(afterClose);
 };
 
-export const executeDialog = (dialog: MatDialog, dialogComponent: any, data: any, afterClose: (result: any) => void,
+export const executeDialog = (
+  dialog: MatDialog, dialogComponent: any, data: any, afterClose: (result: any) => void,
   disableClose: boolean = false, width: string = '70vw'): void => {
   const dialogRef = dialog.open(dialogComponent, {
     width,
@@ -467,7 +475,8 @@ export enum FrequencyEnum {
   onceAYear = 'ONCE_A_YEAR',
 }
 
-export const createAddress = (formattedAddress?: string, location?: google.maps.LatLng,
+export const createAddress = (
+  formattedAddress?: string, location?: google.maps.LatLng,
   address?: IAddress, description?: string): IAddress | undefined => {
   if (location || address) {
     return {
@@ -484,3 +493,32 @@ export const createAddress = (formattedAddress?: string, location?: google.maps.
 };
 
 export const toUrl = (...url: string[]): string => url.join('/');
+
+export const getCurrencyFromRoom = (
+  selectedRoom?: ISummaryRoom | 'All',
+  primaryRoom?: ISummaryRoom,
+): ICurrencyAll => {
+  const defaultCurrency: ICurrencyAll = { id: '', name: 'euro', code: 'EUR', icon: 'euro' };
+  if (selectedRoom === 'All' && primaryRoom) {
+    return primaryRoom.currency;
+  } else if (selectedRoom !== 'All' && selectedRoom) {
+    return selectedRoom.currency;
+  }
+  return defaultCurrency;
+};
+
+export const getTimeZoneFromRoom = (
+  selectedRoom?: ISummaryRoom | 'All',
+  primaryRoom?: ISummaryRoom,
+): string | undefined => {
+  if (selectedRoom === 'All' && primaryRoom) {
+    return primaryRoom.timeZone;
+  } else if (selectedRoom && selectedRoom !== 'All') {
+    return selectedRoom.timeZone;
+  }
+  return undefined;
+};
+
+export const getList = <T extends { id: string }>(list?: T[], id?: string) => {
+  return list?.length === 1 ? list[0] : list?.find((o: T) => o.id === id);
+};

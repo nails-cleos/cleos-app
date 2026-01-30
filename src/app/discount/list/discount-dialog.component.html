@@ -2,21 +2,21 @@
   <mat-icon>close</mat-icon>
 </button>
 <h1 mat-dialog-title>{{ title }}</h1>
-@if (allCustomers) {
+@if (allCustomersWritableSignal()) {
   <div mat-dialog-content>
     <mat-form-field class="chip-list">
       <mat-label>{{ 'DISCOUNT.LIST.DIALOG.CUSTOMER' | translate }}</mat-label>
       <mat-chip-grid #chipList aria-label="Customer selection">
-        @for (customer of customers; track customer.id) {
+        @for (customer of selectedCustomersSignal(); track customer.id) {
           <mat-chip-row (removed)="remove(customer)" [removable]="true">
             {{ customer.displayName }}
             <mat-icon matChipRemove>cancel</mat-icon>
           </mat-chip-row>
         }
-        <input #customerInput [formControl]="customerCtrl" [matAutocomplete]="auto" [matChipInputFor]="chipList">
+        <input #customerInput [formControl]="getForm.customers" [matAutocomplete]="auto" [matChipInputFor]="chipList">
       </mat-chip-grid>
       <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-        @for (customer of sortCustomers(filteredCustomers | async); track customer.id) {
+        @for (customer of sortCustomers(filteredCustomerSignal()); track customer.id) {
           <mat-option [value]="customer">{{ customer.displayName }}</mat-option>
         }
       </mat-autocomplete>

@@ -1,69 +1,80 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CookieService } from 'ngx-cookie-service';
+import { ThemeService } from 'ng2-charts';
+import { DateAdapter } from '@angular/material/core';
+import { Store } from '@ngrx/store';
+
 import { resetTheme, Theme } from './util/theme';
 import { getLocale } from './util/helper';
-import { ThemeService } from 'ng2-charts';
-import { DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
 import { YearMonthDateAdapter } from './util/adapter/year-month-date.adapter';
 import { AuthUserService } from './services/auth-user.service';
-import { Observable, Subscription } from 'rxjs';
 import { SeoService } from './services/seo.service';
-import { Store } from '@ngrx/store';
-import { AppState, selectI18nState } from './store/app.states';
-import { RouterOutlet } from '@angular/router';
 import { setLanguage } from './store/i18n.actions';
-
+import { I18NState } from './store/reducers/i18n.reducers';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  providers: [{
-    provide: DateAdapter,
-    useClass: YearMonthDateAdapter,
-  }],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [
+    {
+      provide: DateAdapter,
+      useClass: YearMonthDateAdapter,
+    },
+  ],
   imports: [RouterOutlet],
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent {
+  private readonly translate = inject(TranslateService);
+  private readonly overlayContainer = inject(OverlayContainer);
+  private readonly cookieService = inject(CookieService);
+  private readonly themeService = inject(ThemeService);
+  private readonly dateAdapter = inject(DateAdapter<Date>);
+  private readonly authUserService = inject(AuthUserService);
+  private readonly seoService = inject(SeoService);
+  private readonly store = inject(Store<I18NState>);
 
-  private cssClass?: string;
-  private authUserServiceSubscription: Subscription;
+  private readonly cssClass = signal<string | undefined>(undefined);
+  private readonly authUserSignal = this.authUserService.authUser;
 
-  private getI18nState: Observable<any>;
-  private i18nSubscription?: Subscription;
+  private lastLanguage?: string;
 
-  constructor(private translate: TranslateService, private overlayContainer: OverlayContainer,
-              private cookieService: CookieService,
-              private themeService: ThemeService, private dateAdapter: DateAdapter<Date>,
-              private authUserService: AuthUserService,
-              @Inject(MAT_DATE_LOCALE) private locale: string, private seoService: SeoService,
-              private readonly store: Store<AppState>) {
-    this.authUserServiceSubscription = this.authUserService.authUser
-      .subscribe(value => this.resetConfig(value.locale, value.theme));
+  constructor() {
+    effect(() => {
+      const user = this.authUserSignal();
+      if (!user) {
+        return;
+      }
 
-    this.getI18nState = this.store.select(selectI18nState);
-  }
-
-  ngOnInit(): void {
-    this.i18nSubscription = this.getI18nState.subscribe((state) => this.translate.use(state.data));
-  }
-
-  ngOnDestroy(): void {
-    this.authUserServiceSubscription.unsubscribe();
-    this.i18nSubscription?.unsubscribe();
+      this.resetConfig(user.locale, user.theme);
+    });
   }
 
   private resetConfig = (locale: string, theme?: Theme): void => {
-    const meta = this.translate.instant('META');
+    const currentLocale = getLocale(locale);
 
-    this.seoService.setMetaDescription(meta.CONTENT);
-    this.seoService.setMetaTitle(meta.TITLE);
-    this.cssClass = resetTheme(theme, this.cssClass, this.overlayContainer, this.cookieService, this.themeService);
-    this.locale = locale;
-    const currentLocale = getLocale(this.locale);
-    this.dateAdapter.setLocale(currentLocale.language);
-    this.store.dispatch(setLanguage({ language: currentLocale.language }));
+    if (this.lastLanguage !== currentLocale.language) {
+      this.lastLanguage = currentLocale.language;
+      this.store.dispatch(setLanguage({ language: currentLocale.language }));
+
+      const meta = this.translate.instant('META');
+
+      this.seoService.setMetaDescription(meta.CONTENT);
+      this.seoService.setMetaTitle(meta.TITLE);
+
+      this.dateAdapter.setLocale(currentLocale.language);
+    }
+
+    this.cssClass.set(resetTheme(
+      this.overlayContainer,
+      this.cookieService,
+      this.themeService,
+      theme,
+      this.cssClass(),
+    ));
   };
 }

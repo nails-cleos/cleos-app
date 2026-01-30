@@ -1,59 +1,43 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import {
   DragDropSortingComponent,
   ISorted,
-  ISorting,
   ItemSorting,
 } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
-import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { AppState, selectAdditionalState } from '../../store/app.states';
 import { IAdditionalAll } from '../../interfaces/additional';
 import { SharedModule } from '../../shared/shared.module';
-import { clean, getAdditionalList, sortAdditional } from '../../store/additional.actions';
+import { getAdditionalList, sortAdditional } from '../../store/additional.actions';
+import { getAdditionalListPipe, getAdditionalResponsePipe } from '../../store/selectors/additional.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { AdditionalState } from '../../store/reducers/additional.reducers';
 
 @Component({
   selector: 'app-sorting',
   templateUrl: './additional-sorting.component.html',
   styleUrls: ['./additional-sorting.component.scss'],
   imports: [SharedModule, DragDropSortingComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AdditionalSortingComponent implements OnInit, OnDestroy {
+export class AdditionalSortingComponent {
+  private readonly store: Store<AdditionalState> = inject(Store<AdditionalState>);
 
-  items?: ISorting[];
+  private additionalList$ = this.store.pipe(getAdditionalListPipe);
+  private response$ = this.store.pipe(getAdditionalResponsePipe);
 
-  private subscription?: Subscription;
-  private getState: Observable<any>;
+  private additionalListSignal = toSignal(this.additionalList$);
+  private responseSignal = toSignal(this.response$);
 
-  constructor(private store: Store<AppState>) {
-    this.getState = this.store.select(selectAdditionalState);
-  }
+  itemsSignal = computed(() => this.additionalListSignal()?.map(
+    (iAdditionalAll: IAdditionalAll) => new ItemSorting(iAdditionalAll.id, iAdditionalAll.name, iAdditionalAll.order)));
 
-  ngOnInit(): void {
-    this.clean();
-    this.subscribe();
-    this.getAdditionalList();
-  }
-
-  ngOnDestroy() {
-    this.subscription?.unsubscribe();
+  constructor() {
+    effect(() => {
+      if (this.responseSignal()) {
+        this.store.dispatch(getAdditionalList());
+      }
+    });
   }
 
   sorted = (additionalList: ISorted[]): void => this.store.dispatch(sortAdditional({ additionalList }));
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private getAdditionalList = (): void => this.store.dispatch(getAdditionalList());
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.response) {
-        this.clean();
-        this.getAdditionalList();
-      }
-      this.items = state?.data?.map((iAdditionalAll: IAdditionalAll) => new ItemSorting(
-        iAdditionalAll.id, iAdditionalAll.name, iAdditionalAll.order),
-      );
-    });
-  };
 }

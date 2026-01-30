@@ -1,7 +1,9 @@
 <div class="flex-container">
   <div class="card-container">
     <div class="card-content">
-      <form (ngSubmit)="submit" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+      <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+        @let isAddMode = isAddModeSignal();
+        @let color = colorSignal();
         <mat-card appearance="outlined">
           @if (isAddMode) {
             <mat-card-header>
@@ -22,16 +24,17 @@
               <div class="inner-container">
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COLOR.NAME.FIELD' | translate }}</mat-label>
-                  <input formControlName="name" matInput required>
+                  <input [formControl]="getForm.name" matInput required data-cy="name-input">
                   @if (getForm.name.hasError('required')) {
                     <mat-error [innerHTML]="'COLOR.NAME.REQUIRED' | translate"></mat-error>
-                  } @else if (errors['code']) {
-                    <mat-error>{{ errors['code'] }}</mat-error>
+                  } @else if (errors()['code']) {
+                    <mat-error>{{ errors()['code'] }}</mat-error>
                   }
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COLOR.DESCRIPTION.FIELD' | translate }}</mat-label>
-                  <textarea #message formControlName="description" matInput maxlength="256"></textarea>
+                  <textarea #message [formControl]="getForm.description" matInput maxlength="256"
+                            data-cy="description-textarea"></textarea>
                   <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
                 </mat-form-field>
               </div>

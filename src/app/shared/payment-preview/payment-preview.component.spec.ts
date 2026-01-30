@@ -4,6 +4,8 @@ import { SharedModule } from '../shared.module';
 import { By } from '@angular/platform-browser';
 import { IPaymentOption, PaymentType } from '../../interfaces/payment';
 import { TranslateModule } from '@ngx-translate/core';
+import { MatIconRegistry } from '@angular/material/icon';
+import { matIconRegistryStub } from '../../util/app-material-registry-stub';
 
 describe('PaymentPreviewComponent', () => {
   let component: PaymentPreviewComponent;
@@ -27,6 +29,7 @@ describe('PaymentPreviewComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [PaymentPreviewComponent, SharedModule, TranslateModule.forRoot()],
+      providers: [{ provide: MatIconRegistry, useValue: matIconRegistryStub }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PaymentPreviewComponent);
@@ -38,7 +41,7 @@ describe('PaymentPreviewComponent', () => {
   });
 
   it('should render type info when type is provided', () => {
-    component.type = mockType;
+    fixture.componentRef.setInput('type', mockType);
     fixture.detectChanges();
 
     const typeName = fixture.debugElement.query(By.css('[matListItemLine]')).nativeElement;
@@ -46,8 +49,8 @@ describe('PaymentPreviewComponent', () => {
   });
 
   it('should render bank info when type.subTypes and bank are provided', () => {
-    component.type = { ...mockType, subTypes: [mockBank] };
-    component.bank = mockBank;
+    fixture.componentRef.setInput('type', { ...mockType, subTypes: [mockBank] });
+    fixture.componentRef.setInput('bank', mockBank);
     fixture.detectChanges();
 
     const listItems = fixture.debugElement.queryAll(By.css('mat-list-item'));
@@ -55,9 +58,9 @@ describe('PaymentPreviewComponent', () => {
   });
 
   it('should render total when toPaid is provided', () => {
-    component.type = { ...mockType, subTypes: [] };
-    component.toPaid = 100;
-    component.currencyIcon = 'euro';
+    fixture.componentRef.setInput('type', { ...mockType, subTypes: [] });
+    fixture.componentRef.setInput('toPaid', 100);
+    fixture.componentRef.setInput('currencyIcon', 'euro');
     fixture.detectChanges();
 
     const totalEl = fixture.debugElement.queryAll(By.css('span.bold'))
@@ -68,9 +71,9 @@ describe('PaymentPreviewComponent', () => {
   });
 
   it('should prefer penalty if toPaid is not defined', () => {
-    component.type = { ...mockType, subTypes: [] };
-    component.penalty = 50;
-    component.currencyIcon = 'euro';
+    fixture.componentRef.setInput('type', { ...mockType, subTypes: [] });
+    fixture.componentRef.setInput('penalty', 50);
+    fixture.componentRef.setInput('currencyIcon', 'euro');
     fixture.detectChanges();
 
     const boldSpans = fixture.debugElement.queryAll(By.css('span.bold'));

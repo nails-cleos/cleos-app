@@ -46,11 +46,11 @@ describe('UpdateTrackingDialogComponent', () => {
   });
 
   it('should close the dialog with started/completed data when dates changed', () => {
-    const newStarted = new Date(component.startedDate.value!.getTime() + 1000 * 60); // +1 min
-    const newCompleted = new Date(component.completedDate.value!.getTime() + 2000 * 60); // +2 min
+    const newStarted = new Date(component.getForm.startedDate.value!.getTime() + 1000 * 60); // +1 min
+    const newCompleted = new Date(component.getForm.completedDate.value!.getTime() + 2000 * 60); // +2 min
 
-    component.startedDate.setValue(newStarted);
-    component.completedDate.setValue(newCompleted);
+    component.getForm.startedDate.setValue(newStarted);
+    component.getForm.completedDate.setValue(newCompleted);
 
     component.doAction();
 

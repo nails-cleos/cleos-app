@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { EffectsModule } from '@ngrx/effects';
+import { provideEffects } from '@ngrx/effects';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { ReservationRoutingModule } from './reservation-routing.module';
 
@@ -30,11 +30,15 @@ import { ReservationEffects } from '../store/effects/reservation.effects';
 import { PaymentEffects } from '../store/effects/payment.effects';
 import { DiscountEffects } from '../store/effects/discount.effects';
 import { CurrencyService } from '../services/currency.service';
-import { Store } from '@ngrx/store';
-import { AppState, selectI18nState } from '../store/app.states';
-import { Observable } from 'rxjs';
+import { provideState, Store } from '@ngrx/store';
 import { FabMenuComponent } from './detail/fab-menu/fab-menu.component';
 import { FormFieldAdderComponent } from '../shared/form-field-adder/form-field-adder.component';
+import { CancelDialogComponent } from '../shared/dialog/cancel/cancel-dialog.component';
+import { CustomerEditDialogComponent } from '../shared/dialog/customer-edit/customer-edit-dialog.component';
+import { RESERVATION_FEATURE_KEY, reservationReducer } from '../store/reducers/reservation.reducers';
+import { ReservationNavigationEffects } from './reservation-navigation.effects';
+import { I18NState } from '../store/reducers/i18n.reducers';
+import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
 
 @NgModule({
   imports: [
@@ -50,6 +54,8 @@ import { FormFieldAdderComponent } from '../shared/form-field-adder/form-field-a
     AddNoteDialogComponent,
     AddDiscountDialogComponent,
     FabMenuComponent,
+    CancelDialogComponent,
+    CustomerEditDialogComponent,
     FormFieldAdderComponent,
     ReservationRoutingModule,
     TranslateModule.forChild({
@@ -64,7 +70,6 @@ import { FormFieldAdderComponent } from '../shared/form-field-adder/form-field-a
       isolate: false,
       extend: true,
     }),
-    EffectsModule.forFeature([ReservationEffects, PaymentEffects, DiscountEffects]),
   ],
   providers: [
     ReservationService,
@@ -77,14 +82,14 @@ import { FormFieldAdderComponent } from '../shared/form-field-adder/form-field-a
     ColorService,
     DiscountService,
     CurrencyService,
+    provideState(RESERVATION_FEATURE_KEY, reservationReducer),
+    provideEffects(ReservationEffects, PaymentEffects, DiscountEffects, ReservationNavigationEffects),
   ],
 })
 export class ReservationModule {
-  constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
-    const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe((state) => {
-      translateService.currentLang = '';
-      this.translateService.use(state.language);
+  constructor(private readonly store: Store<I18NState>, protected translateService: TranslateService) {
+    this.store.pipe(getI18NLanguagePipe).subscribe((language) => {
+      this.translateService.use(language);
     });
   }
 }

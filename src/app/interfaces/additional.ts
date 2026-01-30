@@ -1,4 +1,5 @@
 import { IService } from './room';
+import { ITreatmentGroupAll } from './treatment';
 
 export interface IAdditional {
   id?: string;
@@ -12,8 +13,7 @@ export interface IAdditional {
 }
 
 export interface IAdditionalAll extends IService {
-  duration: string;
-  description?: string;
+  groups?: ITreatmentGroupAll[];
 }
 
 export class Additional implements IAdditional {

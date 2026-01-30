@@ -3,7 +3,7 @@ import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { EMPTY, Subject } from 'rxjs';
 import { ToastComponent } from '../shared/toast/toast.component';
-import { ToastActionType, ToastData, ToastRef, ToastType } from '../shared/toast/toast.model';
+import { ToastData, ToastOptions, ToastRef, ToastType } from '../shared/toast/toast.model';
 
 @Injectable({
   providedIn: 'root',
@@ -21,16 +21,14 @@ export class ToastService {
    * @param message Message to display in the toast
    * @param type Type of toast (success, error, info, warning)
    * @param duration Duration in milliseconds before auto-dismissing, default 5000ms (5s)
-   * @param actionType Type of action (button, link, none)
-   * @param action Text for the action button
+   * @param options Additional options for the toast
    * @returns ToastRef with onAction and onDismiss methods
    */
   show(
     message: string,
     type: ToastType = 'info',
     duration: number = 5000,
-    actionType: ToastActionType = 'none',
-    action?: string,
+    options: ToastOptions = { actionType: 'none' },
   ): ToastRef {
     const topOffset = this.topSpace + (this.overlayRefs.length * this.spaceBetween);
     const positionStrategy = this.overlay.position().global().top(`${topOffset}px`).centerHorizontally();
@@ -55,7 +53,7 @@ export class ToastService {
       };
     }
 
-    const toastData = { message, type, duration, action, actionType } as ToastData;
+    const toastData = { message, type, duration, action: options.action, actionType: options.actionType } as ToastData;
     (overlayRef as any).toastData = toastData;
     this.overlayRefs.push(overlayRef);
 
@@ -76,7 +74,7 @@ export class ToastService {
 
     if (duration > 0) {
       setTimeout(() => {
-        this.dismissSpecific(overlayRef);
+        toastDismissed.next();
       }, duration);
     }
 
@@ -84,34 +82,6 @@ export class ToastService {
       onAction: () => toastAction.asObservable(),
       onDismiss: () => toastDismissed.asObservable(),
     };
-  }
-
-  /**
-   * Show a success toast
-   */
-  success(message: string, duration = 5000, actionType: ToastActionType = 'none', action?: string) {
-    return this.show(message, 'success', duration, actionType, action);
-  }
-
-  /**
-   * Show an error toast
-   */
-  error(message: string, duration = 5000, actionType: ToastActionType = 'none', action?: string) {
-    return this.show(message, 'error', duration, actionType, action);
-  }
-
-  /**
-   * Show a warning toast
-   */
-  warning(message: string, duration = 5000, actionType: ToastActionType = 'none', action?: string) {
-    return this.show(message, 'warning', duration, actionType, action);
-  }
-
-  /**
-   * Show an info toast
-   */
-  info(message: string, duration = 5000, actionType: ToastActionType = 'none', action?: string) {
-    return this.show(message, 'info', duration, actionType, action);
   }
 
   /**

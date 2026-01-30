@@ -1,27 +1,29 @@
-@let handSet = handset$ | async;
-@if (handSet) {
+@let currentIsEditing = isEditing();
+@let currentIsAdmin = isAdmin();
+@if (screenConfig(); as screenConfig) {
   <ng-template #stepOne>
     <form [formGroup]="customerForm" (keydown.enter)="$event.preventDefault()">
-      @if (customers) {
+      @if (customersSignal()) {
         <mat-form-field appearance="outline">
           <mat-label>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</mat-label>
-          <input (keydown)="keyDownHandler($event, customer)" formControlName="customer"
+          <input (keydown)="keyDownHandler($event, getCustomerForm.customer)" [formControl]="getCustomerForm.customer"
                  [matAutocomplete]="autoCustomer" name="customer"
                  autocomplete="off" matInput required type="text">
           <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
-            @for (customer of filteredCustomer | async; track customer.id) {
+            @for (customer of filteredCustomerSignal(); track customer.id) {
               <mat-option [value]="customer">{{ customer.displayName }}</mat-option>
             }
           </mat-autocomplete>
-          @if (customer.hasError('required')) {
+          @if (getCustomerForm.customer.hasError('required')) {
             <mat-error [innerHTML]="'RESERVATION.CUSTOMER.REQUIRED' | translate"></mat-error>
-          } @else if (customer.hasError('requireMatch')) {
+          } @else if (getCustomerForm.customer.hasError('requireMatch')) {
             <mat-error [innerHTML]="'RESERVATION.CUSTOMER.INVALID' | translate"></mat-error>
-          } @else if (errors['customer']) {
-            <mat-error>{{ errors['customer'] }}</mat-error>
+          } @else if (errors()['customer']) {
+            <mat-error>{{ errors()['customer'] }}</mat-error>
           }
         </mat-form-field>
-        @if (customerInfo) {
+        {{ customerInfo() | json }}
+        @if (customerInfo(); as customerInfo) {
           <mat-list>
             <mat-list-item lines="3">
               <div matListItemTitle>{{ 'RESERVATION.CUSTOMER.INFO.DAYS' | translate: { days: customerInfo.days } }}
@@ -32,7 +34,7 @@
                   translate: {treatment: treatmentDetail}" matListItemLine></div>
             </mat-list-item>
           </mat-list>
-        } @else if (customer.value) {
+        } @else if (getCustomerForm.customer.value) {
           <div mat-subheader>{{ 'RESERVATION.CUSTOMER.INFO.NONE' | translate }}</div>
         }
       } @else {
@@ -43,68 +45,72 @@
 
   <ng-template #stepTwo>
     <form [formGroup]="officeForm" (keydown.enter)="$event.preventDefault()">
-      @if (!offices?.length) {
+      @let currentOffices = offices();
+      @if (!currentOffices?.length) {
         <div class="no-content bold">{{ 'RESERVATION.ROOM.NO_CONTENT' | translate }}</div>
       } @else {
         <div class="link-container">
-          @if (offices) {
+          @if (currentOffices) {
             <mat-form-field appearance="outline">
               <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
-              <input (keydown)="keyDownOffice($event)" formControlName="office" [matAutocomplete]="autoOffice"
+              <input (keydown)="keyDownOffice($event)" [formControl]="getOfficeForm.office"
+                     [matAutocomplete]="autoOffice"
                      matInput required type="text">
               <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
-                @for (office of filteredOffice | async; track office.id) {
+                @for (office of filteredOfficeSignal(); track office.id) {
                   <mat-option [value]="office">{{ office.name }}</mat-option>
                 }
               </mat-autocomplete>
-              @if (office.hasError('required')) {
+              @if (getOfficeForm.office.hasError('required')) {
                 <mat-error [innerHTML]="'COMMON.ROOM.OFFICE.REQUIRED' | translate"></mat-error>
-              } @else if (office.hasError('requireMatch')) {
+              } @else if (getOfficeForm.office.hasError('requireMatch')) {
                 <mat-error [innerHTML]="'COMMON.ROOM.OFFICE.INVALID' | translate"></mat-error>
-              } @else if (errors['office']) {
-                <mat-error>{{ errors['office'] }}</mat-error>
+              } @else if (errors()['office']) {
+                <mat-error>{{ errors()['office'] }}</mat-error>
               }
             </mat-form-field>
           } @else {
             <div class="ssc-line"></div>
           }
-          @if (roomList) {
+          @if (roomList()) {
             <mat-form-field appearance="outline">
               <mat-label>{{ 'COMMON.ROOM.FIELD' | translate }}</mat-label>
-              <input (keydown)="keyDownRoom($event)" formControlName="room" [matAutocomplete]="autoRoom" matInput
+              <input (keydown)="keyDownRoom($event)" [formControl]="getOfficeForm.room" [matAutocomplete]="autoRoom"
+                     matInput
                      required type="text">
               <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
-                @for (room of filteredRoom | async; track room.id) {
+                @for (room of filteredRoomSignal(); track room.id) {
                   <mat-option [value]="room">{{ room | roomName }}</mat-option>
                 }
               </mat-autocomplete>
-              @if (room.hasError('required')) {
+              @if (getOfficeForm.room.hasError('required')) {
                 <mat-error [innerHTML]="'COMMON.ROOM.REQUIRED' | translate"></mat-error>
-              } @else if (room.hasError('requireMatch')) {
+              } @else if (getOfficeForm.room.hasError('requireMatch')) {
                 <mat-error [innerHTML]="'COMMON.ROOM.INVALID' | translate"></mat-error>
-              } @else if (errors['room']) {
-                <mat-error>{{ errors['room'] }}</mat-error>
+              } @else if (errors()['room']) {
+                <mat-error>{{ errors()['room'] }}</mat-error>
               }
             </mat-form-field>
           } @else {
             <div class="ssc-line"></div>
           }
-          @if (professionalList) {
+          @if (professionalList()) {
             <mat-form-field appearance="outline">
               <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
-              <input (keydown)="keyDownHandler($event, professional)" formControlName="professional"
+              <input (keydown)="keyDownHandler($event, getOfficeForm.professional)"
+                     [formControl]="getOfficeForm.professional"
                      [matAutocomplete]="autoProfessional" matInput type="text" required>
               <mat-autocomplete #autoProfessional="matAutocomplete" [displayWith]="displayFnProfessional">
-                @for (professional of filteredProfessional | async; track professional.id) {
+                @for (professional of filteredProfessionalSignal(); track professional.id) {
                   <mat-option [value]="professional">{{ professional.displayName }}</mat-option>
                 }
               </mat-autocomplete>
-              @if (professional.hasError('required')) {
+              @if (getOfficeForm.professional.hasError('required')) {
                 <mat-error [innerHTML]="'COMMON.PROFESSIONAL.REQUIRED' | translate"></mat-error>
-              } @else if (professional.hasError('requireMatch')) {
+              } @else if (getOfficeForm.professional.hasError('requireMatch')) {
                 <mat-error [innerHTML]="'COMMON.PROFESSIONAL.INVALID' | translate"></mat-error>
-              } @else if (errors['professional']) {
-                <mat-error>{{ errors['professional'] }}</mat-error>
+              } @else if (errors()['professional']) {
+                <mat-error>{{ errors()['professional'] }}</mat-error>
               }
             </mat-form-field>
           } @else {
@@ -117,31 +123,34 @@
 
   <ng-template #stepThree>
     <form [formGroup]="treatmentForm" (keydown.enter)="$event.preventDefault()">
-      @if (!groups?.length) {
+      @let currentGroups = groups();
+      @if (!currentGroups?.length) {
         <div class="no-content bold">{{ 'RESERVATION.TREATMENT.NO_CONTENT' | translate }}</div>
       } @else {
         <div class="link-container">
           <div formArrayName="dateTimeList" class="array-form">
             @for (dateGroup of dateTimeList.controls; track $index; let i = $index) {
+              @let dateGroupForm = dateGroup.controls;
               <div [formGroupName]="i" class="array-group">
                 <div class="date-time-fields">
                   <mat-form-field appearance="outline" class="date-field">
                     <mat-label>{{ 'RESERVATION.DATE.FIELD' | translate }}</mat-label>
-                    <input (focus)="picker.open()" formControlName="date" [matDatepickerFilter]="myFilter"
-                           [matDatepicker]="picker" [max]="maxCalendarDate" matInput required name="date">
+                    <input (focus)="picker.open()" [formControl]="dateGroupForm.date" [matDatepickerFilter]="myFilter"
+                           [matDatepicker]="picker" [max]="maxCalendarDate" matInput required name="date"
+                           data-cy="date-picker">
                     <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
                     <mat-datepicker #picker touchUi></mat-datepicker>
-                    @if (dateGroup.get('date')?.hasError('invalid')) {
+                    @if (dateGroupForm.date.hasError('invalid')) {
                       <mat-error [innerHTML]="'RESERVATION.DATE.REQUIRED' | translate"></mat-error>
                     }
-                    @if (dateGroup.get('date')?.hasError('duplicateDate')) {
+                    @if (dateGroupForm.date.hasError('duplicateDate')) {
                       <mat-error>Duplicate dates are not allowed.</mat-error>
                     }
                   </mat-form-field>
                   <mat-form-field appearance="outline" class="time-field">
                     <mat-label>{{ 'RESERVATION.START.FIELD' | translate }}</mat-label>
-                    <input formControlName="start" [format]="24" [max]="maxDate" [min]="minDate"
-                           [ngxTimepicker]="tStart" matInput name="start" readonly/>
+                    <input [formControl]="dateGroupForm.start" [format]="24" [max]="maxDate" [min]="minDate"
+                           [ngxTimepicker]="tStart" matInput name="start" readonly data-cy="start-picker">
                     <span matPrefix><mat-icon (click)="tStart.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
                     <ngx-material-timepicker #tStart (timeSet)="timeChange($event, i)"
                                              [minutesGap]="15"></ngx-material-timepicker>
@@ -160,63 +169,64 @@
               </button>
             </div>
           </div>
-          @if (groups) {
+          @if (currentGroups) {
             <mat-form-field appearance="outline">
               <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
-              <input (keydown)="keyDownGroup($event)" formControlName="group" [matAutocomplete]="autoGroup"
-                     matInput required type="text">
+              <input (keydown)="keyDownGroup($event)" [formControl]="getTreatmentForm.group"
+                     [matAutocomplete]="autoGroup" matInput required type="text" data-cy="group-input">
               <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
-                @for (group of filteredGroup | async | sortBy: 'asc':'order'; track group.id) {
+                @for (group of filteredGroupSignal() | sortBy: 'asc':'order'; track group.id) {
                   <mat-option [value]="group">{{ group.name }}</mat-option>
                 }
               </mat-autocomplete>
-              @if (group.hasError('required')) {
+              @if (getTreatmentForm.group.hasError('required')) {
                 <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.REQUIRED' | translate"></mat-error>
-              } @else if (group.hasError('requireMatch')) {
+              } @else if (getTreatmentForm.group.hasError('requireMatch')) {
                 <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate"></mat-error>
-              } @else if (errors['group']) {
-                <mat-error>{{ errors['group'] }}</mat-error>
+              } @else if (errors()['group']) {
+                <mat-error>{{ errors()['group'] }}</mat-error>
               }
             </mat-form-field>
           } @else {
             <div class="ssc-line"></div>
           }
           <div>
-            @if (treatmentList) {
+            @if (treatmentList()) {
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
-                <input (keydown)="keyDownHandler($event, treatment)" formControlName="treatment"
-                       [matAutocomplete]="autoTreatment" matInput required type="text">
+                <input (keydown)="keyDownHandler($event, getTreatmentForm.treatment)"
+                       [formControl]="getTreatmentForm.treatment" [matAutocomplete]="autoTreatment" matInput required
+                       type="text" data-cy="treatment-input">
                 <mat-autocomplete #autoTreatment="matAutocomplete" [displayWith]="displayFnTreatment">
-                  @for (treatment of filteredTreatment | async | sortBy: 'asc':'order'; track treatment.id) {
+                  @for (treatment of filteredTreatmentSignal() | sortBy: 'asc':'order'; track treatment.id) {
                     <mat-option [value]="treatment">{{ treatment.name }}</mat-option>
                   }
                 </mat-autocomplete>
-                @if (treatment.hasError('required')) {
+                @if (getTreatmentForm.treatment.hasError('required')) {
                   <mat-error [innerHTML]="'COMMON.TREATMENT.REQUIRED' | translate"></mat-error>
-                } @else if (treatment.hasError('requireMatch')) {
+                } @else if (getTreatmentForm.treatment.hasError('requireMatch')) {
                   <mat-error [innerHTML]="'COMMON.TREATMENT.INVALID' | translate"></mat-error>
-                } @else if (errors['treatment']) {
-                  <mat-error>{{ errors['treatment'] }}</mat-error>
+                } @else if (errors()['treatment']) {
+                  <mat-error>{{ errors()['treatment'] }}</mat-error>
                 }
               </mat-form-field>
             } @else {
               <div class="ssc-line"></div>
             }
-            @if (treatment.value && !isEditing && discounts?.length) {
+            @if (getTreatmentForm.treatment.value && !currentIsEditing && discounts()?.length) {
               <button (click)="showDiscount = !showDiscount" class="icon-button" mat-fab extended type="button">
                 {{ 'COMMON.BUTTON.DISCOUNT.' + (showDiscount ? 'HIDE' : 'SHOW') | translate }}
                 <mat-icon>redeem</mat-icon>
               </button>
             }
           </div>
-          @if (treatment.value) {
-            @if (showDiscount && !isEditing) {
+          @if (getTreatmentForm.treatment.value) {
+            @if (showDiscount && !currentIsEditing) {
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</mat-label>
-                <mat-select formControlName="discount">
+                <mat-select [formControl]="getTreatmentForm.discount">
                   <mat-option>--</mat-option>
-                  @for (d of discounts; track d.id) {
+                  @for (d of discounts(); track d.id) {
                     <mat-option [value]="d.id">{{ d.title }}</mat-option>
                   }
                 </mat-select>
@@ -225,9 +235,9 @@
             <mat-list-item>
               <mat-icon matListItemIcon>spa</mat-icon>
               <div class="bold" matListItemTitle>{{ 'RESERVATION.TREATMENT.DETAIL' | translate }}</div>
-              @if (treatment.value.description) {
+              @if (getTreatmentForm.treatment.value.description) {
                 <div [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.DESCRIPTION' |
-                  translate: {description: treatment.value.description}" matListItemLine>
+                  translate: {description: getTreatmentForm.treatment.value.description}" matListItemLine>
                 </div>
               }
             </mat-list-item>
@@ -235,22 +245,22 @@
               <div matListItemTitle>
                 <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"></span>
                 @if (price.priceWithDiscount) {
-                  @if (!isEditing) {
-                    <span [class.strikethrough]="discount.value" class="raised-button">
-                    {{ room.value.currency | currencySymbol }} {{ treatment.value.price | number:'1.2-2' }}
+                  @if (!currentIsEditing) {
+                    <span [class.strikethrough]="getTreatmentForm.discount.value" class="raised-button">
+                    {{ getOfficeForm.room.value?.currency | currencySymbol }} {{ getTreatmentForm.treatment.value.price | number:'1.2-2' }}
                   </span>
                     <span [@discountAnimation] class="raised-button bold">
-                    {{ room.value.currency | currencySymbol }} {{ price.priceWithDiscount | number:'1.2-2' }}
+                    {{ getOfficeForm.room.value?.currency | currencySymbol }} {{ price.priceWithDiscount | number:'1.2-2' }}
                   </span>
                   } @else {
                     <span class="raised-button">
-                    {{ room.value.currency | currencySymbol }} {{ price.priceWithDiscount | number:'1.2-2' }}
+                    {{ getOfficeForm.room.value?.currency | currencySymbol }} {{ price.priceWithDiscount | number:'1.2-2' }}
                   </span>
                     <span class="raised-button bold">{{ 'RESERVATION.TREATMENT.DISCOUNT.ADD' | translate }}</span>
                   }
                 } @else {
                   <span class="raised-button">
-                  {{ room.value.currency | currencySymbol }} {{ treatment.value.price | number:'1.2-2' }}
+                  {{ getOfficeForm.room.value?.currency | currencySymbol }} {{ getTreatmentForm.treatment.value.price | number:'1.2-2' }}
                 </span>
                 }
               </div>
@@ -258,7 +268,8 @@
             <mat-list-item>
               <div matListItemTitle>
                 <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.DURATION' | translate"></span>
-                <span class="raised-button">&#9202; {{ treatment.value.duration | durationTime }}</span>
+                <span
+                  class="raised-button">&#9202; {{ getTreatmentForm.treatment.value.duration | durationTime }}</span>
               </div>
             </mat-list-item>
           }
@@ -268,15 +279,15 @@
   </ng-template>
 
   <ng-template #stepFour>
-    @if (additionalList) {
+    @if (additionalListSignal()) {
       <div>
         <mat-selection-list #additional (selectionChange)="onChange(additional.selectedOptions.selected)"
                             class="app-class">
           <mat-divider></mat-divider>
-          @for (it of additionalList; track it.id) {
+          @for (it of additionalListSignal(); track it.id) {
             <mat-list-option [selected]="isSelected(it)" [value]="it" togglePosition="before" lines="3">
               <div matListItemTitle>{{ it.name }}
-                ({{ room.value.currency | currencySymbol }} {{ it.price | number:'1.2-2' }} -
+                ({{ getOfficeForm.room.value?.currency | currencySymbol }} {{ it.price | number:'1.2-2' }} -
                 &#9202; {{ it.duration | durationTime }})
               </div>
               @if (it.description) {
@@ -295,54 +306,57 @@
   <ng-template #stepFive>
     <form [formGroup]="configurationForm" (keydown.enter)="$event.preventDefault()">
       <div class="link-container">
-        <mat-checkbox formControlName="customerChange" color="primary">
+        <mat-checkbox [formControl]="getConfigurationForm.customerChange" color="primary">
           {{ 'RESERVATION.CONFIGURATION.CUSTOMER_CHANGE.FIELD' | translate }}
         </mat-checkbox>
         <mat-form-field appearance="outline">
           <mat-label>{{ 'RESERVATION.CONFIGURATION.REFERENCE.FIELD' | translate }}</mat-label>
-          <input formControlName="reference" [required]="customerChange.value" matInput>
-          @if (reference.hasError('required')) {
+          <input [formControl]="getConfigurationForm.reference" [required]="getConfigurationForm.customerChange.value"
+                 matInput>
+          @if (getConfigurationForm.reference.hasError('required')) {
             <mat-error [innerHTML]="'RESERVATION.CONFIGURATION.REFERENCE.REQUIRED' | translate"></mat-error>
-          } @else if (errors['reference']) {
-            <mat-error>{{ errors['reference'] }}</mat-error>
+          } @else if (errors()['reference']) {
+            <mat-error>{{ errors()['reference'] }}</mat-error>
           }
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>{{ 'RESERVATION.NOTE.FIELD' | translate }}</mat-label>
-          <textarea formControlName="note" matInput></textarea>
-          @if (errors['note']) {
-            <mat-error>{{ errors['note'] }}</mat-error>
+          <textarea [formControl]="getConfigurationForm.note" matInput></textarea>
+          @if (errors()['note']) {
+            <mat-error>{{ errors()['note'] }}</mat-error>
           }
         </mat-form-field>
-        @if (room.value) {
+        @if (getOfficeForm.room.value) {
           <app-price-preview [label]="'RESERVATION.TREATMENT.PRICE.FIELD'" [price]="price"
-                             [currencyIcon]="room.value.currency.icon" [isEditing]="false"></app-price-preview>
+                             [currencyIcon]="getOfficeForm.room.value.currency.icon"
+                             [isEditing]="false"></app-price-preview>
           <mat-form-field appearance="outline">
             <mat-label>{{ 'RESERVATION.AMOUNT.FIELD' | translate }}</mat-label>
-            <mat-icon matPrefix>{{ room.value.currency.icon }}</mat-icon>
-            <input formControlName="amount" matInput matNativeControl [type]="'number'" [step]="1" [min]="1">
-            @if (amount.hasError('min')) {
+            <mat-icon matPrefix>{{ getOfficeForm.room.value.currency.icon }}</mat-icon>
+            <input [formControl]="getConfigurationForm.amount" matInput matNativeControl [type]="'number'" [step]="1"
+                   [min]="1">
+            @if (getConfigurationForm.amount.hasError('min')) {
               <mat-error
-                [innerHTML]="'RESERVATION.AMOUNT.MIN' | translate:{min: 1, currency: room.value.currency.icon}">
+                [innerHTML]="'RESERVATION.AMOUNT.MIN' | translate:{min: 1, currency: getOfficeForm.room.value.currency.icon}">
               </mat-error>
             }
           </mat-form-field>
-          @if (amount.value) {
+          @if (getConfigurationForm.amount.value) {
             <mat-form-field appearance="outline">
               <mat-label>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</mat-label>
-              <mat-select formControlName="type" [required]="true">
+              <mat-select [formControl]="getConfigurationForm.type" [required]="true">
                 @for (t of types; track t) {
                   <mat-option [value]="t">{{ 'COMMON.PAYMENT.TYPE.' + (t || 'NONE') | translate }}</mat-option>
                 }
               </mat-select>
-              @if (type.hasError('required')) {
+              @if (getConfigurationForm.type.hasError('required')) {
                 <mat-error [innerHTML]="'COMMON.PAYMENT.TYPE.FIELD.REQUIRED' | translate"></mat-error>
               }
             </mat-form-field>
-            @if (type.value === 'TRANSFER') {
+            @if (getConfigurationForm.type.value === 'TRANSFER') {
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'RESERVATION.PAYMENT.TRANSFER.FIELD' | translate }}</mat-label>
-                <input formControlName="transfer" matInput>
+                <input [formControl]="getConfigurationForm.transfer" matInput>
               </mat-form-field>
             }
           }
@@ -361,21 +375,21 @@
         [dayEndMinute]="day.dayEndMinute"
         [dayStartHour]="day.dayStartHour"
         [dayStartMinute]="day.dayStartMinute"
-        [daysInWeek]="handSet.daysInWeek"
+        [daysInWeek]="screenConfig.daysInWeek"
         [events]="dataEvent.value.calendarEvents"
         [hourSegments]="4"
         [locale]="dateFormat"
         [refresh]="refresh"
         [viewDate]="dataEvent.value.viewDate"
         [weekendDays]="weekendDays"></mwl-calendar-week-view>
-      @if (errors['schedule']?.length && errors['schedule'][dataEvent.value.index]) {
+      @if (errors()['schedule'][dataEvent.value.index]) {
         <mat-error [innerHTML]="'RESERVATION.SCHEDULE.REQUIRED' | translate" class="divider"></mat-error>
       }
-      @if (errors['overlapping']) {
-        <mat-error [innerHTML]="errors['overlapping']" class="divider"></mat-error>
+      @if (errors()['overlapping']) {
+        <mat-error [innerHTML]="errors()['overlapping']" class="divider"></mat-error>
       }
-      @if (errors['professional']) {
-        <mat-error [innerHTML]="errors['professional']" class="divider"></mat-error>
+      @if (errors()['professional']) {
+        <mat-error [innerHTML]="errors()['professional']" class="divider"></mat-error>
       }
       @if (!last) {
         <mat-divider style="margin-top: 5%"></mat-divider>
@@ -385,16 +399,17 @@
 
   <ng-template #stepSeven>
     @if (isPreview) {
+      @let currentAdditionalSelected = additionalSelected();
       <mat-card appearance="outlined">
         <mat-card-header>
           <mat-card-title>{{ 'RESERVATION.PREVIEW' | translate }}</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-          @if (note.value) {
+          @if (getConfigurationForm.note.value) {
             <mat-list class="note">
               <mat-list-item>
                 <div matListItemTitle>{{ 'RESERVATION.NOTE.FIELD' | translate }}</div>
-                <div matListItemLine>{{ note.value }}</div>
+                <div matListItemLine>{{ getConfigurationForm.note.value }}</div>
               </mat-list-item>
             </mat-list>
           }
@@ -402,29 +417,30 @@
             <mat-list-item>
               <div matListItemTitle>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</div>
               <mat-icon matListItemIcon>wash</mat-icon>
-              <div matListItemLine>{{ customer.value.displayName }}</div>
+              <div matListItemLine>{{ getCustomerForm.customer.value?.displayName }}</div>
             </mat-list-item>
             <mat-divider></mat-divider>
             <div mat-subheader>{{ 'COMMON.ROOM.FIELD' | translate }}</div>
             <mat-list-item>
               <mat-icon matListItemIcon>store</mat-icon>
               <div matListItemTitle>{{ 'RESERVATION.ROOM.NAME.FIELD' | translate }}</div>
-              <div matListItemLine>{{ room.value | roomName }}</div>
+              <div matListItemLine>{{ getOfficeForm.room.value | roomName }}</div>
             </mat-list-item>
             <mat-list-item>
               <mat-icon matListItemIcon>person_pin</mat-icon>
               <div matListItemTitle>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</div>
-              <div matListItemLine>{{ professional.value.displayName }}</div>
+              <div matListItemLine>{{ getOfficeForm.professional.value?.displayName }}</div>
             </mat-list-item>
             <mat-list-item lines="3">
               <mat-icon matListItemIcon>room</mat-icon>
               <div matListItemTitle>{{ 'COMMON.ADDRESS.FIELD' | translate }}</div>
               <div matListItemLine class="description">
-                <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + room.value.address.name"
-                   rel="noreferrer" target="_blank">{{ room.value.address.name }}</a>
+                <a
+                  [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + getOfficeForm.room.value?.address?.name"
+                  rel="noreferrer" target="_blank">{{ getOfficeForm.room.value?.address?.name }}</a>
               </div>
-              @if (room.value.address.description) {
-                <div matListItemLine class="description">{{ room.value.address.description }}</div>
+              @if (getOfficeForm.room.value && getOfficeForm.room.value.address.description) {
+                <div matListItemLine class="description">{{ getOfficeForm.room.value.address.description }}</div>
               }
             </mat-list-item>
             <mat-divider></mat-divider>
@@ -432,45 +448,47 @@
             <mat-list-item>
               <mat-icon matListItemIcon>spa</mat-icon>
               <div matListItemTitle>{{ 'RESERVATION.TREATMENT.NAME.FIELD' | translate }}</div>
-              <div matListItemLine>{{ treatment.value.name }}</div>
+              <div matListItemLine>{{ getTreatmentForm.treatment.value?.name }}</div>
             </mat-list-item>
             <mat-list-item>
               <mat-icon matListItemIcon>timer</mat-icon>
               <div matListItemTitle>{{ 'RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</div>
-              <div matListItemLine>{{ treatment.value.duration | durationTime }}</div>
+              <div matListItemLine>{{ getTreatmentForm.treatment.value?.duration | durationTime }}</div>
             </mat-list-item>
-            @if (additionalSelected.length) {
+            @if (currentAdditionalSelected.length) {
               <mat-list-item>
-                <mat-icon matListItemIcon>{{ room.value.currency.icon }}</mat-icon>
+                <mat-icon matListItemIcon>{{ getOfficeForm.room.value?.currency?.icon }}</mat-icon>
                 <div matListItemTitle>{{ 'RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</div>
-                <div matListItemLine><span class="bold">{{ treatment.value.price | number:'1.2-2' }}</span></div>
+                <div matListItemLine><span
+                  class="bold">{{ getTreatmentForm.treatment.value?.price | number:'1.2-2' }}</span></div>
               </mat-list-item>
               <mat-divider></mat-divider>
               <div mat-subheader>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</div>
-              @for (it of additionalSelected; track it.id) {
+              @for (it of currentAdditionalSelected; track it.id) {
                 <mat-list-item lines="3">
                   <mat-icon matListItemIcon>add_post</mat-icon>
                   <div matListItemTitle>
                     {{ it.name }}
                   </div>
                   <div matListItemLine>
-                    {{ room.value.currency | currencySymbol }} {{ it.price | number:'1.2-2' }}
+                    {{ getOfficeForm.room.value?.currency | currencySymbol }} {{ it.price | number:'1.2-2' }}
                   </div>
                   <div matListItemLine>&#9202; {{ it.duration | durationTime }}</div>
                 </mat-list-item>
               }
             } @else {
-              <app-price-preview [price]="price" [currencyIcon]="room.value.currency.icon" [isEditing]="isEditing"
+              <app-price-preview [price]="price" [currencyIcon]="getOfficeForm.room.value?.currency?.icon"
+                                 [isEditing]="currentIsEditing"
                                  [discountKey]="'RESERVATION.TREATMENT.DISCOUNT.ADD'"></app-price-preview>
             }
-            @if (customerChange.value) {
+            @if (getConfigurationForm.customerChange.value) {
               <mat-divider></mat-divider>
               <div mat-subheader>{{ 'RESERVATION.CONFIGURATION.TITLE' | translate }}</div>
               <mat-list-item>
                 <mat-icon matListItemIcon>settings</mat-icon>
                 <div matListItemTitle>{{ 'RESERVATION.CONFIGURATION.CUSTOMER_CHANGE.FIELD' | translate }}</div>
-                @if (reference.value) {
-                  <div matListItemLine class="description">{{ reference.value }}</div>
+                @if (getConfigurationForm.reference.value) {
+                  <div matListItemLine class="description">{{ getConfigurationForm.reference.value }}</div>
                 }
               </mat-list-item>
             }
@@ -481,7 +499,7 @@
                 <mat-list-item>
                   <mat-icon matListItemIcon>event</mat-icon>
                   <div matListItemTitle>
-                    {{ eventGroup.event.start | date:'short':room.value.timeZone:dateFormat }}
+                    {{ eventGroup.event.start | date:'short':getOfficeForm.room.value?.timeZone:dateFormat }}
                     @if (showTimeZone) {
                       <button (click)="openDialog(eventGroup.event.start)" mat-icon-button type="button">
                         <mat-icon>info_outline</mat-icon>
@@ -489,7 +507,7 @@
                     }
                   </div>
                   <div matListItemLine>
-                    {{ eventGroup.event.end | date:'short':room.value.timeZone:dateFormat }}
+                    {{ eventGroup.event.end | date:'short':getOfficeForm.room.value?.timeZone:dateFormat }}
                     @if (showTimeZone) {
                       <button (click)="openDialog(eventGroup.event.end)" mat-icon-button type="button">
                         <mat-icon>info_outline</mat-icon>
@@ -499,13 +517,14 @@
                 </mat-list-item>
               }
             }
-            @if (additionalSelected.length) {
+            @if (additionalSelected().length) {
               <mat-list-item>
                 <mat-icon matListItemIcon>timer</mat-icon>
                 <div matListItemTitle>{{ 'RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</div>
                 <div matListItemLine>{{ totalDurationFormatted }}</div>
               </mat-list-item>
-              <app-price-preview [price]="price" [currencyIcon]="room.value.currency.icon" [isEditing]="isEditing"
+              <app-price-preview [price]="price" [currencyIcon]="getOfficeForm.room.value?.currency?.icon"
+                                 [isEditing]="currentIsEditing"
                                  [discountKey]="'RESERVATION.TREATMENT.DISCOUNT.ADD'"></app-price-preview>
             }
           </mat-list>
@@ -514,17 +533,17 @@
     }
   </ng-template>
 
-  @if (handSet.smallScreen) {
+  @if (screenConfig.isSmall) {
     <mat-vertical-stepper #stepper [linear]="true" (selectionChange)="triggerClick($event)">
       <mat-step [completed]="getStepCompleted(0)" [editable]="getStepEnabled(0)" [state]="getStepName(0)"
                 [optional]="getStepOptional(0)" [stepControl]="customerForm">
         <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</ng-template>
-        @if (!isEditing) {
+        @if (!currentIsEditing) {
           <div class="flex-container">
             <div class="column-space-between-start">
               <div class="row-space-between-start">
                 <ng-container *ngTemplateOutlet="stepOne"></ng-container>
-                @if (isAdmin) {
+                @if (currentIsAdmin) {
                   <button type="button" (click)="addCustomer" class="raised-button" color="accent" mat-mini-fab>
                     <mat-icon>person_add</mat-icon>
                   </button>
@@ -554,33 +573,34 @@
         <div class="flex-container">
           <div class="column-space-between-start">
             <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
-            @if (room.value) {
+            @if (getOfficeForm.room.value) {
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'RESERVATION.ROOM.DETAIL' | translate }}</mat-label>
                 <input [value]="roomDetail" disabled matInput type="text">
               </mat-form-field>
-              @if (room.value.address && room.value.address.location) {
+              @if (getOfficeForm.room.value.address && getOfficeForm.room.value.address.location) {
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'COMMON.ADDRESS.FIELD' | translate }}</mat-label>
-                  <input [value]="room.value.address.name" disabled matInput type="text">
+                  <input [value]="getOfficeForm.room.value.address.name" disabled matInput type="text">
                 </mat-form-field>
-                @if (room.value.address.description) {
+                @if (getOfficeForm.room.value.address.description) {
                   <mat-form-field appearance="outline">
                     <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
-                    <input [value]="room.value.address.description" disabled matInput type="text">
+                    <input [value]="getOfficeForm.room.value.address.description" disabled matInput type="text">
                   </mat-form-field>
                 }
                 <div class="vertical-divider"></div>
                 <div style="width: 400px">
-                  <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.address.location.y"
-                                  [longitudeMarker]="room.value.address.location.x"></app-google-map>
+                  <app-google-map (addressEmitter)="getAddress($event)"
+                                  [latitudeMarker]="getOfficeForm.room.value.address.location.y"
+                                  [longitudeMarker]="getOfficeForm.room.value.address.location.x"></app-google-map>
                 </div>
               }
             }
           </div>
         </div>
         <div class="divider">
-          @if (!isEditing) {
+          @if (!currentIsEditing) {
             <button type="button" (click)="back()" color="accent" class="icon-button" mat-fab>
               <mat-icon>arrow_upward</mat-icon>
             </button>
@@ -590,7 +610,7 @@
             </button>
           }
           <button type="button" (click)="callStepThree(true)" [disabled]="officeForm.invalid" color="primary"
-                  class="icon-button" mat-fab>
+                  class="icon-button" mat-fab name="toStepThree">
             <mat-icon>arrow_downward</mat-icon>
           </button>
         </div>
@@ -600,7 +620,7 @@
         <ng-template matStepLabel>{{ 'COMMON.TREATMENT.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepThree"></ng-container>
         <div class="divider">
-          @if (!isEditing || (isEditing && isAdmin)) {
+          @if (!currentIsEditing || (currentIsEditing && currentIsAdmin)) {
             <button type="button" (click)="back()" color="accent" class="icon-button" mat-fab>
               <mat-icon>arrow_upward</mat-icon>
             </button>
@@ -678,12 +698,12 @@
       <mat-step [completed]="getStepCompleted(0)" [editable]="getStepEnabled(0)" [state]="getStepName(0)"
                 [optional]="getStepOptional(0)" [stepControl]="customerForm">
         <ng-template matStepLabel>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</ng-template>
-        @if (!isEditing) {
+        @if (!currentIsEditing) {
           <div>
             <div class="flex-container row-space-between-start">
               <ng-container *ngTemplateOutlet="stepOne"></ng-container>
               <div class="vertical-divider"></div>
-              @if (isAdmin) {
+              @if (currentIsAdmin) {
                 <button type="button" (click)="addCustomer" color="accent" class="icon-button" mat-fab extended>
                   <mat-icon>person_add</mat-icon>
                   {{ 'RESERVATION.CUSTOMER.ADD_BUTTON' | translate }}
@@ -716,36 +736,37 @@
           <div class="row-space-between-start">
             <div class="column-space-between-start">
               <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
-              @if (room.value) {
+              @if (getOfficeForm.room.value) {
                 <mat-form-field appearance="outline">
                   <mat-label>{{ 'RESERVATION.ROOM.DETAIL' | translate }}</mat-label>
                   <input [value]="roomDetail" disabled matInput type="text">
                 </mat-form-field>
-                @if (room.value.address && room.value.address.location) {
+                @if (getOfficeForm.room.value.address && getOfficeForm.room.value.address.location) {
                   <mat-form-field appearance="outline">
                     <mat-label>{{ 'COMMON.ADDRESS.FIELD' | translate }}</mat-label>
-                    <input [value]="room.value.address.name" disabled matInput type="text">
+                    <input [value]="getOfficeForm.room.value.address.name" disabled matInput type="text">
                   </mat-form-field>
-                  @if (room.value.address.description) {
+                  @if (getOfficeForm.room.value.address.description) {
                     <mat-form-field appearance="outline">
                       <mat-label>{{ 'COMMON.ADDRESS.DESCRIPTION' | translate }}</mat-label>
-                      <input [value]="room.value.address.description" disabled matInput type="text">
+                      <input [value]="getOfficeForm.room.value.address.description" disabled matInput type="text">
                     </mat-form-field>
                   }
                 }
               }
             </div>
-            @if (room.value && room.value.address && room.value.address.location) {
+            @if (getOfficeForm.room.value && getOfficeForm.room.value.address && getOfficeForm.room.value.address.location) {
               <div class="vertical-divider"></div>
               <div style="width: 400px">
-                <app-google-map (addressEmitter)="getAddress($event)" [latitudeMarker]="room.value.address.location.y"
-                                [longitudeMarker]="room.value.address.location.x"></app-google-map>
+                <app-google-map (addressEmitter)="getAddress($event)"
+                                [latitudeMarker]="getOfficeForm.room.value.address.location.y"
+                                [longitudeMarker]="getOfficeForm.room.value.address.location.x"></app-google-map>
               </div>
             }
           </div>
         </div>
         <div class="divider">
-          @if (!isEditing) {
+          @if (!currentIsEditing) {
             <button type="button" (click)="back()" color="accent" class="icon-button" mat-fab extended>
               {{ 'COMMON.BUTTON.BACK' | translate }}
               <mat-icon>arrow_back</mat-icon>
@@ -757,7 +778,7 @@
             </button>
           }
           <button type="button" (click)="callStepThree(true)" [disabled]="officeForm.invalid" color="primary"
-                  class="icon-button" mat-fab extended>
+                  class="icon-button" mat-fab extended name="toStepThree">
             <mat-icon>arrow_forward</mat-icon>
             {{ 'COMMON.BUTTON.NEXT' | translate }}
           </button>
@@ -768,7 +789,7 @@
         <ng-template matStepLabel>{{ 'COMMON.TREATMENT.FIELD' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepThree"></ng-container>
         <div>
-          @if (!isEditing || (isEditing && isAdmin)) {
+          @if (!currentIsEditing || (currentIsEditing && currentIsAdmin)) {
             <button type="button" (click)="back()" color="accent" mat-fab extended class="icon-button">
               <mat-icon>arrow_back</mat-icon>
               {{ 'COMMON.BUTTON.BACK' | translate }}

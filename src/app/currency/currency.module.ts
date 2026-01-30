@@ -4,13 +4,15 @@ import { CurrencyRoutingModule } from './currency-routing.module';
 import { CurrencyComponent } from './currency.component';
 import { CurrencyListComponent } from './list/currency-list.component';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { EffectsModule } from '@ngrx/effects';
+import { provideEffects } from '@ngrx/effects';
 import { CurrencyEffects } from '../store/effects/currency.effects';
 import { CurrencyService } from '../services/currency.service';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
-import { Store } from '@ngrx/store';
-import { AppState, selectI18nState } from '../store/app.states';
-import { Observable } from 'rxjs';
+import { provideState, Store } from '@ngrx/store';
+import { CurrencyNavigationEffects } from './currency-navigation.effects';
+import { CURRENCY_FEATURE_KEY, currencyReducer } from '../store/reducers/currency.reducers';
+import { I18NState } from '../store/reducers/i18n.reducers';
+import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
 
 @NgModule({
   imports: [
@@ -29,18 +31,17 @@ import { Observable } from 'rxjs';
       isolate: false,
       extend: true,
     }),
-    EffectsModule.forFeature([CurrencyEffects]),
   ],
   providers: [
     CurrencyService,
+    provideState(CURRENCY_FEATURE_KEY, currencyReducer),
+    provideEffects(CurrencyEffects, CurrencyNavigationEffects),
   ],
 })
 export class CurrencyModule {
-  constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
-    const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe((state) => {
-      translateService.currentLang = '';
-      this.translateService.use(state.language);
+  constructor(private readonly store: Store<I18NState>, protected translateService: TranslateService) {
+    this.store.pipe(getI18NLanguagePipe).subscribe((language) => {
+      this.translateService.use(language);
     });
   }
 }

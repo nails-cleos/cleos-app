@@ -1,59 +1,43 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import {
   DragDropSortingComponent,
   ISorted,
-  ISorting,
   ItemSorting,
 } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
-import { Observable, Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { AppState, selectTreatmentState } from '../../store/app.states';
-import { clean, getAllTreatmentsGroup, sortGroupTreatment } from '../../store/treatment.actions';
+import { getAllTreatmentsGroup, sortGroupTreatment } from '../../store/treatment.actions';
 import { ITreatmentGroupAll } from '../../interfaces/treatment';
 import { SharedModule } from '../../shared/shared.module';
+import { getTreatmentResponsePipe, getTreatmentGroupListPipe } from '../../store/selectors/treatment.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { TreatmentState } from '../../store/reducers/treatment.reducers';
 
 @Component({
   selector: 'app-treatment-group-sorting',
   templateUrl: './treatment-sorting.component.html',
   styleUrls: ['./treatment-group-sorting.component.scss'],
   imports: [SharedModule, DragDropSortingComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TreatmentGroupSortingComponent implements OnInit, OnDestroy {
+export class TreatmentGroupSortingComponent {
+  private readonly store: Store<TreatmentState> = inject(Store<TreatmentState>);
 
-  items?: ISorting[];
+  private treatmentGroupList$ = this.store.pipe(getTreatmentGroupListPipe);
+  private response$ = this.store.pipe(getTreatmentResponsePipe);
 
-  private subscription?: Subscription;
-  private getState: Observable<any>;
+  private treatmentGroupListSignal = toSignal(this.treatmentGroupList$);
+  private responseSignal = toSignal(this.response$);
 
-  constructor(private store: Store<AppState>) {
-    this.getState = this.store.select(selectTreatmentState);
-  }
+  itemsSignal = computed(() => this.treatmentGroupListSignal()?.map(
+    (group: ITreatmentGroupAll) => new ItemSorting(group.id, group.name, group.order)));
 
-  ngOnInit(): void {
-    this.clean();
-    this.subscribe();
-    this.getTreatments();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+  constructor() {
+    effect(() => {
+      if (this.responseSignal()) {
+        this.store.dispatch(getAllTreatmentsGroup());
+      }
+    });
   }
 
   sorted = (groups: ISorted[]): void => this.store.dispatch(sortGroupTreatment({ groups }));
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private getTreatments = (): void => this.store.dispatch(getAllTreatmentsGroup());
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.response) {
-        this.clean();
-        this.getTreatments();
-      }
-      this.items = state?.data?.map((group: ITreatmentGroupAll) => new ItemSorting(
-        group.id, group.name, group.order),
-      );
-    });
-  };
 }

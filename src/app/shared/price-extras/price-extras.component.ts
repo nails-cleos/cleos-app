@@ -1,19 +1,22 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { IAdditionalAll } from '../../interfaces/additional';
 import { IExtras } from '../../interfaces/reservation';
-import { SharedModule } from '../shared.module';
 import { ICurrencyAll } from '../../interfaces/currency';
 import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
+import { AppMaterialModule } from '../../util/app-material.module';
+import { TranslatePipe } from '@ngx-translate/core';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-price-extras',
   templateUrl: './price-extras.component.html',
   styleUrl: './price-extras.component.scss',
-  imports: [SharedModule, CurrencySymbolPipe],
+  imports: [AppMaterialModule, CurrencySymbolPipe, TranslatePipe, DecimalPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PriceExtrasComponent {
-  @Input() key!: string;
-  @Input() extras?: IAdditionalAll[] | IExtras[];
-  @Input() total: number = 0;
-  @Input() currency!: ICurrencyAll;
+  key = input.required<string>();
+  currency = input.required<ICurrencyAll>();
+  extras = input<IAdditionalAll[] | IExtras[]>();
+  total = input<number>(0);
 }

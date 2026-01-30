@@ -1,11 +1,10 @@
 <h1 mat-dialog-title>{{ 'COMMON.RESERVATION.EDIT.TITLE' | translate }}</h1>
 <div mat-dialog-content>
   <p>{{ 'COMMON.RESERVATION.EDIT.TEXT' | translate: { penalty: penalty } }}</p>
-  <app-price [price]="price" [currency]="currency" [showPenalty]="true" [showBank]="false"></app-price>
 </div>
 <div mat-dialog-actions class="card-actions">
   <div class="spacer"></div>
-  @if (data.small) {
+  @if (small) {
     <button (click)="onNoClick()" mat-fab>
       <mat-icon>clear</mat-icon>
     </button>

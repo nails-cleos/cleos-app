@@ -1,10 +1,6 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { AppState, selectPaymentState, selectReservationState } from '../../../store/app.states';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable, Subscription } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
 import { IPaymentAll } from '../../../interfaces/payment';
-import { ITracking } from '../../../interfaces/reservation';
 import {
   executeTrackingByReservationId,
   getReview,
@@ -23,69 +19,88 @@ import { SharedModule } from '../../../shared/shared.module';
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
 import { RatingComponent } from '../../../shared/rating/rating.component';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
-import { IReview } from '../../../interfaces/review';
 import { ToastService } from '../../../services/toast.service';
+import { ReservationState } from '../../../store/reducers/reservation.reducers';
+import { PaymentState } from '../../../store/reducers/payment.reducers';
+import {
+  getCurrentReservationIdPipe,
+  getPaymentsPipe,
+  getReviewPipe,
+  getTrackingPipe,
+} from '../../../store/selectors/reservation.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-more-info',
   templateUrl: './more-info.component.html',
   styleUrls: ['./more-info.component.scss'],
   imports: [SharedModule, TimeDetailPipe, RatingComponent, BackButtonDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MoreInfoComponent implements OnInit, OnDestroy {
-  private dialog: MatDialog = inject(MatDialog);
-  private store: Store<AppState> = inject(Store<AppState>);
-  private route: ActivatedRoute = inject(ActivatedRoute);
-  private translate: TranslateService = inject(TranslateService);
-  private clipboard: Clipboard = inject(Clipboard);
-  private toastService: ToastService = inject(ToastService);
+export class MoreInfoComponent {
+  private readonly dialog: MatDialog = inject(MatDialog);
+  private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly clipboard: Clipboard = inject(Clipboard);
+  private readonly toastService: ToastService = inject(ToastService);
+
+  private reservationId$ = this.store.pipe(getCurrentReservationIdPipe);
+  private payments$ = this.store.pipe(getPaymentsPipe);
+  private tracking$ = this.store.pipe(getTrackingPipe);
+  private review$ = this.store.pipe(getReviewPipe);
+
+  private reservationIdSignal = toSignal(this.reservationId$);
+
+  paymentsSignal = toSignal(this.payments$);
+  trackingSignal = toSignal(this.tracking$);
+  reviewSignal = toSignal(this.review$);
 
   displayedColumns: string[] = ['position', 'description', 'amount', 'type', 'status', 'actions'];
 
-  tracking?: ITracking;
-  payments?: IPaymentAll[];
-  review?: IReview;
+  dateFormat: string = this.translate.getCurrentLang();
 
-  dateFormat: string = this.translate.currentLang;
-  totalTime?: string;
+  totalTime = computed(() => {
+    const tracking = this.trackingSignal();
+    if (tracking?.startedTimestamp && tracking?.completedTimestamp) {
+      return getDiffTime(newDateTimestamp(tracking.completedTimestamp),
+        newDateTimestamp(tracking.startedTimestamp));
+    }
+    return undefined;
+  });
 
-  private paymentGetState: Observable<any> = this.store.select(selectPaymentState);
-  private paymentSubscription?: Subscription;
-  private reservationId: any;
-
-  private getState: Observable<any> = this.store.select(selectReservationState);
-  private subscription?: Subscription;
-
-  get execute(): void {
-    this.tracking = undefined;
-    return this.store.dispatch(executeTrackingByReservationId({ id: this.reservationId }));
-  }
-
-  get update(): void {
-    return executeDialog(this.dialog, UpdateTrackingDialogComponent, {
-      startedTimestamp: this.tracking?.startedTimestamp,
-      completedTimestamp: this.tracking?.completedTimestamp,
-    }, result => {
-      if (result) {
-        this.tracking = undefined;
-        this.store.dispatch(updateTrackingByReservationId(
-          { id: this.reservationId, started: result.started, completed: result.completed }),
-        );
+  constructor() {
+    effect(() => {
+      const id = this.reservationIdSignal();
+      if (id) {
+        this.store.dispatch(getTrackingByReservationId({ id }));
+        this.store.dispatch(reservationFindPayments({ id }));
+        this.store.dispatch(getReview({ id }));
       }
-    }, true);
-  }
-
-  ngOnInit(): void {
-    this.subscribe();
-    this.route.params.subscribe(routeParams => {
-      this.reservationId = routeParams.id;
-      this.getInformation();
     });
   }
 
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.paymentSubscription?.unsubscribe();
+  execute() {
+    const id = this.reservationIdSignal();
+    if (id) {
+      this.store.dispatch(executeTrackingByReservationId({ id }));
+    }
+  }
+
+  update() {
+    const id = this.reservationIdSignal();
+    if (id) {
+      const tracking = this.trackingSignal();
+      executeDialog(this.dialog, UpdateTrackingDialogComponent, {
+        startedTimestamp: tracking?.startedTimestamp,
+        completedTimestamp: tracking?.completedTimestamp,
+      }, result => {
+        if (result) {
+          this.store.dispatch(updateTrackingByReservationId(
+            { id, started: result.started, completed: result.completed }),
+          );
+        }
+      }, true);
+    }
   }
 
   resend = (payment: IPaymentAll): void => this.store.dispatch(
@@ -95,46 +110,7 @@ export class MoreInfoComponent implements OnInit, OnDestroy {
   copy = (payment: IPaymentAll): void => {
     if (payment.link) {
       this.clipboard.copy(payment.link);
-      this.toastService.info(this.translate.instant('PAYMENT.COPY'));
+      this.toastService.show(this.translate.instant('PAYMENT.COPY'), 'info');
     }
-  };
-
-  private getInformation = (): void => {
-    if (!this.tracking) {
-      this.tracking = undefined;
-      this.store.dispatch(
-        getTrackingByReservationId({ id: this.reservationId }),
-      );
-    }
-    if (!this.payments) {
-      this.payments = undefined;
-      this.store.dispatch(
-        reservationFindPayments({ id: this.reservationId }),
-      );
-    }
-    if (!this.review) {
-      this.review = undefined;
-      this.store.dispatch(
-        getReview({ id: this.reservationId }),
-      );
-    }
-  };
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      this.payments = state.payments;
-      this.tracking = state.tracking;
-      this.review = state.review;
-      if (this.tracking && this.tracking.startedTimestamp && this.tracking.completedTimestamp) {
-        this.totalTime = getDiffTime(newDateTimestamp(this.tracking.completedTimestamp),
-          newDateTimestamp(this.tracking.startedTimestamp));
-      }
-    });
-    this.paymentSubscription = this.paymentGetState.subscribe((state) => {
-      if (state.response) {
-        this.payments = undefined;
-        this.getInformation();
-      }
-    });
   };
 }

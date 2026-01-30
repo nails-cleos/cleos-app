@@ -1,18 +1,22 @@
-import { Component } from '@angular/core';
-import { environment } from '../../../environments/environment';
-import { MainContentService } from '../main-content.service';
-import { SharedModule } from '../../shared/shared.module';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { MainContentService } from '../../services/main-content.service';
+import { EnvService } from '../../services/env.service';
 
 @Component({
   selector: 'app-privacy',
   templateUrl: './privacy.component.html',
   styleUrls: ['./privacy.component.scss'],
-  imports: [SharedModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PrivacyComponent {
-  url = environment.appServer;
+  private readonly mainContent: MainContentService = inject(MainContentService);
+  private readonly env: EnvService = inject(EnvService);
 
-  constructor(private mainContent: MainContentService) {
+  url = this.env.appServer;
+  title = this.env.title;
+  appDomain = this.env.appDomain;
+
+  constructor() {
     this.mainContent.configure(false, 'open');
   }
 }

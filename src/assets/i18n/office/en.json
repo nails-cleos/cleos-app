@@ -37,6 +37,9 @@
     "ADDRESS": {
       "FIELD": "Invoice address"
     },
+    "DRIVE_FOLDER": {
+      "FIELD": "Drive folder"
+    },
     "DELETED": {
       "TITLE": "Delete office",
       "CONTENT": "Are you sure to delete office {{name}}?",

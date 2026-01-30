@@ -1,13 +1,12 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AppState, selectAccountState } from '../../store/app.states';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, Signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Observable, Subscription } from 'rxjs';
+import { combineLatestWith } from 'rxjs';
 import { getAccountByCustomerId, updateAccount } from '../../store/account.actions';
 import { IAccountAll, ITransaction, Transaction } from '../../interfaces/account';
 import { ICurrency, ICurrencyAll } from '../../interfaces/currency';
 import { map, startWith } from 'rxjs/operators';
-import { AbstractControl, FormBuilder, UntypedFormGroup, Validators, ɵTypedOrUntyped } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../util/validators';
 import { AuthUserService } from '../../services/auth-user.service';
 import { getLocale } from '../../util/helper';
@@ -15,84 +14,142 @@ import { TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../../shared/shared.module';
 import { BalanceComponent } from '../balance/balance.component';
 import { BackButtonDirective } from '../../directives/back-button.directive';
+import {
+  getCurrentCustomerIdPipe,
+  getAccountResponsePipe,
+  getSelectedAccountPipe,
+  getSubErrorsPipe,
+} from '../../store/selectors/account.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { IError } from '../../interfaces/common';
+import { AccountState } from '../../store/reducers/account.reducers';
+
+type BalanceForm = {
+  currency: FormControl<ICurrencyAll | undefined>;
+  gift: FormControl<number>;
+};
 
 @Component({
   selector: 'app-account',
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.scss'],
   imports: [SharedModule, BalanceComponent, BackButtonDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AccountComponent implements OnInit, OnDestroy {
-  form!: UntypedFormGroup;
+export class AccountComponent {
+  private readonly store: Store<AccountState> = inject(Store<AccountState>);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly authUserService: AuthUserService = inject(AuthUserService);
+  private readonly router: Router = inject(Router);
+  private readonly translate: TranslateService = inject(TranslateService);
 
-  account?: IAccountAll;
-  filteredCurrencyOptions?: Observable<ICurrency[] | undefined>;
+  private customerId$ = this.store.pipe(getCurrentCustomerIdPipe);
+  private selectedAccount$ = this.store.pipe(getSelectedAccountPipe);
+  private subErrors$ = this.store.pipe(getSubErrorsPipe);
+  private response$ = this.store.pipe(getAccountResponsePipe);
 
-  errors: any = [];
-  showAdd: boolean;
-  userId?: string;
-  language: string;
+  private customerIdSignal = toSignal(this.customerId$);
+  private selectedAccountSignal = toSignal(this.selectedAccount$);
+  private subErrorsSignal = toSignal(this.subErrors$);
+  private responseSignal = toSignal(this.response$);
+  private authUserSignal = this.authUserService.authUser;
+  private hasAdminRole = computed(() => this.authUserSignal()?.hasAdminRole ?? false);
 
-  private getState: Observable<any>;
-  private subscription?: Subscription;
-  private authUserServiceSubscription: Subscription;
-  private customerId?: string;
-  private hasAdminRole: boolean;
+  form: FormGroup<BalanceForm> = this.formBuilder.group<BalanceForm>({
+    currency: this.formBuilder.control(undefined, {
+      validators: [Validators.required, requireMatch],
+    }),
+    gift: this.formBuilder.control(0, {
+      validators: [Validators.required],
+    }),
+  });
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>, private formBuilder: FormBuilder,
-              private authUserService: AuthUserService, private router: Router, private translate: TranslateService) {
-    this.showAdd = false;
-    this.hasAdminRole = false;
-    this.getState = this.store.select(selectAccountState);
-    this.authUserServiceSubscription = this.authUserService.authUser.subscribe(value => {
-      this.hasAdminRole = value.hasAdminRole;
-      this.userId = value.customerId;
+  accountSignal = computed(() => {
+    const account = this.selectedAccountSignal();
+    if (account) {
+      this.form.patchValue(account);
+    }
+    return account;
+  });
+
+  filteredCurrencyOptionsSignal: Signal<ICurrency[] | undefined> = toSignal(
+    this.getForm.currency.valueChanges.pipe(
+      startWith(''),
+      map((value: any) => !value || typeof value === 'string' ? value : value.code),
+      combineLatestWith(this.selectedAccount$),
+      map(([name, account]) => {
+        if (name) {
+          return this.filterCurrency(name, account);
+        } else {
+          return account?.currencies ? account.currencies.slice() : account?.currencies;
+        }
+      }),
+    ),
+  );
+  userId = computed(() => this.authUserSignal()?.customerId);
+  errors = signal<Record<string, unknown>>({});
+  showAdd = computed(() => this.hasAdminRole() && this.customerIdSignal() !== this.userId());
+
+  language: string = getLocale(this.translate.getCurrentLang()).language;
+
+  constructor() {
+    effect(() => {
+      const subErrors = this.subErrorsSignal();
+      if (subErrors) {
+        const errorMap: Record<string, unknown> = {};
+        subErrors.forEach((error: IError) => {
+          const field = error.field as keyof BalanceForm | undefined;
+
+          if (field && field in this.form.controls) {
+            errorMap[field] = error.message;
+            this.form.controls[field].setErrors({ incorrect: true });
+          }
+        });
+        this.errors.set(errorMap);
+      }
     });
-    this.language = getLocale(this.translate.currentLang).language;
+
+    effect(() => {
+      if (this.responseSignal()) {
+        if (this.hasAdminRole()) {
+          this.router.navigate([this.language, 'users', this.customerIdSignal(), 'overview']);
+        } else {
+          this.router.navigate([this.language, 'me', 'overview']);
+        }
+      }
+    });
+
+    effect(() => {
+      const customerId = this.customerIdSignal();
+      if (customerId) {
+        this.store.dispatch(getAccountByCustomerId({ customerId }));
+      }
+    });
   }
 
-  get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
+  get getForm(): BalanceForm {
     return this.form.controls;
   }
 
-  get submit(): void {
-    if (this.form.invalid) {
+  submit(): void {
+    const id = this.accountSignal()?.id;
+    const customerId = this.customerIdSignal();
+    if (this.form.invalid || !id || !customerId) {
       return;
     }
-
-    const id = this.account!.id;
-    const customerId = this.customerId!;
     const transaction: ITransaction = new Transaction();
     transaction.customerId = customerId;
-    transaction.currencyId = valueChange(this.getForm.currency.value, this.account?.currency)?.id;
+    transaction.currencyId = valueChange(this.getForm.currency.value, this.accountSignal()?.currency)?.id;
     transaction.gift = this.getForm.gift.value;
-    this.store.dispatch(
-      updateAccount({ id, transaction, customerId }),
-    );
+    this.store.dispatch(updateAccount({ id, transaction, customerId }));
     return;
-  }
-
-  ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('customerId');
-    this.createForm();
-    if (id) {
-      this.customerId = id;
-      this.showAdd = this.hasAdminRole && this.customerId !== this.userId;
-      this.getAccount();
-    }
-    this.subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.authUserServiceSubscription.unsubscribe();
   }
 
   displayCurrencyFn = (currency: ICurrencyAll): string => currency ? currency.code : '';
 
-  keyDownHandler = (event: any): void => {
+  keyDownHandler = (event: KeyboardEvent): void => {
     if (event.code === 'Backspace') {
-      this.getForm.currency.setValue('');
+      this.getForm.currency.setValue(undefined);
     }
   };
 
@@ -102,45 +159,10 @@ export class AccountComponent implements OnInit, OnDestroy {
     }
   };
 
-  private getAccount = (): void => this.store.dispatch(
-    getAccountByCustomerId({ customerId: this.customerId! }),
-  );
-
-  private createForm = (): void => {
-    this.form = this.formBuilder.group({
-      currency: ['', [Validators.required, requireMatch]],
-      gift: ['', Validators.required],
-    });
-    this.filteredCurrencyOptions = this.getForm.currency.valueChanges?.pipe(
-      startWith(''),
-      map((value: any) => typeof value === 'string' ? value : value.code),
-      map((name: string) => name ? this.filterCurrency(name) :
-        this.account?.currencies ? this.account?.currencies.slice() : this.account?.currencies),
-    );
-  };
-
-  private filterCurrency = (name: string): ICurrency[] | undefined => this.account?.currencies?.filter(
+  private filterCurrency = (
+    name: string,
+    account?: IAccountAll,
+  ): ICurrency[] | undefined => account?.currencies?.filter(
     option => option.code?.toLowerCase().indexOf(name.toLowerCase()) === 0,
   );
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.selected && !this.account) {
-        this.account = state.selected;
-        this.form.patchValue(state.selected);
-      }
-      if (state.subErrors) {
-        state.subErrors.forEach((value: any) => {
-          this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({ incorrect: true });
-        });
-      } else if (state.response) {
-        if (this.hasAdminRole) {
-          this.router.navigate([this.language, 'users', this.customerId, 'overview']);
-        } else {
-          this.router.navigate([this.language, 'me', 'overview']);
-        }
-      }
-    });
-  };
 }

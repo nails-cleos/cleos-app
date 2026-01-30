@@ -15,16 +15,20 @@ devices.forEach(({ name, width, height, breakpoints }) => {
     });
 
     it('should create a new color', () => {
+      const colorName = 'Color';
       cy.mockColors(true, 0);
-      cy.intercept('POST', '**/api/v1/colors', (req) => req.alias = 'saveColor');
+      cy.mockAdditionalList(0);
+      cy.mockApi('POST', '**/api/v1/colors', {
+        body: { name: colorName },
+        alias: 'saveColor',
+      });
+      cy.intercept('POST', '**/api/v1/colors').as('saveColor');
       cy.openMenu(breakpoints, ['App settings', 'Color']);
       cy.wait('@getColors');
       cy.get('tr').contains('No Color');
       cy.get('button[id="add-button"]').click({ force: true });
       cy.url().should('include', '/colors/add');
       cy.get('mat-card-title').contains('Add color');
-
-      const colorName = 'Color';
 
       cy.formControlType('name', colorName);
       cy.formControlType('description', `${ colorName } Description`, 'textarea');
@@ -46,8 +50,15 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.wait('@getColors');
 
       cy.get('@selectedColor').then((color: any) => {
+        // Updates
+        const colorName = 'New Color';
+
         cy.mockColor(color.id, color);
-        cy.intercept('PATCH', `**/api/v1/colors/${ color.id }`, (req) => req.alias = 'updateColor');
+        cy.mockApi('PATCH', `**/api/v1/colors/${ color.id }`, {
+          body: { name: colorName },
+          alias: 'updateColor',
+        });
+        cy.intercept('PATCH', `**/api/v1/colors/${ color.id }`).as('updateColor');
 
         cy.buttonClickOnTable(breakpoints, color.name, 'row', 'detail-row', 'edit',
           breakpointToButtons(breakpoints, ['delete']));
@@ -55,11 +66,9 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
         cy.get('mat-card-title').contains('Update Color');
         cy.get('mat-card-subtitle').contains(color.name);
-        cy.get('input[formControlName="name"]').should('have.value', color.name);
-        cy.get('textarea[formControlName="description"]').should('have.value', color.description);
+        cy.get('[data-cy="name-input"]').should('have.value', color.name);
+        cy.get('[data-cy="description-textarea"]').should('have.value', color.description);
 
-        // Updates
-        const colorName = 'New Color';
         cy.formControlType('name', colorName);
         cy.formControlType('description', `${ colorName } Description`, 'textarea');
 

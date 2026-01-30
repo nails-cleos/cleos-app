@@ -1,13 +1,18 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MAT_DATE_RANGE_SELECTION_STRATEGY } from '@angular/material/datepicker';
-import { FormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { AppState, selectInvoiceState } from '../store/app.states';
-import { Observable, Subscription } from 'rxjs';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { combineLatestWith, of } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { clean, getAllMyOffices, getOfficeToInvoice, updateOfficeById } from '../store/invoice.actions';
-import { MatTableDataSource } from '@angular/material/table';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../interfaces/pagination';
-import { backendFormatDate, datesInSameWeek, newDateTimestamp } from '../util/dates';
+import { getOfficeToInvoice, updateOfficeById, uploadInvoices } from '../store/invoice.actions';
+import { backendFormatDate, datesInSameWeek, invoiceFormat, newDateTimestamp } from '../util/dates';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { PaymentType, PaymentTypeKey } from '../interfaces/payment';
 import { map, startWith } from 'rxjs/operators';
@@ -15,24 +20,40 @@ import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { TranslateService } from '@ngx-translate/core';
 import { detailExpandAnimation } from '../util/animation';
 import { SelectionModel } from '@angular/cdk/collections';
-import pdfMake, { fonts } from 'pdfmake/build/pdfmake';
+import pdfMake from 'pdfmake/build/pdfmake';
+import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { IInvoice } from '../interfaces/invoice';
 import { IOffice, IOfficeAll, Office } from '../interfaces/office';
 import { pdf } from '../util/invoice';
 import { requireMatch } from '../util/validators';
-import { MonthPeriodAdapter } from '../util/adapter/month-period-adapter.service';
-import { environment } from '../../environments/environment';
-import { Router } from '@angular/router';
 import { SharedModule } from '../shared/shared.module';
 import { TimeDetailPipe } from '../pipes/time-detail.pipe';
+import { getInvoicesPipe } from '../store/selectors/invoice.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../interfaces/pagination';
+import { InvoiceState } from '../store/reducers/invoice.reducers';
+import { MAT_DATE_RANGE_SELECTION_STRATEGY } from '@angular/material/datepicker';
+import { MonthPeriodAdapter } from '../util/adapter/month-period-adapter.service';
+import { DriveAccessService } from '../services/drive-access.service';
+import { BackButtonDirective } from '../directives/back-button.directive';
+import { getMyOfficesPipe } from '../store/selectors/office.selectors';
+import { OfficeState } from '../store/reducers/office.reducers';
+import { EnvService } from '../services/env.service';
 
-pdfMake.fonts = {
-  EBGaramond: {
-    normal: `${ environment.appServer }/assets/fonts/EBGaramond-Regular.ttf`,
-    bold: `${ environment.appServer }/assets/fonts/EBGaramond-Bold.ttf`,
-    italics: `${ environment.appServer }/assets/fonts/EBGaramond-Italic.ttf`,
-    bolditalics: `${ environment.appServer }/assets/fonts/EBGaramond-BoldItalic.ttf`,
-  },
+// Set up VFS fonts for pdfMake (provides fallback Roboto fonts)
+(pdfMake as any).vfs = (pdfFonts as any).pdfMake?.vfs || pdfFonts;
+
+type InvoiceForm = {
+  office: FormControl<IOfficeAll | undefined>;
+  dateRange: FormGroup<DateRangeForm>;
+  type: FormControl<PaymentType | ''>;
+  startNumber: FormControl<number>;
+};
+
+type DateRangeForm = {
+  startDate: FormControl<Date | undefined>;
+  endDate: FormControl<Date | undefined>;
 };
 
 @Component({
@@ -40,99 +61,199 @@ pdfMake.fonts = {
   templateUrl: './invoice.component.html',
   styleUrls: ['./invoice.component.scss'],
   animations: [detailExpandAnimation],
+  imports: [SharedModule, TimeDetailPipe, BackButtonDirective],
   providers: [
     {
       provide: MAT_DATE_RANGE_SELECTION_STRATEGY,
       useClass: MonthPeriodAdapter,
     },
   ],
-  imports: [SharedModule, TimeDetailPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InvoiceComponent implements OnInit, OnDestroy {
-  @ViewChild('pdfTable') pdfTable!: ElementRef;
-  @ViewChild('typeInput') typeInput!: ElementRef<HTMLInputElement>;
+export class InvoiceComponent {
+  private readonly env: EnvService = inject(EnvService);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly store: Store<InvoiceState | OfficeState> = inject(Store<InvoiceState | OfficeState>);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly router: Router = inject(Router);
+  private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
+
+  private allOffices$ = this.store.pipe(getMyOfficesPipe);
+  private invoiceList$ = this.store.pipe(getInvoicesPipe);
+  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private allPaymentTypes$ = of(Object.keys(PaymentType));
+
+  private allOfficesSignal = toSignal(this.allOffices$);
+  private allPaymentTypesSignal = toSignal(this.allPaymentTypes$);
+  private invoiceListSignal = toSignal(this.invoiceList$);
+  private breakpointsSignal = toSignal(
+    this.breakpointObserver$, {
+      initialValue: {
+        matches: false,
+        breakpoints: {
+          [Breakpoints.XSmall]: false,
+          [Breakpoints.Small]: false,
+        },
+      },
+    },
+  );
+
+  form: FormGroup<InvoiceForm> = this.formBuilder.group<InvoiceForm>({
+    office: this.formBuilder.control(undefined, {
+      validators: [Validators.required, requireMatch],
+    }),
+    type: this.formBuilder.control(''),
+    startNumber: this.formBuilder.control(0, {
+      validators: [Validators.required, Validators.min(1)],
+    }),
+    dateRange: this.formBuilder.group<DateRangeForm>({
+      startDate: this.formBuilder.control(undefined, {
+        validators: [Validators.required],
+      }),
+      endDate: this.formBuilder.control(undefined, {
+        validators: [Validators.required],
+      }),
+    }),
+  });
+
+  private officeSignal = toSignal(this.getForm.office.valueChanges);
+  private startDateSignal = toSignal(this.getDateRangeForm.startDate.valueChanges);
+  private endDateSignal = toSignal(this.getDateRangeForm.endDate.valueChanges);
+
+  filteredOfficeSignal = toSignal(
+    this.getForm.office.valueChanges.pipe(
+      startWith(''),
+      map((value: any) => !value || typeof value === 'string' ? value : value.code),
+      combineLatestWith(this.allOffices$),
+      map(([name, offices]) => {
+        if (name) {
+          return this.filterOffice(name, offices);
+        } else {
+          return offices ? offices.slice() : offices;
+        }
+      }),
+    ));
+
+  filteredTypesSignal = toSignal(
+    this.getForm.type.valueChanges.pipe(
+      startWith(''),
+      map((type: string | undefined) => type),
+      combineLatestWith(this.allPaymentTypes$),
+      map(([type, allPaymentTypes]) => type ? this.filterTypes(type, allPaymentTypes) : allPaymentTypes),
+    ));
+
+  selectedPaymentTypesSignal = signal<string[]>([PaymentType.transfer, PaymentType.paynl]);
+  allPaymentTypesWritableSignal = signal<string[] | undefined>(undefined);
+  dataSourceSignal = computed(() => {
+    const invoiceList = this.invoiceListSignal();
+    return invoiceList?.map((invoice: IInvoice, position: number) => {
+      if (invoice.id) {
+        const date1 = newDateTimestamp(invoice.timestamp, invoice.room.timeZone);
+        let order;
+        if (position + 1 < invoiceList.length) {
+          const nextRow = invoiceList[position + 1];
+          const date2 = newDateTimestamp(nextRow.timestamp, nextRow.room.timeZone);
+          if (!datesInSameWeek(date1, date2)) {
+            order = 'newWeek';
+          }
+        }
+        return Object.assign({}, invoice, { position, order });
+      }
+      return invoice;
+    });
+  });
+  resultsLengthSignal = computed(() => this.dataSourceSignal()?.length || 0);
+  pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
+
+  typeInput = viewChild.required<ElementRef<HTMLInputElement>>('typeInput');
 
   displayedColumns: string[] = ['select', 'position', 'customer', 'timestamp', 'description', 'actions'];
   expandedInvoice?: IInvoice;
-  invoices?: IInvoice[];
 
-  form!: UntypedFormGroup;
-  office: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch,
-  ]);
-  filteredOffice: Observable<IOfficeAll[] | undefined> | undefined;
+  selectionSignal = signal<SelectionModel<IInvoice>>(new SelectionModel<IInvoice>(true, []));
+  isAllSelected = computed(() => this.selectionSignal().selected.length === this.resultsLengthSignal());
+  isIndeterminate = computed(() => this.selectionSignal().selected.length > 0 && !this.isAllSelected());
 
-  dateRange!: UntypedFormGroup;
-  startDate: UntypedFormControl = new UntypedFormControl('', [Validators.required]);
-  endDate: UntypedFormControl = new UntypedFormControl('', [Validators.required]);
-  type: UntypedFormControl = new UntypedFormControl();
-  filteredTypes: Observable<string[]>;
-  types: string[] = [PaymentType.transfer, PaymentType.paynl];
+  dateFormat: string = this.translate.getCurrentLang();
+  language: string = this.translate.getCurrentLang();
 
-  dataSource: any;
-  selection = new SelectionModel<IInvoice>(true, []);
+  constructor() {
+    const initial = this.allPaymentTypesSignal();
+    this.allPaymentTypesWritableSignal.set(initial ? [...initial] : []);
 
-  resultsLength = 0;
-  pageSize = PAGE_SIZE;
+    effect(() => {
+      const paymentTypes = this.allPaymentTypesSignal();
+      if (!paymentTypes) {
+        return;
+      }
 
-  dateFormat: string;
-  language: string;
-  startNumber: UntypedFormControl = new UntypedFormControl('', [Validators.required, Validators.min(1)]);
+      this.allPaymentTypesWritableSignal.set(paymentTypes);
+    });
 
-  private getState: Observable<any>;
-
-  private subscription: Subscription | undefined;
-  private allPaymentTypes: string[] = Object.keys(PaymentType);
-  private offices?: IOfficeAll[];
-
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>,
-    private formBuilder: FormBuilder,
-    private router: Router, breakpointObserver: BreakpointObserver) {
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small,
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.pageSize = MOBILE_PAGE_SIZE;
+    effect(() => {
+      const offices = this.allOfficesSignal();
+      if (offices?.length === 1) {
+        this.getForm.office.setValue(offices[0]);
       }
     });
-    this.getState = this.store.select(selectInvoiceState);
-    this.dateFormat = this.translate.currentLang;
-    this.language = this.translate.currentLang;
-    this.filteredTypes = this.type.valueChanges.pipe(
-      startWith(null),
-      map((type: string | null) => type ? this.filterTypes(type) : this.allPaymentTypes.slice()));
+
+    effect(() => {
+      const office = this.officeSignal();
+      if (!office) {
+        return;
+      }
+      if (office.lastInvoiceNumber) {
+        this.getForm.startNumber.setValue(office.lastInvoiceNumber + 1);
+      }
+      const officeId = office.id;
+      const start = backendFormatDate(this.startDateSignal());
+      const end = backendFormatDate(this.endDateSignal());
+      if (start && end) {
+        const types = this.selectedPaymentTypesSignal();
+        this.store.dispatch(getOfficeToInvoice({ officeId, start, end, types }));
+      }
+    });
+
+    effect(() => {
+      this.driveAccessService.requestAccessIfNeeded();
+    });
   }
 
-  get print(): void {
-    const start = Number(this.startNumber.value || 0);
+  get getForm(): InvoiceForm {
+    return this.form.controls;
+  }
 
-    if (this.selection.selected.length === this.invoices?.length) {
-      const lastInvoiceNumber = start + this.selection.selected.length;
-      const office: IOffice = new Office();
-      const id = this.office.value.id;
-      office.lastInvoiceNumber = lastInvoiceNumber;
-      this.store.dispatch(updateOfficeById({ id, office }));
+  get getDateRangeForm(): DateRangeForm {
+    return this.getForm.dateRange.controls;
+  }
+
+  async print() {
+    const start = this.getForm.startNumber.value;
+
+    const selectedOffice = this.getForm.office.value;
+    if (!selectedOffice) {
+      return;
     }
-    const printPdf = pdf(this.selection.selected, this.office.value, start, this.startDate.value, this.endDate.value);
-    pdfMake.createPdf(printPdf, undefined, fonts).open();
-    return;
+    if (this.selectionSignal().selected.length === this.resultsLengthSignal()) {
+      const office: IOffice = new Office();
+      office.lastInvoiceNumber = start + this.selectionSignal().selected.length;
+
+      this.store.dispatch(updateOfficeById({ id: selectedOffice.id, office }));
+    }
+    await this.loadFonts();
+    const fileName = `Sales ${invoiceFormat(this.getDateRangeForm.startDate.value!)}.pdf`;
+    const createPDF = pdf(this.selectionSignal().selected, selectedOffice, start, fileName, this.env);
+    const printPdf: any = pdfMake.createPdf(createPDF);
+
+    printPdf.getBlob().then((blob: Blob) => this.store.dispatch(
+      uploadInvoices({ officeId: selectedOffice.id, blob, fileName }),
+    ));
   }
 
-  ngOnInit(): void {
-    this.clean();
-    this.createForm();
-    this.subscribe();
-    this.findOffices();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  keyDownHandler = (event: any): void => {
+  keyDownHandler = (event: KeyboardEvent): void => {
     if (event.code === 'Backspace') {
-      this.office.setValue(null);
+      this.getForm.office.setValue(undefined);
     }
   };
 
@@ -140,130 +261,91 @@ export class InvoiceComponent implements OnInit, OnDestroy {
 
   selected = (event: MatAutocompleteSelectedEvent): void => {
     const type = PaymentType[event.option.value as PaymentTypeKey];
-    this.types = [...this.types, type];
-    this.allPaymentTypes = this.allPaymentTypes.filter(s => PaymentType[s as PaymentTypeKey] !== type);
-    this.typeInput.nativeElement.value = '';
-    this.type.setValue(null);
-    this.findInvoices();
+    this.selectedPaymentTypesSignal.update((current) => [...current, type]);
+    this.allPaymentTypesWritableSignal.update((current) =>
+      current?.filter((c) => c !== type));
+
+    if (this.typeInput()) {
+      this.typeInput().nativeElement.value = '';
+    }
+    this.getForm.type.setValue('');
   };
 
   remove = (type: string): void => {
-    const index = this.types.indexOf(type);
+    this.selectedPaymentTypesSignal.update((current) =>
+      current.filter((c) => c !== type));
 
-    if (index >= 0) {
-      this.types = this.types.filter(s => s !== type);
-      this.allPaymentTypes = Object.keys(PaymentType).filter(s => !this.types.includes(s.toUpperCase()));
+    this.allPaymentTypesWritableSignal.update((current) =>
+      current ? [...current, type] : [type]);
 
-      this.type.setValue(null);
-      this.findInvoices();
-    }
+    this.getForm.type.setValue('');
   };
-
-  // numSelected === numRows
-  isAllSelected = (): boolean => this.selection.selected.length === this.dataSource.data.length;
 
   toggleAllRows = (): void => {
-    if (this.isAllSelected()) {
-      this.selection.clear();
-      return;
-    }
+    const invoiceList = this.dataSourceSignal() || [];
+    const current = this.selectionSignal();
 
-    this.selection.select(...this.dataSource.data);
+    if (current.selected.length === invoiceList.length) {
+      this.selectionSignal.set(new SelectionModel<IInvoice>(true, []));
+    } else {
+      this.selectionSignal.set(new SelectionModel<IInvoice>(true, [...invoiceList]));
+    }
   };
 
-  checkboxLabel = (row?: any): string =>
-    !row ? `${ this.isAllSelected() ? 'deselect' : 'select' } all` :
-      `${ this.selection.isSelected(row) ? 'deselect' : 'select' } row ${ row.position + 1 }`;
+  toggleRow = (row: IInvoice): void => {
+    const current = this.selectionSignal();
+    if (current.isSelected(row)) {
+      this.selectionSignal.set(new SelectionModel<IInvoice>(true, current.selected.filter(prev => prev !== row)));
+    } else {
+      this.selectionSignal.set(new SelectionModel<IInvoice>(true, [...current.selected, row]));
+    }
+  };
+
+  checkboxLabel = (row?: IInvoice): string =>
+    !row ? `${this.isAllSelected() ? 'deselect' : 'select'} all` :
+      `${this.selectionSignal().isSelected(row) ? 'deselect' : 'select'} row ${row.position + 1}`;
 
   goToPath = (invoice: IInvoice): void => {
     this.router.navigate(invoice.paths);
   };
 
-  private createForm = (): void => {
-    this.dateRange = this.formBuilder.group({
-      startDate: this.startDate,
-      endDate: this.endDate,
-    });
-    this.form = this.formBuilder.group({
-      office: this.office,
-      dateRange: this.dateRange,
-      type: this.type,
-    });
-
-    this.filteredOffice = this.office.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value ? value.name : ''),
-      map(name => name ? this.filterOffice(name) : this.offices ? this.offices.slice() : this.offices),
-    );
-
-    this.valueChanges();
-  };
-
-  private valueChanges = (): void => {
-    this.dateRange.valueChanges.subscribe(value => {
-      if (value?.startDate && value?.endDate && this.office.value.id) {
-        this.findInvoices();
-      }
-    });
-    this.office.valueChanges.subscribe(value => {
-      if (value && value.id) {
-        this.startNumber.setValue(value.lastInvoiceNumber || 1);
-        if (value?.startDate && value?.endDate) {
-          this.findInvoices();
-        }
-      }
-    });
-  };
-
   private filterTypes = (
     value: string,
-  ): string[] => this.allPaymentTypes.filter(state => state.toLowerCase().indexOf(value.toLowerCase()) === 0);
+    allPaymentTypes: string[],
+  ): string[] => allPaymentTypes.filter(state => state.toLowerCase().indexOf(value.toLowerCase()) === 0);
 
-  private filterOffice = (name: string): IOfficeAll[] | undefined => this.offices?.filter(
+  private filterOffice = (name: string, offices: IOfficeAll[]): IOfficeAll[] | undefined => offices?.filter(
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private findInvoices = (): void => {
-    if (this.startDate.value && this.endDate.value) {
-      this.selection.clear();
-      this.store.dispatch(
-        getOfficeToInvoice({
-          officeId: this.office.value.id,
-          start: backendFormatDate(this.startDate.value)!,
-          end: backendFormatDate(this.endDate.value)!,
-          types: this.types,
-        }),
-      );
-    }
+  private loadFonts = async () => {
+    await this.loadFont('EBGaramond-Regular.ttf', '/assets/fonts/EBGaramond-Regular.ttf');
+    await this.loadFont('EBGaramond-Bold.ttf', '/assets/fonts/EBGaramond-Bold.ttf');
+    await this.loadFont('EBGaramond-Italic.ttf', '/assets/fonts/EBGaramond-Italic.ttf');
+    await this.loadFont('EBGaramond-BoldItalic.ttf', '/assets/fonts/EBGaramond-BoldItalic.ttf');
+
+    // Configure fonts after loading
+    pdfMake.fonts = {
+      EBGaramond: {
+        normal: 'EBGaramond-Regular.ttf',
+        bold: 'EBGaramond-Bold.ttf',
+        italics: 'EBGaramond-Italic.ttf',
+        bolditalics: 'EBGaramond-BoldItalic.ttf',
+      },
+      Roboto: {
+        normal: 'Roboto-Regular.ttf',
+        bold: 'Roboto-Medium.ttf',
+        italics: 'Roboto-Italic.ttf',
+        bolditalics: 'Roboto-MediumItalic.ttf',
+      },
+    };
   };
 
-  private findOffices = (): void => this.store.dispatch(getAllMyOffices());
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      this.offices = state.offices;
-      if (this.offices?.length === 1) {
-        this.office.setValue(this.offices[0]);
-      }
-      if (state.changes) {
-        this.invoices = state.data?.map((invoice: IInvoice, position: number) => {
-          if (invoice.id) {
-            const date1 = newDateTimestamp(invoice.timestamp, invoice.room.timeZone);
-            let order;
-            if (position + 1 < state.data.length) {
-              const nextRow = state.data[position + 1];
-              const date2 = newDateTimestamp(nextRow.timestamp, nextRow.room.timeZone);
-              if (!datesInSameWeek(date1, date2)) {
-                order = 'newWeek';
-              }
-            }
-            return Object.assign({}, invoice, { position, order });
-          }
-          return invoice;
-        });
-        this.dataSource = new MatTableDataSource(this.invoices);
-      }
-    });
+  private loadFont = async (name: string, url: string) => {
+    const res = await fetch(url);
+    const buffer = await res.arrayBuffer();
+    pdfMake.vfs[name] = btoa(
+      new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), ''),
+    );
+    (pdfMake as any).virtualfs.storage[name] = new Uint8Array(buffer);
   };
 }

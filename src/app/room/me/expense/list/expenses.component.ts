@@ -1,115 +1,160 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { detailExpandAnimation } from '../../../../util/animation';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../../../interfaces/pagination';
-import { IExpense, IExpenseAll } from '../../../../interfaces/expense';
-import { Observable, Subscription } from 'rxjs';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../../interfaces/pagination';
+import { IExpenseAll } from '../../../../interfaces/expense';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { AppState, selectExpenseState } from '../../../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { clean, deleteExpense, expenseSelected, getExpensesPage } from '../../../../store/expense.actions';
+import { cleanExpense, deleteExpense, expenseSelected, getExpensesPage } from '../../../../store/expense.actions';
 import { DialogComponent } from '../../../../shared/dialog/generic/dialog.component';
-import { ActivatedRoute } from '@angular/router';
 import { getDateFormat, getNowTimeZone, isSameTimeZone, newDateTimestamp } from '../../../../util/dates';
 import { openDialog } from '../../../../util/helper';
-import { DateAdapter } from '@angular/material/core';
-import { YearMonthAdapter } from '../../../../util/adapter/year-month.adapter';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { SharedModule } from '../../../../shared/shared.module';
 import { TimeDetailPipe } from '../../../../pipes/time-detail.pipe';
+import { RoomState } from '../../../../store/reducers/room.reducers';
+import { ExpenseState } from '../../../../store/reducers/expense.reducers';
+import { getCurrentRoomIdPipe } from '../../../../store/selectors/room.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { getExpensePaginationPipe, getExpenseResponsePipe } from '../../../../store/selectors/expense.selectors';
+import { DateAdapter } from '@angular/material/core';
+import { YearMonthAdapter } from '../../../../util/adapter/year-month.adapter';
+
+type ExpensesForm = {
+  date: FormControl<Date | undefined>;
+  filter: FormControl<string | undefined>;
+}
 
 @Component({
   selector: 'app-expenses',
   templateUrl: './expenses.component.html',
   styleUrls: ['./expenses.component.scss'],
   animations: [detailExpandAnimation],
+  imports: [SharedModule, TimeDetailPipe],
   providers: [
     { provide: DateAdapter, useClass: YearMonthAdapter },
   ],
-  imports: [SharedModule, TimeDetailPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+export class ExpensesComponent {
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly store: Store<RoomState | ExpenseState> = inject(Store<RoomState | ExpenseState>);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly dialog: MatDialog = inject(MatDialog);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+
+  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private roomId$ = this.store.pipe(getCurrentRoomIdPipe);
+  private expenseList$ = this.store.pipe(getExpensePaginationPipe);
+  private response$ = this.store.pipe(getExpenseResponsePipe);
+
+  private paginator = viewChild(MatPaginator);
+  private sort = viewChild(MatSort);
+
+  private expenseListSignal = toSignal(this.expenseList$);
+  private responseSignal = toSignal(this.response$);
+  private breakpointsSignal = toSignal(
+    this.breakpointObserver$, {
+      initialValue: {
+        matches: false,
+        breakpoints: {
+          [Breakpoints.XSmall]: false,
+          [Breakpoints.Small]: false,
+        },
+      },
+    },
+  );
+
+  private sortActive = computed(() => this.sort()?.active ?? 'timestamp');
+  private sortDirection = computed(() => this.sort()?.direction ?? 'desc');
+
+  roomIdSignal = toSignal(this.roomId$);
+
+  paginatorPageIndex = signal(0);
+
+  dataSourceSignal = computed(() => this.expenseListSignal()?.content?.map((expense: IExpenseAll) => Object.assign({},
+    expense, { totalBtw: expense.totalGross - expense.totalNet })));
+  resultsLengthSignal = computed(() => this.expenseListSignal()?.totalElements || 0);
+  pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
   displayedColumns: string[] = ['position', 'invoice', 'supplyStore.name', 'timestamp', 'totalGross', 'totalBtw',
     'totalNet', 'actions'];
-  dataSource: any = new MatTableDataSource<Pagination<IExpense>>();
-  expanded?: IExpense;
+  expanded?: IExpenseAll;
 
-  resultsLength = DEFAULT_LENGTH;
-  pageSize = PAGE_SIZE;
-  roomId: string | null = null;
-  dateFormat: string;
-  language: string;
-  date = new FormControl<Date | null>(null);
-  private subscription: Subscription | undefined;
+  dateFormat: string = this.translate.getCurrentLang();
+  language: string = this.translate.getCurrentLang();
 
-  private paginatorSubscription: Subscription | undefined;
-  private getState: Observable<any>;
-  private filter?: string;
-  private dateFilter?: string;
+  form: FormGroup<ExpensesForm> = this.formBuilder.group<ExpensesForm>({
+    date: this.formBuilder.control(undefined),
+    filter: this.formBuilder.control(undefined),
+  });
 
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-    private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver, private route: ActivatedRoute) {
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small,
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.pageSize = MOBILE_PAGE_SIZE;
+  private selectedDate = toSignal(this.getForm.date.valueChanges);
+  private selectedFilter = toSignal(this.getForm.filter.valueChanges);
+
+  constructor() {
+    effect((onCleanup) => {
+      const paginator = this.paginator();
+      if (paginator) {
+        const sub = paginator.page.subscribe((pageEvent) => {
+          this.paginatorPageIndex.set(pageEvent.pageIndex);
+        });
+        onCleanup(() => sub.unsubscribe());
       }
     });
-    this.getState = this.store.select(selectExpenseState);
-    this.dateFormat = this.translate.currentLang;
-    this.language = this.translate.currentLang;
-  }
 
-  ngAfterViewInit(): void {
-    this.route.paramMap.subscribe(param => {
-      this.roomId = param.get('id');
-      this.getExpenses();
+    effect(() => {
+      const page = this.paginatorPageIndex();
+      const roomId = this.roomIdSignal();
+      if (!roomId) {
+        return;
+      }
+      const date = this.selectedDate();
+      const filter = this.selectedFilter();
+      this.store.dispatch(
+        getExpensesPage({
+          roomId: roomId,
+          page: page,
+          sort: this.sortActive(),
+          direction: this.sortDirection(),
+          size: this.pageSizeSignal(),
+          filter: filter?.trim()?.toLowerCase(),
+          dateFilter: getDateFormat(date),
+        }),
+      );
+    });
+
+    effect(() => {
+      if (this.responseSignal()) {
+        this.store.dispatch(cleanExpense());
+        this.paginator()?.firstPage();
+      }
     });
   }
 
-  ngOnInit(): void {
-    this.clean();
-    this.subscribe();
-    this.valueChange();
+  get getForm(): ExpensesForm {
+    return this.form.controls;
   }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.paginatorSubscription?.unsubscribe();
-  }
-
-  applyFilter = (event: Event): void => {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.filter = filterValue.trim().toLowerCase();
-    this.getExpenses(0);
-  };
 
   showTimeZone = (expense: IExpenseAll): boolean => !isSameTimeZone(expense.room.timeZone);
 
   setMonthAndYear = (normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void => {
-    const ctrlValue = this.date.value || getNowTimeZone();
+    const ctrlValue = new Date(this.getForm.date.value || getNowTimeZone());
+    ctrlValue?.setMonth(normalizedMonthAndYear.getMonth());
+    ctrlValue?.setFullYear(normalizedMonthAndYear.getFullYear());
 
-    ctrlValue.setMonth(normalizedMonthAndYear.getMonth());
-    ctrlValue.setFullYear(normalizedMonthAndYear.getFullYear());
-
-    this.date.setValue(ctrlValue);
+    this.getForm.date.setValue(ctrlValue);
 
     datepicker.close();
   };
 
-  keyDownHandler = (event: any): void => {
+  keyDownHandler = (event: KeyboardEvent): void => {
     if (event.code === 'Backspace') {
-      this.date.setValue(null);
+      this.getForm.date.setValue(undefined);
     }
   };
 
@@ -117,9 +162,13 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
     expense.room, this.dateFormat, this.translate, this.dialog, newDateTimestamp(expense.timestamp),
   );
 
-  edit = (selected: IExpense): void => this.store.dispatch(expenseSelected({ selected }));
+  edit = (selected: IExpenseAll): void => this.store.dispatch(expenseSelected({ selected }));
 
-  delete = (expense: IExpense): void => {
+  delete = (expense: IExpenseAll): void => {
+    const roomId = this.roomIdSignal();
+    if (!roomId) {
+      return;
+    }
     const title = this.translate.instant('EXPENSE.DELETED.TITLE');
     const content = this.translate.instant('EXPENSE.DELETED.CONTENT', { invoice: expense.invoice });
     const dialogRef = this.dialog.open(DialogComponent, {
@@ -128,61 +177,7 @@ export class ExpensesComponent implements OnInit, AfterViewInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.store.dispatch(deleteExpense({ roomId: this.roomId!, id: result.id, invoice: result.invoice }));
-      }
-    });
-  };
-
-  private valueChange = (): void => {
-    this.date.valueChanges.subscribe(value => {
-      this.dateFilter = value ? getDateFormat(value) : undefined;
-      this.getExpenses(0);
-    });
-  };
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private createPageSubscriptions = (): void => {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getExpenses();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getExpenses(this.paginator.pageIndex));
-
-    this.cdRef.detectChanges();
-  };
-
-  private getExpenses = (page: number = 0): void => {
-    this.paginatorSubscription?.unsubscribe();
-    this.paginatorSubscription = undefined;
-    this.store.dispatch(
-      getExpensesPage(
-        {
-          roomId: this.roomId!,
-          sort: this.sort.active,
-          direction: this.sort.direction,
-          page: page,
-          size: this.pageSize,
-          filter: this.filter,
-          dateFilter: this.dateFilter,
-        },
-      ),
-    );
-  };
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.response) {
-        this.clean();
-        this.getExpenses();
-      }
-      this.dataSource = state.data?.content.map((expense: IExpenseAll) => {
-        const totalBtw = expense.totalGross - expense.totalNet;
-        return Object.assign({}, expense, { totalBtw });
-      });
-      this.resultsLength = state.data?.totalElements;
-      if (!this.paginatorSubscription && this.resultsLength) {
-        this.createPageSubscriptions();
+        this.store.dispatch(deleteExpense({ roomId, id: result.id, invoice: result.invoice }));
       }
     });
   };

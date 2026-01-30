@@ -3,8 +3,12 @@ import { RouterModule, Routes } from '@angular/router';
 import { TranslationLoaderResolver } from './util/translation.resolver';
 
 const routes: Routes = [
-  { path: ':lang', loadChildren: () => import('./nav/nav.module').then(m => m.NavModule) },
-  { path: '**', redirectTo: '/en-GB', pathMatch: 'full', resolve: { model: TranslationLoaderResolver } },
+  {
+    path: ':lang',
+    loadChildren: () => import('./nav/nav.module').then(m => m.NavModule),
+    resolve: { i18n: TranslationLoaderResolver },
+  },
+  { path: '**', redirectTo: '/en-GB', pathMatch: 'full' },
 ];
 
 @NgModule({

@@ -1,23 +1,24 @@
-@if (extras && extras.length) {
+@let currentExtras = extras();
+@if (currentExtras && currentExtras.length) {
   <div>
     <mat-divider></mat-divider>
-    <div mat-subheader>{{ key | translate }}</div>
-    @for (extra of extras; track extra) {
+    <div mat-subheader>{{ key() | translate }}</div>
+    @for (extra of currentExtras; track extra) {
       <mat-list-item>
         <mat-icon matListItemIcon>add_post</mat-icon>
         <div matListItemTitle>
           {{ extra.name || extra.description || 'Extra' }}
         </div>
         <div matListItemLine>
-          {{ currency | currencySymbol }} {{ extra.price | number:'1.2-2' }}
+          {{ currency() | currencySymbol }} {{ extra.price | number:'1.2-2' }}
         </div>
       </mat-list-item>
     }
-    @if (extras.length > 1) {
+    @if (currentExtras.length > 1) {
       <mat-list-item>
         <mat-icon matListItemIcon>equal</mat-icon>
         <div matListItemTitle>
-          {{ currency | currencySymbol }} {{ total | number:'1.2-2' }}
+          {{ currency() | currencySymbol }} {{ total() | number:'1.2-2' }}
         </div>
       </mat-list-item>
     }

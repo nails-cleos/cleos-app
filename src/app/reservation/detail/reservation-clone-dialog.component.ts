@@ -1,69 +1,77 @@
-import { Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import {
-  ReactiveFormsModule,
-  UntypedFormBuilder,
-  UntypedFormControl,
-  UntypedFormGroup,
-  Validators,
-} from '@angular/forms';
-import { ChangeCustomerDialogComponent } from './change-customer-dialog.component';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { filterDateRoom, getAvailability, getNowTimeZone, getStartEndDay, getTime } from '../../util/dates';
 import { addMonths } from 'date-fns';
 import { MAX_RESERVATION_MONTH } from '../../interfaces/reservation';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
+import { IRoomAll } from '../../interfaces/room';
+
+type CloneForm = {
+  date: FormControl<Date | undefined>,
+  time: FormControl<string>,
+}
+
+type CloneDialogData = {
+  room: IRoomAll,
+  small: boolean;
+}
 
 @Component({
   selector: 'app-reservation-clone-dialog',
   templateUrl: './reservation-clone-dialog.component.html',
   imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationCloneDialogComponent {
-  form!: UntypedFormGroup;
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly dialogRef: MatDialogRef<ReservationCloneDialogComponent> = inject(
+    MatDialogRef<ReservationCloneDialogComponent>);
+  readonly data = inject<CloneDialogData>(MAT_DIALOG_DATA);
 
-  date: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required,
-  ]);
+  form: FormGroup<CloneForm> = this.formBuilder.group<CloneForm>({
+    date: this.formBuilder.control<Date | undefined>(undefined, {
+      validators: [Validators.required],
+    }),
+    time: this.formBuilder.control<string>(''),
+  });
 
-  time: UntypedFormControl = new UntypedFormControl('');
+  maxCalendarDate: Date = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
 
-  maxCalendarDate: Date;
-  minDate: string = '';
-  maxDate: string = '';
+  minDate = signal('');
+  maxDate = signal('');
 
-  constructor(public dialogRef: MatDialogRef<ChangeCustomerDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-              private formBuilder: UntypedFormBuilder) {
-    this.maxCalendarDate = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
-    this.createForm();
-    const { monday, tuesday, wednesday, thursday, friday, saturday, sunday } = getAvailability(this.data.room);
-    const {
-      min,
-      max,
-    } = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday, this.data.room.timeZone);
-    if (min) {
-      this.minDate = getTime(min);
-    }
-    if (max) {
-      this.maxDate = getTime(max);
-    }
-    this.time.setValue(this.minDate);
+  private room = computed(() => this.data.room);
+
+  constructor() {
+    effect(() => {
+      const room = this.room();
+      const { monday, tuesday, wednesday, thursday, friday, saturday, sunday } = getAvailability(room);
+      const { min, max } = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday,
+        room.timeZone);
+      if (min) {
+        const time = getTime(min);
+        this.minDate.set(time);
+        this.getForm.time.setValue(time);
+      }
+      if (max) {
+        this.maxDate.set(getTime(max));
+      }
+    });
   }
 
-  onNoClick(): void {
-    return this.dialogRef.close();
+  get getForm(): CloneForm {
+    return this.form.controls;
   }
 
-  doAction(): void {
-    return this.dialogRef.close({ date: this.date.value, time: this.time.value });
+  onNoClick() {
+    this.dialogRef.close();
+  }
+
+  doAction() {
+    this.dialogRef.close({ date: this.getForm.date.value, time: this.getForm.time.value });
   }
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.data.room);
-
-  private createForm = (): void => {
-    this.form = this.formBuilder.group({
-      date: this.date,
-      start: this.time,
-    });
-  };
 }

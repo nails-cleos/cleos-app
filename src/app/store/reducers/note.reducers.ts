@@ -1,6 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import {
-  clean,
+  cleanNote,
   completeNote,
   createNote,
   deleteNote,
@@ -10,31 +10,37 @@ import {
   noteSaveSuccess,
   noteSelected,
   noteSuccess,
+  setCurrentNoteId,
+  setNoteNavigationParams,
   updateNote,
 } from '../note.actions';
 import { INote } from '../../interfaces/note';
-import { IUser } from '../../interfaces/user';
+import { IUserAll } from '../../interfaces/user';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 
-export interface State {
+export const NOTE_FEATURE_KEY = 'note';
+
+export interface NoteState {
   response?: IResponseSuccess;
   data?: INote;
-  professionals?: IUser[];
-  errorMessage?: string;
+  professionals?: IUserAll[];
   error?: IError;
   subErrors?: IError[];
   selected?: INote;
+  currentNoteId?: string;
+  noteNavigationParams?: { professional?: IUserAll, date?: Date };
   isLoading: boolean;
 }
 
-export const initialState: State = {
+export const initialState: NoteState = {
+  response: undefined,
   data: undefined,
   professionals: undefined,
-  errorMessage: undefined,
   error: undefined,
   subErrors: undefined,
   selected: undefined,
-  response: undefined,
+  currentNoteId: undefined,
+  noteNavigationParams: undefined,
   isLoading: false,
 };
 
@@ -43,7 +49,6 @@ export const noteReducer = createReducer(
   on(getNote, (state) => ({
     ...state,
     data: {} as INote,
-    errorMessage: undefined,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
@@ -51,14 +56,12 @@ export const noteReducer = createReducer(
   on(getAllProfessional, (state) => ({
     ...state,
     professionals: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(noteSuccess, (state, { data }) => ({
     ...state,
     professionals: data,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
@@ -66,20 +69,17 @@ export const noteReducer = createReducer(
     ...state,
     response: action,
     selected: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     isLoading: false,
   })),
   on(noteSelected, (state, { selected }) => ({
     ...state,
     selected,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(noteFailure, (state, { error }) => ({
     ...state,
-    errorMessage: error.message,
     error,
     subErrors: error.subErrors,
     response: undefined,
@@ -87,10 +87,20 @@ export const noteReducer = createReducer(
   })),
   on(updateNote, createNote, deleteNote, completeNote, (state) => ({
     ...state,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
     isLoading: true,
   })),
-  on(clean, () => initialState),
+  on(setCurrentNoteId, (state, { noteId }) => ({
+    ...state,
+    currentNoteId: noteId,
+  })),
+  on(setNoteNavigationParams, (state, { date, professional }) => ({
+    ...state,
+    noteNavigationParams: {
+      date,
+      professional ,
+    },
+  })),
+  on(cleanNote, () => initialState),
 );

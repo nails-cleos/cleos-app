@@ -15,18 +15,22 @@ devices.forEach(({ name, width, height, breakpoints }) => {
     });
 
     it('should create a new currency', () => {
+      const code = 'USD';
+      const name = 'US Dollar';
+      const icon = 'attach_money';
+
       cy.mockCurrencyList(true, 0);
-      cy.intercept('POST', '**/api/v1/currency', (req) => req.alias = 'saveCurrency');
+      cy.mockApi('POST', '**/api/v1/currency', {
+        body: { name },
+        alias: 'saveCurrency',
+      });
+      cy.intercept('POST', '**/api/v1/currency').as('saveCurrency');
       cy.openMenu(breakpoints, ['Admin settings', 'Currency']);
       cy.wait('@getCurrencyList');
       cy.get('tr').contains('No currency');
       cy.get('button[id="add-button"]').click({ force: true });
       cy.url().should('include', '/currency/add');
       cy.get('mat-card-title').contains('Add currency');
-
-      const code = 'USD';
-      const name = 'US Dollar';
-      const icon = 'attach_money';
 
       cy.formControlType('code', code);
       cy.formControlType('name', name);
@@ -50,8 +54,17 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.wait('@getCurrencyList');
 
       cy.get('@selectedCurrency').then((currency: any) => {
+        // Updates
+        const code = 'USD';
+        const name = 'US Dollar';
+        const icon = 'attach_money';
+
         cy.mockCurrency(currency.id, currency);
-        cy.intercept('PATCH', `**/api/v1/currency/${ currency.id }`, (req) => req.alias = 'updateCurrency');
+        cy.mockApi('PATCH', `**/api/v1/currency/${ currency.id }`, {
+          body: { name },
+          alias: 'updateCurrency',
+        });
+        cy.intercept('PATCH', `**/api/v1/currency/${ currency.id }`).as('updateCurrency');
 
         cy.buttonClickOnTable(breakpoints, currency.name, 'row', 'detail-row', 'edit',
           breakpointToButtons(breakpoints, ['delete']));
@@ -59,14 +72,10 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
         cy.get('mat-card-title').contains('Update currency');
         cy.get('mat-card-subtitle').contains(currency.code);
-        cy.get('input[formControlName="code"]').should('have.value', currency.code);
-        cy.get('input[formControlName="name"]').should('have.value', currency.name);
+        cy.get('[data-cy="name-input"]').should('have.value', currency.name);
+        cy.get('[data-cy="code-input"]').should('have.value', currency.code);
         cy.get('#select-icon').contains(currency.icon);
 
-        // Updates
-        const code = 'USD';
-        const name = 'US Dollar';
-        const icon = 'attach_money';
         cy.formControlType('code', code);
         cy.formControlType('name', name);
         cy.selectOption('select-icon', icon);

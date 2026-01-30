@@ -3,7 +3,7 @@ import { AccountComponent } from './account/account.component';
 import { AccountRoutingModule } from './account-routing.module';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
-import { EffectsModule } from '@ngrx/effects';
+import { provideEffects } from '@ngrx/effects';
 import { AccountService } from '../services/account.service';
 import { AccountEffects } from '../store/effects/account.effects';
 import { TransactionComponent } from './transaction/transaction.component';
@@ -12,9 +12,11 @@ import { TransactionViewComponent } from './transaction/view/transaction-view.co
 import { PaymentService } from '../services/payment.service';
 import { TransactionDetailComponent } from './transaction/detail/transaction-detail.component';
 import { PaymentEffects } from '../store/effects/payment.effects';
-import { Store } from '@ngrx/store';
-import { AppState, selectI18nState } from '../store/app.states';
-import { Observable } from 'rxjs';
+import { provideState, Store } from '@ngrx/store';
+import { AccountNavigationEffects } from './account-navigation.effects';
+import { ACCOUNT_FEATURE_KEY, accountReducer } from '../store/reducers/account.reducers';
+import { I18NState } from '../store/reducers/i18n.reducers';
+import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
 
 @NgModule({
   imports: [
@@ -36,20 +38,18 @@ import { Observable } from 'rxjs';
       isolate: false,
       extend: true,
     }),
-    EffectsModule.forFeature([AccountEffects, PaymentEffects]),
   ],
   providers: [
     AccountService,
     PaymentService,
+    provideState(ACCOUNT_FEATURE_KEY, accountReducer),
+    provideEffects(AccountEffects, PaymentEffects, AccountNavigationEffects),
   ],
 })
 export class AccountModule {
-
-  constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
-    const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe((state) => {
-      translateService.currentLang = '';
-      this.translateService.use(state.language);
+  constructor(private readonly store: Store<I18NState>, protected translateService: TranslateService) {
+    this.store.pipe(getI18NLanguagePipe).subscribe((language) => {
+      this.translateService.use(language);
     });
   }
 }

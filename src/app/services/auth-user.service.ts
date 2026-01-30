@@ -1,12 +1,10 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { IUserAll } from '../interfaces/user';
 import { isDarkMode, Theme } from '../util/theme';
 import { hasRoomAdmin } from '../util/helper';
 import { Role } from '../interfaces/token';
-import { BehaviorSubject } from 'rxjs';
-import { NgcContentOptions } from 'ngx-cookieconsent/lib/model/content-options';
 import { TranslateService } from '@ngx-translate/core';
-import { NgcCookieConsentService } from 'ngx-cookieconsent';
+import { NgcContentOptions, NgcCookieConsentService } from 'ngx-cookieconsent';
 
 export interface IAuthUser {
   isDarkMode: boolean;
@@ -28,7 +26,7 @@ export interface IAuthUser {
   theme?: Theme;
 }
 
-const initialAuthUser: IAuthUser = {
+export const initialAuthUser: IAuthUser = {
   isDarkMode: false,
   isAdmin: false,
   isManager: false,
@@ -51,16 +49,19 @@ const initialAuthUser: IAuthUser = {
 @Injectable()
 export class AuthUserService {
   private cookieConsentService: NgcCookieConsentService = inject(NgcCookieConsentService);
-  public authUser: BehaviorSubject<IAuthUser> = new BehaviorSubject<IAuthUser>(initialAuthUser);
+  private _authUser = signal<IAuthUser>(initialAuthUser);
+  authUser = this._authUser.asReadonly();
 
-  reloadUser = (user?: IUserAll): IAuthUser => {
+  reloadUser(user?: IUserAll): IAuthUser {
     let authUser = initialAuthUser;
+
     if (user) {
       const isProfessional = user.authorities.some(u => u.authority === Role.professional);
       const isCustomer = user.authorities.some(u => u.authority === Role.customer);
       const isAdmin = user.authorities.some(u => u.authority === Role.admin);
       const isManager = user.authorities.some(u => u.authority === Role.manager);
       const isRoomAdmin = hasRoomAdmin(user.authorities);
+
       authUser = {
         ...initialAuthUser,
         isDarkMode: isDarkMode(user.theme),
@@ -82,17 +83,21 @@ export class AuthUserService {
         theme: user.theme,
       };
     }
-    this.authUser.next(authUser);
-    return authUser;
-  };
 
-  updateMode = (isDark: boolean): IAuthUser => {
-    const authUser = this.authUser.getValue();
-    authUser.isDarkMode = isDark;
-
-    this.authUser.next(authUser);
+    this._authUser.set(authUser);
     return authUser;
-  };
+  }
+
+  updateMode(isDark: boolean): IAuthUser {
+    const current = this._authUser();
+    if (current.isDarkMode === isDark) {
+      return current;
+    }
+
+    const updated = { ...current, isDarkMode: isDark };
+    this._authUser.set(updated);
+    return updated;
+  }
 
   cookieConsent = (translate: TranslateService): void => {
     const data = translate.instant('COOKIE');

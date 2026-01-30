@@ -7,6 +7,7 @@ import {
   createEndDate,
   createFullDate,
   createNewDate,
+  createNewDateZonedTime,
   dateMonthYear,
   datesInSameWeek,
   dateToTimestamp,
@@ -45,14 +46,17 @@ import {
   invoiceTitle,
   isBetween,
   isSameTimeZone,
+  localeTimeZoneDate,
   monthTitle,
   monthViewTitle,
   newDate,
   newDateTimestamp,
   plusMinutes,
   plusMonthDate,
+  reservationDateTime,
   reservationDuration,
   searchDates,
+  secondsToHHMM,
   startOfPeriod,
   subPeriod,
   sumDurations,
@@ -64,6 +68,7 @@ import { IAvailability, IRoom, IRoomAll, ServiceType } from '../interfaces/room'
 import { IReservationAll } from '../interfaces/reservation';
 import { ITreatmentAll } from '../interfaces/treatment';
 import { IAdditionalAll } from '../interfaces/additional';
+import { toZonedTime } from 'date-fns-tz';
 
 describe('dates utility', () => {
   const treatment: ITreatmentAll = {
@@ -119,7 +124,13 @@ describe('dates utility', () => {
     },
     timeZone: 'UTC',
     availabilities: [monday, tuesday, wednesday, thursday, friday, saturday, sunday],
-    office: {},
+    office: {
+      id: 'office-123',
+      name: '',
+      manager: {
+        id: 'manager-123',
+      },
+    },
     paymentTypes: [],
     primary: false,
   };
@@ -319,9 +330,7 @@ describe('dates utility', () => {
     it('should format time in API_LOCALE', () => {
       const date = new Date(2024, 0, 1, 14, 30);
       const time = getTime(date);
-      expect(time).toBeTruthy();
-      expect(time).toContain('14');
-      expect(time).toContain('30');
+      expect(time).toBe('14:30');
     });
   });
 
@@ -329,7 +338,7 @@ describe('dates utility', () => {
     it('should format full date and time', () => {
       const date = new Date(2024, 0, 1, 14, 30);
       const formatted = formatFullDateTime(date, 'en-US');
-      expect(formatted).toBeTruthy();
+      expect(formatted).toBe('Monday, January 1, 2024 at 02:30 PM');
     });
   });
 
@@ -337,7 +346,7 @@ describe('dates utility', () => {
     it('should format full date with time', () => {
       const date = new Date(2024, 0, 1, 14, 30);
       const formatted = formatFullDate(date, 'en-US');
-      expect(formatted).toBeTruthy();
+      expect(formatted).toBe('01/01/2024, 02:30 PM');
     });
   });
 
@@ -345,7 +354,7 @@ describe('dates utility', () => {
     it('should format date time with capitalized first letter', () => {
       const date = new Date(2024, 0, 1, 14, 30);
       const formatted = formatDateTime(date, 'en-US');
-      expect(formatted).toBeTruthy();
+      expect(formatted).toBe('Monday, January 1 at 02:30 PM');
       expect(formatted.charAt(0)).toBe(formatted.charAt(0).toUpperCase());
     });
   });
@@ -363,14 +372,14 @@ describe('dates utility', () => {
     it('should format month in long format', () => {
       const date = new Date(2024, 0, 1);
       const title = monthTitle(date, 'en', 'long');
-      expect(title).toBeTruthy();
+      expect(title).toBe('January');
       expect(title.charAt(0)).toBe(title.charAt(0).toUpperCase());
     });
 
     it('should format month in short format', () => {
       const date = new Date(2024, 0, 1);
       const title = monthTitle(date, 'en', 'short');
-      expect(title).toBeTruthy();
+      expect(title).toBe('Jan');
       expect(title.charAt(0)).toBe(title.charAt(0).toUpperCase());
     });
   });
@@ -389,7 +398,7 @@ describe('dates utility', () => {
     it('should format weekday name', () => {
       const date = new Date(2024, 0, 1); // Monday
       const header = columnHeader(date, 'en');
-      expect(header).toBeTruthy();
+      expect(header).toBe('Monday');
       expect(header.charAt(0)).toBe(header.charAt(0).toUpperCase());
     });
   });
@@ -398,7 +407,7 @@ describe('dates utility', () => {
     it('should format day view title', () => {
       const date = new Date(2024, 0, 1);
       const title = dayViewTitle(date, 'en');
-      expect(title).toBeTruthy();
+      expect(title).toBe('Monday, January 1, 2024');
       expect(title.charAt(0)).toBe(title.charAt(0).toUpperCase());
     });
   });
@@ -407,7 +416,7 @@ describe('dates utility', () => {
     it('should format hour and minute', () => {
       const date = new Date(2024, 0, 1, 14, 30);
       const formatted = formatDateHourMinute(date, 'en');
-      expect(formatted).toBeTruthy();
+      expect(formatted).toBe('02:30 PM');
       expect(formatted.charAt(0)).toBe(formatted.charAt(0).toUpperCase());
     });
   });
@@ -434,7 +443,7 @@ describe('dates utility', () => {
   describe('formatDuration', () => {
     it('should format PT duration string', () => {
       const formatted = formatDuration('PT2H30M');
-      expect(formatted).toBeTruthy();
+      expect(formatted).toBe('02:30');
     });
   });
 
@@ -442,7 +451,7 @@ describe('dates utility', () => {
     it('should format time from duration', () => {
       const duration = new Duration(14, 30);
       const formatted = formatTime(duration);
-      expect(formatted).toBeTruthy();
+      expect(formatted).toBe('14:30');
     });
   });
 
@@ -1044,9 +1053,9 @@ describe('dates utility', () => {
     });
     it('should return min and max dates for monday', () => {
       const result = getMinMaxDate(1, new Date(), [room]);
-      expect(result.minDate.getHours()).toBe(11);
+      expect(result.minDate.getHours()).toBe(10);
       expect(result.minDate.getMinutes()).toBe(0);
-      expect(result.maxDate.getHours()).toBe(20);
+      expect(result.maxDate.getHours()).toBe(19);
       expect(result.maxDate.getMinutes()).toBe(0);
     });
 
@@ -1060,17 +1069,17 @@ describe('dates utility', () => {
 
     it('should return min and max dates for wednesday', () => {
       const result = getMinMaxDate(3, new Date(), [room]);
-      expect(result.minDate.getHours()).toBe(12);
+      expect(result.minDate.getHours()).toBe(11);
       expect(result.minDate.getMinutes()).toBe(0);
-      expect(result.maxDate.getHours()).toBe(21);
+      expect(result.maxDate.getHours()).toBe(20);
       expect(result.maxDate.getMinutes()).toBe(0);
     });
 
     it('should return min and max dates for thursday', () => {
       const result = getMinMaxDate(4, new Date(), [room]);
-      expect(result.minDate.getHours()).toBe(11);
+      expect(result.minDate.getHours()).toBe(10);
       expect(result.minDate.getMinutes()).toBe(0);
-      expect(result.maxDate.getHours()).toBe(20);
+      expect(result.maxDate.getHours()).toBe(19);
       expect(result.maxDate.getMinutes()).toBe(0);
     });
 
@@ -1084,9 +1093,9 @@ describe('dates utility', () => {
 
     it('should return min and max dates for saturday', () => {
       const result = getMinMaxDate(6, new Date(), [room]);
-      expect(result.minDate.getHours()).toBe(12);
+      expect(result.minDate.getHours()).toBe(11);
       expect(result.minDate.getMinutes()).toBe(0);
-      expect(result.maxDate.getHours()).toBe(18);
+      expect(result.maxDate.getHours()).toBe(17);
       expect(result.maxDate.getMinutes()).toBe(0);
     });
 
@@ -1279,4 +1288,87 @@ describe('dates utility', () => {
     });
   });
 
+  describe('secondsToHHMM', () => {
+    it('converts seconds to HH:MM format', () => {
+      const result = secondsToHHMM(3665); // 1 hour, 1 minute, 5 seconds
+      expect(result).toBe('01:01');
+    });
+
+    it('pads single digit hours and minutes with leading zeros', () => {
+      const result = secondsToHHMM(65); // 1 minute, 5 seconds
+      expect(result).toBe('00:01');
+    });
+
+    it('handles zero seconds', () => {
+      const result = secondsToHHMM();
+      expect(result).toBe('00:00');
+    });
+  });
+
+  describe('localeTimeZoneDate', () => {
+    it('should return empty string if no date is provided', () => {
+      const result = localeTimeZoneDate('en-US');
+      expect(result).toBe('');
+    });
+
+    it('should format a date string with default timezone', () => {
+      const dateStr = '2026-01-29T15:00:00Z';
+      const expected = reservationDateTime(new Date(dateStr), 'en-US', getCurrentTimeZone());
+      const result = localeTimeZoneDate('en-US', dateStr);
+      expect(result).toBe(expected);
+    });
+
+    it('should format a Date object with custom timezone', () => {
+      const dateObj = new Date('2026-01-29T15:00:00Z');
+      const timeZone = 'America/New_York';
+      const expected = reservationDateTime(dateObj, 'en-US', timeZone);
+      const result = localeTimeZoneDate('en-US', dateObj, timeZone);
+      expect(result).toBe(expected);
+    });
+
+    it('should format different locales correctly', () => {
+      const dateObj = new Date('2026-01-29T15:00:00Z');
+      const expectedNL = reservationDateTime(dateObj, 'nl-NL', getCurrentTimeZone());
+      const resultNL = localeTimeZoneDate('nl-NL', dateObj);
+      expect(resultNL).toBe(expectedNL);
+    });
+  });
+
+  describe('createNewDateZonedTime', () => {
+    it('should create a Date at midnight in default timezone from string', () => {
+      const input = '2026-01-29T15:00:00Z';
+      const result = createNewDateZonedTime(input);
+      const expected = toZonedTime(createNewDate(newDateTimestamp(input)), getCurrentTimeZone());
+      expect(result.getTime()).toBe(expected.getTime());
+    });
+
+    it('should create a Date with specified hour, minute, second, milli', () => {
+      const input = '2026-01-29T00:00:00Z';
+      const result = createNewDateZonedTime(input, getCurrentTimeZone(), 10, 30, 15, 500);
+      const expected = toZonedTime(createNewDate(newDateTimestamp(input), 10, 30, 15, 500), getCurrentTimeZone());
+      expect(result.getTime()).toBe(expected.getTime());
+    });
+
+    it('should accept a Date object as input', () => {
+      const dateObj = new Date('2026-01-29T12:00:00Z');
+      const result = createNewDateZonedTime(dateObj);
+      const expected = toZonedTime(createNewDate(newDateTimestamp(dateObj)), getCurrentTimeZone());
+      expect(result.getTime()).toBe(expected.getTime());
+    });
+
+    it('should accept a timestamp (number in seconds) as input', () => {
+      const timestamp = 1764796800; // 2026-01-29T00:00:00Z in seconds
+      const result = createNewDateZonedTime(timestamp);
+      const expected = toZonedTime(createNewDate(newDateTimestamp(timestamp)), getCurrentTimeZone());
+      expect(result.getTime()).toBe(expected.getTime());
+    });
+
+    it('should use a custom timezone if provided', () => {
+      const dateObj = new Date('2026-01-29T12:00:00Z');
+      const timeZone = 'America/New_York';
+      const result = createNewDateZonedTime(dateObj, timeZone);
+      const expected = toZonedTime(createNewDate(newDateTimestamp(dateObj, timeZone)), timeZone);
+      expect(result.getTime()).toBe(expected.getTime());
+    });
+  });
 });

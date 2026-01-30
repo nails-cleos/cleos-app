@@ -1,11 +1,12 @@
 import { IUser, IUserAll } from './user';
+import { FrequencyEnum } from '../util/helper';
 
 export interface IUnavailable {
   id?: string;
   description?: string;
   professionalId?: string;
   professional?: IUser;
-  repeat?: string;
+  repeat?: FrequencyEnum;
   start?: string;
   end?: string;
   endString?: string;
@@ -26,11 +27,14 @@ export interface IUnavailableAll {
   start: string;
   timestamp: number;
   end: string;
+  endString?: string;
   duration: string;
   professional: IUserAll;
-  repeat: string;
+  repeat: FrequencyEnum;
   allDay: boolean;
   type?: string;
+  startDate?: Date;
+  timeZone?: string;
 }
 
 export class Unavailable implements IUnavailable {

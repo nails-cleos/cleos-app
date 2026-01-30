@@ -1,15 +1,12 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { IAvailability, IRoom } from '../../interfaces/room';
-import { Observable, Subscription } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { AppState, selectRoomState } from '../../store/app.states';
-import { clean, deleteRoom, getRoomsPage, roomSelected } from '../../store/room.actions';
+import { cleanRoom, deleteRoom, getRoomsPage, roomSelected } from '../../store/room.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { detailExpandAnimation } from '../../util/animation';
@@ -17,6 +14,9 @@ import { findDayOfWeek, getTimeZone, ITimeZone } from '../../util/dates';
 import { executeDialogNoWidth } from '../../util/helper';
 import { SharedModule } from '../../shared/shared.module';
 import { SortByPipe } from '../../pipes/sort-by.pipe';
+import { RoomState } from '../../store/reducers/room.reducers';
+import { getRoomResponsePipe, getRoomPaginationPipe } from '../../store/selectors/room.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-rooms',
@@ -24,49 +24,84 @@ import { SortByPipe } from '../../pipes/sort-by.pipe';
   styleUrls: ['./rooms.component.scss'],
   animations: [detailExpandAnimation],
   imports: [SharedModule, SortByPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+export class RoomsComponent {
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly store: Store<RoomState> = inject(Store<RoomState>);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly dialog: MatDialog = inject(MatDialog);
+
+  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private roomList$ = this.store.pipe(getRoomPaginationPipe);
+  private response$ = this.store.pipe(getRoomResponsePipe);
+
+  private paginator = viewChild(MatPaginator);
+  private sort = viewChild(MatSort);
+
+  private roomListSignal = toSignal(this.roomList$);
+  private responseSignal = toSignal(this.response$);
+  private breakpointsSignal = toSignal(
+    this.breakpointObserver$, {
+      initialValue: {
+        matches: false,
+        breakpoints: {
+          [Breakpoints.XSmall]: false,
+          [Breakpoints.Small]: false,
+        },
+      },
+    },
+  );
+
+  private sortActive = computed(() => this.sort()?.active ?? 'office');
+  private sortDirection = computed(() => this.sort()?.direction ?? 'asc');
+
+  paginatorPageIndex = signal(0);
+  dataSourceSignal = computed(() => this.roomListSignal()?.content?.map((room: IRoom) => {
+    if (room && room.availabilities && room.availabilities.length) {
+      const availabilities = room.availabilities.map((i: IAvailability) =>
+        Object.assign({}, i, { order: findDayOfWeek(i.day) }));
+      return Object.assign({}, room, { availabilities });
+    }
+    return room;
+  }));
+  resultsLengthSignal = computed(() => this.roomListSignal()?.totalElements || 0);
+  pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
   displayedColumns: string[] = ['position', 'currency', 'office', 'address', 'timeZone', 'availability', 'actions'];
-  dataSource: any = new MatTableDataSource<Pagination<IRoom>>();
   expanded?: IRoom;
 
-  resultsLength = DEFAULT_LENGTH;
-  pageSize = PAGE_SIZE;
-  language: string;
+  language: string = this.translate.getCurrentLang();
 
-  private subscription: Subscription | undefined;
-  private paginatorSubscription: Subscription | undefined;
-  private getState: Observable<any>;
-
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-    private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small,
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.pageSize = MOBILE_PAGE_SIZE;
+  constructor() {
+    effect((onCleanup) => {
+      const paginator = this.paginator();
+      if (paginator) {
+        const sub = paginator.page.subscribe((pageEvent) => {
+          this.paginatorPageIndex.set(pageEvent.pageIndex);
+        });
+        onCleanup(() => sub.unsubscribe());
       }
     });
-    this.getState = this.store.select(selectRoomState);
-    this.language = this.translate.currentLang;
-  }
 
-  ngAfterViewInit(): void {
-    this.getRooms();
-  }
+    effect(() => {
+      const page = this.paginatorPageIndex();
+      this.store.dispatch(
+        getRoomsPage({
+          page: page,
+          sort: this.sortActive(),
+          direction: this.sortDirection(),
+          size: this.pageSizeSignal(),
+        }),
+      );
+    });
 
-  ngOnInit(): void {
-    this.clean();
-    this.subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.paginatorSubscription?.unsubscribe();
+    effect(() => {
+      if (this.responseSignal()) {
+        this.store.dispatch(cleanRoom());
+        this.paginator()?.firstPage();
+      }
+    });
   }
 
   getTimeZone = (timeZone?: string): ITimeZone => getTimeZone(timeZone);
@@ -81,54 +116,6 @@ export class RoomsComponent implements OnInit, AfterViewInit, OnDestroy {
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: room }, result => {
       if (result) {
         this.store.dispatch(deleteRoom({ id: result.id, room: result }));
-      }
-    });
-  };
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private createPageSubscriptions = (): void => {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getRooms();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getRooms(this.paginator.pageIndex));
-
-    this.cdRef.detectChanges();
-  };
-
-  private getRooms = (page: number = 0): void => this.store.dispatch(
-    getRoomsPage({ page: page, sort: this.sort.active, direction: this.sort.direction, size: this.pageSize }),
-  );
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.response) {
-        this.clean();
-        this.getRooms();
-      }
-      this.dataSource = state.data?.content?.map((r: IRoom) => {
-        if (r && r.availabilities && r.availabilities.length) {
-          const availabilities = r.availabilities.map((i: IAvailability) =>
-            Object.assign({}, i, { order: findDayOfWeek(i.day) }));
-          return Object.assign({}, r, { availabilities });
-        }
-        return r;
-      });
-      // this.dataSource = stateValue.data?.content?.map((r: any) => {
-      //   const map = new Map<string, string[]>();
-      //   r.availabilities?.reduce((group: any, item: IAvailabilityAll) => {
-      //     const key = `${item.start} - ${item.end}`;
-      //     let day: any = group.get(key) || [];
-      //     day = [...day, item.day];
-      //     group.set(key, day);
-      //     return group;
-      //   }, map)
-      //   return Object.assign({}, r, {times: map})
-      // });
-      this.resultsLength = state.data?.totalElements;
-      if (!this.paginatorSubscription && this.resultsLength) {
-        this.createPageSubscriptions();
       }
     });
   };

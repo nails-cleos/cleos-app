@@ -22,6 +22,7 @@ export interface ITreatmentGroupAll {
   priceFrom?: string;
   order?: number;
   colors?: IColorAll[];
+  treatments?: ITreatmentAll[];
 }
 
 export interface ITreatment {
@@ -51,14 +52,14 @@ export interface IGroupService {
 }
 
 export interface ITreatmentAll extends IService {
-  duration: string;
-  description?: string;
   discountCustomer?: IDiscount;
   primary?: boolean;
   createdAt?: string;
   treatmentId?: string;
   group: ITreatmentGroupAll;
   color?: IColorAll;
+  history?: ITreatmentAll[];
+  showHistory?: boolean;
 }
 
 export interface ITreatmentDiscountDTO {
@@ -107,9 +108,19 @@ export class Price implements IPrice {
   penalty: number;
   balance: number;
 
-  constructor(price: number = 0, discount: number = 0, extra: number = 0, additional: number = 0, total: number = 0,
-    totalPaid: number = 0, totalWithoutDiscount: number = 0, priceWithDiscount: number = 0,
-    priceWithExtras = 0, priceWithAdditional = 0, percentageToPaid: number = 100, balance: number = 0) {
+  constructor(
+    price = 0,
+    discount = 0,
+    extra = 0,
+    additional = 0,
+    total = 0,
+    totalPaid = 0,
+    totalWithoutDiscount = 0,
+    priceWithDiscount = 0,
+    priceWithExtras = 0,
+    priceWithAdditional = 0,
+    percentageToPaid = 100,
+    balance = 0) {
     this.amount = price;
     this.discount = discount;
     this.extra = extra;

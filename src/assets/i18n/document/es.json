@@ -1,0 +1,15 @@
+{
+  "DOCUMENT": {
+    "OFFICE": {
+      "SEARCH": "Buscar por oficina",
+      "FIELD": "Oficina",
+      "REQUIRED": "Oficina es <b>requerido</b>",
+      "INVALID": "Oficina no valido"
+    },
+    "LIST": {
+      "ERROR": {
+        "NO_CONTENT": "No hay documentos"
+      }
+    }
+  }
+}

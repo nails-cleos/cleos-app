@@ -8,7 +8,6 @@ import { PaymentComponent } from './payment/payment.component';
 import { PaymentCompleteComponent } from './payment/complete/payment-complete.component';
 import { ReferralsComponent } from './referrals/referrals.component';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
-import { ReviewDialogComponent } from './reservation/review/review-dialog.component';
 import { OverviewComponent } from '../user/overview/overview.component';
 import { OptionComponent } from './payment/option/option.component';
 import { MePaymentComponent } from './payment/me/me-payment.component';
@@ -35,12 +34,6 @@ const routes: Routes = [
   {
     path: 'reservation/:id/payment/option',
     component: OptionComponent,
-    canActivate: [authGuard],
-    data: { roles: [Role.customer] },
-  },
-  {
-    path: 'reservation/:id/review',
-    component: ReviewDialogComponent,
     canActivate: [authGuard],
     data: { roles: [Role.customer] },
   },

@@ -1,0 +1,80 @@
+<div>
+  <fieldset>
+    <div class="row-space-around-container">
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'SUMMARY.YEAR.SELECT.DATE' | translate }}</mat-label>
+        <input matInput [matDatepicker]="dp" [formControl]="getForm.date">
+        <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
+        <mat-datepicker #dp startView="multi-year" (yearSelected)="setYear($event, dp)">
+        </mat-datepicker>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'SUMMARY.QUARTER.SELECT' | translate }}</mat-label>
+        <mat-select [formControl]="getForm.selectedQuarter">
+          @for (number of [1, 2, 3, 4]; track number) {
+            <mat-option [value]="number">Q{{ number }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <button color="accent" mat-fab matTooltip="{{ 'SUMMARY.MONTHLY.RESULT' | translate }}"
+              [routerLink]="['/', language, 'dashboard','monthly','summary']">
+        <mat-icon>calendar_month</mat-icon>
+      </button>
+    </div>
+    <div class="space-around-container">
+      @if (quarterSummaryMap?.size) {
+        <mat-form-field appearance="outline" class="full-select">
+          <mat-label>{{ 'COMMON.ROOM.FIELD' | translate }}</mat-label>
+          <mat-select [formControl]="getForm.selectedRoom">
+            @if (primaryRoom) {
+              <mat-option [value]="'All'">All</mat-option>
+            }
+            @for (quarterSummary of quarterSummaryMap | keyvalue; track quarterSummary) {
+              <mat-option [value]="quarterSummary.key">{{ quarterSummary.key.roomName }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      }
+    </div>
+  </fieldset>
+</div>
+
+@if (!isLoading()) {
+  @let currentQuarter = quarter();
+  @let currentYear = year();
+  @let currentShowCash = showCash();
+  @if (currentQuarter && currentYear) {
+    @if (quarterSummaryMap?.size) {
+      <app-quarter style="width: 100%" [showCash]="currentShowCash" [year]="currentYear!" [quarter]="currentQuarter!" [currency]="currency"
+                   [measure]="isHandset() ? 'short' : 'long'" [monthSummaries]="monthSummaries()">
+      </app-quarter>
+      <div class="top">
+        <mat-toolbar color="primary">
+          {{ 'SUMMARY.QUARTER.RESULT' | translate }}
+        </mat-toolbar>
+        <app-total-summary [summaryTotals]="quarterSummaryTotals()" [showCash]="currentShowCash"
+                           [currency]="currency"></app-total-summary>
+      </div>
+    } @else {
+      <mat-toolbar color="warn" style="text-align: center"
+                   [innerHTML]="'SUMMARY.QUARTER.ERROR.NO_CONTENT' | translate:{quarter: currentQuarter, year: currentYear}">
+      </mat-toolbar>
+    }
+  }
+} @else {
+  <div class="spinner-parent-center">
+    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+  </div>
+}
+
+<div class="top-space card-actions">
+  <div class="spacer"></div>
+  <button (click)="goBack()" color="accent" mat-fab extended class="icon-button"
+          type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
+  </button>
+  <button [disabled]="!monthSummaries()" (click)="exportQuarterSummary()" color="primary" mat-fab extended
+          class="icon-button">
+    <mat-icon>file_download</mat-icon>
+    <span>{{ 'COMMON.BUTTON.EXPORT' | translate }}</span>
+  </button>
+</div>

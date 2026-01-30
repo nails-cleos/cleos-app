@@ -1,7 +1,7 @@
 import {
   approveReservation,
   cancelReservation,
-  clean,
+  cleanReservation,
   colorsCompleteSuccess,
   completeReservation,
   createReservation,
@@ -12,7 +12,6 @@ import {
   customerSuccess,
   deleteReservation,
   executeTrackingByReservationId,
-  findRooms,
   getAllAdditionalByGroupId,
   getAllFilterReservations,
   getAllGroupingByRoom,
@@ -47,10 +46,17 @@ import {
   reservationSuccess,
   reservationTreatmentsSuccess,
   searchAvailability,
+  setCurrentCompleteReservation,
+  setCurrentReservationId,
+  setDetailReservationParams,
+  setMeReservationParams,
+  setReservationParams,
   startReservation,
   stateSuccess,
   trackingSuccess,
   updateReservationById,
+  updateReservationColor,
+  updateReservationCustomer,
   updateReservationDiscount,
   updateReservationNote,
   updateReservationTimestamp,
@@ -61,47 +67,73 @@ import {
   ICustomerLastReservation,
   ICustomerReservation,
   IReservation,
+  IReservationAll,
   IRoomReservation,
   ITracking,
+  IUpcomingAll,
 } from '../../interfaces/reservation';
-import { IUser } from '../../interfaces/user';
+import { IUserAll } from '../../interfaces/user';
 import { ITreatmentDiscountDTO } from '../../interfaces/treatment';
-import { IRoom } from '../../interfaces/room';
+import { IRoomAll } from '../../interfaces/room';
 import { Pagination } from '../../interfaces/pagination';
-import { IPayment, IPaymentOption } from '../../interfaces/payment';
-import { IAdditional } from '../../interfaces/additional';
+import { IPaymentAll, IPaymentOption } from '../../interfaces/payment';
+import { IAdditionalAll } from '../../interfaces/additional';
 import { IOffice } from '../../interfaces/office';
-import { IColor } from '../../interfaces/color';
+import { IColorAll } from '../../interfaces/color';
 import { IReview } from '../../interfaces/review';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
 
-export interface State {
+export const RESERVATION_FEATURE_KEY = 'reservation';
+
+export interface ReservationState {
   response?: IResponseSuccess;
-  data?: IReservation | IRoomReservation[] | IReservation[] | ICustomerReservation | IAvailableDTO;
-  filter?: Pagination<IReservation>;
-  page?: Pagination<IReservation>;
+  data?: IReservation | IRoomReservation[] | IReservation[] | ICustomerReservation | IAvailableDTO[];
+  filter?: Pagination<IReservationAll>;
+  page?: Pagination<IReservationAll>;
   customerReservation?: ICustomerReservation;
-  customers?: IUser[];
+  customers?: IUserAll[];
   offices?: IOffice[];
   customer?: ICustomerLastReservation;
-  rooms?: IRoom[];
-  additional?: IAdditional[];
-  treatmentDiscount?: ITreatmentDiscountDTO[];
-  tracking?: ITracking[] | ITracking;
-  payments?: IPayment[];
-  history?: IReservation[];
-  colors?: IColor[];
+  rooms?: IRoomAll[];
+  additional?: IAdditionalAll[];
+  treatmentDiscount?: ITreatmentDiscountDTO;
+  tracking?: ITracking;
+  payments?: IPaymentAll[];
+  history?: IReservationAll[];
+  colors?: IColorAll[];
   paymentOptions?: IPaymentOption[];
   review?: IReview;
-  errorMessage?: string;
   error?: IError;
   subErrors?: IError[];
-  selected?: IReservation;
+  selected?: IUpcomingAll;
+  meReservationParams?: {
+    treatmentId?: string;
+    roomId?: string;
+    professionalId?: string;
+    date?: Date;
+    discountId?: string
+  };
+  currentReservationId?: string;
+  currentCompleteReservation?: { reservationId: string; roomId: string; customerId: string; isDashboard: boolean };
+  detailReservationParams?: { step?: number };
+  reservationParams?: {
+    isDashboard: boolean;
+    skip: boolean;
+    customerId?: string;
+    roomId?: string;
+    treatmentId?: string;
+    groupId?: string;
+    professionalId?: string;
+    additionalIds?: string[];
+    date?: Date;
+    discountId?: string;
+  }
   isLoading: boolean;
 }
 
-export const initialState: State = {
+export const initialState: ReservationState = {
+  response: undefined,
   data: undefined,
   filter: undefined,
   page: undefined,
@@ -118,11 +150,14 @@ export const initialState: State = {
   colors: undefined,
   paymentOptions: undefined,
   review: undefined,
-  errorMessage: undefined,
   error: undefined,
   subErrors: undefined,
   selected: undefined,
-  response: undefined,
+  meReservationParams: undefined,
+  currentReservationId: undefined,
+  currentCompleteReservation: undefined,
+  detailReservationParams: undefined,
+  reservationParams: undefined,
   isLoading: false,
 };
 
@@ -134,7 +169,6 @@ export const reservationReducer = createReducer(
       reservations: { content: [{}, {}, {}], totalElements: 3 },
       upcoming: [{}],
     } as ICustomerReservation,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     selected: undefined,
@@ -142,8 +176,7 @@ export const reservationReducer = createReducer(
   })),
   on(getAllFilterReservations, (state) => ({
     ...state,
-    filter: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IReservation>,
-    errorMessage: undefined,
+    filter: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IReservationAll>,
     error: undefined,
     subErrors: undefined,
     selected: undefined,
@@ -151,8 +184,7 @@ export const reservationReducer = createReducer(
   })),
   on(getPage, (state) => ({
     ...state,
-    page: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IReservation>,
-    errorMessage: undefined,
+    page: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IReservationAll>,
     error: undefined,
     subErrors: undefined,
     selected: undefined,
@@ -161,7 +193,6 @@ export const reservationReducer = createReducer(
   on(getAllGroupingByRoom, (state) => ({
     ...state,
     data: undefined,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     selected: undefined,
@@ -171,7 +202,6 @@ export const reservationReducer = createReducer(
   on(getUpcomingReservation, (state) => ({
     ...state,
     data: undefined,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     selected: undefined,
@@ -180,7 +210,6 @@ export const reservationReducer = createReducer(
   on(customerSearchReservation, searchAvailability, (state) => ({
     ...state,
     data: undefined,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     selected: undefined,
@@ -190,7 +219,6 @@ export const reservationReducer = createReducer(
   on(getCustomers, (state) => ({
     ...state,
     customers: undefined,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     selected: undefined,
@@ -199,17 +227,15 @@ export const reservationReducer = createReducer(
   on(getCustomerInformation, (state) => ({
     ...state,
     customer: undefined,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
   })),
-  on(getAllRooms, findRooms, (state) => ({
+  on(getAllRooms, (state) => ({
     ...state,
     rooms: undefined,
     isLoading: true,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     selected: undefined,
@@ -218,7 +244,6 @@ export const reservationReducer = createReducer(
   on(getAllAdditionalByGroupId, (state) => ({
     ...state,
     additional: undefined,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -226,7 +251,6 @@ export const reservationReducer = createReducer(
   on(getAllTreatments, (state) => ({
     ...state,
     treatmentDiscount: undefined,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -236,7 +260,6 @@ export const reservationReducer = createReducer(
     data: {} as IReservation,
     page: undefined,
     filter: undefined,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     selected: undefined,
@@ -245,20 +268,18 @@ export const reservationReducer = createReducer(
   })),
   on(reservationFindPayments, (state) => ({
     ...state,
-    payments: [{}, {}, {}],
+    payments: [{}, {}, {}] as IPaymentAll[],
     page: undefined,
     filter: undefined,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(getReservationHistory, (state) => ({
     ...state,
-    history: [{}, {}, {}],
+    history: [{}, {}, {}] as IUpcomingAll[],
     page: undefined,
     filter: undefined,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -268,23 +289,39 @@ export const reservationReducer = createReducer(
     completeReservation,
     paymentCompleteReservation,
     cancelReservation,
-    customerCancelReservation,
-    getEditReservation,
-    getReservation, (state) => ({
+    customerCancelReservation, (state) => ({
+      ...state,
+      page: undefined,
+      filter: undefined,
+      error: undefined,
+      subErrors: undefined,
+      response: undefined,
+      isLoading: true,
+    })),
+  on(getEditReservation,
+    updateReservationCustomer,
+    updateReservationColor, (state) => ({
       ...state,
       data: {} as IReservation,
       page: undefined,
       filter: undefined,
-      errorMessage: undefined,
       error: undefined,
       subErrors: undefined,
       selected: undefined,
       response: undefined,
     })),
+  on(getReservation, (state) => ({
+    ...state,
+    page: undefined,
+    filter: undefined,
+    error: undefined,
+    subErrors: undefined,
+    selected: undefined,
+    response: undefined,
+  })),
   on(reservationPageSuccess, (state, { page }) => ({
     ...state,
     page,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -292,7 +329,6 @@ export const reservationReducer = createReducer(
   on(reservationFilterPageSuccess, (state, { filter }) => ({
     ...state,
     filter,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -300,7 +336,6 @@ export const reservationReducer = createReducer(
   on(reservationsCustomerSuccess, (state, { customerReservation }) => ({
     ...state,
     customerReservation,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -308,7 +343,6 @@ export const reservationReducer = createReducer(
   on(reservationSuccess, (state, { data }) => ({
     ...state,
     data,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -317,7 +351,6 @@ export const reservationReducer = createReducer(
   on(customersSuccess, (state, { customers }) => ({
     ...state,
     customers,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -325,7 +358,6 @@ export const reservationReducer = createReducer(
   on(customerSuccess, (state, { customer }) => ({
     ...state,
     customer,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -333,7 +365,6 @@ export const reservationReducer = createReducer(
   on(reservationRoomsSuccess, (state, { rooms }) => ({
     ...state,
     rooms,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -342,7 +373,6 @@ export const reservationReducer = createReducer(
   on(reservationTreatmentsSuccess, (state, { treatmentDiscount }) => ({
     ...state,
     treatmentDiscount,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -350,7 +380,6 @@ export const reservationReducer = createReducer(
   on(reservationAdditionalSuccess, (state, { additional }) => ({
     ...state,
     additional,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -358,15 +387,14 @@ export const reservationReducer = createReducer(
   on(stateSuccess, reservationSaveSuccess, (state, action) => ({
     ...state,
     response: action,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
+    selected: action.state ? { ...state.selected, state: action.state } as IUpcomingAll : state.selected,
     isLoading: false,
   })),
   on(reservationSelected, (state, { selected }) => ({
     ...state,
-    selected: selected,
-    errorMessage: undefined,
+    selected,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -374,15 +402,13 @@ export const reservationReducer = createReducer(
   })),
   on(reservationFailure, (state, { error }) => ({
     ...state,
-    errorMessage: error.message,
     error: error,
-    subErrors: error.subErrors,
+    subErrors: error?.subErrors,
     response: undefined,
     isLoading: false,
   })),
   on(createReservation, deleteReservation, (state) => ({
     ...state,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -391,7 +417,6 @@ export const reservationReducer = createReducer(
   on(updateTrackingByReservationId, executeTrackingByReservationId, (state) => ({
     ...state,
     tracking: undefined,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -399,7 +424,6 @@ export const reservationReducer = createReducer(
   on(getTrackingByReservationId, (state) => ({
     ...state,
     tracking: undefined,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     selected: undefined,
@@ -408,7 +432,6 @@ export const reservationReducer = createReducer(
   on(trackingSuccess, (state, { tracking }) => ({
     ...state,
     tracking,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -416,7 +439,6 @@ export const reservationReducer = createReducer(
   on(reservationPaymentsSuccess, (state, { payments }) => ({
     ...state,
     payments,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -424,14 +446,12 @@ export const reservationReducer = createReducer(
   on(reservationHistorySuccess, (state, { history }) => ({
     ...state,
     history,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(createReview, (state) => ({
     ...state,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -440,7 +460,6 @@ export const reservationReducer = createReducer(
   on(getReview, (state) => ({
     ...state,
     review: undefined,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -449,7 +468,6 @@ export const reservationReducer = createReducer(
   on(reservationReviewSuccess, (state, { review }) => ({
     ...state,
     review,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -458,30 +476,68 @@ export const reservationReducer = createReducer(
   on(getColorsByTreatmentId, (state) => ({
     ...state,
     colors: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(colorsCompleteSuccess, (state, { colors }) => ({
     ...state,
     colors,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(paymentOptions, (state) => ({
     ...state,
     paymentOptions: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(paymentOptionsSuccess, (state, { paymentOptions }) => ({
     ...state,
     paymentOptions,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
-  on(clean, () => initialState),
+  on(setMeReservationParams, (state, { treatmentId, roomId, professionalId, date, discountId }) => ({
+    ...state,
+    meReservationParams: { treatmentId, roomId, professionalId, date, discountId },
+  })),
+  on(setCurrentReservationId, (state, { reservationId }) => ({
+    ...state,
+    currentReservationId: reservationId,
+  })),
+  on(setCurrentCompleteReservation, (state, { reservationId, roomId, customerId, isDashboard }) => ({
+    ...state,
+    currentCompleteReservation: { reservationId, roomId, customerId, isDashboard },
+  })),
+  on(setDetailReservationParams, (state, { step }) => ({
+    ...state,
+    detailReservationParams: { step },
+  })),
+  on(setReservationParams, (state, {
+    isDashboard,
+    skip,
+    customerId,
+    roomId,
+    treatmentId,
+    groupId,
+    professionalId,
+    additionalIds,
+    date,
+    discountId,
+  }) => ({
+    ...state,
+    reservationParams: {
+      isDashboard,
+      skip,
+      customerId,
+      roomId,
+      treatmentId,
+      groupId,
+      professionalId,
+      additionalIds,
+      date,
+      discountId,
+    },
+  })),
+  on(cleanReservation, () => ({ ...initialState })),
 );

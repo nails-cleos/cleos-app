@@ -1,40 +1,47 @@
-import { Component, inject } from '@angular/core';
-import { IAuthority, IUserAll } from '../../interfaces/user';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import { IAuthority } from '../../interfaces/user';
 import { Role } from '../../interfaces/token';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState } from '../../store/app.states';
 import { TokenService } from '../../services/token.service';
 import { getLocale, hasRoomAdmin } from '../../util/helper';
 import { NavigationService } from '../../services/navigation.service';
 import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../shared/shared.module';
+import { getIsAuthenticatedPipe, getRedirectPipe, getUserPipe } from '../../store/selectors/auth.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { AuthState } from '../../store/reducers/auth.reducers';
 
 @Component({
   selector: 'app-redirect',
   templateUrl: './redirect.component.html',
   styleUrls: ['./redirect.component.scss'],
-  imports: [SharedModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RedirectComponent {
+  private readonly store: Store<AuthState> = inject(Store<AuthState>);
+  private readonly tokenService: TokenService = inject(TokenService);
+  private readonly navigateService: NavigationService = inject(NavigationService);
+  private readonly translate: TranslateService = inject(TranslateService);
 
-  private store: Store<AppState> = inject(Store<AppState>);
-  private tokenService: TokenService = inject(TokenService);
-  private navigateService: NavigationService = inject(NavigationService);
-  private translate: TranslateService = inject(TranslateService);
+  private redirect$ = this.store.pipe(getRedirectPipe);
+  private isAuthenticated$ = this.store.pipe(getIsAuthenticatedPipe);
+  private user$ = this.store.pipe(getUserPipe);
+
+  private redirectSignal = toSignal(this.redirect$);
+  private isAuthenticatedSignal = toSignal(this.isAuthenticated$);
+  private userSignal = toSignal(this.user$);
 
   constructor() {
-    this.store.select(selectAuthState).subscribe((state: any) => {
-      const lang = getLocale(this.translate.currentLang).language;
+    effect(() => {
+      const lang = getLocale(this.translate.getCurrentLang()).language;
       let redirectUrl = ['/', lang];
-      if (state.redirect) {
-        if (state.isAuthenticated) {
-          const user: IUserAll = state.user;
-          this.tokenService.token = state.token;
-          this.tokenService.user = state.user;
+      if (this.redirectSignal()) {
+        const user = this.userSignal();
+        if (this.isAuthenticatedSignal() && user) {
+          this.tokenService.setUser = user;
           if (RedirectComponent.hasRoomOrAdmin(user.authorities)) {
             redirectUrl = [lang, 'dashboard'];
           } else if (hasRoomAdmin(user.authorities)) {
-            redirectUrl = [lang, 'events'];
+            redirectUrl = [lang, 'dashboard', 'events'];
           } else {
             redirectUrl = [lang, 'me', 'reservations'];
           }

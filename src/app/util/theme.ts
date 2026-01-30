@@ -25,8 +25,13 @@ export const isDarkMode = (theme: Theme | undefined): boolean => theme === dark;
 
 export const getThemeName = (isDark: boolean): Theme => isDark ? dark : light;
 
-export const resetTheme = (theme: Theme | undefined, cssClass: string | undefined, overlayContainer: OverlayContainer,
-  cookieService: CookieService, themeService: ThemeService): string => {
+export const resetTheme = (
+  overlayContainer: OverlayContainer,
+  cookieService: CookieService,
+  themeService: ThemeService,
+  theme?: Theme,
+  cssClass?: string,
+): string => {
   const body = document.getElementsByTagName('body')[0];
 
   if (cssClass) {

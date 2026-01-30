@@ -18,6 +18,7 @@
       "CANCEL": "Cancel",
       "BOOK": "Reserve",
       "VIEW": "View",
+      "DOWNLOAD": "Download",
       "REVIEW": "Review",
       "EDIT": "Edit",
       "DELETE": "Delete",
@@ -216,7 +217,10 @@
     "LABEL": {
       "FILTER": "Filter",
       "PRICE": "Price",
-      "TOTAL": "Total"
+      "TOTAL": "Total",
+      "MONTHLY": {
+        "DATE": "Month and year"
+      }
     },
     "SEARCH": {
       "TITLE": "Search"
@@ -382,6 +386,14 @@
     "INSTALL": {
       "IOS": "To install this web app on your device. Open in safari, tap the Menu button and then 'Add to Home screen' button",
       "ANDROID": "Add to Home screen"
+    },
+    "FILE": {
+      "DRAG_DROP": "Drag and drop file here",
+      "OR": "or",
+      "CHOOSE": "Choose a file",
+      "DELETE": {
+        "MESSAGE": "Image {{name}} deleted"
+      }
     }
   },
   "REVIEW": {

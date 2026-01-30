@@ -1,13 +1,10 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { ICurrency } from '../../interfaces/currency';
-import { Observable, Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
-import { AppState, selectCurrencyState } from '../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { clean, currencySelected, deleteCurrency, getCurrenciesPage } from '../../store/currency.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
@@ -15,6 +12,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { detailExpandAnimation } from '../../util/animation';
 import { executeDialogNoWidth } from '../../util/helper';
 import { SharedModule } from '../../shared/shared.module';
+import { getCurrencyPaginationPipe, getCurrencyResponsePipe } from '../../store/selectors/currency.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { CurrencyState } from '../../store/reducers/currency.reducers';
 
 @Component({
   selector: 'app-currency-list',
@@ -22,49 +22,77 @@ import { SharedModule } from '../../shared/shared.module';
   styleUrls: ['./currency-list.component.scss'],
   animations: [detailExpandAnimation],
   imports: [SharedModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+export class CurrencyListComponent {
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly store: Store<CurrencyState> = inject(Store<CurrencyState>);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly dialog: MatDialog = inject(MatDialog);
+
+  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private currencyList$ = this.store.pipe(getCurrencyPaginationPipe);
+  private response$ = this.store.pipe(getCurrencyResponsePipe);
+
+  private paginator = viewChild(MatPaginator);
+  private sort = viewChild(MatSort);
+
+  private currencyListSignal = toSignal(this.currencyList$);
+  private responseSignal = toSignal(this.response$);
+  private breakpointsSignal = toSignal(
+    this.breakpointObserver$, {
+      initialValue: {
+        matches: false,
+        breakpoints: {
+          [Breakpoints.XSmall]: false,
+          [Breakpoints.Small]: false,
+        },
+      },
+    },
+  );
+
+  private sortActive = computed(() => this.sort()?.active ?? 'code');
+  private sortDirection = computed(() => this.sort()?.direction ?? 'asc');
+
+  paginatorPageIndex = signal(0);
+  dataSourceSignal = computed(() => this.currencyListSignal()?.content);
+  resultsLengthSignal = computed(() => this.currencyListSignal()?.totalElements || 0);
+  pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
   displayedColumns: string[] = ['position', 'code', 'name', 'actions'];
-  dataSource: any = new MatTableDataSource<Pagination<ICurrency>>();
   expanded?: ICurrency;
 
-  resultsLength = DEFAULT_LENGTH;
-  pageSize = PAGE_SIZE;
-  language: string;
+  language: string = this.translate.getCurrentLang();
 
-  private subscription?: Subscription;
-  private paginatorSubscription?: Subscription;
-  private getState: Observable<any>;
-
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>, public dialog: MatDialog,
-              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small,
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.pageSize = MOBILE_PAGE_SIZE;
+  constructor() {
+    effect((onCleanup) => {
+      const paginator = this.paginator();
+      if (paginator) {
+        const sub = paginator.page.subscribe((pageEvent) => {
+          this.paginatorPageIndex.set(pageEvent.pageIndex);
+        });
+        onCleanup(() => sub.unsubscribe());
       }
     });
-    this.getState = this.store.select(selectCurrencyState);
-    this.language = this.translate.currentLang;
-  }
 
-  ngAfterViewInit(): void {
-    this.getCurrency();
-  }
+    effect(() => {
+      const page = this.paginatorPageIndex();
+      this.store.dispatch(
+        getCurrenciesPage({
+          page: page,
+          sort: this.sortActive(),
+          direction: this.sortDirection(),
+          size: this.pageSizeSignal(),
+        }),
+      );
+    });
 
-  ngOnInit(): void {
-    this.clean();
-    this.subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.paginatorSubscription?.unsubscribe();
+    effect(() => {
+      if (this.responseSignal()) {
+        this.store.dispatch(clean());
+        this.paginator()?.firstPage();
+      }
+    });
   }
 
   edit = (selected: ICurrency): void => this.store.dispatch(currencySelected({ selected }));
@@ -75,36 +103,6 @@ export class CurrencyListComponent implements OnInit, AfterViewInit, OnDestroy {
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: currency }, result => {
       if (result) {
         this.store.dispatch(deleteCurrency({ id: result.id, code: result.code }));
-      }
-    });
-  };
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private createPageSubscriptions = (): void => {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getCurrency();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getCurrency(this.paginator.pageIndex));
-
-    this.cdRef.detectChanges();
-  };
-
-  private getCurrency = (page: number = 0): void => this.store.dispatch(
-    getCurrenciesPage({ page: page, sort: this.sort.active, direction: this.sort.direction, size: this.pageSize }),
-  );
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.response) {
-        this.clean();
-        this.getCurrency();
-      }
-      this.dataSource = state.data?.content;
-      this.resultsLength = state.data?.totalElements;
-      if (!this.paginatorSubscription && this.resultsLength) {
-        this.createPageSubscriptions();
       }
     });
   };

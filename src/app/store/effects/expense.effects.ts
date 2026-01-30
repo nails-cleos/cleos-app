@@ -19,8 +19,9 @@ import {
   getExpensesPage,
   updateExpense,
 } from '../expense.actions';
-import { IExpense, IExpenseInfo } from '../../interfaces/expense';
+import { IExpenseAll, IExpenseInfo } from '../../interfaces/expense';
 import { IApiResponse, success } from '../../interfaces/common';
+import { Pagination } from '../../interfaces/pagination';
 
 @Injectable()
 export class ExpenseEffects {
@@ -33,7 +34,7 @@ export class ExpenseEffects {
     ofType(getExpensesPage),
     switchMap(({ roomId, sort, direction, page, size, filter, dateFilter }) =>
       this.expenseService.getExpensesPage(roomId, sort, direction, page, size, filter, dateFilter)
-        .pipe(map((data: IExpense[]) => expenseSuccess({ data })),
+        .pipe(map((data: Pagination<IExpenseAll>) => expenseSuccess({ data })),
           catchError((err: HttpErrorResponse) => of(expenseFailure({ error: err.error }))),
         )),
   ));
@@ -42,7 +43,7 @@ export class ExpenseEffects {
     ofType(getExpense),
     switchMap(({ roomId, id }) =>
       this.expenseService.getExpense(roomId, id).pipe(
-        map((selected?: IExpense) => expenseSelected({ selected })),
+        map((selected?: IExpenseAll) => expenseSelected({ selected })),
         catchError((err: HttpErrorResponse) => of(expenseFailure({ error: err.error }))),
       )),
   ));
@@ -58,11 +59,11 @@ export class ExpenseEffects {
 
   create$ = createEffect(() => this.actions$.pipe(
     ofType(createExpense),
-    switchMap(({ roomId, expense }) =>
-      this.expenseService.createExpense(roomId, expense).pipe(
+    switchMap(({ roomId, expense, file }) =>
+      this.expenseService.createExpense(roomId, expense, file).pipe(
         switchMap((response: IApiResponse) => {
           const message = this.translate.instant('EXPENSE.CREATED', { invoice: response.name });
-          const path = `rooms/${ roomId }/expenses/${ response.id }`;
+          const path = `rooms/${roomId}/expenses/${response.id}`;
           return success(expenseSaveSuccess, message, path);
         }),
         catchError((err: HttpErrorResponse) => of(expenseFailure({ error: err.error }))),
@@ -75,7 +76,7 @@ export class ExpenseEffects {
       this.expenseService.updateExpense(id, roomId, expense).pipe(
         switchMap((response: IApiResponse) => {
           const message = this.translate.instant('EXPENSE.UPDATED.MESSAGE', { invoice: response.name });
-          const path = `rooms/${ roomId }/expenses/${ response.id }`;
+          const path = `rooms/${roomId}/expenses/${response.id}`;
           return success(expenseSaveSuccess, message, path);
         }),
         catchError((err: HttpErrorResponse) => of(expenseFailure({ error: err.error }))),
@@ -97,7 +98,7 @@ export class ExpenseEffects {
   selectedData$ = createEffect(() => this.actions$.pipe(
     ofType(expenseSelected),
     tap(({ selected }) => this.router.navigate(
-      [this.translate.currentLang, 'rooms', selected?.room?.id, 'expenses', selected?.id])),
+      [this.translate.getCurrentLang(), 'rooms', selected?.room?.id, 'expenses', selected?.id])),
   ), { dispatch: false });
 
   infoSuccess$ = createEffect(() => this.actions$.pipe(

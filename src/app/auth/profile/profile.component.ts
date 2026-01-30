@@ -1,26 +1,47 @@
-import { ChangeDetectorRef, Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AppState, selectUserState } from '../../store/app.states';
 import { IUser, User } from '../../interfaces/user';
-import { FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { clean, getMyUser, updateMyPhoto, updateMyUser } from '../../store/user.actions';
+import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { cleanUser, getMyUser, updateMyPhoto, updateMyUser } from '../../store/user.actions';
 import { fieldChange, validColorValidator, valueChange } from '../../util/validators';
-import { findFlag, flags, IFlag } from '../../util/flags';
+import { flags, IFlag } from '../../util/flags';
 import { createAddress, getDisplayNameInitials, getLocale, getUserImage } from '../../util/helper';
 import { backendFormatDate, createDateFromString, newDate } from '../../util/dates';
 import { lightenDarkenColor } from '../../util/color';
 import { Role } from '../../interfaces/token';
-import { TranslateService } from '@ngx-translate/core';
+import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { resizeImage } from '../../util/file';
 import { SharedModule } from '../../shared/shared.module';
-import { GoogleMapComponent } from '../../shared/google-map/google-map.component';
+import { GoogleMapComponent, GoogleMapForm } from '../../shared/google-map/google-map.component';
 import { BackButtonDirective } from '../../directives/back-button.directive';
-import { NgxMaterialIntlTelInputComponent, TextLabels } from 'ngx-material-intl-tel-input';
+import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
 import { NgIcon } from '@ng-icons/core';
 import { ColorPickerComponent, ColorPickerDirective } from 'ngx-color-picker';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { getSelectedUserPipe, getSubErrorsPipe, getUserResponsePipe } from '../../store/selectors/user.selectors';
+import { IError } from '../../interfaces/common';
+import { UserState } from '../../store/reducers/user.reducers';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
+
+type ProfileForm = {
+  lang: FormControl<string | undefined>;
+  displayName: FormControl<string>;
+  phone: FormControl<string>;
+  dob: FormControl<Date | undefined>;
+  darkColor: FormControl<string>;
+  lightColor: FormControl<string>;
+  addressForm: FormGroup<GoogleMapForm>;
+};
 
 @Component({
   selector: 'app-profile',
@@ -28,96 +49,194 @@ import PlaceGeometry = google.maps.places.PlaceGeometry;
   styleUrls: ['./profile.component.scss'],
   imports: [SharedModule, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective,
     NgIcon, ColorPickerComponent, ColorPickerDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfileComponent implements OnInit, OnDestroy {
-  @ViewChild('canvas', { static: false }) canvas?: ElementRef<HTMLCanvasElement>;
-  @ViewChild('resizedImage', { static: false }) resizedImage?: ElementRef<HTMLImageElement>;
+export class ProfileComponent {
+  private readonly store: Store<UserState> = inject(Store<UserState>);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly translate: TranslateService = inject(TranslateService);
 
-  private store: Store<AppState> = inject(Store<AppState>);
-  private formBuilder: UntypedFormBuilder = inject(UntypedFormBuilder);
-  private cdRef: ChangeDetectorRef = inject(ChangeDetectorRef);
-  private translate: TranslateService = inject(TranslateService);
+  private selectedUser$ = this.store.pipe(getSelectedUserPipe);
+  private subErrors$ = this.store.pipe(getSubErrorsPipe);
+  private response$ = this.store.pipe(getUserResponsePipe);
 
-  form!: UntypedFormGroup;
-  errors: any = [];
-  user?: IUser;
-  image: any;
-  initials?: string;
+  private subErrorsSignal = toSignal(this.subErrors$);
+  private responseSignal = toSignal(this.response$);
+  private langChangeSignal = toSignal<LangChangeEvent>(this.translate.onLangChange);
 
-  langValue: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required,
-  ]);
+  canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
+  resizedImage = viewChild<ElementRef<HTMLImageElement>>('resizedImage');
 
-  displayName: UntypedFormControl = new UntypedFormControl();
-  phone: FormControl = new FormControl('', [Validators.required]);
-  dob: UntypedFormControl = new UntypedFormControl();
-  darkColor: UntypedFormControl = new UntypedFormControl();
-  lightColor: UntypedFormControl = new UntypedFormControl();
+  selectedUserSignal = toSignal(this.selectedUser$);
 
-  address: UntypedFormControl = new UntypedFormControl();
+  showCashSignal = signal(false);
+  errors = signal<Record<string, unknown>>({});
 
-  showColors = false;
+  imageSignal = computed(() => {
+    const user = this.selectedUserSignal();
+    return user ? getUserImage(user) : null;
+  });
+  initialsSignal = computed(() => {
+    const user = this.selectedUserSignal();
+    return user ? getDisplayNameInitials(user) : '';
+  });
+  showColorsSignal = computed(() => {
+    const user = this.selectedUserSignal();
+    const roles = [Role.professional, Role.manager];
+    return !!user?.authorities?.some(au => roles.includes(au.authority as Role));
+  });
+  isAdminSignal = computed(() => {
+    const user = this.selectedUserSignal();
+    return !!user?.authorities?.some(au => au.authority === Role.admin);
+  });
+  labels = computed(() => {
+    this.langChangeSignal();
+    const phoneTranslations = this.translate.instant('COMMON.USER.PHONE');
+
+    return {
+      mainLabel: '',
+      codePlaceholder: '',
+      searchPlaceholderLabel: phoneTranslations.SEARCH || '',
+      noEntriesFoundLabel: phoneTranslations.COUNTRY_NOT_FOUND || '',
+      nationalNumberLabel: phoneTranslations.FIELD || '',
+      hintLabel: '',
+      invalidNumberError: phoneTranslations.INVALID || '',
+      requiredError: phoneTranslations.REQUIRED || '',
+    };
+  });
+
+  googleMapForm: FormGroup<GoogleMapForm> = this.formBuilder.group<GoogleMapForm>({
+    address: this.formBuilder.control(undefined),
+    addressDescription: this.formBuilder.control(undefined),
+  });
+
+  form: FormGroup<ProfileForm> = this.formBuilder.group<ProfileForm>({
+    lang: this.formBuilder.control(undefined, {
+      validators: [Validators.required],
+    }),
+    displayName: this.formBuilder.control(''),
+    phone: this.formBuilder.control('', {
+      validators: [Validators.required],
+    }),
+    dob: this.formBuilder.control(undefined),
+    darkColor: this.formBuilder.control(''),
+    lightColor: this.formBuilder.control(''),
+    addressForm: this.googleMapForm,
+  });
 
   flagList: IFlag[] = flags();
-  isDarkMode: boolean = false;
-  isAdmin: boolean = false;
-  showCash: boolean = false;
-  labels: TextLabels = {
-    mainLabel: '',
-    codePlaceholder: '',
-    searchPlaceholderLabel: '',
-    noEntriesFoundLabel: '',
-    nationalNumberLabel: '',
-    hintLabel: '',
-    invalidNumberError: '',
-    requiredError: '',
-  };
 
-  private getState: Observable<any> = this.store.select(selectUserState);
-  private subscription?: Subscription;
+  private selectedLang = toSignal(this.getForm.lang.valueChanges);
+
+  selectedFlag = signal<string | undefined>(undefined);
+
   private geometry?: PlaceGeometry;
   private formattedAddress?: string;
 
-  get update(): void {
+  constructor() {
+    effect(() => {
+      const lang = this.selectedLang();
+      this.selectedFlag.set(this.flagList.find(l => l.value === lang)?.flag);
+    });
+
+    effect(() => {
+      const subErrors = this.subErrorsSignal();
+      if (subErrors) {
+        const errorMap: Record<string, unknown> = {};
+        subErrors.forEach((error: IError) => {
+          const field = error.field as keyof ProfileForm | undefined;
+
+          if (field && field in this.form.controls) {
+            errorMap[field] = error.message;
+            this.form.controls[field].setErrors({ incorrect: true });
+          }
+        });
+        this.errors.set(errorMap);
+      }
+    });
+
+    effect(() => {
+      if (this.responseSignal()) {
+        this.store.dispatch(cleanUser());
+        this.store.dispatch(getMyUser());
+      }
+    });
+
+    effect(() => {
+      const user = this.selectedUserSignal();
+      if (user) {
+        this.form.patchValue({
+          lang: user.locale,
+          displayName: user.displayName,
+          phone: user.phone,
+          dob: user.dob ? createDateFromString(user.dob) : undefined,
+          darkColor: user.darkColor,
+          lightColor: user.lightColor,
+        });
+        this.googleMapForm.patchValue({
+          address: user.address?.name,
+          addressDescription: user.address?.description,
+        });
+
+        if (this.showColorsSignal()) {
+          this.getForm.lightColor.setValidators([Validators.required, validColorValidator()]);
+          this.getForm.darkColor.setValidators([Validators.required, validColorValidator()]);
+        } else {
+          this.getForm.lightColor.clearValidators();
+          this.getForm.darkColor.clearValidators();
+        }
+        this.getForm.lightColor.updateValueAndValidity({ emitEvent: false });
+        this.getForm.darkColor.updateValueAndValidity({ emitEvent: false });
+      }
+    });
+
+    effect(() => {
+      const img = this.imageSignal();
+      if (img) {
+        this.resizeImageFromUrl(img);
+      }
+    });
+
+    effect(() => {
+      this.showCashSignal.set(this.selectedUserSignal()?.showCash ?? false);
+    });
+  }
+
+  get getForm(): ProfileForm {
+    return this.form.controls;
+  }
+
+  toggleShowCash() {
+    this.showCashSignal.update(current => !current);
+  }
+
+  update(): void {
     if (this.form.invalid) {
       return;
     }
+    const selectedUser = this.selectedUserSignal();
 
-    const lang = valueChange(this.langValue.value.value, this.user?.locale) || this.translate.currentLang;
+    const lang = valueChange(this.getForm.lang.value, selectedUser?.locale) || this.translate.getCurrentLang();
     const user: IUser = new User();
     user.lang = lang;
-    user.displayName = fieldChange(this.displayName, this.user?.displayName);
-    user.phone = fieldChange(this.phone, this.user?.phone);
-    user.dob = fieldChange(this.dob, this.user?.dob);
+    user.displayName = fieldChange(this.getForm.displayName, selectedUser?.displayName);
+    user.phone = fieldChange(this.getForm.phone, selectedUser?.phone);
+    user.dob = fieldChange(this.getForm.dob, selectedUser?.dob);
     user.dob = user.dob ? backendFormatDate(newDate(user.dob)) : user.dob;
-    user.showCash = this.showCash;
+    user.showCash = this.showCashSignal();
 
-    if (this.lightColor.value) {
-      user.lightColor = this.lightColor.value;
+    if (this.getForm.lightColor.value) {
+      user.lightColor = this.getForm.lightColor.value;
     }
 
-    if (this.darkColor.value) {
-      user.darkColor = this.darkColor.value;
+    if (this.getForm.darkColor.value) {
+      user.darkColor = this.getForm.darkColor.value;
     }
 
-    user.address = createAddress(this.formattedAddress, this.geometry?.location, this.user?.address);
+    user.address = createAddress(this.formattedAddress, this.geometry?.location, selectedUser?.address);
 
     this.store.dispatch(updateMyUser({ user, redirectUrl: `/${getLocale(lang).language}/auth/profile` }));
     return;
-  }
-
-  ngOnInit(): void {
-    this.createForm();
-    this.clean();
-    this.findMe();
-    this.subscribe();
-    this.loadLabels();
-    this.translate.onLangChange.subscribe(() => this.loadLabels());
-    this.cdRef.detectChanges();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
   }
 
   onSelectFile = (target: any): void => {
@@ -127,10 +246,12 @@ export class ProfileComponent implements OnInit, OnDestroy {
       reader.onload = (e: any) => {
         const img = new Image();
         img.onload = () => {
-          if (this.canvas?.nativeElement) {
-            const dataUrl = resizeImage(img, this.canvas.nativeElement);
-            if (this.resizedImage) {
-              this.resizedImage.nativeElement.src = dataUrl;
+          const canvas = this.canvas();
+          if (canvas?.nativeElement) {
+            const dataUrl = resizeImage(img, canvas.nativeElement);
+            const resizedImage = this.resizedImage();
+            if (resizedImage) {
+              resizedImage.nativeElement.src = dataUrl;
             }
             this.store.dispatch(updateMyPhoto({ file: dataUrl }));
           }
@@ -149,99 +270,21 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.formattedAddress = placeResult.formatted_address;
   };
 
-  private loadLabels = () => {
-    const phoneTranslations = this.translate.instant('COMMON.USER.PHONE');
-
-    this.labels = {
-      mainLabel: '',
-      codePlaceholder: '',
-      searchPlaceholderLabel: phoneTranslations.SEARCH || '',
-      noEntriesFoundLabel: phoneTranslations.COUNTRY_NOT_FOUND || '',
-      nationalNumberLabel: phoneTranslations.FIELD || '',
-      hintLabel: '',
-      invalidNumberError: phoneTranslations.INVALID || '',
-      requiredError: phoneTranslations.REQUIRED || '',
-    };
-  };
-
-  private findMe = (): void => this.store.dispatch(getMyUser());
-
-  private createForm = (): void => {
-    this.form = this.formBuilder.group({
-      langValue: this.langValue,
-      displayName: this.displayName,
-      phone: this.phone,
-      dob: this.dob,
-      darkColor: this.darkColor,
-      lightColor: this.lightColor,
-      address: this.address,
-    });
-  };
-
-  private clean = (): void => this.store.dispatch(clean());
-
   private resizeImageFromUrl = (url?: string): void => {
     if (url) {
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => {
-        if (this.canvas?.nativeElement) {
-          const dataUrl = resizeImage(img, this.canvas.nativeElement);
-          if (this.resizedImage) {
-            this.resizedImage.nativeElement.src = dataUrl;
-            this.cdRef.detectChanges();
+        const canvas = this.canvas();
+        if (canvas?.nativeElement) {
+          const dataUrl = resizeImage(img, canvas.nativeElement);
+          const resizedImage = this.resizedImage();
+          if (resizedImage) {
+            resizedImage.nativeElement.src = dataUrl;
           }
         }
       };
       img.src = url;
     }
-  };
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.selected) {
-        const user = state.selected;
-        this.user = user;
-        this.initials = getDisplayNameInitials(user);
-        this.image = getUserImage(user);
-        this.resizeImageFromUrl(this.image);
-        this.form.patchValue(state.selected);
-        this.address.setValue(this.user?.address?.name);
-
-        const roles = [Role.professional, Role.manager];
-        this.showColors = state.selected.authorities?.some((au: any) => roles.includes(au.authority));
-        this.isAdmin = state.selected.authorities?.some((u: any) => u.authority === Role.admin);
-
-        if (this.showColors) {
-          if (state.selected.lightColor) {
-            this.lightColor.setValue(state.selected.lightColor);
-          }
-          if (state.selected.darkColor) {
-            this.darkColor.setValue(state.selected.darkColor);
-          }
-          this.lightColor.setValidators([Validators.required, validColorValidator()]);
-          this.darkColor.setValidators([Validators.required, validColorValidator()]);
-          this.lightColor.updateValueAndValidity();
-          this.darkColor.updateValueAndValidity();
-        }
-        if (state.selected.dob) {
-          this.dob.setValue(createDateFromString(state.selected.dob));
-        }
-        const langValue = findFlag(this.flagList, state.selected.locale);
-        this.langValue.setValue(langValue);
-        this.showCash = user.showCash || false;
-        this.cdRef.detectChanges();
-      }
-      if (state.subErrors) {
-        state.subErrors.forEach((value: any) => {
-          this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({ incorrect: true });
-        });
-      }
-      if (state.response) {
-        this.clean();
-        this.findMe();
-      }
-    });
   };
 }

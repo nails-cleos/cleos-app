@@ -1,52 +1,123 @@
-<div class="divider">
-  <button class="hide-gt-xs" (click)="decrement" [disabled]="prevBtnDisabled" color="accent" mat-fab>
-    <mat-icon>navigate_before</mat-icon>
-  </button>
-  <button class="hide-xs" (click)="decrement" [disabled]="prevBtnDisabled" color="accent" mat-fab extended>
-    <mat-icon>navigate_before</mat-icon>
-    <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
-  </button>
-  <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [max]="maxDate" [min]="today" [value]="viewDate"
-         hidden matInput>
-  <mat-datepicker #picker touchUi></mat-datepicker>
-  <button class="hide-gt-xs" (click)="picker.open()" color="primary" mat-fab>
-    <mat-icon>today</mat-icon>
-  </button>
-  <button class="hide-xs" (click)="picker.open()" color="primary" mat-fab extended>
-    <mat-icon>today</mat-icon>
-    <span>{{ 'COMMON.BUTTON.GOTO' | translate }}</span>
-  </button>
-  <button class="hide-gt-xs" (click)="increment" [disabled]="nextBtnDisabled" color="accent" mat-fab>
-    <mat-icon>navigate_next</mat-icon>
-  </button>
-  <button class="hide-xs" (click)="increment" [disabled]="nextBtnDisabled" color="accent" mat-fab extended>
-    <mat-icon>navigate_next</mat-icon>
-    <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
-  </button>
-  <div class="spacer"></div>
-  <div>
-    <h2 style="margin: 0">{{ viewDate | calendarDate:'dayViewTitle':locale }}</h2>
-    <app-counter style="text-align: center" (refreshViewDate)="refreshViewDate($event)"></app-counter>
-  </div>
-</div>
-@if (dashboard?.availability) {
-<!--  @if (dashboardReady && calendarReady) {-->
-    <div class="row">
-      <div class="divider">
-        <app-mwl-day-view-scheduler
-          (segmentClicked)="segmentClick($event.date, $event.professionalId)"
-          (eventTimesChanged)="eventTimesChanged($event)" (professionalChanged)="professionalChanged($event)"
-          (beforeViewRender)="beforeMonthViewRender($event)"
-          [day]="day" [events]="calendar.calendarEvents" [professionals]="professionals" [locale]="locale"
-          [viewDate]="viewDate">
-        </app-mwl-day-view-scheduler>
-      </div>
-    </div>
-<!--  } @else {-->
-<!--    <div class="ssc-square mb"></div>-->
-<!--  }-->
-} @else {
-  <h2 style="text-align: center">
-    {{ 'DASHBOARD.ROOM.NO_OPEN' | translate:{ date: viewDate | calendarDate:'dayViewTitle':locale } }}
-  </h2>
+@let mapDashboard = dashboardMapSignal();
+@if (mapDashboard?.size) {
+  <mat-form-field appearance="outline" class="full-select">
+    <!--  <mat-card-header>-->
+    <mat-select [formControl]="getForm.selectedDash">
+      @for (dashboard of mapDashboard | keyvalue; track dashboard) {
+        <mat-option [value]="dashboard.key">
+          {{ dashboard.key }}
+        </mat-option>
+      }
+    </mat-select>
+    <!--  </mat-card-header>-->
+  </mat-form-field>
 }
+
+<!--Calendar-->
+<mat-card appearance="outlined">
+  <mat-card-title class="calendar-title bold top">
+    <h3>{{ viewDate() | calendarDate:(view + 'ViewTitle'):dateFormat }}</h3>
+  </mat-card-title>
+  <mat-card-header>
+    <mat-card-subtitle class="calendar-title">
+      <button class="hide-gt-xs" (viewDateChange)="closeOpenMonthViewDay($event)" [viewDate]="viewDate()" [view]="view"
+              color="accent" mat-fab mwlCalendarPreviousView>
+        <mat-icon>navigate_before</mat-icon>
+      </button>
+      <button class="hide-xs" (viewDateChange)="closeOpenMonthViewDay($event)" [viewDate]="viewDate()" [view]="view"
+              color="accent" mat-fab extended mwlCalendarPreviousView>
+        <mat-icon>navigate_before</mat-icon>
+        <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
+      </button>
+      <button [viewDate]="viewDate()" (viewDateChange)="closeOpenMonthViewDay($event)"
+              class="btn btn-outline-secondary hide-gt-xs" color="accent"
+              mat-fab mwlCalendarToday>
+        <mat-icon>today</mat-icon>
+      </button>
+      <button [viewDate]="viewDate()" (viewDateChange)="closeOpenMonthViewDay($event)"
+              class="btn btn-outline-secondary hide-xs" color="accent"
+              mat-fab extended mwlCalendarToday>
+        <mat-icon>today</mat-icon>
+        <span>{{ 'COMMON.BUTTON.TODAY' | translate }}</span>
+      </button>
+      <button class="hide-gt-xs" (viewDateChange)="closeOpenMonthViewDay($event)" [viewDate]="viewDate()" [view]="view"
+              color="accent" mat-fab mwlCalendarNextView>
+        <mat-icon>navigate_next</mat-icon>
+      </button>
+      <button class="hide-xs" (viewDateChange)="closeOpenMonthViewDay($event)"
+              [viewDate]="viewDate()" [view]="view"
+              color="accent" mat-fab extended mwlCalendarNextView>
+        <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+        <mat-icon>navigate_next</mat-icon>
+      </button>
+    </mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <ng-template #customCellTemplate let-day="day" let-locale="locale">
+      <div class="cal-cell-top">
+        <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
+      </div>
+      <div class="cell-totals">
+        @for (group of sortBy(day.eventGroups); track group) {
+          <span class="badge text-bg-{{ group[0].toLowerCase() }}">
+              {{ group[1].length }}
+            </span>
+        }
+      </div>
+    </ng-template>
+    <mwl-calendar-month-view (dayClicked)="dayClicked($event.day)" (eventClicked)="handleEvent($event.event)"
+                             (mwlClick)="cellClick(viewDate())"
+                             [cellTemplate]="customCellTemplate"
+                             (beforeViewRender)="beforeMonthViewRender($event)"
+                             [activeDayIsOpen]="activeDayIsOpen" [events]="calendar.calendarEvents"
+                             [locale]="dateFormat"
+                             [viewDate]="viewDate()"></mwl-calendar-month-view>
+  </mat-card-content>
+  <mat-card-actions>
+    <mat-card-title class="totals">
+      <div
+        [innerHTML]="'DASHBOARD.RESERVATION.COMPLETED' | translate:{completed: completed, total: completedTotal}">
+      </div>
+      <div [innerHTML]="'DASHBOARD.RESERVATION.UPCOMING' | translate:{upcoming: upcoming, total: upcomingTotal}">
+      </div>
+      <div
+        [innerHTML]="'DASHBOARD.RESERVATION.TRANSACTION' | translate:{transaction: transaction, total: transactionTotal}">
+      </div>
+      <div [innerHTML]="'DASHBOARD.RESERVATION.PAYMENT' | translate:{total: thisMonthTotal}"></div>
+    </mat-card-title>
+  </mat-card-actions>
+</mat-card>
+@let cardLayout = cardLayoutSignal();
+<mat-grid-list [cols]="cardLayout.columns" [rowHeight]="cardLayout.rowHeight">
+  <!--Mini Cards-->
+  @for (mc of miniCardData; track mc.title) {
+    <mat-grid-tile [colspan]="cardLayout.miniCard.cols" [rowspan]="cardLayout.miniCard.rows">
+      <app-mini-card [color]="mc.color" [error]="mc.error" [icon]="mc.icon" [isInfinity]="mc.isInfinity"
+                     [isCurrency]="mc.isCurrency" [isIncrease]="mc.isIncrease" [isLoading]="isLoading()"
+                     [percentValue]="mc.percentValue" [title]="mc.title | translate" [period]="mc.period"
+                     [previousPeriod]="mc.previousPeriod" [isProjection]="mc.isProjection"
+                     [projection]="'DASHBOARD.MINI_CARD.PROJECTION' | translate" [value]="mc.value"
+                     [duration]="'DASHBOARD.MINI_CARD.DURATION' | translate: {period: mc.previousPeriod}"
+                     [previousPeriodValue]="mc.previousPeriodValue">
+      </app-mini-card>
+    </mat-grid-tile>
+  }
+  <!--Charts-->
+  @for (chart of charts; track chart.title) {
+    <mat-grid-tile [colspan]="cardLayout.chart.cols" [rowspan]="cardLayout.chart.rows">
+      <app-card [chart]="chart" [title]="chart.title" [timeZone]="timeZone">
+        <app-chart [chartSummary]="chart" [error]="errorSignal()" [currency]="currency" [isLoading]="isLoading()"
+                   [locale]="dateFormat" [timeZone]="timeZone"></app-chart>
+      </app-card>
+    </mat-grid-tile>
+  }
+  <!--Table-->
+  @if (roomId || professionalId) {
+    <mat-grid-tile [colspan]="cardLayout.table.cols" [rowspan]="cardLayout.table.rows">
+      <app-card [expand]="false" [title]="'DASHBOARD.CARD.RESERVATION' | translate" [currency]="currency"
+                [locale]="dateFormat" [timeZone]="timeZone">
+        <app-reservation-table [roomId]="roomId" [professionalId]="professionalId" [all]="all"></app-reservation-table>
+      </app-card>
+    </mat-grid-tile>
+  }
+</mat-grid-list>

@@ -1,47 +1,52 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { UnavailableComponent } from './unavailable.component';
-import { Subject } from 'rxjs';
-import { ReactiveFormsModule, UntypedFormBuilder } from '@angular/forms';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { BehaviorSubject, of } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, signal } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { createEndDate, formatDuration, getTime, zoneDateToDate } from '../util/dates';
-import { clean, getAllProfessional, getUnavailable } from '../store/unavailable.actions';
-import { IUnavailable } from '../interfaces/unavailable';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { API_LOCALE, createEndDate, createNewDate, formatDuration, getTime, zoneDateToDate } from '../util/dates';
+import { deleteUnavailable, getUnavailable } from '../store/unavailable.actions';
+import { IUnavailableAll } from '../interfaces/unavailable';
 import { IUserAll } from '../interfaces/user';
 import { IAvailability, IRoomAll } from '../interfaces/room';
-import { AppState } from '../store/app.states';
+import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
+import { FrequencyEnum } from '../util/helper';
+import { UnavailableState } from '../store/reducers/unavailable.reducers';
 
 describe('UnavailableComponent', () => {
   let component: UnavailableComponent;
   let fixture: ComponentFixture<UnavailableComponent>;
 
-  let state$: Subject<any>;
+  let navigationParams$: BehaviorSubject<any>;
+  let unavailableId$: BehaviorSubject<any>;
+  let selectedUnavailable$: BehaviorSubject<any>;
+  let allProfessionals$: BehaviorSubject<any>;
+  let allRooms$: BehaviorSubject<any>;
+  let subErrors$: BehaviorSubject<any>;
+  const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let storeSpy: jasmine.SpyObj<Store<AppState>>;
-  let routerSpy: jasmine.SpyObj<Router>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let storeSpy: jasmine.SpyObj<Store<UnavailableState>>;
   let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
-  let paramMapGetSpy: jasmine.SpyObj<ParamMap>;
+  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let dialogSpy: jasmine.SpyObj<any>;
 
   const mockProfessionals: IUserAll[] = [
     { id: 'a', displayName: 'Alice' } as IUserAll,
     { id: 'b', displayName: 'Bob' } as IUserAll,
   ];
 
-  const mockUnavailable: IUnavailable = {
+  const mockUnavailable: IUnavailableAll = {
     id: '1',
     description: 'Test Description',
     duration: 'PT15M',
-    professional: { id: 'p1', displayName: 'Professional 1' },
+    professional: { id: 'p1', displayName: 'Professional 1' } as IUserAll,
     start: '2024-01-01',
     end: '2024-02-01',
     endString: '2024-02-01',
     timestamp: new Date('2024-01-01T10:00:00Z').getTime() / 1000,
-    repeat: 'NONE',
+    repeat: FrequencyEnum.none,
     allDay: false,
   };
 
@@ -53,7 +58,7 @@ describe('UnavailableComponent', () => {
   const saturday: IAvailability = { day: 'SATURDAY', start: '10:00', end: '16:00' };
   const sunday: IAvailability = { day: 'SUNDAY' };
 
-  const mockRoom = {
+  const mockRoom: IRoomAll = {
     id: 'room-123',
     address: {
       id: 1,
@@ -68,10 +73,16 @@ describe('UnavailableComponent', () => {
     },
     timeZone: 'UTC',
     availabilities: [monday, tuesday, wednesday, thursday, friday, saturday, sunday],
-    office: {},
+    office: {
+      id: 'office-123',
+      name: 'Head Office',
+      manager: {
+        id: 'manager-123',
+      },
+    },
     paymentTypes: [],
     primary: false,
-    professional: mockProfessionals[0],
+    professionals: mockProfessionals,
   };
 
   const today = new Date();
@@ -82,43 +93,59 @@ describe('UnavailableComponent', () => {
   nextMonday.setHours(12, 0, 0, 0);
 
   beforeEach(async () => {
-    state$ = new Subject();
+    navigationParams$ = new BehaviorSubject(undefined);
+    unavailableId$ = new BehaviorSubject(undefined);
+    selectedUnavailable$ = new BehaviorSubject(undefined);
+    allProfessionals$ = new BehaviorSubject(undefined);
+    allRooms$ = new BehaviorSubject(undefined);
+    subErrors$ = new BehaviorSubject(undefined);
 
-    paramMapGetSpy = jasmine.createSpyObj('ParamMap', ['get']);
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [''], {
-      snapshot: {
-        paramMap: paramMapGetSpy,
-      },
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
+      authUser: authUserSignal.asReadonly(),
     });
 
-    storeSpy.select.and.returnValue(state$.asObservable());
-    routerSpy.getCurrentNavigation.and.returnValue(null);
+    let pipeCallIndex = 0;
+    storeSpy.pipe.and.callFake(() => {
+      pipeCallIndex++;
+      switch (pipeCallIndex) {
+        case 1:
+          return navigationParams$.asObservable();
+        case 2:
+          return unavailableId$.asObservable();
+        case 3:
+          return selectedUnavailable$.asObservable();
+        case 4:
+          return allProfessionals$.asObservable();
+        case 5:
+          return allRooms$.asObservable();
+        case 6:
+          return subErrors$.asObservable();
+        default:
+          return new BehaviorSubject(undefined).asObservable();
+      }
+    });
 
     await TestBed.configureTestingModule({
-      imports: [
-        UnavailableComponent,
-        TranslateModule.forRoot(),
-        ReactiveFormsModule,
-        NoopAnimationsModule,
-      ],
+      imports: [UnavailableComponent, TranslateModule.forRoot()],
       providers: [
-        UntypedFormBuilder,
         { provide: Store, useValue: storeSpy },
-        { provide: Router, useValue: routerSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
+        { provide: AuthUserService, useValue: authUserServiceSpy },
+        provideNoopAnimations(),
       ],
     }).compileComponents();
 
-    const translate = TestBed.inject(TranslateService);
-    translate.setDefaultLang('en-GB');
-    translate.use('en-GB');
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
 
     fixture = TestBed.createComponent(UnavailableComponent);
     component = fixture.componentInstance;
+
+    fixture.detectChanges();
+
+    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   it('should create', () => {
@@ -126,26 +153,25 @@ describe('UnavailableComponent', () => {
   });
 
   it('should initialize in add mode when no id is provided', () => {
-    paramMapGetSpy.get.and.returnValue(null);
+    unavailableId$.next(undefined);
+    fixture.detectChanges();
 
-    component.ngOnInit();
-
-    expect(component.isAddMode).toBeTrue();
-    expect(component.id).toBeUndefined();
+    expect(component.isAddModeSignal()).toBeTrue();
+    expect(component['unavailableIdSignal']()).toBeUndefined();
   });
 
   it('should initialize in edit mode when id is provided', () => {
     const testId = '123';
-    paramMapGetSpy.get.and.returnValue(testId);
+    unavailableId$.next(testId);
 
-    component.ngOnInit();
+    fixture.detectChanges();
 
-    expect(component.isAddMode).toBeFalse();
-    expect(component.id).toBe(testId);
+    expect(component.isAddModeSignal()).toBeFalse();
+    expect(component['unavailableIdSignal']()).toBe(testId);
   });
 
   it('should create form with required name field', () => {
-    component.ngOnInit();
+    fixture.detectChanges();
 
     expect(component.form).toBeDefined();
     expect(component.getForm.professional).toBeDefined();
@@ -160,32 +186,24 @@ describe('UnavailableComponent', () => {
     expect(component.getForm.startDate?.hasError('required')).toBeTrue();
   });
 
-  it('should dispatch Clean action on initialization', () => {
-    component.ngOnInit();
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
-  });
-
   it('should dispatch GetUnavailable action when in edit mode', () => {
     const testId = '123';
-    paramMapGetSpy.get.and.returnValue(testId);
+    unavailableId$.next(testId);
 
-    component.ngOnInit();
+    fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getUnavailable({ id: testId }));
   });
 
   it('should patch form when unavailable is selected from state', () => {
-    component.ngOnInit();
+    selectedUnavailable$.next(mockUnavailable);
+    allProfessionals$.next(mockProfessionals);
+    fixture.detectChanges();
 
-    state$.next({
-      selected: mockUnavailable,
-      professionals: mockProfessionals,
-    });
-
-    expect(component.unavailable?.id).toEqual(mockUnavailable.id);
+    const unavailable = component.unavailableSignal();
+    expect(unavailable?.id).toEqual(mockUnavailable.id);
     const date = zoneDateToDate(mockUnavailable.timestamp);
-    expect(component.getForm.professional?.value).toBe(mockUnavailable.professional);
+    expect(component.getForm.professional?.value?.id).toBe(mockUnavailable.professional.id);
     expect(component.getForm.description?.value).toBe(mockUnavailable.description);
     expect(component.getForm.startDate?.value).toEqual(date);
     expect(component.getForm.startTime?.value).toBe(getTime(date));
@@ -193,43 +211,29 @@ describe('UnavailableComponent', () => {
     expect(component.getForm.repeat?.value).toBe(mockUnavailable.repeat);
     expect(component.getForm.endDate?.value).toEqual(createEndDate(mockUnavailable.end!));
     expect(component.getForm.duration?.value).toBe(formatDuration(mockUnavailable.duration!));
-    expect(component.professionals).toEqual(mockProfessionals);
+    expect(component.allProfessionalsSignal()).toEqual(mockProfessionals);
   });
 
   it('should handle form errors from state', () => {
-    component.ngOnInit();
-
     const mockErrors = [
       { field: 'professional', message: 'Professional is required' },
       { field: 'duration', message: 'Duration is required' },
     ];
 
-    state$.next({
-      subErrors: mockErrors,
-    });
+    subErrors$.next(mockErrors);
+    fixture.detectChanges();
 
-    expect(component.errors['professional']).toBe('Professional is required');
+    expect(component.errors()['professional']).toBe('Professional is required');
     expect(component.getForm.professional?.hasError('incorrect')).toBeTrue();
-    expect(component.errors['duration']).toBe('Duration is required');
+    expect(component.errors()['duration']).toBe('Duration is required');
     expect(component.getForm.duration?.hasError('incorrect')).toBeTrue();
   });
 
-  it('should navigate to unavailable list on successful response', () => {
-    component.ngOnInit();
-
-    state$.next({
-      response: true,
-    });
-
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'unavailable']);
-  });
-
   it('should set mix and max when room is set', () => {
-    component.ngOnInit();
-
+    allRooms$.next([mockRoom]);
     component.getForm.startDate.setValue(nextMonday);
 
-    state$.next({ rooms: [mockRoom] });
+    fixture.detectChanges();
 
     expect(component.minTime).toBe('10:00');
     expect(component.maxTime).toBe('19:00');
@@ -238,23 +242,24 @@ describe('UnavailableComponent', () => {
         availabilities: mockRoom.availabilities.filter(av => av !== undefined),
       } as IRoomAll,
     );
-    expect(component.showDuration).toBeTrue();
+    expect(component.showDuration()).toBeTrue();
     expect(component.durationMax).toBe('07:00');
   });
 
   it('should not dispatch action when form is invalid', () => {
-    component.ngOnInit();
-    component.getForm.professional?.setValue('');
+    fixture.detectChanges();
+    component.getForm.professional?.setValue(undefined);
     component.getForm.duration?.setValue('');
     storeSpy.dispatch.calls.reset();
 
-    void component.submit;
+    component.submit();
 
     expect(storeSpy.dispatch).not.toHaveBeenCalled();
   });
 
   it('should dispatch CreateUnavailable action when in add mode and form is valid for all day false', () => {
-    component.ngOnInit();
+    const hours = 10;
+    const minutes = 30;
     const professionalControl = component.getForm.professional;
     professionalControl.setValue(mockProfessionals[0]);
     professionalControl.markAsDirty();
@@ -264,7 +269,7 @@ describe('UnavailableComponent', () => {
     descriptionControl.markAsDirty();
 
     const startDateControl = component.getForm.startDate;
-    startDateControl.setValue(new Date('2024-06-01'));
+    startDateControl.setValue(nextMonday);
     startDateControl.markAsDirty();
 
     const allDayControl = component.getForm.allDay;
@@ -272,25 +277,29 @@ describe('UnavailableComponent', () => {
     allDayControl.markAsDirty();
 
     const startTimeControl = component.getForm.startTime;
-    startTimeControl.setValue('10:00');
+    startTimeControl.setValue(`${hours}:${minutes}`);
     startTimeControl.markAsDirty();
+
+    fixture.detectChanges();
 
     const durationControl = component.getForm.duration;
     durationControl.setValue('00:30');
     durationControl.markAsDirty();
 
     const repeatControl = component.getForm.repeat;
-    repeatControl.setValue('NONE');
+    repeatControl.setValue(FrequencyEnum.none);
     repeatControl.markAsDirty();
 
     const endDateControl = component.getForm.endDate;
-    endDateControl.setValue('2024-06-01');
+    endDateControl.setValue(nextMonday);
     endDateControl.markAsDirty();
+
+    fixture.detectChanges();
 
     storeSpy.dispatch.calls.reset();
     expect(component.form.valid).toBeTrue();
 
-    void component.submit;
+    component.submit();
 
     const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
     expect(dispatchedAction).toEqual(jasmine.objectContaining({
@@ -299,18 +308,18 @@ describe('UnavailableComponent', () => {
         description: 'New Description',
         time: '00:30',
         repeat: 'NONE',
-        start: '01/06/2024, 10:00:00',
+        start: createNewDate(nextMonday, hours, minutes).toLocaleString(API_LOCALE),
         timeZone: 'Europe/Amsterdam',
         allDay: false,
-        endString: '01/06/2024, 00:00:00',
+        endString: createNewDate(nextMonday).toLocaleString(API_LOCALE),
       }),
       type: '[Unavailable] Create unavailable',
     }));
-    expect(component.unavailable).toBeUndefined();
+    expect(component.unavailableSignal()).toBeUndefined();
   });
 
   it('should dispatch CreateUnavailable action when in add mode and form is valid for all day true', () => {
-    component.ngOnInit();
+    fixture.detectChanges();
     const professionalControl = component.getForm.professional;
     professionalControl.setValue(mockProfessionals[0]);
     professionalControl.markAsDirty();
@@ -320,7 +329,7 @@ describe('UnavailableComponent', () => {
     descriptionControl.markAsDirty();
 
     const startDateControl = component.getForm.startDate;
-    startDateControl.setValue(new Date('2024-06-01'));
+    startDateControl.setValue(nextMonday);
     startDateControl.markAsDirty();
 
     const allDayControl = component.getForm.allDay;
@@ -328,17 +337,19 @@ describe('UnavailableComponent', () => {
     allDayControl.markAsDirty();
 
     const repeatControl = component.getForm.repeat;
-    repeatControl.setValue('NONE');
+    repeatControl.setValue(FrequencyEnum.none);
     repeatControl.markAsDirty();
 
     const endDateControl = component.getForm.endDate;
-    endDateControl.setValue('2024-06-01');
+    endDateControl.setValue(nextMonday);
     endDateControl.markAsDirty();
+
+    fixture.detectChanges();
 
     storeSpy.dispatch.calls.reset();
     expect(component.form.valid).toBeTrue();
 
-    void component.submit;
+    component.submit();
 
     const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
     expect(dispatchedAction).toEqual(jasmine.objectContaining({
@@ -346,21 +357,21 @@ describe('UnavailableComponent', () => {
         professionalId: mockProfessionals[0].id,
         description: 'New Description',
         repeat: 'NONE',
-        start: '01/06/2024, 00:00:00',
+        start: createNewDate(nextMonday).toLocaleString(API_LOCALE),
         timeZone: 'Europe/Amsterdam',
         allDay: true,
       }),
       type: '[Unavailable] Create unavailable',
     }));
-    expect(component.unavailable).toBeUndefined();
+    expect(component.unavailableSignal()).toBeUndefined();
   });
 
   it('should dispatch UpdateUnavailable action when in edit mode and form is valid', () => {
     const testId = '123';
-    paramMapGetSpy.get.and.returnValue(testId);
-    component.unavailable = mockUnavailable;
+    unavailableId$.next(testId);
+    selectedUnavailable$.next(mockUnavailable);
 
-    component.ngOnInit();
+    fixture.detectChanges();
     const professionalControl = component.getForm.professional;
     professionalControl.setValue(mockProfessionals[0]);
     professionalControl.markAsDirty();
@@ -370,7 +381,7 @@ describe('UnavailableComponent', () => {
     descriptionControl.markAsDirty();
 
     const startDateControl = component.getForm.startDate;
-    startDateControl.setValue(new Date('2024-06-01'));
+    startDateControl.setValue(nextMonday);
     startDateControl.markAsDirty();
 
     const allDayControl = component.getForm.allDay;
@@ -378,15 +389,15 @@ describe('UnavailableComponent', () => {
     allDayControl.markAsDirty();
 
     const repeatControl = component.getForm.repeat;
-    repeatControl.setValue('ONCE_A_WEEK');
+    repeatControl.setValue(FrequencyEnum.onceAWeek);
     repeatControl.markAsDirty();
 
     const endDateControl = component.getForm.endDate;
-    endDateControl.setValue('2024-06-01');
+    endDateControl.setValue(nextMonday);
     endDateControl.markAsDirty();
     storeSpy.dispatch.calls.reset();
 
-    void component.submit;
+    component.submit();
 
     const dispatchedAction = storeSpy.dispatch.calls.mostRecent().args[0];
     expect(dispatchedAction).toEqual(jasmine.objectContaining({
@@ -395,35 +406,20 @@ describe('UnavailableComponent', () => {
         professionalId: mockProfessionals[0].id,
         description: 'Update Description',
         repeat: 'ONCE_A_WEEK',
-        start: '01/06/2024, 00:00:00',
+        start: createNewDate(nextMonday).toLocaleString(API_LOCALE),
         timeZone: 'Europe/Amsterdam',
         allDay: true,
       }),
       type: '[Unavailable] Update unavailable by id',
     }));
-    expect(component.unavailable).toBeUndefined();
   });
 
   it('should return form controls from getForm getter', () => {
-    component.ngOnInit();
+    fixture.detectChanges();
 
     const controls = component.getForm;
 
     expect(controls).toBe(component.form.controls);
-  });
-
-  it('should unsubscribe on destroy', () => {
-    component.ngOnInit();
-    const subscription = component['subscription'];
-    spyOn(subscription!, 'unsubscribe');
-
-    component.ngOnDestroy();
-
-    expect(subscription!.unsubscribe).toHaveBeenCalled();
-  });
-
-  it('should handle subscription when no subscription exists', () => {
-    expect(() => component.ngOnDestroy()).not.toThrow();
   });
 
   it('should call detectChanges when needed', () => {
@@ -432,122 +428,100 @@ describe('UnavailableComponent', () => {
 
   it('should handle undefined unavailable in edit mode', () => {
     const testId = '123';
-    paramMapGetSpy.get.and.returnValue(testId);
-    component.unavailable = undefined;
+    unavailableId$.next(testId);
+    selectedUnavailable$.next(undefined);
 
-    component.ngOnInit();
+    fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getUnavailable({ id: testId }));
   });
 
   it('should initialize form with empty values', () => {
-    component.ngOnInit();
+    fixture.detectChanges();
 
-    expect(component.getForm.professional?.value).toBe('');
-    expect(component.getForm.description?.value).toBe('');
-    expect(component.getForm.startDate?.value).toEqual('');
-    expect(component.getForm.startTime?.value).toBe('');
-    expect(component.getForm.allDay?.value).toBe('');
-    expect(component.getForm.repeat?.value).toBe('');
-    expect(component.getForm.endDate?.value).toEqual('');
-    expect(component.getForm.duration?.value).toBe('');
+    expect(component.getForm.professional.value).toBeNull();
+    expect(component.getForm.description.value).toBeNull();
+    expect(component.getForm.startDate.value).toBeNull();
+    expect(component.getForm.startTime.value).toBeNull();
+    expect(component.getForm.allDay.value).toBe(false);
+    expect(component.getForm.repeat.value).toBeNull();
+    expect(component.getForm.endDate.value).toBeNull();
+    expect(component.getForm.duration.value).toBeNull();
   });
 
   it('should validate form correctly', () => {
-    component.ngOnInit();
+    fixture.detectChanges();
 
     expect(component.form.invalid).toBeTrue();
 
     component.getForm.professional.setValue(mockProfessionals[0]);
     component.getForm.description.setValue('New Description');
-    component.getForm.startDate.setValue(new Date('2024-06-01'));
+    component.getForm.startDate.setValue(nextMonday);
     component.getForm.allDay.setValue(false);
     component.getForm.startTime.setValue('10:00');
     component.getForm.duration.setValue('00:30');
-    component.getForm.repeat.setValue('NONE');
-    component.getForm.endDate.setValue('2024-06-01');
+    component.getForm.repeat.setValue(FrequencyEnum.none);
+    component.getForm.endDate.setValue(nextMonday);
     expect(component.form.valid).toBeTrue();
   });
 
-  it('should handle state subscription correctly', () => {
-    component.ngOnInit();
-
-    expect(storeSpy.select).toHaveBeenCalled();
-  });
-
-  it('should clean state and get unavailable list on response', () => {
-    component.ngOnInit();
-    storeSpy.dispatch.calls.reset();
-
-    state$.next({
-      response: true,
-    });
-
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'unavailable']);
-  });
-
-  it('should dispatch GetAllTreatmentsGroup action when getProfessionals is called', () => {
-    storeSpy.dispatch.calls.reset();
-
-    component['getProfessionals']();
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllProfessional());
-  });
-
   it('should filter professionals correctly when filter is called', () => {
-    component.professionals = [
-      { displayName: 'Test Group 1', id: '1' },
-      { displayName: 'Another Group', id: '2' },
-      { displayName: 'Test Group 2', id: '3' },
-    ] as any[];
+    const professionals = [
+      { displayName: 'Test Professional 1', id: '1' },
+      { displayName: 'Another Professional', id: '2' },
+      { displayName: 'Test Professional 2', id: '3' },
+    ] as IUserAll[];
+    allProfessionals$.next(professionals);
 
-    const result = component['filter']('test');
+    fixture.detectChanges();
+
+    const result = component['filter']('test', professionals);
 
     expect(result?.length).toBe(2);
-    expect(result?.[0].displayName).toBe('Test Group 1');
-    expect(result?.[1].displayName).toBe('Test Group 2');
+    expect(result?.[0].displayName).toBe('Test Professional 1');
+    expect(result?.[1].displayName).toBe('Test Professional 2');
   });
 
   it('should return undefined when filter is called with no professionals', () => {
-    component.professionals = undefined;
+    allProfessionals$.next(undefined);
+    fixture.detectChanges();
 
-    const result = component['filter']('test');
+    const result = component['filter']('test', undefined);
 
     expect(result).toBeUndefined();
   });
 
-  it('should filter professionals options based on form input', (done) => {
-    component.professionals = [
+  it('filteredProfessionalSignal should return Professional when input empty and filter when value set', () => {
+    const professionals = [
       { displayName: 'Test Professional 1', id: '1' },
       { displayName: 'Another Professional', id: '2' },
       { displayName: 'Test Professional 2', id: '3' },
-    ] as any[];
-    component['createForm']();
+    ] as IUserAll[];
+    allProfessionals$.next(professionals);
+    fixture.detectChanges();
 
-    let emissionCount = 0;
-    component.filteredOptions?.subscribe(filtered => {
-      emissionCount++;
-      // Skip the first emission (startWith('')) and check the second emission with 'T'
-      if (emissionCount === 2) {
-        expect(filtered).toEqual([
-          { displayName: 'Test Professional 1', id: '1' },
-          { displayName: 'Test Professional 2', id: '3' },
-        ]);
-        done();
-      }
-    });
+    // when group control empty -> return all
+    component.getForm.professional.setValue(undefined);
+    fixture.detectChanges();
+    expect(component.filteredProfessionalSignal()).toEqual(professionals);
 
-    component.getForm.professional?.setValue('T');
+    // when group control has 'Test' -> filtered
+    (component.getForm.professional as any).setValue('Test');
+    fixture.detectChanges();
+    expect(component.filteredProfessionalSignal()).toEqual([
+      { id: '1', displayName: 'Test Professional 1' },
+      { id: '3', displayName: 'Test Professional 2' },
+    ] as IUserAll[]);
   });
 
   it('should test keyDownHandler with Backspace event', () => {
-    component.ngOnInit();
-    const mockEvent = { code: 'Backspace' };
+    fixture.detectChanges();
+    const mockEvent = { code: 'Backspace' } as KeyboardEvent;
     const professionalControl = component.getForm.professional;
     professionalControl.setValue(mockProfessionals[1]);
 
     const startDateControl = component.getForm.startDate;
-    startDateControl.setValue(new Date('2024-06-01'));
+    startDateControl.setValue(nextMonday);
 
     const startTimeControl = component.getForm.startTime;
     startTimeControl.setValue('10:00');
@@ -559,16 +533,16 @@ describe('UnavailableComponent', () => {
     durationControl.setValue('00:30');
 
     const repeatControl = component.getForm.repeat;
-    repeatControl.setValue('NONE');
+    repeatControl.setValue(FrequencyEnum.none);
 
     const endDateControl = component.getForm.endDate;
-    endDateControl.setValue('2024-06-01');
+    endDateControl.setValue(nextMonday);
 
     component.getForm.description.setValue('New Description');
 
     component.keyDownHandler(mockEvent);
 
-    expect(professionalControl.value).toBe('');
+    expect(professionalControl.value).toBeUndefined();
     expect(startDateControl.value).toBeUndefined();
     expect(startTimeControl.value).toBeUndefined();
     expect(durationControl.value).toBeUndefined();
@@ -576,26 +550,47 @@ describe('UnavailableComponent', () => {
     expect(repeatControl.value).toBeUndefined();
     expect(allDayControl.value).toBeFalse();
   });
+
   it('should set date from extras when provided', () => {
-    const mockExtras = {
+    navigationParams$.next({
       room: mockRoom,
       date: nextMonday,
-    };
-    routerSpy.getCurrentNavigation.and.returnValue({ extras: { state: mockExtras } } as any);
+    });
+    fixture.detectChanges();
 
-    const newFixture = TestBed.createComponent(UnavailableComponent);
-    const newComponent = newFixture.componentInstance;
-    newFixture.detectChanges();
-    newComponent.ngOnInit();
+    expect(component['rooms']()).toEqual([mockRoom]);
+    expect(component.showDuration()).toBeTrue();
+    expect(component.getForm.startDate.value).toBe(nextMonday);
+    expect(component.getForm.startTime.value).toBe('12:00');
+    expect(component.getForm.duration.value).toBeUndefined();
+    expect(component.getForm.endDate.value).toBeUndefined();
+    expect(component.getForm.repeat.value).toBeUndefined();
+    expect(component.getForm.allDay.value).toBeFalse();
+  });
 
-    expect(newComponent.rooms).toEqual([mockRoom]);
-    expect(newComponent.showDuration).toBeFalse();
-    expect(newComponent.getForm.professional.value).toEqual(mockRoom.professional);
-    expect(newComponent.getForm.startDate.value).toBe(nextMonday);
-    expect(newComponent.getForm.startTime.value).toBe('12:00');
-    expect(newComponent.getForm.duration.value).toBeUndefined();
-    expect(newComponent.getForm.endDate.value).toBeUndefined();
-    expect(newComponent.getForm.repeat.value).toBeUndefined();
-    expect(newComponent.getForm.allDay.value).toBe('');
+  it('should dispatch deleteUnavailable when dialog returns a result', () => {
+    selectedUnavailable$.next(mockUnavailable);
+    fixture.detectChanges();
+    dialogSpy.and.returnValue({
+      afterClosed: () => of(mockUnavailable),
+    } as any);
+
+    component.delete();
+
+    expect(dialogSpy).toHaveBeenCalledWith(
+      jasmine.any(Function),
+      jasmine.objectContaining({
+        data: {
+          title: 'UNAVAILABLE.DELETED.TITLE',
+          content: 'UNAVAILABLE.DELETED.CONTENT',
+          value: mockUnavailable,
+        },
+      }));
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteUnavailable({
+      id: mockUnavailable.id!,
+      timestamp: mockUnavailable.timestamp!,
+      timeZone: mockUnavailable.timeZone,
+    }));
   });
 });

@@ -1,25 +1,23 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Subject } from 'rxjs';
 import { CardComponent } from './card.component';
-import { AuthUserService } from '../../services/auth-user.service';
+import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { IChart } from '../../interfaces/dashboard';
 import { ICurrency } from '../../interfaces/currency';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, signal } from '@angular/core';
 
 describe('CardComponent', () => {
   let component: CardComponent;
   let fixture: ComponentFixture<CardComponent>;
 
-  let authUser$: Subject<any>;
+  const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let dialogSpy: jasmine.Spy<any>;
 
   beforeEach(async () => {
-    authUser$ = new Subject<any>();
 
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
-      authUser: authUser$.asObservable(),
+      authUser: authUserSignal.asReadonly(),
     });
 
     await TestBed.configureTestingModule({
@@ -33,7 +31,7 @@ describe('CardComponent', () => {
     fixture = TestBed.createComponent(CardComponent);
     component = fixture.componentInstance;
 
-    dialogSpy = spyOn(component.dialog, 'open');
+    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   it('should create', () => {
@@ -41,11 +39,13 @@ describe('CardComponent', () => {
   });
 
   it('should subscribe to AuthUserService and set dark mode', () => {
-    authUser$.next({ isDarkMode: true });
-    expect(component['isDarkMode']).toBeTrue();
+    authUserSignal.update(prev => ({ ...prev, isDarkMode: true }));
+    fixture.detectChanges();
+    expect(component['isDarkMode']()).toBeTrue();
 
-    authUser$.next({ isDarkMode: false });
-    expect(component['isDarkMode']).toBeFalse();
+    authUserSignal.update(prev => ({ ...prev, isDarkMode: false }));
+    fixture.detectChanges();
+    expect(component['isDarkMode']()).toBeFalse();
   });
 
   it('should open dialog when chart is provided on click', () => {
@@ -67,9 +67,9 @@ describe('CardComponent', () => {
       icon: 'euro',
     };
 
-    component.chart = chart;
-    component.currency = mockCurrency;
-    component.title = 'Chart';
+    fixture.componentRef.setInput('chart', chart);
+    fixture.componentRef.setInput('currency', mockCurrency);
+    fixture.componentRef.setInput('title', 'Chart');
 
     // act
     component.onClick();
@@ -96,14 +96,8 @@ describe('CardComponent', () => {
   });
 
   it('should not open dialog when no chart is provided', () => {
-    component.chart = undefined;
+    fixture.componentRef.setInput('chart', undefined);
     component.onClick();
     expect(dialogSpy).not.toHaveBeenCalled();
-  });
-
-  it('should unsubscribe on destroy', () => {
-    const spy = spyOn((component as any).authUserServiceSubscription, 'unsubscribe');
-    component.ngOnDestroy();
-    expect(spy).toHaveBeenCalled();
   });
 });

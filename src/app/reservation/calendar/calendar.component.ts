@@ -1,9 +1,8 @@
-import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AppState, selectReservationState } from '../../store/app.states';
-import { Observable, Subject, Subscription } from 'rxjs';
-import { clean, findRooms, getAllGroupingByRoom, updateReservationTimestamp } from '../../store/reservation.actions';
-import { Day, IRoomReservation, MAX_RESERVATION_MONTH, States } from '../../interfaces/reservation';
+import { combineLatestWith, Subject } from 'rxjs';
+import { getAllGroupingByRoom, updateReservationTimestamp } from '../../store/reservation.actions';
+import { Day, IDay, IRoomReservation, MAX_RESERVATION_MONTH, States } from '../../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import {
@@ -37,16 +36,16 @@ import {
   OUT_OF_WORK_ALL_DAY,
 } from '../../util/event';
 import { Router } from '@angular/router';
-import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarModule } from 'angular-calendar';
-import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
+import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarWeekViewComponent } from 'angular-calendar';
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { IUnavailableAll } from '../../interfaces/unavailable';
-import { createRoomOffice, executeDialogNoWidth, FrequencyEnum } from '../../util/helper';
+import { createRoomOffice, executeDialogNoWidth, FrequencyEnum, getList } from '../../util/helper';
 import { addDays, addMonths, isEqual } from 'date-fns';
 import { findStateColor } from '../../util/theme';
-import { map, startWith, takeUntil } from 'rxjs/operators';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { IOffice } from '../../interfaces/office';
+import { map, startWith } from 'rxjs/operators';
+import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { IOffice, IOfficeAll } from '../../interfaces/office';
 import { requireMatch } from '../../util/validators';
 import { CalendarDialogComponent } from '../../shared/dialog/calendar/calendar-dialog.component';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
@@ -55,6 +54,10 @@ import { AuthUserService } from '../../services/auth-user.service';
 import { Role } from '../../interfaces/token';
 import { SharedModule } from '../../shared/shared.module';
 import { RoomNamePipe } from '../../pipes/room-name.pipe';
+import { ReservationState } from '../../store/reducers/reservation.reducers';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { getCalendarPipe, getRoomsPipe } from '../../store/selectors/reservation.selectors';
+import { MatDatepicker } from '@angular/material/datepicker';
 
 const CALENDAR_RESPONSIVE = {
   xsmall: {
@@ -75,108 +78,259 @@ const CALENDAR_RESPONSIVE = {
   },
 };
 
+type CalendarForm = {
+  office: FormControl<IOfficeAll | undefined>;
+  room: FormControl<IRoomAll | undefined>;
+  professional: FormControl<IUserAll | undefined>;
+};
+
+// TODO is not working
+// TODO update calendar events to signals.
 @Component({
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
-  imports: [SharedModule, RoomNamePipe, CalendarModule],
+  imports: [SharedModule, RoomNamePipe, CalendarWeekViewComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CalendarComponent implements OnInit, OnDestroy {
-  readonly dialog = inject(MatDialog);
+export class CalendarComponent {
+  private readonly dialog = inject(MatDialog);
   private readonly translate: TranslateService = inject(TranslateService);
-  private readonly store: Store<AppState> = inject(Store<AppState>);
+  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
   private readonly router: Router = inject(Router);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly cdRef: ChangeDetectorRef = inject(ChangeDetectorRef);
-  private readonly formBuilder: UntypedFormBuilder = inject(UntypedFormBuilder);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
 
-  @ViewChild('picker') picker: any;
+  private rooms$ = this.store.pipe(getRoomsPipe);
+  private calendar$ = this.store.pipe(getCalendarPipe);
+  private breakpoints$ = this.breakpointObserver.observe(
+    Object.values(CALENDAR_RESPONSIVE).map(({ breakpoint }) => breakpoint),
+  );
 
-  data?: IRoomReservation;
+  private roomsSignal = toSignal(this.rooms$);
+  private authUserSignal = this.authUserService.authUser;
+  private breakpointsSignal = toSignal(this.breakpoints$, {
+    initialValue: {
+      matches: false,
+      breakpoints: Object.fromEntries(
+        Object.values(CALENDAR_RESPONSIVE).map(({ breakpoint }) => [breakpoint, false]),
+      ),
+    },
+  });
+
+  private isRoomAdmin = computed(() => this.authUserSignal()?.isRoomAdmin ?? false);
+
+  calendarSignal = toSignal(this.calendar$);
+  isDarkMode = computed(() => this.authUserSignal()?.isDarkMode ?? false);
+  daysInWeekSignal = computed(() => {
+    const state = this.breakpointsSignal();
+    if (!state) {
+      return 7;
+    }
+    const foundBreakpoint = Object.values(CALENDAR_RESPONSIVE)
+      .find(({ breakpoint }) => state.breakpoints[breakpoint]);
+
+    return foundBreakpoint?.daysInWeek ?? 7;
+  });
+
+  form: FormGroup<CalendarForm> = this.formBuilder.group<CalendarForm>({
+    office: this.formBuilder.control(undefined, {
+      validators: [Validators.required, requireMatch],
+    }),
+    room: this.formBuilder.control(undefined, {
+      validators: [Validators.required, requireMatch],
+    }),
+    professional: this.formBuilder.control(undefined, {
+      validators: [requireMatch],
+    }),
+  });
+
+  offices = computed(() => Array.from(createRoomOffice(this.roomsSignal())?.values() || []));
+  filteredOfficeSignal = toSignal(
+    this.getForm.office.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value?.name),
+      combineLatestWith(toObservable(this.offices)),
+      map(([name, offices]) => {
+        if (name) {
+          return this.filterOffice(name, offices);
+        } else {
+          return offices ? offices.slice() : offices;
+        }
+      })),
+  );
+
+  roomList = signal<IRoomAll[] | undefined>(undefined);
+  filteredRoomSignal = toSignal(
+    this.getForm.room.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value?.address?.name),
+      combineLatestWith(toObservable(this.roomList)),
+      map(([name, rooms]) => {
+        if (name) {
+          return this.filterRoom(name, rooms);
+        } else {
+          return rooms ? rooms.slice() : rooms;
+        }
+      })),
+  );
+
+  professionalList = signal<IUserAll[] | undefined>(undefined);
+  filteredProfessionalSignal = toSignal(
+    this.getForm.professional.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value?.displayName),
+      combineLatestWith(toObservable(this.professionalList)),
+      map(([name, professionals]) => {
+        if (name) {
+          return this.filterProfessional(name, professionals);
+        } else {
+          return professionals ? professionals.slice() : professionals;
+        }
+      })),
+  );
+
+  private selectOfficeSignal = toSignal(this.getForm.office.valueChanges);
+  private selectRoomSignal = toSignal(this.getForm.room.valueChanges);
+  private selectProfessionalSignal = toSignal(this.getForm.professional.valueChanges);
+
+  picker = viewChild(MatDatepicker);
+
+  viewDate = signal(getNowTimeZone());
   hourSegments = 4;
-  viewDate: Date = getNowTimeZone();
-  calendar: IDataEvent = new DataEvent([], 0, this.viewDate, 0, false);
-  locale: string = this.translate.currentLang;
-  language: string = this.translate.currentLang;
+  calendar: IDataEvent = new DataEvent([], 0, this.viewDate(), 0, false);
+  calendarEventsSignal = signal<CalendarEvent[]>([]);
+  calendarDaySignal = signal<IDay | undefined>(undefined);
+  calendarRoomSignal = signal<IRoomAll | undefined>(undefined);
+  locale: string = this.translate.getCurrentLang();
+  language: string = this.translate.getCurrentLang();
   professionalId?: string;
-
-  officeForm!: UntypedFormGroup;
-  offices?: IOffice[];
-  filteredOffice?: Observable<IOffice[] | undefined>;
-  office: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch,
-  ]);
-  roomList?: IRoom[];
-  filteredRoom?: Observable<IRoom[] | undefined>;
-  room: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch,
-  ]);
-  professionalList?: IUser[];
-  filteredProfessional?: Observable<IUser[] | undefined>;
-  professional: UntypedFormControl = new UntypedFormControl('', [
-    requireMatch,
-  ]);
 
   refresh: Subject<any> = new Subject();
   maxDate: Date = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
   minDate: Date = new Date(2023, 0, 1);
-  daysInWeek: number = 7;
 
-  isDarkMode?: boolean;
+  isCalendarLoading = true;
+  isLoading = true;
+
+  private roomId = signal<string | undefined>(undefined);
   private selectView: CalendarPeriod = 'day';
-  private getState: Observable<any> = this.store.select(selectReservationState);
-  private destroy$ = new Subject();
-  private subscription = new Subject();
-  private authUserServiceSubscription: Subscription = this.authUserService.authUser.subscribe(value => {
-    this.professionalId = value.professionalId;
-    const darkMode: boolean = value.isDarkMode;
-    if (this.isDarkMode !== undefined && darkMode !== this.isDarkMode) {
-      this.tryFillData(darkMode);
-    }
-    this.isDarkMode = darkMode;
-    this.isRoomAdmin = value.isRoomAdmin;
-  });
-  private roomId?: string;
-  private professionalSelectedId?: string;
+  private professionalSelectedId = signal(this.selectProfessionalSignal()?.id);
   private today: Date = createNewDate(getNowTimeZone());
-  private isRoomAdmin = false;
-  private dataReady = false;
-  private calendarReady = false;
+  private previousDarkMode?: boolean;
 
   constructor() {
-    this.breakpointObserver.observe(Object.values(CALENDAR_RESPONSIVE).map(({ breakpoint }) => breakpoint))
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((state: BreakpointState) => {
-        const foundBreakpoint = Object.values(CALENDAR_RESPONSIVE)
-          .find(({ breakpoint }) => !!state.breakpoints[breakpoint]);
-        if (foundBreakpoint) {
-          this.daysInWeek = foundBreakpoint.daysInWeek;
-        } else {
-          this.daysInWeek = 7;
-        }
-        this.cdRef.markForCheck();
-      });
-  }
+    effect(() => {
+      const calendarRooms = this.calendarSignal();
+      if (!calendarRooms) {
+        return;
+      }
+      const calendarData = calendarRooms[0];
+      if (calendarData?.room) {
+        const timeZone = calendarData.room.timeZone;
+        const { monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude } = getAvailability(
+          calendarData.room);
+        const { min, max } = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday,
+          timeZone);
+        const day = new Day(min, max, getNowTimeZone(), exclude, 1);
+        this.calendar.day = day;
+        this.calendar.room = calendarData.room;
+        this.fillData(this.isDarkMode(), calendarData);
 
-  get search(): void {
-    return this.getReservations();
+        this.calendarDaySignal.set(day);
+        this.calendarRoomSignal.set(calendarData.room);
+        this.calendarEventsSignal.set([...this.calendar.calendarEvents]);
+      }
+      this.isLoading = false;
+      this.isCalendarLoading = false;
+    });
+
+    effect(() => {
+      const current = this.isDarkMode();
+      if (this.previousDarkMode !== undefined && current !== this.previousDarkMode) {
+        const calendarRooms = this.calendarSignal();
+        if (!calendarRooms) {
+          return;
+        }
+        const calendarData = calendarRooms[0];
+        this.fillData(current, calendarData);
+
+        this.calendarEventsSignal.set([...this.calendar.calendarEvents]);
+      }
+      this.previousDarkMode = current;
+    });
+
+    effect(() => {
+      const offices = this.offices();
+      if (offices && offices.length === 1) {
+        this.getForm.office.setValue(offices[0]);
+      }
+    });
+
+    effect(() => {
+      const office = this.selectOfficeSignal();
+      if (!office) {
+        this.isLoading = true;
+        return;
+      }
+      this.isLoading = false;
+      this.roomList.set(office.rooms);
+      const room = getList(office.rooms, this.roomId());
+      this.getForm.room.setValue(room);
+      this.roomId.set(room?.id);
+    });
+
+    effect(() => {
+      const room = this.selectRoomSignal();
+      if (!room) {
+        this.isLoading = true;
+        return;
+      }
+      this.isLoading = false;
+      this.roomId.set(room.id);
+      this.professionalList.set(room.professionals);
+      const professional = getList(room.professionals, this.professionalSelectedId());
+      this.getForm.professional.setValue(professional);
+      this.professionalSelectedId.set(professional?.id);
+    });
+
+    effect(() => {
+      const roomId = this.roomId();
+      this.getReservations(roomId);
+    });
   }
 
   get totalDays(): number {
     // set 0 for full week
-    return this.daysInWeek === 7 ? 0 : this.daysInWeek;
+    const daysInWeek = this.daysInWeekSignal();
+    return daysInWeek === 7 ? 0 : daysInWeek;
   }
 
-  get increment(): void {
-    return this.picker.select(addPeriod(this.selectView, this.viewDate, this.daysInWeek));
+  get getForm(): CalendarForm {
+    return this.form.controls;
   }
 
-  get decrement(): void {
-    return this.picker.select(subPeriod(this.selectView, this.viewDate, this.daysInWeek));
+  search() {
+    const roomId = this.roomId();
+    this.getReservations(roomId);
   }
 
-  get downloadPDF(): void {
+  private get searchDate(): Date {
+    const viewDate = this.viewDate();
+    return this.totalDays ? addDays(viewDate, Math.floor(this.daysInWeekSignal() / 2)) :
+      this.getRelevantWednesday(viewDate);
+  }
+
+  increment() {
+    this.picker()?.select(addPeriod(this.selectView, this.viewDate(), this.daysInWeekSignal()));
+  }
+
+  decrement() {
+    this.picker()?.select(subPeriod(this.selectView, this.viewDate(), this.daysInWeekSignal()));
+  }
+
+  downloadPDF() {
     const element = document.getElementById('weekViewPDF');
     if (element) {
       const clone = element.cloneNode(true) as HTMLElement;
@@ -193,77 +347,58 @@ export class CalendarComponent implements OnInit, OnDestroy {
         headerPast[i].classList.remove('cal-future', 'cal-disabled');
         headerPast[i].classList.add('cal-today');
       }
-      const endDate = addDays(this.searchDate, Math.floor(this.daysInWeek / 2));
-      const startDate = addDays(endDate, 1 - this.daysInWeek);
+      const daysInWeek = this.daysInWeekSignal();
+      const endDate = addDays(this.searchDate, Math.floor(daysInWeek / 2));
+      const startDate = addDays(endDate, 1 - daysInWeek);
 
-      document.title = `From ${ formatDateTwoDigit(startDate, this.locale) } to ${ formatDateTwoDigit(endDate,
-        this.locale) }`;
+      document.title = `From ${formatDateTwoDigit(startDate, this.locale)} to ${formatDateTwoDigit(endDate,
+        this.locale)}`;
 
       document.body.innerHTML = clone.innerHTML;
       window.print();
       location.reload();
     }
-    return;
   }
 
-  private get searchDate(): Date {
-    return this.totalDays ? addDays(this.viewDate, Math.floor(this.daysInWeek / 2)) :
-      this.getRelevantWednesday(this.viewDate);
-  }
-
-  ngOnInit(): void {
-    this.createForm();
-    this.createFilters();
-    this.subscribe();
-    this.clean();
-    this.getRoomList();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-    this.destroy$.unsubscribe();
-    this.authUserServiceSubscription.unsubscribe();
-  }
-
-  displayFnOffice = (office: IOffice): string => office ? `${ office.name }` : '';
+  displayFnOffice = (office: IOffice): string => office ? `${office.name}` : '';
 
   displayFnRoom = (room: IRoom): string => room.address ? room.address.name : '';
 
   displayFnProfessional = (professional: IUser): string => professional?.displayName ? professional.displayName : '';
 
-  keyDownHandler = (event: any, form: UntypedFormControl): void => {
+  keyDownHandler = (event: KeyboardEvent, form: FormControl): void => {
     if (event.code === 'Backspace') {
-      form.setValue('');
+      form.setValue(undefined);
     }
   };
 
-  keyDownOffice = (event: any): void => {
+  keyDownOffice = (event: KeyboardEvent): void => {
     if (event.code === 'Backspace') {
-      this.office.setValue('');
+      this.getForm.office.setValue(undefined);
       this.keyDownRoom(event);
     }
   };
 
-  keyDownRoom = (event: any): void => {
+  keyDownRoom = (event: KeyboardEvent): void => {
     if (event.code === 'Backspace') {
-      this.professionalList = undefined;
-      this.roomId = undefined;
-      this.professionalSelectedId = undefined;
-      this.keyDownHandler(event, this.professional);
-      this.keyDownHandler(event, this.room);
+      this.professionalList.set(undefined);
+      this.roomId.set(undefined);
+      this.professionalSelectedId.set(undefined);
+      this.keyDownHandler(event, this.getForm.professional);
+      this.keyDownHandler(event, this.getForm.room);
     }
   };
 
   view = (event: CalendarEvent): void => {
-    if (event.id && ![OUT_OF_WORK_ALL_DAY, OUT_OF_WORK, LUNCH].includes(`${ event.id }`)) {
+    if (event.id && ![OUT_OF_WORK_ALL_DAY, OUT_OF_WORK, LUNCH].includes(`${event.id}`)) {
       this.router.navigate([event.id]);
     }
   };
 
-  segmentClick = (date: Date): void => {
-    const room = this.data?.room;
-    const data = { date, room, professional: this.professional.value };
+  segmentClick = (date: Date, room?: IRoomAll): void => {
+    const professional = this.getForm.professional.value;
     if (date && room && this.dateIsValid(date)) {
+      const data = { date, roomId: room.id, professionalId: professional?.id };
       executeDialogNoWidth(this.dialog, CalendarDialogComponent, null, result => {
         if (result) {
           this.router.navigate([this.language].concat(result.split(',')), { state: data });
@@ -274,17 +409,14 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   selectDate = (event: any): void => {
     this.changeDate(newDate(event.value));
-    this.getReservations();
+    const roomId = this.roomId();
+    this.getReservations(roomId);
   };
 
   beforeMonthViewRender = ({ header, period }: any): void => {
-    if (this.calendar) {
-      this.calendar.calendarStart = period.start;
-      this.calendar.calendarEnd = period.end;
-      this.calendar.createRecurring();
-      this.calendarReady = true;
-      this.tryFillData();
-    }
+    this.calendar.calendarStart = period.start;
+    this.calendar.calendarEnd = period.end;
+    this.calendar.createRecurring();
     header.forEach((day: any) => {
       if (!this.dateIsValid(day.date)) {
         day.cssClass = 'cal-disabled';
@@ -311,7 +443,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
           updateReservationTimestamp({
             id: event.meta.id,
             start: event.start.toLocaleString(API_LOCALE),
-            role: this.isRoomAdmin ? Role.roomAdmin : Role.professional,
+            role: this.isRoomAdmin() ? Role.roomAdmin : Role.professional,
             timeZone: event.meta.timeZone,
           }),
         );
@@ -323,81 +455,11 @@ export class CalendarComponent implements OnInit, OnDestroy {
     });
   };
 
-  private createForm = (): void => {
-    this.officeForm = this.formBuilder.group({
-      office: this.office,
-      room: this.room,
-      professional: this.professional,
-    });
-    this.valueChanges();
-  };
-
-  private valueChanges = (): void => {
-    this.office.valueChanges.subscribe(value => {
-      if (!value) {
-        return;
-      }
-      this.roomList = value.rooms;
-      const room = value.rooms?.find((o: IOffice) => o.id === this.roomId);
-      if (room) {
-        this.roomList = value.rooms;
-        if (this.room.value.id !== this.roomId) {
-          this.room.setValue(room);
-          this.roomId = this.room.value.id;
-        }
-      } else {
-        if (this.roomList?.length === 1) {
-          this.room.setValue(this.roomList[0]);
-        } else {
-          this.room.setValue('');
-        }
-      }
-    });
-    this.room.valueChanges.subscribe((value) => {
-      if (value) {
-        this.roomId = value.id;
-        this.professionalList = value.professionals;
-        const professional = value.professionals?.find((o: IRoom) => o.id === this.professionalSelectedId);
-        if (professional) {
-          this.professionalList = value.professionals;
-          if (this.professional.value.id !== this.professionalSelectedId) {
-            this.professional.setValue(professional);
-            this.professionalSelectedId = this.professional.value.id;
-          }
-        } else {
-          if (this.professionalList?.length === 1) {
-            this.professional.setValue(this.professionalList[0]);
-          } else {
-            this.professional.setValue('');
-          }
-        }
-      }
-    });
-    this.professional.valueChanges.subscribe(value => this.professionalSelectedId = value ? value.id : undefined);
-  };
-
-  private createFilters = (): void => {
-    this.filteredOffice = this.office.valueChanges.pipe(startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filterOffice(name) : this.offices ? this.offices.slice() : this.offices),
-    );
-    this.filteredRoom = this.room.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(addressName => addressName ? this.filterRoom(addressName) :
-        this.roomList ? this.roomList.slice() : this.roomList),
-    );
-    this.filteredProfessional = this.professional.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(addressName => addressName ? this.filterProfessional(addressName) : this.professionalList
-        ? this.professionalList.slice() : this.professionalList),
-    );
-  };
-
   private changeDate = (date: Date): void => {
-    const newDate = createNewDate(date, this.viewDate.getHours(), this.viewDate.getMinutes());
-    this.viewDate = this.totalDays ? addDays(newDate, -Math.floor(this.daysInWeek / 2)) : newDate;
+    this.viewDate.update(viewDate => {
+      const newDate = createNewDate(date, viewDate.getHours(), viewDate.getMinutes());
+      return this.totalDays ? addDays(newDate, -Math.floor(this.daysInWeekSignal() / 2)) : newDate;
+    });
   };
 
   private dateIsValid = (date: Date): boolean => isBetween(this.today, this.maxDate, date);
@@ -423,10 +485,10 @@ export class CalendarComponent implements OnInit, OnDestroy {
       meta.isReservation = true;
       const draggable = [States.approved, States.created, States.partiallyPaid, States.paid].includes(
         it.state as States);
-      const event = calendarEvent(detail, color, start, darkMode, end, `${ this.language }/reservation/${ it.id }`,
+      const event = calendarEvent(detail, color, start, darkMode, end, `${this.language}/reservation/${it.id}`,
         meta, draggable);
       if (it.showNotification) {
-        event.cssClass = `diagonal ${ it.state.toLowerCase() }`;
+        event.cssClass = `diagonal ${it.state.toLowerCase()}`;
       }
       return event;
     }
@@ -445,7 +507,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
           description: it.description ?? '',
           professionalName: it.professional.displayName,
         });
-        let path = `${ this.language }/unavailable/`;
+        let path = `${this.language}/unavailable/`;
         if (it.type === 'BLOCK_AGENDA') {
           path += 'block-agenda/';
         }
@@ -466,7 +528,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         const startDate = newDateTimestamp(it.dob);
         startDate.setFullYear(getNowTimeZone().getFullYear());
         const color = findStateColor('BIRTHDAY', darkMode);
-        const event = allDayEvent(detail, color, startDate, darkMode, `${ this.language }/users/${ it.id }`);
+        const event = allDayEvent(detail, color, startDate, darkMode, `${this.language}/users/${it.id}`);
         this.calendar?.addEvent(event);
       }
     });
@@ -480,7 +542,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
       });
       const startDate = newDateTimestamp(it.date);
       const state = 'NOTE';
-      const path = `${ this.language }/notes/${ it.id }`;
+      const path = `${this.language}/notes/${it.id}`;
       if (it.repeat === FrequencyEnum.none) {
         this.createNoteEvent(title, state, path, startDate, darkMode);
       } else {
@@ -501,13 +563,15 @@ export class CalendarComponent implements OnInit, OnDestroy {
     const dataEvent = this.calendar;
     if (dataEvent) {
       const [startSearch, endSearch] = searchDates(recurring.allDay, start, recurring.duration);
-      this.createUnavailableEvent(room, dataEvent.day, recurring, startSearch,
-        endSearch, darkMode, dataEvent);
+      this.createUnavailableEvent(room, recurring, startSearch,
+        endSearch, darkMode, dataEvent, dataEvent.day);
     }
   };
 
-  private createUnavailableEvent(room: IRoomAll, day: any, recurring: any, start: Date,
-    end: Date, darkMode: boolean, dataEvent: IDataEvent): void {
+  private createUnavailableEvent(
+    room: IRoomAll, recurring: any, start: Date,
+    end: Date, darkMode: boolean, dataEvent: IDataEvent, day?: IDay,
+  ): void {
     const color = findStateColor('DEFAULT', darkMode);
     const meta = new Meta(!recurring.allDay, room.timeZone);
     const event = calendarEvent(recurring.title, color, start, darkMode, end, recurring.path + recurring.id, meta);
@@ -523,83 +587,49 @@ export class CalendarComponent implements OnInit, OnDestroy {
     return wednesday;
   }
 
-  private fillData(darkMode: boolean = false): void {
-    if (this.data) {
-      this.calendar.addEvents(this.addReservations(this.data, darkMode));
-      const timeZone = this.data.room.timeZone;
-      const { monday, tuesday, wednesday, thursday, friday, saturday, sunday } = getAvailability(
-        this.data.room);
-      const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
-      const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
-      const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
-      this.calendar.recurringEvent?.addNotAvailableRecurring(this.calendar, unavailable, lunch, notWorking, sunday,
-        saturday, friday, thursday, wednesday, tuesday, monday, darkMode, timeZone);
-      this.addUnavailableList(this.data, darkMode);
-      this.addBirthdays(this.data, darkMode);
-      this.addNotes(this.data, darkMode);
+  private fillData(darkMode: boolean = false, calendar: IRoomReservation): void {
+    this.calendar.addEvents(this.addReservations(calendar, darkMode));
+    const timeZone = calendar.room.timeZone;
+    const { monday, tuesday, wednesday, thursday, friday, saturday, sunday } = getAvailability(
+      calendar.room);
+    const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
+    const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
+    const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
+    this.calendar.recurringEvent?.addNotAvailableRecurring(this.calendar, unavailable, lunch, notWorking, sunday,
+      saturday, friday, thursday, wednesday, tuesday, monday, darkMode, timeZone);
+    this.addUnavailableList(calendar, darkMode);
+    this.addBirthdays(calendar, darkMode);
+    this.addNotes(calendar, darkMode);
 
-      this.calendar.recurringEvent?.execute();
-    }
+    this.calendar.recurringEvent?.execute();
   }
 
-  private filterOffice = (name: string): IOffice[] | undefined => this.offices?.filter(
+  private filterOffice = (name: string, offices?: IOfficeAll[]): IOfficeAll[] | undefined => offices?.filter(
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private filterRoom = (addressName: string): IRoom[] | undefined => this.roomList?.filter(
+  private filterRoom = (addressName: string, roomList?: IRoomAll[]): IRoomAll[] | undefined => roomList?.filter(
     option => option.address?.name?.toLowerCase().indexOf(addressName.toLowerCase()) === 0);
 
-  private filterProfessional = (name: string): IUser[] | undefined => this.professionalList?.filter(
+  private filterProfessional = (
+    name: string,
+    professionalList?: IUserAll[],
+  ): IUserAll[] | undefined => professionalList?.filter(
     option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
-  private clean = (): void => {
+  private getReservations = (roomId?: string): void => {
+    if (!roomId) {
+      return;
+    }
     this.calendar.resetEvents();
-    this.store.dispatch(clean(),
-    );
-  };
-
-  private getReservations = (): void => {
-    this.calendar.resetEvents();
+    this.isLoading = true;
+    this.isCalendarLoading = true;
     this.store.dispatch(
       getAllGroupingByRoom({
-        days: this.daysInWeek,
+        days: this.daysInWeekSignal(),
         date: this.searchDate,
-        roomId: this.roomId!,
-        professionalId: this.professionalSelectedId,
+        roomId,
+        professionalId: this.professionalSelectedId(),
       }),
     );
-  };
-  private getRoomList = (): void => this.store.dispatch(findRooms({}));
-
-  private tryFillData = (darkMode = this.isDarkMode): void => {
-    if (this.dataReady && this.calendarReady) {
-      this.fillData(darkMode);
-      this.calendarReady = false;
-      this.dataReady = false;
-    }
-  };
-
-  private subscribe = (): void => {
-    this.getState.pipe(takeUntil(this.subscription)).subscribe((state) => {
-      this.offices = Array.from(createRoomOffice(state.rooms)?.values() || []);
-      if (this.offices && this.roomId && !this.office.value) {
-        this.office.setValue(
-          this.offices?.find(office => office.rooms?.find(o => o.id === this.roomId) ? office : undefined));
-      } else if (this.offices && this.offices.length === 1) {
-        this.office.setValue(this.offices[0]);
-      }
-      if (state.data && state.data.room && state.data.reservations) {
-        this.data = state.data;
-        if (this.data) {
-          const timeZone = this.data.room.timeZone;
-          const { monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude } = getAvailability(
-            this.data.room);
-          const { min, max } = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday,
-            timeZone);
-          this.calendar.day = new Day(min, max, getNowTimeZone(), exclude, 1);
-        }
-        this.dataReady = true;
-        this.tryFillData();
-      }
-    });
   };
 }

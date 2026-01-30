@@ -1,167 +1,164 @@
-import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
-import {
-  AbstractControl,
-  UntypedFormBuilder,
-  UntypedFormControl,
-  UntypedFormGroup,
-  Validators,
-  ɵTypedOrUntyped,
-} from '@angular/forms';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { combineLatestWith } from 'rxjs';
+import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { AppState, selectDiscountState } from '../store/app.states';
-import { Discount, DiscountType, IDiscount, IDiscountAll } from '../interfaces/discount';
-import { clean, createDiscount, getAllCurrency, getDiscount, updateDiscount } from '../store/discount.actions';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ICurrency, ICurrencyAll } from '../interfaces/currency';
-import { fieldChange, valueChange } from '../util/validators';
+import { Discount, DiscountType, IDiscount } from '../interfaces/discount';
+import { createDiscount, getDiscount, updateDiscount } from '../store/discount.actions';
+import { Router } from '@angular/router';
+import { ICurrency } from '../interfaces/currency';
+import { fieldChange, requireMatch, valueChange } from '../util/validators';
 import { map, startWith } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../shared/shared.module';
 import { BackButtonDirective } from '../directives/back-button.directive';
+import {
+  getCurrenciesPipe,
+  getCurrentDiscountIdPipe,
+  getSelectedDiscountPipe,
+  getSubErrorsPipe,
+} from '../store/selectors/discount.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { IError } from '../interfaces/common';
+import { DiscountState } from '../store/reducers/discount.reducers';
+
+type DiscountForm = {
+  name: FormControl<string>;
+  description: FormControl<string | undefined>;
+  amount: FormControl<number>;
+  type: FormControl<DiscountType | undefined>;
+  currency: FormControl<ICurrency | undefined>;
+}
 
 @Component({
   selector: 'app-discount',
   templateUrl: './discount.component.html',
   styleUrls: ['./discount.component.scss'],
   imports: [SharedModule, BackButtonDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DiscountComponent implements OnInit, OnDestroy {
-  @Input() discount?: IDiscountAll;
+export class DiscountComponent {
+  private readonly store: Store<DiscountState> = inject(Store<DiscountState>);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly router: Router = inject(Router);
+  private readonly translate: TranslateService = inject(TranslateService);
 
-  id?: string;
-  isAddMode: boolean;
-  form!: UntypedFormGroup;
-  errors: any = [];
+  private discountId$ = this.store.pipe(getCurrentDiscountIdPipe);
+  private selectedDiscount$ = this.store.pipe(getSelectedDiscountPipe);
+  private allCurrencies$ = this.store.pipe(getCurrenciesPipe);
+  private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
-  currencies?: ICurrencyAll[];
-  filteredCurrencyOptions?: Observable<ICurrency[] | undefined>;
+  private discountIdSignal = toSignal(this.discountId$, { initialValue: null });
+  private selectedDiscountSignal = toSignal(this.selectedDiscount$);
+  private subErrorsSignal = toSignal(this.subErrors$);
+
+  form: FormGroup<DiscountForm> = this.formBuilder.group<DiscountForm>({
+    name: this.formBuilder.control('', {
+      validators: [Validators.required],
+    }),
+    description: this.formBuilder.control(undefined),
+    currency: this.formBuilder.control(undefined, {
+      validators: [Validators.required, requireMatch],
+    }),
+    amount: this.formBuilder.control(0, {
+      validators: [Validators.required, Validators.min(1)],
+    }),
+    type: this.formBuilder.control(undefined, {
+      validators: [Validators.required],
+    }),
+  });
+
+  discountSignal = computed(() => this.selectedDiscountSignal());
+  filteredCurrencySignal = toSignal(
+    this.getForm.currency.valueChanges.pipe(
+      startWith(''),
+      map((value: any) => !value || typeof value === 'string' ? value : value.code),
+      combineLatestWith(this.allCurrencies$),
+      map(([name, currencies]) => {
+        if (name) {
+          return this.filterCurrency(name, currencies);
+        } else {
+          return currencies ? currencies.slice() : currencies;
+        }
+      }),
+    ),
+  );
+
+  isAddModeSignal = computed(() => !this.discountIdSignal());
+  errors = signal<Record<string, unknown>>({});
+
+  private readonly language: string = this.translate.getCurrentLang();
 
   types = DiscountType;
-  private getState: Observable<any>;
-  private subscription?: Subscription;
-  private readonly language: string;
 
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>,
-              private formBuilder: UntypedFormBuilder,
-              private router: Router, private route: ActivatedRoute, private cdRef: ChangeDetectorRef) {
-    this.isAddMode = true;
-    this.getState = this.store.select(selectDiscountState);
-    this.language = this.translate.currentLang;
+  constructor() {
+    effect(() => {
+      const selected = this.selectedDiscountSignal();
+      if (selected?.id) {
+        this.form.patchValue(selected);
+      }
+    });
+
+    effect(() => {
+      const subErrors = this.subErrorsSignal();
+      if (subErrors) {
+        const errorMap: Record<string, unknown> = {};
+        subErrors.forEach((error: IError) => {
+          const field = error.field as keyof DiscountForm | undefined;
+
+          if (field && field in this.form.controls) {
+            errorMap[field] = error.message;
+            this.form.controls[field].setErrors({ incorrect: true });
+          }
+        });
+        this.errors.set(errorMap);
+      }
+    });
+
+    effect(() => {
+      const id = this.discountIdSignal();
+      if (id) {
+        this.store.dispatch(getDiscount({ id }));
+      }
+    });
   }
 
-  get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
+  get getForm(): DiscountForm {
     return this.form.controls;
   }
 
-  get submit(): void {
+  submit(): void {
     if (this.form.invalid) {
       return;
     }
 
+    const discountSignal = this.discountSignal();
     const discount: IDiscount = new Discount();
-    discount.name = fieldChange(this.getForm.name as UntypedFormControl, this.discount?.name);
-    discount.description = valueChange(this.getForm.description.value, this.discount?.description);
-    discount.type = fieldChange(this.getForm.type as UntypedFormControl, this.discount?.type);
-    discount.amount = fieldChange(this.getForm.amount as UntypedFormControl, this.discount?.amount);
+    discount.name = fieldChange(this.getForm.name, discountSignal?.name);
+    discount.description = valueChange(this.getForm.description.value, discountSignal?.description);
+    discount.type = fieldChange(this.getForm.type, discountSignal?.type);
+    discount.amount = fieldChange(this.getForm.amount, discountSignal?.amount);
 
-    if (this.isAddMode) {
-      discount.currencyId = this.getForm.currency.value.id;
+    const id = this.discountIdSignal();
+    if (!id) {
+      discount.currencyId = this.getForm.currency.value?.id;
       this.store.dispatch(createDiscount({ discount }));
     } else {
-      this.discount = undefined;
-      const id = this.id!;
       this.store.dispatch(updateDiscount({ id, discount }));
     }
-    return;
   }
 
-  get addCurrency(): void {
+  addCurrency(): void {
     this.router.navigate([this.language, 'currency', 'add']);
-    return;
   }
 
-  ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.id = id;
-    }
-    this.createForm();
-    this.clean();
-    this.subscribe();
-    this.isAddMode = !this.id;
-    if (!this.isAddMode) {
-      this.getDiscount();
-    } else {
-      this.getCurrencies();
-    }
-    this.cdRef.detectChanges();
-  }
+  displayCurrencyFn = (currency: ICurrency): string => currency?.code ? currency.code : '';
 
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  displayCurrencyFn = (currency: ICurrencyAll): string => currency ? currency.code : '';
-
-  keyDownHandler = (event: any, form: AbstractControl): void => {
+  keyDownHandler = (event: KeyboardEvent): void => {
     if (event.code === 'Backspace') {
-      form.setValue('');
+      this.getForm.currency.setValue(undefined);
     }
   };
 
-  private createForm = (): void => {
-    this.form = this.formBuilder.group({
-      name: ['', [Validators.required]],
-      currency: ['', [Validators.required]],
-      description: [''],
-      amount: ['', [Validators.required, Validators.min(1)]],
-      type: ['', [Validators.required]],
-    });
-    this.filteredCurrencyOptions = this.getForm.currency.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.code),
-      map(name => name ? this.filterCurrency(name) : this.currencies ? this.currencies.slice() : this.currencies),
-    );
-  };
-
-  private filterCurrency = (name: string): ICurrency[] | undefined => this.currencies?.filter(
+  private filterCurrency = (name: string, currencies: ICurrency[]): ICurrency[] | undefined => currencies?.filter(
     option => option.code?.toLowerCase().indexOf(name.toLowerCase()) === 0);
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private getDiscount = (): void => {
-    if (!this.discount) {
-      const id = this.route.snapshot.paramMap.get('id')!;
-      this.store.dispatch(getDiscount({ id }));
-    }
-  };
-
-  private getCurrencies = (): void => this.store.dispatch(getAllCurrency());
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.selected) {
-        this.discount = {
-          id: state.selected.id,
-          name: state.selected.name,
-          description: state.selected.description,
-          amount: state.selected.amount,
-          type: state.selected.type,
-          currency: state.selected.currency,
-        } as IDiscountAll;
-        this.form.patchValue(this.discount);
-        this.getForm.type.setValue(state.selected.type);
-      }
-      this.currencies = state.currencies;
-      if (state.subErrors) {
-        state.subErrors.forEach((value: any) => {
-          this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({ incorrect: true });
-        });
-      } else if (state.response) {
-        this.router.navigate([this.language, 'discounts']);
-      }
-    });
-  };
 }

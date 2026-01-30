@@ -1,93 +1,83 @@
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
-import { ITreatmentGroup } from '../../interfaces/treatment';
-import { Observable, Subscription } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AppState, selectTreatmentState } from '../../store/app.states';
 import { getAllTreatmentsHistory, getTreatmentGroup, treatmentSelected } from '../../store/treatment.actions';
-import { IColorAll } from '../../interfaces/color';
 import { SharedModule } from '../../shared/shared.module';
 import { DurationTimePipe } from '../../pipes/durationTime.pipe';
 import { TreatmentTableComponent } from '../table/treatment-table.component';
 import { BackButtonDirective } from '../../directives/back-button.directive';
+import { TreatmentState } from '../../store/reducers/treatment.reducers';
+import {
+  getCurrentTreatmentIdPipe,
+  getHistoriesPipe,
+  getSelectedTreatmentPipe,
+} from '../../store/selectors/treatment.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-treatment-view',
   templateUrl: './treatment-view.component.html',
   styleUrls: ['./treatment-view.component.scss'],
   imports: [SharedModule, DurationTimePipe, TreatmentTableComponent, BackButtonDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TreatmentViewComponent implements OnInit, AfterViewInit, OnDestroy {
-  group?: ITreatmentGroup;
-  colors?: IColorAll[];
+export class TreatmentViewComponent {
+  private readonly store: Store<TreatmentState> = inject(Store<TreatmentState>);
+
+  private treatmentId$ = this.store.pipe(getCurrentTreatmentIdPipe);
+  private treatmentGroup$ = this.store.pipe(getSelectedTreatmentPipe);
+  private histories$ = this.store.pipe(getHistoriesPipe);
+
+  private treatmentIdSignal = toSignal(this.treatmentId$);
+  private treatmentGroupSignal = toSignal(this.treatmentGroup$);
+
+  historiesSignal = toSignal(this.histories$);
+
+  treatmentGroup = computed(() => {
+    const group = this.treatmentGroupSignal();
+    const histories = this.historiesSignal();
+    if (!group) {
+      return group;
+    }
+    const updatedGroup = { ...group };
+
+    updatedGroup.treatments = group.treatments?.map(treatment => {
+      if (treatment.id === this.treatmentId) {
+        return { ...treatment, showHistory: true, history: histories };
+      }
+      return treatment;
+    });
+
+    return updatedGroup;
+  });
+
+
   expandedPanelIndex: number = 0;
 
-  private subscription?: Subscription;
-  private getState: Observable<any>;
   private treatmentId?: string;
 
-  constructor(private route: ActivatedRoute, private store: Store<AppState>) {
-    this.getState = this.store.select(selectTreatmentState);
+  constructor() {
+    effect(() => {
+      const id = this.treatmentIdSignal();
+      if (id) {
+        this.store.dispatch(getTreatmentGroup({ id, path: 'view' }));
+      }
+    });
   }
 
-  get edit(): void {
-    return this.store.dispatch(treatmentSelected({ selected: this.group, path: 'edit' }));
-  }
-
-  ngOnInit(): void {
-    this.subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  ngAfterViewInit(): void {
-    this.getTreatment();
+  edit() {
+    this.store.dispatch(treatmentSelected({ selected: this.treatmentGroupSignal(), path: 'edit' }));
   }
 
   getHistory = (treatmentId?: string, index?: number): void => {
+    const id = this.treatmentGroupSignal()?.id;
+    if (!id) {
+      return;
+    }
     this.treatmentId = treatmentId;
     if (index !== undefined) {
       this.expandedPanelIndex = index;
     }
-    this.store.dispatch(getAllTreatmentsHistory({ id: this.group!.id!, treatmentId: treatmentId! }));
-  };
-
-  private getTreatment = (): void => {
-    if (!this.group) {
-      const id = this.route.snapshot.paramMap.get('id')!;
-      this.store.dispatch(getTreatmentGroup({ id, path: 'view' }));
-    }
-  };
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.selected) {
-        const treatments = [...state.selected.treatments];
-        this.group = {
-          id: state.selected.id,
-          name: state.selected.name,
-          description: state.selected.description,
-          priceFrom: state.priceFrom,
-          colors: state.selected.colors,
-          treatments,
-        } as ITreatmentGroup;
-        this.colors = state.selected.colors;
-      }
-      if (state.history && this.group) {
-        this.group.treatments = this.group.treatments?.map(p => {
-          if (p.id === this.treatmentId) {
-            return Object.assign({ showHistory: true, history: state.history }, p);
-          }
-          return p;
-        });
-        const treatment = this.group.treatments?.find(p => p.id === this.treatmentId);
-        if (treatment) {
-          treatment.history = state.history;
-        }
-      }
-    });
+    this.store.dispatch(getAllTreatmentsHistory({ id: id, treatmentId: treatmentId! }));
   };
 }
 

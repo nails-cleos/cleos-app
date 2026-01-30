@@ -1,28 +1,30 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Subject } from 'rxjs';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BehaviorSubject } from 'rxjs';
 
 import { TransactionComponent } from './transaction.component';
-import { AuthUserService } from '../../services/auth-user.service';
+import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { IAccountAll, ITransaction } from '../../interfaces/account';
-import { PaymentOption, PaymentType } from '../../interfaces/payment';
+import { IPaymentOption, PaymentOption, PaymentType } from '../../interfaces/payment';
 import { createTransaction, getAccount, paymentOptions } from '../../store/account.actions';
-import { AppState } from '../../store/app.states';
+import { AccountState } from '../../store/reducers/account.reducers';
+import { signal } from '@angular/core';
 
 describe('TransactionComponent', () => {
   let component: TransactionComponent;
   let fixture: ComponentFixture<TransactionComponent>;
 
-  let state$: Subject<any>;
-  let authUser$: Subject<any>;
+  let accountId$: BehaviorSubject<string | null>;
+  let selectedAccount$: BehaviorSubject<IAccountAll | undefined>;
+  let paymentOptions$: BehaviorSubject<any>;
+  let subErrors$: BehaviorSubject<any>;
+  let response$: BehaviorSubject<any>;
+  const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let storeSpy: jasmine.SpyObj<Store<AccountState>>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let paramMapSpy: jasmine.SpyObj<ParamMap>;
   let routerSpy: jasmine.SpyObj<Router>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
@@ -45,49 +47,46 @@ describe('TransactionComponent', () => {
     },
   };
 
-  const mockPaymentOptions = [
-    {
-      name: 'Test Payment Option',
-      image: 'test-image.png',
-      id: 'test-id',
-      paymentOptionSubList: [
-        {
-          name: 'Sub Option',
-          image: 'sub-image.png',
-          id: 'sub-id',
-        },
-      ],
-    },
-  ];
-
   beforeEach(async () => {
-    state$ = new Subject();
-    authUser$ = new Subject();
+    accountId$ = new BehaviorSubject<any>(null);
+    selectedAccount$ = new BehaviorSubject<any>(undefined);
+    paymentOptions$ = new BehaviorSubject<any>(undefined);
+    subErrors$ = new BehaviorSubject<any>(undefined);
+    response$ = new BehaviorSubject<any>(undefined);
 
-    paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
+      authUser: authUserSignal.asReadonly(),
+    });
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
-        paramMap: paramMapSpy,
+        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
       },
     });
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
-      authUser: authUser$.asObservable(),
+
+    let pipeCallIndex = 0;
+    storeSpy.pipe.and.callFake(() => {
+      pipeCallIndex++;
+      switch (pipeCallIndex) {
+        case 1:
+          return accountId$.asObservable();
+        case 2:
+          return selectedAccount$.asObservable();
+        case 3:
+          return paymentOptions$.asObservable();
+        case 4:
+          return subErrors$.asObservable();
+        case 5:
+          return response$.asObservable();
+        default:
+          return new BehaviorSubject(undefined).asObservable();
+      }
     });
 
-    storeSpy.select.and.returnValue(state$.asObservable());
-    paramMapSpy.get.and.returnValue('account-123');
-
     await TestBed.configureTestingModule({
-      imports: [
-        TransactionComponent,
-        TranslateModule.forRoot(),
-        ReactiveFormsModule,
-        BrowserAnimationsModule,
-      ],
+      imports: [TransactionComponent, TranslateModule.forRoot()],
       providers: [
-        FormBuilder,
         { provide: Store, useValue: storeSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Router, useValue: routerSpy },
@@ -96,16 +95,20 @@ describe('TransactionComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.setDefaultLang('en-GB');
     translateService.use('en-GB');
 
     fixture = TestBed.createComponent(TransactionComponent);
     component = fixture.componentInstance;
+
+    fixture.detectChanges();
   });
 
   afterEach(() => {
-    state$.complete();
-    authUser$.complete();
+    accountId$.complete();
+    selectedAccount$.complete();
+    paymentOptions$.complete();
+    subErrors$.complete();
+    response$.complete();
   });
 
   it('should create', () => {
@@ -113,196 +116,129 @@ describe('TransactionComponent', () => {
   });
 
   it('should initialize with default values', () => {
-    expect(component.hasAdminRole).toBeFalse();
     expect(component.amountMin).toBe(100);
     expect(component.language).toBe('en-GB');
-    expect(component.types).toEqual([PaymentType.cash, PaymentType.transfer]);
-    expect(component.errors).toEqual([]);
+    expect(component.types).toEqual([{ type: PaymentType.cash }, { type: PaymentType.transfer }] as IPaymentOption[]);
+    expect(component.errors()).toEqual({});
   });
 
-  it('should extract account ID from route and create form on init', () => {
-    paramMapSpy.get.and.callFake((key: string) => {
-      if (key === 'id') {
-        return 'account-123';
-      }
-      return null;
-    });
-
-    component.account = undefined;
-
-    storeSpy.dispatch.calls.reset();
-    component.ngOnInit();
-
+  it('should have created the reactive form', () => {
     expect(component.form).toBeDefined();
-    expect(component.form.get('amount')).toBeDefined();
-    expect(component.form.get('type')).toBeDefined();
-    expect(component.form.get('transfer')).toBeDefined();
-    expect(component.form.get('bank')).toBeDefined();
+    expect(component.getForm.amount).toBeDefined();
+    expect(component.getBankForm.type).toBeDefined();
+    expect(component.getForm.transfer).toBeDefined();
+    expect(component.getBankForm.bank).toBeDefined();
+  });
+
+  it('should have validators configured (required & min)', () => {
+    const amountControl = component.getForm.amount!;
+    const typeControl = component.getBankForm.type!;
+
+    expect(typeControl.hasError('required')).toBeTrue();
+
+    amountControl.setValue(50);
+    expect(amountControl.hasError('min')).toBeTrue();
+
+    amountControl.setValue(150);
+    expect(amountControl.hasError('min')).toBeFalse();
+  });
+
+  it('should dispatch getAccount when accountId signal emits an id', () => {
+    storeSpy.dispatch.calls.reset();
+    accountId$.next('account-123');
+
+    fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getAccount({ id: 'account-123' }));
   });
 
-  it('should not dispatch GetAccount when account is already loaded', () => {
-    component.account = mockAccount;
-    storeSpy.dispatch.calls.reset();
+  it('should react to selectedAccount updates (accountSignal)', () => {
+    selectedAccount$.next(mockAccount);
+    fixture.detectChanges();
 
-    component.ngOnInit();
-
-    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(
-      getAccount({ id: 'account-123' }),
-    );
+    expect(component.accountSignal()?.id).toBe('account-123');
+    expect(component.currencyIcon).toBeDefined();
+    expect(typeof component.currencyIcon).toBe('string');
   });
 
-  it('should create form with proper validators', () => {
-    component.ngOnInit();
+  it('should react to paymentOptions and compute optionsSignal', () => {
+    const optionsPayload = [
+      {
+        name: 'Test Payment Option',
+        image: 'test-image.png',
+        id: 'test-id',
+        paymentOptionSubList: [{ name: 'Sub Option', image: 'sub-image.png', id: 'sub-id' }],
+      },
+    ];
+    paymentOptions$.next(optionsPayload);
+    fixture.detectChanges();
 
-    const amountControl = component.form.get('amount');
-    const typeControl = component.form.get('type');
-
-    expect(amountControl?.hasError('required')).toBeTrue();
-    expect(typeControl?.hasError('required')).toBeTrue();
-
-    amountControl?.setValue(50);
-    expect(amountControl?.hasError('min')).toBeTrue();
-
-    amountControl?.setValue(150);
-    expect(amountControl?.hasError('min')).toBeFalse();
+    const opts = component.optionsSignal();
+    expect(opts).toBeDefined();
+    expect(Array.isArray(opts)).toBeTrue();
+    expect((opts as any).length).toBeGreaterThan(0);
   });
 
-  it('should update hasAdminRole and call getOptions when auth user changes', () => {
-    spyOn(component, 'getOptions' as any);
+  it('should set errors signal when subErrors arrive and set form control errors', () => {
+    const errors = [
+      { field: 'amount', message: 'Amount is invalid' },
+      { field: 'type', message: 'Type is required' },
+    ];
+    subErrors$.next(errors);
+    fixture.detectChanges();
 
-    authUser$.next({ hasAdminRole: true });
-    expect(component.hasAdminRole).toBeTrue();
-    expect(component['getOptions']).not.toHaveBeenCalled();
+    const currentErrors = component.errors();
+    expect(currentErrors['amount']).toBe('Amount is invalid');
+    expect(currentErrors['type']).toBe('Type is required');
 
-    authUser$.next({ hasAdminRole: false });
-    expect(component.hasAdminRole).toBeFalse();
-    expect(component['getOptions']).toHaveBeenCalled();
+    expect(component.getForm.amount?.hasError('incorrect')).toBeTrue();
+    expect(component.getBankForm.type?.hasError('incorrect')).toBeTrue();
   });
 
-  it('should update account when state has selected account', () => {
-    component.ngOnInit();
+  it('should navigate to appropriate route when response arrives (admin)', () => {
+    selectedAccount$.next(mockAccount);
+    authUserSignal.update(prev => ({ ...prev, hasAdminRole: true }));
 
-    const stateWithAccount = {
-      selected: mockAccount,
-    };
-
-    state$.next(stateWithAccount);
-
-    expect(component.account).toEqual(mockAccount);
-  });
-
-  it('should update payment options when state has paymentOptions', () => {
-    component.ngOnInit();
-
-    const stateWithOptions = {
-      paymentOptions: mockPaymentOptions,
-    };
-
-    state$.next(stateWithOptions);
-
-    expect(component.options).toBeDefined();
-    expect(component.options?.length).toBeGreaterThan(0);
-  });
-
-  it('should handle form errors from state', () => {
-    component.ngOnInit();
-
-    const stateWithErrors = {
-      subErrors: [
-        { field: 'amount', message: 'Amount is invalid' },
-        { field: 'type', message: 'Type is required' },
-      ],
-    };
-
-    state$.next(stateWithErrors);
-
-    expect(component.errors['amount']).toBe('Amount is invalid');
-    expect(component.errors['type']).toBe('Type is required');
-    expect(component.form.get('amount')?.hasError('incorrect')).toBeTrue();
-    expect(component.form.get('type')?.hasError('incorrect')).toBeTrue();
-  });
-
-  it('should navigate to user overview on success when admin', () => {
-    component.hasAdminRole = true;
-    component.account = mockAccount;
-    component.ngOnInit();
-
-    const stateWithResponse = {
-      response: { success: true },
-    };
-
-    state$.next(stateWithResponse);
+    response$.next({ success: true });
+    fixture.detectChanges();
 
     expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'users', 'customer-123', 'overview']);
   });
 
-  it('should navigate to user overview on success when not admin', () => {
-    component.hasAdminRole = false;
-    component.ngOnInit();
+  it('should navigate to me overview when response arrives (not admin)', () => {
+    authUserSignal.update(prev => ({ ...prev, hasAdminRole: false }));
 
-    const stateWithResponse = {
-      response: { success: true },
-    };
-
-    state$.next(stateWithResponse);
+    response$.next({ success: true });
+    fixture.detectChanges();
 
     expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'overview']);
   });
 
-  it('should return currency icon from account', () => {
-    component.account = mockAccount;
-
-    // Test the actual implementation - just check that it returns something
-    const icon = component.currencyIcon;
-    expect(icon).toBeDefined();
-    expect(typeof icon).toBe('string');
-  });
-
-  it('should return empty string currency icon when no account', () => {
-    component.account = undefined;
-
-    // The currencySymbol function returns empty string when currency is undefined
-    expect(component.currencyIcon).toBe('');
-  });
-
-  it('should return form controls via getForm getter', () => {
-    component.ngOnInit();
-
-    const controls = component.getForm;
-
-    expect(controls.amount).toBe(component.form.get('amount'));
-    expect(controls.type).toBe(component.form.get('type'));
-    expect(controls.transfer).toBe(component.form.get('transfer'));
-    expect(controls.bank).toBe(component.form.get('bank'));
-  });
-
   it('should not submit when form is invalid', () => {
-    component.ngOnInit();
     storeSpy.dispatch.calls.reset();
-
-    void component.submit;
-
+    component.submit();
     expect(storeSpy.dispatch).not.toHaveBeenCalled();
   });
 
-  it('should submit transaction with string payment type', () => {
-    component.ngOnInit();
-    component.account = mockAccount;
-    component['accountId'] = 'account-123';
+  it('should dispatch createTransaction for string PaymentType', () => {
+    accountId$.next('account-123');
+    selectedAccount$.next(mockAccount);
+
+    component.bankForm.patchValue({
+      type: { type: PaymentType.cash } as PaymentOption,
+    });
 
     component.form.patchValue({
       amount: 200,
-      type: PaymentType.cash,
       transfer: 'test-transfer',
     });
 
-    void component.submit;
+    component.submit();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(
       createTransaction({
-        id: 'account-123', transaction: {
+        id: 'account-123',
+        transaction: {
           customerId: 'customer-123',
           amount: 200,
           paymentRequest: {
@@ -316,24 +252,29 @@ describe('TransactionComponent', () => {
     );
   });
 
-  it('should submit transaction with PaymentOption type', () => {
-    component.ngOnInit();
-    component.account = mockAccount;
-    component['accountId'] = 'account-123';
+  it('should dispatch createTransaction for PaymentOption type without subTypes', () => {
+    accountId$.next('account-123');
+    selectedAccount$.next(mockAccount);
 
     const paymentOption = new PaymentOption('Test Payment', PaymentType.paynl, 'test-icon', 'test-image', 'test-bic');
 
+    component.bankForm.patchValue({
+      type: paymentOption,
+    });
+
     component.form.patchValue({
       amount: 300,
-      type: paymentOption,
       transfer: 'test-transfer',
     });
 
-    void component.submit;
+    storeSpy.dispatch.calls.reset();
+
+    component.submit();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(
       createTransaction({
-        id: 'account-123', transaction: {
+        id: 'account-123',
+        transaction: {
           customerId: 'customer-123',
           amount: 300,
           paymentRequest: {
@@ -347,27 +288,37 @@ describe('TransactionComponent', () => {
     );
   });
 
-  it('should submit transaction with PaymentOption with subTypes', () => {
-    component.ngOnInit();
-    component.account = mockAccount;
-    component['accountId'] = 'account-123';
+  it('should dispatch createTransaction for PaymentOption with subTypes and selected bank', () => {
+    accountId$.next('account-123');
+    selectedAccount$.next(mockAccount);
 
     const subOption = new PaymentOption('Sub Option', PaymentType.ideal, 'sub-icon', 'sub-image', 'sub-bic');
-    const paymentOption = new PaymentOption('Test Payment', PaymentType.ideal, 'test-icon', 'test-image', 'test-bic',
-      [subOption]);
+    const paymentOption = new PaymentOption(
+      'Test Payment',
+      PaymentType.ideal,
+      'test-icon',
+      'test-image',
+      'test-bic',
+      [subOption],
+    );
+
+    component.bankForm.patchValue({
+      type: paymentOption,
+      bank: { bic: 'selected-bic' } as PaymentOption,
+    });
 
     component.form.patchValue({
       amount: 400,
-      type: paymentOption,
       transfer: 'test-transfer',
-      bank: { bic: 'selected-bic' },
     });
 
-    void component.submit;
+    storeSpy.dispatch.calls.reset();
+    component.submit();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(
       createTransaction({
-        id: 'account-123', transaction: {
+        id: 'account-123',
+        transaction: {
           customerId: 'customer-123',
           amount: 400,
           paymentRequest: {
@@ -381,57 +332,41 @@ describe('TransactionComponent', () => {
     );
   });
 
-  it('should dispatch PaymentOptions action', () => {
-    component['getOptions']();
+  it('should dispatch paymentOptions action when hasAdminRole() is false and computed runs', () => {
+    storeSpy.dispatch.calls.reset();
+
+    authUserSignal.update(prev => ({ ...prev, hasAdminRole: true }));
+    fixture.detectChanges();
+
+    expect(component.hasAdminRole()).toBeTrue();
+    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(paymentOptions());
+
+    authUserSignal.update(prev => ({ ...prev, hasAdminRole: false }));
+    fixture.detectChanges();
+
+    expect(component.hasAdminRole()).toBeFalse();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentOptions());
   });
 
-  it('should handle case when account ID is not provided', () => {
-    paramMapSpy.get.and.returnValue(null);
+  it('should leave errors when response clears (errors persist until next submission)', () => {
+    subErrors$.next([{ field: 'amount', message: 'Amount is invalid' }]);
+    fixture.detectChanges();
 
-    component.ngOnInit();
+    expect((component.errors() as any)['amount']).toBe('Amount is invalid');
 
-    expect(component['accountId']).toBeUndefined();
+    response$.next({ success: true });
+
+    expect((component.errors() as any)['amount']).toBe('Amount is invalid');
   });
 
-  it('should unsubscribe from all subscriptions on destroy', () => {
-    component['subscription'] = jasmine.createSpyObj('Subscription', ['unsubscribe']);
-    component['authUserServiceSubscription'] = jasmine.createSpyObj('Subscription', ['unsubscribe']);
+  it('should handle empty selector emissions gracefully', () => {
+    selectedAccount$.next(undefined);
+    paymentOptions$.next(undefined);
+    subErrors$.next(undefined);
+    response$.next(undefined);
 
-    component.ngOnDestroy();
-
-    expect(component['subscription']!.unsubscribe).toHaveBeenCalled();
-    expect(component['authUserServiceSubscription'].unsubscribe).toHaveBeenCalled();
-  });
-
-  it('should clear errors when response is successful', () => {
-    component.ngOnInit();
-
-    // First set some errors
-    const stateWithErrors = {
-      subErrors: [{ field: 'amount', message: 'Amount is invalid' }],
-    };
-    state$.next(stateWithErrors);
-
-    expect(component.errors['amount']).toBe('Amount is invalid');
-
-    // Then clear them with successful response
-    const stateWithResponse = {
-      response: { success: true },
-    };
-    state$.next(stateWithResponse);
-
-    // Errors should not be cleared automatically - they persist until next submission
-    expect(component.errors['amount']).toBe('Amount is invalid');
-  });
-
-  it('should handle empty state gracefully', () => {
-    component.ngOnInit();
-
-    state$.next({});
-
-    expect(component.account).toBeUndefined();
-    expect(component.options).toBeUndefined();
+    expect(component.accountSignal()).toBeUndefined();
+    expect(component.optionsSignal()).toBeUndefined();
   });
 });

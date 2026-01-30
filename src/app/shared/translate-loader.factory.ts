@@ -12,7 +12,7 @@ export class TranslateLoaderFactory {
         const currentLang = getLocale(lang).i18n;
         const fileLang = appAvailableLanguages.includes(currentLang) ? currentLang : defaultLanguage;
 
-        return from(import(`../../assets/i18n/${ module }/${ fileLang }.json`));
+        return from(import(`../../assets/i18n/${module}/${fileLang}.json`));
       }
     };
 }
@@ -21,7 +21,7 @@ export class MissingTranslateHandler implements MissingTranslationHandler {
   handle = (params: MissingTranslationHandlerParams): string => params.key;
 
   getValue = (lang: string, key: string): void => {
-    from(import(`../../assets/i18n/me/${ lang }.json`)).subscribe(t => {
+    from(import(`../../assets/i18n/me/${lang}.json`)).subscribe(t => {
       const file = JSON.parse(JSON.stringify(t));
       this.byString(file, key);
     });

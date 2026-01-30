@@ -2,7 +2,7 @@ import { Pagination } from '../../interfaces/pagination';
 import { createReducer, on } from '@ngrx/store';
 
 import {
-  clean,
+  cleanTreatment,
   colorSuccess,
   createTreatment,
   deleteTreatmentGroup,
@@ -11,6 +11,8 @@ import {
   getAllTreatmentsHistory,
   getTreatmentGroup,
   getTreatmentsPage,
+  setCurrentTreatmentId,
+  sortTreatment,
   treatmentFailure,
   treatmentHistorySuccess,
   treatmentSaveSuccess,
@@ -18,31 +20,33 @@ import {
   treatmentSuccess,
   updateTreatmentGroup,
 } from '../treatment.actions';
-import { ITreatmentAll, ITreatmentGroup } from '../../interfaces/treatment';
-import { IColor } from '../../interfaces/color';
+import { ITreatmentAll, ITreatmentGroupAll } from '../../interfaces/treatment';
+import { IColorAll } from '../../interfaces/color';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 
-export interface State {
+export const TREATMENT_FEATURE_KEY = 'treatment';
+
+export interface TreatmentState {
   response?: IResponseSuccess;
-  data?: ITreatmentGroup[] | Pagination<ITreatmentGroup>;
+  data?: ITreatmentGroupAll[] | Pagination<ITreatmentGroupAll>;
   history?: ITreatmentAll[];
-  colors?: IColor[];
-  errorMessage?: string;
+  colors?: IColorAll[];
   error?: IError;
   subErrors?: IError[];
-  selected?: ITreatmentGroup;
+  selected?: ITreatmentGroupAll;
+  currentTreatmentId?: string;
   isLoading: boolean;
 }
 
-export const initialState: State = {
+export const initialState: TreatmentState = {
   data: undefined,
   history: undefined,
   colors: undefined,
-  errorMessage: undefined,
   error: undefined,
   subErrors: undefined,
   selected: undefined,
   response: undefined,
+  currentTreatmentId: undefined,
   isLoading: false,
 };
 
@@ -50,8 +54,7 @@ export const treatmentReducer = createReducer(
   initialState,
   on(getTreatmentsPage, (state) => ({
     ...state,
-    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<ITreatmentGroup>,
-    errorMessage: undefined,
+    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<ITreatmentGroupAll>,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
@@ -59,7 +62,6 @@ export const treatmentReducer = createReducer(
   on(getAllTreatmentsGroup, (state) => ({
     ...state,
     data: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
@@ -67,35 +69,30 @@ export const treatmentReducer = createReducer(
   on(getAllColors, (state) => ({
     ...state,
     colors: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(getTreatmentGroup, (state) => ({
     ...state,
-    selected: {} as ITreatmentGroup,
-    errorMessage: undefined,
+    selected: {} as ITreatmentGroupAll,
     subErrors: undefined,
     response: undefined,
   })),
   on(treatmentSuccess, (state, { data }) => ({
     ...state,
     data,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(colorSuccess, (state, { colors }) => ({
     ...state,
     colors,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(treatmentSaveSuccess, (state, action) => ({
     ...state,
     response: action,
-    errorMessage: undefined,
     selected: undefined,
     subErrors: undefined,
     isLoading: false,
@@ -103,13 +100,11 @@ export const treatmentReducer = createReducer(
   on(treatmentSelected, (state, { selected }) => ({
     ...state,
     selected,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(treatmentFailure, (state, { error }) => ({
     ...state,
-    errorMessage: error.message,
     error,
     subErrors: error.subErrors,
     response: undefined,
@@ -117,7 +112,6 @@ export const treatmentReducer = createReducer(
   })),
   on(updateTreatmentGroup, createTreatment, deleteTreatmentGroup, (state) => ({
     ...state,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
     selected: undefined,
@@ -126,7 +120,6 @@ export const treatmentReducer = createReducer(
   on(getAllTreatmentsHistory, (state) => ({
     ...state,
     history: [{} as ITreatmentAll, {} as ITreatmentAll, {} as ITreatmentAll],
-    errorMessage: undefined,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
@@ -134,9 +127,18 @@ export const treatmentReducer = createReducer(
   on(treatmentHistorySuccess, (state, { history }) => ({
     ...state,
     history,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
-  on(clean, () => initialState),
+  on(sortTreatment, (state) => ({
+    ...state,
+    selected: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(setCurrentTreatmentId, (state, { treatmentId }) => ({
+    ...state,
+    currentTreatmentId: treatmentId,
+  })),
+  on(cleanTreatment, () => initialState),
 );

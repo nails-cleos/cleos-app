@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { IError, IResponseSuccess, ResponseSuccess } from '../interfaces/common';
+import { IError, IResponseSuccess } from '../interfaces/common';
 import { IPayment, IPaymentOption, IPaymentRequest, PaymentStatus } from '../interfaces/payment';
 import { IReservationPayment } from '../interfaces/reservation';
 
@@ -19,6 +19,9 @@ enum PaymentActionTypes {
   getPayment = '[Payment] Find payment by ID',
   getPaymentOptions = '[Payment] Payment options',
   createPaymentLinkByReservationId = '[Payment] Create payment link',
+  setPaymentResultParams = '[Payment] Set payment result params',
+  setCurrentPaymentId = '[Payment] Set current payment id',
+  setCurrentPathId = '[Payment] Set current path id',
   clean = '[Payment] Clean',
 }
 
@@ -70,7 +73,7 @@ export const notifyPayment = createAction(
 
 export const paymentSaveSuccess = createAction(
   PaymentActionTypes.paymentSaveSuccess,
-  props<ResponseSuccess>(),
+  props<IResponseSuccess>(),
 );
 
 export const paymentFailure = createAction(
@@ -100,4 +103,30 @@ export const createPaymentLinkByReservationId = createAction(
   props<{ reservationId: string; payment: IReservationPayment }>(),
 );
 
-export const clean = createAction(PaymentActionTypes.clean);
+export const setPaymentResultParams = createAction(
+  PaymentActionTypes.setPaymentResultParams,
+  props<{
+    path: 'reservation' | 'transaction';
+    id: string;
+    status: string;
+    paymentId: string;
+    preferenceId?: string;
+    payerId?: string;
+    token?: string;
+    reason?: string;
+    orderId?: string;
+    orderStatusId?: string;
+  }>(),
+);
+
+export const setCurrentPaymentId = createAction(
+  PaymentActionTypes.setCurrentPaymentId,
+  props<{ paymentId: string; }>(),
+);
+
+export const setCurrentPathId = createAction(
+  PaymentActionTypes.setCurrentPathId,
+  props<{ path: 'reservation' | 'transaction'; id: string }>(),
+);
+
+export const cleanPayment = createAction(PaymentActionTypes.clean);

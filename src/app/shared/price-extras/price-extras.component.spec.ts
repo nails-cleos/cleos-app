@@ -10,7 +10,7 @@ describe('PriceExtrasComponent', () => {
     await TestBed.configureTestingModule({
       imports: [PriceExtrasComponent],
     }).compileComponents();
-    
+
     fixture = TestBed.createComponent(PriceExtrasComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

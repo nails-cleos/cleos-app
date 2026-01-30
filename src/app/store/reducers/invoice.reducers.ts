@@ -1,35 +1,37 @@
 import {
-  clean,
-  getAllMyOffices,
+  cleanInvoice,
+  getInvoicesPage,
   getOfficeToInvoice,
   invoiceFailure,
-  invoiceOfficesSuccess,
+  invoicePageSuccess,
+  invoiceSaveSuccess,
   invoiceSuccess,
   updateOfficeById,
+  uploadInvoices,
 } from '../invoice.actions';
-import { IOffice } from '../../interfaces/office';
-import { IInvoice } from '../../interfaces/invoice';
-import { IError } from '../../interfaces/common';
+import { IInvoice, IInvoiceData } from '../../interfaces/invoice';
+import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
+import { Pagination } from '../../interfaces/pagination';
 
-export interface State {
+export const INVOICE_FEATURE_KEY = 'invoice';
+
+export interface InvoiceState {
+  response?: IResponseSuccess;
   data?: IInvoice[];
-  offices?: IOffice[];
-  errorMessage?: string;
+  page?: Pagination<IInvoiceData>;
   error?: IError;
   subErrors?: IError[];
   isLoading: boolean;
-  changes: boolean;
 }
 
-export const initialState: State = {
+export const initialState: InvoiceState = {
+  response: undefined,
   data: undefined,
-  errorMessage: undefined,
+  page: undefined,
   error: undefined,
   subErrors: undefined,
-  offices: undefined,
   isLoading: false,
-  changes: true,
 };
 
 export const invoiceReducer = createReducer(
@@ -37,48 +39,57 @@ export const invoiceReducer = createReducer(
   on(getOfficeToInvoice, (state) => ({
     ...state,
     data: [{} as IInvoice, {} as IInvoice, {} as IInvoice],
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
-    changes: true,
+    response: undefined,
+  })),
+  on(getInvoicesPage, (state) => ({
+    ...state,
+    page: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IInvoiceData>,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
   })),
   on(invoiceSuccess, (state, { data }) => ({
     ...state,
-    data: data,
-    errorMessage: undefined,
+    data,
     error: undefined,
     subErrors: undefined,
-    changes: true,
+    response: undefined,
   })),
-  on(getAllMyOffices, (state) => ({
+  on(invoicePageSuccess, (state, { page }) => ({
     ...state,
-    offices: undefined,
-    errorMessage: undefined,
+    page,
     error: undefined,
     subErrors: undefined,
-    changes: false,
-  })),
-  on(invoiceOfficesSuccess, (state, { offices }) => ({
-    ...state,
-    offices: offices,
-    errorMessage: undefined,
-    error: undefined,
-    subErrors: undefined,
-    changes: false,
+    response: undefined,
   })),
   on(invoiceFailure, (state, { error }) => ({
     ...state,
-    errorMessage: error.message,
     error: error,
     subErrors: error.subErrors,
-    changes: false,
+    response: undefined,
+    isLoading: false,
   })),
   on(updateOfficeById, (state) => ({
     ...state,
-    errorMessage: undefined,
     error: undefined,
     subErrors: undefined,
-    changes: false,
+    response: undefined,
   })),
-  on(clean, () => initialState),
+  on(uploadInvoices, (state) => ({
+    ...state,
+    isLoading: true,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+  })),
+  on(invoiceSaveSuccess, (state, action) => ({
+    ...state,
+    isLoading: false,
+    error: undefined,
+    subErrors: undefined,
+    response: action,
+  })),
+  on(cleanInvoice, () => initialState),
 );

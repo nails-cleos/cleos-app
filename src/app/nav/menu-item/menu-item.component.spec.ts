@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MenuItemComponent } from './menu-item.component';
 import { Router } from '@angular/router';
-import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
+import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
+import { MatDrawer } from '@angular/material/sidenav';
 
 describe('MenuItemComponent', () => {
   let component: MenuItemComponent;
@@ -13,13 +14,11 @@ describe('MenuItemComponent', () => {
 
   let routerSpy: jasmine.SpyObj<Router>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let translateSpy: jasmine.SpyObj<TranslateService>;
 
   beforeEach(async () => {
     breakpoint$ = new Subject<BreakpointState>();
 
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    translateSpy = jasmine.createSpyObj('TranslateService', [], { currentLang: 'en' });
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
@@ -28,39 +27,44 @@ describe('MenuItemComponent', () => {
       providers: [
         { provide: Router, useValue: routerSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     }).compileComponents();
 
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
+
     fixture = TestBed.createComponent(MenuItemComponent);
     component = fixture.componentInstance;
+
+    fixture.componentRef.setInput('items', []);
+
+    fixture.detectChanges();
   });
 
   afterEach(() => breakpoint$.complete());
 
   it('should create', () => {
-    fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 
   it('should set language from TranslateService', () => {
-    expect(component.language).toBe('en');
+    expect(component.language).toBe('en-GB');
   });
 
   it('should call router.navigate and drawer.toggle when navigate is called', () => {
     const menu = { path: 'dashboard/home' } as any;
-    const drawer = { toggle: jasmine.createSpy('toggle') };
+    const drawer = { toggle: jasmine.createSpy('toggle') } as unknown as MatDrawer;
 
     component.navigate(menu, drawer);
 
     expect(drawer.toggle).toHaveBeenCalled();
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en', 'dashboard', 'home']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'dashboard', 'home']);
   });
 
   it('should call router.navigate without drawer when drawer is not provided', () => {
     const menu = { path: 'settings/account' } as any;
     component.navigate(menu);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en', 'settings', 'account']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'settings', 'account']);
   });
 
   describe('toggleSubMenu', () => {
@@ -140,12 +144,26 @@ describe('MenuItemComponent', () => {
   });
 
   it('should update isHandset$ when breakpoint changes', () => {
-    const emittedValues: boolean[] = [];
-    component.isHandset$.subscribe(value => emittedValues.push(value));
+    breakpoint$.next({
+      matches: true,
+      breakpoints: {
+        [Breakpoints.XSmall]: true,
+        [Breakpoints.Small]: true,
+        [Breakpoints.Medium]: true,
+      },
+    });
+    fixture.detectChanges();
+    expect(component.isHandsetSignal()).toBeTrue();
 
-    breakpoint$.next({ matches: true } as BreakpointState);
-    breakpoint$.next({ matches: false } as BreakpointState);
-
-    expect(emittedValues).toEqual([true, false]);
+    breakpoint$.next({
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
+        [Breakpoints.Medium]: false,
+      },
+    });
+    fixture.detectChanges();
+    expect(component.isHandsetSignal()).toBeFalse();
   });
 });

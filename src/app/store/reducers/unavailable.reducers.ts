@@ -1,11 +1,11 @@
 import { createReducer, on } from '@ngrx/store';
 import { Pagination } from '../../interfaces/pagination';
-import { IUnavailable } from '../../interfaces/unavailable';
-import { IUser } from '../../interfaces/user';
-import { IRoom } from '../../interfaces/room';
+import { IUnavailableAll } from '../../interfaces/unavailable';
+import { IUserAll } from '../../interfaces/user';
+import { IRoomAll } from '../../interfaces/room';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import {
-  clean,
+  cleanUnavailable,
   createBlockAgenda,
   createUnavailable,
   deleteUnavailable,
@@ -15,6 +15,8 @@ import {
   getUnavailablePage,
   professionalSuccess,
   roomSuccess,
+  setCurrentUnavailableId,
+  setUnavailableParams,
   unavailableFailure,
   unavailableSaveSuccess,
   unavailableSelected,
@@ -22,27 +24,31 @@ import {
   updateUnavailable,
 } from '../unavailable.actions';
 
-export interface State {
+export const UNAVAILABLE_FEATURE_KEY = 'unavailable';
+
+export interface UnavailableState {
   response?: IResponseSuccess;
-  data?: Pagination<IUnavailable>;
-  professionals?: IUser[];
-  rooms?: IRoom[];
-  errorMessage?: string;
+  data?: Pagination<IUnavailableAll>;
+  professionals?: IUserAll[];
+  rooms?: IRoomAll[];
   error?: IError;
   subErrors?: IError[];
-  selected?: IUnavailable;
+  selected?: IUnavailableAll;
+  currentUnavailableId?: string;
+  unavailableParams?: { date?: Date; room?: IRoomAll; };
   isLoading: boolean;
 }
 
-export const initialState: State = {
+export const initialState: UnavailableState = {
   data: undefined,
   professionals: undefined,
   rooms: undefined,
-  errorMessage: undefined,
   error: undefined,
   subErrors: undefined,
   selected: undefined,
   response: undefined,
+  currentUnavailableId: undefined,
+  unavailableParams: undefined,
   isLoading: false,
 };
 
@@ -50,8 +56,7 @@ export const unavailableReducer = createReducer(
   initialState,
   on(getUnavailablePage, (state) => ({
     ...state,
-    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IUnavailable>,
-    errorMessage: undefined,
+    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IUnavailableAll>,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
@@ -59,35 +64,30 @@ export const unavailableReducer = createReducer(
   on(getAllProfessional, (state) => ({
     ...state,
     professionals: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(getAllRoomsByProfessionalId, (state) => ({
     ...state,
     rooms: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(getUnavailable, (state) => ({
     ...state,
-    selected: {} as IUnavailable,
-    errorMessage: undefined,
+    selected: {} as IUnavailableAll,
     subErrors: undefined,
     response: undefined,
   })),
   on(unavailableSuccess, (state, { data }) => ({
     ...state,
     data,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(professionalSuccess, (state, { professionals }) => ({
     ...state,
     professionals,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
@@ -95,20 +95,17 @@ export const unavailableReducer = createReducer(
     ...state,
     response,
     selected: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     isLoading: false,
   })),
   on(unavailableSelected, (state, { selected }) => ({
     ...state,
     selected,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
   on(unavailableFailure, (state, { error }) => ({
     ...state,
-    errorMessage: error.message,
     error,
     subErrors: error.subErrors,
     response: undefined,
@@ -117,7 +114,6 @@ export const unavailableReducer = createReducer(
   on(updateUnavailable, createUnavailable, createBlockAgenda, deleteUnavailable, (state) => ({
     ...state,
     error: undefined,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
     isLoading: true,
@@ -125,9 +121,16 @@ export const unavailableReducer = createReducer(
   on(roomSuccess, (state, { rooms }) => ({
     ...state,
     rooms,
-    errorMessage: undefined,
     subErrors: undefined,
     response: undefined,
   })),
-  on(clean, () => initialState),
+  on(setCurrentUnavailableId, (state, { unavailableId }) => ({
+    ...state,
+    currentUnavailableId: unavailableId,
+  })),
+  on(setUnavailableParams, (state, { date, room }) => ({
+    ...state,
+    unavailableParams: { date, room },
+  })),
+  on(cleanUnavailable, () => initialState),
 );

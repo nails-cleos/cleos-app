@@ -3,17 +3,17 @@
   <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
     <mat-form-field appearance="outline" class="full">
       <mat-label>{{ 'RESERVATION.DATE.FIELD' | translate }}</mat-label>
-      <input (focus)="picker.open()" [formControl]="date" [matDatepickerFilter]="myFilter"
+      <input (focus)="picker.open()" [formControl]="getForm.date" [matDatepickerFilter]="myFilter"
              [matDatepicker]="picker" [max]="maxCalendarDate" matInput required>
       <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
       <mat-datepicker #picker touchUi></mat-datepicker>
-      @if (date.hasError('required')) {
+      @if (getForm.date.hasError('required')) {
         <mat-error [innerHTML]="'RESERVATION.DATE.REQUIRED' | translate"></mat-error>
       }
     </mat-form-field>
     <mat-form-field appearance="outline" class="full">
       <mat-label>{{ 'RESERVATION.START.FIELD' | translate }}</mat-label>
-      <input [formControl]="time" [format]="24" [max]="maxDate" [min]="minDate" [ngxTimepicker]="t"
+      <input [formControl]="getForm.time" [format]="24" [max]="maxDate()" [min]="minDate()" [ngxTimepicker]="t"
              matInput name="time" readonly/>
       <span matPrefix> &nbsp;<mat-icon (click)="t.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
       <ngx-material-timepicker #t [minutesGap]="15"></ngx-material-timepicker>

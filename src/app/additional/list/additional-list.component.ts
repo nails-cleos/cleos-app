@@ -1,21 +1,21 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { DEFAULT_LENGTH, MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { IAdditional } from '../../interfaces/additional';
-import { Observable, Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { AppState, selectAdditionalState } from '../../store/app.states';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { convertDuration } from '../../util/dates';
 import { detailExpandAnimation } from '../../util/animation';
 import { executeDialogNoWidth } from '../../util/helper';
 import { SharedModule } from '../../shared/shared.module';
-import { additionalSelected, deleteAdditional, getAdditionalPage, clean } from '../../store/additional.actions';
+import { additionalSelected, cleanAdditional, deleteAdditional, getAdditionalPage } from '../../store/additional.actions';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { getAdditionalPaginationPipe, getAdditionalResponsePipe } from '../../store/selectors/additional.selectors';
+import { AdditionalState } from '../../store/reducers/additional.reducers';
 
 @Component({
   selector: 'app-additional-list',
@@ -23,50 +23,85 @@ import { additionalSelected, deleteAdditional, getAdditionalPage, clean } from '
   styleUrls: ['./additional-list.component.scss'],
   animations: [detailExpandAnimation],
   imports: [SharedModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+export class AdditionalListComponent {
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly store: Store<AdditionalState> = inject(Store<AdditionalState>);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly dialog: MatDialog = inject(MatDialog);
+
+  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private additionalList$ = this.store.pipe(getAdditionalPaginationPipe);
+  private response$ = this.store.pipe(getAdditionalResponsePipe);
+
+  private paginator = viewChild(MatPaginator);
+  private sort = viewChild(MatSort);
+
+  private additionalListSignal = toSignal(this.additionalList$);
+  private responseSignal = toSignal(this.response$);
+  private breakpointsSignal = toSignal(
+    this.breakpointObserver$, {
+      initialValue: {
+        matches: false,
+        breakpoints: {
+          [Breakpoints.XSmall]: false,
+          [Breakpoints.Small]: false,
+        },
+      },
+    },
+  );
+
+  private sortActive = computed(() => this.sort()?.active ?? 'order');
+  private sortDirection = computed(() => this.sort()?.direction ?? 'asc');
+
+  paginatorPageIndex = signal(0);
+  dataSourceSignal = computed(() => this.additionalListSignal()?.content?.map((additional: IAdditional) => {
+    if (additional.duration) {
+      const duration = convertDuration(additional.duration);
+
+      return Object.assign({}, additional, { hour: duration.hour, minute: duration.minute });
+    }
+    return additional;
+  }));
+  resultsLengthSignal = computed(() => this.additionalListSignal()?.totalElements || 0);
+  pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
   displayedColumns: string[] = ['order', 'name', 'description', 'duration', 'actions'];
-  dataSource: any = new MatTableDataSource<Pagination<IAdditional>>();
 
   expandedAdditional: IAdditional | undefined;
 
-  resultsLength = DEFAULT_LENGTH;
-  pageSize = PAGE_SIZE;
-  language: string;
+  language: string = this.translate.getCurrentLang();
 
-  private subscription: Subscription | undefined;
-  private paginatorSubscription: Subscription | undefined;
-  private getState: Observable<any>;
-
-  constructor(private readonly translate: TranslateService, public dialog: MatDialog, private store: Store<AppState>,
-              private cdRef: ChangeDetectorRef, breakpointObserver: BreakpointObserver) {
-    breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small,
-    ]).subscribe(result => {
-      if (result.matches) {
-        this.pageSize = MOBILE_PAGE_SIZE;
+  constructor() {
+    effect((onCleanup) => {
+      const paginator = this.paginator();
+      if (paginator) {
+        const sub = paginator.page.subscribe((pageEvent) => {
+          this.paginatorPageIndex.set(pageEvent.pageIndex);
+        });
+        onCleanup(() => sub.unsubscribe());
       }
     });
-    this.getState = this.store.select(selectAdditionalState);
-    this.language = this.translate.currentLang;
-  }
 
-  ngAfterViewInit(): void {
-    this.getAdditionalList();
-  }
+    effect(() => {
+      const page = this.paginatorPageIndex();
+      this.store.dispatch(
+        getAdditionalPage({
+          page: page,
+          sort: this.sortActive(),
+          direction: this.sortDirection(),
+          size: this.pageSizeSignal(),
+        }),
+      );
+    });
 
-  ngOnInit(): void {
-    this.clean();
-    this.subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-    this.paginatorSubscription?.unsubscribe();
+    effect(() => {
+      if (this.responseSignal()) {
+        this.store.dispatch(cleanAdditional());
+        this.paginator()?.firstPage();
+      }
+    });
   }
 
   edit = (selected: IAdditional): void => this.store.dispatch(
@@ -82,43 +117,6 @@ export class AdditionalListComponent implements OnInit, AfterViewInit, OnDestroy
         this.store.dispatch(
           deleteAdditional({ id: result.id, name: result.name }),
         );
-      }
-    });
-  };
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private createPageSubscriptions = (): void => {
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.getAdditionalList();
-    });
-    this.paginatorSubscription = this.paginator?.page.subscribe(() => this.getAdditionalList(this.paginator.pageIndex));
-
-    this.cdRef.detectChanges();
-  };
-
-  private getAdditionalList = (page: number = 0): void => this.store.dispatch(
-    getAdditionalPage({ page: page, sort: this.sort.active, direction: this.sort.direction, size: this.pageSize }),
-  );
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.response) {
-        this.clean();
-        this.getAdditionalList();
-      }
-      this.dataSource = state.data?.content?.map((additional: IAdditional) => {
-        if (additional.duration) {
-          const duration = convertDuration(additional.duration);
-
-          return Object.assign({}, additional, { hour: duration.hour, minute: duration.minute });
-        }
-        return additional;
-      });
-      this.resultsLength = state.data?.totalElements;
-      if (!this.paginatorSubscription && this.resultsLength) {
-        this.createPageSubscriptions();
       }
     });
   };

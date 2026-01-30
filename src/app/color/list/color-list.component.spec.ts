@@ -1,312 +1,194 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import { BehaviorSubject, of } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { TranslateModule } from '@ngx-translate/core';
-import { BreakpointObserver } from '@angular/cdk/layout';
-import { ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute, ParamMap } from '@angular/router';
-import { of, Subject } from 'rxjs';
-
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ColorListComponent } from './color-list.component';
 import { IColor } from '../../interfaces/color';
-import { PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import { clean, colorSelected, deleteColor, getColorsPage } from '../../store/color.actions';
-import { AppState } from '../../store/app.states';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { colorSelected, deleteColor, getColorsPage } from '../../store/color.actions';
+import { ActivatedRoute } from '@angular/router';
+import { signal } from '@angular/core';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { ColorState } from '../../store/reducers/color.reducers';
 
 describe('ColorListComponent', () => {
   let component: ColorListComponent;
   let fixture: ComponentFixture<ColorListComponent>;
-
-  let state$: Subject<any>;
-
-  let storeSpy: jasmine.SpyObj<Store<AppState>>;
+  let storeSpy: jasmine.SpyObj<Store<ColorState>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let dialogSpy: jasmine.Spy<any>;
+  let translate: TranslateService;
+  let dialogSpy: jasmine.SpyObj<any>;
 
-  const mockColors: IColor[] = [
-    { id: '1', name: 'Red', description: 'Red color' },
-    { id: '2', name: 'Blue', description: 'Blue color' },
-    { id: '3', name: 'Green', description: 'Green color' },
+  const mockColor: IColor[] = [
+    { id: '1', name: 'Color 1', description: 'Desc 1' },
+    { id: '2', name: 'Color 2', description: 'Desc 2' },
   ];
 
-  const mockPagination: Pagination<IColor> = {
-    content: mockColors,
-    totalElements: 3,
-    totalPages: 1,
-    number: 0,
+  const mockPagination = {
+    content: mockColor,
+    totalElements: 2,
   };
 
-  beforeEach(async () => {
-    state$ = new Subject();
+  let colorList$: BehaviorSubject<any>;
+  let breakpoint$: BehaviorSubject<any>;
+  let response$: BehaviorSubject<any>;
 
-    const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
-    storeSpy = jasmine.createSpyObj('Store', ['select', 'dispatch']);
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: paramMapSpy,
+  beforeEach(async () => {
+    colorList$ = new BehaviorSubject(mockPagination);
+    response$ = new BehaviorSubject<any>(undefined);
+    breakpoint$ = new BehaviorSubject<any>({
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
       },
     });
 
-    paramMapSpy.get.and.returnValue(null);
-    storeSpy.select.and.returnValue(state$.asObservable());
-    breakpointObserverSpy.observe.and.returnValue(of({ matches: false, breakpoints: {} }));
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      snapshot: {
+        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+      },
+    });
+
+    let pipeCallIndex = 0;
+    storeSpy.pipe.and.callFake(() => {
+      pipeCallIndex++;
+      switch (pipeCallIndex) {
+        case 1:
+          return colorList$.asObservable();
+        case 2:
+          return response$.asObservable();
+        default:
+          return new BehaviorSubject(undefined).asObservable();
+      }
+    });
+
+    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [ColorListComponent, TranslateModule.forRoot(), NoopAnimationsModule],
+      imports: [ColorListComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
-        { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        provideNoopAnimations(),
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ColorListComponent);
     component = fixture.componentInstance;
 
-    // Set up mock paginator and sort before initialization to prevent errors
-    component.paginator = {
-      pageIndex: 0,
-      page: of({ pageIndex: 0, pageSize: PAGE_SIZE }),
-    } as unknown as MatPaginator;
+    translate = TestBed.inject(TranslateService);
+    translate.use('en-GB');
 
-    component.sort = {
-      sortChange: of(),
-      active: 'name',
-      direction: 'asc',
-    } as unknown as MatSort;
+    fixture.detectChanges();
 
-    dialogSpy = spyOn(component.dialog, 'open');
+    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
-  afterEach(() => state$.complete());
+  afterEach(() => {
+    colorList$.complete();
+    response$.complete();
+    breakpoint$.complete();
+  });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize with default values', () => {
-    expect(component.displayedColumns).toEqual(['position', 'name', 'description', 'actions']);
-    expect(component.dataSource).toBeInstanceOf(MatTableDataSource);
-    expect(component.pageSize).toBe(PAGE_SIZE);
+  it('should compute dataSourceSignal correctly', () => {
+    colorList$.next(mockPagination);
+    fixture.detectChanges();
+
+    const data = component.dataSourceSignal() as any;
+    expect(data?.length).toBe(2);
   });
 
-  it('should dispatch Clean action on initialization', () => {
-    // Reset to check only the initialization call
-    storeSpy.dispatch.calls.reset();
-    component.ngOnInit();
+  it('should compute resultsLengthSignal correctly', () => {
+    colorList$.next(mockPagination);
+    fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
+    expect(component.resultsLengthSignal()).toBe(2);
   });
 
-  it('should call getColorList after view init', () => {
-    spyOn(component as any, 'getColorList');
-
-    component.ngAfterViewInit();
-
-    expect(component['getColorList']).toHaveBeenCalled();
-  });
-
-  it('should update data source when state changes', () => {
-    component.ngOnInit();
-
-    state$.next({
-      data: mockPagination,
+  it('should set mobile page size when small breakpoint matches', () => {
+    breakpoint$.next({
+      matches: true,
+      breakpoints: {
+        [Breakpoints.XSmall]: true,
+        [Breakpoints.Small]: true,
+      },
     });
+    fixture.detectChanges();
 
-    expect(component.dataSource).toBe(mockColors);
-    expect(component.resultsLength).toBe(3);
+    expect(component.pageSizeSignal()).toBe(MOBILE_PAGE_SIZE);
   });
 
-  it('should clean and get color list on response', () => {
-    component.ngOnInit();
-    component.ngAfterViewInit();
-
-    state$.next({
-      response: true,
+  it('should keep default page size when breakpoint does not match', () => {
+    breakpoint$.next({
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
+      },
     });
+    fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(clean());
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getColorsPage({
-      page: 0,
-      sort: 'name',
-      direction: 'asc',
-      size: PAGE_SIZE,
-    }));
+    expect(component.pageSizeSignal()).toBe(PAGE_SIZE);
   });
 
-  it('should create page subscriptions when results length is available', () => {
-    component.ngOnInit();
+  it('should dispatch getColorPage when paginatorPageIndex changes', () => {
+    component.paginatorPageIndex.set(1);
+    fixture.detectChanges();
 
-    component.paginator = {
-      pageIndex: 0,
-      page: of({ pageIndex: 0, pageSize: PAGE_SIZE }),
-    } as unknown as MatPaginator;
-
-    component.sort = {
-      sortChange: of({ active: 'name', direction: 'asc' }),
-      active: 'name',
-      direction: 'asc',
-    } as unknown as MatSort;
-
-    spyOn(component as any, 'createPageSubscriptions');
-
-    state$.next({
-      data: mockPagination,
-    });
-
-    expect(component['createPageSubscriptions']).toHaveBeenCalled();
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(
+      getColorsPage({
+        page: 1,
+        sort: 'name',
+        direction: 'asc',
+        size: PAGE_SIZE,
+      }),
+    );
   });
 
-  it('should dispatch ColorSelected action when edit is called', () => {
-    const testColor = mockColors[0];
+  it('should dispatch clean and reset paginator when responseSignal emits', () => {
+    const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
 
-    component.edit(testColor);
+    component['paginator'] = signal(paginatorMock);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(colorSelected({ selected: testColor }));
+    response$.next({ success: true });
+
+    fixture.detectChanges();
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(
+      getColorsPage({
+        page: 0,
+        sort: 'name',
+        direction: 'asc',
+        size: PAGE_SIZE,
+      }),
+    );
   });
 
-  it('should unsubscribe from subscriptions on destroy', () => {
-    const subscription = jasmine.createSpy('subscription');
-    const paginatorSubscription = jasmine.createSpy('paginatorSubscription');
+  it('should dispatch colorSelected when edit is called', () => {
+    const item = mockColor[0];
+    component.edit(item);
 
-    component['subscription'] = { unsubscribe: subscription } as any;
-    component['paginatorSubscription'] = { unsubscribe: paginatorSubscription } as any;
-
-    component.ngOnDestroy();
-
-    expect(subscription).toHaveBeenCalled();
-    expect(paginatorSubscription).toHaveBeenCalled();
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(colorSelected({ selected: item }));
   });
 
-  it('should handle missing subscriptions on destroy', () => {
-    component['subscription'] = undefined;
-    component['paginatorSubscription'] = undefined;
-
-    expect(() => component.ngOnDestroy()).not.toThrow();
-  });
-
-  it('should reset paginator page index when sort changes', () => {
-    const sortChangeSubject = new Subject();
-
-    component.paginator = {
-      pageIndex: 5,
-      page: of({ pageIndex: 0, pageSize: PAGE_SIZE }),
-    } as unknown as MatPaginator;
-
-    component.sort = {
-      sortChange: sortChangeSubject.asObservable(),
-      active: 'name',
-      direction: 'asc',
-    } as unknown as MatSort;
-
-    spyOn(component as any, 'getColorList');
-    component['createPageSubscriptions']();
-
-    sortChangeSubject.next({ active: 'description', direction: 'desc' });
-
-    expect(component.paginator.pageIndex).toBe(0);
-    expect(component['getColorList']).toHaveBeenCalled();
-  });
-
-  it('should handle paginator page changes', () => {
-    const pageSubject = new Subject();
-    component.paginator = {
-      pageIndex: 1,
-      page: pageSubject.asObservable(),
-    } as unknown as MatPaginator;
-
-    component.sort = {
-      sortChange: of(),
-      active: 'name',
-      direction: 'asc',
-    } as unknown as MatSort;
-
-    spyOn(component as any, 'getColorList');
-    component['createPageSubscriptions']();
-
-    pageSubject.next({ pageIndex: 1, pageSize: PAGE_SIZE });
-
-    expect(component['getColorList']).toHaveBeenCalled();
-  });
-
-  it('should dispatch GetColorsPage action with correct parameters', () => {
-    component.sort = {
-      active: 'name',
-      direction: 'asc',
-    } as unknown as MatSort;
-
-    component['getColorList'](2);
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getColorsPage(
-      { page: 2, size: PAGE_SIZE, sort: 'name', direction: 'asc' },
-    ));
-  });
-
-  it('should handle undefined expanded color', () => {
-    expect(component.expandedColor).toBeUndefined();
-
-    component.expandedColor = mockColors[0];
-    expect(component.expandedColor).toBe(mockColors[0]);
-  });
-
-  it('should handle state subscription errors gracefully', () => {
-    expect(() => {
-      state$.next({
-        data: null,
-      });
-    }).not.toThrow();
-  });
-
-  it('should handle empty pagination data', () => {
-    component.ngOnInit();
-    const emptyPagination: Pagination<IColor> = {
-      content: [],
-      totalElements: 0,
-      totalPages: 0,
-      number: 0,
-    };
-
-    state$.next({
-      data: emptyPagination,
-    });
-
-    expect(component.dataSource).toEqual([]);
-    expect(component.resultsLength).toBe(0);
-  });
-
-  it('should initialize with correct state observable', () => {
-    expect(storeSpy.select).toHaveBeenCalled();
-  });
-
-  it('should maintain correct displayedColumns order', () => {
-    const expectedColumns = ['position', 'name', 'description', 'actions'];
-    expect(component.displayedColumns).toEqual(expectedColumns);
-  });
-
-  it('should handle mobile breakpoint adjustment', () => {
-    // Test is handled by component initialization with BreakpointObserver
-    // The mobile adjustment happens in constructor based on breakpoint observer
-    expect(component.pageSize).toBeDefined();
-  });
-
-  it('should call delete method without errors', () => {
-    component.ngOnInit();
-
-    const testColor = mockColors[0] as unknown as IColor;
-
+  it('should dispatch deleteColor when dialog returns a result', () => {
+    const item = mockColor[0];
     dialogSpy.and.returnValue({
-      afterClosed: () => of(testColor),
-    });
+      afterClosed: () => of(item),
+    } as any);
 
-    component.delete(testColor);
+    component.delete(item);
 
     expect(dialogSpy).toHaveBeenCalledWith(
       jasmine.any(Function),
@@ -314,10 +196,10 @@ describe('ColorListComponent', () => {
         data: {
           title: 'COLOR.DELETED.TITLE',
           content: 'COLOR.DELETED.CONTENT',
-          value: testColor,
+          value: item,
         },
       }));
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteColor({ id: testColor.id!, name: testColor.name! }));
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteColor({ id: item.id!, name: item.name! }));
   });
 });

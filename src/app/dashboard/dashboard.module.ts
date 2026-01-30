@@ -1,12 +1,14 @@
 import { NgModule } from '@angular/core';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { EffectsModule } from '@ngrx/effects';
-import { DashboardComponent } from './dashboard.component';
-import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
-import { DashboardEffects } from '../store/effects/dashboard.effects';
 import { DashboardRoutingModule } from './dashboard-routing.module';
-import { ReservationEffects } from '../store/effects/reservation.effects';
+
+import { DashboardComponent } from './dashboard.component';
+import { MiniCardComponent } from './mini-card/mini-card.component';
+import { ReservationTableComponent } from './reservation/table/reservation-table.component';
 import { DashboardService } from '../services/dashboard.service';
+import { provideEffects } from '@ngrx/effects';
+import { DashboardEffects } from '../store/effects/dashboard.effects';
+import { ReservationEffects } from '../store/effects/reservation.effects';
 import { ReservationService } from '../services/reservation.service';
 import { PaymentService } from '../services/payment.service';
 import { TreatmentService } from '../services/treatment.service';
@@ -14,15 +16,40 @@ import { RoomService } from '../services/room.service';
 import { UserService } from '../services/user.service';
 import { AdditionalService } from '../services/additional.service';
 import { TrackingService } from '../services/tracking.service';
-import { DayViewSchedulerComponent } from './day-view-scheduler.component';
+import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { ColorService } from '../services/color.service';
-import { Store } from '@ngrx/store';
-import { AppState, selectI18nState } from '../store/app.states';
-import { Observable } from 'rxjs';
+import { MonthSummaryComponent } from './month-summary/month-summary.component';
+import { YearSummaryComponent } from './year-summary/year-summary.component';
+import { YearComponent } from './year-summary/year/year.component';
+import { QuarterSummaryComponent } from './quarter-summary/quarter-summary.component';
+import { MonthComponent } from './month-summary/month/month.component';
+import { QuarterComponent } from './quarter-summary/quarter/quarter.component';
+import { TotalSummaryComponent } from './total-summary/total-summary.component';
+import { provideState, Store } from '@ngrx/store';
+import { ResultSummaryComponent } from './result-summary/result-summary.component';
+import { TotalSummaryItemComponent } from './total-summary-item/total-summary-item.component';
+import { DASHBOARD_FEATURE_KEY, dashboardReducer } from '../store/reducers/dashboard.reducers';
+import { DashboardNavigationEffects } from './dashboard-navigation.effects';
+import { DayViewSchedulerComponent } from './events/day-view-scheduler.component';
+import { DashboardEventComponent } from './events/dashboard-event.component';
+import { I18NState } from '../store/reducers/i18n.reducers';
+import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
 
 @NgModule({
   imports: [
     DashboardComponent,
+    DashboardEventComponent,
+    MiniCardComponent,
+    ReservationTableComponent,
+    MonthSummaryComponent,
+    YearSummaryComponent,
+    YearComponent,
+    QuarterSummaryComponent,
+    MonthComponent,
+    QuarterComponent,
+    TotalSummaryComponent,
+    ResultSummaryComponent,
+    TotalSummaryItemComponent,
     DayViewSchedulerComponent,
     DashboardRoutingModule,
     TranslateModule.forChild({
@@ -37,7 +64,6 @@ import { Observable } from 'rxjs';
       isolate: false,
       extend: true,
     }),
-    EffectsModule.forFeature([DashboardEffects, ReservationEffects]),
   ],
   providers: [
     DashboardService,
@@ -49,14 +75,14 @@ import { Observable } from 'rxjs';
     AdditionalService,
     TrackingService,
     ColorService,
+    provideState(DASHBOARD_FEATURE_KEY, dashboardReducer),
+    provideEffects(DashboardEffects, ReservationEffects, DashboardNavigationEffects),
   ],
 })
 export class DashboardModule {
-  constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
-    const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe((state) => {
-      translateService.currentLang = '';
-      this.translateService.use(state.language);
+  constructor(private readonly store: Store<I18NState>, protected translateService: TranslateService) {
+    this.store.pipe(getI18NLanguagePipe).subscribe((language) => {
+      this.translateService.use(language);
     });
   }
 }

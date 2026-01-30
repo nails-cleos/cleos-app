@@ -6,9 +6,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app/app-routing.module';
 import { TranslateLoaderFactory } from './app/shared/translate-loader.factory';
-import { EffectsModule } from '@ngrx/effects';
-import { reducers } from './app/store/app.states';
-import { ActionReducer, MetaReducer, StoreModule } from '@ngrx/store';
+import { ActionReducer, MetaReducer, provideStore } from '@ngrx/store';
 import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
 import { getAnalytics, provideAnalytics, ScreenTrackingService, UserTrackingService } from '@angular/fire/analytics';
 import { getMessaging, provideMessaging } from '@angular/fire/messaging';
@@ -31,7 +29,6 @@ import { PermissionsService } from './app/services/auth-guard.service';
 import { PaginatorI18n } from './app/util/paginator';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatPaginatorIntl } from '@angular/material/paginator';
-import { localStorageSync } from 'ngrx-store-localstorage';
 import localeEn from '@angular/common/locales/en';
 import localeEnGB from '@angular/common/locales/en-GB';
 import localeEnNL from '@angular/common/locales/en-NL';
@@ -39,12 +36,37 @@ import localeEs from '@angular/common/locales/es';
 import localeAr from '@angular/common/locales/es-AR';
 import { provideHttpClient, withInterceptors, withJsonpSupport } from '@angular/common/http';
 import { httpInterceptorProviders } from './app/http-interceptors';
+import { provideRouterStore } from '@ngrx/router-store';
+import { localStorageSync } from 'ngrx-store-localstorage';
+import { AUTH_FEATURE_KEY, authReducer } from './app/store/reducers/auth.reducers';
+import { userReducer } from './app/store/reducers/user.reducers';
+import { treatmentReducer } from './app/store/reducers/treatment.reducers';
+import { catalogueReducer } from './app/store/reducers/catalogue.reducers';
+import { roomReducer } from './app/store/reducers/room.reducers';
+import { reservationReducer } from './app/store/reducers/reservation.reducers';
+import { notificationReducer } from './app/store/reducers/notification.reducers';
+import { unavailableReducer } from './app/store/reducers/unavailable.reducers';
+import { discountReducer } from './app/store/reducers/discount.reducers';
+import { mainReducer } from './app/store/reducers/main.reducers';
+import { paymentReducer } from './app/store/reducers/payment.reducers';
+import { dashboardReducer } from './app/store/reducers/dashboard.reducers';
+import { additionalReducer } from './app/store/reducers/additional.reducers';
+import { currencyReducer } from './app/store/reducers/currency.reducers';
+import { officeReducer } from './app/store/reducers/office.reducers';
+import { invoiceReducer } from './app/store/reducers/invoice.reducers';
+import { colorReducer } from './app/store/reducers/color.reducers';
+import { expenseReducer } from './app/store/reducers/expense.reducers';
+import { noteReducer } from './app/store/reducers/note.reducers';
+import { accountReducer } from './app/store/reducers/account.reducers';
+import { i18nReducer } from './app/store/reducers/i18n.reducers';
+import { I18NEffects } from './app/store/effects/i18n.effects';
+import { provideEffects } from '@ngrx/effects';
 
 export interface ISendMessage {
   name: string;
   email: string;
   subject: string;
-  message: string;
+  body: string;
 }
 
 const cookieConfig: NgcCookieConsentConfig = {
@@ -67,12 +89,12 @@ const cookieConfig: NgcCookieConsentConfig = {
   },
   type: 'info',
   content: {
-    href: `${ environment.appServer }/privacy`,
+    href: `${environment.appServer}/privacy`,
   },
 };
 
-const localStorageSyncReducer =
-  (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync({ keys: ['auth'], rehydrate: true })(reducer);
+const localStorageSyncReducer = (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync(
+  { keys: [AUTH_FEATURE_KEY], rehydrate: true })(reducer);
 
 registerLocaleData(localeEn, 'en');
 registerLocaleData(localeEnGB, 'en-GB');
@@ -81,26 +103,6 @@ registerLocaleData(localeEs, 'es');
 registerLocaleData(localeAr, 'es-AR');
 
 const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
-
-const providersFrom = importProvidersFrom(BrowserModule, StoreModule.forRoot(reducers, { metaReducers }),
-  EffectsModule.forRoot([]),
-  TranslateModule.forRoot({
-    defaultLanguage: 'en',
-    loader: {
-      provide: TranslateLoader,
-      useClass: TranslateLoaderFactory.forModule('common'),
-    },
-    isolate: false,
-    extend: true,
-  }),
-  NgcCookieConsentModule.forRoot(cookieConfig),
-  AppRoutingModule,
-  ServiceWorkerModule.register('ngsw-worker.js', {
-    enabled: environment.production,
-    registrationStrategy: 'registerWhenStable:30000',
-  }),
-  AngularFireModule.initializeApp(environment.firebase),
-);
 
 const authProvider = provideAuth(() => {
   const auth = getAuth();
@@ -129,10 +131,52 @@ export function initializePwaService(pwaService: PwaService) {
 
 const providers = [
   provideHttpClient(withInterceptors(httpInterceptorProviders), withJsonpSupport()),
-  providersFrom,
+  provideStore({
+    auth: authReducer,
+    user: userReducer,
+    treatment: treatmentReducer,
+    catalogue: catalogueReducer,
+    room: roomReducer,
+    reservation: reservationReducer,
+    notification: notificationReducer,
+    unavailable: unavailableReducer,
+    discount: discountReducer,
+    main: mainReducer,
+    payment: paymentReducer,
+    dashboard: dashboardReducer,
+    additional: additionalReducer,
+    currency: currencyReducer,
+    office: officeReducer,
+    invoice: invoiceReducer,
+    color: colorReducer,
+    expense: expenseReducer,
+    note: noteReducer,
+    accounts: accountReducer,
+    i18n: i18nReducer,
+  }, { metaReducers }),
+  provideRouterStore(),
+  importProvidersFrom(
+    BrowserModule,
+    TranslateModule.forRoot({
+      fallbackLang: 'en',
+      loader: {
+        provide: TranslateLoader,
+        useClass: TranslateLoaderFactory.forModule('common'),
+      },
+      isolate: false,
+      extend: true,
+    }),
+    NgcCookieConsentModule.forRoot(cookieConfig),
+    AppRoutingModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: environment.production,
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
+    AngularFireModule.initializeApp(environment.firebase),
+  ),
   {
     provide: MatPaginatorIntl, deps: [TranslateService],
-    useFactory: (translateService: TranslateService) => new PaginatorI18n(translateService).getPaginatorIntl(),
+    useFactory: () => new PaginatorI18n().getPaginatorIntl(),
   },
   PermissionsService,
   TokenService,
@@ -162,6 +206,7 @@ const providers = [
   ScreenTrackingService,
   UserTrackingService,
   provideAnimations(),
+  provideEffects(I18NEffects),
 ];
 
 if (environment.production) {

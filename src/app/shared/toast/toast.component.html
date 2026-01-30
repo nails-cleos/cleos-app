@@ -3,7 +3,7 @@
     <mat-icon>{{ getIcon() }}</mat-icon>
   </div>
   <div class="toast-content">
-    <div class="toast-message">{{ data.message }}</div>
+    <div [innerHTML]="data.message"></div>
   </div>
   <div class="toast-actions">
     <button mat-icon-button (click)="onDismiss()">

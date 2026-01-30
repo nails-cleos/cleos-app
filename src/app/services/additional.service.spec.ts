@@ -4,7 +4,7 @@ import { of } from 'rxjs';
 
 import { AdditionalService } from './additional.service';
 import { IAdditional, IAdditionalAll } from '../interfaces/additional';
-import { Pagination } from '../interfaces/pagination';
+import { paginated, Pagination } from '../interfaces/pagination';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { IApiResponse } from '../interfaces/common';
 import { createFilter } from '../util/service-helper';
@@ -71,18 +71,18 @@ describe('AdditionalService', () => {
     });
 
     expect(httpSpy.get).toHaveBeenCalledWith('v1/additional/pages', {
-      params: createFilter(page, size, sort, direction),
+      params: createFilter(page, size, sort, direction), ...paginated(),
     });
   });
 
-  it('should fetch all additionals by group id with correct parameters', () => {
+  it('should fetch all additionalList by group id with correct parameters', () => {
     const roomId = 'roomId';
     const groupId = 'groupId';
-    const mockAdditionals = [mockAdditional];
-    httpSpy.get.and.returnValue(of(mockAdditionals));
+    const additionalList = [mockAdditionalAll];
+    httpSpy.get.and.returnValue(of(additionalList));
 
     service.getAllAdditionalByGroupId(roomId, groupId).subscribe((result) => {
-      expect(result).toEqual(mockAdditionals);
+      expect(result).toEqual(additionalList);
     });
 
     expect(httpSpy.get).toHaveBeenCalledWith('v1/additional/groups', {
@@ -91,11 +91,11 @@ describe('AdditionalService', () => {
   });
 
   it('should fetch all additional list', () => {
-    const mockAdditionalsList = [mockAdditionalAll];
-    httpSpy.get.and.returnValue(of(mockAdditionalsList));
+    const mockAdditionalList = [mockAdditionalAll];
+    httpSpy.get.and.returnValue(of(mockAdditionalList));
 
     service.getAdditionalList().subscribe((result) => {
-      expect(result).toEqual(mockAdditionalsList);
+      expect(result).toEqual(mockAdditionalList);
     });
 
     expect(httpSpy.get).toHaveBeenCalledWith('v1/additional');

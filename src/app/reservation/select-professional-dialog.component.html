@@ -1,19 +1,19 @@
 <h1 mat-dialog-title>{{ 'RESERVATION.PROFESSIONAL.SELECT' | translate }}</h1>
 <div mat-dialog-content>
-  <form [formGroup]="professionalForm" (keydown.enter)="$event.preventDefault()">
-    @if (professionals) {
+  <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
+    @if (professionals()) {
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
-        <input (keydown)="keyDownHandler($event)" [formControl]="professional" [matAutocomplete]="autoProfessional"
-               autocomplete="off" matInput required type="text">
+        <input (keydown)="keyDownHandler($event)" [formControl]="getForm.professional"
+               [matAutocomplete]="autoProfessional" autocomplete="off" matInput required type="text">
         <mat-autocomplete #autoProfessional="matAutocomplete" [displayWith]="displayFnUser">
-          @for (professional of filteredProfessional | async; track professional) {
+          @for (professional of filteredProfessionalSignal(); track professional) {
             <mat-option [value]="professional">{{ professional.displayName }}</mat-option>
           }
         </mat-autocomplete>
-        @if (professional.hasError('required')) {
+        @if (getForm.professional.hasError('required')) {
           <mat-error [innerHTML]="'COMMON.PROFESSIONAL.REQUIRED' | translate"></mat-error>
-        } @else if (professional.hasError('requireMatch')) {
+        } @else if (getForm.professional.hasError('requireMatch')) {
           <mat-error [innerHTML]="'COMMON.PROFESSIONAL.INVALID' | translate"></mat-error>
         }
       </mat-form-field>
@@ -28,12 +28,12 @@
     <button (click)="onNoClick()" mat-icon-button>
       <mat-icon>clear</mat-icon>
     </button>
-    <button (click)="doAction()" [disabled]="professionalForm.invalid" cdkFocusInitial color="primary" mat-icon-button>
+    <button (click)="doAction()" [disabled]="form.invalid" cdkFocusInitial color="primary" mat-icon-button>
       <mat-icon>published_with_changes</mat-icon>
     </button>
   } @else {
     <button (click)="onNoClick()" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
-    <button (click)="doAction()" [disabled]="professionalForm.invalid" cdkFocusInitial color="primary"
+    <button (click)="doAction()" [disabled]="form.invalid" cdkFocusInitial color="primary"
             mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.UPDATE' | translate }}
     </button>
   }

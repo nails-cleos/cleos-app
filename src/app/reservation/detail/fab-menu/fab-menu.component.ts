@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener, inject, input, output } from '@angular/core';
 import { iconChange, listAnimation } from '../../../util/animation';
 import { IFabMenu } from '../../../interfaces/reservation';
 import { AppMaterialModule } from '../../../util/app-material.module';
@@ -9,28 +9,26 @@ import { AppMaterialModule } from '../../../util/app-material.module';
   styleUrls: ['./fab-menu.component.scss'],
   animations: [listAnimation, iconChange],
   imports: [AppMaterialModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FabMenuComponent {
-  @Input() fabMenus!: IFabMenu[];
-  @Output() fabMenuItemSelected: EventEmitter<string> = new EventEmitter<string>();
+  private readonly elementRef: ElementRef = inject(ElementRef);
 
-  menuOpen: boolean;
+  fabMenus = input.required<IFabMenu[]>();
 
-  constructor(private elementRef: ElementRef) {
-    this.menuOpen = false;
-  }
+  fabMenuItemSelected = output<string>();
 
-  toggleMenu(): void {
+  menuOpen: boolean = false;
+
+  toggleMenu() {
     this.menuOpen = !this.menuOpen;
-    return;
   }
 
-  @HostListener('document:click', ['$event'])
-    clickOutsideMenu = (event: MouseEvent): void => {
-      if (!this.elementRef.nativeElement.contains(event.target)) {
-        this.menuOpen = false;
-      }
-    };
+  @HostListener('document:click', ['$event']) clickOutsideMenu = (event: MouseEvent) => {
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.menuOpen = false;
+    }
+  };
 
   handleMenuItemClick = (item: any): void => {
     this.menuOpen = false;

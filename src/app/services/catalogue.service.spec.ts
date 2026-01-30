@@ -9,15 +9,16 @@ describe('CatalogueService', () => {
   let service: CatalogueService;
   let httpSpy: jasmine.SpyObj<HttpClient>;
 
-  const mockCatalogue: ICatalogue = {
+  const mockCatalogue: ICatalogueAll = {
+    contentType: '',
+    image: undefined,
+    order: 0,
     id: '1',
     name: 'Test Catalogue',
     description: 'A test catalogue',
     home: true,
     catalog: false,
-    file: null,
     blob: null,
-    groupId: 'group1',
   };
 
   beforeEach(() => {
@@ -89,7 +90,7 @@ describe('CatalogueService', () => {
       const mockApiResponse = { id: 'response-123', name: 'Catalogue created successfully' };
       httpSpy.post.and.returnValue(of(mockApiResponse));
 
-      service.createCatalogue(mockCatalogue, mockDataUrl).subscribe(result => {
+      service.createCatalogue(mockCatalogue as ICatalogue, mockDataUrl).subscribe(result => {
         expect(result).toEqual(mockApiResponse);
       });
 
@@ -108,7 +109,7 @@ describe('CatalogueService', () => {
       httpSpy.delete.and.returnValue(of(mockCatalogue));
 
       service.deleteCatalogue('1').subscribe(result => {
-        expect(result).toEqual(mockCatalogue);
+        expect(result).toEqual(mockCatalogue as ICatalogue);
       });
 
       expect(httpSpy.delete).toHaveBeenCalledWith('v1/catalogues/1');
@@ -121,7 +122,7 @@ describe('CatalogueService', () => {
       const mockApiResponse = { id: 'response-123', name: 'Catalogue updated successfully' };
       httpSpy.patch.and.returnValue(of(mockApiResponse));
 
-      service.updateCatalogue(mockCatalogue, mockDataUrl).subscribe(result => {
+      service.updateCatalogue('1', mockCatalogue as ICatalogue, mockDataUrl).subscribe(result => {
         expect(result).toEqual(mockApiResponse);
       });
 
@@ -167,7 +168,7 @@ describe('CatalogueService', () => {
 
       service.updateCatalogueOrder(cataloguesAll).subscribe();
 
-      expect(httpSpy.put).toHaveBeenCalledWith('v1/catalogues/order', [
+      expect(httpSpy.put).toHaveBeenCalledWith('v1/catalogues/orders', [
         { id: '1', order: 0 },
         { id: '2', order: 1 },
         { id: '3', order: 2 },
@@ -179,7 +180,7 @@ describe('CatalogueService', () => {
 
       service.updateCatalogueOrder([]).subscribe();
 
-      expect(httpSpy.put).toHaveBeenCalledWith('v1/catalogues/order', []);
+      expect(httpSpy.put).toHaveBeenCalledWith('v1/catalogues/orders', []);
     });
   });
 });

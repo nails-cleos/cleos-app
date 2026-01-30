@@ -1,73 +1,76 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { AppState, selectAuthState } from '../../store/app.states';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { clean, signupSuccess } from '../../store/auth.actions';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
-import { Observable, Subscription } from 'rxjs';
+import { signupSuccess } from '../../store/auth.actions';
+import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
 import { sendPasswordResetEmail } from '@firebase/auth';
 import { TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../../shared/shared.module';
 import { BackButtonDirective } from '../../directives/back-button.directive';
-import { ResponseSuccess } from '../../interfaces/common';
 import { ToastService } from '../../services/toast.service';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { getAuthErrorPipe, getAuthResponsePipe } from '../../store/selectors/auth.selectors';
+import { AuthState } from '../../store/reducers/auth.reducers';
+
+type ForgotPasswordForm = {
+  email: FormControl<string>;
+};
 
 @Component({
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],
   imports: [SharedModule, BackButtonDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ForgotPasswordComponent implements OnInit, OnDestroy {
-  private store: Store<AppState> = inject(Store<AppState>);
-  private toastService: ToastService = inject(ToastService);
-  private formBuilder: UntypedFormBuilder = inject(UntypedFormBuilder);
-  private router: Router = inject(Router);
-  private auth: Auth = inject(Auth);
-  private translate: TranslateService = inject(TranslateService);
+export class ForgotPasswordComponent {
+  private readonly store: Store<AuthState> = inject(Store<AuthState>);
+  private readonly toastService: ToastService = inject(ToastService);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly router: Router = inject(Router);
+  private readonly auth: Auth = inject(Auth);
+  private readonly translate: TranslateService = inject(TranslateService);
 
-  getState: Observable<any> = this.store.select(selectAuthState);
-  subscription?: Subscription;
+  private error$ = this.store.pipe(getAuthErrorPipe);
+  private response$ = this.store.pipe(getAuthResponsePipe);
 
-  form!: UntypedFormGroup;
-  language: string = this.translate.currentLang;
+  private errorSignal = toSignal(this.error$);
+  private responseSignal = toSignal(this.response$);
 
-  ngOnInit(): void {
-    this.clean();
-    this.createForm();
-    this.subscribe();
-  }
+  form: FormGroup<ForgotPasswordForm> = this.formBuilder.group<ForgotPasswordForm>({
+    email: this.formBuilder.control('', {
+      validators: [Validators.required],
+    }),
+  });
+  language: string = this.translate.getCurrentLang();
 
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  forgotPassword(): void {
-    sendPasswordResetEmail(this.auth, this.form.get('email')?.value.trim()).then(() => {
-      const message = this.translate.instant('AUTH.FORGOT_PASSWORD.MESSAGE');
-      this.store.dispatch(signupSuccess({ message }));
-    }).catch(e => console.error(`Error sending reset password. ${e}`));
-    return;
-  }
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private createForm = (): void => {
-    this.form = this.formBuilder.group({
-      email: ['', Validators.required],
+  constructor() {
+    effect(() => {
+      const error = this.errorSignal();
+      if (error?.message) {
+        this.toastService.show(error.message, 'error');
+      }
     });
-  };
 
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      if (state.errorMessage) {
-        this.toastService.error(state.errorMessage);
-      } else if (state.response) {
-        const response: ResponseSuccess = state.response;
-        const toastRef = this.toastService.show(response.message, response.toastType, 5000, 'button');
+    effect(() => {
+      const response = this.responseSignal();
+      if (response?.message) {
+        const actionType = 'button';
+        const toastRef = this.toastService.show(response.message, response.toastType, 5000, { actionType });
         toastRef.onAction().subscribe(() => this.router.navigate([this.language, 'auth']));
       }
     });
-  };
+  }
+
+  get getForm() {
+    return this.form.controls;
+  }
+
+  forgotPassword(): void {
+    sendPasswordResetEmail(this.auth, this.getForm.email.value.trim()).then(() => {
+      const message = this.translate.instant('AUTH.FORGOT_PASSWORD.MESSAGE');
+      this.store.dispatch(signupSuccess({ message }));
+    }).catch(e => console.error(`Error sending reset password. ${e}`));
+  }
 }

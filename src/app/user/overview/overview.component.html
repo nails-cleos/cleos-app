@@ -1,7 +1,8 @@
 <div class="grid-container">
   <h1 class="mat-h1">Overview</h1>
-  <mat-grid-list [cols]="(layout | async)?.columns" rowHeight="200px">
-    <mat-grid-tile [colspan]="(layout | async)?.miniCardInfo?.cols" [rowspan]="(layout | async)?.miniCardInfo?.rows">
+  @let layout = layoutSignal();
+  <mat-grid-list [cols]="layout?.columns" rowHeight="200px">
+    <mat-grid-tile [colspan]="layout?.miniCardInfo?.cols" [rowspan]="layout?.miniCardInfo?.rows">
       <mat-card appearance="outlined" class="dashboard-card">
         <mat-card-content>
           @if (customer) {
@@ -22,15 +23,18 @@
               </div>
               <div class="text-center">
                 <mat-icon color="primary">cake</mat-icon>
-                <span class="super">{{ customer.dob ? customer.dob : 'N/A' }}</span>
+                <span
+                  class="super">{{ customer.dob ? customer.dob : 'N/A' }}</span>
               </div>
               <div class="text-center">
                 <mat-icon color="primary">phone</mat-icon>
-                <span class="super">{{ customer.phone ? customer.phone : 'N/A' }}</span>
+                <span
+                  class="super">{{ customer.phone ? customer.phone : 'N/A' }}</span>
               </div>
               <div class="text-center">
                 <mat-icon color="primary">mail_outline</mat-icon>
-                <span class="super">{{ customer.email ? customer.email : 'N/A' }}</span>
+                <span
+                  class="super">{{ customer.email ? customer.email : 'N/A' }}</span>
               </div>
             } @else {
               <div class="card-margin ssc-head-line"></div>
@@ -45,10 +49,10 @@
         </mat-card-content>
         <mat-card-actions class="top-space" style="margin: auto">
           @if (customer) {
-            <button class="hide-gt-xs only-button" color="accent" mat-fab (click)="goToProfile">
+            <button class="hide-gt-xs only-button" color="accent" mat-fab (click)="goToProfile()">
               <mat-icon matPrefix>edit</mat-icon>
             </button>
-            <button class="hide-xs only-button" color="accent" mat-fab extended (click)="goToProfile">
+            <button class="hide-xs only-button" color="accent" mat-fab extended (click)="goToProfile()">
               <mat-icon matPrefix>edit</mat-icon>
               <span>{{ 'COMMON.BUTTON.EDIT' | translate }}</span>
             </button>
@@ -58,8 +62,8 @@
         </mat-card-actions>
       </mat-card>
     </mat-grid-tile>
-    <mat-grid-tile [colspan]="(layout | async)?.miniCardAccount?.cols"
-                   [rowspan]="(layout | async)?.miniCardAccount?.rows">
+    <mat-grid-tile [colspan]="layout?.miniCardAccount?.cols"
+                   [rowspan]="layout?.miniCardAccount?.rows">
       <mat-card appearance="outlined" class="dashboard-card">
         @if (account) {
           <mat-card-header class="card-header">
@@ -73,7 +77,7 @@
             <div>
               <div class="card-icon top-space bottom-space" mat-card-avatar>
                 <mat-icon class="avatar-icon pointer-only" color="primary" [matBadgeOverlap]="true" [matBadge]="'+'"
-                          [matBadgeColor]="'primary'" (click)="goTo" aria-hidden="false">
+                          [matBadgeColor]="'primary'" (click)="goTo()" aria-hidden="false">
                   account_balance
                 </mat-icon>
               </div>
@@ -88,7 +92,7 @@
       </mat-card>
     </mat-grid-tile>
     @for (mc of miniCardData; let i = $index; track mc) {
-      <mat-grid-tile [colspan]="( layout | async )?.miniCard?.cols" [rowspan]="( layout | async )?.miniCard?.rows">
+      <mat-grid-tile [colspan]="layout?.miniCard?.cols" [rowspan]="layout?.miniCard?.rows">
         <mat-card appearance="outlined" class="dashboard-card">
           @if (mc.title) {
             <mat-card-header class="card-header">
@@ -139,9 +143,9 @@
       </mat-grid-tile>
     }
     @for (chart of charts; track chart) {
-      <mat-grid-tile [colspan]="( layout | async )?.chart?.cols" [rowspan]="( layout | async )?.chart?.rows">
+      <mat-grid-tile [colspan]="layout?.chart?.cols" [rowspan]="layout?.chart?.rows">
         <app-card [chart]="chart" [title]="chart.title">
-          <app-chart [chartSummary]="chart" [error]="error" [locale]="language"></app-chart>
+          <app-chart [chartSummary]="chart" [error]="errorSignal()" [locale]="language"></app-chart>
         </app-card>
       </mat-grid-tile>
     }
@@ -149,7 +153,8 @@
   @if (customer) {
     <div>
       @if (customer.address) {
-        <app-google-map [latitudeMarker]="customer.address.location.y" [longitudeMarker]="customer.address.location.x"
+        <app-google-map [latitudeMarker]="customer.address.location.y"
+                        [longitudeMarker]="customer.address.location.x"
                         [markInfo]="'<b>' + customer.address.name + '</b>'"></app-google-map>
       }
     </div>
@@ -164,7 +169,7 @@
   </div>
 </div>
 @if (upcoming.length && customer?.phone) {
-  <button color="accent" id="add-button" mat-fab (click)="notification">
+  <button color="accent" id="add-button" mat-fab (click)="notification()">
     <mat-icon>campaign</mat-icon>
   </button>
 }

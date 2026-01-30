@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TreatmentTableComponent } from './treatment-table.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { SimpleChange } from '@angular/core';
 import { ITreatmentAll } from '../../interfaces/treatment';
 import { ServiceType } from '../../interfaces/room';
 import { convertDuration } from '../../util/dates';
@@ -17,7 +16,6 @@ describe('TreatmentTableComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.setDefaultLang('en-GB');
     translateService.use('en-GB');
 
     fixture = TestBed.createComponent(TreatmentTableComponent);
@@ -30,9 +28,9 @@ describe('TreatmentTableComponent', () => {
   });
 
   it('should initialize with default values', () => {
-    expect(component.resultsLength).toBeDefined();
-    expect(component.pageSize).toBeDefined();
-    expect(component.dataSource).toBeInstanceOf(MatTableDataSource);
+    expect(component.resultsLengthSignal()).toBeDefined();
+    expect(component.pageSizeSignal()).toBeDefined();
+    expect(component.dataSource()).toBeInstanceOf(MatTableDataSource);
   });
 
   it('should update dataSource and resultsLength in ngOnChanges', () => {
@@ -59,24 +57,21 @@ describe('TreatmentTableComponent', () => {
       },
     ];
 
-    component.treatment = treatments;
+    fixture.componentRef.setInput('treatment', treatments);
+    fixture.detectChanges();
 
-    component.ngOnChanges({
-      treatment: new SimpleChange(null, treatments, false),
-    });
-
-    expect(component.dataSource.data.length).toBe(2);
-    expect(component.resultsLength).toBe(2);
+    expect(component.dataSource().data.length).toBe(2);
+    expect(component.resultsLengthSignal()).toBe(2);
 
     // The real convertDuration should parse PT90M as 1h30m
     const first = convertDuration('PT90M');
     const second = convertDuration('PT30M');
 
-    expect(component.dataSource.data[0].hour).toBe(first.hour);
-    expect(component.dataSource.data[0].minute).toBe(first.minute);
+    expect(component.dataSource().data[0].hour).toBe(first.hour);
+    expect(component.dataSource().data[0].minute).toBe(first.minute);
 
-    expect(component.dataSource.data[1].hour).toBe(second.hour);
-    expect(component.dataSource.data[1].minute).toBe(second.minute);
+    expect(component.dataSource().data[1].hour).toBe(second.hour);
+    expect(component.dataSource().data[1].minute).toBe(second.minute);
   });
 
   it('should handle treatment with undefined duration', () => {
@@ -90,12 +85,8 @@ describe('TreatmentTableComponent', () => {
       type: ServiceType.treatment,
     } as ITreatmentAll];
 
-    component.treatment = treatments;
+    fixture.componentRef.setInput('treatment', treatments);
 
-    component.ngOnChanges({
-      treatment: new SimpleChange(null, treatments, false),
-    });
-
-    expect(component.dataSource.data[0]).toEqual(treatments[0]);
+    expect(component.dataSource().data[0]).toEqual(treatments[0]);
   });
 });

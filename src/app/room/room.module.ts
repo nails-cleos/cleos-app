@@ -5,7 +5,7 @@ import { RoomRoutingModule } from './room-routing.module';
 import { RoomsComponent } from './list/rooms.component';
 import { RoomComponent } from './room.component';
 import { AvailabilityComponent } from './availability/availability.component';
-import { EffectsModule } from '@ngrx/effects';
+import { provideEffects } from '@ngrx/effects';
 import { RoomEffects } from '../store/effects/room.effects';
 import { RoomService } from '../services/room.service';
 import { UserService } from '../services/user.service';
@@ -15,10 +15,16 @@ import { ExpenseService } from '../services/expense.service';
 import { ExpensesComponent } from './me/expense/list/expenses.component';
 import { ExpenseComponent } from './me/expense/expense.component';
 import { ExpenseEffects } from '../store/effects/expense.effects';
-import { Store } from '@ngrx/store';
-import { AppState, selectI18nState } from '../store/app.states';
-import { Observable } from 'rxjs';
+import { provideState, Store } from '@ngrx/store';
 import { PriceDialogComponent } from './me/add-service/price-dialog.component';
+import { ROOM_FEATURE_KEY, roomReducer } from '../store/reducers/room.reducers';
+import { RoomNavigationEffects } from './room-navigation.effects';
+import { I18NState } from '../store/reducers/i18n.reducers';
+import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
+import { TokenService } from '../services/token.service';
+import { AwsLambdaService } from '../services/aws-lambda.service';
+import { AWS_FEATURE_KEY, awsReducer } from '../store/reducers/aws.reducers';
+import { AwsEffects } from '../store/effects/aws.effects';
 
 @NgModule({
   imports: [
@@ -42,20 +48,22 @@ import { PriceDialogComponent } from './me/add-service/price-dialog.component';
       isolate: false,
       extend: true,
     }),
-    EffectsModule.forFeature([RoomEffects, ExpenseEffects]),
   ],
   providers: [
     RoomService,
     UserService,
     ExpenseService,
+    TokenService,
+    AwsLambdaService,
+    provideState(ROOM_FEATURE_KEY, roomReducer),
+    provideState(AWS_FEATURE_KEY, awsReducer),
+    provideEffects(RoomEffects, ExpenseEffects, AwsEffects, RoomNavigationEffects),
   ],
 })
 export class RoomModule {
-  constructor(private readonly store: Store<AppState>, protected translateService: TranslateService) {
-    const getI18nState: Observable<any> = this.store.select(selectI18nState);
-    getI18nState.subscribe((state) => {
-      translateService.currentLang = '';
-      this.translateService.use(state.language);
+  constructor(private readonly store: Store<I18NState>, protected translateService: TranslateService) {
+    this.store.pipe(getI18NLanguagePipe).subscribe((language) => {
+      this.translateService.use(language);
     });
   }
 }

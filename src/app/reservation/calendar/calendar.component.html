@@ -1,27 +1,28 @@
 <div>
   <fieldset>
     <legend>{{ 'COMMON.SEARCH.TITLE' | translate }}</legend>
-    <form [formGroup]="officeForm" (keydown.enter)="$event.preventDefault()" (ngSubmit)="search">
-      @if (!offices?.length) {
+    <form [formGroup]="form" (keydown.enter)="$event.preventDefault()" (ngSubmit)="search()">
+      @let currentOffices = offices();
+      @if (!currentOffices?.length) {
         <button class="only-button" color="accent" mat-fab extended [routerLink]="['/', language, 'rooms', 'add']"
                 type="button">
           <mat-icon>add_business</mat-icon> &nbsp;{{ 'RESERVATION.ROOM.TITLE' | translate }}
         </button>
       } @else {
         <div class="row-column-space-evenly-center">
-          @if (offices) {
+          @if (currentOffices) {
             <mat-form-field appearance="outline">
               <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
-              <input (keydown)="keyDownOffice($event)" [formControl]="office" [matAutocomplete]="autoOffice" matInput
-                     required type="text">
+              <input (keydown)="keyDownOffice($event)" [formControl]="getForm.office" [matAutocomplete]="autoOffice"
+                     matInput required type="text">
               <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
-                @for (office of filteredOffice | async; track office) {
+                @for (office of filteredOfficeSignal(); track office) {
                   <mat-option [value]="office">{{ office.name }}</mat-option>
                 }
               </mat-autocomplete>
-              @if (office.hasError('required')) {
+              @if (getForm.office.hasError('required')) {
                 <mat-error [innerHTML]="'COMMON.ROOM.OFFICE.REQUIRED' | translate"></mat-error>
-              } @else if (office.hasError('requireMatch')) {
+              } @else if (getForm.office.hasError('requireMatch')) {
                 <mat-error [innerHTML]="'COMMON.ROOM.OFFICE.INVALID' | translate"></mat-error>
               }
             </mat-form-field>
@@ -29,36 +30,36 @@
             <div class="ssc-line"></div>
           }
 
-          @if (roomList) {
+          @if (roomList()) {
             <mat-form-field appearance="outline">
               <mat-label>{{ 'COMMON.ROOM.FIELD' | translate }}</mat-label>
-              <input (keydown)="keyDownRoom($event)" [formControl]="room" [matAutocomplete]="autoRoom" matInput required
-                     type="text">
+              <input (keydown)="keyDownRoom($event)" [formControl]="getForm.room" [matAutocomplete]="autoRoom" matInput
+                     required type="text">
               <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
-                @for (room of filteredRoom | async; track room) {
+                @for (room of filteredRoomSignal(); track room) {
                   <mat-option [value]="room">{{ room | roomName }}</mat-option>
                 }
               </mat-autocomplete>
-              @if (room.hasError('required')) {
+              @if (getForm.room.hasError('required')) {
                 <mat-error [innerHTML]="'COMMON.ROOM.REQUIRED' | translate"></mat-error>
-              } @else if (room.hasError('requireMatch')) {
+              } @else if (getForm.room.hasError('requireMatch')) {
                 <mat-error [innerHTML]="'COMMON.ROOM.INVALID' | translate"></mat-error>
               }
             </mat-form-field>
           } @else {
             <div class="ssc-line"></div>
           }
-          @if (professionalList) {
+          @if (professionalList()) {
             <mat-form-field appearance="outline">
               <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
-              <input (keydown)="keyDownHandler($event, professional)" [formControl]="professional"
+              <input (keydown)="keyDownHandler($event, getForm.professional)" [formControl]="getForm.professional"
                      [matAutocomplete]="autoProfessional" matInput type="text">
               <mat-autocomplete #autoProfessional="matAutocomplete" [displayWith]="displayFnProfessional">
-                @for (professional of filteredProfessional | async; track professional) {
+                @for (professional of filteredProfessionalSignal(); track professional) {
                   <mat-option [value]="professional">{{ professional.displayName }}</mat-option>
                 }
               </mat-autocomplete>
-              @if (professional.hasError('requireMatch')) {
+              @if (getForm.professional.hasError('requireMatch')) {
                 <mat-error [innerHTML]="'COMMON.PROFESSIONAL.INVALID' | translate"></mat-error>
               }
             </mat-form-field>
@@ -67,10 +68,10 @@
           }
         </div>
       }
-      <button type="submit" [disabled]="officeForm.invalid" class="hide-gt-xs only-button" color="accent" mat-fab>
+      <button type="submit" [disabled]="form.invalid" class="hide-gt-xs only-button" color="accent" mat-fab>
         <mat-icon matPrefix>search</mat-icon>
       </button>
-      <button type="submit" [disabled]="officeForm.invalid" class="hide-xs only-button" color="accent" mat-fab extended>
+      <button type="submit" [disabled]="form.invalid" class="hide-xs only-button" color="accent" mat-fab extended>
         <mat-icon matPrefix>search</mat-icon>
         <span>{{ 'COMMON.SEARCH.TITLE' | translate }}</span>
       </button>
@@ -78,72 +79,65 @@
   </fieldset>
 </div>
 
-@if (data && calendar) {
-<!--  @if (inProgress) {-->
-<!--    <div class="spinner-parent-center">-->
-<!--      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>-->
-<!--    </div>-->
-<!--  } @else {-->
-    <div class="divider card-actions">
-      <button class="hide-gt-xs" (click)="decrement" color="accent" mat-fab>
-        <mat-icon>navigate_before</mat-icon>
+  <div class="divider card-actions">
+    <button class="hide-gt-xs" (click)="decrement()" color="accent" mat-fab>
+      <mat-icon>navigate_before</mat-icon>
+    </button>
+    <button class="hide-xs" (click)="decrement()" color="accent" mat-fab extended>
+      <mat-icon>navigate_before</mat-icon>
+      <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
+    </button>
+    <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [value]="viewDate"
+           hidden matInput [max]="maxDate" [min]="minDate">
+    <mat-datepicker #picker touchUi></mat-datepicker>
+    <button class="hide-gt-xs" (click)="picker.open()" color="primary" mat-fab>
+      <mat-icon>today</mat-icon>
+    </button>
+    <button class="hide-xs" (click)="picker.open()" color="primary" mat-fab extended>
+      <mat-icon>today</mat-icon>
+      <span>{{ 'COMMON.BUTTON.GOTO' | translate }}</span>
+    </button>
+    <button class="hide-gt-xs" (click)="increment()" color="accent" mat-fab>
+      <mat-icon>navigate_next</mat-icon>
+    </button>
+    <button class="hide-xs" (click)="increment()" color="accent" mat-fab extended>
+      <mat-icon>navigate_next</mat-icon>
+      <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+    </button>
+    <div class="spacer"></div>
+    @if (daysInWeekSignal() >= 5) {
+      <button (click)="downloadPDF()" color="accent" mat-fab extended [disabled]="isDarkMode()">
+        <mat-icon>print</mat-icon>
+        <span>{{ 'COMMON.BUTTON.PRINT' | translate }}</span>
       </button>
-      <button class="hide-xs" (click)="decrement" color="accent" mat-fab extended>
-        <mat-icon>navigate_before</mat-icon>
-        <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
-      </button>
-      <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [value]="viewDate"
-             hidden matInput [max]="maxDate" [min]="minDate">
-      <mat-datepicker #picker touchUi></mat-datepicker>
-      <button class="hide-gt-xs" (click)="picker.open()" color="primary" mat-fab>
-        <mat-icon>today</mat-icon>
-      </button>
-      <button class="hide-xs" (click)="picker.open()" color="primary" mat-fab extended>
-        <mat-icon>today</mat-icon>
-        <span>{{ 'COMMON.BUTTON.GOTO' | translate }}</span>
-      </button>
-      <button class="hide-gt-xs" (click)="increment" color="accent" mat-fab>
-        <mat-icon>navigate_next</mat-icon>
-      </button>
-      <button class="hide-xs" (click)="increment" color="accent" mat-fab extended>
-        <mat-icon>navigate_next</mat-icon>
-        <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
-      </button>
-      <div class="spacer"></div>
-      @if (daysInWeek >= 5) {
-        <button (click)="downloadPDF" color="accent" mat-fab extended [disabled]="isDarkMode">
-          <mat-icon>print</mat-icon>
-          <span>{{ 'COMMON.BUTTON.PRINT' | translate }}</span>
-        </button>
-      }
-      <button class="hide-gt-xs" color="primary" mat-fab [routerLink]="['/', language, 'reservation']">
-        <mat-icon>book_online</mat-icon>
-      </button>
-      <button class="hide-xs" color="primary" mat-fab extended [routerLink]="['/', language, 'reservation']">
-        <mat-icon>book_online</mat-icon>
-        <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
-      </button>
-    </div>
+    }
+    <button class="hide-gt-xs" color="primary" mat-fab [routerLink]="['/', language, 'reservation']">
+      <mat-icon>book_online</mat-icon>
+    </button>
+    <button class="hide-xs" color="primary" mat-fab extended [routerLink]="['/', language, 'reservation']">
+      <mat-icon>book_online</mat-icon>
+      <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
+    </button>
+  </div>
 
-    <div id="weekViewPDF">
-      <div class="divider">
-        <mwl-calendar-week-view
-          (beforeViewRender)="beforeMonthViewRender($event)"
-          (eventClicked)="view($event.event)"
-          (hourSegmentClicked)="segmentClick($event.date)"
-          (eventTimesChanged)="eventTimesChanged($event)"
-          [refresh]="refresh"
-          [dayEndHour]="calendar.day!.dayEndHour"
-          [dayEndMinute]="calendar.day!.dayEndMinute"
-          [dayStartHour]="calendar.day!.dayStartHour"
-          [dayStartMinute]="calendar.day!.dayStartMinute"
-          [daysInWeek]="totalDays"
-          [events]="calendar.calendarEvents"
-          [hourSegments]="hourSegments"
-          [locale]="locale"
-          [viewDate]="viewDate"
-          [weekendDays]="[]"></mwl-calendar-week-view>
-      </div>
+  @let calendarDay = calendarDaySignal();
+  <div id="weekViewPDF">
+    <div class="divider">
+      <mwl-calendar-week-view
+        (beforeViewRender)="beforeMonthViewRender($event)"
+        (eventClicked)="view($event.event)"
+        (hourSegmentClicked)="segmentClick($event.date, calendarRoomSignal())"
+        (eventTimesChanged)="eventTimesChanged($event)"
+        [refresh]="refresh"
+        [dayEndHour]="calendarDay?.dayEndHour ?? 23"
+        [dayEndMinute]="calendarDay?.dayEndMinute ?? 59"
+        [dayStartHour]="calendarDay?.dayStartHour ?? 0"
+        [dayStartMinute]="calendarDay?.dayStartMinute ?? 0"
+        [daysInWeek]="totalDays"
+        [events]="calendarEventsSignal()"
+        [hourSegments]="hourSegments"
+        [locale]="locale"
+        [viewDate]="viewDate()"
+        [weekendDays]="[]"></mwl-calendar-week-view>
     </div>
-<!--  }-->
-}
+  </div>

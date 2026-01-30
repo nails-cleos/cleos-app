@@ -1,98 +1,101 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import {
-  ReactiveFormsModule,
-  UntypedFormBuilder,
-  UntypedFormControl,
-  UntypedFormGroup,
-  Validators,
-} from '@angular/forms';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IUser, IUserAll } from '../../interfaces/user';
-import { Observable, Subscription } from 'rxjs';
+import { combineLatestWith } from 'rxjs';
 import { requireMatch } from '../../util/validators';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { AppState, selectUserState } from '../../store/app.states';
 import { map, startWith } from 'rxjs/operators';
-import { clean, getAllCustomers } from '../../store/user.actions';
+import { cleanUser, getAllCustomers } from '../../store/user.actions';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
-import { AsyncPipe } from '@angular/common';
+import { UserState } from '../../store/reducers/user.reducers';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { getAllCustomersPipe } from '../../store/selectors/user.selectors';
+
+type ChangeCustomerForm = {
+  customer: FormControl<IUserAll | undefined>,
+}
+
+type ChangeCustomerDialogData = {
+  customerId: string,
+  small: boolean;
+}
 
 @Component({
   selector: 'app-change-customer-dialog-component',
   templateUrl: './change-customer-dialog.component.html',
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe, AsyncPipe],
+  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ChangeCustomerDialogComponent implements OnInit, OnDestroy {
-  customerForm!: UntypedFormGroup;
-  customers?: IUserAll[];
-  filteredCustomer?: Observable<IUser[] | undefined>;
-  customer: UntypedFormControl = new UntypedFormControl('', [
-    Validators.required, requireMatch,
-  ]);
+export class ChangeCustomerDialogComponent {
+  private readonly store: Store<UserState> = inject(Store<UserState>);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly dialogRef: MatDialogRef<ChangeCustomerDialogComponent> = inject(
+    MatDialogRef<ChangeCustomerDialogComponent>);
+  readonly data = inject<ChangeCustomerDialogData>(MAT_DIALOG_DATA);
 
-  private getState: Observable<any>;
-  private subscription?: Subscription;
+  private customers$ = this.store.pipe(getAllCustomersPipe);
 
-  constructor(public dialogRef: MatDialogRef<ChangeCustomerDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any,
-    private store: Store<AppState>, private formBuilder: UntypedFormBuilder) {
-    this.getState = this.store.select(selectUserState);
+  form: FormGroup<ChangeCustomerForm> = this.formBuilder.group<ChangeCustomerForm>({
+    customer: this.formBuilder.control<IUserAll | undefined>(undefined, {
+      validators: [Validators.required, requireMatch],
+    }),
+  });
+
+  customersSignal = toSignal(this.customers$);
+  filteredCustomerSignal = toSignal(
+    this.getForm.customer.valueChanges.pipe(
+      startWith(''),
+      map(value => typeof value === 'string' ? value : value?.displayName),
+      combineLatestWith(this.customers$),
+      map(([name, customerList]) => {
+        if (name) {
+          return this.filterCustomer(name, customerList);
+        } else {
+          return customerList ? customerList.slice() : customerList;
+        }
+      }),
+    ),
+  );
+
+  private customerId = computed(() => this.data.customerId);
+
+  constructor() {
+    effect(() => {
+      this.customerId();
+      this.store.dispatch(cleanUser());
+      this.store.dispatch(getAllCustomers());
+    });
+
+    effect(() => {
+      const customers = this.customersSignal();
+      const customerId = this.customerId();
+      this.getForm.customer.setValue(customers?.find(customer => customer.id === customerId));
+    });
   }
 
-  get onNoClick(): void {
-    return this.dialogRef.close();
+  get getForm(): ChangeCustomerForm {
+    return this.form.controls;
   }
 
-  get doAction(): void {
-    return this.dialogRef.close({ customerId: this.customer.value.id });
+  onNoClick() {
+    this.dialogRef.close();
   }
 
-  ngOnInit(): void {
-    this.clean();
-    this.createForm();
-    this.createFilters();
-    this.subscribe();
-    this.getCustomers();
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+  doAction() {
+    this.dialogRef.close({ customerId: this.getForm.customer.value?.id });
   }
 
   displayFnUser = (user: IUser): string => user?.displayName ? user.displayName : '';
 
-  keyDownHandler = (event: any): void => {
+  keyDownHandler = (event: KeyboardEvent): void => {
     if (event.code === 'Backspace') {
-      this.customer.setValue('');
+      this.getForm.customer.setValue(undefined);
     }
   };
 
-  private createForm = (): void => {
-    this.customerForm = this.formBuilder.group({
-      customer: this.customer,
-    });
-  };
-
-  private createFilters = (): void => {
-    this.filteredCustomer = this.customer.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.displayName),
-      map(name => name ? this.filterCustomer(name) : this.customers ? this.customers.slice() : this.customers),
-    );
-  };
-
-  private filterCustomer = (name: string): IUser[] | undefined => this.customers?.filter(
+  private filterCustomer = (name: string, customers: IUserAll[]): IUserAll[] | undefined => customers?.filter(
     option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
-
-  private getCustomers = (): void => this.store.dispatch(getAllCustomers());
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      this.customers = state.data;
-      this.customer.setValue(this.customers?.find(customer => customer.id === this.data.customerId));
-    });
-  };
 
 }

@@ -1,4 +1,4 @@
-import { ITreatmentGroup } from './treatment';
+import { ITreatmentGroup, ITreatmentGroupAll } from './treatment';
 
 export interface ICatalogue {
   id?: string;
@@ -22,7 +22,7 @@ export interface ICatalogueAll {
   catalog?: boolean;
   blob: any;
   image: any;
-  treatmentGroup?: ITreatmentGroup;
+  treatmentGroup?: ITreatmentGroupAll;
 }
 
 export interface ISlide {

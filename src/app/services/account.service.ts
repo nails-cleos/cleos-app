@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IAccount, ITransaction } from '../interfaces/account';
+import { IAccountAll, ITransaction } from '../interfaces/account';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
 import { SortDirection } from '@angular/material/sort';
@@ -27,7 +27,7 @@ export class AccountService {
     { params: createFilter(page, size, sort, direction) },
   );
 
-  getAccount = (id: string): Observable<IAccount | undefined> => this.http.get<IAccount>(toUrl(this.urlV1, id));
+  getAccount = (id: string): Observable<IAccountAll | undefined> => this.http.get<IAccountAll>(toUrl(this.urlV1, id));
 
   getTransaction = (
     id: string,
@@ -37,7 +37,7 @@ export class AccountService {
 
   getAccountByCustomerId = (
     customerId: string,
-  ): Observable<IAccount | undefined> => this.http.get<IAccount>(toUrl(this.urlV1, 'customers', customerId));
+  ): Observable<IAccountAll | undefined> => this.http.get<IAccountAll>(toUrl(this.urlV1, 'customers', customerId));
 
   createTransaction = (id: string, transaction: ITransaction): Observable<IApiResponse> => this.http.post<IApiResponse>(
     toUrl(this.urlV1, id, 'transactions'), transaction);

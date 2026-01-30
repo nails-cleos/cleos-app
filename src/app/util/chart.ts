@@ -2,7 +2,7 @@ import { ChartConfiguration, ChartOptions, ChartType, TooltipItem } from 'chart.
 import { IChart } from '../interfaces/dashboard';
 import { ICurrency } from '../interfaces/currency';
 import { numberFormat } from './numbers';
-import { getNowTimeZone, newDateTimestamp } from './dates';
+import { getNowTimeZone, newDateTimestamp, secondsToHHMM } from './dates';
 
 export interface IChartUtil {
   labels: any[];
@@ -48,7 +48,7 @@ export const createChart = (
       options = pieChartPercentageOptions();
       break;
     case 'TIME_CHART':
-      options = barChartTimeOptions(isDark, timeZone);
+      options = barChartTimeOptions(isDark);
       break;
     case 'CHART':
     default:
@@ -67,7 +67,7 @@ export const createChart = (
         pointHoverRadius: (value.pointRadius || 3) + 1,
         backgroundColor: color.backgroundColor,
         hoverBackgroundColor: color.hoverBackgroundColor,
-        borderDash: value.borderDash,
+        borderDash: value.borderDash ? value.borderDash : [],
         borderColor: color.borderColor,
         hoverBorderColor: color.hoverBorderColor,
         pointBackgroundColor: color.pointBackgroundColor,
@@ -471,7 +471,7 @@ const externalTooltipHandler = (context: any) => {
   tooltipEl.style.padding = tooltip.options.padding + 'px ' + tooltip.options.padding + 'px';
 };
 
-const barChartTimeOptions = (isDark?: boolean, timeZone?: string): ChartOptions<'bar'> => {
+const barChartTimeOptions = (isDark?: boolean): ChartOptions<'bar'> => {
   let options: ChartOptions<'bar'>;
   if (isDark) {
     options = {
@@ -481,7 +481,7 @@ const barChartTimeOptions = (isDark?: boolean, timeZone?: string): ChartOptions<
           grid: { color: 'rgba(255,255,255,0.1)' },
           beginAtZero: true,
           ticks: {
-            callback: (v: any) => formatSecsAsHourMin(v, timeZone),
+            callback: (v: any) => secondsToHHMM(v),
             stepSize: 1800,
             color: 'white',
           },
@@ -496,7 +496,7 @@ const barChartTimeOptions = (isDark?: boolean, timeZone?: string): ChartOptions<
           mode: 'index',
           intersect: false,
           callbacks: {
-            label: (tooltipItem: any) => barChatTimeLabel(tooltipItem, timeZone),
+            label: (tooltipItem: any) => barChatTimeLabel(tooltipItem),
           },
         },
       },
@@ -508,7 +508,7 @@ const barChartTimeOptions = (isDark?: boolean, timeZone?: string): ChartOptions<
         y: {
           beginAtZero: true,
           ticks: {
-            callback: (v: any) => formatSecsAsHourMin(v, timeZone),
+            callback: (v: any) => secondsToHHMM(v),
             stepSize: 1800,
           },
         },
@@ -518,7 +518,7 @@ const barChartTimeOptions = (isDark?: boolean, timeZone?: string): ChartOptions<
           mode: 'index',
           intersect: false,
           callbacks: {
-            label: (tooltipItem: any) => barChatTimeLabel(tooltipItem, timeZone),
+            label: (tooltipItem: any) => barChatTimeLabel(tooltipItem),
           },
         },
       },
@@ -544,16 +544,13 @@ const pieChatPercentageLabel = (tooltipItem: TooltipItem<'pie'>): string => {
   return `${ tooltipItem.label }: ${ (Number(tooltipItem.raw) * 100 / total).toFixed(2) }%`;
 };
 
-const formatSecsAsHourMin = (d: any, timeZone?: string): string => newDateTimestamp(d, timeZone).toISOString()
-  .substring(11, 16);
-
-const barChatTimeLabel = (tooltipItem: any, timeZone?: string): string => {
+const barChatTimeLabel = (tooltipItem: any): string => {
   let label = tooltipItem.dataset.label || '';
   if (label) {
     label += ': ';
   }
   if (tooltipItem.parsed.y !== null) {
-    label += formatSecsAsHourMin(tooltipItem.parsed.y, timeZone);
+    label += secondsToHHMM(tooltipItem.parsed.y);
   }
   return label;
 };

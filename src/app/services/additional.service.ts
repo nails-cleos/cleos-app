@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Pagination } from '../interfaces/pagination';
+import { paginated, Pagination } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { IAdditional, IAdditionalAll } from '../interfaces/additional';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
@@ -23,11 +23,11 @@ export class AdditionalService {
     page: number,
     size: number,
   ): Observable<Pagination<IAdditional>> => this.http.get<Pagination<IAdditional>>(
-    toUrl(this.urlV1, 'pages'), { params: createFilter(page, size, sort, direction) },
+    toUrl(this.urlV1, 'pages'), { ...paginated(), params: createFilter(page, size, sort, direction) },
   );
 
-  getAllAdditionalByGroupId = (roomId: string, groupId: string): Observable<IAdditional[]> =>
-    this.http.get<IAdditional[]>(toUrl(this.urlV1, 'groups'),
+  getAllAdditionalByGroupId = (roomId: string, groupId: string): Observable<IAdditionalAll[]> =>
+    this.http.get<IAdditionalAll[]>(toUrl(this.urlV1, 'groups'),
       { params: new HttpParams().set('roomId', roomId).set('groupId', groupId) },
     );
 

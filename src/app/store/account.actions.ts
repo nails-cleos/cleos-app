@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { IAccount, ITransaction } from '../interfaces/account';
+import { IAccountAll, ITransaction } from '../interfaces/account';
 import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
 import { IPaymentOption } from '../interfaces/payment';
 
@@ -17,6 +17,9 @@ enum AccountActionTypes {
   getTransactionsByAccountId = '[Account] Get transactions by account id',
   getTransaction = '[Account] find transaction by id',
   getAccountByCustomerId = '[Account] Find account by customer id',
+  setCurrentAccountId = '[Account] Set current account id',
+  setCurrentTransactionId = '[Account] Set current transaction id',
+  setCurrentCustomerId = '[Account] Set current customer id',
   clean = '[Account] Clean'
 }
 
@@ -52,7 +55,7 @@ export const accountFailure = createAction(
 
 export const accountSelected = createAction(
   AccountActionTypes.accountSelected,
-  props<{ selected?: IAccount | ITransaction }>(),
+  props<{ selected?: IAccountAll | ITransaction }>(),
 );
 
 export const getAccount = createAction(
@@ -81,6 +84,21 @@ export const getTransaction = createAction(
 
 export const getAccountByCustomerId = createAction(
   AccountActionTypes.getAccountByCustomerId,
+  props<{ customerId: string }>(),
+);
+
+export const setCurrentAccountId = createAction(
+  AccountActionTypes.setCurrentAccountId,
+  props<{ accountId: string }>(),
+);
+
+export const setCurrentTransactionId = createAction(
+  AccountActionTypes.setCurrentTransactionId,
+  props<{ transactionId: string }>(),
+);
+
+export const setCurrentCustomerId = createAction(
+  AccountActionTypes.setCurrentCustomerId,
   props<{ customerId: string }>(),
 );
 

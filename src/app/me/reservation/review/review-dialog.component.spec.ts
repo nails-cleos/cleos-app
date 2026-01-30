@@ -10,24 +10,18 @@ import { ICurrencyAll } from '../../../interfaces/currency';
 import { ITreatmentAll } from '../../../interfaces/treatment';
 import { getCurrentTimeZone } from '../../../util/dates';
 import { PaymentType } from '../../../interfaces/payment';
+import { AnalyticsStub } from '../../../util/firebase-stub';
 
 describe('ReviewDialogComponent', () => {
   let component: ReviewDialogComponent;
   let fixture: ComponentFixture<ReviewDialogComponent>;
 
   let dialogRefSpy: jasmine.SpyObj<MatDialogRef<ReviewDialogComponent>>;
-  let analyticsSpy: jasmine.SpyObj<Analytics>;
 
   let translateService: TranslateService;
 
   beforeEach(async () => {
     dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
-
-    analyticsSpy = jasmine.createSpyObj('Analytics', ['logEvent'], {
-      app: { options: {} },
-      gtagFunction: () => {
-      },
-    });
 
     const customer: IUserAll = {
       id: 'customer-id',
@@ -56,7 +50,13 @@ describe('ReviewDialogComponent', () => {
       availabilities: [{ day: 'MONDAY', start: '09:00', end: '17:00' }],
       address,
       currency,
-      office: {},
+      office: {
+        id: 'office-id',
+        name: 'Main Office',
+        manager: {
+          id: 'manager-id',
+        },
+      },
       timeZone: getCurrentTimeZone(),
       paymentTypes: [PaymentType.transfer],
       primary: true,
@@ -86,7 +86,7 @@ describe('ReviewDialogComponent', () => {
       providers: [
         { provide: MatDialogRef, useValue: dialogRefSpy },
         { provide: MAT_DIALOG_DATA, useValue: reservation },
-        { provide: Analytics, useValue: analyticsSpy },
+        { provide: Analytics, useClass: AnalyticsStub },
       ],
     }).compileComponents();
 
@@ -104,7 +104,7 @@ describe('ReviewDialogComponent', () => {
     expect(component.reservation).toBeDefined();
     expect(component.price).toBeDefined();
     expect(component.end).toBeInstanceOf(Date);
-    expect(component.dateFormat).toBe(translateService.currentLang);
+    expect(component.dateFormat).toBe(translateService.getCurrentLang());
   });
 
   it('should close dialog on onNoClick', () => {
@@ -133,25 +133,6 @@ describe('ReviewDialogComponent', () => {
   });
 
   it('should initialize detail form control as empty', () => {
-    expect(component.detail.value).toBeNull();
-  });
-
-  it('should handle existing review from data', () => {
-    const reservationWithReview = {
-      ...component.reservation!,
-      review: { rating: 3, detail: 'Good' },
-    } as IReservationAll;
-
-    const mockAnalytics = { app: { options: {} } } as Analytics;
-    const translate = TestBed.inject(TranslateService);
-
-    const comp = new ReviewDialogComponent(
-      dialogRefSpy,
-      reservationWithReview,
-      translate,
-      mockAnalytics,
-    );
-
-    expect(comp.review).toEqual({ rating: 3, detail: 'Good' });
+    expect(component.detail.value).toBe('');
   });
 });

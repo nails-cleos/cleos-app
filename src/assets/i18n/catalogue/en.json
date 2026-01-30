@@ -14,16 +14,6 @@
       "HOME": "Show in home",
       "CATALOG": "Show in catalog"
     },
-    "FILE": {
-      "DRAG_DROP": "Drag and drop file here",
-      "OR": "or",
-      "CHOOSE": "Choose a file"
-    },
-    "DELETE": {
-      "BUTTON": "Delete image {{name}}",
-      "MESSAGE": "Image {{name}} deleted",
-      "UNDO": "Undo"
-    },
     "DELETED": {
       "TITLE": "Delete catalogue",
       "CONTENT": "Are you sure to delete catalogue {{name}}?",

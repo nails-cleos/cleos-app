@@ -68,50 +68,50 @@ describe('Theme Utils', () => {
   });
 
   describe('resetTheme', () => {
-    let overlayContainer: jasmine.SpyObj<OverlayContainer>;
-    let cookieService: jasmine.SpyObj<CookieService>;
-    let themeService: jasmine.SpyObj<ThemeService>;
+    let overlayContainerSpy: jasmine.SpyObj<OverlayContainer>;
+    let cookieServiceSpy: jasmine.SpyObj<CookieService>;
+    let themeServiceSpy: jasmine.SpyObj<ThemeService>;
     let body: HTMLBodyElement;
 
     beforeEach(() => {
       body = document.getElementsByTagName('body')[0];
 
-      overlayContainer = jasmine.createSpyObj('OverlayContainer', ['getContainerElement']);
-      overlayContainer.getContainerElement.and.returnValue(document.createElement('div'));
+      overlayContainerSpy = jasmine.createSpyObj('OverlayContainer', ['getContainerElement']);
+      overlayContainerSpy.getContainerElement.and.returnValue(document.createElement('div'));
 
-      cookieService = jasmine.createSpyObj('CookieService', ['get', 'set']);
-      cookieService.get.and.returnValue('light-theme');
+      cookieServiceSpy = jasmine.createSpyObj('CookieService', ['get', 'set']);
+      cookieServiceSpy.get.and.returnValue('light-theme');
 
-      themeService = jasmine.createSpyObj('ThemeService', ['setColorschemesOptions']);
+      themeServiceSpy = jasmine.createSpyObj('ThemeService', ['setColorschemesOptions']);
     });
 
     it('should remove old class, add new theme class and set cookie', () => {
       body.classList.add('old-theme');
 
-      const result = resetTheme('dark-theme', 'old-theme', overlayContainer, cookieService, themeService);
+      const result = resetTheme(overlayContainerSpy, cookieServiceSpy, themeServiceSpy, 'dark-theme', 'old-theme');
 
       expect(body.classList.contains('old-theme')).toBeFalse();
       expect(body.classList.contains('dark-theme')).toBeTrue();
-      expect(overlayContainer.getContainerElement().classList.contains('dark-theme')).toBeTrue();
-      expect(cookieService.set).toHaveBeenCalledWith(THEME, 'dark-theme');
+      expect(overlayContainerSpy.getContainerElement().classList.contains('dark-theme')).toBeTrue();
+      expect(cookieServiceSpy.set).toHaveBeenCalledWith(THEME, 'dark-theme');
       expect(result).toBe('dark-theme');
     });
 
     it('should use cookie theme if no theme is provided', () => {
-      cookieService.get.and.returnValue('light-theme');
-      const result = resetTheme(undefined, undefined, overlayContainer, cookieService, themeService);
+      cookieServiceSpy.get.and.returnValue('light-theme');
+      const result = resetTheme(overlayContainerSpy, cookieServiceSpy, themeServiceSpy, undefined, undefined);
 
       expect(result).toBe('light-theme');
     });
 
     it('should call themeService.setColorschemesOptions with overrides', () => {
-      resetTheme('dark-theme', undefined, overlayContainer, cookieService, themeService);
-      expect(themeService.setColorschemesOptions).toHaveBeenCalledWith(jasmine.objectContaining({
+      resetTheme(overlayContainerSpy, cookieServiceSpy, themeServiceSpy, 'dark-theme', undefined);
+      expect(themeServiceSpy.setColorschemesOptions).toHaveBeenCalledWith(jasmine.objectContaining({
         plugins: jasmine.any(Object),
       }));
 
-      resetTheme('light-theme', undefined, overlayContainer, cookieService, themeService);
-      expect(themeService.setColorschemesOptions).toHaveBeenCalledWith(jasmine.objectContaining({
+      resetTheme(overlayContainerSpy, cookieServiceSpy, themeServiceSpy, 'light-theme', undefined);
+      expect(themeServiceSpy.setColorschemesOptions).toHaveBeenCalledWith(jasmine.objectContaining({
         scales: undefined,
       }));
     });

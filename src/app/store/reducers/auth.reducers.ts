@@ -1,11 +1,14 @@
-import { IMenu, IUser } from '../../interfaces/user';
+import { IMenu, IUserAll } from '../../interfaces/user';
 import {
-  clean,
+  cleanAuth,
   login,
   loginFailure,
   loginSuccess,
   logOut,
-  redirect, reLogin,
+  redirect,
+  reLogin,
+  setCurrentCode,
+  setDriveToken,
   signupFailure,
   signupSuccess,
 } from '../auth.actions';
@@ -13,39 +16,40 @@ import { IError, IResponseSuccess } from '../../interfaces/common';
 import { Params } from '@angular/router';
 import { createReducer, on } from '@ngrx/store';
 
-export interface State {
+export const AUTH_FEATURE_KEY = 'auth';
+
+export interface AuthState {
   isAuthenticated: boolean;
   redirect: boolean;
   isLoading: boolean;
-  user?: IUser;
-  token?: string;
+  user?: IUserAll;
   menus?: IMenu[];
-  errorMessage?: string;
   error?: IError;
   response?: IResponseSuccess;
   subErrors?: IError[];
+  driveToken?: string;
   queryParams?: Params;
+  currentCode?: string;
 }
 
-export const initialState: State = {
+export const initialState: AuthState = {
   isAuthenticated: false,
   redirect: false,
   isLoading: false,
   user: undefined,
-  token: undefined,
   menus: undefined,
-  errorMessage: undefined,
   error: undefined,
   response: undefined,
   subErrors: undefined,
+  driveToken: undefined,
   queryParams: {},
+  currentCode: undefined,
 };
 
 export const authReducer = createReducer(
   initialState,
   on(login, (state) => ({
     ...state,
-    errorMessage: undefined,
     error: undefined,
     response: undefined,
     subErrors: undefined,
@@ -55,24 +59,21 @@ export const authReducer = createReducer(
   on(loginFailure, signupFailure, (state, { error }) => ({
     ...state,
     isLoading: false,
-    errorMessage: error.message,
     error: error,
     response: undefined,
     subErrors: error.subErrors,
     redirect: false,
   })),
-  on(loginSuccess, (state, { token, queryParams }) => ({
+  on(loginSuccess, (state, { token, queryParams, redirect }) => ({
     ...state,
     isLoading: false,
     isAuthenticated: true,
     user: token.user,
-    token: token.tokenAccess,
     menus: token.menus,
-    errorMessage: undefined,
     response: undefined,
     subErrors: undefined,
     queryParams: queryParams,
-    redirect: false,
+    redirect: redirect || false,
   })),
   on(redirect, (state) => ({
     ...state,
@@ -82,10 +83,17 @@ export const authReducer = createReducer(
     ...state,
     isLoading: false,
     isAuthenticated: false,
-    errorMessage: undefined,
     response: action,
     subErrors: undefined,
     redirect: false,
   })),
-  on(reLogin, clean, logOut, () => initialState),
+  on(setCurrentCode, (state, { code }) => ({
+    ...state,
+    currentCode: code,
+  })),
+  on(setDriveToken, (state, { token }) => ({
+    ...state,
+    driveToken: token,
+  })),
+  on(reLogin, cleanAuth, logOut, () => initialState),
 );

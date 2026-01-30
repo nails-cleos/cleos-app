@@ -35,7 +35,7 @@ export class LoginEffects {
   loginSuccess$ = createEffect(() => this.actions.pipe(
     ofType(loginSuccess),
     tap(({ queryParams }) => {
-      let redirectUrl = [this.translate.currentLang, 'auth', 'redirect'];
+      let redirectUrl = [this.translate.getCurrentLang(), 'auth', 'redirect'];
       if (Object.keys(queryParams).length) {
         const state = JSON.parse(atob(queryParams.state));
         const decodedURI = state.returnUrl;
@@ -67,7 +67,7 @@ export class LoginEffects {
       signOut(this.auth).then(() => {
         this.authUserService.reloadUser();
         localStorage.removeItem('auth');
-        window.location.href = `/${ getLocale(this.translate.currentLang).language }/home`;
+        window.location.href = `/${getLocale(this.translate.getCurrentLang()).language}/home`;
       }).catch((error) => {
         console.error('sign out error: ' + error);
       });
@@ -78,12 +78,12 @@ export class LoginEffects {
     ofType(reLogin),
     tap(() => {
       localStorage.removeItem('auth');
-      window.location.href = `/${ this.translate.currentLang }/auth`;
+      window.location.href = this.router.url;
     }),
   ), { dispatch: false });
 
   redirect$ = createEffect(() => this.actions.pipe(
     ofType(redirect),
-    tap(() => this.router.navigate([this.translate.currentLang, 'auth', 'redirect'])),
+    tap(() => this.router.navigate([this.translate.getCurrentLang(), 'auth', 'redirect'])),
   ), { dispatch: false });
 }

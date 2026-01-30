@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ChartComponent } from './chart.component';
-import { Subject } from 'rxjs';
-import { AuthUserService } from '../../services/auth-user.service';
+import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { NavigationService } from '../../services/navigation.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { signal } from '@angular/core';
 
 describe('ChartComponent', () => {
   let component: ChartComponent;
   let fixture: ComponentFixture<ChartComponent>;
 
-  let authUser$: Subject<any>;
+  const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
@@ -20,11 +20,10 @@ describe('ChartComponent', () => {
   };
 
   beforeEach(async () => {
-    authUser$ = new Subject();
 
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['reload']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
-      authUser: authUser$.asObservable(),
+      authUser: authUserSignal.asReadonly(),
     });
 
     await TestBed.configureTestingModule({
@@ -37,10 +36,8 @@ describe('ChartComponent', () => {
 
     fixture = TestBed.createComponent(ChartComponent);
     component = fixture.componentInstance;
-    component.error = error;
+    fixture.componentRef.setInput('error', error);
   });
-
-  afterEach(() => authUser$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();

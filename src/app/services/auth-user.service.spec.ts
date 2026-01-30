@@ -81,7 +81,6 @@ describe('AuthUserService', () => {
     service = TestBed.inject(AuthUserService);
     cookieConsentService = TestBed.inject(NgcCookieConsentService) as jasmine.SpyObj<NgcCookieConsentService>;
     translateService = TestBed.inject(TranslateService);
-    translateService.setDefaultLang('en-GB');
     translateService.use('en-GB');
   });
 
@@ -90,7 +89,7 @@ describe('AuthUserService', () => {
   });
 
   it('should initialize with default auth user', () => {
-    const initialAuthUser = service.authUser.getValue();
+    const initialAuthUser = service.authUser();
 
     expect(initialAuthUser.isDarkMode).toBeFalse();
     expect(initialAuthUser.isAdmin).toBeFalse();
@@ -231,14 +230,6 @@ describe('AuthUserService', () => {
       expect(result.referralMax).toBe(5); // Uses default
       expect(result.showCash).toBeFalse(); // Uses default
     });
-
-    it('should emit updated auth user via BehaviorSubject', () => {
-      const authUserSpy = spyOn(service.authUser, 'next');
-
-      const result = service.reloadUser(mockUser);
-
-      expect(authUserSpy).toHaveBeenCalledWith(result);
-    });
   });
 
   describe('updateMode', () => {
@@ -249,7 +240,7 @@ describe('AuthUserService', () => {
       const result = service.updateMode(true);
 
       expect(result.isDarkMode).toBeTrue();
-      expect(service.authUser.getValue().isDarkMode).toBeTrue();
+      expect(service.authUser().isDarkMode).toBeTrue();
     });
 
     it('should update dark mode to false', () => {
@@ -259,24 +250,15 @@ describe('AuthUserService', () => {
       const result = service.updateMode(false);
 
       expect(result.isDarkMode).toBeFalse();
-      expect(service.authUser.getValue().isDarkMode).toBeFalse();
-    });
-
-    it('should emit updated auth user via BehaviorSubject', () => {
-      service.reloadUser(mockUser);
-      const authUserSpy = spyOn(service.authUser, 'next');
-
-      const result = service.updateMode(true);
-
-      expect(authUserSpy).toHaveBeenCalledWith(result);
+      expect(service.authUser().isDarkMode).toBeFalse();
     });
 
     it('should preserve other user properties when updating mode', () => {
       service.reloadUser(mockUser);
-      const originalAuthUser = service.authUser.getValue();
+      const originalAuthUser = service.authUser();
 
       service.updateMode(true);
-      const updatedAuthUser = service.authUser.getValue();
+      const updatedAuthUser = service.authUser();
 
       expect(updatedAuthUser.userId).toBe(originalAuthUser.userId);
       expect(updatedAuthUser.email).toBe(originalAuthUser.email);
@@ -330,40 +312,27 @@ describe('AuthUserService', () => {
     });
   });
 
-  describe('BehaviorSubject functionality', () => {
-    it('should allow subscription to auth user changes', (done) => {
-      let emissionCount = 0;
-      const expectedEmissions = [
-        // Initial value
-        jasmine.objectContaining({ isAuthenticated: false }),
-        // After reloadUser
-        jasmine.objectContaining({ isAuthenticated: true, userId: 'user-123' }),
-        // After updateMode
-        jasmine.objectContaining({ isAuthenticated: true, isDarkMode: true }),
-      ];
+  it('should update auth user when reloadUser is called', () => {
+    expect(service.authUser().isAuthenticated).toBeFalse();
 
-      service.authUser.subscribe((authUser) => {
-        expect(authUser).toEqual(expectedEmissions[emissionCount]);
-        emissionCount++;
+    service.reloadUser(mockUser);
 
-        if (emissionCount === 3) {
-          done();
-        }
-      });
+    expect(service.authUser().isAuthenticated).toBeTrue();
+    expect(service.authUser().userId).toBe('user-123');
+  });
 
-      // Trigger emissions
-      service.reloadUser(mockUser);
-      service.updateMode(true);
-    });
+  it('should update only dark mode when updateMode is called', () => {
+    service.reloadUser(mockUser);
 
-    it('should provide current value immediately to new subscribers', () => {
-      service.reloadUser(mockUser);
+    const before = service.authUser();
 
-      service.authUser.subscribe((authUser) => {
-        expect(authUser.isAuthenticated).toBeTrue();
-        expect(authUser.userId).toBe('user-123');
-      });
-    });
+    service.updateMode(true);
+
+    const after = service.authUser();
+
+    expect(after.isDarkMode).toBeTrue();
+    expect(after.userId).toBe(before.userId);
+    expect(after.email).toBe(before.email);
   });
 
   describe('edge cases and error handling', () => {

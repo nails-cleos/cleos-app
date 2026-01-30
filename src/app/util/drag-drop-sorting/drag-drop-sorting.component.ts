@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { SharedModule } from '../../shared/shared.module';
 import { BackButtonDirective } from '../../directives/back-button.directive';
@@ -41,16 +41,17 @@ export class ItemSorting implements ISorting {
   templateUrl: './drag-drop-sorting.component.html',
   styleUrls: ['./drag-drop-sorting.component.scss'],
   imports: [SharedModule, BackButtonDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DragDropSortingComponent {
-  @Input() title!: string;
-  @Input() items!: ISorting[];
-  @Output() sorted = new EventEmitter<Sorted[]>();
+  title = input.required<string>();
+  items = input.required<ISorting[]>();
+  sorted = output<Sorted[]>();
 
-  get sort(): void {
-  	const sorted = this.items.map((item, i) => new Sorted(i + 1, item.key));
-  	return this.sorted.emit(sorted);
+  sort() {
+    const sorted = this.items().map((item, i) => new Sorted(i + 1, item.key));
+    this.sorted.emit(sorted);
   }
 
-  drop = (event: CdkDragDrop<ISorting[]>): void => moveItemInArray(this.items, event.previousIndex, event.currentIndex);
+  drop = (event: CdkDragDrop<ISorting[]>) => moveItemInArray(this.items(), event.previousIndex, event.currentIndex);
 }

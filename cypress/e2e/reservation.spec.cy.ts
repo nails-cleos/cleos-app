@@ -4,7 +4,7 @@ import { API_LOCALE } from '../../src/app/util/dates';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   const days = breakpointToDays('reservation', breakpoints);
-  describe(`Reservation with ${ name }`, () => {
+  describe(`Reservation with ${name}`, () => {
     beforeEach(() => cy.viewport(width, height));
     const email = 'nails.cleos@gmail.com';
     const customerId = '1c27715c-21a3-4255-97ac-9263d9f177e7';
@@ -17,13 +17,15 @@ devices.forEach(({ name, width, height, breakpoints }) => {
     const hourFormat = zeroPad(hour);
     const minute = 30;
     const minuteFormat = zeroPad(minute);
-    const reservationTime = `${ hourFormat }:${ minuteFormat }`;
+    const reservationTime = `${hourFormat}:${minuteFormat}`;
 
     const reservationDate = new Date();
-    reservationDate.setMonth(reservationDate.getMonth() + 1);
-    reservationDate.setDate(15);
-    // Next Wednesday
-    reservationDate.setDate(reservationDate.getDate() + ((10 - reservationDate.getDay()) % 7 || 7));
+    reservationDate.setMonth(reservationDate.getMonth() + 1, 1);
+
+    // move to next Wednesday
+    const day = reservationDate.getDay(); // 0 = Sun
+    const diffToWednesday = (3 - day + 7) % 7 || 7;
+    reservationDate.setDate(reservationDate.getDate() + diffToWednesday);
     beforeEach(() => {
       cy.mockAuthentication(email, 'ROLE_ADMIN');
       cy.visit('en-GB/reservation');
@@ -48,23 +50,24 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
       cy.wait('@getRooms').its('response.statusCode').should('eq', 200);
       cy.wait('@getTreatmentSearch').its('response.statusCode').should('eq', 200);
+      cy.get('button[name="toStepThree"]').click({ force: true });
 
       // Select treatment and date time
       const formattedDate = reservationDate.toLocaleDateString('en-GB');
 
-      cy.get('input[formControlName="date"]').click({ force: true });
+      cy.get('[data-cy="date-picker"]').click({ force: true });
       cy.get('.mat-calendar-next-button').click({ force: true });
 
       cy.wait(50);
-      cy.get(`button[aria-label="${ formattedDate }"]`).click({ force: true });
+      cy.get(`button[aria-label="${formattedDate}"]`).click({ force: true });
 
-      cy.get('input[formControlName="start"]').click({ force: true });
+      cy.get('[data-cy="start-picker"]').click({ force: true });
       cy.setTime(hourFormat, minuteFormat);
 
-      cy.get('input[formControlName="date"]').should('have.value', formattedDate);
-      cy.get('input[formControlName="start"]').should('have.value', reservationTime);
-      cy.get('input[formControlName="group"]').should('have.value', 'Biab Treatment ');
-      cy.get('input[formControlName="treatment"]').should('have.value', 'Biab + Single Color ');
+      cy.get('[data-cy="date-picker"]').should('have.value', formattedDate);
+      cy.get('[data-cy="start-picker"]').should('have.value', reservationTime);
+      cy.get('[data-cy="group-input"]').should('have.value', 'Biab Treatment ');
+      cy.get('[data-cy="treatment-input"]').should('have.value', 'Biab + Single Color ');
 
       cy.get('button[name="toStepFour"]').click({ force: true });
 
@@ -90,9 +93,9 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
       // Calendar
       cy.checkAppDialog('Update reservation',
-        `Are you sure to change reservation to ${ formattedDate }, ${ reservationTime }:00?`, 'Yes');
+        `Are you sure to change reservation to ${formattedDate}, ${reservationTime}:00?`, 'Yes');
 
-      cy.wait(50);
+      cy.wait(500);
       calendarExpectations(reservationTime)[days].forEach((events, dayIndex) => validateCalendar(dayIndex, events));
       cy.get('button[name="toStepSeven"]').click({ force: true });
 
@@ -115,8 +118,8 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.checkMatList('Powder', 'add_post', '€ 5.00', '⏲ 00:15');
 
       cy.get('div[mat-subheader]').contains('Appointment').should('exist');
-      cy.checkMatList(`${ formattedDate }, ${ reservationTime }`, 'spa',
-        `${ formattedDate }, ${ zeroPad(hour + 2) }:${ minuteFormat }`);
+      cy.checkMatList(`${formattedDate}, ${reservationTime}`, 'spa',
+        `${formattedDate}, ${zeroPad(hour + 2)}:${minuteFormat}`);
       cy.checkMatList('Duration', 'timer', '02:00');
       cy.checkMatList('Total', 'euro', '105.00');
 
@@ -135,7 +138,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           expect(body.timeZone).to.eq('Europe/Amsterdam');
           expect(body.additionalIds).to.have
             .members(['557c6520-035a-4b0a-9bd4-f2f1dce27f6d', '397bce4b-27ba-459f-801a-dcceea330b8d']);
-          expect(body.canCustomerChange).to.eq(null);
+          expect(body.canCustomerChange).to.eq(false);
           expect(body.reference).to.eq(null);
           expect(body.note).to.eq(null);
           expect(body.payment).to.eq(undefined);
@@ -145,7 +148,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           expect(body.discountId).to.eq(undefined);
         });
 
-        cy.url().should('include', `reservation/${ reservationId }`);
+        cy.url().should('include', `reservation/${reservationId}`);
         cy.wait('@getReservation').its('response.statusCode').should('eq', 200);
         cy.wait('@getPayments').its('response.statusCode').should('eq', 204);
         cy.wait('@getHistory').its('response.statusCode').should('eq', 204);
@@ -164,7 +167,7 @@ const wednesday = (reservationTime: string) => [
   ...defaultEvents,
   { text: '10:00 - 11:30', length: 1 },
   { text: '15:30 - 17:00', length: 1 },
-  { text: `${ reservationTime } - 15:30`, length: 1 },
+  { text: `${reservationTime} - 15:30`, length: 1 },
 ];
 const thursday = [{ text: 'All day', length: 1 }];
 const weekend = [{ text: 'Out of work', length: 1 }];
@@ -182,6 +185,6 @@ const validateCalendar = (day: number, events: { text: string, length: number }[
   cy.get('mwl-calendar-week-view').find('.cal-day-column').eq(day).find('mwl-calendar-week-view-event')
     .then(eventsList => {
       events.forEach(
-        event => cy.wrap(eventsList).filter(`:contains("${ event.text }")`).should('have.length', event.length));
+        event => cy.wrap(eventsList).filter(`:contains("${event.text}")`).should('have.length', event.length));
     });
 };

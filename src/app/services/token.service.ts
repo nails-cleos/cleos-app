@@ -1,78 +1,95 @@
-import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, Subject, Subscription, timer } from 'rxjs';
-import { shareReplay, switchMap, takeUntil } from 'rxjs/operators';
-import { Router } from '@angular/router';
-import { IUserAll } from '../interfaces/user';
+import { computed, DestroyRef, effect, inject, Injectable, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Auth, user } from '@angular/fire/auth';
 import { User } from '@firebase/auth';
+import { Subscription, timer } from 'rxjs';
+
+import { IUserAll } from '../interfaces/user';
 import { getNowTimeZone, newDate, plusMinutes } from '../util/dates';
-import { TranslateService } from '@ngx-translate/core';
+import { getDriveTokenPipe } from '../store/selectors/auth.selectors';
+import { AuthState } from '../store/reducers/auth.reducers';
+import { Store } from '@ngrx/store';
 
 @Injectable({ providedIn: 'root' })
 export class TokenService {
-  private myTokenCache?: Observable<User | null>;
-  private readonly cacheSize: number = 1;
-  private readonly refreshInterval: number = 55 * 60 * 1000; // 5 min;
-  private myUser: any;
-  private myTokenSubscription?: Subscription;
-  private stopTimer?: Subject<boolean>;
-  private _token$: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
-  private translate: TranslateService = inject(TranslateService);
-  private router: Router = inject(Router);
-  private auth: Auth = inject(Auth);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly store = inject(Store<AuthState>);
+  private readonly auth = inject(Auth);
 
-  get user(): IUserAll {
-    return this.myUser;
-  }
+  private readonly tokenSignal = signal<string | null>(null);
+  readonly token = computed(() => this.tokenSignal());
 
-  set user(myUser: IUserAll) {
-    this.myUser = myUser;
-  }
+  private readonly userSignal = signal<IUserAll | null>(null);
+  readonly user = computed(() => this.userSignal());
 
-  get token(): string | null {
-    return this._token$.value;
-  }
+  readonly storeDriveToken = toSignal(this.store.pipe(getDriveTokenPipe), { initialValue: undefined });
+  readonly driveToken = computed(() => this.storeDriveToken());
 
-  set token(token: string) {
-    this._token$.next(token);
-    if (token && !this.myTokenCache) {
-      const myStopTimer = new Subject<boolean>();
-      this.stopTimer = myStopTimer;
-      const myTimer = timer(0, this.refreshInterval);
-      this.myTokenCache = myTimer.pipe(
-        takeUntil(myStopTimer),
-        switchMap(() => user(this.auth)),
-        shareReplay(this.cacheSize),
-      );
+  private readonly firebaseUser = toSignal<User | null>(user(this.auth), { initialValue: null });
 
-      this.myTokenSubscription = this.myTokenCache.subscribe({
-        next: (firebaseUser) => {
-          firebaseUser?.getIdTokenResult().then(tokenResult => {
-            const expirationTime = plusMinutes(newDate(tokenResult.expirationTime), -10);
-            if (getNowTimeZone() >= expirationTime) {
-              firebaseUser.getIdToken(true).then(newToken => {
-                this._token$.next(newToken);
-              });
-            }
-          });
-        },
-        error: () => this.clear(),
-        complete: () => this.clear(),
+  private refreshSubscription?: Subscription;
+  private readonly refreshInterval = 55 * 60 * 1000; // 55 min
+
+  constructor() {
+    effect(() => {
+      const fbUser = this.firebaseUser();
+      if (!fbUser) {
+        this.clear();
+        return;
+      }
+
+      fbUser.getIdToken().then(token => {
+        this.tokenSignal.set(token);
       });
-    }
+    });
+
+    effect(() => {
+      const token = this.tokenSignal();
+      if (token === null) {
+        this.stopRefreshTimer();
+        return;
+      } else {
+        this.startRefreshTimer();
+      }
+    });
   }
 
-  clear = (): void => {
-    if (this.myTokenSubscription) {
-      this.myTokenSubscription.unsubscribe();
+  set setUser(user: IUserAll) {
+    this.userSignal.set(user);
+  }
+
+  private startRefreshTimer(): void {
+    if (this.refreshSubscription) {
+      return;
     }
-    if (this.stopTimer) {
-      this.stopTimer.next(true);
-      this.stopTimer = undefined;
-    }
-    this.myTokenCache = undefined;
-    this._token$.next(null);
-    this.myUser = undefined;
-    this.router.navigate(['/', this.translate.currentLang, 'login']);
-  };
+
+    this.refreshSubscription = timer(0, this.refreshInterval).subscribe(
+      async () => {
+        const firebaseUser = this.firebaseUser();
+        if (!firebaseUser) {
+          return;
+        }
+
+        const result = await firebaseUser.getIdTokenResult();
+        const refreshAt = plusMinutes(newDate(result.expirationTime), -10);
+
+        if (getNowTimeZone() >= refreshAt) {
+          const newToken = await firebaseUser.getIdToken(true);
+          this.tokenSignal.set(newToken);
+        }
+      });
+
+    this.destroyRef.onDestroy(() => this.stopRefreshTimer());
+  }
+
+  private stopRefreshTimer(): void {
+    this.refreshSubscription?.unsubscribe();
+    this.refreshSubscription = undefined;
+  }
+
+  clear(): void {
+    this.stopRefreshTimer();
+    this.tokenSignal.set(null);
+    this.userSignal.set(null);
+  }
 }

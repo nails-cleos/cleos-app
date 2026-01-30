@@ -28,7 +28,7 @@ import { CurrencyService } from '../../services/currency.service';
 import { Pagination } from '../../interfaces/pagination';
 import { IDiscount, IReferral, IUserDiscount } from '../../interfaces/discount';
 import { ICurrency } from '../../interfaces/currency';
-import { IApiResponse, success } from '../../interfaces/common';
+import { IApiResponse, success, successResponse } from '../../interfaces/common';
 
 @Injectable()
 export class DiscountEffects {
@@ -110,8 +110,8 @@ export class DiscountEffects {
       this.discountService.createDiscount(discount).pipe(
         switchMap((response: IApiResponse) => {
           const message = this.translate.instant('DISCOUNT.CREATED', { name: response.name });
-          const path = `discounts/${ response.id }`;
-          return success(discountSaveSuccess, message, path);
+          const path = `discounts/${response.id}`;
+          return successResponse(discountSaveSuccess, message, path, 'discounts');
         }),
         catchError((err: HttpErrorResponse) => of(discountFailure({ error: err.error }))),
       )),
@@ -123,8 +123,8 @@ export class DiscountEffects {
       this.discountService.updateDiscount(id, discount).pipe(
         switchMap((response: IApiResponse) => {
           const message = this.translate.instant('DISCOUNT.UPDATED.MESSAGE', { name: response.name });
-          const path = `discounts/${ response.id }`;
-          return success(discountSaveSuccess, message, path);
+          const path = `discounts/${response.id}`;
+          return successResponse(discountSaveSuccess, message, path, 'discounts');
         }),
         catchError((err: HttpErrorResponse) => of(discountFailure({ error: err.error }))),
       )),
@@ -144,7 +144,7 @@ export class DiscountEffects {
 
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(discountSelected),
-    tap(({ selected }) => this.router.navigate([this.translate.currentLang, 'discounts', selected?.id])),
+    tap(({ selected }) => this.router.navigate([this.translate.getCurrentLang(), 'discounts', selected?.id])),
   ), { dispatch: false });
 
   dataSuccess$ = createEffect(() => this.actions.pipe(

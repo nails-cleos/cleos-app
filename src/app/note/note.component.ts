@@ -1,21 +1,12 @@
-import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  UntypedFormControl,
-  UntypedFormGroup,
-  Validators,
-  ɵTypedOrUntyped,
-} from '@angular/forms';
-import { Observable, Subscription } from 'rxjs';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, Signal, signal } from '@angular/core';
+import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { combineLatestWith } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
-import { AppState, selectNoteState } from '../store/app.states';
-import { ActivatedRoute, Router } from '@angular/router';
 import { backendFormatDate, createDateFromString } from '../util/dates';
-import { fieldChange, requireMatchAsync, valueChange } from '../util/validators';
-import { clean, createNote, deleteNote, getAllProfessional, getNote, updateNote } from '../store/note.actions';
-import { INote, INoteAll, Note } from '../interfaces/note';
+import { fieldChange, requireMatch, valueChange } from '../util/validators';
+import { createNote, deleteNote, getNote, updateNote } from '../store/note.actions';
+import { INote, Note } from '../interfaces/note';
 import { IUser, IUserAll } from '../interfaces/user';
 import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
@@ -23,148 +14,179 @@ import { MatDialog } from '@angular/material/dialog';
 import { map, startWith } from 'rxjs/operators';
 import { SharedModule } from '../shared/shared.module';
 import { BackButtonDirective } from '../directives/back-button.directive';
+import { NoteState } from '../store/reducers/note.reducers';
+import {
+  getAllProfessionalsPipe,
+  getCurrentNoteIdPipe,
+  getNavigationParamsPipe,
+  getSelectedNotePipe,
+  getSubErrorsPipe,
+} from '../store/selectors/note.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { IError } from '../interfaces/common';
+
+type NoteForm = {
+  description: FormControl<string>;
+  professional: FormControl<IUserAll | undefined>;
+  date: FormControl<Date | undefined>;
+  repeat: FormControl<FrequencyEnum | undefined>;
+}
 
 @Component({
   selector: 'app-note',
   templateUrl: './note.component.html',
   styleUrls: ['./note.component.scss'],
   imports: [SharedModule, BackButtonDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NoteComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input() note?: INoteAll;
-  form!: UntypedFormGroup;
-  id?: string;
-  isAddMode: boolean;
+export class NoteComponent {
+  private readonly store: Store<NoteState> = inject(Store<NoteState>);
+  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly dialog: MatDialog = inject(MatDialog);
 
-  professionals?: IUserAll[];
-  filteredOptions?: Observable<IUser[] | undefined>;
+  private noteId$ = this.store.pipe(getCurrentNoteIdPipe);
+  private navigationParams$ = this.store.pipe(getNavigationParamsPipe);
+  private selectedNote$ = this.store.pipe(getSelectedNotePipe);
+  private allProfessionals$ = this.store.pipe(getAllProfessionalsPipe);
+  private subErrors$ = this.store.pipe(getSubErrorsPipe);
+
+  private noteIdSignal = toSignal(this.noteId$, { initialValue: null });
+  private navigationParams = toSignal(this.navigationParams$);
+  private subErrorsSignal = toSignal(this.subErrors$);
+
+  allProfessionalsSignal = toSignal(this.allProfessionals$);
+  noteSignal = toSignal(this.selectedNote$);
+  isAddModeSignal = computed(() => !this.noteIdSignal());
+  errors = signal<Record<string, unknown>>({});
+
+  form: FormGroup<NoteForm> = this.formBuilder.group<NoteForm>({
+    description: this.formBuilder.control('', {
+      validators: [Validators.required],
+    }),
+    professional: this.formBuilder.control(undefined, {
+      validators: [Validators.required, requireMatch],
+    }),
+    date: this.formBuilder.control(undefined, {
+      validators: [Validators.required],
+    }),
+    repeat: this.formBuilder.control(undefined, {
+      validators: [Validators.required],
+    }),
+  });
+
+  filteredProfessionalSignal: Signal<IUserAll[] | undefined> = toSignal(
+    this.getForm.professional.valueChanges.pipe(
+      startWith(undefined),
+      map((value?: IUserAll | string) => !value || typeof value === 'string' ? value : value.displayName),
+      combineLatestWith(this.allProfessionals$),
+      map(([name, professionals]) => {
+        if (!professionals) {
+          return [];
+        }
+
+        return name ? this.filter(name, professionals) : professionals.slice();
+      })),
+  );
 
   repeats = [FrequencyEnum.none, FrequencyEnum.onceAWeek, FrequencyEnum.onceAMonth, FrequencyEnum.onceAYear];
-  errors: any = [];
 
-  private getState: Observable<any>;
-  private subscription?: Subscription;
-  private readonly extras: any;
-  private readonly language: string;
+  constructor() {
+    effect(() => {
+      const params = this.navigationParams();
+      if (params) {
+        this.getForm.professional.setValue(params.professional);
+        this.getForm.date.setValue(params.date);
+      }
+    });
 
-  constructor(private readonly translate: TranslateService, private store: Store<AppState>,
-    private formBuilder: FormBuilder, private route: ActivatedRoute, private router: Router,
-    public dialog: MatDialog) {
-    this.isAddMode = true;
-    this.getState = this.store.select(selectNoteState);
-    this.extras = this.router.getCurrentNavigation()?.extras.state;
-    this.language = translate.currentLang;
+    effect(() => {
+      const selected = this.noteSignal();
+      if (selected?.id) {
+        const note = {
+          id: selected.id,
+          description: selected.description,
+          professional: selected.professional,
+          repeat: selected.repeat,
+          date: createDateFromString(selected.date),
+        };
+        this.form.patchValue(note);
+      }
+    });
+
+    effect(() => {
+      const subErrors = this.subErrorsSignal();
+      if (subErrors) {
+        const errorMap: Record<string, unknown> = {};
+        subErrors.forEach((error: IError) => {
+          const field = error.field as keyof NoteForm | undefined;
+
+          if (field && field in this.form.controls) {
+            errorMap[field] = error.message;
+            this.form.controls[field].setErrors({ incorrect: true });
+          }
+        });
+        this.errors.set(errorMap);
+      }
+    });
+
+    effect(() => {
+      const id = this.noteIdSignal();
+      if (id) {
+        this.store.dispatch(getNote({ id }));
+      }
+    });
   }
 
-  get getForm(): ɵTypedOrUntyped<any, any, { [p: string]: AbstractControl<any> }> {
+  get getForm(): NoteForm {
     return this.form.controls;
   }
 
-  get submit(): void {
+  submit(): void {
     if (this.form.invalid) {
       return;
     }
 
+    const noteSignal = this.noteSignal();
     const note: INote = new Note();
-    note.description = fieldChange(this.getForm.description as UntypedFormControl, this.note?.description);
-    note.professionalId = valueChange(this.getForm.professional.value, this.note?.professional)?.id;
-    note.repeat = fieldChange(this.getForm.repeat as UntypedFormControl, this.note?.repeat);
+    note.description = fieldChange(this.getForm.description, noteSignal?.description);
+    note.professionalId = valueChange(this.getForm.professional.value, noteSignal?.professional)?.id;
+    note.repeat = fieldChange(this.getForm.repeat, noteSignal?.repeat);
     note.date = backendFormatDate(this.getForm.date.value);
 
-    if (this.isAddMode) {
+    const id = this.noteIdSignal();
+    if (!id) {
       this.store.dispatch(createNote({ note }));
     } else {
-      const id = this.id!;
       this.store.dispatch(updateNote({ id, note }));
     }
     return;
   }
 
-  get delete(): void {
+  delete() {
+    const note = this.noteSignal();
+    if (!note?.id) {
+      return;
+    }
     const title = this.translate.instant('NOTE.DELETED.TITLE');
-    const description = this.note?.description;
+    const description = note.description;
     const content = this.translate.instant('NOTE.DELETED.CONTENT', { description });
 
-    return executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: this.note }, result => {
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: note }, result => {
       if (result) {
         this.store.dispatch(deleteNote({ id: result.id, description: result.description }));
       }
     });
   }
 
-  ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.id = id;
-    }
-    this.isAddMode = !this.id;
-    this.clean();
-    this.createForm();
-    this.subscribe();
-    if (this.extras) {
-      this.getForm.professional.setValue(this.extras.professional);
-      this.getForm.date.setValue(this.extras.date);
-    }
-    if (!this.isAddMode) {
-      this.getNote();
-    }
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
-  }
-
-  ngAfterViewInit(): void {
-    this.getProfessionals();
-  }
-
   displayFn = (user: IUser): string => user?.displayName ? user.displayName : '';
 
-  keyDownHandler = (event: any): void => {
+  keyDownHandler = (event: KeyboardEvent): void => {
     if (event.code === 'Backspace') {
-      this.getForm.professional.setValue('');
+      this.getForm.professional.setValue(undefined);
     }
   };
 
-  private createForm = (): void => {
-    this.form = this.formBuilder.group({
-      description: ['', Validators.required],
-      professional: ['', Validators.required, requireMatchAsync],
-      date: ['', Validators.required],
-      repeat: ['', Validators.required],
-    });
-    this.filteredOptions = this.getForm.professional.valueChanges.pipe(
-      startWith(''),
-      map(value => typeof value === 'string' ? value : value.name),
-      map(name => name ? this.filter(name) : this.professionals ? this.professionals.slice() : this.professionals),
-    );
-  };
-
-  private filter = (name: string): IUser[] | undefined => this.professionals?.filter(
+  private filter = (name: string, professionals: IUserAll[]): IUserAll[] | undefined => professionals?.filter(
     option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
-
-  private clean = (): void => this.store.dispatch(clean());
-
-  private getProfessionals = (): void => this.store.dispatch(getAllProfessional());
-
-  private getNote = (): void => this.store.dispatch(getNote({ id: this.id! }));
-
-  private subscribe = (): void => {
-    this.subscription = this.getState.subscribe((state) => {
-      this.professionals = state.professionals;
-      this.note = state.selected;
-      if (this.note?.id) {
-        this.form.patchValue(this.note);
-        this.getForm.date.setValue(createDateFromString(this.note.date));
-      }
-      if (state.subErrors) {
-        state.subErrors.forEach((value: any) => {
-          this.errors[value.field] = value.message;
-          this.form.controls[value.field].setErrors({ incorrect: true });
-        });
-      } else if (state.response) {
-        this.router.navigate([this.language, 'reservation', 'calendar']);
-      }
-    });
-  };
 }

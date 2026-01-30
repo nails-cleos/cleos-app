@@ -3,8 +3,9 @@
     <mat-icon>all_out</mat-icon>
   </button>
   @if (menuOpen) {
-    <div class="menu-items" [@listAnimation]="fabMenus.length">
-      @for (item of fabMenus; track item.icon) {
+    @let menus = fabMenus();
+    <div class="menu-items" [@listAnimation]="menus.length">
+      @for (item of menus; track item.icon) {
         <button mat-fab (click)="handleMenuItemClick(item)" matTooltip="{{ item.tooltip }}" [color]="item.color"
                 matTooltipPosition="left">
           <mat-icon>{{ item.icon }}</mat-icon>
