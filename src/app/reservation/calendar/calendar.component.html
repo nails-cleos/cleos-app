@@ -79,35 +79,28 @@
   </fieldset>
 </div>
 
-@if (calendarSignal()) {
   <div class="divider card-actions">
-    <button class="hide-gt-xs" (click)="decrement()" color="accent" mat-fab
-            [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading">
+    <button class="hide-gt-xs" (click)="decrement()" color="accent" mat-fab>
       <mat-icon>navigate_before</mat-icon>
     </button>
-    <button class="hide-xs" (click)="decrement()" color="accent" mat-fab extended
-            [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading">
+    <button class="hide-xs" (click)="decrement()" color="accent" mat-fab extended>
       <mat-icon>navigate_before</mat-icon>
       <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
     </button>
     <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [value]="viewDate"
            hidden matInput [max]="maxDate" [min]="minDate">
     <mat-datepicker #picker touchUi></mat-datepicker>
-    <button class="hide-gt-xs" (click)="picker.open()" color="primary" mat-fab
-            [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading">
+    <button class="hide-gt-xs" (click)="picker.open()" color="primary" mat-fab>
       <mat-icon>today</mat-icon>
     </button>
-    <button class="hide-xs" (click)="picker.open()" color="primary" mat-fab extended
-            [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading">
+    <button class="hide-xs" (click)="picker.open()" color="primary" mat-fab extended>
       <mat-icon>today</mat-icon>
       <span>{{ 'COMMON.BUTTON.GOTO' | translate }}</span>
     </button>
-    <button class="hide-gt-xs" (click)="increment()" color="accent" mat-fab
-            [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading">
+    <button class="hide-gt-xs" (click)="increment()" color="accent" mat-fab>
       <mat-icon>navigate_next</mat-icon>
     </button>
-    <button class="hide-xs" (click)="increment()" color="accent" mat-fab extended
-            [class.spinner]="isLoading || isCalendarLoading" [disabled]="isLoading || isCalendarLoading">
+    <button class="hide-xs" (click)="increment()" color="accent" mat-fab extended>
       <mat-icon>navigate_next</mat-icon>
       <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
     </button>
@@ -127,27 +120,24 @@
     </button>
   </div>
 
-  @if (calendarDaySignal(); as calendarDay) {
-    <div id="weekViewPDF">
-      <div class="divider">
-        <mwl-calendar-week-view
-          (beforeViewRender)="beforeMonthViewRender($event)"
-          (eventClicked)="view($event.event)"
-          (hourSegmentClicked)="segmentClick($event.date, calendarRoomSignal())"
-          (eventTimesChanged)="eventTimesChanged($event)"
-          [refresh]="refresh"
-          [dayEndHour]="calendarDay.dayEndHour"
-          [dayEndMinute]="calendarDay.dayEndMinute"
-          [dayStartHour]="calendarDay.dayStartHour"
-          [dayStartMinute]="calendarDay.dayStartMinute"
-          [daysInWeek]="totalDays"
-          [events]="calendarEventsSignal()"
-          [hourSegments]="hourSegments"
-          [locale]="locale"
-          [viewDate]="viewDate()"
-          [weekendDays]="[]"></mwl-calendar-week-view>
-      </div>
+  @let calendarDay = calendarDaySignal();
+  <div id="weekViewPDF">
+    <div class="divider">
+      <mwl-calendar-week-view
+        (beforeViewRender)="beforeMonthViewRender($event)"
+        (eventClicked)="view($event.event)"
+        (hourSegmentClicked)="segmentClick($event.date, calendarRoomSignal())"
+        (eventTimesChanged)="eventTimesChanged($event)"
+        [refresh]="refresh"
+        [dayEndHour]="calendarDay?.dayEndHour ?? 23"
+        [dayEndMinute]="calendarDay?.dayEndMinute ?? 59"
+        [dayStartHour]="calendarDay?.dayStartHour ?? 0"
+        [dayStartMinute]="calendarDay?.dayStartMinute ?? 0"
+        [daysInWeek]="totalDays"
+        [events]="calendarEventsSignal()"
+        [hourSegments]="hourSegments"
+        [locale]="locale"
+        [viewDate]="viewDate()"
+        [weekendDays]="[]"></mwl-calendar-week-view>
     </div>
-  }
-  <!--  }-->
-}
+  </div>

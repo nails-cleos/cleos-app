@@ -679,10 +679,6 @@
     color: mat.m2-get-color-from-palette($warn-palette);
   }
 
-  .red-text {
-    color: mat.m2-get-color-from-palette($warn-palette);
-  }
-
   @if $isDark {
     .contrast-text {
       color: #fafafa !important;

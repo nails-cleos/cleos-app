@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { TokenService } from './token.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -8,19 +8,16 @@ import { Auth } from '@angular/fire/auth';
 import { Store } from '@ngrx/store';
 import { AuthState } from '../store/reducers/auth.reducers';
 import { IUserAll } from '../interfaces/user';
+import { signal } from '@angular/core';
 
 describe('TokenService', () => {
   let service: TokenService;
 
   let storeSpy: jasmine.SpyObj<Store<AuthState>>;
 
-  let token$: BehaviorSubject<any>;
-  let user$: BehaviorSubject<any>;
   let driveToken$: BehaviorSubject<any>;
 
   beforeEach(() => {
-    token$ = new BehaviorSubject('token');
-    user$ = new BehaviorSubject({ id: 'a', displayName: 'Alice' } as IUserAll);
     driveToken$ = new BehaviorSubject('driveToken');
 
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
@@ -33,10 +30,6 @@ describe('TokenService', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return token$.asObservable();
-        case 2:
-          return user$.asObservable();
-        case 3:
           return driveToken$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -67,34 +60,11 @@ describe('TokenService', () => {
     expect(service.driveToken()).toBe('driveToken');
   });
 
-  it('should set token', () => {
-    service.setToken = 'newToken';
-
-    expect(service.token()).toBe('newToken');
-  });
-
   it('should set user', () => {
     const newUser = { id: 'b', displayName: 'Bob' } as IUserAll;
     service.setUser = newUser;
 
     expect(service.user()).toEqual(newUser);
-  });
-
-  it('should not recreate token cache if already initialized', () => {
-    (service as any).myTokenCache = of(null);
-
-    service.setToken = 'abc';
-    service.setToken = 'def';
-
-    expect(service.token()).toBe('def');
-  });
-
-  it('should ignore null firebase user', () => {
-    (service as any).myTokenCache = of(null);
-
-    expect(() => {
-      service.setToken = 'token';
-    }).not.toThrow();
   });
 
   it('should NOT refresh token when not expired', async () => {
@@ -107,8 +77,6 @@ describe('TokenService', () => {
     };
 
     (service as any).firebaseUser$ = of(fakeUser);
-
-    service.setToken = 'token';
 
     await Promise.resolve();
 
@@ -126,13 +94,41 @@ describe('TokenService', () => {
     service.clear();
 
     expect(service.clear).toHaveBeenCalled();
+    expect(service['tokenSignal']()).toBeNull();
+    expect(service['userSignal']()).toBeNull();
   });
 
-  it('should navigate to login on clear', () => {
-    const router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+  it('should not refresh token if expiration is in the future', fakeAsync(() => {
+    const future = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
+    const fakeUser = {
+      getIdToken: jasmine.createSpy(),
+      getIdTokenResult: jasmine.createSpy().and.resolveTo({
+        expirationTime: future,
+      }),
+    };
+
+    (service as any).firebaseUser = signal(fakeUser);
+    service['tokenSignal'].set('token');
+
+    tick(0);
+
+    expect(fakeUser.getIdToken).not.toHaveBeenCalled();
+  }));
+
+  it('should clear token and user when firebase user is null', fakeAsync(() => {
+    (service as any).firebaseUser = signal(null);
+
+    tick();
+
+    expect(service.token()).toBeNull();
+    expect(service.user()).toBeNull();
+  }));
+
+  it('should clear token when clean is called', () => {
     service.clear();
 
-    expect(router.navigate).toHaveBeenCalledWith(['/', 'en-GB', 'login']);
+    expect(service.token()).toBeNull();
+    expect(service.user()).toBeNull();
   });
 });

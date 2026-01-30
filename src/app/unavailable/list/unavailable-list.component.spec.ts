@@ -116,6 +116,14 @@ describe('UnavailableListComponent', () => {
 
     translate = TestBed.inject(TranslateService);
     translate.use('en-GB');
+    translate.setTranslation('en-GB', {
+      COMMON: {
+        TIME_ZONE: {
+          TITLE: 'Time Zone',
+          PROFESSIONAL_INFO: 'You are in a different time zone than <b>{{value}}</b>. <br><br>Your time: <b>{{localTime}}</b><br>Professional time: <b>{{timeZoneTime}}{{arg}}</b>',
+        },
+      },
+    });
 
     fixture.detectChanges();
 
@@ -233,5 +241,78 @@ describe('UnavailableListComponent', () => {
 
     expect(storeSpy.dispatch)
       .toHaveBeenCalledWith(deleteUnavailable({ id: item.id, timestamp: item.timestamp, timeZone: item.timeZone }));
+  });
+
+  it('should not show dialog when timeZone is missing', () => {
+    const item = {
+      id: '1', description: 'Desc 1',
+      start: '',
+      timestamp: getNowTimeZone().getTime() / 1000,
+      end: '',
+      duration: 'PT1H',
+      professional: { ...mockProfessional, timeZone: null },
+      repeat: FrequencyEnum.none,
+      allDay: false,
+    } as unknown as IUnavailableAll;
+
+    expect(component.showTimeZone(item)).toBeFalse();
+  });
+
+  it('should open timezone dialog', () => {
+    const date = new Date(2026, 0, 21, 1, 30);
+    const unavailable = {
+      id: '1', description: 'Desc 1',
+      start: '',
+      timestamp: date.getTime() / 1000,
+      end: '',
+      duration: 'PT1H',
+      professional: mockProfessional,
+      repeat: FrequencyEnum.none,
+      allDay: false,
+      timeZone: 'America/Cordoba',
+    };
+
+    component.openDialog(unavailable);
+
+    expect(dialogSpy).toHaveBeenCalledWith(
+      jasmine.any(Function),
+      jasmine.objectContaining({
+        data: {
+          title: 'Time Zone',
+          content: `You are in a different time zone than <b>${mockProfessional.displayName}</b>. <br><br>Your time: <b>01:30</b><br>Professional time: <b>21:30 <b><sup class="warning">-1D</sup></b></b>`,
+          hideNoButton: true,
+          hideOkButton: true,
+        },
+      }));
+  });
+
+  it('should open timezone dialog when professional timezone is different', () => {
+    const date = new Date(2026, 0, 21, 23, 30);
+    const unavailable = {
+      id: '1', description: 'Desc 1',
+      start: '',
+      timestamp: date.getTime() / 1000,
+      end: '',
+      duration: 'PT1H',
+      professional: {
+        ...mockProfessional,
+        timeZone: 'Asia/Istanbul',
+      },
+      repeat: FrequencyEnum.none,
+      allDay: false,
+    };
+
+    component.openDialog(unavailable);
+
+    expect(dialogSpy).toHaveBeenCalledWith(
+      jasmine.any(Function),
+      jasmine.objectContaining({
+        data: {
+          title: 'Time Zone',
+          content: `You are in a different time zone than <b>${mockProfessional.displayName}</b>. <br><br>Your time: <b>23:30</b><br>Professional time: <b>01:30 <b><sup class="success">+1D</sup></b></b>`,
+          hideNoButton: true,
+          hideOkButton: true,
+        },
+      }));
   });
 });

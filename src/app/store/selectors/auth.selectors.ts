@@ -43,15 +43,6 @@ export const getUserPipe = pipe(
   filter((val): val is IUserAll => val !== undefined),
 );
 
-const selectToken = createSelector(
-  selectAuthState,
-  (state: AuthState) => state?.token,
-);
-export const getTokenPipe = pipe(
-  select(selectToken),
-  filter((val): val is string => val !== undefined),
-);
-
 const selectDriveToken = createSelector(
   selectAuthState,
   (state: AuthState) => state?.driveToken,

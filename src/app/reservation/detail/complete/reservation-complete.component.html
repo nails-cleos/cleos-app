@@ -103,8 +103,9 @@
               }
             </mat-form-field>
           </div>
-          @if (totalTime) {
-            <h4 class="bold" [innerHTML]="'RESERVATION.TRACKING.DURATION' | translate: {totalTime: totalTime}"></h4>
+          @if (totalTime(); as totalTime) {
+            <h4 class="bold" [ngClass]="{'red-text': !isValidTime()}"
+                [innerHTML]="'RESERVATION.TRACKING.DURATION' | translate: {totalTime: totalTime}"></h4>
           }
           <mat-list>
             @let currentPrice = price();
@@ -198,8 +199,8 @@
         <button appBackButton color="accent" mat-fab extended class="icon-button" type="button">
           {{ 'COMMON.BUTTON.BACK' | translate }}
         </button>
-        <button [disabled]="getForm.group.invalid || getForm.treatment.invalid || !isValidSplit" cdkFocusInitial
-                color="primary" mat-fab extended class="icon-button">
+        <button [disabled]="getForm.group.invalid || getForm.treatment.invalid || !isValidSplit || !isValidTime()"
+                cdkFocusInitial color="primary" mat-fab extended class="icon-button">
           {{ 'COMMON.BUTTON.COMPLETE' | translate }}
         </button>
       </mat-card-actions>

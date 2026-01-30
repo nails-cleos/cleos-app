@@ -132,3 +132,13 @@ export const getEventDashboardPipe = pipe(
   select(eventDashboard),
   filter((val): val is IRoomEvents => val !== undefined),
 );
+
+export const selectDashboardIsLoading = createSelector(
+  selectDashboardState,
+  (state: DashboardState) => state?.isLoading,
+);
+
+export const isDashboardLoadingPipe = pipe(
+  select(selectDashboardIsLoading),
+  filter((val): val is boolean => val !== undefined),
+);

@@ -312,7 +312,8 @@ export const openDialog = (
 
 export const createDialog = (
   key: string, value: string, locale: string, translate: TranslateService,
-  dialog: MatDialog, timeZone?: string, time?: Date): void => {
+  dialog: MatDialog, timeZone?: string, time?: Date,
+): void => {
   const localDate = new Date(localeTimeZoneDate('en-US', time));
   const date = new Date(localeTimeZoneDate('en-US', time, timeZone));
 

@@ -6,12 +6,7 @@ import { TokenService } from '../../services/token.service';
 import { getLocale, hasRoomAdmin } from '../../util/helper';
 import { NavigationService } from '../../services/navigation.service';
 import { TranslateService } from '@ngx-translate/core';
-import {
-  getIsAuthenticatedPipe,
-  getRedirectPipe,
-  getTokenPipe,
-  getUserPipe,
-} from '../../store/selectors/auth.selectors';
+import { getIsAuthenticatedPipe, getRedirectPipe, getUserPipe } from '../../store/selectors/auth.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthState } from '../../store/reducers/auth.reducers';
 
@@ -30,12 +25,10 @@ export class RedirectComponent {
   private redirect$ = this.store.pipe(getRedirectPipe);
   private isAuthenticated$ = this.store.pipe(getIsAuthenticatedPipe);
   private user$ = this.store.pipe(getUserPipe);
-  private token$ = this.store.pipe(getTokenPipe);
 
   private redirectSignal = toSignal(this.redirect$);
   private isAuthenticatedSignal = toSignal(this.isAuthenticated$);
   private userSignal = toSignal(this.user$);
-  private tokenSignal = toSignal(this.token$);
 
   constructor() {
     effect(() => {
@@ -44,7 +37,6 @@ export class RedirectComponent {
       if (this.redirectSignal()) {
         const user = this.userSignal();
         if (this.isAuthenticatedSignal() && user) {
-          this.tokenService.setToken = this.tokenSignal()!;
           this.tokenService.setUser = user;
           if (RedirectComponent.hasRoomOrAdmin(user.authorities)) {
             redirectUrl = [lang, 'dashboard'];

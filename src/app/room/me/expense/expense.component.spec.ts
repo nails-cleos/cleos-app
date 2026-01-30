@@ -9,12 +9,13 @@ import { RoomState } from '../../../store/reducers/room.reducers';
 import { IExpenseAll, ISupplyStore } from '../../../interfaces/expense';
 import { getExpense } from '../../../store/expense.actions';
 import { getNowTimeZone } from '../../../util/dates';
-import { signal } from '@angular/core';
+import { computed, signal } from '@angular/core';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
 import { Auth } from '@angular/fire/auth';
 import { callAwsLambda } from '../../../store/aws.actions';
 import { DriveAccessService } from '../../../services/drive-access.service';
 import { EnvService } from '../../../services/env.service';
+import { TokenService } from '../../../services/token.service';
 
 describe('ExpenseComponent', () => {
   let component: ExpenseComponent;
@@ -34,7 +35,6 @@ describe('ExpenseComponent', () => {
   let subErrors$: BehaviorSubject<any>;
   let response$: BehaviorSubject<any>;
   let aws$: BehaviorSubject<any>;
-  let token$: BehaviorSubject<any>;
 
   let env: EnvService;
 
@@ -56,6 +56,11 @@ describe('ExpenseComponent', () => {
   const mockSuppliers: ISupplyStore[] = [{ id: '1', name: 'vendor_name' }];
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
+  const tokenSignal = signal<string | null>('token');
+
+  const tokenServiceMock = {
+    token: computed(() => tokenSignal()),
+  };
 
   beforeEach(async () => {
     roomId$ = new BehaviorSubject<any>(undefined);
@@ -65,7 +70,6 @@ describe('ExpenseComponent', () => {
     subErrors$ = new BehaviorSubject<any>(undefined);
     response$ = new BehaviorSubject<any>(undefined);
     aws$ = new BehaviorSubject<any>(undefined);
-    token$ = new BehaviorSubject<any>('token');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -73,8 +77,7 @@ describe('ExpenseComponent', () => {
     }));
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    driveAccessServiceSpy =
-      jasmine.createSpyObj<DriveAccessService>('DriveAccessService', ['requestAccessIfNeeded']);
+    driveAccessServiceSpy = jasmine.createSpyObj<DriveAccessService>('DriveAccessService', ['requestAccessIfNeeded']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
@@ -111,8 +114,6 @@ describe('ExpenseComponent', () => {
           return response$.asObservable();
         case 7:
           return aws$.asObservable();
-        case 8:
-          return token$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -126,6 +127,7 @@ describe('ExpenseComponent', () => {
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: Auth, useValue: authSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
+        { provide: TokenService, useValue: tokenServiceMock },
       ],
     }).compileComponents();
 
@@ -305,11 +307,10 @@ describe('ExpenseComponent', () => {
     spyOnProperty(env, 'awsExtractEnable', 'get')
       .and.returnValue(true);
     component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: mockFile });
-    token$.next('aws-token');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch)
-      .toHaveBeenCalledWith(callAwsLambda({ token: 'aws-token', file: mockFile, userId: 'user-123' }));
+      .toHaveBeenCalledWith(callAwsLambda({ token: 'token', file: mockFile, userId: 'user-123' }));
   });
 
 
@@ -317,11 +318,10 @@ describe('ExpenseComponent', () => {
     spyOnProperty(env, 'awsExtractEnable', 'get')
       .and.returnValue(false);
     component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: mockFile });
-    token$.next('aws-token');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).not
-      .toHaveBeenCalledWith(callAwsLambda({ token: 'aws-token', file: mockFile, userId: 'user-123' }));
+      .toHaveBeenCalledWith(callAwsLambda({ token: 'token', file: mockFile, userId: 'user-123' }));
   });
 
   it('should set full aws data', () => {

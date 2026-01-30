@@ -20,6 +20,7 @@ import { selectAwsIsLoading } from './aws.selectors';
 import { selectInvoiceError, selectInvoiceIsLoading, selectInvoiceResponse } from './invoice.selectors';
 import { selectStatementError, selectStatementIsLoading, selectStatementResponse } from './statement.selectors';
 import { selectDocumentError, selectDocumentIsLoading, selectDocumentResponse } from './document.selectors';
+import { selectDashboardIsLoading } from './dashboard.selectors';
 
 export const selectGlobalIsLoading = createSelector(
   selectAccountIsLoading,
@@ -29,6 +30,7 @@ export const selectGlobalIsLoading = createSelector(
   selectCatalogueIsLoading,
   selectColorIsLoading,
   selectCurrencyIsLoading,
+  selectDashboardIsLoading,
   selectDiscountIsLoading,
   selectDocumentIsLoading,
   selectExpenseIsLoading,

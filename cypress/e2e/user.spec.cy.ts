@@ -22,7 +22,11 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
     mapRole.forEach((value, role) => {
       it(`should create a new ${ role }`, () => {
-        cy.intercept('POST', `**/api/v1/${ value.url }`, (req) => req.alias = 'saveUser');
+        cy.mockApi('POST', `**/api/v1/${ value.url }`, {
+          body: { name: value.displayName },
+          alias: 'saveUser',
+        });
+        cy.intercept('POST', `**/api/v1/${ value.url }`).as('saveUser');
 
         cy.openMenu(breakpoints, ['App settings', 'Users']);
         cy.mockUsers(0);
@@ -67,7 +71,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           }
         });
 
-        cy.url().should('include', '/users/add');
+        cy.url().should('include', '/users');
       });
 
       it(`should edit a ${ role }`, () => {
@@ -76,7 +80,11 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         cy.wait('@getUsers');
 
         cy.get('@selectedUser').then((user: any) => {
-          cy.intercept('PATCH', `**/api/v1/users/${ user.id }`, (req) => req.alias = 'updateUser');
+          cy.mockApi('PATCH', `**/api/v1/users/${ user.id }`, {
+            body: { name: value.displayName },
+            alias: 'updateUser',
+          });
+          cy.intercept('PATCH', `**/api/v1/users/${ user.id }`).as('updateUser');
           cy.mockUser(user.id, user);
 
           cy.buttonClickOnTable(breakpoints, user.displayName, 'user-row', 'user-detail-row.user-expanded-row', 'edit',

@@ -677,7 +677,7 @@ export class ReservationComponent {
           const localDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.LOCAL', { date: localDate });
           const roomDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.ROOM', { date: timeZoneDate });
           const message = `${warning} - ${localDateLabel} / ${roomDateLabel}`;
-          const toastRef = this.toastService.show(message, 'warning', 0, { actionType: 'button' });
+          const toastRef = this.toastService.show(message, 'warning', 0, { actionType: 'none' });
           toastRef.onAction().subscribe(() => {
             this.dismiss = true;
           });

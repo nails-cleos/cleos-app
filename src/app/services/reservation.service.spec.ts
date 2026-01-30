@@ -384,8 +384,12 @@ describe('ReservationService', () => {
 
   describe('createReservation', () => {
     it('should create reservation', () => {
-      const reservations = [mockReservation];
-      httpSpy.post.and.returnValue(of(reservations));
+      const reservations: IApiResponse[] = [{
+        id: mockReservation.id!,
+        timestamp: mockReservation.timestamp,
+        timeZone: mockReservation.timeZone,
+      }];
+      httpSpy.post.and.returnValue(of([mockReservation]));
 
       service.createReservation(mockReservation).subscribe(result => {
         expect(result).toEqual(reservations);
@@ -409,10 +413,15 @@ describe('ReservationService', () => {
 
   describe('updateReservationById', () => {
     it('should update reservation', () => {
+      const reservations: IApiResponse = {
+        id: mockReservation.id!,
+        timestamp: mockReservation.timestamp,
+        timeZone: mockReservation.timeZone,
+      };
       httpSpy.patch.and.returnValue(of(mockReservation));
 
       service.updateReservationById('res-123', mockReservation).subscribe(result => {
-        expect(result).toEqual(mockReservation);
+        expect(result).toEqual(reservations);
       });
 
       expect(httpSpy.patch).toHaveBeenCalledWith('v1/reservations/res-123', mockReservation);

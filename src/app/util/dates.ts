@@ -132,8 +132,11 @@ export const getEndWithDuration = (start: Date, duration?: IDuration): Date => {
   return createNewDate(start, 23, 59, 59, 99);
 };
 
-export const getRoomStartEndDay = (availability: IAvailability, timeZone: string,
-  viewDate: Date = getNowTimeZone()): { min: Date; max: Date } => {
+export const getRoomStartEndDay = (
+  availability: IAvailability,
+  timeZone: string,
+  viewDate: Date = getNowTimeZone(),
+): { min: Date; max: Date } => {
   const availabilityMinMax = getMinAndMax(availability, viewDate, timeZone);
 
   const min: Date = availabilityMinMax.min;
@@ -142,9 +145,16 @@ export const getRoomStartEndDay = (availability: IAvailability, timeZone: string
   return min && max ? formatMinMax(min, max) : { min, max };
 };
 
-export const getStartEndDay = (monday: IAvailability, tuesday: IAvailability, wednesday: IAvailability,
-  thursday: IAvailability, friday: IAvailability, saturday: IAvailability,
-  sunday: IAvailability, timeZone: string): any => {
+export const getStartEndDay = (
+  monday: IAvailability,
+  tuesday: IAvailability,
+  wednesday: IAvailability,
+  thursday: IAvailability,
+  friday: IAvailability,
+  saturday: IAvailability,
+  sunday: IAvailability,
+  timeZone: string,
+): any => {
   const date: Date = getNowTimeZone(timeZone);
   const mondayMinMax = getMinAndMax(monday, date, timeZone);
   const tuesdayMinMax = getMinAndMax(tuesday, date, timeZone);
@@ -366,9 +376,11 @@ export const formatDateName = (date: Date, locale: string, measure: any): string
   day: 'numeric', month: measure, weekday: measure, year: 'numeric',
 });
 
-export const localeTimeZoneDate = (locale: string, date?: Date | string,
-  timeZone: string = getCurrentTimeZone()): string =>
-  date ? reservationDateTime(newDate(date), locale, timeZone) : '';
+export const localeTimeZoneDate = (
+  locale: string,
+  date?: Date | string,
+  timeZone: string = getCurrentTimeZone(),
+): string => date ? reservationDateTime(newDate(date), locale, timeZone) : '';
 
 export const reservationDateTime = (date: Date, locale: string, timeZone: string = getCurrentTimeZone()): string =>
   date.toLocaleDateString(locale, {
@@ -431,9 +443,9 @@ export const formatTime = (duration: IDuration, timeZone?: string, locale: strin
 
 export const getNowTimeZone = (timeZone: string = getCurrentTimeZone()): Date => newDateTimestamp(new Date(), timeZone);
 
-export const createDateFromString = (stringDate: string): Date => {
+export const createDateFromString = (stringDate: string, timeZone: string = getCurrentTimeZone()): Date => {
   const date = stringDate.split('-');
-  return new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2]));
+  return newDateTimestamp(new Date(Number(date[0]), Number(date[1]) - 1, Number(date[2])), timeZone);
 };
 
 export const createDate = (
@@ -456,8 +468,10 @@ export const createFullDate = (selectDate: Date): Date => {
   return date;
 };
 
-export const newDateTimestamp = (date: string | Date | number = new Date(),
-  timeZone: string = getCurrentTimeZone()): Date => {
+export const newDateTimestamp = (
+  date: string | Date | number = new Date(),
+  timeZone: string = getCurrentTimeZone(),
+): Date => {
   if (typeof date === 'string') {
     return toZonedTime(new Date(date), timeZone);
   } else if (date instanceof Date) {
@@ -761,4 +775,11 @@ export const searchDates = (allDay: boolean, start: Date, duration: IDuration): 
   }
 
   return [startSearch, endSearch];
+};
+
+export const secondsToHHMM = (sec: number = 0): string => {
+  const hours = Math.floor(sec / 3600);
+  const minutes = Math.floor((sec % 3600) / 60);
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 };

@@ -20,10 +20,12 @@ devices.forEach(({ name, width, height, breakpoints }) => {
     const reservationTime = `${hourFormat}:${minuteFormat}`;
 
     const reservationDate = new Date();
-    reservationDate.setMonth(reservationDate.getMonth() + 1);
-    reservationDate.setDate(15);
-    // Next Wednesday
-    reservationDate.setDate(reservationDate.getDate() + ((10 - reservationDate.getDay()) % 7 || 7));
+    reservationDate.setMonth(reservationDate.getMonth() + 1, 1);
+
+    // move to next Wednesday
+    const day = reservationDate.getDay(); // 0 = Sun
+    const diffToWednesday = (3 - day + 7) % 7 || 7;
+    reservationDate.setDate(reservationDate.getDate() + diffToWednesday);
     beforeEach(() => {
       cy.mockAuthentication(email, 'ROLE_ADMIN');
       cy.visit('en-GB/reservation');
@@ -165,7 +167,7 @@ const wednesday = (reservationTime: string) => [
   ...defaultEvents,
   { text: '10:00 - 11:30', length: 1 },
   { text: '15:30 - 17:00', length: 1 },
-  { text: `${ reservationTime } - 15:30`, length: 1 },
+  { text: `${reservationTime} - 15:30`, length: 1 },
 ];
 const thursday = [{ text: 'All day', length: 1 }];
 const weekend = [{ text: 'Out of work', length: 1 }];

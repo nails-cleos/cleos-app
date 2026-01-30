@@ -67,6 +67,8 @@ declare namespace Cypress {
 
     mockAdditional(id: string, selectedAdditional?: any): Chainable<any>;
 
+    mockApi(method: HttpMethod, url: string, options: MockApiOptions): Chainable<any>;
+
     mockColor(id: string, selectedColor?: any): Chainable<any>;
 
     mockCurrency(id: string, selectedCurrency?: any): Chainable<any>;
@@ -126,8 +128,14 @@ Cypress.Commands.add('openMenu', (breakpoint: string, menus: string[]) => {
   });
 });
 
-Cypress.Commands.add('buttonClickOnTable', (breakpoint: string, column: string, rowClass: string, rowExpandedClass,
-  button: string, otherButtons?: string[]) => {
+Cypress.Commands.add('buttonClickOnTable', (
+  breakpoint: string,
+  column: string,
+  rowClass: string,
+  rowExpandedClass,
+  button: string,
+  otherButtons?: string[],
+) => {
   if (['XSmall', 'Small'].includes(breakpoint)) {
     cy.get(`tr.${rowClass}`).contains('td', column).then($cell => {
       const $row = $cell.closest('tr');
@@ -245,9 +253,16 @@ const addMonths = (date: Date, plusMonths: number = 0) => {
   return newDate;
 };
 
-const createUnavailable = (professional: any, description: string, timestamp: number,
-  repeat: string, end?: string, duration?: number, allDay: boolean = false,
-  type: string = 'UNAVAILABLE') => ({
+const createUnavailable = (
+  professional: any,
+  description: string,
+  timestamp: number,
+  repeat: string,
+  end?: string,
+  duration?: number,
+  allDay: boolean = false,
+  type: string = 'UNAVAILABLE',
+) => ({
   createdAt: '2025-01-31T11:54:00',
   createdBy: '57ceebd2-a012-42a3-af9a-5d546c193200',
   deleted: false,
@@ -632,19 +647,15 @@ Cypress.Commands.add('mockCreateReservation', (
     cy.fixture('rooms').then((roomData) => {
       cy.fixture('treatmentSearch').then((treatmentData) => {
         cy.fixture('additional').then((additionalData) => {
-          cy.intercept(
-            'POST',
-            '**/api/v1/reservations',
-            (req) => {
-              req.alias = 'createReservation';
-              req.reply({
-                statusCode: 201,
-                body: [{
-                  id: reservationId,
-                  ...req.body,
-                }],
-              });
-            });
+          cy.mockApi('POST', '**/api/v1/reservations', {
+            body: [{
+              id: reservationId,
+              timestamp: date.getTime() / 1000,
+              timeZone: 'Europe/Amsterdam',
+            }],
+            alias: 'createReservation',
+          });
+          cy.intercept('POST', '**/api/v1/reservations').as('createReservation');
           cy.intercept(
             'GET',
             `**/api/v1/reservations/${reservationId}`,
@@ -836,6 +847,37 @@ Cypress.Commands.add('mockCurrency', (id: string, selectedCurrency?: any) => {
     ).as('getCurrency');
   });
 });
+
+type HttpMethod = 'POST' | 'PATCH' | 'PUT' | 'DELETE';
+
+interface MockApiOptions {
+  alias: string;
+  body?: any;
+}
+
+Cypress.Commands.add('mockApi', (method: HttpMethod, url: string, options: MockApiOptions) => {
+  const { body, alias } = options;
+
+  cy.intercept(method, url, (req) => {
+    const idFromRequest = req.body?.id;
+    const fallbackId = idFromRequest ?? 'mock-id';
+
+    const withId = (item: any) =>
+      item && typeof item === 'object' && !Array.isArray(item)
+        ? { id: item.id ?? fallbackId, ...item }
+        : item;
+
+    const responseBody = Array.isArray(body)
+      ? body.map(item => withId(item))
+      : withId(body);
+
+    req.reply({
+      statusCode: method === 'POST' ? 201 : 200,
+      body: responseBody,
+    });
+  }).as(alias);
+});
+
 
 const mockPage = (
   alias: string,

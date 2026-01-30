@@ -10,7 +10,7 @@ import {
   IReservationAll,
   IRoomReservation,
   ITracking,
-  IUpcomingAll,
+  IUpcomingAll, States,
 } from '../interfaces/reservation';
 import { IUserAll } from '../interfaces/user';
 import { ITreatmentDiscountDTO } from '../interfaces/treatment';
@@ -222,6 +222,7 @@ export const reservationSaveSuccess = createAction(
     deleted?: boolean;
     id?: string;
     toastType?: ToastType;
+    state?: States;
   }>(),
 );
 
@@ -276,8 +277,9 @@ export const approveReservation = createAction(
     id,
     extras,
     isDashboard,
-    state: 'approve' as const,
+    event: 'approve' as const,
     key: 'APPROVE' as const,
+    state: States.approved,
   }),
 );
 
@@ -287,8 +289,9 @@ export const startReservation = createAction(
     id,
     extras,
     isDashboard,
-    state: 'start' as const,
+    event: 'start' as const,
     key: 'START' as const,
+    state: States.started,
   }),
 );
 
@@ -298,8 +301,9 @@ export const completeReservation = createAction(
     id,
     extras,
     isDashboard,
-    state: 'complete' as const,
+    event: 'complete' as const,
     key: 'COMPLETE' as const,
+    state: States.completed,
   }),
 );
 
@@ -309,8 +313,9 @@ export const cancelReservation = createAction(
     id,
     extras,
     isDashboard,
-    state: 'cancel' as const,
+    event: 'cancel' as const,
     key: 'CANCEL' as const,
+    state: States.cancelled,
   }),
 );
 
@@ -320,8 +325,9 @@ export const customerCancelReservation = createAction(
     id,
     extras,
     isDashboard,
-    state: 'cancel/customer' as const,
+    event: 'cancel/customer' as const,
     key: 'CANCEL' as const,
+    state: States.cancelled,
   }),
 );
 
@@ -331,8 +337,9 @@ export const paymentCompleteReservation = createAction(
     id,
     extras,
     isDashboard,
-    state: 'payment/complete' as const,
+    event: 'payment/complete' as const,
     key: 'COMPLETE' as const,
+    state: States.completed,
   }),
 );
 
@@ -348,7 +355,7 @@ export const updateReservationColor = createAction(
 
 export const stateSuccess = createAction(
   ReservationActionTypes.stateSuccess,
-  props<{ message: string; id: string; paymentLink?: string; isDashboard?: boolean }>(),
+  props<{ message: string; id: string; paymentLink?: string; isDashboard?: boolean; state?: States }>(),
 );
 
 export const getTrackingByReservationId = createAction(

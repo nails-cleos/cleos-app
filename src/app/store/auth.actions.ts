@@ -64,6 +64,6 @@ export const reLogin = createAction(
   AuthActionTypes.reLogin,
 );
 
-export const clean = createAction(
+export const cleanAuth = createAction(
   AuthActionTypes.clean,
 );

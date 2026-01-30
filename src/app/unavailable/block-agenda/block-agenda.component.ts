@@ -156,6 +156,10 @@ export class BlockAgendaComponent {
     });
 
     effect(() => {
+      this.rooms.set(this.allRoomsSignal());
+    });
+
+    effect(() => {
       const selected = this.unavailableSignal();
       if (!selected?.id) {
         return;
@@ -196,11 +200,9 @@ export class BlockAgendaComponent {
 
     effect(() => {
       const starDate = this.selectedStartDate();
-      if (starDate) {
-        const rooms = this.rooms();
-        if (rooms?.length) {
-          this.setMaxMin(starDate, rooms);
-        }
+      const rooms = this.rooms();
+      if (starDate && rooms?.length) {
+        this.setMaxMin(starDate, rooms);
       }
     });
 
@@ -219,14 +221,6 @@ export class BlockAgendaComponent {
       const professional = this.selectedProfessional();
       if (professional) {
         this.store.dispatch(getAllRoomsByProfessionalId({ professionalId: professional.id }));
-      }
-    });
-
-    effect(() => {
-      const rooms = this.allRoomsSignal();
-      const startDate = this.getForm.startDate.value;
-      if (startDate && rooms) {
-        this.setMaxMin(startDate, rooms);
       }
     });
 

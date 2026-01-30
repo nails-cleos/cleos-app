@@ -15,7 +15,6 @@ describe('RedirectComponent', () => {
   let redirect$: BehaviorSubject<any>;
   let isAuthenticated$: BehaviorSubject<any>;
   let user$: BehaviorSubject<any>;
-  let token$: BehaviorSubject<any>;
 
   let storeSpy: jasmine.SpyObj<Store<AuthState>>;
   let navigateServiceSpy: jasmine.SpyObj<NavigationService>;
@@ -41,7 +40,6 @@ describe('RedirectComponent', () => {
     redirect$ = new BehaviorSubject(undefined);
     isAuthenticated$ = new BehaviorSubject(undefined);
     user$ = new BehaviorSubject(undefined);
-    token$ = new BehaviorSubject(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     navigateServiceSpy = jasmine.createSpyObj('NavigationService', ['reload']);
@@ -56,8 +54,6 @@ describe('RedirectComponent', () => {
           return isAuthenticated$.asObservable();
         case 3:
           return user$.asObservable();
-        case 4:
-          return token$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -99,18 +95,16 @@ describe('RedirectComponent', () => {
   it('should navigate to /en/dashboard if user has admin role', () => {
     redirect$.next(true);
     isAuthenticated$.next(true);
-    token$.next('fake-token');
     user$.next({ authorities: [{ authority: Role.admin }] });
     fixture.detectChanges();
 
-    expect(tokenServiceMock.token()).toBe('fake-token');
+    expect(tokenServiceMock.token()).toBe('abc');
     expect(navigateServiceSpy.reload).toHaveBeenCalledWith(['en-GB', 'dashboard']);
   });
 
   it('should navigate to /en/events if user has room admin role', () => {
     redirect$.next(true);
     isAuthenticated$.next(true);
-    token$.next('fake-token');
     user$.next({ authorities: [{ authority: Role.roomAdmin }] });
     fixture.detectChanges();
 
@@ -120,7 +114,6 @@ describe('RedirectComponent', () => {
   it('should navigate to /en/me/reservations for other roles', () => {
     redirect$.next(true);
     isAuthenticated$.next(true);
-    token$.next('fake-token');
     user$.next({ authorities: [{ authority: 'USER' }] });
     fixture.detectChanges();
 

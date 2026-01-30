@@ -262,20 +262,27 @@ export class ReservationEffects {
   edit$ = createEffect(() => this.actions.pipe(
     ofType(updateReservationById),
     switchMap(({ id, reservation, role }) => this.reservationService.updateReservationById(id, reservation).pipe(
-      map((response: IReservation) => this.requestSuccess('COMMON.RESERVATION.UPDATED.MESSAGE', true,
-        role, response.id, newDateTimestamp(response.timestamp, response.room?.timeZone), response.paymentLink)),
+      map((response: IApiResponse) => this.requestSuccess('COMMON.RESERVATION.UPDATED.MESSAGE', true,
+        role, response.id, newDateTimestamp(response.timestamp, response.timeZone), response.paymentLink)),
       catchError((err: HttpErrorResponse) => of(reservationFailure({ error: err.error }))),
     )),
   ));
 
-  changeStateOne$ = createEffect(() => this.actions.pipe(
-    ofType(approveReservation, startReservation, completeReservation),
-    switchMap(({ id, state, key, extras, isDashboard }) => this.changeState(id, state, key, extras, isDashboard)),
-  ));
-
-  changeStateTwo$ = createEffect(() => this.actions.pipe(
-    ofType(cancelReservation, customerCancelReservation, paymentCompleteReservation),
-    switchMap(({ id, state, key, extras, isDashboard }) => this.changeState(id, state, key, extras, isDashboard)),
+  changeState$ = createEffect(() => this.actions.pipe(
+    ofType(approveReservation, startReservation, completeReservation,
+      cancelReservation, customerCancelReservation, paymentCompleteReservation),
+    switchMap((
+      { id, event, key, extras, isDashboard, state },
+    ) => this.reservationService.changeState(id, event, extras).pipe(
+      map((response: IReservation | void) => stateSuccess({
+        message: this.translate.instant(`COMMON.RESERVATION.STATE.${key}`),
+        id,
+        paymentLink: response?.paymentLink,
+        isDashboard,
+        state,
+      })),
+      catchError((err: HttpErrorResponse) => of(reservationFailure({ error: err.error }))),
+    )),
   ));
 
   changeCustomer$ = createEffect(() => this.actions.pipe(
@@ -456,10 +463,11 @@ export class ReservationEffects {
         window.open(paymentLink, '_self');
         return;
       }
-      if (isDashboard !== undefined) {
-        this.router.navigate(isDashboard ?
-          [this.translate.getCurrentLang(), 'dashboard', 'events'] : [this.translate.getCurrentLang(), 'reservation', id]);
+      if (isDashboard) {
+        this.router.navigate([this.translate.getCurrentLang(), 'dashboard', 'events']);
+        return;
       }
+      this.router.navigate([this.translate.getCurrentLang(), 'reservation', id]);
     }),
   ), { dispatch: false });
 
@@ -487,18 +495,5 @@ export class ReservationEffects {
     const path = id ? `reservation/${id}` : undefined;
 
     return reservationSaveSuccess({ message, navigate, path, role, paymentLink, deleted, id, toastType });
-  }
-
-  private changeState(id: string, state: string, key: string, extras?: any, isDashboard?: boolean) {
-    return this.reservationService.changeState(id, state, extras).pipe(
-      map((response: IReservation | void) =>
-        stateSuccess({
-          message: this.translate.instant(`COMMON.RESERVATION.STATE.${key}`),
-          id,
-          paymentLink: response?.paymentLink,
-          isDashboard,
-        })),
-      catchError((err: HttpErrorResponse) => of(reservationFailure({ error: err.error }))),
-    );
   }
 }

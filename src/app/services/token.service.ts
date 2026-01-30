@@ -1,30 +1,24 @@
 import { computed, DestroyRef, effect, inject, Injectable, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
 import { Auth, user } from '@angular/fire/auth';
 import { User } from '@firebase/auth';
 import { Subscription, timer } from 'rxjs';
-import { TranslateService } from '@ngx-translate/core';
-import { Store } from '@ngrx/store';
 
 import { IUserAll } from '../interfaces/user';
 import { getNowTimeZone, newDate, plusMinutes } from '../util/dates';
-import { getDriveTokenPipe, getTokenPipe, getUserPipe } from '../store/selectors/auth.selectors';
+import { getDriveTokenPipe } from '../store/selectors/auth.selectors';
 import { AuthState } from '../store/reducers/auth.reducers';
+import { Store } from '@ngrx/store';
 
 @Injectable({ providedIn: 'root' })
 export class TokenService {
   private readonly destroyRef = inject(DestroyRef);
-  private readonly router = inject(Router);
-  private readonly translate = inject(TranslateService);
   private readonly store = inject(Store<AuthState>);
   private readonly auth = inject(Auth);
 
-  private readonly storeToken = toSignal(this.store.pipe(getTokenPipe), { initialValue: null });
   private readonly tokenSignal = signal<string | null>(null);
   readonly token = computed(() => this.tokenSignal());
 
-  private readonly storeUser = toSignal(this.store.pipe(getUserPipe), { initialValue: null });
   private readonly userSignal = signal<IUserAll | null>(null);
   readonly user = computed(() => this.userSignal());
 
@@ -38,31 +32,26 @@ export class TokenService {
 
   constructor() {
     effect(() => {
-      const token = this.storeToken();
-      if (token && !this.tokenSignal()) {
-        this.tokenSignal.set(token);
+      const fbUser = this.firebaseUser();
+      if (!fbUser) {
+        this.clear();
+        return;
       }
-    });
 
-    effect(() => {
-      const user = this.storeUser();
-      if (user && !this.userSignal()) {
-        this.userSignal.set(user);
-      }
+      fbUser.getIdToken().then(token => {
+        this.tokenSignal.set(token);
+      });
     });
 
     effect(() => {
       const token = this.tokenSignal();
-      if (token) {
-        this.startRefreshTimer();
-      } else {
+      if (token === null) {
         this.stopRefreshTimer();
+        return;
+      } else {
+        this.startRefreshTimer();
       }
     });
-  }
-
-  set setToken(token: string) {
-    this.tokenSignal.set(token);
   }
 
   set setUser(user: IUserAll) {
@@ -74,24 +63,21 @@ export class TokenService {
       return;
     }
 
-    const timer$ = timer(0, this.refreshInterval);
+    this.refreshSubscription = timer(0, this.refreshInterval).subscribe(
+      async () => {
+        const firebaseUser = this.firebaseUser();
+        if (!firebaseUser) {
+          return;
+        }
 
-    this.refreshSubscription = timer$.subscribe(() => {
-      const firebaseUser = this.firebaseUser();
-      if (!firebaseUser) {
-        return;
-      }
+        const result = await firebaseUser.getIdTokenResult();
+        const refreshAt = plusMinutes(newDate(result.expirationTime), -10);
 
-      firebaseUser.getIdTokenResult().then(result => {
-        const expirationTime = plusMinutes(newDate(result.expirationTime), -10);
-
-        if (getNowTimeZone() >= expirationTime) {
-          firebaseUser.getIdToken(true).then(newToken => {
-            this.tokenSignal.set(newToken);
-          });
+        if (getNowTimeZone() >= refreshAt) {
+          const newToken = await firebaseUser.getIdToken(true);
+          this.tokenSignal.set(newToken);
         }
       });
-    });
 
     this.destroyRef.onDestroy(() => this.stopRefreshTimer());
   }
@@ -105,7 +91,5 @@ export class TokenService {
     this.stopRefreshTimer();
     this.tokenSignal.set(null);
     this.userSignal.set(null);
-
-    this.router.navigate(['/', this.translate.getCurrentLang(), 'login']);
   }
 }

@@ -17,8 +17,8 @@
     "postbuild-pwa": "cp -r ./src/manifest-dev.json ./dist/cleos/browser/manifest.json && cp ./src/firebase-messaging-sw-dev.js ./dist/cleos/browser/firebase-messaging-sw-dev.js",
     "build:source": "ng build --source-map",
     "test": "TZ=Europe/Amsterdam ng test --no-watch",
-    "lint": "ng lint",
-    "lint-fix": "ng lint --fix",
+    "lint": "NODE_OPTIONS=--max-old-space-size=8192 ng lint",
+    "lint-fix": "NODE_OPTIONS=--max-old-space-size=8192 ng lint --fix",
     "eslint": "eslint src --fix",
     "e2e": "start-server-and-test serve http://localhost:4300 'cypress run --headless --reporter junit --reporter-options mochaFile=cypress/results/test-results.xml'",
     "serve": "ng serve --port 4300 --host 0.0.0.0 --no-hmr",
@@ -27,8 +27,8 @@
     "report:generate": "npx marge cypress/reports/mochawesome/report.json -o cypress/reports/mochawesome",
     "heroku-postbuild": "ng build --configuration=staging",
     "emulator": "firebase emulators:start",
-    "cypress:open": "npm run start:dev & npx wait-on http://localhost:4300 && npx cypress open",
-    "cypress:run": "cypress run"
+    "cypress:open": "TZ=Europe/Amsterdam npm run start:dev & npx wait-on http://localhost:4300 && npx cypress open",
+    "cypress:run": "TZ=Europe/Amsterdam cypress run"
   },
   "private": true,
   "dependencies": {
@@ -69,7 +69,6 @@
     "express": "^5.2.1",
     "file-saver": "^2.0.5",
     "firebase": "^12.7.0",
-    "karma-spec-reporter": "^0.0.36",
     "libphonenumber-js": "^1.12.33",
     "luxon": "^3.7.2",
     "ng2-charts": "^8.0.0",
@@ -126,6 +125,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "^2.1.0",
     "karma-junit-reporter": "^2.0.1",
+    "karma-spec-reporter": "^0.0.36",
     "mocha-junit-reporter": "^2.2.1",
     "mocha-multi-reporters": "^1.5.1",
     "mochawesome": "^7.1.4",

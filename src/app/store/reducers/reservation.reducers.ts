@@ -289,8 +289,16 @@ export const reservationReducer = createReducer(
     completeReservation,
     paymentCompleteReservation,
     cancelReservation,
-    customerCancelReservation,
-    getEditReservation,
+    customerCancelReservation, (state) => ({
+      ...state,
+      page: undefined,
+      filter: undefined,
+      error: undefined,
+      subErrors: undefined,
+      response: undefined,
+      isLoading: true,
+    })),
+  on(getEditReservation,
     updateReservationCustomer,
     updateReservationColor, (state) => ({
       ...state,
@@ -381,6 +389,7 @@ export const reservationReducer = createReducer(
     response: action,
     error: undefined,
     subErrors: undefined,
+    selected: action.state ? { ...state.selected, state: action.state } as IUpcomingAll : state.selected,
     isLoading: false,
   })),
   on(reservationSelected, (state, { selected }) => ({
@@ -394,7 +403,7 @@ export const reservationReducer = createReducer(
   on(reservationFailure, (state, { error }) => ({
     ...state,
     error: error,
-    subErrors: error.subErrors,
+    subErrors: error?.subErrors,
     response: undefined,
     isLoading: false,
   })),
@@ -530,5 +539,5 @@ export const reservationReducer = createReducer(
       discountId,
     },
   })),
-  on(cleanReservation, () => initialState),
+  on(cleanReservation, () => ({ ...initialState })),
 );
