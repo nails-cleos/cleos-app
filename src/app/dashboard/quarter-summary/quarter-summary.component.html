@@ -39,32 +39,27 @@
   </fieldset>
 </div>
 
-@if (!isLoading()) {
-  @let currentQuarter = quarter();
-  @let currentYear = year();
-  @let currentShowCash = showCash();
-  @if (currentQuarter && currentYear) {
-    @if (quarterSummaryMap?.size) {
-      <app-quarter style="width: 100%" [showCash]="currentShowCash" [year]="currentYear!" [quarter]="currentQuarter!" [currency]="currency"
-                   [measure]="isHandset() ? 'short' : 'long'" [monthSummaries]="monthSummaries()">
-      </app-quarter>
-      <div class="top">
-        <mat-toolbar color="primary">
-          {{ 'SUMMARY.QUARTER.RESULT' | translate }}
-        </mat-toolbar>
-        <app-total-summary [summaryTotals]="quarterSummaryTotals()" [showCash]="currentShowCash"
-                           [currency]="currency"></app-total-summary>
-      </div>
-    } @else {
-      <mat-toolbar color="warn" style="text-align: center"
-                   [innerHTML]="'SUMMARY.QUARTER.ERROR.NO_CONTENT' | translate:{quarter: currentQuarter, year: currentYear}">
+@let currentQuarter = quarter();
+@let currentYear = year();
+@let currentShowCash = showCash();
+@if (currentQuarter && currentYear) {
+  @if (quarterSummaryMap?.size) {
+    <app-quarter style="width: 100%" [showCash]="currentShowCash" [year]="currentYear!" [quarter]="currentQuarter!"
+                 [currency]="currency"
+                 [measure]="isHandset() ? 'short' : 'long'" [monthSummaries]="monthSummaries()">
+    </app-quarter>
+    <div class="top">
+      <mat-toolbar color="primary">
+        {{ 'SUMMARY.QUARTER.RESULT' | translate }}
       </mat-toolbar>
-    }
+      <app-total-summary [summaryTotals]="quarterSummaryTotals()" [showCash]="currentShowCash"
+                         [currency]="currency"></app-total-summary>
+    </div>
+  } @else {
+    <mat-toolbar color="warn" style="text-align: center"
+                 [innerHTML]="'SUMMARY.QUARTER.ERROR.NO_CONTENT' | translate:{quarter: currentQuarter, year: currentYear}">
+    </mat-toolbar>
   }
-} @else {
-  <div class="spinner-parent-center">
-    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
-  </div>
 }
 
 <div class="top-space card-actions">

@@ -1,4 +1,4 @@
-import { Cell, CellFormulaValue, CellHyperlinkValue, Row, Workbook, Worksheet } from 'exceljs';
+import { Cell, CellFormulaValue, CellHyperlinkValue, Row, Workbook, Worksheet, WorksheetView } from 'exceljs';
 import {
   API_LOCALE,
   createNewDateZonedTime,
@@ -39,6 +39,7 @@ interface IMonthResult {
 const qCells = ['A', 'B', 'C', 'D'];
 const monthCells = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 const cells = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'];
+const yearCells = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
 
 export const createMonthlyExpenseWorkbook = (
   header: string,
@@ -147,6 +148,8 @@ export const createYearlyWorkbook = (
   env: EnvService,
 ): Workbook => {
   const workbook = new Workbook();
+  const yearSummarySheetName = translate.instant('SUMMARY.YEAR.RESULT');
+  workbook.addWorksheet(yearSummarySheetName);
   let monthResults: IMonthResult[] = [];
   completeData(workbook, date, data).forEach(it => {
     const name = monthViewTitle(new Date(date.getFullYear(), it.month - 1));
@@ -211,7 +214,9 @@ export const createYearlyWorkbook = (
     }
   });
 
+  createYearSummarySheet(workbook, yearSummarySheetName, monthResults, currency, translate);
   createQData(workbook, monthResults, currency, translate);
+  setActiveMonthTab(workbook, date);
 
   return workbook;
 };
@@ -633,6 +638,130 @@ const createQData = (
       resizeColumn(worksheet);
     }
   });
+};
+
+const createYearSummarySheet = (
+  workbook: Workbook,
+  sheetName: string,
+  monthResults: IMonthResult[],
+  currency: string,
+  translate: TranslateService,
+): void => {
+  const worksheet = workbook.getWorksheet(sheetName);
+  if (!worksheet) {
+    return;
+  }
+
+  const title = translate.instant('SUMMARY.YEAR.RESULT');
+  setTitle(worksheet, 1, 'J', title);
+
+  const monthTitle = translate.instant('SUMMARY.MONTHLY.TABLE.MONTH');
+  const grossTitle = translate.instant('SUMMARY.MONTHLY.TABLE.GROSS');
+  const netTitle = translate.instant('SUMMARY.MONTHLY.TABLE.NET');
+  const btwTitle = translate.instant('SUMMARY.MONTHLY.TABLE.BTW');
+  const incomeTitle = translate.instant('SUMMARY.INCOMES');
+  const expenseTitle = translate.instant('SUMMARY.EXPENSES');
+
+  worksheet.addRow([
+    monthTitle,
+    `${incomeTitle} ${grossTitle}`,
+    `${incomeTitle} ${netTitle}`,
+    `${incomeTitle} ${btwTitle}`,
+    `${expenseTitle} ${grossTitle}`,
+    `${expenseTitle} ${netTitle}`,
+    `${expenseTitle} ${btwTitle}`,
+    `Result ${grossTitle}`,
+    `Result ${netTitle}`,
+    `Result ${btwTitle}`,
+  ]);
+  setSubtitle(worksheet, yearCells, 2);
+
+  const startRow = 3;
+  monthResults.forEach(it => {
+    worksheet.addRow([
+      it.name,
+      it.total.saleGross,
+      it.total.saleNet,
+      it.total.saleBtw,
+      it.total.expenseGross,
+      it.total.expenseNet,
+      it.total.expenseBtw,
+      it.total.saleGross - it.total.expenseGross,
+      it.total.saleNet - it.total.expenseNet,
+      it.total.saleBtw - it.total.expenseBtw,
+    ]);
+  });
+
+  const endRow = startRow + monthResults.length - 1;
+  if (monthResults.length) {
+    setBorder(worksheet, startRow, endRow, yearCells);
+  }
+
+  const totalRow = endRow + 1;
+  const totalLabel = translate.instant('SUMMARY.TOTAL');
+  setResultTitle(worksheet, totalRow, totalLabel);
+
+  const incomeGross = monthResults.reduce((acc, it) => acc + it.total.saleGross, 0);
+  const incomeNet = monthResults.reduce((acc, it) => acc + it.total.saleNet, 0);
+  const incomeBtw = monthResults.reduce((acc, it) => acc + it.total.saleBtw, 0);
+  const expenseGross = monthResults.reduce((acc, it) => acc + it.total.expenseGross, 0);
+  const expenseNet = monthResults.reduce((acc, it) => acc + it.total.expenseNet, 0);
+  const expenseBtw = monthResults.reduce((acc, it) => acc + it.total.expenseBtw, 0);
+  const resultGross = incomeGross - expenseGross;
+  const resultNet = incomeNet - expenseNet;
+  const resultBtw = incomeBtw - expenseBtw;
+
+  setTotal(worksheet, totalRow, 'B', `SUM(B${startRow}:B${endRow})`, incomeGross, 'J');
+  setTotal(worksheet, totalRow, 'C', `SUM(C${startRow}:C${endRow})`, incomeNet, 'J');
+  setTotal(worksheet, totalRow, 'D', `SUM(D${startRow}:D${endRow})`, incomeBtw, 'J');
+  setTotal(worksheet, totalRow, 'E', `SUM(E${startRow}:E${endRow})`, expenseGross, 'J');
+  setTotal(worksheet, totalRow, 'F', `SUM(F${startRow}:F${endRow})`, expenseNet, 'J');
+  setTotal(worksheet, totalRow, 'G', `SUM(G${startRow}:G${endRow})`, expenseBtw, 'J');
+  setTotal(worksheet, totalRow, 'H', `SUM(H${startRow}:H${endRow})`, resultGross, 'J');
+  setTotal(worksheet, totalRow, 'I', `SUM(I${startRow}:I${endRow})`, resultNet, 'J');
+  setTotal(worksheet, totalRow, 'J', `SUM(J${startRow}:J${endRow})`, resultBtw, 'J');
+
+  const priceFormat = currencyFormat(currency);
+  setColumnFormat(worksheet, ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'], priceFormat);
+
+  const positivePriceFormat = currencyFormat(currency, true);
+  setCellFormat(worksheet, [
+    `B${totalRow}`, `C${totalRow}`, `D${totalRow}`, `E${totalRow}`, `F${totalRow}`, `G${totalRow}`,
+    `H${totalRow}`, `I${totalRow}`, `J${totalRow}`,
+  ], positivePriceFormat);
+
+  resizeColumn(worksheet);
+};
+
+const setActiveMonthTab = (workbook: Workbook, date: Date): void => {
+  const activeMonthName = monthViewTitle(new Date(date.getFullYear(), date.getMonth()));
+  const activeIndex = workbook.worksheets.findIndex(sheet => sheet.name === activeMonthName);
+  if (activeIndex >= 0) {
+    workbook.views = [{
+      x: 0,
+      y: 0,
+      width: 48000,
+      height: 24000,
+      firstSheet: 0,
+      activeTab: activeIndex,
+      visibility: 'visible',
+    }];
+
+    const activeSheet = workbook.worksheets[activeIndex];
+    if (activeSheet) {
+      const selectedView = {
+        state: 'normal',
+        rightToLeft: false,
+        activeCell: 'A1',
+        showRuler: true,
+        showRowColHeaders: true,
+        showGridLines: true,
+        zoomScale: 100,
+        zoomScaleNormal: 100,
+      } as WorksheetView;
+      activeSheet.views = [selectedView];
+    }
+  }
 };
 
 const setQ = (worksheet: Worksheet, qTotal: ITotal, currency: string): void => {

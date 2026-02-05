@@ -10,7 +10,7 @@ on:
 ### Increments the part of the version
 ### Options for version parts: major, minor, patch
 env:
-  VERSION_PART: 'minor'
+  VERSION_PART: 'patch'
 
 jobs:
   snapshot:

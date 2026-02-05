@@ -21,4 +21,8 @@ export class EnvService {
 
   firebase = environment.firebase;
   firebaseMessaging = environment.firebaseMessaging;
+
+  get googleDriveUploadFile(): boolean {
+    return environment.googleDriveUploadFile;
+  }
 }

@@ -387,15 +387,15 @@ describe('ReservationService', () => {
       const reservations: IApiResponse[] = [{
         id: mockReservation.id!,
         timestamp: mockReservation.timestamp,
-        timeZone: mockReservation.timeZone,
+        timeZone: mockReservation.room?.timeZone,
       }];
-      httpSpy.post.and.returnValue(of([mockReservation]));
+      httpSpy.post.and.returnValue(of(reservations));
 
       service.createReservation(mockReservation).subscribe(result => {
         expect(result).toEqual(reservations);
       });
 
-      expect(httpSpy.post).toHaveBeenCalledWith('v1/reservations', mockReservationAll);
+      expect(httpSpy.post).toHaveBeenCalledWith('v1/reservations', mockReservation);
     });
   });
 
@@ -416,9 +416,9 @@ describe('ReservationService', () => {
       const reservations: IApiResponse = {
         id: mockReservation.id!,
         timestamp: mockReservation.timestamp,
-        timeZone: mockReservation.timeZone,
+        timeZone: mockReservation.room?.timeZone,
       };
-      httpSpy.patch.and.returnValue(of(mockReservation));
+      httpSpy.patch.and.returnValue(of(reservations));
 
       service.updateReservationById('res-123', mockReservation).subscribe(result => {
         expect(result).toEqual(reservations);

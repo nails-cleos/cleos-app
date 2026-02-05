@@ -20,6 +20,7 @@ import { uploadStatement } from '../store/statement.actions';
 import { getMyOfficesPipe } from '../store/selectors/office.selectors';
 import { OfficeState } from '../store/reducers/office.reducers';
 import { DateAdapter } from '@angular/material/core';
+import { EnvService } from '../services/env.service';
 
 type StatementForm = {
   office: FormControl<IOfficeAll | undefined>;
@@ -36,6 +37,7 @@ type StatementForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StatementComponent {
+  private readonly env: EnvService = inject(EnvService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly store: Store<StatementState | OfficeState> = inject(Store<StatementState | OfficeState>);
   private readonly translate: TranslateService = inject(TranslateService);
@@ -85,7 +87,7 @@ export class StatementComponent {
     });
 
     effect(() => {
-      this.driveAccessService.requestAccessIfNeeded();
+      this.driveAccessService.requestAccessIfNeeded(this.env.googleDriveUploadFile);
     });
   }
 

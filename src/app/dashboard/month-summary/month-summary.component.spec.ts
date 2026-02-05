@@ -32,6 +32,7 @@ describe('MonthSummaryComponent', () => {
 
   let monthlySummaryMap$: BehaviorSubject<any>;
   let navigationParams$: BehaviorSubject<any>;
+  let isLoading$: BehaviorSubject<any>;
 
   const authUserSignal = signal<IAuthUser>({ ...initialAuthUser, showCash: true, displayName: 'Test User' });
 
@@ -76,6 +77,7 @@ describe('MonthSummaryComponent', () => {
   beforeEach(async () => {
     monthlySummaryMap$ = new BehaviorSubject<any>(undefined);
     navigationParams$ = new BehaviorSubject<any>(undefined);
+    isLoading$ = new BehaviorSubject<any>(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
@@ -90,6 +92,8 @@ describe('MonthSummaryComponent', () => {
           return monthlySummaryMap$.asObservable();
         case 2:
           return navigationParams$.asObservable();
+        case 3:
+          return isLoading$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -327,9 +331,11 @@ describe('MonthSummaryComponent', () => {
       const summaries = [{ id: 'summary-1', gross: 100, btw: 20 }];
 
       component.updateMonthlySummary(totalTypes, summaries);
+      isLoading$.next(true);
+      fixture.detectChanges();
 
       expect(storeSpy.dispatch).toHaveBeenCalled();
-      expect(component.isLoading).toBeTrue();
+      expect(component.isLoading()).toBeTrue();
     });
 
     it('should dispatch updateMonthlySummary action for expense type', () => {
@@ -454,10 +460,11 @@ describe('MonthSummaryComponent', () => {
       }]]);
 
       monthlySummaryMap$.next(summaryMap);
+      isLoading$.next(false);
       fixture.detectChanges();
 
       expect(component.getForm.selectedRoom.value).toBe(mockRoom);
-      expect(component.isLoading).toBeFalse();
+      expect(component.isLoading()).toBeFalse();
     });
 
     it('should set primary room when multiple rooms with same currency', () => {

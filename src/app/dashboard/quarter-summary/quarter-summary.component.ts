@@ -26,7 +26,11 @@ import { SharedModule } from '../../shared/shared.module';
 import { QuarterComponent } from './quarter/quarter.component';
 import { TotalSummaryComponent } from '../total-summary/total-summary.component';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { getQuarterNavigationParamsPipe, getQuarterSummaryMapPipe } from '../../store/selectors/dashboard.selectors';
+import {
+  getQuarterNavigationParamsPipe,
+  getQuarterSummaryMapPipe,
+  isDashboardLoadingPipe,
+} from '../../store/selectors/dashboard.selectors';
 import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { DateAdapter } from '@angular/material/core';
 import { YearAdapter } from '../../util/adapter/year.adapter';
@@ -55,6 +59,7 @@ export class QuarterSummaryComponent {
 
   private quarterSummaryMap$ = this.store.pipe(getQuarterSummaryMapPipe);
   private navigationParams$ = this.store.pipe(getQuarterNavigationParamsPipe);
+  private isLoading$ = this.store.pipe(isDashboardLoadingPipe);
 
   private now = getNowTimeZone();
 
@@ -92,7 +97,7 @@ export class QuarterSummaryComponent {
   quarter = signal<number>(getDateQuarter(getNowTimeZone()));
   year = signal<number>(getNowTimeZone().getFullYear());
   quarterSummaryTotals = signal<ISummaryTotals>(new SummaryTotals());
-  isLoading = signal<boolean>(false);
+  readonly isLoading = toSignal(this.isLoading$, { initialValue: false });
 
   readonly language: string = this.translate.getCurrentLang();
 
@@ -132,7 +137,6 @@ export class QuarterSummaryComponent {
             }
           }
         }
-        this.isLoading.set(false);
       }
     });
 
@@ -273,7 +277,6 @@ export class QuarterSummaryComponent {
     this.reset();
     this.year.set(year);
     this.quarter.set(quarter);
-    this.isLoading.set(true);
     this.store.dispatch(getQuarterSummary({ year, quarter }));
   };
 

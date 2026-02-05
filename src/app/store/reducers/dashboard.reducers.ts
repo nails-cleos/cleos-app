@@ -299,6 +299,7 @@ export const dashboardReducer = createReducer(
     error: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: true,
   })),
   on(monthlySummarySuccess, (state, { monthlySummary }) => ({
     ...state,
@@ -306,6 +307,7 @@ export const dashboardReducer = createReducer(
     error: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: false,
   })),
   on(updateMonthlySummary, (state) => ({
     ...state,
@@ -313,12 +315,14 @@ export const dashboardReducer = createReducer(
     error: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: true,
   })),
   on(saveMonthlySummarySuccess, (state, action) => ({
     ...state,
     error: undefined,
     subErrors: undefined,
     response: action,
+    isLoading: false,
   })),
   on(setMonthlyNavigationParams, (state, { step, date }) => ({
     ...state,
@@ -343,6 +347,7 @@ export const dashboardReducer = createReducer(
     error: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: true,
   })),
   on(yearSummarySuccess, (state, { yearSummary }) => ({
     ...state,
@@ -350,6 +355,7 @@ export const dashboardReducer = createReducer(
     error: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: false,
   })),
   on(exportYearSummary, (state) => ({
     ...state,
@@ -371,6 +377,7 @@ export const dashboardReducer = createReducer(
     error: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: true,
   })),
   on(quarterSummarySuccess, (state, { quarterSummary }) => ({
     ...state,
@@ -378,6 +385,7 @@ export const dashboardReducer = createReducer(
     error: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: false,
   })),
   on(cleanDashboard, () => initialState),
 );
