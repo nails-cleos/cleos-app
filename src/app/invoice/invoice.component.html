@@ -31,8 +31,8 @@
                 <mat-icon matChipRemove>cancel</mat-icon>
               </mat-chip-row>
             }
-            <input #typeInput [formControl]="getForm.type" [matAutocomplete]="auto" [matChipInputFor]="chipList"
-                   placeholder="{{ 'INVOICE.PAYMENT.FIELD' | translate }}">
+            <input #typeInput matInput [formControl]="getForm.type" [matAutocomplete]="auto"
+                   [matChipInputFor]="chipList" placeholder="{{ 'INVOICE.PAYMENT.FIELD' | translate }}">
           </mat-chip-grid>
           <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
             @for (type of filteredTypesSignal(); track type) {

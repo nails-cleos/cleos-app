@@ -12,7 +12,7 @@
             </mat-chip-row>
           }
           <input #stateInput [formControl]="getForm.state" [matAutocomplete]="auto" [matChipInputFor]="chipList"
-                 placeholder="{{ 'RESERVATION.STATE.FIELD' | translate }}">
+                 matInput placeholder="{{ 'RESERVATION.STATE.FIELD' | translate }}">
         </mat-chip-grid>
         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
           @for (state of filteredStateSignal(); track state) {

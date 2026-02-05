@@ -208,7 +208,7 @@ describe('DashComponent', () => {
 
     component['createEvents']();
 
-    const event = component.calendar.calendarEvents![0];
+    const event = component.calendar.calendarEvents[0];
     expect(event.allDay).toBeTrue();
     expect(event.meta.state).toBe('BIRTHDAY');
   });

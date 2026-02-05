@@ -18,6 +18,7 @@ import { PercentPipe } from '@angular/common';
 import { formatBytes, resizeImage } from '../../util/file';
 import { DragDropDirective } from '../../directives/drag-drop.directive';
 import { ToastService } from '../../services/toast.service';
+import { ReactiveFormsModule } from '@angular/forms';
 
 export interface UploadFile {
   raw?: File;
@@ -31,7 +32,7 @@ export interface UploadFile {
   selector: 'app-file-drop',
   templateUrl: './file-drop.component.html',
   styleUrls: ['./file-drop.component.scss'],
-  imports: [AppMaterialModule, TranslatePipe, PercentPipe, DragDropDirective],
+  imports: [AppMaterialModule, TranslatePipe, PercentPipe, DragDropDirective, ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FileDropComponent {
