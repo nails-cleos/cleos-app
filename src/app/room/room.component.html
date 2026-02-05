@@ -110,7 +110,7 @@
                       </mat-chip-row>
                     }
                     <input #professionalInput [formControl]="getForm.professional" [matAutocomplete]="auto"
-                           [matChipInputFor]="chipList">
+                           [matChipInputFor]="chipList" matInput>
                   </mat-chip-grid>
                   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
                     @for (professional of sortProfessionals(filteredProfessionalSignal()); track professional.id) {

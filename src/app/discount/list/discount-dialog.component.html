@@ -13,7 +13,8 @@
             <mat-icon matChipRemove>cancel</mat-icon>
           </mat-chip-row>
         }
-        <input #customerInput [formControl]="getForm.customers" [matAutocomplete]="auto" [matChipInputFor]="chipList">
+        <input #customerInput matInput [formControl]="getForm.customers" [matAutocomplete]="auto"
+               [matChipInputFor]="chipList">
       </mat-chip-grid>
       <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
         @for (customer of sortCustomers(filteredCustomerSignal()); track customer.id) {
