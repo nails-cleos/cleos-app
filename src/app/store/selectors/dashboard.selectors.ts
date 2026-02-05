@@ -2,7 +2,6 @@ import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import { DASHBOARD_FEATURE_KEY, DashboardState } from '../reducers/dashboard.reducers';
 import {
-  IMonthlyExport,
   IMonthSummary,
   IMonthlySummaryExpense,
   IMonthlySummarySale,
@@ -76,12 +75,7 @@ const selectYearExport = createSelector(
   (state: DashboardState) => state?.yearExport,
 );
 
-export const getYearExportPipe = pipe(
-  select(selectYearExport),
-  filter((val): val is Map<ISummaryRoom, {
-    monthlyExport: IMonthlyExport[];
-  }> => val !== undefined),
-);
+export const getYearExportPipe = pipe(select(selectYearExport));
 
 const selectYearNavigationParams = createSelector(
   selectDashboardState,

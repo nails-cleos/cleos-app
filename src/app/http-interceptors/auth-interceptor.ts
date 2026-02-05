@@ -14,7 +14,7 @@ export const authInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn):
       req = req.clone({
         setHeaders: {
           'X-Authorization-Firebase': token,
-          'X-Google-Drive-Token': driveToken ?? '',
+          ...(driveToken && { 'X-Google-Drive-Token': driveToken }),
         },
       });
       return next(req);

@@ -245,7 +245,7 @@ export class ExpenseComponent {
     });
 
     effect(() => {
-      this.driveAccessService.requestAccessIfNeeded(this.isAddModeSignal());
+      this.driveAccessService.requestAccessIfNeeded(this.isAddModeSignal() && this.env.googleDriveUploadFile);
     });
   }
 

@@ -28,6 +28,7 @@ export const environment = {
   awsIdentityPoolId: 'eu-central-1:e77fb0cd-db20-4959-8010-e5d71ca4ef52',
   awsLoginsKey: 'securetoken.google.com/nails-cleos-dev',
   awsExtractEnable: false,
+  googleDriveUploadFile: true,
   googleMapKey: 'AIzaSyAkKXZ_Qi3MLge6Jjhi1bw0OXawDAbJgXc',
   showMap: false,
 };
