@@ -60,7 +60,7 @@
                               <mat-icon matChipRemove>cancel</mat-icon>
                             </mat-chip-row>
                           }
-                          <input #colorInput [formControl]="getForm.color" [matAutocomplete]="auto"
+                          <input #colorInput matInput [formControl]="getForm.color" [matAutocomplete]="auto"
                                  [matChipInputFor]="chipList">
                         </mat-chip-grid>
                         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedColor($event)">
@@ -125,7 +125,8 @@
                         }
                       </mat-form-field>
                       <div class="divider">
-                        <button (click)="removeTab(index)" [disabled]="treatmentsSignal().length === 1" class="tab-field"
+                        <button (click)="removeTab(index)" [disabled]="treatmentsSignal().length === 1"
+                                class="tab-field"
                                 color="warn" mat-fab extended type="button">
                           <mat-icon>delete</mat-icon>
                           {{ 'COMMON.BUTTON.DELETE' | translate }}

@@ -36,6 +36,7 @@ import {
   getYearExportPipe,
   getYearNavigationParamsPipe,
   getYearSummaryMapPipe,
+  isDashboardLoadingPipe,
 } from '../../store/selectors/dashboard.selectors';
 import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { DateAdapter } from '@angular/material/core';
@@ -66,14 +67,16 @@ export class YearSummaryComponent {
   private yearSummaryMap$ = this.store.pipe(getYearSummaryMapPipe);
   private yearExport$ = this.store.pipe(getYearExportPipe);
   private navigationParams$ = this.store.pipe(getYearNavigationParamsPipe);
+  private isLoading$ = this.store.pipe(isDashboardLoadingPipe);
 
   private authUserSignal = this.authUserService.authUser;
 
   private primaryRoomSignal = signal<ISummaryRoom | undefined>(undefined);
   private quarterSummariesSignal = signal<IQuarterSummary[] | undefined>(undefined);
   private sheetDataSignal = signal<IMonthlyExport[]>([]);
-  private exportSignal = signal<boolean>(false);
+  private readonly exportSignal = signal<boolean>(false);
   private navigationParams = toSignal(this.navigationParams$);
+  readonly isLoading = toSignal(this.isLoading$, { initialValue: false });
 
   private userName = computed(() => this.authUserSignal()?.displayName);
 
@@ -133,7 +136,6 @@ export class YearSummaryComponent {
   ]).pipe(map(result => result.matches), shareReplay());
 
   isExportLoading = signal<boolean>(false);
-  isLoading = signal<boolean>(false);
   language: string = this.translate.getCurrentLang();
 
   constructor() {
@@ -174,7 +176,6 @@ export class YearSummaryComponent {
             }
           }
         }
-        this.isLoading.set(false);
       }
     });
 
@@ -340,7 +341,6 @@ export class YearSummaryComponent {
     this.quarterSummariesSignal.set(undefined);
     this.primaryRoomSignal.set(undefined);
     this.exportSignal.set(false);
-    this.isLoading.set(true);
     this.store.dispatch(getYearSummary({ year }));
   };
 

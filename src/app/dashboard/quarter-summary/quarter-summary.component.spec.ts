@@ -27,6 +27,7 @@ describe('QuarterSummaryComponent', () => {
 
   let quarterSummaryMap$: BehaviorSubject<any>;
   let navigationParams$: BehaviorSubject<any>;
+  let isLoading$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   let storeSpy: jasmine.SpyObj<Store>;
@@ -110,6 +111,7 @@ describe('QuarterSummaryComponent', () => {
   beforeEach(async () => {
     quarterSummaryMap$ = new BehaviorSubject<any>(undefined);
     navigationParams$ = new BehaviorSubject<any>(undefined);
+    isLoading$ = new BehaviorSubject<any>(undefined);
 
     const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
     storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
@@ -132,6 +134,8 @@ describe('QuarterSummaryComponent', () => {
           return quarterSummaryMap$.asObservable();
         case 2:
           return navigationParams$.asObservable();
+        case 3:
+          return isLoading$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -176,7 +180,6 @@ describe('QuarterSummaryComponent', () => {
 
   describe('Component Initialization', () => {
     it('should initialize with default values', () => {
-      expect(component.isLoading()).toBeFalse();
       expect(component.quarterSummaryTotals()).toEqual(new SummaryTotals());
     });
 
@@ -222,6 +225,7 @@ describe('QuarterSummaryComponent', () => {
       fixture.detectChanges();
       const map = createMockQuarterSummaryMap();
       quarterSummaryMap$.next(map);
+      isLoading$.next(false);
       fixture.detectChanges();
 
       expect(component.getForm.selectedRoom.value).toEqual(mockRoom);
@@ -447,6 +451,8 @@ describe('QuarterSummaryComponent', () => {
 
     it('should set isLoading to true', () => {
       component['getSummary'](2024, 1);
+      isLoading$.next(true);
+      fixture.detectChanges();
 
       expect(component.isLoading()).toBeTrue();
     });

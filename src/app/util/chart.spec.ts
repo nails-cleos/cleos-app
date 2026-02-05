@@ -2,7 +2,6 @@ import { createChart } from './chart';
 import { secondsToHHMM } from './dates';
 
 describe('createChart util', () => {
-
   it('should create default chart with datasets and labels', () => {
     const chart: any = {
       type: 'bar',
@@ -39,15 +38,13 @@ describe('createChart util', () => {
 
     const result = createChart(chart, { code: 'EUR', symbol: '€' } as any, false, 'en-US');
 
-    const tooltipLabel =
-      (result.options.plugins as any).tooltip.callbacks.label;
+    const tooltipLabel = (result.options.plugins as any).tooltip.callbacks.label;
 
-    const tooltipFooter =
-      (result.options.plugins as any).tooltip.callbacks.footer;
+    const tooltipFooter = (result.options.plugins as any).tooltip.callbacks.footer;
 
     const label = tooltipLabel({
       raw: 100,
-      dataset: { label: 'Revenue' },
+      dataset: result.charData.datasets[0],
       datasetIndex: 0,
       dataIndex: 0,
       chart: { data: result.charData },
@@ -55,8 +52,8 @@ describe('createChart util', () => {
     });
 
     const footer = tooltipFooter([
-      { parsed: { y: 100 }, dataset: {} },
-      { parsed: { y: 50 }, dataset: {} },
+      { parsed: { y: 100 }, dataset: { borderDash: [] } },
+      { parsed: { y: 50 }, dataset: { borderDash: [] } },
     ]);
 
     expect(label).toContain('Revenue');
@@ -78,12 +75,12 @@ describe('createChart util', () => {
 
     const result = createChart(chart, undefined, false, 'en-US');
 
-    const tooltipLabel =
-      (result.options.plugins as any).tooltip.callbacks.label;
+    const tooltipLabel = (result.options.plugins as any).tooltip.callbacks.label;
 
     const label = tooltipLabel({
       raw: 80,
-      dataset: { label: 'Current' },
+      parsed: { y: 80 },
+      dataset: result.charData.datasets[1],
       datasetIndex: 1,
       dataIndex: 0,
       chart: { data: result.charData },
@@ -117,8 +114,7 @@ describe('createChart util', () => {
 
     const result = createChart(chart);
 
-    const tooltipLabel =
-      (result.options.plugins as any).tooltip.callbacks.label;
+    const tooltipLabel = (result.options.plugins as any).tooltip.callbacks.label;
 
     const label = tooltipLabel({
       label: 'A',
@@ -142,8 +138,7 @@ describe('createChart util', () => {
 
     const result = createChart(chart, undefined, false);
 
-    const tooltipLabel =
-      (result.options.plugins as any).tooltip.callbacks.label;
+    const tooltipLabel = (result.options.plugins as any).tooltip.callbacks.label;
 
     const label = tooltipLabel({
       dataset: { label: 'Work' },
@@ -162,10 +157,8 @@ describe('createChart util', () => {
 
     const result = createChart(chart);
 
-    const tickLabel =
-      (result.options.scales as any).x.ticks.callback();
+    const tickLabel = (result.options.scales as any).x.ticks.callback();
 
     expect(tickLabel).toBe('');
   });
-
 });

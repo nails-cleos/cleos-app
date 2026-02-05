@@ -92,7 +92,7 @@
           <td *matCellDef="let document" class="hide-xs" mat-cell>
             @if (document.id) {
               <div>
-                @if (!document.deleted) {
+                @if (!document.deleted && googleDriveUploadFile) {
                   <button (click)="download(document)" mat-icon-button
                           matTooltip="{{ 'COMMON.BUTTON.DOWNLOAD' | translate }}" matTooltipPosition="left">
                     <mat-icon color="primary">file_download</mat-icon>
@@ -116,7 +116,7 @@
                     <div matListItemLine>{{ document.date | date:'MM-yyyy' }}</div>
                   </mat-list-item>
                 }
-                @if (!document.deleted) {
+                @if (!document.deleted && googleDriveUploadFile) {
                   <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
                   <mat-list-item role="list">
                     <button (click)="download(document)" color="primary" mat-icon-button>

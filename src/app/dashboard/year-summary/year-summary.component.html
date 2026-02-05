@@ -32,39 +32,33 @@
   </fieldset>
 </div>
 
-@if (!isLoading()) {
-  @if (getForm.date.value) {
-    <button [class.spinner]="isExportLoading()" (click)="exportAction()"
-            [disabled]="isExportLoading() || (export && (!yearExport || sheetData.length === 0))" color="accent"
-            mat-fab extended style="width: 100%; margin: 10px">
-      <ng-container>
-        @if (export) {
-          <mat-icon>file_download</mat-icon>
-          <span>{{ 'COMMON.BUTTON.EXPORT' | translate }}</span>
-        } @else {
-          <mat-icon>cloud_download</mat-icon>
-          <span [innerHTML]="'COMMON.BUTTON.GET_DATA' | translate: {year: getForm.date.value.getFullYear() }"></span>
-        }
-      </ng-container>
-    </button>
-    @if (yearSummaryMap?.size) {
-      <app-year [quarterSummaries]="quarterSummaries" [year]="getForm.date.value.getFullYear()"
-                [measure]="(isHandset$ | async) ? 'short' : 'long'" [currency]="currencySignal()"
-                [start]="(isHandset$ | async) ?1 : 2" [showCash]="showCash()"></app-year>
-      <div class="top">
-        <mat-toolbar color="primary">
-          {{ 'SUMMARY.YEAR.RESULT' | translate }}
-        </mat-toolbar>
-        <app-total-summary [summaryTotals]="yearSummaryTotalsSignal()" [currency]="currencySignal()"
-                           [showCash]="showCash()"></app-total-summary>
-      </div>
-    } @else {
-      <mat-toolbar color="warn" style="text-align: center"
-                   [innerHTML]="'SUMMARY.YEAR.ERROR.NO_CONTENT' | translate:{year: getForm.date.value.getFullYear()}"></mat-toolbar>
-    }
+@if (getForm.date.value) {
+  <button [class.spinner]="isExportLoading()" (click)="exportAction()"
+          [disabled]="isExportLoading() || (export && (!yearExport || sheetData.length === 0))" color="accent"
+          mat-fab extended style="width: 100%; margin: 10px">
+    <ng-container>
+      @if (export) {
+        <mat-icon>file_download</mat-icon>
+        <span>{{ 'COMMON.BUTTON.EXPORT' | translate }}</span>
+      } @else {
+        <mat-icon>cloud_download</mat-icon>
+        <span [innerHTML]="'COMMON.BUTTON.GET_DATA' | translate: {year: getForm.date.value.getFullYear() }"></span>
+      }
+    </ng-container>
+  </button>
+  @if (yearSummaryMap?.size) {
+    <app-year [quarterSummaries]="quarterSummaries" [year]="getForm.date.value.getFullYear()"
+              [measure]="(isHandset$ | async) ? 'short' : 'long'" [currency]="currencySignal()"
+              [start]="(isHandset$ | async) ?1 : 2" [showCash]="showCash()"></app-year>
+    <div class="top">
+      <mat-toolbar color="primary">
+        {{ 'SUMMARY.YEAR.RESULT' | translate }}
+      </mat-toolbar>
+      <app-total-summary [summaryTotals]="yearSummaryTotalsSignal()" [currency]="currencySignal()"
+                         [showCash]="showCash()"></app-total-summary>
+    </div>
+  } @else {
+    <mat-toolbar color="warn" style="text-align: center"
+                 [innerHTML]="'SUMMARY.YEAR.ERROR.NO_CONTENT' | translate:{year: getForm.date.value.getFullYear()}"></mat-toolbar>
   }
-} @else {
-  <div class="spinner-parent-center">
-    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
-  </div>
 }

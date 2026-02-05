@@ -5,6 +5,9 @@ import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth
 import { NavigationService } from '../../services/navigation.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { signal } from '@angular/core';
+import { IChart } from '../../interfaces/dashboard';
+import { ICurrency } from '../../interfaces/currency';
+import { createChart } from '../../util/chart';
 
 describe('ChartComponent', () => {
   let component: ChartComponent;
@@ -14,10 +17,6 @@ describe('ChartComponent', () => {
 
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
-
-  const error = {
-    status: 'NOT_FOUND',
-  };
 
   beforeEach(async () => {
 
@@ -36,10 +35,53 @@ describe('ChartComponent', () => {
 
     fixture = TestBed.createComponent(ChartComponent);
     component = fixture.componentInstance;
-    fixture.componentRef.setInput('error', error);
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should update chart when chartSummary input changes', () => {
+    const currency: ICurrency = { code: 'EUR', icon: 'EUR' };
+    const locale = 'en-GB';
+    const timeZone = 'Europe/Amsterdam';
+
+    const firstSummary: IChart = {
+      title: 'First chart',
+      type: 'bar',
+      labels: ['Jan', 'Feb'],
+      options: 'CHART',
+      colors: 'COLORS',
+      dataSet: [
+        { label: 'Revenue', data: [10, 20], type: 'bar' },
+      ],
+    };
+
+    fixture.componentRef.setInput('error', undefined);
+    fixture.componentRef.setInput('currency', currency);
+    fixture.componentRef.setInput('locale', locale);
+    fixture.componentRef.setInput('timeZone', timeZone);
+    fixture.componentRef.setInput('chartSummary', firstSummary);
+    fixture.detectChanges();
+
+    expect(component.chart()).toEqual(
+      createChart(firstSummary, currency, false, locale, timeZone),
+    );
+
+    const secondSummary: IChart = {
+      ...firstSummary,
+      title: 'Second chart',
+      labels: ['Mar', 'Apr', 'May'],
+      dataSet: [
+        { label: 'Revenue', data: [5, 15, 25], type: 'bar' },
+      ],
+    };
+
+    fixture.componentRef.setInput('chartSummary', secondSummary);
+    fixture.detectChanges();
+
+    expect(component.chart()).toEqual(
+      createChart(secondSummary, currency, false, locale, timeZone),
+    );
   });
 });

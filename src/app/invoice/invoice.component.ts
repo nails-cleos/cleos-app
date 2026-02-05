@@ -216,7 +216,7 @@ export class InvoiceComponent {
     });
 
     effect(() => {
-      this.driveAccessService.requestAccessIfNeeded();
+      this.driveAccessService.requestAccessIfNeeded(this.env.googleDriveUploadFile);
     });
   }
 

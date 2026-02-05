@@ -24,6 +24,7 @@ import { DateAdapter } from '@angular/material/core';
 import { YearMonthAdapter } from '../util/adapter/year-month.adapter';
 import { getDateFormat, getDateQuarter, getNowTimeZone, monthViewTitle } from '../util/dates';
 import { MatDatepicker } from '@angular/material/datepicker';
+import { EnvService } from '../services/env.service';
 
 type DocumentsForm = {
   office: FormControl<IOfficeAll | undefined>;
@@ -39,6 +40,7 @@ type DocumentsForm = {
   styleUrl: './document.component.scss',
 })
 export class DocumentComponent {
+  private readonly env: EnvService = inject(EnvService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly store: Store<DocumentState | OfficeState> = inject(Store<DocumentState | OfficeState>);
@@ -151,7 +153,7 @@ export class DocumentComponent {
       if (!data) {
         return;
       }
-      this.driveAccessService.requestAccessIfNeeded();
+      this.driveAccessService.requestAccessIfNeeded(this.googleDriveUploadFile);
     });
 
     effect(() => {
@@ -164,6 +166,10 @@ export class DocumentComponent {
 
   get getForm(): DocumentsForm {
     return this.form.controls;
+  }
+
+  get googleDriveUploadFile(): boolean {
+    return this.env.googleDriveUploadFile;
   }
 
   setMonthAndYear = (normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void => {

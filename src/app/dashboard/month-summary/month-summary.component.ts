@@ -12,7 +12,11 @@ import {
   newDateTimestamp,
 } from '../../util/dates';
 import { Store } from '@ngrx/store';
-import { getMonthlyNavigationParamsPipe, getMonthlySummaryMapPipe } from '../../store/selectors/dashboard.selectors';
+import {
+  getMonthlyNavigationParamsPipe,
+  getMonthlySummaryMapPipe,
+  isDashboardLoadingPipe,
+} from '../../store/selectors/dashboard.selectors';
 import { TranslateService } from '@ngx-translate/core';
 import { getMonthlySummary, updateMonthlySummary } from '../../store/dashboard.actions';
 import {
@@ -73,9 +77,11 @@ export class MonthSummaryComponent {
 
   private monthlySummaryMap$ = this.store.pipe(getMonthlySummaryMapPipe);
   private navigationParams$ = this.store.pipe(getMonthlyNavigationParamsPipe);
+  private isLoading$ = this.store.pipe(isDashboardLoadingPipe);
 
   private authUserSignal = this.authUserService.authUser;
   private navigationParams = toSignal(this.navigationParams$);
+  readonly isLoading = toSignal(this.isLoading$, { initialValue: false });
 
   private selectedRoomSignal = signal<ISummaryRoom | 'All' | undefined>(undefined);
   private primaryRoomSignal = signal<ISummaryRoom | undefined>(undefined);
@@ -124,7 +130,6 @@ export class MonthSummaryComponent {
   monthlySummaryCash: IMonthlySummaryRequest[] = [];
   type: typeof SummaryType = SummaryType;
   locale = 'es';
-  isLoading = false;
 
   dateFormat: string = this.translate.getCurrentLang();
   readonly language: string = this.translate.getCurrentLang();
@@ -179,7 +184,6 @@ export class MonthSummaryComponent {
             }
           }
         }
-        this.isLoading = false;
       }
     });
 
@@ -545,7 +549,6 @@ export class MonthSummaryComponent {
   };
 
   updateMonthlySummary = (totalTypes: ITotalType, summaries: IMonthlySummaryRequest[]): void => {
-    this.isLoading = true;
     let totals: ITotal[];
     switch (totalTypes.type) {
       case SummaryType.cash:
@@ -607,7 +610,6 @@ export class MonthSummaryComponent {
   };
 
   private getSummary = (date: string): void => {
-    this.isLoading = true;
     this.summaryReservations = undefined;
     this.summaryExpenses = undefined;
     this.summaryCash = undefined;

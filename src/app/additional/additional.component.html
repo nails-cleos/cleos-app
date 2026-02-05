@@ -71,7 +71,7 @@
                               <mat-icon matChipRemove>cancel</mat-icon>
                             </mat-chip-row>
                           }
-                          <input #groupInput [formControl]="getForm.group" [matAutocomplete]="auto"
+                          <input #groupInput matInput [formControl]="getForm.group" [matAutocomplete]="auto"
                                  [matChipInputFor]="chipList">
                         </mat-chip-grid>
                         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedGroup($event)">

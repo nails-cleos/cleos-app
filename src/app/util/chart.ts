@@ -145,8 +145,13 @@ const radarChartDefaultOptions = (isDark?: boolean): ChartOptions<'radar'> => {
   return options;
 };
 
-const barChartDefaultOptions = (sum?: boolean, isDark?: boolean, locale?: string, timeZone?: string,
-  currency?: ICurrency): ChartOptions<'bar'> => {
+const barChartDefaultOptions = (
+  sum?: boolean,
+  isDark?: boolean,
+  locale?: string,
+  timeZone?: string,
+  currency?: ICurrency,
+): ChartOptions<'bar'> => {
   let options: ChartOptions<'bar'>;
   if (isDark) {
     options = {
@@ -292,7 +297,8 @@ const lineChartDefaultOptions = (
 };
 
 const footer = (tooltipItems: any, currency?: ICurrency, sum?: boolean, locale?: string, title?: string) => {
-  const total = sum ? tooltipItems.reduce((a: number, b: any) => a + (b.dataset.borderDash ? 0 : b.parsed.y), 0) :
+  const total = sum ?
+    tooltipItems.reduce((a: number, b: any) => a + (b.dataset.borderDash.length ? 0 : b.parsed.y), 0) :
     tooltipItems[tooltipItems.length - 1].formattedValue;
   return tooltipItems.length > 1 ? createTooltip(title || 'Total', total, currency, locale) : '';
 };
@@ -304,14 +310,14 @@ const label = (tooltipItem: any, currency?: ICurrency, sum?: boolean, locale?: s
     return createTooltip(tooltipItem.dataset.label, Number(tooltipItem.raw) - previous, currency, locale);
   }
 
-  const addTooltip = !tooltipItem.dataset.borderDash || tooltipItem.dataset.borderDash &&
+  const addTooltip = !tooltipItem.dataset.borderDash.length || tooltipItem.dataset.borderDash.length &&
     (newDateTimestamp(tooltipItem.label, timeZone) > getNowTimeZone(timeZone));
 
   return addTooltip ? createTooltip(tooltipItem.dataset.label, tooltipItem.raw, currency, locale) : '';
 };
 
 const createTooltip = (title: string, value: string | number, currency?: ICurrency, locale?: string) =>
-  `${ title } ${ numberFormat(value, currency, locale) }`;
+  `${title} ${numberFormat(value, currency, locale)}`;
 
 const barChartNoLabelOptions = (isDark?: boolean): ChartOptions<'bar'> => {
   let options: ChartOptions<'bar'>;
@@ -541,7 +547,7 @@ const pieChartPercentageOptions = (): ChartOptions<'pie'> => ({
 
 const pieChatPercentageLabel = (tooltipItem: TooltipItem<'pie'>): string => {
   const total = tooltipItem.dataset.data.reduce((a, b) => Number(a) + Number(b));
-  return `${ tooltipItem.label }: ${ (Number(tooltipItem.raw) * 100 / total).toFixed(2) }%`;
+  return `${tooltipItem.label}: ${(Number(tooltipItem.raw) * 100 / total).toFixed(2)}%`;
 };
 
 const barChatTimeLabel = (tooltipItem: any): string => {
@@ -566,8 +572,7 @@ const chartArrayColors = (): any[] => ([{
   hoverBorderColor: ['rgb(254, 205, 190)', 'rgb(152, 109, 142)', 'rgb(95, 147, 154)',
     'rgb(161, 202, 226)', 'rgb(242, 213, 239)', 'rgb(203, 239, 227)', 'rgb(194, 213, 167)',
     'rgb(176, 171, 202)', 'rgb(226, 169, 190)', 'rgb(163, 214, 212)'],
-},
-{
+}, {
   hoverBackgroundColor: ['rgba(254, 205, 190, 0.2)', 'rgba(152, 109, 142, 0.2)', 'rgba(95, 147, 154, 0.2)',
     'rgba(161, 202, 226, 0.2)', 'rgba(242, 213, 239, 0.2)', 'rgba(203, 239, 227, 0.2)', 'rgba(194, 213, 167, 0.2)',
     'rgba(176, 171, 202, 0.2)', 'rgba(226, 169, 190, 0.2)', 'rgba(163, 214, 212, 0.2)'],

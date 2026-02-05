@@ -925,6 +925,7 @@ export class ReservationComponent {
                 if (event) {
                   this.events.at(dataEvent.index)?.get('event')?.setValue(event);
                   dataEvent.addEvent(event);
+                  this.refresh.next(event);
                 }
               } else {
                 this.segmentClick(date, 'EDITING', data.date, reservation.id);
@@ -1567,6 +1568,7 @@ export class ReservationComponent {
     }
     selectedEvent?.setValue(event);
     eventData.addEvent(event);
+    this.refresh.next(event);
   };
 
   private filterCustomer = (name: string, customers?: IUserAll[]): IUserAll[] | undefined => customers?.filter(
