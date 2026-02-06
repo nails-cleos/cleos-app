@@ -3,11 +3,11 @@
   @let currentsSummaryTotals = summaryTotals();
   <mat-card-content>
     <div class="flex-row-wrap">
-      <div class="bottom" [ngClass]="{ 'year-cash-content': showCash, 'year-content': !showCash }">
+      <div class="bottom" [ngClass]="{ 'year-cash-content': showCash(), 'year-content': !showCash() }">
         <app-result-summary [summaryType]="'income'" [summaryTotals]="currentsSummaryTotals" [currency]="currentCurrency"
                             [title]="'INCOME'"></app-result-summary>
       </div>
-      <div class="bottom" [ngClass]="{ 'year-cash-content': showCash, 'year-content': !showCash }">
+      <div class="bottom" [ngClass]="{ 'year-cash-content': showCash(), 'year-content': !showCash() }">
         <app-result-summary [summaryType]="'expense'" [summaryTotals]="currentsSummaryTotals"
                             [currency]="currentCurrency"
                             [title]="'EXPENSE'"></app-result-summary>
