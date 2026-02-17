@@ -1,9 +1,9 @@
 import { createAction, props } from '@ngrx/store';
-import { IError, PageRequest, IResponseSuccess } from '../interfaces/common';
+import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
 import { ITreatmentAll, ITreatmentGroup, ITreatmentGroupAll } from '../interfaces/treatment';
 import { IColorAll } from '../interfaces/color';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
-import { Pagination } from '../interfaces/pagination';
+import { TreatmentData } from './reducers/treatment.reducers';
 
 enum TreatmentActionTypes {
   getTreatmentsPage = '[Treatment] Get treatments page',
@@ -41,7 +41,7 @@ export const getAllColors = createAction(
 
 export const treatmentSuccess = createAction(
   TreatmentActionTypes.treatmentSuccess,
-  props<{ data: ITreatmentGroupAll[] | Pagination<ITreatmentGroupAll> }>(),
+  props<{ data: TreatmentData }>(),
 );
 
 export const colorSuccess = createAction(

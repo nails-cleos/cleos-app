@@ -10,6 +10,7 @@ import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
 import { Pagination } from '../../interfaces/pagination';
 import { IDocument } from '../../interfaces/document';
+import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 
 export const DOCUMENT_FEATURE_KEY = 'document';
 
@@ -67,4 +68,15 @@ export const documentReducer = createReducer(
     response: action,
   })),
   on(cleanDocument, () => initialState),
+
+  on(clearGlobalResponse, (state) => ({
+    ...state,
+    response: undefined,
+  })),
+
+  on(clearGlobalError, (state) => ({
+    ...state,
+    error: undefined,
+    subErrors: undefined,
+  })),
 );

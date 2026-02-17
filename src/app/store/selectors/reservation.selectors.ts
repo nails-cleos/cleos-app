@@ -10,7 +10,6 @@ import {
   IUpcomingAll,
 } from '../../interfaces/reservation';
 import { IError, IResponseSuccess } from '../../interfaces/common';
-import { Pagination } from '../../interfaces/pagination';
 import { RESERVATION_FEATURE_KEY, ReservationState } from '../reducers/reservation.reducers';
 import { ITreatmentDiscountDTO } from '../../interfaces/treatment';
 import { IRoomAll } from '../../interfaces/room';
@@ -26,10 +25,7 @@ const selectReservationPaginationData = createSelector(
   selectReservationState,
   (state: ReservationState) => state?.page,
 );
-export const getReservationPaginationPipe = pipe(
-  select(selectReservationPaginationData),
-  filter((val): val is Pagination<IReservationAll> => val !== undefined),
-);
+export const getReservationPaginationPipe = pipe(select(selectReservationPaginationData));
 
 const selectCustomerReservationData = createSelector(
   selectReservationState,
@@ -217,10 +213,7 @@ const selectFilteredReservations = createSelector(
   selectReservationState,
   (state: ReservationState) => state.filter,
 );
-export const getFilteredReservationsPipe = pipe(
-  select(selectFilteredReservations),
-  filter((val): val is Pagination<IReservationAll> => val !== undefined),
-);
+export const getFilteredReservationsPipe = pipe(select(selectFilteredReservations));
 
 const selectCustomers = createSelector(
   selectReservationState,

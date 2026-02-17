@@ -26,12 +26,13 @@ import { IError, IResponseSuccess } from '../../interfaces/common';
 
 import { createReducer, on } from '@ngrx/store';
 import { IOfficeAll } from '../../interfaces/office';
+import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 
 export const ROOM_FEATURE_KEY = 'room';
 
 export interface RoomState {
   response?: IResponseSuccess;
-  data?: IRoom | Pagination<IRoom>;
+  data?: Pagination<IRoom>;
   services?: IRoomService;
   professionals?: IUserAll[];
   currencies?: ICurrencyAll[];
@@ -79,7 +80,6 @@ export const roomReducer = createReducer(
   })),
   on(getRoom, (state) => ({
     ...state,
-    data: {} as IRoom,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
@@ -162,5 +162,16 @@ export const roomReducer = createReducer(
     currentRoomId: roomId,
   })),
   on(cleanRoom, () => initialState),
+
+  on(clearGlobalResponse, (state) => ({
+    ...state,
+    response: undefined,
+  })),
+
+  on(clearGlobalError, (state) => ({
+    ...state,
+    error: undefined,
+    subErrors: undefined,
+  })),
 );
 

@@ -45,12 +45,12 @@ export const expenseInfoSuccess = createAction(
 
 export const createExpense = createAction(
   ExpenseActionTypes.createExpense,
-  props<{ roomId: string; expense: IExpense; file?: File }>(),
+  props<{ roomId: string; expense: IExpense; file: File }>(),
 );
 
 export const updateExpense = createAction(
   ExpenseActionTypes.updateExpense,
-  props<{ id: string; roomId: string; expense: IExpense }>(),
+  props<{ id: string; roomId: string; expense: IExpense; file?: File }>(),
 );
 
 export const expenseSaveSuccess = createAction(

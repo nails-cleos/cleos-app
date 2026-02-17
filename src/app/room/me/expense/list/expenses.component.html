@@ -132,6 +132,12 @@
                         matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
                   <mat-icon color="primary">edit</mat-icon>
                 </button>
+                @if (expense.document && googleDriveUploadFile) {
+                  <button (click)="download(expense.document)" mat-icon-button
+                          matTooltip="{{ 'COMMON.BUTTON.DOWNLOAD' | translate }}" matTooltipPosition="left">
+                    <mat-icon color="accent">file_download</mat-icon>
+                  </button>
+                }
                 <button (click)="delete(expense)" mat-icon-button matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}"
                         matTooltipPosition="right">
                   <mat-icon color="warn">delete</mat-icon>

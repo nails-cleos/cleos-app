@@ -1,10 +1,10 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
-import { IAdditional, IAdditionalAll } from '../../interfaces/additional';
+import { IAdditionalAll } from '../../interfaces/additional';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { ADDITIONAL_FEATURE_KEY, AdditionalState } from '../reducers/additional.reducers';
-import { Pagination } from '../../interfaces/pagination';
 import { ITreatmentGroupAll } from '../../interfaces/treatment';
+import { map } from 'rxjs/operators';
 
 const selectAdditionalState = createFeatureSelector<AdditionalState>(ADDITIONAL_FEATURE_KEY);
 
@@ -14,7 +14,8 @@ const selectAdditionalData = createSelector(
 );
 export const getAdditionalListPipe = pipe(
   select(selectAdditionalData),
-  filter((val): val is IAdditionalAll[] => val !== undefined),
+  filter((val) => val?.kind === 'list'),
+  map((val) => val.value),
 );
 
 const selectAdditionalPaginationData = createSelector(
@@ -23,7 +24,8 @@ const selectAdditionalPaginationData = createSelector(
 );
 export const getAdditionalPaginationPipe = pipe(
   select(selectAdditionalPaginationData),
-  filter((val): val is Pagination<IAdditional> => val !== undefined),
+  filter((val) => val?.kind === 'pagination'),
+  map((val) => val?.value),
 );
 
 const selectCurrentAdditionalId = createSelector(

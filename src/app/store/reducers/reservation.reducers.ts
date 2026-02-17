@@ -83,6 +83,7 @@ import { IColorAll } from '../../interfaces/color';
 import { IReview } from '../../interfaces/review';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
+import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 
 export const RESERVATION_FEATURE_KEY = 'reservation';
 
@@ -540,4 +541,15 @@ export const reservationReducer = createReducer(
     },
   })),
   on(cleanReservation, () => ({ ...initialState })),
+
+  on(clearGlobalResponse, (state) => ({
+    ...state,
+    response: undefined,
+  })),
+
+  on(clearGlobalError, (state) => ({
+    ...state,
+    error: undefined,
+    subErrors: undefined,
+  })),
 );

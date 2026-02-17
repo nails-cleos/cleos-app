@@ -3,8 +3,8 @@ import { filter, pipe } from 'rxjs';
 import { ITreatmentAll, ITreatmentGroupAll } from '../../interfaces/treatment';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { TREATMENT_FEATURE_KEY, TreatmentState } from '../reducers/treatment.reducers';
-import { Pagination } from '../../interfaces/pagination';
 import { IColorAll } from '../../interfaces/color';
+import { map } from 'rxjs/operators';
 
 const selectTreatmentState = createFeatureSelector<TreatmentState>(TREATMENT_FEATURE_KEY);
 
@@ -14,7 +14,8 @@ const selectTreatmentPaginationData = createSelector(
 );
 export const getTreatmentPaginationPipe = pipe(
   select(selectTreatmentPaginationData),
-  filter((val): val is Pagination<ITreatmentGroupAll> => val !== undefined),
+  filter((val) => val?.kind === 'pagination'),
+  map((val) => val.value),
 );
 
 const selectCurrentTreatmentId = createSelector(
@@ -32,7 +33,8 @@ const selectTreatmentGroupList = createSelector(
 );
 export const getTreatmentGroupListPipe = pipe(
   select(selectTreatmentGroupList),
-  filter((val): val is ITreatmentGroupAll[] => val !== undefined),
+  filter((val) => val?.kind === 'list'),
+  map((val) => val.value),
 );
 
 const selectedTreatment = createSelector(

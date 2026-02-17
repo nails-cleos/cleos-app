@@ -17,6 +17,9 @@ import { ExpenseState } from '../../../../store/reducers/expense.reducers';
 import { RoomState } from '../../../../store/reducers/room.reducers';
 import { deleteExpense, expenseSelected, getExpensesPage } from '../../../../store/expense.actions';
 import { signal } from '@angular/core';
+import { DriveAccessService } from '../../../../services/drive-access.service';
+import { documentView } from '../../../../store/document.actions';
+import { DocumentTypeEnum } from '../../../../interfaces/document';
 
 describe('ExpensesComponent', () => {
   let component: ExpensesComponent;
@@ -28,6 +31,7 @@ describe('ExpensesComponent', () => {
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let dialogSpy: jasmine.Spy<any>;
   let translate: TranslateService;
+  let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
 
   let roomId$: BehaviorSubject<string | undefined>;
   let expenseList$: BehaviorSubject<any>;
@@ -134,6 +138,7 @@ describe('ExpensesComponent', () => {
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     datepickerSpy = jasmine.createSpyObj('MatDatepicker', ['close']);
+    driveAccessServiceSpy = jasmine.createSpyObj<DriveAccessService>('DriveAccessService', ['requestAccessIfNeeded']);
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
@@ -164,6 +169,7 @@ describe('ExpensesComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: DriveAccessService, useValue: driveAccessServiceSpy },
         provideNoopAnimations(),
       ],
     }).compileComponents();
@@ -385,5 +391,12 @@ describe('ExpensesComponent', () => {
     expect(result?.getFullYear()).toBe(2025);
     expect(result?.getMonth()).toBe(2);
     expect(datepickerSpy.close).toHaveBeenCalled();
+  });
+
+  it('should dispatch documentSelected when edit is called', () => {
+    const item = { id: '1', name: 'Document 1', date: new Date(2024, 2, 1), type: DocumentTypeEnum.expense };
+    component.download(item);
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(documentView({ id: item.id, fileName: item.name }));
   });
 });

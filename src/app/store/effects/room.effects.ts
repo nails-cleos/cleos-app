@@ -109,7 +109,7 @@ export class RoomEffects {
     switchMap(({ id, room }) => this.roomService.deleteRoom(id).pipe(
       switchMap(() => {
         const message = this.translate.instant('ROOM.DELETED.MESSAGE', { name: roomName(room) });
-        return success(roomSaveSuccess, message, undefined, false, 'warning');
+        return success(roomSaveSuccess, message, undefined, true, 'warning');
       }),
       catchError((err: HttpErrorResponse) => of(roomFailure({ error: err.error }))),
     )),

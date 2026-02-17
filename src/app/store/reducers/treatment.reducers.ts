@@ -23,12 +23,17 @@ import {
 import { ITreatmentAll, ITreatmentGroupAll } from '../../interfaces/treatment';
 import { IColorAll } from '../../interfaces/color';
 import { IError, IResponseSuccess } from '../../interfaces/common';
+import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 
 export const TREATMENT_FEATURE_KEY = 'treatment';
 
+export type TreatmentData =
+  | { kind: 'pagination'; value: Pagination<ITreatmentGroupAll> }
+  | { kind: 'list'; value: ITreatmentGroupAll[] };
+
 export interface TreatmentState {
   response?: IResponseSuccess;
-  data?: ITreatmentGroupAll[] | Pagination<ITreatmentGroupAll>;
+  data?: TreatmentData;
   history?: ITreatmentAll[];
   colors?: IColorAll[];
   error?: IError;
@@ -54,7 +59,13 @@ export const treatmentReducer = createReducer(
   initialState,
   on(getTreatmentsPage, (state) => ({
     ...state,
-    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<ITreatmentGroupAll>,
+    data: {
+      kind: 'pagination',
+      value: {
+        content: [{}, {}, {}],
+        totalElements: 3,
+      } as Pagination<ITreatmentGroupAll>,
+    },
     subErrors: undefined,
     selected: undefined,
     response: undefined,
@@ -141,4 +152,15 @@ export const treatmentReducer = createReducer(
     currentTreatmentId: treatmentId,
   })),
   on(cleanTreatment, () => initialState),
+
+  on(clearGlobalResponse, (state) => ({
+    ...state,
+    response: undefined,
+  })),
+
+  on(clearGlobalError, (state) => ({
+    ...state,
+    error: undefined,
+    subErrors: undefined,
+  })),
 );

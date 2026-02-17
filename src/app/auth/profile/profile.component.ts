@@ -25,7 +25,7 @@ import { GoogleMapComponent, GoogleMapForm } from '../../shared/google-map/googl
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
 import { NgIcon } from '@ng-icons/core';
-import { ColorPickerComponent, ColorPickerDirective } from 'ngx-color-picker';
+import { ColorPickerDirective } from 'ngx-color-picker';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getSelectedUserPipe, getSubErrorsPipe, getUserResponsePipe } from '../../store/selectors/user.selectors';
 import { IError } from '../../interfaces/common';
@@ -47,8 +47,8 @@ type ProfileForm = {
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
-  imports: [SharedModule, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective,
-    NgIcon, ColorPickerComponent, ColorPickerDirective],
+  imports: [SharedModule, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective, NgIcon,
+    ColorPickerDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileComponent {
@@ -132,6 +132,7 @@ export class ProfileComponent {
 
   private geometry?: PlaceGeometry;
   private formattedAddress?: string;
+  private lastImageUrl?: string;
 
   constructor() {
     effect(() => {
@@ -192,9 +193,15 @@ export class ProfileComponent {
 
     effect(() => {
       const img = this.imageSignal();
-      if (img) {
-        this.resizeImageFromUrl(img);
+      if (!img) {
+        this.lastImageUrl = undefined;
+        return;
       }
+      if (img === this.lastImageUrl) {
+        return;
+      }
+      this.lastImageUrl = img;
+      this.resizeImageFromUrl(img);
     });
 
     effect(() => {

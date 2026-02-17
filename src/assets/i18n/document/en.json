@@ -1,11 +1,5 @@
 {
   "DOCUMENT": {
-    "OFFICE": {
-      "SEARCH": "Find by office",
-      "FIELD": "Office",
-      "REQUIRED": "Office is <b>required</b>",
-      "INVALID": "Office is invalid"
-    },
     "LIST": {
       "ERROR": {
         "NO_CONTENT": "No Documents"

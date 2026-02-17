@@ -23,6 +23,7 @@ import {
 import { IPayment, IPaymentOption } from '../../interfaces/payment';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
+import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 
 export const PAYMENT_FEATURE_KEY = 'payment';
 
@@ -153,4 +154,15 @@ export const paymentReducer = createReducer(
     currentPathId: { id, path },
   })),
   on(cleanPayment, () => initialState),
+
+  on(clearGlobalResponse, (state) => ({
+    ...state,
+    response: undefined,
+  })),
+
+  on(clearGlobalError, (state) => ({
+    ...state,
+    error: undefined,
+    subErrors: undefined,
+  })),
 );

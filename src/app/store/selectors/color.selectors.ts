@@ -1,9 +1,8 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
-import { IColor, IColorAll } from '../../interfaces/color';
+import { IColorAll } from '../../interfaces/color';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { COLOR_FEATURE_KEY, ColorState } from '../reducers/color.reducers';
-import { Pagination } from '../../interfaces/pagination';
 
 const selectColorState = createFeatureSelector<ColorState>(COLOR_FEATURE_KEY);
 
@@ -11,10 +10,7 @@ const selectColorPaginationData = createSelector(
   selectColorState,
   (state: ColorState) => state?.data,
 );
-export const getColorPaginationPipe = pipe(
-  select(selectColorPaginationData),
-  filter((val): val is Pagination<IColor> => val !== undefined),
-);
+export const getColorPaginationPipe = pipe(select(selectColorPaginationData));
 
 const selectCurrentColorId = createSelector(
   selectColorState,

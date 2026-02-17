@@ -25,7 +25,7 @@ export class OfficeService {
     sort: string,
     direction: SortDirection,
     size: number,
-  ): Observable<Pagination<IOffice>> => this.http.get<Pagination<IOffice>>(
+  ): Observable<Pagination<IOfficeAll>> => this.http.get<Pagination<IOfficeAll>>(
     toUrl(this.urlV1, 'pages'),
     { ...paginated(), params: createFilter(page, size, sort, direction) },
   );

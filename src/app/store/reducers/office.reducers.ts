@@ -5,6 +5,7 @@ import {
   createOffice,
   deleteOffice,
   getAllManager,
+  getAllMyOffices,
   getOffice,
   getOfficesPage,
   managerSuccess,
@@ -14,17 +15,21 @@ import {
   officeSuccess,
   setCurrentOfficeId,
   updateOffice,
-  getAllMyOffices,
 } from '../office.actions';
 import { IOffice, IOfficeAll } from '../../interfaces/office';
 import { IUserAll } from '../../interfaces/user';
 import { IError, IResponseSuccess } from '../../interfaces/common';
+import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 
 export const OFFICE_FEATURE_KEY = 'office';
 
+export type OfficeData =
+  | { kind: 'pagination'; value: Pagination<IOfficeAll> }
+  | { kind: 'list'; value: IOfficeAll[] };
+
 export interface OfficeState {
   response?: IResponseSuccess;
-  data?: IOffice | Pagination<IOffice> | IOfficeAll[];
+  data?: OfficeData;
   managers?: IUserAll[];
   error?: IError;
   subErrors?: IError[];
@@ -48,7 +53,13 @@ export const officeReducer = createReducer(
   initialState,
   on(getOfficesPage, (state) => ({
     ...state,
-    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IOffice>,
+    data: {
+      kind: 'pagination',
+      value: {
+        content: [{}, {}, {}],
+        totalElements: 3,
+      } as Pagination<IOfficeAll>,
+    },
     subErrors: undefined,
     selected: undefined,
     response: undefined,
@@ -62,7 +73,6 @@ export const officeReducer = createReducer(
   })),
   on(getOffice, (state) => ({
     ...state,
-    data: {} as IOffice,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
@@ -70,6 +80,7 @@ export const officeReducer = createReducer(
   on(officeSuccess, (state, { data }) => ({
     ...state,
     data,
+    error: undefined,
     subErrors: undefined,
     response: undefined,
   })),
@@ -117,12 +128,16 @@ export const officeReducer = createReducer(
     subErrors: undefined,
     response: undefined,
   })),
-  on(officeSuccess, (state, { data }) => ({
+  on(cleanOffice, () => initialState),
+
+  on(clearGlobalResponse, (state) => ({
     ...state,
-    data,
-    error: undefined,
-    subErrors: undefined,
     response: undefined,
   })),
-  on(cleanOffice, () => initialState),
+
+  on(clearGlobalError, (state) => ({
+    ...state,
+    error: undefined,
+    subErrors: undefined,
+  })),
 );

@@ -312,6 +312,12 @@
         "INVALID": "Oficina no valida"
       }
     },
+    "OFFICE": {
+      "SEARCH": "Buscar por oficina",
+      "FIELD": "Oficina",
+      "REQUIRED": "Oficina es <b>requerido</b>",
+      "INVALID": "Oficina no valido"
+    },
     "DASHBOARD": {
       "HOME": "Principal",
       "PROFILE": "Perfil",

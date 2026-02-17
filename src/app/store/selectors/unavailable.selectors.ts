@@ -3,7 +3,6 @@ import { filter, pipe } from 'rxjs';
 import { IUnavailableAll } from '../../interfaces/unavailable';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { UNAVAILABLE_FEATURE_KEY, UnavailableState } from '../reducers/unavailable.reducers';
-import { Pagination } from '../../interfaces/pagination';
 import { IUserAll } from '../../interfaces/user';
 import { IRoomAll } from '../../interfaces/room';
 
@@ -13,10 +12,7 @@ const selectUnavailablePaginationData = createSelector(
   selectUnavailableState,
   (state: UnavailableState) => state?.data,
 );
-export const getUnavailablePaginationPipe = pipe(
-  select(selectUnavailablePaginationData),
-  filter((val): val is Pagination<IUnavailableAll> => val !== undefined),
-);
+export const getUnavailablePaginationPipe = pipe(select(selectUnavailablePaginationData));
 
 const selectCurrentUnavailableId = createSelector(
   selectUnavailableState,

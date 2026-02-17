@@ -23,6 +23,7 @@ import { Pagination } from '../../interfaces/pagination';
 import { IAccount, IAccountAll, IAccountTransaction, ITransaction } from '../../interfaces/account';
 import { IPaymentOption } from '../../interfaces/payment';
 import { IError, IResponseSuccess } from '../../interfaces/common';
+import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 
 export const ACCOUNT_FEATURE_KEY = 'accounts';
 
@@ -143,5 +144,16 @@ export const accountReducer = createReducer(
     currentAccountId: state.currentAccountId,
     currentTransactionId: state.currentTransactionId,
     currentCustomerId: state.currentCustomerId,
+  })),
+
+  on(clearGlobalResponse, (state) => ({
+    ...state,
+    response: undefined,
+  })),
+
+  on(clearGlobalError, (state) => ({
+    ...state,
+    error: undefined,
+    subErrors: undefined,
   })),
 );

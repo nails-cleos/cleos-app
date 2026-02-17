@@ -15,14 +15,15 @@ import {
   updateExpense,
 } from '../expense.actions';
 import { Pagination } from '../../interfaces/pagination';
-import { IExpense, IExpenseAll, IExpenseInfo } from '../../interfaces/expense';
+import { IExpenseAll, IExpenseInfo } from '../../interfaces/expense';
 import { IError, IResponseSuccess } from '../../interfaces/common';
+import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 
 export const EXPENSE_FEATURE_KEY = 'expense';
 
 export interface ExpenseState {
   response?: IResponseSuccess;
-  data?: Pagination<IExpenseAll> | IExpense[];
+  data?: Pagination<IExpenseAll>;
   info?: IExpenseInfo;
   error?: IError;
   subErrors?: IError[];
@@ -115,4 +116,15 @@ export const expenseReducer = createReducer(
     currentExpenseId: expenseId,
   })),
   on(cleanExpense, () => initialState),
+
+  on(clearGlobalResponse, (state) => ({
+    ...state,
+    response: undefined,
+  })),
+
+  on(clearGlobalError, (state) => ({
+    ...state,
+    error: undefined,
+    subErrors: undefined,
+  })),
 );

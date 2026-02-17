@@ -1,8 +1,8 @@
 import { createAction, props } from '@ngrx/store';
-import { IError, PageRequest, IResponseSuccess } from '../interfaces/common';
-import { Pagination } from '../interfaces/pagination';
-import { IDiscount, IReferral, IUserDiscount } from '../interfaces/discount';
+import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
+import { IDiscount, IReferral } from '../interfaces/discount';
 import { ICurrency } from '../interfaces/currency';
+import { DiscountData } from './reducers/discount.reducers';
 
 enum DiscountActionTypes {
   getDiscountsPage = '[Discount] Get discounts page',
@@ -51,7 +51,7 @@ export const sendDiscountToCustomers = createAction(
 
 export const discountSuccess = createAction(
   DiscountActionTypes.discountSuccess,
-  props<{ data: Pagination<IDiscount> | Pagination<IUserDiscount> | IUserDiscount[] }>(),
+  props<{ data: DiscountData }>(),
 );
 
 export const referralSuccess = createAction(

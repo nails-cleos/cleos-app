@@ -46,7 +46,7 @@ export class UserEffects {
     ofType(getUsersPage),
     switchMap(({ page, sort, direction, size, filter }) =>
       this.userService.getUsersPage(page, sort, direction, size, filter).pipe(
-        switchMap((data: Pagination<IUserAll>) => of(userSuccess({ data }))),
+        switchMap((value: Pagination<IUserAll>) => of(userSuccess({ data: { kind: 'pagination', value } }))),
         catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
       )),
   ));
@@ -55,7 +55,7 @@ export class UserEffects {
     ofType(getAllCustomers),
     switchMap(() =>
       this.userService.getCustomers().pipe(
-        switchMap((data: IUserAll[]) => of(userSuccess({ data }))),
+        switchMap((value: IUserAll[]) => of(userSuccess({ data: { kind: 'list', value } }))),
         catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
       )),
   ));
@@ -82,7 +82,7 @@ export class UserEffects {
     ofType(getCustomerOverview),
     switchMap(({ id }) =>
       this.userService.getCustomerOverview(id).pipe(
-        switchMap((data: IOverview) => of(userSuccess({ data }))),
+        switchMap((value: IOverview) => of(userSuccess({ data: { kind: 'overview', value } }))),
         catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
       )),
   ));
@@ -150,7 +150,7 @@ export class UserEffects {
     switchMap(({ id, displayName }) =>
       this.userService.deleteUser(id).pipe(
         switchMap(() =>
-          this.requestSuccess('USER.DELETED.MESSAGE', displayName, undefined, undefined, 'warning')),
+          this.requestSuccess('USER.DELETED.MESSAGE', displayName, undefined, undefined, 'warning', true)),
         catchError((err: HttpErrorResponse) => of(userFailure({ error: err.error }))),
       )),
   ));
@@ -217,8 +217,9 @@ export class UserEffects {
     path?: string,
     role?: Role,
     toastType?: ToastType,
+    reload: boolean = false,
   ) {
     const message = this.translate.instant(key, { role, displayName });
-    return success(userSaveSuccess, message, path, undefined, toastType);
+    return success(userSaveSuccess, message, path, reload, toastType);
   }
 }

@@ -9,9 +9,9 @@
         </mat-datepicker>
       </mat-form-field>
       <mat-form-field appearance="outline">
-        <mat-label>{{ 'STATEMENT.OFFICE.SEARCH' | translate }}</mat-label>
+        <mat-label>{{ 'COMMON.OFFICE.SEARCH' | translate }}</mat-label>
         <input (keydown)="keyDownHandler($event)" [formControl]="getForm.office" [matAutocomplete]="autoOffice"
-               autocomplete="off" matInput placeholder="{{ 'STATEMENT.OFFICE.FIELD' | translate }}"
+               autocomplete="off" matInput placeholder="{{ 'COMMON.OFFICE.FIELD' | translate }}"
                type="text" required>
         <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
           @for (office of filteredOfficeSignal(); track office.id) {
@@ -21,9 +21,9 @@
           }
         </mat-autocomplete>
         @if (getForm.office.hasError('required')) {
-          <mat-error [innerHTML]="'STATEMENT.OFFICE.REQUIRED' | translate"></mat-error>
+          <mat-error [innerHTML]="'COMMON.OFFICE.REQUIRED' | translate"></mat-error>
         } @else if (getForm.office.hasError('requireMatch')) {
-          <mat-error [innerHTML]="'STATEMENT.OFFICE.INVALID' | translate"></mat-error>
+          <mat-error [innerHTML]="'COMMON.OFFICE.INVALID' | translate"></mat-error>
         }
       </mat-form-field>
     </div>

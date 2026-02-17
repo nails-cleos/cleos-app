@@ -7,7 +7,8 @@ import {
   getInvoicesPage,
   getOfficeToInvoice,
   invoiceFailure,
-  invoicePageSuccess, invoiceSaveSuccess,
+  invoicePageSuccess,
+  invoiceSaveSuccess,
   invoiceSuccess,
   invoiceUpdateOfficeSuccess,
   updateOfficeById,
@@ -53,17 +54,20 @@ export class InvoiceEffects {
       )),
   ));
 
-  uploadInvoices$ = createEffect(() => this.actions.pipe(
-    ofType(uploadInvoices),
-    switchMap(({ officeId, blob, fileName }) =>
-      this.invoiceService.uploadInvoices(officeId, blob, fileName).pipe(
-        map(() => {
-          const message = this.translateService.instant('INVOICE.UPLOAD_SUCCESS', { fileName });
-          return invoiceSaveSuccess({ message, blob, fileName });
-        }),
-        catchError((err: HttpErrorResponse) => of(invoiceFailure({ error: err.error }))),
-      )),
-  ));
+  uploadInvoices$ = createEffect(() =>
+    this.actions.pipe(
+      ofType(uploadInvoices),
+      switchMap(({ officeId, blob, fileName, upload }) => {
+        const message = this.translateService.instant('INVOICE.UPLOAD_SUCCESS', { fileName });
+
+        if (!upload) {
+          return of(invoiceSaveSuccess({ message, blob, fileName }));
+        }
+        return this.invoiceService.uploadInvoices(officeId, blob, fileName).pipe(
+          map(() => invoiceSaveSuccess({ message, blob, fileName })),
+          catchError((err: HttpErrorResponse) => of(invoiceFailure({ error: err.error }))));
+      }),
+    ));
 
   updateOfficesSuccess$ = createEffect(() => this.actions.pipe(
     ofType(invoiceUpdateOfficeSuccess),

@@ -1,10 +1,10 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
-import { IDiscount, IDiscountAll, IReferral, IUserDiscount } from '../../interfaces/discount';
+import { IDiscountAll, IReferral } from '../../interfaces/discount';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { DISCOUNT_FEATURE_KEY, DiscountState } from '../reducers/discount.reducers';
-import { Pagination } from '../../interfaces/pagination';
 import { ICurrency } from '../../interfaces/currency';
+import { map } from 'rxjs/operators';
 
 const selectDiscountState = createFeatureSelector<DiscountState>(DISCOUNT_FEATURE_KEY);
 
@@ -14,7 +14,8 @@ const selectDiscountPaginationData = createSelector(
 );
 export const getDiscountPaginationPipe = pipe(
   select(selectDiscountPaginationData),
-  filter((val): val is Pagination<IDiscount> => val !== undefined),
+  filter((val) => val?.kind === 'paginationDiscount'),
+  map((val) => val.value),
 );
 
 const selectMyDiscountPaginationData = createSelector(
@@ -23,7 +24,8 @@ const selectMyDiscountPaginationData = createSelector(
 );
 export const getMyDiscountPaginationPipe = pipe(
   select(selectMyDiscountPaginationData),
-  filter((val): val is Pagination<IUserDiscount> => val !== undefined),
+  filter((val) => val?.kind === 'pagination'),
+  map((val) => val.value),
 );
 
 const selectReferrals = createSelector(
@@ -68,7 +70,8 @@ const selectedUserDiscount = createSelector(
 );
 export const getUserDiscountsPipe = pipe(
   select(selectedUserDiscount),
-  filter((val): val is IUserDiscount[] => val !== undefined),
+  filter((val) => val?.kind === 'list'),
+  map((val) => val.value),
 );
 
 const selectSubErrors = createSelector(
