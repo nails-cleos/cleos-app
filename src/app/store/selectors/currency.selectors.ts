@@ -1,9 +1,8 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
-import { ICurrency, ICurrencyAll } from '../../interfaces/currency';
+import { ICurrencyAll } from '../../interfaces/currency';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { CURRENCY_FEATURE_KEY, CurrencyState } from '../reducers/currency.reducers';
-import { Pagination } from '../../interfaces/pagination';
 
 const selectCurrencyState = createFeatureSelector<CurrencyState>(CURRENCY_FEATURE_KEY);
 
@@ -11,10 +10,7 @@ const selectCurrencyPaginationData = createSelector(
   selectCurrencyState,
   (state: CurrencyState) => state?.data,
 );
-export const getCurrencyPaginationPipe = pipe(
-  select(selectCurrencyPaginationData),
-  filter((val): val is Pagination<ICurrency> => val !== undefined),
-);
+export const getCurrencyPaginationPipe = pipe(select(selectCurrencyPaginationData));
 
 const selectCurrentCurrencyId = createSelector(
   selectCurrencyState,

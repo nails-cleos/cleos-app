@@ -1,9 +1,8 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
-import { IRoom, IRoomAll, IRoomCustomer, IRoomService } from '../../interfaces/room';
+import { IRoomAll, IRoomCustomer, IRoomService } from '../../interfaces/room';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { ROOM_FEATURE_KEY, RoomState } from '../reducers/room.reducers';
-import { Pagination } from '../../interfaces/pagination';
 import { IUserAll } from '../../interfaces/user';
 import { ICurrencyAll } from '../../interfaces/currency';
 import { IOfficeAll } from '../../interfaces/office';
@@ -14,10 +13,7 @@ const selectRoomPaginationData = createSelector(
   selectRoomState,
   (state: RoomState) => state?.data,
 );
-export const getRoomPaginationPipe = pipe(
-  select(selectRoomPaginationData),
-  filter((val): val is Pagination<IRoom> => val !== undefined),
-);
+export const getRoomPaginationPipe = pipe(select(selectRoomPaginationData));
 
 const selectCurrentRoomId = createSelector(
   selectRoomState,

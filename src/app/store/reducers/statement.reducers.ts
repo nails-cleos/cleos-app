@@ -1,6 +1,7 @@
 import { cleanStatement, statementFailure, statementSaveSuccess, uploadStatement } from '../statement.actions';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
+import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 
 export const STATEMENT_FEATURE_KEY = 'statement';
 
@@ -42,4 +43,15 @@ export const statementReducer = createReducer(
     response: action,
   })),
   on(cleanStatement, () => initialState),
+
+  on(clearGlobalResponse, (state) => ({
+    ...state,
+    response: undefined,
+  })),
+
+  on(clearGlobalError, (state) => ({
+    ...state,
+    error: undefined,
+    subErrors: undefined,
+  })),
 );

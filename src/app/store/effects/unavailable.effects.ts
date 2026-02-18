@@ -105,7 +105,7 @@ export class UnavailableEffects {
       switchMap(() => {
         const message = this.translate.instant('UNAVAILABLE.DELETED.MESSAGE',
           { date: newDateTimestamp(timestamp, timeZone) });
-        return success(unavailableSaveSuccess, message, undefined, false, 'warning');
+        return success(unavailableSaveSuccess, message, undefined, true, 'warning');
       }),
       catchError((err: HttpErrorResponse) => of(unavailableFailure({ error: err.error }))),
     )),

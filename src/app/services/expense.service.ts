@@ -28,7 +28,8 @@ export class ExpenseService {
       params = params.append('date', dateFilter);
     }
 
-    return this.http.get<Pagination<IExpenseAll>>(this.updatePathVariable(roomId, ['pages']), { ...paginated(), params });
+    return this.http.get<Pagination<IExpenseAll>>(this.updatePathVariable(roomId, ['pages']),
+      { ...paginated(), params });
   };
 
   getAllExpensesInfo = (roomId: string): Observable<IExpenseInfo> => this.http.get<IExpenseInfo>(
@@ -42,12 +43,10 @@ export class ExpenseService {
   createExpense = (
     roomId: string,
     expense: IExpense,
-    file?: File,
+    file: File,
   ): Observable<IApiResponse> => {
     const formData = new FormData();
-    if (file) {
-      formData.append('file', file, file.name);
-    }
+    formData.append('file', file, file.name);
     const blob = new Blob([JSON.stringify(expense)], { type: 'application/json' });
     formData.append('expense', blob);
 
@@ -60,8 +59,22 @@ export class ExpenseService {
   );
 
   updateExpense = (
-    id: string, roomId: string, expense: IExpense,
-  ): Observable<IApiResponse> => this.http.patch<IApiResponse>(this.updatePathVariable(roomId, [id]), expense);
+    id: string,
+    roomId: string,
+    expense: IExpense,
+    file?: File,
+  ): Observable<IApiResponse> => {
+    const formData = new FormData();
+    if (file) {
+      formData.append('file', file, file.name);
+    }
+    const blob = new Blob([JSON.stringify(expense)], { type: 'application/json' });
+    formData.append('expense', blob);
+
+    const headers = new HttpHeaders().set('Upload', 'true');
+
+    return this.http.patch<IApiResponse>(this.updatePathVariable(roomId, [id]), formData, { headers });
+  };
 
   private updatePathVariable(roomId: string, args?: (string | null | undefined)[]): string {
     let url = this.urlV1;

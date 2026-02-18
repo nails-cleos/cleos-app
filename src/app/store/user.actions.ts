@@ -1,8 +1,8 @@
 import { createAction, props } from '@ngrx/store';
 import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
-import { Pagination } from '../interfaces/pagination';
-import { IOverview, IUser, IUserAll } from '../interfaces/user';
+import { IUser, IUserAll } from '../interfaces/user';
 import { Role } from '../interfaces/token';
+import { UserData } from './reducers/user.reducers';
 
 enum UserActionTypes {
   getUsersPage = '[User] Get users page',
@@ -38,7 +38,7 @@ export const getAllCustomers = createAction(UserActionTypes.getAllCustomers);
 
 export const userSuccess = createAction(
   UserActionTypes.userSuccess,
-  props<{ data: Pagination<IUserAll> | IUserAll[] | IOverview }>(),
+  props<{ data: UserData }>(),
 );
 
 export const userFailure = createAction(

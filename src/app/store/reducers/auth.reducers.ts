@@ -15,6 +15,7 @@ import {
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { Params } from '@angular/router';
 import { createReducer, on } from '@ngrx/store';
+import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 
 export const AUTH_FEATURE_KEY = 'auth';
 
@@ -96,4 +97,15 @@ export const authReducer = createReducer(
     driveToken: token,
   })),
   on(reLogin, cleanAuth, logOut, () => initialState),
+
+  on(clearGlobalResponse, (state) => ({
+    ...state,
+    response: undefined,
+  })),
+
+  on(clearGlobalError, (state) => ({
+    ...state,
+    error: undefined,
+    subErrors: undefined,
+  })),
 );

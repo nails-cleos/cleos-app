@@ -215,6 +215,7 @@ describe('ExpenseComponent', () => {
 
   it('should dispatch createExpense when in add mode and form valid', () => {
     roomId$.next('room-123');
+    component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: mockFile });
     fixture.detectChanges();
     storeSpy.dispatch.calls.reset();
 
@@ -241,8 +242,31 @@ describe('ExpenseComponent', () => {
     }));
   });
 
+  it('should not dispatch createExpense when in add mode and form valid but raw is undefined', () => {
+    roomId$.next('room-123');
+    component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: undefined });
+    fixture.detectChanges();
+    storeSpy.dispatch.calls.reset();
+
+    const supplyStoreControl = component.getForm.supplyStore;
+    supplyStoreControl.setValue('New Expense');
+    supplyStoreControl.markAsDirty();
+    const invoiceControl = component.getForm.invoice;
+    invoiceControl.setValue('New Description');
+    invoiceControl.markAsDirty();
+    const dateControl = component.getForm.date;
+    dateControl.setValue(getNowTimeZone());
+    dateControl.markAsDirty();
+
+    component.submit();
+
+    expect(component.form.valid).toBeTrue();
+    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+  });
+
   it('should create expense and clean the form when createAnother is tick', () => {
     roomId$.next('room-123');
+    component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: mockFile });
     fixture.detectChanges();
     storeSpy.dispatch.calls.reset();
 
@@ -274,8 +298,7 @@ describe('ExpenseComponent', () => {
 
     expenseId$.next('abc-123');
     roomId$.next('room-123');
-    selectedExpense$.next(mockExpense);
-    fixture.detectChanges();
+    selectedExpense$.next({ ...mockExpense, document: { name: 'invoice.pdf' } });
     fixture.detectChanges();
 
     const supplyStoreControl = component.getForm.supplyStore;

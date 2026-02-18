@@ -78,7 +78,7 @@ export class CurrencyEffects {
       this.currencyService.deleteCurrency(id).pipe(
         switchMap(() => {
           const message = this.translate.instant('CURRENCY.DELETED.MESSAGE', { code });
-          return successResponse(currencySaveSuccess, message, undefined, 'currency', undefined, 'warning');
+          return successResponse(currencySaveSuccess, message, undefined, 'currency', true, 'warning');
         }),
         catchError((err: HttpErrorResponse) => of(currencyFailure({ error: err.error }))),
       )),

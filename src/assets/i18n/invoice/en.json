@@ -13,12 +13,6 @@
         "MIN": "Start number should be greater than 0"
       }
     },
-    "OFFICE": {
-      "SEARCH": "Find by office",
-      "FIELD": "Office",
-      "REQUIRED": "Office is <b>required</b>",
-      "INVALID": "Office is invalid"
-    },
     "PAYMENT": {
       "SEARCH": "Find by payment type",
       "FIELD": "Payment type"

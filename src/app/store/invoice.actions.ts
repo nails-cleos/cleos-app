@@ -49,7 +49,7 @@ export const updateOfficeById = createAction(
 
 export const uploadInvoices = createAction(
   InvoiceActionTypes.uploadInvoices,
-  props<{ officeId: string; blob: Blob; fileName: string }>(),
+  props<{ officeId: string; blob: Blob; fileName: string; upload: boolean }>(),
 );
 
 export const invoiceSaveSuccess = createAction(

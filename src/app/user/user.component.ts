@@ -15,7 +15,7 @@ import { GoogleMapComponent, GoogleMapForm } from '../shared/google-map/google-m
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
 import { NgIcon } from '@ng-icons/core';
-import { ColorPickerComponent, ColorPickerDirective } from 'ngx-color-picker';
+import { ColorPickerDirective } from 'ngx-color-picker';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { UserState } from '../store/reducers/user.reducers';
 import {
@@ -45,7 +45,7 @@ type UserForm = {
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss'],
   imports: [SharedModule, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective,
-    NgIcon, ColorPickerDirective, ColorPickerComponent],
+    NgIcon, ColorPickerDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserComponent {

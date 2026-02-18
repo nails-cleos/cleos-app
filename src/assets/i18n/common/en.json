@@ -312,6 +312,12 @@
         "INVALID": "Office is invalid"
       }
     },
+    "OFFICE": {
+      "SEARCH": "Find by office",
+      "FIELD": "Office",
+      "REQUIRED": "Office is <b>required</b>",
+      "INVALID": "Office is invalid"
+    },
     "DASHBOARD": {
       "HOME": "Home",
       "PROFILE": "Profile",

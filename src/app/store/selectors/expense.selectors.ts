@@ -3,7 +3,6 @@ import { filter, pipe } from 'rxjs';
 import { IExpenseAll, IExpenseInfo } from '../../interfaces/expense';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { EXPENSE_FEATURE_KEY, ExpenseState } from '../reducers/expense.reducers';
-import { Pagination } from '../../interfaces/pagination';
 
 const selectExpenseState = createFeatureSelector<ExpenseState>(EXPENSE_FEATURE_KEY);
 
@@ -11,10 +10,7 @@ const selectExpensePaginationData = createSelector(
   selectExpenseState,
   (state: ExpenseState) => state?.data,
 );
-export const getExpensePaginationPipe = pipe(
-  select(selectExpensePaginationData),
-  filter((val): val is Pagination<IExpenseAll> => val !== undefined),
-);
+export const getExpensePaginationPipe = pipe(select(selectExpensePaginationData));
 
 const selectCurrentExpenseId = createSelector(
   selectExpenseState,

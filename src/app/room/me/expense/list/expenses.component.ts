@@ -23,6 +23,11 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { getExpensePaginationPipe, getExpenseResponsePipe } from '../../../../store/selectors/expense.selectors';
 import { DateAdapter } from '@angular/material/core';
 import { YearMonthAdapter } from '../../../../util/adapter/year-month.adapter';
+import { EnvService } from '../../../../services/env.service';
+import { DriveAccessService } from '../../../../services/drive-access.service';
+import { IDocument } from '../../../../interfaces/document';
+import { documentView } from '../../../../store/document.actions';
+import { DocumentState } from '../../../../store/reducers/document.reducers';
 
 type ExpensesForm = {
   date: FormControl<Date | undefined>;
@@ -41,11 +46,14 @@ type ExpensesForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExpensesComponent {
+  private readonly env: EnvService = inject(EnvService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<RoomState | ExpenseState> = inject(Store<RoomState | ExpenseState>);
+  private readonly store: Store<RoomState | ExpenseState | DocumentState> = inject(
+    Store<RoomState | ExpenseState | DocumentState>);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
   private roomId$ = this.store.pipe(getCurrentRoomIdPipe);
@@ -134,10 +142,18 @@ export class ExpensesComponent {
         this.paginator()?.firstPage();
       }
     });
+
+    effect(() => {
+      this.driveAccessService.requestAccessIfNeeded(this.googleDriveUploadFile);
+    });
   }
 
   get getForm(): ExpensesForm {
     return this.form.controls;
+  }
+
+  get googleDriveUploadFile(): boolean {
+    return this.env.googleDriveUploadFile;
   }
 
   showTimeZone = (expense: IExpenseAll): boolean => !isSameTimeZone(expense.room.timeZone);
@@ -181,4 +197,8 @@ export class ExpensesComponent {
       }
     });
   };
+
+  download = (document: IDocument): void => this.store.dispatch(
+    documentView({ id: document.id, fileName: document.name }),
+  );
 }

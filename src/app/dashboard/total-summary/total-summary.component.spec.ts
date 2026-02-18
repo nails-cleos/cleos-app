@@ -105,10 +105,10 @@ describe('TotalSummaryComponent', () => {
       fixture.detectChanges();
 
       const contentDivs = fixture.debugElement.queryAll(By.css('.bottom'));
-      expect(contentDivs[0].nativeElement.classList.contains('year-content')).toBeFalse();
-      expect(contentDivs[0].nativeElement.classList.contains('year-cash-content')).toBeTrue();
-      expect(contentDivs[1].nativeElement.classList.contains('year-content')).toBeFalse();
-      expect(contentDivs[1].nativeElement.classList.contains('year-cash-content')).toBeTrue();
+      expect(contentDivs[0].nativeElement.classList.contains('year-cash-content')).toBeFalse();
+      expect(contentDivs[0].nativeElement.classList.contains('year-content')).toBeTrue();
+      expect(contentDivs[1].nativeElement.classList.contains('year-cash-content')).toBeFalse();
+      expect(contentDivs[1].nativeElement.classList.contains('year-content')).toBeTrue();
     });
 
     it('should apply correct CSS classes when showCash is true', () => {

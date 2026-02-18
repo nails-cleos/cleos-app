@@ -1,5 +1,6 @@
 import { ICurrencyAll } from './currency';
 import { IRoomAll } from './room';
+import { IDocument } from './document';
 
 export interface IExpense {
   id?: string | null;
@@ -35,10 +36,11 @@ export interface IExpenseAll {
   gross: number;
   btw?: number;
   room: IRoomAll;
-  expenseTotals: ITotalExpense[],
-  totalNet: number,
-  totalGross: number,
+  expenseTotals: ITotalExpense[];
+  totalNet: number;
+  totalGross: number;
   deleted: boolean;
+  document?: IDocument;
 }
 
 export interface IExpenseInfo {

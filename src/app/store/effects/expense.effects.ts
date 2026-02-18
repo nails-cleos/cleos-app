@@ -72,8 +72,8 @@ export class ExpenseEffects {
 
   update$ = createEffect(() => this.actions$.pipe(
     ofType(updateExpense),
-    switchMap(({ id, roomId, expense }) =>
-      this.expenseService.updateExpense(id, roomId, expense).pipe(
+    switchMap(({ id, roomId, expense, file }) =>
+      this.expenseService.updateExpense(id, roomId, expense, file).pipe(
         switchMap((response: IApiResponse) => {
           const message = this.translate.instant('EXPENSE.UPDATED.MESSAGE', { invoice: response.name });
           const path = `rooms/${roomId}/expenses/${response.id}`;
@@ -89,7 +89,7 @@ export class ExpenseEffects {
       this.expenseService.deleteExpense(roomId, id).pipe(
         switchMap(() => {
           const message = this.translate.instant('EXPENSE.DELETED.MESSAGE', { invoice });
-          return success(expenseSaveSuccess, message, undefined, undefined, 'warning');
+          return success(expenseSaveSuccess, message, undefined, true, 'warning');
         }),
         catchError((err: HttpErrorResponse) => of(expenseFailure({ error: err.error }))),
       )),
@@ -97,8 +97,14 @@ export class ExpenseEffects {
 
   selectedData$ = createEffect(() => this.actions$.pipe(
     ofType(expenseSelected),
-    tap(({ selected }) => this.router.navigate(
-      [this.translate.getCurrentLang(), 'rooms', selected?.room?.id, 'expenses', selected?.id])),
+    tap(({ selected }) => {
+      const roomId = selected?.room?.id;
+      const expenseId = selected?.id;
+      if (!roomId || !expenseId) {
+        return;
+      }
+      this.router.navigate([this.translate.getCurrentLang(), 'rooms', roomId, 'expenses', expenseId]);
+    }),
   ), { dispatch: false });
 
   infoSuccess$ = createEffect(() => this.actions$.pipe(

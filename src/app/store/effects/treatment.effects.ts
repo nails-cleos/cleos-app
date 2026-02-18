@@ -42,7 +42,7 @@ export class TreatmentEffects {
     ofType(getTreatmentsPage),
     switchMap(({ page, sort, direction, size }) =>
       this.treatmentService.getTreatmentsPage(page, sort, direction, size).pipe(
-        map((data: Pagination<ITreatmentGroupAll>) => treatmentSuccess({ data })),
+        map((value: Pagination<ITreatmentGroupAll>) => treatmentSuccess({ data: { kind: 'pagination', value } })),
         catchError((err: HttpErrorResponse) => of(treatmentFailure({ error: err.error }))),
       )),
   ));
@@ -50,7 +50,7 @@ export class TreatmentEffects {
   findGroups$ = createEffect(() => this.actions.pipe(
     ofType(getAllTreatmentsGroup),
     switchMap(() => this.treatmentService.getAllTreatmentsGroup().pipe(
-      map((data: ITreatmentGroupAll[]) => treatmentSuccess({ data })),
+      map((value: ITreatmentGroupAll[]) => treatmentSuccess({ data: { kind: 'list', value } })),
       catchError((err: HttpErrorResponse) => of(treatmentFailure({ error: err.error }))),
     )),
   ));
@@ -122,7 +122,7 @@ export class TreatmentEffects {
     switchMap(({ id, name }) => this.treatmentService.deleteTreatmentGroup(id).pipe(
       switchMap(() => {
         const message = this.translate.instant('TREATMENT.DELETED.MESSAGE', { name });
-        return success(treatmentSaveSuccess, message, undefined, false, 'warning');
+        return success(treatmentSaveSuccess, message, undefined, true, 'warning');
       }),
       catchError((err: HttpErrorResponse) => of(treatmentFailure({ error: err.error }))),
     )),

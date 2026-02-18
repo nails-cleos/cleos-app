@@ -27,12 +27,18 @@ import { Pagination } from '../../interfaces/pagination';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
 import { Role } from '../../interfaces/token';
+import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 
 export const USER_FEATURE_KEY = 'user';
 
+export type UserData =
+  | { kind: 'pagination'; value: Pagination<IUserAll> }
+  | { kind: 'list'; value: IUserAll[] }
+  | { kind: 'overview'; value: IOverview };
+
 export interface UserState {
   response?: IResponseSuccess;
-  data?: IUserAll[] | Pagination<IUserAll> | IOverview;
+  data?: UserData;
   users?: IUserAll[];
   error?: IError;
   subErrors?: IError[];
@@ -58,21 +64,33 @@ export const userReducer = createReducer(
   initialState,
   on(getUsersPage, (state) => ({
     ...state,
-    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IUserAll>,
+    data: {
+      kind: 'pagination',
+      value: {
+        content: [{}, {}, {}],
+        totalElements: 3,
+      } as Pagination<IUserAll>,
+    },
     subErrors: undefined,
     selected: undefined,
     response: undefined,
   })),
   on(getAllCustomers, (state) => ({
     ...state,
-    data: [] as IUserAll[],
+    data: {
+      kind: 'list',
+      value: [] as IUserAll[],
+    },
     subErrors: undefined,
     selected: undefined,
     response: undefined,
   })),
   on(getCustomerOverview, (state) => ({
     ...state,
-    data: {} as IOverview,
+    data: {
+      kind: 'overview',
+      value: {} as IOverview,
+    },
     subErrors: undefined,
     selected: undefined,
     response: undefined,
@@ -137,4 +155,15 @@ export const userReducer = createReducer(
     userNavigationParams: { role },
   })),
   on(cleanUser, () => initialState),
+
+  on(clearGlobalResponse, (state) => ({
+    ...state,
+    response: undefined,
+  })),
+
+  on(clearGlobalError, (state) => ({
+    ...state,
+    error: undefined,
+    subErrors: undefined,
+  })),
 );

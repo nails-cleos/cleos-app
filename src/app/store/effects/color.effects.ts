@@ -78,7 +78,7 @@ export class ColorEffects {
       this.colorService.deleteColor(id).pipe(
         switchMap(() => {
           const message = this.translate.instant('COLOR.DELETED.MESSAGE', { name: name });
-          return success(colorSaveSuccess, message, undefined, undefined, 'warning');
+          return success(colorSaveSuccess, message, undefined, true, 'warning');
         }),
         catchError((err: HttpErrorResponse) => of(colorFailure({ error: err.error }))),
       )),

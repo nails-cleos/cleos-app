@@ -13,7 +13,7 @@ import { IApiResponse } from '../interfaces/common';
 export class AdditionalService {
 
   private url = 'additional';
-  private urlV1 = `v1/${ this.url }`;
+  private urlV1 = `v1/${this.url}`;
 
   private http: HttpClient = inject(HttpClient);
 
@@ -22,7 +22,7 @@ export class AdditionalService {
     direction: SortDirection,
     page: number,
     size: number,
-  ): Observable<Pagination<IAdditional>> => this.http.get<Pagination<IAdditional>>(
+  ): Observable<Pagination<IAdditionalAll>> => this.http.get<Pagination<IAdditionalAll>>(
     toUrl(this.urlV1, 'pages'), { ...paginated(), params: createFilter(page, size, sort, direction) },
   );
 

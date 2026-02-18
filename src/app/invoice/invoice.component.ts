@@ -235,7 +235,8 @@ export class InvoiceComponent {
     if (!selectedOffice) {
       return;
     }
-    if (this.selectionSignal().selected.length === this.resultsLengthSignal()) {
+    const allSelected = this.selectionSignal().selected.length === this.resultsLengthSignal();
+    if (allSelected) {
       const office: IOffice = new Office();
       office.lastInvoiceNumber = start + this.selectionSignal().selected.length;
 
@@ -247,7 +248,7 @@ export class InvoiceComponent {
     const printPdf: any = pdfMake.createPdf(createPDF);
 
     printPdf.getBlob().then((blob: Blob) => this.store.dispatch(
-      uploadInvoices({ officeId: selectedOffice.id, blob, fileName }),
+      uploadInvoices({ officeId: selectedOffice.id, blob, fileName, upload: allSelected }),
     ));
   }
 
