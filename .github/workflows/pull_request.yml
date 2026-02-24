@@ -2,7 +2,7 @@ name: Pull request flow
 
 on:
   push:
-    branches: [ 'main' ]
+    branches: ['main']
   pull_request:
     branches:
       - 'develop'
@@ -15,6 +15,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
+      - name: Start timer
+        run: echo "JOB_START=$(date +%s)" >> $GITHUB_ENV
+
       - name: Use Node.js 24.12.0
         uses: actions/setup-node@v4
         with:
@@ -30,6 +34,20 @@ jobs:
       - name: Run lint
         run: npm run lint
 
+      - name: Build & Lint summary
+        if: always()
+        run: |
+          DURATION=$(( $(date +%s) - $JOB_START ))
+
+          echo "## 🏗 Build & Lint" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Step | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ${{ job.status == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint  | ${{ job.status == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- ⏱ Duration: ${DURATION}s" >> $GITHUB_STEP_SUMMARY
+
   unit-tests:
     runs-on: ubuntu-latest
     needs: build-and-lint
@@ -38,6 +56,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
+      - name: Start timer
+        run: echo "JOB_START=$(date +%s)" >> $GITHUB_ENV
+
       - name: Use Node.js 24.12.0
         uses: actions/setup-node@v4
         with:
@@ -50,7 +72,6 @@ jobs:
       - name: Run tests with coverage
         run: |
           node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng test --code-coverage --watch=false --browsers=ChromeHeadless
-        continue-on-error: true
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4
@@ -62,12 +83,61 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Coverage Report
+      - name: Coverage Report Comment
         uses: romeovs/lcov-reporter-action@v0.3.1
         with:
           lcov-file: ./coverage/cleos/lcov.info
           github-token: ${{ secrets.GITHUB_TOKEN }}
           delete-old-comments: true
+
+      - name: Unit test & coverage summary
+        if: always()
+        run: |
+          DURATION=$(( $(date +%s) - $JOB_START ))
+
+          echo "## 🧪 Unit Tests & Coverage" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Extract test results
+          if [ -f "test-results/junit-report.xml" ]; then
+            TESTS=$(grep -o 'tests="[0-9]*"' test-results/junit-report.xml | head -1 | grep -o '[0-9]*')
+            FAILURES=$(grep -o 'failures="[0-9]*"' test-results/junit-report.xml | head -1 | grep -o '[0-9]*')
+            PASS_RATE=$(( (TESTS - FAILURES) * 100 / TESTS ))
+
+            echo "### Test Results" >> $GITHUB_STEP_SUMMARY
+            echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Total Tests | $TESTS |" >> $GITHUB_STEP_SUMMARY
+            echo "| Failures | $FAILURES |" >> $GITHUB_STEP_SUMMARY
+            echo "| Pass Rate | ${PASS_RATE}% |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Coverage
+          FILE=./coverage/cleos/coverage-summary.json
+          if [ -f "$FILE" ]; then
+            node -e "
+              const summary = require('$FILE').total;
+              const format = v => v.toFixed(2) + '%';
+              const fs = require('fs');
+
+              const status = summary.lines.pct >= 80 ? '🟢 Good'
+                           : summary.lines.pct >= 70 ? '🟡 Warning'
+                           : '🔴 Low';
+
+              fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+                '### Coverage\n\n' +
+                '| Metric | Coverage |\n|--------|----------|\n' +
+                '| Lines | ' + format(summary.lines.pct) + ' |\n' +
+                '| Statements | ' + format(summary.statements.pct) + ' |\n' +
+                '| Functions | ' + format(summary.functions.pct) + ' |\n' +
+                '| Branches | ' + format(summary.branches.pct) + ' |\n\n' +
+                '**Overall Status:** ' + status + '\n\n'
+              );
+            "
+          fi
+
+          echo "- ⏱ Duration: ${DURATION}s" >> $GITHUB_STEP_SUMMARY
 
   e2e-tests:
     runs-on: ubuntu-latest
@@ -77,11 +147,12 @@ jobs:
 
     strategy:
       matrix:
-        containers: [ 1, 2 ]
+        containers: [1, 2]
       fail-fast: false
 
     steps:
       - uses: actions/checkout@v3
+
       - name: Use Node.js 24.12.0
         uses: actions/setup-node@v4
         with:
