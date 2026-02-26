@@ -15,6 +15,7 @@ import {
 import { ICurrency } from '../../interfaces/currency';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
+import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 
 export const CURRENCY_FEATURE_KEY = 'currency';
 
@@ -91,4 +92,15 @@ export const currencyReducer = createReducer(
     currentCurrencyId: currencyId,
   })),
   on(clean, () => initialState),
+
+  on(clearGlobalResponse, (state) => ({
+    ...state,
+    response: undefined,
+  })),
+
+  on(clearGlobalError, (state) => ({
+    ...state,
+    error: undefined,
+    subErrors: undefined,
+  })),
 );

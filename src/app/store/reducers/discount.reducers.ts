@@ -19,16 +19,22 @@ import {
   setCurrentDiscountId,
   updateDiscount,
 } from '../discount.actions';
-import { IDiscount, IReferral, IUserDiscount } from '../../interfaces/discount';
+import { IDiscount, IDiscountAll, IReferral, IUserDiscount } from '../../interfaces/discount';
 import { ICurrency } from '../../interfaces/currency';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
+import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 
 export const DISCOUNT_FEATURE_KEY = 'discount';
 
+export type DiscountData =
+  | { kind: 'paginationDiscount'; value: Pagination<IDiscountAll> }
+  | { kind: 'pagination'; value: Pagination<IUserDiscount> }
+  | { kind: 'list'; value: IUserDiscount[] };
+
 export interface DiscountState {
   response?: IResponseSuccess;
-  data?: IDiscount | Pagination<IDiscount> | Pagination<IUserDiscount> | IUserDiscount[];
+  data?: DiscountData;
   referrals?: IReferral[];
   currencies?: ICurrency[];
   error?: IError;
@@ -54,7 +60,13 @@ export const discountReducer = createReducer(
   initialState,
   on(getMyDiscountsPage, getDiscountsPage, (state) => ({
     ...state,
-    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IDiscount>,
+    data: {
+      kind: 'paginationDiscount',
+      value: {
+        content: [{}, {}, {}],
+        totalElements: 3,
+      } as Pagination<IDiscountAll>,
+    },
     subErrors: undefined,
     selected: undefined,
     response: undefined,
@@ -82,21 +94,23 @@ export const discountReducer = createReducer(
   })),
   on(getDiscount, (state) => ({
     ...state,
-    data: {} as IDiscount,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
   })),
   on(getUserDiscountByCustomerId, (state) => ({
     ...state,
-    data: [],
+    data: {
+      kind: 'list',
+      value: [],
+    },
     subErrors: undefined,
     selected: undefined,
     response: undefined,
   })),
   on(discountSuccess, (state, { data }) => ({
     ...state,
-    data: data,
+    data,
     subErrors: undefined,
     response: undefined,
   })),
@@ -144,4 +158,15 @@ export const discountReducer = createReducer(
     currentDiscountId: discountId,
   })),
   on(cleanDiscount, () => initialState),
+
+  on(clearGlobalResponse, (state) => ({
+    ...state,
+    response: undefined,
+  })),
+
+  on(clearGlobalError, (state) => ({
+    ...state,
+    error: undefined,
+    subErrors: undefined,
+  })),
 );

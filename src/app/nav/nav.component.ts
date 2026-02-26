@@ -34,6 +34,7 @@ import { ToastOptions } from '../shared/toast/toast.model';
 import { IResponseSuccess } from '../interfaces/common';
 import { EnvService } from '../services/env.service';
 import { LoadingOverlayService } from '../services/loading-overlay.service';
+import { clearGlobalError, clearGlobalResponse } from '../store/global.actions';
 
 @Component({
   selector: 'app-nav',
@@ -97,6 +98,7 @@ export class NavComponent {
 
   private authUserSignal = this.authUserService.authUser;
   private isAuthorized = computed(() => this.isAuthenticatedSignal() ?? false);
+  private readonly response = computed(() => this.globalResponseSignal());
 
   isHandsetSignal = computed(() => this.breakpointsSignal()?.matches ?? false);
   showInformation = computed(() => !this.authUserSignal()?.isRoomAdmin);
@@ -113,7 +115,6 @@ export class NavComponent {
   });
 
   isDarkMode = signal(this.authUserSignal().isDarkMode || isDarkMode(this.cookieService.get(THEME) as Theme));
-  response = computed(() => this.globalResponseSignal());
   error = computed(() => this.globalErrorSignal());
   notifications = signal<INotification[]>([]);
   workDay = signal<INotification[]>([]);
@@ -170,14 +171,13 @@ export class NavComponent {
 
       if (response.message) {
         const options = this.getToastOptions(response);
-        const toastRef = this.toastService.show(response.message, response.toastType, 5000, options);
-
-        toastRef.onDismiss().subscribe(() => {
-          if (response.reload) {
-            this.navigationService.reload(this.router.url.split('/'));
-          }
-        });
+        this.toastService.show(response.message, response.toastType, 5000, options);
+        if (response.reload) {
+          this.navigationService.reload(this.router.url.split('/'));
+        }
       }
+
+      this.store.dispatch(clearGlobalResponse());
     });
 
     effect(() => {
@@ -187,6 +187,7 @@ export class NavComponent {
       }
 
       this.toastService.show(err.message, 'error');
+      this.store.dispatch(clearGlobalError());
     });
 
     effect(() => {

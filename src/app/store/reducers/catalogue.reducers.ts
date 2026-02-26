@@ -19,6 +19,7 @@ import {
   updateCatalogue,
   updateCatalogueOrder,
 } from '../catalogue.actions';
+import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 
 export const CATALOGUE_FEATURE_KEY = 'catalogue';
 
@@ -126,4 +127,15 @@ export const catalogueReducer = createReducer(
     currentCatalogueId: catalogueId,
   })),
   on(cleanCatalogue, () => initialState),
+
+  on(clearGlobalResponse, (state) => ({
+    ...state,
+    response: undefined,
+  })),
+
+  on(clearGlobalError, (state) => ({
+    ...state,
+    error: undefined,
+    subErrors: undefined,
+  })),
 );

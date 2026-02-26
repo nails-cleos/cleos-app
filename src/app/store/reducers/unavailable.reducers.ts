@@ -23,6 +23,7 @@ import {
   unavailableSuccess,
   updateUnavailable,
 } from '../unavailable.actions';
+import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 
 export const UNAVAILABLE_FEATURE_KEY = 'unavailable';
 
@@ -133,4 +134,15 @@ export const unavailableReducer = createReducer(
     unavailableParams: { date, room },
   })),
   on(cleanUnavailable, () => initialState),
+
+  on(clearGlobalResponse, (state) => ({
+    ...state,
+    response: undefined,
+  })),
+
+  on(clearGlobalError, (state) => ({
+    ...state,
+    error: undefined,
+    subErrors: undefined,
+  })),
 );

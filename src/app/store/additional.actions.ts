@@ -1,9 +1,9 @@
 import { createAction, props } from '@ngrx/store';
-import { IAdditional, IAdditionalAll } from '../interfaces/additional';
+import { IAdditional } from '../interfaces/additional';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
-import { Pagination } from '../interfaces/pagination';
 import { ITreatmentGroupAll } from '../interfaces/treatment';
+import { AdditionalData } from './reducers/additional.reducers';
 
 enum AdditionalActionTypes {
   getAdditionalPage = '[Additional] Get additional page',
@@ -39,7 +39,7 @@ export const getAdditionalList = createAction(
 
 export const additionalSuccess = createAction(
   AdditionalActionTypes.additionalSuccess,
-  props<{ data: Pagination<IAdditional> | IAdditionalAll[] }>(),
+  props<{ data: AdditionalData }>(),
 );
 
 export const createAdditional = createAction(

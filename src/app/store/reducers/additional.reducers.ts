@@ -20,12 +20,17 @@ import { IAdditional, IAdditionalAll } from '../../interfaces/additional';
 import { ITreatmentGroupAll } from '../../interfaces/treatment';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
+import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 
 export const ADDITIONAL_FEATURE_KEY = 'additional';
 
+export type AdditionalData =
+  | { kind: 'pagination'; value?: Pagination<IAdditionalAll> }
+  | { kind: 'list'; value?: IAdditionalAll[] };
+
 export interface AdditionalState {
   response?: IResponseSuccess;
-  data?: Pagination<IAdditional> | IAdditionalAll[];
+  data?: AdditionalData;
   groups?: ITreatmentGroupAll[];
   error?: IError;
   subErrors?: IError[];
@@ -49,7 +54,13 @@ export const additionalReducer = createReducer(
   initialState,
   on(getAdditionalPage, (state) => ({
     ...state,
-    data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IAdditional>,
+    data: {
+      kind: 'pagination',
+      value: {
+        content: [{}, {}, {}],
+        totalElements: 3,
+      } as Pagination<IAdditionalAll>,
+    },
     subErrors: undefined,
     selected: undefined,
   })),
@@ -68,7 +79,7 @@ export const additionalReducer = createReducer(
 
   on(additionalSuccess, (state, { data }) => ({
     ...state,
-    data: data,
+    data,
     subErrors: undefined,
     isLoading: false,
   })),
@@ -127,4 +138,15 @@ export const additionalReducer = createReducer(
   })),
 
   on(cleanAdditional, () => initialState),
+
+  on(clearGlobalResponse, (state) => ({
+    ...state,
+    response: undefined,
+  })),
+
+  on(clearGlobalError, (state) => ({
+    ...state,
+    error: undefined,
+    subErrors: undefined,
+  })),
 );

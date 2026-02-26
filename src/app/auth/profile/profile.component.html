@@ -99,11 +99,9 @@
                     <input matInput [cpOutputFormat]="'hex'" [colorPicker]="getForm.darkColor.value"
                            (colorPickerChange)="getForm.darkColor.setValue($event)"
                            [style.background]="getForm.darkColor.value" [style.color]="'#000'"
-                           [formControl]="getForm.darkColor" #darkColorInput [cpPosition]="'top'"
-                           style="margin-right: 5px"/>
-                    <color-picker #darkColorPicker></color-picker>
-
-                    <mat-icon matSuffix style="cursor: pointer" (click)="darkColorPicker.openDialog(darkColorInput)"
+                           [formControl]="getForm.darkColor" [cpPosition]="'top'"
+                           #darkColorPicker="ngxColorPicker" style="margin-right: 5px"/>
+                    <mat-icon matSuffix style="cursor: pointer" (click)="darkColorPicker.openDialog()"
                               id="darkColorIcon">
                       palette
                     </mat-icon>
@@ -116,10 +114,9 @@
                     <input matInput [cpOutputFormat]="'hex'" [colorPicker]="getForm.lightColor.value"
                            (colorPickerChange)="getForm.lightColor.setValue($event)"
                            [style.background]="getForm.lightColor.value" [style.color]="'#fff'"
-                           [formControl]="getForm.lightColor" #lightColorInput [cpPosition]="'top'"
-                           style="margin-right: 5px"/>
-                    <color-picker #lightColorPicker></color-picker>
-                    <mat-icon matSuffix style="cursor: pointer" (click)="lightColorPicker.openDialog(lightColorInput)"
+                           [formControl]="getForm.lightColor" [cpPosition]="'top'"
+                           #lightColorPicker="ngxColorPicker" style="margin-right: 5px"/>
+                    <mat-icon matSuffix style="cursor: pointer" (click)="lightColorPicker.openDialog()"
                               id="lightColorIcon">
                       palette
                     </mat-icon>
@@ -203,4 +200,3 @@
     </div>
   </div>
 </div>
-

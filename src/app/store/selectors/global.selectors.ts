@@ -34,7 +34,9 @@ export const selectGlobalIsLoading = createSelector(
   selectDiscountIsLoading,
   selectDocumentIsLoading,
   selectExpenseIsLoading,
+
   selectInvoiceIsLoading,
+
   selectNoteIsLoading,
   selectNotificationIsLoading,
   selectOfficeIsLoading,
@@ -56,10 +58,13 @@ export const selectGlobalResponse = createSelector(
   selectCatalogueResponse,
   selectColorResponse,
   selectCurrencyResponse,
+
   selectDiscountResponse,
   selectDocumentResponse,
   selectExpenseResponse,
+
   selectInvoiceResponse,
+
   selectNoteResponse,
 
   selectOfficeResponse,
@@ -82,10 +87,13 @@ export const selectGlobalError = createSelector(
   selectCatalogueError,
   selectColorError,
   selectCurrencyError,
+
   selectDiscountError,
   selectDocumentError,
   selectExpenseError,
+
   selectInvoiceError,
+
   selectNoteError,
 
   selectOfficeError,

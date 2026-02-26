@@ -102,7 +102,7 @@ export class CatalogueEffects {
       this.catalogueService.deleteCatalogue(id).pipe(
         switchMap(() => {
           const message = this.translate.instant('CATALOGUE.DELETED.MESSAGE', { name });
-          return success(catalogueSaveSuccess, message, undefined, undefined, 'warning');
+          return success(catalogueSaveSuccess, message, undefined, true, 'warning');
         }),
         catchError((err: HttpErrorResponse) => of(catalogueFailure({ error: err.error }))),
       )),

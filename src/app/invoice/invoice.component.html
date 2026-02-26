@@ -5,9 +5,9 @@
     <form [formGroup]="form" (keydown.enter)="$event.preventDefault()" (ngSubmit)="print()">
       <div class="row-column-space-around-center">
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'INVOICE.OFFICE.SEARCH' | translate }}</mat-label>
+          <mat-label>{{ 'COMMON.OFFICE.SEARCH' | translate }}</mat-label>
           <input (keydown)="keyDownHandler($event)" [formControl]="getForm.office" [matAutocomplete]="autoOffice"
-                 autocomplete="off" matInput placeholder="{{ 'INVOICE.OFFICE.FIELD' | translate }}"
+                 autocomplete="off" matInput placeholder="{{ 'COMMON.OFFICE.FIELD' | translate }}"
                  type="text" required>
           <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
             @for (office of filteredOfficeSignal(); track office.id) {
@@ -17,9 +17,9 @@
             }
           </mat-autocomplete>
           @if (getForm.office.hasError('required')) {
-            <mat-error [innerHTML]="'INVOICE.OFFICE.REQUIRED' | translate"></mat-error>
+            <mat-error [innerHTML]="'COMMON.OFFICE.REQUIRED' | translate"></mat-error>
           } @else if (getForm.office.hasError('requireMatch')) {
-            <mat-error [innerHTML]="'INVOICE.OFFICE.INVALID' | translate"></mat-error>
+            <mat-error [innerHTML]="'COMMON.OFFICE.INVALID' | translate"></mat-error>
           }
         </mat-form-field>
         <mat-form-field appearance="outline">
@@ -45,9 +45,9 @@
         <mat-form-field appearance="outline">
           <mat-label>{{ 'INVOICE.SEARCH.RANGE.FIELD' | translate }}</mat-label>
           <mat-date-range-input [rangePicker]="drp" [formGroup]="getForm.dateRange">
-            <input matStartDate [formControl]="getDateRangeForm.startDate"
+            <input matStartDate [formControl]="getDateRangeForm.startDate" matInput
                    placeholder="{{'INVOICE.SEARCH.RANGE.START' | translate }}">
-            <input matEndDate [formControl]="getDateRangeForm.endDate"
+            <input matEndDate [formControl]="getDateRangeForm.endDate" matInput
                    placeholder="{{'INVOICE.SEARCH.RANGE.END' | translate }}">
           </mat-date-range-input>
           <mat-datepicker-toggle matSuffix [for]="drp"></mat-datepicker-toggle>

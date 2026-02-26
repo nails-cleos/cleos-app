@@ -108,6 +108,7 @@ export class ExpenseComponent {
   roomName = computed(() => this.infoSignal()?.roomName || '');
   supplyStores = computed(() => this.infoSignal()?.supplyStores || []);
   today = computed(() => getNowTimeZone(this.timeZone()));
+  readonly fileName = computed(() => this.expenseSignal()?.document?.name);
 
   filteredSupplyStore = toSignal(
     this.getForm.supplyStore.valueChanges.pipe(
@@ -124,10 +125,12 @@ export class ExpenseComponent {
     ),
   );
 
+  readonly submitLabel = computed(() => `COMMON.BUTTON.${this.isAddModeSignal() ? 'CREATE' : 'UPDATE'}`);
+
   totalMap: Map<number, { btwValue: string, net: string }> = new Map();
 
+  file = signal<UploadFile | undefined>(undefined);
   private timeZone = computed(() => this.infoSignal()?.timeZone || '');
-  private file = signal<UploadFile | undefined>(undefined);
   private selectedSupplyStore = toSignal(this.getForm.supplyStore.valueChanges);
 
   private readonly language: string = this.translate.getCurrentLang();
@@ -135,13 +138,18 @@ export class ExpenseComponent {
   constructor() {
     effect(() => {
       const selected = this.expenseSignal();
+      if (selected?.document) {
+        this.file.set({ name: selected.document.name, progress: 100, size: 0 });
+      }
       if (selected?.id) {
-        this.form.patchValue(selected);
-        this.getForm.date.setValue(createNewDateZonedTime(selected.timestamp, selected.room?.timeZone));
-        this.removeExpense(0);
-        selected.expenseTotals.forEach(
-          (it, index) => this.addTotal(true, index, it.gross, it.btw, it.description, it.type),
-        );
+        queueMicrotask(() => {
+          this.form.patchValue(selected);
+          this.getForm.date.setValue(createNewDateZonedTime(selected.timestamp, selected.room?.timeZone));
+          this.removeExpense(0);
+          selected.expenseTotals.forEach(
+            (it, index) => this.addTotal(true, index, it.gross, it.btw, it.description, it.type),
+          );
+        });
       }
     });
 
@@ -165,15 +173,7 @@ export class ExpenseComponent {
       const roomId = this.roomIdSignal();
       if (this.responseSignal()) {
         if (this.isAddModeSignal() && this.createAnother) {
-          this.form.reset();
-          this.form.markAsPristine({ emitEvent: false });
-          this.form.markAsUntouched({ emitEvent: false });
-          this.totals.clear();
-          this.totals.controls.forEach(control => {
-            control.markAsPristine({ emitEvent: false });
-            control.markAsUntouched({ emitEvent: false });
-          });
-          this.totalMap = new Map();
+          this.file.set(undefined);
         } else {
           this.router.navigate([this.language, 'rooms', roomId, 'expenses']);
         }
@@ -198,8 +198,17 @@ export class ExpenseComponent {
     effect(() => {
       const file = this.file()?.raw;
       if (!file) {
+        if (!this.isAddModeSignal()) {
+          return;
+        }
         this.form.reset();
-        this.removeExpense(0);
+        this.form.markAsPristine({ emitEvent: false });
+        this.form.markAsUntouched({ emitEvent: false });
+        this.totals.clear();
+        this.totals.controls.forEach(control => {
+          control.markAsPristine({ emitEvent: false });
+          control.markAsUntouched({ emitEvent: false });
+        });
         this.totalMap = new Map();
         return;
       }
@@ -245,7 +254,7 @@ export class ExpenseComponent {
     });
 
     effect(() => {
-      this.driveAccessService.requestAccessIfNeeded(this.isAddModeSignal() && this.env.googleDriveUploadFile);
+      this.driveAccessService.requestAccessIfNeeded(this.env.googleDriveUploadFile);
     });
   }
 
@@ -270,7 +279,8 @@ export class ExpenseComponent {
   submit() {
     const date = this.getForm.date.value;
     const roomId = this.roomIdSignal();
-    if (this.form.invalid || !roomId || !date) {
+    const uploadFile = this.file();
+    if (this.form.invalid || !roomId || !date || !uploadFile) {
       return;
     }
 
@@ -283,10 +293,13 @@ export class ExpenseComponent {
     expense.date = createNewDateZonedTime(date, expenseSignal?.room?.timeZone).toLocaleString(API_LOCALE);
 
     const id = this.expenseIdSignal();
+    const file = uploadFile.raw;
     if (!id) {
-      this.store.dispatch(createExpense({ roomId, expense, file: this.file()?.raw }));
+      if (file) {
+        this.store.dispatch(createExpense({ roomId, expense, file }));
+      }
     } else {
-      this.store.dispatch(updateExpense({ id, roomId, expense }));
+      this.store.dispatch(updateExpense({ id, roomId, expense, file }));
     }
   }
 

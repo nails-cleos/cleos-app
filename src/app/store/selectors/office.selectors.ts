@@ -1,10 +1,10 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
-import { IOffice, IOfficeAll } from '../../interfaces/office';
+import { IOfficeAll } from '../../interfaces/office';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { OFFICE_FEATURE_KEY, OfficeState } from '../reducers/office.reducers';
-import { Pagination } from '../../interfaces/pagination';
 import { IUserAll } from '../../interfaces/user';
+import { map } from 'rxjs/operators';
 
 const selectOfficeState = createFeatureSelector<OfficeState>(OFFICE_FEATURE_KEY);
 
@@ -14,7 +14,8 @@ const selectOfficePaginationData = createSelector(
 );
 export const getOfficePaginationPipe = pipe(
   select(selectOfficePaginationData),
-  filter((val): val is Pagination<IOffice> => val !== undefined),
+  filter((val) => val?.kind === 'pagination'),
+  map((val) => val.value),
 );
 
 const selectCurrentOfficeId = createSelector(
@@ -78,5 +79,6 @@ const selectMyOffices = createSelector(
 );
 export const getMyOfficesPipe = pipe(
   select(selectMyOffices),
-  filter((val): val is IOfficeAll[] => val !== undefined),
+  filter((val) => val?.kind === 'list'),
+  map((val) => val.value),
 );

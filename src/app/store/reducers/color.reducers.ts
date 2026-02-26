@@ -15,6 +15,7 @@ import {
 import { IColor } from '../../interfaces/color';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
+import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 
 export const COLOR_FEATURE_KEY = 'color';
 
@@ -91,4 +92,15 @@ export const colorReducer = createReducer(
     currentColorId: colorId,
   })),
   on(cleanColor, () => initialState),
+
+  on(clearGlobalResponse, (state) => ({
+    ...state,
+    response: undefined,
+  })),
+
+  on(clearGlobalError, (state) => ({
+    ...state,
+    error: undefined,
+    subErrors: undefined,
+  })),
 );

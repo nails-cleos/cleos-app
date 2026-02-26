@@ -38,7 +38,7 @@ export class OfficeEffects {
     ofType(getOfficesPage),
     switchMap(({ page, sort, direction, size }) =>
       this.officeService.getOfficesPage(page, sort, direction, size).pipe(
-        map((data: Pagination<IOffice>) => officeSuccess({ data })),
+        map((value: Pagination<IOfficeAll>) => officeSuccess({ data: { kind: 'pagination', value } })),
         catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
       )),
   ));
@@ -56,7 +56,7 @@ export class OfficeEffects {
     ofType(getAllMyOffices),
     switchMap(() =>
       this.officeService.getAllMyOffices().pipe(
-        map((data: IOfficeAll[]) => officeSuccess(data ? { data } : { data: [] })),
+        map((value: IOfficeAll[]) => officeSuccess({ data: { kind: 'list', value: value ?? [] } })),
         catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
       )),
   ));
@@ -102,7 +102,7 @@ export class OfficeEffects {
       this.officeService.deleteOffice(id).pipe(
         switchMap(() => {
           const message = this.translate.instant('OFFICE.DELETED.MESSAGE', { name });
-          return successResponse(officeSaveSuccess, message, undefined, 'offices', false, 'warning');
+          return successResponse(officeSaveSuccess, message, undefined, 'offices', true, 'warning');
         }),
         catchError((err: HttpErrorResponse) => of(officeFailure({ error: err.error }))),
       )),

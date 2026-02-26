@@ -29,6 +29,7 @@ module.exports = (config: any) => {
         { type: 'html' },
         { type: 'lcovonly' },
         { type: 'text-summary' },
+        { type: 'json-summary' },
       ],
       check: {
         global: {

@@ -101,14 +101,13 @@
                     <input matInput [cpOutputFormat]="'hex'" [colorPicker]="getForm.darkColor.value"
                            (colorPickerChange)="getForm.darkColor.setValue($event)"
                            [style.background]="getForm.darkColor.value" [style.color]="'#000'"
-                           [formControl]="getForm.darkColor" #darkColorInput [cpPosition]="'top'"
-                           style="margin-right: 5px" data-cy="dark-color-picker"/>
-
-                    <mat-icon matSuffix style="cursor: pointer" (click)="darkColorPicker.openDialog(darkColorInput)"
+                           [formControl]="getForm.darkColor" [cpPosition]="'top'"
+                           #darkColorPicker="ngxColorPicker" style="margin-right: 5px"
+                           data-cy="dark-color-picker"/>
+                    <mat-icon matSuffix style="cursor: pointer" (click)="darkColorPicker.openDialog()"
                               id="darkColorIcon">
                       palette
                     </mat-icon>
-                    <color-picker #darkColorPicker></color-picker>
                     @if (getForm.darkColor.hasError('invalidColor')) {
                       <mat-error>
                         {{ 'COMMON.PROFESSIONAL.COLOR.INVALID' | translate }}
@@ -120,14 +119,13 @@
                     <input matInput [cpOutputFormat]="'hex'" [colorPicker]="getForm.lightColor.value"
                            (colorPickerChange)="getForm.lightColor.setValue($event)"
                            [style.background]="getForm.lightColor.value" [style.color]="'#fff'"
-                           [formControl]="getForm.lightColor" #lightColorInput [cpPosition]="'top'"
-                           style="margin-right: 5px"data-cy="light-color-picker"/>
-
-                    <mat-icon matSuffix style="cursor: pointer" (click)="lightColorPicker.openDialog(lightColorInput)"
+                           [formControl]="getForm.lightColor" [cpPosition]="'top'"
+                           #lightColorPicker="ngxColorPicker" style="margin-right: 5px"
+                           data-cy="light-color-picker"/>
+                    <mat-icon matSuffix style="cursor: pointer" (click)="lightColorPicker.openDialog()"
                               id="lightColorIcon">
                       palette
                     </mat-icon>
-                    <color-picker #lightColorPicker></color-picker>
                     @if (getForm.lightColor.hasError('invalidColor')) {
                       <mat-error>
                         {{ 'COMMON.PROFESSIONAL.COLOR.INVALID' | translate }}

@@ -26,7 +26,7 @@ import { DiscountService } from '../../services/discount.service';
 import { Router } from '@angular/router';
 import { CurrencyService } from '../../services/currency.service';
 import { Pagination } from '../../interfaces/pagination';
-import { IDiscount, IReferral, IUserDiscount } from '../../interfaces/discount';
+import { IDiscount, IDiscountAll, IReferral, IUserDiscount } from '../../interfaces/discount';
 import { ICurrency } from '../../interfaces/currency';
 import { IApiResponse, success, successResponse } from '../../interfaces/common';
 
@@ -42,7 +42,9 @@ export class DiscountEffects {
     ofType(getDiscountsPage),
     switchMap(({ page, sort, direction, size }) =>
       this.discountService.getDiscountsPage(page, sort, direction, size).pipe(
-        switchMap((data: Pagination<IDiscount>) => of(discountSuccess({ data }))),
+        switchMap((value: Pagination<IDiscountAll>) => of(discountSuccess({
+          data: { kind: 'paginationDiscount', value },
+        }))),
         catchError((err: HttpErrorResponse) => of(discountFailure({ error: err.error }))),
       )),
   ));
@@ -51,7 +53,7 @@ export class DiscountEffects {
     ofType(getMyDiscountsPage),
     switchMap(({ page, sort, direction, size }) =>
       this.discountService.getMyDiscountsPage(page, sort, direction, size).pipe(
-        switchMap((data: Pagination<IUserDiscount>) => of(discountSuccess({ data }))),
+        switchMap((value: Pagination<IUserDiscount>) => of(discountSuccess({ data: { kind: 'pagination', value } }))),
         catchError((err: HttpErrorResponse) => of(discountFailure({ error: err.error }))),
       )),
   ));
@@ -87,7 +89,7 @@ export class DiscountEffects {
     ofType(getUserDiscountByCustomerId),
     switchMap(({ customerId }) =>
       this.discountService.getUserDiscountByCustomerId(customerId).pipe(
-        switchMap((data: IUserDiscount[]) => of(discountSuccess({ data }))),
+        switchMap((value: IUserDiscount[]) => of(discountSuccess({ data: { kind: 'list', value } }))),
         catchError((err: HttpErrorResponse) => of(discountFailure({ error: err.error }))),
       )),
   ));
@@ -136,7 +138,7 @@ export class DiscountEffects {
       this.discountService.deleteDiscount(id).pipe(
         switchMap(() => {
           const message = this.translate.instant('DISCOUNT.DELETED.MESSAGE', { name });
-          return success(discountSaveSuccess, message, undefined, undefined, 'warning');
+          return success(discountSaveSuccess, message, undefined, true, 'warning');
         }),
         catchError((err: HttpErrorResponse) => of(discountFailure({ error: err.error }))),
       )),

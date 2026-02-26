@@ -38,7 +38,7 @@ export class AdditionalEffects {
     ofType(getAdditionalPage),
     switchMap(({ sort, direction, page, size }) =>
       this.additionalService.getAdditionalPage(sort, direction, page, size).pipe(
-        map((data: Pagination<IAdditional>) => additionalSuccess({ data })),
+        map((value: Pagination<IAdditionalAll>) => additionalSuccess({ data: { kind: 'pagination', value } })),
         catchError((err: HttpErrorResponse) => of(additionalFailure({ error: err.error }))),
       )),
   ));
@@ -47,7 +47,7 @@ export class AdditionalEffects {
     ofType(getAdditionalList),
     switchMap(() =>
       this.additionalService.getAdditionalList().pipe(
-        map((data: IAdditionalAll[]) => additionalSuccess({ data })),
+        map((value) => additionalSuccess({ data: { kind: 'list', value } })),
         catchError((err: HttpErrorResponse) => of(additionalFailure({ error: err.error }))),
       )),
   ));
@@ -102,7 +102,7 @@ export class AdditionalEffects {
       this.additionalService.deleteAdditional(id).pipe(
         switchMap(() => {
           const message = this.translate.instant('ADDITIONAL.DELETED.MESSAGE', { name });
-          return success(additionalSaveSuccess, message, undefined, undefined, 'warning');
+          return success(additionalSaveSuccess, message, undefined, true, 'warning');
         }),
         catchError((err: HttpErrorResponse) => of(additionalFailure({ error: err.error }))),
       )),

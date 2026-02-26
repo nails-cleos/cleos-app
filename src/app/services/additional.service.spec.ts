@@ -32,8 +32,8 @@ describe('AdditionalService', () => {
     description: 'Test Description',
   };
 
-  const mockPagination: Pagination<IAdditional> = {
-    content: [mockAdditional],
+  const mockPagination: Pagination<IAdditionalAll> = {
+    content: [mockAdditionalAll],
     totalElements: 1,
     totalPages: 1,
     number: 0,

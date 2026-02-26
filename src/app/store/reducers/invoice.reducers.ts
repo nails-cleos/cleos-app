@@ -13,6 +13,7 @@ import { IInvoice, IInvoiceData } from '../../interfaces/invoice';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
 import { Pagination } from '../../interfaces/pagination';
+import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 
 export const INVOICE_FEATURE_KEY = 'invoice';
 
@@ -92,4 +93,15 @@ export const invoiceReducer = createReducer(
     response: action,
   })),
   on(cleanInvoice, () => initialState),
+
+  on(clearGlobalResponse, (state) => ({
+    ...state,
+    response: undefined,
+  })),
+
+  on(clearGlobalError, (state) => ({
+    ...state,
+    error: undefined,
+    subErrors: undefined,
+  })),
 );

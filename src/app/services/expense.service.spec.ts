@@ -57,6 +57,32 @@ describe('ExpenseService', () => {
     expect(params.get('date')).toBe('2025-01-01');
   });
 
+  it('should get paginated expenses with filters', () => {
+    httpSpy.get.and.returnValue(of({}));
+
+    service.getExpensesPage(
+      roomId,
+      'amount',
+      'asc' as SortDirection,
+      1,
+      10,
+      'food',
+    ).subscribe();
+
+    expect(httpSpy.get).toHaveBeenCalled();
+
+    const [url, options] = httpSpy.get.calls.mostRecent().args;
+
+    expect(url).toBe(`v1/rooms/${roomId}/expenses/pages`);
+
+    const params = options?.params as HttpParams;
+    expect(params.get('page')).toBe('1');
+    expect(params.get('size')).toBe('10');
+    expect(params.get('sort')).toBe('amount');
+    expect(params.get('direction')).toBe('asc');
+    expect(params.get('filter')).toBe('food');
+  });
+
   it('should get all expenses info', () => {
     httpSpy.get.and.returnValue(of({}));
 
@@ -73,7 +99,7 @@ describe('ExpenseService', () => {
     expect(httpSpy.get).toHaveBeenCalledWith(`v1/rooms/${roomId}/expenses/exp-1`);
   });
 
-  it('should create expense with file', () => {
+  it('should create expense', () => {
     httpSpy.post.and.returnValue(of({ success: true }));
 
     const expense = { amount: 10 } as IExpense;
@@ -96,20 +122,6 @@ describe('ExpenseService', () => {
     expect(formData.has('expense')).toBeTrue();
   });
 
-  it('should create expense without file', () => {
-    httpSpy.post.and.returnValue(of({ success: true }));
-
-    const expense = { amount: 20 } as IExpense;
-
-    service.createExpense(roomId, expense).subscribe();
-
-    const [, body] = httpSpy.post.calls.mostRecent().args;
-
-    const formData = body as FormData;
-    expect(formData.has('file')).toBeFalse();
-    expect(formData.has('expense')).toBeTrue();
-  });
-
   it('should delete expense', () => {
     httpSpy.delete.and.returnValue(of(void 0));
 
@@ -118,14 +130,41 @@ describe('ExpenseService', () => {
     expect(httpSpy.delete).toHaveBeenCalledWith(`v1/rooms/${roomId}/expenses/exp-1`);
   });
 
-  it('should update expense', () => {
+  it('should update expense with file', () => {
+    httpSpy.patch.and.returnValue(of({ success: true }));
+
+    const expense = { amount: 99 } as IExpense;
+    const file = new File(['data'], 'receipt.pdf');
+
+    service.updateExpense('exp-1', roomId, expense, file).subscribe();
+
+    expect(httpSpy.patch).toHaveBeenCalled();
+
+    const [url, body, options] = httpSpy.patch.calls.mostRecent().args;
+
+    expect(url).toBe(`v1/rooms/${roomId}/expenses/exp-1`);
+    expect(body instanceof FormData).toBeTrue();
+
+    const headers = options?.headers as HttpHeaders;
+    expect(headers.get('Upload')).toBe('true');
+
+    const formData = body as FormData;
+    expect(formData.has('file')).toBeTrue();
+    expect(formData.has('expense')).toBeTrue();
+  });
+
+  it('should update expense without file', () => {
     httpSpy.patch.and.returnValue(of({ success: true }));
 
     const expense = { amount: 99 } as IExpense;
 
     service.updateExpense('exp-1', roomId, expense).subscribe();
 
-    expect(httpSpy.patch).toHaveBeenCalledWith(`v1/rooms/${roomId}/expenses/exp-1`, expense);
+    const [, body] = httpSpy.patch.calls.mostRecent().args;
+
+    const formData = body as FormData;
+    expect(formData.has('file')).toBeFalse();
+    expect(formData.has('expense')).toBeTrue();
   });
 
   it('should replace roomId and append args correctly', () => {

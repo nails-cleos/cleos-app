@@ -34,9 +34,8 @@
       @if (isAddMode || expense) {
         <mat-card-content>
           <div class="inner-container">
-            @if (isAddMode) {
-              <app-file-drop (fileSelected)="onSelectedFile($event)" [animate]="false"></app-file-drop>
-            }
+            <app-file-drop (fileSelected)="onSelectedFile($event)" [animate]="false" [currentFile]="file()"
+                           [fileName]="fileName()"></app-file-drop>
             <div class="side-by-side-fields">
               <mat-form-field appearance="outline" class="field">
                 <mat-label>{{ 'EXPENSE.INVOICE.FIELD' | translate }}</mat-label>
@@ -199,16 +198,10 @@
                   class="icon-button" type="button">
             {{ 'COMMON.BUTTON.BACK' | translate }}
           </button>
-          @if (isAddMode) {
-            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
-              {{ 'COMMON.BUTTON.CREATE' | translate }}
-            </button>
-          } @else {
-            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button"
-                    type="submit">
-              {{ 'COMMON.BUTTON.UPDATE' | translate }}
-            </button>
-          }
+          <button [disabled]="form.invalid || !file()" color="primary" mat-fab extended class="icon-button"
+                  type="submit">
+            {{ submitLabel() | translate }}
+          </button>
         </mat-card-actions>
       } @else {
         <mat-card-content>
