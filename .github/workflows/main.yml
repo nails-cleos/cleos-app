@@ -36,6 +36,23 @@ jobs:
           git commit -am "Update rc version"
           git push
 
+      - name: Add Snapshot Summary
+        if: always()
+        run: |
+          echo "## 🔁 Snapshot Version Bump" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Triggered by:** push to main" >> $GITHUB_STEP_SUMMARY
+          echo "- **Target Branch:** develop" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version Part Incremented:** ${{ env.VERSION_PART }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit Author:** Nails Cleos" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Snapshot version updated successfully" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Snapshot version bump failed" >> $GITHUB_STEP_SUMMARY
+          fi
+
   version:
     if: github.event_name == 'push'
 
@@ -60,3 +77,19 @@ jobs:
           VERSION=$("${GITHUB_WORKSPACE}/version-update.sh")
           git commit -am "Release version $VERSION"
           git push
+
+      - name: Add Release Summary
+        if: always()
+        run: |
+          echo "## 🚀 Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** main" >> $GITHUB_STEP_SUMMARY
+          echo "- **Released Version:** ${{ env.release_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version Strategy:** Automatic bump" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Release completed successfully" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Release failed" >> $GITHUB_STEP_SUMMARY
+          fi
