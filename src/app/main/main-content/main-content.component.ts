@@ -26,9 +26,6 @@ import {
   observeElementSignal,
   rubberBand,
   scaleIn,
-  slideAnimation,
-  slideInX,
-  slideInY,
 } from '../../util/animation';
 import { AnimationAnimateMetadata, AnimationSequenceMetadata } from '@angular/animations';
 import { isMobile } from '../../util/helper';
@@ -57,7 +54,7 @@ type MainForm = {
   selector: 'app-main-content',
   templateUrl: './main-content.component.html',
   styleUrls: ['./main-content.component.scss'],
-  animations: [bottomTop, leftRight, slideInX, slideInY, fadeInOut, slideAnimation],
+  animations: [bottomTop, leftRight, fadeInOut],
   imports: [SharedModule, AnimateDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -201,6 +198,9 @@ export class MainContentComponent {
   ];
 
   currentIndex = signal(0);
+  sliderTransform = computed(() => `translateX(-${this.currentIndex() * 100}%)`);
+
+  private readonly sliderIntervalMs = 5000;
 
   constructor() {
     effect(() => {
@@ -290,7 +290,14 @@ export class MainContentComponent {
       this.mainContent.configure(false, 'close', true);
     });
 
-    effect(() => queueMicrotask(() => this.moveForwardSlide()));
+    effect((onCleanup) => {
+      if (this.slides.length < 2) {
+        return;
+      }
+
+      const timerId = window.setInterval(() => this.moveForwardSlide(), this.sliderIntervalMs);
+      onCleanup(() => window.clearInterval(timerId));
+    });
   }
 
   get getForm(): MainForm {
@@ -333,10 +340,6 @@ export class MainContentComponent {
   };
 
   private moveForwardSlide = (): void => {
-    if (!this.slides?.length) {
-      return;
-    }
-
     // update currentIndex signal
     const idx = this.currentIndex();
     const next = idx === this.slides.length - 1 ? 0 : idx + 1;

@@ -137,13 +137,13 @@ describe('MainContentComponent', () => {
       { id: '2', image: 'img2.jpg', order: 1 },
     ];
 
-    expect(component.currentIndex()).toBe(1); // constructor do the initial moveBackwardSlide
-
-    component['moveForwardSlide']();
     expect(component.currentIndex()).toBe(0);
 
     component['moveForwardSlide']();
     expect(component.currentIndex()).toBe(1);
+
+    component['moveForwardSlide']();
+    expect(component.currentIndex()).toBe(0);
   });
 
   it('should check if current slide index matches', () => {

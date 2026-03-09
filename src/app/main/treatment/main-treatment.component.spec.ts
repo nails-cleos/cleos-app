@@ -1,66 +1,82 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { MainTreatmentComponent } from './main-treatment.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
 import { MainState } from '../../store/reducers/main.reducers';
+import { MainContentService } from '../../services/main-content.service';
+import { MainTreatmentComponent } from './main-treatment.component';
 
 describe('MainTreatmentComponent', () => {
   let component: MainTreatmentComponent;
   let fixture: ComponentFixture<MainTreatmentComponent>;
-  let translateService: TranslateService;
+
+  let treatmentId$: BehaviorSubject<string | undefined>;
+  let treatments$: BehaviorSubject<unknown>;
 
   let storeSpy: jasmine.SpyObj<Store<MainState>>;
+  let translateSpy: jasmine.SpyObj<TranslateService>;
+  let mainContentSpy: jasmine.SpyObj<MainContentService>;
 
-  let treatmentId$: BehaviorSubject<any>;
-
-  beforeEach(async () => {
-    treatmentId$ = new BehaviorSubject<any>(undefined);
-
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return treatmentId$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-
-    await TestBed.configureTestingModule({
-      imports: [MainTreatmentComponent, TranslateModule.forRoot()],
-      providers: [
-        { provide: Store, useValue: storeSpy },
-      ],
-    }).compileComponents();
-
+  const createComponent = (): void => {
     fixture = TestBed.createComponent(MainTreatmentComponent);
     component = fixture.componentInstance;
-    translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
-
-    translateService.setTranslation('en-GB', {
-      TREATMENTS: [
-        { id: 'id', translations: { title: 'Test Title', description: 'Test Description' } },
-      ],
-    });
-
     fixture.detectChanges();
+  };
+
+  beforeEach(async () => {
+    treatmentId$ = new BehaviorSubject<string | undefined>(undefined);
+    treatments$ = new BehaviorSubject<unknown>([]);
+
+    storeSpy = jasmine.createSpyObj<Store<MainState>>('Store', ['pipe', 'dispatch']);
+    storeSpy.pipe.and.returnValue(treatmentId$.asObservable());
+
+    translateSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['stream']);
+    translateSpy.stream.and.returnValue(treatments$.asObservable());
+
+    mainContentSpy = jasmine.createSpyObj<MainContentService>('MainContentService', ['configure']);
+
+    await TestBed.configureTestingModule({
+      imports: [MainTreatmentComponent],
+      providers: [
+        { provide: Store, useValue: storeSpy },
+        { provide: TranslateService, useValue: translateSpy },
+        { provide: MainContentService, useValue: mainContentSpy },
+      ],
+    }).compileComponents();
   });
 
-  it('should create', () => {
+  it('should create and configure main content', () => {
+    createComponent();
+
     expect(component).toBeTruthy();
     expect(component.sections()).toBeUndefined();
+    expect(mainContentSpy.configure).toHaveBeenCalledWith(false, 'open');
+    expect(storeSpy.pipe).toHaveBeenCalled();
+    expect(translateSpy.stream).toHaveBeenCalledWith('TREATMENTS');
   });
 
-  it('should load the section when id exist', () => {
-    treatmentId$.next('id');
+  it('should return sections when treatment id exists in translations', () => {
+    treatments$.next([
+      { id: 'biab', translations: { title: 'Title', description: 'Description' } },
+    ]);
+
+    createComponent();
+    treatmentId$.next('biab');
     fixture.detectChanges();
+
     expect(component.sections()).toBeDefined();
-    expect(component.sections()?.length).toBeGreaterThan(0);
+    expect((component.sections() ?? []).length).toBeGreaterThan(0);
+  });
+
+  it('should return undefined sections when treatment id is unknown', () => {
+    treatments$.next([
+      { id: 'biab', translations: { title: 'Title', description: 'Description' } },
+    ]);
+
+    createComponent();
+    treatmentId$.next('unknown');
+    fixture.detectChanges();
+
+    expect(component.sections()).toBeUndefined();
   });
 });

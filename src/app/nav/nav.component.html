@@ -62,7 +62,7 @@
     }
   </mat-drawer>
   <mat-drawer-content class="page-wrap">
-    <mat-toolbar class="header" color="primary">
+    <mat-toolbar class="header nav-gradient">
       @if (isHandsetSignal() && showInformation()) {
         <button (click)="drawer.toggle()" aria-label="Toggle sidenav" mat-icon-button type="button" name="cleosMenu">
           <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
@@ -182,12 +182,12 @@
           </mat-menu>
         </div>
       } @else if (!isHandsetSignal()) {
-        <button color="accent" mat-fab extended [routerLink]="['/', language(), 'home']">
+        <button mat-button [routerLink]="['/', language(), 'home']">
           <mat-icon>home</mat-icon>
-          <span>{{ 'COMMON.DASHBOARD.HOME' | translate }}</span>
+          {{ 'COMMON.DASHBOARD.HOME' | translate }}
         </button>
       } @else {
-        <button color="accent" mat-fab [routerLink]="['/', language(), 'home']">
+        <button mat-icon-button [routerLink]="['/', language(), 'home']">
           <mat-icon>home</mat-icon>
         </button>
       }

@@ -1,0 +1,227 @@
+:host {
+  display: block;
+}
+
+:host ::ng-deep {
+  .section-style {
+    font-weight: 300;
+    background: var(--toast-background);
+    line-height: 1.75;
+    width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  /* RESET */
+  .section-style *,
+  .section-style *::before,
+  .section-style *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* HERO */
+  .section-style .hero {
+    background: linear-gradient(
+        135deg,
+        var(--primary-darker-color) 0%,
+        var(--primary-color) 60%,
+        var(--accent-color) 100%
+    );
+    color: #fff;
+    padding: 5rem 2rem 4rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .section-style .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        ellipse at 70% 30%,
+        rgba(255, 255, 255, .12) 0%,
+        transparent 60%
+    );
+  }
+
+  /* HERO TEXT */
+  .section-style .hero-eyebrow {
+    font-size: .75rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    opacity: .75;
+    margin-bottom: 1rem;
+  }
+
+  .section-style .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.8rem, 6vw, 4.5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 1.2rem;
+  }
+
+  /* LAYOUT */
+  .section-style .layout {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 4rem 2rem 6rem;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 4rem;
+  }
+
+  /* SIDEBAR */
+  .section-style .sidebar {
+    position: sticky;
+    top: 80px;
+  }
+
+  .section-style .sidebar-label {
+    font-size: .7rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--primary-darker-color);
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+
+  .section-style .sidebar nav a {
+    display: block;
+    font-size: .83rem;
+    color: var(--text-primary-color);
+    text-decoration: none;
+    padding: .35rem 0 .35rem 1rem;
+    border-left: 2px solid var(--accent-color);
+    border-radius: 0 8px 8px 0;
+    transition: .2s;
+  }
+
+  .section-style .sidebar nav a:hover,
+  .section-style .sidebar nav a:focus-visible {
+    color: var(--primary-darker-color);
+    background: var(--accent-lighter-color);
+    border-left-color: var(--primary-color);
+    box-shadow: inset 0 0 0 1px var(--accent-color);
+  }
+
+  /* CONTENT */
+  .section-style .content section {
+    margin-bottom: 3rem;
+    scroll-margin-top: 96px;
+    animation: fadeUp .5s ease both;
+  }
+
+  /* SECTION TITLE */
+  .section-style .section-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: .85rem;
+    color: var(--primary-color);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: .3rem;
+    display: block;
+  }
+
+  .section-style h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-primary-color);
+    margin-bottom: 1rem;
+  }
+
+  /* TEXT */
+  .section-style p {
+    margin-bottom: 1rem;
+  }
+
+  .section-style ul {
+    list-style: none;
+    margin: .5rem 0 1rem;
+  }
+
+  .section-style ul li {
+    padding: .4rem 0 .4rem 1.4rem;
+    position: relative;
+    font-size: .95rem;
+  }
+
+  .section-style ul li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary-color);
+  }
+
+  /* DIVIDER */
+  .section-style .divider {
+    height: 1px;
+    background: var(--accent-color);
+    margin-bottom: 3rem;
+  }
+
+  /* HIGHLIGHT */
+  .section-style .contact-card {
+    background: var(--accent-lighter-color);
+    border: 1px solid var(--accent-color);
+    color: black;
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+
+  /* LINKS */
+  .section-style a {
+    color: var(--primary-color);
+  }
+
+  .section-style a:hover {
+    text-decoration: underline;
+  }
+
+  /* BADGE */
+  .section-style .update-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    background: var(--accent-color);
+    color: black;
+    font-size: .78rem;
+    padding: .3rem .8rem;
+    border-radius: 999px;
+    margin-bottom: 2rem;
+  }
+}
+
+/* ANIMATION */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* MOBILE */
+@media (max-width: 720px) {
+  .section-style .layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2rem 1.25rem 4rem;
+  }
+
+  .section-style .sidebar {
+    position: static;
+  }
+}

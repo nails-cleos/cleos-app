@@ -97,7 +97,7 @@ describe('NavComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['subscribe', 'attachLang']);
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'select', 'dispatch']);
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['cookieConsent', 'reloadUser'], {
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['cookieConsent', 'reloadUser', 'updateMode'], {
       authUser: authUserSignal.asReadonly(),
     });
     tokenServiceSpy = jasmine.createSpyObj('TokenService', ['user'], {

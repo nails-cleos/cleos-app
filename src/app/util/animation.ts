@@ -1,7 +1,6 @@
 import {
   animate,
   animateChild,
-  group,
   keyframes,
   query,
   sequence,
@@ -53,29 +52,11 @@ import { WritableSignal } from '@angular/core';
 //   ])
 // ];
 
-const fadeIn = [
-  query(':enter, :leave',
-    style({ position: 'absolute', width: '100%' }), { optional: true },
-  ),
-  group([
-    query(':enter', [
-      style({ opacity: 0 }),
-      animate('600ms ease-in-out',
-        style({ opacity: 1 }),
-      ),
-    ], { optional: true }),
-    query(':leave', [
-      style({ opacity: 1 }),
-      animate('600ms ease-in-out',
-        style({ opacity: 0 }),
-      ),
-    ], { optional: true }),
-  ]),
-];
-
 export const slideAnimation = trigger('slideAnimation', [
-  transition(':increment', fadeIn),
-  transition(':decrement', fadeIn),
+  transition(':increment, :decrement', [
+    style({ opacity: 0 }),
+    animate('600ms ease-in-out', style({ opacity: 1 })),
+  ]),
 ]);
 
 export const fadeInUpDown = (translate: string = '20px', duration: string = '2000ms') => sequence([
@@ -122,34 +103,6 @@ export const scaleIn = (delay: string = '0ms') => sequence([
   ])),
 ]);
 
-export const slideInX = trigger('slideInX', [
-  transition(':enter',
-    [
-      style({ transform: 'translateX({{translate}})', opacity: 0 }),
-      animate('{{duration}} {{delay}} ease-in-out', style({ transform: 'translateX(0)', opacity: 1 })),
-    ], { params: { translate: '-2000px', duration: '1500ms', delay: '0ms' } },
-  ),
-]);
-
-export const slideInY = trigger('slideInY', [
-  transition(':enter',
-    [
-      style({ transform: 'translateY({{translate}})', opacity: 0 }),
-      animate('{{duration}} {{delay}} ease-in-out', style({ transform: 'translateY(0)', opacity: 1 })),
-    ], { params: { translate: '-2000px', duration: '1500ms', delay: '0ms' } },
-  ),
-]);
-
-export const fade = trigger('fade', [
-  state('open', style({ opacity: '{{opacityOpen}}', zIndex: '{{index}}' }), { params: { opacityOpen: 0, index: -1 } }),
-  state('close', style({ opacity: '{{opacityClose}}' }), { params: { opacityClose: 1 } }),
-  transition('open <=> close', animate('{{duration}} ease-in-out'), {
-    params: {
-      duration: '1000ms',
-    },
-  }),
-]);
-
 export const fadeInOut = trigger('fadeInOut', [
   state('in',
     style({ opacity: 1 }),
@@ -162,22 +115,6 @@ export const fadeInOut = trigger('fadeInOut', [
     animate('500ms ease-in-out',
       style({ opacity: 0 }),
     ),
-  ]),
-]);
-
-export const colorChange = trigger('colorChange', [
-  state('open', style({ backgroundColor: 'rgb({{backgroundColor}})', color: '#000', fill: '#000' }), {
-    params: {
-      backgroundColor: '101, 247, 204',
-    },
-  }),
-  state('close', style({ backgroundColor: 'rgba({{backgroundColor}}, 0.2)', color: '#fff', fill: '#fff' }), {
-    params: {
-      backgroundColor: '101, 247, 204',
-    },
-  }),
-  transition('* <=> *', [
-    animate('1000ms ease-in-out'),
   ]),
 ]);
 
