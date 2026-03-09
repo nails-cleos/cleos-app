@@ -220,7 +220,7 @@ describe('ExpenseComponent', () => {
     storeSpy.dispatch.calls.reset();
 
     const supplyStoreControl = component.getForm.supplyStore;
-    supplyStoreControl.setValue('New Expense');
+    supplyStoreControl.setValue({ id: '', name: 'New Expense' });
     supplyStoreControl.markAsDirty();
     const invoiceControl = component.getForm.invoice;
     invoiceControl.setValue('New Description');
@@ -302,7 +302,7 @@ describe('ExpenseComponent', () => {
     fixture.detectChanges();
 
     const supplyStoreControl = component.getForm.supplyStore;
-    supplyStoreControl.setValue('Updated Expense');
+    supplyStoreControl.setValue({ id: '123', name: 'Updated Expense' });
     supplyStoreControl.markAsDirty();
     const invoiceControl = component.getForm.invoice;
     invoiceControl.setValue('Updated Description');
@@ -320,7 +320,7 @@ describe('ExpenseComponent', () => {
       id: 'abc-123',
       expense: jasmine.objectContaining({
         invoice: 'Updated Description',
-        supplyStoreString: 'Updated Expense',
+        supplyStoreString: '123',
       }),
       type: '[Expense] Update expense by id',
     }));
