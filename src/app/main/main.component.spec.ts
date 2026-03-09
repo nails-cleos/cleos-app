@@ -4,9 +4,8 @@ import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Auth } from '@angular/fire/auth';
-import { AuthUserService } from '../services/auth-user.service';
+import { AuthUserService, initialAuthUser } from '../services/auth-user.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient } from '@angular/common/http';
 import { MainContentService } from '../services/main-content.service';
 import { redirect } from '../store/auth.actions';
@@ -15,6 +14,7 @@ import { NavigationService } from '../services/navigation.service';
 import { MainState } from '../store/reducers/main.reducers';
 import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { signal } from '@angular/core';
 
 describe('MainComponent', () => {
   let component: MainComponent;
@@ -38,7 +38,10 @@ describe('MainComponent', () => {
 
     const paramMapSpy = jasmine.createSpyObj('ParamMap', ['get', 'lang']);
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['cookieConsent', 'updateMode']);
+    const authUserSignal = signal({ ...initialAuthUser });
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['cookieConsent', 'updateMode'], {
+      authUser: authUserSignal.asReadonly(),
+    });
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['attachLang']);
     mainContentServiceSpy = jasmine.createSpyObj('MainContentService', [], {
       value: { showPreload: false, navigationHeader: 'close', showArrow: false },
@@ -84,7 +87,6 @@ describe('MainComponent', () => {
         { provide: MainContentService, useValue: mainContentServiceSpy },
         { provide: TokenService, useValue: tokenServiceSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
-        provideNoopAnimations(),
         provideHttpClient(),
         provideHttpClientTesting(),
       ],

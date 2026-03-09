@@ -22,19 +22,20 @@ export class MainTreatmentComponent {
   private readonly translate: TranslateService = inject(TranslateService);
 
   private treatmentId$ = this.store.pipe(getCurrentTreatmentIdPipe);
+  private treatments$ = this.translate.stream('TREATMENTS');
 
   private treatmentIdSignal = toSignal(this.treatmentId$);
+  private treatmentsSignal = toSignal(this.treatments$, { initialValue: [] as IMainTreatment[] });
 
   sections = computed(() => {
     const treatmentId = this.treatmentIdSignal();
-    if (treatmentId) {
-      const translations = this.translate.instant('TREATMENTS')
-        .find((it: IMainTreatment) => it.id === treatmentId).translations;
-      if (translations) {
-        return sections(translations);
-      }
+    const treatments = this.treatmentsSignal();
+    if (!treatmentId || !Array.isArray(treatments)) {
+      return undefined;
     }
-    return undefined;
+
+    const translations = treatments.find((it: IMainTreatment) => it.id === treatmentId)?.translations;
+    return translations ? sections(translations) : undefined;
   });
 
   constructor() {

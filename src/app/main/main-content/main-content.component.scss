@@ -1,3 +1,8 @@
+$work-width: 400px;
+$work-height: 300px;
+$mobile-work-width: 300px;
+$mobile-work-height: 250px;
+
 .mb-50 {
   margin-bottom: 50px;
 }
@@ -37,6 +42,13 @@ section {
   position: relative;
 }
 
+.slider-track {
+  display: flex;
+  height: 100%;
+  transition: transform 600ms ease-in-out;
+  will-change: transform;
+}
+
 .slide {
   position: absolute;
   top: 0;
@@ -46,15 +58,55 @@ section {
 .slider-img,
 #experiences,
 .work-img {
+  flex: 0 0 100%;
   background-size: cover;
   background-position: center center;
 }
 
 .carousel-caption,
 .carousel-caption h2,
-.carousel-caption p{
+.carousel-caption p {
   box-sizing: border-box;
   text-align: center;
+}
+
+.enter-slide-x,
+.enter-slide-y {
+  opacity: 0;
+  animation-duration: var(--enter-duration, 1500ms);
+  animation-delay: var(--enter-delay, 0ms);
+  animation-fill-mode: both;
+  animation-timing-function: ease-in-out;
+}
+
+.enter-slide-x {
+  animation-name: enter-slide-x;
+}
+
+.enter-slide-y {
+  animation-name: enter-slide-y;
+}
+
+@keyframes enter-slide-x {
+  from {
+    transform: translateX(var(--enter-translate-x, -2000px));
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes enter-slide-y {
+  from {
+    transform: translateY(var(--enter-translate-y, -2000px));
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .carousel-caption {
@@ -230,8 +282,8 @@ section {
 
 .work-item > img,
 .work-img {
-  width: 400px !important;
-  height: 300px;
+  width: $work-width !important;
+  height: $work-height;
 }
 
 .work-item > img {
@@ -331,9 +383,11 @@ section {
     h1 {
       font-size: 72px !important;
     }
+
     h2 {
       font-size: 30px !important;
     }
+
     p {
       font-size: 16px !important;
     }
@@ -378,8 +432,8 @@ section {
 
   .work-img {
     margin: 20px 0;
-    width: 300px;
-    height: 250px;
+    width: $mobile-work-width;
+    height: $mobile-work-height;
   }
 
   .overlay {

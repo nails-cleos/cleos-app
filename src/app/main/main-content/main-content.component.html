@@ -2,27 +2,28 @@
 @let currentIsSmall = isSmall();
 <section id="slider">
   <div class="container slider">
-    <div [@slideAnimation]="currentIndex()">
-      @for (slide of slides; track slide; let i = $index) {
-        @if (isCurrentSlideIndex(i)) {
-          <div class="slider-img" [ngStyle]="{'background-image': 'url(' + slide.image + ')'}"></div>
-        }
+    <div class="slider-track" [style.transform]="sliderTransform()">
+      @for (slide of slides; track slide.id) {
+        <div class="slider-img" [ngStyle]="{'background-image': 'url(' + slide.image + ')'}"></div>
       }
     </div>
   </div>
 
   <div class="carousel-caption fade-in-background">
-    <h2 [@slideInY]="{value: ':enter', params: {translate: '-2000px'}}">
+    <h2 class="enter-slide-y" [style.--enter-translate-y]="'-2000px'">
       {{ 'MAIN.SLIDER.SUB_TITLE' | translate }}</h2>
-    <h1 [@slideInY]="{value: ':enter', params: {translate: '-2000px'}}"
+    <h1 class="enter-slide-y" [style.--enter-translate-y]="'-2000px'"
         [innerHTML]="'MAIN.SLIDER.TITLE' | translate"></h1>
-    <h3 [@slideInX]="{value: ':enter', params: {translate: '-2000px'}}">{{ 'MAIN.SLIDER.SUB_1' | translate }}</h3>
-    <p [@slideInX]="{value: ':enter', params: {translate: '2000px'}}">{{ 'MAIN.SLIDER.SUB_2' | translate }}
+    <h3 class="enter-slide-x" [style.--enter-translate-x]="'-2000px'">{{ 'MAIN.SLIDER.SUB_1' | translate }}</h3>
+    <p class="enter-slide-x" [style.--enter-translate-x]="'2000px'">{{ 'MAIN.SLIDER.SUB_2' | translate }}
     </p>
 
     <ul class="social-links text-center">
       @for (social of socialLinks; track social) {
-        <li [@slideInY]="{value: ':enter', params: {translate: '100px', duration: '500ms', delay: social.delay}}">
+        <li class="enter-slide-y"
+            [style.--enter-translate-y]="'100px'"
+            [style.--enter-duration]="'500ms'"
+            [style.--enter-delay]="social.delay">
           @if (social.phone && social.phoneKey && social.phoneText) {
             <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
                (mouseleave)="onHover(social, false)" aria-label="social icon"

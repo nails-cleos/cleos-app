@@ -25,6 +25,15 @@ body {
   font-display: swap;
 }
 
+.nav-gradient {
+  background: linear-gradient(
+      135deg,
+      var(--primary-darker-color) 0%,
+      var(--primary-color) 60%,
+      var(--accent-color) 100%
+  ) !important;
+}
+
 .mat-mdc-header-cell, .mat-column-actions {
   text-align: center !important;
 }

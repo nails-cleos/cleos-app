@@ -1,12 +1,15 @@
-<div id="preloader" [@fade]="showLoader ? 'close' : 'open'">
+<div id="preloader" [class.preloader-hidden]="!showLoader">
   <div class="loader"></div>
 </div>
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav-content>
     @let currentNavigationState = navigationState();
-    <mat-toolbar [@colorChange]="{value: currentNavigationState, params: {backgroundColor: backgroundColor}}"
-                 class="nav-fixed-top">
-      <svg xmlns="http://www.w3.org/2000/svg" width="512pt" height="512pt"
+    <mat-toolbar class="nav-fixed-top"
+                 [class.nav-transparent]="currentNavigationState === 'close'"
+                 [class.nav-gradient]="currentNavigationState !== 'close'"
+                 [style.color]="currentNavigationState === 'close' ? '#fff' : '#000'"
+                 [class.nav-fixed-top-solid]="currentNavigationState === 'open'">
+      <svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" width="512pt" height="512pt"
            viewBox="0 0 4500 4500" preserveAspectRatio="xMidYMid meet">
         <g transform="translate(0,4500) scale(0.1,-0.1)" stroke="none">
           <path
@@ -141,28 +144,31 @@
     </mat-toolbar>
     <div #home id="home"></div>
     <router-outlet #bodySection></router-outlet>
-    <footer id="footer" class="footer">
+    <footer id="footer" class="footer nav-gradient">
       <div class="footer-content">
-        <mat-toolbar [ngClass]="{ 'footer-toolbar-dark': isDarkMode, 'footer-toolbar-light': !isDarkMode }">
+        <mat-toolbar>
           <mat-toolbar-row>
             <span class="footer-image-container">
               <img src="assets/icons/icon-512x512-maskable.png" style="transform: scale(2);" alt="Logo footer">
             </span>
           </mat-toolbar-row>
-          <mat-toolbar-row style="margin-top: 20px">
-              <span style="margin: auto;">
-                <button [routerLinkActive]="['active']" [routerLink]="['/', language, 'privacy']" mat-button
-                        aria-label="Go to privacy">
-                  <span>{{ 'MAIN.SECTION.PRIVACY' | translate }}</span>
-                </button>
-                <button [routerLinkActive]="['active']" [routerLink]="['/', language, 'term-and-conditions']" mat-button
-                        aria-label="Go to term-and-conditions">
-                  <span>{{ 'MAIN.SECTION.TERM_AND_CONDITIONS' | translate }}</span>
-                </button>
-                <button (click)="scrollToElement('contact')" mat-button aria-label="Go to contact">
-                  <span>{{ 'MAIN.SECTION.CONTACT' | translate }}</span>
-                </button>
-              </span>
+          <mat-toolbar-row class="footer-links-row">
+            <span class="links">
+              <button [routerLinkActive]="['active']" [routerLink]="['/', language, 'home', 'privacy']" mat-button
+                      aria-label="Go to privacy">
+                <span>{{ 'MAIN.SECTION.PRIVACY' | translate }}</span>
+              </button>
+              <span class="separator">•</span>
+              <button [routerLinkActive]="['active']" [routerLink]="['/', language, 'home', 'term-and-conditions']"
+                      mat-button
+                      aria-label="Go to term-and-conditions">
+                <span>{{ 'MAIN.SECTION.TERM_AND_CONDITIONS' | translate }}</span>
+              </button>
+              <span class="separator">•</span>
+              <button (click)="scrollToElement('contact')" mat-button aria-label="Go to contact">
+                <span>{{ 'MAIN.SECTION.CONTACT' | translate }}</span>
+              </button>
+            </span>
           </mat-toolbar-row>
           <mat-toolbar-row>
             <span style="margin: auto;">
@@ -188,8 +194,11 @@
       </div>
     </footer>
     @if (showArrow) {
-      <a [@fade]="{value: currentNavigationState, params: {opacityOpen: 1, opacityClose: 0, index: 99}}"
-         class="pointer-only" (click)="scrollToElement(home)" id="back-top" type="button">
+      <a class="pointer-only"
+         [class.back-top-visible]="currentNavigationState === 'open'"
+         (click)="scrollToElement(home)"
+         id="back-top"
+         type="button">
         <mat-icon>keyboard_double_arrow_up</mat-icon>
       </a>
     }
