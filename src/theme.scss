@@ -160,6 +160,8 @@ $dark-theme: mat.m2-define-dark-theme((
 
   --toast-background: #fff;
   --toast-text: rgba(0, 0, 0, .87);
+
+  --invert-text: #fff;
 }
 
 /* -----------------------------
@@ -183,6 +185,8 @@ $dark-theme: mat.m2-define-dark-theme((
 
   --toast-background: #424242;
   --toast-text: rgba(255, 255, 255, .87);
+
+  --invert-text: rgba(0, 0, 0, .87);
 }
 
 /* -----------------------------

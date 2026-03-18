@@ -5,7 +5,6 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { IRoomCustomer } from '../../../interfaces/room';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { detailExpandAnimation } from '../../../util/animation';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatSort } from '@angular/material/sort';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
@@ -19,7 +18,6 @@ import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-customers',
-  animations: [detailExpandAnimation],
   templateUrl: './customers.component.html',
   styleUrl: './customers.component.scss',
   imports: [AppMaterialModule, TimeDetailPipe, TranslatePipe, DatePipe, RouterLink],

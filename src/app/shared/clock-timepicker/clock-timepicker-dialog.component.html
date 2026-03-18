@@ -1,0 +1,64 @@
+<div class="timepicker">
+  <div class="timepicker__header">
+    <button
+      (click)="setView('hour')"
+      [class.active]="view === 'hour'"
+      class="timepicker__time-part"
+      type="button">
+      {{ displayHour }}
+    </button>
+    <span class="timepicker__separator">:</span>
+    <button
+      (click)="setView('minute')"
+      [class.active]="view === 'minute'"
+      class="timepicker__time-part"
+      type="button">
+      {{ displayMinute }}
+    </button>
+
+    <div *ngIf="format === 12" class="timepicker__meridiem">
+      <button
+        (click)="setMeridiem('AM')"
+        [class.active]="meridiem === 'AM'"
+        class="timepicker__meridiem-button"
+        type="button">
+        AM
+      </button>
+      <button
+        (click)="setMeridiem('PM')"
+        [class.active]="meridiem === 'PM'"
+        class="timepicker__meridiem-button"
+        type="button">
+        PM
+      </button>
+    </div>
+  </div>
+
+  <div class="timepicker__body">
+    <div
+      [style.--timepicker-hand-angle]="handAngle + 'deg'"
+      [style.--timepicker-hand-length]="handLength + '%'"
+      class="clock-face">
+      <div class="clock-face__clock-hand"></div>
+      <div class="clock-face__center"></div>
+
+      <button
+        *ngFor="let option of dialOptions"
+        (click)="selectDialOption(option)"
+        [class.active]="option.active"
+        [class.disabled]="option.disabled"
+        [disabled]="option.disabled"
+        [style.left.%]="option.left"
+        [style.top.%]="option.top"
+        class="clock-face__number timepicker-dial__item"
+        type="button">
+        {{ option.label }}
+      </button>
+    </div>
+  </div>
+
+  <div class="timepicker__actions">
+    <button (click)="cancel()" mat-button type="button">Cancel</button>
+    <button (click)="confirm()" [disabled]="isConfirmDisabled" mat-flat-button type="button">OK</button>
+  </div>
+</div>

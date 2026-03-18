@@ -3,10 +3,10 @@
     <div class="frame flex-wrap">
       @for (catalogue of catalogues(); track catalogue) {
         <mat-card appearance="outlined" class="catalogue-card flex-item">
-          @if (catalogue.treatmentGroup) {
+          @if (catalogue.group) {
             <mat-card-header>
               <mat-card-title>{{ catalogue.name }}</mat-card-title>
-              <mat-card-subtitle>{{ catalogue.treatmentGroup.name }}</mat-card-subtitle>
+              <mat-card-subtitle>{{ catalogue.group.name }}</mat-card-subtitle>
             </mat-card-header>
           } @else {
             <mat-card-header>

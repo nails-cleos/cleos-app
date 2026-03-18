@@ -20,7 +20,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { Role } from '../../interfaces/token';
 import { executeDialogNoWidth, snakeToCamel } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { detailExpandAnimation } from '../../util/animation';
 import { RoleIconKey, RoleIconName } from '../../util/icon';
 import { Router } from '@angular/router';
 import { SharedModule } from '../../shared/shared.module';
@@ -38,7 +37,6 @@ type UsersForm = {
   selector: 'app-users',
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.scss'],
-  animations: [detailExpandAnimation],
   imports: [SharedModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -9,7 +9,6 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { clean, currencySelected, deleteCurrency, getCurrenciesPage } from '../../store/currency.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { detailExpandAnimation } from '../../util/animation';
 import { executeDialogNoWidth } from '../../util/helper';
 import { SharedModule } from '../../shared/shared.module';
 import { getCurrencyPaginationPipe, getCurrencyResponsePipe } from '../../store/selectors/currency.selectors';
@@ -20,7 +19,6 @@ import { CurrencyState } from '../../store/reducers/currency.reducers';
   selector: 'app-currency-list',
   templateUrl: './currency-list.component.html',
   styleUrls: ['./currency-list.component.scss'],
-  animations: [detailExpandAnimation],
   imports: [SharedModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

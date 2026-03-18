@@ -33,18 +33,15 @@
 </div>
 
 @if (getForm.date.value) {
-  <button [class.spinner]="isExportLoading()" (click)="exportAction()"
+  <button class="export" [class.spinner]="isExportLoading()" (click)="exportAction()"
           [disabled]="isExportLoading() || (export && (!yearExport || sheetData.length === 0))" color="accent"
           mat-fab extended style="width: 100%; margin: 10px">
-    <ng-container>
-      @if (export) {
-        <mat-icon>file_download</mat-icon>
-        <span>{{ 'COMMON.BUTTON.EXPORT' | translate }}</span>
-      } @else {
-        <mat-icon>cloud_download</mat-icon>
-        <span [innerHTML]="'COMMON.BUTTON.GET_DATA' | translate: {year: getForm.date.value.getFullYear() }"></span>
-      }
-    </ng-container>
+    <mat-icon>{{ export ? 'file_download' : 'cloud_download' }}</mat-icon>
+    @if (export) {
+      <span>{{ 'COMMON.BUTTON.EXPORT' | translate }}</span>
+    } @else {
+      <span [innerHTML]="'COMMON.BUTTON.GET_DATA' | translate: {year: getForm.date.value.getFullYear() }"></span>
+    }
   </button>
   @if (yearSummaryMap?.size) {
     <app-year [quarterSummaries]="quarterSummaries" [year]="getForm.date.value.getFullYear()"

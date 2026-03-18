@@ -1,20 +1,20 @@
 <form [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
   <mat-form-field class="margin-right-eight" appearance="outline">
     <mat-label>{{ 'ROOM.START.FIELD' | translate }}</mat-label>
-    <input matInput name="start_time" [format]="24" [formControl]="getForm.start" [ngxTimepicker]="tStart" [max]="getForm.end.value"
+    <input matInput name="start_time" [format]="24" [formControl]="getForm.start" [timepicker]="tStart" [max]="getForm.end.value"
            required readonly/>
     <span matPrefix><mat-icon (click)="tStart.open()" matPrefix>timer</mat-icon> &nbsp;</span>
-    <ngx-material-timepicker [minutesGap]="15" #tStart></ngx-material-timepicker>
+    <app-timepicker [minutesGap]="15" #tStart></app-timepicker>
     @if (getForm.start.hasError('required')) {
       <mat-error [innerHTML]="'ROOM.START.REQUIRED' | translate"></mat-error>
     }
   </mat-form-field>
   <mat-form-field class="margin-right-eight" appearance="outline">
     <mat-label>{{ 'ROOM.END.FIELD' | translate }}</mat-label>
-    <input matInput name="end_time" [format]="24" [formControl]="getForm.end" [ngxTimepicker]="tEnd" [min]="getForm.start.value"
+    <input matInput name="end_time" [format]="24" [formControl]="getForm.end" [timepicker]="tEnd" [min]="getForm.start.value"
            readonly/>
     <span matPrefix><mat-icon (click)="tEnd.open()" matPrefix>timer</mat-icon> &nbsp;</span>
-    <ngx-material-timepicker [minutesGap]="15" #tEnd></ngx-material-timepicker>
+    <app-timepicker [minutesGap]="15" #tEnd></app-timepicker>
     @if (getForm.end.hasError('required')) {
       <mat-error [innerHTML]="'ROOM.END.REQUIRED' | translate"></mat-error>
     }
@@ -29,17 +29,17 @@
       </div>
       <mat-form-field class="margin-right-eight" appearance="outline">
         <mat-label>{{ 'ROOM.START.FIELD' | translate }}</mat-label>
-        <input matInput name="lunch_start_time" [format]="24" [formControl]="getForm.startLunch" [ngxTimepicker]="tLunchStart"
+        <input matInput name="lunch_start_time" [format]="24" [formControl]="getForm.startLunch" [timepicker]="tLunchStart"
                [min]="getForm.start.value" [max]="getForm.endLunch.value || ''" readonly/>
         <span matPrefix><mat-icon (click)="tLunchStart.open()" matPrefix>timer</mat-icon> &nbsp;</span>
-        <ngx-material-timepicker [minutesGap]="15" #tLunchStart></ngx-material-timepicker>
+        <app-timepicker [minutesGap]="15" #tLunchStart></app-timepicker>
       </mat-form-field>
       <mat-form-field class="margin-right-eight" appearance="outline">
         <mat-label>{{ 'ROOM.END.FIELD' | translate }}</mat-label>
-        <input matInput name="lunch_end_time" [format]="24" [formControl]="getForm.endLunch" [ngxTimepicker]="tLunchEnd"
+        <input matInput name="lunch_end_time" [format]="24" [formControl]="getForm.endLunch" [timepicker]="tLunchEnd"
                [min]="getForm.startLunch.value || ''" [max]="getForm.end.value" readonly/>
         <span matPrefix><mat-icon (click)="tLunchEnd.open()" matPrefix>timer</mat-icon> &nbsp;</span>
-        <ngx-material-timepicker [minutesGap]="15" #tLunchEnd></ngx-material-timepicker>
+        <app-timepicker [minutesGap]="15" #tLunchEnd></app-timepicker>
       </mat-form-field>
     </div>
   }

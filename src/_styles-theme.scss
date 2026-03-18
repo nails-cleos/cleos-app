@@ -423,6 +423,26 @@
   .timepicker {
     .timepicker__header {
       background-color: mat.m2-get-color-from-palette($primary-palette) !important;
+
+      @if $isDark {
+        color: #fff !important;
+      } @else {
+        color: #000 !important;
+      }
+    }
+
+    .timepicker__time-part,
+    .timepicker__separator,
+    .timepicker__meridiem-button {
+      color: inherit !important;
+    }
+
+    .timepicker__meridiem-button.active {
+      @if $isDark {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+      } @else {
+        background-color: rgba(0, 0, 0, 0.15) !important;
+      }
     }
 
     .timepicker__body,
@@ -454,21 +474,29 @@
       }
     }
 
+    .clock-face__center {
+      background-color: mat.m2-get-color-from-palette($primary-palette) !important;
+    }
+
     .clock-face__number {
+      &.active,
       > span.active {
         background-color: mat.m2-get-color-from-palette($primary-palette) !important;
+        color: mat.m2-get-color-from-palette($primary-palette, default-contrast) !important;
       }
 
+      &.disabled,
       > span.disabled {
         color: mat.m2-get-color-from-palette($background, disabled-button) !important;
       }
 
+      &,
       > span {
         color: mat.m2-get-color-from-palette($foreground, base) !important;
       }
     }
 
-    button:not(.timepicker-dial__item) {
+    button:not(.timepicker-dial__item):not(.timepicker__time-part):not(.timepicker__meridiem-button) {
       color: mat.m2-get-color-from-palette($primary-palette) !important;
     }
   }

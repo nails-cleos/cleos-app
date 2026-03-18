@@ -8,7 +8,6 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { getMyDiscountsPage } from '../../../store/discount.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import { signal } from '@angular/core';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { MeDiscountComponent } from './me-discount.component';
 import { Analytics } from '@angular/fire/analytics';
 import { DiscountState } from '../../../store/reducers/discount.reducers';
@@ -103,7 +102,6 @@ describe('MeDiscountComponent', () => {
         { provide: Analytics, useClass: AnalyticsStub },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
-        provideNoopAnimations(),
       ],
     }).compileComponents();
 

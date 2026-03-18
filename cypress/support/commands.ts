@@ -132,16 +132,18 @@ Cypress.Commands.add('buttonClickOnTable', (
   breakpoint: string,
   column: string,
   rowClass: string,
-  rowExpandedClass,
+  rowExpandedClass: string,
   button: string,
   otherButtons?: string[],
 ) => {
   if (['XSmall', 'Small'].includes(breakpoint)) {
-    cy.get(`tr.${rowClass}`).contains('td', column).then($cell => {
+    cy.get(`tr.${rowClass}`).contains('td', column).then(($cell: any) => {
       const $row = $cell.closest('tr');
       cy.wrap($row).click({ force: true });
 
-      cy.wrap($row).next(`tr.${rowExpandedClass}`).should('be.visible').within(() => {
+      cy.wrap($row).next(`tr.${rowExpandedClass}`).should('exist').within(() => {
+        cy.get('.detail').should('have.class', 'detail-expanded');
+
         otherButtons?.forEach(otherButton => {
           cy.get('button[mat-icon-button]').contains(otherButton).should('exist');
         });
@@ -177,9 +179,23 @@ Cypress.Commands.add('formControlType', (formControlName: string, value: any, ty
 });
 
 Cypress.Commands.add('setTime', (hour: number | string, minute: number | string = 0) => {
-  cy.get('ngx-material-timepicker-content', { timeout: 5000 }).should('exist').contains(hour).click({ force: true });
-  cy.get('ngx-material-timepicker-content').contains(minute === 0 ? '00' : minute).click({ force: true });
-  cy.get('.timepicker-button').contains('Ok').click({ force: true });
+  const toDialLabel = (value: number | string): string => {
+    const numericValue = Number(value);
+    if (Number.isNaN(numericValue)) {
+      return `${value}`.trim();
+    }
+    return `${numericValue}`.padStart(2, '0');
+  };
+
+  const hourLabel = toDialLabel(hour);
+  const minuteLabel = toDialLabel(minute);
+
+  cy.get('.clock-timepicker-panel .timepicker', { timeout: 5000 }).should('exist').within(() => {
+    cy.contains('.clock-face__number', hourLabel).click({ force: true });
+    cy.contains('.clock-face__number', minuteLabel).click({ force: true });
+    cy.contains('.timepicker__actions button', /^ok$/i).click({ force: true });
+  });
+
   cy.wait(50);
 });
 

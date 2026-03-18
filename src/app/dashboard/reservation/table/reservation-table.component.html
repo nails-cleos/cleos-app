@@ -111,7 +111,7 @@
 
         <ng-container matColumnDef="expandedDetail">
           <td *matCellDef="let reservation" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
-            <div [@detailExpand]="reservation === expanded ? 'expanded' : 'collapsed'" class="detail hide-gt-xs">
+            <div [class.detail-expanded]="reservation === expanded" class="detail hide-gt-xs">
               @if (reservation.id) {
                 <mat-list>
                   <mat-list-item>

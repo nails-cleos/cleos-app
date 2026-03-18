@@ -7,7 +7,6 @@ import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { getAllCustomersInfo } from '../../../store/room.actions';
 import { IRoomCustomer } from '../../../interfaces/room';
 import { ActivatedRoute } from '@angular/router';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { RoomState } from '../../../store/reducers/room.reducers';
 
 describe('CustomersComponent', () => {
@@ -56,7 +55,6 @@ describe('CustomersComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
-        provideNoopAnimations(),
       ],
     }).compileComponents();
 

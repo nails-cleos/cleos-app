@@ -2,12 +2,12 @@
 @if (currentUpcoming) {
   <mat-card appearance="outlined">
     @if (currentUpcoming.price.isPaid) {
-      <span [@stampAnimation]="{value: ':enter', params: {deg: -20}}" class="stamp stamp-paid">
+      <span class="stamp stamp-paid stamp-enter">
         {{ 'ME.RESERVATION.UPCOMING.PAID' | translate }}
       </span>
     }
     @if (currentUpcoming.state === 'APPROVED') {
-      <span [@stampAnimation]="{value: ':enter', params: {deg: 20}}" class="stamp stamp-approved">
+      <span class="stamp stamp-approved stamp-enter">
         {{ 'ME.RESERVATION.UPCOMING.APPROVED' | translate }}
       </span>
     }
@@ -111,16 +111,17 @@
             }
           </tbody>
           @if (currentUpcoming.price) {
+            @let hasDiscount = currentUpcoming.price.total !== currentUpcoming.price.totalWithoutDiscount ||
+              currentUpcoming.price.discount > 0;
             <tfoot class="foot">
             <tr>
               <th class="right">{{ 'COMMON.LABEL.TOTAL' | translate }}</th>
-              @if (currentUpcoming.price.discount) {
+              @if (hasDiscount) {
                 <td class="left">
-                <span
-                  [class.strikethrough]="currentUpcoming.price.total !== currentUpcoming.price.totalWithoutDiscount">
+                <span [class.strikethrough]="hasDiscount">
                   {{ currentUpcoming.room.currency | currencySymbol }} {{ currentUpcoming.price.totalWithoutDiscount | number:'1.2-2' }}
                 </span>
-                  <span [@discountAnimation] class="raised-button bold">
+                  <span class="raised-button bold discount-enter">
                   {{ currentUpcoming.room.currency | currencySymbol }} {{ currentUpcoming.price.total | number:'1.2-2' }}
                 </span>
                 </td>

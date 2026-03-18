@@ -60,7 +60,6 @@ import {
   PaymentType,
   PENALTY,
 } from '../../interfaces/payment';
-import { detailExpandAnimation, transitionAnimation } from '../../util/animation';
 import { isToday, isTomorrow } from 'date-fns';
 import { ReservationIconName } from '../../util/icon';
 import { FormArray, FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
@@ -106,7 +105,6 @@ type DetailForm = {
 
 @Component({
   selector: 'app-reservation-detail',
-  animations: [transitionAnimation, detailExpandAnimation],
   templateUrl: './reservation-detail.component.html',
   styleUrls: ['./reservation-detail.component.scss'],
   imports: [SharedModule, RoomNamePipe, ReservationIconPipe, PriceExtrasComponent, PricePreviewComponent,

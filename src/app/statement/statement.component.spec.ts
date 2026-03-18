@@ -7,7 +7,6 @@ import { StatementComponent } from './statement.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IOfficeAll } from '../interfaces/office';
 import { StatementState } from '../store/reducers/statement.reducers';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { DriveAccessService } from '../services/drive-access.service';
 import { uploadStatement } from '../store/statement.actions';
 
@@ -81,7 +80,6 @@ describe('StatementComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Router, useValue: routerSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
-        provideNoopAnimations(),
       ],
     }).compileComponents();
 

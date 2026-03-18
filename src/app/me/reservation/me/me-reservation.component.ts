@@ -65,7 +65,6 @@ import {
   round,
 } from '../../../util/helper';
 import { DiscountType, IDiscount, IUserDiscount } from '../../../interfaces/discount';
-import { transitionAnimation } from '../../../util/animation';
 import { isEqual } from 'date-fns';
 import { IAdditionalAll } from '../../../interfaces/additional';
 import { MatListOption } from '@angular/material/list';
@@ -161,7 +160,6 @@ type AvailabilityData = { time: string; date: Date }
 
 @Component({
   selector: 'app-me-reservation',
-  animations: [transitionAnimation],
   templateUrl: './me-reservation.component.html',
   styleUrls: ['./me-reservation.component.scss'],
   imports: [SharedModule, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe, PriceComponent,

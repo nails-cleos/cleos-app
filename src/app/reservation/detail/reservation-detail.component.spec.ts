@@ -3,7 +3,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { BehaviorSubject, of } from 'rxjs';
-
 import { ReservationDetailComponent } from './reservation-detail.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { CancelOption, IReservationAll, States } from '../../interfaces/reservation';
@@ -20,7 +19,6 @@ import {
   updateReservationColor,
   updateReservationCustomer,
 } from '../../store/reservation.actions';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { notifyPayment, paymentSend } from '../../store/payment.actions';
 import { ServiceType } from '../../interfaces/room';
 import { IUserAll } from '../../interfaces/user';
@@ -176,7 +174,6 @@ describe('ReservationDetailComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
-        provideNoopAnimations(),
       ],
     }).compileComponents();
 

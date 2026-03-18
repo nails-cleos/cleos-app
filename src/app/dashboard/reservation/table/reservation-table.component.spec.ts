@@ -7,7 +7,6 @@ import { IReservation } from '../../../interfaces/reservation';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { deleteReservation, getPage } from '../../../store/reservation.actions';
 import { ActivatedRoute } from '@angular/router';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { ReservationTableComponent } from './reservation-table.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
 import { IUser } from '../../../interfaces/user';
@@ -107,7 +106,6 @@ describe('ReservationTableComponent', () => {
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
-        provideNoopAnimations(),
       ],
     }).compileComponents();
 

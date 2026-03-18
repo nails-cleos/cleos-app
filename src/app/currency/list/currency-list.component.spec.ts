@@ -9,7 +9,6 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagina
 import { currencySelected, deleteCurrency, getCurrenciesPage } from '../../store/currency.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { CurrencyState } from '../../store/reducers/currency.reducers';
 
 describe('CurrencyListComponent', () => {
@@ -81,7 +80,6 @@ describe('CurrencyListComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
-        provideNoopAnimations(),
       ],
     }).compileComponents();
 

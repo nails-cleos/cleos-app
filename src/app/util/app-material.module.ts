@@ -13,7 +13,6 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectModule } from '@angular/material/select';
 import { MatGridListModule } from '@angular/material/grid-list';
-import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -34,9 +33,12 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatStep, MatStepLabel, MatStepper } from '@angular/material/stepper';
+import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
+import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
 
 const materialModules = [
-  NgxMaterialTimepickerModule,
+  TimepickerComponent,
+  TimepickerDirective,
   MatAutocompleteModule,
   MatButtonModule,
   MatCardModule,

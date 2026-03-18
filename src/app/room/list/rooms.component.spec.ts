@@ -8,7 +8,6 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { deleteRoom, getRoomsPage, roomSelected } from '../../store/room.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { RoomState } from '../../store/reducers/room.reducers';
 import { RoomsComponent } from './rooms.component';
 import { ICurrencyAll } from '../../interfaces/currency';
@@ -109,7 +108,6 @@ describe('RoomsComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
-        provideNoopAnimations(),
       ],
     }).compileComponents();
 

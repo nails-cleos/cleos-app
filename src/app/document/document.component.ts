@@ -10,7 +10,6 @@ import { DocumentState } from '../store/reducers/document.reducers';
 import { cleanDocument, documentDownloadZip, documentView, getDocumentsPage } from '../store/document.actions';
 import { DriveAccessService } from '../services/drive-access.service';
 import { SharedModule } from '../shared/shared.module';
-import { detailExpandAnimation } from '../util/animation';
 import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { requireMatch } from '../util/validators';
 import { IOfficeAll } from '../interfaces/office';
@@ -34,7 +33,6 @@ type DocumentsForm = {
 @Component({
   selector: 'app-document',
   imports: [SharedModule],
-  animations: [detailExpandAnimation],
   templateUrl: './document.component.html',
   providers: [{ provide: DateAdapter, useClass: YearMonthAdapter }],
   styleUrl: './document.component.scss',

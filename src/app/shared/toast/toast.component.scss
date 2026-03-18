@@ -8,6 +8,7 @@
   background-color: var(--toast-background);
   color: var(--toast-text);
   margin-bottom: 8px;
+  animation: slideIn 300ms ease-out both;
 }
 
 @keyframes slideIn {

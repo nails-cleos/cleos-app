@@ -48,6 +48,7 @@ export class FileDropComponent {
   currentFile = input<UploadFile>();
 
   fileSelected = output<UploadFile | undefined>();
+  image = output<string>();
 
   file = signal<UploadFile | undefined>(undefined);
   isImage = signal(false);
@@ -145,6 +146,7 @@ export class FileDropComponent {
       img.onload = () => {
         const image = resizeImage(img, this.canvas()?.nativeElement || this.canvasXs()?.nativeElement);
         this.file.update(prev => prev ? { ...prev, image } : prev);
+        this.image.emit(image);
         const resizedImage = this.resizedImage();
         if (resizedImage) {
           resizedImage.nativeElement.src = image;

@@ -293,7 +293,7 @@
             <ng-container matColumnDef="expandedDetail">
               <td *matCellDef="let payment; let i = dataIndex;" [attr.colspan]="paymentDisplayedColumns.length"
                   class="hide-gt-xs">
-                <div [@detailExpand]="payment === paymentExpanded ? 'expanded' : 'collapsed'" class="detail hide-gt-xs">
+                <div [class.detail-expanded]="payment === paymentExpanded" class="detail hide-gt-xs">
                   <mat-list>
                     <div mat-subheader>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
                     @if (currentProfessionalId && ['CASH', 'TRANSFER'].includes(payment.type)) {
@@ -446,7 +446,7 @@
 
             <ng-container matColumnDef="expandedDetail">
               <td *matCellDef="let history" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
-                <div [@detailExpand]="history === expanded ? 'expanded' : 'collapsed'" class="detail hide-gt-xs">
+                <div [class.detail-expanded]="history === expanded" class="detail hide-gt-xs">
                   @if (history.id) {
                     <mat-list>
                       <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</div>

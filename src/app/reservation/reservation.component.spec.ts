@@ -1,12 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormArray, ReactiveFormsModule } from '@angular/forms';
+import { FormArray } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { BehaviorSubject, of } from 'rxjs';
-
 import { ReservationComponent } from './reservation.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
 import { BreakpointObserver } from '@angular/cdk/layout';
@@ -170,13 +168,7 @@ describe('ReservationComponent', () => {
     routerSpy.getCurrentNavigation.and.returnValue(null);
 
     await TestBed.configureTestingModule({
-      imports: [
-        ReservationComponent,
-        GoogleMapStubComponent,
-        TranslateModule.forRoot(),
-        ReactiveFormsModule,
-        BrowserAnimationsModule,
-      ],
+      imports: [ReservationComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },

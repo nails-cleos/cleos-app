@@ -15,7 +15,6 @@ import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { getCurrentTimeZone, isSameTimeZone, newDateTimestamp } from '../../util/dates';
 import { IUnavailable, IUnavailableAll } from '../../interfaces/unavailable';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { detailExpandAnimation } from '../../util/animation';
 import { createDialog } from '../../util/helper';
 import { SharedModule } from '../../shared/shared.module';
 import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
@@ -28,7 +27,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
   selector: 'app-unavailable-list',
   templateUrl: './unavailable-list.component.html',
   styleUrls: ['./unavailable-list.component.scss'],
-  animations: [detailExpandAnimation],
   imports: [SharedModule, TimeDetailPipe, DurationTimePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

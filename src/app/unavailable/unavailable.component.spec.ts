@@ -5,7 +5,6 @@ import { BehaviorSubject, of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { ChangeDetectorRef, signal } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { API_LOCALE, createEndDate, createNewDate, formatDuration, getTime, zoneDateToDate } from '../util/dates';
 import { deleteUnavailable, getUnavailable } from '../store/unavailable.actions';
 import { IUnavailableAll } from '../interfaces/unavailable';
@@ -133,7 +132,6 @@ describe('UnavailableComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
-        provideNoopAnimations(),
       ],
     }).compileComponents();
 

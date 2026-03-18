@@ -114,8 +114,8 @@
 
       <ng-container matColumnDef="expandedDetail">
         <td *matCellDef="let unavailable" [attr.colspan]="displayedColumns.length" mat-cell>
-          <div [@detailExpand]="unavailable === expandedUnavailable ? 'expanded' : 'collapsed'"
-               class="unavailable-detail">
+          <div [class.detail-expanded]="unavailable === expandedUnavailable"
+               class="detail unavailable-detail">
             <mat-list>
               <mat-list-item class="hide-gt-xs" role="list">
                 <div class="hide-gt-xs" matListItemTitle>{{ 'UNAVAILABLE.LIST.COLUMN.PROFESSIONAL' | translate }}</div>

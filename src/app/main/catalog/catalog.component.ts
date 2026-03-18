@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { ICatalogueAll } from '../../interfaces/catalogue';
 import { Store } from '@ngrx/store';
 import { MainContentService } from '../../services/main-content.service';
@@ -29,13 +29,19 @@ export class CatalogComponent {
     this.cataloguesSignal()?.forEach((it?: ICatalogueAll) => {
       if (it?.blob) {
         const image = getImage(it.blob, it.contentType);
-        catalogues.push(Object.assign({}, it, { image }));
+        catalogues.push({ ...it, image });
       }
     });
-    if (catalogues.length) {
-      this.mainContent.configure(false, 'open');
-    }
+
     return catalogues;
   });
+
+  constructor() {
+    effect(() => {
+      if (this.catalogues().length) {
+        this.mainContent.configure(false, 'open');
+      }
+    });
+  }
 }
 

@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, ElementRef, HostListener, inject, input, output } from '@angular/core';
-import { iconChange, listAnimation } from '../../../util/animation';
 import { IFabMenu } from '../../../interfaces/reservation';
 import { AppMaterialModule } from '../../../util/app-material.module';
 
@@ -7,7 +6,6 @@ import { AppMaterialModule } from '../../../util/app-material.module';
   selector: 'app-fab-menu',
   templateUrl: './fab-menu.component.html',
   styleUrls: ['./fab-menu.component.scss'],
-  animations: [listAnimation, iconChange],
   imports: [AppMaterialModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
