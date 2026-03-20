@@ -25,7 +25,6 @@ import {
 import { API_LOCALE, getDiffTime, getNowTimeZone, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
-import { transitionAnimation } from '../../../util/animation';
 import { IAdditionalAll } from '../../../interfaces/additional';
 import { MatListOption } from '@angular/material/list';
 import { IService } from '../../../interfaces/room';
@@ -63,7 +62,6 @@ type ReservationCompleteForm = {
   selector: 'app-reservation-complete',
   templateUrl: './reservation-complete.component.html',
   styleUrls: ['./reservation-complete.component.scss'],
-  animations: [transitionAnimation],
   imports: [SharedModule, TimeDetailPipe, CurrencySymbolPipe, DurationTimePipe, FormFieldAdderComponent,
     PricePreviewComponent, BackButtonDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,

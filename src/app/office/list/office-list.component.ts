@@ -9,7 +9,6 @@ import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { cleanOffice, deleteOffice, getOfficesPage, officeSelected } from '../../store/office.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
-import { detailExpandAnimation } from '../../util/animation';
 import { SharedModule } from '../../shared/shared.module';
 import { OfficeState } from '../../store/reducers/office.reducers';
 import { getOfficePaginationPipe, getOfficeResponsePipe } from '../../store/selectors/office.selectors';
@@ -19,7 +18,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
   selector: 'app-office-list',
   templateUrl: './office-list.component.html',
   styleUrls: ['./office-list.component.scss'],
-  animations: [detailExpandAnimation],
   imports: [SharedModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -10,7 +10,6 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { createReview, getCustomerReservations } from '../../../store/reservation.actions';
 import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
 import { executeDialogNoWidth, openDialog } from '../../../util/helper';
-import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { IReview, Review } from '../../../interfaces/review';
 import { ReviewDialogComponent } from '../review/review-dialog.component';
 import { isToday } from 'date-fns';
@@ -33,7 +32,6 @@ import { ReservationState } from '../../../store/reducers/reservation.reducers';
 
 @Component({
   selector: 'app-reservations',
-  animations: [transitionAnimation, stampAnimation],
   templateUrl: './reservations.component.html',
   styleUrls: ['./reservations.component.scss'],
   imports: [SharedModule, UpcomingComponent, TimeDetailPipe, ReservationIconPipe, ErrorComponent],

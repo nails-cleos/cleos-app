@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 import { concatMap } from 'rxjs/operators';
-import { cleanMain, setCurrentLang, setCurrentTreatmentId } from '../store/main.actions';
+import { cleanMain, getAllCatalogue, setCurrentLang, setCurrentTreatmentId } from '../store/main.actions';
 import { cleanCatalogue, getAllCatalogs } from '../store/catalogue.actions';
 
 @Injectable()
@@ -39,7 +39,7 @@ export class MainNavigationEffects {
 
         // 3) /{lang}/home
         if (!homePath) {
-          return [cleanMain(), setCurrentLang({ lang })];
+          return [cleanMain(), setCurrentLang({ lang }), getAllCatalogue()];
         }
 
         // 4) /{lang}/home/*

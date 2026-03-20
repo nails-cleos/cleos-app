@@ -444,7 +444,7 @@
   },
   "TREATMENTS": [
     {
-      "id": "biab",
+      "id": "biab-treatment",
       "name": "Biab Treatment",
       "description": "The GelBottle Inc™ BIAB is a thicker consistency gel, chip-resistant which helps to harden your natural nails while you wear it and offer extreme long lasting shine. BIAB tends to last around three to four weeks – sometimes longer.",
       "title": "Biab Nailstudio in Capelle aan den iJssel",
@@ -538,32 +538,32 @@
       }
     },
     {
-      "id": "gel-polish",
+      "id": "gelpolish",
       "name": "GelPolish",
       "description": "The GelPolish Colour is applied with the Biab Rubber Base Coat underneath to give extra strength to flaky, brittle, thin or splitting nails. Treatments includes manicure always. GelPolish tends to last around two to three weeks – sometimes longer."
     },
     {
-      "id": "vinylux",
+      "id": "nail-polish-cnd-vinylux",
       "name": "Nail Polish CND Vinylux",
       "description": "CND VINYLUX™ Long Wear Polish Colour finished with top coat shine which makes it way more chip-resistant than your average nail polish. It tends to last at least a week. Then you can remove it with standard nail polish remover."
     },
     {
-      "id": "e-file",
+      "id": "manicure-e-file",
       "name": "Manicure E-File",
       "description": "The E-file manicure means I perform on dry skin using different E-file bits to push back and exfoliate the dead skin which gives us a more clean and polished look. Then your nails are ready to receive the treatment you are wanting!"
     },
     {
-      "id": "toenails",
+      "id": "toenails-color",
       "name": "Toenails Color",
       "description": "Color on toenails (the treatment includes cuticles removal and shape toenails)"
     },
     {
-      "id": "repair",
+      "id": "nail-repair",
       "name": "Nail Repair",
       "description": "Fixing nails just before your treatment or when you come to me to fix one. Time and price will depend on the condition of the nail. If it happend due to a defect in the treatment itself then it will be free of charge."
     },
     {
-      "id": "spa",
+      "id": "cnd-spa-manicure",
       "name": "CND Spa Manicure",
       "description": ""
     }

@@ -15,7 +15,6 @@ import { addDays } from 'date-fns';
 import { PaymentType } from '../interfaces/payment';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { InvoiceState } from '../store/reducers/invoice.reducers';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { DriveAccessService } from '../services/drive-access.service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -152,7 +151,6 @@ describe('InvoiceComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Router, useValue: routerSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
-        provideNoopAnimations(),
       ],
     }).compileComponents();
 

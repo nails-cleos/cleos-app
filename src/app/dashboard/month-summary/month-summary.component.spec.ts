@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Store } from '@ngrx/store';
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
-import { BrowserAnimationsModule, provideNoopAnimations } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
 import { MonthSummaryComponent } from './month-summary.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
@@ -104,7 +103,6 @@ describe('MonthSummaryComponent', () => {
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
-        provideNoopAnimations(),
       ],
     }).compileComponents();
 

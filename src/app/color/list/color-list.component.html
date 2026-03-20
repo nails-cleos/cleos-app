@@ -63,7 +63,7 @@
 
       <ng-container matColumnDef="expandedDetail">
         <td *matCellDef="let color" [attr.colspan]="displayedColumns.length" class="hide-gt-xs" mat-cell>
-          <div [@detailExpand]="color === expandedColor ? 'expanded' : 'collapsed'"
+          <div [class.detail-expanded]="color === expandedColor"
                class="detail hide-gt-xs">
             <mat-list>
               @if (color.description) {

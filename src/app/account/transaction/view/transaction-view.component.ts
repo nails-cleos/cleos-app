@@ -7,7 +7,6 @@ import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateService } from '@ngx-translate/core';
 import { getTransactionsByAccountId } from '../../../store/account.actions';
-import { detailExpandAnimation } from '../../../util/animation';
 import { newDateTimestamp } from '../../../util/dates';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { SharedModule } from '../../../shared/shared.module';
@@ -20,7 +19,6 @@ import { AccountState } from '../../../store/reducers/account.reducers';
   selector: 'app-transaction-view',
   templateUrl: './transaction-view.component.html',
   styleUrls: ['./transaction-view.component.scss'],
-  animations: [detailExpandAnimation],
   imports: [SharedModule, BalanceComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

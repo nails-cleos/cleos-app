@@ -4,7 +4,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, of } from 'rxjs';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { ExpensesComponent } from './expenses.component';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../../interfaces/pagination';
@@ -170,7 +169,6 @@ describe('ExpensesComponent', () => {
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
-        provideNoopAnimations(),
       ],
     }).compileComponents();
 

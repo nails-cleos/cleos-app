@@ -3,7 +3,6 @@ import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
 import { AngularFireModule } from '@angular/fire/compat';
 import { ServiceWorkerModule } from '@angular/service-worker';
-import { provideAnimations } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app/app-routing.module';
 import { TranslateLoaderFactory } from './app/shared/translate-loader.factory';
 import { ActionReducer, MetaReducer, provideStore } from '@ngrx/store';
@@ -205,7 +204,6 @@ const providers = [
   provideAnalytics(() => getAnalytics()),
   ScreenTrackingService,
   UserTrackingService,
-  provideAnimations(),
   provideEffects(I18NEffects),
 ];
 

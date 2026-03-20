@@ -82,6 +82,9 @@ export class CatalogueComponent {
   isAddModeSignal = computed(() => !this.catalogueId());
   errors = signal<Record<string, unknown>>({});
   file = signal<UploadFile | undefined>(undefined);
+  image = signal<string | undefined>(undefined);
+
+  private selectedHome = toSignal(this.getForm.home.valueChanges);
 
   constructor() {
     effect(() => {
@@ -117,8 +120,13 @@ export class CatalogueComponent {
           progress: 100,
           image: `data:${catalogue.contentType};base64,${catalogue.blob}`,
         });
-        this.getForm.group.setValue(catalogue.treatmentGroup);
+        this.getForm.group.setValue(catalogue.group);
       }
+    });
+
+    effect(() => {
+      this.getForm.group.setValidators(this.selectedHome() ? [Validators.required, requireMatch] : [requireMatch]);
+      this.getForm.group.updateValueAndValidity({ emitEvent: false });
     });
   }
 
@@ -131,7 +139,7 @@ export class CatalogueComponent {
       return;
     }
 
-    const resizedImageDataUrl = this.file()?.image;
+    const resizedImageDataUrl = this.image() || this.file()?.image;
     if (!resizedImageDataUrl) {
       return;
     }
@@ -152,8 +160,8 @@ export class CatalogueComponent {
     }
   }
 
-  onFileSelected(file?: UploadFile) {
-    this.file.set(file);
+  onImageSelected(image?: string) {
+    this.image.set(image);
   }
 
   displayFnGroup = (group: ITreatmentGroup): string => group ? `${group.name}` : '';

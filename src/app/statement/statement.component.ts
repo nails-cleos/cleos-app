@@ -5,7 +5,6 @@ import { Store } from '@ngrx/store';
 import { getNowTimeZone, invoiceFormat } from '../util/dates';
 import { map, startWith } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
-import { detailExpandAnimation } from '../util/animation';
 import { IOfficeAll } from '../interfaces/office';
 import { requireMatch } from '../util/validators';
 import { SharedModule } from '../shared/shared.module';
@@ -31,7 +30,6 @@ type StatementForm = {
   selector: 'app-statement',
   templateUrl: './statement.component.html',
   styleUrls: ['./statement.component.scss'],
-  animations: [detailExpandAnimation],
   imports: [SharedModule, BackButtonDirective, FileDropComponent],
   providers: [{ provide: DateAdapter, useClass: YearMonthAdapter }],
   changeDetection: ChangeDetectionStrategy.OnPush,

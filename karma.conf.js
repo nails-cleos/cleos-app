@@ -1,4 +1,4 @@
-module.exports = (config: any) => {
+module.exports = (config) => {
   config.set({
     basePath: '',
     frameworks: ['jasmine', '@angular-devkit/build-angular'],
@@ -35,7 +35,7 @@ module.exports = (config: any) => {
         global: {
           statements: 80,
           branches: 60,
-          functions: 70,
+          functions: 80,
           lines: 80,
         },
       },

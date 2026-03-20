@@ -9,7 +9,6 @@ import {
 } from '@angular/forms';
 import { IExtras } from '../../interfaces/reservation';
 import { ICurrencyAll } from '../../interfaces/currency';
-import { detailExpandAnimation } from '../../util/animation';
 import { PaymentType } from '../../interfaces/payment';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -29,7 +28,6 @@ type FormFieldsForm = {
   selector: 'app-form-field-adder',
   templateUrl: './form-field-adder.component.html',
   styleUrl: './form-field-adder.component.scss',
-  animations: [detailExpandAnimation],
   imports: [AppMaterialModule, TranslatePipe, ReactiveFormsModule, CurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

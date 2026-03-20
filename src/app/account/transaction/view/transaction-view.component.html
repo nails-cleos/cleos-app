@@ -103,7 +103,7 @@
 
       <ng-container matColumnDef="expandedDetail">
         <td *matCellDef="let transaction" [attr.colspan]="displayedColumns.length" class="hide-gt-xs" mat-cell>
-          <div [@detailExpand]="transaction === expandedTransaction ? 'expanded' : 'collapsed'"
+          <div [class.detail-expanded]="transaction === expandedTransaction"
                class="detail hide-gt-xs">
             <mat-list>
               @if (transaction.payment?.description) {

@@ -4,8 +4,7 @@ on:
   push:
     branches: ['main']
   pull_request:
-    branches:
-      - 'develop'
+    branches: ['develop']
 
 jobs:
   build-and-lint:
@@ -14,13 +13,13 @@ jobs:
       TZ: "Europe/Amsterdam"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
       - name: Start timer
         run: echo "JOB_START=$(date +%s)" >> $GITHUB_ENV
 
       - name: Use Node.js 24.12.0
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 24.12.0
           cache: 'npm'
@@ -28,23 +27,37 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build app
-        run: npm run build --if-present
+      - name: Type check
+        run: |
+          npx tsc -b tsconfig.check.json --noEmit
+          echo "TYPE_CHECK_STATUS=$?" >> $GITHUB_ENV
+
+      - name: Build production app
+        run: |
+          npm run build
+          echo "BUILD_STATUS=$?" >> $GITHUB_ENV
 
       - name: Run lint
-        run: npm run lint
+        run: |
+          npm run lint
+          echo "LINT_STATUS=$?" >> $GITHUB_ENV
 
       - name: Build & Lint summary
         if: always()
         run: |
           DURATION=$(( $(date +%s) - $JOB_START ))
 
+          status_icon () {
+            if [ "$1" -eq 0 ]; then echo "✅ Passed"; else echo "❌ Failed"; fi
+          }
+
           echo "## 🏗 Build & Lint" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Step | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Build | ${{ job.status == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Lint  | ${{ job.status == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Type Check | $(status_icon $TYPE_CHECK_STATUS) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | $(status_icon $BUILD_STATUS) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint | $(status_icon $LINT_STATUS) |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- ⏱ Duration: ${DURATION}s" >> $GITHUB_STEP_SUMMARY
 
@@ -55,13 +68,13 @@ jobs:
       TZ: "Europe/Amsterdam"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
       - name: Start timer
         run: echo "JOB_START=$(date +%s)" >> $GITHUB_ENV
 
       - name: Use Node.js 24.12.0
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 24.12.0
           cache: 'npm'
@@ -72,19 +85,20 @@ jobs:
       - name: Run tests with coverage
         run: |
           node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng test --code-coverage --watch=false --browsers=ChromeHeadless
+          echo "TEST_STATUS=$?" >> $GITHUB_ENV
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
-          file: ./coverage/cleos/lcov.info
+          files: ./coverage/cleos/lcov.info
           flags: unittests
-          name: codecov-umbrella
+          name: codecov
           fail_ci_if_error: true
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Coverage Report Comment
-        uses: romeovs/lcov-reporter-action@v0.3.1
+        uses: romeovs/lcov-reporter-action@v0.4.0
         with:
           lcov-file: ./coverage/cleos/lcov.info
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -151,10 +165,10 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
       - name: Use Node.js 24.12.0
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 24.12.0
           cache: 'npm'
@@ -162,15 +176,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build app
-        run: npm run build --if-present
+      - name: Cache Cypress
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Cypress run
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v7
         with:
           install: false
           start: npm run serve
           wait-on: 'http://localhost:4300'
+          command: npm run cypress:run
           record: true
           parallel: true
           group: e2e
@@ -178,3 +196,4 @@ jobs:
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CI: true

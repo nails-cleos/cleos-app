@@ -49,7 +49,9 @@
                       <mat-option [value]="group">{{ group.name }}</mat-option>
                     }
                   </mat-autocomplete>
-                  @if (getForm.group.hasError('requireMatch')) {
+                  @if (getForm.group.hasError('required')) {
+                    <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.REQUIRED' | translate"></mat-error>
+                  } @else if (getForm.group.hasError('requireMatch')) {
                     <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate"></mat-error>
                   } @else if (errors()['group']) {
                     <mat-error>{{ errors()['group'] }}</mat-error>
@@ -67,7 +69,7 @@
                   {{ 'CATALOGUE.SHOW.CATALOG' | translate }}
                 </mat-checkbox>
               </div>
-              <app-file-drop accept="image/*" (fileSelected)="onFileSelected($event)"
+              <app-file-drop accept="image/*" (image)="onImageSelected($event)"
                              [currentFile]="file()" [undo]="!isAddModeSignal()"></app-file-drop>
             </div>
           </mat-card-content>
@@ -77,11 +79,11 @@
                     type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
             </button>
             @if (isAddMode) {
-              <button [disabled]="form.invalid || !file()" color="primary" mat-fab extended
+              <button [disabled]="form.invalid || !image()" color="primary" mat-fab extended
                       class="icon-button" type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}
               </button>
             } @else {
-              <button [disabled]="form.invalid || !file()" color="primary"
+              <button [disabled]="form.invalid" color="primary"
                       mat-fab extended class="icon-button" type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}
               </button>
             }

@@ -7,7 +7,6 @@ import { IPrice } from '../../../interfaces/treatment';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { transitionAnimation } from '../../../util/animation';
 import { Analytics, logEvent } from '@angular/fire/analytics';
 import { RoomNamePipe } from '../../../pipes/room-name.pipe';
 import { RatingComponent } from '../../../shared/rating/rating.component';
@@ -17,7 +16,6 @@ import { AppMaterialModule } from '../../../util/app-material.module';
 @Component({
   selector: 'app-review-dialog',
   templateUrl: './review-dialog.component.html',
-  animations: [transitionAnimation],
   styleUrls: ['./review-dialog.component.scss'],
   imports: [RoomNamePipe, RatingComponent, AppMaterialModule, TranslatePipe, DatePipe, DecimalPipe,
     ReactiveFormsModule],

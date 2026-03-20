@@ -2,6 +2,14 @@
   position: relative;
 }
 
+.fab-trigger .mat-icon {
+  transition: transform 200ms ease-in-out;
+}
+
+.fab-menu.open .fab-trigger .mat-icon {
+  transform: rotate(225deg);
+}
+
 .menu-items {
   position: absolute;
   top: calc(100% + 8px); /* Position the menu items below the button */
@@ -20,6 +28,24 @@
   margin-bottom: 0;
 }
 
+.menu-item-enter {
+  opacity: 0;
+  transform: translateY(-15px);
+  animation: fab-menu-item-in 500ms ease-in forwards;
+  animation-delay: var(--fab-item-delay, 0ms);
+}
+
 .fab-menu.open .menu-items {
   display: flex; /* Show the menu items when the menu is open */
+}
+
+@keyframes fab-menu-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

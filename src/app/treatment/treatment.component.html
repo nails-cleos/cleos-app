@@ -114,11 +114,11 @@
                       </mat-form-field>
                       <mat-form-field appearance="outline" class="tab-field">
                         <mat-label>{{ 'TREATMENT.DURATION.FIELD' | translate }}</mat-label>
-                        <input [format]="24" [ngxTimepicker]="t" [value]="tab.time || ''" matInput readonly required
+                        <input [format]="24" [timepicker]="t" [value]="tab.time || ''" matInput readonly required
                                id="treatment-duration"/>
                         <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
-                        <ngx-material-timepicker #t (timeSet)="setTime(tab, $event)"
-                                                 [minutesGap]="15"></ngx-material-timepicker>
+                        <app-timepicker #t (timeSet)="setTime(tab, $event)"
+                                                 [minutesGap]="15"></app-timepicker>
                         @if (tab.errors['time']) {
                           <mat-hint [innerHTML]="'TREATMENT.DURATION.' + tab.errors['time'] | translate"
                                     class="mat-mdc-form-field-error"></mat-hint>

@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { ReservationCompleteComponent } from './reservation-complete.component';
 import { BehaviorSubject, of } from 'rxjs';
 import { Store } from '@ngrx/store';

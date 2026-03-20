@@ -9,7 +9,6 @@ import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { convertDuration } from '../../util/dates';
-import { detailExpandAnimation } from '../../util/animation';
 import { executeDialogNoWidth } from '../../util/helper';
 import { SharedModule } from '../../shared/shared.module';
 import { additionalSelected, cleanAdditional, deleteAdditional, getAdditionalPage } from '../../store/additional.actions';
@@ -21,7 +20,6 @@ import { AdditionalState } from '../../store/reducers/additional.reducers';
   selector: 'app-additional-list',
   templateUrl: './additional-list.component.html',
   styleUrls: ['./additional-list.component.scss'],
-  animations: [detailExpandAnimation],
   imports: [SharedModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

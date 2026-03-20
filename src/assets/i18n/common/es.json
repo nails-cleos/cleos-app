@@ -444,7 +444,7 @@
   },
   "TREATMENTS": [
     {
-      "id": "biab",
+      "id": "biab-treatment",
       "name": "Biab Treatment",
       "description": "El GelBottle Inc™ BIAB es un gel de consistencia más espesa, resistente a las astillas, que ayuda a endurecer tus uñas naturales mientras lo usas y ofrece un brillo extremadamente duradero. El BIAB tiende a durar alrededor de tres a cuatro semanas, a veces más.",
       "title": "Biab Nailstudio in Capelle aan den iJssel",
@@ -538,32 +538,32 @@
       }
     },
     {
-      "id": "gel-polish",
+      "id": "gelpolish",
       "name": "GelPolish",
       "description": "El esmalte de GelPolish se aplica con la capa base de goma Biab debajo para brindar fuerza adicional a las uñas escamosas, quebradizas, delgadas o que se dividen. Los tratamientos incluyen siempre manicura. El esmalte de GelPolish tiende a durar alrededor de dos a tres semanas, a veces más tiempo."
     },
     {
-      "id": "vinylux",
+      "id": "nail-polish-cnd-vinylux",
       "name": "Nail Polish CND Vinylux",
       "description": "El esmalte de larga duración CND VINYLUX™, terminado con un brillo de capa superior que lo hace mucho más resistente a las astillas que tu esmalte de uñas promedio. Tiende a durar al menos una semana. Luego puedes quitarlo con quitaesmalte estándar."
     },
     {
-      "id": "e-file",
+      "id": "manicure-e-file",
       "name": "Manicure E-File",
       "description": "La manicura con lima eléctrica implica realizarla en piel seca utilizando diferentes cabezales de lima eléctrica para empujar hacia atrás y exfoliar la piel muerta, lo que nos da un aspecto más limpio y pulido. ¡Luego tus uñas están listas para recibir el tratamiento que desees!"
     },
     {
-      "id": "toenails",
+      "id": "toenails-color",
       "name": "Color para las uñas de los pies",
       "description": "Color en las uñas de los pies (el tratamiento incluye la eliminación de cutículas y dar forma a las uñas de los pies)."
     },
     {
-      "id": "repair",
+      "id": "nail-repair",
       "name": "Reparación de uñas",
       "description": "Arreglar las uñas justo antes de tu tratamiento o cuando vengas a mí para arreglar una. El tiempo y el precio dependerán de la condición de la uña. Si ocurrió debido a un defecto en el propio tratamiento, entonces será gratuito."
     },
     {
-      "id": "spa",
+      "id": "cnd-spa-manicure",
       "name": "CND Spa Manicure",
       "description": ""
     }

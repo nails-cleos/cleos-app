@@ -88,8 +88,35 @@ table {
 }
 
 .detail {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  pointer-events: none;
+  transition: grid-template-rows 225ms cubic-bezier(0.4, 0, 0.2, 1), opacity 225ms ease-in-out;
+}
+
+.detail:not(.detail-expanded) {
+  grid-template-rows: 0fr !important;
+  opacity: 0 !important;
+}
+
+.detail.detail-expanded {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.detail > * {
+  min-height: 0;
+}
+
+.detail:not(.detail-expanded) > * {
   overflow: hidden;
-  display: flex;
+}
+
+.detail.detail-expanded > * {
+  overflow: visible;
+  min-height: auto;
 }
 
 .column-large-text {
@@ -213,6 +240,20 @@ a, u {
 
 .bold {
   font-weight: bold;
+}
+
+.discount-enter {
+  opacity: 0;
+  animation: discount-fade-in 1000ms ease-out 500ms forwards;
+}
+
+@keyframes discount-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .bigger {
@@ -468,6 +509,203 @@ span.cal-event-actions {
 
 .text-top {
   vertical-align: text-top;
+}
+
+// Shared reveal and entrance animation helpers
+.enter-slide-x,
+.enter-slide-y {
+  opacity: 0;
+  animation-duration: var(--enter-duration, 1500ms);
+  animation-delay: var(--enter-delay, 0ms);
+  animation-fill-mode: both;
+  animation-timing-function: ease-in-out;
+}
+
+.enter-slide-x {
+  animation-name: enter-slide-x;
+}
+
+.enter-slide-y {
+  animation-name: enter-slide-y;
+}
+
+@keyframes enter-slide-x {
+  from {
+    transform: translateX(var(--enter-translate-x, -2000px));
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes enter-slide-y {
+  from {
+    transform: translateY(var(--enter-translate-y, -2000px));
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.reveal-x,
+.reveal-y {
+  opacity: 0;
+  transition-property: opacity, transform;
+  transition-duration: var(--reveal-duration, 500ms), var(--reveal-duration, 500ms);
+  transition-timing-function: ease-in-out, ease-in-out;
+  transition-delay: var(--reveal-exit-delay, 0ms), var(--reveal-exit-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.reveal-x {
+  transform: translateX(var(--reveal-x, -100%));
+}
+
+.reveal-y {
+  transform: translateY(var(--reveal-y, 100%));
+}
+
+.reveal-x.reveal-visible {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: var(--reveal-enter-delay, 0ms), var(--reveal-enter-delay, 0ms);
+}
+
+.reveal-y.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: var(--reveal-enter-delay, 0ms), var(--reveal-enter-delay, 0ms);
+}
+
+.fade-up-reveal {
+  opacity: 0;
+  transform: translateY(var(--fade-up-distance, 20px));
+  transition: opacity var(--fade-up-duration, 700ms) ease-in-out,
+  transform var(--fade-up-duration, 700ms) ease-in-out;
+  will-change: opacity, transform;
+}
+
+.fade-up-reveal.fade-up-reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.rubber-band-reveal {
+  transform: scale(1);
+}
+
+.rubber-band-reveal.rubber-band-reveal-visible {
+  animation: rubber-band-reveal 1000ms ease-in-out both;
+}
+
+@keyframes rubber-band-reveal {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scaleX(1.25) scaleY(0.75);
+  }
+  40% {
+    transform: scaleX(0.75) scaleY(1.25);
+  }
+  60% {
+    transform: scaleX(1.15) scaleY(0.85);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.bounce-down-reveal {
+  opacity: 0;
+  transform: translateY(-60px);
+  will-change: opacity, transform;
+}
+
+.bounce-down-reveal.bounce-down-reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+  animation: bounce-down-reveal 500ms ease-out 1 both;
+}
+
+@keyframes bounce-down-reveal {
+  0% {
+    opacity: 0;
+    transform: translateY(-60px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(12px);
+  }
+  80% {
+    transform: translateY(-4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scale-in-reveal {
+  opacity: 0;
+  transform: scale(1.15);
+}
+
+.scale-in-reveal.scale-in-reveal-visible {
+  animation: scale-in-reveal 500ms ease-in-out both;
+  animation-delay: var(--scale-in-delay, 0ms);
+}
+
+@keyframes scale-in-reveal {
+  from {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.work-fade-in {
+  opacity: 0;
+  animation: work-fade-in 500ms ease-in-out forwards;
+  animation-delay: var(--work-fade-delay, 0ms);
+}
+
+@keyframes work-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.gelatine-reveal.gelatine-reveal-visible {
+  animation: gelatine-reveal 1000ms ease-in-out both;
+}
+
+@keyframes gelatine-reveal {
+  0% {
+    transform: scale(1, 1);
+  }
+  25% {
+    transform: scale(0.9, 1.1);
+  }
+  50% {
+    transform: scale(1.1, 0.9);
+  }
+  75% {
+    transform: scale(0.95, 1.05);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
 }
 
 // fireworks
@@ -897,15 +1135,7 @@ $box-shadow2: ();
   align-items: center;
 }
 
-.work-inner-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-evenly;
-  align-items: center;
-}
-
 @media (max-width: 599px) {
-  .work-inner-container,
   .contact-inner-container {
     flex-direction: column;
   }
@@ -925,6 +1155,16 @@ $box-shadow2: ();
 
 .timepicker-backdrop-overlay {
   z-index: 1100 !important;
+}
+
+.clock-timepicker-panel .mat-mdc-dialog-container {
+  padding: 0 !important;
+}
+
+.clock-timepicker-panel .mat-mdc-dialog-container .mdc-dialog__surface {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
 }
 
 .diagonal::before {

@@ -49,6 +49,7 @@
 }
 
 .stamp {
+  --stamp-rotate: 0deg;
   border: 4px solid transparent;
   border-radius: 4px;
   display: inline-block;
@@ -66,9 +67,22 @@
 }
 
 .stamp-paid {
-  transform: rotate(-20deg);
+  --stamp-rotate: -20deg;
 }
 
 .stamp-approved {
-  transform: rotate(20deg);
+  --stamp-rotate: 20deg;
+}
+
+.stamp-enter {
+  animation: stamp-enter 500ms both;
+}
+
+@keyframes stamp-enter {
+  from {
+    transform: scale(5) rotate(var(--stamp-rotate));
+  }
+  to {
+    transform: scale(1) rotate(var(--stamp-rotate));
+  }
 }

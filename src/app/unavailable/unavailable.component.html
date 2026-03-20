@@ -69,9 +69,9 @@
                       <mat-form-field appearance="outline" class="full-margin">
                         <mat-label>{{ 'UNAVAILABLE.TIME.FIELD' | translate }}</mat-label>
                         <input (focusin)="focusin()" [formControl]="getForm.startTime" [format]="24" [max]="maxTime"
-                               [min]="minTime" [ngxTimepicker]="time" matInput name="start_time" readonly/>
+                               [min]="minTime" [timepicker]="time" matInput name="start_time" readonly/>
                         <span matPrefix><mat-icon (click)="time.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
-                        <ngx-material-timepicker #time [minutesGap]="15"></ngx-material-timepicker>
+                        <app-timepicker #time [minutesGap]="15"></app-timepicker>
                         @if (getForm.startTime.hasError('required')) {
                           <mat-error [innerHTML]="'UNAVAILABLE.TIME.REQUIRED' | translate"></mat-error>
                         }
@@ -82,10 +82,10 @@
                 @if (showDuration() && !getForm.allDay.value) {
                   <mat-form-field appearance="outline">
                     <mat-label>{{ 'UNAVAILABLE.DURATION.FIELD' | translate }}</mat-label>
-                    <input [formControl]="getForm.duration" [format]="24" [max]="durationMax" [ngxTimepicker]="t" matInput
+                    <input [formControl]="getForm.duration" [format]="24" [max]="durationMax" [timepicker]="t" matInput
                            name="duration" readonly/>
                     <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
-                    <ngx-material-timepicker #t [minutesGap]="15"></ngx-material-timepicker>
+                    <app-timepicker #t [minutesGap]="15"></app-timepicker>
                     @if (getForm.duration.hasError('required')) {
                       <mat-error [innerHTML]="'UNAVAILABLE.DURATION.REQUIRED' | translate"></mat-error>
                     } @else if (errors()['duration']) {

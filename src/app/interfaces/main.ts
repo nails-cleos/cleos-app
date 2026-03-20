@@ -1,4 +1,3 @@
-import { ITreatmentGroup } from './treatment';
 import { WritableSignal } from '@angular/core';
 
 export interface ISlide {
@@ -28,10 +27,11 @@ export interface IAnimation {
 export type IStory = IAnimation;
 
 export interface IWork {
+  id: string;
   image: string;
   title: string;
   detail?: string;
-  group: ITreatmentGroup;
+  groupId?: string;
 }
 
 export interface IExperience extends IAnimation {

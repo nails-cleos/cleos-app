@@ -7,7 +7,6 @@ import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth
 import { TranslateModule } from '@ngx-translate/core';
 import { ActivatedRoute } from '@angular/router';
 import { IMonthlyExport, IMonthlySummaryExpense, IMonthlySummarySale, ISummaryTotal } from '../../interfaces/dashboard';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import fs from 'file-saver';
 import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { signal } from '@angular/core';
@@ -39,7 +38,6 @@ describe('YearSummaryComponent', () => {
     await TestBed.configureTestingModule({
       imports: [YearSummaryComponent, TranslateModule.forRoot()],
       providers: [
-        provideNoopAnimations(),
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },

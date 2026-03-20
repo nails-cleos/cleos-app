@@ -1,0 +1,158 @@
+.timepicker {
+  border-radius: 12px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.timepicker__header {
+  display: flex;
+  justify-content: center;
+  padding: 14px 16px;
+  position: relative;
+}
+
+.timepicker__time-part {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font-size: 34px;
+  font-weight: 500;
+  line-height: 1;
+  opacity: 0.65;
+  padding: 4px;
+}
+
+.timepicker__time-part.active {
+  opacity: 1;
+}
+
+.timepicker__separator {
+  font-size: 34px;
+  line-height: 1;
+  opacity: 0.95;
+}
+
+.timepicker__meridiem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-left: 12px;
+}
+
+.timepicker__meridiem-button {
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: inherit;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+  padding: 2px 6px;
+}
+
+.timepicker__meridiem-button.active {
+  opacity: 1;
+}
+
+.timepicker__body {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.clock-face {
+  --timepicker-hand-angle: 0deg;
+  --timepicker-hand-length: 40%;
+  border-radius: 50%;
+  height: 260px;
+  position: relative;
+  width: 260px;
+}
+
+.clock-face__clock-hand {
+  height: 2px;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) rotate(calc(var(--timepicker-hand-angle) - 90deg));
+  transform-origin: left center;
+  width: var(--timepicker-hand-length);
+}
+
+.clock-face__clock-hand::after {
+  background-color: currentColor;
+  border-radius: 50%;
+  content: '';
+  height: 14px;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translate(50%, -50%);
+  width: 14px;
+}
+
+.clock-face__clock-hand::before {
+  background-color: currentColor;
+  border-radius: 50%;
+  content: '';
+  height: 8px;
+  left: -1px;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+}
+
+.clock-face__center {
+  border-radius: 50%;
+  height: 8px;
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+}
+
+.clock-face__number {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  font-size: 13px;
+  font-weight: 500;
+  height: 36px;
+  justify-content: center;
+  line-height: 1;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 36px;
+}
+
+.clock-face__number.disabled {
+  cursor: default;
+}
+
+.timepicker__actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding: 0 12px 10px;
+}
+
+@media (max-width: 420px) {
+  .clock-face {
+    height: 220px;
+    width: 220px;
+  }
+
+  .clock-face__number {
+    font-size: 12px;
+    height: 30px;
+    width: 30px;
+  }
+}

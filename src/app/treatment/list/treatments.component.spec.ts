@@ -9,7 +9,6 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagina
 import { deleteTreatmentGroup, getTreatmentsPage } from '../../store/treatment.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { TreatmentState } from '../../store/reducers/treatment.reducers';
 
 describe('TreatmentsComponent', () => {
@@ -79,7 +78,6 @@ describe('TreatmentsComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
-        provideNoopAnimations(),
       ],
     }).compileComponents();
 

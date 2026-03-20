@@ -170,19 +170,25 @@
             <div matListItemLine>
               <span [innerHTML]="'ME.RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"></span>
               @if (isEditing) {
+                @let editingPrice = ((price.priceWithDiscount || price.priceWithDiscount === 0) ?
+                  price.priceWithDiscount : treatment.price);
                 <span class="raised-button">
-                  {{ room?.currency | currencySymbol }} {{ (price.priceWithDiscount ? price.priceWithDiscount : treatment.price) | number:'1.2-2' }}
+                  {{ room?.currency | currencySymbol }} {{ editingPrice | number:'1.2-2' }}
                 </span>
-                @if (price.priceWithDiscount) {
+                @if (price.priceWithDiscount || price.priceWithDiscount === 0) {
                   <span class="raised-button bold">{{ 'ME.RESERVATION.TREATMENT.DISCOUNT.ADD' | translate }}</span>
                 }
               } @else {
-                <span [class.strikethrough]="getTreatmentForm.discount.value" class="raised-button">
+                @let hasDiscount = !!getTreatmentForm.discount.value ||
+                  price.total !== price.totalWithoutDiscount || price.discount > 0;
+                @let discountedPrice = ((price.priceWithDiscount || price.priceWithDiscount === 0) ?
+                  price.priceWithDiscount : treatment.price);
+                <span [class.strikethrough]="hasDiscount" class="raised-button">
                     {{ room?.currency | currencySymbol }} {{ treatment.price | number:'1.2-2' }}
                 </span>
-                @if (price.priceWithDiscount) {
-                  <span [@discountAnimation] class="raised-button bold">
-                    {{ room?.currency | currencySymbol }} {{ price.priceWithDiscount | number:'1.2-2' }}
+                @if (hasDiscount) {
+                  <span class="raised-button bold discount-enter">
+                    {{ room?.currency | currencySymbol }} {{ discountedPrice | number:'1.2-2' }}
                   </span>
                 }
               }
@@ -356,6 +362,7 @@
               </mat-list-item>
             } @else {
               <app-price-preview [price]="price" [currencyIcon]="room?.currency?.icon" [isEditing]="isEditing"
+                                 [discountId]="getTreatmentForm.discount.value"
                                  [discountKey]="'ME.RESERVATION.TREATMENT.DISCOUNT.ADD'"></app-price-preview>
             }
             <mat-divider></mat-divider>
@@ -387,6 +394,7 @@
               </mat-list-item>
               <app-price-preview [price]="price" [currencyIcon]="room?.currency?.icon"
                                  [isEditing]="isEditing"
+                                 [discountId]="getTreatmentForm.discount.value"
                                  [discountKey]="'ME.RESERVATION.TREATMENT.DISCOUNT.ADD'"></app-price-preview>
             }
             <app-payment-preview [type]="getTypeForm.type.value" [bank]="getTypeForm.bank.value"
