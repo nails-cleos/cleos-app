@@ -84,7 +84,6 @@ import {
   PENALTY,
 } from '../../../interfaces/payment';
 import { AuthUserService } from '../../../services/auth-user.service';
-import { Analytics, logEvent } from '@angular/fire/analytics';
 import {
   completeAndNext,
   enableStep,
@@ -123,6 +122,7 @@ import { ToastService } from '../../../services/toast.service';
 import { IError } from '../../../interfaces/common';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { BankForm } from '../../../shared/bank/bank.component';
+import { FirebaseService } from '../../../services/firebase.service';
 
 const MAX_UPCOMING_RESERVATION = 10;
 
@@ -178,8 +178,8 @@ export class MeReservationComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly router: Router = inject(Router);
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly analytic: Analytics = inject(Analytics);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
+  private readonly firebaseService = inject(FirebaseService);
 
   private navigationParams$ = this.store.pipe(getMeNavigationParamsPipe);
   private reservationId$ = this.store.pipe(getCurrentReservationIdPipe);
@@ -487,7 +487,7 @@ export class MeReservationComponent {
     effect(() => {
       const reservationId = this.reservationIdSignal();
       if (reservationId) {
-        logEvent(this.analytic, 'screen_view', {
+        this.firebaseService.logEvent('screen_view', {
           // eslint-disable-next-line camelcase
           firebase_screen: `Edit customer reservation ${reservationId}`,
           // eslint-disable-next-line camelcase
@@ -837,7 +837,7 @@ export class MeReservationComponent {
     this.roomId = this.room.id;
     this.setTypes();
     this.getTreatmentList(this.room.id);
-    completeAndNext(this.steps, this.myStepper, goNext, this.analytic);
+    completeAndNext(this.steps, this.myStepper, goNext, this.firebaseService);
   };
 
   callStepThree = (goNext: boolean): void => {
@@ -847,7 +847,7 @@ export class MeReservationComponent {
     this.isPreview = false;
     this.treatmentId = this.getTreatmentForm.treatment.value?.id;
     this.getAdditionalList();
-    completeAndNext(this.steps, this.myStepper, goNext, this.analytic);
+    completeAndNext(this.steps, this.myStepper, goNext, this.firebaseService);
   };
 
   callStepFour = (goNext: boolean): void => {
@@ -876,7 +876,7 @@ export class MeReservationComponent {
         additionalIds: additionalSelected?.map(additional => additional.id),
       }),
     );
-    completeAndNext(this.steps, this.myStepper, goNext, this.analytic);
+    completeAndNext(this.steps, this.myStepper, goNext, this.firebaseService);
   };
 
   callStepFive = (goNext: boolean): void => {
@@ -889,7 +889,7 @@ export class MeReservationComponent {
       this.date.getMinutes() + this.duration.minute);
 
     this.isPayment = true;
-    completeAndNext(this.steps, this.myStepper, goNext, this.analytic);
+    completeAndNext(this.steps, this.myStepper, goNext, this.firebaseService);
   };
 
   callStepSix = (goNext: boolean): void => {
@@ -898,7 +898,7 @@ export class MeReservationComponent {
     }
 
     this.isPreview = true;
-    completeAndNext(this.steps, this.myStepper, goNext, this.analytic);
+    completeAndNext(this.steps, this.myStepper, goNext, this.firebaseService);
   };
 
   getStepName = (index: number): string => getStepName(this.steps, index);
@@ -1005,7 +1005,7 @@ export class MeReservationComponent {
   };
 
   private canNotContinue = (message: string, type: string): void => {
-    logEvent(this.analytic, 'screen_view', {
+    this.firebaseService.logEvent('screen_view', {
       // eslint-disable-next-line camelcase
       firebase_screen: `Customer cannot ${type} a reservation`,
       // eslint-disable-next-line camelcase
@@ -1082,7 +1082,7 @@ export class MeReservationComponent {
       }
       this.getTreatmentList(roomId);
     }
-    completeAndNext(this.steps, this.myStepper, true, this.analytic);
+    completeAndNext(this.steps, this.myStepper, true, this.firebaseService);
   };
 
   private setTypes = (): void => {

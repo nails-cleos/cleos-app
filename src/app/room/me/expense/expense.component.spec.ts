@@ -11,7 +11,6 @@ import { getExpense } from '../../../store/expense.actions';
 import { getNowTimeZone } from '../../../util/dates';
 import { computed, signal } from '@angular/core';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
-import { Auth } from '@angular/fire/auth';
 import { callAwsLambda } from '../../../store/aws.actions';
 import { DriveAccessService } from '../../../services/drive-access.service';
 import { EnvService } from '../../../services/env.service';
@@ -25,7 +24,6 @@ describe('ExpenseComponent', () => {
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let navigateSpy: jasmine.Spy;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
-  let authSpy: jasmine.SpyObj<Auth>;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
 
   let roomId$: BehaviorSubject<any>;
@@ -86,15 +84,6 @@ describe('ExpenseComponent', () => {
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
     });
-    authSpy = jasmine.createSpyObj('Auth', ['onIdTokenChanged'], {
-      currentUser: null,
-    });
-
-    authSpy.onIdTokenChanged.and.callFake((callback: any) => {
-      callback(null);
-      return () => {
-      };
-    });
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
@@ -125,7 +114,6 @@ describe('ExpenseComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
-        { provide: Auth, useValue: authSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
         { provide: TokenService, useValue: tokenServiceMock },
       ],

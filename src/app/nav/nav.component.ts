@@ -209,7 +209,6 @@ export class NavComponent {
           this.messagingService.requestPermission(user);
           this.resetTheme(user.theme);
         }
-        this.messagingService.receiveMessage();
       }
     });
 

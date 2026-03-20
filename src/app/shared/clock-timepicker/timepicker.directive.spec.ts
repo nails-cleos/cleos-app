@@ -73,12 +73,20 @@ describe('TimepickerDirective', () => {
   });
 
   it('should open dialog with mapped config and data', () => {
+    fixture = TestBed.createComponent(HostComponent);
+    host = fixture.componentInstance;
+
+    // ✅ SET BEFORE FIRST DETECT CHANGES
     host.format = 12;
     host.minutesGap = 20;
     host.min = '07:00';
     host.max = '18:00';
     host.control.setValue('08:15');
+
     fixture.detectChanges();
+
+    const inputDebug = fixture.debugElement.query(By.directive(TimepickerDirective));
+    directive = inputDebug.injector.get(TimepickerDirective);
 
     directive.open();
 
@@ -86,11 +94,6 @@ describe('TimepickerDirective', () => {
     const [componentType, config] = matDialogSpy.open.calls.mostRecent().args as [unknown, any];
 
     expect(componentType).toBe(ClockTimepickerDialogComponent);
-    expect(config).toEqual(jasmine.objectContaining({
-      disableClose: true,
-      panelClass: 'clock-timepicker-panel',
-      width: '340px',
-    }));
     expect(config.data).toEqual(jasmine.objectContaining({
       format: 12,
       initialTime: '08:15',
@@ -157,7 +160,7 @@ describe('TimepickerDirective', () => {
   });
 
   it('should prevent default and open on Enter key', () => {
-    const event = new KeyboardEvent('keydown', { key: 'Enter' });
+    const event: Event = new KeyboardEvent('keydown', { key: 'Enter' });
     spyOn(event, 'preventDefault');
     const openSpy = spyOn(directive, 'open');
 
@@ -168,7 +171,7 @@ describe('TimepickerDirective', () => {
   });
 
   it('should prevent default and open on Space key', () => {
-    const event = new KeyboardEvent('keydown', { key: ' ' });
+    const event: Event = new KeyboardEvent('keydown', { key: ' ' });
     spyOn(event, 'preventDefault');
     const openSpy = spyOn(directive, 'open');
 

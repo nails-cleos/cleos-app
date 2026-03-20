@@ -9,9 +9,9 @@ import { login, loginFailure, loginSuccess, logOut, redirect, reLogin } from '..
 import { TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../../services/navigation.service';
 import { AuthUserService } from '../../services/auth-user.service';
-import { Auth, signOut } from '@angular/fire/auth';
 import { getLocale } from '../../util/helper';
 import { Token } from '../../interfaces/token';
+import { FirebaseService } from '../../services/firebase.service';
 
 @Injectable()
 export class LoginEffects {
@@ -20,8 +20,8 @@ export class LoginEffects {
   private readonly authService: AuthService = inject(AuthService);
   private readonly router: Router = inject(Router);
   private readonly navigationService: NavigationService = inject(NavigationService);
-  private readonly auth: Auth = inject(Auth);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
+  private readonly firebaseService = inject(FirebaseService);
 
   login$ = createEffect(() => this.actions.pipe(
     ofType(login),
@@ -64,7 +64,7 @@ export class LoginEffects {
   logOut$ = createEffect(() => this.actions.pipe(
     ofType(logOut),
     tap(() => {
-      signOut(this.auth).then(() => {
+      this.firebaseService.signOut().then(() => {
         this.authUserService.reloadUser();
         localStorage.removeItem('auth');
         window.location.href = `/${getLocale(this.translate.getCurrentLang()).language}/home`;

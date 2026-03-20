@@ -10,7 +10,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { getThemeName, isDarkMode, resetTheme, Theme, THEME } from '../util/theme';
 import { ThemeService } from 'ng2-charts';
 import { goTo, observeElementSignal } from '../util/animation';
-import { Auth, user } from '@angular/fire/auth';
 import { AuthUserService } from '../services/auth-user.service';
 import { MainContentService } from '../services/main-content.service';
 import { updateMyUser } from '../store/main.actions';
@@ -21,6 +20,7 @@ import { getCurrentLangPipe } from '../store/selectors/main.selectors';
 import { MainState } from '../store/reducers/main.reducers';
 import { EnvService } from '../services/env.service';
 import { filter } from 'rxjs';
+import { FirebaseService } from '../services/firebase.service';
 
 @Component({
   selector: 'app-main',
@@ -38,17 +38,16 @@ export class MainComponent {
   private readonly overlayContainer: OverlayContainer = inject(OverlayContainer);
   private readonly cookieService: CookieService = inject(CookieService);
   private readonly themeService: ThemeService = inject(ThemeService);
-  private readonly auth: Auth = inject(Auth);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly mainContent: MainContentService = inject(MainContentService);
   private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly firebaseService = inject(FirebaseService);
 
   private authUserSignal = this.authUserService.authUser;
   private lang$ = this.store.pipe(getCurrentLangPipe);
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.Handset]);
 
   private langSignal = toSignal(this.lang$);
-  private userSignal = toSignal(user(this.auth), { initialValue: null });
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -64,7 +63,7 @@ export class MainComponent {
 
   isHandsetSignal = computed(() => this.breakpointsSignal()?.matches ?? false);
   isDarkMode = signal(isDarkMode(this.cookieService.get(THEME) as Theme));
-  isAuthenticated = computed(() => !!this.userSignal());
+  isAuthenticated = this.firebaseService.isAuthenticated;
 
   title = this.env.title;
   firstSection?: Element | null;

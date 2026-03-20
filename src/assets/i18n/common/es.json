@@ -266,7 +266,7 @@
         "FIELD": "Contraseña",
         "REQUIRED": "Contraseña es <b>requerido</b>",
         "WRONG": "Email o contraseña incorrecto",
-        "WEEK": "Contraseña es devil"
+        "WEAK": "Contraseña es devil"
       },
       "PHONE": {
         "FIELD": "Teléfono",

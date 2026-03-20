@@ -3,21 +3,10 @@ import { Store } from '@ngrx/store';
 import { cleanAuth, login, redirect, setCurrentCode, signupSuccess } from '../store/auth.actions';
 import { ActivatedRoute } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
-import {
-  Auth,
-  createUserWithEmailAndPassword,
-  GoogleAuthProvider,
-  sendEmailVerification,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  updateProfile,
-  user,
-} from '@angular/fire/auth';
 import { VERIFICATION_EMAIL } from '../util/helper';
 import { THEME } from '../util/theme';
 import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
-import { fetchSignInMethodsForEmail } from '@firebase/auth';
 import { SharedModule } from '../shared/shared.module';
 import { ToastService } from '../services/toast.service';
 import {
@@ -31,6 +20,8 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthState } from '../store/reducers/auth.reducers';
 import { EnvService } from '../services/env.service';
+import { FirebaseService } from '../services/firebase.service';
+import { User } from 'firebase/auth';
 
 type AuthForm = {
   email: FormControl<string>;
@@ -48,13 +39,13 @@ type AuthForm = {
 })
 export class AuthComponent {
   private readonly env: EnvService = inject(EnvService);
-  private readonly auth: Auth = inject(Auth);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly store: Store<AuthState> = inject(Store<AuthState>);
   private readonly route: ActivatedRoute = inject(ActivatedRoute);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly cookieService: CookieService = inject(CookieService);
   private readonly translate: TranslateService = inject(TranslateService);
+  private readonly firebaseService = inject(FirebaseService);
 
   private currentCode$ = this.store.pipe(getCurrentCodePipe);
   private isAuthenticated$ = this.store.pipe(getIsAuthenticatedPipe);
@@ -70,7 +61,6 @@ export class AuthComponent {
   private errorSignal = toSignal(this.error$);
   private responseSignal = toSignal(this.response$);
   private codeSignal = toSignal(this.currentCode$);
-  private userSignal = toSignal(user(this.auth), { initialValue: null });
 
   statusSignal = signal('init');
 
@@ -85,6 +75,7 @@ export class AuthComponent {
     displayName: this.formBuilder.control(undefined),
   });
   private emailSignal = toSignal(this.getForm.email.valueChanges, { initialValue: '' });
+  private currentCodeSignal = toSignal(this.getForm.code.valueChanges, { initialValue: undefined });
 
   language: string = this.translate.getCurrentLang();
   showForm: boolean = false;
@@ -122,46 +113,21 @@ export class AuthComponent {
     });
 
     effect(() => {
-      const user = this.userSignal();
+      const user = this.firebaseService.user();
       if (!user) {
         return;
       }
 
-      untracked(() => {
-        const displayName = this.getForm.displayName.value;
-
-        if (displayName) {
-          updateProfile(user, { displayName }).catch(console.error);
-        }
-
-        if (!user.emailVerified && !this.cookieService.get(VERIFICATION_EMAIL)) {
-          sendEmailVerification(user).then(() => {
-            const message = this.translate.instant('AUTH.ACTIVATE_ACCOUNT.MESSAGE');
-            this.store.dispatch(signupSuccess({ message }));
-            this.cookieService.set(VERIFICATION_EMAIL, 'sent');
-          }).catch(console.error);
-          return;
-        }
-
-        user.getIdToken().then(idToken => {
-          this.store.dispatch(
-            login({
-              token: idToken,
-              queryParams: this.route.snapshot.queryParams,
-              theme: this.cookieService.get(THEME),
-              code: this.codeSignal(),
-            }),
-          );
-        });
-      });
+      untracked(() => this.processUser(user));
     });
 
     effect(() => {
-      const code = this.getForm.code.value;
+      const code = this.currentCodeSignal();
       if (code) {
         this.store.dispatch(setCurrentCode({ code }));
       }
     });
+
     effect(() => {
       this.emailSignal();
       this.statusSignal.set('init');
@@ -176,7 +142,7 @@ export class AuthComponent {
     if (this.form.valid) {
       const displayName = this.getForm.displayName.value;
       if (displayName) {
-        createUserWithEmailAndPassword(this.auth, this.getForm.email.value, this.getForm.password.value)
+        this.firebaseService.signUp(this.getForm.email.value, this.getForm.password.value)
           .catch(err => {
             console.error('An error happen trying to createUserWithEmailAndPassword', err);
             switch (err.code) {
@@ -184,7 +150,7 @@ export class AuthComponent {
                 this.getForm.email.setErrors({ email: true });
                 break;
               case 'auth/weak-password':
-                this.getForm.password.setErrors({ week: true });
+                this.getForm.password.setErrors({ weak: true });
                 break;
               default:
                 this.getForm.password.setErrors({ error: err.message });
@@ -192,7 +158,7 @@ export class AuthComponent {
             }
           });
       } else {
-        signInWithEmailAndPassword(this.auth, this.getForm.email.value, this.getForm.password.value).catch(err => {
+        this.firebaseService.signIn(this.getForm.email.value, this.getForm.password.value).catch(err => {
           console.error('An error happen trying to signInWithEmailAndPassword', err);
           if (err.code === 'auth/wrong-password') {
             this.getForm.password.setErrors({ wrong: true });
@@ -205,12 +171,12 @@ export class AuthComponent {
   }
 
   loginWithGoogle(): void {
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(this.auth, provider).catch(err => console.error('An error happen trying to signInWithPopup', err));
+    this.firebaseService.signInWithGoogle()
+      .catch(err => console.error('An error happen trying to signInWithPopup', err));
   }
 
   validateEmail(): void {
-    fetchSignInMethodsForEmail(this.auth, this.getForm.email.value).then(response => {
+    this.firebaseService.fetchSignInMethods(this.getForm.email.value).then(response => {
       const displayNameControl = this.getForm.displayName;
       if (!response.length) {
         displayNameControl?.setValidators([Validators.required]);
@@ -221,5 +187,39 @@ export class AuthComponent {
       displayNameControl?.updateValueAndValidity();
       this.statusSignal.set(response.join('|'));
     }).catch(err => console.error('An error happen trying to fetchSignInMethodsForEmail', err));
+  }
+
+  private processUser(user: User) {
+    const displayName = this.getForm.displayName.value;
+
+    if (displayName) {
+      this.firebaseService.updateProfile({ displayName }).catch(console.error);
+    }
+
+    if (!user.emailVerified && !this.cookieService.get(VERIFICATION_EMAIL)) {
+      this.firebaseService.sendVerificationEmail()
+        .then(() => {
+          const message = this.translate.instant('AUTH.ACTIVATE_ACCOUNT.MESSAGE');
+          this.store.dispatch(signupSuccess({ message }));
+          this.cookieService.set(VERIFICATION_EMAIL, 'sent');
+        })
+        .catch(console.error);
+      return;
+    }
+
+    this.firebaseService.getIdToken()
+      .then(idToken => {
+        if (!idToken) {
+          return;
+        }
+        this.store.dispatch(
+          login({
+            token: idToken,
+            queryParams: this.route.snapshot.queryParams,
+            theme: this.cookieService.get(THEME),
+            code: this.codeSignal(),
+          }),
+        );
+      });
   }
 }

@@ -7,11 +7,11 @@ import { IPrice } from '../../../interfaces/treatment';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { Analytics, logEvent } from '@angular/fire/analytics';
 import { RoomNamePipe } from '../../../pipes/room-name.pipe';
 import { RatingComponent } from '../../../shared/rating/rating.component';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { AppMaterialModule } from '../../../util/app-material.module';
+import { FirebaseService } from '../../../services/firebase.service';
 
 @Component({
   selector: 'app-review-dialog',
@@ -25,7 +25,7 @@ export class ReviewDialogComponent {
   private readonly dialogRef: MatDialogRef<ReviewDialogComponent> = inject(MatDialogRef<ReviewDialogComponent>);
   private readonly data = inject<IReservationAll>(MAT_DIALOG_DATA);
   private readonly translate: TranslateService = inject(TranslateService);
-  private readonly analytic: Analytics = inject(Analytics);
+  private readonly firebaseService = inject(FirebaseService);
 
   reservation?: IReservationAll;
   end?: Date;
@@ -47,7 +47,7 @@ export class ReviewDialogComponent {
       const duration = reservationDuration(this.data);
       this.end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
     });
-    logEvent(this.analytic, 'screen_view', {
+    this.firebaseService.logEvent('screen_view', {
       // eslint-disable-next-line camelcase
       firebase_screen: 'Review page',
       // eslint-disable-next-line camelcase

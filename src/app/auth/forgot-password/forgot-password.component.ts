@@ -3,8 +3,6 @@ import { Store } from '@ngrx/store';
 import { signupSuccess } from '../../store/auth.actions';
 import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Auth } from '@angular/fire/auth';
-import { sendPasswordResetEmail } from '@firebase/auth';
 import { TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../../shared/shared.module';
 import { BackButtonDirective } from '../../directives/back-button.directive';
@@ -12,6 +10,7 @@ import { ToastService } from '../../services/toast.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getAuthErrorPipe, getAuthResponsePipe } from '../../store/selectors/auth.selectors';
 import { AuthState } from '../../store/reducers/auth.reducers';
+import { FirebaseService } from '../../services/firebase.service';
 
 type ForgotPasswordForm = {
   email: FormControl<string>;
@@ -29,8 +28,8 @@ export class ForgotPasswordComponent {
   private readonly toastService: ToastService = inject(ToastService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly router: Router = inject(Router);
-  private readonly auth: Auth = inject(Auth);
   private readonly translate: TranslateService = inject(TranslateService);
+  private readonly firebaseService = inject(FirebaseService);
 
   private error$ = this.store.pipe(getAuthErrorPipe);
   private response$ = this.store.pipe(getAuthResponsePipe);
@@ -68,7 +67,7 @@ export class ForgotPasswordComponent {
   }
 
   forgotPassword(): void {
-    sendPasswordResetEmail(this.auth, this.getForm.email.value.trim()).then(() => {
+    this.firebaseService.sendPasswordResetEmail(this.getForm.email.value.trim()).then(() => {
       const message = this.translate.instant('AUTH.FORGOT_PASSWORD.MESSAGE');
       this.store.dispatch(signupSuccess({ message }));
     }).catch(e => console.error(`Error sending reset password. ${e}`));

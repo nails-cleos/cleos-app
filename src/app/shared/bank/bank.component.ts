@@ -4,7 +4,7 @@ import { requireMatch } from '../../util/validators';
 import { IPaymentOption, PaymentPercentage } from '../../interfaces/payment';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslateModule } from '@ngx-translate/core';
-import { CommonModule } from '@angular/common';
+
 import { map, startWith } from 'rxjs/operators';
 
 export type BankForm = {
@@ -17,7 +17,7 @@ export type BankForm = {
   selector: 'app-bank',
   templateUrl: './bank.component.html',
   styleUrls: ['./bank.component.scss'],
-  imports: [CommonModule, AppMaterialModule, TranslateModule, ReactiveFormsModule, FormsModule],
+  imports: [AppMaterialModule, TranslateModule, ReactiveFormsModule, FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BankComponent {

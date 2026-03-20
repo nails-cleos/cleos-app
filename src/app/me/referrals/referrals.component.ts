@@ -4,7 +4,6 @@ import { Clipboard } from '@angular/cdk/clipboard';
 import { TranslateService } from '@ngx-translate/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { AuthUserService } from '../../services/auth-user.service';
-import { Analytics, logEvent } from '@angular/fire/analytics';
 import { SharedModule } from '../../shared/shared.module';
 import { ToastService } from '../../services/toast.service';
 import { BottomSheetShareComponent } from './bottom-sheet-share.component';
@@ -12,6 +11,7 @@ import { BottomSheetReferralComponent } from './bottom-sheet-referral.component'
 import { getReferralsPipe } from '../../store/selectors/discount.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DiscountState } from '../../store/reducers/discount.reducers';
+import { FirebaseService } from '../../services/firebase.service';
 
 @Component({
   selector: 'app-referrals',
@@ -26,8 +26,8 @@ export class ReferralsComponent {
   private readonly toastService: ToastService = inject(ToastService);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly bottomSheet: MatBottomSheet = inject(MatBottomSheet);
-  private readonly analytic: Analytics = inject(Analytics);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
+  private readonly firebaseService = inject(FirebaseService);
 
   private referrals$ = this.store.pipe(getReferralsPipe);
 
@@ -44,7 +44,7 @@ export class ReferralsComponent {
   showShare = signal(false);
 
   constructor() {
-    logEvent(this.analytic, 'screen_view', {
+    this.firebaseService.logEvent('screen_view', {
       // eslint-disable-next-line camelcase
       firebase_screen: 'Referral page',
       // eslint-disable-next-line camelcase

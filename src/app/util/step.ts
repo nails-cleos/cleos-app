@@ -1,16 +1,20 @@
 import { IStep } from '../interfaces/step';
 import { MatStepper } from '@angular/material/stepper';
-import { Analytics, logEvent } from '@angular/fire/analytics';
+import { FirebaseService } from '../services/firebase.service';
 
-export const completeAndNext = (steps: IStep[], myStepper: MatStepper, goNext: boolean,
-  analytics?: Analytics): void => {
+export const completeAndNext = (
+  steps: IStep[],
+  myStepper: MatStepper,
+  goNext: boolean,
+  firebaseService?: FirebaseService,
+): void => {
   setTimeout(() => {
     const step = getStep(steps, myStepper.selectedIndex - (goNext ? 0 : 1));
     if (step) {
-      if (analytics) {
-        logEvent(analytics, 'screen_view', {
+      if (firebaseService) {
+        firebaseService.logEvent('screen_view', {
           // eslint-disable-next-line camelcase
-          firebase_screen: `Customer reservation. Step: ${ step?.name }`,
+          firebase_screen: `Customer reservation. Step: ${step?.name}`,
           // eslint-disable-next-line camelcase
           firebase_screen_class: 'MeReservationComponent',
         });

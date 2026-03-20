@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 declare namespace Cypress {
   interface Chainable {
     randomUUID(): Chainable<string>;
@@ -34,6 +35,8 @@ declare namespace Cypress {
     mockFirebase(email: string): Chainable<any>;
 
     mockNotifications(): Chainable<any>;
+
+    mockCatalogues(): Chainable<any>;
 
     mockCustomerReservations(): Chainable<any>;
 
@@ -199,16 +202,42 @@ Cypress.Commands.add('setTime', (hour: number | string, minute: number | string 
   cy.wait(50);
 });
 
-const firebaseUser = (email: string, displayName?: string, kind?: string) => ({
-  kind: kind,
-  idToken: 'mock-id-token',
-  email: email,
-  displayName: displayName,
-  photoUrl: null,
-  refreshToken: 'mock-refresh-token',
-  expiresIn: '3600',
-  localId: '12345',
-});
+const createFakeJwt = (payload: Record<string, any>) => {
+  const base64 = (obj: object) =>
+    btoa(JSON.stringify(obj))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
+
+  const header = base64({ alg: 'HS256', typ: 'JWT' });
+  const body = base64(payload);
+  const signature = 'mock-signature';
+
+  return `${header}.${body}.${signature}`;
+};
+
+const firebaseUser = (email: string, displayName?: string, kind?: string) => {
+  const now = Math.floor(Date.now() / 1000);
+
+  const idToken = createFakeJwt({
+    sub: '12345',
+    email,
+    name: displayName,
+    iat: now,
+    exp: now + 3600,
+  });
+
+  return {
+    kind: kind,
+    idToken,
+    email: email,
+    displayName: displayName,
+    photoUrl: null,
+    refreshToken: 'mock-refresh-token',
+    expiresIn: now + 3600,
+    localId: '12345',
+  };
+};
 
 const dashboardNoContent = (displayName: string, messageKey: string) => ({
   professionalName: displayName,
@@ -361,6 +390,28 @@ Cypress.Commands.add('mockLogin', (email: string, displayName: string, role: str
     statusCode: 200,
     body: firebaseUser(email, displayName, 'identitytoolkit#UpdateAccountResponse'),
   }).as('updateProfileSuccess');
+
+  cy.intercept('POST', 'https://securetoken.googleapis.com/v1/token*',
+    (req: any) => {
+      const now = Math.floor(Date.now() / 1000);
+
+      req.reply({
+        statusCode: 200,
+        body: {
+          access_token: createFakeJwt({
+            sub: '12345',
+            email: 'test@test.com',
+            iat: now,
+            exp: now + 3600,
+          }),
+          expires_in: '3600',
+          token_type: 'Bearer',
+          refresh_token: 'mock-refresh-token',
+          user_id: '12345',
+        },
+      });
+    },
+  ).as('refreshToken');
 });
 
 Cypress.Commands.add('mockFirebase', (email: string) => {
@@ -428,6 +479,17 @@ Cypress.Commands.add('mockNotifications', () => {
       body: null,
     },
   ).as('getNotifications');
+});
+
+Cypress.Commands.add('mockCatalogues', () => {
+  cy.intercept(
+    'GET',
+    new RegExp('/api/v1/catalogues\\?home=true'),
+    {
+      statusCode: 204,
+      body: null,
+    },
+  ).as('getCatalogues');
 });
 
 Cypress.Commands.add('mockCustomerReservations', () => {

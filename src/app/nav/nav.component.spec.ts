@@ -258,7 +258,6 @@ describe('NavComponent', () => {
       .toHaveBeenCalledWith(getNotificationsPage({ page: 0, sort: 'date', direction: 'desc', size: PAGE_SIZE }));
 
     expect(messagingServiceSpy.requestPermission).toHaveBeenCalledWith(mockUser);
-    expect(messagingServiceSpy.receiveMessage).toHaveBeenCalled();
   });
 
   it('should receive notifications', () => {

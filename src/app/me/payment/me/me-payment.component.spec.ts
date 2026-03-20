@@ -2,14 +2,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MePaymentComponent } from './me-payment.component';
 import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
-import { Analytics } from '@angular/fire/analytics';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 import { getPayment, paymentOptions, updatePaymentById } from '../../../store/payment.actions';
 import { PaymentPercentage, PaymentType } from '../../../interfaces/payment';
 import { ActivatedRoute } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
-import { AnalyticsStub } from '../../../util/firebase-stub';
 
 describe('MePaymentComponent', () => {
   let component: MePaymentComponent;
@@ -55,7 +53,6 @@ describe('MePaymentComponent', () => {
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
-        { provide: Analytics, useClass: AnalyticsStub },
         provideHttpClient(),
       ],
     }).compileComponents();

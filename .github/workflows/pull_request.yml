@@ -188,11 +188,10 @@ jobs:
           install: false
           start: npm run serve
           wait-on: 'http://localhost:4300'
-          command: npm run cypress:run
           record: true
           parallel: true
           group: e2e
-          ci-build-id: e2e-${{ github.run_id }}
+          ci-build-id: ${{ github.workflow }}-${{ github.run_id }}-${{ github.run_attempt }}
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

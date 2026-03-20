@@ -4,7 +4,7 @@ import { from, Observable } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { TokenService } from '../services/token.service';
 import { isExternalUrl } from './index';
-import { Auth } from '@angular/fire/auth';
+import { FirebaseService } from '../services/firebase.service';
 
 const withAuthHeaders = (
   req: HttpRequest<unknown>,
@@ -17,9 +17,12 @@ const withAuthHeaders = (
   },
 });
 
-export const authInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> => {
+export const authInterceptor = (
+  req: HttpRequest<unknown>,
+  next: HttpHandlerFn,
+): Observable<HttpEvent<unknown>> => {
   const tokenService = inject(TokenService);
-  const auth = inject(Auth);
+  const firebaseService = inject(FirebaseService);
 
   if (isExternalUrl(req.url) || req.url.includes('login')) {
     return next(req);
@@ -30,20 +33,21 @@ export const authInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn):
     return next(withAuthHeaders(req, token, tokenService.driveToken()));
   }
 
-  return from(auth.authStateReady()).pipe(
+  return from(firebaseService.authStateReady()).pipe(
     switchMap(() => {
       const restoredToken = tokenService.token();
       if (restoredToken) {
         return next(withAuthHeaders(req, restoredToken, tokenService.driveToken()));
       }
 
-      const firebaseUser = auth.currentUser;
-      if (!firebaseUser) {
-        return next(req);
-      }
+      return from(firebaseService.getIdToken()).pipe(
+        switchMap((idToken) => {
+          if (!idToken) {
+            return next(req);
+          }
 
-      return from(firebaseUser.getIdToken()).pipe(
-        switchMap((idToken: string) => next(withAuthHeaders(req, idToken, tokenService.driveToken()))),
+          return next(withAuthHeaders(req, idToken, tokenService.driveToken()));
+        }),
         catchError(() => next(req)),
       );
     }),

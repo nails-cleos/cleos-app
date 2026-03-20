@@ -17,9 +17,9 @@ import { By } from '@angular/platform-browser';
   imports: [BackButtonDirective],
 })
 class HostComponent {
-  form: FormGroup | undefined = undefined;
-  date: Date | undefined = undefined;
-  step: number | undefined = undefined;
+  form?: FormGroup;
+  date?: Date;
+  step?: number;
 }
 
 describe('BackButtonDirective', () => {
@@ -42,14 +42,22 @@ describe('BackButtonDirective', () => {
 
     fixture = TestBed.createComponent(HostComponent);
     hostComp = fixture.componentInstance;
+
+    // ✅ Set all inputs before detectChanges
+    hostComp.date = new Date(2026, 2, 20);
+    hostComp.step = 1;
+    hostComp.form = new FormGroup({ test: new FormControl('') });
+
     fixture.detectChanges();
 
+    // ✅ Query directive after inputs are stable
     const debugEl = fixture.debugElement.query(By.directive(BackButtonDirective));
     directive = debugEl.injector.get(BackButtonDirective);
 
     translateService = TestBed.inject(TranslateService);
     translateService.use('en-GB');
 
+    // ✅ Spy on dialog AFTER directive is queried
     dialogSpy = spyOn(directive.dialog, 'open');
   });
 
@@ -58,17 +66,9 @@ describe('BackButtonDirective', () => {
   });
 
   it('should call navigation.back when form is pristine', () => {
-    const form = new FormGroup({
-      test: new FormControl(''),
-    });
-    hostComp.form = form;
-    hostComp.date = new Date();
-    hostComp.step = 1;
-    fixture.detectChanges();
+    hostComp.form?.markAsPristine(); // ensure pristine
 
-    dialogSpy.and.returnValue({
-      afterClosed: () => of(form),
-    });
+    dialogSpy.and.returnValue({ afterClosed: () => of(hostComp.form) });
 
     directive.onClick();
 
@@ -76,39 +76,21 @@ describe('BackButtonDirective', () => {
   });
 
   it('should call navigation.back when no form is provided', () => {
-    hostComp.date = new Date();
-    hostComp.step = 2;
-    fixture.detectChanges();
+    hostComp.form = undefined;
 
     directive.onClick();
-
-    dialogSpy.and.returnValue({
-      afterClosed: () => of(directive.form()),
-    });
 
     expect(navigationServiceSpy.back).toHaveBeenCalledWith(hostComp.date, hostComp.step);
   });
 
   it('should show dialog when form is dirty', () => {
-    const form = new FormGroup({
-      test: new FormControl(''),
-    });
-    form.markAsDirty();
-    hostComp.form = form;
-    fixture.detectChanges();
+    hostComp.form?.markAsDirty();
 
     translateService.setTranslation('en-GB', {
-      COMMON: {
-        BACK: {
-          TITLE: 'Back Title',
-          CONTENT: 'Back Content',
-        },
-      },
+      COMMON: { BACK: { TITLE: 'Back Title', CONTENT: 'Back Content' } },
     });
 
-    dialogSpy.and.returnValue({
-      afterClosed: () => of(form),
-    });
+    dialogSpy.and.returnValue({ afterClosed: () => of(hostComp.form) });
 
     directive.onClick();
 

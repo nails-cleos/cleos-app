@@ -87,9 +87,8 @@ describe('BlockAgendaComponent', () => {
   const today = new Date();
   const daysUntilMonday = (1 + 7 - today.getDay()) % 7 || 7;
 
-  const nextMonday = new Date(today);
-  nextMonday.setDate(today.getDate() + daysUntilMonday);
-  nextMonday.setHours(12, 0, 0, 0);
+  const nextMonday = new Date(
+    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + daysUntilMonday, 12, 0, 0));
 
   beforeEach(async () => {
     navigationParams$ = new BehaviorSubject(undefined);
@@ -225,15 +224,15 @@ describe('BlockAgendaComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.minTime).toBe('10:00');
-    expect(component.maxTime).toBe('19:00');
+    expect(component.minTime).toBe('11:00');
+    expect(component.maxTime).toBe('20:00');
     expect(component.roomAvailability).toEqual(
       {
         availabilities: mockRoom.availabilities.filter(av => av !== undefined),
       } as IRoomAll,
     );
     expect(component.showDuration()).toBeTrue();
-    expect(component.durationMax).toBe('07:00');
+    expect(component.durationMax).toBe('06:00');
   });
 
   it('should not dispatch action when form is invalid', () => {
@@ -444,7 +443,7 @@ describe('BlockAgendaComponent', () => {
     expect(component['rooms']()).toEqual([mockRoom]);
     expect(component.showDuration()).toBeTrue();
     expect(component.getForm.startDate.value).toBe(nextMonday);
-    expect(component.getForm.startTime.value).toBe('12:00');
+    expect(component.getForm.startTime.value).toBe('14:00');
     expect(component.getForm.duration.value).toBeUndefined();
   });
 
