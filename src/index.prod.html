@@ -131,8 +131,105 @@
             }
           }
         ]
+      },
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "name": "Nails Cleos Breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": {
+              "@id": "https://www.nailscleos.nl/",
+              "name": "Home"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Treatments",
+            "item": [
+              {
+                "@type": "Thing",
+                "@id": "https://www.nailscleos.nl/en-GB#treatments",
+                "name": "Treatments (English)"
+              },
+              {
+                "@type": "Thing",
+                "@id": "https://www.nailscleos.nl/es#treatments",
+                "name": "Treatments (Español)"
+              }
+            ]
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Biab",
+            "item": [
+              {
+                "@type": "Thing",
+                "@id": "https://www.nailscleos.nl/en-GB/biab/treatment",
+                "name": "Biab (English)"
+              },
+              {
+                "@type": "Thing",
+                "@id": "https://www.nailscleos.nl/es/biab/treatment",
+                "name": "Biab (Español)"
+              }
+            ]
+          }
+        ]
+      },
+      "faqPage": {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "name": "Nails Cleos FAQs",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is your return policy?",
+            "inLanguage": "en",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Our return policy lasts 30 days...",
+              "inLanguage": "en"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Cuál es su política de devoluciones?",
+            "inLanguage": "es",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Nuestra política de devoluciones dura 30 días...",
+              "inLanguage": "es"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do you ship internationally?",
+            "inLanguage": "en",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, we ship to over 100 countries...",
+              "inLanguage": "en"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Realizan envíos internacionales?",
+            "inLanguage": "es",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí, enviamos a más de 100 países...",
+              "inLanguage": "es"
+            }
+          }
+        ]
       }
     }
+    // TODO update faqs
   </script>
   <base href="/"/>
 
@@ -251,9 +348,9 @@
   <link href="assets/icons/icon-57x57.png" rel="apple-touch-icon-precomposed" sizes="57x57"/>
   <link href="assets/icons/icon-72x72.png" rel="apple-touch-icon" sizes="72x72"/>
 
-  <link as="image" href="assets/icons/icon-512x512.png" rel="preload"/>
-  <link as="font" href="styles.scss" rel="preload"/>
-  <link as="style" href="styles.scss" rel="stylesheet"/>
+  <link rel="preload" href="assets/icons/icon-512x512.png" as="image"/>
+  <link rel="stylesheet" href="styles.scss"/>
+  <link rel="preload" href="styles.scss" as="style">
 
   <link crossorigin="" href="https://nailscleos.nl" rel="preconnect"/>
   <link href="manifest.json" rel="manifest"/>

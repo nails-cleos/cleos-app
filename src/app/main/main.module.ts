@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MainRoutingModule } from './main-routing.module';
 import { provideEffects } from '@ngrx/effects';
-
 import { MainComponent } from './main.component';
 import { MainContentComponent } from './main-content/main-content.component';
 import { CatalogComponent } from './catalog/catalog.component';
@@ -25,12 +24,14 @@ import { MAIN_FEATURE_KEY, mainReducer } from '../store/reducers/main.reducers';
 import { MainNavigationEffects } from './main-navigation.effects';
 import { I18NState } from '../store/reducers/i18n.reducers';
 import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
+import { FaqComponent } from './faq/faq.component';
 
 @NgModule({
   imports: [
     MainComponent,
     MainContentComponent,
     CatalogComponent,
+    FaqComponent,
     PrivacyComponent,
     TermsAndConditionsComponent,
     BottomSheetBookAppointmentComponent,
