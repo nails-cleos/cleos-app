@@ -1,0 +1,30 @@
+<mat-form-field appearance="outline" class="color-field">
+  <mat-label>{{ label() }}</mat-label>
+  <input matInput type="text" [formControl]="control()" [attr.data-cy]="dataCy()" (blur)="normalizeTypedValue()">
+  <button mat-icon-button matSuffix type="button" [attr.id]="triggerId()" (click)="picker.click()">
+    <span class="color-swatch" [style.background-color]="previewColor()"></span>
+  </button>
+  <input #picker class="native-color-input" type="color" [value]="previewColor()" [attr.aria-label]="label()"
+         (input)="updateFromPicker($event)">
+  @if (control().hasError('invalidColor') && invalidText()) {
+    <mat-error>{{ invalidText() }}</mat-error>
+  }
+</mat-form-field>
+
+@if (controlValue()) {
+  <mat-card appearance="outlined" class="color-preview-card" [style.background-color]="previewCardBackground()">
+    <mat-card-header>
+      <mat-card-subtitle [style.color]="previewTitleColor()">
+        {{ previewTitle() }}
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div [style.background-color]="controlValue()"
+           [style.border-color]="previewBorderColor()"
+           [style.color]="previewTextColor()"
+           class="reservation-example">
+        {{ previewText() }}
+      </div>
+    </mat-card-content>
+  </mat-card>
+}

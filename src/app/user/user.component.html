@@ -96,81 +96,27 @@
                                 [markInfo]="'<b>' + (formattedAddress || user?.address?.name) + '</b>'">
                 </app-google-map>
                 @if (isProfessionalOrManager) {
-                  <mat-form-field appearance="outline">
-                    <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.DARK.FIELD' | translate }}</mat-label>
-                    <input matInput [cpOutputFormat]="'hex'" [colorPicker]="getForm.darkColor.value"
-                           (colorPickerChange)="getForm.darkColor.setValue($event)"
-                           [style.background]="getForm.darkColor.value" [style.color]="'#000'"
-                           [formControl]="getForm.darkColor" [cpPosition]="'top'"
-                           #darkColorPicker="ngxColorPicker" style="margin-right: 5px"
-                           data-cy="dark-color-picker"/>
-                    <mat-icon matSuffix style="cursor: pointer" (click)="darkColorPicker.openDialog()"
-                              id="darkColorIcon">
-                      palette
-                    </mat-icon>
-                    @if (getForm.darkColor.hasError('invalidColor')) {
-                      <mat-error>
-                        {{ 'COMMON.PROFESSIONAL.COLOR.INVALID' | translate }}
-                      </mat-error>
-                    }
-                  </mat-form-field>
-                  <mat-form-field appearance="outline">
-                    <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.LIGHT.FIELD' | translate }}</mat-label>
-                    <input matInput [cpOutputFormat]="'hex'" [colorPicker]="getForm.lightColor.value"
-                           (colorPickerChange)="getForm.lightColor.setValue($event)"
-                           [style.background]="getForm.lightColor.value" [style.color]="'#fff'"
-                           [formControl]="getForm.lightColor" [cpPosition]="'top'"
-                           #lightColorPicker="ngxColorPicker" style="margin-right: 5px"
-                           data-cy="light-color-picker"/>
-                    <mat-icon matSuffix style="cursor: pointer" (click)="lightColorPicker.openDialog()"
-                              id="lightColorIcon">
-                      palette
-                    </mat-icon>
-                    @if (getForm.lightColor.hasError('invalidColor')) {
-                      <mat-error>
-                        {{ 'COMMON.PROFESSIONAL.COLOR.INVALID' | translate }}
-                      </mat-error>
-                    }
-                  </mat-form-field>
-                  <div style="width: 100%; display: table;">
-                    <div style="display: table-row">
-                      <div style="display: table-cell;">
-                        @if (getForm.darkColor.value) {
-                          <mat-card appearance="outlined" [style.background-color]="'#363636'">
-                            <mat-card-header>
-                              <mat-card-subtitle [style.color]="'#fafafa'">
-                                {{ 'COMMON.PROFESSIONAL.COLOR.DARK.RESERVATION' | translate }}
-                              </mat-card-subtitle>
-                            </mat-card-header>
-                            <mat-card-content>
-                              <div [style.background-color]="getForm.darkColor.value"
-                                   [style.border-color]="lightenDarkenColor(getForm.darkColor.value, true)"
-                                   [style.color]="'#000'" class="reservation-example">
-                                {{ 'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate }}
-                              </div>
-                            </mat-card-content>
-                          </mat-card>
-                        }
-                      </div>
-                      <div style="display: table-cell;">
-                        @if (getForm.lightColor.value) {
-                          <mat-card appearance="outlined" [style.background-color]="'#fafafa'">
-                            <mat-card-header>
-                              <mat-card-subtitle [style.color]="'#363636'">
-                                {{ 'COMMON.PROFESSIONAL.COLOR.LIGHT.RESERVATION' | translate }}
-                              </mat-card-subtitle>
-                            </mat-card-header>
-                            <mat-card-content>
-                              <div [style.background-color]="getForm.lightColor.value"
-                                   [style.border-color]="lightenDarkenColor(getForm.lightColor.value, false)"
-                                   [style.color]="'#fff'" class="reservation-example">
-                                {{ 'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate }}
-                              </div>
-                            </mat-card-content>
-                          </mat-card>
-                        }
-                      </div>
-                    </div>
+                  <div class="color-picker-row">
+                    <app-color-picker
+                      [label]="'COMMON.PROFESSIONAL.COLOR.DARK.FIELD' | translate"
+                      [control]="getForm.darkColor"
+                      [invalidText]="'COMMON.PROFESSIONAL.COLOR.INVALID' | translate"
+                      [previewMode]="'dark'"
+                      [previewTitle]="'COMMON.PROFESSIONAL.COLOR.DARK.RESERVATION' | translate"
+                      [previewText]="'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate"
+                      [dataCy]="'dark-color-picker'"
+                      [triggerId]="'darkColorIcon'">
+                    </app-color-picker>
+                    <app-color-picker
+                      [label]="'COMMON.PROFESSIONAL.COLOR.LIGHT.FIELD' | translate"
+                      [control]="getForm.lightColor"
+                      [invalidText]="'COMMON.PROFESSIONAL.COLOR.INVALID' | translate"
+                      [previewMode]="'light'"
+                      [previewTitle]="'COMMON.PROFESSIONAL.COLOR.LIGHT.RESERVATION' | translate"
+                      [previewText]="'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate"
+                      [dataCy]="'light-color-picker'"
+                      [triggerId]="'lightColorIcon'">
+                    </app-color-picker>
                   </div>
                 }
               </div>

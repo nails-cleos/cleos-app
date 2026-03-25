@@ -16,7 +16,6 @@ import { fieldChange, validColorValidator, valueChange } from '../../util/valida
 import { flags, IFlag } from '../../util/flags';
 import { createAddress, getDisplayNameInitials, getLocale, getUserImage } from '../../util/helper';
 import { backendFormatDate, createDateFromString, newDate } from '../../util/dates';
-import { lightenDarkenColor } from '../../util/color';
 import { Role } from '../../interfaces/token';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { resizeImage } from '../../util/file';
@@ -25,11 +24,11 @@ import { GoogleMapComponent, GoogleMapForm } from '../../shared/google-map/googl
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
 import { NgIcon } from '@ng-icons/core';
-import { ColorPickerDirective } from 'ngx-color-picker';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getSelectedUserPipe, getSubErrorsPipe, getUserResponsePipe } from '../../store/selectors/user.selectors';
 import { IError } from '../../interfaces/common';
 import { UserState } from '../../store/reducers/user.reducers';
+import { ColorPickerComponent } from '../../shared/color-picker/color-picker.component';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 
@@ -48,7 +47,7 @@ type ProfileForm = {
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
   imports: [SharedModule, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective, NgIcon,
-    ColorPickerDirective],
+    ColorPickerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileComponent {
@@ -269,8 +268,6 @@ export class ProfileComponent {
       reader.readAsDataURL(file);
     }
   };
-
-  lightenDarkenColor = (color: string, isDark: boolean): string => lightenDarkenColor(color, isDark ? 50 : -50);
 
   getAddress = (placeResult: PlaceResult): void => {
     this.geometry = placeResult.geometry;

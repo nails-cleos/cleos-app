@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { getUser, saveUser } from '../store/user.actions';
 import { IUser, User } from '../interfaces/user';
 import { flags, IFlag } from '../util/flags';
-import { lightenDarkenColor, randomColor } from '../util/color';
+import { randomColor } from '../util/color';
 import { backendFormatDate, createDateFromString, newDate } from '../util/dates';
 import { fieldChange, validColorValidator, valueChange } from '../util/validators';
 import { createAddress } from '../util/helper';
@@ -15,7 +15,6 @@ import { GoogleMapComponent, GoogleMapForm } from '../shared/google-map/google-m
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
 import { NgIcon } from '@ng-icons/core';
-import { ColorPickerDirective } from 'ngx-color-picker';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { UserState } from '../store/reducers/user.reducers';
 import {
@@ -25,6 +24,7 @@ import {
   getSubErrorsPipe,
 } from '../store/selectors/user.selectors';
 import { IError } from '../interfaces/common';
+import { ColorPickerComponent } from '../shared/color-picker/color-picker.component';
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 import PlaceResult = google.maps.places.PlaceResult;
 
@@ -45,7 +45,7 @@ type UserForm = {
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss'],
   imports: [SharedModule, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective,
-    NgIcon, ColorPickerDirective],
+    NgIcon, ColorPickerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserComponent {
@@ -226,8 +226,6 @@ export class UserComponent {
       this.store.dispatch(saveUser({ user }));
     }
   }
-
-  lightenDarkenColor = (color: string, isDark: boolean): string => lightenDarkenColor(color, isDark ? 50 : -50);
 
   getAddress = (placeResult: PlaceResult): void => {
     this.geometry = placeResult.geometry;

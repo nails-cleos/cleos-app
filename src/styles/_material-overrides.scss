@@ -1,0 +1,35 @@
+.mat-mdc-header-cell, .mat-column-actions {
+  text-align: center !important;
+}
+
+mat-header-cell, mat-cell {
+  justify-content: center;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+}
+
+/* offsets the header by the same amount of size/padding the sort button occupies */
+.mat-sort-header-container {
+  margin-left: 18px;
+}
+
+.mat-mdc-row, .mat-mdc-header-row {
+  border-bottom-width: 0;
+}
+
+.mat-mdc-raised-button {
+  .mat-icon {
+    display: inherit !important;
+    margin-right: 5px;
+  }
+}
+
+.clock-timepicker-panel .mat-mdc-dialog-container {
+  padding: 0 !important;
+}
+
+.clock-timepicker-panel .mat-mdc-dialog-container .mdc-dialog__surface {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
