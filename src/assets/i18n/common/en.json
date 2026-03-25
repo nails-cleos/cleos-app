@@ -266,7 +266,7 @@
         "FIELD": "Password",
         "REQUIRED": "Password is <b>required</b>",
         "WRONG": "Email or password is incorrect",
-        "WEEK": "Password is week"
+        "WEAK": "Password is weak"
       },
       "PHONE": {
         "FIELD": "Phone",

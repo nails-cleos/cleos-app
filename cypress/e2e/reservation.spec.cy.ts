@@ -28,12 +28,14 @@ devices.forEach(({ name, width, height, breakpoints }) => {
     reservationDate.setDate(reservationDate.getDate() + diffToWednesday);
     beforeEach(() => {
       cy.mockAuthentication(email, 'ROLE_ADMIN');
-      cy.visit('en-GB/reservation');
-      cy.mockFirebaseAppCheck();
       cy.mockNotifications();
+      cy.mockCatalogues();
       cy.mockCustomersData(customerId, treatmentId);
       cy.mockRoomData(customerId);
       cy.mockSearch(customerId, roomId, groupId, professionalId, reservationDate, days);
+
+      cy.visit('en-GB/reservation');
+      cy.mockFirebaseAppCheck();
     });
 
     it('should create a reservation', () => {

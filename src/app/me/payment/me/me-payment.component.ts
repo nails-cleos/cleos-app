@@ -9,7 +9,6 @@ import {
   PaymentPercentage,
   PaymentType,
 } from '../../../interfaces/payment';
-import { Analytics, logEvent } from '@angular/fire/analytics';
 import { TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../../../shared/shared.module';
 import { BankComponent, BankForm } from '../../../shared/bank/bank.component';
@@ -23,6 +22,7 @@ import {
   getSelectedPaymentPipe,
 } from '../../../store/selectors/payment.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { FirebaseService } from '../../../services/firebase.service';
 
 @Component({
   selector: 'app-me-payment',
@@ -34,8 +34,8 @@ import { toSignal } from '@angular/core/rxjs-interop';
 export class MePaymentComponent {
   private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly analytic: Analytics = inject(Analytics);
   private readonly translate: TranslateService = inject(TranslateService);
+  private readonly firebaseService = inject(FirebaseService);
 
   private paymentId$ = this.store.pipe(getCurrentPaymentIdPipe);
   private payment$ = this.store.pipe(getSelectedPaymentPipe);
@@ -59,7 +59,7 @@ export class MePaymentComponent {
     effect(() => {
       const id = this.paymentIdSignal();
       if (id) {
-        logEvent(this.analytic, 'screen_view', {
+        this.firebaseService.logEvent('screen_view', {
           // eslint-disable-next-line camelcase
           firebase_screen: `Customer missing payment ${id}`,
           // eslint-disable-next-line camelcase

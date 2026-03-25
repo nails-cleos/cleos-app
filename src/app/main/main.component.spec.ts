@@ -3,7 +3,6 @@ import { MainComponent } from './main.component';
 import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Auth } from '@angular/fire/auth';
 import { AuthUserService, initialAuthUser } from '../services/auth-user.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
@@ -24,7 +23,6 @@ describe('MainComponent', () => {
   let navigateSpy: jasmine.Spy;
 
   let storeSpy: jasmine.SpyObj<Store<MainState>>;
-  let authSpy: jasmine.SpyObj<Auth>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let mainContentServiceSpy: jasmine.SpyObj<MainContentService>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
@@ -45,9 +43,6 @@ describe('MainComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['attachLang']);
     mainContentServiceSpy = jasmine.createSpyObj('MainContentService', [], {
       value: { showPreload: false, navigationHeader: 'close', showArrow: false },
-    });
-    authSpy = jasmine.createSpyObj('Auth', ['onIdTokenChanged'], {
-      currentUser: null,
     });
     tokenServiceSpy = jasmine.createSpyObj('TokenService', ['token'], {
       setToken: '',
@@ -71,17 +66,11 @@ describe('MainComponent', () => {
 
     paramMapSpy.get.and.returnValue('en');
     navigationServiceSpy.attachLang.and.returnValue('en');
-    authSpy.onIdTokenChanged.and.callFake((callback: any) => {
-      callback(null);
-      return () => {
-      };
-    });
 
     await TestBed.configureTestingModule({
       imports: [MainComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
-        { provide: Auth, useValue: authSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MainContentService, useValue: mainContentServiceSpy },

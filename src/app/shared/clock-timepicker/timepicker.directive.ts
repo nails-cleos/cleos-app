@@ -46,13 +46,13 @@ export class TimepickerDirective implements OnDestroy {
   }
 
   @HostListener('keydown.enter', ['$event'])
-  onEnter(event: KeyboardEvent): void {
+  onEnter(event: Event): void {
     event.preventDefault();
     this.open();
   }
 
   @HostListener('keydown.space', ['$event'])
-  onSpace(event: KeyboardEvent): void {
+  onSpace(event: Event): void {
     event.preventDefault();
     this.open();
   }

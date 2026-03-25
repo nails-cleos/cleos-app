@@ -7,10 +7,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { ToastService } from '../../services/toast.service';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { Analytics } from '@angular/fire/analytics';
 import { provideHttpClient } from '@angular/common/http';
 import { DiscountState } from '../../store/reducers/discount.reducers';
-import { AnalyticsStub } from '../../util/firebase-stub';
 import { signal } from '@angular/core';
 
 describe('ReferralsComponent', () => {
@@ -56,7 +54,6 @@ describe('ReferralsComponent', () => {
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: MatBottomSheet, useValue: bottomSheetSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
-        { provide: Analytics, useClass: AnalyticsStub },
         provideHttpClient(),
       ],
     }).compileComponents();

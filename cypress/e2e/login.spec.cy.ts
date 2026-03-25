@@ -64,7 +64,6 @@ devices.forEach(({ name, width, height }) => {
         it(`Login with existing user with role: ${role}`, () => {
           cy.visit('en-GB/auth');
           cy.mockFirebaseAppCheck();
-          cy.mockNotifications();
           cy.mockCreateAuthUri(true, ['password']);
           cy.mockFirebase(email);
           cy.mockLogin(email, displayName, role);

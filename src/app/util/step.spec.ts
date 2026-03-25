@@ -1,3 +1,5 @@
+/* eslint-disable camelcase */
+
 import { MatStepper } from '@angular/material/stepper';
 
 import { Step } from '../interfaces/step';
@@ -13,6 +15,7 @@ import {
   getStepOptional,
   goNextStep,
 } from './step';
+import { FirebaseService } from '../services/firebase.service';
 
 describe('Step Utils', () => {
   describe('goNextStep', () => {
@@ -166,6 +169,26 @@ describe('Step Utils', () => {
       expect(stepper.next).not.toHaveBeenCalled();
       expect(steps[1].completed).toBeTrue();
       expect(enabledNextCall).not.toHaveBeenCalled();
+    });
+
+    it('should log the screen view when firebase service is provided', () => {
+      const current = new Step(1, 'current', jasmine.createSpy('currentCall') as unknown as (goNext: boolean) => void);
+      const steps = [
+        new Step(0, 'first', jasmine.createSpy('first') as unknown as (goNext: boolean) => void),
+        current,
+      ];
+      const stepper = {
+        selectedIndex: 1,
+        next: jasmine.createSpy('next'),
+      } as unknown as MatStepper;
+      const firebaseService = jasmine.createSpyObj<FirebaseService>('FirebaseService', ['logEvent']);
+
+      completeAndNext(steps, stepper, true, firebaseService);
+      jasmine.clock().tick(101);
+
+      expect(firebaseService.logEvent).toHaveBeenCalledWith('screen_view', jasmine.objectContaining({
+        firebase_screen: 'Customer reservation. Step: current',
+      }));
     });
   });
 });

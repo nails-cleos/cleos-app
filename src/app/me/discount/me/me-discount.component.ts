@@ -7,13 +7,13 @@ import { TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { cleanDiscount, getMyDiscountsPage } from '../../../store/discount.actions';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Analytics, logEvent } from '@angular/fire/analytics';
 import { SharedModule } from '../../../shared/shared.module';
 import { currencySymbol } from '../../../util/helper';
-import { getMyDiscountPaginationPipe, getDiscountResponsePipe } from '../../../store/selectors/discount.selectors';
+import { getDiscountResponsePipe, getMyDiscountPaginationPipe } from '../../../store/selectors/discount.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { DiscountState } from '../../../store/reducers/discount.reducers';
+import { FirebaseService } from '../../../services/firebase.service';
 
 @Component({
   selector: 'app-me-discount',
@@ -27,7 +27,7 @@ export class MeDiscountComponent {
   private readonly store: Store<DiscountState> = inject(Store<DiscountState>);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly router: Router = inject(Router);
-  private readonly analytic: Analytics = inject(Analytics);
+  private readonly firebaseService = inject(FirebaseService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
   private discountList$ = this.store.pipe(getMyDiscountPaginationPipe);
@@ -77,7 +77,7 @@ export class MeDiscountComponent {
   private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
-    logEvent(this.analytic, 'screen_view', {
+    this.firebaseService.logEvent('screen_view', {
       // eslint-disable-next-line camelcase
       firebase_screen: 'Referral page',
       // eslint-disable-next-line camelcase

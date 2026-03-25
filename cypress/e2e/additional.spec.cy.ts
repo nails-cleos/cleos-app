@@ -8,11 +8,13 @@ devices.forEach(({ name, width, height, breakpoints }) => {
     beforeEach(() => {
       const email = 'nails.cleos@gmail.com';
       cy.mockAuthentication(email, 'ROLE_ADMIN');
-      cy.visit('en-GB/dashboard');
-      cy.mockFirebaseAppCheck();
       cy.mockNotifications();
+      cy.mockCatalogues();
       cy.mockAdminDashboard(new Date(), 'CLEOS');
       cy.mockTreatments(false);
+
+      cy.visit('en-GB/dashboard');
+      cy.mockFirebaseAppCheck();
     });
 
     it('should create a new additional', () => {

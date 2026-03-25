@@ -70,8 +70,8 @@
                                      name="password"/>
                               @if (getForm.password.hasError('required')) {
                                 <mat-error [innerHTML]="'COMMON.USER.PASSWORD.REQUIRED' | translate"></mat-error>
-                              } @else if (getForm.password.hasError('week')) {
-                                <mat-error [innerHTML]="'COMMON.USER.PASSWORD.WEEK' | translate"></mat-error>
+                              } @else if (getForm.password.hasError('weak')) {
+                                <mat-error [innerHTML]="'COMMON.USER.PASSWORD.WEAK' | translate"></mat-error>
                               } @else if (getForm.password.hasError('wrong')) {
                                 <mat-error [innerHTML]="'COMMON.USER.PASSWORD.WRONG' | translate"></mat-error>
                               } @else if (getForm.password.hasError('error')) {
