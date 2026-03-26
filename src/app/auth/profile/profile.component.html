@@ -86,6 +86,28 @@
                     <mat-error>{{ errors()['dob'] }}</mat-error>
                   }
                 </mat-form-field>
+                @if (showColorsSignal()) {
+                  <div class="color-picker-row">
+                    <app-color-picker
+                      [label]="'COMMON.PROFESSIONAL.COLOR.DARK.FIELD' | translate"
+                      [control]="getForm.darkColor"
+                      [invalidText]="'COMMON.PROFESSIONAL.COLOR.INVALID' | translate"
+                      [previewMode]="'dark'"
+                      [previewTitle]="'COMMON.PROFESSIONAL.COLOR.DARK.RESERVATION' | translate"
+                      [previewText]="'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate"
+                      [triggerId]="'darkColorIcon'">
+                    </app-color-picker>
+                    <app-color-picker
+                      [label]="'COMMON.PROFESSIONAL.COLOR.LIGHT.FIELD' | translate"
+                      [control]="getForm.lightColor"
+                      [invalidText]="'COMMON.PROFESSIONAL.COLOR.INVALID' | translate"
+                      [previewMode]="'light'"
+                      [previewTitle]="'COMMON.PROFESSIONAL.COLOR.LIGHT.RESERVATION' | translate"
+                      [previewText]="'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate"
+                      [triggerId]="'lightColorIcon'">
+                    </app-color-picker>
+                  </div>
+                }
                 <app-google-map [addressFormGroup]="googleMapForm" [latitudeMarker]="user.address?.location?.y"
                                 [longitudeMarker]="user.address?.location?.x" (addressEmitter)="getAddress($event)"
                                 [markInfo]="'<b>' + user.address?.name + '</b>'">
@@ -93,82 +115,6 @@
                 @if (errors()['location']) {
                   <mat-error class="divider">{{ errors()['location'] }}</mat-error>
                 }
-                @if (showColorsSignal()) {
-                  <mat-form-field appearance="outline">
-                    <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.DARK.FIELD' | translate }}</mat-label>
-                    <input matInput [cpOutputFormat]="'hex'" [colorPicker]="getForm.darkColor.value"
-                           (colorPickerChange)="getForm.darkColor.setValue($event)"
-                           [style.background]="getForm.darkColor.value" [style.color]="'#000'"
-                           [formControl]="getForm.darkColor" [cpPosition]="'top'"
-                           #darkColorPicker="ngxColorPicker" style="margin-right: 5px"/>
-                    <mat-icon matSuffix style="cursor: pointer" (click)="darkColorPicker.openDialog()"
-                              id="darkColorIcon">
-                      palette
-                    </mat-icon>
-                    @if (getForm.darkColor.hasError('invalidColor')) {
-                      <mat-error>{{ 'COMMON.PROFESSIONAL.COLOR.INVALID' | translate }}</mat-error>
-                    }
-                  </mat-form-field>
-                  <mat-form-field appearance="outline">
-                    <mat-label>{{ 'COMMON.PROFESSIONAL.COLOR.LIGHT.FIELD' | translate }}</mat-label>
-                    <input matInput [cpOutputFormat]="'hex'" [colorPicker]="getForm.lightColor.value"
-                           (colorPickerChange)="getForm.lightColor.setValue($event)"
-                           [style.background]="getForm.lightColor.value" [style.color]="'#fff'"
-                           [formControl]="getForm.lightColor" [cpPosition]="'top'"
-                           #lightColorPicker="ngxColorPicker" style="margin-right: 5px"/>
-                    <mat-icon matSuffix style="cursor: pointer" (click)="lightColorPicker.openDialog()"
-                              id="lightColorIcon">
-                      palette
-                    </mat-icon>
-                    @if (getForm.lightColor.hasError('invalidColor')) {
-                      <mat-error>{{ 'COMMON.PROFESSIONAL.COLOR.INVALID' | translate }}</mat-error>
-                    }
-                  </mat-form-field>
-                }
-
-                <div class="table">
-                  <div class="row">
-                    <div class="cell">
-                      @if (getForm.darkColor.value) {
-                        <mat-card appearance="outlined" [style.background-color]="'#363636'">
-                          <mat-card-header>
-                            <mat-card-subtitle [style.color]="'#fafafa'">
-                              {{ 'COMMON.PROFESSIONAL.COLOR.DARK.RESERVATION' | translate }}
-                            </mat-card-subtitle>
-                          </mat-card-header>
-                          <mat-card-content>
-                            <div
-                              [style.background-color]="getForm.darkColor.value"
-                              [style.border-color]="lightenDarkenColor(getForm.darkColor.value, false)"
-                              [style.color]="'#fafafa'"
-                              class="reservation-example">
-                              {{ 'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate }}
-                            </div>
-                          </mat-card-content>
-                        </mat-card>
-                      }
-                    </div>
-                    <div class="cell">
-                      @if (getForm.lightColor.value) {
-                        <mat-card appearance="outlined" [style.background-color]="'#fafafa'">
-                          <mat-card-header>
-                            <mat-card-subtitle [style.color]="'#363636'">
-                              {{ 'COMMON.PROFESSIONAL.COLOR.LIGHT.RESERVATION' | translate }}
-                            </mat-card-subtitle>
-                          </mat-card-header>
-                          <mat-card-content>
-                            <div
-                              [style.background-color]="getForm.lightColor.value"
-                              [style.border-color]="lightenDarkenColor(getForm.lightColor.value, true)"
-                              [style.color]="'#000'" class="reservation-example">
-                              {{ 'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate }}
-                            </div>
-                          </mat-card-content>
-                        </mat-card>
-                      }
-                    </div>
-                  </div>
-                </div>
                 @if (isAdminSignal()) {
                   <mat-checkbox (change)="toggleShowCash()" color="primary" [checked]="showCashSignal()">
                     {{ 'COMMON.PROFILE.SHOW_CASH' | translate }}

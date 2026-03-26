@@ -52,9 +52,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         cy.get('td[data-mat-row="1"][data-mat-col="1"]').find('button').click({ force: true });
 
         if (role !== 'Customer') {
-          cy.get('#darkColorIcon').click({ force: true });
           cy.get('[data-cy="dark-color-picker"]').clear().type('#0f0');
-          cy.get('#lightColorIcon').click({ force: true });
           cy.get('[data-cy="light-color-picker"]').clear().type('#00f');
         }
 

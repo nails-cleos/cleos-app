@@ -1,0 +1,42 @@
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0 0 60px 0;
+  height: 100vh;
+  font-family: 'EB+Garamond', serif !important;
+}
+
+@font-face {
+  font-family: 'EB+Garamond';
+  font-style: normal;
+  font-weight: 400;
+  src: local('EB+Garamond Regular'), local('EB+Garamond-Regular'),
+  url(https://fonts.gstatic.com/s/ebgaramond/v27/SlGDmQSNjdsmc35JDF1K5E55YMjF_7DPuGi-6_RkCY9_WamXgHlIbvw.woff2) format('woff2');
+  font-display: swap;
+}
+
+table {
+  width: 100%;
+}
+
+a, u {
+  text-decoration: none;
+}
+
+pre {
+  padding: 15px;
+}
+
+fieldset {
+  border: 1px solid;
+  border-radius: 25px;
+  position: relative;
+  margin: 20px 0 20px 0;
+}
+
+legend {
+  margin-left: 15px;
+  left: 50px;
+}

@@ -1,0 +1,63 @@
+@keyframes ssc-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.ssc-line,
+.ssc-head-line,
+.ssc-square,
+.ssc-circle {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: linear-gradient(90deg, rgba(20, 20, 20, 0.08), rgba(20, 20, 20, 0.14), rgba(20, 20, 20, 0.08));
+}
+
+.ssc-line::after,
+.ssc-head-line::after,
+.ssc-square::after,
+.ssc-circle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  animation: ssc-shimmer 1.3s infinite;
+}
+
+.ssc-line {
+  width: 100%;
+  min-height: 16px;
+  border-radius: 999px;
+}
+
+.ssc-head-line {
+  width: 42%;
+  min-height: 28px;
+  border-radius: 999px;
+}
+
+.ssc-square {
+  width: 100%;
+  min-height: 120px;
+  border-radius: 12px;
+}
+
+.ssc-circle {
+  width: 72px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.w-60 {
+  width: 60%;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.mb {
+  margin-bottom: 16px;
+}
