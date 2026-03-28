@@ -120,7 +120,7 @@ describe('ReservationComponent', () => {
     matches$ = new BehaviorSubject(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe'], {
       observe: () => matches$.asObservable(),
     });
@@ -165,7 +165,7 @@ describe('ReservationComponent', () => {
 
     reservationId$.next('test-reservation-id');
 
-    routerSpy.getCurrentNavigation.and.returnValue(null);
+    routerSpy.currentNavigation.and.returnValue(null);
 
     await TestBed.configureTestingModule({
       imports: [ReservationComponent, GoogleMapStubComponent, TranslateModule.forRoot()],

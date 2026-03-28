@@ -2,26 +2,20 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BankComponent, BankForm } from './bank.component';
 import { FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { IPaymentOption, PaymentPercentage, PaymentType } from '../../interfaces/payment';
-import { requireMatch } from '../../util/validators';
 import { TranslateModule } from '@ngx-translate/core';
 
 describe('BankComponent', () => {
   let component: BankComponent;
   let fixture: ComponentFixture<BankComponent>;
 
-  const bankA: IPaymentOption = { subTypes: [], svgIcon: '', type: PaymentType.ideal, name: 'ING' };
-  const bankB: IPaymentOption = { subTypes: [], svgIcon: '', type: PaymentType.ideal, name: 'ABN' };
-
-  const paymentTypeWithBanks: IPaymentOption = {
+  const paymentTypeWithPercentage: IPaymentOption = {
     svgIcon: '',
     type: PaymentType.ideal,
     name: 'Card',
-    subTypes: [bankA, bankB],
     hidePercentage: false,
   };
 
-  const paymentTypeWithoutBanks: IPaymentOption = {
-    subTypes: [],
+  const paymentTypeWithoutPercentage: IPaymentOption = {
     svgIcon: '',
     type: PaymentType.ideal,
     name: 'Cash',
@@ -42,12 +36,11 @@ describe('BankComponent', () => {
 
     form = formBuilder.group<BankForm>({
       type: formBuilder.control(undefined),
-      bank: formBuilder.control(undefined),
       percentage: formBuilder.control(PaymentPercentage.total),
     });
 
     fixture.componentRef.setInput('form', form);
-    fixture.componentRef.setInput('options', [paymentTypeWithBanks, paymentTypeWithoutBanks]);
+    fixture.componentRef.setInput('options', [paymentTypeWithPercentage, paymentTypeWithoutPercentage]);
     fixture.componentRef.setInput('firstTime', false);
 
     fixture.detectChanges();
@@ -57,41 +50,17 @@ describe('BankComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should populate bankList and set validators when type has subTypes', () => {
-    form.controls.type.setValue(paymentTypeWithBanks);
-    fixture.detectChanges();
-
-    expect(component.bankList.length).toBe(2);
-    expect(form.controls.bank.hasValidator(Validators.required)).toBeTrue();
-    expect(form.controls.bank.hasValidator(requireMatch)).toBeTrue();
-  });
-
-  it('should clear bankList and validators when type has no subTypes', () => {
-    form.controls.type.setValue(paymentTypeWithoutBanks);
-
-    expect(component.bankList.length).toBe(0);
-    expect(form.controls.bank.validator).toBeNull();
-  });
-
   it('should hide percentage when type.hidePercentage is true', () => {
-    form.controls.type.setValue(paymentTypeWithoutBanks);
+    form.controls.type.setValue(paymentTypeWithoutPercentage);
 
     expect(form.controls.percentage.validator).toBeNull();
   });
 
   it('should require percentage when hidePercentage is false', () => {
-    form.controls.type.setValue(paymentTypeWithBanks);
+    form.controls.type.setValue(paymentTypeWithPercentage);
     fixture.detectChanges();
 
     expect(form.controls.percentage.hasValidator(Validators.required)).toBeTrue();
-  });
-
-  it('should reset bank value on backspace', () => {
-    form.controls.bank.setValue(bankA);
-
-    component.keyDownHandler(new KeyboardEvent('keydown', { code: 'Backspace' }));
-
-    expect(form.controls.bank.value).toBeUndefined();
   });
 
   it('should emit correct percentage when percentage changes', () => {
@@ -115,11 +84,11 @@ describe('BankComponent', () => {
   });
 
   it('should auto-select type if firstTime and only one option', () => {
-    fixture.componentRef.setInput('options', [paymentTypeWithBanks]);
+    fixture.componentRef.setInput('options', [paymentTypeWithPercentage]);
     fixture.componentRef.setInput('firstTime', true);
 
     fixture.detectChanges();
 
-    expect(form.controls.type.value).toEqual(paymentTypeWithBanks);
+    expect(form.controls.type.value).toEqual(paymentTypeWithPercentage);
   });
 });

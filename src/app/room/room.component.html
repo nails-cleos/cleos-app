@@ -173,7 +173,7 @@
                 @for (option of paymentOptions; track option) {
                   <mat-list-option [disabled]="option.disabled" [selected]="isSelected(option)"
                                    [value]="option.name" color="primary">
-                    <div>{{ option.name }}</div>
+                    <div [class.deprecated-option]="option.deprecated">{{ option.name }}</div>
                   </mat-list-option>
                 }
               </mat-selection-list>

@@ -10,8 +10,6 @@ import {
   getAccountByCustomerId,
   getTransaction,
   getTransactionsByAccountId,
-  paymentOptions,
-  paymentOptionsSuccess,
   paymentSend,
   setCurrentAccountId,
   setCurrentCustomerId,
@@ -21,7 +19,6 @@ import {
 
 import { Pagination } from '../../interfaces/pagination';
 import { IAccount, IAccountAll, IAccountTransaction, ITransaction } from '../../interfaces/account';
-import { IPaymentOption } from '../../interfaces/payment';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 
@@ -30,7 +27,6 @@ export const ACCOUNT_FEATURE_KEY = 'accounts';
 export interface AccountState {
   response?: IResponseSuccess;
   data?: IAccount | IAccountTransaction | ITransaction[];
-  paymentOptions?: IPaymentOption[];
   error?: IError;
   subErrors?: IError[];
   selected?: IAccountAll | ITransaction;
@@ -43,7 +39,6 @@ export interface AccountState {
 export const initialState: AccountState = {
   response: undefined,
   data: undefined,
-  paymentOptions: undefined,
   error: undefined,
   subErrors: undefined,
   selected: undefined,
@@ -63,13 +58,6 @@ export const accountReducer = createReducer(
     selected: {} as IAccountAll,
   })),
 
-  on(paymentOptions, (state) => ({
-    ...state,
-    response: undefined,
-    paymentOptions: undefined,
-    subErrors: undefined,
-  })),
-
   on(getTransactionsByAccountId, (state) => ({
     ...state,
     data: {
@@ -83,13 +71,6 @@ export const accountReducer = createReducer(
   on(accountSuccess, (state, { data }) => ({
     ...state,
     data,
-    response: undefined,
-    subErrors: undefined,
-  })),
-
-  on(paymentOptionsSuccess, (state, { paymentOptions }) => ({
-    ...state,
-    paymentOptions,
     response: undefined,
     subErrors: undefined,
   })),

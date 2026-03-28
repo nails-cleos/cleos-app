@@ -44,7 +44,6 @@ import {
   getAllAdditionalByGroupId,
   getAllTreatments,
   getEditReservation,
-  paymentOptions,
   updateReservationById,
 } from '../../../store/reservation.actions';
 import { map, startWith } from 'rxjs/operators';
@@ -75,9 +74,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../../interfaces/token';
 import { IUser, IUserAll } from '../../../interfaces/user';
 import {
-  accountCredit,
   getPaymentOptions,
-  getPayNlOptions,
   IPaymentOption,
   PaymentPercentage,
   PaymentType,
@@ -88,6 +85,7 @@ import {
   completeAndNext,
   enableStep,
   getBackIndex,
+  getIndex,
   getStepCall,
   getStepCompleted,
   getStepEnabled,
@@ -100,7 +98,6 @@ import { SortByPipe } from '../../../pipes/sort-by.pipe';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
 import { DurationTimePipe } from '../../../pipes/durationTime.pipe';
 import { PriceComponent } from '../../../shared/price/price.component';
-import { PricePreviewComponent } from '../../../shared/price-preview/price-preview.component';
 import { PaymentPreviewComponent } from '../../../shared/payment-preview/payment-preview.component';
 import { GoogleMapComponent } from '../../../shared/google-map/google-map.component';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
@@ -111,7 +108,6 @@ import {
   getCurrentReservationIdPipe,
   getCustomerReservationPipe,
   getMeNavigationParamsPipe,
-  getPaymentOptionsPipe,
   getRoomsPipe,
   getSelectedReservationPipe,
   getSubErrorsPipe,
@@ -163,8 +159,7 @@ type AvailabilityData = { time: string; date: Date }
   templateUrl: './me-reservation.component.html',
   styleUrls: ['./me-reservation.component.scss'],
   imports: [SharedModule, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe, PriceComponent,
-    PricePreviewComponent, PaymentPreviewComponent, NgxMaterialIntlTelInputComponent, GoogleMapComponent,
-    BackButtonDirective],
+    PaymentPreviewComponent, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective],
   providers: [{
     provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false },
   }],
@@ -189,7 +184,6 @@ export class MeReservationComponent {
   private selectedReservation$ = this.store.pipe(getSelectedReservationPipe);
   private customerReservation$ = this.store.pipe(getCustomerReservationPipe);
   private availableList$ = this.store.pipe(getAvailableListPipe);
-  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
@@ -201,7 +195,6 @@ export class MeReservationComponent {
   private selectedReservationSignal = toSignal(this.selectedReservation$);
   private customerReservationSignal = toSignal(this.customerReservation$);
   private availableListSignal = toSignal(this.availableList$);
-  private paymentOptionsSignal = toSignal(this.paymentOptions$);
   private subErrorsSignal = toSignal(this.subErrors$);
   private authUserSignal = this.authUserService.authUser;
 
@@ -239,7 +232,7 @@ export class MeReservationComponent {
   });
 
   private stepper = viewChild.required<MatStepper>('stepper');
-  private picker = viewChild.required<MatDatepicker<Date>>('picker');
+  private picker = viewChild<MatDatepicker<Date>>('picker');
 
   errors = signal<Record<string, unknown>>({});
 
@@ -276,7 +269,6 @@ export class MeReservationComponent {
 
   typeForm: FormGroup<BankForm> = this.formBuilder.group<BankForm>({
     type: this.formBuilder.control(undefined),
-    bank: this.formBuilder.control(undefined),
     percentage: this.formBuilder.control(undefined),
   });
 
@@ -380,10 +372,10 @@ export class MeReservationComponent {
       switch (ud.discountCustomer.type) {
         case DiscountType.money:
           title =
-            `${currencySymbol(ud.discountCustomer.discount?.currency)} ${ud.discountCustomer.amount} ${title}`;
+            `${ currencySymbol(ud.discountCustomer.discount?.currency) } ${ ud.discountCustomer.amount } ${ title }`;
           break;
         case DiscountType.percentage:
-          title = `${ud.discountCustomer.amount} % ${title}`;
+          title = `${ ud.discountCustomer.amount } % ${ title }`;
           break;
       }
       return Object.assign({}, ud, { title });
@@ -418,7 +410,7 @@ export class MeReservationComponent {
   options = signal<IPaymentOption[] | undefined>(undefined);
   additionalSelected = signal<IAdditionalAll[]>([]);
 
-  accountCreditOptions: IPaymentOption[] = accountCredit(this.translate.instant('COMMON.PAYMENT.TYPE.ACCOUNT'));
+  paymentTypes = signal<PaymentType[] | undefined>(undefined);
   availableList = computed(() => {
     const availableList = this.availableListSignal();
     if (availableList?.length) {
@@ -489,7 +481,7 @@ export class MeReservationComponent {
       if (reservationId) {
         this.firebaseService.logEvent('screen_view', {
           // eslint-disable-next-line camelcase
-          firebase_screen: `Edit customer reservation ${reservationId}`,
+          firebase_screen: `Edit customer reservation ${ reservationId }`,
           // eslint-disable-next-line camelcase
           firebase_screen_class: 'MeReservationComponent',
         });
@@ -530,7 +522,7 @@ export class MeReservationComponent {
           const warning = this.translate.instant('COMMON.TIME_ZONE.WARNING');
           const localDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.LOCAL', { date: localDate });
           const roomDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.ROOM', { date: timeZoneDate });
-          const message = `${warning} - ${localDateLabel} / ${roomDateLabel}`;
+          const message = `${ warning } - ${ localDateLabel } / ${ roomDateLabel }`;
           const toastRef = this.toastService.show(message, 'warning', 0, { actionType: 'button' });
           toastRef.onAction().subscribe(() => {
             this.dismiss = true;
@@ -542,7 +534,9 @@ export class MeReservationComponent {
         this.professionalId = professional?.id;
       }
       this.getTreatmentForm.group.setValue(undefined);
-      this.cleanTreatment();
+      if (!this.isEditing) {
+        this.cleanTreatment();
+      }
     });
 
     effect(() => {
@@ -652,8 +646,7 @@ export class MeReservationComponent {
         this.canNotContinue(message, 'create');
       } else {
         this.canCreate = true;
-        this.balance = customerReservation?.balance || 0;
-        this.price = this.price.withBalance(customerReservation?.balance);
+        this.applyCustomerBalance(customerReservation?.balance);
         this.getAcceptForm.phone.setValue(customerReservation?.phone || this.reservation?.customer?.phone);
         if (customerReservation?.isFirstTime) {
           this.firstTime = true;
@@ -672,13 +665,6 @@ export class MeReservationComponent {
           this.getTypeForm.type.clearValidators();
           this.getTypeForm.type.updateValueAndValidity();
         }
-      }
-    });
-
-    effect(() => {
-      const paymentOptions = this.paymentOptionsSignal();
-      if (paymentOptions) {
-        this.options.set(getPayNlOptions(paymentOptions));
       }
     });
 
@@ -774,6 +760,72 @@ export class MeReservationComponent {
     return this.typeForm.controls;
   }
 
+  get paymentToPay(): number {
+    if (!this.oldPrice) {
+      const amount = this.price.total;
+      const covered = this.price.totalPaid + this.accountBalanceUsed;
+      return Math.max(amount - covered, 0);
+    }
+
+    const covered = this.oldPrice.totalPaid + this.oldPrice.balance;
+    const amount = this.showPenalty
+      ? (this.hasReservationChanges ? this.oldPrice.penalty + this.price.total : this.oldPrice.penalty)
+      : this.price.total;
+    return Math.max(amount - covered, 0);
+  }
+
+  get paymentCredit(): number {
+    if (!this.oldPrice) {
+      const amount = this.price.total;
+      const covered = this.price.totalPaid + this.accountBalanceUsed;
+      return Math.max(covered - amount, 0);
+    }
+
+    if (!this.hasReservationChanges) {
+      return 0;
+    }
+
+    const amount = this.showPenalty ? this.oldPrice.penalty + this.price.total : this.price.total;
+    const covered = this.oldPrice.totalPaid + this.accountBalanceUsed;
+    return Math.max(covered - amount, 0);
+  }
+
+  get accountBalanceUsed(): number {
+    if (this.oldPrice) {
+      const totalPaid = this.oldPrice.totalPaid;
+      const balance = this.oldPrice.balance || this.balance || 0;
+      const amount = this.showPenalty
+        ? (this.hasReservationChanges ? this.oldPrice.penalty + this.price.total : this.oldPrice.penalty)
+        : this.price.total;
+      return Math.min(balance, Math.max(amount - totalPaid, 0));
+    }
+
+    const balance = this.price.balance || this.balance || 0;
+    return Math.min(balance, Math.max(this.price.total - this.price.totalPaid, 0));
+  }
+
+  get hasReservationChanges(): boolean {
+    if (!this.isEditing || !this.reservation) {
+      return false;
+    }
+
+    const roomId = this.getOfficeForm.room.value?.id;
+    const professionalId = this.getOfficeForm.professional.value?.id;
+    const treatmentId = this.getTreatmentForm.treatment.value?.id;
+    const event = this.getEventForm.event.value;
+    const reservationDate = newDateTimestamp(this.reservation.timestamp, this.reservation.room.timeZone);
+    const currentAdditionalIds = this.additionalSelected().map(item => item.id).sort();
+    const reservationAdditionalIds = (this.reservation.additional ?? []).map(item => item.id ?? item.key).sort();
+    const reservationTreatmentId = this.reservation.treatment.id ?? this.reservation.treatment.key;
+
+    return roomId !== this.reservation.room.id ||
+      professionalId !== this.reservation.professional.id ||
+      treatmentId !== reservationTreatmentId ||
+      !!event && !isEqual(event, reservationDate) ||
+      currentAdditionalIds.length !== reservationAdditionalIds.length ||
+      currentAdditionalIds.some((id, index) => id !== reservationAdditionalIds[index]);
+  }
+
   back(): void {
     if (this.isPreview) {
       this.isPreview = false;
@@ -803,16 +855,10 @@ export class MeReservationComponent {
 
     const role = Role.customer;
     const option = this.getTypeForm.type?.value;
-    // TODO validate if not first time and option empty firstTime
     if (option && option.type !== PaymentType.account) {
-      const type = option.type;
-      const paymentOptionId = option.bic;
       const percentage = this.getTypeForm.percentage?.value || PaymentPercentage.total;
 
-      reservation.payment = { type, paymentOptionId, percentage, bic: undefined };
-      if (option.subTypes.length) {
-        reservation.payment.bic = this.getTypeForm.bank.value?.bic;
-      }
+      reservation.payment = { type: option.type, percentage };
     }
     if (this.isEditing && this.reservation) {
       reservation.id = this.reservation.id;
@@ -888,6 +934,23 @@ export class MeReservationComponent {
     this.endDate = createNewDate(this.date, this.date.getHours() + this.duration.hour,
       this.date.getMinutes() + this.duration.minute);
 
+    const requiresPayment = this.paymentToPay > 0 || this.paymentCredit > 0;
+    const paymentIndex = getIndex(this.steps, 'payment');
+    if (paymentIndex !== undefined) {
+      this.steps[paymentIndex].enable = requiresPayment;
+      this.steps[paymentIndex].optional = !requiresPayment;
+      this.steps[paymentIndex].completed = !requiresPayment;
+    }
+
+    if (!requiresPayment) {
+      this.isPayment = false;
+      this.isPreview = true;
+      setTimeout(() => {
+        this.myStepper.selectedIndex = 5;
+      }, 0);
+      return;
+    }
+
     this.isPayment = true;
     completeAndNext(this.steps, this.myStepper, goNext, this.firebaseService);
   };
@@ -915,11 +978,11 @@ export class MeReservationComponent {
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.getOfficeForm.room.value);
 
-  displayFnGroup = (group: ITreatmentGroup): string => group ? `${group.name}` : '';
+  displayFnGroup = (group: ITreatmentGroup): string => group ? `${ group.name }` : '';
 
-  displayFnTreatment = (treatment: ITreatment): string => treatment ? `${treatment.name}` : '';
+  displayFnTreatment = (treatment: ITreatment): string => treatment ? `${ treatment.name }` : '';
 
-  displayFnOffice = (office: IOffice): string => office ? `${office.name}` : '';
+  displayFnOffice = (office: IOffice): string => office ? `${ office.name }` : '';
 
   displayFnRoom = (room: IRoom): string => room.address ? room.address.name : '';
 
@@ -1007,7 +1070,7 @@ export class MeReservationComponent {
   private canNotContinue = (message: string, type: string): void => {
     this.firebaseService.logEvent('screen_view', {
       // eslint-disable-next-line camelcase
-      firebase_screen: `Customer cannot ${type} a reservation`,
+      firebase_screen: `Customer cannot ${ type } a reservation`,
       // eslint-disable-next-line camelcase
       firebase_screen_class: 'MeReservationComponent',
     });
@@ -1027,7 +1090,7 @@ export class MeReservationComponent {
     }
     new Map([...this.availableList().entries()]
       .sort((a: any, b: any) => this.sortDate({ key: a[0] }, { key: b[0] })))
-      .forEach((value, key) => {
+      .forEach((_value, key) => {
         if (isEqual(date, newDate(key))) {
           this.selectedIndex = i;
         }
@@ -1063,6 +1126,7 @@ export class MeReservationComponent {
     this.getOfficeForm.professional.setValue(reservation.professional);
     this.getTreatmentForm.startDate.setValue(date);
     this.price = getPrice(this.reservation, this.reservation?.payments);
+    this.applyCustomerBalance(this.balance);
     this.additionalSelected.set(this.reservation.additional ? this.reservation.additional
       .map(ad => Object.assign({}, ad, { id: ad.key })) : []);
     this.treatmentId = reservation.treatment.key;
@@ -1070,13 +1134,13 @@ export class MeReservationComponent {
     this.roomId = roomId;
     this.professionalId = reservation.professional.id;
     if (this.isEditing) {
-      if (!this.reservation.canEdit && this.price.totalPaid < this.price.penalty) {
-        this.oldPrice = this.price;
-        this.showPenalty = true;
+      this.oldPrice = this.price;
+      this.showPenalty = !this.reservation.canEdit;
+      this.setTypes();
+      if (!this.reservation.canEdit) {
         this.getTypeForm.type.setValidators([Validators.required]);
         this.getTypeForm.type.updateValueAndValidity();
         this.firstTime = true;
-        this.setTypes();
       } else {
         enableStep(this.steps, 'payment', false);
       }
@@ -1085,14 +1149,19 @@ export class MeReservationComponent {
     completeAndNext(this.steps, this.myStepper, true, this.firebaseService);
   };
 
+  private applyCustomerBalance = (balance?: number): void => {
+    this.balance = balance || 0;
+    this.price = this.price.withBalance(balance);
+    if (this.oldPrice) {
+      this.oldPrice = this.oldPrice.withBalance(balance);
+    }
+  };
+
   private setTypes = (): void => {
     const types = this.getOfficeForm.room.value?.paymentTypes.filter(
       (p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
-    if (types?.includes(PaymentType.paynl)) {
-      this.getOptions();
-    } else {
-      this.options.set(getPaymentOptions(this.translate, types));
-    }
+    this.paymentTypes.set(types);
+    this.options.set(getPaymentOptions(this.translate, types));
   };
 
   private cleanTreatment = (): void => {
@@ -1102,5 +1171,4 @@ export class MeReservationComponent {
     this.getEventForm.event.setValue(undefined);
   };
 
-  private getOptions = (): void => this.store.dispatch(paymentOptions());
 }

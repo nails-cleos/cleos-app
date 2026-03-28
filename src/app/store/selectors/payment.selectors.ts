@@ -2,7 +2,7 @@ import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { PAYMENT_FEATURE_KEY, PaymentState } from '../reducers/payment.reducers';
-import { IPayment, IPaymentOption } from '../../interfaces/payment';
+import { IPayment, PaymentType } from '../../interfaces/payment';
 
 const selectPaymentState = createFeatureSelector<PaymentState>(PAYMENT_FEATURE_KEY);
 
@@ -23,6 +23,8 @@ export const getResultParamsPipe = pipe(
     reason?: string;
     orderId?: string;
     orderStatusId?: string;
+    paymentType?: PaymentType;
+    accountId?: string;
   } => val !== undefined),
 );
 
@@ -41,7 +43,7 @@ const selectCurrentPathId = createSelector(
 );
 export const getCurrentPathIdPipe = pipe(
   select(selectCurrentPathId),
-  filter((val): val is { path: 'reservation' | 'transaction'; id: string; } => val !== undefined),
+  filter((val): val is { path: 'reservation' | 'transaction'; id: string; accountId?: string; } => val !== undefined),
 );
 
 const selectedPayment = createSelector(
@@ -51,15 +53,6 @@ const selectedPayment = createSelector(
 export const getSelectedPaymentPipe = pipe(
   select(selectedPayment),
   filter((val): val is IPayment => val !== undefined),
-);
-
-const selectPaymentOptions = createSelector(
-  selectPaymentState,
-  (state: PaymentState) => state?.data,
-);
-export const getPaymentOptionsPipe = pipe(
-  select(selectPaymentOptions),
-  filter((val): val is IPaymentOption[] => val !== undefined),
 );
 
 const selectPayments = createSelector(

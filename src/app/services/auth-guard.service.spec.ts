@@ -17,11 +17,11 @@ describe('authGuard', () => {
   beforeEach(() => {
     user$ = new BehaviorSubject({ authorities: [{ authority: 'ROLE_USER' }] });
     action$ = new BehaviorSubject(undefined);
-    const routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    const routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
     const storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     const toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
 
-    routerSpy.getCurrentNavigation.and.returnValue(null);
+    routerSpy.currentNavigation.and.returnValue(null);
     storeSpy.pipe.and.returnValue(user$.asObservable());
 
     toastServiceSpy.show.and.returnValue({

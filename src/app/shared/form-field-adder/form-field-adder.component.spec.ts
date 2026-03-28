@@ -1,11 +1,15 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormFieldAdderComponent } from './form-field-adder.component';
-import { PaymentType } from '../../interfaces/payment';
+import { IPaymentOption, PaymentType } from '../../interfaces/payment';
 import { TranslateModule } from '@ngx-translate/core';
 
 describe('FormFieldAdderComponent', () => {
   let component: FormFieldAdderComponent;
   let fixture: ComponentFixture<FormFieldAdderComponent>;
+  const paymentOptions: IPaymentOption[] = [
+    { name: 'Cash', type: PaymentType.cash, icon: 'universal_currency', svgIcon: '' },
+    { name: 'Transfer', type: PaymentType.transfer, icon: 'send_money', svgIcon: '' },
+  ];
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -16,7 +20,7 @@ describe('FormFieldAdderComponent', () => {
     component = fixture.componentInstance;
 
     // Provide required inputs
-    fixture.componentRef.setInput('allPaymentTypes', [PaymentType.cash, PaymentType.transfer]);
+    fixture.componentRef.setInput('allPaymentTypes', paymentOptions);
     fixture.componentRef.setInput('key', 'test');
     fixture.componentRef.setInput('currency', { code: 'EUR', icon: '€' });
     fixture.componentRef.setInput('split', false);
@@ -100,5 +104,36 @@ describe('FormFieldAdderComponent', () => {
     component.updateExtra(1);
 
     expect(component.total()).toBe(50);
+  });
+
+  it('should resolve selected payment option and control in split mode', () => {
+    fixture.componentRef.setInput('split', true);
+    fixture.detectChanges();
+
+    component.addNewRow();
+    fixture.detectChanges();
+
+    component.getPaymentTypeControl(0).setValue(PaymentType.transfer);
+
+    expect(component.getPaymentTypeControl(0).value).toBe(PaymentType.transfer);
+    expect(component.getSelectedPaymentOption(0)).toEqual(paymentOptions[1]);
+  });
+
+  it('should emit invalid split state when total does not match toPaid', () => {
+    spyOn(component.isValid, 'emit');
+    fixture.componentRef.setInput('split', true);
+    fixture.detectChanges();
+
+    component.addNewRow();
+    fixture.detectChanges();
+
+    const group = component.getFormGroup(0);
+    group.controls.description.setValue('Split payment');
+    group.controls.price.setValue(10);
+    component.getPaymentTypeControl(0).setValue(PaymentType.cash);
+    component.updateExtra(0);
+    fixture.detectChanges();
+
+    expect(component.isValid.emit).toHaveBeenCalledWith(false);
   });
 });

@@ -200,7 +200,7 @@ export class SearchComponent {
 
     dialogRef.afterClosed().subscribe(reservationId => {
       if (reservationId) {
-        const options = Object.values(CancelOption).filter(co => co !== CancelOption.charge);
+        const options = Object.values(CancelOption).filter(co => co !== CancelOption.chargeAndAccount);
         openCancel(this.dialog, reservation.room, this.smallSignal(), options, result => {
           if (result) {
             this.store.dispatch(cancelReservation(reservationId, result));
@@ -243,4 +243,3 @@ export class SearchComponent {
   private filterStates = (value: string, allStates: string[]): string[] => allStates.filter(
     state => state.toLowerCase().indexOf(value.toLowerCase()) === 0);
 }
-

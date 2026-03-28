@@ -24,7 +24,7 @@ declare namespace Cypress {
 
     mockAuthentication(email: string, role: string): Chainable<any>;
 
-    mockLogin(email: string, displayName: string, role: string): Chainable<any>;
+    mockLogin(email: string, displayName: string, role: string, emailVerified?: boolean): Chainable<any>;
 
     mockFirebaseAppCheck(): Chainable<any>;
 
@@ -32,7 +32,7 @@ declare namespace Cypress {
 
     mockFetchSignInMethodsForEmail(methods: string[]): Chainable<any>;
 
-    mockFirebase(email: string): Chainable<any>;
+    mockFirebase(email: string, emailVerified?: boolean): Chainable<any>;
 
     mockNotifications(): Chainable<any>;
 
@@ -84,9 +84,15 @@ Cypress.Commands.add('randomUUID', () => cy.wrap('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxx
 })));
 
 Cypress.Commands.add('logout', () => {
-  cy.get('button[name="settings"]').click();
-  cy.get('mat-list-item').contains('Sign out').click();
-  cy.url().should('include', 'home');
+  cy.get('body').then(($body) => {
+    if (!$body.find('button[name="settings"]').length) {
+      return;
+    }
+
+    cy.get('button[name="settings"]').click();
+    cy.get('mat-list-item').contains('Sign out').click();
+    cy.url().should('include', 'home');
+  });
 });
 
 Cypress.Commands.add('checkAppDialog', (title: string, message: string, buttonClick: string) => {
@@ -216,7 +222,7 @@ const createFakeJwt = (payload: Record<string, any>) => {
   return `${header}.${body}.${signature}`;
 };
 
-const firebaseUser = (email: string, displayName?: string, kind?: string) => {
+const firebaseUser = (email: string, displayName?: string, kind?: string, emailVerified: boolean = true) => {
   const now = Math.floor(Date.now() / 1000);
 
   const idToken = createFakeJwt({
@@ -231,6 +237,7 @@ const firebaseUser = (email: string, displayName?: string, kind?: string) => {
     kind: kind,
     idToken,
     email: email,
+    emailVerified,
     displayName: displayName,
     photoUrl: null,
     refreshToken: 'mock-refresh-token',
@@ -351,7 +358,7 @@ Cypress.Commands.add('mockAuthentication', (email: string, role: string) => {
   });
 });
 
-Cypress.Commands.add('mockLogin', (email: string, displayName: string, role: string) => {
+Cypress.Commands.add('mockLogin', (email: string, displayName: string, role: string, emailVerified: boolean = false) => {
   cy.fixture('users').then((usersData) => {
     cy.fixture('menus').then((menuData) => {
       cy.intercept('POST', 'http://localhost:9999/api/v1/auth/login', {
@@ -371,6 +378,7 @@ Cypress.Commands.add('mockLogin', (email: string, displayName: string, role: str
         {
           localId: '12345',
           email: email,
+          emailVerified,
           displayName: displayName,
           photoUrl: 'https://example.com/photo.jpg',
           providerUserInfo: [
@@ -414,15 +422,15 @@ Cypress.Commands.add('mockLogin', (email: string, displayName: string, role: str
   ).as('refreshToken');
 });
 
-Cypress.Commands.add('mockFirebase', (email: string) => {
+Cypress.Commands.add('mockFirebase', (email: string, emailVerified: boolean = true) => {
   cy.intercept('POST', '**/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword**', {
     statusCode: 200,
-    body: firebaseUser(email),
+    body: firebaseUser(email, undefined, undefined, emailVerified),
   }).as('firebaseSignIn');
 
   cy.intercept('POST', 'https://identitytoolkit.googleapis.com/v1/accounts:signUp*', {
     statusCode: 200,
-    body: firebaseUser(email),
+    body: firebaseUser(email, undefined, undefined, emailVerified),
   }).as('firebaseSignUp');
 
   cy.intercept('POST', 'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode*', {
@@ -444,7 +452,11 @@ Cypress.Commands.add('mockFirebaseAppCheck', () => {
     },
   }).as('firebaseAppCheck');
 
-  cy.contains('Got it!').click({ force: true });
+  cy.get('body').then(($body) => {
+    if ($body.text().includes('Got it!')) {
+      cy.contains('button, a', 'Got it!').click({ force: true });
+    }
+  });
 });
 
 // Cypress.Commands.add('mockFetchSignInMethodsForEmail', (email) => {

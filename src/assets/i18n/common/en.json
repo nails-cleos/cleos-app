@@ -33,6 +33,7 @@
       "IDEAL": "iDeal payment",
       "PAY_NL": "PAY. payment",
       "PAYNL": "PAY. payment",
+      "MOLLIE": "Mollie. payment",
       "NOTIFY": "Notify",
       "SELECT": "Select",
       "UNAVAILABLE": "Add unavailable",
@@ -106,6 +107,7 @@
       "PERCENTAGE": "Percentage"
     },
     "PAYMENT": {
+      "TO_PAY": "Total to pay: {{amount}} {{symbol}}",
       "TYPE": {
         "FIELD": {
           "TITLE": "Payment Type",
@@ -117,6 +119,7 @@
         "IDEAL": "iDeal",
         "PAY_NL": "PAY.",
         "PAYNL": "PAY.",
+        "MOLLIE": "Mollie.",
         "TRANSFER": "Wire Transfer",
         "ACCOUNT": "Account credit",
         "NONE": "No payment selected",
@@ -128,11 +131,13 @@
         "INVALID": "Bank is invalid"
       },
       "OPTIONS": {
-        "TO_PAY": "Total to pay: {{amount}} {{symbol}}",
-        "PAID": "Total paid: {{amount}} {{symbol}}",
-        "ACCOUNT": "Account credit: {{amount}} {{symbol}}",
-        "PENALTY": "Penalty: {{amount}} {{symbol}}",
-        "D_OR_R": "Discount or refund: {{amount}} {{symbol}}"
+        "UPDATED_TOTAL": "Updated total",
+        "BALANCE": "Balance",
+        "TO_PAY": "Total to pay",
+        "PAID": "Total paid",
+        "ACCOUNT": "Account credit",
+        "PENALTY": "Penalty",
+        "WILL_ADD_ACCOUNT": "This amount will be added to the account."
       },
       "DEPOSIT_50": "Pay a 50% deposit of the reservation",
       "TOTAL": "Pay total of the reservation",

@@ -77,7 +77,7 @@
         <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
         <td *matCellDef="let transaction" class="hide-xs" mat-cell>
           @if (transaction.id) {
-            <div>{{ transaction.payment.type }}</div>
+            <div>{{ transaction.payment?.type }}</div>
           } @else {
             <div class="ssc-line"></div>
           }

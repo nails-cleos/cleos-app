@@ -1,7 +1,7 @@
 <ng-template #stepOne>
   @if (reservation()) {
     <app-bank [firstTime]="first" [form]="form" [options]="options()"
-              [professionalName]="professionalName" (percentageEmitter)="getPercentage($event)"></app-bank>
+              [professionalName]="professionalName()" (percentageEmitter)="getPercentage($event)"></app-bank>
   } @else {
     <div class="spinner-parent-center">
       <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
@@ -36,7 +36,7 @@
             <div matListItemLine><span class="bold">{{ 'COMMON.LABEL.TOTAL' | translate }}</span></div>
             <div matListItemLine><span class="bold">{{ currentPrice.total }}</span></div>
           </mat-list-item>
-          <app-payment-preview [type]="form.get('type')?.value" [bank]="form.get('bank')?.value"
+          <app-payment-preview [type]="form.get('type')?.value"
                                [toPaid]="currentPrice.toPaid" [currencyIcon]="currentReservation.room.currency.icon">
           </app-payment-preview>
         </mat-list>

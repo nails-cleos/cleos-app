@@ -13,8 +13,6 @@ import {
   getAccountByCustomerId,
   getTransaction,
   getTransactionsByAccountId,
-  paymentOptions,
-  paymentOptionsSuccess,
   paymentSend,
   updateAccount,
 } from '../account.actions';
@@ -22,7 +20,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { AccountService } from '../../services/account.service';
 import { PaymentService } from '../../services/payment.service';
 import { IAccountAll, ITransaction } from '../../interfaces/account';
-import { IPaymentOption } from '../../interfaces/payment';
 import { IApiResponse, success } from '../../interfaces/common';
 
 @Injectable()
@@ -46,15 +43,6 @@ export class AccountEffects {
     switchMap(({ id, transactionId }) =>
       this.accountService.getTransaction(id, transactionId).pipe(
         map((selected?: ITransaction) => accountSelected({ selected })),
-        catchError((err: HttpErrorResponse) => of(accountFailure({ error: err.error }))),
-      )),
-  ));
-
-  paymentOptions$ = createEffect(() => this.actions.pipe(
-    ofType(paymentOptions),
-    switchMap(() =>
-      this.paymentService.getPaymentOptions().pipe(
-        map((paymentOptions?: IPaymentOption[]) => paymentOptionsSuccess({ paymentOptions })),
         catchError((err: HttpErrorResponse) => of(accountFailure({ error: err.error }))),
       )),
   ));
@@ -86,7 +74,7 @@ export class AccountEffects {
             return of(paymentSend({ link: response.paymentLink }));
           } else {
             const message = this.translate.instant('ACCOUNT.MONEY_ADDED', { id: id });
-            const path = `accounts/${id}/transactions/${response.id}`;
+            const path = `accounts/${ id }/transactions/${ response.id }`;
             return success(accountSaveSuccess, message, path);
           }
         }),
@@ -100,7 +88,7 @@ export class AccountEffects {
       this.accountService.updateAccount(id, transaction).pipe(
         switchMap((response: IApiResponse) => {
           const message = this.translate.instant('ACCOUNT.UPDATED', { id: response.id });
-          return success(accountSaveSuccess, message, `accounts/customers/${customerId}`);
+          return success(accountSaveSuccess, message, `accounts/customers/${ customerId }`);
         }),
         catchError((err: HttpErrorResponse) => of(accountFailure({ error: err.error }))),
       )),

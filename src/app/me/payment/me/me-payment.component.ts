@@ -1,10 +1,9 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { getPayment, paymentOptions, updatePaymentById } from '../../../store/payment.actions';
+import { getPayment, updatePaymentById } from '../../../store/payment.actions';
 import {
   getPaymentOptions,
-  getPayNlOptions,
   IPaymentOption,
   PaymentPercentage,
   PaymentType,
@@ -18,7 +17,6 @@ import { IReservationPayment } from '../../../interfaces/reservation';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 import {
   getCurrentPaymentIdPipe,
-  getPaymentOptionsPipe,
   getSelectedPaymentPipe,
 } from '../../../store/selectors/payment.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -39,19 +37,17 @@ export class MePaymentComponent {
 
   private paymentId$ = this.store.pipe(getCurrentPaymentIdPipe);
   private payment$ = this.store.pipe(getSelectedPaymentPipe);
-  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
   private paymentIdSignal = toSignal(this.paymentId$);
-  private paymentOptionsSignal = toSignal(this.paymentOptions$);
   paymentSignal = toSignal(this.payment$);
 
   form = this.formBuilder.group<BankForm>({
     type: this.formBuilder.control(undefined),
-    bank: this.formBuilder.control(undefined),
     percentage: this.formBuilder.control(undefined),
   });
 
   options = signal<IPaymentOption[] | undefined>(undefined);
+  paymentTypes = signal<PaymentType[] | undefined>(undefined);
 
   language: string = this.translate.getCurrentLang();
 
@@ -75,18 +71,8 @@ export class MePaymentComponent {
         const reservation = payment?.reservation;
         const types = reservation?.room?.paymentTypes.filter(
           p => ![PaymentType.cash, PaymentType.transfer].includes(p));
-        if (types?.includes(PaymentType.paynl)) {
-          this.store.dispatch(paymentOptions());
-        } else {
-          this.options.set(getPaymentOptions(this.translate, types));
-        }
-      }
-    });
-
-    effect(() => {
-      const options = this.paymentOptionsSignal();
-      if (options) {
-        this.options.set(getPayNlOptions(options));
+        this.paymentTypes.set(types);
+        this.options.set(getPaymentOptions(this.translate, types));
       }
     });
   }
@@ -105,12 +91,8 @@ export class MePaymentComponent {
       return;
     }
     const type = option.type;
-    const paymentOptionId = option.bic;
     const percentage = PaymentPercentage.total;
-    const payment: IReservationPayment = { type, paymentOptionId, percentage, bic: undefined };
-    if (option.subTypes.length) {
-      payment.bic = this.getForm.bank?.value?.bic;
-    }
+    const payment: IReservationPayment = { type, percentage };
 
     const id = this.paymentSignal()?.id;
     this.store.dispatch(updatePaymentById({ id: id!, payment }));

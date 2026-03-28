@@ -37,7 +37,6 @@ describe('ReservationDetailComponent', () => {
   let reservationSelected$: BehaviorSubject<any>;
   let payments$: BehaviorSubject<any>;
   let histories$: BehaviorSubject<any>;
-  let paymentOptions$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
@@ -135,7 +134,6 @@ describe('ReservationDetailComponent', () => {
     reservationSelected$ = new BehaviorSubject(undefined);
     payments$ = new BehaviorSubject(undefined);
     histories$ = new BehaviorSubject(undefined);
-    paymentOptions$ = new BehaviorSubject(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -161,8 +159,6 @@ describe('ReservationDetailComponent', () => {
           return payments$.asObservable();
         case 5:
           return histories$.asObservable();
-        case 6:
-          return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -195,7 +191,6 @@ describe('ReservationDetailComponent', () => {
     reservationSelected$.complete();
     payments$.complete();
     histories$.complete();
-    paymentOptions$.complete();
   });
 
   it('should create', () => {
@@ -552,8 +547,7 @@ describe('ReservationDetailComponent', () => {
         jasmine.any(Function),
         jasmine.objectContaining({
           data: jasmine.objectContaining({
-            options: [CancelOption.refund, CancelOption.discount, CancelOption.chargeWithDiscount,
-              CancelOption.chargeWithRefund, CancelOption.none],
+            options: [CancelOption.refund, CancelOption.account, CancelOption.chargeAndRefund, CancelOption.none],
             price: jasmine.objectContaining({
               amount: 100,
               totalPaid: 0,
@@ -778,7 +772,7 @@ describe('ReservationDetailComponent', () => {
       fixture.detectChanges();
 
       dialogSpy.and.returnValue({
-        afterClosed: () => of({ option: CancelOption.discount }),
+        afterClosed: () => of({ option: CancelOption.account }),
       });
 
       component.onChangeState('cancel');
@@ -787,7 +781,7 @@ describe('ReservationDetailComponent', () => {
         jasmine.any(Function),
         jasmine.objectContaining({
           data: jasmine.objectContaining({
-            options: [CancelOption.discount, CancelOption.refund],
+            options: [CancelOption.account, CancelOption.refund],
             price: jasmine.objectContaining({
               amount: 100,
               totalPaid: 100,
@@ -797,12 +791,12 @@ describe('ReservationDetailComponent', () => {
         }));
 
       expect(storeSpy.dispatch)
-        .toHaveBeenCalledWith(customerCancelReservation('reservation-123', { option: CancelOption.discount }));
+        .toHaveBeenCalledWith(customerCancelReservation('reservation-123', { option: CancelOption.account }));
     });
 
     it('should allow canceling with a penalty when is not edit mode', () => {
       dialogSpy.and.returnValue({
-        afterClosed: () => of({ option: CancelOption.charge }),
+        afterClosed: () => of({ option: CancelOption.chargeAndAccount }),
       });
       reservationSelected$.next({ ...mockReservation, canEdit: false });
       histories$.next([]);
@@ -814,7 +808,7 @@ describe('ReservationDetailComponent', () => {
         jasmine.any(Function),
         jasmine.objectContaining({
           data: jasmine.objectContaining({
-            options: [CancelOption.charge],
+            options: [CancelOption.chargeAndAccount],
             price: jasmine.objectContaining({
               amount: 100,
               totalPaid: 0,
@@ -825,7 +819,7 @@ describe('ReservationDetailComponent', () => {
         }));
 
       expect(storeSpy.dispatch)
-        .toHaveBeenCalledWith(customerCancelReservation('reservation-123', { option: CancelOption.charge }));
+        .toHaveBeenCalledWith(customerCancelReservation('reservation-123', { option: CancelOption.chargeAndAccount }));
     });
 
     it('should allow canceling with a penalty when is not edit mode and has paid the penalty', () => {
@@ -860,7 +854,7 @@ describe('ReservationDetailComponent', () => {
 
     it('should allow canceling when is not edit mode and has paid more than the penalty', () => {
       dialogSpy.and.returnValue({
-        afterClosed: () => of({ option: CancelOption.chargeWithDiscount }),
+        afterClosed: () => of({ option: CancelOption.chargeAndAccount }),
       });
       reservationSelected$.next({ ...mockReservation, canEdit: false });
       payments$.next(
@@ -874,7 +868,7 @@ describe('ReservationDetailComponent', () => {
         jasmine.any(Function),
         jasmine.objectContaining({
           data: jasmine.objectContaining({
-            options: [CancelOption.chargeWithDiscount, CancelOption.chargeWithRefund],
+            options: [CancelOption.chargeAndAccount, CancelOption.chargeAndRefund],
             price: jasmine.objectContaining({
               amount: 100,
               totalPaid: 100,
@@ -886,7 +880,7 @@ describe('ReservationDetailComponent', () => {
 
       expect(storeSpy.dispatch)
         .toHaveBeenCalledWith(
-          customerCancelReservation('reservation-123', { option: CancelOption.chargeWithDiscount }));
+          customerCancelReservation('reservation-123', { option: CancelOption.chargeAndAccount }));
     });
   });
 

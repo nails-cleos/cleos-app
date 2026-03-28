@@ -6,7 +6,6 @@ import { PaymentService } from './payment.service';
 import {
   IPay,
   IPaymentAll,
-  IPaymentOption,
   IPaymentRequest,
   IPaymentStatus,
   PaymentPercentage,
@@ -24,18 +23,10 @@ describe('PaymentService', () => {
     paymentId: 'paymentId',
     id: 'payment-123',
     status: 'completed',
-    type: PaymentType.paynl,
+    type: PaymentType.mollie,
     amount: 100,
     timestamp: Date.now(),
     preferenceId: 'pref-123',
-  };
-
-  const mockPaymentOption: IPaymentOption = {
-    name: 'Credit Card',
-    type: PaymentType.ideal,
-    icon: 'card-icon',
-    svgIcon: 'card-image.png',
-    subTypes: [],
   };
 
   const mockPaymentStatus: IPaymentStatus = {
@@ -53,7 +44,6 @@ describe('PaymentService', () => {
   const mockReservationPayment: IReservationPayment = {
     type: PaymentType.ideal,
     amount: 150,
-    paymentOptionId: 'option-123',
     percentage: PaymentPercentage.total,
   };
 
@@ -93,19 +83,6 @@ describe('PaymentService', () => {
       });
 
       expect(httpSpy.get).toHaveBeenCalledWith('v1/payments/payment-123');
-    });
-  });
-
-  describe('getPaymentOptions', () => {
-    it('should get all payment options', () => {
-      const paymentOptions = [mockPaymentOption];
-      httpSpy.get.and.returnValue(of(paymentOptions));
-
-      service.getPaymentOptions().subscribe(result => {
-        expect(result).toEqual(paymentOptions);
-      });
-
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/payments');
     });
   });
 
@@ -307,14 +284,6 @@ describe('PaymentService', () => {
 
       service.getPayment('non-existent').subscribe(result => {
         expect(result).toBeUndefined();
-      });
-    });
-
-    it('should handle empty payment options array', () => {
-      httpSpy.get.and.returnValue(of([]));
-
-      service.getPaymentOptions().subscribe(result => {
-        expect(result).toEqual([]);
       });
     });
 

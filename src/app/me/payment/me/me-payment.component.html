@@ -6,7 +6,7 @@
         <mat-card appearance="outlined">
           <mat-card-header>
             <mat-card-title
-              [innerHTML]="'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate: {amount: payment?.amount | number:'1.2-2', symbol: payment?.reservation?.room?.currency | currencySymbol}">
+              [innerHTML]="'COMMON.PAYMENT.TO_PAY' | translate: {amount: payment?.amount | number:'1.2-2', symbol: payment?.reservation?.room?.currency | currencySymbol}">
             </mat-card-title>
             <mat-card-subtitle>
               @if (payment?.reservation) {

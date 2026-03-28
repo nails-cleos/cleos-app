@@ -237,7 +237,7 @@ describe('InvoiceComponent', () => {
         officeId: mockOffice.id,
         start: backendFormatDate(start)!,
         end: backendFormatDate(end)!,
-        types: [PaymentType.transfer, PaymentType.paynl],
+        types: [PaymentType.transfer, PaymentType.paynl, PaymentType.mollie],
       }),
     );
   });

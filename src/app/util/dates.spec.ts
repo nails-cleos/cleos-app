@@ -9,6 +9,7 @@ import {
   createNewDate,
   createNewDateZonedTime,
   dateMonthYear,
+  dateToUTC,
   datesInSameWeek,
   dateToTimestamp,
   daysOfWeek,
@@ -1041,6 +1042,9 @@ describe('dates utility', () => {
   });
 
   describe('getMinMaxDate', () => {
+    const expectedHour = (hour: number, minute: number = 0): number =>
+      dateToUTC(createNewDate(new Date(), hour, minute), room.timeZone).getHours();
+
     it('should return min and max dates for sunday', () => {
       const result = getMinMaxDate(0, new Date(), [room]);
       expect(result.minDate.getHours()).toBe(0);
@@ -1050,9 +1054,9 @@ describe('dates utility', () => {
     });
     it('should return min and max dates for monday', () => {
       const result = getMinMaxDate(1, new Date(), [room]);
-      expect(result.minDate.getHours()).toBe(10);
+      expect(result.minDate.getHours()).toBe(expectedHour(9));
       expect(result.minDate.getMinutes()).toBe(0);
-      expect(result.maxDate.getHours()).toBe(19);
+      expect(result.maxDate.getHours()).toBe(expectedHour(18));
       expect(result.maxDate.getMinutes()).toBe(0);
     });
 
@@ -1066,17 +1070,17 @@ describe('dates utility', () => {
 
     it('should return min and max dates for wednesday', () => {
       const result = getMinMaxDate(3, new Date(), [room]);
-      expect(result.minDate.getHours()).toBe(11);
+      expect(result.minDate.getHours()).toBe(expectedHour(10));
       expect(result.minDate.getMinutes()).toBe(0);
-      expect(result.maxDate.getHours()).toBe(20);
+      expect(result.maxDate.getHours()).toBe(expectedHour(19));
       expect(result.maxDate.getMinutes()).toBe(0);
     });
 
     it('should return min and max dates for thursday', () => {
       const result = getMinMaxDate(4, new Date(), [room]);
-      expect(result.minDate.getHours()).toBe(10);
+      expect(result.minDate.getHours()).toBe(expectedHour(9));
       expect(result.minDate.getMinutes()).toBe(0);
-      expect(result.maxDate.getHours()).toBe(19);
+      expect(result.maxDate.getHours()).toBe(expectedHour(18));
       expect(result.maxDate.getMinutes()).toBe(0);
     });
 
@@ -1090,9 +1094,9 @@ describe('dates utility', () => {
 
     it('should return min and max dates for saturday', () => {
       const result = getMinMaxDate(6, new Date(), [room]);
-      expect(result.minDate.getHours()).toBe(11);
+      expect(result.minDate.getHours()).toBe(expectedHour(10));
       expect(result.minDate.getMinutes()).toBe(0);
-      expect(result.maxDate.getHours()).toBe(17);
+      expect(result.maxDate.getHours()).toBe(expectedHour(16));
       expect(result.maxDate.getMinutes()).toBe(0);
     });
 

@@ -71,7 +71,7 @@ describe('NoteComponent', () => {
       }
     });
 
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
 
     await TestBed.configureTestingModule({

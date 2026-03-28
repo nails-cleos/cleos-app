@@ -226,11 +226,10 @@
       "FIELD": "Select a cancellation option",
       "REQUIRED": "Cancellation option is <b>required</b>",
       "OPTION": {
-        "DISCOUNT": "<b>Discount:</b><br>Create a discount for the amount paid.",
+        "ACCOUNT": "<b>Account credit:</b><br>Add the amount paid to the account as credit.",
         "REFUND": "<b>Refund:</b><br>Refund the amount paid.",
-        "CHARGE": "<b>Penalty:</b><br>A penalty of {{penalty}}% will be charge.",
-        "CHARGE_WITH_DISCOUNT": "<b>Penalty + Discount:</b><br>A penalty of {{penalty}}% will be charge. If you paid more than the {{penalty}}%, a discount will be created.",
-        "CHARGE_WITH_REFUND": "<b>Penalty + Refund:</b><br>A {{penalty}}% penalty will be charged. If you paid more than {{penalty}}%, you will get a refund.",
+        "CHARGE_AND_ACCOUNT": "<b>Penalty + Account credit:</b><br>A {{penalty}}% penalty will be charged. If the amount paid is higher than the penalty, the difference will be added to the account.",
+        "CHARGE_AND_REFUND": "<b>Penalty + Refund:</b><br>A {{penalty}}% penalty will be charged. If the amount paid is higher than the penalty, the difference will be refunded.",
         "NONE": "<b>None:</b><br>No extra action performed."
       }
     },

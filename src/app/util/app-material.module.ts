@@ -91,27 +91,10 @@ export class AppMaterialModule {
     matIconRegistry.addSvgIcon('INSTAGRAM-NO-COLOR', this.getUrl('assets/instagram-no-color.svg'));
     matIconRegistry.addSvgIcon('FACEBOOK', this.getUrl('assets/facebook.svg'));
     matIconRegistry.addSvgIcon('FACEBOOK-NO-COLOR', this.getUrl('assets/facebook-no-color.svg'));
-    matIconRegistry.addSvgIcon('/payment_methods/1.svg', this.getUrl('assets/payment_methods/1.svg'));
-    matIconRegistry.addSvgIcon('IDEAL', this.getUrl('assets/payment_methods/1.svg'));
-    matIconRegistry.addSvgIcon('/payment_methods/2.svg', this.getUrl('assets/payment_methods/2.svg'));
-    matIconRegistry.addSvgIcon('/payment_methods/21.svg', this.getUrl('assets/payment_methods/21.svg'));
-    matIconRegistry.addSvgIcon('PAYPAL', this.getUrl('assets/payment_methods/21.svg'));
+    matIconRegistry.addSvgIcon('IDEAL', this.getUrl('assets/payment_methods/ideal.svg'));
+    matIconRegistry.addSvgIcon('PAYPAL', this.getUrl('assets/payment_methods/paypal.svg'));
+    matIconRegistry.addSvgIcon('MOLLIE', this.getUrl('assets/payment_methods/mollie.svg'));
     matIconRegistry.addSvgIcon('PAY_NL', this.getUrl('assets/payment_methods/paynl.svg'));
-    matIconRegistry.addSvgIcon('/issuers/1.svg', this.getUrl('assets/issuers/1.svg'));
-    matIconRegistry.addSvgIcon('/issuers/2.svg', this.getUrl('assets/issuers/2.svg'));
-    matIconRegistry.addSvgIcon('/issuers/4.svg', this.getUrl('assets/issuers/4.svg'));
-    matIconRegistry.addSvgIcon('/issuers/5.svg', this.getUrl('assets/issuers/5.svg'));
-    matIconRegistry.addSvgIcon('/issuers/8.svg', this.getUrl('assets/issuers/8.svg'));
-    matIconRegistry.addSvgIcon('/issuers/9.svg', this.getUrl('assets/issuers/9.svg'));
-    matIconRegistry.addSvgIcon('/issuers/10.svg', this.getUrl('assets/issuers/10.svg'));
-    matIconRegistry.addSvgIcon('/issuers/11.svg', this.getUrl('assets/issuers/11.svg'));
-    matIconRegistry.addSvgIcon('/issuers/12.svg', this.getUrl('assets/issuers/12.svg'));
-    matIconRegistry.addSvgIcon('/issuers/5080.svg', this.getUrl('assets/issuers/5080.svg'));
-    matIconRegistry.addSvgIcon('/issuers/5084.svg', this.getUrl('assets/issuers/5084.svg'));
-    matIconRegistry.addSvgIcon('/issuers/23355.svg', this.getUrl('assets/issuers/23355.svg'));
-    matIconRegistry.addSvgIcon('/issuers/23358.svg', this.getUrl('assets/issuers/23358.svg'));
-    matIconRegistry.addSvgIcon('/issuers/23361.svg', this.getUrl('assets/issuers/23361.svg'));
-    matIconRegistry.addSvgIcon('MOYONL21', this.getUrl('assets/issuers/MOYONL21.svg'));
   }
 
   private getUrl = (path: string): SafeResourceUrl => this.domSanitizer.bypassSecurityTrustResourceUrl(path);

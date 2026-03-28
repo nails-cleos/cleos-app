@@ -33,6 +33,7 @@
       "IDEAL": "Pagar con iDeal",
       "PAY_NL": "Pagar con PAY.",
       "PAYNL": "Pagar con PAY.",
+      "MOLLIE": "Mollie. payment",
       "NOTIFY": "Notificar",
       "SELECT": "Seleccionar",
       "UNAVAILABLE": "Agregar no disponible",
@@ -117,6 +118,7 @@
         "IDEAL": "iDeal",
         "PAY_NL": "PAY.",
         "PAYNL": "PAY.",
+        "MOLLIE": "Mollie.",
         "TRANSFER": "Transferencia bancaria",
         "ACCOUNT": "Crédito de la cuenta",
         "NONE": "Pago no seleccionado",
@@ -128,11 +130,13 @@
         "INVALID": "Banco es no valido"
       },
       "OPTIONS": {
+        "UPDATED_TOTAL": "Total actualizado",
+        "BALANCE": "Balance",
         "TO_PAY": "Total a pagar: {{amount}} {{symbol}}",
         "PAID": "Total pagado: {{amount}} {{symbol}}",
         "ACCOUNT": "Crédito: {{amount}} {{symbol}}",
         "PENALTY": "Penalización: {{amount}} {{symbol}}",
-        "D_OR_R": "Descuento o reembolso: {{amount}} {{symbol}}"
+        "WILL_ADD_ACCOUNT": "Esta cantidad se añadirá a la cuenta."
       },
       "DEPOSIT_50": "Pagar un depósito del 50% de la reserva",
       "TOTAL": "Pagar total de la reserva",

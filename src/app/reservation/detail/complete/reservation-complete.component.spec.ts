@@ -204,8 +204,8 @@ describe('ReservationCompleteComponent', () => {
     });
 
     it('should initialize types array', () => {
-      expect(component.types).toContain(PaymentType.cash);
-      expect(component.types).toContain(PaymentType.transfer);
+      expect(component.types.map(type => type.type)).toContain(PaymentType.cash);
+      expect(component.types.map(type => type.type)).toContain(PaymentType.transfer);
     });
   });
 
@@ -374,6 +374,16 @@ describe('ReservationCompleteComponent', () => {
       component.splitChange();
 
       expect(component.isValidSplit).toBe(false);
+    });
+
+    it('should reset split validity when split is turned off', () => {
+      component.split = true;
+      component.isValidSplit = false;
+
+      component.splitChange();
+
+      expect(component.split).toBe(false);
+      expect(component.isValidSplit).toBe(true);
     });
   });
 
@@ -588,7 +598,7 @@ describe('ReservationCompleteComponent', () => {
       component.price.set({ isPaid: false } as any);
       fixture.detectChanges();
 
-      expect(component.getForm.type.value).toBe(PaymentType.transfer);
+      expect(component.getForm.type.value).toBe(PaymentType.mollie);
     });
 
     it('should clear type when payment is paid', () => {
