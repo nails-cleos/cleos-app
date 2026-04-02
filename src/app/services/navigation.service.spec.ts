@@ -22,8 +22,7 @@ describe('NavigationService', () => {
     id: 'user-123',
     displayName: 'Test User',
     email: 'test@example.com',
-    locale: 'en-US',
-    lang: 'en',
+    locale: 'en-GB',
   };
 
   beforeEach(() => {
@@ -247,7 +246,7 @@ describe('NavigationService', () => {
 
       service.attachLang('es', userWithDifferentLocale);
       const updatedUser: IUser = new User();
-      updatedUser.lang = 'es';
+      updatedUser.locale = 'es';
 
       expect(storeSpy.dispatch).toHaveBeenCalledWith(setLanguage({ language: 'es' }));
       expect(storeSpy.dispatch).toHaveBeenCalledWith(
@@ -270,12 +269,19 @@ describe('NavigationService', () => {
       expect(result).toBe('en-GB'); // Default language from getLocale mock
     });
 
+    it('should not update user when current user is not provided', () => {
+      service.attachLang('es');
+
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(setLanguage({ language: 'es' }));
+      expect(storeSpy.dispatch).toHaveBeenCalledTimes(1);
+    });
+
     it('should handle user without locale', () => {
       const userWithoutLocale = { ...mockUser, locale: undefined };
 
       service.attachLang('es', userWithoutLocale);
       const updatedUser: IUser = new User();
-      updatedUser.lang = 'es';
+      updatedUser.locale = 'es';
 
       expect(storeSpy.dispatch).toHaveBeenCalledWith(setLanguage({ language: 'es' }));
       expect(storeSpy.dispatch).toHaveBeenCalledWith(
@@ -292,7 +298,7 @@ describe('NavigationService', () => {
 
       service.attachLang('es', mockUser);
 
-      expect(capturedUser!.lang).toBe('es');
+      expect(capturedUser!.locale).toBe('es');
     });
   });
 

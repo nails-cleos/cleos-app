@@ -36,12 +36,12 @@ describe('requestOptionInterceptor', () => {
   });
 
   it('should add default JSON and language headers for internal requests', async () => {
-    tokenServiceMock.user.and.returnValue({ lang: 'nl-NL' });
+    tokenServiceMock.user.and.returnValue({ lang: 'nl' });
     const request = await runInterceptor(new HttpRequest('GET', 'v1/users/me'));
 
     expect(request.headers.get('Content-Type')).toBe('application/json');
     expect(request.headers.get('Accept')).toBe('application/json');
-    expect(request.headers.get('Accept-Language')).toBe('nl-NL');
+    expect(request.headers.get('Accept-Language')).toBe('nl');
   });
 
   it('should preserve provided headers and skip Content-Type when Upload header is present', async () => {

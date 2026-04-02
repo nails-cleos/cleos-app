@@ -1,0 +1,29 @@
+{
+  "CATALOGUE": {
+    "TITLE": "Catalogus toevoegen",
+    "CREATED": "Catalogus {{name}} aangemaakt",
+    "DETAIL": "Catalogus bijwerken",
+    "NAME": {
+      "FIELD": "Naam",
+      "REQUIRED": "Naam is <b>verplicht</b>"
+    },
+    "DESCRIPTION": {
+      "FIELD": "Beschrijving"
+    },
+    "SHOW": {
+      "HOME": "Op home tonen",
+      "CATALOG": "In catalogus tonen"
+    },
+    "DELETED": {
+      "TITLE": "Catalogus verwijderen",
+      "CONTENT": "Weet je zeker dat je catalogus {{name}} wilt verwijderen?",
+      "MESSAGE": "Catalogus {{name}} verwijderd"
+    },
+    "UPDATED": {
+      "ALL": {
+        "MESSAGE": "Catalogi gesorteerd"
+      },
+      "MESSAGE": "Catalogus {{name}} bijgewerkt"
+    }
+  }
+}

@@ -1,0 +1,259 @@
+{
+  "RESERVATION": {
+    "CLONE": "Datum en tijd om te klonen",
+    "PREVIEW": "Voorbeeld",
+    "APPOINTMENT": "Afspraak",
+    "LIST": {
+      "CANCEL": {
+        "TITLE": "Afspraak annuleren",
+        "CONTENT": "Weet je zeker dat je afspraak {{date}} wilt annuleren?",
+        "MESSAGE": "Afspraak {{date}} geannuleerd"
+      },
+      "HISTORY": {
+        "TITLE": "Geschiedenis",
+        "ERROR": {
+          "NO_CONTENT": "Geen geschiedenis"
+        }
+      }
+    },
+    "CUSTOMER": {
+      "FIELD": "Klant",
+      "DETAIL": "Klantafspraak",
+      "SEARCH": "Zoek op klant",
+      "REQUIRED": "Klant is <b>verplicht</b>",
+      "INVALID": "Klant is ongeldig",
+      "ADD_BUTTON": "Klant toevoegen",
+      "CHANGE": "Klant wijzigen",
+      "UPDATE": "Klant bijwerken",
+      "INFO": {
+        "NONE": "Klant heeft geen afspraken",
+        "DAYS": "Laatste afspraak was {{days}} dagen geleden",
+        "PROFESSIONAL_NAME": "<span class='bold'>Professional:</span> {{professional}}",
+        "TREATMENT": "<span class='bold'>Behandeling:</span> {{treatment}}"
+      }
+    },
+    "ROOM": {
+      "TITLE": "Ruimte toevoegen",
+      "NO_CONTENT": "Geen ruimtes",
+      "DETAIL": "Details",
+      "NAME": {
+        "FIELD": "Naam"
+      }
+    },
+    "PROFESSIONAL": {
+      "SELECT": "Selecteer professional"
+    },
+    "TREATMENT": {
+      "DETAIL": "Details",
+      "NO_CONTENT": "Geen behandelingen",
+      "NAME": {
+        "FIELD": "Naam"
+      },
+      "DURATION": {
+        "FIELD": "Duur"
+      },
+      "PRICE": {
+        "FIELD": "Prijs"
+      },
+      "EXTRAS": {
+        "TITLE": "Extra's",
+        "NO_CONTENT": "Geen gegevens",
+        "DESCRIPTION": {
+          "LABEL": "Beschrijving",
+          "REQUIRED": "Beschrijving is <b>verplicht</b>"
+        },
+        "PRICE": {
+          "LABEL": "Prijs",
+          "REQUIRED": "Prijs is <b>verplicht</b>"
+        },
+        "TYPE": {
+          "LABEL": "Betaalmethode",
+          "REQUIRED": "Betaalmethode is <b>verplicht</b>"
+        },
+        "REMAINS": "<div class='red-text'>Nog te verdelen: <span class='bold'>{{toPaid}}</span></div>",
+        "TOTAL": "Totaal"
+      },
+      "COMPLETE": {
+        "DESCRIPTION": "<span class='bold'>Beschrijving:</span> {{description}}",
+        "GROUP": "<span class='bold'>Servicecategorie:</span> {{name}}",
+        "NAME": "<span class='bold'>Service:</span> {{group}} - {{name}}",
+        "TOTAL": "<span class='bold'>Totaal:</span>",
+        "PRICE": "<span class='bold'>Prijs:</span>",
+        "DURATION": "<span class='bold'>Duur:</span>"
+      },
+      "DISCOUNT": {
+        "FIELD": "Korting",
+        "ADD": "Met korting"
+      },
+      "COLOR": {
+        "FIELD": "Kleur",
+        "REQUIRED": "Kleur is <b>verplicht</b>",
+        "INVALID": "Kleur is ongeldig",
+        "CHANGE": "Kleur wijzigen",
+        "UPDATE": "Kleur bijwerken"
+      }
+    },
+    "DATE": {
+      "FIELD": "Kies een datum",
+      "REQUIRED": "Datum is <b>verplicht</b>"
+    },
+    "TIME": {
+      "START": {
+        "FIELD": "Kies een starttijd voor de behandeling",
+        "REQUIRED": "Starttijd van de behandeling is <b>verplicht</b>"
+      },
+      "END": {
+        "FIELD": "Kies een eindtijd voor de behandeling",
+        "REQUIRED": "Eindtijd van de behandeling is <b>verplicht</b>"
+      }
+    },
+    "START": {
+      "FIELD": "Kies een tijd",
+      "REQUIRED": "Tijd is <b>verplicht</b>"
+    },
+    "SCHEDULE": {
+      "FIELD": "Plan een afspraak",
+      "REQUIRED": "Een afspraak plannen is <b>verplicht</b>"
+    },
+    "EVENT": {
+      "CUSTOMER": "<b>{{customerName}}</b>",
+      "OVERLAPPING": {
+        "TITLE": "Overlappende afspraak",
+        "CONTENT": "De nieuwe afspraak overlapt met <div>{{data}}</div>. Weet je zeker dat je de afspraak wilt toevoegen?",
+        "ERROR": "De nieuwe afspraak overlapt met <div>{{data}}</div>"
+      },
+      "DETAIL": "<div class='detail'><b>{{professionalName}}</b></div><div class='detail'>{{customerName}}</div>{{treatments}}",
+      "TITLE": "Nieuwe afspraak toevoegen",
+      "CONTENT": "Weet je zeker dat je een afspraak wilt toevoegen op {{date}}?",
+      "CHANGE": {
+        "TITLE": "Afspraak bijwerken",
+        "CONTENT": "Weet je zeker dat je de afspraak wilt wijzigen naar {{date}}?"
+      },
+      "MESSAGE": {
+        "UNAVAILABLE": "<b>Niet beschikbaar</b>",
+        "LUNCH": "<b>Lunchpauze</b>",
+        "OUT_OF_WORK": "<b>Buiten werktijd</b>"
+      },
+      "UNAVAILABLE": "<div class='detail'><b>{{professionalName}} niet beschikbaar</b></div><div class='detail'>{{description}}</div>",
+      "BIRTHDAY": "<div class='detail'><b>&#127874; {{customerName}}</b></div>",
+      "NOTE": "<div class='detail'><b>&#128211; {{note}}</b></div>"
+    },
+    "PAYMENT": {
+      "TITLE": "Betalingen",
+      "PAID": "Betaald",
+      "TRANSFER": {
+        "FIELD": "Overschrijvingsreferentie"
+      },
+      "UPDATE": {
+        "MESSAGE": "Betaling(en) bijgewerkt"
+      },
+      "SPLIT": {
+        "TITLE": "Splits de betaling",
+        "CHECKBOX": "Splitsen"
+      }
+    },
+    "ACTION": {
+      "APPROVE": "Goedkeuren",
+      "EDIT": "Bewerken",
+      "PAY": "Betalen",
+      "START": "Starten",
+      "COMPLETE": "Voltooien",
+      "CANCEL": "Annuleren",
+      "BOOK": "Opnieuw boeken",
+      "SEND": "Whatsapp sturen",
+      "MORE": "Meer",
+      "CHANGE": "Klant wijzigen",
+      "COLOR": "Kleur wijzigen",
+      "COFFEE": "Koffie sturen",
+      "PREVIOUS": "Vorige",
+      "NEXT": "Volgende",
+      "CLONE": "Klonen"
+    },
+    "CHANGE_STATE": {
+      "TITLE": "Status wijzigen",
+      "ACTION": {
+        "APPROVE": "de afspraak goedkeuren",
+        "EDIT": "de afspraak bewerken",
+        "PAY": "de afspraak betalen",
+        "START": "de afspraak starten",
+        "COMPLETE": "de afspraak voltooien",
+        "CANCEL": "de afspraak annuleren",
+        "BOOK": "opnieuw boeken"
+      },
+      "CONTENT": "Weet je zeker dat je {{action}}?"
+    },
+    "TRACKING": {
+      "TITLE": "Registratie",
+      "DURATION": "Duur van de afspraak: {{totalTime}}",
+      "SYNC": "Afspraak niet verwerkt",
+      "UPDATE": "Registratie bijwerken",
+      "STARTED": "Gestart",
+      "COMPLETED": "Voltooid"
+    },
+    "REVIEW": {
+      "TITLE": "Beoordeling"
+    },
+    "STATE": {
+      "FIELD": "Status",
+      "SEARCH": "Zoek op status",
+      "CANCEL": "Afspraak geannuleerd",
+      "CHANGE_CUSTOMER": "Klant gewijzigd",
+      "CHANGE_COLOR": "Kleur gewijzigd"
+    },
+    "CONFIGURATION": {
+      "TITLE": "Configuratie",
+      "REFERENCE": {
+        "FIELD": "Referentie",
+        "REQUIRED": "Referentie is <b>verplicht</b>"
+      },
+      "CUSTOMER_CHANGE": {
+        "FIELD": "Klant mag wijzigen"
+      }
+    },
+    "NOTE": {
+      "FIELD": "Notitie",
+      "CUSTOMER": "Klantnotitie",
+      "REQUIRED": "Notitie is <b>verplicht</b>",
+      "ADD": "Notitie toevoegen",
+      "MESSAGE": "Wat is je notitie?"
+    },
+    "AMOUNT": {
+      "FIELD": "Betaald bedrag",
+      "MIN": "Betaald bedrag moet groter zijn dan 0"
+    },
+    "CANCEL": {
+      "TITLE": "Afspraak annuleren",
+      "FIELD": "Selecteer een annuleringsoptie",
+      "REQUIRED": "Annuleringsoptie is <b>verplicht</b>",
+      "OPTION": {
+        "ACCOUNT": "<b>Accounttegoed:</b><br>Voeg het betaalde bedrag als tegoed toe aan het account.",
+        "REFUND": "<b>Terugbetaling:</b><br>Betaal het betaalde bedrag terug.",
+        "CHARGE_AND_ACCOUNT": "<b>Boete + accounttegoed:</b><br>Er wordt een boete van {{penalty}}% in rekening gebracht. Als het betaalde bedrag hoger is dan de boete, wordt het verschil aan het account toegevoegd.",
+        "CHARGE_AND_REFUND": "<b>Boete + terugbetaling:</b><br>Er wordt een boete van {{penalty}}% in rekening gebracht. Als het betaalde bedrag hoger is dan de boete, wordt het verschil terugbetaald.",
+        "NONE": "<b>Geen:</b><br>Er wordt geen extra actie uitgevoerd."
+      }
+    },
+    "DISCOUNT": {
+      "ADD": "Korting toevoegen",
+      "FIELD": "Selecteer korting",
+      "REQUIRED": "Korting is <b>verplicht</b>"
+    },
+    "MOVE": {
+      "TITLE": "Weet je zeker dat je de afspraak van {{customer}} wilt verplaatsen?",
+      "CONTENT": "Van: {{from}} <br> Naar: {{to}}"
+    }
+  },
+  "PAYMENT": {
+    "TYPE": {
+      "FIELD": "Betaalmethode",
+      "SEARCH": "Zoek op betaalmethode"
+    },
+    "RECREATE": "Betaallink opnieuw aangemaakt",
+    "COPY": "Link gekopieerd!",
+    "LIST": {
+      "ERROR": {
+        "NO_CONTENT": "Geen betaling"
+      }
+    }
+  }
+}

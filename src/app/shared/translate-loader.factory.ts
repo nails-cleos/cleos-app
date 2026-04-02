@@ -2,17 +2,21 @@ import { MissingTranslationHandler, MissingTranslationHandlerParams, TranslateLo
 import { from, Observable } from 'rxjs';
 import { getLocale } from '../util/helper';
 
-const appAvailableLanguages = ['en', 'es'];
+const appAvailableLanguages = ['en', 'es', 'nl'];
 const defaultLanguage = 'en';
 
 export class TranslateLoaderFactory {
+  static loadJson = <T>(module: string, lang: string): Observable<T> => {
+    const currentLang = getLocale(lang).i18n;
+    const fileLang = appAvailableLanguages.includes(currentLang) ? currentLang : defaultLanguage;
+
+    return from(import(`../../assets/i18n/${module}/${fileLang}.json`)).pipe() as Observable<T>;
+  };
+
   static forModule = (module: string): any =>
     class LazyTranslateLoader implements TranslateLoader {
       getTranslation(lang: string): Observable<any> {
-        const currentLang = getLocale(lang).i18n;
-        const fileLang = appAvailableLanguages.includes(currentLang) ? currentLang : defaultLanguage;
-
-        return from(import(`../../assets/i18n/${module}/${fileLang}.json`));
+        return TranslateLoaderFactory.loadJson(module, lang);
       }
     };
 }

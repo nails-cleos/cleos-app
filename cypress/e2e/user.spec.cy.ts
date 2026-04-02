@@ -62,7 +62,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           const body = userData.request.body;
           expect(body.email).to.eq(`${ role }@email.com`);
           expect(body.displayName).to.eq(`${ role } Name`);
-          expect(body.lang).to.eq('en_GB');
+          expect(body.locale).to.eq('en_GB');
           expect(body.phone).to.eq('+31 6 25250787');
           expect(body.dob).to.be.ok;
           if (role !== 'Customer') {
@@ -106,7 +106,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
           const phone = '+31 6 25251524';
           cy.formControlType('email', `${ role }@email.com`);
-          cy.selectOption('select-lang', 'Spanish');
+          cy.selectOption('select-lang', 'Español');
           cy.formControlType('displayName', `${ role } Name`);
           cy.get('#phone').find('input').clear().type(phone);
           cy.get('[data-cy="dob-picker"]').clear().click({ force: true });
@@ -123,7 +123,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
             const body = userData.request.body;
             expect(body.email).to.eq(`${ role }@email.com`);
             expect(body.displayName).to.eq(`${ role } Name`);
-            expect(body.lang).to.eq('es');
+            expect(body.locale).to.eq('es');
             expect(body.phone).to.eq(phone);
             expect(body.dob).to.be.ok;
           });

@@ -44,14 +44,14 @@ export class NavigationService {
 
   reload = (url: string[], data?: any, queryParams?: any, reloadURL = '/auth/redirect', lang?: string): void => {
     const currentLang = getLocale(this.languageSignal()).language;
-    const navigateUrl = `/${lang || currentLang}${reloadURL}`;
+    const navigateUrl = `/${ lang || currentLang }${ reloadURL }`;
     this.router.navigateByUrl(navigateUrl, { skipLocationChange: true }).then(() =>
       this.router.navigate(url.filter(path => path), { state: data, queryParams }));
   };
 
   reloadPage = (url?: string): void => {
     const currentLang = getLocale(this.languageSignal()).language;
-    const currentUrl = url ?? `/${currentLang}`;
+    const currentUrl = url ?? `/${ currentLang }`;
     this.router.navigateByUrl(currentUrl).then(() => window.location.reload());
   };
 
@@ -65,11 +65,15 @@ export class NavigationService {
 
     this.store.dispatch(setLanguage({ language }));
 
+    if (!currentUser) {
+      return language;
+    }
+
     const userLanguage = getLocale(currentUser?.locale).language;
 
     if (userLanguage !== language) {
       const user: IUser = new User();
-      user.lang = language;
+      user.locale = language;
 
       this.store.dispatch(updateMyUser({ user, redirectUrl: this.router.url }));
     }

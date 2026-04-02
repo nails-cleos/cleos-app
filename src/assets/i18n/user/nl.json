@@ -1,0 +1,69 @@
+{
+  "USER": {
+    "FIELD": "Gebruikers",
+    "TITLE": "Gebruiker toevoegen",
+    "CUSTOMER": "Klant {{displayName}} aangemaakt",
+    "PROFESSIONAL": "Professional {{displayName}} aangemaakt",
+    "MANAGER": "Manager {{displayName}} aangemaakt",
+    "DETAIL": "Gebruiker bijwerken",
+    "LIST": {
+      "COLUMN": {
+        "DISPLAY_NAME": "Weergavenaam",
+        "EMAIL": "E-mail",
+        "DETAIL": {
+          "TITLE": "Rollen"
+        }
+      },
+      "ERROR": {
+        "NO_CONTENT": "Geen gebruikers"
+      },
+      "STATUS": {
+        "ENABLED": "Geverifieerd",
+        "DISABLED": "Niet geverifieerd",
+        "NOT_CREATED": "Niet geregistreerd",
+        "DELETED": "Verwijderd"
+      }
+    },
+    "ROLE": {
+      "FIELD": "Rollen",
+      "REQUIRED": "Rol is <b>verplicht</b>"
+    },
+    "DELETED": {
+      "TITLE": "Gebruiker verwijderen",
+      "CONTENT": "Weet je zeker dat je gebruiker {{displayName}} wilt verwijderen?",
+      "MESSAGE": "Gebruiker {{displayName}} verwijderd"
+    },
+    "RESTORE": {
+      "TITLE": "Gebruiker herstellen",
+      "CONTENT": "Weet je zeker dat je gebruiker {{displayName}} wilt herstellen?",
+      "MESSAGE": "Gebruiker {{displayName}} hersteld"
+    },
+    "UPDATED": {
+      "MESSAGE": "Gebruiker {{displayName}} bijgewerkt"
+    },
+    "ACTIVATION_RESEND": {
+      "TITLE": "Activatiecode opnieuw verzenden",
+      "CONTENT": "Weet je zeker dat je de activatiecode opnieuw wilt verzenden naar gebruiker {{displayName}}?",
+      "MESSAGE": "Activatiecode verzonden"
+    },
+    "ROLES": {
+      "REMOVE": "Rol {{role}} verwijderd van {{displayName}}",
+      "ADD": "Rol {{role}} toegevoegd aan {{displayName}}"
+    },
+    "MERGE": {
+      "SELECT": "Selecteer gebruiker om samen te voegen",
+      "NAME": "<b>Naam:</b> {{name}}",
+      "EMAIL": "<b>E-mail:</b> {{email}}",
+      "SUCCESS": "Gebruikers samengevoegd",
+      "OLD_USER": {
+        "TITLE": "Oude gebruiker",
+        "FIELD": "Oude gebruiker",
+        "REQUIRED": "Oude gebruiker is <b>verplicht</b>",
+        "INVALID": "Oude gebruiker is ongeldig"
+      },
+      "NEW_USER": {
+        "TITLE": "Nieuwe gebruiker"
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import { findFlag, flags } from './flags';
-import { flagEs, flagGb } from '@ng-icons/flag-icons';
+import { flagEs, flagGb, flagNl } from '@ng-icons/flag-icons';
 
 describe('Flags Utils', () => {
 
@@ -15,10 +15,11 @@ describe('Flags Utils', () => {
       });
     });
 
-    it('should include ES and GB flags', () => {
+    it('should include ES, GB, and NL flags', () => {
       const list = flags();
       expect(list.find(f => f.value === 'es')?.flag).toBe(flagEs);
       expect(list.find(f => f.value === 'en_GB')?.flag).toBe(flagGb);
+      expect(list.find(f => f.value === 'nl')?.flag).toBe(flagNl);
     });
   });
 
@@ -33,11 +34,16 @@ describe('Flags Utils', () => {
       expect(result.value).toBe('en_GB');
     });
 
+    it('should resolve dutch locales through getLocale fallback', () => {
+      const result = findFlag('nl-NL');
+      expect(result.value).toBe('nl');
+    });
+
     it('should fallback to navigator.language if still not found', () => {
       const originalLang = navigator.language;
       Object.defineProperty(navigator, 'language', { value: 'es', configurable: true });
       const result = findFlag('unknown_lang');
-      expect(result.value).toBe('es');
+      expect(result.value).toBe('en_GB');
       Object.defineProperty(navigator, 'language', { value: originalLang });
     });
   });

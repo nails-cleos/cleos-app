@@ -1,0 +1,43 @@
+{
+  "ADDITIONAL": {
+    "TITLE": "Extra toevoegen",
+    "CREATED": "Extra {{name}} aangemaakt",
+    "DETAIL": "Extra bijwerken",
+    "LIST": {
+      "COLUMN": {
+        "PRICE": "Prijs",
+        "DURATION": "Duur"
+      },
+      "ERROR": {
+        "NO_CONTENT": "Geen extra's"
+      }
+    },
+    "NAME": {
+      "FIELD": "Naam",
+      "REQUIRED": "Naam is <b>verplicht</b>"
+    },
+    "DESCRIPTION": {
+      "FIELD": "Beschrijving"
+    },
+    "PRICE": {
+      "FIELD": "Prijs",
+      "REQUIRED": "Prijs is <b>verplicht</b>",
+      "GREATER": "Prijs moet groter zijn dan 1"
+    },
+    "DURATION": {
+      "FIELD": "Duur",
+      "REQUIRED": "Duur is <b>verplicht</b>"
+    },
+    "DELETED": {
+      "TITLE": "Extra verwijderen",
+      "CONTENT": "Weet je zeker dat je extra {{name}} wilt verwijderen?",
+      "MESSAGE": "Extra {{name}} verwijderd"
+    },
+    "UPDATED": {
+      "MESSAGE": "Extra {{name}} bijgewerkt"
+    },
+    "SORTED": {
+      "MESSAGE": "Lijst met extra's gesorteerd"
+    }
+  }
+}

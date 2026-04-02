@@ -28,11 +28,9 @@ import { PermissionsService } from './app/services/auth-guard.service';
 import { PaginatorI18n } from './app/util/paginator';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatPaginatorIntl } from '@angular/material/paginator';
-import localeEn from '@angular/common/locales/en';
 import localeEnGB from '@angular/common/locales/en-GB';
-import localeEnNL from '@angular/common/locales/en-NL';
+import localeNl from '@angular/common/locales/nl';
 import localeEs from '@angular/common/locales/es';
-import localeAr from '@angular/common/locales/es-AR';
 import { provideHttpClient, withInterceptors, withJsonpSupport } from '@angular/common/http';
 import { httpInterceptorProviders } from './app/http-interceptors';
 import { provideRouterStore } from '@ngrx/router-store';
@@ -95,11 +93,9 @@ const cookieConfig: NgcCookieConsentConfig = {
 const localStorageSyncReducer = (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync(
   { keys: [AUTH_FEATURE_KEY], rehydrate: true })(reducer);
 
-registerLocaleData(localeEn, 'en');
 registerLocaleData(localeEnGB, 'en-GB');
-registerLocaleData(localeEnNL, 'en-NL');
+registerLocaleData(localeNl, 'nl');
 registerLocaleData(localeEs, 'es');
-registerLocaleData(localeAr, 'es-AR');
 
 const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
 

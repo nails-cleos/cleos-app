@@ -1,29 +1,29 @@
-<div class="content">
-  <section class="section-style">
-    @for (section of sections(); track section) {
+<div class="content treatment-page">
+  <section class="section-style treatment-shell">
+    @for (section of sections(); track section; let index = $index) {
       @switch (section.type) {
         @case ('title') {
-          <h1 [ngClass]="section.class" [innerHTML]="section.value"></h1>
+          <h1 class="section-title" [class.hero-title]="index === 0" [ngClass]="section.class" [innerHTML]="section.value"></h1>
         }
         @case ('subtitle') {
-          <h2 [ngClass]="section.class" [innerHTML]="section.value"></h2>
+          <h2 class="section-subtitle" [ngClass]="section.class" [innerHTML]="section.value"></h2>
         }
         @case ('detail') {
-          <div [ngClass]="section.class">
+          <div class="detail-card" [class.hero-copy]="index <= 3" [ngClass]="section.class">
             <p [innerHTML]="section.value"></p>
           </div>
         }
         @case ('image') {
-          <div class="image-container">
+          <div class="image-container image-frame">
             <img class="responsive-image" [ngSrc]="section.value" [width]="section.width" [height]="section.height"
                  alt="{{section.alt}}" priority>
           </div>
         }
         @case ('image-text') {
-          <div class="image-container">
+          <div class="image-container image-text-grid">
             @for (detail of section.details; track detail) {
-              <div class="image-margin">
-                <p [ngClass]="detail.class" [innerHTML]="detail.description"></p>
+              <div class="image-margin image-text-card">
+                <p class="image-text-description" [ngClass]="detail.class" [innerHTML]="detail.description"></p>
                 <img [ngSrc]="detail.value" [width]="detail.width" [height]="detail.height"
                      alt="{{detail.alt}}" priority>
               </div>
@@ -33,19 +33,19 @@
         @case ('image-detail') {
           <div class="image-detail-container" [class]="section.class">
             @if (section.class && section.class.indexOf('left') >= 0) {
-              <div class="image-detail">
+              <div class="image-detail image-detail-media">
                 <img [ngSrc]="section.value" [width]="section.width" [height]="section.height" alt="{{section.alt}}"
                      priority>
               </div>
-              <div class="text" [class]="section.class">
+              <div class="text image-detail-copy" [class]="section.class">
                 @if (section.details) {
                   @for (detail of section.details; track detail) {
                     @switch (detail.type) {
                       @case ('subtitle') {
-                        <h3 class="title" [innerHTML]="detail.value"></h3>
+                        <h3 class="title image-detail-title" [innerHTML]="detail.value"></h3>
                       }
                       @case ('detail') {
-                        <div [class]="detail.class">
+                        <div class="detail-card nested-detail" [class]="detail.class">
                           <p [innerHTML]="detail.value"></p>
                         </div>
                       }
@@ -54,15 +54,15 @@
                 }
               </div>
             } @else {
-              <div class="text" [class]="section.class">
+              <div class="text image-detail-copy" [class]="section.class">
                 @if (section.details) {
                   @for (detail of section.details; track detail) {
                     @switch (detail.type) {
                       @case ('subtitle') {
-                        <h3 class="title" [innerHTML]="detail.value"></h3>
+                        <h3 class="title image-detail-title" [innerHTML]="detail.value"></h3>
                       }
                       @case ('detail') {
-                        <div [class]="detail.class">
+                        <div class="detail-card nested-detail" [class]="detail.class">
                           <p [innerHTML]="detail.value"></p>
                         </div>
                       }
@@ -70,7 +70,7 @@
                   }
                 }
               </div>
-              <div class="image-detail">
+              <div class="image-detail image-detail-media">
                 <img [ngSrc]="section.value" [width]="section.width" [height]="section.height" alt="{{section.alt}}"
                      priority>
               </div>
@@ -78,14 +78,14 @@
           </div>
         }
         @case ('list') {
-          <ul>
+          <ul class="feature-list">
             @for (detail of section.details; track detail) {
               <li class="bold">{{ detail.value }}</li>
             }
           </ul>
         }
         @case ('enum') {
-          <ol class="text-center">
+          <ol class="text-center care-list">
             @for (detail of section.details; track detail) {
               <li class="bold">{{ detail.value }}</li>
             }
@@ -95,12 +95,12 @@
           <h3 class="sub-sub-title" [innerHTML]="section.value"></h3>
         }
         @case ('divider') {
-          <mat-list>
+          <mat-list class="divider-block">
             <mat-divider class="divider margin-bottom"></mat-divider>
           </mat-list>
         }
         @case ('table') {
-          <div class="table-wrapper">
+          <div class="table-wrapper desktop-table">
             <table [ngClass]="section.class" class="responsive-table">
               @for (detail of section.details; track detail) {
                 <tr>
@@ -132,6 +132,25 @@
               }
             </table>
           </div>
+          @if (section.details && section.details.length > 1) {
+            <div class="comparison-cards mobile-table">
+              @for (detail of section.details.slice(1); track detail) {
+                <article class="comparison-card">
+                  @if (detail.details && detail.details[0]) {
+                    <h4 class="comparison-card-title" [innerHTML]="detail.details[0].value"></h4>
+                  }
+                  @if (detail.details && section.details[0].details) {
+                    @for (detailDetail of detail.details.slice(1); track detailDetail; let cellIndex = $index) {
+                      <div class="comparison-card-row">
+                        <span class="comparison-card-label" [innerHTML]="section.details?.[0]?.details?.[cellIndex + 1]?.value"></span>
+                        <p class="comparison-card-value" [innerHTML]="detailDetail.value"></p>
+                      </div>
+                    }
+                  }
+                </article>
+              }
+            </div>
+          }
         }
       }
     }

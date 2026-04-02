@@ -50,6 +50,8 @@ type MainForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainContentComponent {
+  private static readonly BIAB_TREATMENT_ID = 'biab-treatment';
+
   private readonly store: Store<MainState> = inject(Store<MainState>);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
@@ -372,9 +374,10 @@ export class MainContentComponent {
   isCurrentSlideIndex = (index: number): boolean => this.currentIndex() === index;
 
   goToTreatment = (name?: string): void => {
-    if (name === 'biab') {
+    const treatmentId = name === 'biab' ? MainContentComponent.BIAB_TREATMENT_ID : name;
+    if (treatmentId === MainContentComponent.BIAB_TREATMENT_ID) {
       goTo('home');
-      this.router.navigate([this.translate.getCurrentLang(), 'home', name, 'treatment']);
+      this.router.navigate([this.translate.getCurrentLang(), 'home', treatmentId, 'treatment']);
     }
   };
 
