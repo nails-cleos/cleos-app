@@ -15,7 +15,7 @@ import { ITreatmentDiscountDTO } from '../../interfaces/treatment';
 import { IRoomAll } from '../../interfaces/room';
 import { IUserAll } from '../../interfaces/user';
 import { IAdditionalAll } from '../../interfaces/additional';
-import { IPaymentAll, IPaymentOption } from '../../interfaces/payment';
+import { IPaymentAll } from '../../interfaces/payment';
 import { IReview } from '../../interfaces/review';
 import { IColorAll } from '../../interfaces/color';
 
@@ -134,15 +134,6 @@ const selectCalendar = createSelector(
 export const getCalendarPipe = pipe(
   select(selectCalendar),
   filter((val): val is IRoomReservation[] => val !== undefined),
-);
-
-const selectPaymentOptions = createSelector(
-  selectReservationState,
-  (state: ReservationState) => state?.paymentOptions,
-);
-export const getPaymentOptionsPipe = pipe(
-  select(selectPaymentOptions),
-  filter((val): val is IPaymentOption[] => val !== undefined),
 );
 
 const selectPayments = createSelector(

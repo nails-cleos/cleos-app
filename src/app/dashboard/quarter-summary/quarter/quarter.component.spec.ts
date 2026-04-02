@@ -10,7 +10,7 @@ describe('QuarterComponent', () => {
   let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
 
     await TestBed.configureTestingModule({
       imports: [QuarterComponent, TranslateModule.forRoot()],

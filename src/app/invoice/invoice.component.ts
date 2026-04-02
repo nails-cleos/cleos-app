@@ -141,7 +141,7 @@ export class InvoiceComponent {
       map(([type, allPaymentTypes]) => type ? this.filterTypes(type, allPaymentTypes) : allPaymentTypes),
     ));
 
-  selectedPaymentTypesSignal = signal<string[]>([PaymentType.transfer, PaymentType.paynl]);
+  selectedPaymentTypesSignal = signal<string[]>([PaymentType.transfer, PaymentType.paynl, PaymentType.mollie]);
   allPaymentTypesWritableSignal = signal<string[] | undefined>(undefined);
   dataSourceSignal = computed(() => {
     const invoiceList = this.invoiceListSignal();

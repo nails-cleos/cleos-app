@@ -1,31 +1,133 @@
-# CleosApp
+# Cleos
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.0.5.
+Cleos is an Angular 21 application for running a beauty and appointment business. It combines the public booking experience, customer self-service flows, and back-office management in a single app.
 
-## Development server
+The project includes:
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4300/`. The app will automatically reload if you change any of the source files.
+- Public catalogue and treatment pages
+- Customer flows for booking, payments, referrals, and reservation management
+- Internal dashboards for reservations, invoices, statements, users, rooms, offices, treatments, discounts, and availability
+- PWA support, Firebase integrations, and Cypress/Karma test coverage
 
-## Code scaffolding
+## Tech Stack
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- Angular 21
+- Angular Material
+- NgRx Store / Effects / Router Store
+- RxJS
+- SCSS
+- Firebase
+- Cypress and Karma/Jasmine
 
-## Build
+## Requirements
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+- Node `v24.12.0`
+- npm `11.6.2`
 
-## Running unit tests
+The expected versions are defined in [package.json](/Users/lucasscarlatta/Developer/Lucas/cleos-app/package.json).
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Getting Started
 
-## Running end-to-end tests
+Install dependencies:
 
-Run `cypress:run` to execute the end-to-end tests via [Cypress](https://www.cypress.io/).
+```bash
+npm install
+```
 
-## Run PWA
+Start the app in development mode:
 
-Run `ng build-pwa` then run `ng start:pwa` and create a server `ngrok http --domain=typically-optimum-tetra.ngrok-free.app 4200`
+```bash
+npm run start:dev
+```
 
-## Further help
+The dev server runs on `http://localhost:4300`.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## Available Scripts
+
+- `npm run start:dev` starts the Angular dev server on port `4300`
+- `npm run serve` starts the dev server on `0.0.0.0:4300`
+- `npm run build-development` builds the app with the development configuration
+- `npm run build` builds the production bundle
+- `npm run build-pwa` builds the PWA bundle
+- `npm run test` runs unit tests with Karma
+- `npm run lint` runs Angular ESLint
+- `npm run lint:fix` runs Angular ESLint with autofix
+- `npm run cypress:run` runs Cypress end-to-end tests
+- `npm run cypress:open` starts the app and opens Cypress interactively
+
+## Build Configurations
+
+The application ships with multiple Angular build targets:
+
+- `development`
+- `production`
+- `staging`
+- `pwa`
+
+Environment files live in [src/environments](/Users/lucasscarlatta/Developer/Lucas/cleos-app/src/environments).
+
+## Project Structure
+
+Main application areas inside [src/app](/Users/lucasscarlatta/Developer/Lucas/cleos-app/src/app):
+
+- [src/app/main](/Users/lucasscarlatta/Developer/Lucas/cleos-app/src/app/main): public landing, catalogue, legal, and marketing pages
+- [src/app/me](/Users/lucasscarlatta/Developer/Lucas/cleos-app/src/app/me): customer-facing reservation, payment, and referral flows
+- [src/app/reservation](/Users/lucasscarlatta/Developer/Lucas/cleos-app/src/app/reservation): reservation management, search, calendar, and detail screens
+- [src/app/account](/Users/lucasscarlatta/Developer/Lucas/cleos-app/src/app/account): customer account balances and transactions
+- [src/app/dashboard](/Users/lucasscarlatta/Developer/Lucas/cleos-app/src/app/dashboard): reporting and operational dashboard views
+- [src/app/shared](/Users/lucasscarlatta/Developer/Lucas/cleos-app/src/app/shared): reusable UI building blocks
+- [src/app/store](/Users/lucasscarlatta/Developer/Lucas/cleos-app/src/app/store): actions, reducers, selectors, and effects
+- [src/app/services](/Users/lucasscarlatta/Developer/Lucas/cleos-app/src/app/services): API and integration services
+
+Other important folders:
+
+- [src/assets](/Users/lucasscarlatta/Developer/Lucas/cleos-app/src/assets): images, icons, and static assets
+- [cypress](/Users/lucasscarlatta/Developer/Lucas/cleos-app/cypress): end-to-end tests
+- [scripts](/Users/lucasscarlatta/Developer/Lucas/cleos-app/scripts): project utility scripts
+
+## Testing
+
+Run unit tests:
+
+```bash
+npm run test
+```
+
+Run a TypeScript-only spec compile check:
+
+```bash
+npx tsc -p tsconfig.spec.json --noEmit
+```
+
+Run Cypress:
+
+```bash
+npm run cypress:run
+```
+
+## PWA Notes
+
+PWA-related files include:
+
+- [src/manifest.json](/Users/lucasscarlatta/Developer/Lucas/cleos-app/src/manifest.json)
+- [src/firebase-messaging-sw.js](/Users/lucasscarlatta/Developer/Lucas/cleos-app/src/firebase-messaging-sw.js)
+- [ngsw-config.json](/Users/lucasscarlatta/Developer/Lucas/cleos-app/ngsw-config.json)
+
+To build the PWA bundle:
+
+```bash
+npm run build-pwa
+```
+
+## Notes For Contributors
+
+- Styles are written in SCSS
+- State management is handled with NgRx
+- The app uses Angular standalone components in several areas
+- Payment, reservation, and account flows are tightly connected, so changes there usually need both UI and store-level verification
+
+## Troubleshooting
+
+- If the app cannot reach backend services locally, check [proxy.conf.json](/Users/lucasscarlatta/Developer/Lucas/cleos-app/proxy.conf.json)
+- If test execution fails in the browser runner, try the TypeScript spec compile check first to separate compile errors from Karma/browser issues
+- If you are working on production or staging behavior, verify the active Angular configuration and environment replacement in [angular.json](/Users/lucasscarlatta/Developer/Lucas/cleos-app/angular.json)

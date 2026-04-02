@@ -33,8 +33,6 @@ import {
   getTrackingByReservationId,
   getUpcomingReservation,
   paymentCompleteReservation,
-  paymentOptions,
-  paymentOptionsSuccess,
   reservationAdditionalSuccess,
   reservationFailure,
   reservationFilterPageSuccess,
@@ -88,7 +86,7 @@ import { IUserAll } from '../../interfaces/user';
 import { ITreatmentDiscountDTO } from '../../interfaces/treatment';
 import { IRoomAll } from '../../interfaces/room';
 import { IAdditionalAll } from '../../interfaces/additional';
-import { IPaymentAll, IPaymentOption } from '../../interfaces/payment';
+import { IPaymentAll } from '../../interfaces/payment';
 import { IApiResponse } from '../../interfaces/common';
 import { IReview } from '../../interfaces/review';
 import { IColorAll } from '../../interfaces/color';
@@ -275,7 +273,7 @@ export class ReservationEffects {
       { id, event, key, extras, isDashboard, state },
     ) => this.reservationService.changeState(id, event, extras).pipe(
       map((response: IReservation | void) => stateSuccess({
-        message: this.translate.instant(`COMMON.RESERVATION.STATE.${key}`),
+        message: this.translate.instant(`COMMON.RESERVATION.STATE.${ key }`),
         id,
         paymentLink: response?.paymentLink,
         isDashboard,
@@ -348,14 +346,6 @@ export class ReservationEffects {
     ofType(getColorsByTreatmentId),
     switchMap(({ treatmentId }) => this.colorService.getColorsByTreatmentId(treatmentId).pipe(
       map((colors: IColorAll[]) => colorsCompleteSuccess({ colors })),
-      catchError((err: HttpErrorResponse) => of(reservationFailure({ error: err.error }))),
-    )),
-  ));
-
-  paymentOptions$ = createEffect(() => this.actions.pipe(
-    ofType(paymentOptions),
-    switchMap(() => this.paymentService.getPaymentOptions().pipe(
-      map((paymentOptions?: IPaymentOption[]) => paymentOptionsSuccess({ paymentOptions })),
       catchError((err: HttpErrorResponse) => of(reservationFailure({ error: err.error }))),
     )),
   ));
@@ -492,7 +482,7 @@ export class ReservationEffects {
     paymentLink?: string, deleted?: boolean, toastType?: ToastType,
   ) {
     const message = this.translate.instant(key, { date });
-    const path = id ? `reservation/${id}` : undefined;
+    const path = id ? `reservation/${ id }` : undefined;
 
     return reservationSaveSuccess({ message, navigate, path, role, paymentLink, deleted, id, toastType });
   }

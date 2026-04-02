@@ -1,6 +1,6 @@
+<mat-divider></mat-divider>
+<div mat-subheader>{{ 'ME.PAYMENT.DETAIL' | translate }}</div>
 @if (type(); as type) {
-  <mat-divider></mat-divider>
-  <div mat-subheader>{{ 'ME.PAYMENT.DETAIL' | translate }}</div>
   <mat-list-item>
     @if (type.icon) {
       <mat-icon matListItemIcon>{{ type.icon }}</mat-icon>
@@ -10,20 +10,32 @@
     <div matListItemTitle>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</div>
     <div matListItemLine>{{ type.name }}</div>
   </mat-list-item>
-  @if (type.subTypes.length) {
-    @if (bank(); as bank) {
+  @if (price()) {
+    <app-price-preview [price]="price()" [currencyIcon]="currencyIcon()" [isEditing]="isEditing()"
+                       [updatedTotal]="updatedTotal()" [penalty]="penalty()" [toPaid]="toPaid()"
+                       [accountBalanceUsedInput]="accountBalanceUsed()"
+                       [accountCredit]="accountCredit()" [paidTotal]="paidTotal()"
+                       [discountId]="discountId()" [discountKey]="discountKey()"></app-price-preview>
+  } @else {
+    @if (accountBalanceUsed()) {
       <mat-list-item>
-        <mat-icon matListItemIcon [svgIcon]="bank.svgIcon"></mat-icon>
-        <div matListItemTitle>{{ 'COMMON.PAYMENT.BANK.FIELD' | translate }}</div>
-        <div matListItemLine>{{ bank.name }}</div>
+        <mat-icon matListItemIcon>account_balance</mat-icon>
+        <div matListItemTitle>{{ 'COMMON.PAYMENT.OPTIONS.ACCOUNT' | translate }}</div>
+        <div matListItemLine>{{ currencyIcon() | currencySymbol }} {{ accountBalanceUsed() }}</div>
+      </mat-list-item>
+    }
+    @if (toPaid() || penalty()) {
+      <mat-list-item>
+        <mat-icon matListItemIcon>{{ currencyIcon() }}</mat-icon>
+        <div matListItemTitle><span class="bold">{{ 'COMMON.LABEL.TOTAL' | translate }}</span></div>
+        <div matListItemLine><span class="bold">{{ toPaid() || penalty() }}</span></div>
       </mat-list-item>
     }
   }
-  @if (toPaid() || penalty()) {
-    <mat-list-item>
-      <mat-icon matListItemIcon>{{ currencyIcon() }}</mat-icon>
-      <div matListItemTitle><span class="bold">{{ 'COMMON.LABEL.TOTAL' | translate }}</span></div>
-      <div matListItemLine><span class="bold">{{ toPaid() || penalty() }}</span></div>
-    </mat-list-item>
-  }
+} @else if (price()) {
+  <app-price-preview [price]="price()" [currencyIcon]="currencyIcon()" [isEditing]="isEditing()"
+                     [updatedTotal]="updatedTotal()" [penalty]="penalty()" [toPaid]="toPaid()"
+                     [accountBalanceUsedInput]="accountBalanceUsed()"
+                     [accountCredit]="accountCredit()" [paidTotal]="paidTotal()"
+                     [discountId]="discountId()" [discountKey]="discountKey()"></app-price-preview>
 }

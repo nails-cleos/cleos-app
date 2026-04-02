@@ -52,10 +52,25 @@
       <td mat-cell *matCellDef="let element; let i = index" [formGroup]="getFormGroup(i)">
         <mat-form-field appearance="outline">
           <mat-label>{{ 'RESERVATION.TREATMENT.EXTRAS.TYPE.LABEL' | translate }}</mat-label>
-          <mat-select formControlName="paymentType" required (blur)="updateExtra(i)">
+          <mat-select [formControl]="getPaymentTypeControl(i)" required (selectionChange)="updateExtra(i)">
+            <mat-select-trigger>
+              @if (getSelectedPaymentOption(i); as selectedOption) {
+                @if (selectedOption.svgIcon) {
+                  <mat-icon [svgIcon]="selectedOption.svgIcon" class="svg-icon"></mat-icon>
+                } @else if (selectedOption.icon) {
+                  <mat-icon class="svg-icon">{{ selectedOption.icon }}</mat-icon>
+                }
+                {{ selectedOption.name }}
+              }
+            </mat-select-trigger>
             @for (t of allPaymentTypes(); track t) {
-              <mat-option [value]="t.toUpperCase()">
-                {{ 'COMMON.PAYMENT.TYPE.' + t.toUpperCase() | translate }}
+              <mat-option [value]="t.type">
+                @if (t.icon) {
+                  <mat-icon>{{ t.icon }}</mat-icon>
+                } @else {
+                  <mat-icon [svgIcon]="t.svgIcon" class="svg-icon"></mat-icon>
+                }
+                {{ t.name }}
               </mat-option>
             }
           </mat-select>

@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
-import { getPayment, paymentOptions, updatePaymentById } from '../../../store/payment.actions';
+import { getPayment, updatePaymentById } from '../../../store/payment.actions';
 import { PaymentPercentage, PaymentType } from '../../../interfaces/payment';
 import { ActivatedRoute } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
@@ -19,12 +19,10 @@ describe('MePaymentComponent', () => {
   // streams returned by store.pipe()
   let paymentId$: Subject<string | null>;
   let payment$: Subject<any>;
-  let paymentOptions$: Subject<any>;
 
   beforeEach(async () => {
     paymentId$ = new Subject();
     payment$ = new Subject();
-    paymentOptions$ = new Subject();
 
     storeSpy = jasmine.createSpyObj<Store<PaymentState>>('Store', ['dispatch', 'pipe']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -41,8 +39,6 @@ describe('MePaymentComponent', () => {
           return paymentId$.asObservable();
         case 2:
           return payment$.asObservable();
-        case 3:
-          return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -64,7 +60,6 @@ describe('MePaymentComponent', () => {
   afterEach(() => {
     paymentId$.complete();
     payment$.complete();
-    paymentOptions$.complete();
   });
 
   it('should create', () => {
@@ -81,42 +76,34 @@ describe('MePaymentComponent', () => {
     );
   });
 
-  it('should NOT dispatch paymentOptions when paynl is not available', () => {
+  it('should keep options empty when no online payment type is available', () => {
     payment$.next({
       reservation: {
         room: {
-          paymentTypes: [PaymentType.paypal],
+          paymentTypes: [PaymentType.cash, PaymentType.transfer],
         },
       },
     });
 
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(paymentOptions());
+    expect(component.options()).toEqual([]);
   });
 
-  it('should dispatch paymentOptions when paynl is available', () => {
+  it('should derive options from the room payment types', () => {
     payment$.next({
       reservation: {
         room: {
-          paymentTypes: [PaymentType.paynl],
+          paymentTypes: [PaymentType.cash, PaymentType.mollie],
         },
       },
     });
 
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentOptions());
-  });
-
-  it('should update options signal when paymentOptions are emitted', () => {
-    const options = [{ bic: 'ING', type: PaymentType.paynl }];
-
-    paymentOptions$.next(options);
-
-    fixture.detectChanges();
-
-    expect(component.options()).toBeDefined();
+    expect(component.options()).toEqual(jasmine.arrayContaining([
+      jasmine.objectContaining({ type: PaymentType.mollie }),
+    ]));
   });
 
   it('should dispatch updatePaymentById on update()', () => {
@@ -132,9 +119,7 @@ describe('MePaymentComponent', () => {
     fixture.detectChanges();
 
     component.getForm.type.setValue({
-      type: PaymentType.paynl,
-      bic: 'paynl',
-      subTypes: [],
+      type: PaymentType.mollie,
     } as any);
 
     component.update();
@@ -143,10 +128,8 @@ describe('MePaymentComponent', () => {
       updatePaymentById({
         id: 'payment-1',
         payment: {
-          type: PaymentType.paynl,
-          paymentOptionId: 'paynl',
+          type: PaymentType.mollie,
           percentage: PaymentPercentage.total,
-          bic: undefined,
         },
       }),
     );

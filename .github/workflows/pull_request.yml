@@ -114,16 +114,37 @@ jobs:
 
           # Extract test results
           if [ -f "test-results/junit-report.xml" ]; then
-            TESTS=$(grep -o 'tests="[0-9]*"' test-results/junit-report.xml | head -1 | grep -o '[0-9]*')
-            FAILURES=$(grep -o 'failures="[0-9]*"' test-results/junit-report.xml | head -1 | grep -o '[0-9]*')
-            PASS_RATE=$(( (TESTS - FAILURES) * 100 / TESTS ))
+            node -e "
+              const fs = require('fs');
+              const xml = fs.readFileSync('test-results/junit-report.xml', 'utf8');
+              const getAttr = (name) => {
+                const match = xml.match(new RegExp(name + '=\"([^\"]+)\"'));
+                return match ? match[1] : undefined;
+              };
+              const tests = Number(getAttr('tests') || 0);
+              const failures = Number(getAttr('failures') || 0);
+              const errors = Number(getAttr('errors') || 0);
+              const pending = Number(getAttr('pending') || getAttr('disabled') || 0);
+              const skipped = Number(getAttr('skipped') || 0);
+              const duration = getAttr('time') || '0';
+              const failed = failures + errors;
+              const passed = Math.max(tests - failed - pending - skipped, 0);
+              const result = failed === 0 ? 'Passing ✅' : 'Failing ❌';
 
+              fs.appendFileSync(
+                process.env.GITHUB_STEP_SUMMARY,
+                '### Test Results\\n\\n' +
+                '| Result | Passed ✅ | Failed ❌ | Pending ✋ | Skipped ↩️ | Duration 🕗 |\\n' +
+                '|--------|-----------|-----------|------------|-------------|------------|\\n' +
+                '| ' + result + ' | ' + passed + ' | ' + failed + ' | ' + pending + ' | ' + skipped + ' | ' + duration + 's |\\n\\n'
+              );
+            "
+          else
             echo "### Test Results" >> $GITHUB_STEP_SUMMARY
-            echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
-            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
-            echo "| Total Tests | $TESTS |" >> $GITHUB_STEP_SUMMARY
-            echo "| Failures | $FAILURES |" >> $GITHUB_STEP_SUMMARY
-            echo "| Pass Rate | ${PASS_RATE}% |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Result | Passed ✅ | Failed ❌ | Pending ✋ | Skipped ↩️ | Duration 🕗 |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-----------|-----------|------------|-------------|------------|" >> $GITHUB_STEP_SUMMARY
+            echo "| No report found ❌ | 0 | 0 | 0 | 0 | ${DURATION}s |" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
 

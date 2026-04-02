@@ -8,19 +8,17 @@ import {
   notifyPayment,
   paymentFailure,
   paymentNotComplete,
-  paymentOptions,
   paymentSave,
   paymentSaveSuccess,
   paymentSelected,
   paymentSend,
-  paymentSuccess,
   recreate,
   setCurrentPathId,
   setCurrentPaymentId,
   setPaymentResultParams,
   updatePaymentById,
 } from '../payment.actions';
-import { IPayment, IPaymentOption } from '../../interfaces/payment';
+import { IPayment, PaymentType } from '../../interfaces/payment';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
 import { clearGlobalError, clearGlobalResponse } from '../global.actions';
@@ -29,7 +27,7 @@ export const PAYMENT_FEATURE_KEY = 'payment';
 
 export interface PaymentState {
   response?: IResponseSuccess;
-  data?: IPayment | Pagination<IPayment> | IPaymentOption[];
+  data?: IPayment | Pagination<IPayment>;
   error?: IError;
   subErrors?: IError[];
   selected?: IPayment | IPayment[];
@@ -45,11 +43,14 @@ export interface PaymentState {
     reason?: string;
     orderId?: string;
     orderStatusId?: string;
+    paymentType?: PaymentType;
+    accountId?: string;
   };
   currentPaymentId?: string;
   currentPathId?: {
     path: 'reservation' | 'transaction';
     id: string;
+    accountId?: string;
   };
   isLoading: boolean;
 }
@@ -80,21 +81,6 @@ export const paymentReducer = createReducer(
     isLoading: true,
     subErrors: undefined,
     selected: undefined,
-    response: undefined,
-  })),
-  on(paymentOptions, (state) => ({
-    ...state,
-    data: undefined,
-    isLoading: true,
-    subErrors: undefined,
-    selected: undefined,
-    response: undefined,
-  })),
-  on(paymentSuccess, (state, { data }) => ({
-    ...state,
-    data,
-    isLoading: false,
-    subErrors: undefined,
     response: undefined,
   })),
   on(paymentSaveSuccess, (state, action) => ({
@@ -130,7 +116,20 @@ export const paymentReducer = createReducer(
     isLoading: true,
   })),
   on(setPaymentResultParams,
-    (state, { path, id, paymentId, status, orderId, orderStatusId, payerId, preferenceId, reason, token }) => ({
+    (state, {
+      path,
+      id,
+      paymentId,
+      status,
+      orderId,
+      orderStatusId,
+      payerId,
+      preferenceId,
+      reason,
+      token,
+      paymentType,
+      accountId,
+    }) => ({
       ...state,
       paymentResultParams: {
         path,
@@ -143,15 +142,17 @@ export const paymentReducer = createReducer(
         preferenceId,
         reason,
         token,
+        paymentType,
+        accountId,
       },
     })),
   on(setCurrentPaymentId, (state, { paymentId }) => ({
     ...state,
     currentPaymentId: paymentId,
   })),
-  on(setCurrentPathId, (state, { id, path }) => ({
+  on(setCurrentPathId, (state, { id, path, accountId }) => ({
     ...state,
-    currentPathId: { id, path },
+    currentPathId: { id, path, accountId },
   })),
   on(cleanPayment, () => initialState),
 

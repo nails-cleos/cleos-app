@@ -8,7 +8,7 @@ import { TransactionComponent } from './transaction.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { IAccountAll, ITransaction } from '../../interfaces/account';
 import { IPaymentOption, PaymentOption, PaymentType } from '../../interfaces/payment';
-import { createTransaction, getAccount, paymentOptions } from '../../store/account.actions';
+import { createTransaction, getAccount } from '../../store/account.actions';
 import { AccountState } from '../../store/reducers/account.reducers';
 import { signal } from '@angular/core';
 
@@ -18,7 +18,6 @@ describe('TransactionComponent', () => {
 
   let accountId$: BehaviorSubject<string | null>;
   let selectedAccount$: BehaviorSubject<IAccountAll | undefined>;
-  let paymentOptions$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
   let response$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
@@ -48,9 +47,9 @@ describe('TransactionComponent', () => {
   };
 
   beforeEach(async () => {
+    authUserSignal.set(initialAuthUser);
     accountId$ = new BehaviorSubject<any>(null);
     selectedAccount$ = new BehaviorSubject<any>(undefined);
-    paymentOptions$ = new BehaviorSubject<any>(undefined);
     subErrors$ = new BehaviorSubject<any>(undefined);
     response$ = new BehaviorSubject<any>(undefined);
 
@@ -74,10 +73,8 @@ describe('TransactionComponent', () => {
         case 2:
           return selectedAccount$.asObservable();
         case 3:
-          return paymentOptions$.asObservable();
-        case 4:
           return subErrors$.asObservable();
-        case 5:
+        case 4:
           return response$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -106,7 +103,6 @@ describe('TransactionComponent', () => {
   afterEach(() => {
     accountId$.complete();
     selectedAccount$.complete();
-    paymentOptions$.complete();
     subErrors$.complete();
     response$.complete();
   });
@@ -127,7 +123,7 @@ describe('TransactionComponent', () => {
     expect(component.getForm.amount).toBeDefined();
     expect(component.getBankForm.type).toBeDefined();
     expect(component.getForm.transfer).toBeDefined();
-    expect(component.getBankForm.bank).toBeDefined();
+    expect(component.getBankForm.percentage).toBeDefined();
   });
 
   it('should have validators configured (required & min)', () => {
@@ -161,22 +157,20 @@ describe('TransactionComponent', () => {
     expect(typeof component.currencyIcon).toBe('string');
   });
 
-  it('should react to paymentOptions and compute optionsSignal', () => {
-    const optionsPayload = [
-      {
-        name: 'Test Payment Option',
-        image: 'test-image.png',
-        id: 'test-id',
-        paymentOptionSubList: [{ name: 'Sub Option', image: 'sub-image.png', id: 'sub-id' }],
-      },
-    ];
-    paymentOptions$.next(optionsPayload);
+  it('should compute admin payment options locally', () => {
+    authUserSignal.update(prev => ({ ...prev, hasAdminRole: true }));
     fixture.detectChanges();
 
-    const opts = component.optionsSignal();
-    expect(opts).toBeDefined();
-    expect(Array.isArray(opts)).toBeTrue();
-    expect((opts as any).length).toBeGreaterThan(0);
+    expect(component.optionsSignal().map(option => option.type)).toEqual([PaymentType.cash, PaymentType.transfer]);
+  });
+
+  it('should compute non-admin payment options locally', () => {
+    authUserSignal.update(prev => ({ ...prev, hasAdminRole: false }));
+    fixture.detectChanges();
+
+    const options = component.optionsSignal();
+    expect(options.map(option => option.type)).toEqual([PaymentType.mollie]);
+    expect(options[0].hidePercentage).toBeTrue();
   });
 
   it('should set errors signal when subErrors arrive and set form control errors', () => {
@@ -243,20 +237,18 @@ describe('TransactionComponent', () => {
           amount: 200,
           paymentRequest: {
             type: PaymentType.cash,
-            paymentOptionId: undefined,
             transfer: 'test-transfer',
-            bic: undefined,
           },
         } as ITransaction,
       }),
     );
   });
 
-  it('should dispatch createTransaction for PaymentOption type without subTypes', () => {
+  it('should dispatch createTransaction for PaymentOption type', () => {
     accountId$.next('account-123');
     selectedAccount$.next(mockAccount);
 
-    const paymentOption = new PaymentOption('Test Payment', PaymentType.paynl, 'test-icon', 'test-image', 'test-bic');
+    const paymentOption = new PaymentOption('Test Payment', PaymentType.paypal, 'PAYPAL');
 
     component.bankForm.patchValue({
       type: paymentOption,
@@ -278,75 +270,12 @@ describe('TransactionComponent', () => {
           customerId: 'customer-123',
           amount: 300,
           paymentRequest: {
-            type: PaymentType.paynl,
-            paymentOptionId: 'test-bic' as any,
+            type: PaymentType.paypal,
             transfer: 'test-transfer',
-            bic: undefined,
           },
         } as ITransaction,
       }),
     );
-  });
-
-  it('should dispatch createTransaction for PaymentOption with subTypes and selected bank', () => {
-    accountId$.next('account-123');
-    selectedAccount$.next(mockAccount);
-
-    const subOption = new PaymentOption('Sub Option', PaymentType.ideal, 'sub-icon', 'sub-image', 'sub-bic');
-    const paymentOption = new PaymentOption(
-      'Test Payment',
-      PaymentType.ideal,
-      'test-icon',
-      'test-image',
-      'test-bic',
-      [subOption],
-    );
-
-    component.bankForm.patchValue({
-      type: paymentOption,
-      bank: { bic: 'selected-bic' } as PaymentOption,
-    });
-
-    component.form.patchValue({
-      amount: 400,
-      transfer: 'test-transfer',
-    });
-
-    storeSpy.dispatch.calls.reset();
-    component.submit();
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      createTransaction({
-        id: 'account-123',
-        transaction: {
-          customerId: 'customer-123',
-          amount: 400,
-          paymentRequest: {
-            type: PaymentType.ideal,
-            paymentOptionId: 'test-bic' as any,
-            transfer: 'test-transfer',
-            bic: 'selected-bic',
-          },
-        } as ITransaction,
-      }),
-    );
-  });
-
-  it('should dispatch paymentOptions action when hasAdminRole() is false and computed runs', () => {
-    storeSpy.dispatch.calls.reset();
-
-    authUserSignal.update(prev => ({ ...prev, hasAdminRole: true }));
-    fixture.detectChanges();
-
-    expect(component.hasAdminRole()).toBeTrue();
-    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(paymentOptions());
-
-    authUserSignal.update(prev => ({ ...prev, hasAdminRole: false }));
-    fixture.detectChanges();
-
-    expect(component.hasAdminRole()).toBeFalse();
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentOptions());
   });
 
   it('should leave errors when response clears (errors persist until next submission)', () => {
@@ -362,11 +291,10 @@ describe('TransactionComponent', () => {
 
   it('should handle empty selector emissions gracefully', () => {
     selectedAccount$.next(undefined);
-    paymentOptions$.next(undefined);
     subErrors$.next(undefined);
     response$.next(undefined);
 
     expect(component.accountSignal()).toBeUndefined();
-    expect(component.optionsSignal()).toBeUndefined();
+    expect(component.optionsSignal().map(option => option.type)).toEqual([PaymentType.mollie]);
   });
 });

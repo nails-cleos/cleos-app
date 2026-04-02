@@ -56,7 +56,7 @@ export class TransactionViewComponent {
 
   paginatorPageIndex = signal(0);
   dataSourceSignal = computed(() => this.transactionsSignal()?.content?.map((it: ITransaction) =>
-    Object.assign({}, it, { date: newDateTimestamp(it.payment?.timestamp) }),
+    Object.assign({}, it, { date: newDateTimestamp(it.timestamp ?? it.payment?.timestamp) }),
   ));
   resultsLengthSignal = computed(() => this.transactionsSignal()?.totalElements || 0);
   accountSignal = computed(() => this.accountTransactionSignal()?.account);

@@ -46,7 +46,7 @@ module.exports = (config) => {
         '**/src/app/**/*.selectors.ts',
       ],
     },
-    reporters: ['progress', 'spec', 'kjhtml', 'junit'],
+    reporters: ['spec', 'kjhtml', 'junit'],
     specReporter: {
       maxLogLines: 5,
       suppressErrorSummary: false,

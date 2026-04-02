@@ -31,7 +31,7 @@ describe('DashboardEventComponent', () => {
     navigationParams$ = new BehaviorSubject(undefined);
     eventDashboard$ = new BehaviorSubject(undefined);
 
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),

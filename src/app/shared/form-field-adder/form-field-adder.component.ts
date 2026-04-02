@@ -9,7 +9,7 @@ import {
 } from '@angular/forms';
 import { IExtras } from '../../interfaces/reservation';
 import { ICurrencyAll } from '../../interfaces/currency';
-import { PaymentType } from '../../interfaces/payment';
+import { IPaymentOption, PaymentType } from '../../interfaces/payment';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CurrencyPipe } from '@angular/common';
@@ -34,7 +34,7 @@ type FormFieldsForm = {
 export class FormFieldAdderComponent {
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  allPaymentTypes = input.required<string[]>();
+  allPaymentTypes = input.required<IPaymentOption[]>();
   key = input.required<string>();
   currency = input.required<ICurrencyAll>();
   split = input<boolean>(false);
@@ -104,6 +104,14 @@ export class FormFieldAdderComponent {
   getFormGroup = (index: number): FormGroup<ExtraForm> => this.formArray.at(index);
 
   getFormGroupControls = (index: number): ExtraForm => this.getFormGroup(index).controls;
+
+  getPaymentTypeControl = (index: number): FormControl<PaymentType | undefined> => this.getFormGroupControls(
+    index).paymentType!;
+
+  getSelectedPaymentOption = (index: number): IPaymentOption | undefined => {
+    const paymentType = this.getFormGroupControls(index).paymentType?.value;
+    return this.allPaymentTypes().find(option => option.type === paymentType);
+  };
 
   private createItemFormGroup = (): FormGroup<ExtraForm> => {
     return this.formBuilder.group<ExtraForm>({

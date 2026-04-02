@@ -230,10 +230,9 @@ export enum States {
 
 export enum CancelOption {
   refund = 'REFUND',
-  discount = 'DISCOUNT',
-  chargeWithDiscount = 'CHARGE_WITH_DISCOUNT',
-  chargeWithRefund = 'CHARGE_WITH_REFUND',
-  charge = 'CHARGE',
+  account = 'ACCOUNT',
+  chargeAndAccount = 'CHARGE_AND_ACCOUNT',
+  chargeAndRefund = 'CHARGE_AND_REFUND',
   none = 'NONE'
 }
 

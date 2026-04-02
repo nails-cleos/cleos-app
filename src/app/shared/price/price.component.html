@@ -1,4 +1,4 @@
-@let currentPrice = price();
+@let currentPrice = summaryPrice;
 @let currentCurrency = currency();
 @let currentShowBank = showBank();
 @let currentFirstTime = firstTime();
@@ -6,30 +6,19 @@
 @let currentOptions = options();
 @let currentProfessionalName = professionalName();
 @if (currentPrice) {
-  <div [innerHTML]="'COMMON.PAYMENT.OPTIONS.PAID' | translate: {amount: currentPrice.totalPaid | number:'1.2-2',
-                   symbol: currentCurrency | currencySymbol}"></div>
+  <app-price-preview [price]="currentPrice" [currencyIcon]="currentCurrency?.icon" [summaryOnly]="true"
+                     [updatedTotal]="paymentPrice()?.total" [paidTotal]="currentPrice.totalPaid"
+                     [penalty]="showPenalty() ? currentPrice.penalty : undefined"
+                     [accountBalanceUsedInput]="appliedBalance"
+                     [toPaid]="adjustedAmountToPay" [accountCredit]="adjustedCredit"></app-price-preview>
 
-  <div [innerHTML]="'COMMON.PAYMENT.OPTIONS.PENALTY' | translate: {amount: currentPrice.penalty | number:'1.2-2',
-                   symbol: currentCurrency | currencySymbol}"></div>
-
-  @if (showPenalty()) {
-    @if (currentPrice.totalPaid - currentPrice.penalty > 0) {
-      <div [innerHTML]="'COMMON.PAYMENT.OPTIONS.D_OR_R' | translate: {
-          amount: (currentPrice.totalPaid - currentPrice.penalty )| number:'1.2-2', symbol: currentCurrency | currencySymbol}"></div>
-    }
-
-    @if (currentPrice.penalty - currentPrice.totalPaid > 0) {
-      <div [innerHTML]="'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate: {
-          amount: (currentPrice.penalty - currentPrice.totalPaid) | number:'1.2-2', symbol: currentCurrency | currencySymbol}"></div>
-    }
-
-    @if (currentShowBank && currentPrice.penalty > currentPrice.totalPaid) {
-      <app-bank [firstTime]="currentFirstTime" [form]="form" [options]="currentOptions"
-                [professionalName]="currentProfessionalName" (percentageEmitter)="emitter($event)"></app-bank>
-    }
+  @if (shouldShowBankForm) {
+    <app-bank [firstTime]="currentFirstTime" [form]="form" [options]="currentOptions"
+              [showPaymentMessage]="!currentPrice?.isPaid"
+              [professionalName]="currentProfessionalName" (percentageEmitter)="emitter($event)"></app-bank>
   }
 
-  @if (currentShowBank) {
+  @if (shouldShowBankForm) {
     <mat-divider></mat-divider>
   }
 } @else if (currentShowBank) {

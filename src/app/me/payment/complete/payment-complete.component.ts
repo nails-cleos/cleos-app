@@ -7,7 +7,11 @@ import { PaymentStatus, PaymentType } from '../../../interfaces/payment';
 import { SharedModule } from '../../../shared/shared.module';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { getPaymentResponsePipe, getResultParamsPipe, getSubErrorsPipe } from '../../../store/selectors/payment.selectors';
+import {
+  getPaymentResponsePipe,
+  getResultParamsPipe,
+  getSubErrorsPipe,
+} from '../../../store/selectors/payment.selectors';
 
 @Component({
   selector: 'app-payment-complete',
@@ -43,14 +47,17 @@ export class PaymentCompleteComponent {
         // TODO analytic payment option
         let type;
         let referenceId;
-        if (params.paymentId !== 'null') {
-          if (params.preferenceId && params.preferenceId !== 'null') {
-            type = PaymentType.ml;
-            referenceId = params.preferenceId;
-          } else if (params.payerId && params.paymentId !== 'null') {
-            type = PaymentType.paypal;
-            referenceId = params.payerId;
-          }
+        if (params.paymentType) {
+          this.router.navigate([this.language, 'me', this.path, this.id, 'payment'],
+            { queryParams: { accountId: params.accountId } });
+          return;
+        }
+        if (params.preferenceId && params.preferenceId !== 'null') {
+          type = PaymentType.ml;
+          referenceId = params.preferenceId;
+        } else if (params.payerId && params.paymentId !== 'null') {
+          type = PaymentType.paypal;
+          referenceId = params.payerId;
         } else if (params.token) {
           type = PaymentType.ideal;
           referenceId = params.token;
@@ -70,13 +77,10 @@ export class PaymentCompleteComponent {
           this.store.dispatch(
             paymentNotComplete({ subError: [{ message }] }),
           );
-          // this.router.navigate([this.language, 'me', this.path, this.id, 'payment']);
           return;
         }
         const paymentStatus = new PaymentStatus(params.paymentId, type, referenceId, params.reason);
         this.store.dispatch(paymentSave({ id: params.id, path: params.path, status, paymentStatus }));
-
-
       }
     });
     this.language = this.translate.getCurrentLang();
@@ -92,7 +96,7 @@ export class PaymentCompleteComponent {
     effect(() => {
       const path = this.responseSignal()?.path;
       if (path) {
-        this.router.navigate([`${this.language}/${path}`]);
+        this.router.navigate([`${ this.language }/${ path }`]);
       }
     });
   }

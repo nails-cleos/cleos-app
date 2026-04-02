@@ -12,7 +12,7 @@ import { IExtras } from '../../../interfaces/reservation';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
 import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
-import { PaymentType } from '../../../interfaces/payment';
+import { getPaymentOptions, IPaymentOption, PaymentType } from '../../../interfaces/payment';
 import {
   addPayment,
   createTreatmentGroupService,
@@ -168,7 +168,7 @@ export class ReservationCompleteComponent {
     ),
   );
 
-  types: string[] = [PaymentType.cash, PaymentType.transfer];
+  types: IPaymentOption[] = getPaymentOptions(this.translate, [PaymentType.cash, PaymentType.transfer]);
   price: WritableSignal<IPrice> = signal(new Price());
   totalTime = signal('');
   readonly isValidTime = computed(() => {
@@ -198,7 +198,7 @@ export class ReservationCompleteComponent {
         if (additionalSelected) {
           this.additionalSelected.set(additionalSelected);
         }
-        this.types = [...reservation.room.paymentTypes, PaymentType.transfer];
+        this.types = getPaymentOptions(this.translate, [...reservation.room.paymentTypes, PaymentType.transfer]);
         this.setAppointmentDuration();
       }
     });
@@ -287,7 +287,7 @@ export class ReservationCompleteComponent {
       if (isPaid) {
         this.getForm.type.setValue(undefined);
       } else {
-        this.getForm.type.setValue(PaymentType.transfer);
+        this.getForm.type.setValue(PaymentType.mollie);
       }
     });
   }
@@ -362,12 +362,21 @@ export class ReservationCompleteComponent {
 
   splitChange = () => {
     this.split = !this.split;
-    if (this.split) {
-      const totalSplit = this.currentSplitData?.map(t => t.price).reduce((acc, value) => acc + value, 0) || 0;
-      if (totalSplit !== this.price().toPaid) {
-        this.isValidSplit = false;
-      }
+    if (!this.split) {
+      this.isValidSplit = true;
+      return;
     }
+
+    const totalSplit = this.currentSplitData?.map(t => t.price).reduce((acc, value) => acc + value, 0) || 0;
+    this.isValidSplit = totalSplit === this.price().toPaid;
+    if (!this.currentSplitData?.length) {
+      this.isValidSplit = false;
+    }
+  };
+
+  getSelectedPaymentOption = (): IPaymentOption | undefined => {
+    const paymentType = this.getForm.type.value;
+    return this.types.find(option => option.type === paymentType);
   };
 
   private setAppointmentDuration = (): void => {
@@ -410,6 +419,7 @@ export class ReservationCompleteComponent {
           endDateTime: this.endDate.toLocaleString(API_LOCALE),
           extras: this.currentExtraData,
           split: splitData,
+          pointOfSale: true,
         },
         this.isDashboard(),
       ),

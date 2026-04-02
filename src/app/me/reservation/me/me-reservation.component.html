@@ -169,26 +169,23 @@
             }
             <div matListItemLine>
               <span [innerHTML]="'ME.RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"></span>
+              @let treatmentPrice = price.discount ? price.priceWithDiscount : treatment.price;
               @if (isEditing) {
-                @let editingPrice = ((price.priceWithDiscount || price.priceWithDiscount === 0) ?
-                  price.priceWithDiscount : treatment.price);
                 <span class="raised-button">
-                  {{ room?.currency | currencySymbol }} {{ editingPrice | number:'1.2-2' }}
+                  {{ room?.currency | currencySymbol }} {{ treatmentPrice | number:'1.2-2' }}
                 </span>
-                @if (price.priceWithDiscount || price.priceWithDiscount === 0) {
+                @if (price.discount) {
                   <span class="raised-button bold">{{ 'ME.RESERVATION.TREATMENT.DISCOUNT.ADD' | translate }}</span>
                 }
               } @else {
                 @let hasDiscount = !!getTreatmentForm.discount.value ||
                   price.total !== price.totalWithoutDiscount || price.discount > 0;
-                @let discountedPrice = ((price.priceWithDiscount || price.priceWithDiscount === 0) ?
-                  price.priceWithDiscount : treatment.price);
                 <span [class.strikethrough]="hasDiscount" class="raised-button">
                     {{ room?.currency | currencySymbol }} {{ treatment.price | number:'1.2-2' }}
                 </span>
                 @if (hasDiscount) {
                   <span class="raised-button bold discount-enter">
-                    {{ room?.currency | currencySymbol }} {{ discountedPrice | number:'1.2-2' }}
+                    {{ room?.currency | currencySymbol }} {{ treatmentPrice | number:'1.2-2' }}
                   </span>
                 }
               }
@@ -270,17 +267,21 @@
     @if (room) {
       @let currentOptions = options();
       @if (price.isPaid) {
-        <app-price [price]="oldPrice" [typeForm]="typeForm" [options]="accountCreditOptions"
+        <app-price [price]="oldPrice" [paymentPrice]="price" [hasChanges]="hasReservationChanges"
+                   [typeForm]="typeForm" [options]="currentOptions"
                    [currency]="room.currency" [firstTime]="firstTime"
                    [professionalName]="professionalName"
+                   [accountBalanceUsed]="accountBalanceUsed"
                    [showBank]="true" (percentageEmitter)="getPercentage($event)"
                    [showPenalty]="showPenalty"></app-price>
       } @else if (!currentOptions?.length) {
         <div class="no-content bold">{{ 'ME.PAYMENT.TYPE.NO_CONTENT' | translate }}</div>
       } @else {
-        <app-price [price]="oldPrice" [typeForm]="typeForm" [options]="currentOptions"
+        <app-price [price]="oldPrice" [paymentPrice]="price" [hasChanges]="hasReservationChanges"
+                   [typeForm]="typeForm" [options]="currentOptions"
                    [currency]="room.currency"
                    [firstTime]="firstTime" [professionalName]="professionalName" [showBank]="true"
+                   [accountBalanceUsed]="accountBalanceUsed"
                    (percentageEmitter)="getPercentage($event)" [showPenalty]="showPenalty"></app-price>
       }
     }
@@ -360,10 +361,6 @@
                 <div matListItemTitle>{{ 'COMMON.LABEL.PRICE' | translate }}</div>
                 <div matListItemLine>{{ price.additional }}</div>
               </mat-list-item>
-            } @else {
-              <app-price-preview [price]="price" [currencyIcon]="room?.currency?.icon" [isEditing]="isEditing"
-                                 [discountId]="getTreatmentForm.discount.value"
-                                 [discountKey]="'ME.RESERVATION.TREATMENT.DISCOUNT.ADD'"></app-price-preview>
             }
             <mat-divider></mat-divider>
             <div mat-subheader>{{ 'ME.RESERVATION.APPOINTMENT' | translate }}</div>
@@ -392,14 +389,25 @@
                 <div matListItemTitle>{{ 'ME.RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</div>
                 <div matListItemLine>{{ totalDurationFormatted }}</div>
               </mat-list-item>
-              <app-price-preview [price]="price" [currencyIcon]="room?.currency?.icon"
-                                 [isEditing]="isEditing"
-                                 [discountId]="getTreatmentForm.discount.value"
-                                 [discountKey]="'ME.RESERVATION.TREATMENT.DISCOUNT.ADD'"></app-price-preview>
             }
-            <app-payment-preview [type]="getTypeForm.type.value" [bank]="getTypeForm.bank.value"
-                                 [currencyIcon]="room?.currency?.icon" [toPaid]="price.toPaid"
-                                 [penalty]="oldPrice?.penalty"></app-payment-preview>
+            @if (paymentToPay > 0) {
+              <app-payment-preview [type]="getTypeForm.type.value"
+                                   [currencyIcon]="room?.currency?.icon" [toPaid]="paymentToPay"
+                                   [penalty]="oldPrice?.penalty"
+                                   [accountBalanceUsed]="accountBalanceUsed"
+                                   [price]="price" [isEditing]="isEditing" [updatedTotal]="price.total"
+                                   [accountCredit]="paymentCredit" [paidTotal]="oldPrice?.totalPaid ?? price.totalPaid"
+                                   [discountId]="getTreatmentForm.discount.value"
+                                   [discountKey]="'ME.RESERVATION.TREATMENT.DISCOUNT.ADD'"></app-payment-preview>
+            } @else if (paymentCredit > 0) {
+              <app-payment-preview [accountCredit]="paymentCredit" [currencyIcon]="room?.currency?.icon"
+                                   [accountBalanceUsed]="accountBalanceUsed"
+                                   [price]="price" [isEditing]="isEditing" [updatedTotal]="price.total"
+                                   [penalty]="showPenalty ? oldPrice?.penalty : undefined"
+                                   [paidTotal]="oldPrice?.totalPaid ?? price.totalPaid"
+                                   [discountId]="getTreatmentForm.discount.value"
+                                   [discountKey]="'ME.RESERVATION.TREATMENT.DISCOUNT.ADD'"></app-payment-preview>
+            }
           </mat-list>
           <mat-divider style="margin-bottom: 2%;"></mat-divider>
           <p>{{ 'ME.RESERVATION.USER.PHONE.MESSAGE' | translate }}</p>
@@ -538,7 +546,7 @@
           </button>
         </div>
       </mat-step>
-      <mat-step [completed]="getStepCompleted(4)" [editable]="getStepEnabled(4) && !isEditing"
+      <mat-step [completed]="getStepCompleted(4)" [editable]="getStepEnabled(4)"
                 [state]="getStepName(4)" [optional]="getStepOptional(4) && !firstTime" [stepControl]="typeForm">
         <ng-template matStepLabel>{{ 'ME.PAYMENT.DETAIL' | translate }}</ng-template>
         <ng-container *ngTemplateOutlet="stepFive"></ng-container>

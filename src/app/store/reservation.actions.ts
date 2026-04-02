@@ -10,13 +10,14 @@ import {
   IReservationAll,
   IRoomReservation,
   ITracking,
-  IUpcomingAll, States,
+  IUpcomingAll,
+  States,
 } from '../interfaces/reservation';
 import { IUserAll } from '../interfaces/user';
 import { ITreatmentDiscountDTO } from '../interfaces/treatment';
 import { IRoomAll } from '../interfaces/room';
 import { IAdditionalAll } from '../interfaces/additional';
-import { IPaymentAll, IPaymentOption } from '../interfaces/payment';
+import { IPaymentAll } from '../interfaces/payment';
 import { Role } from '../interfaces/token';
 import { IReview } from '../interfaces/review';
 import { IColorAll } from '../interfaces/color';
@@ -77,8 +78,6 @@ enum ReservationActionTypes {
   updateReservationNote = '[Reservation] Update note by reservation id',
   updateReservationDiscount = '[Reservation] Update discount by reservation id',
   updateReservationTimestamp = '[Reservation] Update timestamp by reservation id',
-  paymentOptions = '[Reservation] Payment options',
-  paymentOptionsSuccess = '[Reservation] Payment options success',
   setMeReservationParams = '[Reservation] Set me reservation params',
   setCurrentReservationId = '[Reservation] Set current reservation id',
   setCurrentCompleteReservation = '[Reservation] Set current complete reservation',
@@ -424,13 +423,6 @@ export const updateReservationDiscount = createAction(
 export const updateReservationTimestamp = createAction(
   ReservationActionTypes.updateReservationTimestamp,
   props<{ id: string; start: string; role: Role; timeZone?: string }>(),
-);
-
-export const paymentOptions = createAction(ReservationActionTypes.paymentOptions);
-
-export const paymentOptionsSuccess = createAction(
-  ReservationActionTypes.paymentOptionsSuccess,
-  props<{ paymentOptions?: IPaymentOption[] }>(),
 );
 
 export const setMeReservationParams = createAction(

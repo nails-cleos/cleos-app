@@ -5,11 +5,10 @@ import { IPayment, IPaymentAll } from '../../interfaces/payment';
 import { cleanPayment, getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../../shared/shared.module';
-import { BackButtonDirective } from '../../directives/back-button.directive';
 import {
   getCurrentPathIdPipe,
-  getPaymentsPipe,
   getPaymentResponsePipe,
+  getPaymentsPipe,
   getSubErrorsPipe,
 } from '../../store/selectors/payment.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -19,7 +18,7 @@ import { PaymentState } from '../../store/reducers/payment.reducers';
   selector: 'app-payment',
   templateUrl: './payment.component.html',
   styleUrls: ['./payment.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [SharedModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentComponent {
@@ -51,6 +50,7 @@ export class PaymentComponent {
 
   private id?: string;
   private path?: 'reservation' | 'transaction';
+  private accountId?: string;
 
   constructor() {
     effect(() => {
@@ -60,7 +60,8 @@ export class PaymentComponent {
         const id = currentPath.id;
         this.path = path;
         this.id = id;
-        this.store.dispatch(getPaymentByResourceId({ id, path, redirect: true }));
+        this.accountId = currentPath.accountId;
+        this.store.dispatch(getPaymentByResourceId({ id, path }));
       }
     });
 
@@ -68,7 +69,7 @@ export class PaymentComponent {
       const response = this.responseSignal();
       if (response?.path) {
         this.store.dispatch(cleanPayment());
-        this.router.navigate([`${this.language}/${response.path}`]);
+        this.router.navigate([`${ this.language }/${ response.path }`]);
       }
     });
 
@@ -109,11 +110,23 @@ export class PaymentComponent {
 
   getCurrency = (payment: IPaymentAll): string => {
     let icon = 'euro';
-    if (payment.reservation) {
+    if (payment.reservation?.id) {
       icon = payment.reservation.room.currency.icon;
-    } else if (payment.transaction && payment.transaction.account) {
-      icon = payment.transaction.account.currency.icon;
+    } else if (payment.transaction?.id && payment.transaction?.account) {
+      icon = payment.transaction?.account?.currency?.icon;
     }
     return icon;
   };
+
+  goBack() {
+    if (this.path && this.id) {
+      let navigate: string[] = [this.language];
+      if (this.accountId) {
+        navigate = [...navigate, 'accounts', this.accountId, 'transactions', this.id];
+      } else {
+        navigate = [...navigate, this.path, this.id];
+      }
+      this.router.navigate(navigate);
+    }
+  }
 }

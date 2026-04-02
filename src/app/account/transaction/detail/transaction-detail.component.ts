@@ -45,7 +45,7 @@ export class TransactionDetailComponent {
   transactionSignal = computed(() => {
     const transaction = this.selectedTransactionSignal();
     if (transaction) {
-      Object.assign(
+      return Object.assign(
         {}, transaction, { date: newDateTimestamp(transaction.payment?.timestamp) },
       );
     }
@@ -53,7 +53,7 @@ export class TransactionDetailComponent {
   });
 
   dateFormat = this.translate.getCurrentLang();
-  step?: number = this.router.getCurrentNavigation()?.extras.state?.step;
+  step?: number = this.router.currentNavigation()?.extras.state?.step;
   language = this.translate.getCurrentLang();
 
   constructor() {
