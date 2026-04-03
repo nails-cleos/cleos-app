@@ -3,10 +3,9 @@ name: Deploy
 on:
   push:
     tags:
-      - 'v*.*.*'  # Trigger on tags matching this pattern
+      - 'v*.*.*'
 
 env:
-  IMAGE_NAME: d1d8fh8tgyhz8m
   AWS_REGION: eu-central-1
 
 jobs:
@@ -16,20 +15,18 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Git clone the repository
+      - name: Checkout Repository
         uses: actions/checkout@v6
 
       - name: Set up AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v6
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ secrets.IAMROLE_GITHUB }}
           role-session-name: GitHub-Action-Role
           aws-region: ${{ env.AWS_REGION }}
 
-      - uses: actions/checkout@v6
       - name: Deploy
-        run: ./scripts/amplify-deploy.sh ${{env.IMAGE_NAME}} main
+        run: ./scripts/amplify-deploy.sh ${{ vars.AMPLIFY_APP_ID }} main
 
       - name: Add Deployment Summary
         if: always()
@@ -38,7 +35,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Tag:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit:** $(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Image Name:** ${{ env.IMAGE_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image Name:** ${{ vars.AMPLIFY_APP_ID }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Branch Deployed:** main" >> $GITHUB_STEP_SUMMARY
           echo "- **AWS Region:** ${{ env.AWS_REGION }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
