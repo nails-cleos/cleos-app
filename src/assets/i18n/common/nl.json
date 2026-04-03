@@ -1,0 +1,489 @@
+{
+  "COMMON": {
+    "BUTTON": {
+      "BACK": "Terug",
+      "RELOAD": "Opnieuw laden",
+      "NEXT": "Volgende",
+      "TODAY": "Vandaag",
+      "PREVIOUS": "Vorige",
+      "GOTO": "Ga naar",
+      "YES": "Ja",
+      "NO": "Nee",
+      "SEND": "Versturen",
+      "CREATE": "Aanmaken",
+      "ADD": "Toevoegen",
+      "RESEND": "Opnieuw verzenden",
+      "IGNORE": "Negeren",
+      "UPDATE": "Bijwerken",
+      "CANCEL": "Annuleren",
+      "BOOK": "Reserveren",
+      "VIEW": "Bekijken",
+      "DOWNLOAD": "Downloaden",
+      "REVIEW": "Beoordelen",
+      "EDIT": "Bewerken",
+      "DELETE": "Verwijderen",
+      "INVITE": "Uitnodiging sturen",
+      "CLOSE": "Sluiten",
+      "COPY": "Kopieren",
+      "SHARE": "Delen",
+      "COMPLETE": "Voltooien",
+      "PAYMENT": "Betaling",
+      "ML": "ML-betaling",
+      "PAYPAL": "PayPal-betaling",
+      "IDEAL": "iDeal-betaling",
+      "PAY_NL": "PAY.-betaling",
+      "PAYNL": "PAY.-betaling",
+      "MOLLIE": "Mollie-betaling",
+      "NOTIFY": "Melden",
+      "SELECT": "Selecteren",
+      "UNAVAILABLE": "Niet-beschikbaarheid toevoegen",
+      "ACCEPT": "Accepteren",
+      "MERGE": "Samenvoegen",
+      "GET_DATA": "Gegevens ophalen van {{year}}",
+      "EXPORT": "Exporteren",
+      "SAVE_EXPORT": "Opslaan en exporteren",
+      "SAVE": "Opslaan",
+      "BLOCK_AGENDA": "Agenda blokkeren",
+      "NOTE": "Notitie toevoegen",
+      "SORT": "Sorteren",
+      "PRINT": "Afdrukken",
+      "LOGIN": "Inloggen",
+      "EXPAND": {
+        "TRUE": "Klik om minder te tonen",
+        "FALSE": "Klik om meer te tonen"
+      },
+      "DISCOUNT": {
+        "SHOW": "Kortingen tonen",
+        "HIDE": "Kortingen verbergen",
+        "SEND": "Korting sturen"
+      }
+    },
+    "COLUMN": {
+      "ACTIONS": "Acties",
+      "LAST_UPDATE": "Laatst bijgewerkt",
+      "NAME": "Naam",
+      "DESCRIPTION": "Beschrijving",
+      "TYPE": "Type",
+      "STATUS": "Status",
+      "AMOUNT": "Bedrag"
+    },
+    "PAGINATOR": {
+      "ITEMS_PER_PAGE_LABEL": "Items per pagina:",
+      "NEXT_PAGE_LABEL": "Volgende pagina",
+      "PREVIOUS_PAGE_LABEL": "Vorige pagina",
+      "FIRST_PAGE_LABEL": "Eerste pagina",
+      "LAST_PAGE_LABEL": "Laatste pagina",
+      "RANGE_PAGE_LABEL_1": "0 van {{length}}",
+      "RANGE_PAGE_LABEL_2": "{{startIndex}} - {{endIndex}} van {{length}}"
+    },
+    "ROLES": {
+      "ROLE_CUSTOMER": "Klant",
+      "ROLE_PROFESSIONAL": "Professional",
+      "ROLE_MANAGER": "Manager",
+      "ROLE_ADMIN": "Admin"
+    },
+    "REPEAT": {
+      "NONE": "Geen",
+      "EVERY_DAY": "Elke dag",
+      "ONCE_A_WEEK": "Een keer per week",
+      "ONCE_A_MONTH": "Een keer per maand",
+      "ONCE_A_YEAR": "Een keer per jaar"
+    },
+    "NOTIFICATION": {
+      "NO": "Geen meldingen",
+      "LOAD_MORE": "Meer laden"
+    },
+    "LANG": {
+      "ES": "Español",
+      "EN": "English",
+      "NL": "Nederlands"
+    },
+    "ADDRESS": {
+      "FIELD": "Adres",
+      "INVALID": "Adres is ongeldig",
+      "DESCRIPTION": "Beschrijving"
+    },
+    "DISCOUNT": {
+      "MONEY": "Bedrag",
+      "PERCENTAGE": "Percentage"
+    },
+    "PAYMENT": {
+      "TO_PAY": "Totaal te betalen: {{amount}} {{symbol}}",
+      "TYPE": {
+        "FIELD": {
+          "TITLE": "Betaalmethode",
+          "REQUIRED": "Betaalmethode is <b>verplicht</b>"
+        },
+        "CASH": "Contant",
+        "ML": "Mercado Libre",
+        "PAYPAL": "PayPal",
+        "IDEAL": "iDeal",
+        "PAY_NL": "PAY.",
+        "PAYNL": "PAY.",
+        "MOLLIE": "Mollie",
+        "TRANSFER": "Bankoverschrijving",
+        "ACCOUNT": "Accounttegoed",
+        "NONE": "Geen betaalmethode geselecteerd",
+        "PENDING": "In afwachting"
+      },
+      "BANK": {
+        "FIELD": "Bank",
+        "REQUIRED": "Bank is <b>verplicht</b>",
+        "INVALID": "Bank is ongeldig"
+      },
+      "OPTIONS": {
+        "UPDATED_TOTAL": "Bijgewerkt totaal",
+        "BALANCE": "Saldo",
+        "TO_PAY": "Totaal te betalen",
+        "PAID": "Totaal betaald",
+        "ACCOUNT": "Accounttegoed",
+        "PENALTY": "Boete",
+        "WILL_ADD_ACCOUNT": "Dit bedrag wordt toegevoegd aan het account."
+      },
+      "DEPOSIT_50": "Betaal een aanbetaling van 50% van de afspraak",
+      "TOTAL": "Betaal het volledige bedrag van de afspraak",
+      "PENDING": "Betaling in afwachting",
+      "SUCCESS": "Betaling succesvol voltooid",
+      "ERROR": "Betalingsfout. {{reason}}",
+      "CANCELLATION_POLICY": {
+        "TITLE": "Annulerings-/verplaatsingsbeleid",
+        "1": "<span class='important'>Minder dan 24 uur</span> van tevoren annuleren leidt tot een vergoeding van <span class='important'>{{penalty}}%</span> van de gereserveerde behandelprijs.",
+        "2": "<span class='important'>Niet komen opdagen</span> wordt eveneens belast met <span class='important'>{{penalty}}%</span> van de geboekte behandelprijs.",
+        "3": "Annuleren of verplaatsen van een afspraak die <span class='important'>binnen 24 uur van tevoren</span> is gemaakt, resulteert in een <span class='important'>terugbetaling of kortingsvoucher</span> voor het betaalde bedrag."
+      }
+    },
+    "EXPENSE": {
+      "TYPE": {
+        "DIRECT_COSTS": "Directe kosten",
+        "PS": "Productbenodigdheden",
+        "LS": "Arbeidskosten",
+        "INDIRECT_COSTS": "Indirecte kosten",
+        "OC": "Overheadkosten",
+        "AC": "Administratieve kosten",
+        "MA": "Marketing en reclame",
+        "IO": "Overige indirecte kosten",
+        "OTHER_EXPENSES": "Overige uitgaven",
+        "TD": "Training en ontwikkeling",
+        "MR": "Onderhoud en reparaties",
+        "ME": "Diverse uitgaven"
+      }
+    },
+    "CASH": {
+      "TYPE": {
+        "CASH": "Contant"
+      }
+    },
+    "ACCOUNT": {
+      "BALANCE": "Saldo"
+    },
+    "STATUS": {
+      "PAYMENT": {
+        "NONE": "In afwachting",
+        "APPROVED": "Goedgekeurd",
+        "APPROVED_REFUND": "Goedgekeurd",
+        "REJECTED": "Afgewezen",
+        "FAILURE": "Afgewezen",
+        "CANCELLED": "Geannuleerd",
+        "IN_PROCESS": "In behandeling",
+        "PENDING": "In afwachting",
+        "CREATED": "Aangemaakt",
+        "UNKNOWN": "Onbekend",
+        "REFUND": "Terugbetaald",
+        "REFUND_PENDING": "Terugbetaling in behandeling",
+        "REFUND_FAILURE": "Terugbetaling mislukt"
+      },
+      "RESERVATION": {
+        "CREATED": "Aangemaakt",
+        "APPROVED": "Goedgekeurd",
+        "PAID": "Betaald",
+        "PARTIALLY_PAID": "Gedeeltelijk betaald",
+        "PARTIALLYPAID": "Gedeeltelijk betaald",
+        "STARTED": "Gestart",
+        "PARTIALLY_COMPLETED": "Gedeeltelijk voltooid",
+        "PARTIALLYCOMPLETED": "Gedeeltelijk voltooid",
+        "COMPLETED": "Voltooid",
+        "CANCELLED": "Geannuleerd",
+        "CANCELLED_PAYMENT_REQUIRED": "Betaling vereist",
+        "CANCELLEDPAYMENTREQUIRED": "Betaling vereist",
+        "EDIT_CANCELLED": "Nieuwe gekoppelde afspraak",
+        "EDITCANCELLED": "Nieuwe gekoppelde afspraak"
+      }
+    },
+    "BACK": {
+      "TITLE": "Je staat op het punt terug te gaan",
+      "CONTENT": "Je hebt wijzigingen op deze pagina. Als je teruggaat, raak je deze wijzigingen kwijt. Weet je zeker dat je wilt teruggaan?"
+    },
+    "COMPLETE": {
+      "TITLE": "Je staat op het punt de afspraak te voltooien",
+      "CONTENT": "Je hebt wijzigingen in extra's. Als je de afspraak voltooit, raak je deze wijzigingen kwijt. Weet je zeker dat je de afspraak wilt voltooien?"
+    },
+    "ERROR": {
+      "NO_CONTENT": "Geen inhoud"
+    },
+    "LABEL": {
+      "FILTER": "Filter",
+      "PRICE": "Prijs",
+      "TOTAL": "Totaal",
+      "MONTHLY": {
+        "DATE": "Maand en jaar"
+      }
+    },
+    "SEARCH": {
+      "TITLE": "Zoeken"
+    },
+    "ALL_DAY": {
+      "CHECK": "Hele dag"
+    },
+    "PROFILE": {
+      "FIELD": "Profiel",
+      "SHOW_CASH": "Contant geld tonen",
+      "INCOMPLETE": "Vul je profiel aan",
+      "UPDATED": {
+        "MESSAGE": "Gebruiker {{displayName}} bijgewerkt",
+        "PHOTO": "Profielfoto bijgewerkt",
+        "DARK_MODE_TRUE": "Donkere modus aan",
+        "DARK_MODE_FALSE": "Donkere modus uit"
+      }
+    },
+    "USER": {
+      "WITH": {
+        "EMAIL": "Inloggen met e-mail",
+        "GOOGLE": "Inloggen met Google",
+        "IN": "Inloggen",
+        "REGISTER": "Registreren"
+      },
+      "LOGIN": {
+        "ACCEPT": "Door verder te gaan geef je aan dat je akkoord gaat met onze <a href='{{tos}}'>Algemene<br>voorwaarden</a> en <a href='{{privacyPolicy}}'>Privacyverklaring</a>.",
+        "ACCOUNT": {
+          "TITLE": "Je hebt al een account",
+          "MESSAGE": "Je hebt <span class=bold>{{email}}</span> al gebruikt. Log in met Google om verder te gaan."
+        }
+      },
+      "DISPLAY_NAME": {
+        "FIELD": "Weergavenaam",
+        "REQUIRED": "Weergavenaam is <b>verplicht</b>"
+      },
+      "EMAIL": {
+        "FIELD": "E-mail",
+        "REQUIRED": "E-mail is <b>verplicht</b>",
+        "VALID": "Voer een geldig e-mailadres in"
+      },
+      "PASSWORD": {
+        "FIELD": "Wachtwoord",
+        "REQUIRED": "Wachtwoord is <b>verplicht</b>",
+        "WRONG": "E-mail of wachtwoord is onjuist",
+        "WEAK": "Wachtwoord is te zwak"
+      },
+      "PHONE": {
+        "FIELD": "Telefoon",
+        "SEARCH": "Zoeken",
+        "REQUIRED": "Telefoon is <b>verplicht</b>",
+        "INVALID": "Ongeldig telefoonnummer",
+        "COUNTRY_NOT_FOUND": "Geen landen gevonden"
+      },
+      "LANG": {
+        "FIELD": "Taal",
+        "REQUIRED": "Taal is <b>verplicht</b>"
+      },
+      "DOB": {
+        "FIELD": "Geboortedatum"
+      }
+    },
+    "TREATMENT": {
+      "FIELD": "Behandeling",
+      "REQUIRED": "Behandeling is <b>verplicht</b>",
+      "INVALID": "Behandeling is ongeldig",
+      "GROUP": {
+        "FIELD": "Behandelingstype",
+        "REQUIRED": "Behandelingstype is <b>verplicht</b>",
+        "INVALID": "Behandelingstype is ongeldig",
+        "ADD_BUTTON": "Behandelingen toevoegen"
+      },
+      "COLOR": {
+        "FIELD": "Kleur",
+        "INVALID": "Kleur is ongeldig",
+        "ADD_BUTTON": "Kleur toevoegen"
+      }
+    },
+    "ADDITIONAL": {
+      "FIELD": "Extra"
+    },
+    "ROOM": {
+      "FIELD": "Ruimte",
+      "REQUIRED": "Ruimte is <b>verplicht</b>",
+      "INVALID": "Ruimte is ongeldig",
+      "OFFICE": {
+        "FIELD": "Vestiging",
+        "REQUIRED": "Vestiging is <b>verplicht</b>",
+        "INVALID": "Vestiging is ongeldig"
+      }
+    },
+    "OFFICE": {
+      "SEARCH": "Zoek op vestiging",
+      "FIELD": "Vestiging",
+      "REQUIRED": "Vestiging is <b>verplicht</b>",
+      "INVALID": "Vestiging is ongeldig"
+    },
+    "DASHBOARD": {
+      "HOME": "Home",
+      "PROFILE": "Profiel",
+      "SIGN_OUT": "Uitloggen",
+      "DARK_MODE": "Donkere modus",
+      "LIGHT_MODE": "Lichte modus"
+    },
+    "CURRENCY": {
+      "FIELD": "Valuta",
+      "REQUIRED": "Valuta is <b>verplicht</b>",
+      "INVALID": "Valuta is ongeldig",
+      "ADD_BUTTON": "Valuta toevoegen"
+    },
+    "RESERVATION": {
+      "CREATED": "Afspraak {{date}} aangemaakt",
+      "PAYMENT_MESSAGE": "Als je betaalt, wordt de afspraak goedgekeurd. Anders moet je wachten tot {{professional}} deze goedkeurt.",
+      "LIST": {
+        "COLUMN": {
+          "CUSTOMER": "Klant",
+          "PROFESSIONAL": "Professional",
+          "START": "Begin",
+          "STATE": "Status",
+          "TREATMENT": "Behandeling"
+        },
+        "ERROR": {
+          "NO_CONTENT": "Geen afspraken"
+        }
+      },
+      "UPDATED": {
+        "MESSAGE": "Afspraak {{date}} bijgewerkt"
+      },
+      "STATE": {
+        "APPROVE": "Afspraak goedgekeurd",
+        "START": "Afspraak gestart",
+        "COMPLETE": "Afspraak voltooid",
+        "CANCEL": "Afspraak geannuleerd"
+      },
+      "EDIT": {
+        "TITLE": "Afspraak verplaatsen",
+        "TEXT": "Minder dan 24 uur van tevoren annuleren leidt tot een vergoeding van {{penalty}}% van de gereserveerde behandelprijs."
+      }
+    },
+    "TIME_ZONE": {
+      "TITLE": "Tijdzone",
+      "ROOM_INFO": "Je bevindt je in een andere tijdzone dan <b>{{value}}</b>. <br><br>Jouw tijd: <b>{{localTime}}</b><br>Tijd van de ruimte: <b>{{timeZoneTime}}</b>{{arg}}",
+      "PROFESSIONAL_INFO": "Je bevindt je in een andere tijdzone dan <b>{{value}}</b>. <br><br>Jouw tijd: <b>{{localTime}}</b><br>Tijd van de professional: <b>{{timeZoneTime}}{{arg}}</b>",
+      "ACTION": "Sluiten",
+      "WARNING": "Waarschuwing",
+      "DATE": {
+        "LOCAL": "Jouw tijd <b>{{date}}</b>",
+        "ROOM": "Tijd van de ruimte <b>{{date}}</b>"
+      }
+    },
+    "PROFESSIONAL": {
+      "FIELD": "Professional",
+      "REQUIRED": "Professional is <b>verplicht</b>",
+      "INVALID": "Professional is ongeldig",
+      "ADD_BUTTON": "Professional toevoegen",
+      "COLOR": {
+        "RESERVATION": "10:00 - 12:00 Klant",
+        "INVALID": "Kleur is ongeldig",
+        "DARK": {
+          "FIELD": "Donkere modus",
+          "RESERVATION": "Zo zien afspraken eruit in donkere modus"
+        },
+        "LIGHT": {
+          "FIELD": "Lichte modus",
+          "RESERVATION": "Zo zien afspraken eruit in lichte modus"
+        }
+      }
+    },
+    "INSTALL": {
+      "IOS": "Om deze webapp op je apparaat te installeren: open in Safari, tik op de deelknop en vervolgens op 'Zet op beginscherm'.",
+      "ANDROID": "Toevoegen aan beginscherm"
+    },
+    "FILE": {
+      "DRAG_DROP": "Sleep hier een bestand naartoe",
+      "OR": "of",
+      "CHOOSE": "Kies een bestand",
+      "DELETE": {
+        "MESSAGE": "Afbeelding {{name}} verwijderd"
+      }
+    }
+  },
+  "REVIEW": {
+    "RATE": "Beoordeling {{rating}}/{{total}}",
+    "YOUR_RATE": "Jouw beoordeling {{rating}}/{{total}}",
+    "RATING": {
+      "1": "Zeer slecht",
+      "2": "Slecht",
+      "3": "Goed",
+      "4": "Zeer goed",
+      "5": "Uitstekend"
+    }
+  },
+  "WHATSAPP": {
+    "SEND": {
+      "APPROVE": "♡ Afspraak ♡%0A{{date}}%0A{{treatment}}%0A%0A⚠️ Afspraken die minder dan 24 uur van tevoren worden geannuleerd, vereisen betaling van 50% van de behandelingskosten. Bedankt voor je begrip!%0A%0A♡ Tot snel ♡",
+      "TODAY": "♡ Herinnering ♡%0AHallo! Vandaag is je afspraak bij Cleos.%0A{{treatment}}%0A%0A⚠️ Bij annulering binnen 24 uur kan 50% van de behandeling in rekening worden gebracht.%0A♡ Tot snel ♡",
+      "COFFEE": "Jouw koffie staat al klaar! ☕%0A♡ Tot zo, lieve klant ♡",
+      "TOMORROW": "♡ Herinnering ♡%0A%0AMorgen, {{date}}, is je afspraak bij Cleos!%0A{{treatment}}%0A%0A⚠️ Afspraken die minder dan 24 uur van tevoren worden geannuleerd, vereisen betaling van 50% van de behandelingskosten.%0A%0A♡ Tot snel ♡",
+      "FOLLOWINGS": {
+        "TITLE": "Jouw afspraken%0A",
+        "VALUE": "%0A♡ {{date}}"
+      },
+      "ATTENTION": "%0A%0A⚠️ Afspraken die minder dan 24 uur van tevoren worden geannuleerd, vereisen betaling van 50% van de behandelingskosten. Bedankt voor je begrip!%0A%0A♡ Tot snel ♡"
+    }
+  },
+  "APP": {
+    "TITLE": "Cleos"
+  },
+  "COOKIE": {
+    "HEADER": "Cookies worden gebruikt op deze website!",
+    "MESSAGE": "Deze website gebruikt cookies om ervoor te zorgen dat je de beste ervaring op onze website krijgt.",
+    "DISMISS": "Begrepen!",
+    "ALLOW": "Cookies toestaan",
+    "DENY": "Weigeren",
+    "LINK": "Meer informatie",
+    "POLICY": "Cookiebeleid"
+  },
+  "META": {
+    "TITLE": "Biab nagels in Capelle aan den IJssel | Biab Nailstudio in Capelle aan den IJssel",
+    "CONTENT": "Op zoek naar een nagelstudio in Capelle aan den IJssel? Dan ben je hier op de juiste plek als je hoge kwaliteit in je behandelingen wilt. Sterke, gezonde en altijd perfect verzorgde nagels met een mooie natuurlijke uitstraling. Je kunt terecht voor TheGelBottle Biab Treatment, GelPolish, GelNails, nagelverlenging (geen acryl), een natuurlijke manicure en zelfs een pedicure. Mis de kans niet om elegante, glanzende en verzorgde Nail Art te krijgen en je nagels mooi en gezond te houden. Heb je allergieën voor dit soort producten? Dan heb ik mogelijk een oplossing met de nieuwe HEMA FREE Biab van The Gel Bottle!"
+  },
+  "TREATMENTS": [
+    {
+      "id": "biab-treatment",
+      "name": "Biab Treatment",
+      "description": "The GelBottle Inc™ BIAB is een dikkere gel met hoge weerstand tegen chippen. Het helpt je natuurlijke nagels te verstevigen terwijl je het draagt en geeft een langdurige glans. BIAB blijft meestal drie tot vier weken mooi - soms zelfs langer.",
+      "title": "Biab Nailstudio in Capelle aan den IJssel"
+    },
+    {
+      "id": "gelpolish",
+      "name": "GelPolish",
+      "description": "De GelPolish Colour wordt aangebracht met de Biab Rubber Base Coat eronder voor extra stevigheid bij schilferige, broze, dunne of splijtende nagels. De behandeling bevat altijd manicure. GelPolish blijft meestal twee tot drie weken mooi - soms langer."
+    },
+    {
+      "id": "nail-polish-cnd-vinylux",
+      "name": "Nail Polish CND Vinylux",
+      "description": "CND VINYLUX™ Long Wear Polish Colour wordt afgewerkt met een glanzende topcoat, waardoor het veel beter bestand is tegen chippen dan gewone nagellak. Het blijft meestal minstens een week mooi. Daarna kun je het verwijderen met standaard nagellakremover."
+    },
+    {
+      "id": "manicure-e-file",
+      "name": "Manicure E-File",
+      "description": "Bij een E-file manicure werk ik op droge huid met verschillende bitjes om dode huid terug te duwen en te verwijderen. Dat zorgt voor een schonere en verzorgdere look. Daarna zijn je nagels klaar voor de behandeling die jij wilt!"
+    },
+    {
+      "id": "toenails-color",
+      "name": "Teennagels kleur",
+      "description": "Kleur op teennagels (de behandeling omvat het verwijderen van nagelriemen en het in vorm brengen van de teennagels)"
+    },
+    {
+      "id": "nail-repair",
+      "name": "Nagelreparatie",
+      "description": "Nagels repareren vlak voor je behandeling of wanneer je langskomt om er een te laten herstellen. Tijd en prijs hangen af van de conditie van de nagel. Als het is ontstaan door een probleem met de behandeling zelf, dan is het kosteloos."
+    },
+    {
+      "id": "cnd-spa-manicure",
+      "name": "CND Spa Manicure",
+      "description": ""
+    }
+  ]
+}

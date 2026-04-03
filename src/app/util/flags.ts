@@ -1,5 +1,5 @@
 import { getLocale } from './helper';
-import { flagEs, flagGb } from '@ng-icons/flag-icons';
+import { flagEs, flagGb, flagNl } from '@ng-icons/flag-icons';
 
 export interface IFlag {
   icon: string;
@@ -9,12 +9,6 @@ export interface IFlag {
 }
 
 export const flags = (): IFlag[] => [
-  // {
-  //   icon: 'ar',
-  //   value: 'es_AR',
-  //   text: 'ES',
-  //   flag: flagAr
-  // },
   {
     icon: 'es',
     value: 'es',
@@ -26,18 +20,12 @@ export const flags = (): IFlag[] => [
     value: 'en_GB',
     text: 'EN',
     flag: flagGb,
-    // },
-    // {
-    //   icon: 'nl',
-    //   value: 'nl',
-    //   text: 'NL',
-    //   flag: flagNl
-    // },
-    // {
-    //   icon: 'us',
-    //   value: 'en',
-    //   text: 'EN',
-    //   flag: flagUs
+  },
+  {
+    icon: 'nl',
+    value: 'nl',
+    text: 'NL',
+    flag: flagNl,
   },
 ];
 

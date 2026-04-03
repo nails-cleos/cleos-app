@@ -1,0 +1,27 @@
+{
+  "COLOR": {
+    "TITLE": "Kleur toevoegen",
+    "CREATED": "Kleur {{name}} aangemaakt",
+    "DETAIL": "Kleur bijwerken",
+    "LIST": {
+      "ERROR": {
+        "NO_CONTENT": "Geen kleuren"
+      }
+    },
+    "NAME": {
+      "FIELD": "Naam",
+      "REQUIRED": "Naam is <b>verplicht</b>"
+    },
+    "DESCRIPTION": {
+      "FIELD": "Beschrijving"
+    },
+    "DELETED": {
+      "TITLE": "Kleur verwijderen",
+      "CONTENT": "Weet je zeker dat je kleur {{name}} wilt verwijderen?",
+      "MESSAGE": "Kleur {{name}} verwijderd"
+    },
+    "UPDATED": {
+      "MESSAGE": "Kleur {{name}} bijgewerkt"
+    }
+  }
+}

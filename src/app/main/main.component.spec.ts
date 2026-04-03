@@ -14,6 +14,8 @@ import { MainState } from '../store/reducers/main.reducers';
 import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
+import { FirebaseService } from '../services/firebase.service';
+import { updateMyUser } from '../store/main.actions';
 
 describe('MainComponent', () => {
   let component: MainComponent;
@@ -28,6 +30,7 @@ describe('MainComponent', () => {
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
   let tokenServiceSpy: jasmine.SpyObj<TokenService>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let firebaseServiceSpy: { isAuthenticated: ReturnType<typeof signal<boolean>> };
 
   let translateService: TranslateService;
 
@@ -52,6 +55,9 @@ describe('MainComponent', () => {
         paramMap: paramMapSpy,
       },
     });
+    firebaseServiceSpy = {
+      isAuthenticated: signal(false),
+    };
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
@@ -66,7 +72,6 @@ describe('MainComponent', () => {
 
     paramMapSpy.get.and.returnValue('en');
     navigationServiceSpy.attachLang.and.returnValue('en');
-
     await TestBed.configureTestingModule({
       imports: [MainComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
       providers: [
@@ -76,6 +81,7 @@ describe('MainComponent', () => {
         { provide: MainContentService, useValue: mainContentServiceSpy },
         { provide: TokenService, useValue: tokenServiceSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: FirebaseService, useValue: firebaseServiceSpy },
         provideHttpClient(),
         provideHttpClientTesting(),
       ],
@@ -127,14 +133,27 @@ describe('MainComponent', () => {
     expect(component.isDarkMode()).toBe(!initialMode);
   });
 
+  it('should persist theme only when toggled by an authenticated user', () => {
+    firebaseServiceSpy.isAuthenticated.set(true);
+    storeSpy.dispatch.calls.reset();
+
+    component.changeTheme();
+
+    const dispatched: any = storeSpy.dispatch.calls.mostRecent().args[0];
+    expect(dispatched.type).toBe(updateMyUser.type);
+    expect(dispatched.user.theme).toBe('dark-theme');
+    expect(dispatched.redirectUrl).toEqual(jasmine.any(String));
+    expect(dispatched.message).toEqual(jasmine.any(String));
+  });
+
   it('should dispatch Redirect action in redirect()', () => {
     component.redirect();
     expect(storeSpy.dispatch).toHaveBeenCalledWith(redirect());
   });
 
-  it('should call treatment and navigate to biab/treatment', () => {
+  it('should call treatment and navigate to biab-treatment/treatment', () => {
     component.treatment();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'home', 'biab', 'treatment']);
+    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'home', 'biab-treatment', 'treatment']);
   });
 });

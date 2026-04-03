@@ -30,6 +30,8 @@ import { FirebaseService } from '../services/firebase.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainComponent {
+  private static readonly BIAB_TREATMENT_ID = 'biab-treatment';
+
   private readonly env: EnvService = inject(EnvService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly store: Store<MainState> = inject(Store<MainState>);
@@ -80,7 +82,6 @@ export class MainComponent {
   constructor() {
     this.authUserService.updateMode(this.isDarkMode());
 
-    let lastDarkMode: boolean | undefined;
     effect(() => {
       const isDark = this.isDarkMode();
       this.authUserService.updateMode(isDark);
@@ -92,25 +93,6 @@ export class MainComponent {
       const isDark = this.authUserSignal().isDarkMode;
       if (isDark !== this.isDarkMode()) {
         this.isDarkMode.set(isDark);
-      }
-    });
-
-    effect(() => {
-      const isDark = this.isDarkMode();
-      if (lastDarkMode === isDark) {
-        return;
-      }
-      lastDarkMode = isDark;
-      if (this.isAuthenticated()) {
-        const theme: Theme = getThemeName(isDark);
-        const authenticatedUser: IUser = new User();
-        authenticatedUser.theme = theme;
-        const redirectUrl = this.router.url;
-        const message = this.translate.instant(
-          `COMMON.PROFILE.UPDATED.DARK_MODE_${isDark.toString().toUpperCase()}`);
-        this.store.dispatch(
-          updateMyUser({ user: authenticatedUser, redirectUrl, message }),
-        );
       }
     });
 
@@ -136,7 +118,9 @@ export class MainComponent {
   }
 
   changeTheme(): void {
-    this.isDarkMode.set(!this.isDarkMode());
+    const isDark = !this.isDarkMode();
+    this.isDarkMode.set(isDark);
+    this.persistThemePreference(isDark);
   }
 
   redirect(): void {
@@ -145,7 +129,7 @@ export class MainComponent {
 
   treatment(): void {
     goTo('home');
-    this.router.navigate([this.translate.getCurrentLang(), 'home', 'biab', 'treatment']);
+    this.router.navigate([this.translate.getCurrentLang(), 'home', MainComponent.BIAB_TREATMENT_ID, 'treatment']);
     return;
   }
 
@@ -160,6 +144,19 @@ export class MainComponent {
     this.cssClass = resetTheme(this.overlayContainer, this.cookieService, this.themeService, theme, this.cssClass);
     this.authUserService.updateMode(isDarkMode(theme));
   };
+
+  private persistThemePreference(isDark: boolean): void {
+    if (!this.isAuthenticated()) {
+      return;
+    }
+
+    const theme: Theme = getThemeName(isDark);
+    const authenticatedUser: IUser = new User();
+    authenticatedUser.theme = theme;
+    const redirectUrl = this.router.url;
+    const message = this.translate.instant(`COMMON.PROFILE.UPDATED.DARK_MODE_${isDark.toString().toUpperCase()}`);
+    this.store.dispatch(updateMyUser({ user: authenticatedUser, redirectUrl, message }));
+  }
 
   private navigationAnimation = (): void => {
     this.navigationObserve?.disconnect();

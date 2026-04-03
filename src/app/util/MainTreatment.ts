@@ -10,41 +10,99 @@ export interface ISection {
   alt?: string;
 }
 
-export interface IMainTreatment {
-  id: string;
-  title: string;
-  sections: ISection[];
-  translations: any;
+export interface IMainTreatmentComparisonRow {
+  label: string;
+  biab: string;
+  regularGels: string;
+  acrylic: string;
 }
 
-export const sections = (translations: any): ISection[] => {
+export interface IBiabTreatmentTranslations {
+  heroTitle: string;
+  introLead: string;
+  introBridge: string;
+  comparisonLead: string;
+  whyBestTitle: string;
+  assessmentText: string;
+  benefitsText: string;
+  summaryLabel: string;
+  standardsLead: string;
+  standardsItems: string[];
+  ctaTitle: string;
+  advantagesTitle: string;
+  advantagesIntro: string;
+  productConfidenceText: string;
+  essenceLabel: string;
+  veganBenefitText: string;
+  paletteText: string;
+  paletteLeadIn: string;
+  paletteCallout: string;
+  hemaFreeText: string;
+  frequencyReminderText: string;
+  maintenanceTitle: string;
+  maintenanceText: string;
+  maintenanceCareTitle: string;
+  maintenanceCareItems: string[];
+  growthExampleTitle: string;
+  growthExampleCaption: string;
+  growthExampleText: string;
+  restQuestionTitle: string;
+  restQuestionIntro: string;
+  restQuestionCallout: string;
+  restQuestionServiceProof: string;
+  restQuestionDeepDive: string;
+  restQuestionAnswer: string;
+  restQuestionTransition: string;
+  restQuestionWhyTitle: string;
+  restQuestionWhyText: string;
+  restQuestionWarning: string;
+  comparisonTable: {
+    columns: {
+      biab: string;
+      regularGels: string;
+      acrylic: string;
+    };
+    rows: IMainTreatmentComparisonRow[];
+  };
+}
+
+export interface IMainTreatmentContent {
+  id: string;
+  translations: IBiabTreatmentTranslations;
+}
+
+export interface IMainTreatmentContentFile {
+  treatments: IMainTreatmentContent[];
+}
+
+export const sections = (translations: IBiabTreatmentTranslations): ISection[] => {
   return [
     {
       type: 'title',
-      value: translations.value_43,
+      value: translations.heroTitle,
       class: 'center',
     },
     {
       type: 'detail',
-      value: translations.value_2,
+      value: translations.introLead,
     },
     {
       type: 'detail',
-      value: translations.value_88,
+      value: translations.introBridge,
     },
     {
       type: 'detail',
-      value: translations.value_44,
+      value: translations.comparisonLead,
     },
     {
       type: 'table',
       value: '',
       class: 'margin-bottom',
-      details: comparativeTable(translations),
+      details: comparativeTable(translations.comparisonTable),
     },
     {
       type: 'subtitle',
-      value: translations.value_1,
+      value: translations.whyBestTitle,
       class: 'center',
     },
     {
@@ -55,43 +113,30 @@ export const sections = (translations: any): ISection[] => {
       details: [
         {
           type: 'detail',
-          value: translations.value_3,
+          value: translations.assessmentText,
         },
         {
           type: 'detail',
-          value: translations.value_4,
+          value: translations.benefitsText,
         },
         {
           type: 'detail',
-          value: translations.value_5,
+          value: translations.summaryLabel,
         },
       ],
     },
     {
       type: 'detail',
-      value: translations.value_6,
+      value: translations.standardsLead,
     },
     {
       type: 'list',
       value: '',
-      details: [
-        {
-          type: 'detail',
-          value: translations.value_7,
-        },
-        {
-          type: 'detail',
-          value: translations.value_8,
-        },
-        {
-          type: 'detail',
-          value: translations.value_9,
-        },
-      ],
+      details: mapDetails(translations.standardsItems),
     },
     {
       type: 'subsubtitle',
-      value: translations.value_10,
+      value: translations.ctaTitle,
     },
     {
       type: 'divider',
@@ -99,7 +144,7 @@ export const sections = (translations: any): ISection[] => {
     },
     {
       type: 'subtitle',
-      value: translations.value_33,
+      value: translations.advantagesTitle,
     },
     {
       type: 'image-detail',
@@ -110,7 +155,7 @@ export const sections = (translations: any): ISection[] => {
       details: [
         {
           type: 'detail',
-          value: translations.value_34,
+          value: translations.advantagesIntro,
         },
       ],
     },
@@ -123,18 +168,18 @@ export const sections = (translations: any): ISection[] => {
       details: [
         {
           type: 'detail',
-          value: translations.value_35,
+          value: translations.productConfidenceText,
           class: 'margin-bottom-10',
         },
         {
           type: 'detail',
-          value: translations.value_37,
+          value: translations.veganBenefitText,
         },
       ],
     },
     {
       type: 'subsubtitle',
-      value: translations.value_36,
+      value: translations.essenceLabel,
     },
     {
       type: 'image',
@@ -151,27 +196,27 @@ export const sections = (translations: any): ISection[] => {
       details: [
         {
           type: 'detail',
-          value: translations.value_38,
+          value: translations.paletteText,
           class: 'bold',
         },
         {
           type: 'detail',
-          value: translations.value_39,
+          value: translations.paletteLeadIn,
           class: 'bold',
         },
         {
           type: 'subtitle',
-          value: translations.value_40,
+          value: translations.paletteCallout,
         },
       ],
     },
     {
       type: 'detail',
-      value: translations.value_41,
+      value: translations.hemaFreeText,
     },
     {
       type: 'detail',
-      value: translations.value_42,
+      value: translations.frequencyReminderText,
     },
     {
       type: 'divider',
@@ -179,42 +224,21 @@ export const sections = (translations: any): ISection[] => {
     },
     {
       type: 'subtitle',
-      value: translations.value_11,
+      value: translations.maintenanceTitle,
     },
     {
       type: 'detail',
-      value: translations.value_12,
+      value: translations.maintenanceText,
       class: 'margin-bottom',
     },
     {
       type: 'subsubtitle',
-      value: translations.value_13,
+      value: translations.maintenanceCareTitle,
     },
     {
       type: 'enum',
       value: '',
-      details: [
-        {
-          type: 'detail',
-          value: translations.value_14,
-        },
-        {
-          type: 'detail',
-          value: translations.value_15,
-        },
-        {
-          type: 'detail',
-          value: translations.value_16,
-        },
-        {
-          type: 'detail',
-          value: translations.value_17,
-        },
-        {
-          type: 'detail',
-          value: translations.value_18,
-        },
-      ],
+      details: mapDetails(translations.maintenanceCareItems),
     },
     {
       type: 'image',
@@ -231,17 +255,17 @@ export const sections = (translations: any): ISection[] => {
       details: [
         {
           type: 'detail',
-          value: translations.value_20,
+          value: translations.growthExampleTitle,
           class: 'top-text bold',
         },
         {
           type: 'detail',
-          value: translations.value_19,
+          value: translations.growthExampleCaption,
           class: 'bottom-tex',
         },
         {
           type: 'detail',
-          value: translations.value_21,
+          value: translations.growthExampleText,
           class: 'bottom-tex',
         },
       ],
@@ -252,52 +276,52 @@ export const sections = (translations: any): ISection[] => {
     },
     {
       type: 'subtitle',
-      value: translations.value_23,
+      value: translations.restQuestionTitle,
       class: 'margin-bottom',
     },
     {
       type: 'detail',
-      value: translations.value_24,
+      value: translations.restQuestionIntro,
     },
     {
       type: 'detail',
-      value: translations.value_25,
+      value: translations.restQuestionCallout,
       class: 'center bold margin-bottom',
     },
     {
       type: 'detail',
-      value: translations.value_26,
+      value: translations.restQuestionServiceProof,
     },
     {
       type: 'detail',
-      value: translations.value_27,
+      value: translations.restQuestionDeepDive,
     },
     {
       type: 'detail',
-      value: translations.value_28,
+      value: translations.restQuestionAnswer,
     },
     {
       type: 'detail',
-      value: translations.value_29,
+      value: translations.restQuestionTransition,
     },
     {
       type: 'subsubtitle',
-      value: translations.value_30,
+      value: translations.restQuestionWhyTitle,
     },
     {
       type: 'detail',
-      value: translations.value_31,
+      value: translations.restQuestionWhyText,
       class: 'bottom',
     },
     {
       type: 'detail',
-      value: translations.value_32,
+      value: translations.restQuestionWarning,
       class: 'bold center-50',
     },
   ];
 };
 
-const comparativeTable = (translations: any): ISection[] => {
+const comparativeTable = (comparisonTable: IBiabTreatmentTranslations['comparisonTable']): ISection[] => {
   const title = [{
     type: 'subtitle',
     value: '',
@@ -309,52 +333,53 @@ const comparativeTable = (translations: any): ISection[] => {
       },
       {
         type: 'detail',
-        value: translations.value_45,
+        value: comparisonTable.columns.biab,
         class: 'inner-border center table-header',
       },
       {
         type: 'detail',
-        value: translations.value_46,
+        value: comparisonTable.columns.regularGels,
         class: 'inner-border center table-header',
       },
       {
         type: 'detail',
-        value: translations.value_47,
+        value: comparisonTable.columns.acrylic,
         class: 'inner-border center table-header',
       },
     ],
   } as ISection];
 
-  let details: ISection[] = [];
-  const start = 48;
-  for (let i = 0; i < 10; i++) {
-    details = [...details, {
-      type: 'detail',
-      value: '',
-      details: [
-        {
-          type: 'detail',
-          value: translations[`value_${ start + (i * 4) }`],
-          class: 'inner-border bold center table-column-header',
-        },
-        {
-          type: 'detail',
-          value: translations[`value_${ start + 1 + (i * 4) }`],
-          class: 'inner-border center',
-        },
-        {
-          type: 'detail',
-          value: translations[`value_${ start + 2 + (i * 4) }`],
-          class: 'inner-border center',
-        },
-        {
-          type: 'detail',
-          value: translations[`value_${ start + 3 + (i * 4) }`],
-          class: 'inner-border center',
-        },
-      ],
-    }];
-  }
+  const details = comparisonTable.rows.map((row: IMainTreatmentComparisonRow) => ({
+    type: 'detail',
+    value: '',
+    details: [
+      {
+        type: 'detail',
+        value: row.label,
+        class: 'inner-border bold center table-column-header',
+      },
+      {
+        type: 'detail',
+        value: row.biab,
+        class: 'inner-border center',
+      },
+      {
+        type: 'detail',
+        value: row.regularGels,
+        class: 'inner-border center',
+      },
+      {
+        type: 'detail',
+        value: row.acrylic,
+        class: 'inner-border center',
+      },
+    ],
+  } as ISection));
 
   return title.concat(details);
 };
+
+const mapDetails = (values: string[]): ISection[] => values.map((value: string) => ({
+  type: 'detail',
+  value,
+}));

@@ -1,0 +1,23 @@
+{
+  "INVOICE": {
+    "SEARCH": {
+      "RANGE": {
+        "FIELD": "Kies een datumbereik",
+        "REQUIRED": "Datumbereik is <b>verplicht</b>",
+        "START": "Begin",
+        "END": "Einde"
+      },
+      "START": {
+        "FIELD": "Startnummer",
+        "REQUIRED": "Startnummer is <b>verplicht</b>",
+        "MIN": "Startnummer moet groter zijn dan 0"
+      }
+    },
+    "PAYMENT": {
+      "SEARCH": "Zoek op betaalmethode",
+      "FIELD": "Betaalmethode"
+    },
+    "UPLOAD_SUCCESS": "Factuur {{fileName}} succesvol geüpload",
+    "TITLE": "Facturen aanmaken"
+  }
+}

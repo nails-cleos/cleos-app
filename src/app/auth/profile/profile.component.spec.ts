@@ -146,7 +146,7 @@ describe('ProfileComponent', () => {
       user: jasmine.objectContaining({
         displayName: 'New user',
         phone: '+31 23 456 7890',
-        lang: 'es',
+        locale: 'es',
       }),
       redirectUrl: '/es/auth/profile',
       type: '[User] Update me',

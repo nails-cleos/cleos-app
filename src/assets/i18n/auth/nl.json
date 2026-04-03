@@ -1,0 +1,29 @@
+{
+  "AUTH": {
+    "FORBIDDEN": "De gebruiker heeft niet de benodigde rechten",
+    "SIGN_IN": {
+      "TITLE": "Welkom bij Cleos",
+      "CODE": {
+        "FIELD": "Referralcode"
+      },
+      "FORGOT_PASSWORD": "Wachtwoord vergeten?"
+    },
+    "SIGN_UP": {
+      "SUCCESS": "Gebruiker {{displayName}} aangemaakt. Controleer je e-mail {{email}}"
+    },
+    "ACTIVATE_ACCOUNT": {
+      "TITLE": "Account activeren",
+      "CONTENT": "Welkom bij Cleos",
+      "BUTTON": "Activeren",
+      "MESSAGE": "Account geactiveerd"
+    },
+    "FORGOT_PASSWORD": {
+      "TITLE": "Wachtwoord vergeten",
+      "MESSAGE": "Controleer je e-mail om je wachtwoord te wijzigen",
+      "EMAIL": {
+        "FIELD": "E-mail",
+        "ERROR": "Voer een geldig e-mailadres in"
+      }
+    }
+  }
+}

@@ -59,7 +59,7 @@ jobs:
           echo "| Build | $(status_icon $BUILD_STATUS) |" >> $GITHUB_STEP_SUMMARY
           echo "| Lint | $(status_icon $LINT_STATUS) |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- ⏱ Duration: ${DURATION}s" >> $GITHUB_STEP_SUMMARY
+          echo "- 🕗 Duration: ${DURATION}s" >> $GITHUB_STEP_SUMMARY
 
   unit-tests:
     runs-on: ubuntu-latest
@@ -83,9 +83,13 @@ jobs:
         run: npm ci
 
       - name: Run tests with coverage
+        shell: bash
         run: |
-          node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng test --code-coverage --watch=false --browsers=ChromeHeadless
-          echo "TEST_STATUS=$?" >> $GITHUB_ENV
+          set +e
+          node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng test --code-coverage --watch=false --browsers=ChromeHeadless 2>&1 | tee unit-test.log
+          TEST_STATUS=${PIPESTATUS[0]}
+          echo "TEST_STATUS=$TEST_STATUS" >> $GITHUB_ENV
+          exit $TEST_STATUS
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
@@ -117,6 +121,7 @@ jobs:
             node -e "
               const fs = require('fs');
               const xml = fs.readFileSync('test-results/junit-report.xml', 'utf8');
+              const log = fs.existsSync('unit-test.log') ? fs.readFileSync('unit-test.log', 'utf8') : '';
               const getAttr = (name) => {
                 const match = xml.match(new RegExp(name + '=\"([^\"]+)\"'));
                 return match ? match[1] : undefined;
@@ -129,7 +134,9 @@ jobs:
               const duration = getAttr('time') || '0';
               const failed = failures + errors;
               const passed = Math.max(tests - failed - pending - skipped, 0);
-              const result = failed === 0 ? 'Passing ✅' : 'Failing ❌';
+              const testStatus = Number(process.env.TEST_STATUS || 0);
+              const disconnected = /DISCONNECTED/.test(log);
+              const result = failed === 0 && testStatus === 0 && !disconnected ? 'Passing ✅' : 'Failing ❌';
 
               fs.appendFileSync(
                 process.env.GITHUB_STEP_SUMMARY,
@@ -172,7 +179,7 @@ jobs:
             "
           fi
 
-          echo "- ⏱ Duration: ${DURATION}s" >> $GITHUB_STEP_SUMMARY
+          echo "- 🕗 Duration: ${DURATION}s" >> $GITHUB_STEP_SUMMARY
 
   e2e-tests:
     runs-on: ubuntu-latest

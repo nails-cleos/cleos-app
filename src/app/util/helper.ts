@@ -59,7 +59,7 @@ class Locale implements ILocale {
   flag: string;
   i18n: string;
 
-  constructor(language: string, i18n: string, flag: string = 'en_NL') {
+  constructor(language: string, i18n: string, flag: string = 'en_GB') {
     this.language = language;
     this.flag = flag;
     this.i18n = i18n;
@@ -67,24 +67,24 @@ class Locale implements ILocale {
 }
 
 export const getLocale = (userLang?: string | null): ILocale => {
-  let locale = 'en-GB';
+  let language = 'en-GB';
   let flag;
   const lang = userLang?.replace('_', '-');
   if (lang?.startsWith('es')) {
-    locale = 'es';
-    flag = locale;
+    language = 'es';
+    flag = language;
+  } else if (lang?.startsWith('nl')) {
+    language = 'nl';
+    flag = 'nl';
   } else if (lang?.startsWith('en')) {
-    locale = 'en-GB';
-    flag = 'en-GB';
-    // } else if (userLang?.startsWith('nl')) {
-    //   locale = 'nl';
-    //   flag = 'nl';
+    language = 'en-GB';
+    flag = 'en_GB';
   }
 
-  const match = locale?.match(/([-_])/);
-  const i18n = !match ? locale : locale.substring(0, match.index);
+  const match = language?.match(/([-_])/);
+  const i18n = !match ? language : language.substring(0, match.index);
 
-  return new Locale(locale, i18n, flag?.replace('-', '_'));
+  return new Locale(language, i18n, flag);
 };
 
 export const round = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;

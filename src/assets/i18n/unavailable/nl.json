@@ -1,0 +1,59 @@
+{
+  "UNAVAILABLE": {
+    "FIELD": "Niet beschikbaar",
+    "TITLE": "Niet-beschikbaarheid toevoegen",
+    "CREATED": "Niet-beschikbaarheid {{date}} aangemaakt",
+    "DETAIL": "Niet-beschikbaarheid bijwerken",
+    "BLOCK_AGENDA": {
+      "TITLE": "Agenda blokkeren toevoegen",
+      "DETAIL": "Agenda blokkering bijwerken"
+    },
+    "LIST": {
+      "COLUMN": {
+        "PROFESSIONAL": "Professional",
+        "START": "Begin",
+        "DURATION": "Duur",
+        "REPEAT": "Herhalen"
+      },
+      "ERROR": {
+        "NO_CONTENT": "Geen gebeurtenissen"
+      }
+    },
+    "DESCRIPTION": {
+      "FIELD": "Beschrijving"
+    },
+    "PROFESSIONAL": {
+      "FIELD": "Professional",
+      "REQUIRED": "Professional is <b>verplicht</b>",
+      "INVALID": "Professional is ongeldig"
+    },
+    "DATE": {
+      "FIELD": "Kies een begindatum",
+      "REQUIRED": "Begin is <b>verplicht</b>"
+    },
+    "TIME": {
+      "FIELD": "Kies een tijd",
+      "REQUIRED": "Tijd is <b>verplicht</b>"
+    },
+    "DURATION": {
+      "FIELD": "Duur",
+      "REQUIRED": "Duur is <b>verplicht</b>"
+    },
+    "REPEAT": {
+      "FIELD": "Herhalen"
+    },
+    "END": {
+      "FIELD": "Kies een einddatum",
+      "REQUIRED": "Einddatum is <b>verplicht</b>",
+      "GREATER": "Einde moet later zijn dan begin"
+    },
+    "DELETED": {
+      "TITLE": "Niet-beschikbaarheid verwijderen",
+      "CONTENT": "Weet je zeker dat je niet-beschikbaarheid {{date}} wilt verwijderen?",
+      "MESSAGE": "Niet-beschikbaarheid {{date}} verwijderd"
+    },
+    "UPDATED": {
+      "MESSAGE": "Niet-beschikbaarheid {{date}} bijgewerkt"
+    }
+  }
+}

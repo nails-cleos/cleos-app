@@ -1,0 +1,33 @@
+{
+  "CURRENCY": {
+    "TITLE": "Valuta toevoegen",
+    "CREATED": "Valuta {{code}} aangemaakt",
+    "DETAIL": "Valuta bijwerken",
+    "LIST": {
+      "COLUMN": {
+        "CODE": "Code"
+      },
+      "ERROR": {
+        "NO_CONTENT": "Geen valuta"
+      }
+    },
+    "CODE": {
+      "FIELD": "Code",
+      "REQUIRED": "Code is <b>verplicht</b>"
+    },
+    "ICON": {
+      "FIELD": "Icoon"
+    },
+    "NAME": {
+      "FIELD": "Naam"
+    },
+    "DELETED": {
+      "TITLE": "Valuta verwijderen",
+      "CONTENT": "Weet je zeker dat je valuta {{code}} wilt verwijderen?",
+      "MESSAGE": "Valuta {{code}} verwijderd"
+    },
+    "UPDATED": {
+      "MESSAGE": "Valuta {{code}} bijgewerkt"
+    }
+  }
+}
