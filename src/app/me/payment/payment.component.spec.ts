@@ -2,11 +2,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PaymentComponent } from './payment.component';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/payment.actions';
 import { IPaymentAll, PaymentType } from '../../interfaces/payment';
 import { PaymentState } from '../../store/reducers/payment.reducers';
+import { cleanPayment } from '../../store/payment.actions';
 
 describe('PaymentComponent', () => {
   let component: PaymentComponent;
@@ -54,6 +55,9 @@ describe('PaymentComponent', () => {
       ],
     }).compileComponents();
 
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use('en-GB');
+
     fixture = TestBed.createComponent(PaymentComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -76,8 +80,26 @@ describe('PaymentComponent', () => {
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getPaymentByResourceId({ id: '123', path: 'reservation', redirect: true }),
+      getPaymentByResourceId({ id: '123', path: 'reservation' }),
     );
+  });
+
+  it('should keep accountId from currentPath for back navigation', () => {
+    currentPath$.next({ id: '123', path: 'transaction', accountId: 'account-1' });
+    fixture.detectChanges();
+
+    component.goBack();
+
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'accounts', 'account-1', 'transactions', '123']);
+  });
+
+  it('should navigate back to the resource page when accountId is missing', () => {
+    currentPath$.next({ id: '123', path: 'reservation' });
+    fixture.detectChanges();
+
+    component.goBack();
+
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'reservation', '123']);
   });
 
   it('should hide footer when paymentList has items', () => {
@@ -104,6 +126,14 @@ describe('PaymentComponent', () => {
 
     expect(component.errorMessage).toBe('Payment failed');
     expect(component.showError).toBeTrue();
+  });
+
+  it('should clean and navigate when response has a path', () => {
+    response$.next({ path: 'dashboard' });
+    fixture.detectChanges();
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(cleanPayment());
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB/dashboard']);
   });
 
   it('should call store.dispatch(paymentSend) when pay() is called', () => {
@@ -138,6 +168,59 @@ describe('PaymentComponent', () => {
     expect(storeSpy.dispatch).toHaveBeenCalledWith(
       notifyPayment({ id: 'p1', path: 'reservation', resourceId: '123', preferenceId: 'pref1', paymentType: 'paypal' }),
     );
+  });
+
+  it('should return reservation currency icon', () => {
+    const icon = component.getCurrency({
+      id: 'p1',
+      timestamp: 0,
+      amount: 0,
+      description: '',
+      paymentId: '',
+      preferenceId: '',
+      status: '',
+      type: PaymentType.cash,
+      reservation: { id: 'reservation-1', room: { currency: { icon: '$' } } } as any,
+    });
+
+    expect(icon).toBe('$');
+  });
+
+  it('should return transaction account currency icon', () => {
+    const icon = component.getCurrency({
+      id: 'p1',
+      timestamp: 0,
+      amount: 0,
+      description: '',
+      paymentId: '',
+      preferenceId: '',
+      status: '',
+      type: PaymentType.cash,
+      transaction: { id: 'transaction-1', account: { currency: { icon: '£' } } } as any,
+    });
+
+    expect(icon).toBe('£');
+  });
+
+  it('should return euro when no reservation or transaction currency is available', () => {
+    const icon = component.getCurrency({
+      id: 'p1',
+      timestamp: 0,
+      amount: 0,
+      description: '',
+      paymentId: '',
+      preferenceId: '',
+      status: '',
+      type: PaymentType.cash,
+    });
+
+    expect(icon).toBe('euro');
+  });
+
+  it('should not navigate back when path or id is missing', () => {
+    component.goBack();
+
+    expect(routerSpy.navigate).not.toHaveBeenCalled();
   });
 
   it('close() should hide error', () => {

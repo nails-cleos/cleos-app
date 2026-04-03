@@ -24,7 +24,7 @@ export class MeNavigationEffects {
       ofType(ROUTER_NAVIGATION),
       concatMap((action: RouterNavigationAction) => {
         const url = action.payload.routerState.url;
-        const navigation = this.router.getCurrentNavigation();
+        const navigation = this.router.currentNavigation();
         const navigationState = navigation?.extras.state;
 
         // 1) /me/discounts
@@ -39,12 +39,13 @@ export class MeNavigationEffects {
           return [cleanDiscount(), getMyReferrals()];
         }
 
-        // 3) /me/:path/:id/payment/
-        const pathMatch = url.match(/\/me\/([^/]+)\/([^/]+)\/payment\/?$/);
+        // 3) /me/:path/:id/payment?accountId=:accountId
+        const pathMatch = url.match(/\/me\/([^/]+)\/([^/]+)\/payment(?:\?.*)?$/);
         if (pathMatch) {
           const [, path, id] = pathMatch;
+          const queryParams = action.payload.routerState.root.queryParams;
           if (path === 'reservation' || path === 'transaction') {
-            return [cleanPayment(), setCurrentPathId({ path, id })];
+            return [cleanPayment(), setCurrentPathId({ path, id, accountId: queryParams?.['accountId'] })];
           }
         }
 
@@ -65,7 +66,7 @@ export class MeNavigationEffects {
         }
 
         // 6) /me/:path/:id/payment/:status
-        const match = url.match(/\/me\/([^/]+)\/([^/]+)\/payment\/([^/]+)/);
+        const match = url.match(/\/me\/([^/]+)\/([^/]+)\/payment\/([^/?]+)/);
         if (match) {
           const [, path, id, status] = match;
           if (path === 'reservation' || path === 'transaction') {
@@ -81,8 +82,10 @@ export class MeNavigationEffects {
                 payerId: queryParams?.['PayerID'],
                 token: queryParams?.['token'],
                 reason: queryParams?.['reason'] ?? queryParams?.['errorcode'],
-                orderId: queryParams?.['orderId'],
+                orderId: queryParams?.['order_id'] ?? queryParams?.['orderId'],
                 orderStatusId: queryParams?.['orderStatusId'],
+                paymentType: queryParams?.['payment_type'],
+                accountId: queryParams?.['account_id'],
               }),
             ];
           }
@@ -91,7 +94,11 @@ export class MeNavigationEffects {
         // 7) /me/reservation/:id
         const reservationIdMatch = url.match(/\/me\/reservation\/([^\/]+)$/);
         if (reservationIdMatch) {
-          return [cleanReservation(), setCurrentReservationId({ reservationId: reservationIdMatch[1] })];
+          return [
+            cleanReservation(),
+            setCurrentReservationId({ reservationId: reservationIdMatch[1] }),
+            getUpcomingReservation(),
+          ];
         }
 
         // 8) /me/reservation
@@ -113,7 +120,7 @@ export class MeNavigationEffects {
               getUpcomingReservation(),
             ];
           }
-          return [cleanReservation(), getAllRooms({})];
+          return [cleanReservation(), getUpcomingReservation(), getAllRooms({})];
         }
 
         // 9) /me/reservations

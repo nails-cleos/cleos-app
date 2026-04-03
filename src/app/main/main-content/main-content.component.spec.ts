@@ -10,7 +10,6 @@ import { ToastService } from '../../services/toast.service';
 import { sendMessage } from '../../store/main.actions';
 import { ISendMessage } from '../../../main';
 import { ISocialLink } from '../../interfaces/main';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { BehaviorSubject } from 'rxjs';
 import { provideHttpClient } from '@angular/common/http';
 import { MainState } from '../../store/reducers/main.reducers';
@@ -70,7 +69,6 @@ describe('MainContentComponent', () => {
         { provide: Router, useValue: routerSpy },
         { provide: MainContentService, useValue: mainContentServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
-        provideNoopAnimations(),
         provideHttpClient(),
         provideHttpClientTesting(),
       ],
@@ -137,13 +135,13 @@ describe('MainContentComponent', () => {
       { id: '2', image: 'img2.jpg', order: 1 },
     ];
 
-    expect(component.currentIndex()).toBe(1); // constructor do the initial moveBackwardSlide
-
-    component['moveForwardSlide']();
     expect(component.currentIndex()).toBe(0);
 
     component['moveForwardSlide']();
     expect(component.currentIndex()).toBe(1);
+
+    component['moveForwardSlide']();
+    expect(component.currentIndex()).toBe(0);
   });
 
   it('should check if current slide index matches', () => {
@@ -154,7 +152,7 @@ describe('MainContentComponent', () => {
 
   it('should navigate to biab treatment', () => {
     component.goToTreatment('biab');
-    expect(routerSpy.navigate).toHaveBeenCalledWith([translateService.getCurrentLang(), 'home', 'biab', 'treatment']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([translateService.getCurrentLang(), 'home', 'biab-treatment', 'treatment']);
   });
 
   it('should not navigate for other treatments', () => {
@@ -171,12 +169,8 @@ describe('MainContentComponent', () => {
     expect(social.svgIcon).toBe('WHATSAPP-NO-COLOR');
   });
 
-  it('should update works signal when filterBy is called', () => {
+  it('should update filter signal when filterBy is called', () => {
     const group = { id: '1', name: 'Group 1', order: 1 };
-    component.allWorks = [
-      { title: 'Work1', image: '', group },
-      { title: 'Work2', image: '', group: { id: '2', name: 'Group 2', order: 2 } },
-    ];
 
     component.filterBy(group);
     expect(component.filter()).toBe(group);
@@ -185,10 +179,10 @@ describe('MainContentComponent', () => {
     expect(component.filter()).toBeUndefined();
   });
 
-  it('should precompute treatment animations when groups are set', () => {
+  it('should populate groups signal from translations', () => {
     fixture.detectChanges();
 
-    expect(component.treatmentAnimations()).toBeDefined();
-    expect(component.treatmentAnimations().length).toBe(1);
+    expect(component.groups()).toBeDefined();
+    expect(component.groups().length).toBe(1);
   });
 });

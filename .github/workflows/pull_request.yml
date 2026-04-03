@@ -4,8 +4,7 @@ on:
   push:
     branches: ['main']
   pull_request:
-    branches:
-      - 'develop'
+    branches: ['develop']
 
 jobs:
   build-and-lint:
@@ -14,13 +13,13 @@ jobs:
       TZ: "Europe/Amsterdam"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
       - name: Start timer
         run: echo "JOB_START=$(date +%s)" >> $GITHUB_ENV
 
       - name: Use Node.js 24.12.0
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 24.12.0
           cache: 'npm'
@@ -28,25 +27,39 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build app
-        run: npm run build --if-present
+      - name: Type check
+        run: |
+          npx tsc -b tsconfig.check.json --noEmit
+          echo "TYPE_CHECK_STATUS=$?" >> $GITHUB_ENV
+
+      - name: Build production app
+        run: |
+          npm run build
+          echo "BUILD_STATUS=$?" >> $GITHUB_ENV
 
       - name: Run lint
-        run: npm run lint
+        run: |
+          npm run lint
+          echo "LINT_STATUS=$?" >> $GITHUB_ENV
 
       - name: Build & Lint summary
         if: always()
         run: |
           DURATION=$(( $(date +%s) - $JOB_START ))
 
+          status_icon () {
+            if [ "$1" -eq 0 ]; then echo "✅ Passed"; else echo "❌ Failed"; fi
+          }
+
           echo "## 🏗 Build & Lint" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Step | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Build | ${{ job.status == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Lint  | ${{ job.status == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Type Check | $(status_icon $TYPE_CHECK_STATUS) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | $(status_icon $BUILD_STATUS) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint | $(status_icon $LINT_STATUS) |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- ⏱ Duration: ${DURATION}s" >> $GITHUB_STEP_SUMMARY
+          echo "- 🕗 Duration: ${DURATION}s" >> $GITHUB_STEP_SUMMARY
 
   unit-tests:
     runs-on: ubuntu-latest
@@ -55,13 +68,13 @@ jobs:
       TZ: "Europe/Amsterdam"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
       - name: Start timer
         run: echo "JOB_START=$(date +%s)" >> $GITHUB_ENV
 
       - name: Use Node.js 24.12.0
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 24.12.0
           cache: 'npm'
@@ -70,21 +83,26 @@ jobs:
         run: npm ci
 
       - name: Run tests with coverage
+        shell: bash
         run: |
-          node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng test --code-coverage --watch=false --browsers=ChromeHeadless
+          set +e
+          node --max-old-space-size=4096 ./node_modules/@angular/cli/bin/ng test --code-coverage --watch=false --browsers=ChromeHeadless 2>&1 | tee unit-test.log
+          TEST_STATUS=${PIPESTATUS[0]}
+          echo "TEST_STATUS=$TEST_STATUS" >> $GITHUB_ENV
+          exit $TEST_STATUS
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
-          file: ./coverage/cleos/lcov.info
+          files: ./coverage/cleos/lcov.info
           flags: unittests
-          name: codecov-umbrella
+          name: codecov
           fail_ci_if_error: true
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Coverage Report Comment
-        uses: romeovs/lcov-reporter-action@v0.3.1
+        uses: romeovs/lcov-reporter-action@v0.4.0
         with:
           lcov-file: ./coverage/cleos/lcov.info
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -100,16 +118,40 @@ jobs:
 
           # Extract test results
           if [ -f "test-results/junit-report.xml" ]; then
-            TESTS=$(grep -o 'tests="[0-9]*"' test-results/junit-report.xml | head -1 | grep -o '[0-9]*')
-            FAILURES=$(grep -o 'failures="[0-9]*"' test-results/junit-report.xml | head -1 | grep -o '[0-9]*')
-            PASS_RATE=$(( (TESTS - FAILURES) * 100 / TESTS ))
+            node -e "
+              const fs = require('fs');
+              const xml = fs.readFileSync('test-results/junit-report.xml', 'utf8');
+              const log = fs.existsSync('unit-test.log') ? fs.readFileSync('unit-test.log', 'utf8') : '';
+              const getAttr = (name) => {
+                const match = xml.match(new RegExp(name + '=\"([^\"]+)\"'));
+                return match ? match[1] : undefined;
+              };
+              const tests = Number(getAttr('tests') || 0);
+              const failures = Number(getAttr('failures') || 0);
+              const errors = Number(getAttr('errors') || 0);
+              const pending = Number(getAttr('pending') || getAttr('disabled') || 0);
+              const skipped = Number(getAttr('skipped') || 0);
+              const duration = getAttr('time') || '0';
+              const failed = failures + errors;
+              const passed = Math.max(tests - failed - pending - skipped, 0);
+              const testStatus = Number(process.env.TEST_STATUS || 0);
+              const disconnected = /DISCONNECTED/.test(log);
+              const result = failed === 0 && testStatus === 0 && !disconnected ? 'Passing ✅' : 'Failing ❌';
 
+              fs.appendFileSync(
+                process.env.GITHUB_STEP_SUMMARY,
+                '### Test Results\\n\\n' +
+                '| Result | Passed ✅ | Failed ❌ | Pending ✋ | Skipped ↩️ | Duration 🕗 |\\n' +
+                '|--------|-----------|-----------|------------|-------------|------------|\\n' +
+                '| ' + result + ' | ' + passed + ' | ' + failed + ' | ' + pending + ' | ' + skipped + ' | ' + duration + 's |\\n\\n'
+              );
+            "
+          else
             echo "### Test Results" >> $GITHUB_STEP_SUMMARY
-            echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
-            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
-            echo "| Total Tests | $TESTS |" >> $GITHUB_STEP_SUMMARY
-            echo "| Failures | $FAILURES |" >> $GITHUB_STEP_SUMMARY
-            echo "| Pass Rate | ${PASS_RATE}% |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Result | Passed ✅ | Failed ❌ | Pending ✋ | Skipped ↩️ | Duration 🕗 |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-----------|-----------|------------|-------------|------------|" >> $GITHUB_STEP_SUMMARY
+            echo "| No report found ❌ | 0 | 0 | 0 | 0 | ${DURATION}s |" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
 
@@ -137,7 +179,7 @@ jobs:
             "
           fi
 
-          echo "- ⏱ Duration: ${DURATION}s" >> $GITHUB_STEP_SUMMARY
+          echo "- 🕗 Duration: ${DURATION}s" >> $GITHUB_STEP_SUMMARY
 
   e2e-tests:
     runs-on: ubuntu-latest
@@ -151,10 +193,10 @@ jobs:
       fail-fast: false
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
       - name: Use Node.js 24.12.0
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 24.12.0
           cache: 'npm'
@@ -162,11 +204,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build app
-        run: npm run build --if-present
+      - name: Cache Cypress
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Cypress run
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v7
         with:
           install: false
           start: npm run serve
@@ -174,7 +219,8 @@ jobs:
           record: true
           parallel: true
           group: e2e
-          ci-build-id: e2e-${{ github.run_id }}
+          ci-build-id: ${{ github.workflow }}-${{ github.run_id }}-${{ github.run_attempt }}
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CI: true

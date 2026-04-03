@@ -1,0 +1,51 @@
+.price-table {
+  display: grid;
+  gap: 8px;
+  margin: 8px 0 12px;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.label {
+  color: rgba(0, 0, 0, 0.68);
+}
+
+.label.strong,
+.value.strong {
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.value {
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.subtract-row {
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.balance-row {
+  margin-top: 4px;
+  padding-top: 8px;
+}
+
+.balance-row.positive .value,
+.balance-row.positive .label {
+  color: #a9441b;
+}
+
+.balance-row.negative .value,
+.balance-row.negative .label {
+  color: #146c43;
+}

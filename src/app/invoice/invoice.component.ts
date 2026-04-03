@@ -18,7 +18,6 @@ import { PaymentType, PaymentTypeKey } from '../interfaces/payment';
 import { map, startWith } from 'rxjs/operators';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { TranslateService } from '@ngx-translate/core';
-import { detailExpandAnimation } from '../util/animation';
 import { SelectionModel } from '@angular/cdk/collections';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
@@ -60,7 +59,6 @@ type DateRangeForm = {
   selector: 'app-invoice',
   templateUrl: './invoice.component.html',
   styleUrls: ['./invoice.component.scss'],
-  animations: [detailExpandAnimation],
   imports: [SharedModule, TimeDetailPipe, BackButtonDirective],
   providers: [
     {
@@ -143,7 +141,7 @@ export class InvoiceComponent {
       map(([type, allPaymentTypes]) => type ? this.filterTypes(type, allPaymentTypes) : allPaymentTypes),
     ));
 
-  selectedPaymentTypesSignal = signal<string[]>([PaymentType.transfer, PaymentType.paynl]);
+  selectedPaymentTypesSignal = signal<string[]>([PaymentType.transfer, PaymentType.paynl, PaymentType.mollie]);
   allPaymentTypesWritableSignal = signal<string[] | undefined>(undefined);
   dataSourceSignal = computed(() => {
     const invoiceList = this.invoiceListSignal();

@@ -4,14 +4,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Subject } from 'rxjs';
 import { ToastData } from './toast.model';
-import { toastAnimation } from '../../util/animation';
 
 @Component({
   selector: 'app-toast',
   imports: [CommonModule, MatIconModule, MatButtonModule],
   templateUrl: './toast.component.html',
   styleUrl: './toast.component.scss',
-  animations: [toastAnimation],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ToastComponent {

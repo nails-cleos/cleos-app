@@ -12,10 +12,10 @@
       </mat-form-field>
       <mat-form-field appearance="outline" class="time-field">
         <mat-label>{{ 'RESERVATION.START.FIELD' | translate }}</mat-label>
-        <input [formControl]="getForm.startedTime" [format]="24" [ngxTimepicker]="sTime" matInput name="startedTime"
+        <input [formControl]="getForm.startedTime" [format]="24" [timepicker]="sTime" matInput name="startedTime"
                readonly/>
         <span matPrefix><mat-icon (click)="sTime.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
-        <ngx-material-timepicker #sTime (timeSet)="timeChange($event, getForm.startedDate)"></ngx-material-timepicker>
+        <app-timepicker #sTime (timeSet)="timeChange($event, getForm.startedDate)"></app-timepicker>
       </mat-form-field>
     </fieldset>
     <fieldset class="date-time-fields">
@@ -29,10 +29,10 @@
       </mat-form-field>
       <mat-form-field appearance="outline" class="time-field">
         <mat-label>{{ 'RESERVATION.START.FIELD' | translate }}</mat-label>
-        <input [formControl]="getForm.completedTime" [format]="24" [ngxTimepicker]="cTime" matInput name="completedTime"
+        <input [formControl]="getForm.completedTime" [format]="24" [timepicker]="cTime" matInput name="completedTime"
                readonly/>
         <span matPrefix><mat-icon (click)="cTime.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
-        <ngx-material-timepicker #cTime (timeSet)="timeChange($event, getForm.completedDate)"></ngx-material-timepicker>
+        <app-timepicker #cTime (timeSet)="timeChange($event, getForm.completedDate)"></app-timepicker>
       </mat-form-field>
     </fieldset>
   </div>

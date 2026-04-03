@@ -11,7 +11,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { executeDialogNoWidth, openDialog } from '../../../util/helper';
 import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
-import { detailExpandAnimation } from '../../../util/animation';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { SharedModule } from '../../../shared/shared.module';
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
@@ -25,7 +24,6 @@ import { ReservationState } from '../../../store/reducers/reservation.reducers';
   selector: 'app-reservation-table',
   templateUrl: './reservation-table.component.html',
   styleUrls: ['./reservation-table.component.scss'],
-  animations: [detailExpandAnimation],
   imports: [SharedModule, TimeDetailPipe, ReservationIconPipe, ErrorComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

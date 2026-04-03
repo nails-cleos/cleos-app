@@ -77,7 +77,7 @@
         <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
         <td *matCellDef="let transaction" class="hide-xs" mat-cell>
           @if (transaction.id) {
-            <div>{{ transaction.payment.type }}</div>
+            <div>{{ transaction.payment?.type }}</div>
           } @else {
             <div class="ssc-line"></div>
           }
@@ -103,7 +103,7 @@
 
       <ng-container matColumnDef="expandedDetail">
         <td *matCellDef="let transaction" [attr.colspan]="displayedColumns.length" class="hide-gt-xs" mat-cell>
-          <div [@detailExpand]="transaction === expandedTransaction ? 'expanded' : 'collapsed'"
+          <div [class.detail-expanded]="transaction === expandedTransaction"
                class="detail hide-gt-xs">
             <mat-list>
               @if (transaction.payment?.description) {

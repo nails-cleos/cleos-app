@@ -1,0 +1,136 @@
+{
+  "ME": {
+    "RESERVATION": {
+      "PREVIEW": "Voorbeeld",
+      "APPOINTMENT": "Afspraak",
+      "UPCOMING": {
+        "TITLE": "Komende afspraak",
+        "START": "Begin",
+        "END": "Einde",
+        "PAID": "Betaald",
+        "TO_PAY": "Te betalen",
+        "APPROVED": "Goedgekeurd",
+        "CREATED": "Afspraak moet worden goedgekeurd door: ",
+        "PAY_NOW": "Betaal nu en zet de prijs vast",
+        "NO_UPCOMING": {
+          "TITLE": "Geen komende afspraken"
+        },
+        "CUSTOMER": {
+          "NO_CONTENT": "Geen beschikbaarheid op <span class='bold'>{{date}}</span>"
+        },
+        "ERROR": {
+          "CUSTOMER": "De klant heeft al afspraken op {{date1}}, {{date2}} en {{date3}}",
+          "PAYMENT": "Je moet een afspraak betalen"
+        }
+      },
+      "TREATMENT": {
+        "DETAIL": "Details",
+        "NO_CONTENT": "Geen behandelingen",
+        "DISCOUNT": {
+          "FIELD": "Korting",
+          "ADD": "Met korting"
+        },
+        "COMPLETE": {
+          "DESCRIPTION": "<span class='bold'>Beschrijving:</span> {{description}}",
+          "PRICE": "<span class='bold'>Prijs:</span>",
+          "DURATION": "<span class='bold'>Duur:</span>"
+        },
+        "NAME": {
+          "FIELD": "Naam"
+        },
+        "DURATION": {
+          "FIELD": "Duur"
+        },
+        "PRICE": {
+          "FIELD": "Prijs"
+        }
+      },
+      "DATE": {
+        "FIELD": "Kies een datum",
+        "REQUIRED": "Datum is <b>verplicht</b>",
+        "GREATER": "Datum moet later zijn dan vandaag",
+        "LESS": "Datum moet eerder zijn dan {{maxDate}}"
+      },
+      "SCHEDULE": {
+        "FIELD": "Plan een afspraak",
+        "REQUIRED": "Een afspraak plannen is <b>verplicht</b>"
+      },
+      "ROOM": {
+        "DETAIL": "Details",
+        "NO_CONTENT": "Geen ruimtes",
+        "NAME": {
+          "FIELD": "Naam",
+          "NAME": "<span class='bold'>Naam:</span> {{name}}"
+        },
+        "PROFESSIONAL": {
+          "FIELD": "Professional",
+          "NAME": "<span class='bold'>Professional:</span> {{name}}"
+        },
+        "ADDRESS": {
+          "NAME": "<span class='bold'>Adres:</span> {{name}}",
+          "DESCRIPTION": "<span class='bold'>Beschrijving:</span> {{description}}",
+          "DISTANCE": {
+            "KM": "<span class='bold'>Afstand:</span> {{distance}} kilometer",
+            "M": "<span class='bold'>Afstand:</span> {{distance}} meter"
+          }
+        }
+      },
+      "USER": {
+        "PHONE": {
+          "ADD": "Telefoon toevoegen",
+          "MESSAGE": "Het telefoonnummer is verplicht om een afspraak te maken, omdat het wordt gebruikt om updates over de afspraak te sturen."
+        }
+      }
+    },
+    "PAYMENT": {
+      "ERROR_TEXT": "Betalingsfout",
+      "ERROR": "Betaling onvolledig.\n{{reason}}",
+      "DETAIL": "Betalingsdetails",
+      "RESERVATION": "Afspraak {{reservationId}}",
+      "LIST": {
+        "ERROR": {
+          "NO_CONTENT": "Geen betaling"
+        }
+      },
+      "TYPE": {
+        "NO_CONTENT": "Geen betaalmethode"
+      }
+    },
+    "REFERRAL": {
+      "TITLE": "Doorverwijzingen",
+      "MESSAGE": "Nodig je vrienden uit voor Cleos en ontvang geweldige kortingen",
+      "DETAIL": "Je ontvangt korting zodra je vriend een account maakt met jouw code en een afspraak bijwoont",
+      "COPY": "Code gekopieerd",
+      "LINK": "Maak je Cleos-account aan. Ik raad het aan! \ud83d\ude0d\n\nAls je mijn code {{code}} gebruikt of via {{url}} binnenkomt, bespaar je op je eerste afspraak. Profiteer ervan!",
+      "INVITE": {
+        "TITLE": "Uitnodigingen",
+        "SEND": "Uitnodiging ontvangen",
+        "USED": "Afspraak bijgewoond"
+      }
+    },
+    "REVIEW": {
+      "TITLE": "Beoordeling",
+      "DETAIL": "Details",
+      "RATE": "Beoordeling {{rating}}/{{total}}",
+      "YOUR_RATE": "Jouw beoordeling {{rating}}/{{total}}",
+      "CREATED": "Beoordeling opgeslagen",
+      "RATING": {
+        "1": "Zeer slecht",
+        "2": "Slecht",
+        "3": "Goed",
+        "4": "Zeer goed",
+        "5": "Uitstekend"
+      }
+    },
+    "DISCOUNT": {
+      "LIST": {
+        "COLUMN": {
+          "USED": "Gebruikt"
+        },
+        "ERROR": {
+          "NO_CONTENT": "Geen kortingen"
+        }
+      }
+    }
+  }
+}

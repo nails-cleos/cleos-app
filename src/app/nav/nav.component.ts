@@ -209,7 +209,6 @@ export class NavComponent {
           this.messagingService.requestPermission(user);
           this.resetTheme(user.theme);
         }
-        this.messagingService.receiveMessage();
       }
     });
 
@@ -306,6 +305,7 @@ export class NavComponent {
     this.isDarkMode.update(prev => !prev);
     const theme = getThemeName(this.isDarkMode());
     this.resetTheme(theme);
+    this.authUserService.updateMode(this.isDarkMode());
     const user: IUser = new User();
     user.theme = theme;
     const redirectUrl = this.router.url;

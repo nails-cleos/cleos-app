@@ -1,0 +1,52 @@
+{
+  "OFFICE": {
+    "TITLE": "Vestiging toevoegen",
+    "CREATED": "Vestiging {{name}} aangemaakt",
+    "DETAIL": "Vestiging bijwerken",
+    "ROOMS": "Ruimtes",
+    "LIST": {
+      "COLUMN": {
+        "MANAGER": "Manager"
+      },
+      "ERROR": {
+        "NO_CONTENT": "Geen vestigingen"
+      }
+    },
+    "NAME": {
+      "FIELD": "Naam",
+      "REQUIRED": "Naam is <b>verplicht</b>"
+    },
+    "MANAGER": {
+      "FIELD": "Manager",
+      "REQUIRED": "Manager is <b>verplicht</b>",
+      "INVALID": "Manager is ongeldig",
+      "ADD_BUTTON": "Manager toevoegen"
+    },
+    "SUBJECT": {
+      "FIELD": "Onderwerp"
+    },
+    "KVK": {
+      "FIELD": "KvK-nummer"
+    },
+    "ACCOUNT": {
+      "FIELD": "Rekeningnummer"
+    },
+    "BTW": {
+      "FIELD": "Btw-nummer"
+    },
+    "ADDRESS": {
+      "FIELD": "Factuuradres"
+    },
+    "DRIVE_FOLDER": {
+      "FIELD": "Drive-map"
+    },
+    "DELETED": {
+      "TITLE": "Vestiging verwijderen",
+      "CONTENT": "Weet je zeker dat je vestiging {{name}} wilt verwijderen?",
+      "MESSAGE": "Vestiging {{name}} verwijderd"
+    },
+    "UPDATED": {
+      "MESSAGE": "Vestiging {{name}} bijgewerkt"
+    }
+  }
+}

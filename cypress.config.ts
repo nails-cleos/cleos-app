@@ -7,6 +7,7 @@ export default defineConfig({
     baseUrl: 'http://localhost:4300',
     defaultCommandTimeout: 8000,
     specPattern: 'cypress/e2e/**/*.cy.ts',
+    allowCypressEnv: false,
   },
 
   reporter: 'mocha-multi-reporters',

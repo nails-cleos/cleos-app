@@ -1,0 +1,213 @@
+{
+  "ROOM": {
+    "TITLE": "Ruimte toevoegen",
+    "CREATED": "Ruimte {{name}} aangemaakt",
+    "DETAIL": "Ruimte bijwerken",
+    "PAYMENT_OPTION": "Betaalopties",
+    "LIST": {
+      "COLUMN": {
+        "CURRENCY": "Valuta",
+        "OFFICE": "Vestiging",
+        "ADDRESS": "Adres",
+        "TIME_ZONE": "Tijdzone",
+        "AVAILABILITY": {
+          "FIELD": "Beschikbaarheid",
+          "MONDAY": "Maandag",
+          "TUESDAY": "Dinsdag",
+          "WEDNESDAY": "Woensdag",
+          "THURSDAY": "Donderdag",
+          "FRIDAY": "Vrijdag",
+          "SATURDAY": "Zaterdag",
+          "SUNDAY": "Zondag"
+        }
+      },
+      "ERROR": {
+        "NO_CONTENT": "Geen ruimtes"
+      }
+    },
+    "NAME": {
+      "FIELD": "Naam",
+      "REQUIRED": "Naam is <b>verplicht</b>"
+    },
+    "OFFICE": {
+      "FIELD": "Vestiging",
+      "REQUIRED": "Vestiging is <b>verplicht</b>",
+      "INVALID": "Vestiging is ongeldig",
+      "ADD_BUTTON": "Vestiging toevoegen"
+    },
+    "TIME_ZONE": {
+      "FIELD": "Tijdzone",
+      "REQUIRED": "Tijdzone is <b>verplicht</b>",
+      "INVALID": "Tijdzone is ongeldig"
+    },
+    "CLOSE_DATE": {
+      "FIELD": "Sluitingsdatum"
+    },
+    "PRIMARY": {
+      "FIELD": "Is primair?"
+    },
+    "AVAILABILITY": {
+      "FIELD": "Beschikbaarheid",
+      "REQUIRED": "Minstens een beschikbaarheid is <b>verplicht</b>"
+    },
+    "PROFESSIONAL": {
+      "FIELD": "Professional",
+      "REQUIRED": "Minstens een professional is <b>verplicht</b>"
+    },
+    "MONDAY_TIME": {
+      "FIELD": "Maandag",
+      "DESCRIPTION": "Beschikbare werktijden op maandag",
+      "REQUIRED": "Voeg werktijden voor maandag toe of negeer maandag"
+    },
+    "TUESDAY_TIME": {
+      "FIELD": "Dinsdag",
+      "DESCRIPTION": "Beschikbare werktijden op dinsdag",
+      "REQUIRED": "Voeg werktijden voor dinsdag toe of negeer dinsdag"
+    },
+    "WEDNESDAY_TIME": {
+      "FIELD": "Woensdag",
+      "DESCRIPTION": "Beschikbare werktijden op woensdag",
+      "REQUIRED": "Voeg werktijden voor woensdag toe of negeer woensdag"
+    },
+    "THURSDAY_TIME": {
+      "FIELD": "Donderdag",
+      "DESCRIPTION": "Beschikbare werktijden op donderdag",
+      "REQUIRED": "Voeg werktijden voor donderdag toe of negeer donderdag"
+    },
+    "FRIDAY_TIME": {
+      "FIELD": "Vrijdag",
+      "DESCRIPTION": "Beschikbare werktijden op vrijdag",
+      "REQUIRED": "Voeg werktijden voor vrijdag toe of negeer vrijdag"
+    },
+    "SATURDAY_TIME": {
+      "FIELD": "Zaterdag",
+      "DESCRIPTION": "Beschikbare werktijden op zaterdag",
+      "REQUIRED": "Voeg werktijden voor zaterdag toe of negeer zaterdag"
+    },
+    "SUNDAY_TIME": {
+      "FIELD": "Zondag",
+      "DESCRIPTION": "Beschikbare werktijden op zondag",
+      "REQUIRED": "Voeg werktijden voor zondag toe of negeer zondag"
+    },
+    "LUNCH": {
+      "FIELD": "Lunchpauze",
+      "CHECK": "Lunchpauze toevoegen"
+    },
+    "START": {
+      "FIELD": "Begin",
+      "REQUIRED": "Begin is <b>verplicht</b>"
+    },
+    "END": {
+      "FIELD": "Einde",
+      "REQUIRED": "Einde is <b>verplicht</b>"
+    },
+    "DELETED": {
+      "TITLE": "Ruimte verwijderen",
+      "CONTENT": "Weet je zeker dat je ruimte {{name}} wilt verwijderen?",
+      "MESSAGE": "Ruimte {{name}} verwijderd"
+    },
+    "UPDATED": {
+      "MESSAGE": "Ruimte {{name}} bijgewerkt"
+    },
+    "ME": {
+      "TITLE": "Mijn ruimte",
+      "SERVICES": {
+        "TITLE": "Mijn diensten",
+        "ADD": "Prijs toevoegen",
+        "ALL": "Alles",
+        "SELECTED": "Geselecteerd",
+        "ADDITIONAL": {
+          "TITLE": "Extra"
+        },
+        "TREATMENT": {
+          "TITLE": "Behandeling"
+        },
+        "PRICE": {
+          "TEXT": "Wat is de prijs van {{name}}?",
+          "FIELD": "Prijs",
+          "REQUIRED": "Prijs is <b>verplicht</b>",
+          "GREATER": "Prijs moet groter zijn dan 1"
+        },
+        "UPDATE": {
+          "MESSAGE": "Ruimtediensten bijgewerkt"
+        }
+      }
+    }
+  },
+  "EXPENSE": {
+    "TITLE": "Uitgave toevoegen",
+    "CREATED": "Uitgave {{invoice}} aangemaakt",
+    "DETAIL": "Uitgave bijwerken",
+    "LIST": {
+      "COLUMN": {
+        "INVOICE": "Factuur",
+        "SUPPLY_STORE": "Leverancier",
+        "DATE": "Datum",
+        "GROSS": "Bruto",
+        "BTW": "Btw",
+        "NET": "Netto"
+      },
+      "ERROR": {
+        "NO_CONTENT": "Geen uitgaven"
+      }
+    },
+    "INVOICE": {
+      "FIELD": "Factuur",
+      "REQUIRED": "Factuur is <b>verplicht</b>"
+    },
+    "SUPPLY_STORE": {
+      "FIELD": "Leverancier",
+      "REQUIRED": "Leverancier is <b>verplicht</b>"
+    },
+    "DESCRIPTION": {
+      "FIELD": "Beschrijving"
+    },
+    "DATE": {
+      "FIELD": "Kies een datum",
+      "REQUIRED": "Datum is <b>verplicht</b>",
+      "FUTURE": "Datum mag niet in de toekomst liggen"
+    },
+    "GROSS": {
+      "FIELD": "Bruto",
+      "REQUIRED": "Bruto is <b>verplicht</b>"
+    },
+    "BTW": {
+      "FIELD": "Btw",
+      "MIN": "Btw moet groter zijn dan 0,00",
+      "MAX": "Btw moet kleiner zijn dan 100,00",
+      "DUPLICATED": "Btw is al toegevoegd",
+      "REQUIRED": "Btw is <b>verplicht</b>"
+    },
+    "NET": {
+      "FIELD": "Netto"
+    },
+    "TOTAL": {
+      "GROSS": "Totaal bruto",
+      "NET": "Totaal netto",
+      "BTW": "Totaal btw"
+    },
+    "TYPE": {
+      "FIELD": "Type",
+      "REQUIRED": "Type is <b>verplicht</b>"
+    },
+    "DELETED": {
+      "TITLE": "Uitgave verwijderen",
+      "CONTENT": "Weet je zeker dat je uitgave {{invoice}} wilt verwijderen?",
+      "MESSAGE": "Uitgave {{invoice}} verwijderd"
+    },
+    "UPDATED": {
+      "MESSAGE": "Uitgave {{invoice}} bijgewerkt"
+    }
+  },
+  "CUSTOMER": {
+    "RESERVATION": "Laatste afspraak",
+    "LAST_TIME": "Laatste keer",
+    "DAYS": {
+      "TITLE": "Dagen",
+      "VALUE": "{{days}} dagen geleden"
+    },
+    "ERROR": {
+      "NO_CONTENT": "Geen klanten"
+    }
+  }
+}

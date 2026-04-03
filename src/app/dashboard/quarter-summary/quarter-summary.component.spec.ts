@@ -115,7 +115,7 @@ describe('QuarterSummaryComponent', () => {
 
     const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
     storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),
@@ -140,7 +140,7 @@ describe('QuarterSummaryComponent', () => {
           return new BehaviorSubject(undefined).asObservable();
       }
     });
-    routerSpy.getCurrentNavigation.and.returnValue(null);
+    routerSpy.currentNavigation.and.returnValue(null);
     breakpointObserverSpy.observe.and.returnValue(of({ matches: false, breakpoints: {} }));
 
     paramMapSpy.get.and.returnValue('test');

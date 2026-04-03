@@ -9,6 +9,7 @@ import {
   createNewDate,
   createNewDateZonedTime,
   dateMonthYear,
+  dateToUTC,
   datesInSameWeek,
   dateToTimestamp,
   daysOfWeek,
@@ -597,19 +598,16 @@ describe('dates utility', () => {
   describe('newDate', () => {
     it('should create date from timestamp', () => {
       const timestamp = 1704067200000; // 2024-01-01
-      const date = newDate(timestamp);
-      expect(date instanceof Date).toBeTrue();
+      expect(newDate(timestamp) instanceof Date).toBeTrue();
     });
 
     it('should create date from string', () => {
-      const date = newDate('2024-01-01');
-      expect(date instanceof Date).toBeTrue();
+      expect(newDate('2024-01-01') instanceof Date).toBeTrue();
     });
 
     it('should create date from Date', () => {
       const inputDate = new Date(2024, 0, 1);
-      const date = newDate(inputDate);
-      expect(date instanceof Date).toBeTrue();
+      expect(newDate(inputDate) instanceof Date).toBeTrue();
     });
   });
 
@@ -1044,6 +1042,9 @@ describe('dates utility', () => {
   });
 
   describe('getMinMaxDate', () => {
+    const expectedHour = (hour: number, minute: number = 0): number =>
+      dateToUTC(createNewDate(new Date(), hour, minute), room.timeZone).getHours();
+
     it('should return min and max dates for sunday', () => {
       const result = getMinMaxDate(0, new Date(), [room]);
       expect(result.minDate.getHours()).toBe(0);
@@ -1053,9 +1054,9 @@ describe('dates utility', () => {
     });
     it('should return min and max dates for monday', () => {
       const result = getMinMaxDate(1, new Date(), [room]);
-      expect(result.minDate.getHours()).toBe(10);
+      expect(result.minDate.getHours()).toBe(expectedHour(9));
       expect(result.minDate.getMinutes()).toBe(0);
-      expect(result.maxDate.getHours()).toBe(19);
+      expect(result.maxDate.getHours()).toBe(expectedHour(18));
       expect(result.maxDate.getMinutes()).toBe(0);
     });
 
@@ -1069,17 +1070,17 @@ describe('dates utility', () => {
 
     it('should return min and max dates for wednesday', () => {
       const result = getMinMaxDate(3, new Date(), [room]);
-      expect(result.minDate.getHours()).toBe(11);
+      expect(result.minDate.getHours()).toBe(expectedHour(10));
       expect(result.minDate.getMinutes()).toBe(0);
-      expect(result.maxDate.getHours()).toBe(20);
+      expect(result.maxDate.getHours()).toBe(expectedHour(19));
       expect(result.maxDate.getMinutes()).toBe(0);
     });
 
     it('should return min and max dates for thursday', () => {
       const result = getMinMaxDate(4, new Date(), [room]);
-      expect(result.minDate.getHours()).toBe(10);
+      expect(result.minDate.getHours()).toBe(expectedHour(9));
       expect(result.minDate.getMinutes()).toBe(0);
-      expect(result.maxDate.getHours()).toBe(19);
+      expect(result.maxDate.getHours()).toBe(expectedHour(18));
       expect(result.maxDate.getMinutes()).toBe(0);
     });
 
@@ -1093,15 +1094,23 @@ describe('dates utility', () => {
 
     it('should return min and max dates for saturday', () => {
       const result = getMinMaxDate(6, new Date(), [room]);
-      expect(result.minDate.getHours()).toBe(11);
+      expect(result.minDate.getHours()).toBe(expectedHour(10));
       expect(result.minDate.getMinutes()).toBe(0);
-      expect(result.maxDate.getHours()).toBe(17);
+      expect(result.maxDate.getHours()).toBe(expectedHour(16));
       expect(result.maxDate.getMinutes()).toBe(0);
     });
 
     it('should return min and max for multiples rooms with different day', () => {
       const date = new Date();
-      date.setDate(date.getDate() + ((10 - date.getDay()) % 7 || 7)); // next wednesday
+      const daysUntilWednesday = ((3 - date.getUTCDay() + 7) % 7) || 7;
+      const nextWednesday = new Date(Date.UTC(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        date.getUTCDate() + daysUntilWednesday,
+        12,
+        0,
+        0,
+      ));
 
       const anotherRoom: IRoomAll = {
         ...room,
@@ -1110,10 +1119,10 @@ describe('dates utility', () => {
         ],
       };
 
-      const result = getMinMaxDate(3, date, [room, anotherRoom]);
-      expect(result.minDate.getHours()).toBe(10);
+      const result = getMinMaxDate(3, nextWednesday, [room, anotherRoom]);
+      expect(result.minDate.getUTCHours()).toBe(9);
       expect(result.minDate.getMinutes()).toBe(30);
-      expect(result.maxDate.getHours()).toBe(20);
+      expect(result.maxDate.getUTCHours()).toBe(19);
       expect(result.maxDate.getMinutes()).toBe(0);
     });
   });

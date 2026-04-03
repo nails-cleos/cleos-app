@@ -1,44 +1,54 @@
-import { TestBed } from '@angular/core/testing';
-import { EMPTY, Observable } from 'rxjs';
-
+import { signal, WritableSignal } from '@angular/core';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { of } from 'rxjs';
 import { MessagingService } from './messaging.service';
 import { Store } from '@ngrx/store';
-import { Messaging } from '@angular/fire/messaging';
-import { Auth } from '@angular/fire/auth';
-import { Database } from '@angular/fire/database';
-import { AppCheck } from '@angular/fire/app-check';
 import { subscribeNotification } from '../store/notification.actions';
-import { AppCheckStub, DatabaseStub } from '../util/firebase-stub';
 import { NotificationState } from '../store/reducers/notification.reducers';
+import { FirebaseService } from './firebase.service';
+import { EnvService } from './env.service';
 
 describe('MessagingService', () => {
   let service: MessagingService;
   let storeSpy: jasmine.SpyObj<Store<NotificationState>>;
-  let messagingSpy: jasmine.SpyObj<Messaging>;
-  let authSpy: any;
+  let firebaseSpy: jasmine.SpyObj<FirebaseService>;
+  let envSpy: jasmine.SpyObj<EnvService>;
+  let isAuthenticatedSignal: WritableSignal<boolean>;
 
-  const mockUser = {
-    id: 'user-123',
-    email: 'test@example.com',
-  };
+  const mockUser = { id: 'user-123', email: 'test@example.com' };
+  const mockToken = 'mock-fcm-token';
 
   beforeEach(() => {
+    isAuthenticatedSignal = signal(true);
+
     storeSpy = jasmine.createSpyObj('Store', ['dispatch']);
-    messagingSpy = {} as jasmine.SpyObj<Messaging>;
-    authSpy = {
-      currentUser: null,
-    };
+    firebaseSpy = jasmine.createSpyObj('FirebaseService', [
+      'updateToken',
+      'getMessagingToken',
+      'onMessageReceived',
+    ], {
+      isAuthenticated: isAuthenticatedSignal.asReadonly(),
+      appCheckToken: Promise.resolve('app-check-token'),
+    });
+
+    envSpy = jasmine.createSpyObj('EnvService', [], {
+      firebaseMessaging: '/firebase-messaging-sw.js',
+      firebase: { vapidKey: 'VAPID_KEY' },
+    });
+
+    // Mock onMessageReceived observable
+    firebaseSpy.onMessageReceived.and.returnValue(of({ msg: 'hello' }));
+    firebaseSpy.updateToken.and.returnValue(Promise.resolve());
 
     TestBed.configureTestingModule({
       providers: [
         MessagingService,
         { provide: Store, useValue: storeSpy },
-        { provide: Messaging, useValue: messagingSpy },
-        { provide: Auth, useValue: authSpy },
-        { provide: Database, useValue: DatabaseStub },
-        { provide: AppCheck, useClass: AppCheckStub },
+        { provide: FirebaseService, useValue: firebaseSpy },
+        { provide: EnvService, useValue: envSpy },
       ],
     });
+
     service = TestBed.inject(MessagingService);
   });
 
@@ -46,145 +56,75 @@ describe('MessagingService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should initialize with empty message observable', () => {
-    expect(service.message$).toBeDefined();
-    expect(service.message$).toBe(EMPTY);
+  it('should initialize message$ from firebase', (done) => {
+    service.message$.subscribe(msg => {
+      expect(msg).toEqual({ msg: 'hello' });
+      done();
+    });
   });
 
   describe('updateToken', () => {
-    beforeEach(() => {
-      spyOn(service, 'updateToken').and.callFake((_: any, token: string) => {
-        if (authSpy.currentUser) {
-          storeSpy.dispatch(subscribeNotification({ token }));
-        }
-      });
+    it('should dispatch action and call firebase.updateToken when authenticated', async () => {
+      await service.updateToken(mockUser, mockToken);
+
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(subscribeNotification({ token: mockToken }));
+      expect(firebaseSpy.updateToken).toHaveBeenCalledWith(mockUser.id, mockToken);
     });
 
-    it('should dispatch notification action when user is authenticated', () => {
-      const token = 'mock-fcm-token';
-      authSpy.currentUser = mockUser;
+    it('should not dispatch or update token if not authenticated', async () => {
+      isAuthenticatedSignal.set(false);
 
-      service.updateToken(mockUser, token);
+      await service.updateToken(mockUser, mockToken);
 
-      expect(service.updateToken).toHaveBeenCalledWith(mockUser, token);
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(subscribeNotification({ token }));
-    });
-
-    it('should not dispatch action when user is not authenticated', () => {
-      const token = 'mock-fcm-token';
-      authSpy.currentUser = null;
-
-      service.updateToken(mockUser, token);
-
-      expect(service.updateToken).toHaveBeenCalledWith(mockUser, token);
       expect(storeSpy.dispatch).not.toHaveBeenCalled();
-    });
-
-    it('should handle user authentication check correctly', () => {
-      const token = 'test-token';
-
-      // Test with authenticated user
-      authSpy.currentUser = { id: 'test-user' };
-      service.updateToken(mockUser, token);
-      expect(storeSpy.dispatch).toHaveBeenCalledTimes(1);
-
-      // Reset spy
-      storeSpy.dispatch.calls.reset();
-
-      // Test with null user
-      authSpy.currentUser = null;
-      service.updateToken(mockUser, token);
-      expect(storeSpy.dispatch).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('receiveMessage', () => {
-    it('should create an observable for incoming messages', () => {
-      service.receiveMessage();
-
-      expect(service.message$).toBeInstanceOf(Observable);
-      expect(service.message$).not.toBe(EMPTY);
-    });
-
-    it('should replace the default empty observable', () => {
-      const originalMessage$ = service.message$;
-
-      service.receiveMessage();
-
-      expect(service.message$).not.toBe(originalMessage$);
-      expect(service.message$).toBeInstanceOf(Observable);
+      expect(firebaseSpy.updateToken).not.toHaveBeenCalled();
     });
   });
 
   describe('requestPermission', () => {
-    it('should be a function that accepts a user parameter', () => {
-      expect(typeof service.requestPermission).toBe('function');
+    it('should call firebase.getMessagingToken and updateToken if permission granted', fakeAsync(() => {
+      const fakeSWReg = { scope: '__' } as any;
+      const fakeToken = 'new-token';
 
-      // Should not throw when called with a user
-      expect(() => {
-        service.requestPermission(mockUser);
-      }).not.toThrow();
-    });
+      // spy the global Notification.requestPermission
+      spyOn(Notification, 'requestPermission').and.returnValue(Promise.resolve('granted'));
+      spyOn(navigator.serviceWorker, 'register').and.returnValue(Promise.resolve(fakeSWReg));
+      firebaseSpy.getMessagingToken.and.returnValue(Promise.resolve(fakeToken));
 
-    it('should handle null or undefined user gracefully', () => {
-      expect(() => {
-        service.requestPermission(null);
-      }).not.toThrow();
+      service.updateToken = jasmine.createSpy().and.callFake(() => {}); // spy updateToken to avoid store dispatch racing
 
-      expect(() => {
-        service.requestPermission(undefined as any);
-      }).not.toThrow();
-    });
-  });
+      service.requestPermission(mockUser);
 
-  describe('service methods exist and are callable', () => {
-    it('should have updateToken method', () => {
-      expect(typeof service.updateToken).toBe('function');
-    });
+      // flush all promises
+      tick();
 
-    it('should have receiveMessage method', () => {
-      expect(typeof service.receiveMessage).toBe('function');
-    });
-
-    it('should have requestPermission method', () => {
-      expect(typeof service.requestPermission).toBe('function');
-    });
-  });
-
-  describe('store integration', () => {
-    beforeEach(() => {
-      spyOn(service, 'updateToken').and.callFake((_: any, token: string) => {
-        if (authSpy.currentUser) {
-          storeSpy.dispatch(subscribeNotification({ token }));
-        }
+      expect(firebaseSpy.getMessagingToken).toHaveBeenCalledWith({
+        serviceWorkerRegistration: fakeSWReg,
+        vapidKey: envSpy.firebase.vapidKey,
       });
+      expect(service.updateToken).toHaveBeenCalledWith(mockUser, fakeToken);
+    }));
+
+    it('should not call updateToken if permission denied', async () => {
+      spyOn(Notification, 'requestPermission').and.returnValue(Promise.resolve('denied'));
+
+      await service.requestPermission(mockUser);
+
+      expect(firebaseSpy.getMessagingToken).not.toHaveBeenCalled();
+      expect(storeSpy.dispatch).not.toHaveBeenCalled();
     });
 
-    it('should use the injected store for dispatching actions', () => {
-      const token = 'integration-test-token';
-      authSpy.currentUser = { id: 'test-user' };
+    it('should stop before requesting permission when app check token is missing', async () => {
+      Object.defineProperty(firebaseSpy, 'appCheckToken', {
+        value: Promise.resolve(null),
+        configurable: true,
+      });
+      const permissionSpy = spyOn(Notification, 'requestPermission');
 
-      service.updateToken(mockUser, token);
+      await service.requestPermission(mockUser);
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(subscribeNotification({ token }));
-    });
-  });
-
-  describe('Firebase service injection', () => {
-    it('should have messaging service injected', () => {
-      expect((service as any).messaging).toBeDefined();
-    });
-
-    it('should have auth service injected', () => {
-      expect((service as any).auth).toBeDefined();
-    });
-
-    it('should have database service injected', () => {
-      expect((service as any).database).toBeDefined();
-    });
-
-    it('should have app check service injected', () => {
-      expect((service as any).appCheck).toBeDefined();
+      expect(permissionSpy).not.toHaveBeenCalled();
+      expect(firebaseSpy.getMessagingToken).not.toHaveBeenCalled();
     });
   });
 });

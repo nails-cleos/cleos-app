@@ -1,0 +1,43 @@
+{
+  "ACCOUNT": {
+    "TITLE": "Account",
+    "BALANCE": "Saldo",
+    "MONEY_ADDED": "Geld toegevoegd aan account {{id}}",
+    "UPDATED": "Account {{id}} bijgewerkt",
+    "GIFT": {
+      "FIELD": "Cadeau",
+      "REQUIRED": "Cadeau is <b>verplicht</b>",
+      "GREATER": "Cadeau moet groter zijn dan 0",
+      "LESS": "Cadeau moet kleiner zijn dan 100"
+    },
+    "TRANSACTION": {
+      "TITLE": "Transactie",
+      "DETAIL": "Transactiedetails",
+      "TRANSFER": "Overschrijvingsreferentie",
+      "ID": "Transactie-id",
+      "PREFERENCE_ID": "Referentie",
+      "PAYMENT_ID": "Betaling",
+      "AMOUNT_GIFTED": "Geschonken bedrag",
+      "DATE": "Datum",
+      "STATUS": "Status",
+      "LIST": {
+        "COLUMN": {
+          "AMOUNT_GIFTED": "Geschonken bedrag",
+          "DATE": "Datum"
+        },
+        "ERROR": {
+          "NO_CONTENT": "Geen transacties"
+        }
+      },
+      "TYPE": {
+        "FIELD": "Type",
+        "REQUIRED": "Type is <b>verplicht</b>"
+      },
+      "AMOUNT": {
+        "FIELD": "Bedrag",
+        "REQUIRED": "Bedrag is <b>verplicht</b>",
+        "MIN": "Bedrag moet groter zijn dan {{currency}}{{min}}"
+      }
+    }
+  }
+}

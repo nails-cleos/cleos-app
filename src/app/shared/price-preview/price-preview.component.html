@@ -1,13 +1,14 @@
 @if (price(); as price) {
-  @if (price.total || price.total === 0) {
+  @if (!summaryOnly() && (price.total || price.total === 0)) {
+    @let hasDiscount = !!discountId() || price.total !== price.totalWithoutDiscount || price.discount > 0;
     <mat-list-item>
       <mat-icon style="margin-top: 32px" matListItemIcon>{{ currencyIcon() }}</mat-icon>
       <div matListItemTitle [innerHTML]="label() | translate"></div>
-      @if (price.total !== price.totalWithoutDiscount) {
+      @if (hasDiscount) {
         @if (!isEditing()) {
           <div matListItemLine>
-            <span [class.strikethrough]="price.discount">{{ price.totalWithoutDiscount | number:'1.2-2' }}</span>
-            <span @discountAnimation class="raised-button bold">{{ price.total | number:'1.2-2' }}</span>
+            <span [class.strikethrough]="hasDiscount">{{ price.totalWithoutDiscount | number:'1.2-2' }}</span>
+            <span class="raised-button bold discount-enter">{{ price.total | number:'1.2-2' }}</span>
           </div>
         } @else {
           <div matListItemLine>
@@ -22,32 +23,47 @@
       }
     </mat-list-item>
   }
-  @if (!price.isPaid && (price.balance || price.totalPaid)) {
+  @if (hasBalanceSummary) {
     @let currentCurrencyIcon = currencyIcon();
-    @if (price.totalPaid) {
-      <mat-list-item>
-        <div matListItemTitle [innerHTML]="'COMMON.PAYMENT.OPTIONS.PAID' | translate: {
-                         amount: price.totalPaid | number:'1.2-2',
-                         symbol: currentCurrencyIcon | currencySymbol
-                         }">
+    <div class="price-table">
+      @if (updatedTotal() !== undefined && updatedTotal() !== null) {
+        <div class="row">
+          <span class="label strong">{{ 'COMMON.PAYMENT.OPTIONS.UPDATED_TOTAL' | translate }}</span>
+          <span class="value">{{ currentCurrencyIcon | currencySymbol }} {{ currentTotal | number:'1.2-2' }}</span>
         </div>
-      </mat-list-item>
-    }
-    @if (price.balance) {
-      <mat-list-item>
-        <div matListItemTitle [innerHTML]="'COMMON.PAYMENT.OPTIONS.ACCOUNT' | translate: {
-                         amount: price.balance | number:'1.2-2',
-                         symbol: currentCurrencyIcon | currencySymbol
-                         }">
+      }
+
+      @if (penalty()) {
+        <div class="row">
+          <span class="label strong">{{ 'COMMON.PAYMENT.OPTIONS.PENALTY' | translate }}</span>
+          <span class="value">{{ currentCurrencyIcon | currencySymbol }} {{ penalty() | number:'1.2-2' }}</span>
         </div>
-      </mat-list-item>
-    }
-    <mat-list-item>
-      <div matListItemTitle [innerHTML]="'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate: {
-                         amount: price.toPaid | number:'1.2-2',
-                         symbol: currentCurrencyIcon | currencySymbol
-                         }">
+      }
+
+      <div class="row subtract-row">
+        <span class="label">&nbsp; &nbsp;{{ 'COMMON.PAYMENT.OPTIONS.PAID' | translate }}</span>
+        <span class="value">- {{ currentCurrencyIcon | currencySymbol }} {{ currentPaidTotal | number:'1.2-2' }}</span>
       </div>
-    </mat-list-item>
+
+      @if (accountBalanceUsed > 0) {
+        <div class="row subtract-row">
+          <span class="label">&nbsp; &nbsp;{{ 'COMMON.PAYMENT.OPTIONS.ACCOUNT' | translate }}</span>
+          <span class="value">- {{ currentCurrencyIcon | currencySymbol }} {{ accountBalanceUsed | number:'1.2-2' }}</span>
+        </div>
+      }
+
+      <div class="row balance-row" [class.positive]="(toPaid() ?? 0) > 0" [class.negative]="accountCreditAmount > 0">
+        <span class="label strong">
+          @if ((toPaid() ?? 0) > 0) {
+            {{ 'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate }}
+          } @else if (accountCreditAmount > 0) {
+            {{ 'COMMON.PAYMENT.OPTIONS.ACCOUNT' | translate }}
+          } @else {
+            {{ 'COMMON.PAYMENT.OPTIONS.BALANCE' | translate }}
+          }
+        </span>
+        <span class="value">{{ currentCurrencyIcon | currencySymbol }} {{ resultAmount | number:'1.2-2' }}</span>
+      </div>
+    </div>
   }
 }

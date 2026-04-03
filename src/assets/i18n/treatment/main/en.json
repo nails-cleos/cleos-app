@@ -1,0 +1,126 @@
+{
+  "treatments": [
+    {
+      "id": "biab-treatment",
+      "translations": {
+        "heroTitle": "Is BIAB TREATMENT better than other gels and acrylic?",
+        "introLead": "In most cases, when the client doesn't know <span class='bold'>which treatment to choose</span>, either because it's their <span class='bold'>first time in a nailstudio</span> or because they want to try a new technique, my recommendation usually ends up being: let's go for the <span class='bold'>BIAB TREATMENT</span>. Why? I'll explain more below.…",
+        "introBridge": "But first...",
+        "comparisonLead": "Don't miss this summary table that shows the main differences between them:",
+        "whyBestTitle": "Why is BIAB TREATMENT the best?",
+        "assessmentText": "In each case presented to me, I carefully examine the nail and touch it to recommend the most suitable treatment. I consider not only the texture and shape of each hand but also my client's <span class='bold'>lifestyle, tastes</span>, and <span class='bold'>preferences.</span>",
+        "benefitsText": "With this type of <span class='bold'>Gelnails</span>, I can guarantee <span class='bold'>healthy and personalized nails</span>, with a <span class='bold'>uniform color</span> and <span class='bold'>unique style</span>, strengthened by a flexible and resistant gel that allows reaching the desired length without breaking or chipping, thus avoiding the use of <span class='bold'>extensions</span> or <span class='bold'>acrylic nails</span>, which are more invasive to the health of the nail.",
+        "summaryLabel": "In summary...",
+        "standardsLead": "<span class='bold'>BIAB TREATMENT</span> meets my standards of:",
+        "standardsItems": [
+          "exceptional quality;",
+          "elegant finish;",
+          "notable resistance and durability."
+        ],
+        "ctaTitle": "GIVE IT A TRY!",
+        "advantagesTitle": "Discover the Advantages of BIAB TREATMENT over other types of Gel Polishes",
+        "advantagesIntro": "Throughout my years of experience, I have explored a wide range of gels and nail care products. However, none have captured my attention like the fascinating world of BIAB. I have fallen in love with its chewy and sticky texture, which brightens my days with a unique palette of tones.",
+        "productConfidenceText": "I have full confidence in the quality of The GelBottle Inc.'s BIAB, as I know its <span class='bold'>consistency, flexibility, and adhesion</span> will ensure my clients the long-lasting treatment and <span class='bold'>strong nails</span> they seek when entrusting me with their hands. Nails protected against bumps, pressures, and bends.",
+        "essenceLabel": "BIAB encapsulates its essence in this equation:",
+        "veganBenefitText": "One of the main advantages I highlight when promoting the BIAB TREATMENT, comparing it to other conventional gels and acrylics, is that it is a VEGAN and CRUELTY-FREE product, in addition to being 10-free, which means fewer unwanted chemicals. It offers a range of mostly natural and light colors to reflect the concern for minimizing damage and maintaining the product's naturalness.",
+        "paletteText": "BIAB offers an elegant color palette that, when applied, provides a uniform and natural finish without waste. As I always say, once you try it,",
+        "paletteLeadIn": "Remember my words",
+        "paletteCallout": "There's no turning back!",
+        "hemaFreeText": "In contrast to other products, The GelBottle Inc. offers a range of HEMA-FREE Biab gels, with even fewer chemical components. This is ideal for clients with sensitivity, allergies, or simply for those who want to take additional precautions when caring for their nails.",
+        "frequencyReminderText": "And once again, I bring up Biab with another strength regarding the <span class='bold'>frequency with which you have to return for your new Biab Set Treatment</span>, as I mentioned earlier.",
+        "maintenanceTitle": "How often is it advisable to do the BIAB TREATMENT?",
+        "maintenanceText": "The reliability of the product along with the quality of my work makes clients usually <span class='bold'>come back for a new set of the BIAB treatment</span> every 3, 4, or sometimes even 5 weeks, depending on factors such as the growth rate of the nails and the care taken during that period.",
+        "maintenanceCareTitle": "Basic care to keep in mind for the good maintenance of the BIAB:",
+        "maintenanceCareItems": [
+          "Do not use hot water for the first 24 hours;",
+          "wear gloves for household chores;",
+          "do not bite your nails or put them in your mouth to avoid constant moisture;",
+          "avoid using your nails as tools;",
+          "keep cuticles hydrated with special oil (Recommended: CND Solar Oil)."
+        ],
+        "growthExampleTitle": "Example of <span class='bigger bold'>26 days</span> nail growth protected by BIAB TREATMENT",
+        "growthExampleCaption": "Remember my words",
+        "growthExampleText": "After 4 weeks, you'll probably be wanting to cut your nails due to the discomfort caused by their excessive length.",
+        "restQuestionTitle": "Do nails need to rest during the Biab treatment?",
+        "restQuestionIntro": "It's a frequent question, but the answer is simple:",
+        "restQuestionCallout": "&#11088; Find the center that treats your nails<br>with the care they deserve...",
+        "restQuestionServiceProof": "And over time, you’ll find the answer you’re looking for in the quality of the service and the final result.",
+        "restQuestionDeepDive": "But wait, let me delve a bit deeper into this...",
+        "restQuestionAnswer": "With the BIAB TREATMENT and proper technique, your nails can remain healthy and strong without needing to interrupt the treatment. This gel acts as a protector, promoting resilient growth, as long as they are given the proper care.",
+        "restQuestionTransition": "So...",
+        "restQuestionWhyTitle": "Why do I say it doesn't make sense to let the nails rest",
+        "restQuestionWhyText": "Nails are a set of dead cells that renew gradually as they grow, approximately 1 to 2 millimeters per month. Therefore, if they are dead cells, their health won't improve by removing the Biab.",
+        "restQuestionWarning": "<span class='red-text'>Attention❗❗❗</span> While these individual cells that make up the nail may not be alive, nail health can be influenced by factors such as blood circulation, nutrition, and specific care. That's why I insist on choosing the right center to treat them.",
+        "comparisonTable": {
+          "columns": {
+            "biab": "BIAB",
+            "regularGels": "REGULAR GELS",
+            "acrylic": "ACRYLIC"
+          },
+          "rows": [
+            {
+              "label": "IDEAL NAIL TYPE",
+              "biab": "Weak and brittle nails, including for recovering bitten nails (Onychophagia)",
+              "regularGels": "Hard and resistant nails",
+              "acrylic": "Not recommended"
+            },
+            {
+              "label": "HEALTHY NAIL GROWTH",
+              "biab": "Yes, it's allowed",
+              "regularGels": "In general it's allowed",
+              "acrylic": "No, it does not allowed"
+            },
+            {
+              "label": "FLEXIBILITY",
+              "biab": "High",
+              "regularGels": "High",
+              "acrylic": "Inflexible"
+            },
+            {
+              "label": "RESISTANCE",
+              "biab": "High. Low risk of chipping or breaking off completely",
+              "regularGels": "Low. Medium risk of chipping",
+              "acrylic": "Regular. High risk of breakage or complete loss of the product"
+            },
+            {
+              "label": "ADHERENCE",
+              "biab": "Excellent",
+              "regularGels": "Regular",
+              "acrylic": "Maximum but harmful"
+            },
+            {
+              "label": "TOXICITY LEVEL",
+              "biab": "Vegan, low level of chemical components. With an edition of HEMA-FREE products",
+              "regularGels": "Medium toxicity level",
+              "acrylic": "Significant toxicity. They often even cause headaches due to their strong smell"
+            },
+            {
+              "label": "APPEARANCE",
+              "biab": "Uniform colour. Extremely natural and elegant",
+              "regularGels": "Uniform colour, natural appearance",
+              "acrylic": "Not uniform or natural"
+            },
+            {
+              "label": "FINISH",
+              "biab": "Very natural and elegant",
+              "regularGels": "Thin",
+              "acrylic": "Not very natural. Requires a considerable amount of product for durability"
+            },
+            {
+              "label": "FREQUENCY",
+              "biab": "Every 3 or 5 weeks",
+              "regularGels": "Every 3 weeks max",
+              "acrylic": "Every 3 weeks max"
+            },
+            {
+              "label": "DRYING",
+              "biab": "UV-Led Lamp",
+              "regularGels": "UV-Led Lamp",
+              "acrylic": "With exposure to air"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

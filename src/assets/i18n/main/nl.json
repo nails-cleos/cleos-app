@@ -1,0 +1,94 @@
+{
+  "MAIN": {
+    "LEGALS": "Copyright © 2021 - Nails Cleos - Alle rechten voorbehouden.",
+    "SECTION": {
+      "STORY": "Mijn verhaal",
+      "TREATMENT": "Behandelingen",
+      "BIAB": "Biab",
+      "WORK": "Cleos Works",
+      "EXPERIENCE": "Ervaring",
+      "CONTACT": "Contact",
+      "CONTACTS": "Laten we praten!",
+      "CATALOG": "Catalogi",
+      "ACCOUNT": "Mijn account",
+      "AUTH": "Inloggen",
+      "PRIVACY": "Privacy",
+      "TERM_AND_CONDITIONS": "Algemene voorwaarden"
+    },
+    "SLIDER": {
+      "TITLE": "Biab Nailstudio </br> Capelle aan den IJssel",
+      "SUB_TITLE": "Jouw nagels, jouw gezondheid, jouw",
+      "SUB_1": "Hoge kwaliteit in je behandelingen",
+      "SUB_2": "GEZOND · ELEGANT · PERFECT · NAGELS"
+    },
+    "STORY": {
+      "DESCRIPTION": "Is er iets magischer dan van je hobby je dagelijkse werk te maken?",
+      "TEXT_1": "Mijn naam is Carla Lujan Bonadero, ik ben 30 jaar oud en ik hou van mode en Latijns-Amerikaanse muziek.",
+      "TEXT_2": "Mijn verhaal als Nail Artist begon in de zomer van 2014. Terwijl ik accountancy studeerde aan de Universiteit voor Economische Wetenschappen in Cordoba, in mijn geliefde Argentinie, en even vrij was van tentamens, schreef ik me in voor mijn eerste manicurecursus.",
+      "TEXT_3": "Mijn uitdaging was om mijn basistechnieken in deze kunst te verbeteren, gewoon om die innerlijke vonk en creativiteit in mij de ruimte te geven. Ik vond inspiratie in de momenten die ik besteedde aan mijn eigen handen en natuurlijk aan de dappere vrouwen uit mijn directe omgeving die mij als beginnende styliste hun vertrouwen gaven.",
+      "TEXT_4": "Na het afronden van mijn accountancystudie in maart 2018 heb ik de eerste 3 jaar in dat vakgebied gewerkt, terwijl ik tegelijkertijd bedrijfskunde studeerde aan dezelfde universiteit. Maar op een dag koos ik ervoor om mijn loopbaan een andere richting te geven. Met de onvoorwaardelijke steun van degene die enkele maanden later mijn lieve echtgenoot zou worden, ben ik mij nog verder gaan ontwikkelen als nagelstyliste. Klant na klant, nagel na nagel, raakte ik er steeds meer van overtuigd dat de wereld van nagelverzorging en beauty mijn echte passie was en het bedrijf dat ik met volle motivatie wilde opbouwen...",
+      "TEXT_5": "...Zo ontstond mijn eigen onderneming met de naam <span class='bold'>\"Cleos\"</span>. De naam is geinspireerd op de geschiedenis van deze kunst.",
+      "MEMBER": "Expert Nail Artist"
+    },
+    "WORK": {
+      "TEXT_1": "Zelfs Cleopatra uit het oude Egypte gebruikte henna als kleurstof om haar nagels te kleuren. Men gelooft dat roodachtige tinten waren voorbehouden aan koninginnen als teken van rang en macht. Dat bevestigt dat manicure al sinds mensenheugenis een vorm van zelfexpressie en zelfbevestiging voor vrouwen is.",
+      "FILTER": {
+        "ALL": "Alles"
+      }
+    },
+    "EXPERIENCE": {
+      "TEXT_1": "Een warm welkom",
+      "TEXT_2": "Een kop koffie",
+      "TEXT_3": "Laten we creeren",
+      "TEXT_4": "Blijdschap"
+    },
+    "CONTACT": {
+      "TITLE": "Neem contact met mij op",
+      "DETAIL": "Betrokkenheid bij de klant is een van mijn basisprincipes. Mijn dagelijkse uitdaging is om aan hun behoeften te voldoen,<br>hun verwachtingen te overtreffen en ervoor te zorgen dat terugkomen voor een nieuwe set nagels een langverwacht moment blijft.",
+      "ADDRESS": "Nails Cleos, Frederik Hendrikstraat 8, 2902 HE Capelle aan den IJssel",
+      "PHONE": "+310627111665",
+      "MAIL": "nails.cleos@gmail.com",
+      "SEND": {
+        "PHONE": "+310627111665",
+        "TITLE": "Heb je een vraag? Ik hoor graag van je",
+        "MESSAGE": "Je bericht is succesvol verzonden",
+        "HELLO": "Hallo Cleos! %0AIk heb een vraag ♡"
+      },
+      "NAME": {
+        "FIELD": "Jouw naam",
+        "REQUIRED": "Jouw naam is verplicht"
+      },
+      "EMAIL": {
+        "FIELD": "Jouw e-mail",
+        "REQUIRED": "Jouw e-mail is verplicht",
+        "INVALID": "E-mail is ongeldig"
+      },
+      "SUBJECT": {
+        "FIELD": "Onderwerp",
+        "REQUIRED": "Onderwerp is verplicht"
+      },
+      "BODY": {
+        "FIELD": "Bericht",
+        "REQUIRED": "Bericht is verplicht"
+      }
+    },
+    "CATALOGUE": {
+      "NO_DETAIL": "Geen details"
+    },
+    "BOOK": {
+      "APPOINTMENT": "Boek je afspraak",
+      "VIA": {
+        "WHATSAPP": "Via Whatsapp",
+        "INSTAGRAM": "Via Instagram",
+        "FACEBOOK": "Via Facebook",
+        "PHONE": "Via telefoon",
+        "EMAIL": "Via e-mail"
+      }
+    }
+  },
+  "CARD": {
+    "TREATMENT": {
+      "DURATION": "<span class='bold'>Duur:</span> {{duration}}"
+    }
+  }
+}

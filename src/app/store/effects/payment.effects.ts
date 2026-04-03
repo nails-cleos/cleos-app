@@ -11,19 +11,17 @@ import {
   notifyPayment,
   paymentFailure,
   paymentNotComplete,
-  paymentOptions,
   paymentSave,
   paymentSaveSuccess,
   paymentSelected,
   paymentSend,
-  paymentSuccess,
   recreate,
   updatePaymentById,
 } from '../payment.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { PaymentService } from '../../services/payment.service';
 import { Router } from '@angular/router';
-import { IPay, IPayment, IPaymentOption } from '../../interfaces/payment';
+import { IPay, IPayment } from '../../interfaces/payment';
 import { IApiResponse, successResponse } from '../../interfaces/common';
 
 @Injectable()
@@ -42,20 +40,11 @@ export class PaymentEffects {
       )),
   ));
 
-  options$ = createEffect(() => this.actions.pipe(
-    ofType(paymentOptions),
-    switchMap(() =>
-      this.paymentService.getPaymentOptions().pipe(
-        map((data?: IPaymentOption[]) => paymentSuccess({ data })),
-        catchError((err: HttpErrorResponse) => of(paymentFailure({ error: err.error }))),
-      )),
-  ));
-
   findByReservation$ = createEffect(() => this.actions.pipe(
     ofType(getPaymentByResourceId),
-    switchMap(({ id, path, redirect }) =>
+    switchMap(({ id, path }) =>
       this.paymentService.getPaymentByResourceId(id, path).pipe(
-        map((selected: IPayment[]) => paymentSelected({ selected, redirect })),
+        map((selected: IPayment[]) => paymentSelected({ selected })),
         catchError((err: HttpErrorResponse) => of(paymentFailure({ error: err.error }))),
       )),
   ));
@@ -154,10 +143,6 @@ export class PaymentEffects {
   send$ = createEffect(() => this.actions.pipe(
     ofType(paymentSend),
     tap(({ link }) => window.open(link, '_self')),
-  ), { dispatch: false });
-
-  dataSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(paymentSuccess),
   ), { dispatch: false });
 
   saveSuccess$ = createEffect(() => this.actions.pipe(

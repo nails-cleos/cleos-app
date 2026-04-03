@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReviewDialogComponent } from './review-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Analytics } from '@angular/fire/analytics';
 import { IReservationAll } from '../../../interfaces/reservation';
 import { IAddress, IRoomAll, ServiceType } from '../../../interfaces/room';
 import { IUserAll } from '../../../interfaces/user';
@@ -10,7 +9,6 @@ import { ICurrencyAll } from '../../../interfaces/currency';
 import { ITreatmentAll } from '../../../interfaces/treatment';
 import { getCurrentTimeZone } from '../../../util/dates';
 import { PaymentType } from '../../../interfaces/payment';
-import { AnalyticsStub } from '../../../util/firebase-stub';
 
 describe('ReviewDialogComponent', () => {
   let component: ReviewDialogComponent;
@@ -86,7 +84,6 @@ describe('ReviewDialogComponent', () => {
       providers: [
         { provide: MatDialogRef, useValue: dialogRefSpy },
         { provide: MAT_DIALOG_DATA, useValue: reservation },
-        { provide: Analytics, useClass: AnalyticsStub },
       ],
     }).compileComponents();
 

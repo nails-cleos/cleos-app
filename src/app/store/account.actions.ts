@@ -1,7 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 import { IAccountAll, ITransaction } from '../interfaces/account';
 import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
-import { IPaymentOption } from '../interfaces/payment';
 
 enum AccountActionTypes {
   accountSuccess = '[Account] Success',
@@ -11,8 +10,6 @@ enum AccountActionTypes {
   accountFailure = '[Account] Failure',
   accountSelected = '[Account] Selected',
   getAccount = '[Account] Find account by id',
-  paymentOptions = '[Account] Payment Option',
-  paymentOptionsSuccess = '[Account] Payment Option success',
   paymentSend = '[Account] Payment send',
   getTransactionsByAccountId = '[Account] Get transactions by account id',
   getTransaction = '[Account] find transaction by id',
@@ -26,11 +23,6 @@ enum AccountActionTypes {
 export const accountSuccess = createAction(
   AccountActionTypes.accountSuccess,
   props<{ data: ITransaction[] }>(),
-);
-
-export const paymentOptionsSuccess = createAction(
-  AccountActionTypes.paymentOptionsSuccess,
-  props<{ paymentOptions?: IPaymentOption[] }>(),
 );
 
 export const createTransaction = createAction(
@@ -61,10 +53,6 @@ export const accountSelected = createAction(
 export const getAccount = createAction(
   AccountActionTypes.getAccount,
   props<{ id: string }>(),
-);
-
-export const paymentOptions = createAction(
-  AccountActionTypes.paymentOptions,
 );
 
 export const paymentSend = createAction(

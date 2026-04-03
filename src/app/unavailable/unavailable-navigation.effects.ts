@@ -20,7 +20,7 @@ export class UnavailableNavigationEffects {
       ofType(ROUTER_NAVIGATION),
       concatMap((action: RouterNavigationAction) => {
         const url = action.payload.routerState.url;
-        const navigation = this.router.getCurrentNavigation();
+        const navigation = this.router.currentNavigation();
         const navigationState = navigation?.extras.state;
 
         // 1) /unavailable/block-agenda/add

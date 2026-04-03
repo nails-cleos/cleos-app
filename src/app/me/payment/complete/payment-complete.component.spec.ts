@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Subject } from 'rxjs';
+import { paymentNotComplete, paymentSave } from '../../../store/payment.actions';
+import { PaymentType } from '../../../interfaces/payment';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 
 describe('PaymentCompleteComponent', () => {
@@ -78,7 +80,115 @@ describe('PaymentCompleteComponent', () => {
     fixture.detectChanges();
 
     expect(component).toBeTruthy();
-    expect(storeSpy.dispatch).toHaveBeenCalled();
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentSave({
+      id: '123',
+      path: 'reservation',
+      status: 'approved',
+      paymentStatus: jasmine.objectContaining({
+        paymentId: 'pid',
+        paymentType: PaymentType.ml,
+        preferenceId: 'pref-1',
+      }) as any,
+    }));
+  });
+
+  it('should dispatch paymentSave for paypal params', () => {
+    paymentResultParams$.next({
+      id: '123',
+      path: 'transaction',
+      status: 'approved',
+      paymentId: 'payment-id',
+      payerId: 'payer-1',
+    });
+
+    fixture.detectChanges();
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentSave({
+      id: '123',
+      path: 'transaction',
+      status: 'approved',
+      paymentStatus: jasmine.objectContaining({
+        paymentType: PaymentType.paypal,
+        preferenceId: 'payer-1',
+      }) as any,
+    }));
+  });
+
+  it('should dispatch paymentSave for ideal params', () => {
+    paymentResultParams$.next({
+      id: '123',
+      path: 'reservation',
+      status: 'approved',
+      paymentId: 'payment-id',
+      token: 'token-1',
+    });
+
+    fixture.detectChanges();
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentSave({
+      id: '123',
+      path: 'reservation',
+      status: 'approved',
+      paymentStatus: jasmine.objectContaining({
+        paymentType: PaymentType.ideal,
+        preferenceId: 'token-1',
+      }) as any,
+    }));
+  });
+
+  it('should dispatch paymentSave for paynl status callback', () => {
+    paymentResultParams$.next({
+      id: '123',
+      path: 'reservation',
+      status: 'status',
+      paymentId: 'payment-id',
+      orderId: 'order-1',
+      orderStatusId: '100',
+    });
+
+    fixture.detectChanges();
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentSave({
+      id: '123',
+      path: 'reservation',
+      status: 'approved',
+      paymentStatus: jasmine.objectContaining({
+        paymentType: PaymentType.paynl,
+        preferenceId: 'order-1',
+      }) as any,
+    }));
+  });
+
+  it('should redirect to payment page when payment type is already resolved', () => {
+    paymentResultParams$.next({
+      id: '123',
+      path: 'reservation',
+      status: 'created',
+      paymentId: 'pid',
+      paymentType: PaymentType.mollie,
+      accountId: 'account-1',
+    });
+
+    fixture.detectChanges();
+
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'reservation', '123', 'payment'], {
+      queryParams: { accountId: 'account-1' },
+    });
+  });
+
+  it('should dispatch incomplete payment when callback params are missing', () => {
+    paymentResultParams$.next({
+      id: '123',
+      path: 'reservation',
+      status: 'approved',
+      paymentId: 'pid',
+    });
+
+    fixture.detectChanges();
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentNotComplete({
+      subError: [{ message: 'ME.PAYMENT.ERROR' }],
+    }));
   });
 
   it('should navigate back when subErrors exist', () => {

@@ -3,10 +3,8 @@ import { MainComponent } from './main.component';
 import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Auth } from '@angular/fire/auth';
-import { AuthUserService } from '../services/auth-user.service';
+import { AuthUserService, initialAuthUser } from '../services/auth-user.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient } from '@angular/common/http';
 import { MainContentService } from '../services/main-content.service';
 import { redirect } from '../store/auth.actions';
@@ -15,6 +13,9 @@ import { NavigationService } from '../services/navigation.service';
 import { MainState } from '../store/reducers/main.reducers';
 import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { signal } from '@angular/core';
+import { FirebaseService } from '../services/firebase.service';
+import { updateMyUser } from '../store/main.actions';
 
 describe('MainComponent', () => {
   let component: MainComponent;
@@ -24,12 +25,12 @@ describe('MainComponent', () => {
   let navigateSpy: jasmine.Spy;
 
   let storeSpy: jasmine.SpyObj<Store<MainState>>;
-  let authSpy: jasmine.SpyObj<Auth>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let mainContentServiceSpy: jasmine.SpyObj<MainContentService>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
   let tokenServiceSpy: jasmine.SpyObj<TokenService>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let firebaseServiceSpy: { isAuthenticated: ReturnType<typeof signal<boolean>> };
 
   let translateService: TranslateService;
 
@@ -38,13 +39,13 @@ describe('MainComponent', () => {
 
     const paramMapSpy = jasmine.createSpyObj('ParamMap', ['get', 'lang']);
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['cookieConsent', 'updateMode']);
+    const authUserSignal = signal({ ...initialAuthUser });
+    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['cookieConsent', 'updateMode'], {
+      authUser: authUserSignal.asReadonly(),
+    });
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['attachLang']);
     mainContentServiceSpy = jasmine.createSpyObj('MainContentService', [], {
       value: { showPreload: false, navigationHeader: 'close', showArrow: false },
-    });
-    authSpy = jasmine.createSpyObj('Auth', ['onIdTokenChanged'], {
-      currentUser: null,
     });
     tokenServiceSpy = jasmine.createSpyObj('TokenService', ['token'], {
       setToken: '',
@@ -54,6 +55,9 @@ describe('MainComponent', () => {
         paramMap: paramMapSpy,
       },
     });
+    firebaseServiceSpy = {
+      isAuthenticated: signal(false),
+    };
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
@@ -68,23 +72,16 @@ describe('MainComponent', () => {
 
     paramMapSpy.get.and.returnValue('en');
     navigationServiceSpy.attachLang.and.returnValue('en');
-    authSpy.onIdTokenChanged.and.callFake((callback: any) => {
-      callback(null);
-      return () => {
-      };
-    });
-
     await TestBed.configureTestingModule({
       imports: [MainComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
-        { provide: Auth, useValue: authSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MainContentService, useValue: mainContentServiceSpy },
         { provide: TokenService, useValue: tokenServiceSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
-        provideNoopAnimations(),
+        { provide: FirebaseService, useValue: firebaseServiceSpy },
         provideHttpClient(),
         provideHttpClientTesting(),
       ],
@@ -136,14 +133,27 @@ describe('MainComponent', () => {
     expect(component.isDarkMode()).toBe(!initialMode);
   });
 
+  it('should persist theme only when toggled by an authenticated user', () => {
+    firebaseServiceSpy.isAuthenticated.set(true);
+    storeSpy.dispatch.calls.reset();
+
+    component.changeTheme();
+
+    const dispatched: any = storeSpy.dispatch.calls.mostRecent().args[0];
+    expect(dispatched.type).toBe(updateMyUser.type);
+    expect(dispatched.user.theme).toBe('dark-theme');
+    expect(dispatched.redirectUrl).toEqual(jasmine.any(String));
+    expect(dispatched.message).toEqual(jasmine.any(String));
+  });
+
   it('should dispatch Redirect action in redirect()', () => {
     component.redirect();
     expect(storeSpy.dispatch).toHaveBeenCalledWith(redirect());
   });
 
-  it('should call treatment and navigate to biab/treatment', () => {
+  it('should call treatment and navigate to biab-treatment/treatment', () => {
     component.treatment();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'home', 'biab', 'treatment']);
+    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'home', 'biab-treatment', 'treatment']);
   });
 });

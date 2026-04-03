@@ -1,0 +1,107 @@
+{
+  "DASHBOARD": {
+    "FIELD": "Dashboard",
+    "SIGN_IN": "Inloggen",
+    "RESERVATION": {
+      "COMPLETED": "<span class='bold'>Voltooid: </span>{{completed}} - {{total}}",
+      "UPCOMING": "<span class='bold'>Komend: </span>{{upcoming}} - {{total}}",
+      "TRANSACTION": "<span class='bold'>Tegoed: </span>{{transaction}} - {{total}}",
+      "PAYMENT": "<span class='bold'>Totale betalingen: </span>{{total}}",
+      "DELETED": {
+        "TITLE": "Afspraak verwijderen",
+        "CONTENT": "Weet je zeker dat je afspraak {{date}} wilt verwijderen?",
+        "MESSAGE": "Afspraak {{date}} verwijderd"
+      }
+    },
+    "MINI_CARD": {
+      "DURATION": "sinds {{period}}",
+      "PROJECTION": "prognose",
+      "TOTAL_TREATMENT_SALES": "Totale behandelingomzet",
+      "AVERAGE_TREATMENT_VALUE": "Gemiddelde behandelwaarde",
+      "TOTAL_TREATMENTS": "Totaal aantal behandelingen",
+      "NEW_CUSTOMERS_RESERVATION": "Nieuwe klantafspraken"
+    },
+    "CARD": {
+      "RESERVATION": "Afspraken",
+      "EXPAND": "Uitklappen"
+    },
+    "ROOM": {
+      "NO_OPEN": "Ruimte is niet open op {{date}}",
+      "VIEW": "Bekijken",
+      "MORE_INFO": "Meer",
+      "APPROVE": "Goedkeuren",
+      "START": "Starten",
+      "COMPLETE": "Voltooien",
+      "OPEN_IN": "Open over",
+      "CLOSE_IN": "Sluit over",
+      "CLOSED": "Gesloten",
+      "STARTED": "<div>Gestart {startText}</div>",
+      "ELAPSED": "<div>Verstreken {elapsedText}</div>",
+      "FINISH_IN": "<div>Klaar over {finishText}</div>"
+    },
+    "META": {
+      "TITLE": "Professionele nagelstyling: Nails Cleos - Mooie nagels, persoonlijke aandacht | Nails Capelle aan den IJssel",
+      "CONTENT": "Ontdek de kunst van verzorgde nagels bij Nails Cleos in Capelle aan den IJssel. Als eigenaar en specialist geef ik iedere behandeling persoonlijke aandacht, met oog voor detail en service op maat. Verfijn je stijl met een individuele benadering van nagelverzorging en nail art. Boek nu je afspraak en ervaar het verschil van een persoonlijke nagelbehandeling die helemaal op jou is afgestemd."
+    }
+  },
+  "SUMMARY": {
+    "INCOMES": "Inkomsten",
+    "INCOME": "Inkomst",
+    "EXPENSES": "Uitgaven",
+    "EXPENSE": "Uitgave",
+    "UPDATED": "Maandoverzicht bijgewerkt",
+    "CASH_INCOMES": "Contante inkomsten",
+    "CASH": "Contante inkomst",
+    "TOTAL": "Totaal",
+    "TOTAL_CASH": "Totaal met contant",
+    "YEAR": {
+      "RESULT": "Jaaroverzicht",
+      "SELECT": {
+        "DATE": "Jaar"
+      },
+      "ERROR": {
+        "NO_CONTENT": "Geen gegevens in {{year}}"
+      }
+    },
+    "QUARTER": {
+      "RESULT": "Kwartaaloverzicht",
+      "SELECT": "Kwartaal",
+      "ERROR": {
+        "NO_CONTENT": "Geen gegevens in Q{{quarter}} van {{year}}"
+      }
+    },
+    "MONTHLY": {
+      "RESULT": "Maandoverzicht",
+      "SELECT": {
+        "DATE": "Maand en jaar",
+        "FORMAT": "Bedragnotatie"
+      },
+      "FORMAT": {
+        "EN": "Notatie $1,234.56",
+        "ES": "Notatie $1.234,56"
+      },
+      "TABLE": {
+        "DATE": "Datum",
+        "WEEK": "Week {{weekNumber}}",
+        "MONTH": "Maand",
+        "CUSTOMER": "Klant",
+        "DESCRIPTION": "Beschrijving",
+        "DISCOUNT": "Korting",
+        "GROSS": "Bruto",
+        "NET": "Netto",
+        "BTW": "Btw",
+        "TYPE": "Type",
+        "SUB_TYPE": "Subtype",
+        "COLOR": "Kleur",
+        "INVOICE": "Factuur",
+        "SUPPLY_STORE": "Leverancier",
+        "TOTALS": "Totalen"
+      },
+      "ERROR": {
+        "INCOMES": "Geen inkomsten op {{date}}",
+        "EXPENSES": "Geen uitgaven op {{date}}",
+        "CASH_INCOMES": "Geen contante inkomsten op {{date}}"
+      }
+    }
+  }
+}

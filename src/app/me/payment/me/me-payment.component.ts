@@ -1,15 +1,13 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { getPayment, paymentOptions, updatePaymentById } from '../../../store/payment.actions';
+import { getPayment, updatePaymentById } from '../../../store/payment.actions';
 import {
   getPaymentOptions,
-  getPayNlOptions,
   IPaymentOption,
   PaymentPercentage,
   PaymentType,
 } from '../../../interfaces/payment';
-import { Analytics, logEvent } from '@angular/fire/analytics';
 import { TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../../../shared/shared.module';
 import { BankComponent, BankForm } from '../../../shared/bank/bank.component';
@@ -19,10 +17,10 @@ import { IReservationPayment } from '../../../interfaces/reservation';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 import {
   getCurrentPaymentIdPipe,
-  getPaymentOptionsPipe,
   getSelectedPaymentPipe,
 } from '../../../store/selectors/payment.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { FirebaseService } from '../../../services/firebase.service';
 
 @Component({
   selector: 'app-me-payment',
@@ -34,24 +32,22 @@ import { toSignal } from '@angular/core/rxjs-interop';
 export class MePaymentComponent {
   private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly analytic: Analytics = inject(Analytics);
   private readonly translate: TranslateService = inject(TranslateService);
+  private readonly firebaseService = inject(FirebaseService);
 
   private paymentId$ = this.store.pipe(getCurrentPaymentIdPipe);
   private payment$ = this.store.pipe(getSelectedPaymentPipe);
-  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
   private paymentIdSignal = toSignal(this.paymentId$);
-  private paymentOptionsSignal = toSignal(this.paymentOptions$);
   paymentSignal = toSignal(this.payment$);
 
   form = this.formBuilder.group<BankForm>({
     type: this.formBuilder.control(undefined),
-    bank: this.formBuilder.control(undefined),
     percentage: this.formBuilder.control(undefined),
   });
 
   options = signal<IPaymentOption[] | undefined>(undefined);
+  paymentTypes = signal<PaymentType[] | undefined>(undefined);
 
   language: string = this.translate.getCurrentLang();
 
@@ -59,7 +55,7 @@ export class MePaymentComponent {
     effect(() => {
       const id = this.paymentIdSignal();
       if (id) {
-        logEvent(this.analytic, 'screen_view', {
+        this.firebaseService.logEvent('screen_view', {
           // eslint-disable-next-line camelcase
           firebase_screen: `Customer missing payment ${id}`,
           // eslint-disable-next-line camelcase
@@ -75,18 +71,8 @@ export class MePaymentComponent {
         const reservation = payment?.reservation;
         const types = reservation?.room?.paymentTypes.filter(
           p => ![PaymentType.cash, PaymentType.transfer].includes(p));
-        if (types?.includes(PaymentType.paynl)) {
-          this.store.dispatch(paymentOptions());
-        } else {
-          this.options.set(getPaymentOptions(this.translate, types));
-        }
-      }
-    });
-
-    effect(() => {
-      const options = this.paymentOptionsSignal();
-      if (options) {
-        this.options.set(getPayNlOptions(options));
+        this.paymentTypes.set(types);
+        this.options.set(getPaymentOptions(this.translate, types));
       }
     });
   }
@@ -105,12 +91,8 @@ export class MePaymentComponent {
       return;
     }
     const type = option.type;
-    const paymentOptionId = option.bic;
     const percentage = PaymentPercentage.total;
-    const payment: IReservationPayment = { type, paymentOptionId, percentage, bic: undefined };
-    if (option.subTypes.length) {
-      payment.bic = this.getForm.bank?.value?.bic;
-    }
+    const payment: IReservationPayment = { type, percentage };
 
     const id = this.paymentSignal()?.id;
     this.store.dispatch(updatePaymentById({ id: id!, payment }));

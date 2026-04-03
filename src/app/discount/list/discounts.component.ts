@@ -16,7 +16,6 @@ import {
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { executeDialog } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { detailExpandAnimation } from '../../util/animation';
 import { SharedModule } from '../../shared/shared.module';
 import { DiscountDialogComponent, DiscountDialogData } from './discount-dialog.component';
 import { getDiscountPaginationPipe, getDiscountResponsePipe } from '../../store/selectors/discount.selectors';
@@ -27,7 +26,6 @@ import { DiscountState } from '../../store/reducers/discount.reducers';
   selector: 'app-discounts',
   templateUrl: './discounts.component.html',
   styleUrls: ['./discounts.component.scss'],
-  animations: [detailExpandAnimation],
   imports: [SharedModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

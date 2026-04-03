@@ -1,0 +1,381 @@
+@use 'sass:math';
+
+.discount-enter {
+  opacity: 0;
+  animation: discount-fade-in 1000ms ease-out 500ms forwards;
+}
+
+@keyframes discount-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes strike {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.strikethrough {
+  position: relative;
+}
+
+.strikethrough:before {
+  position: absolute;
+  content: '';
+  left: 0;
+  top: 50%;
+  right: 0;
+  border-top: 2px solid;
+  border-color: inherit;
+  -webkit-transform: rotate(-5deg);
+  -moz-transform: rotate(-5deg);
+  -ms-transform: rotate(-5deg);
+  -o-transform: rotate(-5deg);
+  transform: rotate(-5deg);
+  animation-name: strike;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner:before {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  margin-left: -10px;
+  border-radius: 50%;
+  animation: spinner .8s linear infinite;
+}
+
+.enter-slide-x,
+.enter-slide-y {
+  opacity: 0;
+  animation-duration: var(--enter-duration, 1500ms);
+  animation-delay: var(--enter-delay, 0ms);
+  animation-fill-mode: both;
+  animation-timing-function: ease-in-out;
+}
+
+.enter-slide-x {
+  animation-name: enter-slide-x;
+}
+
+.enter-slide-y {
+  animation-name: enter-slide-y;
+}
+
+@keyframes enter-slide-x {
+  from {
+    transform: translateX(var(--enter-translate-x, -2000px));
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes enter-slide-y {
+  from {
+    transform: translateY(var(--enter-translate-y, -2000px));
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.reveal-x,
+.reveal-y {
+  opacity: 0;
+  transition-property: opacity, transform;
+  transition-duration: var(--reveal-duration, 500ms), var(--reveal-duration, 500ms);
+  transition-timing-function: ease-in-out, ease-in-out;
+  transition-delay: var(--reveal-exit-delay, 0ms), var(--reveal-exit-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.reveal-x {
+  transform: translateX(var(--reveal-x, -100%));
+}
+
+.reveal-y {
+  transform: translateY(var(--reveal-y, 100%));
+}
+
+.reveal-x.reveal-visible {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: var(--reveal-enter-delay, 0ms), var(--reveal-enter-delay, 0ms);
+}
+
+.reveal-y.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: var(--reveal-enter-delay, 0ms), var(--reveal-enter-delay, 0ms);
+}
+
+.fade-up-reveal {
+  opacity: 0;
+  transform: translateY(var(--fade-up-distance, 20px));
+  transition: opacity var(--fade-up-duration, 700ms) ease-in-out,
+  transform var(--fade-up-duration, 700ms) ease-in-out;
+  will-change: opacity, transform;
+}
+
+.fade-up-reveal.fade-up-reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.rubber-band-reveal {
+  transform: scale(1);
+}
+
+.rubber-band-reveal.rubber-band-reveal-visible {
+  animation: rubber-band-reveal 1000ms ease-in-out both;
+}
+
+@keyframes rubber-band-reveal {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scaleX(1.25) scaleY(0.75);
+  }
+  40% {
+    transform: scaleX(0.75) scaleY(1.25);
+  }
+  60% {
+    transform: scaleX(1.15) scaleY(0.85);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.bounce-down-reveal {
+  opacity: 0;
+  transform: translateY(-60px);
+  will-change: opacity, transform;
+}
+
+.bounce-down-reveal.bounce-down-reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+  animation: bounce-down-reveal 500ms ease-out 1 both;
+}
+
+@keyframes bounce-down-reveal {
+  0% {
+    opacity: 0;
+    transform: translateY(-60px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(12px);
+  }
+  80% {
+    transform: translateY(-4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scale-in-reveal {
+  opacity: 0;
+  transform: scale(1.15);
+}
+
+.scale-in-reveal.scale-in-reveal-visible {
+  animation: scale-in-reveal 500ms ease-in-out both;
+  animation-delay: var(--scale-in-delay, 0ms);
+}
+
+@keyframes scale-in-reveal {
+  from {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.work-fade-in {
+  opacity: 0;
+  animation: work-fade-in 500ms ease-in-out forwards;
+  animation-delay: var(--work-fade-delay, 0ms);
+}
+
+@keyframes work-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.gelatine-reveal.gelatine-reveal-visible {
+  animation: gelatine-reveal 1000ms ease-in-out both;
+}
+
+@keyframes gelatine-reveal {
+  0% {
+    transform: scale(1, 1);
+  }
+  25% {
+    transform: scale(0.9, 1.1);
+  }
+  50% {
+    transform: scale(1.1, 0.9);
+  }
+  75% {
+    transform: scale(0.95, 1.05);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+$particles: 100;
+$width: 500;
+$height: 500;
+
+$box-shadow: ();
+$box-shadow2: ();
+@for $i from 0 through $particles {
+  $box-shadow: $box-shadow,
+  math.random($width) - math.div($width, 2) + px math.random($height)- math.div($height, 1.2) + px hsl(math.random(360), 100%, 50%);
+  $box-shadow2: $box-shadow2, 0 0 #000;
+}
+
+@mixin keyframes($animationName) {
+  @-webkit-keyframes #{$animationName} {
+    @content;
+  }
+
+  @-moz-keyframes #{$animationName} {
+    @content;
+  }
+
+  @-o-keyframes #{$animationName} {
+    @content;
+  }
+
+  @-ms-keyframes #{$animationName} {
+    @content;
+  }
+
+  @keyframes #{$animationName} {
+    @content;
+  }
+}
+
+@mixin animation-delay($settings) {
+  -moz-animation-delay: $settings;
+  -webkit-animation-delay: $settings;
+  -o-animation-delay: $settings;
+  -ms-animation-delay: $settings;
+  animation-delay: $settings;
+}
+
+@mixin animation-duration($settings) {
+  -moz-animation-duration: $settings;
+  -webkit-animation-duration: $settings;
+  -o-animation-duration: $settings;
+  -ms-animation-duration: $settings;
+  animation-duration: $settings;
+}
+
+@mixin animation($settings) {
+  -moz-animation: $settings;
+  -webkit-animation: $settings;
+  -o-animation: $settings;
+  -ms-animation: $settings;
+  animation: $settings;
+}
+
+@mixin transform($settings) {
+  transform: $settings;
+  -moz-transform: $settings;
+  -webkit-transform: $settings;
+  -o-transform: $settings;
+  -ms-transform: $settings;
+}
+
+.pyro > .before, .pyro > .after {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  box-shadow: $box-shadow2;
+  z-index: 9999;
+  @include animation((1s bang ease-out infinite backwards, 1s gravity ease-in infinite backwards, 5s position linear infinite backwards));
+}
+
+.pyro > .after {
+  @include animation-delay((1.25s, 1.25s, 1.25s));
+  @include animation-duration((1.25s, 1.25s, 6.25s));
+}
+
+@include keyframes(bang) {
+  to {
+    box-shadow: $box-shadow;
+  }
+}
+
+@include keyframes(gravity) {
+  to {
+    @include transform(translateY(200px));
+    opacity: 0;
+  }
+}
+
+@include keyframes(position) {
+  0%, 19.9% {
+    margin-top: 10%;
+    margin-left: 40%;
+  }
+  20%, 39.9% {
+    margin-top: 40%;
+    margin-left: 30%;
+  }
+  40%, 59.9% {
+    margin-top: 20%;
+    margin-left: 70%;
+  }
+  60%, 79.9% {
+    margin-top: 30%;
+    margin-left: 20%;
+  }
+  80%, 99.9% {
+    margin-top: 30%;
+    margin-left: 80%;
+  }
+}

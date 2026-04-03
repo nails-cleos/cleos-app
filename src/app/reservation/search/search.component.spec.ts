@@ -3,12 +3,11 @@ import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { IReservationAll, States } from '../../interfaces/reservation';
+import { CancelOption, IReservationAll, States } from '../../interfaces/reservation';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { getAllFilterReservations } from '../../store/reservation.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { SearchComponent } from './search.component';
 import { IUserAll } from '../../interfaces/user';
 import { getNowTimeZone } from '../../util/dates';
@@ -143,7 +142,6 @@ describe('SearchComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
-        provideNoopAnimations(),
       ],
     }).compileComponents();
 
@@ -241,6 +239,27 @@ describe('SearchComponent', () => {
         states: component.selectedStatesSignal(),
       }),
     );
+  });
+
+  it('should exclude chargeAndAccount from cancel options', () => {
+    const confirmDialogRef = {
+      afterClosed: () => new BehaviorSubject('reservation-123').asObservable(),
+    } as any;
+    const cancelDialogRef = {
+      afterClosed: () => new BehaviorSubject(undefined).asObservable(),
+    } as any;
+    const openSpy = spyOn(component['dialog'], 'open').and.returnValues(confirmDialogRef, cancelDialogRef);
+
+    component.cancel(mockReservation);
+
+    expect(openSpy.calls.count()).toBe(2);
+    const cancelConfig = openSpy.calls.argsFor(1)[1] as { data: { options: CancelOption[] } };
+    expect(cancelConfig.data.options).toEqual([
+      CancelOption.refund,
+      CancelOption.account,
+      CancelOption.chargeAndRefund,
+      CancelOption.none,
+    ]);
   });
 
   it('should update allCustomersWritableSignal when store emits', async () => {

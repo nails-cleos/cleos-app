@@ -14,10 +14,12 @@ devices.forEach(({ name, width, height, breakpoints }) => {
     beforeEach(() => {
       const email = 'nails.cleos@gmail.com';
       cy.mockAuthentication(email, 'ROLE_ADMIN');
+      cy.mockNotifications();
+      cy.mockCatalogues();
+      cy.mockAdminDashboard(new Date(), 'CLEOS');
+
       cy.visit('en-GB/dashboard');
       cy.mockFirebaseAppCheck();
-      cy.mockNotifications();
-      cy.mockAdminDashboard(new Date(), 'CLEOS');
     });
 
     mapRole.forEach((value, role) => {
@@ -50,9 +52,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         cy.get('td[data-mat-row="1"][data-mat-col="1"]').find('button').click({ force: true });
 
         if (role !== 'Customer') {
-          cy.get('#darkColorIcon').click({ force: true });
           cy.get('[data-cy="dark-color-picker"]').clear().type('#0f0');
-          cy.get('#lightColorIcon').click({ force: true });
           cy.get('[data-cy="light-color-picker"]').clear().type('#00f');
         }
 
@@ -62,7 +62,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           const body = userData.request.body;
           expect(body.email).to.eq(`${ role }@email.com`);
           expect(body.displayName).to.eq(`${ role } Name`);
-          expect(body.lang).to.eq('en_GB');
+          expect(body.locale).to.eq('en_GB');
           expect(body.phone).to.eq('+31 6 25250787');
           expect(body.dob).to.be.ok;
           if (role !== 'Customer') {
@@ -106,7 +106,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
           const phone = '+31 6 25251524';
           cy.formControlType('email', `${ role }@email.com`);
-          cy.selectOption('select-lang', 'Spanish');
+          cy.selectOption('select-lang', 'Español');
           cy.formControlType('displayName', `${ role } Name`);
           cy.get('#phone').find('input').clear().type(phone);
           cy.get('[data-cy="dob-picker"]').clear().click({ force: true });
@@ -123,7 +123,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
             const body = userData.request.body;
             expect(body.email).to.eq(`${ role }@email.com`);
             expect(body.displayName).to.eq(`${ role } Name`);
-            expect(body.lang).to.eq('es');
+            expect(body.locale).to.eq('es');
             expect(body.phone).to.eq(phone);
             expect(body.dob).to.be.ok;
           });

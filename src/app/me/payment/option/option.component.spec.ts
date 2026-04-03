@@ -6,7 +6,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { IPaymentOption, PaymentType } from '../../../interfaces/payment';
-import { getPaymentByResourceId, paymentOptions } from '../../../store/payment.actions';
+import { getPaymentByResourceId } from '../../../store/payment.actions';
 import { IReservationAll } from '../../../interfaces/reservation';
 import { provideHttpClient } from '@angular/common/http';
 
@@ -19,13 +19,11 @@ describe('OptionComponent', () => {
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
 
   let reservationId$: BehaviorSubject<any>;
-  let paymentOptions$: BehaviorSubject<any>;
   let payments$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
     reservationId$ = new BehaviorSubject(undefined);
-    paymentOptions$ = new BehaviorSubject(undefined);
     payments$ = new BehaviorSubject(undefined);
     breakpoint$ = new BehaviorSubject(undefined);
 
@@ -42,8 +40,6 @@ describe('OptionComponent', () => {
         case 1:
           return reservationId$.asObservable();
         case 2:
-          return paymentOptions$.asObservable();
-        case 3:
           return payments$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -67,7 +63,6 @@ describe('OptionComponent', () => {
 
   afterEach(() => {
     reservationId$.complete();
-    paymentOptions$.complete();
     payments$.complete();
   });
 
@@ -83,7 +78,7 @@ describe('OptionComponent', () => {
     );
   });
 
-  it('should populate options if paynl is not included', () => {
+  it('should derive options from the reservation room payment types', () => {
     const paymentsMock = [{
       reservation: {
         id: 'res1',
@@ -97,15 +92,18 @@ describe('OptionComponent', () => {
     payments$.next(paymentsMock);
     fixture.detectChanges();
 
-    expect(component.options()).toBeDefined();
+    expect(component.options()).toEqual(jasmine.arrayContaining([
+      jasmine.objectContaining({ type: PaymentType.paypal }),
+      jasmine.objectContaining({ type: PaymentType.ideal }),
+    ]));
     expect(component.reservation()).toEqual(paymentsMock[0].reservation);
   });
 
-  it('should dispatch paymentOptions if paynl is included', () => {
+  it('should keep local options empty when no online payment type is available', () => {
     const paymentsMock = [{
       reservation: {
         id: 'res2',
-        room: { paymentTypes: [PaymentType.paynl], currency: { icon: 'euro' } },
+        room: { paymentTypes: [PaymentType.cash, PaymentType.transfer], currency: { icon: 'euro' } },
         state: 'CONFIRMED',
         treatment: { price: 100 },
       },
@@ -114,7 +112,7 @@ describe('OptionComponent', () => {
 
     payments$.next(paymentsMock);
     fixture.detectChanges();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentOptions());
+    expect(component.options()).toEqual([]);
   });
 
   it('should dispatch createPaymentLinkByReservationId on pay()', () => {
@@ -131,7 +129,7 @@ describe('OptionComponent', () => {
 
     fixture.detectChanges();
 
-    const option: IPaymentOption = { name: '', svgIcon: '', type: PaymentType.paypal, bic: '123', subTypes: [] };
+    const option: IPaymentOption = { name: '', svgIcon: '', type: PaymentType.paypal };
     component.form.controls.type.setValue(option);
 
     component.pay();

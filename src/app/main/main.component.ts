@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, Injector, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Router, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { redirect } from '../store/auth.actions';
 import { IUser, User } from '../interfaces/user';
 import { OverlayContainer } from '@angular/cdk/overlay';
@@ -9,30 +9,30 @@ import { CookieService } from 'ngx-cookie-service';
 import { TranslateService } from '@ngx-translate/core';
 import { getThemeName, isDarkMode, resetTheme, Theme, THEME } from '../util/theme';
 import { ThemeService } from 'ng2-charts';
-import { bottomTop, colorChange, colorChangeChild, fade, goTo, observeElementSignal } from '../util/animation';
-import { Auth, user } from '@angular/fire/auth';
+import { goTo, observeElementSignal } from '../util/animation';
 import { AuthUserService } from '../services/auth-user.service';
 import { MainContentService } from '../services/main-content.service';
 import { updateMyUser } from '../store/main.actions';
-import { TokenService } from '../services/token.service';
 import { NavigationService } from '../services/navigation.service';
 import { SharedModule } from '../shared/shared.module';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { getCurrentLangPipe } from '../store/selectors/main.selectors';
 import { MainState } from '../store/reducers/main.reducers';
 import { EnvService } from '../services/env.service';
+import { filter } from 'rxjs';
+import { FirebaseService } from '../services/firebase.service';
 
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.scss'],
-  animations: [fade, bottomTop, colorChange, colorChangeChild],
   imports: [SharedModule, RouterOutlet, RouterLinkActive],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainComponent {
+  private static readonly BIAB_TREATMENT_ID = 'biab-treatment';
+
   private readonly env: EnvService = inject(EnvService);
-  private readonly injector = inject(Injector);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly store: Store<MainState> = inject(Store<MainState>);
   private readonly router: Router = inject(Router);
@@ -40,17 +40,16 @@ export class MainComponent {
   private readonly overlayContainer: OverlayContainer = inject(OverlayContainer);
   private readonly cookieService: CookieService = inject(CookieService);
   private readonly themeService: ThemeService = inject(ThemeService);
-  private readonly auth: Auth = inject(Auth);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly mainContent: MainContentService = inject(MainContentService);
-  private readonly tokenService: TokenService = inject(TokenService);
   private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly firebaseService = inject(FirebaseService);
 
+  private authUserSignal = this.authUserService.authUser;
   private lang$ = this.store.pipe(getCurrentLangPipe);
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.Handset]);
 
   private langSignal = toSignal(this.lang$);
-  private userSignal = toSignal(user(this.auth), { initialValue: null });
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -66,7 +65,7 @@ export class MainComponent {
 
   isHandsetSignal = computed(() => this.breakpointsSignal()?.matches ?? false);
   isDarkMode = signal(isDarkMode(this.cookieService.get(THEME) as Theme));
-  isAuthenticated = computed(() => !!this.userSignal());
+  isAuthenticated = this.firebaseService.isAuthenticated;
 
   title = this.env.title;
   firstSection?: Element | null;
@@ -74,14 +73,15 @@ export class MainComponent {
   appVersion = this.env.version;
 
   cssClass?: string;
-  backgroundColor: string = this.isDarkMode() ? '126, 119, 105' : '169, 163, 151';
+  backgroundColor = computed(() => this.isDarkMode() ? '126, 119, 105' : '169, 163, 151');
   language: string = this.translate.getCurrentLang();
   showArrow: boolean = false;
 
   private navigationObserve?: IntersectionObserver;
 
   constructor() {
-    let lastDarkMode: boolean | undefined;
+    this.authUserService.updateMode(this.isDarkMode());
+
     effect(() => {
       const isDark = this.isDarkMode();
       this.authUserService.updateMode(isDark);
@@ -90,21 +90,9 @@ export class MainComponent {
     });
 
     effect(() => {
-      const isDark = this.isDarkMode();
-      if (lastDarkMode === isDark) {
-        return;
-      }
-      lastDarkMode = isDark;
-      if (this.isAuthenticated()) {
-        const theme: Theme = getThemeName(isDark);
-        const authenticatedUser: IUser = new User();
-        authenticatedUser.theme = theme;
-        const redirectUrl = this.router.url;
-        const message = this.translate.instant(
-          `COMMON.PROFILE.UPDATED.DARK_MODE_${isDark.toString().toUpperCase()}`);
-        this.store.dispatch(
-          updateMyUser({ user: authenticatedUser, redirectUrl, message }),
-        );
+      const isDark = this.authUserSignal().isDarkMode;
+      if (isDark !== this.isDarkMode()) {
+        this.isDarkMode.set(isDark);
       }
     });
 
@@ -120,11 +108,19 @@ export class MainComponent {
       this.authUserService.cookieConsent(this.translate);
       this.language = this.navigationService.attachLang(lang);
     });
-    this.navigationAnimation();
+
+    this.router.events
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => setTimeout(() => this.navigationAnimation(), 0));
   }
 
   changeTheme(): void {
-    this.isDarkMode.set(!this.isDarkMode());
+    const isDark = !this.isDarkMode();
+    this.isDarkMode.set(isDark);
+    this.persistThemePreference(isDark);
   }
 
   redirect(): void {
@@ -133,7 +129,7 @@ export class MainComponent {
 
   treatment(): void {
     goTo('home');
-    this.router.navigate([this.translate.getCurrentLang(), 'home', 'biab', 'treatment']);
+    this.router.navigate([this.translate.getCurrentLang(), 'home', MainComponent.BIAB_TREATMENT_ID, 'treatment']);
     return;
   }
 
@@ -147,8 +143,20 @@ export class MainComponent {
   private resetTheme = (theme?: Theme): void => {
     this.cssClass = resetTheme(this.overlayContainer, this.cookieService, this.themeService, theme, this.cssClass);
     this.authUserService.updateMode(isDarkMode(theme));
-    this.backgroundColor = this.isDarkMode() ? '126, 119, 105' : '169, 163, 151';
   };
+
+  private persistThemePreference(isDark: boolean): void {
+    if (!this.isAuthenticated()) {
+      return;
+    }
+
+    const theme: Theme = getThemeName(isDark);
+    const authenticatedUser: IUser = new User();
+    authenticatedUser.theme = theme;
+    const redirectUrl = this.router.url;
+    const message = this.translate.instant(`COMMON.PROFILE.UPDATED.DARK_MODE_${isDark.toString().toUpperCase()}`);
+    this.store.dispatch(updateMyUser({ user: authenticatedUser, redirectUrl, message }));
+  }
 
   private navigationAnimation = (): void => {
     this.navigationObserve?.disconnect();

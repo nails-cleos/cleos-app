@@ -1,0 +1,37 @@
+{
+  "NOTE": {
+    "TITLE": "Notitie toevoegen",
+    "DETAIL": "Notitie bijwerken",
+    "DESCRIPTION": {
+      "FIELD": "Beschrijving",
+      "REQUIRED": "Beschrijving is <b>verplicht</b>"
+    },
+    "PROFESSIONAL": {
+      "FIELD": "Professional",
+      "REQUIRED": "Professional is <b>verplicht</b>",
+      "INVALID": "Professional is ongeldig"
+    },
+    "DATE": {
+      "FIELD": "Kies datum",
+      "REQUIRED": "Datum is <b>verplicht</b>"
+    },
+    "REPEAT": {
+      "FIELD": "Herhalen",
+      "REQUIRED": "Herhalen is <b>verplicht</b>"
+    },
+    "CREATED": {
+      "MESSAGE": "Notitie '{{description}}' aangemaakt"
+    },
+    "DELETED": {
+      "TITLE": "Notitie verwijderen",
+      "CONTENT": "Weet je zeker dat je notitie '{{description}}' wilt verwijderen?",
+      "MESSAGE": "Notitie '{{description}}' verwijderd"
+    },
+    "UPDATED": {
+      "MESSAGE": "Notitie '{{description}}' bijgewerkt"
+    },
+    "COMPLETED": {
+      "MESSAGE": "Notitie '{{description}}' voltooid"
+    }
+  }
+}

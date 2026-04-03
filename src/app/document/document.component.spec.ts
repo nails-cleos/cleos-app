@@ -7,7 +7,6 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../interfaces/pagination';
 import { documentDownloadZip, documentView, getDocumentsPage } from '../store/document.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { DocumentState } from '../store/reducers/document.reducers';
 import { DocumentComponent } from './document.component';
 import { DriveAccessService } from '../services/drive-access.service';
@@ -91,7 +90,6 @@ describe('DocumentsComponent', () => {
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
-        provideNoopAnimations(),
       ],
     }).compileComponents();
 

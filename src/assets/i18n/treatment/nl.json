@@ -1,0 +1,54 @@
+{
+  "TREATMENT": {
+    "TITLE": "Behandelingen toevoegen",
+    "CREATED": "Behandeling {{name}} aangemaakt",
+    "DETAIL": "Behandeling bijwerken",
+    "COLORS": "Kleuren",
+    "LIST": {
+      "COLUMN": {
+        "PRICE_FROM": "Prijs vanaf",
+        "PRICE": "Prijs",
+        "DURATION": "Duur",
+        "DATE": "Bijgewerkt"
+      },
+      "ERROR": {
+        "NO_CONTENT": "Geen behandelingen",
+        "REQUIRED": "Minstens een behandeling is verplicht"
+      }
+    },
+    "NAME": {
+      "FIELD": "Naam",
+      "REQUIRED": "Naam is <b>verplicht</b>"
+    },
+    "DESCRIPTION": {
+      "FIELD": "Beschrijving"
+    },
+    "PRICE": {
+      "FIELD": "Prijs",
+      "REQUIRED": "Prijs is <b>verplicht</b>",
+      "GREATER": "Prijs moet groter zijn dan 1"
+    },
+    "DURATION": {
+      "FIELD": "Duur",
+      "REQUIRED": "Duur is <b>verplicht</b>"
+    },
+    "PRICE_FROM": {
+      "FIELD": "Prijs vanaf",
+      "MIN": "Prijs vanaf moet groter zijn dan 0"
+    },
+    "COLOR": {
+      "FIELD": "Kleur"
+    },
+    "DELETED": {
+      "TITLE": "Behandeling verwijderen",
+      "CONTENT": "Weet je zeker dat je behandeling {{name}} wilt verwijderen?",
+      "MESSAGE": "Behandeling {{name}} verwijderd"
+    },
+    "UPDATED": {
+      "MESSAGE": "Behandeling {{name}} bijgewerkt"
+    },
+    "SORTED": {
+      "MESSAGE": "Behandelingen gesorteerd"
+    }
+  }
+}

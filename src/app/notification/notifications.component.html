@@ -14,9 +14,12 @@
         </mat-card-header>
         <mat-card-content>
           @if (currentNotifications.length) {
-            <div class="inner-container" @list>
+            <div class="inner-container">
               @for (not of currentNotifications; let last = $last; let first = $first; let i = $index; track not) {
-                <mat-list @items matRipple style="padding: 0">
+                <mat-list matRipple style="padding: 0"
+                          class="notification-enter"
+                          [class.notification-leave]="not.deleted"
+                          [style.--notification-enter-delay]="(i * 40) + 'ms'">
                   @if (first) {
                     <mat-divider></mat-divider>
                   }

@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { IUpcomingAll } from '../../../interfaces/reservation';
 import { customerEditDialog, getPrice, openDialog } from '../../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
-import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { createNewDate, isSameTimeZone, newDateTimestamp, reservationDuration } from '../../../util/dates';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -12,7 +11,6 @@ import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
 
 @Component({
   selector: 'app-upcoming',
-  animations: [transitionAnimation, stampAnimation],
   templateUrl: './upcoming.component.html',
   styleUrls: ['./upcoming.component.scss'],
   imports: [SharedModule, RoomNamePipe, CurrencySymbolPipe],

@@ -139,7 +139,7 @@ describe('UserComponent', () => {
       user: jasmine.objectContaining({
         displayName: 'New user',
         phone: '+31 23 456 7890',
-        lang: 'es',
+        locale: 'es',
       }),
       type: '[User] Save',
     });
@@ -211,7 +211,7 @@ describe('UserComponent', () => {
         displayName: 'New name',
         email: 'email@test.com',
         phone: '+31 23 456 7890',
-        lang: 'es',
+        locale: 'es',
       }),
       role: Role.customer,
       type: '[User] Save',

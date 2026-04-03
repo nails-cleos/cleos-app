@@ -5,7 +5,6 @@ import { BehaviorSubject, of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { ChangeDetectorRef, signal } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { API_LOCALE, createEndDate, createNewDate, formatDuration, getTime, zoneDateToDate } from '../util/dates';
 import { deleteUnavailable, getUnavailable } from '../store/unavailable.actions';
 import { IUnavailableAll } from '../interfaces/unavailable';
@@ -88,9 +87,8 @@ describe('UnavailableComponent', () => {
   const today = new Date();
   const daysUntilMonday = (1 + 7 - today.getDay()) % 7 || 7;
 
-  const nextMonday = new Date(today);
-  nextMonday.setDate(today.getDate() + daysUntilMonday);
-  nextMonday.setHours(12, 0, 0, 0);
+  const nextMonday = new Date(
+    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + daysUntilMonday, 12, 0, 0));
 
   beforeEach(async () => {
     navigationParams$ = new BehaviorSubject(undefined);
@@ -133,7 +131,6 @@ describe('UnavailableComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
-        provideNoopAnimations(),
       ],
     }).compileComponents();
 
@@ -235,15 +232,15 @@ describe('UnavailableComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.minTime).toBe('10:00');
-    expect(component.maxTime).toBe('19:00');
+    expect(component.minTime).toBe('11:00');
+    expect(component.maxTime).toBe('20:00');
     expect(component.roomAvailability).toEqual(
       {
         availabilities: mockRoom.availabilities.filter(av => av !== undefined),
       } as IRoomAll,
     );
     expect(component.showDuration()).toBeTrue();
-    expect(component.durationMax).toBe('07:00');
+    expect(component.durationMax).toBe('06:00');
   });
 
   it('should not dispatch action when form is invalid', () => {
@@ -561,7 +558,7 @@ describe('UnavailableComponent', () => {
     expect(component['rooms']()).toEqual([mockRoom]);
     expect(component.showDuration()).toBeTrue();
     expect(component.getForm.startDate.value).toBe(nextMonday);
-    expect(component.getForm.startTime.value).toBe('12:00');
+    expect(component.getForm.startTime.value).toBe('14:00');
     expect(component.getForm.duration.value).toBeUndefined();
     expect(component.getForm.endDate.value).toBeUndefined();
     expect(component.getForm.repeat.value).toBeUndefined();

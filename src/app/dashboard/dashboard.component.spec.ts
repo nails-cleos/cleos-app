@@ -42,7 +42,7 @@ describe('DashComponent', () => {
       {
         reservationId: 'r1',
         title: 'Test reservation',
-        start: Date.now(),
+        start: Date.now() / 1000,
         end: null,
         state: States.completed,
         total: 50,
@@ -194,19 +194,23 @@ describe('DashComponent', () => {
   });
 
   it('should create birthday all-day event', () => {
+    const today = new Date();
+
     component.calendarSummary = {
       reservations: [],
       unavailable: [],
       birthdays: [{
         userId: 'u1',
         title: 'Birthday',
-        date: Date.now(),
+        date: today.toDateString(),
       }],
       transactions: [],
       notes: [],
     } as any;
 
     component['createEvents']();
+
+    expect(component.calendar.calendarEvents.length).toBe(1);
 
     const event = component.calendar.calendarEvents[0];
     expect(event.allDay).toBeTrue();
@@ -222,7 +226,7 @@ describe('DashComponent', () => {
       notes: [{
         noteId: 'n1',
         title: 'Repeated note',
-        date: Date.now(),
+        date: Date.now() / 1000,
         repeat: FrequencyEnum.everyDay,
       }],
     } as any;

@@ -288,7 +288,7 @@ export class ExpenseComponent {
     const expense: IExpense = new Expense();
     const supplyStore = fieldChange(this.getForm.supplyStore, expenseSignal?.supplyStore);
     expense.invoice = fieldChange(this.getForm.invoice, expenseSignal?.invoice);
-    expense.supplyStoreString = supplyStore?.id ? supplyStore.id : supplyStore;
+    expense.supplyStoreString = supplyStore?.id ? supplyStore.id : supplyStore.name;
     expense.expenseTotals = this.totals.getRawValue() as unknown as ITotalExpense[];
     expense.date = createNewDateZonedTime(date, expenseSignal?.room?.timeZone).toLocaleString(API_LOCALE);
 

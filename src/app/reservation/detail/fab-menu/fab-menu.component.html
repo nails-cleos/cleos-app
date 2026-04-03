@@ -1,12 +1,13 @@
 <div class="fab-menu" [class.open]="menuOpen">
-  <button mat-fab color="primary" (click)="toggleMenu()" [@iconChange]="menuOpen ? 'open' : 'closed'">
+  <button mat-fab color="primary" (click)="toggleMenu()" class="fab-trigger">
     <mat-icon>all_out</mat-icon>
   </button>
   @if (menuOpen) {
     @let menus = fabMenus();
-    <div class="menu-items" [@listAnimation]="menus.length">
-      @for (item of menus; track item.icon) {
-        <button mat-fab (click)="handleMenuItemClick(item)" matTooltip="{{ item.tooltip }}" [color]="item.color"
+    <div class="menu-items">
+      @for (item of menus; track item.icon; let i = $index) {
+        <button mat-fab class="menu-item-enter" [style.--fab-item-delay]="(i * 100) + 'ms'"
+                (click)="handleMenuItemClick(item)" matTooltip="{{ item.tooltip }}" [color]="item.color"
                 matTooltipPosition="left">
           <mat-icon>{{ item.icon }}</mat-icon>
         </button>

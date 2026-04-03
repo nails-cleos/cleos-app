@@ -9,7 +9,6 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { deleteOffice, getOfficesPage, officeSelected } from '../../store/office.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { OfficeState } from '../../store/reducers/office.reducers';
 
 describe('OfficeListComponent', () => {
@@ -77,7 +76,6 @@ describe('OfficeListComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
-        provideNoopAnimations(),
       ],
     }).compileComponents();
 

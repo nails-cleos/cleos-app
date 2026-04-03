@@ -10,13 +10,11 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { createReview, getCustomerReservations } from '../../../store/reservation.actions';
 import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
 import { executeDialogNoWidth, openDialog } from '../../../util/helper';
-import { stampAnimation, transitionAnimation } from '../../../util/animation';
 import { IReview, Review } from '../../../interfaces/review';
 import { ReviewDialogComponent } from '../review/review-dialog.component';
 import { isToday } from 'date-fns';
 import { Router } from '@angular/router';
 import { IPayment } from '../../../interfaces/payment';
-import { Analytics, logEvent } from '@angular/fire/analytics';
 import { SharedModule } from '../../../shared/shared.module';
 import { UpcomingComponent } from '../upcoming/upcoming.component';
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
@@ -30,10 +28,10 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { cleanDiscount } from '../../../store/discount.actions';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
+import { FirebaseService } from '../../../services/firebase.service';
 
 @Component({
   selector: 'app-reservations',
-  animations: [transitionAnimation, stampAnimation],
   templateUrl: './reservations.component.html',
   styleUrls: ['./reservations.component.scss'],
   imports: [SharedModule, UpcomingComponent, TimeDetailPipe, ReservationIconPipe, ErrorComponent],
@@ -44,8 +42,8 @@ export class ReservationsComponent {
   private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly router: Router = inject(Router);
-  private readonly analytics: Analytics = inject(Analytics);
   private readonly dialog: MatDialog = inject(MatDialog);
+  private readonly firebaseService = inject(FirebaseService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
   private customerReservation$ = this.store.pipe(getCustomerReservationPipe);
@@ -159,7 +157,7 @@ export class ReservationsComponent {
       });
     });
 
-    logEvent(this.analytics, 'screen_view', {
+    this.firebaseService.logEvent('screen_view', {
       // eslint-disable-next-line camelcase
       firebase_screen: 'Main reservation page',
       // eslint-disable-next-line camelcase

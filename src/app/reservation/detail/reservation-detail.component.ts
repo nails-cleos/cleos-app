@@ -7,7 +7,6 @@ import {
   getReservation,
   getReservationHistory,
   paymentCompleteReservation,
-  paymentOptions,
   reservationFindPayments,
   startReservation,
   updateReservationColor,
@@ -52,7 +51,6 @@ import { IPrice, Price } from '../../interfaces/treatment';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import {
   getPaymentOptions,
-  getPayNlOptions,
   IPayment,
   IPaymentAll,
   IPaymentOption,
@@ -60,7 +58,6 @@ import {
   PaymentType,
   PENALTY,
 } from '../../interfaces/payment';
-import { detailExpandAnimation, transitionAnimation } from '../../util/animation';
 import { isToday, isTomorrow } from 'date-fns';
 import { ReservationIconName } from '../../util/icon';
 import { FormArray, FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
@@ -89,7 +86,6 @@ import {
   getCurrentReservationIdPipe,
   getDetailNavigationParamsPipe,
   getHistoriesPipe,
-  getPaymentOptionsPipe,
   getPaymentsPipe,
   getSelectedReservationPipe,
 } from '../../store/selectors/reservation.selectors';
@@ -106,7 +102,6 @@ type DetailForm = {
 
 @Component({
   selector: 'app-reservation-detail',
-  animations: [transitionAnimation, detailExpandAnimation],
   templateUrl: './reservation-detail.component.html',
   styleUrls: ['./reservation-detail.component.scss'],
   imports: [SharedModule, RoomNamePipe, ReservationIconPipe, PriceExtrasComponent, PricePreviewComponent,
@@ -130,12 +125,10 @@ export class ReservationDetailComponent {
   private reservationSelected$ = this.store.pipe(getSelectedReservationPipe);
   private payments$ = this.store.pipe(getPaymentsPipe);
   private histories$ = this.store.pipe(getHistoriesPipe);
-  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
   private authUserSignal = this.authUserService.authUser;
   private reservationIdSignal = toSignal(this.reservationId$);
   private navigationParams = toSignal(this.navigationParams$);
-  private paymentOptionsSignal = toSignal(this.paymentOptions$);
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -169,6 +162,7 @@ export class ReservationDetailComponent {
 
   price: IPrice = new Price();
   options = signal<IPaymentOption[] | undefined>(undefined);
+  paymentTypes = signal<PaymentType[] | undefined>(undefined);
 
   showFireworks = false;
 
@@ -260,11 +254,8 @@ export class ReservationDetailComponent {
           const types = reservation.room.paymentTypes.filter(
             (p: PaymentType) => ![PaymentType.cash, PaymentType.transfer]
               .includes(p));
-          if (types?.includes(PaymentType.paynl)) {
-            this.getOptions();
-          } else {
-            this.options.set(getPaymentOptions(this.translate, types));
-          }
+          this.paymentTypes.set(types);
+          this.options.set(getPaymentOptions(this.translate, types));
           this.customerMachine(this);
           this.changeState = this.machine.next(snakeToCamel(reservation.state));
           if (reservation.state === States.completed) {
@@ -382,12 +373,6 @@ export class ReservationDetailComponent {
       }
     });
 
-    effect(() => {
-      const paymentOptions = this.paymentOptionsSignal();
-      if (paymentOptions) {
-        this.options.set(getPayNlOptions(paymentOptions));
-      }
-    });
   }
 
   get getForm(): DetailForm {
@@ -592,8 +577,6 @@ export class ReservationDetailComponent {
     color?: string,
   ): IFabMenu => ({ tooltip, icon, id, color } as IFabMenu);
 
-  private getOptions = (): void => this.store.dispatch(paymentOptions());
-
   private professionalMachine = (self: this): any => {
     const reservation = self.reservation();
     if (!reservation) {
@@ -711,7 +694,7 @@ export class ReservationDetailComponent {
     const cloneTransaction = ReservationDetailComponent.createTransaction('clone',
       (): void => self.clone(reservation));
 
-    const options = Object.values(CancelOption).filter(co => co !== CancelOption.charge);
+    const options = Object.values(CancelOption).filter(co => co !== CancelOption.chargeAndAccount);
     const cancelTransaction = ReservationDetailComponent.createTransaction('cancelled', (): void =>
       self.cancel(reservation, options, self.price, result => {
         if (result) {
@@ -798,10 +781,16 @@ export class ReservationDetailComponent {
         next: [clone],
       },
       cancelledPaymentRequired: {
-        next: [],
+        transitions: {
+          cancel: cancelTransaction,
+        },
+        next: [cancel],
       },
-      editCancelled: {
-        next: [],
+      editCancelled:  {
+        transitions: {
+          cancel: cancelTransaction,
+        },
+        next: [cancel],
       },
     }, initialState);
   };
@@ -825,7 +814,7 @@ export class ReservationDetailComponent {
     /* CANCEL */
     if (reservation.canEdit) {
       if (price.totalPaid) {
-        cancelOptions = [CancelOption.discount, CancelOption.refund];
+        cancelOptions = [CancelOption.account, CancelOption.refund];
       } else {
         cancelOptions = [CancelOption.none];
       }
@@ -834,13 +823,13 @@ export class ReservationDetailComponent {
       const penaltyToPay = (price.total * PENALTY / 100);
       price.setPenalty(penaltyToPay);
       if (price.totalPaid < penaltyToPay) {
-        cancelOptions = [CancelOption.charge];
+        cancelOptions = [CancelOption.chargeAndAccount];
         showPenalty = true;
       } else if (price.totalPaid === penaltyToPay) {
         cancelOptions = [CancelOption.none];
         cancelIcon = ReservationIconName.freeCancellation;
       } else {
-        cancelOptions = [CancelOption.chargeWithDiscount, CancelOption.chargeWithRefund];
+        cancelOptions = [CancelOption.chargeAndAccount, CancelOption.chargeAndRefund];
         showPenalty = true;
         cancelIcon = ReservationIconName.freeCancellation;
       }

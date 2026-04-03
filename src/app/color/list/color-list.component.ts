@@ -10,7 +10,6 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { cleanColor, colorSelected, deleteColor, getColorsPage } from '../../store/color.actions';
 import { executeDialogNoWidth } from '../../util/helper';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
-import { detailExpandAnimation } from '../../util/animation';
 import { SharedModule } from '../../shared/shared.module';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getColorPaginationPipe, getColorResponsePipe } from '../../store/selectors/color.selectors';
@@ -20,7 +19,6 @@ import { ColorState } from '../../store/reducers/color.reducers';
   selector: 'app-color-list',
   templateUrl: './color-list.component.html',
   styleUrls: ['./color-list.component.scss'],
-  animations: [detailExpandAnimation],
   imports: [SharedModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

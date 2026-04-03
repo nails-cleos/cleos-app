@@ -117,7 +117,7 @@ export class UserEffects {
         switchMap((response: Token) => {
           const message = this.translate.instant('COMMON.PROFILE.UPDATED.MESSAGE',
             { displayName: response.user.displayName });
-          const lang = user.lang;
+          const lang = user.locale;
           return success(userSaveSuccess, message ? message : message, undefined, undefined, undefined,
             loginSuccess({
               token: response,

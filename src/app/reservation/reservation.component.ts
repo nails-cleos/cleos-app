@@ -89,7 +89,6 @@ import {
   removeDiscount,
   roomDetail,
 } from '../util/helper';
-import { transitionAnimation } from '../util/animation';
 import { addDays, addMonths, isEqual } from 'date-fns';
 import { findStateColor } from '../util/theme';
 import { IAdditionalAll } from '../interfaces/additional';
@@ -210,7 +209,6 @@ type ReservationErrors = {
 
 @Component({
   selector: 'app-reservation',
-  animations: [transitionAnimation],
   templateUrl: './reservation.component.html',
   styleUrls: ['./reservation.component.scss'],
   imports: [SharedModule, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe, PricePreviewComponent,

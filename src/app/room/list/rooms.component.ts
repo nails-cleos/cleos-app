@@ -9,7 +9,6 @@ import { Store } from '@ngrx/store';
 import { cleanRoom, deleteRoom, getRoomsPage, roomSelected } from '../../store/room.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { detailExpandAnimation } from '../../util/animation';
 import { findDayOfWeek, getTimeZone, ITimeZone } from '../../util/dates';
 import { executeDialogNoWidth } from '../../util/helper';
 import { SharedModule } from '../../shared/shared.module';
@@ -22,7 +21,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
   selector: 'app-rooms',
   templateUrl: './rooms.component.html',
   styleUrls: ['./rooms.component.scss'],
-  animations: [detailExpandAnimation],
   imports: [SharedModule, SortByPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

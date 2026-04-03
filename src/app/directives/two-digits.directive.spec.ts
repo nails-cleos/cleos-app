@@ -170,8 +170,17 @@ describe('TwoDigitsDirective', () => {
 
   describe('with allowNegatives enabled', () => {
     beforeEach(() => {
+      fixture = TestBed.createComponent(HostComponent);
+      hostComp = fixture.componentInstance;
+
       hostComp.allowNegatives = true;
+
       fixture.detectChanges();
+
+      // re-query directive and input element
+      const debugEl = fixture.debugElement.query(By.directive(TwoDigitsDirective));
+      directive = debugEl.injector.get(TwoDigitsDirective);
+      inputElement = debugEl.nativeElement as HTMLInputElement;
     });
 
     it('should allow negative numbers when allowNegatives is true', () => {

@@ -1,0 +1,40 @@
+{
+  "DISCOUNT": {
+    "TITLE": "Korting toevoegen",
+    "SEND": "Korting {{name}} verzonden",
+    "CREATED": "Korting {{name}} aangemaakt",
+    "DETAIL": "Korting bijwerken",
+    "LIST": {
+      "DIALOG": {
+        "CUSTOMER": "Klanten"
+      },
+      "ERROR": {
+        "NO_CONTENT": "Geen kortingen"
+      }
+    },
+    "NAME": {
+      "FIELD": "Naam",
+      "REQUIRED": "Naam is <b>verplicht</b>"
+    },
+    "DESCRIPTION": {
+      "FIELD": "Beschrijving"
+    },
+    "AMOUNT": {
+      "FIELD": "Bedrag",
+      "REQUIRED": "Bedrag is <b>verplicht</b>",
+      "GREATER": "Bedrag moet groter zijn dan 1"
+    },
+    "TYPE": {
+      "FIELD": "Type",
+      "REQUIRED": "Type is <b>verplicht</b>"
+    },
+    "DELETED": {
+      "TITLE": "Korting verwijderen",
+      "CONTENT": "Weet je zeker dat je korting {{name}} wilt verwijderen?",
+      "MESSAGE": "Korting {{name}} verwijderd"
+    },
+    "UPDATED": {
+      "MESSAGE": "Korting {{name}} bijgewerkt"
+    }
+  }
+}

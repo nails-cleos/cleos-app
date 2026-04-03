@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BehaviorSubject } from 'rxjs';
 
 import { TransactionViewComponent } from './transaction-view.component';
@@ -109,11 +108,7 @@ describe('TransactionViewComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [
-        TransactionViewComponent,
-        TranslateModule.forRoot(),
-        BrowserAnimationsModule,
-      ],
+      imports: [TransactionViewComponent, TranslateModule.forRoot()],
       providers: [
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Store, useValue: storeSpy },

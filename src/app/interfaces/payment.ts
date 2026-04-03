@@ -8,6 +8,7 @@ export interface IPaymentType {
   name: string;
   disabled: boolean;
   checked: boolean;
+  deprecated: boolean;
 }
 
 export enum PaymentType {
@@ -17,26 +18,23 @@ export enum PaymentType {
   ideal = 'IDEAL',
   transfer = 'TRANSFER',
   paynl = 'PAY_NL',
-  account = 'ACCOUNT'
+  account = 'ACCOUNT',
+  mollie = 'MOLLIE',
 }
 
 export type PaymentTypeKey = keyof typeof PaymentType;
 
 export interface IPaymentOption {
   name: string;
-  subTypes: IPaymentOption[];
   svgIcon: string;
   type: PaymentType;
-  bic?: string;
   hidePercentage?: boolean;
   icon?: string;
 }
 
 export class PaymentOption implements IPaymentOption {
   name: string;
-  subTypes: IPaymentOption[];
   type: PaymentType;
-  bic?: string;
   svgIcon: string;
   hidePercentage?: boolean;
   icon?: string;
@@ -46,16 +44,12 @@ export class PaymentOption implements IPaymentOption {
     type: PaymentType,
     svgIcon: string,
     icon?: string,
-    bic?: string,
-    subTypes?: IPaymentOption[],
     hidePercentage: boolean = false,
   ) {
     this.name = name;
     this.type = type;
     this.svgIcon = svgIcon;
     this.icon = icon;
-    this.bic = bic;
-    this.subTypes = subTypes || [];
     this.hidePercentage = hidePercentage;
   }
 }
@@ -63,50 +57,52 @@ export class PaymentOption implements IPaymentOption {
 export const getPaymentOptions = (
   translate: TranslateService,
   types?: PaymentType[],
+  hidePercentage: boolean = false,
 ): IPaymentOption[] => types?.map((it: any) => {
-  let subTypes: IPaymentOption[] = [];
-  if (it === PaymentType.ideal) {
-    subTypes = iDealBanks();
-  }
   const name = translate.instant(`COMMON.PAYMENT.TYPE.${it}`);
   let svgIcon = '';
+  let icon;
   switch (it) {
     case PaymentType.ideal:
-      svgIcon = '/payment_methods/1.svg';
+      svgIcon = 'IDEAL';
       break;
     case PaymentType.paypal:
-      svgIcon = '/payment_methods/21.svg';
+      svgIcon = 'PAYPAL';
+      break;
+    case PaymentType.mollie:
+      svgIcon = 'MOLLIE';
+      break;
+    case PaymentType.paynl:
+      svgIcon = 'PAY_NL';
+      break;
+    case PaymentType.cash:
+      icon = 'universal_currency';
+      break;
+    case PaymentType.transfer:
+      icon = 'send_money';
       break;
   }
 
-  return new PaymentOption(name, it, svgIcon, undefined, undefined, subTypes);
+  return new PaymentOption(name, it, svgIcon, icon, hidePercentage);
 }) || [];
 
-export const getPayNlOptions = (
+export const filterPaymentOptions = (
   options?: IPaymentOption[],
-): PaymentOption[] => options?.map((it: any) => new PaymentOption(
-  it.name, PaymentType.paynl, it.image, it.image, it.id,
-  it.paymentOptionSubList?.map((sub: any) => new PaymentOption(sub.name, PaymentType.paynl, sub.image,
-    sub.image, sub.id, []))),
-) || [];
+  allowedTypes?: PaymentType[],
+): IPaymentOption[] => {
+  if (!options?.length) {
+    return [];
+  }
+  if (!allowedTypes?.length) {
+    return options;
+  }
 
-export const iDealBanks = (): IPaymentOption[] => [
-  { subTypes: [], type: PaymentType.ideal, name: 'ABN AMRO', bic: 'ABNANL2A', svgIcon: '/issuers/1.svg' },
-  { subTypes: [], type: PaymentType.ideal, name: 'Rabobank', bic: 'RABONL2U', svgIcon: '/issuers/2.svg' },
-  { subTypes: [], type: PaymentType.ideal, name: 'ING Bank', bic: 'INGBNL2A', svgIcon: '/issuers/4.svg' },
-  { subTypes: [], type: PaymentType.ideal, name: 'SNS Bank', bic: 'SNSBNL2A', svgIcon: '/issuers/5.svg' },
-  { subTypes: [], type: PaymentType.ideal, name: 'ASN', bic: 'ASNBNL21', svgIcon: '/issuers/8.svg' },
-  { subTypes: [], type: PaymentType.ideal, name: 'Regio Bank', bic: 'RBRBNL21', svgIcon: '/issuers/9.svg' },
-  { subTypes: [], type: PaymentType.ideal, name: 'Triodos Bank', bic: 'TRIONL2U', svgIcon: '/issuers/10.svg' },
-  { subTypes: [], type: PaymentType.ideal, name: 'Van Lanschot Bankiers', bic: 'FVLBNL22', svgIcon: '/issuers/11.svg' },
-  { subTypes: [], type: PaymentType.ideal, name: 'Knab', bic: 'KNABNL2H', svgIcon: '/issuers/12.svg' },
-  { subTypes: [], type: PaymentType.ideal, name: 'Bunq', bic: 'BUNQNL2A', svgIcon: '/issuers/5080.svg' },
-  { subTypes: [], type: PaymentType.ideal, name: 'Moneyou', bic: 'MOYONL21', svgIcon: 'MOYONL21' },
-];
+  return options
+    .filter(option => allowedTypes.includes(option.type));
+};
 
 export const accountCredit = (name: string): IPaymentOption[] => [
   {
-    subTypes: [],
     type: PaymentType.account,
     name,
     icon: 'account_balance',
@@ -124,22 +120,32 @@ export const paymentOptions = (): IPaymentType[] => [{
   name: PaymentType.cash,
   disabled: true,
   checked: true,
+  deprecated: false,
 }, {
   name: PaymentType.ml,
   disabled: false,
   checked: false,
+  deprecated: true,
 }, {
   name: PaymentType.paypal,
   disabled: false,
   checked: false,
+  deprecated: true,
 }, {
   name: PaymentType.ideal,
   disabled: false,
   checked: false,
+  deprecated: true,
 }, {
   name: PaymentType.paynl,
   disabled: false,
   checked: false,
+  deprecated: true,
+}, {
+  name: PaymentType.mollie,
+  disabled: false,
+  checked: false,
+  deprecated: false,
 }];
 
 export interface IPaymentStatus {

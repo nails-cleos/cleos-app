@@ -107,7 +107,7 @@
 
         <ng-container matColumnDef="expandedDetail">
           <td *matCellDef="let document" [attr.colspan]="displayedColumns.length" class="hide-gt-xs" mat-cell>
-            <div [@detailExpand]="document === expandedDocument ? 'expanded' : 'collapsed'"
+            <div [class.detail-expanded]="document === expandedDocument"
                  class="detail hide-gt-xs">
               <mat-list>
                 @if (document.date) {

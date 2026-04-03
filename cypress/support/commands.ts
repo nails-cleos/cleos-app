@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 declare namespace Cypress {
   interface Chainable {
     randomUUID(): Chainable<string>;
@@ -23,7 +24,7 @@ declare namespace Cypress {
 
     mockAuthentication(email: string, role: string): Chainable<any>;
 
-    mockLogin(email: string, displayName: string, role: string): Chainable<any>;
+    mockLogin(email: string, displayName: string, role: string, emailVerified?: boolean): Chainable<any>;
 
     mockFirebaseAppCheck(): Chainable<any>;
 
@@ -31,9 +32,11 @@ declare namespace Cypress {
 
     mockFetchSignInMethodsForEmail(methods: string[]): Chainable<any>;
 
-    mockFirebase(email: string): Chainable<any>;
+    mockFirebase(email: string, emailVerified?: boolean): Chainable<any>;
 
     mockNotifications(): Chainable<any>;
+
+    mockCatalogues(): Chainable<any>;
 
     mockCustomerReservations(): Chainable<any>;
 
@@ -81,9 +84,15 @@ Cypress.Commands.add('randomUUID', () => cy.wrap('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxx
 })));
 
 Cypress.Commands.add('logout', () => {
-  cy.get('button[name="settings"]').click();
-  cy.get('mat-list-item').contains('Sign out').click();
-  cy.url().should('include', 'home');
+  cy.get('body').then(($body) => {
+    if (!$body.find('button[name="settings"]').length) {
+      return;
+    }
+
+    cy.get('button[name="settings"]').click();
+    cy.get('mat-list-item').contains('Sign out').click();
+    cy.url().should('include', 'home');
+  });
 });
 
 Cypress.Commands.add('checkAppDialog', (title: string, message: string, buttonClick: string) => {
@@ -132,16 +141,18 @@ Cypress.Commands.add('buttonClickOnTable', (
   breakpoint: string,
   column: string,
   rowClass: string,
-  rowExpandedClass,
+  rowExpandedClass: string,
   button: string,
   otherButtons?: string[],
 ) => {
   if (['XSmall', 'Small'].includes(breakpoint)) {
-    cy.get(`tr.${rowClass}`).contains('td', column).then($cell => {
+    cy.get(`tr.${rowClass}`).contains('td', column).then(($cell: any) => {
       const $row = $cell.closest('tr');
       cy.wrap($row).click({ force: true });
 
-      cy.wrap($row).next(`tr.${rowExpandedClass}`).should('be.visible').within(() => {
+      cy.wrap($row).next(`tr.${rowExpandedClass}`).should('exist').within(() => {
+        cy.get('.detail').should('have.class', 'detail-expanded');
+
         otherButtons?.forEach(otherButton => {
           cy.get('button[mat-icon-button]').contains(otherButton).should('exist');
         });
@@ -177,22 +188,63 @@ Cypress.Commands.add('formControlType', (formControlName: string, value: any, ty
 });
 
 Cypress.Commands.add('setTime', (hour: number | string, minute: number | string = 0) => {
-  cy.get('ngx-material-timepicker-content', { timeout: 5000 }).should('exist').contains(hour).click({ force: true });
-  cy.get('ngx-material-timepicker-content').contains(minute === 0 ? '00' : minute).click({ force: true });
-  cy.get('.timepicker-button').contains('Ok').click({ force: true });
+  const toDialLabel = (value: number | string): string => {
+    const numericValue = Number(value);
+    if (Number.isNaN(numericValue)) {
+      return `${value}`.trim();
+    }
+    return `${numericValue}`.padStart(2, '0');
+  };
+
+  const hourLabel = toDialLabel(hour);
+  const minuteLabel = toDialLabel(minute);
+
+  cy.get('.clock-timepicker-panel .timepicker', { timeout: 5000 }).should('exist').within(() => {
+    cy.contains('.clock-face__number', hourLabel).click({ force: true });
+    cy.contains('.clock-face__number', minuteLabel).click({ force: true });
+    cy.contains('.timepicker__actions button', /^ok$/i).click({ force: true });
+  });
+
   cy.wait(50);
 });
 
-const firebaseUser = (email: string, displayName?: string, kind?: string) => ({
-  kind: kind,
-  idToken: 'mock-id-token',
-  email: email,
-  displayName: displayName,
-  photoUrl: null,
-  refreshToken: 'mock-refresh-token',
-  expiresIn: '3600',
-  localId: '12345',
-});
+const createFakeJwt = (payload: Record<string, any>) => {
+  const base64 = (obj: object) =>
+    btoa(JSON.stringify(obj))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
+
+  const header = base64({ alg: 'HS256', typ: 'JWT' });
+  const body = base64(payload);
+  const signature = 'mock-signature';
+
+  return `${header}.${body}.${signature}`;
+};
+
+const firebaseUser = (email: string, displayName?: string, kind?: string, emailVerified: boolean = true) => {
+  const now = Math.floor(Date.now() / 1000);
+
+  const idToken = createFakeJwt({
+    sub: '12345',
+    email,
+    name: displayName,
+    iat: now,
+    exp: now + 3600,
+  });
+
+  return {
+    kind: kind,
+    idToken,
+    email: email,
+    emailVerified,
+    displayName: displayName,
+    photoUrl: null,
+    refreshToken: 'mock-refresh-token',
+    expiresIn: now + 3600,
+    localId: '12345',
+  };
+};
 
 const dashboardNoContent = (displayName: string, messageKey: string) => ({
   professionalName: displayName,
@@ -306,7 +358,7 @@ Cypress.Commands.add('mockAuthentication', (email: string, role: string) => {
   });
 });
 
-Cypress.Commands.add('mockLogin', (email: string, displayName: string, role: string) => {
+Cypress.Commands.add('mockLogin', (email: string, displayName: string, role: string, emailVerified: boolean = false) => {
   cy.fixture('users').then((usersData) => {
     cy.fixture('menus').then((menuData) => {
       cy.intercept('POST', 'http://localhost:9999/api/v1/auth/login', {
@@ -326,6 +378,7 @@ Cypress.Commands.add('mockLogin', (email: string, displayName: string, role: str
         {
           localId: '12345',
           email: email,
+          emailVerified,
           displayName: displayName,
           photoUrl: 'https://example.com/photo.jpg',
           providerUserInfo: [
@@ -345,17 +398,39 @@ Cypress.Commands.add('mockLogin', (email: string, displayName: string, role: str
     statusCode: 200,
     body: firebaseUser(email, displayName, 'identitytoolkit#UpdateAccountResponse'),
   }).as('updateProfileSuccess');
+
+  cy.intercept('POST', 'https://securetoken.googleapis.com/v1/token*',
+    (req: any) => {
+      const now = Math.floor(Date.now() / 1000);
+
+      req.reply({
+        statusCode: 200,
+        body: {
+          access_token: createFakeJwt({
+            sub: '12345',
+            email: 'test@test.com',
+            iat: now,
+            exp: now + 3600,
+          }),
+          expires_in: '3600',
+          token_type: 'Bearer',
+          refresh_token: 'mock-refresh-token',
+          user_id: '12345',
+        },
+      });
+    },
+  ).as('refreshToken');
 });
 
-Cypress.Commands.add('mockFirebase', (email: string) => {
+Cypress.Commands.add('mockFirebase', (email: string, emailVerified: boolean = true) => {
   cy.intercept('POST', '**/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword**', {
     statusCode: 200,
-    body: firebaseUser(email),
+    body: firebaseUser(email, undefined, undefined, emailVerified),
   }).as('firebaseSignIn');
 
   cy.intercept('POST', 'https://identitytoolkit.googleapis.com/v1/accounts:signUp*', {
     statusCode: 200,
-    body: firebaseUser(email),
+    body: firebaseUser(email, undefined, undefined, emailVerified),
   }).as('firebaseSignUp');
 
   cy.intercept('POST', 'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode*', {
@@ -377,7 +452,11 @@ Cypress.Commands.add('mockFirebaseAppCheck', () => {
     },
   }).as('firebaseAppCheck');
 
-  cy.contains('Got it!').click({ force: true });
+  cy.get('body').then(($body) => {
+    if ($body.text().includes('Got it!')) {
+      cy.contains('button, a', 'Got it!').click({ force: true });
+    }
+  });
 });
 
 // Cypress.Commands.add('mockFetchSignInMethodsForEmail', (email) => {
@@ -412,6 +491,17 @@ Cypress.Commands.add('mockNotifications', () => {
       body: null,
     },
   ).as('getNotifications');
+});
+
+Cypress.Commands.add('mockCatalogues', () => {
+  cy.intercept(
+    'GET',
+    new RegExp('/api/v1/catalogues\\?home=true'),
+    {
+      statusCode: 204,
+      body: null,
+    },
+  ).as('getCatalogues');
 });
 
 Cypress.Commands.add('mockCustomerReservations', () => {

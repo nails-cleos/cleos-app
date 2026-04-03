@@ -5,12 +5,10 @@ import { ReservationsComponent } from './reservations.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { Analytics } from '@angular/fire/analytics';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatDialog } from '@angular/material/dialog';
 import { Price } from '../../../interfaces/treatment';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
-import { AnalyticsStub } from '../../../util/firebase-stub';
 
 describe('ReservationsComponent', () => {
   let component: ReservationsComponent;
@@ -66,7 +64,6 @@ describe('ReservationsComponent', () => {
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
-        { provide: Analytics, useClass: AnalyticsStub },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: MatDialog, useValue: dialogSpy },
         provideRouter([]),

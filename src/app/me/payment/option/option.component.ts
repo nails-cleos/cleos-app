@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, v
 import {
   createPaymentLinkByReservationId,
   getPaymentByResourceId,
-  paymentOptions,
 } from '../../../store/payment.actions';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -14,7 +13,6 @@ import { IStep, Step } from '../../../interfaces/step';
 import { MatStepper } from '@angular/material/stepper';
 import {
   getPaymentOptions,
-  getPayNlOptions,
   IPaymentOption,
   PaymentPercentage,
   PaymentType,
@@ -32,7 +30,7 @@ import { PaymentState } from '../../../store/reducers/payment.reducers';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { getCurrentReservationIdPipe } from '../../../store/selectors/reservation.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { getPaymentOptionsPipe, getPaymentsPipe } from '../../../store/selectors/payment.selectors';
+import { getPaymentsPipe } from '../../../store/selectors/payment.selectors';
 
 @Component({
   selector: 'app-option',
@@ -49,12 +47,10 @@ export class OptionComponent {
   private readonly translate: TranslateService = inject(TranslateService);
 
   private reservationId$ = this.store.pipe(getCurrentReservationIdPipe);
-  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
   private payments$ = this.store.pipe(getPaymentsPipe);
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
   private reservationIdSignal = toSignal(this.reservationId$);
-  private paymentOptionsSignal = toSignal(this.paymentOptions$);
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -72,16 +68,17 @@ export class OptionComponent {
 
   form: FormGroup<BankForm> = this.formBuilder.group<BankForm>({
     type: this.formBuilder.control(undefined),
-    bank: this.formBuilder.control(undefined),
     percentage: this.formBuilder.control(undefined),
   });
 
   options = signal<IPaymentOption[] | undefined>(undefined);
+  paymentTypes = signal<PaymentType[] | undefined>(undefined);
 
   smallScreen = computed(() => this.breakpointsSignal()?.matches);
 
   reservation = signal<IReservationAll | undefined>(undefined);
   price = signal<IPrice>(new Price());
+  professionalName = computed(() => this.reservation()?.professional?.displayName ?? '');
   first = true;
 
   private readonly steps: IStep[];
@@ -108,11 +105,8 @@ export class OptionComponent {
         if (reservation) {
           const types = reservation.room.paymentTypes.filter(
             (p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
-          if (types?.includes(PaymentType.paynl)) {
-            this.store.dispatch(paymentOptions());
-          } else {
-            this.options.set(getPaymentOptions(this.translate, types));
-          }
+          this.paymentTypes.set(types);
+          this.options.set(getPaymentOptions(this.translate, types));
           const price = getPrice(reservation, payments);
           this.price.set(price);
           if (price.isPaid) {
@@ -129,21 +123,10 @@ export class OptionComponent {
       }
     });
 
-    effect(() => {
-      const options = this.paymentOptionsSignal();
-      if (options) {
-        this.options.set(getPayNlOptions(options));
-      }
-    });
   }
 
   get getForm(): BankForm {
     return this.form.controls;
-  }
-
-  get professionalName(): string {
-    const displayName = this.reservation()?.professional?.displayName;
-    return displayName ? displayName : '';
   }
 
   private get myStepper() {
@@ -160,12 +143,8 @@ export class OptionComponent {
       return;
     }
     const type = option.type;
-    const paymentOptionId = option.bic;
     const percentage = this.getForm.percentage?.value || PaymentPercentage.total;
-    const payment: IReservationPayment = { type, paymentOptionId, percentage, bic: undefined };
-    if (option.subTypes.length) {
-      payment.bic = this.getForm.bank?.value?.bic;
-    }
+    const payment: IReservationPayment = { type, percentage };
     const reservationId = this.reservationId!;
     this.store.dispatch(createPaymentLinkByReservationId({ reservationId, payment }));
   }

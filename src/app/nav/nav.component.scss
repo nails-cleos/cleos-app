@@ -4,14 +4,8 @@ mat-drawer-container {
   .sidenav {
     width: auto;
   }
-  /* TODO(mdc-migration): The following rule targets internal classes of card that may no longer apply for the MDC version. */
-  /* TODO(mdc-migration): The following rule targets internal classes of card that may no longer apply for the MDC version. */
-  /* TODO(mdc-migration): The following rule targets internal classes of card that may no longer apply for the MDC version. */
-  /* TODO(mdc-migration): The following rule targets internal classes of card that may no longer apply for the MDC version. */
   mat-card {
     padding: 16px 0 0 0;
-    /* TODO(mdc-migration): The following rule targets internal classes of card that may no longer apply for the MDC version. */
-    /* TODO(mdc-migration): The following rule targets internal classes of card that may no longer apply for the MDC version. */
     mat-card-header {
       padding: 0 16px 0 16px;
     }
@@ -147,4 +141,3 @@ main {
   backdrop-filter: blur(2px);
   z-index: 999;
 }
-

@@ -150,10 +150,10 @@
                   <mat-form-field appearance="outline" class="time-field">
                     <mat-label>{{ 'RESERVATION.START.FIELD' | translate }}</mat-label>
                     <input [formControl]="dateGroupForm.start" [format]="24" [max]="maxDate" [min]="minDate"
-                           [ngxTimepicker]="tStart" matInput name="start" readonly data-cy="start-picker">
+                           [timepicker]="tStart" matInput name="start" readonly data-cy="start-picker">
                     <span matPrefix><mat-icon (click)="tStart.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
-                    <ngx-material-timepicker #tStart (timeSet)="timeChange($event, i)"
-                                             [minutesGap]="15"></ngx-material-timepicker>
+                    <app-timepicker #tStart (timeSet)="timeChange($event, i)"
+                                             [minutesGap]="15"></app-timepicker>
                   </mat-form-field>
                 </div>
                 <button class="remove-button" [disabled]="dateTimeList.controls.length === 1" (click)="removeDate(i)"
@@ -244,24 +244,30 @@
             <mat-list-item>
               <div matListItemTitle>
                 <span [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"></span>
-                @if (price.priceWithDiscount) {
-                  @if (!currentIsEditing) {
-                    <span [class.strikethrough]="getTreatmentForm.discount.value" class="raised-button">
+                @if (!currentIsEditing) {
+                  @let hasDiscount = !!getTreatmentForm.discount.value ||
+                    price.total !== price.totalWithoutDiscount || price.discount > 0;
+                  @let discountedPrice = ((price.priceWithDiscount || price.priceWithDiscount === 0) ?
+                    price.priceWithDiscount : getTreatmentForm.treatment.value.price);
+                  <span [class.strikethrough]="hasDiscount" class="raised-button">
                     {{ getOfficeForm.room.value?.currency | currencySymbol }} {{ getTreatmentForm.treatment.value.price | number:'1.2-2' }}
                   </span>
-                    <span [@discountAnimation] class="raised-button bold">
-                    {{ getOfficeForm.room.value?.currency | currencySymbol }} {{ price.priceWithDiscount | number:'1.2-2' }}
+                  @if (hasDiscount) {
+                    <span class="raised-button bold discount-enter">
+                    {{ getOfficeForm.room.value?.currency | currencySymbol }} {{ discountedPrice | number:'1.2-2' }}
                   </span>
-                  } @else {
+                  }
+                } @else {
+                  @if (price.priceWithDiscount || price.priceWithDiscount === 0) {
                     <span class="raised-button">
                     {{ getOfficeForm.room.value?.currency | currencySymbol }} {{ price.priceWithDiscount | number:'1.2-2' }}
                   </span>
                     <span class="raised-button bold">{{ 'RESERVATION.TREATMENT.DISCOUNT.ADD' | translate }}</span>
+                  } @else {
+                    <span class="raised-button">
+                    {{ getOfficeForm.room.value?.currency | currencySymbol }} {{ getTreatmentForm.treatment.value.price | number:'1.2-2' }}
+                  </span>
                   }
-                } @else {
-                  <span class="raised-button">
-                  {{ getOfficeForm.room.value?.currency | currencySymbol }} {{ getTreatmentForm.treatment.value.price | number:'1.2-2' }}
-                </span>
                 }
               </div>
             </mat-list-item>
@@ -479,6 +485,7 @@
             } @else {
               <app-price-preview [price]="price" [currencyIcon]="getOfficeForm.room.value?.currency?.icon"
                                  [isEditing]="currentIsEditing"
+                                 [discountId]="getTreatmentForm.discount.value"
                                  [discountKey]="'RESERVATION.TREATMENT.DISCOUNT.ADD'"></app-price-preview>
             }
             @if (getConfigurationForm.customerChange.value) {
@@ -525,6 +532,7 @@
               </mat-list-item>
               <app-price-preview [price]="price" [currencyIcon]="getOfficeForm.room.value?.currency?.icon"
                                  [isEditing]="currentIsEditing"
+                                 [discountId]="getTreatmentForm.discount.value"
                                  [discountKey]="'RESERVATION.TREATMENT.DISCOUNT.ADD'"></app-price-preview>
             }
           </mat-list>

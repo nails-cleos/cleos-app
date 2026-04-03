@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { createTransaction, getAccount, paymentOptions } from '../../store/account.actions';
+import { createTransaction, getAccount } from '../../store/account.actions';
 import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AuthUserService } from '../../services/auth-user.service';
 import { ITransaction } from '../../interfaces/account';
-import { getPayNlOptions, IPaymentOption, PaymentType } from '../../interfaces/payment';
+import { getPaymentOptions, IPaymentOption, PaymentType } from '../../interfaces/payment';
 import { currencySymbol } from '../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../../shared/shared.module';
@@ -18,7 +18,6 @@ import {
   getAccountResponsePipe,
   getCurrentAccountIdPipe,
   getSelectedAccountPipe,
-  getSelectPaymentOptionsPipe,
   getSubErrorsPipe,
 } from '../../store/selectors/account.selectors';
 import { AccountState } from '../../store/reducers/account.reducers';
@@ -45,13 +44,11 @@ export class TransactionComponent {
 
   private accountId$ = this.store.pipe(getCurrentAccountIdPipe);
   private selectedAccount$ = this.store.pipe(getSelectedAccountPipe);
-  private paymentOptions$ = this.store.pipe(getSelectPaymentOptionsPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
   private response$ = this.store.pipe(getAccountResponsePipe);
 
   private accountIdSignal = toSignal(this.accountId$, { initialValue: null });
   private selectedAccountSignal = toSignal(this.selectedAccount$);
-  private paymentOptionsSignal = toSignal(this.paymentOptions$);
   private subErrorsSignal = toSignal(this.subErrors$);
   private responseSignal = toSignal(this.response$);
   private authUserSignal = this.authUserService.authUser;
@@ -59,8 +56,12 @@ export class TransactionComponent {
 
   errors = signal<Record<string, unknown>>({});
   accountSignal = computed(() => this.selectedAccountSignal());
-  optionsSignal = computed(() =>
-    this.paymentOptionsSignal() ? getPayNlOptions(this.paymentOptionsSignal()!) : undefined);
+  optionsSignal = computed(() => {
+    if (!this.hasAdminRole()) {
+      return getPaymentOptions(this.translate, [PaymentType.mollie], true);
+    }
+    return getPaymentOptions(this.translate, [PaymentType.cash, PaymentType.transfer]);
+  });
   hasAdminRole = computed(() => this.authUserSignal().hasAdminRole);
 
   types = [{ type: PaymentType.cash }, { type: PaymentType.transfer }] as IPaymentOption[];
@@ -68,7 +69,6 @@ export class TransactionComponent {
   language: string = this.translate.getCurrentLang();
 
   bankForm = this.formBuilder.group<BankForm>({
-    bank: this.formBuilder.control(undefined),
     percentage: this.formBuilder.control(undefined),
     type: this.formBuilder.control(undefined, {
       validators: [Validators.required],
@@ -86,11 +86,6 @@ export class TransactionComponent {
   transfer = PaymentType.transfer;
 
   constructor() {
-    effect(() => {
-      if (!this.hasAdminRole()) {
-        this.store.dispatch(paymentOptions());
-      }
-    });
     effect(() => {
       const subErrors = this.subErrorsSignal();
       if (subErrors) {
@@ -152,20 +147,14 @@ export class TransactionComponent {
     const customerId = this.accountSignal()?.customer?.id;
     const amount = this.getForm.amount.value;
     let type;
-    let paymentOptionId;
-    let bic;
     if (option) {
       type = option.type;
-      paymentOptionId = option.bic;
-      if (option.subTypes?.length) {
-        bic = this.getBankForm.bank?.value?.bic;
-      }
     }
     const transfer = this.getForm.transfer.value;
     const transaction: ITransaction = {
       customerId,
       amount,
-      paymentRequest: { type, paymentOptionId, transfer, bic },
+      paymentRequest: { type, transfer },
     };
     const id = this.accountIdSignal()!;
     this.store.dispatch(createTransaction({ id, transaction }));

@@ -31,7 +31,7 @@ devices.forEach(({ name, width, height }) => {
       it(`should register a new user in ${name}`, () => {
         cy.visit('en-GB/auth');
         cy.mockFirebaseAppCheck();
-        cy.get('button').contains('Sign in with Email').click();
+        cy.get('button').contains('Sign in with Email').click({ force: true });
 
         cy.get('form').within(() => {
           cy.get('input[name="email"]').should('be.visible');
@@ -48,13 +48,12 @@ devices.forEach(({ name, width, height }) => {
           cy.get('button[type="submit"]').click();
         });
 
-        cy.get('button').contains('Login').click();
+        cy.wait('@firebaseSignUp');
+        cy.wait('@updateProfileSuccess');
+        cy.wait('@sendOobCodeSuccess');
 
-        cy.get('.toast-info .toast-actions mat-icon').contains('close').click({ force: true });
-
-        cy.url().should('include', '/me/reservations');
-        cy.get('mat-card-title').contains('No upcoming reservations');
-        cy.get('tr').contains('No reservations');
+        cy.url({ timeout: 20000 }).should('include', '/auth');
+        cy.get('.toast-info').should('contain.text', 'Account activated');
       });
     });
 
@@ -64,12 +63,11 @@ devices.forEach(({ name, width, height }) => {
         it(`Login with existing user with role: ${role}`, () => {
           cy.visit('en-GB/auth');
           cy.mockFirebaseAppCheck();
-          cy.mockNotifications();
           cy.mockCreateAuthUri(true, ['password']);
           cy.mockFirebase(email);
-          cy.mockLogin(email, displayName, role);
+          cy.mockLogin(email, displayName, role, true);
           value.mocks.forEach(fn => fn());
-          cy.get('button').contains('Sign in with Email').click();
+          cy.get('button').contains('Sign in with Email').click({ force: true });
 
           cy.get('form').within(() => {
             cy.get('input[name="email"]').should('be.visible');
@@ -82,8 +80,6 @@ devices.forEach(({ name, width, height }) => {
 
             cy.get('button[type="submit"]').click();
           });
-
-          cy.get('button').contains('Login').click();
 
           cy.url().should('include', value.url);
 

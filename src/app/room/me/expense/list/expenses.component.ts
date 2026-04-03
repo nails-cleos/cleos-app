@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
-import { detailExpandAnimation } from '../../../../util/animation';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../../interfaces/pagination';
@@ -38,7 +37,6 @@ type ExpensesForm = {
   selector: 'app-expenses',
   templateUrl: './expenses.component.html',
   styleUrls: ['./expenses.component.scss'],
-  animations: [detailExpandAnimation],
   imports: [SharedModule, TimeDetailPipe],
   providers: [
     { provide: DateAdapter, useClass: YearMonthAdapter },

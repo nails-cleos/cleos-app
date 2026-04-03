@@ -8,43 +8,32 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { ITreatmentGroup } from '../../interfaces/treatment';
+import { ITreatmentGroupAll } from '../../interfaces/treatment';
 import { IExperience, ISlide, ISocialLink, IStory, IWork } from '../../interfaces/main';
-import { NonNullableFormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { sendMessage } from '../../store/main.actions';
 import { AuthUserService } from '../../services/auth-user.service';
 import {
-  bottomTop,
-  bounceInDownAnimation,
-  fadeInOut,
-  fadeInUpDown,
-  gelatine,
   goTo,
-  leftRight,
   observeElementSignal,
-  rubberBand,
-  scaleIn,
-  slideAnimation,
-  slideInX,
-  slideInY,
 } from '../../util/animation';
-import { AnimationAnimateMetadata, AnimationSequenceMetadata } from '@angular/animations';
 import { isMobile } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MainContentService } from '../../services/main-content.service';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Router } from '@angular/router';
 import { SharedModule } from '../../shared/shared.module';
-import { AnimateDirective } from '../../directives/animate.directive';
 import { ToastService } from '../../services/toast.service';
 import { BottomSheetBookAppointmentComponent } from './bottom-sheet-book-appointment';
-import { getMainErrorPipe, getResponsePipe } from '../../store/selectors/main.selectors';
+import { getCataloguePipe, getMainErrorPipe, getResponsePipe } from '../../store/selectors/main.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ISendMessage } from '../../../main';
 import { MainState } from '../../store/reducers/main.reducers';
 import { EnvService } from '../../services/env.service';
+import { ICatalogueAll } from '../../interfaces/catalogue';
+import { getImage } from '../../util/file';
 
 type MainForm = {
   name: FormControl<string>;
@@ -57,11 +46,12 @@ type MainForm = {
   selector: 'app-main-content',
   templateUrl: './main-content.component.html',
   styleUrls: ['./main-content.component.scss'],
-  animations: [bottomTop, leftRight, slideInX, slideInY, fadeInOut, slideAnimation],
-  imports: [SharedModule, AnimateDirective],
+  imports: [SharedModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainContentComponent {
+  private static readonly BIAB_TREATMENT_ID = 'biab-treatment';
+
   private readonly store: Store<MainState> = inject(Store<MainState>);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
@@ -74,19 +64,28 @@ export class MainContentComponent {
   private readonly env: EnvService = inject(EnvService);
 
   private treatmentItem = viewChild<ElementRef<HTMLDivElement>>('treatmentItem');
+  private treatmentTitle = viewChild<ElementRef<HTMLDivElement>>('treatmentTitle');
+  private workSubTitle = viewChild<ElementRef<HTMLDivElement>>('workSubTitle');
+  private experienceTitle = viewChild<ElementRef<HTMLDivElement>>('experienceTitle');
+  private storyTitle = viewChild<ElementRef<HTMLDivElement>>('storyTitle');
   private storyDescription = viewChild<ElementRef<HTMLDivElement>>('storyDescription');
   private storyMember = viewChild<ElementRef<HTMLDivElement>>('storyMember');
+  private contactTitle = viewChild<ElementRef<HTMLDivElement>>('contactTitle');
+  private contactText = viewChild<ElementRef<HTMLDivElement>>('contactText');
+  private contactMap = viewChild<ElementRef<HTMLDivElement>>('contactMap');
   private contactItem1 = viewChild<ElementRef<HTMLDivElement>>('contactItem1');
   private contactItem2 = viewChild<ElementRef<HTMLDivElement>>('contactItem2');
   private contactItem3 = viewChild<ElementRef<HTMLDivElement>>('contactItem3');
 
   private response$ = this.store.pipe(getResponsePipe);
   private error$ = this.store.pipe(getMainErrorPipe);
+  private catalogue$ = this.store.pipe(getCataloguePipe);
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
   private authUserSignal = this.authUserService.authUser;
   private responseSignal = toSignal(this.response$);
   private errorSignal = toSignal(this.error$);
+  private catalogueSignal = toSignal(this.catalogue$);
   private breakpointsSignal = toSignal(this.breakpointObserver$, {
     initialValue: {
       matches: false,
@@ -101,24 +100,22 @@ export class MainContentComponent {
   isDarkMode = computed(() => this.authUserSignal()?.isDarkMode ?? false);
 
   treatmentItemState = signal<'open' | 'close'>('open');
+  treatmentTitleState = signal<'open' | 'close'>('open');
+  workSubTitleState = signal<'open' | 'close'>('open');
+  experienceTitleState = signal<'open' | 'close'>('open');
+  storyTitleState = signal<'open' | 'close'>('open');
   storyDescriptionState = signal<'open' | 'close'>('open');
   storyMemberState = signal<'open' | 'close'>('open');
+  contactTitleState = signal<'open' | 'close'>('open');
+  contactTextState = signal<'open' | 'close'>('open');
+  contactMapState = signal<'open' | 'close'>('open');
   contactItem1State = signal<'open' | 'close'>('open');
   contactItem2State = signal<'open' | 'close'>('open');
   contactItem3State = signal<'open' | 'close'>('open');
-  treatmentAnimations = signal<AnimationSequenceMetadata[]>([]);
-  groups = signal<ITreatmentGroup[]>([]);
-  filter = signal<ITreatmentGroup | undefined>(undefined);
+  groups = signal<ITreatmentGroupAll[]>([]);
+  filter = signal<ITreatmentGroupAll | undefined>(undefined);
 
   title = this.env.title;
-
-  treatmentTitle: AnimationAnimateMetadata = bounceInDownAnimation('500ms');
-  storyTitle: AnimationSequenceMetadata = fadeInUpDown('20px', '700ms');
-  workText: AnimationSequenceMetadata = gelatine;
-  experienceTitle: AnimationSequenceMetadata = rubberBand;
-  contactTitle: AnimationSequenceMetadata = fadeInUpDown('20px', '500ms');
-  contactText: AnimationSequenceMetadata = rubberBand;
-  contactMap: AnimationAnimateMetadata = bounceInDownAnimation('500ms');
 
   form: FormGroup<MainForm> = this.formBuilder.group<MainForm>({
     name: this.formBuilder.control('', { validators: [Validators.required] }),
@@ -153,8 +150,20 @@ export class MainContentComponent {
       svgIcon: 'FACEBOOK-NO-COLOR',
     },
   ];
-  works: IWork[] = [];
-  allWorks: IWork[] = [];
+
+  allWorks = computed<IWork[]>(() => (this.catalogueSignal() ?? []).map(it => this.mapToWork(it))
+    .filter(it => it !== undefined));
+
+  works = computed(() => {
+    const all = this.allWorks() ?? [];
+    const group = this.filter();
+
+    if (!group) {
+      return all;
+    }
+
+    return all.filter(work => work.groupId === group.id);
+  });
 
   experiences: IExperience[] = [
     {
@@ -201,6 +210,9 @@ export class MainContentComponent {
   ];
 
   currentIndex = signal(0);
+  sliderTransform = computed(() => `translateX(-${this.currentIndex() * 100}%)`);
+
+  private readonly sliderIntervalMs = 5000;
 
   constructor() {
     effect(() => {
@@ -229,15 +241,36 @@ export class MainContentComponent {
       const treatments = this.translate.instant('TREATMENTS');
       const groups = Array.isArray(treatments) ? treatments : [];
       this.groups.set(groups);
-      this.treatmentAnimations.set(
-        groups.map((_, i) => scaleIn(`${i * (this.isSmall() ? 0 : 300)}ms`)),
-      );
     });
 
     effect((onCleanup) => {
       const tEl = this.treatmentItem()?.nativeElement;
       if (tEl) {
         const obs = observeElementSignal(this.treatmentItemState, tEl, !this.isSmall());
+        onCleanup(() => obs?.disconnect());
+      }
+
+      const ttEl = this.treatmentTitle()?.nativeElement;
+      if (ttEl) {
+        const obs = observeElementSignal(this.treatmentTitleState, ttEl, !this.isSmall(), 0.1);
+        onCleanup(() => obs?.disconnect());
+      }
+
+      const wsEl = this.workSubTitle()?.nativeElement;
+      if (wsEl) {
+        const obs = observeElementSignal(this.workSubTitleState, wsEl, !this.isSmall(), 0.1);
+        onCleanup(() => obs?.disconnect());
+      }
+
+      const etEl = this.experienceTitle()?.nativeElement;
+      if (etEl) {
+        const obs = observeElementSignal(this.experienceTitleState, etEl, !this.isSmall(), 0.1);
+        onCleanup(() => obs?.disconnect());
+      }
+
+      const stEl = this.storyTitle()?.nativeElement;
+      if (stEl) {
+        const obs = observeElementSignal(this.storyTitleState, stEl, !this.isSmall(), 0.1);
         onCleanup(() => obs?.disconnect());
       }
 
@@ -250,6 +283,24 @@ export class MainContentComponent {
       const smEl = this.storyMember()?.nativeElement;
       if (smEl) {
         const obs = observeElementSignal(this.storyMemberState, smEl, !this.isSmall(), 0.1);
+        onCleanup(() => obs?.disconnect());
+      }
+
+      const ctEl = this.contactTitle()?.nativeElement;
+      if (ctEl) {
+        const obs = observeElementSignal(this.contactTitleState, ctEl, !this.isSmall(), 0.1);
+        onCleanup(() => obs?.disconnect());
+      }
+
+      const cTextEl = this.contactText()?.nativeElement;
+      if (cTextEl) {
+        const obs = observeElementSignal(this.contactTextState, cTextEl, !this.isSmall(), 0.1);
+        onCleanup(() => obs?.disconnect());
+      }
+
+      const cMapEl = this.contactMap()?.nativeElement;
+      if (cMapEl) {
+        const obs = observeElementSignal(this.contactMapState, cMapEl, false, 0.1);
         onCleanup(() => obs?.disconnect());
       }
 
@@ -290,7 +341,14 @@ export class MainContentComponent {
       this.mainContent.configure(false, 'close', true);
     });
 
-    effect(() => queueMicrotask(() => this.moveForwardSlide()));
+    effect((onCleanup) => {
+      if (this.slides.length < 2) {
+        return;
+      }
+
+      const timerId = window.setInterval(() => this.moveForwardSlide(), this.sliderIntervalMs);
+      onCleanup(() => window.clearInterval(timerId));
+    });
   }
 
   get getForm(): MainForm {
@@ -316,9 +374,10 @@ export class MainContentComponent {
   isCurrentSlideIndex = (index: number): boolean => this.currentIndex() === index;
 
   goToTreatment = (name?: string): void => {
-    if (name === 'biab') {
+    const treatmentId = name === 'biab' ? MainContentComponent.BIAB_TREATMENT_ID : name;
+    if (treatmentId === MainContentComponent.BIAB_TREATMENT_ID) {
       goTo('home');
-      this.router.navigate([this.translate.getCurrentLang(), 'home', name, 'treatment']);
+      this.router.navigate([this.translate.getCurrentLang(), 'home', treatmentId, 'treatment']);
     }
   };
 
@@ -327,19 +386,27 @@ export class MainContentComponent {
     social.svgIcon = `${social.name}${suffix}`;
   };
 
-  filterBy = (group?: ITreatmentGroup): void => {
-    this.works = [];
+  filterBy = (group?: ITreatmentGroupAll): void => {
     this.filter.set(group);
   };
 
   private moveForwardSlide = (): void => {
-    if (!this.slides?.length) {
-      return;
-    }
-
     // update currentIndex signal
     const idx = this.currentIndex();
     const next = idx === this.slides.length - 1 ? 0 : idx + 1;
     this.currentIndex.set(next);
+  };
+
+  private mapToWork = (it: ICatalogueAll): IWork | undefined => {
+    if (!it.id) {
+      return undefined;
+    }
+    return {
+      id: it.id,
+      image: getImage(it.blob, it.contentType),
+      title: it.name,
+      detail: it.description,
+      groupId: it.group?.name?.trim().toLowerCase().replace(/\s+/g, '-'),
+    };
   };
 }

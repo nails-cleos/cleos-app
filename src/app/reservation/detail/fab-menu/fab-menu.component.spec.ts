@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FabMenuComponent } from './fab-menu.component';
 import { ElementRef } from '@angular/core';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 describe('FabMenuComponent', () => {
   let component: FabMenuComponent;
@@ -18,7 +17,6 @@ describe('FabMenuComponent', () => {
       imports: [FabMenuComponent],
       providers: [
         { provide: ElementRef, useValue: mockElementRef },
-        provideNoopAnimations(),
       ],
     }).compileComponents();
 

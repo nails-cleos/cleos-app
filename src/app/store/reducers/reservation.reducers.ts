@@ -29,8 +29,6 @@ import {
   getTrackingByReservationId,
   getUpcomingReservation,
   paymentCompleteReservation,
-  paymentOptions,
-  paymentOptionsSuccess,
   reservationAdditionalSuccess,
   reservationFailure,
   reservationFilterPageSuccess,
@@ -76,7 +74,7 @@ import { IUserAll } from '../../interfaces/user';
 import { ITreatmentDiscountDTO } from '../../interfaces/treatment';
 import { IRoomAll } from '../../interfaces/room';
 import { Pagination } from '../../interfaces/pagination';
-import { IPaymentAll, IPaymentOption } from '../../interfaces/payment';
+import { IPaymentAll } from '../../interfaces/payment';
 import { IAdditionalAll } from '../../interfaces/additional';
 import { IOffice } from '../../interfaces/office';
 import { IColorAll } from '../../interfaces/color';
@@ -103,7 +101,6 @@ export interface ReservationState {
   payments?: IPaymentAll[];
   history?: IReservationAll[];
   colors?: IColorAll[];
-  paymentOptions?: IPaymentOption[];
   review?: IReview;
   error?: IError;
   subErrors?: IError[];
@@ -149,7 +146,6 @@ export const initialState: ReservationState = {
   payments: undefined,
   history: undefined,
   colors: undefined,
-  paymentOptions: undefined,
   review: undefined,
   error: undefined,
   subErrors: undefined,
@@ -483,18 +479,6 @@ export const reservationReducer = createReducer(
   on(colorsCompleteSuccess, (state, { colors }) => ({
     ...state,
     colors,
-    subErrors: undefined,
-    response: undefined,
-  })),
-  on(paymentOptions, (state) => ({
-    ...state,
-    paymentOptions: undefined,
-    subErrors: undefined,
-    response: undefined,
-  })),
-  on(paymentOptionsSuccess, (state, { paymentOptions }) => ({
-    ...state,
-    paymentOptions,
     subErrors: undefined,
     response: undefined,
   })),

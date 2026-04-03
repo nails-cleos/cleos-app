@@ -7,7 +7,6 @@ import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateService } from '@ngx-translate/core';
 import { getTransactionsByAccountId } from '../../../store/account.actions';
-import { detailExpandAnimation } from '../../../util/animation';
 import { newDateTimestamp } from '../../../util/dates';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { SharedModule } from '../../../shared/shared.module';
@@ -20,7 +19,6 @@ import { AccountState } from '../../../store/reducers/account.reducers';
   selector: 'app-transaction-view',
   templateUrl: './transaction-view.component.html',
   styleUrls: ['./transaction-view.component.scss'],
-  animations: [detailExpandAnimation],
   imports: [SharedModule, BalanceComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -58,7 +56,7 @@ export class TransactionViewComponent {
 
   paginatorPageIndex = signal(0);
   dataSourceSignal = computed(() => this.transactionsSignal()?.content?.map((it: ITransaction) =>
-    Object.assign({}, it, { date: newDateTimestamp(it.payment?.timestamp) }),
+    Object.assign({}, it, { date: newDateTimestamp(it.timestamp ?? it.payment?.timestamp) }),
   ));
   resultsLengthSignal = computed(() => this.transactionsSignal()?.totalElements || 0);
   accountSignal = computed(() => this.accountTransactionSignal()?.account);

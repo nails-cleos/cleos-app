@@ -9,7 +9,6 @@ import { Store } from '@ngrx/store';
 import { cleanTreatment, deleteTreatmentGroup, getTreatmentsPage } from '../../store/treatment.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { detailExpandAnimation } from '../../util/animation';
 import { SharedModule } from '../../shared/shared.module';
 import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
 import { TreatmentState } from '../../store/reducers/treatment.reducers';
@@ -20,7 +19,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
   selector: 'app-treatments',
   templateUrl: './treatments.component.html',
   styleUrls: ['./treatments.component.scss'],
-  animations: [detailExpandAnimation],
   imports: [SharedModule, CurrencySymbolPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

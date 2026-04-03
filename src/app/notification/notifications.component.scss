@@ -2,6 +2,37 @@
   margin-right: 1%;
 }
 
+.notification-enter {
+  opacity: 0;
+  transform: scale(0.5);
+  transform-origin: top right;
+  animation: notification-enter 500ms cubic-bezier(.8, -0.6, 0.2, 1.5) forwards;
+  animation-delay: var(--notification-enter-delay, 0ms);
+}
+
+.notification-leave {
+  animation: none;
+  opacity: 0;
+  transform: scale(0.5);
+  height: 0;
+  margin: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: transform 300ms ease-in-out, opacity 300ms ease-in-out, height 300ms ease-in-out,
+  margin 300ms ease-in-out;
+}
+
+@keyframes notification-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
 /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
 ::ng-deep .mat-list-item-content {

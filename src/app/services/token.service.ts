@@ -1,7 +1,5 @@
 import { computed, DestroyRef, effect, inject, Injectable, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Auth, user } from '@angular/fire/auth';
-import { User } from '@firebase/auth';
 import { Subscription, timer } from 'rxjs';
 
 import { IUserAll } from '../interfaces/user';
@@ -9,12 +7,13 @@ import { getNowTimeZone, newDate, plusMinutes } from '../util/dates';
 import { getDriveTokenPipe } from '../store/selectors/auth.selectors';
 import { AuthState } from '../store/reducers/auth.reducers';
 import { Store } from '@ngrx/store';
+import { FirebaseService } from './firebase.service';
 
 @Injectable({ providedIn: 'root' })
 export class TokenService {
   private readonly destroyRef = inject(DestroyRef);
   private readonly store = inject(Store<AuthState>);
-  private readonly auth = inject(Auth);
+  private readonly firebaseService = inject(FirebaseService);
 
   private readonly tokenSignal = signal<string | null>(null);
   readonly token = computed(() => this.tokenSignal());
@@ -25,14 +24,12 @@ export class TokenService {
   readonly storeDriveToken = toSignal(this.store.pipe(getDriveTokenPipe), { initialValue: undefined });
   readonly driveToken = computed(() => this.storeDriveToken());
 
-  private readonly firebaseUser = toSignal<User | null>(user(this.auth), { initialValue: null });
-
   private refreshSubscription?: Subscription;
   private readonly refreshInterval = 55 * 60 * 1000; // 55 min
 
   constructor() {
     effect(() => {
-      const fbUser = this.firebaseUser();
+      const fbUser = this.firebaseService.user();
       if (!fbUser) {
         this.clear();
         return;
@@ -65,16 +62,15 @@ export class TokenService {
 
     this.refreshSubscription = timer(0, this.refreshInterval).subscribe(
       async () => {
-        const firebaseUser = this.firebaseUser();
-        if (!firebaseUser) {
+        const result = await this.firebaseService.idTokenResult;
+        if (!result) {
           return;
         }
 
-        const result = await firebaseUser.getIdTokenResult();
         const refreshAt = plusMinutes(newDate(result.expirationTime), -10);
 
         if (getNowTimeZone() >= refreshAt) {
-          const newToken = await firebaseUser.getIdToken(true);
+          const newToken = await this.firebaseService.getIdToken(true);
           this.tokenSignal.set(newToken);
         }
       });

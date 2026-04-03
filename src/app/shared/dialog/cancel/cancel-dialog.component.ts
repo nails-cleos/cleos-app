@@ -41,10 +41,12 @@ export class CancelDialogComponent {
   });
   typeForm: FormGroup<BankForm> = this.formBuilder.group<BankForm>({
     type: this.formBuilder.control(undefined),
-    bank: this.formBuilder.control(undefined),
     percentage: this.formBuilder.control(undefined),
   });
-  paymentOptions?: IPaymentOption[] = this.data.paymentOptions;
+  paymentOptions?: IPaymentOption[] = this.data.paymentOptions?.map(it => {
+    it.hidePercentage = true;
+    return it;
+  });
 
   options: string[] = this.data.options;
   price?: IPrice = this.data.price;
@@ -74,19 +76,10 @@ export class CancelDialogComponent {
     if (this.form.invalid || this.typeForm.invalid) {
       return;
     }
-    // if we want to only charge, it is the same use CHARGE_WITH_DISCOUNT or CHARGE_WITH_REFUND
-    const cancelOption = this.getForm.paymentCancellation.value === 'CHARGE' ? 'CHARGE_WITH_DISCOUNT' :
-      this.getForm.paymentCancellation.value;
+    const cancelOption = this.getForm.paymentCancellation.value;
     const option = this.getTypeForm.type.value;
     const type = option?.type;
-    const paymentOptionId = option?.bic;
-    const bic = this.getTypeForm.bank.value?.bic;
-    let cancelRequest;
-    if (option?.subTypes?.length) {
-      cancelRequest = { cancelOption, type, paymentOptionId, bic };
-    } else {
-      cancelRequest = { cancelOption, type, paymentOptionId };
-    }
+    const cancelRequest = { cancelOption, type };
     this.dialogRef.close(cancelRequest);
     return;
   }

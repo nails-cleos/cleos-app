@@ -159,7 +159,7 @@
 
         <ng-container matColumnDef="expandedDetail">
           <td *matCellDef="let invoice" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
-            <div [@detailExpand]="invoice === expandedInvoice ? 'expanded' : 'collapsed'" class="detail hide-gt-xs">
+            <div [class.detail-expanded]="invoice === expandedInvoice" class="detail hide-gt-xs">
               <mat-list>
                 <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
                 <mat-list-item role="list">

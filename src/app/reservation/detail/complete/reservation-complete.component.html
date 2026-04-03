@@ -76,28 +76,28 @@
           <div class="side-by-side-fields">
             <mat-form-field appearance="outline" class="full-field ">
               <mat-label>{{ 'RESERVATION.TIME.START.FIELD' | translate }}</mat-label>
-              <input [formControl]="getForm.startTime" [format]="24" [ngxTimepicker]="tStart" matInput name="start"
+              <input [formControl]="getForm.startTime" [format]="24" [timepicker]="tStart" matInput name="start"
                      readonly
                      required style="text-align: center;"/>
               <span matPrefix class="bold" style="margin: 0 5px 0 10px;">
                 {{ startDate | timeDetail | date:'shortDate':reservation.room.timeZone:dateFormat }}
               </span>
               <mat-icon (click)="tStart.open()" matSuffix>schedule</mat-icon>
-              <ngx-material-timepicker #tStart (timeSet)="timeChange($event, startDate)"></ngx-material-timepicker>
+              <app-timepicker #tStart (timeSet)="timeChange($event, startDate)"></app-timepicker>
               @if (getForm.startTime.hasError('required')) {
                 <mat-error [innerHTML]="'RESERVATION.TIME.START.REQUIRED' | translate"></mat-error>
               }
             </mat-form-field>
             <mat-form-field appearance="outline" class="full-field ">
               <mat-label>{{ 'RESERVATION.TIME.END.FIELD' | translate }}</mat-label>
-              <input [formControl]="getForm.endTime" [format]="24" [ngxTimepicker]="tEnd" matInput name="end" readonly
+              <input [formControl]="getForm.endTime" [format]="24" [timepicker]="tEnd" matInput name="end" readonly
                      required
                      style="text-align: center;"/>
               <span matPrefix class="bold" style="margin: 0 5px 0 10px;">
                 {{ endDate | timeDetail | date:'shortDate':reservation.room.timeZone:dateFormat }}
               </span>
               <mat-icon (click)="tEnd.open()" matSuffix>schedule</mat-icon>
-              <ngx-material-timepicker #tEnd (timeSet)="timeChange($event, endDate)"></ngx-material-timepicker>
+              <app-timepicker #tEnd (timeSet)="timeChange($event, endDate)"></app-timepicker>
               @if (getForm.endTime.hasError('required')) {
                 <mat-error [innerHTML]="'RESERVATION.TIME.END.REQUIRED' | translate"></mat-error>
               }
@@ -177,8 +177,26 @@
                   <mat-form-field appearance="outline" class="full-field">
                     <mat-label>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</mat-label>
                     <mat-select [formControl]="getForm.type">
+                      <mat-select-trigger>
+                        @let selectedOption = getSelectedPaymentOption();
+                        @if (selectedOption) {
+                          @if (selectedOption.svgIcon) {
+                            <mat-icon [svgIcon]="selectedOption.svgIcon" class="svg-icon"></mat-icon>
+                          } @else if (selectedOption.icon) {
+                            <mat-icon class="svg-icon">{{ selectedOption.icon }}</mat-icon>
+                          }
+                          {{ selectedOption.name }}
+                        }
+                      </mat-select-trigger>
                       @for (t of types; track t) {
-                        <mat-option [value]="t">{{ 'COMMON.PAYMENT.TYPE.' + (t || 'NONE') | translate }}</mat-option>
+                        <mat-option [value]="t.type">
+                          @if (t.icon) {
+                            <mat-icon>{{ t.icon }}</mat-icon>
+                          } @else {
+                            <mat-icon [svgIcon]="t.svgIcon" class="svg-icon"></mat-icon>
+                          }
+                          {{ t.name }}
+                        </mat-option>
                       }
                     </mat-select>
                   </mat-form-field>

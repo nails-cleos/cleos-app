@@ -142,7 +142,7 @@ describe('Helper Utils', () => {
     it('should return default locale object for invalid locale string', () => {
       const locale = getLocale('invalid-locale');
       expect(locale.language).toEqual('en-GB');
-      expect(locale.flag).toEqual('en_NL');
+      expect(locale.flag).toEqual('en_GB');
       expect(locale.i18n).toEqual('en');
     });
 
@@ -153,17 +153,31 @@ describe('Helper Utils', () => {
       expect(locale.i18n).toEqual('en');
     });
 
+    it('should return dutch locale object for nl values', () => {
+      const locale = getLocale('nl');
+      expect(locale.language).toEqual('nl');
+      expect(locale.flag).toEqual('nl');
+      expect(locale.i18n).toEqual('nl');
+    });
+
+    it('should return dutch locale object for nl values', () => {
+      const locale = getLocale('nl-NL');
+      expect(locale.language).toEqual('nl');
+      expect(locale.flag).toEqual('nl');
+      expect(locale.i18n).toEqual('nl');
+    });
+
     it('should return default locale object when no locale string is provided', () => {
       const locale = getLocale();
       expect(locale.language).toEqual('en-GB');
-      expect(locale.flag).toEqual('en_NL');
+      expect(locale.flag).toEqual('en_GB');
       expect(locale.i18n).toEqual('en');
     });
 
     it('should return default locale object when locale is null', () => {
       const locale = getLocale(null);
       expect(locale.language).toEqual('en-GB');
-      expect(locale.flag).toEqual('en_NL');
+      expect(locale.flag).toEqual('en_GB');
       expect(locale.i18n).toEqual('en');
     });
   });

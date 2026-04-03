@@ -47,7 +47,7 @@ describe('TransactionDetailComponent', () => {
     subErrors$ = new BehaviorSubject<any[]>([]);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
@@ -74,7 +74,7 @@ describe('TransactionDetailComponent', () => {
       }
     });
 
-    routerSpy.getCurrentNavigation.and.returnValue({ extras: { state: { step: 2 } } } as any);
+    routerSpy.currentNavigation.and.returnValue({ extras: { state: { step: 2 } } } as any);
 
     await TestBed.configureTestingModule({
       imports: [TransactionDetailComponent, TranslateModule.forRoot()],

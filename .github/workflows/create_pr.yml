@@ -11,7 +11,7 @@ jobs:
   pull-request:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Get Issue Number
         id: extract_issue
@@ -22,7 +22,7 @@ jobs:
 
       - name: Get Issue Title and Label
         id: get_issue_title_label
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |

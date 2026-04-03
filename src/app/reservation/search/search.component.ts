@@ -26,7 +26,6 @@ import { FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { openCancel, openDialog } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { detailExpandAnimation } from '../../util/animation';
 import { SharedModule } from '../../shared/shared.module';
 import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
 import { ReservationIconPipe } from '../../pipes/reservation-icon.pipe';
@@ -48,7 +47,6 @@ type SearchForm = {
   selector: 'app-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
-  animations: [detailExpandAnimation],
   imports: [SharedModule, TimeDetailPipe, ReservationIconPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -202,7 +200,7 @@ export class SearchComponent {
 
     dialogRef.afterClosed().subscribe(reservationId => {
       if (reservationId) {
-        const options = Object.values(CancelOption).filter(co => co !== CancelOption.charge);
+        const options = Object.values(CancelOption).filter(co => co !== CancelOption.chargeAndAccount);
         openCancel(this.dialog, reservation.room, this.smallSignal(), options, result => {
           if (result) {
             this.store.dispatch(cancelReservation(reservationId, result));
@@ -245,4 +243,3 @@ export class SearchComponent {
   private filterStates = (value: string, allStates: string[]): string[] => allStates.filter(
     state => state.toLowerCase().indexOf(value.toLowerCase()) === 0);
 }
-

@@ -22,7 +22,7 @@ export interface ICatalogueAll {
   catalog?: boolean;
   blob: any;
   image: any;
-  treatmentGroup?: ITreatmentGroupAll;
+  group?: ITreatmentGroupAll;
 }
 
 export interface ISlide {

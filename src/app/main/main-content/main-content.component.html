@@ -2,27 +2,28 @@
 @let currentIsSmall = isSmall();
 <section id="slider">
   <div class="container slider">
-    <div [@slideAnimation]="currentIndex()">
-      @for (slide of slides; track slide; let i = $index) {
-        @if (isCurrentSlideIndex(i)) {
-          <div class="slider-img" [ngStyle]="{'background-image': 'url(' + slide.image + ')'}"></div>
-        }
+    <div class="slider-track" [style.transform]="sliderTransform()">
+      @for (slide of slides; track slide.id) {
+        <div class="slider-img" [ngStyle]="{'background-image': 'url(' + slide.image + ')'}"></div>
       }
     </div>
   </div>
 
   <div class="carousel-caption fade-in-background">
-    <h2 [@slideInY]="{value: ':enter', params: {translate: '-2000px'}}">
+    <h2 class="enter-slide-y" [style.--enter-translate-y]="'-2000px'">
       {{ 'MAIN.SLIDER.SUB_TITLE' | translate }}</h2>
-    <h1 [@slideInY]="{value: ':enter', params: {translate: '-2000px'}}"
+    <h1 class="enter-slide-y" [style.--enter-translate-y]="'-2000px'"
         [innerHTML]="'MAIN.SLIDER.TITLE' | translate"></h1>
-    <h3 [@slideInX]="{value: ':enter', params: {translate: '-2000px'}}">{{ 'MAIN.SLIDER.SUB_1' | translate }}</h3>
-    <p [@slideInX]="{value: ':enter', params: {translate: '2000px'}}">{{ 'MAIN.SLIDER.SUB_2' | translate }}
+    <h3 class="enter-slide-x" [style.--enter-translate-x]="'-2000px'">{{ 'MAIN.SLIDER.SUB_1' | translate }}</h3>
+    <p class="enter-slide-x" [style.--enter-translate-x]="'2000px'">{{ 'MAIN.SLIDER.SUB_2' | translate }}
     </p>
 
     <ul class="social-links text-center">
       @for (social of socialLinks; track social) {
-        <li [@slideInY]="{value: ':enter', params: {translate: '100px', duration: '500ms', delay: social.delay}}">
+        <li class="enter-slide-y"
+            [style.--enter-translate-y]="'100px'"
+            [style.--enter-duration]="'500ms'"
+            [style.--enter-delay]="social.delay">
           @if (social.phone && social.phoneKey && social.phoneText) {
             <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
                (mouseleave)="onHover(social, false)" aria-label="social icon"
@@ -45,7 +46,11 @@
 <!-- Story -->
 <section id="story" class="story">
   <div class="section-container">
-    <div class="section-title text-center" appAnimate [animateInAnimation]="storyTitle">
+    <div #storyTitle
+         class="section-title text-center fade-up-reveal"
+         [class.fade-up-reveal-visible]="storyTitleState() === 'close'"
+         [style.--fade-up-distance]="'20px'"
+         [style.--fade-up-duration]="'700ms'">
       <h2>{{ 'MAIN.SECTION.STORY' | translate }}</h2>
       <div class="home-divider">
         <mat-icon color="warn" class="material-icons">favorite</mat-icon>
@@ -54,29 +59,44 @@
 
     <div class="story-container">
       <div class="section-sub-title story-item">
-        <h3 class="text-center" #storyDescription
-            [@leftRight]="{value: storyDescriptionState(), params: {translate: '-20px'}}">
+        <h3 class="text-center reveal-x"
+            #storyDescription
+            [class.reveal-visible]="storyDescriptionState() === 'close'"
+            [style.--reveal-x]="'-20px'">
           {{ 'MAIN.STORY.DESCRIPTION' | translate }}
         </h3>
 
         @for (story of stories; track story) {
-          <h4 class="text-justify" [id]="story.id" [innerHTML]="story.text | translate"
-              [@leftRight]="{value: story.state(), params: {translate: '-20px', delay: story.delay}}">
+          <h4 class="text-justify reveal-x"
+              [id]="story.id"
+              [innerHTML]="story.text | translate"
+              [class.reveal-visible]="story.state() === 'close'"
+              [style.--reveal-x]="'-20px'"
+              [style.--reveal-enter-delay]="story.delay">
           </h4>
         }
       </div>
 
       <div class="story-member-item" #storyMember>
         <figure class="team-member text-center">
-          <div class="member-thumb"
-               [@bottomTop]="{value: storyMemberState(), params: {translate: '40vh', delayIn: '0ms', delayOut: '600ms'}}">
+          <div class="member-thumb reveal-y"
+               [class.reveal-visible]="storyMemberState() === 'close'"
+               [style.--reveal-y]="'40vh'"
+               [style.--reveal-enter-delay]="'0ms'"
+               [style.--reveal-exit-delay]="'600ms'">
             <img src="assets/home_page/img/team/member-1.webp" alt="Team Member" class="img-responsive">
           </div>
-          <h4
-            [@bottomTop]="{value: storyMemberState(), params: {translate: '20px', delayIn: '300ms', delayOut: '300ms'}}">
+          <h4 class="reveal-y"
+              [class.reveal-visible]="storyMemberState() === 'close'"
+              [style.--reveal-y]="'20px'"
+              [style.--reveal-enter-delay]="'300ms'"
+              [style.--reveal-exit-delay]="'300ms'">
             Carla Luján Bonadero</h4>
-          <span
-            [@bottomTop]="{value: storyMemberState(), params: {translate: '20px', delayIn: '600ms', delayOut: '0ms'}}">{{ 'MAIN.STORY.MEMBER' | translate }}</span>
+          <span class="reveal-y"
+                [class.reveal-visible]="storyMemberState() === 'close'"
+                [style.--reveal-y]="'20px'"
+                [style.--reveal-enter-delay]="'600ms'"
+                [style.--reveal-exit-delay]="'0ms'">{{ 'MAIN.STORY.MEMBER' | translate }}</span>
         </figure>
       </div>
     </div>
@@ -85,7 +105,7 @@
 <!-- End Story -->
 
 <!-- Works -->
-@if (allWorks.length) {
+@if (allWorks().length) {
   <section id="work" class="works">
     <div class="work-container">
       <div class="section-title text-center">
@@ -95,8 +115,9 @@
         </div>
       </div>
 
-      <div class="work-sub-title text-center" appAnimate [animateInAnimation]="workText"
-           [stopAnimation]="currentIsSmall">
+      <div #workSubTitle
+           class="work-sub-title text-center gelatine-reveal"
+           [class.gelatine-reveal-visible]="workSubTitleState() === 'close'">
         <h4>{{ 'MAIN.WORK.TEXT_1' | translate }}</h4>
       </div>
 
@@ -118,18 +139,17 @@
       </div>
 
       <div class="work-inner-container">
-        @for (work of works; track work; let i = $index) {
-          <div class="text-center work-flex-item" [@fadeInOut]="i">
-            <figure class="work-item">
-              <div class="work-img" [ngStyle]="{'background-image': 'url(' + work.image + ')'}"></div>
-              <figcaption class="overlay">
-                <a [title]="work.title" [href]="work.image" target="_blank" aria-label="Open work image">
-                  <mat-icon class="text-top">visibility</mat-icon>
-                </a>
-                <h4>{{ work.title }}</h4>
-                <p>{{ work.detail }}</p>
-              </figcaption>
-            </figure>
+        @for (work of works(); track work; let i = $index) {
+          <div class="text-center work-flex-item work-fade-in" [style.--work-fade-delay]="(i * 60) + 'ms'">
+            <a class="work-link" [href]="work.image" target="_blank" [title]="work.title" aria-label="Open work image">
+              <figure class="work-item">
+                <img class="work-img" [src]="work.image" [alt]="work.title">
+                <figcaption class="overlay">
+                  <h4>{{ work.title }}</h4>
+                  <p>{{ work.detail }}</p>
+                </figcaption>
+              </figure>
+            </a>
           </div>
         }
       </div>
@@ -143,7 +163,9 @@
   <section id="treatments" class="treatments">
     <div class="section-container">
 
-      <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="treatmentTitle">
+      <div #treatmentTitle
+           class="section-title text-center mb-50 bounce-down-reveal"
+           [class.bounce-down-reveal-visible]="treatmentTitleState() === 'close'">
         <h2 style="margin-top: 6%;">{{ 'MAIN.SECTION.TREATMENT' | translate }}</h2>
         <div class="home-divider">
           <mat-icon color="warn" class="material-icons">favorite</mat-icon>
@@ -154,8 +176,10 @@
       <div class="treatment-container">
         @for (group of groups(); track group; let i = $index) {
           <div class="work-flex-item">
-            <div class="treatment-item pointer-only" appAnimate [animateInAnimation]="treatmentAnimations()[i]"
-                 [stopAnimation]="currentIsSmall" (click)="goToTreatment(group.id)">
+            <div class="treatment-item pointer-only scale-in-reveal"
+                 [class.scale-in-reveal-visible]="treatmentItemState() === 'close'"
+                 [style.--scale-in-delay]="(i * (currentIsSmall ? 0 : 300)) + 'ms'"
+                 (click)="goToTreatment(group.id)">
               <div class="treatment-icon">
                 <mat-icon [svgIcon]="'CLEOS-COLOR'"></mat-icon>
               </div>
@@ -176,7 +200,9 @@
 <section id="experiences" class="experiences">
   <div class="parallax-overlay">
     <div class="section-container">
-      <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="experienceTitle">
+      <div #experienceTitle
+           class="section-title text-center mb-50 rubber-band-reveal"
+           [class.rubber-band-reveal-visible]="experienceTitleState() === 'close'">
         <h2 class="experience-title">{{ 'MAIN.SECTION.EXPERIENCE' | translate }}</h2>
         <div class="home-divider">
           <mat-icon color="warn" class="material-icons">favorite</mat-icon>
@@ -185,8 +211,7 @@
 
       <div class="treatment-container">
         @for (experience of experiences; track experience) {
-          <!--          <div class="text-center treatment-item" [id]="experience.id"-->
-            <!--               [@bottomTop]="{value: experience.state.value, params: {translate: '20px', delayIn: experience.delay, delayOut: experience.delayOut}}">-->
+          <!-- experience reveal is currently static -->
           <div class="text-center" [id]="experience.id">
             <div class="counters-item">
               <mat-icon>{{ experience.icon }}</mat-icon>
@@ -205,15 +230,20 @@
 <section id="contact" class="contact">
   <div class="section-container mb-50">
 
-    <div class="section-title text-center mb-50" appAnimate [animateInAnimation]="contactTitle">
+    <div #contactTitle
+         class="section-title text-center mb-50 fade-up-reveal"
+         [class.fade-up-reveal-visible]="contactTitleState() === 'close'"
+         [style.--fade-up-distance]="'20px'"
+         [style.--fade-up-duration]="'500ms'">
       <h2>{{ 'MAIN.SECTION.CONTACTS' | translate }}</h2>
       <div class="home-divider">
         <mat-icon color="warn" class="material-icons">favorite</mat-icon>
       </div>
     </div>
 
-    <div class="section-sub-title text-center" appAnimate [animateInAnimation]="contactText"
-         [stopAnimation]="currentIsSmall">
+    <div #contactText
+         class="section-sub-title text-center rubber-band-reveal"
+         [class.rubber-band-reveal-visible]="contactTextState() === 'close'">
       <p [innerHTML]="'MAIN.CONTACT.DETAIL' | translate"></p>
     </div>
 
@@ -221,7 +251,9 @@
 
       <!-- contact address -->
       <div class="flex-item" #contactItem1>
-        <div class="contact-address" [@leftRight]="contactItem1State()">
+        <div class="contact-address reveal-x"
+             [class.reveal-visible]="contactItem1State() === 'close'"
+             [style.--reveal-x]="'-100%'">
           <h3>{{ 'MAIN.CONTACT.TITLE' | translate }}</h3>
           <p>
             <mat-icon matPrefix>room</mat-icon>&nbsp;
@@ -246,8 +278,11 @@
 
       <!-- contact form -->
       <div class="contact--item" #contactItem2>
-        <div class="contact-form"
-             [@bottomTop]="{value:contactItem2State(), params: {delayIn: currentIsSmall ? '0ms' : '500ms', delayOut: '0ms'}}">
+        <div class="contact-form reveal-y"
+             [class.reveal-visible]="contactItem2State() === 'close'"
+             [style.--reveal-y]="'100%'"
+             [style.--reveal-enter-delay]="currentIsSmall ? '0ms' : '500ms'"
+             [style.--reveal-exit-delay]="'0ms'">
           <h3 class="bold no-content">{{ 'MAIN.CONTACT.SEND.TITLE' | translate }}</h3>
 
           <form (ngSubmit)="sendEmail()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
@@ -305,8 +340,10 @@
       <div class="flex-item" #contactItem3>
         <ul class="social-inner-container">
           @for (social of socialLinks; track social) {
-            <li
-              [@leftRight]="{value: contactItem3State(), params: {translate: '100%', delay: currentIsSmall ? '0ms' : social.delay}}">
+            <li class="reveal-x"
+                [class.reveal-visible]="contactItem3State() === 'close'"
+                [style.--reveal-x]="'100%'"
+                [style.--reveal-enter-delay]="currentIsSmall ? '0ms' : social.delay">
               @if (social.phone && social.phoneKey && social.phoneText) {
                 <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
                    (mouseleave)="onHover(social, false)" aria-label="Social icon"
@@ -328,7 +365,7 @@
   </div>
 
   <!-- Google map -->
-  <div appAnimate [animateInAnimation]="contactMap" [stopAnimation]="true">
+  <div #contactMap class="bounce-down-reveal" [class.bounce-down-reveal-visible]="contactMapState() === 'close'">
     <iframe [title]="`${title} map`" width="100%" height="300" class="map" allowfullscreen="" loading="lazy"
             [ngClass]="{'dark-map': isDarkMode()}" referrerpolicy="no-referrer-when-downgrade"
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2459.8286698251877!2d4.476945576894232!3d51.937078579223154!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c5cbae073735b3%3A0xc150afbfa3aeaf88!2sNails%20Cleos!5e0!3m2!1sen!2snl!4v1701072269943!5m2!1sen!2snl">

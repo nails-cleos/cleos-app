@@ -9,7 +9,6 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { colorSelected, deleteColor, getColorsPage } from '../../store/color.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { ColorState } from '../../store/reducers/color.reducers';
 
 describe('ColorListComponent', () => {
@@ -76,7 +75,6 @@ describe('ColorListComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
-        provideNoopAnimations(),
       ],
     }).compileComponents();
 

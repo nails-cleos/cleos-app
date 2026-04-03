@@ -76,7 +76,7 @@
 
       <ng-container matColumnDef="expandedDetail">
         <td *matCellDef="let treatment" [attr.colspan]="displayedColumns.length">
-          <div [@detailExpand]="treatment === expanded ? 'expanded' : 'collapsed'" class="detail">
+          <div [class.detail-expanded]="treatment === expanded" class="detail">
             <mat-list>
               <mat-list-item role="list">
                 <div matListItemTitle>{{ 'COMMON.COLUMN.LAST_UPDATE' | translate }}</div>

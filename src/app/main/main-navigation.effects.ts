@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 import { concatMap } from 'rxjs/operators';
-import { cleanMain, setCurrentLang, setCurrentTreatmentId } from '../store/main.actions';
+import { cleanMain, getAllCatalogue, setCurrentLang, setCurrentTreatmentId } from '../store/main.actions';
 import { cleanCatalogue, getAllCatalogs } from '../store/catalogue.actions';
 
 @Injectable()
@@ -14,26 +14,36 @@ export class MainNavigationEffects {
       ofType(ROUTER_NAVIGATION),
       concatMap((action: RouterNavigationAction) => {
         const url = action.payload.routerState.url;
-
-        // 1) /home/catalogs
-        const catalogsMatch = url.match(/\/home\/catalogs$/);
-        if (catalogsMatch) {
-          return [cleanCatalogue(), getAllCatalogs()];
+        const cleanUrl = url.split('?')[0].split('#')[0];
+        const homeMatch = cleanUrl.match(/^\/([^\/]+)\/home(?:\/(.*))?$/);
+        if (!homeMatch) {
+          return [];
         }
 
-        // 1) /home/{id}/treatment
-        const treatmentMatch = url.match(/\/home\/([^\/]+)\/treatment$/);
+        const lang = homeMatch[1];
+        const homePath = homeMatch[2] || '';
+
+        // 1) /{lang}/home/catalogs
+        if (homePath === 'catalogs') {
+          return [setCurrentLang({ lang }), cleanCatalogue(), getAllCatalogs()];
+        }
+
+        // 2) /{lang}/home/{id}/treatment
+        const treatmentMatch = homePath.match(/^([^\/]+)\/treatment$/);
         if (treatmentMatch) {
-          return [setCurrentTreatmentId({ treatmentId: treatmentMatch[1] })];
+          return [
+            setCurrentLang({ lang }),
+            setCurrentTreatmentId({ treatmentId: treatmentMatch[1] }),
+          ];
         }
 
-        // 1) /home
-        const homeMatch = url.match(/\/([^\/]+)\/home\/?$/);
-        if (homeMatch) {
-          return [cleanMain(), setCurrentLang({ lang: homeMatch[1] })];
+        // 3) /{lang}/home
+        if (!homePath) {
+          return [cleanMain(), setCurrentLang({ lang }), getAllCatalogue()];
         }
 
-        return [];
+        // 4) /{lang}/home/*
+        return [setCurrentLang({ lang })];
       }),
     ));
 }

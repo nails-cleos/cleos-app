@@ -9,7 +9,6 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { additionalSelected, deleteAdditional, getAdditionalPage } from '../../store/additional.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { AdditionalState } from '../../store/reducers/additional.reducers';
 
 describe('AdditionalListComponent', () => {
@@ -77,7 +76,6 @@ describe('AdditionalListComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
-        provideNoopAnimations(),
       ],
     }).compileComponents();
 

@@ -2,12 +2,18 @@
 @use './styles-theme' as style;
 @use 'sass:color';
 
+@include mat.core();
+
+/* -----------------------------
+   TYPOGRAPHY
+----------------------------- */
+
 $fontConfig: (
   display-4: mat.m2-define-typography-level(112px, 112px, 300, 'EB+Garamond', -0.0134em),
   display-3: mat.m2-define-typography-level(56px, 56px, 400, 'EB+Garamond', -0.0089em),
-  display-2: mat.m2-define-typography-level(45px, 48px, 400, 'EB+Garamond', 0.0000em),
+  display-2: mat.m2-define-typography-level(45px, 48px, 400, 'EB+Garamond', 0),
   display-1: mat.m2-define-typography-level(34px, 40px, 400, 'EB+Garamond', 0.0074em),
-  headline: mat.m2-define-typography-level(24px, 32px, 400, 'EB+Garamond', 0.0000em),
+  headline: mat.m2-define-typography-level(24px, 32px, 400, 'EB+Garamond', 0),
   title: mat.m2-define-typography-level(20px, 32px, 500, 'EB+Garamond', 0.0075em),
   subheading-2: mat.m2-define-typography-level(16px, 28px, 400, 'EB+Garamond', 0.0094em),
   subheading-1: mat.m2-define-typography-level(15px, 24px, 500, 'EB+Garamond', 0.0067em),
@@ -18,316 +24,104 @@ $fontConfig: (
   input: mat.m2-define-typography-level(inherit, 1.125, 400, 'EB+Garamond', 1.5px)
 );
 
-// Foreground Elements
-
-// Light Theme Text
-$dark-text: #000000;
-$dark-primary-text: rgba($dark-text, 0.87);
-$dark-accent-text: rgba($dark-primary-text, 0.54);
-$dark-disabled-text: rgba($dark-primary-text, 0.38);
-$dark-dividers: rgba($dark-primary-text, 0.12);
-$dark-focused: rgba($dark-primary-text, 0.12);
-
-$mat-light-theme-foreground: (
-  base: black,
-  contrast: #ffffff,
-  divider: $dark-dividers,
-  dividers: $dark-dividers,
-  disabled: $dark-disabled-text,
-  disabled-button: rgba($dark-text, 0.26),
-  disabled-text: $dark-disabled-text,
-  elevation: black,
-  secondary-text: $dark-accent-text,
-  hint-text: $dark-disabled-text,
-  accent-text: $dark-accent-text,
-  icon: $dark-accent-text,
-  icons: $dark-accent-text,
-  text: $dark-primary-text,
-  slider-min: $dark-primary-text,
-  slider-off: rgba($dark-text, 0.26),
-  slider-off-active: $dark-disabled-text,
-);
-
-// Dark Theme text
-$light-text: #ffffff;
-$light-primary-text: $light-text;
-$light-accent-text: rgba($light-primary-text, 0.7);
-$light-disabled-text: rgba($light-primary-text, 0.5);
-$light-dividers: rgba($light-primary-text, 0.12);
-$light-focused: rgba($light-primary-text, 0.12);
-
-$mat-dark-theme-foreground: (
-  base: $light-text,
-  contrast: #000000,
-  divider: $light-dividers,
-  dividers: $light-dividers,
-  disabled: $light-disabled-text,
-  disabled-button: rgba($light-text, 0.3),
-  disabled-text: $light-disabled-text,
-  elevation: black,
-  hint-text: $light-disabled-text,
-  secondary-text: $light-accent-text,
-  accent-text: $light-accent-text,
-  icon: $light-text,
-  icons: $light-text,
-  text: $light-text,
-  slider-min: $light-text,
-  slider-off: rgba($light-text, 0.3),
-  slider-off-active: rgba($light-text, 0.3),
-);
-
-// Background config
-$light-background: #fafafa;
-$dark-background: #2c2c2c;
-
-// Light bg
-$light-bg-darker-5: color.scale($light-background, $lightness: -5%);
-$light-bg-darker-10: color.scale($light-background, $lightness: -10%);
-$light-bg-darker-20: color.scale($light-background, $lightness: -20%);
-$light-bg-darker-30: color.scale($light-background, $lightness: -30%);
-$light-bg-lighter-5: color.scale($light-background, $lightness: 5%);
-$light-bg-alpha-80: rgba($light-background, 0.8);
-$dark-bg-tooltip: color.scale($dark-background, $lightness: 20%);
-$dark-bg-alpha-4: rgba($dark-background, 0.04);
-$dark-bg-alpha-12: rgba($dark-background, 0.12);
-$dark-bg-alpha-20: rgba($dark-background, 0.20);
-$dark-bg-alpha-70: rgba($dark-background, 0.70);
-
-// Background palette for light themes.
-$mat-light-theme-background: (
-  background: $light-background,
-  status-bar: $light-bg-darker-20,
-  app-bar: $light-bg-darker-5,
-  hover: $dark-bg-alpha-12,
-  alpha4: $dark-bg-alpha-4,
-  hoverable: $dark-bg-alpha-70,
-  shadow: $dark-bg-alpha-20,
-  card: $light-bg-lighter-5,
-  dialog: $light-bg-lighter-5,
-  tooltip: $dark-bg-tooltip,
-  disabled-button: $dark-bg-alpha-12,
-  raised-button: $light-bg-lighter-5,
-  focused-button: $dark-focused,
-  selected-button: $light-bg-darker-20,
-  selected-disabled-button: $light-bg-darker-30,
-  disabled-button-toggle: $light-bg-darker-10,
-  unselected-chip: $light-bg-darker-10,
-  disabled-list-option: $light-bg-darker-10,
-  loading: $light-bg-alpha-80,
-);
-
-// Dark bg
-$dark-bg-lighter-5: color.scale($dark-background, $lightness: 5%);
-$dark-bg-lighter-10: color.scale($dark-background, $lightness: 10%);
-$dark-bg-lighter-20: color.scale($dark-background, $lightness: 20%);
-$dark-bg-lighter-30: color.scale($dark-background, $lightness: 30%);
-$dark-bg-alpha-80: rgba($dark-background, 0.8);
-$light-bg-alpha-4: rgba($light-background, 0.04);
-$light-bg-alpha-12: rgba($light-background, 0.12);
-$light-bg-alpha-20: rgba($light-background, 0.20);
-$light-bg-alpha-70: rgba($light-background, 0.70);
-
-// Background palette for dark themes.
-$mat-dark-theme-background: (
-  background: $dark-background,
-  status-bar: $dark-bg-lighter-20,
-  app-bar: $dark-bg-lighter-5,
-  hover: $light-bg-alpha-12,
-  alpha4: $light-bg-alpha-4,
-  hoverable: $light-bg-alpha-70,
-  shadow: $light-bg-alpha-20,
-  card: $dark-bg-lighter-5,
-  dialog: $dark-bg-lighter-5,
-  tooltip: $dark-bg-lighter-20,
-  disabled-button: $light-bg-alpha-12,
-  raised-button: $dark-bg-lighter-5,
-  focused-button: $light-focused,
-  selected-button: $dark-bg-lighter-20,
-  selected-disabled-button: $dark-bg-lighter-30,
-  disabled-button-toggle: $dark-bg-lighter-10,
-  unselected-chip: $dark-bg-lighter-20,
-  disabled-list-option: $dark-bg-lighter-10,
-  loading: $dark-bg-alpha-80,
-);
-
-@include mat.slide-toggle-density(-1);
-
 @include mat.all-component-typographies($fontConfig);
 @include mat.elevation-classes();
 @include mat.app-background();
 
-// Theme Config
-body {
-  --primary-color: #b5ac9e;
-  --primary-lighter-color: #e9e6e2;
-  --primary-darker-color: #9d9282;
-  --text-primary-color: #{$dark-primary-text};
-  --text-primary-lighter-color: #{$dark-primary-text};
-  --text-primary-darker-color: #{$dark-primary-text};
-}
+/* -----------------------------
+   COLOR PALETTES
+----------------------------- */
+
+$dark-text: #000;
+$light-text: #fff;
+
+$dark-primary-text: rgba($dark-text, .87);
+$light-primary-text: $light-text;
+
+/* PRIMARY */
 
 $mat-primary: (
-  50: #f6f5f3,
-  100: #e9e6e2,
-  200: #dad6cf,
-  300: #cbc5bb,
-  400: #c0b8ad,
-  500: #b5ac9e,
-  600: #aea596,
-  700: #a59b8c,
-  800: #9d9282,
-  900: #8d8270,
-  A100: #ffffff,
-  A200: #fef0da,
-  A400: #ffdca6,
-  A700: #ffd38c,
-  contrast : (
-    50 : $dark-primary-text,
-    100 : $dark-primary-text,
-    200 : $dark-primary-text,
-    300 : $dark-primary-text,
-    400 : $dark-primary-text,
-    500 : $dark-primary-text,
-    600 : $dark-primary-text,
-    700 : $dark-primary-text,
-    800 : $dark-primary-text,
-    900 : $dark-primary-text,
-    A100 : $dark-primary-text,
-    A200 : $dark-primary-text,
-    A400 : $dark-primary-text,
-    A700 : $dark-primary-text,
+  50:#f6f5f3,
+  100:#e9e6e2,
+  200:#dad6cf,
+  300:#cbc5bb,
+  400:#c0b8ad,
+  500:#b5ac9e,
+  600:#aea596,
+  700:#a59b8c,
+  800:#9d9282,
+  900:#8d8270,
+  contrast:(
+    50:$dark-primary-text,
+    100:$dark-primary-text,
+    200:$dark-primary-text,
+    300:$dark-primary-text,
+    400:$dark-primary-text,
+    500:$dark-primary-text,
+    600:$dark-primary-text,
+    700:$dark-primary-text,
+    800:$dark-primary-text,
+    900:$dark-primary-text
   )
 );
 
-body {
-  --accent-color: #dcc8c2;
-  --accent-lighter-color: #f5efed;
-  --accent-darker-color: #ceb4ac;
-  --text-accent-color: #{$dark-primary-text};
-  --text-accent-lighter-color: #{$dark-primary-text};
-  --text-accent-darker-color: #{$dark-primary-text};
-}
+/* ACCENT */
 
 $mat-accent: (
-  50 : #fbf8f8,
-  100 : #f5efed,
-  200 : #eee4e1,
-  300 : #e7d9d4,
-  400 : #e1d0cb,
-  500 : #dcc8c2,
-  600 : #d8c2bc,
-  700 : #d3bbb4,
-  800 : #ceb4ac,
-  900 : #c5a79f,
-  A100 : #ffffff,
-  A200 : #ffffff,
-  A400 : #ffffff,
-  A700 : #ffefeb,
-  contrast: (
-    50 : $dark-primary-text,
-    100 : $dark-primary-text,
-    200 : $dark-primary-text,
-    300 : $dark-primary-text,
-    400 : $dark-primary-text,
-    500 : $dark-primary-text,
-    600 : $dark-primary-text,
-    700 : $dark-primary-text,
-    800 : $dark-primary-text,
-    900 : $dark-primary-text,
-    A100 : $dark-primary-text,
-    A200 : $dark-primary-text,
-    A400 : $dark-primary-text,
-    A700 : $dark-primary-text,
+  50:#fbf8f8,
+  100:#f5efed,
+  200:#eee4e1,
+  300:#e7d9d4,
+  400:#e1d0cb,
+  500:#dcc8c2,
+  600:#d8c2bc,
+  700:#d3bbb4,
+  800:#ceb4ac,
+  900:#c5a79f,
+  contrast:(
+    50:$dark-primary-text,
+    100:$dark-primary-text,
+    200:$dark-primary-text,
+    300:$dark-primary-text,
+    400:$dark-primary-text,
+    500:$dark-primary-text,
+    600:$dark-primary-text,
+    700:$dark-primary-text,
+    800:$dark-primary-text,
+    900:$dark-primary-text
   )
 );
 
-body {
-  --warn-color: #a51a19;
-  --warn-lighter-color: #e4baba;
-  --warn-darker-color: #8a0f0e;
-  --text-warn-color: #{$light-primary-text};
-  --text-warn-lighter-color: #{$dark-primary-text};
-  --text-warn-darker-color: #{$light-primary-text};
-}
+/* WARN */
 
 $mat-warn: (
-  50 : #f4e4e3,
-  100 : #e4baba,
-  200 : #d28d8c,
-  300 : #c05f5e,
-  400 : #b33c3c,
-  500 : #a51a19,
-  600 : #9d1716,
-  700 : #931312,
-  800 : #8a0f0e,
-  900 : #790808,
-  A100 : #FFA8A8,
-  A200 : #FF7575,
-  A400 : #FF4242,
-  A700 : #FF2929,
-  contrast: (
-    50 : $dark-primary-text,
-    100 : $dark-primary-text,
-    200 : $dark-primary-text,
-    300 : $light-primary-text,
-    400 : $light-primary-text,
-    500 : $light-primary-text,
-    600 : $light-primary-text,
-    700 : $light-primary-text,
-    800 : $light-primary-text,
-    900 : $light-primary-text,
-    A100 : $dark-primary-text,
-    A200 : $dark-primary-text,
-    A400 : $light-primary-text,
-    A700 : $light-primary-text
+  50:#f4e4e3,
+  100:#e4baba,
+  200:#d28d8c,
+  300:#c05f5e,
+  400:#b33c3c,
+  500:#a51a19,
+  600:#9d1716,
+  700:#931312,
+  800:#8a0f0e,
+  900:#790808,
+  contrast:(
+    50:$dark-primary-text,
+    100:$dark-primary-text,
+    200:$dark-primary-text,
+    300:$light-primary-text,
+    400:$light-primary-text,
+    500:$light-primary-text,
+    600:$light-primary-text,
+    700:$light-primary-text,
+    800:$light-primary-text,
+    900:$light-primary-text
   )
 );
 
-$mat-warn-dark: (
-  50 : #fdf0f0,
-  100 : #fbd9d9,
-  200 : #f8c0c0,
-  300 : #f5a6a6,
-  400 : #f29393,
-  500 : #f08080,
-  600 : #ee7878,
-  700 : #ec6d6d,
-  800 : #e96363,
-  900 : #e55050,
-  A100 : #ffffff,
-  A200 : #ffffff,
-  A400 : #ffdcdc,
-  A700 : #ffc3c3,
-  contrast: (
-    50 : $dark-primary-text,
-    100 : $dark-primary-text,
-    200 : $dark-primary-text,
-    300 : $dark-primary-text,
-    400 : $dark-primary-text,
-    500 : $dark-primary-text,
-    600 : $dark-primary-text,
-    700 : $dark-primary-text,
-    800 : $dark-primary-text,
-    900 : $light-primary-text,
-    A100 : $dark-primary-text,
-    A200 : $dark-primary-text,
-    A400 : $dark-primary-text,
-    A700 : $dark-primary-text,
-  )
-);
-
-$theme-warn-dark: mat.m2-define-palette($mat-warn-dark);
-
-// Define a dark theme
-$dark-theme: mat.m2-define-dark-theme((
-  color: (
-    primary: mat.m2-define-palette($mat-primary, 500),
-    accent: mat.m2-define-palette($mat-accent),
-    warn: mat.m2-define-palette($mat-warn-dark)
-  )
-));
-
-// Define a light theme
+/* -----------------------------
+   THEMES
+----------------------------- */
 $light-theme: mat.m2-define-light-theme((
   color: (
     primary: mat.m2-define-palette($mat-primary, 500),
@@ -336,55 +130,81 @@ $light-theme: mat.m2-define-light-theme((
   )
 ));
 
+$dark-theme: mat.m2-define-dark-theme((
+  color: (
+    primary: mat.m2-define-palette($mat-primary, 500),
+    accent: mat.m2-define-palette($mat-accent),
+    warn: mat.m2-define-palette($mat-warn)
+  )
+));
 @include mat.all-component-themes($light-theme);
 
+/* -----------------------------
+   LIGHT THEME
+----------------------------- */
+
 .light-theme {
+  @include mat.all-component-colors($light-theme);
   @include style.color($light-theme);
   @include mat.strong-focus-indicators-color($light-theme);
 
-  & {
-    --toast-background: #ffffff;
-    --toast-text: rgba(0, 0, 0, 0.87);
-    --toast-success: var(--primary-color);
-    --toast-error: var(--warn-color);
-    --toast-warning: #ff9800;
-    --toast-info: var(--accent-color);
-    --toast-shadow: rgba(0, 0, 0, 0.15);
-  }
+  --primary-color: #b5ac9e;
+  --primary-lighter-color: #e9e6e2;
+  --primary-darker-color: #9d9282;
+
+  --accent-color: #dcc8c2;
+  --accent-lighter-color: #f5efed;
+  --accent-darker-color: #ceb4ac;
+
+  --warn-color: #a51a19;
+
+  --toast-background: #fff;
+  --toast-text: rgba(0, 0, 0, .87);
+
+  --invert-text: #fff;
 }
+
+/* -----------------------------
+   DARK THEME
+----------------------------- */
 
 .dark-theme {
   @include mat.all-component-colors($dark-theme);
   @include style.color($dark-theme);
   @include mat.strong-focus-indicators-color($dark-theme);
 
-  & {
-    --toast-background: #424242;
-    --toast-text: rgba(255, 255, 255, 0.87);
-    --toast-success: var(--primary-color);
-    --toast-error: var(--warn-color);
-    --toast-warning: #ffb74d;
-    --toast-info: var(--accent-color);
-    --toast-shadow: rgba(0, 0, 0, 0.4);
-  }
+  --primary-color: #9d9282;
+  --primary-lighter-color: #b5ac9e;
+  --primary-darker-color: #7f7566;
+
+  --accent-color: #ceb4ac;
+  --accent-lighter-color: #dcc8c2;
+  --accent-darker-color: #b89b93;
+
+  --warn-color: #f08080;
+
+  --toast-background: #424242;
+  --toast-text: rgba(255, 255, 255, .87);
+
+  --invert-text: rgba(0, 0, 0, .87);
 }
+
+/* -----------------------------
+   COMPONENT TWEAKS
+----------------------------- */
 
 .home-page-form {
   @include mat.form-field-density(-5);
   @include mat.button-density(-3);
-
-  .mat-mdc-text-field-wrapper:not(.mdc-text-field--outlined),
-  .mat-mdc-floating-label {
-    display: inline !important;
-  }
 }
 
-// Handle buttons appropriately, with respect to line-height
-.mat-mdc-raised-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button {
+.mat-mdc-raised-button,
+.mat-mdc-outlined-button,
+.mat-mdc-unelevated-button {
   padding: 0 1.15em;
   margin: 0 .65em;
   min-width: 3em;
-  line-height: 36.4px
+  line-height: 36.4px;
 }
 
 .mat-mdc-standard-chip {
@@ -392,7 +212,11 @@ $light-theme: mat.m2-define-light-theme((
   min-height: 2.5em;
 }
 
-.material-symbols-outlined, .material-icons {
+/* -----------------------------
+   ICONS
+----------------------------- */
+.material-symbols-outlined,
+.material-icons {
   font-weight: normal;
   font-style: normal;
   font-size: 24px;
@@ -421,70 +245,4 @@ $light-theme: mat.m2-define-light-theme((
 
 .material-icons {
   font-family: 'Material Icons', 'Material Symbols', sans-serif;
-}
-
-@media (min-width: 320px) {
-  h1 {
-    font-size: 1.5rem !important;
-  }
-  h2 {
-    font-size: 1.25rem !important;
-  }
-  h3 {
-    font-size: 1.125rem !important;
-  }
-  h4 {
-    font-size: 1rem !important;
-  }
-}
-
-@media (min-width: 481px) {
-  h1 {
-    font-size: 2.125rem !important;
-  }
-  h2 {
-    font-size: 1.5rem !important;
-  }
-  h3 {
-    font-size: 1.25rem !important;
-  }
-  h4 {
-    font-size: 1.125rem !important;
-  }
-  h5 {
-    font-size: 1rem !important;
-  }
-}
-
-@media (min-width: 961px) {
-  h1 {
-    font-size: 2.125rem !important;
-    line-height: 1 !important;
-    letter-spacing: -0.0625rem !important;
-  }
-  h2 {
-    font-size: 1.875rem !important;
-    line-height: 1.067 !important;
-    letter-spacing: -0.05rem !important;
-  }
-  h3 {
-    font-size: 1.5rem !important;
-    line-height: 1.083 !important;
-    letter-spacing: -0.0375rem !important;
-  }
-  h4 {
-    font-size: 1.25rem !important;
-    line-height: 1.1 !important;
-    letter-spacing: -0.025rem !important;
-  }
-  h5 {
-    font-size: 1.125rem !important;
-    line-height: 1.11 !important;
-    letter-spacing: -0.0125rem !important;
-  }
-  h6 {
-    font-size: 1rem !important;
-    line-height: 1.125 !important;
-    letter-spacing: -0.00625rem !important;
-  }
 }

@@ -22,7 +22,7 @@ export class PermissionsService {
 
   private currentUser = toSignal(this.user$);
 
-  private readonly data: any = this.router.getCurrentNavigation()?.extras?.state;
+  private readonly data: any = this.router.currentNavigation()?.extras?.state;
 
   constructor() {
   }

@@ -13,7 +13,6 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectModule } from '@angular/material/select';
 import { MatGridListModule } from '@angular/material/grid-list';
-import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -34,9 +33,12 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { MatStep, MatStepLabel, MatStepper } from '@angular/material/stepper';
+import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
+import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
 
 const materialModules = [
-  NgxMaterialTimepickerModule,
+  TimepickerComponent,
+  TimepickerDirective,
   MatAutocompleteModule,
   MatButtonModule,
   MatCardModule,
@@ -89,27 +91,10 @@ export class AppMaterialModule {
     matIconRegistry.addSvgIcon('INSTAGRAM-NO-COLOR', this.getUrl('assets/instagram-no-color.svg'));
     matIconRegistry.addSvgIcon('FACEBOOK', this.getUrl('assets/facebook.svg'));
     matIconRegistry.addSvgIcon('FACEBOOK-NO-COLOR', this.getUrl('assets/facebook-no-color.svg'));
-    matIconRegistry.addSvgIcon('/payment_methods/1.svg', this.getUrl('assets/payment_methods/1.svg'));
-    matIconRegistry.addSvgIcon('IDEAL', this.getUrl('assets/payment_methods/1.svg'));
-    matIconRegistry.addSvgIcon('/payment_methods/2.svg', this.getUrl('assets/payment_methods/2.svg'));
-    matIconRegistry.addSvgIcon('/payment_methods/21.svg', this.getUrl('assets/payment_methods/21.svg'));
-    matIconRegistry.addSvgIcon('PAYPAL', this.getUrl('assets/payment_methods/21.svg'));
+    matIconRegistry.addSvgIcon('IDEAL', this.getUrl('assets/payment_methods/ideal.svg'));
+    matIconRegistry.addSvgIcon('PAYPAL', this.getUrl('assets/payment_methods/paypal.svg'));
+    matIconRegistry.addSvgIcon('MOLLIE', this.getUrl('assets/payment_methods/mollie.svg'));
     matIconRegistry.addSvgIcon('PAY_NL', this.getUrl('assets/payment_methods/paynl.svg'));
-    matIconRegistry.addSvgIcon('/issuers/1.svg', this.getUrl('assets/issuers/1.svg'));
-    matIconRegistry.addSvgIcon('/issuers/2.svg', this.getUrl('assets/issuers/2.svg'));
-    matIconRegistry.addSvgIcon('/issuers/4.svg', this.getUrl('assets/issuers/4.svg'));
-    matIconRegistry.addSvgIcon('/issuers/5.svg', this.getUrl('assets/issuers/5.svg'));
-    matIconRegistry.addSvgIcon('/issuers/8.svg', this.getUrl('assets/issuers/8.svg'));
-    matIconRegistry.addSvgIcon('/issuers/9.svg', this.getUrl('assets/issuers/9.svg'));
-    matIconRegistry.addSvgIcon('/issuers/10.svg', this.getUrl('assets/issuers/10.svg'));
-    matIconRegistry.addSvgIcon('/issuers/11.svg', this.getUrl('assets/issuers/11.svg'));
-    matIconRegistry.addSvgIcon('/issuers/12.svg', this.getUrl('assets/issuers/12.svg'));
-    matIconRegistry.addSvgIcon('/issuers/5080.svg', this.getUrl('assets/issuers/5080.svg'));
-    matIconRegistry.addSvgIcon('/issuers/5084.svg', this.getUrl('assets/issuers/5084.svg'));
-    matIconRegistry.addSvgIcon('/issuers/23355.svg', this.getUrl('assets/issuers/23355.svg'));
-    matIconRegistry.addSvgIcon('/issuers/23358.svg', this.getUrl('assets/issuers/23358.svg'));
-    matIconRegistry.addSvgIcon('/issuers/23361.svg', this.getUrl('assets/issuers/23361.svg'));
-    matIconRegistry.addSvgIcon('MOYONL21', this.getUrl('assets/issuers/MOYONL21.svg'));
   }
 
   private getUrl = (path: string): SafeResourceUrl => this.domSanitizer.bypassSecurityTrustResourceUrl(path);

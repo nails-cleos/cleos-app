@@ -98,7 +98,7 @@ describe('UpcomingComponent', () => {
   };
 
   beforeEach(async () => {
-    routerSpyObj = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    routerSpyObj = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
 
     await TestBed.configureTestingModule({
       imports: [UpcomingComponent, TranslateModule.forRoot()],

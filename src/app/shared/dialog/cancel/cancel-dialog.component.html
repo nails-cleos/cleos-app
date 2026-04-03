@@ -2,7 +2,8 @@
 <div mat-dialog-content>
   <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
     <app-price [price]="price" [typeForm]="typeForm" [options]="paymentOptions" [currency]="currency"
-               [firstTime]="true" [showPenalty]="showPenalty" [showBank]="true"></app-price>
+               [firstTime]="true" [showPenalty]="showPenalty" [showBank]="true"
+               [includeBalance]="false"></app-price>
     <div class="top-space">
       <mat-label>{{ 'RESERVATION.CANCEL.FIELD' | translate }}</mat-label>
       <mat-radio-group class="radio-group" [formControl]="getForm.paymentCancellation">

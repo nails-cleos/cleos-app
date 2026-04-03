@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
 import { YearSummaryComponent } from './year-summary.component';
 import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -7,7 +7,6 @@ import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth
 import { TranslateModule } from '@ngx-translate/core';
 import { ActivatedRoute } from '@angular/router';
 import { IMonthlyExport, IMonthlySummaryExpense, IMonthlySummarySale, ISummaryTotal } from '../../interfaces/dashboard';
-import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import fs from 'file-saver';
 import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { signal } from '@angular/core';
@@ -39,7 +38,6 @@ describe('YearSummaryComponent', () => {
     await TestBed.configureTestingModule({
       imports: [YearSummaryComponent, TranslateModule.forRoot()],
       providers: [
-        provideNoopAnimations(),
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
@@ -62,7 +60,7 @@ describe('YearSummaryComponent', () => {
   });
 
   describe('exportToExcel method', () => {
-    it('should export to Excel with valid data', () => {
+    it('should export to Excel with valid data', fakeAsync(() => {
       const mockMonthlyExport: IMonthlyExport = {
         month: 1,
         saleSummary: [],
@@ -74,11 +72,14 @@ describe('YearSummaryComponent', () => {
       component.getForm.date.setValue(new Date(2024, 0, 1));
 
       component['exportToExcel']();
+      tick();
+      flushMicrotasks();
 
       expect(component.sheetData.length).toBeGreaterThan(0);
-    });
+      expect(saveAsSpy).toHaveBeenCalled();
+    }));
 
-    it('should sort summaries by timestamp before export', () => {
+    it('should sort summaries by timestamp before export', fakeAsync(() => {
       const mockMonthlyExport: IMonthlyExport = {
         month: 1,
         saleSummary: [
@@ -136,13 +137,16 @@ describe('YearSummaryComponent', () => {
       fixture.detectChanges();
 
       component['exportToExcel']();
+      tick();
+      flushMicrotasks();
 
       const sheetData = component.sheetData;
       expect(sheetData[0].saleSummary[0].timestamp).toBe(200);
       expect(sheetData[0].saleSummary[1].timestamp).toBe(100);
       expect(sheetData[0].expenseSummary[0].timestamp).toBe(400);
       expect(sheetData[0].expenseSummary[1].timestamp).toBe(300);
-    });
+      expect(saveAsSpy).toHaveBeenCalled();
+    }));
 
     it('should not export when sheetData is empty', () => {
       component['sheetDataSignal'].set([]);
@@ -168,6 +172,7 @@ describe('YearSummaryComponent', () => {
 
       component['exportToExcel']();
       tick();
+      flushMicrotasks();
 
       expect(saveAsSpy).toHaveBeenCalledTimes(1);
 

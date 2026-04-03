@@ -1,13 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ForgotPasswordComponent } from './forgot-password.component';
 import { Store } from '@ngrx/store';
-import { Auth } from '@angular/fire/auth';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ToastService } from '../../services/toast.service';
 import { Router } from '@angular/router';
 import { BehaviorSubject, of, Subject } from 'rxjs';
 import { AuthState } from '../../store/reducers/auth.reducers';
 import { IError } from '../../interfaces/common';
+import { FirebaseService } from '../../services/firebase.service';
 
 describe('ForgotPasswordComponent', () => {
   let component: ForgotPasswordComponent;
@@ -18,9 +18,9 @@ describe('ForgotPasswordComponent', () => {
   let action$: Subject<void>;
 
   let storeSpy: jasmine.SpyObj<Store<AuthState>>;
-  let authSpy: jasmine.SpyObj<Auth>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
   let routerSpy: jasmine.SpyObj<Router>;
+  let firebaseServiceSpy: jasmine.SpyObj<FirebaseService>;
 
   beforeEach(async () => {
     error$ = new Subject<IError | undefined>();
@@ -28,9 +28,9 @@ describe('ForgotPasswordComponent', () => {
     action$ = new Subject<void>();
 
     storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
-    authSpy = jasmine.createSpyObj('Auth', ['sendPasswordResetEmail']);
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    firebaseServiceSpy = jasmine.createSpyObj('FirebaseService', ['sendPasswordResetEmail']);
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
@@ -54,9 +54,9 @@ describe('ForgotPasswordComponent', () => {
       imports: [ForgotPasswordComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
-        { provide: Auth, useValue: authSpy },
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: Router, useValue: routerSpy },
+        { provide: FirebaseService, useValue: firebaseServiceSpy },
       ],
     }).compileComponents();
 
@@ -95,5 +95,18 @@ describe('ForgotPasswordComponent', () => {
 
     expect(toastServiceSpy.show).toHaveBeenCalledWith('OK', 'success', 5000, { actionType: 'button' });
     expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'auth']);
+  });
+
+  it('should request a password reset and dispatch signupSuccess', async () => {
+    firebaseServiceSpy.sendPasswordResetEmail.and.resolveTo();
+    component.getForm.email.setValue(' test@example.com ');
+
+    component.forgotPassword();
+    await fixture.whenStable();
+
+    expect(firebaseServiceSpy.sendPasswordResetEmail).toHaveBeenCalledWith('test@example.com');
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
+      type: '[Auth] Signup Success',
+    }));
   });
 });
