@@ -1,11 +1,10 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { awsLambdaFailure, awsLambdaSuccess, callAwsLambda } from '../aws.actions';
 import { AwsLambdaService } from '../../services/aws-lambda.service';
 import { IAwsExtract } from '../../interfaces/aws';
+import { effectRequest } from '../../util/rxjs';
 
 @Injectable()
 export class AwsEffects {
@@ -14,14 +13,11 @@ export class AwsEffects {
 
   callLambda$ = createEffect(() => this.actions.pipe(
     ofType(callAwsLambda),
-    switchMap(({ token, file, userId }) =>
-      this.awsLambdaService.processPdf(token, file, userId).pipe(
-        map((data: IAwsExtract) => awsLambdaSuccess({ data })),
-        catchError((err: HttpErrorResponse) => of(awsLambdaFailure({ error: err.error }))),
-      )),
+    switchMap(({ token, file, userId }) => effectRequest(
+      this.awsLambdaService.processPdf(token, file, userId).pipe(map((data: IAwsExtract) =>
+        awsLambdaSuccess({ data }))),
+      action => action,
+      awsLambdaFailure,
+    )),
   ));
-
-  awsLambdaSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(awsLambdaSuccess),
-  ), { dispatch: false });
 }

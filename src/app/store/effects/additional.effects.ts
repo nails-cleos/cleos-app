@@ -1,8 +1,6 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { of } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import {
   additionalFailure,
   additionalSaveSuccess,
@@ -25,6 +23,7 @@ import { TreatmentService } from '../../services/treatment.service';
 import { IAdditional, IAdditionalAll } from '../../interfaces/additional';
 import { IApiResponse, success, successResponse } from '../../interfaces/common';
 import { Pagination } from '../../interfaces/pagination';
+import { effectRequest } from '../../util/rxjs';
 
 @Injectable()
 export class AdditionalEffects {
@@ -36,98 +35,92 @@ export class AdditionalEffects {
 
   getAll$ = createEffect(() => this.actions.pipe(
     ofType(getAdditionalPage),
-    switchMap(({ sort, direction, page, size }) =>
-      this.additionalService.getAdditionalPage(sort, direction, page, size).pipe(
-        map((value: Pagination<IAdditionalAll>) => additionalSuccess({ data: { kind: 'pagination', value } })),
-        catchError((err: HttpErrorResponse) => of(additionalFailure({ error: err.error }))),
-      )),
+    switchMap(({ sort, direction, page, size }) => effectRequest(
+      this.additionalService.getAdditionalPage(sort, direction, page, size)
+        .pipe(map((value: Pagination<IAdditionalAll>) => additionalSuccess({ data: { kind: 'pagination', value } }))),
+      action => action,
+      additionalFailure,
+    )),
   ));
 
   findAdditionalList$ = createEffect(() => this.actions.pipe(
     ofType(getAdditionalList),
-    switchMap(() =>
-      this.additionalService.getAdditionalList().pipe(
-        map((value) => additionalSuccess({ data: { kind: 'list', value } })),
-        catchError((err: HttpErrorResponse) => of(additionalFailure({ error: err.error }))),
-      )),
+    switchMap(() => effectRequest(
+      this.additionalService.getAdditionalList()
+        .pipe(map((value) => additionalSuccess({ data: { kind: 'list', value } }))),
+      action => action,
+      additionalFailure,
+    )),
   ));
 
   findOne$ = createEffect(() => this.actions.pipe(
     ofType(getAdditional),
-    switchMap(({ id }) =>
-      this.additionalService.getAdditional(id).pipe(
-        map((selected?: IAdditional) => additionalSelected({ selected })),
-        catchError((err: HttpErrorResponse) => of(additionalFailure({ error: err.error }))),
-      )),
+    switchMap(({ id }) => effectRequest(
+      this.additionalService.getAdditional(id).pipe(map((selected?: IAdditional) => additionalSelected({ selected }))),
+      action => action,
+      additionalFailure,
+    )),
   ));
 
   save$ = createEffect(() => this.actions.pipe(
     ofType(createAdditional),
-    switchMap(({ additional }) =>
-      this.additionalService.createAdditional(additional).pipe(
-        switchMap((response: IApiResponse) => {
-          const message = this.translate.instant('ADDITIONAL.CREATED', { name: response.name });
-          const path = `additional/${response.id}`;
-          return successResponse(additionalSaveSuccess, message, path, 'additional');
-        }),
-        catchError((err: HttpErrorResponse) => of(additionalFailure({ error: err.error }))),
-      )),
+    switchMap(({ additional }) => effectRequest(
+      this.additionalService.createAdditional(additional).pipe(switchMap((response: IApiResponse) => {
+        const message = this.translate.instant('ADDITIONAL.CREATED', { name: response.name });
+        const path = `additional/${ response.id }`;
+        return successResponse(additionalSaveSuccess, message, path, 'additional');
+      })),
+      action => action,
+      additionalFailure,
+    )),
   ));
 
   update$ = createEffect(() => this.actions.pipe(
     ofType(updateAdditional),
-    switchMap(({ id, additional }) =>
-      this.additionalService.updateAdditional(id, additional).pipe(
-        switchMap((response: IAdditional) => {
-          const message = this.translate.instant('ADDITIONAL.UPDATED.MESSAGE', { name: response.name });
-          const path = `additional/${response.id}`;
-          return successResponse(additionalSaveSuccess, message, path, 'additional');
-        }),
-        catchError((err: HttpErrorResponse) => of(additionalFailure({ error: err.error }))),
-      )),
+    switchMap(({ id, additional }) => effectRequest(
+      this.additionalService.updateAdditional(id, additional).pipe(switchMap((response: IAdditional) => {
+        const message = this.translate.instant('ADDITIONAL.UPDATED.MESSAGE', { name: response.name });
+        const path = `additional/${ response.id }`;
+        return successResponse(additionalSaveSuccess, message, path, 'additional');
+      })),
+      action => action,
+      additionalFailure,
+    )),
   ));
 
   updateSort$ = createEffect(() => this.actions.pipe(
     ofType(sortAdditional),
-    switchMap(({ additionalList }) =>
-      this.additionalService.sortAdditional(additionalList).pipe(
-        switchMap(() => success(additionalSaveSuccess, this.translate.instant('ADDITIONAL.SORTED.MESSAGE'))),
-        catchError((err: HttpErrorResponse) => of(additionalFailure({ error: err.error }))),
-      )),
+    switchMap(({ additionalList }) => effectRequest(
+      this.additionalService.sortAdditional(additionalList).pipe(switchMap(() => success(additionalSaveSuccess, this.translate.instant('ADDITIONAL.SORTED.MESSAGE')))),
+      action => action,
+      additionalFailure,
+    )),
   ));
 
   delete$ = createEffect(() => this.actions.pipe(
     ofType(deleteAdditional),
-    switchMap(({ id, name }) =>
-      this.additionalService.deleteAdditional(id).pipe(
-        switchMap(() => {
-          const message = this.translate.instant('ADDITIONAL.DELETED.MESSAGE', { name });
-          return success(additionalSaveSuccess, message, undefined, true, 'warning');
-        }),
-        catchError((err: HttpErrorResponse) => of(additionalFailure({ error: err.error }))),
-      )),
+    switchMap(({ id, name }) => effectRequest(
+      this.additionalService.deleteAdditional(id).pipe(switchMap(() => {
+        const message = this.translate.instant('ADDITIONAL.DELETED.MESSAGE', { name });
+        return success(additionalSaveSuccess, message, undefined, true, 'warning');
+      })),
+      action => action,
+      additionalFailure,
+    )),
   ));
 
   findGroups$ = createEffect(() => this.actions.pipe(
     ofType(getAllTreatmentsGroup),
-    switchMap(() =>
-      this.treatmentService.getAllTreatmentsGroup().pipe(
-        map((groups) => findGroupsSuccess({ groups })),
-        catchError((err: HttpErrorResponse) => of(additionalFailure({ error: err.error }))),
-      )),
+    switchMap(() => effectRequest(
+      this.treatmentService.getAllTreatmentsGroup().pipe(map((groups) => findGroupsSuccess({ groups }))),
+      action => action,
+      additionalFailure,
+    )),
   ));
 
   selectedData$ = createEffect(() => this.actions.pipe(
     ofType(additionalSelected),
     tap(({ selected }) => this.router.navigate(
       [this.translate.getCurrentLang(), 'additional', selected?.id])),
-  ), { dispatch: false });
-
-  dataSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(additionalSuccess),
-  ), { dispatch: false });
-
-  saveSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(additionalSaveSuccess),
   ), { dispatch: false });
 }

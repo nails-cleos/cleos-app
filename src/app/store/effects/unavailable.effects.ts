@@ -1,8 +1,6 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { of } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import {
   createBlockAgenda,
   createUnavailable,
@@ -17,8 +15,7 @@ import {
   unavailableSaveSuccess,
   unavailableSelected,
   unavailableSuccess,
-  updateUnavailable,
-} from '../unavailable.actions';
+  updateUnavailable } from '../unavailable.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { UnavailableService } from '../../services/unavailable.service';
 import { Router } from '@angular/router';
@@ -29,6 +26,7 @@ import { IUnavailableAll } from '../../interfaces/unavailable';
 import { IUserAll } from '../../interfaces/user';
 import { IRoomAll } from '../../interfaces/room';
 import { IApiResponse, success, successResponse } from '../../interfaces/common';
+import { effectRequest } from '../../util/rxjs';
 
 @Injectable()
 export class UnavailableEffects {
@@ -40,74 +38,85 @@ export class UnavailableEffects {
 
   getAll$ = createEffect(() => this.actions.pipe(
     ofType(getUnavailablePage),
-    switchMap(({ page, sort, direction, size }) =>
-      this.unavailableService.getUnavailablePage(page, sort, direction, size).pipe(
-        map((data: Pagination<IUnavailableAll>) => unavailableSuccess({ data })),
-        catchError((err: HttpErrorResponse) => of(unavailableFailure({ error: err.error }))),
-      )),
+    switchMap(({ page, sort, direction, size }) => effectRequest(
+      this.unavailableService.getUnavailablePage(page, sort, direction, size)
+        .pipe(map((data: Pagination<IUnavailableAll>) => unavailableSuccess({ data }))),
+      action => action,
+      unavailableFailure,
+    )),
   ));
 
   getAllProfessional$ = createEffect(() => this.actions.pipe(
     ofType(getAllProfessional),
-    switchMap(() => this.userService.getProfessionals().pipe(
-      map((professionals: IUserAll[]) => professionalSuccess({ professionals })),
-      catchError((err: HttpErrorResponse) => of(unavailableFailure({ error: err.error }))),
+    switchMap(() => effectRequest(
+      this.userService.getProfessionals().pipe(map((professionals: IUserAll[]) =>
+        professionalSuccess({ professionals }))),
+      action => action,
+      unavailableFailure,
     )),
   ));
 
   getRoom$ = createEffect(() => this.actions.pipe(
     ofType(getAllRoomsByProfessionalId),
-    switchMap(({ professionalId }) => this.userService.getAllRoomsByProfessionalId(professionalId).pipe(
-      map((rooms: IRoomAll[]) => roomSuccess({ rooms })),
-      catchError((err: HttpErrorResponse) => of(unavailableFailure({ error: err.error }))),
+    switchMap(({ professionalId }) => effectRequest(
+      this.userService.getAllRoomsByProfessionalId(professionalId).pipe(map((rooms: IRoomAll[]) =>
+        roomSuccess({ rooms }))),
+      action => action,
+      unavailableFailure,
     )),
   ));
 
   findOne$ = createEffect(() => this.actions.pipe(
     ofType(getUnavailable),
-    switchMap(({ id }) => this.unavailableService.getUnavailable(id).pipe(
-      map((selected?: IUnavailableAll) => unavailableSelected({ selected })),
-      catchError((err: HttpErrorResponse) => of(unavailableFailure({ error: err.error }))),
+    switchMap(({ id }) => effectRequest(
+      this.unavailableService.getUnavailable(id).pipe(map((selected?: IUnavailableAll) =>
+        unavailableSelected({ selected }))),
+      action => action,
+      unavailableFailure,
     )),
   ));
 
   save$ = createEffect(() => this.actions.pipe(
     ofType(createUnavailable),
-    switchMap(({ unavailable, isRoomAdmin }) => this.unavailableService.createUnavailable(unavailable).pipe(
-      switchMap((response: IApiResponse) => this.requestSuccess('UNAVAILABLE.CREATED',
-        newDateTimestamp(response.timestamp), isRoomAdmin ? 'dashboard/events' : `unavailable/${response.id}`)),
-      catchError((err: HttpErrorResponse) => of(unavailableFailure({ error: err.error }))),
+    switchMap(({ unavailable, isRoomAdmin }) => effectRequest(
+      this.unavailableService.createUnavailable(unavailable).pipe(switchMap((response: IApiResponse) => this.requestSuccess('UNAVAILABLE.CREATED',
+        newDateTimestamp(response.timestamp), isRoomAdmin ? 'dashboard/events' : `unavailable/${response.id}`))),
+      action => action,
+      unavailableFailure,
     )),
   ));
 
   blockAgenda$ = createEffect(() => this.actions.pipe(
     ofType(createBlockAgenda),
-    switchMap(({ unavailable, isRoomAdmin }) => this.unavailableService.createBlockAgenda(unavailable).pipe(
-      switchMap((response: IApiResponse) => this.requestSuccess('UNAVAILABLE.CREATED',
+    switchMap(({ unavailable, isRoomAdmin }) => effectRequest(
+      this.unavailableService.createBlockAgenda(unavailable).pipe(switchMap((response: IApiResponse) => this.requestSuccess('UNAVAILABLE.CREATED',
         newDateTimestamp(response.timestamp),
-        isRoomAdmin ? 'dashboard/events' : `unavailable/block-agenda/${response.id}`)),
-      catchError((err: HttpErrorResponse) => of(unavailableFailure({ error: err.error }))),
+        isRoomAdmin ? 'dashboard/events' : `unavailable/block-agenda/${response.id}`))),
+      action => action,
+      unavailableFailure,
     )),
   ));
 
   update$ = createEffect(() => this.actions.pipe(
     ofType(updateUnavailable),
-    switchMap(({ id, unavailable, path }) => this.unavailableService.updateUnavailable(id, unavailable).pipe(
-      switchMap((response: IApiResponse) => this.requestSuccess('UNAVAILABLE.UPDATED.MESSAGE',
-        newDateTimestamp(response.timestamp), `${path}/${response.id}`)),
-      catchError((err: HttpErrorResponse) => of(unavailableFailure({ error: err.error }))),
+    switchMap(({ id, unavailable, path }) => effectRequest(
+      this.unavailableService.updateUnavailable(id, unavailable).pipe(switchMap((response: IApiResponse) => this.requestSuccess('UNAVAILABLE.UPDATED.MESSAGE',
+        newDateTimestamp(response.timestamp), `${path}/${response.id}`))),
+      action => action,
+      unavailableFailure,
     )),
   ));
 
   delete$ = createEffect(() => this.actions.pipe(
     ofType(deleteUnavailable),
-    switchMap(({ id, timestamp, timeZone }) => this.unavailableService.deleteUnavailable(id).pipe(
-      switchMap(() => {
+    switchMap(({ id, timestamp, timeZone }) => effectRequest(
+      this.unavailableService.deleteUnavailable(id).pipe(switchMap(() => {
         const message = this.translate.instant('UNAVAILABLE.DELETED.MESSAGE',
           { date: newDateTimestamp(timestamp, timeZone) });
         return success(unavailableSaveSuccess, message, undefined, true, 'warning');
-      }),
-      catchError((err: HttpErrorResponse) => of(unavailableFailure({ error: err.error }))),
+      })),
+      action => action,
+      unavailableFailure,
     )),
   ));
 
@@ -120,22 +129,6 @@ export class UnavailableEffects {
       }
       this.router.navigate([...path, selected?.id]);
     }),
-  ), { dispatch: false });
-
-  dataSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(unavailableSuccess),
-  ), { dispatch: false });
-
-  roomSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(roomSuccess),
-  ), { dispatch: false });
-
-  professionalSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(professionalSuccess),
-  ), { dispatch: false });
-
-  saveSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(unavailableSaveSuccess),
   ), { dispatch: false });
 
   private requestSuccess(key: string, date: Date, path: string) {

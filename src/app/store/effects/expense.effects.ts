@@ -1,8 +1,6 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { of } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { ExpenseService } from '../../services/expense.service';
@@ -22,6 +20,7 @@ import {
 import { IExpenseAll, IExpenseInfo } from '../../interfaces/expense';
 import { IApiResponse, success } from '../../interfaces/common';
 import { Pagination } from '../../interfaces/pagination';
+import { effectRequest } from '../../util/rxjs';
 
 @Injectable()
 export class ExpenseEffects {
@@ -32,67 +31,68 @@ export class ExpenseEffects {
 
   getAll$ = createEffect(() => this.actions$.pipe(
     ofType(getExpensesPage),
-    switchMap(({ roomId, sort, direction, page, size, filter, dateFilter }) =>
+    switchMap(({ roomId, sort, direction, page, size, filter, dateFilter }) => effectRequest(
       this.expenseService.getExpensesPage(roomId, sort, direction, page, size, filter, dateFilter)
-        .pipe(map((data: Pagination<IExpenseAll>) => expenseSuccess({ data })),
-          catchError((err: HttpErrorResponse) => of(expenseFailure({ error: err.error }))),
-        )),
+        .pipe(map((data: Pagination<IExpenseAll>) => expenseSuccess({ data }))),
+      action => action,
+      expenseFailure,
+    )),
   ));
 
   findOne$ = createEffect(() => this.actions$.pipe(
     ofType(getExpense),
-    switchMap(({ roomId, id }) =>
-      this.expenseService.getExpense(roomId, id).pipe(
-        map((selected?: IExpenseAll) => expenseSelected({ selected })),
-        catchError((err: HttpErrorResponse) => of(expenseFailure({ error: err.error }))),
-      )),
+    switchMap(({ roomId, id }) => effectRequest(
+      this.expenseService.getExpense(roomId, id).pipe(map((selected?: IExpenseAll) => expenseSelected({ selected }))),
+      action => action,
+      expenseFailure,
+    )),
   ));
 
   getInfo$ = createEffect(() => this.actions$.pipe(
     ofType(getAllExpensesInfo),
-    switchMap(({ roomId }) =>
-      this.expenseService.getAllExpensesInfo(roomId).pipe(
-        map((info: IExpenseInfo) => expenseInfoSuccess({ info })),
-        catchError((err: HttpErrorResponse) => of(expenseFailure({ error: err.error }))),
-      )),
+    switchMap(({ roomId }) => effectRequest(
+      this.expenseService.getAllExpensesInfo(roomId).pipe(map((info: IExpenseInfo) => expenseInfoSuccess({ info }))),
+      action => action,
+      expenseFailure,
+    )),
   ));
 
   create$ = createEffect(() => this.actions$.pipe(
     ofType(createExpense),
-    switchMap(({ roomId, expense, file }) =>
-      this.expenseService.createExpense(roomId, expense, file).pipe(
-        switchMap((response: IApiResponse) => {
-          const message = this.translate.instant('EXPENSE.CREATED', { invoice: response.name });
-          const path = `rooms/${roomId}/expenses/${response.id}`;
-          return success(expenseSaveSuccess, message, path);
-        }),
-        catchError((err: HttpErrorResponse) => of(expenseFailure({ error: err.error }))),
-      )),
+    switchMap(({ roomId, expense, file }) => effectRequest(
+      this.expenseService.createExpense(roomId, expense, file).pipe(switchMap((response: IApiResponse) => {
+        const message = this.translate.instant('EXPENSE.CREATED', { invoice: response.name });
+        const path = `rooms/${ roomId }/expenses/${ response.id }`;
+        return success(expenseSaveSuccess, message, path);
+      })),
+      action => action,
+      expenseFailure,
+    )),
   ));
 
   update$ = createEffect(() => this.actions$.pipe(
     ofType(updateExpense),
-    switchMap(({ id, roomId, expense, file }) =>
-      this.expenseService.updateExpense(id, roomId, expense, file).pipe(
-        switchMap((response: IApiResponse) => {
-          const message = this.translate.instant('EXPENSE.UPDATED.MESSAGE', { invoice: response.name });
-          const path = `rooms/${roomId}/expenses/${response.id}`;
-          return success(expenseSaveSuccess, message, path);
-        }),
-        catchError((err: HttpErrorResponse) => of(expenseFailure({ error: err.error }))),
-      )),
+    switchMap(({ id, roomId, expense, file }) => effectRequest(
+      this.expenseService.updateExpense(id, roomId, expense, file).pipe(switchMap((response: IApiResponse) => {
+        const message = this.translate.instant('EXPENSE.UPDATED.MESSAGE', { invoice: response.name });
+        const path = `rooms/${ roomId }/expenses/${ response.id }`;
+        return success(expenseSaveSuccess, message, path);
+      })),
+      action => action,
+      expenseFailure,
+    )),
   ));
 
   delete$ = createEffect(() => this.actions$.pipe(
     ofType(deleteExpense),
-    switchMap(({ roomId, id, invoice }) =>
-      this.expenseService.deleteExpense(roomId, id).pipe(
-        switchMap(() => {
-          const message = this.translate.instant('EXPENSE.DELETED.MESSAGE', { invoice });
-          return success(expenseSaveSuccess, message, undefined, true, 'warning');
-        }),
-        catchError((err: HttpErrorResponse) => of(expenseFailure({ error: err.error }))),
-      )),
+    switchMap(({ roomId, id, invoice }) => effectRequest(
+      this.expenseService.deleteExpense(roomId, id).pipe(switchMap(() => {
+        const message = this.translate.instant('EXPENSE.DELETED.MESSAGE', { invoice });
+        return success(expenseSaveSuccess, message, undefined, true, 'warning');
+      })),
+      action => action,
+      expenseFailure,
+    )),
   ));
 
   selectedData$ = createEffect(() => this.actions$.pipe(
@@ -105,13 +105,5 @@ export class ExpenseEffects {
       }
       this.router.navigate([this.translate.getCurrentLang(), 'rooms', roomId, 'expenses', expenseId]);
     }),
-  ), { dispatch: false });
-
-  infoSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(expenseInfoSuccess),
-  ), { dispatch: false });
-
-  saveSuccess$ = createEffect(() => this.actions$.pipe(
-    ofType(expenseSaveSuccess),
   ), { dispatch: false });
 }

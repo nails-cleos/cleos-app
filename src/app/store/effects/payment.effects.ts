@@ -1,8 +1,7 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import {
   adjustPayments,
   createPaymentLinkByReservationId,
@@ -23,6 +22,7 @@ import { PaymentService } from '../../services/payment.service';
 import { Router } from '@angular/router';
 import { IPay, IPayment } from '../../interfaces/payment';
 import { IApiResponse, successResponse } from '../../interfaces/common';
+import { effectRequest } from '../../util/rxjs';
 
 @Injectable()
 export class PaymentEffects {
@@ -33,84 +33,88 @@ export class PaymentEffects {
 
   getAll$ = createEffect(() => this.actions.pipe(
     ofType(getPayment),
-    switchMap(({ id }) =>
-      this.paymentService.getPayment(id).pipe(
-        map((selected?: IPayment) => paymentSelected({ selected })),
-        catchError((err: HttpErrorResponse) => of(paymentFailure({ error: err.error }))),
-      )),
+    switchMap(({ id }) => effectRequest(
+      this.paymentService.getPayment(id).pipe(map((selected?: IPayment) => paymentSelected({ selected }))),
+      action => action,
+      paymentFailure,
+    )),
   ));
 
   findByReservation$ = createEffect(() => this.actions.pipe(
     ofType(getPaymentByResourceId),
-    switchMap(({ id, path }) =>
-      this.paymentService.getPaymentByResourceId(id, path).pipe(
-        map((selected: IPayment[]) => paymentSelected({ selected })),
-        catchError((err: HttpErrorResponse) => of(paymentFailure({ error: err.error }))),
-      )),
+    switchMap(({ id, path }) => effectRequest(
+      this.paymentService.getPaymentByResourceId(id, path)
+        .pipe(map((selected: IPayment[]) => paymentSelected({ selected }))),
+      action => action,
+      paymentFailure,
+    )),
   ));
 
   createOne$ = createEffect(() => this.actions.pipe(
     ofType(createPaymentLinkByReservationId),
-    switchMap(({ reservationId, payment }) =>
-      this.paymentService.createPaymentLinkByReservationId(reservationId, payment).pipe(
-        map((response: IPayment) => paymentSend({ link: response.link || response.paymentURL })),
-        catchError((err: HttpErrorResponse) => of(paymentFailure({ error: err.error }))),
-      )),
+    switchMap(({ reservationId, payment }) => effectRequest(
+      this.paymentService.createPaymentLinkByReservationId(reservationId, payment)
+        .pipe(map((response: IPayment) => paymentSend({ link: response.link || response.paymentURL }))),
+      action => action,
+      paymentFailure,
+    )),
   ));
 
   save$ = createEffect(() => this.actions.pipe(
     ofType(paymentSave),
-    switchMap(({ id, path, status, paymentStatus }) =>
-      this.paymentService.add(id, path, status, paymentStatus).pipe(
-        switchMap((response: IPay) => {
-          const path = response.paths?.join('/');
-          switch (response.status) {
-            case 'approved':
-              return this.requestSuccess('COMMON.PAYMENT.SUCCESS', path);
-            case 'pending':
-              return this.requestSuccess('COMMON.PAYMENT.PENDING', path);
-            default:
-              const message = this.translate.instant('ME.PAYMENT.ERROR', { reason: response.message });
-              return of(paymentNotComplete(
-                { subError: [{ message }], response: { message, path, toastType: 'error', redirect: path } }));
-          }
-        }),
-        catchError((err: HttpErrorResponse) => of(paymentFailure({ error: err.error }))),
-      )),
+    switchMap(({ id, path, status, paymentStatus }) => effectRequest(
+      this.paymentService.add(id, path, status, paymentStatus).pipe(switchMap((response: IPay) => {
+        const path = response.paths?.join('/');
+        switch (response.status) {
+          case 'approved':
+            return this.requestSuccess('COMMON.PAYMENT.SUCCESS', path);
+          case 'pending':
+            return this.requestSuccess('COMMON.PAYMENT.PENDING', path);
+          default:
+            const message = this.translate.instant('ME.PAYMENT.ERROR', { reason: response.message });
+            return of(paymentNotComplete(
+              { subError: [{ message }], response: { message, path, toastType: 'error', redirect: path } }));
+        }
+      })),
+      action => action,
+      paymentFailure,
+    )),
   ));
 
   update$ = createEffect(() => this.actions.pipe(
     ofType(adjustPayments),
-    switchMap(({ payments }) =>
-      this.paymentService.adjustPayments(payments).pipe(
-        switchMap(() => this.requestSuccess('COMMON.PAYMENT.SUCCESS', undefined, true)),
-        catchError((err: HttpErrorResponse) => of(paymentFailure({ error: err.error }))),
-      )),
+    switchMap(({ payments }) => effectRequest(
+      this.paymentService.adjustPayments(payments)
+        .pipe(switchMap(() => this.requestSuccess('COMMON.PAYMENT.SUCCESS', undefined, true))),
+      action => action,
+      paymentFailure,
+    )),
   ));
 
   updateLink$ = createEffect(() => this.actions.pipe(
     ofType(updatePaymentById),
-    switchMap(({ id, payment }) =>
-      this.paymentService.updatePayment(id, payment).pipe(
-        map((response: IApiResponse) => paymentSend({ link: response.paymentLink })),
-        catchError((err: HttpErrorResponse) => of(paymentFailure({ error: err.error }))),
-      )),
+    switchMap(({ id, payment }) => effectRequest(
+      this.paymentService.updatePayment(id, payment)
+        .pipe(map((response: IApiResponse) => paymentSend({ link: response.paymentLink }))),
+      action => action,
+      paymentFailure,
+    )),
   ));
 
   recreate$ = createEffect(() => this.actions.pipe(
     ofType(recreate),
-    switchMap(({ id, paymentType }) =>
-      this.paymentService.recreate(id, paymentType).pipe(
-        switchMap(() => this.requestSuccess('PAYMENT.RECREATE')),
-        catchError((err: HttpErrorResponse) => of(paymentFailure({ error: err.error }))),
-      )),
+    switchMap(({ id, paymentType }) => effectRequest(
+      this.paymentService.recreate(id, paymentType).pipe(switchMap(() => this.requestSuccess('PAYMENT.RECREATE'))),
+      action => action,
+      paymentFailure,
+    )),
   ));
 
   notify$ = createEffect(() => this.actions.pipe(
     ofType(notifyPayment),
-    switchMap(({ id, path, resourceId, preferenceId, paymentType }) =>
-      this.paymentService.notifyPayment(id, path, resourceId, preferenceId, paymentType).pipe(
-        switchMap((response: IPay) => {
+    switchMap(({ id, path, resourceId, preferenceId, paymentType }) => effectRequest(
+      this.paymentService.notifyPayment(id, path, resourceId, preferenceId, paymentType)
+        .pipe(switchMap((response: IPay) => {
           switch (response.status) {
             case 'approved':
               return this.requestSuccess('COMMON.PAYMENT.SUCCESS', undefined, true);
@@ -120,9 +124,10 @@ export class PaymentEffects {
               const message = this.translate.instant('COMMON.PAYMENT.ERROR', { reason: response.message });
               return of(paymentNotComplete({ subError: [message] }));
           }
-        }),
-        catchError((err: HttpErrorResponse) => of(paymentFailure({ error: err.error }))),
-      )),
+        })),
+      action => action,
+      paymentFailure,
+    )),
   ));
 
   selectedData$ = createEffect(() => this.actions.pipe(
@@ -143,10 +148,6 @@ export class PaymentEffects {
   send$ = createEffect(() => this.actions.pipe(
     ofType(paymentSend),
     tap(({ link }) => window.open(link, '_self')),
-  ), { dispatch: false });
-
-  saveSuccess$ = createEffect(() => this.actions.pipe(
-    ofType(paymentSaveSuccess),
   ), { dispatch: false });
 
   private requestSuccess(key: string, path?: string, reload?: boolean) {
