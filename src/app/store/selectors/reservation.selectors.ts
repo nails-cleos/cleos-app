@@ -120,7 +120,7 @@ export const getSelectedReservationPipe = pipe(
 
 const selectAvailable = createSelector(
   selectReservationState,
-  (state: ReservationState) => state?.data,
+  (state: ReservationState) => state?.availability,
 );
 export const getAvailableListPipe = pipe(
   select(selectAvailable),
@@ -129,7 +129,7 @@ export const getAvailableListPipe = pipe(
 
 const selectCalendar = createSelector(
   selectReservationState,
-  (state: ReservationState) => state?.data,
+  (state: ReservationState) => state?.groupedRooms,
 );
 export const getCalendarPipe = pipe(
   select(selectCalendar),

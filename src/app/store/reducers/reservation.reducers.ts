@@ -30,9 +30,11 @@ import {
   getUpcomingReservation,
   paymentCompleteReservation,
   reservationAdditionalSuccess,
+  reservationAvailabilitySuccess,
   reservationFailure,
   reservationFilterPageSuccess,
   reservationFindPayments,
+  reservationGroupingByRoomSuccess,
   reservationHistorySuccess,
   reservationPageSuccess,
   reservationPaymentsSuccess,
@@ -41,7 +43,6 @@ import {
   reservationSaveSuccess,
   reservationsCustomerSuccess,
   reservationSelected,
-  reservationSuccess,
   reservationTreatmentsSuccess,
   searchAvailability,
   setCurrentCompleteReservation,
@@ -64,7 +65,6 @@ import {
   IAvailableDTO,
   ICustomerLastReservation,
   ICustomerReservation,
-  IReservation,
   IReservationAll,
   IRoomReservation,
   ITracking,
@@ -87,7 +87,8 @@ export const RESERVATION_FEATURE_KEY = 'reservation';
 
 export interface ReservationState {
   response?: IResponseSuccess;
-  data?: IReservation | IRoomReservation[] | IReservation[] | ICustomerReservation | IAvailableDTO[];
+  groupedRooms?: IRoomReservation[];
+  availability?: IAvailableDTO[];
   filter?: Pagination<IReservationAll>;
   page?: Pagination<IReservationAll>;
   customerReservation?: ICustomerReservation;
@@ -132,7 +133,8 @@ export interface ReservationState {
 
 export const initialState: ReservationState = {
   response: undefined,
-  data: undefined,
+  groupedRooms: undefined,
+  availability: undefined,
   filter: undefined,
   page: undefined,
   customerReservation: undefined,
@@ -189,7 +191,7 @@ export const reservationReducer = createReducer(
   })),
   on(getAllGroupingByRoom, (state) => ({
     ...state,
-    data: undefined,
+    groupedRooms: undefined,
     error: undefined,
     subErrors: undefined,
     selected: undefined,
@@ -198,7 +200,6 @@ export const reservationReducer = createReducer(
   })),
   on(getUpcomingReservation, (state) => ({
     ...state,
-    data: undefined,
     error: undefined,
     subErrors: undefined,
     selected: undefined,
@@ -206,7 +207,7 @@ export const reservationReducer = createReducer(
   })),
   on(customerSearchReservation, searchAvailability, (state) => ({
     ...state,
-    data: undefined,
+    availability: undefined,
     error: undefined,
     subErrors: undefined,
     selected: undefined,
@@ -254,7 +255,6 @@ export const reservationReducer = createReducer(
   })),
   on(updateReservationNote, updateReservationDiscount, updateReservationTimestamp, updateReservationById, (state) => ({
     ...state,
-    data: {} as IReservation,
     page: undefined,
     filter: undefined,
     error: undefined,
@@ -299,7 +299,6 @@ export const reservationReducer = createReducer(
     updateReservationCustomer,
     updateReservationColor, (state) => ({
       ...state,
-      data: {} as IReservation,
       page: undefined,
       filter: undefined,
       error: undefined,
@@ -337,9 +336,17 @@ export const reservationReducer = createReducer(
     subErrors: undefined,
     response: undefined,
   })),
-  on(reservationSuccess, (state, { data }) => ({
+  on(reservationGroupingByRoomSuccess, (state, { groupedRooms }) => ({
     ...state,
-    data,
+    groupedRooms,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(reservationAvailabilitySuccess, (state, { availability }) => ({
+    ...state,
+    availability,
     error: undefined,
     subErrors: undefined,
     response: undefined,
