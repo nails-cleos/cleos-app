@@ -1,8 +1,6 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { of } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { login, loginFailure, loginSuccess, logOut, redirect, reLogin } from '../auth.actions';
@@ -12,6 +10,7 @@ import { AuthUserService } from '../../services/auth-user.service';
 import { getLocale } from '../../util/helper';
 import { Token } from '../../interfaces/token';
 import { FirebaseService } from '../../services/firebase.service';
+import { effectRequest } from '../../util/rxjs';
 
 @Injectable()
 export class LoginEffects {
@@ -25,11 +24,12 @@ export class LoginEffects {
 
   login$ = createEffect(() => this.actions.pipe(
     ofType(login),
-    switchMap(({ token, code, theme, queryParams }) =>
-      this.authService.login(token, code, theme).pipe(
-        map((token: Token) => loginSuccess({ token, queryParams, redirect: true })),
-        catchError((err: HttpErrorResponse) => of(loginFailure({ error: err.error }))),
-      )),
+    switchMap(({ token, code, theme, queryParams }) => effectRequest(
+      this.authService.login(token, code, theme).pipe(map((token: Token) =>
+        loginSuccess({ token, queryParams, redirect: true }))),
+      action => action,
+      loginFailure,
+    )),
   ));
 
   loginSuccess$ = createEffect(() => this.actions.pipe(
@@ -55,10 +55,6 @@ export class LoginEffects {
         this.navigationService.reload(redirectUrl);
       }
     }),
-  ), { dispatch: false });
-
-  logInFailure$ = createEffect(() => this.actions.pipe(
-    ofType(loginFailure),
   ), { dispatch: false });
 
   logOut$ = createEffect(() => this.actions.pipe(
