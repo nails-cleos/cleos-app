@@ -59,7 +59,8 @@ enum ReservationActionTypes {
   updateReservationCustomer = '[Reservation] Update customer by reservation id',
   updateReservationColor = '[Reservation] Update color by reservation id',
   stateSuccess = '[Reservation] State success',
-  reservationSuccess = '[Reservation] Success',
+  reservationGroupingByRoomSuccess = '[Reservation] Grouping by room success',
+  reservationAvailabilitySuccess = '[Reservation] Availability success',
   reservationPageSuccess = '[Reservation] Page Success',
   reservationFilterPageSuccess = '[Reservation] Filter Page Success',
   customersSuccess = '[Reservation] Customers success',
@@ -155,9 +156,14 @@ export const getAllAdditionalByGroupId = createAction(
 
 export const getUpcomingReservation = createAction(ReservationActionTypes.getUpcomingReservation);
 
-export const reservationSuccess = createAction(
-  ReservationActionTypes.reservationSuccess,
-  props<{ data: IRoomReservation[] | IAvailableDTO[] }>(),
+export const reservationGroupingByRoomSuccess = createAction(
+  ReservationActionTypes.reservationGroupingByRoomSuccess,
+  props<{ groupedRooms: IRoomReservation[] }>(),
+);
+
+export const reservationAvailabilitySuccess = createAction(
+  ReservationActionTypes.reservationAvailabilitySuccess,
+  props<{ availability: IAvailableDTO[] }>(),
 );
 
 export const reservationPageSuccess = createAction(

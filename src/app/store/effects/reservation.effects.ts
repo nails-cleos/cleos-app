@@ -32,9 +32,11 @@ import {
   getUpcomingReservation,
   paymentCompleteReservation,
   reservationAdditionalSuccess,
+  reservationAvailabilitySuccess,
   reservationFailure,
   reservationFilterPageSuccess,
   reservationFindPayments,
+  reservationGroupingByRoomSuccess,
   reservationHistorySuccess,
   reservationPageSuccess,
   reservationPaymentsSuccess,
@@ -43,7 +45,6 @@ import {
   reservationSaveSuccess,
   reservationsCustomerSuccess,
   reservationSelected,
-  reservationSuccess,
   reservationTreatmentsSuccess,
   searchAvailability,
   startReservation,
@@ -138,8 +139,8 @@ export class ReservationEffects {
     ofType(getAllGroupingByRoom),
     switchMap(({ days, date, roomId, professionalId }) => effectRequest(
       this.reservationService.getAllGroupingByRoom(days, date, roomId, professionalId),
-      (response: IRoomReservation[]) => reservationSuccess(
-        response ? { data: response } : { data: [] as IRoomReservation[] }),
+      (groupedRooms: IRoomReservation[]) => reservationGroupingByRoomSuccess(
+        groupedRooms ? { groupedRooms } : { groupedRooms: [] }),
       reservationFailure,
     )),
   ));
@@ -148,7 +149,8 @@ export class ReservationEffects {
     ofType(searchAvailability),
     switchMap(({ roomId, days, dates, professionalId }) => effectRequest(
       this.reservationService.searchAvailability(roomId, days, dates, professionalId),
-      (data: IRoomReservation[]) => reservationSuccess(data ? { data } : { data: [] }),
+      (groupedRooms: IRoomReservation[]) => reservationGroupingByRoomSuccess(
+        groupedRooms ? { groupedRooms } : { groupedRooms: [] }),
       reservationFailure,
     )),
   ));
@@ -157,7 +159,8 @@ export class ReservationEffects {
     ofType(customerSearchReservation),
     switchMap(({ roomId, treatmentId, date, professionalId, additionalIds }) => effectRequest(
       this.reservationService.customerSearch(roomId, treatmentId, date, professionalId, additionalIds),
-      (data: IAvailableDTO[]) => reservationSuccess(data ? { data } : { data: [] }),
+      (availability: IAvailableDTO[]) => reservationAvailabilitySuccess(
+        availability ? { availability } : { availability: [] }),
       reservationFailure,
     )),
   ));
