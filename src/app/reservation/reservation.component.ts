@@ -48,16 +48,12 @@ import {
   createDate,
   createFullDate,
   createNewDate,
-  dateToTimestamp,
   dateToUTC,
   Duration,
   filterDateRoom,
   formatTime,
-  getAvailability,
   getCurrentTimeZone,
-  getDurationOrUndefined,
   getNowTimeZone,
-  getStartEndDay,
   getTime,
   getTimeNumber,
   IDuration,
@@ -70,7 +66,7 @@ import {
   searchDates,
   totalDuration,
 } from '../util/dates';
-import { createBullet, DataEvent, IDataEvent, Meta, newEvent } from '../util/event';
+import { DataEvent, IDataEvent } from '../util/event';
 import { Router } from '@angular/router';
 import { Role } from '../interfaces/token';
 import { IUnavailableAll } from '../interfaces/unavailable';
@@ -90,7 +86,6 @@ import {
   roomDetail,
 } from '../util/helper';
 import { addDays, addMonths, isEqual } from 'date-fns';
-import { findStateColor } from '../util/theme';
 import { IAdditionalAll } from '../interfaces/additional';
 import { MatListOption } from '@angular/material/list';
 import { IOffice, IOfficeAll } from '../interfaces/office';
@@ -133,79 +128,37 @@ import {
 } from '../store/selectors/reservation.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../interfaces/common';
+import {
+  ConfigurationForm,
+  createReservationErrors,
+  CustomerForm,
+  DateTimeForm,
+  EventForm,
+  EventGroupForm,
+  OfficeForm,
+  ReservationErrors,
+  ReservationForms,
+  TreatmentForm,
+} from './reservation-form.types';
+import { ReservationFormErrorService } from './reservation-form-error.service';
+import { ReservationCalendarService } from './reservation-calendar.service';
 import PlaceResult = google.maps.places.PlaceResult;
 
-type CustomerForm = {
-  customer: FormControl<IUserAll | undefined>;
-}
-
-type OfficeForm = {
-  room: FormControl<IRoomAll | undefined>;
-  professional: FormControl<IUserAll | undefined>;
-  office: FormControl<IOfficeAll | undefined>;
-};
-
-type DateTimeForm = {
-  date: FormControl<Date | undefined>;
-  start: FormControl<string | undefined>;
-}
-
-type TreatmentForm = {
-  treatment: FormControl<IService | undefined>;
-  discount: FormControl<string | undefined>;
-  group: FormControl<IGroupService | undefined>;
-  dateTimeList: FormArray<FormGroup<DateTimeForm>>;
-};
-
-type ConfigurationForm = {
-  customerChange: FormControl<boolean>;
-  reference: FormControl<string | undefined>;
-  note: FormControl<string | undefined>;
-  type: FormControl<PaymentType | undefined>;
-  amount: FormControl<number | undefined>;
-  transfer: FormControl<string | undefined>;
-};
-
-type EventForm = {
-  event: FormControl<CalendarEvent | undefined>;
-};
-
-type EventGroupForm = {
-  events: FormArray<FormGroup<EventForm>>;
-};
-
-type ReservationForms = {
-  customerForm: FormGroup<CustomerForm>;
-  officeForm: FormGroup<OfficeForm>;
-  treatmentForm: FormGroup<TreatmentForm>;
-  configurationForm: FormGroup<ConfigurationForm>;
-  eventGroup: FormGroup<EventGroupForm>;
-};
-
-type ReservationErrors = {
-  customer?: string;
-
-  room?: string;
-  professional?: string;
-  office?: string;
-
-  treatment?: string;
-  discount?: string;
-  group?: string;
-  dateTimeList?: string[];
-
-  customerChange?: string;
-  reference?: string;
-  note?: string;
-  type?: string;
-  amount?: string;
-  transfer?: string;
-
-  events?: string[];
-
-  schedule: boolean[];
-  overlapping: boolean;
-};
+const RESERVATION_ERROR_FIELDS = [
+  'customer',
+  'room',
+  'professional',
+  'office',
+  'treatment',
+  'discount',
+  'group',
+  'customerChange',
+  'reference',
+  'note',
+  'type',
+  'amount',
+  'transfer',
+] as const;
 
 @Component({
   selector: 'app-reservation',
@@ -227,6 +180,8 @@ export class ReservationComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly router: Router = inject(Router);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
+  private readonly formErrorService = inject(ReservationFormErrorService);
+  private readonly reservationCalendarService = inject(ReservationCalendarService);
 
   private navigationParams$ = this.store.pipe(getNavigationParamsPipe);
   private reservationId$ = this.store.pipe(getCurrentReservationIdPipe);
@@ -331,12 +286,7 @@ export class ReservationComponent {
     configurationForm: this.configurationForm,
   });
 
-  errors = signal<ReservationErrors>({
-    schedule: [],
-    dateTimeList: [],
-    events: [],
-    overlapping: false,
-  });
+  errors = signal<ReservationErrors>(createReservationErrors());
 
   customersSignal = toSignal(this.customers$);
   filteredCustomerSignal = toSignal(
@@ -684,13 +634,9 @@ export class ReservationComponent {
         const professional = getList(room.professionals, this.professionalId());
         this.getOfficeForm.professional.setValue(professional);
         this.professionalId.set(professional?.id);
-        const { monday, tuesday, wednesday, thursday, friday, saturday, sunday } = getAvailability(room);
-        const {
-          min,
-          max,
-        } = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday, room.timeZone);
-        if (min) {
-          this.minDate = getTime(min);
+        const schedule = this.reservationCalendarService.getRoomSchedule(room);
+        if (schedule.minTime) {
+          this.minDate = schedule.minTime;
           this.dateTimeList.controls.forEach((control: any) => {
             const start = control.get('start');
             if (start && (!start.value || start.value === '' || start.value === '00:00')) {
@@ -698,8 +644,8 @@ export class ReservationComponent {
             }
           });
         }
-        if (max) {
-          this.maxDate = getTime(max);
+        if (schedule.maxTime) {
+          this.maxDate = schedule.maxTime;
         }
         this.getTreatmentForm.group.setValue(undefined);
         // this.cleanTreatment();
@@ -828,49 +774,7 @@ export class ReservationComponent {
       const subErrors = this.subErrorsSignal();
       if (subErrors) {
         this.isPreview = false;
-        const errorMap: ReservationErrors = { schedule: [], dateTimeList: [], events: [], overlapping: false };
-        subErrors.forEach((error: IError) => {
-          let step = this.isEditing() ? this.isAdmin() ? 1 : 2 : 0;
-          switch (error.field) {
-            case 'room':
-              step = 1;
-              break;
-            case 'professional':
-              step = 3;
-              break;
-          }
-          if (this.myStepper) {
-            this.myStepper.selectedIndex = step;
-          }
-
-          const field = error.field as keyof Omit<ReservationErrors, 'schedule' | 'dateTimeList' | 'events' | 'overlapping'> | undefined;
-          if (field) {
-            errorMap[field] = error.message;
-
-            // Set Angular form errors
-            if (field in this.customerForm.controls) {
-              this.customerForm.controls[field as keyof CustomerForm]?.setErrors({ incorrect: true });
-            }
-            if (field in this.officeForm.controls) {
-              this.officeForm.controls[field as keyof OfficeForm]?.setErrors({ incorrect: true });
-            }
-            if (field in this.treatmentForm.controls) {
-              this.treatmentForm.controls[field as keyof TreatmentForm]?.setErrors({ incorrect: true });
-            }
-            if (field in this.configurationForm.controls) {
-              this.configurationForm.controls[field as keyof ConfigurationForm]?.setErrors({ incorrect: true });
-            }
-            if (field in this.eventGroup.controls) {
-              this.eventGroup.controls[field as keyof EventGroupForm]?.setErrors({ incorrect: true });
-            }
-            const inputField = document.querySelector(`input[formControlName="${field}"]`) as HTMLInputElement;
-            if (inputField) {
-              inputField.focus();
-              inputField.blur();
-            }
-          }
-        });
-        this.errors.set(errorMap);
+        this.applySubErrors(subErrors);
       }
     });
 
@@ -1428,19 +1332,18 @@ export class ReservationComponent {
     if (!treatment || !customer) {
       return undefined;
     }
-    let treatments = createBullet(treatment.name);
-    treatments += this.additionalSelected().map(additional => createBullet(additional.name));
-
-    const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
-      customerName: customer.displayName,
-      professionalName: this.getOfficeForm.professional.value?.displayName,
-      treatments,
+    return this.reservationCalendarService.createSelectionEvent({
+      treatment,
+      customer,
+      additional: this.additionalSelected(),
+      professional: this.getOfficeForm.professional.value,
+      start,
+      end,
+      state,
+      timeZone,
+      id,
+      isDarkMode: this.isDarkMode(),
     });
-
-    const meta = new Meta(true, timeZone, undefined, undefined, this.getOfficeForm.professional.value?.id);
-    meta.isReservation = true;
-    const isDarkMode = this.isDarkMode();
-    return newEvent(detail, findStateColor(state, isDarkMode), start, isDarkMode, end, id, meta, true);
   };
 
   private dateIsValid = (date: Date): boolean => isBetween(getNowTimeZone(), this.maxCalendarDate, date);
@@ -1464,68 +1367,22 @@ export class ReservationComponent {
     if (!room) {
       return;
     }
-    const timeZone = room.timeZone;
-
-    const { monday, tuesday, wednesday, thursday, friday, saturday, sunday, exclude } = getAvailability(room);
-    this.weekendDays = exclude;
-    const { min, max } = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday, timeZone);
-    this.day = new Day(min, max, getNowTimeZone(), exclude, 1);
-
-    const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
-    const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
-    const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
-
-    eventData.recurringEvent?.addNotAvailableRecurring(eventData, unavailable, lunch, notWorking, sunday, saturday,
-      friday, thursday, wednesday, tuesday, monday, this.isDarkMode(), timeZone);
+    const schedule = this.reservationCalendarService.addRoomAvailabilityEvents(eventData, room, this.isDarkMode());
+    this.weekendDays = schedule.weekendDays;
+    this.day = schedule.day;
   };
 
-  private addReservations = (reservations: IReservationAll[]): CalendarEvent[] => reservations.map(it => {
-    if (it.id !== this.reservationId) {
-      if (it.treatment.duration) {
-        if (it.timestamp >= dateToTimestamp()) {
-          const timeZone = it.room.timeZone;
-          const start = newDateTimestamp(it.timestamp);
-          const duration = reservationDuration(it);
-          const end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
-          let treatments = createBullet(it.treatment.name);
-          treatments += it.additional?.map(additional => createBullet(additional.name));
-
-          const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
-            customerName: it.customer.displayName,
-            professionalName: it.professional.displayName,
-            treatments,
-          });
-
-          const isDarkMode = this.isDarkMode();
-          const color = findStateColor(it.state, isDarkMode);
-          const meta = new Meta(true, timeZone, undefined, undefined, it.professional.id);
-          meta.isReservation = true;
-          return newEvent(detail, color, start, isDarkMode, end, it.id, meta);
-        }
-      }
-    }
-    return undefined;
-  }).filter((item): item is CalendarEvent => item !== undefined) ?? [];
+  private addReservations = (reservations: IReservationAll[]): CalendarEvent[] =>
+    this.reservationCalendarService.buildReservationEvents(reservations, this.reservationId, this.isDarkMode());
 
   private addUnavailableList = (dataEvent: IDataEvent, unavailableList: IUnavailableAll[]) => {
-    unavailableList.forEach(it => {
-      if (it.duration || it.allDay) {
-        const startDate = newDateTimestamp(it.timestamp, this.getOfficeForm.room.value?.timeZone);
-        const start = it.allDay ? createNewDate(startDate) : startDate;
-        const professionalId = it.professional.id;
-        const title = this.translate.instant('RESERVATION.EVENT.UNAVAILABLE', {
-          description: it.description ? it.description : '',
-          professionalName: it.professional.displayName,
-        });
-        let path = 'unavailable/';
-        if (it.type === 'BLOCK_AGENDA') {
-          path += 'block-agenda/';
-        }
-        dataEvent.recurringEvent?.addFrequency(it.repeat, start, it.id, title, 'UNAVAILABLE', path,
-          (date, recurring) => this.validateUnavailable(date, recurring, dataEvent),
-          getDurationOrUndefined(it.duration), professionalId, it.allDay);
-      }
-    });
+    this.reservationCalendarService.addUnavailableEvents(
+      dataEvent,
+      unavailableList,
+      this.getOfficeForm.room.value?.timeZone,
+      this.isDarkMode(),
+      this.validateUnavailable,
+    );
   };
 
   private validateUnavailable = (start: Date, recurring: any, dataEvent: IDataEvent): void => {
@@ -1534,12 +1391,50 @@ export class ReservationComponent {
   };
 
   private createUnavailableEvent = (recurring: any, start: Date, end: Date, dataEvent: IDataEvent): void => {
-    const isDarkMode = this.isDarkMode();
-    const color = findStateColor('DEFAULT', isDarkMode);
-    const meta = new Meta(!recurring.allDay, this.getOfficeForm.room.value?.timeZone, undefined, undefined,
-      recurring.professionalId);
-    const event = newEvent(recurring.title, color, start, isDarkMode, end, recurring.path, meta);
+    const event = this.reservationCalendarService.createUnavailableEvent(
+      recurring,
+      start,
+      end,
+      this.getOfficeForm.room.value?.timeZone,
+      this.isDarkMode(),
+    );
     dataEvent.addEvent(event);
+  };
+
+  private applySubErrors = (subErrors: IError[]): void => {
+    const state = this.formErrorService.createErrorState(subErrors, {
+      allowedFields: RESERVATION_ERROR_FIELDS,
+      createErrors: createReservationErrors,
+      defaultStepIndex: this.isEditing() ? (this.isAdmin() ? 1 : 2) : 0,
+      stepByField: { room: 1, professional: 3 },
+    });
+    if (this.myStepper !== undefined && state.stepIndex !== undefined) {
+      this.myStepper.selectedIndex = state.stepIndex;
+    }
+
+    state.fields.forEach(field => {
+      if (field in this.customerForm.controls) {
+        this.customerForm.controls[field as keyof CustomerForm]?.setErrors({ incorrect: true });
+      }
+      if (field in this.officeForm.controls) {
+        this.officeForm.controls[field as keyof OfficeForm]?.setErrors({ incorrect: true });
+      }
+      if (field in this.treatmentForm.controls) {
+        this.treatmentForm.controls[field as keyof TreatmentForm]?.setErrors({ incorrect: true });
+      }
+      if (field in this.configurationForm.controls) {
+        this.configurationForm.controls[field as keyof ConfigurationForm]?.setErrors({ incorrect: true });
+      }
+      if (field in this.eventGroup.controls) {
+        this.eventGroup.controls[field as keyof EventGroupForm]?.setErrors({ incorrect: true });
+      }
+
+      const inputField = document.querySelector(`input[formControlName="${field}"]`) as HTMLInputElement | null;
+      inputField?.focus();
+      inputField?.blur();
+    });
+
+    this.errors.set(state.errors);
   };
 
   private createSelectEvent = (title: string, content: string, event: CalendarEvent, eventData: IDataEvent): void => {
