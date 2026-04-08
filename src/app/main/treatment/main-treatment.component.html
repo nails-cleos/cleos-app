@@ -142,7 +142,7 @@
                   @if (detail.details && section.details[0].details) {
                     @for (detailDetail of detail.details.slice(1); track detailDetail; let cellIndex = $index) {
                       <div class="comparison-card-row">
-                        <span class="comparison-card-label" [innerHTML]="section.details?.[0]?.details?.[cellIndex + 1]?.value"></span>
+                        <span class="comparison-card-label" [innerHTML]="section.details[0].details?.[cellIndex + 1]?.value"></span>
                         <p class="comparison-card-value" [innerHTML]="detailDetail.value"></p>
                       </div>
                     }

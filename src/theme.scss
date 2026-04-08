@@ -160,6 +160,14 @@ $dark-theme: mat.m2-define-dark-theme((
 
   --toast-background: #fff;
   --toast-text: rgba(0, 0, 0, .87);
+  --toast-success: #7f7566;
+  --toast-success-soft: #e9e6e2;
+  --toast-info: #ceb4ac;
+  --toast-info-soft: #f5efed;
+  --toast-warning: #c7863a;
+  --toast-warning-soft: #f7ead8;
+  --toast-error: #a51a19;
+  --toast-error-soft: #f7d9d8;
 
   --invert-text: #fff;
 }
@@ -185,6 +193,14 @@ $dark-theme: mat.m2-define-dark-theme((
 
   --toast-background: #424242;
   --toast-text: rgba(255, 255, 255, .87);
+  --toast-success: #dcc8c2;
+  --toast-success-soft: rgba(220, 200, 194, .16);
+  --toast-info: #ceb4ac;
+  --toast-info-soft: rgba(206, 180, 172, .16);
+  --toast-warning: #f1bb72;
+  --toast-warning-soft: rgba(241, 187, 114, .18);
+  --toast-error: #f08080;
+  --toast-error-soft: rgba(240, 128, 128, .18);
 
   --invert-text: rgba(0, 0, 0, .87);
 }

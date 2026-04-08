@@ -1,6 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { switchMap, tap } from 'rxjs/operators';
+import { Action } from '@ngrx/store';
+import { concatMap, delay, switchMap, tap } from 'rxjs/operators';
+import { from, Observable, of } from 'rxjs';
 import {
   approveReservation,
   cancelReservation,
@@ -167,55 +169,49 @@ export class ReservationEffects {
 
   getAllCustomers$ = createEffect(() => this.actions.pipe(
     ofType(getCustomers),
-    switchMap(() => effectRequest(
+    switchMap(() => this.request(
       this.userService.getCustomers(),
-      (customers: IUserAll[]) => customersSuccess({ customers }),
-      reservationFailure,
-    )),
+      (customers: IUserAll[]) => customersSuccess({ customers })),
+    ),
   ));
 
   getCustomerInfo$ = createEffect(() => this.actions.pipe(
     ofType(getCustomerInformation),
-    switchMap(({ id }) => effectRequest(
+    switchMap(({ id }) => this.request(
       this.userService.getCustomerInformation(id),
-      (customer: ICustomerLastReservation) => customerSuccess({ customer }),
-      reservationFailure,
-    )),
+      (customer: ICustomerLastReservation) => customerSuccess({ customer })),
+    ),
   ));
 
   getAllTreatments$ = createEffect(() => this.actions.pipe(
     ofType(getAllTreatments),
-    switchMap(({ roomId, customerId }) => effectRequest(
+    switchMap(({ roomId, customerId }) => this.request(
       this.treatmentService.getAllTreatments(roomId, customerId),
       (treatmentDiscount: ITreatmentDiscountDTO) => reservationTreatmentsSuccess({ treatmentDiscount }),
-      reservationFailure,
     )),
   ));
 
   getAllRooms$ = createEffect(() => this.actions.pipe(
     ofType(getAllRooms),
-    switchMap(({ customerId }) => effectRequest(
+    switchMap(({ customerId }) => this.request(
       this.roomService.getAllRooms(customerId),
       (rooms: IRoomAll[]) => reservationRoomsSuccess({ rooms }),
-      reservationFailure,
     )),
   ));
 
   getAllAdditional$ = createEffect(() => this.actions.pipe(
     ofType(getAllAdditionalByGroupId),
-    switchMap(({ roomId, groupId }) => effectRequest(
+    switchMap(({ roomId, groupId }) => this.request(
       this.additionalService.getAllAdditionalByGroupId(roomId, groupId),
       (additional: IAdditionalAll[]) => reservationAdditionalSuccess({ additional }),
-      reservationFailure,
     )),
   ));
 
   getUpcomingReservation$ = createEffect(() => this.actions.pipe(
     ofType(getUpcomingReservation),
-    switchMap(() => effectRequest(
+    switchMap(() => this.request(
       this.reservationService.getUpcomingReservation(),
       (customerReservation: ICustomerReservation) => reservationsCustomerSuccess({ customerReservation }),
-      reservationFailure,
     )),
   ));
 
@@ -250,15 +246,18 @@ export class ReservationEffects {
     ofType(createReservation),
     switchMap(({ reservation, role }) => effectRequest(
       this.reservationService.createReservation(reservation),
-      (response: IReservation[]) => response.map(res =>
-        this.requestSuccess(
-          'COMMON.RESERVATION.CREATED',
-          true,
-          role,
-          res.id,
-          newDateTimestamp(res.timestamp, res.room?.timeZone),
-          res.paymentLink,
-        )),
+      (response: IReservation[]) => from(response).pipe(
+        concatMap(res => of(
+          this.requestSuccess(
+            'COMMON.RESERVATION.CREATED',
+            true,
+            role,
+            res.id,
+            newDateTimestamp(res.timestamp, res.timeZone),
+            res.paymentLink,
+          ),
+        ).pipe(delay(0))),
+      ),
       reservationFailure,
     )),
   ));
@@ -339,28 +338,25 @@ export class ReservationEffects {
 
   findTracking$ = createEffect(() => this.actions.pipe(
     ofType(getTrackingByReservationId),
-    switchMap(({ id }) => effectRequest(
+    switchMap(({ id }) => this.request(
       this.trackingService.getTrackingByReservationId(id),
       (tracking: ITracking) => trackingSuccess({ tracking }),
-      reservationFailure,
     )),
   ));
 
   executeTracking$ = createEffect(() => this.actions.pipe(
     ofType(executeTrackingByReservationId),
-    switchMap(({ id }) => effectRequest(
+    switchMap(({ id }) => this.request(
       this.trackingService.executeTrackingByReservationId(id),
       (tracking: ITracking) => trackingSuccess({ tracking }),
-      reservationFailure,
     )),
   ));
 
   updateByReservationId$ = createEffect(() => this.actions.pipe(
     ofType(updateTrackingByReservationId),
-    switchMap(({ id, started, completed }) => effectRequest(
+    switchMap(({ id, started, completed }) => this.request(
       this.trackingService.updateTrackingByReservationId(id, started, completed),
       (tracking: ITracking) => trackingSuccess({ tracking }),
-      reservationFailure,
     )),
   ));
 
@@ -375,19 +371,15 @@ export class ReservationEffects {
 
   findReview$ = createEffect(() => this.actions.pipe(
     ofType(getReview),
-    switchMap(({ id }) => effectRequest(
-      this.reservationService.getReview(id),
-      (review?: IReview) => reservationReviewSuccess({ review }),
-      reservationFailure,
-    )),
+    switchMap(({ id }) => this.request(this.reservationService.getReview(id),
+      (review?: IReview) => reservationReviewSuccess({ review }))),
   ));
 
   getAllColorsByTreatmentId$ = createEffect(() => this.actions.pipe(
     ofType(getColorsByTreatmentId),
-    switchMap(({ treatmentId }) => effectRequest(
+    switchMap(({ treatmentId }) => this.request(
       this.colorService.getColorsByTreatmentId(treatmentId),
       (colors: IColorAll[]) => colorsCompleteSuccess({ colors }),
-      reservationFailure,
     )),
   ));
 
@@ -498,5 +490,12 @@ export class ReservationEffects {
     const path = id ? `reservation/${ id }` : undefined;
 
     return reservationSaveSuccess({ message, navigate, path, role, paymentLink, deleted, id, toastType });
+  }
+
+  private request<TResponse>(
+    request$: Observable<TResponse>,
+    onSuccess: (response: TResponse) => Action | Action[],
+  ): Observable<Action> {
+    return effectRequest(request$, onSuccess, reservationFailure);
   }
 }

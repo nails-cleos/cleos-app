@@ -82,6 +82,12 @@ import { IReview } from '../../interfaces/review';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
 import { clearGlobalError, clearGlobalResponse } from '../global.actions';
+import {
+  CurrentCompleteReservationParams,
+  DetailReservationParams,
+  MeReservationParams,
+  ReservationParams,
+} from '../reservation.models';
 
 export const RESERVATION_FEATURE_KEY = 'reservation';
 
@@ -106,28 +112,11 @@ export interface ReservationState {
   error?: IError;
   subErrors?: IError[];
   selected?: IUpcomingAll;
-  meReservationParams?: {
-    treatmentId?: string;
-    roomId?: string;
-    professionalId?: string;
-    date?: Date;
-    discountId?: string
-  };
+  meReservationParams?: MeReservationParams;
   currentReservationId?: string;
-  currentCompleteReservation?: { reservationId: string; roomId: string; customerId: string; isDashboard: boolean };
-  detailReservationParams?: { step?: number };
-  reservationParams?: {
-    isDashboard: boolean;
-    skip: boolean;
-    customerId?: string;
-    roomId?: string;
-    treatmentId?: string;
-    groupId?: string;
-    professionalId?: string;
-    additionalIds?: string[];
-    date?: Date;
-    discountId?: string;
-  }
+  currentCompleteReservation?: CurrentCompleteReservationParams;
+  detailReservationParams?: DetailReservationParams;
+  reservationParams?: ReservationParams;
   isLoading: boolean;
 }
 
@@ -531,7 +520,10 @@ export const reservationReducer = createReducer(
       discountId,
     },
   })),
-  on(cleanReservation, () => ({ ...initialState })),
+  on(cleanReservation, (state) => ({
+    ...initialState,
+    response: state.response,
+  })),
 
   on(clearGlobalResponse, (state) => ({
     ...state,

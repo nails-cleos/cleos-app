@@ -120,6 +120,15 @@ describe('MeReservationComponent', () => {
     }));
   });
 
+  it('should map sub errors through the shared reservation error service', () => {
+    subErrors$.next([{ field: 'startDate', message: 'Start date is invalid' }] as any);
+    fixture.detectChanges();
+
+    expect(component.errors().startDate).toBe('Start date is invalid');
+    expect(component.getTreatmentForm.startDate.hasError('incorrect')).toBeTrue();
+    expect(component['myStepper'].selectedIndex).toBe(1);
+  });
+
   it('should use the selected payment type when creating a reservation payment', () => {
     authUserSignal.update(prev => ({ ...prev, customerId: 'customer-1' }));
     component.date = new Date('2026-03-26T10:00:00');
