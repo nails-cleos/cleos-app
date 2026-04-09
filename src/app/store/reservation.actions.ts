@@ -22,6 +22,12 @@ import { Role } from '../interfaces/token';
 import { IReview } from '../interfaces/review';
 import { IColorAll } from '../interfaces/color';
 import { ToastType } from '../shared/toast/toast.model';
+import {
+  CurrentCompleteReservationParams,
+  DetailReservationParams,
+  MeReservationParams,
+  ReservationParams,
+} from './reservation.models';
 
 enum ReservationActionTypes {
   getPage = '[Reservation] Find paged',
@@ -433,13 +439,7 @@ export const updateReservationTimestamp = createAction(
 
 export const setMeReservationParams = createAction(
   ReservationActionTypes.setMeReservationParams,
-  props<{
-    treatmentId?: string;
-    roomId?: string;
-    professionalId?: string;
-    date?: Date;
-    discountId?: string
-  }>(),
+  props<MeReservationParams>(),
 );
 
 export const setCurrentReservationId = createAction(
@@ -449,28 +449,17 @@ export const setCurrentReservationId = createAction(
 
 export const setCurrentCompleteReservation = createAction(
   ReservationActionTypes.setCurrentCompleteReservation,
-  props<{ reservationId: string; roomId: string; customerId: string; isDashboard: boolean }>(),
+  props<CurrentCompleteReservationParams>(),
 );
 
 export const setDetailReservationParams = createAction(
   ReservationActionTypes.setDetailReservationParams,
-  props<{ step?: number }>(),
+  props<DetailReservationParams>(),
 );
 
 export const setReservationParams = createAction(
   ReservationActionTypes.setReservationParams,
-  props<{
-    isDashboard: boolean;
-    skip: boolean;
-    customerId?: string;
-    roomId?: string;
-    treatmentId?: string;
-    groupId?: string;
-    professionalId?: string;
-    additionalIds?: string[];
-    date?: Date;
-    discountId?: string;
-  }>(),
+  props<ReservationParams>(),
 );
 
 export const cleanReservation = createAction(ReservationActionTypes.clean);

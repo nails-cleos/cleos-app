@@ -18,6 +18,12 @@ import { IAdditionalAll } from '../../interfaces/additional';
 import { IPaymentAll } from '../../interfaces/payment';
 import { IReview } from '../../interfaces/review';
 import { IColorAll } from '../../interfaces/color';
+import {
+  CurrentCompleteReservationParams,
+  DetailReservationParams,
+  MeReservationParams,
+  ReservationParams,
+} from '../reservation.models';
 
 const selectReservationState = createFeatureSelector<ReservationState>(RESERVATION_FEATURE_KEY);
 
@@ -52,13 +58,7 @@ const selectMeNavigationParams = createSelector(
 
 export const getMeNavigationParamsPipe = pipe(
   select(selectMeNavigationParams),
-  filter((val): val is {
-    treatmentId?: string;
-    roomId?: string;
-    professionalId?: string;
-    date?: Date;
-    discountId?: string
-  } => val !== undefined),
+  filter((val): val is MeReservationParams => val !== undefined),
 );
 
 const selectNavigationParams = createSelector(
@@ -68,18 +68,7 @@ const selectNavigationParams = createSelector(
 
 export const getNavigationParamsPipe = pipe(
   select(selectNavigationParams),
-  filter((val): val is {
-    isDashboard: boolean;
-    skip: boolean;
-    customerId?: string;
-    roomId?: string;
-    treatmentId?: string;
-    groupId?: string;
-    professionalId?: string;
-    additionalIds?: string[];
-    date?: Date;
-    discountId?: string;
-  } => val !== undefined),
+  filter((val): val is ReservationParams => val !== undefined),
 );
 
 const selectAdditionalList = createSelector(
@@ -151,8 +140,7 @@ const selectCurrentCompleteReservation = createSelector(
 );
 export const getCurrentCompleteReservationPipe = pipe(
   select(selectCurrentCompleteReservation),
-  filter((val): val is { reservationId: string; roomId: string; customerId: string; isDashboard: boolean } => val !==
-    undefined),
+  filter((val): val is CurrentCompleteReservationParams => val !== undefined),
 );
 
 const selectTracking = createSelector(
@@ -188,7 +176,7 @@ const selectDetailNavigationParams = createSelector(
 );
 export const getDetailNavigationParamsPipe = pipe(
   select(selectDetailNavigationParams),
-  filter((val): val is { step?: number } => val !== undefined),
+  filter((val): val is DetailReservationParams => val !== undefined),
 );
 
 const selectHistories = createSelector(

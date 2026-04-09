@@ -107,6 +107,7 @@ describe('ReservationComponent', () => {
   };
 
   beforeEach(async () => {
+    authUserSignal.set({ ...initialAuthUser, isDarkMode: true, professionalId: 'prof-123' });
     navigationParams$ = new BehaviorSubject(undefined);
     reservationId$ = new BehaviorSubject(undefined);
     customers$ = new BehaviorSubject(undefined);
@@ -250,6 +251,15 @@ describe('ReservationComponent', () => {
       component.getTreatmentForm.group.setValue(mockGroup);
       fixture.detectChanges();
       expect(component.treatmentList()).toEqual([mockTreatment]);
+    });
+
+    it('should derive min and max booking time when room changes', () => {
+      component.getOfficeForm.room.setValue(mockRoom);
+      fixture.detectChanges();
+
+      expect(component.minDate).toBe('09:00');
+      expect(component.maxDate).toBe('17:00');
+      expect(component.getFormDateTimeControls(0).start.value).toBe('09:00');
     });
   });
 
@@ -636,6 +646,89 @@ describe('ReservationComponent', () => {
       expect(component.getTreatmentForm.group.valid).toBeTrue();
       expect(component.getTreatmentForm.treatment.valid).toBeTrue();
     });
+
+    it('should map sub errors to form controls through the shared service', () => {
+      spyOn(document, 'querySelector').and.returnValue(null);
+      subErrors$.next([{ field: 'room', message: 'Room is invalid' }] as any);
+      fixture.detectChanges();
+
+      expect(component.errors().room).toBe('Room is invalid');
+      expect(component.getOfficeForm.room.hasError('incorrect')).toBeTrue();
+    });
+
+    it('should apply shared sub errors to customer and configuration controls', () => {
+      const inputSpy = jasmine.createSpyObj<HTMLInputElement>('input', ['focus', 'blur']);
+      spyOn(document, 'querySelector').and.returnValue(inputSpy);
+
+      component['applySubErrors']([
+        { field: 'customer', message: 'Customer is invalid' },
+        { field: 'note', message: 'Note is invalid' },
+      ] as any);
+
+      expect(component.errors().customer).toBe('Customer is invalid');
+      expect(component.errors().note).toBe('Note is invalid');
+      expect(component.getCustomerForm.customer.hasError('incorrect')).toBeTrue();
+      expect(component.getConfigurationForm.note.hasError('incorrect')).toBeTrue();
+      expect(inputSpy.focus).toHaveBeenCalled();
+      expect(inputSpy.blur).toHaveBeenCalled();
+    });
+
+    it('should move the stepper to the mapped step when applying shared sub errors', () => {
+      const stepper = { selectedIndex: 0 };
+      Object.defineProperty(component, 'stepper', {
+        get: () => () => stepper,
+        configurable: true,
+      });
+      spyOn(document, 'querySelector').and.returnValue(null);
+
+      component['applySubErrors']([{ field: 'professional', message: 'Professional is invalid' }] as any);
+
+      expect(stepper.selectedIndex).toBe(3);
+    });
+
+    it('should use the editing default step for unmapped sub errors when the user is not admin', () => {
+      const stepper = { selectedIndex: 0 };
+      Object.defineProperty(component, 'stepper', {
+        get: () => () => stepper,
+        configurable: true,
+      });
+      component.isEditing.set(true);
+      spyOn(document, 'querySelector').and.returnValue(null);
+
+      component['applySubErrors']([{ field: 'customer', message: 'Customer is invalid' }] as any);
+
+      expect(stepper.selectedIndex).toBe(2);
+      expect(component.getCustomerForm.customer.hasError('incorrect')).toBeTrue();
+    });
+
+    it('should use the admin editing default step for unmapped sub errors', () => {
+      const stepper = { selectedIndex: 0 };
+      Object.defineProperty(component, 'stepper', {
+        get: () => () => stepper,
+        configurable: true,
+      });
+      component.isEditing.set(true);
+      authUserSignal.update(prev => ({ ...prev, isAdmin: true }));
+      spyOn(document, 'querySelector').and.returnValue(null);
+
+      component['applySubErrors']([{ field: 'customer', message: 'Customer is invalid' }] as any);
+
+      expect(stepper.selectedIndex).toBe(1);
+      expect(component.getCustomerForm.customer.hasError('incorrect')).toBeTrue();
+    });
+
+    it('should still map shared sub errors when no stepper is available', () => {
+      Object.defineProperty(component, 'stepper', {
+        get: () => () => undefined,
+        configurable: true,
+      });
+      spyOn(document, 'querySelector').and.returnValue(null);
+
+      expect(() => component['applySubErrors']([{ field: 'note', message: 'Note is invalid' }] as any)).not.toThrow();
+
+      expect(component.errors().note).toBe('Note is invalid');
+      expect(component.getConfigurationForm.note.hasError('incorrect')).toBeTrue();
+    });
   });
 
   describe('Professional Selection', () => {
@@ -1005,6 +1098,99 @@ describe('ReservationComponent', () => {
       component.segmentClick(invalidDate, 'CREATED', 'event');
 
       expect(dialogSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Calendar service integration', () => {
+    beforeEach(() => {
+      component.getOfficeForm.room.setValue(mockRoom);
+    });
+
+    it('should not delegate room availability setup when no room is selected', () => {
+      component.getOfficeForm.room.setValue(undefined);
+      spyOn(component['reservationCalendarService'], 'addRoomAvailabilityEvents');
+
+      component['addNotAvailable']({} as any);
+
+      expect(component['reservationCalendarService'].addRoomAvailabilityEvents).not.toHaveBeenCalled();
+    });
+
+    it('should delegate room availability setup to the calendar service', () => {
+      const mockDay = new (component as any).day.constructor();
+      spyOn(component['reservationCalendarService'], 'addRoomAvailabilityEvents').and.returnValue({
+        weekendDays: [1, 2],
+        day: mockDay,
+        minTime: '09:00',
+        maxTime: '17:00',
+        availability: {} as any,
+      });
+
+      component['addNotAvailable']({} as any);
+
+      expect(component['reservationCalendarService'].addRoomAvailabilityEvents).toHaveBeenCalled();
+      expect(component.weekendDays).toEqual([1, 2]);
+      expect(component.day).toBe(mockDay);
+    });
+
+    it('should delegate reservation event creation to the calendar service', () => {
+      const events = [{ id: 'event-1' }] as any;
+      spyOn(component['reservationCalendarService'], 'buildReservationEvents').and.returnValue(events);
+
+      const result = component['addReservations']([] as any);
+
+      expect(component['reservationCalendarService'].buildReservationEvents).toHaveBeenCalled();
+      expect(result).toBe(events);
+    });
+
+    it('should delegate unavailable list creation to the calendar service', () => {
+      spyOn(component['reservationCalendarService'], 'addUnavailableEvents');
+
+      component['addUnavailableList']({} as any, [] as any);
+
+      expect(component['reservationCalendarService'].addUnavailableEvents).toHaveBeenCalled();
+    });
+
+    it('should pass an undefined room timezone when creating unavailable events without a selected room', () => {
+      component.getOfficeForm.room.setValue(undefined);
+      spyOn(component['reservationCalendarService'], 'addUnavailableEvents');
+
+      component['addUnavailableList']({} as any, [] as any);
+
+      expect(component['reservationCalendarService'].addUnavailableEvents).toHaveBeenCalledWith(
+        {} as any,
+        [] as any,
+        undefined,
+        true,
+        component['validateUnavailable'],
+      );
+    });
+
+    it('should create unavailable events through the calendar service', () => {
+      const event = { id: 'event-1' } as any;
+      const addEvent = jasmine.createSpy('addEvent');
+      spyOn(component['reservationCalendarService'], 'createUnavailableEvent').and.returnValue(event);
+
+      component['createUnavailableEvent']({ allDay: false }, new Date(), new Date(), { addEvent } as any);
+
+      expect(component['reservationCalendarService'].createUnavailableEvent).toHaveBeenCalled();
+      expect(addEvent).toHaveBeenCalledWith(event);
+    });
+
+    it('should validate unavailable dates before creating an event', () => {
+      spyOn(component as any, 'createUnavailableEvent');
+
+      component['validateUnavailable'](new Date(), { allDay: false, duration: { hour: 1, minute: 0 } }, {} as any);
+
+      expect(component['createUnavailableEvent']).toHaveBeenCalled();
+    });
+
+    it('should return no selection event when customer or treatment is missing', () => {
+      component.getTreatmentForm.treatment.setValue(undefined);
+      component.getCustomerForm.customer.setValue(undefined);
+
+      const event = component['createNewEvent'](new Date(), new Date(), 'CREATED', mockRoom.timeZone, 'event-1');
+
+      expect(event).toBeUndefined();
     });
   });
 });

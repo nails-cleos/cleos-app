@@ -120,6 +120,74 @@ describe('MeReservationComponent', () => {
     }));
   });
 
+  it('should map sub errors through the shared reservation error service', () => {
+    component.getOfficeForm.office.setValue({ id: 'office-1', name: 'Office' } as any);
+    component.getOfficeForm.room.setValue({ id: 'room-1', address: { name: 'Room' } } as any);
+    component.getOfficeForm.professional.setValue({ id: 'professional-1', displayName: 'Professional' } as any);
+    subErrors$.next([{ field: 'startDate', message: 'Start date is invalid' }] as any);
+    fixture.detectChanges();
+
+    expect(component.errors().startDate).toBe('Start date is invalid');
+    expect(component.getTreatmentForm.startDate.hasError('incorrect')).toBeTrue();
+  });
+
+  it('should apply shared sub errors to office, payment and accept controls', () => {
+    component['applySubErrors']([
+      { field: 'room', message: 'Room invalid' },
+      { field: 'type', message: 'Payment type invalid' },
+      { field: 'phone', message: 'Phone invalid' },
+      { field: 'event', message: 'Event invalid' },
+    ] as any);
+
+    expect(component.errors().room).toBe('Room invalid');
+    expect(component.errors().type).toBe('Payment type invalid');
+    expect(component.errors().phone).toBe('Phone invalid');
+    expect(component.errors().event).toBe('Event invalid');
+    expect(component.getOfficeForm.room.hasError('incorrect')).toBeTrue();
+    expect(component.getTypeForm.type.hasError('incorrect')).toBeTrue();
+    expect(component.getAcceptForm.phone.hasError('incorrect')).toBeTrue();
+    expect(component.getEventForm.event.hasError('incorrect')).toBeTrue();
+  });
+
+  it('should move the stepper to the treatment step for startDate sub errors', () => {
+    const stepper = { selectedIndex: 0 };
+    Object.defineProperty(component, 'stepper', {
+      get: () => () => stepper,
+      configurable: true,
+    });
+
+    component['applySubErrors']([{ field: 'startDate', message: 'Start date invalid' }] as any);
+
+    expect(stepper.selectedIndex).toBe(1);
+  });
+
+  it('should keep the first step selected for generic shared sub errors', () => {
+    const stepper = { selectedIndex: 2 };
+    Object.defineProperty(component, 'stepper', {
+      get: () => () => stepper,
+      configurable: true,
+    });
+
+    component['applySubErrors']([{ field: 'room', message: 'Room invalid' }] as any);
+
+    expect(stepper.selectedIndex).toBe(0);
+    expect(component.getOfficeForm.room.hasError('incorrect')).toBeTrue();
+  });
+
+  it('should ignore sub errors for unsupported fields', () => {
+    const stepper = { selectedIndex: 1 };
+    Object.defineProperty(component, 'stepper', {
+      get: () => () => stepper,
+      configurable: true,
+    });
+
+    component['applySubErrors']([{ field: 'unsupported', message: 'Ignore me' }] as any);
+
+    expect(stepper.selectedIndex).toBe(0);
+    expect(component.errors()).toEqual({});
+    expect(component.getOfficeForm.room.hasError('incorrect')).toBeFalse();
+  });
+
   it('should use the selected payment type when creating a reservation payment', () => {
     authUserSignal.update(prev => ({ ...prev, customerId: 'customer-1' }));
     component.date = new Date('2026-03-26T10:00:00');
@@ -155,6 +223,30 @@ describe('MeReservationComponent', () => {
       }) as any,
       role: Role.customer,
     }));
+  });
+
+  it('should default the payment percentage to total when none is selected', () => {
+    authUserSignal.update(prev => ({ ...prev, customerId: 'customer-1' }));
+    component.date = new Date('2026-03-26T10:00:00');
+    component.getOfficeForm.room.setValue({
+      id: 'room-1',
+      professionals: [{ id: 'professional-1' }],
+      paymentTypes: [PaymentType.cash, PaymentType.mollie],
+    } as any);
+    fixture.detectChanges();
+
+    component.getOfficeForm.professional.setValue({ id: 'professional-1' } as any);
+    component.getTreatmentForm.treatment.setValue({ id: 'treatment-1' } as any);
+    component.getTypeForm.type.setValue({ type: PaymentType.mollie } as any);
+    component.getAcceptForm.phone.setValue('123456789');
+
+    component.create();
+
+    const action = storeSpy.dispatch.calls.mostRecent().args[0] as any;
+    expect(action.reservation.payment).toEqual({
+      type: PaymentType.mollie,
+      percentage: PaymentPercentage.total,
+    });
   });
 
   it('should not create reservation payment when account credit is selected', () => {
@@ -261,6 +353,53 @@ describe('MeReservationComponent', () => {
     component.balance = 17.5;
 
     expect(component.accountBalanceUsed).toBe(17.5);
+  });
+
+  it('should apply customer balance to both current and old price', () => {
+    component.price = new Price(0, 0, 0, 0, 70, 0, 70, 0, 0, 0, 100, 0);
+    component.oldPrice = new Price(0, 0, 0, 0, 50, 0, 50, 0, 0, 0, 100, 0);
+
+    component['applyCustomerBalance'](25);
+
+    expect(component.balance).toBe(25);
+    expect(component.price.balance).toBe(25);
+    expect(component.oldPrice?.balance).toBe(25);
+  });
+
+  it('should derive online payment types and options from the selected room', () => {
+    component.getOfficeForm.room.setValue({
+      id: 'room-1',
+      paymentTypes: [PaymentType.cash, PaymentType.transfer, PaymentType.mollie, PaymentType.paypal],
+    } as any);
+
+    component['setTypes']();
+
+    expect(component.paymentTypes()).toEqual([PaymentType.mollie, PaymentType.paypal]);
+    expect(component.options()?.map(option => option.type)).toEqual([PaymentType.mollie, PaymentType.paypal]);
+    expect(component.options()?.every(option => option.name !== undefined)).toBeTrue();
+  });
+
+  it('should clear payment options when no room is selected', () => {
+    component.getOfficeForm.room.setValue(undefined);
+
+    component['setTypes']();
+
+    expect(component.paymentTypes()).toBeUndefined();
+    expect(component.options()).toEqual([]);
+  });
+
+  it('should reset treatment-specific state when cleaning treatment', () => {
+    component.price = new Price(0, 0, 0, 0, 70, 0, 70, 0, 0, 0, 100, 0);
+    component.getTreatmentForm.treatment.setValue({ id: 'treatment-1' } as any);
+    component.treatmentList.set([{ id: 'treatment-1' } as any]);
+    component.getEventForm.event.setValue(new Date());
+
+    component['cleanTreatment']();
+
+    expect(component.price.total).toBe(0);
+    expect(component.getTreatmentForm.treatment.value).toBeUndefined();
+    expect(component.treatmentList()).toBeUndefined();
+    expect(component.getEventForm.event.value).toBeUndefined();
   });
 
   it('should return zero accountBalanceUsed when there is no balance available', () => {

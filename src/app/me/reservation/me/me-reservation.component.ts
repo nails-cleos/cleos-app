@@ -119,14 +119,10 @@ import { IError } from '../../../interfaces/common';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { BankForm } from '../../../shared/bank/bank.component';
 import { FirebaseService } from '../../../services/firebase.service';
+import { OfficeForm } from '../../../reservation/reservation-form.types';
+import { ReservationFormErrorService } from '../../../reservation/reservation-form-error.service';
 
 const MAX_UPCOMING_RESERVATION = 10;
-
-type OfficeForm = {
-  room: FormControl<IRoomAll | undefined>;
-  professional: FormControl<IUserAll | undefined>;
-  office: FormControl<IOfficeAll | undefined>;
-};
 
 type TreatmentForm = {
   treatment: FormControl<IService | undefined>;
@@ -144,15 +140,24 @@ type AcceptForm = {
   phone: FormControl<string | undefined>;
 };
 
-type ReservationForms = {
-  officeForm: FormGroup<OfficeForm>;
-  treatmentForm: FormGroup<TreatmentForm>;
-  eventGroup: FormGroup<EventForm>;
-  typeForm: FormGroup<BankForm>;
-  acceptForm: FormGroup<AcceptForm>;
-};
-
 type AvailabilityData = { time: string; date: Date }
+
+type MeReservationField = keyof TreatmentForm | keyof EventForm | keyof BankForm | keyof AcceptForm | keyof OfficeForm;
+
+const ME_RESERVATION_ERROR_FIELDS = [
+  'room',
+  'professional',
+  'office',
+  'treatment',
+  'discount',
+  'startDate',
+  'group',
+  'event',
+  'type',
+  'percentage',
+  'accept',
+  'phone',
+] as const satisfies readonly MeReservationField[];
 
 @Component({
   selector: 'app-me-reservation',
@@ -175,6 +180,7 @@ export class MeReservationComponent {
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly firebaseService = inject(FirebaseService);
+  private readonly formErrorService = inject(ReservationFormErrorService);
 
   private navigationParams$ = this.store.pipe(getMeNavigationParamsPipe);
   private reservationId$ = this.store.pipe(getCurrentReservationIdPipe);
@@ -234,7 +240,7 @@ export class MeReservationComponent {
   private stepper = viewChild.required<MatStepper>('stepper');
   private picker = viewChild<MatDatepicker<Date>>('picker');
 
-  errors = signal<Record<string, unknown>>({});
+  errors = signal<Partial<Record<MeReservationField, string>> & { schedule?: boolean }>({});
 
   treatmentForm: FormGroup<TreatmentForm> = this.formBuilder.group<TreatmentForm>({
     treatment: this.formBuilder.control(undefined, {
@@ -671,27 +677,7 @@ export class MeReservationComponent {
     effect(() => {
       const subErrors = this.subErrorsSignal();
       if (subErrors) {
-        const errorMap: Record<string, unknown> = {};
-        subErrors.forEach((error: IError) => {
-          switch (error.field) {
-            case 'startDate':
-              this.myStepper.selectedIndex = 1;
-              break;
-            default:
-              this.myStepper.selectedIndex = 0;
-              break;
-          }
-
-          const field = error.field as keyof ReservationForms | undefined;
-          if (field && field in this.form.controls) {
-            errorMap[field] = error.message;
-            this.form.controls[field].setErrors({ incorrect: true });
-            if (field in this.getTreatmentForm) {
-              this.treatmentForm.controls[field as keyof TreatmentForm]?.setErrors({ incorrect: true });
-            }
-          }
-        });
-        this.errors.set(errorMap);
+        this.applySubErrors(subErrors);
       }
     });
   }
@@ -1169,6 +1155,39 @@ export class MeReservationComponent {
     this.getTreatmentForm.treatment.setValue(undefined);
     this.treatmentList.set(undefined);
     this.getEventForm.event.setValue(undefined);
+  };
+
+  private applySubErrors = (subErrors: IError[]): void => {
+    const state = this.formErrorService.createErrorState(subErrors, {
+      allowedFields: ME_RESERVATION_ERROR_FIELDS,
+      createErrors: () => ({} as Partial<Record<MeReservationField, string>> & { schedule?: boolean }),
+      defaultStepIndex: 0,
+      stepByField: { startDate: 1 },
+    });
+
+    if (state.stepIndex !== undefined) {
+      this.myStepper.selectedIndex = state.stepIndex;
+    }
+
+    state.fields.forEach(field => {
+      if (field in this.getOfficeForm) {
+        this.getOfficeForm[field as keyof OfficeForm]?.setErrors({ incorrect: true });
+      }
+      if (field in this.getTreatmentForm) {
+        this.getTreatmentForm[field as keyof TreatmentForm]?.setErrors({ incorrect: true });
+      }
+      if (field in this.getEventForm) {
+        this.getEventForm[field as keyof EventForm]?.setErrors({ incorrect: true });
+      }
+      if (field in this.getTypeForm) {
+        this.getTypeForm[field as keyof BankForm]?.setErrors({ incorrect: true });
+      }
+      if (field in this.getAcceptForm) {
+        this.getAcceptForm[field as keyof AcceptForm]?.setErrors({ incorrect: true });
+      }
+    });
+
+    this.errors.set(state.errors);
   };
 
 }

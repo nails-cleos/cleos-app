@@ -1,25 +1,30 @@
 <div class="toast" [ngClass]="'toast-' + data.type">
-  <div class="toast-icon">
-    <mat-icon>{{ getIcon() }}</mat-icon>
+  <div class="toast-icon-shell">
+    <div class="toast-icon">
+      <mat-icon>{{ getIcon() }}</mat-icon>
+    </div>
   </div>
   <div class="toast-content">
-    <div [innerHTML]="data.message"></div>
+    <div class="toast-title">{{ data.type | titlecase }}</div>
+    <div class="toast-message" [innerHTML]="data.message"></div>
   </div>
   <div class="toast-actions">
-    <button mat-icon-button (click)="onDismiss()">
-      <mat-icon>close</mat-icon>
-    </button>
     @switch (data.actionType) {
       @case ('link') {
-        <a mat-button [href]="data.action" target="_blank" rel="noopener">
+        <a class="toast-action-button" mat-stroked-button [href]="data.action" target="_blank" rel="noopener">
           <mat-icon>open_in_new</mat-icon>
+          <span>Open</span>
         </a>
       }
       @case ('button') {
-        <button mat-button (click)="onAction()">
+        <button class="toast-action-button" mat-stroked-button (click)="onAction()">
           <mat-icon>{{ data.action || 'done_all' }}</mat-icon>
+          <span>Action</span>
         </button>
       }
     }
+    <button class="toast-close-button" mat-icon-button (click)="onDismiss()">
+      <mat-icon>close</mat-icon>
+    </button>
   </div>
 </div>
