@@ -104,10 +104,8 @@ export class RoomEffects {
   updateServices$ = createEffect(() => this.actions.pipe(
     ofType(updateServices),
     switchMap(({ id, prices }) => effectRequest(
-      this.roomService.updateServices(id, prices).pipe(switchMap(() => {
-        const message = this.translate.instant('ROOM.ME.SERVICES.UPDATE.MESSAGE');
-        return success(roomSaveSuccess, message);
-      })),
+      this.roomService.updateServices(id, prices).pipe(switchMap(() =>
+        success(roomSaveSuccess, 'ROOM.ME.SERVICES.UPDATE.MESSAGE'))),
       action => action,
       roomFailure,
     )),

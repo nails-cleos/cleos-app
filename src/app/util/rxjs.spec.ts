@@ -6,7 +6,7 @@ import { effectRequest, genericRetryStrategy } from './rxjs';
 
 describe('genericRetryStrategy', () => {
   it('should rethrow excluded status codes', (done: DoneFn) => {
-    const error = { status: 0, statusText: 'Offline' };
+    const error = { status: 400, statusText: 'Bad Request' };
     const delaySelector = genericRetryStrategy({});
 
     delaySelector(error, 0).subscribe({
@@ -69,7 +69,13 @@ describe('effectRequest', () => {
       value => ({ type: '[Test] Success', value }),
       ({ error: mappedError }) => ({ type: '[Test] Failure', error: mappedError }),
     ).subscribe(action => {
-      expect(action).toEqual(jasmine.objectContaining({ type: '[Test] Failure', error }));
+      expect(action).toEqual(jasmine.objectContaining({
+        type: '[Test] Failure',
+        error: {
+          message: 'boom',
+          status: undefined,
+        },
+      }));
       done();
     });
   });

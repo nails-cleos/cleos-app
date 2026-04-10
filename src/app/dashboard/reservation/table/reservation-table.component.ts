@@ -115,7 +115,7 @@ export class ReservationTableComponent {
     const content = this.translate.instant('RESERVATION.DELETED.CONTENT',
       { date: newDateTimestamp(reservation.timestamp) });
 
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: reservation }, result => {
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: reservation, variant: 'warning' }, result => {
       if (result) {
         this.store.dispatch(
           deleteReservation({ id: result.id, timestamp: result.timestamp, timeZone: result.room.timeZone }),

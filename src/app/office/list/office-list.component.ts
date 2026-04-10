@@ -98,7 +98,7 @@ export class OfficeListComponent {
     const title = this.translate.instant('OFFICE.DELETED.TITLE');
     const content = this.translate.instant('OFFICE.DELETED.CONTENT', { name: office.name });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: office },
+      data: { title, content, value: office, variant: 'warning' },
     });
 
     dialogRef.afterClosed().subscribe(result => {

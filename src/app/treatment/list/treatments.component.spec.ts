@@ -191,6 +191,7 @@ describe('TreatmentsComponent', () => {
           title: 'TREATMENT.DELETED.TITLE',
           content: 'TREATMENT.DELETED.CONTENT',
           value: item,
+          variant: 'warning',
         },
       }));
 

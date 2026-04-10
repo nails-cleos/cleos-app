@@ -15,7 +15,7 @@ import { catchError, mergeMap } from 'rxjs/operators';
 export const genericRetryStrategy = (
   {
     scalingDuration = 1000,
-    excludedStatusCodes = [0, 400, 401, 403, 404, 409, 412],
+    excludedStatusCodes = [400, 401, 403, 404, 409, 412],
   }: {
     maxRetryAttempts?: number;
     scalingDuration?: number;
@@ -46,15 +46,25 @@ const normalizeEffectSuccess = <TAction extends Action>(result: EffectSuccess<TA
 
 const handleFailure = <TAction extends Action, TFailureAction extends Action>(
   onFailure: FailureActionCreator<TFailureAction>,
+  mapError?: (err: HttpErrorResponse) => any,
 ) : OperatorFunction<TAction, TAction | TFailureAction> => catchError(
-    (err: HttpErrorResponse) => of(onFailure({ error: err.error })),
+    (err: HttpErrorResponse) => {
+      const error = mapError ? mapError(err) : {
+        ...err.error,
+        status: err.error?.status || (err.status === 404 ? 'NOT_FOUND' : err.status === 0 || err.status >= 500 ? 'SERVER_ERROR' : undefined),
+        message: err.status === 0 || err.status >= 500 ? 'COMMON.ERROR.TRY_LATER' : err.error?.message,
+      };
+
+      return of(onFailure({ error }));
+    },
   );
 
 export const effectRequest = <TResponse, TAction extends Action, TFailureAction extends Action>(
   request$: Observable<TResponse>,
   onSuccess: (response: TResponse) => EffectSuccess<TAction>,
   onFailure: FailureActionCreator<TFailureAction>,
+  mapError?: (err: HttpErrorResponse) => any,
 ): Observable<Action> => request$.pipe(
     mergeMap(response => normalizeEffectSuccess(onSuccess(response))),
-    handleFailure<TAction, TFailureAction>(onFailure),
+    handleFailure<TAction, TFailureAction>(onFailure, mapError),
   );

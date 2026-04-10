@@ -98,7 +98,7 @@ export class CurrencyListComponent {
   delete = (currency: ICurrency): void => {
     const title = this.translate.instant('CURRENCY.DELETED.TITLE');
     const content = this.translate.instant('CURRENCY.DELETED.CONTENT', { code: currency.code });
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: currency }, result => {
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: currency, variant: 'warning' }, result => {
       if (result) {
         this.store.dispatch(deleteCurrency({ id: result.id, code: result.code }));
       }

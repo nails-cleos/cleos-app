@@ -209,11 +209,13 @@
         </div>
       </div>
 
-      <div class="treatment-container">
+      <div class="treatment-container experience-grid">
         @for (experience of experiences; track experience) {
-          <!-- experience reveal is currently static -->
-          <div class="text-center" [id]="experience.id">
-            <div class="counters-item">
+          <div class="text-center fade-up-reveal"
+               [id]="experience.id"
+               [class.fade-up-reveal-visible]="experienceTitleState() === 'close'"
+               [style.transition-delay]="experience.delay">
+            <div class="counters-item experience-card">
               <mat-icon>{{ experience.icon }}</mat-icon>
               <strong>{{ experience.position }}</strong>
               <p>{{ experience.text | translate }}</p>
@@ -288,14 +290,14 @@
           <form (ngSubmit)="sendEmail()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
             <div class="home-page-form inner-container">
               <div class="contact-inner-container">
-                <mat-form-field class="full full-margin">
+                <mat-form-field class="full full-margin" appearance="outline">
                   <mat-label>{{ 'MAIN.CONTACT.NAME.FIELD' | translate }}</mat-label>
                   <input [formControl]="getForm.name" autocomplete="name" matInput required>
                   @if (getForm.name.hasError('required')) {
                     <mat-error [innerHTML]="'MAIN.CONTACT.NAME.REQUIRED' | translate"></mat-error>
                   }
                 </mat-form-field>
-                <mat-form-field class="full">
+                <mat-form-field class="full" appearance="outline">
                   <mat-label>{{ 'MAIN.CONTACT.EMAIL.FIELD' | translate }}</mat-label>
                   <input [formControl]="getForm.email" autocomplete="email" matInput required>
                   @if (getForm.email.hasError('email')) {
@@ -307,14 +309,14 @@
                 </mat-form-field>
               </div>
 
-              <mat-form-field>
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'MAIN.CONTACT.SUBJECT.FIELD' | translate }}</mat-label>
                 <input [formControl]="getForm.subject" autocomplete="subject" matInput required>
                 @if (getForm.subject.hasError('required')) {
                   <mat-error [innerHTML]="'MAIN.CONTACT.SUBJECT.REQUIRED' | translate"></mat-error>
                 }
               </mat-form-field>
-              <mat-form-field>
+              <mat-form-field appearance="outline">
                 <mat-label>{{ 'MAIN.CONTACT.BODY.FIELD' | translate }}</mat-label>
                 <textarea #message [formControl]="getForm.body" matInput maxlength="256" required></textarea>
                 <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>

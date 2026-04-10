@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
 import { HttpErrorResponse, HttpHandlerFn, HttpRequest } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 import { firstValueFrom, throwError } from 'rxjs';
@@ -41,13 +41,35 @@ describe('errorInterceptor', () => {
     });
   });
 
-  it('should map network error status 0 to a normalized message payload', async () => {
+  it('should map network error status 0 to a normalized message payload', fakeAsync(() => {
     const error = { status: 0, statusText: 'Offline', error: { message: 'Network unavailable' } };
-    const result = await runWithError(error);
+    const req = new HttpRequest('GET', '/v1/test');
+    const next: HttpHandlerFn = () => throwError(() => error);
+    let result: unknown;
+    let completed = false;
 
-    expect(result).toEqual({ error: { message: 'Network unavailable' } });
+    TestBed.runInInjectionContext(() => errorInterceptor(req, next)).subscribe({
+      next: () => fail('Expected interceptor to error'),
+      error: err => {
+        result = err;
+        completed = true;
+      },
+    });
+
+    tick(9001);
+    flushMicrotasks();
+
+    expect(result).toEqual({
+      status: 0,
+      statusText: 'Offline',
+      error: {
+        message: 'COMMON.ERROR.TRY_LATER',
+        status: 'SERVER_ERROR',
+      },
+    });
+    expect(completed).toBeTrue();
     expect(storeSpy.dispatch).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should dispatch reLogin on 401 when user is authenticated', async () => {
     isAuthenticated = true;

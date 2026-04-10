@@ -1,0 +1,131 @@
+:host {
+  display: block;
+}
+
+.dialog-shell {
+  min-width: min(100%, 480px);
+  padding: 10px 36px 14px 8px;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding-right: 4px;
+}
+
+.dialog-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dialog-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 8px;
+  color: var(--primary-darker-color);
+  background: color-mix(in srgb, var(--primary-lighter-color) 78%, transparent);
+}
+
+.dialog-shell-warning .dialog-badge {
+  color: var(--warn-color);
+  background: color-mix(in srgb, var(--warn-color) 12%, var(--primary-lighter-color) 88%);
+}
+
+h1[mat-dialog-title] {
+  margin: 0;
+  line-height: 1.2;
+  font-size: 1.25rem;
+  font-weight: 700;
+  white-space: normal;
+}
+
+.close-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  padding: 0;
+  margin: -2px -2px 0 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  overflow: hidden;
+  cursor: pointer;
+  appearance: none;
+}
+
+.close-button:hover {
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.close-button mat-icon {
+  margin: 0;
+}
+
+.dialog-divider {
+  height: 1px;
+  margin: 20px -24px 20px -18px;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.dialog-content[mat-dialog-content] {
+  margin: 0;
+  padding: 8px 14px 12px !important;
+  color: color-mix(in srgb, currentColor 82%, transparent);
+  line-height: 1.6;
+  max-height: none;
+}
+
+.dialog-shell-warning .dialog-content[mat-dialog-content] {
+  color: color-mix(in srgb, currentColor 88%, transparent);
+}
+
+.dialog-actions[mat-dialog-actions] {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px 0 14px !important;
+  margin: 0;
+  min-height: 0;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 599px) {
+  .dialog-shell {
+    min-width: 0;
+    padding: 8px 24px 12px 10px;
+  }
+
+  .dialog-actions[mat-dialog-actions] {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 12px 18px 0 12px !important;
+  }
+
+  .dialog-actions[mat-dialog-actions] .spacer {
+    display: none;
+  }
+
+  .dialog-actions[mat-dialog-actions] button {
+    width: 100%;
+    min-width: 0;
+  }
+}

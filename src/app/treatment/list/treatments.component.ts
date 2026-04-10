@@ -99,7 +99,7 @@ export class TreatmentsComponent {
     const title = this.translate.instant('TREATMENT.DELETED.TITLE');
     const content = this.translate.instant('TREATMENT.DELETED.CONTENT', { name: treatment.name });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: treatment },
+      data: { title, content, value: treatment, variant: 'warning' },
     });
 
     dialogRef.afterClosed().subscribe(result => {

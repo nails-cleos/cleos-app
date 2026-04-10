@@ -12,12 +12,40 @@ mat-drawer-container {
   }
 
   .header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+
     .align-right {
       flex: 1 1 auto;
+      min-width: 0;
     }
 
     img {
       margin-right: 5% !important;
+    }
+
+    .header-logo {
+      flex: 0 0 auto;
+    }
+
+    .header-title {
+      flex: 0 1 auto;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      flex: 0 0 auto;
+    }
+
+    .header-action-button {
+      flex: 0 0 auto;
     }
 
     .badge-padding {
@@ -54,6 +82,15 @@ mat-drawer-container {
 
 .grid-container {
   margin: 20px;
+  position: relative;
+}
+
+.route-shell-hidden {
+  display: none;
+}
+
+.route-error {
+  width: 100%;
 }
 
 .dot {
@@ -96,6 +133,40 @@ img {
 @media not all and (max-device-width: 812px) and (orientation: portrait) {
   img {
     max-width: 60px !important;
+  }
+}
+
+@media (max-width: 599px) {
+  mat-drawer-container {
+    .header {
+      padding-inline: 8px;
+
+      img {
+        margin-right: 0 !important;
+      }
+
+      .header-logo {
+        width: 40px;
+        height: 40px;
+      }
+
+      .header-title {
+        font-size: 0.95rem;
+      }
+
+      .badge-padding,
+      .header-action-button,
+      button[mat-icon-button] {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        padding: 0;
+      }
+
+      .badge-padding {
+        padding-right: 0;
+      }
+    }
   }
 }
 

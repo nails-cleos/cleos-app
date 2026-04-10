@@ -317,7 +317,7 @@ export class ReservationEffects {
     switchMap(({ id, customerId }) => effectRequest(
       this.reservationService.updateReservationCustomer(id, customerId),
       (response: IApiResponse) => stateSuccess({
-        message: this.translate.instant('RESERVATION.STATE.CHANGE_CUSTOMER'),
+        message: 'RESERVATION.STATE.CHANGE_CUSTOMER',
         id: response.id,
       }),
       reservationFailure,
@@ -329,7 +329,7 @@ export class ReservationEffects {
     switchMap(({ id, colorId }) => effectRequest(
       this.reservationService.updateReservationColor(id, colorId),
       (response: IApiResponse) => stateSuccess({
-        message: this.translate.instant('RESERVATION.STATE.CHANGE_COLOR'),
+        message: 'RESERVATION.STATE.CHANGE_COLOR',
         id: response.id,
       }),
       reservationFailure,

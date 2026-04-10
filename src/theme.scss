@@ -157,6 +157,10 @@ $dark-theme: mat.m2-define-dark-theme((
   --accent-darker-color: #ceb4ac;
 
   --warn-color: #a51a19;
+  --experience-text-color: #fff;
+  --experience-hover-color: var(--accent-lighter-color);
+  --experience-hover-border-color: color-mix(in srgb, var(--accent-color) 72%, white 28%);
+  --experience-hover-background: rgba(255, 255, 255, .14);
 
   --toast-background: #fff;
   --toast-text: rgba(0, 0, 0, .87);
@@ -190,6 +194,10 @@ $dark-theme: mat.m2-define-dark-theme((
   --accent-darker-color: #b89b93;
 
   --warn-color: #f08080;
+  --experience-text-color: rgba(0, 0, 0, .87);
+  --experience-hover-color: var(--primary-darker-color);
+  --experience-hover-border-color: color-mix(in srgb, var(--primary-darker-color) 55%, transparent);
+  --experience-hover-background: rgba(0, 0, 0, .08);
 
   --toast-background: #424242;
   --toast-text: rgba(255, 255, 255, .87);

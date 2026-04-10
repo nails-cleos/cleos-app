@@ -67,7 +67,7 @@ export class CataloguesComponent {
   delete(catalogue: ICatalogueAll): void {
     const title = this.translate.instant('CATALOGUE.DELETED.TITLE');
     const content = this.translate.instant('CATALOGUE.DELETED.CONTENT', { name: catalogue.name });
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: catalogue }, result => {
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: catalogue, variant: 'warning' }, result => {
       if (result) {
         this.store.dispatch(deleteCatalogue({ id: result.id, name: result.name }));
       }

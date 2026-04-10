@@ -111,7 +111,7 @@ export class UnavailableListComponent {
     const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT',
       { date: newDateTimestamp(unavailable.timestamp) });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: unavailable },
+      data: { title, content, value: unavailable, variant: 'warning' },
     });
 
     dialogRef.afterClosed().subscribe(result => {
