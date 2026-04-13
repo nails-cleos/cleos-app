@@ -68,11 +68,11 @@
           <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
         </button>
       }
-      <img alt="logo" src="assets/icons/icon-512x512.png" (click)="goToHome()" class="pointer-only">
-      <span (click)="goToHome()" class="pointer-only">{{ title }}</span>
+      <img alt="logo" src="assets/icons/icon-512x512.png" (click)="goToHome()" class="pointer-only header-logo">
+      <span (click)="goToHome()" class="pointer-only header-title">{{ title }}</span>
       <span class="align-right"></span>
       @if (currentUser?.email) {
-        <div>
+        <div class="header-actions">
           @if (isProfessional() && workDay.length) {
             <button [matMenuTriggerFor]="menuWorkDay" class="badge-padding" mat-icon-button>
               <mat-icon [matBadgeHidden]="!workDay.length" [matBadgeOverlap]="true" [matBadge]="workDay.length"
@@ -187,17 +187,20 @@
           {{ 'COMMON.DASHBOARD.HOME' | translate }}
         </button>
       } @else {
-        <button mat-icon-button [routerLink]="['/', language(), 'home']">
+        <button class="header-action-button" mat-icon-button [routerLink]="['/', language(), 'home']">
           <mat-icon>home</mat-icon>
         </button>
       }
     </mat-toolbar>
     <main class="content">
       <div class="grid-container">
-        @if (error(); as error) {
-          <app-error [error]="error"></app-error>
-        } @else {
+        <div class="route-shell" [class.route-shell-hidden]="!!pageError()">
           <router-outlet></router-outlet>
+        </div>
+        @if (pageError(); as error) {
+          <div class="route-error">
+            <app-error [error]="error"></app-error>
+          </div>
         }
       </div>
     </main>

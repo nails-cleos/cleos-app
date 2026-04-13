@@ -110,7 +110,7 @@ export class AdditionalListComponent {
     const title = this.translate.instant('ADDITIONAL.DELETED.TITLE');
     const content = this.translate.instant('ADDITIONAL.DELETED.CONTENT', { name: additional.name });
 
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: additional }, result => {
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: additional, variant: 'warning' }, result => {
       if (result) {
         this.store.dispatch(
           deleteAdditional({ id: result.id, name: result.name }),

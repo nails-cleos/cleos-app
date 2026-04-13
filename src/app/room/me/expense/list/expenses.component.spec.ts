@@ -320,6 +320,7 @@ describe('ExpensesComponent', () => {
           title: 'EXPENSE.DELETED.TITLE',
           content: 'EXPENSE.DELETED.CONTENT',
           value: testExpense,
+          variant: 'warning',
         },
       }));
 

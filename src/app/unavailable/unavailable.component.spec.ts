@@ -581,6 +581,7 @@ describe('UnavailableComponent', () => {
           title: 'UNAVAILABLE.DELETED.TITLE',
           content: 'UNAVAILABLE.DELETED.CONTENT',
           value: mockUnavailable,
+          variant: 'warning',
         },
       }));
 

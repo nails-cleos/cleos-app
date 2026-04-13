@@ -21,7 +21,6 @@ import {
   yearExportSuccess,
   yearSummarySuccess,
 } from '../dashboard.actions';
-import { TranslateService } from '@ngx-translate/core';
 import { DashboardService } from '../../services/dashboard.service';
 import { Router } from '@angular/router';
 import { NavigationService } from '../../services/navigation.service';
@@ -38,7 +37,6 @@ import {
 
 @Injectable()
 export class DashboardEffects {
-  private readonly translate: TranslateService = inject(TranslateService);
   private readonly actions: Actions = inject(Actions);
   private readonly router: Router = inject(Router);
   private readonly dashboardService: DashboardService = inject(DashboardService);
@@ -97,7 +95,7 @@ export class DashboardEffects {
     switchMap(({ date, summaryType, totals, summaries, roomId, step }) => effectRequest(
       this.dashboardService.updateMonthlySummary(date, summaryType, totals, summaries, roomId)
         .pipe(map(() => saveMonthlySummarySuccess({
-          date, step, message: this.translate.instant('SUMMARY.UPDATED'),
+          date, step, message: 'SUMMARY.UPDATED',
         }))),
       action => action,
       dashFailure,

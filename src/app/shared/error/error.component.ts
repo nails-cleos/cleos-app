@@ -26,10 +26,10 @@ export class ErrorComponent {
       }
       if (!['NO_CONTENT', 'no_content_error'].includes(error.status || '')) {
         if (error.status === 'NOT_FOUND') {
-          this.imageSrc = './assets/not_found.png';
+          this.imageSrc = './assets/not_found.svg';
           this.retry = false;
         } else {
-          this.imageSrc = './assets/error.png';
+          this.imageSrc = './assets/error.svg';
           this.retry = error.status !== 'BAD_REQUEST';
         }
       }

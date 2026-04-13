@@ -111,7 +111,7 @@ export class RoomsComponent {
   delete = (room: IRoom): void => {
     const title = this.translate.instant('ROOM.DELETED.TITLE');
     const content = this.translate.instant('ROOM.DELETED.CONTENT', { name: room.address?.name });
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: room }, result => {
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: room, variant: 'warning' }, result => {
       if (result) {
         this.store.dispatch(deleteRoom({ id: result.id, room: result }));
       }

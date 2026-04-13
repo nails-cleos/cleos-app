@@ -18,10 +18,10 @@ jobs:
       - name: Start timer
         run: echo "JOB_START=$(date +%s)" >> $GITHUB_ENV
 
-      - name: Use Node.js 24.12.0
+      - name: Use Node.js 22.12.0
         uses: actions/setup-node@v6
         with:
-          node-version: 24.12.0
+          node-version: 22.12.0
           cache: 'npm'
 
       - name: Install dependencies
@@ -73,10 +73,10 @@ jobs:
       - name: Start timer
         run: echo "JOB_START=$(date +%s)" >> $GITHUB_ENV
 
-      - name: Use Node.js 24.12.0
+      - name: Use Node.js 22.12.0
         uses: actions/setup-node@v6
         with:
-          node-version: 24.12.0
+          node-version: 22.12.0
           cache: 'npm'
 
       - name: Install dependencies
@@ -160,11 +160,17 @@ jobs:
           if [ -f "$FILE" ]; then
             node -e "
               const summary = require('$FILE').total;
-              const format = v => v.toFixed(2) + '%';
+              const toNumber = v => typeof v === 'number' ? v : Number.parseFloat(String(v));
+              const format = v => {
+                const value = toNumber(v);
+                return Number.isFinite(value) ? value.toFixed(2) + '%' : 'N/A';
+              };
               const fs = require('fs');
+              const linesPct = toNumber(summary.lines.pct);
 
-              const status = summary.lines.pct >= 80 ? '🟢 Good'
-                           : summary.lines.pct >= 70 ? '🟡 Warning'
+              const status = linesPct >= 80 ? '🟢 Good'
+                           : linesPct >= 70 ? '🟡 Warning'
+                           : Number.isFinite(linesPct) ? '🔴 Low'
                            : '🔴 Low';
 
               fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
@@ -195,10 +201,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Use Node.js 24.12.0
+      - name: Use Node.js 22.12.0
         uses: actions/setup-node@v6
         with:
-          node-version: 24.12.0
+          node-version: 22.12.0
           cache: 'npm'
 
       - name: Install dependencies

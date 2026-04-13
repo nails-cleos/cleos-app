@@ -234,6 +234,7 @@ describe('UnavailableListComponent', () => {
           title: 'UNAVAILABLE.DELETED.TITLE',
           content: 'UNAVAILABLE.DELETED.CONTENT',
           value: item,
+          variant: 'warning',
         },
       }));
 

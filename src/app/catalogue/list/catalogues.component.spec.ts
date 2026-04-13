@@ -155,6 +155,7 @@ describe('CataloguesComponent', () => {
           title: 'CATALOGUE.DELETED.TITLE',
           content: 'CATALOGUE.DELETED.CONTENT',
           value: testCatalogue,
+          variant: 'warning',
         },
       }));
 

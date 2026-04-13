@@ -106,10 +106,8 @@ export class TreatmentEffects {
   updateSort$ = createEffect(() => this.actions.pipe(
     ofType(sortTreatment),
     switchMap(({ treatments }) => effectRequest(
-      this.treatmentService.sortTreatment(treatments).pipe(switchMap(() => {
-        const message = this.translate.instant('TREATMENT.SORTED.MESSAGE');
-        return success(treatmentSaveSuccess, message);
-      })),
+      this.treatmentService.sortTreatment(treatments).pipe(switchMap(() =>
+        success(treatmentSaveSuccess, 'TREATMENT.SORTED.MESSAGE'))),
       action => action,
       treatmentFailure,
     )),
@@ -118,10 +116,8 @@ export class TreatmentEffects {
   updateGroupSort$ = createEffect(() => this.actions.pipe(
     ofType(sortGroupTreatment),
     switchMap(({ groups }) => effectRequest(
-      this.treatmentService.sortGroupTreatment(groups).pipe(switchMap(() => {
-        const message = this.translate.instant('TREATMENT.SORTED.MESSAGE');
-        return success(treatmentSaveSuccess, message);
-      })),
+      this.treatmentService.sortGroupTreatment(groups).pipe(switchMap(() =>
+        success(treatmentSaveSuccess, 'TREATMENT.SORTED.MESSAGE'))),
       action => action,
       treatmentFailure,
     )),

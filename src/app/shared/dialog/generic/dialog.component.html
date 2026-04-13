@@ -1,12 +1,33 @@
-<h1 mat-dialog-title>{{ data.title }}</h1>
-<div [innerHTML]="data.content" mat-dialog-content></div>
-<div mat-dialog-actions>
-  @if (!data.hideNoButton) {
-    <button (click)="onNoClick()" cdkFocusInitial mat-button>
-      {{ 'COMMON.BUTTON.NO' | translate }}
+<div class="dialog-shell" [class.dialog-shell-warning]="isWarning">
+  <div class="dialog-header">
+    <div class="dialog-title-wrap">
+      <div class="dialog-badge" aria-hidden="true">
+        <mat-icon>{{ icon }}</mat-icon>
+      </div>
+      <h1 mat-dialog-title>{{ data.title }}</h1>
+    </div>
+    <button (click)="onNoClick()" aria-label="Close dialog" class="close-button" type="button">
+      <mat-icon>close</mat-icon>
     </button>
-  }
-  @if (!data.hideOkButton) {
-    <button [mat-dialog-close]="data.value" mat-button>{{ 'COMMON.BUTTON.YES' | translate }}</button>
-  }
+  </div>
+
+  <div class="dialog-divider" aria-hidden="true"></div>
+
+  <div class="dialog-content" [innerHTML]="data.content" mat-dialog-content></div>
+
+  <div class="dialog-divider" aria-hidden="true"></div>
+
+  <div mat-dialog-actions class="dialog-actions">
+    <div class="spacer"></div>
+    @if (!data.hideNoButton) {
+      <button (click)="onNoClick()" cdkFocusInitial mat-stroked-button type="button">
+        {{ 'COMMON.BUTTON.NO' | translate }}
+      </button>
+    }
+    @if (!data.hideOkButton) {
+      <button [mat-dialog-close]="data.value" [color]="confirmColor" mat-flat-button type="button">
+        {{ 'COMMON.BUTTON.YES' | translate }}
+      </button>
+    }
+  </div>
 </div>

@@ -100,7 +100,7 @@ export class ColorListComponent {
     const title = this.translate.instant('COLOR.DELETED.TITLE');
     const content = this.translate.instant('COLOR.DELETED.CONTENT', { name: color.name });
 
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: color }, result => {
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: color, variant: 'warning' }, result => {
       if (result) {
         this.store.dispatch(deleteColor({ id: result.id, name: result.name }));
       }

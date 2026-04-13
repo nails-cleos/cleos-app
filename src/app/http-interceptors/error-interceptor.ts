@@ -17,8 +17,14 @@ export const errorInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn)
     delay: genericRetryStrategy({}),
   }), catchError(err => {
     if ([0].indexOf(err.status) !== -1) {
-      const message = err?.error?.message || err.statusText;
-      return throwError(() => ({ error: { message } }));
+      return throwError(() => ({
+        ...err,
+        error: {
+          ...err?.error,
+          status: 'SERVER_ERROR',
+          message: 'COMMON.ERROR.TRY_LATER',
+        },
+      }));
     }
     if (err.status === 401) {
       if (authService.authUser().isAuthenticated) {

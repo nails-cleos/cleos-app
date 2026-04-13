@@ -218,7 +218,8 @@
       "CONTENT": "Je hebt wijzigingen in extra's. Als je de afspraak voltooit, raak je deze wijzigingen kwijt. Weet je zeker dat je de afspraak wilt voltooien?"
     },
     "ERROR": {
-      "NO_CONTENT": "Geen inhoud"
+      "NO_CONTENT": "Geen inhoud",
+      "TRY_LATER": "Er is iets misgegaan. Probeer het later opnieuw"
     },
     "LABEL": {
       "FILTER": "Filter",

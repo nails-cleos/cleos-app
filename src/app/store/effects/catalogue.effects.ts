@@ -92,10 +92,8 @@ export class CatalogueEffects {
   updateAll$ = createEffect(() => this.actions.pipe(
     ofType(updateCatalogueOrder),
     switchMap(({ catalogues }) => effectRequest(
-      this.catalogueService.updateCatalogueOrder(catalogues).pipe(switchMap(() => {
-        const message = this.translate.instant('CATALOGUE.UPDATED.ALL.MESSAGE');
-        return success(catalogueSaveSuccess, message);
-      })),
+      this.catalogueService.updateCatalogueOrder(catalogues).pipe(switchMap(() =>
+        success(catalogueSaveSuccess, 'CATALOGUE.UPDATED.ALL.MESSAGE'))),
       action => action,
       catalogueFailure,
     )),

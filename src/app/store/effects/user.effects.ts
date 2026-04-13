@@ -137,9 +137,8 @@ export class UserEffects {
     ofType(updateMyPhoto),
     switchMap(({ file }) => effectRequest(
       this.userService.updateMyPhoto(file).pipe(switchMap((response: Token) => {
-        const message = this.translate.instant('COMMON.PROFILE.UPDATED.PHOTO');
         const lang = getLocale(this.translate.getCurrentLang()).language;
-        return success(userSaveSuccess, message, undefined, undefined, undefined,
+        return success(userSaveSuccess, 'COMMON.PROFILE.UPDATED.PHOTO', undefined, undefined, undefined,
           loginSuccess({
             token: response,
             queryParams: { state: btoa(JSON.stringify({ returnUrl: `/${ lang }/auth/profile`, lang })) },

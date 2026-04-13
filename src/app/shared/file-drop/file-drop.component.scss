@@ -23,6 +23,11 @@
   }
 }
 
+.file-drop-icon {
+  width: 63px;
+  height: 64px;
+}
+
 .fileover {
   animation: shake 1s;
   animation-iteration-count: infinite;
@@ -139,4 +144,3 @@ img {
 canvas {
   display: none;
 }
-

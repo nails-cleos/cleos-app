@@ -3,6 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import {
+  catalogueFailure,
   catalogueSuccess,
   getAllCatalogue,
   getListTreatmentsGroup,
@@ -39,7 +40,7 @@ export class MainEffects {
       this.catalogueService.getAllHome()
         .pipe(switchMap((catalogues: ICatalogueAll[]) => of(catalogueSuccess({ catalogues })))),
       action => action,
-      requestFailure,
+      catalogueFailure,
     )),
   ));
 
@@ -56,10 +57,8 @@ export class MainEffects {
   sendMessage$ = createEffect(() => this.actions.pipe(
     ofType(sendMessage),
     switchMap(({ sendMessage }) => effectRequest(
-      this.mainService.sendMessage(sendMessage).pipe(switchMap(() => {
-        const message = this.translate.instant('MAIN.CONTACT.SEND.MESSAGE');
-        return success(requestSuccess, message);
-      })),
+      this.mainService.sendMessage(sendMessage).pipe(switchMap(() =>
+        success(requestSuccess, 'MAIN.CONTACT.SEND.MESSAGE'))),
       action => action,
       requestFailure,
     )),

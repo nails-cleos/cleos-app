@@ -91,7 +91,7 @@ export class AdditionalEffects {
   updateSort$ = createEffect(() => this.actions.pipe(
     ofType(sortAdditional),
     switchMap(({ additionalList }) => effectRequest(
-      this.additionalService.sortAdditional(additionalList).pipe(switchMap(() => success(additionalSaveSuccess, this.translate.instant('ADDITIONAL.SORTED.MESSAGE')))),
+      this.additionalService.sortAdditional(additionalList).pipe(switchMap(() => success(additionalSaveSuccess, 'ADDITIONAL.SORTED.MESSAGE'))),
       action => action,
       additionalFailure,
     )),

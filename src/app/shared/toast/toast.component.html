@@ -6,7 +6,7 @@
   </div>
   <div class="toast-content">
     <div class="toast-title">{{ data.type | titlecase }}</div>
-    <div class="toast-message" [innerHTML]="data.message"></div>
+    <div class="toast-message" [innerHTML]="data.message | translate"></div>
   </div>
   <div class="toast-actions">
     @switch (data.actionType) {

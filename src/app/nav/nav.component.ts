@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ActivatedRoute, Router, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { IUser, User } from '../interfaces/user';
 import { logOut, redirect } from '../store/auth.actions';
@@ -99,6 +99,8 @@ export class NavComponent {
   private authUserSignal = this.authUserService.authUser;
   private isAuthorized = computed(() => this.isAuthenticatedSignal() ?? false);
   private readonly response = computed(() => this.globalResponseSignal());
+  private readonly isBlockingPageError = (error?: { status?: string }) =>
+    ['NOT_FOUND', 'SERVER_ERROR'].includes(error?.status || '');
 
   isHandsetSignal = computed(() => this.breakpointsSignal()?.matches ?? false);
   showInformation = computed(() => !this.authUserSignal()?.isRoomAdmin);
@@ -115,7 +117,10 @@ export class NavComponent {
   });
 
   isDarkMode = signal(this.authUserSignal().isDarkMode || isDarkMode(this.cookieService.get(THEME) as Theme));
-  error = computed(() => this.globalErrorSignal());
+  pageError = computed(() => {
+    const error = this.globalErrorSignal();
+    return this.isBlockingPageError(error) ? error : undefined;
+  });
   notifications = signal<INotification[]>([]);
   workDay = signal<INotification[]>([]);
   countNotifications = signal(0);
@@ -134,6 +139,11 @@ export class NavComponent {
   constructor() {
     this.navigationService.subscribe();
     this.authUserService.cookieConsent(this.translate);
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart && this.isBlockingPageError(this.globalErrorSignal())) {
+        this.store.dispatch(clearGlobalError());
+      }
+    });
 
     const meta = this.translate.instant('DASHBOARD.META');
     this.seoService.setMetaDescription(meta.CONTENT);
@@ -181,13 +191,16 @@ export class NavComponent {
     });
 
     effect(() => {
-      const err = this.error();
+      const err = this.globalErrorSignal();
       if (!err?.message) {
         return;
       }
 
       this.toastService.show(err.message, 'error');
-      this.store.dispatch(clearGlobalError());
+
+      if (!this.isBlockingPageError(err)) {
+        this.store.dispatch(clearGlobalError());
+      }
     });
 
     effect(() => {
