@@ -269,6 +269,8 @@ describe('ReservationCalendarService', () => {
     expect(event.id).toBe('event-1');
     expect(event.meta.isReservation).toBeTrue();
     expect(event.meta.professionalId).toBe('professional-1');
+    expect(event.meta.treatmentName).toBe('Treatment');
+    expect(event.meta.additionalNames).toEqual(['Extra']);
   });
 
   it('should create selection events without a professional', () => {
@@ -288,5 +290,7 @@ describe('ReservationCalendarService', () => {
 
     expect(event.meta.professionalId).toBeUndefined();
     expect(event.id).toBe('event-2');
+    expect(event.meta.treatmentName).toBe('Treatment');
+    expect(event.meta.additionalNames).toEqual([]);
   });
 });

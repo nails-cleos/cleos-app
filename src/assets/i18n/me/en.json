@@ -3,6 +3,25 @@
     "RESERVATION": {
       "PREVIEW": "Preview",
       "APPOINTMENT": "Appointment",
+      "FLOW": {
+        "SUMMARY": {
+          "EYEBROW": "Reservation flow",
+          "TITLE": "Booking summary",
+          "BREAKDOWN": "Price breakdown",
+          "EMPTY": "Not selected yet",
+          "NONE": "None",
+          "DATE_TIME": "Date & time",
+          "TOTAL": "Current total"
+        },
+        "STEPS": {
+          "ROOM": "Choose the office, room, and professional for this booking.",
+          "TREATMENT": "Pick a date, treatment, and discount before checking availability.",
+          "ADDITIONALS": "Add optional extras that affect duration and price.",
+          "SCHEDULE": "Choose the best available appointment time for this reservation.",
+          "PAYMENT": "Review the amount due and complete the payment details.",
+          "PREVIEW": "Review the reservation flow and confirm your contact and policy details."
+        }
+      },
       "UPCOMING": {
         "TITLE": "Upcoming Reservation",
         "START": "Start",

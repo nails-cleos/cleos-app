@@ -1,35 +1,28 @@
-section {
-  display: table;
+.empty-state--compact {
+  min-height: auto;
 }
 
-.button-row {
-  padding: 10px;
-  display: table-cell;
-  width: 390px;
-
-  button {
-    border: 1px solid;
-  }
+.availability-shell {
+  padding: 18px 0 4px;
 }
 
-.button-row .mat-mdc-button-base {
-  margin: 8px 8px 8px 0;
+.availability-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
-.mat-mdc-raised-button.large {
-  width: fit-content;
-  line-height: 60px;
+.availability-grid .mat-mdc-raised-button {
+  min-width: 88px;
 }
 
-.button-container {
-  margin: auto;
-  padding: 10px;
+.payment-shell app-price,
+.support-card app-payment-preview {
+  display: block;
 }
 
-.raised-button {
-  margin-left: 10px
-}
-
-.app-class .mat-mdc-list-item {
-  height: auto;
+.policy-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }

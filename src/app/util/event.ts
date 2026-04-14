@@ -28,6 +28,8 @@ export interface IMeta {
   timeZone?: string;
   state?: string;
   route?: string[];
+  treatmentName?: string;
+  additionalNames?: string[];
 }
 
 export class Meta implements IMeta {
@@ -40,6 +42,8 @@ export class Meta implements IMeta {
   id?: string;
   customer?: string;
   isReservation?: boolean;
+  treatmentName?: string;
+  additionalNames?: string[];
 
   constructor(
     time?: boolean,

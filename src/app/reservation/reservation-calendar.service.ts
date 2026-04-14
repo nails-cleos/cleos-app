@@ -129,6 +129,8 @@ export class ReservationCalendarService {
       const color = findStateColor(it.state, isDarkMode);
       const meta = new Meta(true, it.room.timeZone, undefined, undefined, it.professional.id);
       meta.isReservation = true;
+      meta.treatmentName = it.treatment.name;
+      meta.additionalNames = it.additional?.map(additional => additional.name) || [];
 
       return newEvent(detail, color, start, isDarkMode, end, it.id, meta);
     }).filter((item): item is CalendarEvent => item !== undefined);
@@ -199,6 +201,8 @@ export class ReservationCalendarService {
 
     const meta = new Meta(true, params.timeZone, undefined, undefined, params.professional?.id);
     meta.isReservation = true;
+    meta.treatmentName = params.treatment.name;
+    meta.additionalNames = params.additional.map(additional => additional.name);
 
     return newEvent(
       detail,

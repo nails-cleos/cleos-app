@@ -13,11 +13,10 @@ import { IRoomAll, ServiceType } from '../interfaces/room';
 import { IOfficeAll } from '../interfaces/office';
 import { IAdditionalAll } from '../interfaces/additional';
 import { PaymentType } from '../interfaces/payment';
-import { IGroupService, ITreatment, ITreatmentAll } from '../interfaces/treatment';
+import { IGroupService, ITreatment, ITreatmentAll, Price } from '../interfaces/treatment';
 import { DiscountType, IUserDiscount } from '../interfaces/discount';
-import { MatStepper } from '@angular/material/stepper';
 import { DataEvent } from '../util/event';
-import { Duration } from '../util/dates';
+import { Duration, getTime, newDateTimestamp } from '../util/dates';
 import { addMonths } from 'date-fns';
 import { MAX_RESERVATION_MONTH } from '../interfaces/reservation';
 import { provideHttpClient } from '@angular/common/http';
@@ -105,6 +104,25 @@ describe('ReservationComponent', () => {
     duration: '1H30M',
     primary: true,
   };
+
+  const createEditReservation = () => ({
+    id: 'reservation-1',
+    customer: mockCustomer,
+    room: mockRoom,
+    professional: mockRoom.professionals![0],
+    treatment: {
+      ...mockTreatment,
+      groupId: 'group-1',
+      discountCustomer: undefined,
+    },
+    additional: [
+      { id: 'additional-1', key: 'additional-1', name: 'Removal', price: 5, duration: '15M', type: ServiceType.additional },
+    ],
+    note: 'Important note',
+    configurationCanCustomerChange: true,
+    configurationReference: 'REF-1',
+    timestamp: new Date('2026-04-16T08:00:00Z').getTime() / 1000,
+  });
 
   beforeEach(async () => {
     authUserSignal.set({ ...initialAuthUser, isDarkMode: true, professionalId: 'prof-123' });
@@ -385,8 +403,12 @@ describe('ReservationComponent', () => {
         { key: 'add-2', id: 'add-2', name: 'Additional 2', price: 30, duration: '15M', type: ServiceType.additional },
       ];
 
-      const mockOptions = mockAdditional.map(item => ({ value: item })) as any;
-      component.onChange(mockOptions);
+      const selectionList = {
+        selectedOptions: {
+          selected: mockAdditional.map(item => ({ value: item })),
+        },
+      } as any;
+      component.onChange(selectionList);
 
       expect(component.additionalSelected()).toEqual(mockAdditional);
     });
@@ -477,9 +499,11 @@ describe('ReservationComponent', () => {
       component.isEditing.set(true);
       selectedReservation$.next({
         id: 'reservation-1',
+        customer: mockCustomer,
         treatment: mockTreatment,
         room: mockRoom,
         professional: mockRoom.professionals![0],
+        timestamp: new Date('2026-04-16T08:00:00Z').getTime() / 1000,
       });
       fixture.detectChanges();
 
@@ -504,13 +528,7 @@ describe('ReservationComponent', () => {
 
   describe('back method', () => {
     beforeEach(() => {
-      const stepperSpy = jasmine.createSpyObj<MatStepper>('MatStepper', [], {
-        selectedIndex: 0,
-      });
-      Object.defineProperty(component, 'stepper', {
-        get: () => () => stepperSpy,
-        configurable: true,
-      });
+      component.currentStepIndex.set(1);
     });
 
     it('should set isPreview to false when currently in preview mode', () => {
@@ -551,16 +569,9 @@ describe('ReservationComponent', () => {
       expect(component['cleanEvent']).not.toHaveBeenCalled();
     });
 
-    it('should update stepper selectedIndex', () => {
-      const stepperSpy = component['stepper'] as any;
-      if (stepperSpy && stepperSpy.selectedIndex !== undefined) {
-        component.back();
-        // After back, selectedIndex should change
-        expect(stepperSpy.selectedIndex).toBeDefined();
-      } else {
-        // If no stepper, just ensure back completes without error
-        expect(() => component.back()).not.toThrow();
-      }
+    it('should update current step index', () => {
+      component.back();
+      expect(component.currentStepIndex()).toBe(0);
     });
   });
 
@@ -590,6 +601,24 @@ describe('ReservationComponent', () => {
     it('should check if add button is disabled', () => {
       component.dateTimeList.setErrors({ invalid: true });
       expect(component.isAddButtonDisabled).toBeTrue();
+    });
+
+    it('should use the selected reservation as summary fallback and derive summary totals', () => {
+      const reservation = createEditReservation();
+      selectedReservation$.next(reservation);
+      fixture.detectChanges();
+
+      component.price.set(new Price());
+
+      expect(component.summaryCustomer).toEqual(reservation.customer);
+      expect(component.summaryRoom).toEqual(reservation.room);
+      expect(component.summaryProfessional).toEqual(reservation.professional);
+      expect(component.summaryTreatment).toEqual(reservation.treatment);
+      expect(component.summaryAdditionals).toEqual(reservation.additional);
+      expect(component.summaryDateTimes.length).toBe(1);
+      expect(component.selectedTreatmentPrice).toBe(100);
+      expect(component.effectiveTotalWithoutDiscount).toBe(105);
+      expect(component.effectiveTotalPrice).toBe(105);
     });
   });
 
@@ -674,54 +703,38 @@ describe('ReservationComponent', () => {
     });
 
     it('should move the stepper to the mapped step when applying shared sub errors', () => {
-      const stepper = { selectedIndex: 0 };
-      Object.defineProperty(component, 'stepper', {
-        get: () => () => stepper,
-        configurable: true,
-      });
+      component.currentStepIndex.set(0);
       spyOn(document, 'querySelector').and.returnValue(null);
 
       component['applySubErrors']([{ field: 'professional', message: 'Professional is invalid' }] as any);
 
-      expect(stepper.selectedIndex).toBe(3);
+      expect(component.currentStepIndex()).toBe(3);
     });
 
     it('should use the editing default step for unmapped sub errors when the user is not admin', () => {
-      const stepper = { selectedIndex: 0 };
-      Object.defineProperty(component, 'stepper', {
-        get: () => () => stepper,
-        configurable: true,
-      });
+      component.currentStepIndex.set(0);
       component.isEditing.set(true);
       spyOn(document, 'querySelector').and.returnValue(null);
 
       component['applySubErrors']([{ field: 'customer', message: 'Customer is invalid' }] as any);
 
-      expect(stepper.selectedIndex).toBe(2);
+      expect(component.currentStepIndex()).toBe(2);
       expect(component.getCustomerForm.customer.hasError('incorrect')).toBeTrue();
     });
 
     it('should use the admin editing default step for unmapped sub errors', () => {
-      const stepper = { selectedIndex: 0 };
-      Object.defineProperty(component, 'stepper', {
-        get: () => () => stepper,
-        configurable: true,
-      });
+      component.currentStepIndex.set(0);
       component.isEditing.set(true);
       authUserSignal.update(prev => ({ ...prev, isAdmin: true }));
       spyOn(document, 'querySelector').and.returnValue(null);
 
       component['applySubErrors']([{ field: 'customer', message: 'Customer is invalid' }] as any);
 
-      expect(stepper.selectedIndex).toBe(1);
+      expect(component.currentStepIndex()).toBe(1);
       expect(component.getCustomerForm.customer.hasError('incorrect')).toBeTrue();
     });
 
-    it('should still map shared sub errors when no stepper is available', () => {
-      Object.defineProperty(component, 'stepper', {
-        get: () => () => undefined,
-        configurable: true,
-      });
+    it('should still map shared sub errors without throwing', () => {
       spyOn(document, 'querySelector').and.returnValue(null);
 
       expect(() => component['applySubErrors']([{ field: 'note', message: 'Note is invalid' }] as any)).not.toThrow();
@@ -797,6 +810,79 @@ describe('ReservationComponent', () => {
       component.getTreatmentForm.discount.setValue(mockDiscount.id);
       component.getTreatmentForm.discount.setValue(undefined);
       expect(component.getTreatmentForm.discount.value).toBeUndefined();
+    });
+  });
+
+  describe('Edit Hydration', () => {
+    it('should hydrate the edit reservation into the form state', async () => {
+      const reservation = createEditReservation();
+      component.isEditing.set(true);
+
+      component['setData'](reservation as any);
+      await Promise.resolve();
+
+      expect(component.getCustomerForm.customer.value).toEqual(reservation.customer);
+      expect(component.getOfficeForm.office.value).toEqual(reservation.room.office);
+      expect(component.getOfficeForm.room.value).toEqual(reservation.room);
+      expect(component.getOfficeForm.professional.value).toEqual(reservation.professional);
+      expect(component.getTreatmentForm.treatment.value).toEqual(reservation.treatment);
+      expect(component.getConfigurationForm.note.value).toBe('Important note');
+      expect(component.getConfigurationForm.reference.value).toBe('REF-1');
+      expect(component.getConfigurationForm.customerChange.value).toBeTrue();
+      expect(component.additionalSelected().map(item => item.id)).toEqual(['additional-1']);
+      expect(component.price().total).toBe(105);
+      expect(component.currentStepIndex()).toBe(2);
+      expect(component['hydratingEdit']).toBeFalse();
+    });
+
+    it('should reuse the first date-time control when hydrating edit data', async () => {
+      const reservation = createEditReservation();
+      component.isEditing.set(true);
+      const expectedDate = newDateTimestamp(reservation.timestamp, reservation.room.timeZone);
+      const expectedStart = getTime(expectedDate, component['dateFormat']);
+
+      component['setData'](reservation as any);
+      await Promise.resolve();
+
+      expect(component.dateTimeList.length).toBe(1);
+      expect(component.getFormDateTimeControls(0).date.value).toEqual(expectedDate);
+      expect(component.getFormDateTimeControls(0).start.value).toBe(expectedStart);
+    });
+  });
+
+  describe('Additional Selection Sync', () => {
+    it('should compare additionals by id', () => {
+      expect(component.compareAdditional(
+        { id: 'additional-1' } as any,
+        { id: 'additional-1' } as any,
+      )).toBeTrue();
+      expect(component.compareAdditional(
+        { id: 'additional-1' } as any,
+        { id: 'additional-2' } as any,
+      )).toBeFalse();
+    });
+
+    it('should sync rendered additional selections from stored ids', async () => {
+      const selected = { id: 'additional-1', name: 'Removal' } as IAdditionalAll;
+      const optionA = { value: selected, selected: false };
+      const optionB = { value: { id: 'additional-2', name: 'Powder' }, selected: true };
+      (component as any).additionalLists = () => [{ options: [optionA, optionB] }];
+      component.additionalSelected.set([selected]);
+
+      component['syncRenderedAdditionalSelections']();
+      await Promise.resolve();
+
+      expect(optionA.selected).toBeTrue();
+      expect(optionB.selected).toBeFalse();
+    });
+
+    it('should detect when additional selections need syncing', () => {
+      const current = [{ id: 'additional-1' }, { id: 'additional-2' }] as IAdditionalAll[];
+      const same = current.slice();
+      const differentOrder = [{ id: 'additional-2' }, { id: 'additional-1' }] as IAdditionalAll[];
+
+      expect(component['shouldSyncAdditionalSelection'](current, same)).toBeFalse();
+      expect(component['shouldSyncAdditionalSelection'](current, differentOrder)).toBeTrue();
     });
   });
 
@@ -939,7 +1025,9 @@ describe('ReservationComponent', () => {
     });
 
     it('should handle empty additional selection', () => {
-      component.onChange([]);
+      component.onChange({
+        selectedOptions: { selected: [] },
+      } as any);
       expect(component.additionalSelected()).toEqual([]);
     });
 

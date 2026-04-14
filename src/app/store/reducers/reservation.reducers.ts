@@ -194,12 +194,19 @@ export const reservationReducer = createReducer(
     selected: undefined,
     response: undefined,
   })),
-  on(customerSearchReservation, searchAvailability, (state) => ({
+  on(customerSearchReservation, (state) => ({
     ...state,
     availability: undefined,
     error: undefined,
     subErrors: undefined,
-    selected: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(searchAvailability, (state) => ({
+    ...state,
+    groupedRooms: undefined,
+    error: undefined,
+    subErrors: undefined,
     response: undefined,
     isLoading: true,
   })),

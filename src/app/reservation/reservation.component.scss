@@ -1,47 +1,142 @@
 .calendar {
   display: block;
-  margin-left: auto;
-  margin-right: auto;
   width: 40%;
+  margin-inline: auto;
 }
 
 .cal-week-view .cal-event {
-  color: black;
+  color: var(--invert-text, black);
 }
 
-.raised-button {
-  margin: 7% 0 0 10px;
+.calendar-tooltip-card,
+.calendar-tooltip-fallback {
+  max-width: 260px;
+  padding: 10px 12px;
+  color: #fff;
 }
 
-.app-class .mat-mdc-list-item {
-  height: auto;
+.calendar-tooltip-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.calendar-tooltip-card__time {
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.calendar-tooltip-card__row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.calendar-tooltip-card__row span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  opacity: 0.8;
+  text-transform: uppercase;
+}
+
+.calendar-tooltip-card__row strong {
+  line-height: 1.4;
+}
+
+.field-grid--double {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .array-form {
+  display: flex;
   flex: 1;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.array-group {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 18px;
+  border: 1px solid var(--reservation-array-border);
+  border-radius: 24px;
+  background: var(--reservation-surface-muted);
+}
+
+.array-group__index {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 14px;
+  background: var(--reservation-array-index-bg);
+  color: var(--reservation-accent);
+  font-weight: 700;
+}
+
+.date-time-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.date-field,
+.time-field {
+  width: 100%;
+}
+
+.remove-button {
+  align-self: center;
+  justify-self: center;
+}
+
+.add-button-container {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.schedule-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.schedule-card,
+.preview-card {
+  overflow: hidden;
+}
+
+.schedule-divider {
+  margin: 0 10px;
+}
+
+.icon-button {
+  margin: 0;
+}
+
+.raised-button {
+  margin: 0 0 0 10px;
+}
+
+@media (max-width: 899px) {
+  .field-grid--double,
+  .date-time-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
 
   .array-group {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 16px;
-    border-radius: 24px;
-    margin-bottom: 16px;
+    grid-template-columns: minmax(0, 1fr);
+  }
 
-    .date-time-fields {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 8px;
-      margin: 5px;
+  .array-group__index {
+    width: 32px;
+    height: 32px;
+  }
 
-      .date-field, .time-field {
-        width: 100%;
-      }
-    }
-
-    .remove-button {
-      align-self: center;
-      justify-self: center;
-      margin-right: 5px;
-    }
+  .remove-button {
+    justify-self: flex-start;
   }
 }

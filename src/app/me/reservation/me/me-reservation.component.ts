@@ -1,5 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
-import { MatStepper } from '@angular/material/stepper';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+  viewChild,
+  viewChildren,
+} from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
@@ -47,7 +56,6 @@ import {
   updateReservationById,
 } from '../../../store/reservation.actions';
 import { map, startWith } from 'rxjs/operators';
-import { STEPPER_GLOBAL_OPTIONS, StepperSelectionEvent } from '@angular/cdk/stepper';
 import {
   createRoomOffice,
   createTreatmentGroupService,
@@ -66,7 +74,7 @@ import {
 import { DiscountType, IDiscount, IUserDiscount } from '../../../interfaces/discount';
 import { isEqual } from 'date-fns';
 import { IAdditionalAll } from '../../../interfaces/additional';
-import { MatListOption } from '@angular/material/list';
+import { MatListOption, MatSelectionList } from '@angular/material/list';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { IOffice, IOfficeAll } from '../../../interfaces/office';
 import { IStep, Step } from '../../../interfaces/step';
@@ -81,17 +89,7 @@ import {
   PENALTY,
 } from '../../../interfaces/payment';
 import { AuthUserService } from '../../../services/auth-user.service';
-import {
-  completeAndNext,
-  enableStep,
-  getBackIndex,
-  getIndex,
-  getStepCall,
-  getStepCompleted,
-  getStepEnabled,
-  getStepName,
-  getStepOptional,
-} from '../../../util/step';
+import { enableStep, getBackIndex, getIndex } from '../../../util/step';
 import { SharedModule } from '../../../shared/shared.module';
 import { RoomNamePipe } from '../../../pipes/room-name.pipe';
 import { SortByPipe } from '../../../pipes/sort-by.pipe';
@@ -165,9 +163,6 @@ const ME_RESERVATION_ERROR_FIELDS = [
   styleUrls: ['./me-reservation.component.scss'],
   imports: [SharedModule, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe, PriceComponent,
     PaymentPreviewComponent, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective],
-  providers: [{
-    provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false },
-  }],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MeReservationComponent {
@@ -237,8 +232,8 @@ export class MeReservationComponent {
     };
   });
 
-  private stepper = viewChild.required<MatStepper>('stepper');
   private picker = viewChild<MatDatepicker<Date>>('picker');
+  private additionalLists = viewChildren<MatSelectionList>('additional');
 
   errors = signal<Partial<Record<MeReservationField, string>> & { schedule?: boolean }>({});
 
@@ -372,8 +367,8 @@ export class MeReservationComponent {
       })),
   );
 
-  discounts = computed(() => {
-    return this.treatmentDiscountSignal()?.discounts.map((ud: IUserDiscount) => {
+  discounts = computed(() =>
+    this.treatmentDiscountSignal()?.discounts.map((ud: IUserDiscount) => {
       let title = ud.discountCustomer.name;
       switch (ud.discountCustomer.type) {
         case DiscountType.money:
@@ -385,10 +380,9 @@ export class MeReservationComponent {
           break;
       }
       return Object.assign({}, ud, { title });
-    });
-  });
+    }));
   showDiscount = false;
-  price: IPrice = new Price();
+  price = signal<IPrice>(new Price());
   oldPrice?: IPrice;
 
   private selectOfficeSignal = toSignal(this.getOfficeForm.office.valueChanges);
@@ -405,10 +399,13 @@ export class MeReservationComponent {
   private professionalId?: string;
   private customerId = computed(() => this.authUserSignal()?.customerId);
   private treatmentId?: string;
+  private groupId?: string;
   private reservationMonths = MAX_RESERVATION_CUSTOMER_MONTH;
   private steps: IStep[];
   private dismiss = false;
   private treatmentDiscount?: IDiscount;
+  private hydratedReservationKey?: string;
+  private hydratingEdit = false;
   private readonly language: string = this.translate.getCurrentLang();
 
   smallScreen = computed(() => this.breakpointsSignal()?.matches);
@@ -440,6 +437,7 @@ export class MeReservationComponent {
     return new Map<string, AvailabilityData[]>();
   });
   selectedIndex = 1;
+  activeStepIndex = signal(0);
   isPreview = false;
   isPayment = false;
   dateFormat: string = this.translate.getCurrentLang();
@@ -493,6 +491,7 @@ export class MeReservationComponent {
         });
         this.reservationId = reservationId;
         this.isEditing = true;
+        this.activeStepIndex.set(1);
         this.steps = this.steps.map(value => {
           switch (value.order) {
             case 0:
@@ -514,7 +513,7 @@ export class MeReservationComponent {
       }
       this.roomList.set(office.rooms);
       const room = getList(office.rooms, this.roomId);
-      this.getOfficeForm.room.setValue(room);
+      this.getOfficeForm.room.setValue(room, { emitEvent: !this.hydratingEdit });
     });
 
     effect(() => {
@@ -536,8 +535,11 @@ export class MeReservationComponent {
         }
         this.professionalList.set(room.professionals);
         const professional = getList(room.professionals, this.professionalId);
-        this.getOfficeForm.professional.setValue(professional);
+        this.getOfficeForm.professional.setValue(professional, { emitEvent: !this.hydratingEdit });
         this.professionalId = professional?.id;
+      }
+      if (this.hydratingEdit) {
+        return;
       }
       this.getTreatmentForm.group.setValue(undefined);
       if (!this.isEditing) {
@@ -547,19 +549,21 @@ export class MeReservationComponent {
 
     effect(() => {
       const group = this.selectGroupSignal();
+      this.groupId = group?.id;
       if (!group) {
         return;
       }
       this.treatmentList.set(group.treatments);
       const treatment = getList(group.treatments, this.treatmentId);
-      this.getTreatmentForm.treatment.setValue(treatment);
+      this.getTreatmentForm.treatment.setValue(treatment, { emitEvent: !this.hydratingEdit });
     });
 
     effect(() => {
       const treatment = this.selectTreatmentSignal();
       this.treatmentId = treatment?.id;
       if (treatment) {
-        this.price = newPrice(this.price, treatment.price, this.treatmentDiscount);
+        const currentPrice = untracked(() => this.price());
+        this.setPrice(newPrice(currentPrice, treatment.price, this.treatmentDiscount));
       }
     });
 
@@ -570,11 +574,13 @@ export class MeReservationComponent {
         const userDiscount = discounts.find(d => d.id === discountId);
         if (userDiscount) {
           this.treatmentDiscount = userDiscount.discountCustomer;
-          this.price = newDiscount(this.price, this.treatmentDiscount);
+          const currentPrice = untracked(() => this.price());
+          this.setPrice(newDiscount(currentPrice, this.treatmentDiscount));
         }
       } else {
         this.treatmentDiscount = undefined;
-        this.price = removeDiscount(this.price);
+        const currentPrice = untracked(() => this.price());
+        this.setPrice(removeDiscount(currentPrice));
       }
     });
 
@@ -586,9 +592,13 @@ export class MeReservationComponent {
         if (additionalSelected?.length) {
           const selectIds = additionalSelected?.map(value => value.id);
           const newList = additionalList.filter(al => selectIds.includes(al.id));
-          if (newList.length !== additionalSelected.length) {
+          if (this.shouldSyncAdditionalSelection(additionalSelected, newList)) {
             this.additionalSelected.set(newList);
-            this.price = newAdditional(this.price, additionalSelected, this.reservation?.treatment?.discountCustomer);
+            this.syncRenderedAdditionalSelections();
+            const currentPrice = untracked(() => this.price());
+            this.setPrice(
+              newAdditional(currentPrice, newList, this.reservation?.treatment?.discountCustomer),
+            );
           }
         }
       }
@@ -597,11 +607,29 @@ export class MeReservationComponent {
     effect(() => {
       const treatmentDiscount = this.treatmentDiscountSignal();
       if (treatmentDiscount?.treatments) {
-        const room = this.getOfficeForm.room.value;
+        const room = this.getOfficeForm.room.value || this.reservation?.room;
         if (room) {
-          this.groups.set(Array.from(
+          const groups = Array.from(
             createTreatmentGroupService(new Map<string, IGroupService>(), treatmentDiscount.treatments,
-              room.currency.code).values()));
+              room.currency.code).values());
+          this.groups.set(groups);
+
+          const currentGroupId = this.groupId;
+          const currentGroup = currentGroupId
+            ? groups.find(group => group.id === currentGroupId)
+            : groups.find(group => group.treatments.some(treatment => treatment.id === this.treatmentId));
+
+          if (currentGroup) {
+            this.treatmentList.set(currentGroup.treatments);
+            if (this.getTreatmentForm.group.value?.id !== currentGroup.id) {
+              this.getTreatmentForm.group.setValue(currentGroup, { emitEvent: !this.hydratingEdit });
+            }
+
+            const currentTreatment = getList(currentGroup.treatments, this.treatmentId);
+            if (currentTreatment && this.getTreatmentForm.treatment.value?.id !== currentTreatment.id) {
+              this.getTreatmentForm.treatment.setValue(currentTreatment, { emitEvent: !this.hydratingEdit });
+            }
+          }
         }
       }
     });
@@ -627,6 +655,11 @@ export class MeReservationComponent {
     effect(() => {
       const reservation = this.selectedReservationSignal();
       if (reservation) {
+        const reservationKey = this.getReservationHydrationKey(reservation);
+        if (this.hydratedReservationKey === reservationKey) {
+          return;
+        }
+        this.hydratedReservationKey = reservationKey;
         if (reservation.paymentRequired) {
           const message = this.translate.instant('ME.RESERVATION.UPCOMING.ERROR.PAYMENT');
           this.canNotContinue(message, 'update');
@@ -666,7 +699,8 @@ export class MeReservationComponent {
       const availableList = this.availableListSignal();
       if (availableList) {
         this.setSelectedIndex();
-        if (this.price.isPaid) {
+        const isPaid = untracked(() => this.price().isPaid);
+        if (isPaid) {
           this.firstTime = false;
           this.getTypeForm.type.clearValidators();
           this.getTypeForm.type.updateValueAndValidity();
@@ -680,10 +714,6 @@ export class MeReservationComponent {
         this.applySubErrors(subErrors);
       }
     });
-  }
-
-  private get myStepper() {
-    return this.stepper();
   }
 
   private get datePicker() {
@@ -707,7 +737,19 @@ export class MeReservationComponent {
   }
 
   get room() {
-    return this.getOfficeForm.room.value;
+    return this.getOfficeForm.room.value || this.selectedReservationSignal()?.room;
+  }
+
+  get summaryRoom() {
+    return this.room;
+  }
+
+  get summaryProfessional() {
+    return this.getOfficeForm.professional.value || this.selectedReservationSignal()?.professional;
+  }
+
+  get summaryTreatment() {
+    return this.getTreatmentForm.treatment.value || this.selectedReservationSignal()?.treatment;
   }
 
   get treatment() {
@@ -724,6 +766,66 @@ export class MeReservationComponent {
 
   get showTimeZone(): boolean {
     return !isSameTimeZone(this.room?.timeZone);
+  }
+
+  get hasDiscountApplied(): boolean {
+    return !!this.getTreatmentForm.discount.value ||
+      this.price().total !== this.price().totalWithoutDiscount || this.price().discount > 0;
+  }
+
+  get selectedTreatmentPrice(): number {
+    return Number(this.treatment?.price ?? this.price().amount ?? 0);
+  }
+
+  get selectedAdditionalTotal(): number {
+    return this.additionalSelected().reduce((total, additional) => total + Number(additional.price || 0), 0);
+  }
+
+  get effectiveDiscountAmount(): number {
+    return this.price().discount || 0;
+  }
+
+  get effectiveTotalWithoutDiscount(): number {
+    const fallbackTotal = this.selectedTreatmentPrice + this.selectedAdditionalTotal;
+    return this.price().totalWithoutDiscount === 0 && fallbackTotal > 0
+      ? fallbackTotal
+      : this.price().totalWithoutDiscount;
+  }
+
+  get effectiveTreatmentDisplayPrice(): number {
+    if (this.hasDiscountApplied && this.effectiveDiscountAmount > 0) {
+      const discountedPrice = this.price().priceWithDiscount;
+      return discountedPrice || Math.max(this.selectedTreatmentPrice - this.effectiveDiscountAmount, 0);
+    }
+
+    return this.selectedTreatmentPrice;
+  }
+
+  get effectiveTotalPrice(): number {
+    if (this.price().total === 0 && this.effectiveTotalWithoutDiscount > 0) {
+      return Math.max(this.effectiveTotalWithoutDiscount - this.effectiveDiscountAmount, 0);
+    }
+
+    return this.price().total;
+  }
+
+  get appointmentStart(): Date | undefined {
+    return this.getEventForm.event.value || this.getTreatmentForm.startDate.value || this.date;
+  }
+
+  get appointmentEnd(): Date | undefined {
+    if (this.endDate) {
+      return this.endDate;
+    }
+
+    const start = this.appointmentStart;
+    const treatment = this.treatment;
+    if (!start || !treatment) {
+      return undefined;
+    }
+
+    const duration = totalDuration(treatment, this.additionalSelected()).duration;
+    return createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
   }
 
   get getTreatmentForm(): TreatmentForm {
@@ -748,22 +850,22 @@ export class MeReservationComponent {
 
   get paymentToPay(): number {
     if (!this.oldPrice) {
-      const amount = this.price.total;
-      const covered = this.price.totalPaid + this.accountBalanceUsed;
+      const amount = this.price().total;
+      const covered = this.price().totalPaid + this.accountBalanceUsed;
       return Math.max(amount - covered, 0);
     }
 
     const covered = this.oldPrice.totalPaid + this.oldPrice.balance;
     const amount = this.showPenalty
-      ? (this.hasReservationChanges ? this.oldPrice.penalty + this.price.total : this.oldPrice.penalty)
-      : this.price.total;
+      ? (this.hasReservationChanges ? this.oldPrice.penalty + this.price().total : this.oldPrice.penalty)
+      : this.price().total;
     return Math.max(amount - covered, 0);
   }
 
   get paymentCredit(): number {
     if (!this.oldPrice) {
-      const amount = this.price.total;
-      const covered = this.price.totalPaid + this.accountBalanceUsed;
+      const amount = this.price().total;
+      const covered = this.price().totalPaid + this.accountBalanceUsed;
       return Math.max(covered - amount, 0);
     }
 
@@ -771,7 +873,7 @@ export class MeReservationComponent {
       return 0;
     }
 
-    const amount = this.showPenalty ? this.oldPrice.penalty + this.price.total : this.price.total;
+    const amount = this.showPenalty ? this.oldPrice.penalty + this.price().total : this.price().total;
     const covered = this.oldPrice.totalPaid + this.accountBalanceUsed;
     return Math.max(covered - amount, 0);
   }
@@ -781,13 +883,13 @@ export class MeReservationComponent {
       const totalPaid = this.oldPrice.totalPaid;
       const balance = this.oldPrice.balance || this.balance || 0;
       const amount = this.showPenalty
-        ? (this.hasReservationChanges ? this.oldPrice.penalty + this.price.total : this.oldPrice.penalty)
-        : this.price.total;
+        ? (this.hasReservationChanges ? this.oldPrice.penalty + this.price().total : this.oldPrice.penalty)
+        : this.price().total;
       return Math.min(balance, Math.max(amount - totalPaid, 0));
     }
 
-    const balance = this.price.balance || this.balance || 0;
-    return Math.min(balance, Math.max(this.price.total - this.price.totalPaid, 0));
+    const balance = this.price().balance || this.balance || 0;
+    return Math.min(balance, Math.max(this.price().total - this.price().totalPaid, 0));
   }
 
   get hasReservationChanges(): boolean {
@@ -821,7 +923,10 @@ export class MeReservationComponent {
     } else {
       this.getEventForm.event.setValue(undefined);
     }
-    this.myStepper.selectedIndex = getBackIndex(this.steps, this.myStepper.selectedIndex);
+    const previousIndex = getBackIndex(this.steps, this.activeStepIndex());
+    if (previousIndex >= 0) {
+      this.setActiveStep(previousIndex);
+    }
   }
 
   create(): void {
@@ -858,8 +963,6 @@ export class MeReservationComponent {
     }
   }
 
-  triggerClick = (event: StepperSelectionEvent): void => getStepCall(this.steps, event.selectedIndex - 1);
-
   callStepTwo = (goNext: boolean): void => {
     if (this.officeForm.invalid || !this.room) {
       return;
@@ -869,7 +972,9 @@ export class MeReservationComponent {
     this.roomId = this.room.id;
     this.setTypes();
     this.getTreatmentList(this.room.id);
-    completeAndNext(this.steps, this.myStepper, goNext, this.firebaseService);
+    if (goNext) {
+      this.completeAndGoToNextStep(0);
+    }
   };
 
   callStepThree = (goNext: boolean): void => {
@@ -878,8 +983,11 @@ export class MeReservationComponent {
     }
     this.isPreview = false;
     this.treatmentId = this.getTreatmentForm.treatment.value?.id;
+    enableStep(this.steps, 'post_add');
     this.getAdditionalList();
-    completeAndNext(this.steps, this.myStepper, goNext, this.firebaseService);
+    if (goNext) {
+      this.completeAndGoToNextStep(1);
+    }
   };
 
   callStepFour = (goNext: boolean): void => {
@@ -908,7 +1016,9 @@ export class MeReservationComponent {
         additionalIds: additionalSelected?.map(additional => additional.id),
       }),
     );
-    completeAndNext(this.steps, this.myStepper, goNext, this.firebaseService);
+    if (goNext) {
+      this.completeAndGoToNextStep(2);
+    }
   };
 
   callStepFive = (goNext: boolean): void => {
@@ -931,14 +1041,15 @@ export class MeReservationComponent {
     if (!requiresPayment) {
       this.isPayment = false;
       this.isPreview = true;
-      setTimeout(() => {
-        this.myStepper.selectedIndex = 5;
-      }, 0);
+      this.completeStep(3);
+      this.setActiveStep(5);
       return;
     }
 
     this.isPayment = true;
-    completeAndNext(this.steps, this.myStepper, goNext, this.firebaseService);
+    if (goNext) {
+      this.completeAndGoToNextStep(3);
+    }
   };
 
   callStepSix = (goNext: boolean): void => {
@@ -947,16 +1058,49 @@ export class MeReservationComponent {
     }
 
     this.isPreview = true;
-    completeAndNext(this.steps, this.myStepper, goNext, this.firebaseService);
+    if (goNext) {
+      this.completeAndGoToNextStep(4);
+    }
   };
 
-  getStepName = (index: number): string => getStepName(this.steps, index);
+  private setActiveStep = (index: number): void => {
+    this.activeStepIndex.set(index);
+    if (this.steps[index]?.name === 'post_add') {
+      queueMicrotask(() => this.syncRenderedAdditionalSelections());
+    }
+  };
 
-  getStepEnabled = (index: number): boolean => getStepEnabled(this.steps, index);
+  private completeStep = (index: number): void => {
+    const step = this.steps.find(value => value.order === index);
+    if (!step) {
+      return;
+    }
+    step.completed = true;
+    this.steps[step.order] = step;
+    this.firebaseService.logEvent('screen_view', {
+      // eslint-disable-next-line camelcase
+      firebase_screen: `Customer reservation. Step: ${ step.name }`,
+      // eslint-disable-next-line camelcase
+      firebase_screen_class: 'MeReservationComponent',
+    });
+  };
 
-  getStepCompleted = (index: number): boolean => getStepCompleted(this.steps, index);
+  private completeAndGoToNextStep = (index: number): void => {
+    this.completeStep(index);
+    const nextIndex = this.getNextEnabledStepIndex(index);
+    if (nextIndex !== undefined) {
+      this.setActiveStep(nextIndex);
+    }
+  };
 
-  getStepOptional = (index: number): boolean => getStepOptional(this.steps, index);
+  private getNextEnabledStepIndex = (currentIndex: number): number | undefined => {
+    for (const step of this.steps.slice(currentIndex + 1)) {
+      if (step.enable) {
+        return step.order;
+      }
+    }
+    return undefined;
+  };
 
   openDialog = (reservationDate?: Date): void => openDialog(
     this.room!, this.dateFormat, this.translate, this.dialog, reservationDate,
@@ -1031,25 +1175,57 @@ export class MeReservationComponent {
     this.keyDownHandler(event, this.getOfficeForm.office);
   };
 
-  onChange = (options: MatListOption[]): void => {
-    const additionalSelected = options.map(o => o.value);
-    this.additionalSelected.set(additionalSelected);
-    this.price = newAdditional(this.price, additionalSelected, this.treatmentDiscount);
+  onChange = (list: MatSelectionList): void => {
+    Promise.resolve().then(() => {
+      const additionalSelected = list.selectedOptions.selected.map(option => option.value as IAdditionalAll);
+      const currentIds = this.additionalSelected().map(item => item.id).sort();
+      const nextIds = additionalSelected.map(item => item.id).sort();
+
+      if (currentIds.length === nextIds.length && currentIds.every((id, index) => id === nextIds[index])) {
+        return;
+      }
+
+      this.additionalSelected.set(additionalSelected);
+      this.syncRenderedAdditionalSelections();
+      this.setPrice(newAdditional(this.price(), additionalSelected, this.treatmentDiscount));
+    });
   };
 
   isSelected = (it: IAdditionalAll): boolean => this.additionalSelected().filter(el => el.id === it.id).length > 0;
 
+  compareAdditional = (first?: IAdditionalAll, second?: IAdditionalAll): boolean => first?.id === second?.id;
+
   getPercentage = (percentage: number): void => {
-    this.price = newPercentage(this.price, percentage);
+    this.setPrice(newPercentage(this.price(), percentage));
   };
 
   private getTreatmentList = (roomId: string): void => {
     this.store.dispatch(getAllTreatments({ roomId }));
   };
 
+  private shouldSyncAdditionalSelection = (current: IAdditionalAll[], next: IAdditionalAll[]): boolean => {
+    if (current.length !== next.length) {
+      return true;
+    }
+
+    return next.some((item, index) => current[index]?.id !== item.id || current[index] !== item);
+  };
+
+  private syncRenderedAdditionalSelections = (): void => {
+    queueMicrotask(() => {
+      const selectedIds = new Set(this.additionalSelected().map(item => item.id));
+      this.additionalLists().forEach(list => {
+        list.options.forEach((option: MatListOption) => {
+          const additionalId = (option.value as IAdditionalAll | undefined)?.id;
+          option.selected = additionalId ? selectedIds.has(additionalId) : false;
+        });
+      });
+    });
+  };
+
   private getAdditionalList = (): void => {
     const roomId = this.getOfficeForm.room.value!.id;
-    const groupId = this.getTreatmentForm.group.value!.id;
+    const groupId = this.groupId || this.getTreatmentForm.group.value!.id;
     this.store.dispatch(getAllAdditionalByGroupId({ roomId, groupId }));
   };
 
@@ -1103,24 +1279,31 @@ export class MeReservationComponent {
     option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 
   private setData = (reservation: IUpcomingAll): void => {
+    this.hydratingEdit = true;
+    this.treatmentDiscount = reservation.treatment.discountCustomer;
     this.reservation = reservation;
     this.isPreview = false;
     const date = newDateTimestamp(reservation.timestamp, this.reservation.room.timeZone);
-    this.getEventForm.event.setValue(date);
+    this.groupId = reservation.treatment.groupId;
+    this.treatmentId = reservation.treatment.key;
+    this.roomId = reservation.room.id;
+    this.professionalId = reservation.professional.id;
+    this.roomList.set(reservation.room.office.rooms);
+    this.professionalList.set(reservation.room.professionals);
+    this.getEventForm.event.setValue(date, { emitEvent: false });
     this.time = getTime(date, this.dateFormat);
-    this.getOfficeForm.room.setValue(reservation.room);
-    this.getOfficeForm.professional.setValue(reservation.professional);
-    this.getTreatmentForm.startDate.setValue(date);
-    this.price = getPrice(this.reservation, this.reservation?.payments);
+    this.getOfficeForm.office.setValue(reservation.room.office, { emitEvent: false });
+    this.getOfficeForm.room.setValue(reservation.room, { emitEvent: false });
+    this.getOfficeForm.professional.setValue(reservation.professional, { emitEvent: false });
+    this.getTreatmentForm.startDate.setValue(date, { emitEvent: false });
+    this.getTreatmentForm.treatment.setValue(reservation.treatment, { emitEvent: false });
+    this.setPrice(getPrice(this.reservation, this.reservation?.payments));
     this.applyCustomerBalance(this.balance);
     this.additionalSelected.set(this.reservation.additional ? this.reservation.additional
       .map(ad => Object.assign({}, ad, { id: ad.key })) : []);
-    this.treatmentId = reservation.treatment.key;
-    const roomId = reservation.room.id;
-    this.roomId = roomId;
-    this.professionalId = reservation.professional.id;
+    this.syncRenderedAdditionalSelections();
     if (this.isEditing) {
-      this.oldPrice = this.price;
+      this.oldPrice = this.price();
       this.showPenalty = !this.reservation.canEdit;
       this.setTypes();
       if (!this.reservation.canEdit) {
@@ -1130,14 +1313,33 @@ export class MeReservationComponent {
       } else {
         enableStep(this.steps, 'payment', false);
       }
-      this.getTreatmentList(roomId);
+      this.getTreatmentList(this.roomId!);
     }
-    completeAndNext(this.steps, this.myStepper, true, this.firebaseService);
+    if (this.isEditing) {
+      this.setActiveStep(1);
+    } else {
+      this.completeAndGoToNextStep(0);
+    }
+    queueMicrotask(() => {
+      this.hydratingEdit = false;
+    });
   };
+
+  private getReservationHydrationKey = (reservation: IUpcomingAll): string => [
+    reservation.id,
+    reservation.timestamp,
+    reservation.room.id,
+    reservation.professional.id,
+    reservation.treatment.id ?? reservation.treatment.key,
+    (reservation.additional ?? []).map(item => item.id ?? item.key).join(','),
+    reservation.canEdit ? '1' : '0',
+    reservation.paymentRequired ? '1' : '0',
+  ].join('|');
 
   private applyCustomerBalance = (balance?: number): void => {
     this.balance = balance || 0;
-    this.price = this.price.withBalance(balance);
+    const currentPrice = untracked(() => this.price());
+    this.setPrice(currentPrice.withBalance(balance));
     if (this.oldPrice) {
       this.oldPrice = this.oldPrice.withBalance(balance);
     }
@@ -1151,10 +1353,14 @@ export class MeReservationComponent {
   };
 
   private cleanTreatment = (): void => {
-    this.price = new Price();
+    this.price.set(new Price());
     this.getTreatmentForm.treatment.setValue(undefined);
     this.treatmentList.set(undefined);
     this.getEventForm.event.setValue(undefined);
+  };
+
+  private setPrice = (price: IPrice): void => {
+    this.price.set(price);
   };
 
   private applySubErrors = (subErrors: IError[]): void => {
@@ -1166,7 +1372,7 @@ export class MeReservationComponent {
     });
 
     if (state.stepIndex !== undefined) {
-      this.myStepper.selectedIndex = state.stepIndex;
+      this.setActiveStep(state.stepIndex);
     }
 
     state.fields.forEach(field => {

@@ -3,6 +3,27 @@
     "CLONE": "Date and time to clone",
     "PREVIEW": "Preview",
     "APPOINTMENT": "Appointment",
+    "FLOW": {
+      "STEP": "Step",
+      "SUMMARY": {
+        "EYEBROW": "Reservation flow",
+        "TITLE": "Booking summary",
+        "BREAKDOWN": "Price breakdown",
+        "EMPTY": "Not selected yet",
+        "NONE": "None",
+        "DATE_TIME": "Date & time",
+        "TOTAL": "Current total"
+      },
+      "STEPS": {
+        "CUSTOMER": "Select the customer and review their latest reservation context.",
+        "ROOM": "Choose the office, room, and professional for this booking.",
+        "TREATMENT": "Set preferred dates, time, treatment, and discount before checking availability.",
+        "ADDITIONALS": "Add optional extras that affect duration and price.",
+        "CONFIGURATION": "Capture notes, payment details, and customer-change settings.",
+        "SCHEDULE": "Pick the final appointment slots from the available calendar.",
+        "PREVIEW": "Review the reservation flow and final total before confirming the booking."
+      }
+    },
     "LIST": {
       "CANCEL": {
         "TITLE": "Cancel reservation",
