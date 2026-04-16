@@ -82,10 +82,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../../interfaces/token';
 import { IUser, IUserAll } from '../../../interfaces/user';
 import {
-  getPaymentOptions,
   IPaymentOption,
   PaymentPercentage,
-  PaymentType,
   PENALTY,
 } from '../../../interfaces/payment';
 import { AuthUserService } from '../../../services/auth-user.service';
@@ -119,6 +117,7 @@ import { BankForm } from '../../../shared/bank/bank.component';
 import { FirebaseService } from '../../../services/firebase.service';
 import { OfficeForm } from '../../../reservation/reservation-form.types';
 import { ReservationFormErrorService } from '../../../reservation/reservation-form-error.service';
+import { getPaymentOptionsPipe } from '../../../store/selectors/payment.selectors';
 
 const MAX_UPCOMING_RESERVATION = 10;
 
@@ -151,7 +150,7 @@ const ME_RESERVATION_ERROR_FIELDS = [
   'startDate',
   'group',
   'event',
-  'type',
+  'option',
   'percentage',
   'accept',
   'phone',
@@ -160,7 +159,6 @@ const ME_RESERVATION_ERROR_FIELDS = [
 @Component({
   selector: 'app-me-reservation',
   templateUrl: './me-reservation.component.html',
-  styleUrls: ['./me-reservation.component.scss'],
   imports: [SharedModule, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe, PriceComponent,
     PaymentPreviewComponent, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -186,18 +184,20 @@ export class MeReservationComponent {
   private customerReservation$ = this.store.pipe(getCustomerReservationPipe);
   private availableList$ = this.store.pipe(getAvailableListPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
+  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
-  private navigationParams = toSignal(this.navigationParams$);
-  private reservationIdSignal = toSignal(this.reservationId$);
-  private treatmentDiscountSignal = toSignal(this.treatmentDiscount$);
-  private roomsSignal = toSignal(this.rooms$);
-  private selectedReservationSignal = toSignal(this.selectedReservation$);
-  private customerReservationSignal = toSignal(this.customerReservation$);
-  private availableListSignal = toSignal(this.availableList$);
-  private subErrorsSignal = toSignal(this.subErrors$);
-  private authUserSignal = this.authUserService.authUser;
+  private readonly navigationParams = toSignal(this.navigationParams$);
+  private readonly reservationIdSignal = toSignal(this.reservationId$);
+  private readonly treatmentDiscountSignal = toSignal(this.treatmentDiscount$);
+  private readonly roomsSignal = toSignal(this.rooms$);
+  private readonly selectedReservationSignal = toSignal(this.selectedReservation$);
+  private readonly customerReservationSignal = toSignal(this.customerReservation$);
+  private readonly availableListSignal = toSignal(this.availableList$);
+  private readonly subErrorsSignal = toSignal(this.subErrors$);
+  private readonly authUserSignal = this.authUserService.authUser;
+  private readonly paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
 
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
@@ -213,6 +213,9 @@ export class MeReservationComponent {
   private langChangeSignal = toSignal<LangChangeEvent>(this.translate.onLangChange, {
     initialValue: undefined,
   });
+  private readonly paymentOptions = computed(
+    () => this.paymentOptionsSignal().filter(option => option.enabled && option.enabledCustomer),
+  );
 
   additionalListSignal = toSignal(this.additionalList$);
 
@@ -269,7 +272,7 @@ export class MeReservationComponent {
   });
 
   typeForm: FormGroup<BankForm> = this.formBuilder.group<BankForm>({
-    type: this.formBuilder.control(undefined),
+    option: this.formBuilder.control(undefined),
     percentage: this.formBuilder.control(undefined),
   });
 
@@ -413,7 +416,6 @@ export class MeReservationComponent {
   options = signal<IPaymentOption[] | undefined>(undefined);
   additionalSelected = signal<IAdditionalAll[]>([]);
 
-  paymentTypes = signal<PaymentType[] | undefined>(undefined);
   availableList = computed(() => {
     const availableList = this.availableListSignal();
     if (availableList?.length) {
@@ -668,8 +670,8 @@ export class MeReservationComponent {
         }
         if (!reservation.canEdit) {
           this.firstTime = true;
-          this.getTypeForm.type.setValidators([Validators.required]);
-          this.getTypeForm.type.updateValueAndValidity();
+          this.getTypeForm.option.setValidators([Validators.required]);
+          this.getTypeForm.option.updateValueAndValidity();
         }
       }
     });
@@ -689,8 +691,8 @@ export class MeReservationComponent {
         this.getAcceptForm.phone.setValue(customerReservation?.phone || this.reservation?.customer?.phone);
         if (customerReservation?.isFirstTime) {
           this.firstTime = true;
-          this.getTypeForm.type.setValidators([Validators.required]);
-          this.getTypeForm.type.updateValueAndValidity();
+          this.getTypeForm.option.setValidators([Validators.required]);
+          this.getTypeForm.option.updateValueAndValidity();
         }
       }
     });
@@ -702,8 +704,8 @@ export class MeReservationComponent {
         const isPaid = untracked(() => this.price().isPaid);
         if (isPaid) {
           this.firstTime = false;
-          this.getTypeForm.type.clearValidators();
-          this.getTypeForm.type.updateValueAndValidity();
+          this.getTypeForm.option.clearValidators();
+          this.getTypeForm.option.updateValueAndValidity();
         }
       }
     });
@@ -807,6 +809,14 @@ export class MeReservationComponent {
     }
 
     return this.price().total;
+  }
+
+  get effectivePaidTotal(): number {
+    return this.oldPrice?.totalPaid || this.price().totalPaid || 0;
+  }
+
+  get showCoveredAmounts(): boolean {
+    return this.effectivePaidTotal > 0 || this.accountBalanceUsed > 0;
   }
 
   get appointmentStart(): Date | undefined {
@@ -945,8 +955,8 @@ export class MeReservationComponent {
     reservation.phone = this.getAcceptForm.phone.value;
 
     const role = Role.customer;
-    const option = this.getTypeForm.type?.value;
-    if (option && option.type !== PaymentType.account) {
+    const option = this.getTypeForm.option?.value;
+    if (option && option.type.toLowerCase() !== 'account') {
       const percentage = this.getTypeForm.percentage?.value || PaymentPercentage.total;
 
       reservation.payment = { type: option.type, percentage };
@@ -1307,8 +1317,8 @@ export class MeReservationComponent {
       this.showPenalty = !this.reservation.canEdit;
       this.setTypes();
       if (!this.reservation.canEdit) {
-        this.getTypeForm.type.setValidators([Validators.required]);
-        this.getTypeForm.type.updateValueAndValidity();
+        this.getTypeForm.option.setValidators([Validators.required]);
+        this.getTypeForm.option.updateValueAndValidity();
         this.firstTime = true;
       } else {
         enableStep(this.steps, 'payment', false);
@@ -1346,10 +1356,10 @@ export class MeReservationComponent {
   };
 
   private setTypes = (): void => {
+    const options = this.paymentOptions();
     const types = this.getOfficeForm.room.value?.paymentTypes.filter(
-      (p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
-    this.paymentTypes.set(types);
-    this.options.set(getPaymentOptions(this.translate, types));
+      p => !['cash', 'transfer'].includes(p.toLowerCase()));
+    this.options.set(options.filter(option => types?.includes(option.type)));
   };
 
   private cleanTreatment = (): void => {

@@ -13,6 +13,7 @@ describe('ToastService', () => {
   let injector: jasmine.SpyObj<DestroyableInjector>;
   let overlayRef: jasmine.SpyObj<OverlayRef>;
   let positionStrategy: jasmine.SpyObj<any>;
+  let innerWidthSpy: jasmine.Spy<() => number>;
 
   beforeEach(() => {
     const overlayRefSpy = jasmine.createSpyObj('OverlayRef', [
@@ -22,12 +23,14 @@ describe('ToastService', () => {
     ]);
     const positionStrategySpy = jasmine.createSpyObj('PositionStrategy', [
       'global',
+      'bottom',
       'top',
       'centerHorizontally',
     ]);
 
     // Chain the position strategy methods
     positionStrategySpy.global.and.returnValue(positionStrategySpy);
+    positionStrategySpy.bottom.and.returnValue(positionStrategySpy);
     positionStrategySpy.top.and.returnValue(positionStrategySpy);
     positionStrategySpy.centerHorizontally.and.returnValue(positionStrategySpy);
 
@@ -60,6 +63,10 @@ describe('ToastService', () => {
   });
 
   describe('show', () => {
+    beforeEach(() => {
+      innerWidthSpy = spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1024);
+    });
+
     it('should create toast with default parameters', () => {
       const message = 'Test message';
 
@@ -77,6 +84,15 @@ describe('ToastService', () => {
       expect(toastRef).toBeDefined();
       expect(toastRef.onAction).toBeDefined();
       expect(toastRef.onDismiss).toBeDefined();
+    });
+
+    it('should position toast from the bottom on mobile', () => {
+      innerWidthSpy.and.returnValue(375);
+
+      service.show('Mobile toast');
+
+      expect(positionStrategy.bottom).toHaveBeenCalledWith('16px');
+      expect(positionStrategy.centerHorizontally).toHaveBeenCalled();
     });
 
     it('should create toast with custom parameters', () => {

@@ -1,149 +1,154 @@
-<div class="flex-container">
-  <div class="card-container">
-    <div class="card-content">
-      <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
-        @let isAddMode = isAddModeSignal();
-        @let office = officeSignal();
-        <mat-card appearance="outlined">
-          @if (isAddMode) {
-            <mat-card-header>
-              <mat-card-title>{{ 'OFFICE.TITLE' | translate }}</mat-card-title>
-            </mat-card-header>
+@let isAddMode = isAddModeSignal();
+@let office = officeSignal();
+
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <section class="app-surface-section">
+    <div class="app-detail-section-header">
+      <div>
+        <span class="app-surface-eyebrow">
+          {{ (isAddMode ? 'OFFICE.TITLE' : 'OFFICE.DETAIL') | translate }}
+        </span>
+        @if (!isAddMode) {
+          @if (office) {
+            <h2 class="app-crud-title">{{ office.name }}</h2>
           } @else {
-            <mat-card-header>
-              <mat-card-title>{{ 'OFFICE.DETAIL' | translate }}</mat-card-title>
-              @if (office) {
-                <mat-card-subtitle>{{ office.name }}</mat-card-subtitle>
-              } @else {
-                <div class="ssc-line"></div>
-              }
-            </mat-card-header>
+            <div class="ssc-line app-skeleton-title"></div>
           }
-          @if (isAddMode || office) {
-            <mat-card-content>
-              <div class="inner-container">
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'OFFICE.NAME.FIELD' | translate }}</mat-label>
-                  <input [formControl]="getForm.name" autocomplete="name" matInput required>
-                  @if (getForm.name.hasError('required')) {
-                    <mat-error [innerHTML]="'OFFICE.NAME.REQUIRED' | translate"></mat-error>
-                  } @else if (errors['name']) {
-                    <mat-error>{{ errors['name'] }}</mat-error>
-                  }
-                </mat-form-field>
-                @if (isAddMode) {
-                  @if (allManagersSignal()) {
-                    <div class="fields-container">
-                      <mat-form-field appearance="outline">
-                        <mat-label>{{ 'OFFICE.MANAGER.FIELD' | translate }}</mat-label>
-                        <input [formControl]="getForm.manager" [matAutocomplete]="auto" matInput required type="text">
-                        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-                          @for (manager of filteredManagerSignal(); track manager.id) {
-                            <mat-option [value]="manager">{{ manager.displayName }}</mat-option>
-                          }
-                        </mat-autocomplete>
-                        @if (getForm.manager.hasError('required')) {
-                          <mat-error [innerHTML]="'OFFICE.MANAGER.REQUIRED' | translate"></mat-error>
-                        } @else if (getForm.manager.hasError('requireMatch')) {
-                          <mat-error [innerHTML]="'OFFICE.MANAGER.INVALID' | translate"></mat-error>
-                        } @else if (errors()['manager']) {
-                          <mat-error>{{ errors()['manager'] }}</mat-error>
-                        }
-                      </mat-form-field>
-                      <button class="hide-gt-xs" (click)="addManager()" color="accent" mat-fab type="button">
-                        <mat-icon matPrefix>person_add</mat-icon>
-                      </button>
-                      <button class="hide-xs" (click)="addManager()" color="accent" mat-fab extended type="button">
-                        <mat-icon matPrefix>person_add</mat-icon>
-                        <span>{{ 'OFFICE.MANAGER.ADD_BUTTON' | translate }}</span>
-                      </button>
-                    </div>
-                  } @else {
-                    <div class="ssc-line"></div>
-                  }
-                } @else {
-                  <mat-form-field appearance="outline">
-                    <mat-label>{{ 'OFFICE.MANAGER.FIELD' | translate }}</mat-label>
-                    <input [value]="managerName" disabled matInput type="text">
-                  </mat-form-field>
-                }
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'OFFICE.SUBJECT.FIELD' | translate }}</mat-label>
-                  <input [formControl]="getForm.subject" matInput>
-                  @let subjectError = errors()['subject'];
-                  @if (subjectError) {
-                    <mat-error>{{ subjectError }}</mat-error>
-                  }
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'OFFICE.KVK.FIELD' | translate }}</mat-label>
-                  <input [formControl]="getForm.kvk" matInput>
-                  @let kvkError = errors()['kvk'];
-                  @if (kvkError) {
-                    <mat-error>{{ kvkError }}</mat-error>
-                  }
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'OFFICE.ACCOUNT.FIELD' | translate }}</mat-label>
-                  <input [formControl]="getForm.account" matInput>
-                  @let accountError = errors()['account'];
-                  @if (accountError) {
-                    <mat-error>{{ accountError }}</mat-error>
-                  }
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'OFFICE.BTW.FIELD' | translate }}</mat-label>
-                  <input [formControl]="getForm.btw" matInput>
-                  @let btwError = errors()['btw'];
-                  @if (btwError) {
-                    <mat-error>{{ btwError }}</mat-error>
-                  }
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'OFFICE.ADDRESS.FIELD' | translate }}</mat-label>
-                  <input [formControl]="getForm.billingAddress" matInput>
-                  @let billingAddressError = errors()['billingAddress'];
-                  @if (billingAddressError) {
-                    <mat-error>{{ billingAddressError }}</mat-error>
-                  }
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'OFFICE.DRIVE_FOLDER.FIELD' | translate }}</mat-label>
-                  <input [formControl]="getForm.driveFolder" matInput>
-                  @let driveFolderError = errors()['driveFolder'];
-                  @if (driveFolderError) {
-                    <mat-error>{{ driveFolderError }}</mat-error>
-                  }
-                </mat-form-field>
-              </div>
-            </mat-card-content>
-            <mat-card-actions class="card-actions">
-              <div class="spacer"></div>
-              <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
-                {{ 'COMMON.BUTTON.BACK' | translate }}
-              </button>
-              @if (isAddModeSignal()) {
-                <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
-                  {{ 'COMMON.BUTTON.CREATE' | translate }}
-                </button>
-              } @else {
-                <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
-                  {{ 'COMMON.BUTTON.UPDATE' | translate }}
-                </button>
-              }
-            </mat-card-actions>
-          } @else {
-            <mat-card-content>
-              <div class="ssc-hr"></div>
-              <div class="ssc-square mb"></div>
-              <div class="ssc-hr"></div>
-            </mat-card-content>
-            <mat-card-actions class="card-actions">
-              <div class="ssc-head-line"></div>
-            </mat-card-actions>
-          }
-        </mat-card>
-      </form>
+        }
+      </div>
     </div>
-  </div>
+
+    <form (ngSubmit)="submit()"
+          [formGroup]="form"
+          novalidate
+          (keydown.enter)="$event.preventDefault()"
+          class="app-crud-form">
+      @if (isAddMode || office) {
+        <div class="app-crud-form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'OFFICE.NAME.FIELD' | translate }}</mat-label>
+            <input [formControl]="getForm.name" autocomplete="name" matInput required>
+            @if (getForm.name.hasError('required')) {
+              <mat-error [innerHTML]="'OFFICE.NAME.REQUIRED' | translate"></mat-error>
+            } @else if (errors()['name']) {
+              <mat-error>{{ errors()['name'] }}</mat-error>
+            }
+          </mat-form-field>
+
+          @if (isAddMode) {
+            @if (allManagersSignal()) {
+              <div class="app-inline-field-action">
+                <mat-form-field appearance="outline">
+                  <mat-label>{{ 'OFFICE.MANAGER.FIELD' | translate }}</mat-label>
+                  <input [formControl]="getForm.manager" [matAutocomplete]="auto" matInput required type="text">
+                  <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+                    @for (manager of filteredManagerSignal(); track manager.id) {
+                      <mat-option [value]="manager">{{ manager.displayName }}</mat-option>
+                    }
+                  </mat-autocomplete>
+                  @if (getForm.manager.hasError('required')) {
+                    <mat-error [innerHTML]="'OFFICE.MANAGER.REQUIRED' | translate"></mat-error>
+                  } @else if (getForm.manager.hasError('requireMatch')) {
+                    <mat-error [innerHTML]="'OFFICE.MANAGER.INVALID' | translate"></mat-error>
+                  } @else if (errors()['manager']) {
+                    <mat-error>{{ errors()['manager'] }}</mat-error>
+                  }
+                </mat-form-field>
+
+                <button mat-stroked-button type="button" (click)="addManager()" class="app-detail-action-button">
+                  <mat-icon>person_add</mat-icon>
+                  <span>{{ 'OFFICE.MANAGER.ADD_BUTTON' | translate }}</span>
+                </button>
+              </div>
+            } @else {
+              <div class="ssc-line app-crud-skeleton-field"></div>
+            }
+          } @else {
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'OFFICE.MANAGER.FIELD' | translate }}</mat-label>
+              <input [value]="managerName" disabled matInput type="text">
+            </mat-form-field>
+          }
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'OFFICE.SUBJECT.FIELD' | translate }}</mat-label>
+            <input [formControl]="getForm.subject" matInput>
+            @let subjectError = errors()['subject'];
+            @if (subjectError) {
+              <mat-error>{{ subjectError }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'OFFICE.KVK.FIELD' | translate }}</mat-label>
+            <input [formControl]="getForm.kvk" matInput>
+            @let kvkError = errors()['kvk'];
+            @if (kvkError) {
+              <mat-error>{{ kvkError }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'OFFICE.ACCOUNT.FIELD' | translate }}</mat-label>
+            <input [formControl]="getForm.account" matInput>
+            @let accountError = errors()['account'];
+            @if (accountError) {
+              <mat-error>{{ accountError }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'OFFICE.BTW.FIELD' | translate }}</mat-label>
+            <input [formControl]="getForm.btw" matInput>
+            @let btwError = errors()['btw'];
+            @if (btwError) {
+              <mat-error>{{ btwError }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="app-crud-form-grid__full">
+            <mat-label>{{ 'OFFICE.ADDRESS.FIELD' | translate }}</mat-label>
+            <input [formControl]="getForm.billingAddress" matInput>
+            @let billingAddressError = errors()['billingAddress'];
+            @if (billingAddressError) {
+              <mat-error>{{ billingAddressError }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="app-crud-form-grid__full">
+            <mat-label>{{ 'OFFICE.DRIVE_FOLDER.FIELD' | translate }}</mat-label>
+            <input [formControl]="getForm.driveFolder" matInput>
+            @let driveFolderError = errors()['driveFolder'];
+            @if (driveFolderError) {
+              <mat-error>{{ driveFolderError }}</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div class="app-detail-actions">
+          <button appBackButton mat-stroked-button type="button">
+            <mat-icon>keyboard_return</mat-icon>
+            <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+          </button>
+          @if (isAddModeSignal()) {
+            <button [disabled]="form.invalid" mat-stroked-button type="submit">
+              <mat-icon>add_business</mat-icon>
+              <span>{{ 'COMMON.BUTTON.CREATE' | translate }}</span>
+            </button>
+          } @else {
+            <button [disabled]="form.invalid" mat-stroked-button type="submit">
+              <mat-icon>published_with_changes</mat-icon>
+              <span>{{ 'COMMON.BUTTON.UPDATE' | translate }}</span>
+            </button>
+          }
+        </div>
+      } @else {
+        <div class="app-crud-loading">
+          <div class="ssc-hr"></div>
+          <div class="ssc-square app-crud-loading__block"></div>
+          <div class="ssc-hr"></div>
+        </div>
+      }
+    </form>
+  </section>
 </div>

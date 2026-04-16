@@ -4,7 +4,6 @@ import { EventColor } from 'calendar-utils';
 import { IAvailability } from './room';
 import { ICurrency, ICurrencyAll } from './currency';
 import { States } from './reservation';
-import { PaymentType } from './payment';
 import { FrequencyEnum } from '../util/helper';
 
 export interface IDashboard {
@@ -58,6 +57,7 @@ export interface ICalendarReservations {
   title: string;
   start: number;
   started: number;
+  finished?: number;
   end: number;
   state: string;
   total: number;
@@ -83,7 +83,7 @@ export interface ICalendarBirthday {
 export interface ICalendarNote {
   noteId: string;
   title: string;
-  date: number;
+  date: number | string;
   repeat: FrequencyEnum;
 }
 
@@ -113,6 +113,7 @@ export interface IRoomEvents {
   timeZone: string;
   roomId: string;
   roomName: string;
+  currencyCode: string;
   professionals: IProfessionalEvent[];
   error?: any;
 }
@@ -209,7 +210,7 @@ export class TotalType implements ITotalType {
 
 export interface ISummaryTotal extends ITotal {
   id: string;
-  paymentType: PaymentType;
+  paymentType: string;
   expenseType: string;
   expenseSubType: string;
   type: string;

@@ -1,87 +1,83 @@
-<div class="flex-container">
-  <div class="card-container">
-    <div class="card-content">
-      <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
-        @let isAddMode = isAddModeSignal();
-        @let currency = currencySignal();
-        <mat-card appearance="outlined">
-          @if (isAddMode) {
-            <mat-card-header>
-              <mat-card-title>{{ 'CURRENCY.TITLE' | translate }}</mat-card-title>
-            </mat-card-header>
+@let isAddMode = isAddModeSignal();
+@let currency = currencySignal();
+
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <section class="app-surface-section">
+    <div class="app-detail-section-header">
+      <div>
+        <span class="app-surface-eyebrow">
+          {{ (isAddMode ? 'CURRENCY.TITLE' : 'CURRENCY.DETAIL') | translate }}
+        </span>
+        @if (!isAddMode) {
+          @if (currency) {
+            <h2 class="app-crud-title">{{ currency.code }}</h2>
           } @else {
-            <mat-card-header>
-              <mat-card-title>{{ 'CURRENCY.DETAIL' | translate }}</mat-card-title>
-              @if (currency) {
-                <mat-card-subtitle>{{ currency.code }}</mat-card-subtitle>
-              } @else {
-                <div class="ssc-line"></div>
-              }
-            </mat-card-header>
+            <div class="ssc-line app-skeleton-title"></div>
           }
-          @if (isAddMode || currency) {
-            <mat-card-content>
-              <div class="inner-container">
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'CURRENCY.CODE.FIELD' | translate }}</mat-label>
-                  <input [formControl]="getForm.code" matInput required data-cy="code-input">
-                  @if (getForm.code.hasError('required')) {
-                    <mat-error [innerHTML]="'CURRENCY.CODE.REQUIRED' | translate"></mat-error>
-                  } @else if (errors()['code']) {
-                    <mat-error>{{ errors()['code'] }}</mat-error>
-                  }
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'CURRENCY.NAME.FIELD' | translate }}</mat-label>
-                  <input [formControl]="getForm.name" matInput data-cy="name-input">
-                  @let nameError = errors()['name'];
-                  @if (nameError) {
-                    <mat-error>{{ nameError }}</mat-error>
-                  }
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'CURRENCY.ICON.FIELD' | translate }}</mat-label>
-                  <mat-select [formControl]="getForm.icon" id="select-icon" data-cy="icon-input">
-                    <mat-select-trigger>
-                      <mat-icon>{{ getForm.icon.value }}</mat-icon>
-                    </mat-select-trigger>
-                    <mat-option>--</mat-option>
-                    @for (ic of icons; track ic) {
-                      <mat-option [value]="ic">
-                        <mat-icon>{{ ic }}</mat-icon>
-                      </mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-              </div>
-            </mat-card-content>
-            <mat-card-actions class="card-actions">
-              <div class="spacer"></div>
-              <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
-                {{ 'COMMON.BUTTON.BACK' | translate }}
-              </button>
-              @if (isAddMode) {
-                <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
-                  {{ 'COMMON.BUTTON.CREATE' | translate }}
-                </button>
-              } @else {
-                <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
-                  {{ 'COMMON.BUTTON.UPDATE' | translate }}
-                </button>
-              }
-            </mat-card-actions>
-          } @else {
-            <mat-card-content>
-              <div class="ssc-hr"></div>
-              <div class="ssc-square mb"></div>
-              <div class="ssc-hr"></div>
-            </mat-card-content>
-            <mat-card-actions class="card-actions">
-              <div class="ssc-head-line"></div>
-            </mat-card-actions>
-          }
-        </mat-card>
-      </form>
+        }
+      </div>
     </div>
-  </div>
+
+    <form (ngSubmit)="submit()"
+          [formGroup]="form"
+          novalidate
+          (keydown.enter)="$event.preventDefault()"
+          class="app-crud-form">
+      @if (isAddMode || currency) {
+        <div class="app-crud-form-grid app-crud-form-grid--triple">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'CURRENCY.CODE.FIELD' | translate }}</mat-label>
+            <input [formControl]="getForm.code" matInput required data-cy="code-input">
+            @if (getForm.code.hasError('required')) {
+              <mat-error [innerHTML]="'CURRENCY.CODE.REQUIRED' | translate"></mat-error>
+            } @else if (errors()['code']) {
+              <mat-error>{{ errors()['code'] }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'CURRENCY.NAME.FIELD' | translate }}</mat-label>
+            <input [formControl]="getForm.name" matInput data-cy="name-input">
+            @let nameError = errors()['name'];
+            @if (nameError) {
+              <mat-error>{{ nameError }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'CURRENCY.ICON.FIELD' | translate }}</mat-label>
+            <mat-select [formControl]="getForm.icon" id="select-icon" data-cy="icon-input">
+              <mat-select-trigger>
+                <mat-icon>{{ getForm.icon.value }}</mat-icon>
+              </mat-select-trigger>
+              <mat-option>--</mat-option>
+              @for (ic of icons; track ic) {
+                <mat-option [value]="ic">
+                  <mat-icon>{{ ic }}</mat-icon>
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="app-detail-actions">
+          <button appBackButton mat-stroked-button type="button">
+            <mat-icon>keyboard_return</mat-icon>
+            <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+          </button>
+
+          <button [disabled]="form.invalid" mat-stroked-button type="submit">
+            <mat-icon>{{ isAddMode ? 'add' : 'published_with_changes' }}</mat-icon>
+            <span>{{ (isAddMode ? 'COMMON.BUTTON.CREATE' : 'COMMON.BUTTON.UPDATE') | translate }}</span>
+          </button>
+        </div>
+      } @else {
+        <div class="app-crud-loading">
+          <div class="ssc-hr"></div>
+          <div class="ssc-square app-crud-loading__block"></div>
+          <div class="ssc-hr"></div>
+        </div>
+      }
+    </form>
+  </section>
 </div>

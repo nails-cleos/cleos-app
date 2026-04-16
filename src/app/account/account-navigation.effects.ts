@@ -8,6 +8,7 @@ import {
   setCurrentCustomerId,
   setCurrentTransactionId,
 } from '../store/account.actions';
+import { getOptions } from '../store/payment.actions';
 
 @Injectable()
 export class AccountNavigationEffects {
@@ -28,7 +29,7 @@ export class AccountNavigationEffects {
         // 2) /accounts/:id/transactions/add
         const addMatch = url.match(/\/accounts\/([^\/]+)\/transactions\/add$/);
         if (addMatch) {
-          return [clean(), setCurrentAccountId({ accountId: addMatch[1] })];
+          return [clean(), getOptions(), setCurrentAccountId({ accountId: addMatch[1] })];
         }
 
         // 3) /accounts/:id/transactions/:transactionId

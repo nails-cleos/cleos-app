@@ -1,24 +1,24 @@
-<div class="dialog-shell" [class.dialog-shell-warning]="isWarning">
-  <div class="dialog-header">
-    <div class="dialog-title-wrap">
-      <div class="dialog-badge" aria-hidden="true">
+<div class="app-surface-dialog-shell" [class.app-surface-dialog-shell--warning]="isWarning">
+  <div class="app-surface-dialog-header">
+    <div class="app-surface-dialog-title-wrap">
+      <div class="app-surface-dialog-badge" aria-hidden="true">
         <mat-icon>{{ icon }}</mat-icon>
       </div>
-      <h1 mat-dialog-title>{{ data.title }}</h1>
+      <h1 mat-dialog-title class="app-surface-dialog-title">{{ data.title }}</h1>
     </div>
-    <button (click)="onNoClick()" aria-label="Close dialog" class="close-button" type="button">
+    <button (click)="onNoClick()" aria-label="Close dialog" class="app-surface-dialog-close" type="button">
       <mat-icon>close</mat-icon>
     </button>
   </div>
 
-  <div class="dialog-divider" aria-hidden="true"></div>
+  <div class="app-surface-dialog-divider" aria-hidden="true"></div>
 
-  <div class="dialog-content" [innerHTML]="data.content" mat-dialog-content></div>
+  <div class="app-surface-dialog-content" [innerHTML]="data.content" mat-dialog-content></div>
 
-  <div class="dialog-divider" aria-hidden="true"></div>
+  <div class="app-surface-dialog-divider" aria-hidden="true"></div>
 
-  <div mat-dialog-actions class="dialog-actions">
-    <div class="spacer"></div>
+  <div mat-dialog-actions class="app-surface-dialog-actions">
+    <div class="app-surface-dialog-spacer"></div>
     @if (!data.hideNoButton) {
       <button (click)="onNoClick()" cdkFocusInitial mat-stroked-button type="button">
         {{ 'COMMON.BUTTON.NO' | translate }}

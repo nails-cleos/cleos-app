@@ -50,4 +50,21 @@ describe('PriceDialogComponent', () => {
     const data = { type: mockData.type, price: 200 };
     expect(dialogRefSpy.close).toHaveBeenCalledWith(data);
   });
+
+  it('should default price to zero when currentPrice is missing', async () => {
+    TestBed.resetTestingModule();
+    await TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule, TranslateModule.forRoot(), PriceDialogComponent],
+      providers: [
+        { provide: MatDialogRef, useValue: dialogRefSpy },
+        { provide: MAT_DIALOG_DATA, useValue: { name: 'Test', type: ServiceType.additional } },
+      ],
+    }).compileComponents();
+
+    const defaultFixture = TestBed.createComponent(PriceDialogComponent);
+    const defaultComponent = defaultFixture.componentInstance;
+    defaultFixture.detectChanges();
+
+    expect(defaultComponent.getForm.price.value).toBe(0);
+  });
 });

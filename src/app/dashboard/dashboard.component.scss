@@ -1,32 +1,102 @@
-.calendar-title {
-  text-align: center;
+:host {
+  display: block;
+  color: var(--mat-sys-on-surface, inherit);
+  --dashboard-text-muted: var(--mat-sys-on-surface-variant, #6b7280);
+  --dashboard-row-border: rgba(148, 163, 184, 0.16);
+}
 
-  button {
-    margin: 10px;
-  }
+:host-context(.dark-theme) {
+  --dashboard-text-muted: rgba(255, 255, 255, 0.64);
+  --dashboard-row-border: rgba(255, 255, 255, 0.08);
+}
+
+.dashboard-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 20px;
+}
+
+.dashboard-toolbar__copy h2,
+.dashboard-calendar__copy h3 {
+  margin: 0;
+  line-height: 1.1;
+  color: var(--app-surface-text);
+}
+
+.dashboard-toolbar__copy h2 {
+  font-size: 1.8rem;
+}
+
+.dashboard-toolbar__copy p,
+.dashboard-calendar__copy p {
+  margin: 0;
+  color: var(--app-surface-text-muted);
+}
+
+.dashboard-toolbar__eyebrow,
+.dashboard-calendar__eyebrow {
+  margin-bottom: 8px;
+}
+
+.dashboard-toolbar__context {
+  color: var(--app-surface-text);
+}
+
+.dashboard-selector {
+  width: min(320px, 100%);
+}
+
+.dashboard-calendar__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: end;
+  margin-bottom: 20px;
+}
+
+.dashboard-calendar__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dashboard-calendar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.dashboard-calendar__button,
+.dashboard-calendar__icon {
+  border-color: var(--app-surface-card-border) !important;
+  background: var(--app-surface-card-bg);
+  box-shadow: none;
+}
+
+.dashboard-calendar__surface {
+  overflow: hidden;
 }
 
 .cell-totals {
-  margin: 5px;
-  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  padding: 6px 8px 8px;
 }
 
 .badge {
-  margin-right: 5px;
-  --bs-badge-padding-x: .65em;
-  --bs-badge-padding-y: .35em;
-  --bs-badge-font-size: .75em;
-  --bs-badge-font-weight: 700;
-  --bs-badge-border-radius: .375rem;
-  display: inline-block;
-  padding: var(--bs-badge-padding-y) var(--bs-badge-padding-x);
-  font-size: var(--bs-badge-font-size);
-  font-weight: var(--bs-badge-font-weight);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
   line-height: 1;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: baseline;
-  border-radius: var(--bs-badge-border-radius);
 }
 
 .spinner:before {
@@ -39,33 +109,128 @@
   height: 20px;
   margin-top: -10px;
   margin-left: -10px;
-  border-radius: 50%;
   border: 2px solid #fff;
   border-top-color: #000;
-  animation: spinner .8s linear infinite;
+  border-radius: 50%;
+  animation: spinner 0.8s linear infinite;
 }
 
-@media screen and (min-width: 768px) {
-  .totals {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    margin: 1% 1% 0;
+.dashboard-metrics {
+  gap: 12px;
+  margin-top: 20px;
+}
 
-    div {
-      width: 48%;
-    }
+.dashboard-metric {
+  padding: 16px 18px;
+  line-height: 1.5;
+  color: var(--app-surface-text);
+}
+
+.dashboard-grid-shell {
+  padding: 24px 24px 8px;
+}
+
+:host ::ng-deep .dashboard-metric .bold {
+  font-weight: 700;
+}
+
+:host ::ng-deep .dashboard-metric * {
+  color: inherit;
+}
+
+:host ::ng-deep .dashboard-calendar__surface .cal-month-view .cal-header .cal-cell,
+:host ::ng-deep .dashboard-calendar__surface .cal-month-view .cal-header .cal-cell * {
+  color: var(--app-surface-text);
+}
+
+@media screen and (max-width: 959px) {
+  .dashboard-toolbar,
+  .dashboard-calendar__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dashboard-selector {
+    width: 100%;
+  }
+
+  .dashboard-calendar__actions {
+    justify-content: flex-start;
+  }
+
+  .dashboard-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media screen and (max-width: 767px) {
-  .totals {
-    display: block;
-    margin: 1% 1% 0;
+@media screen and (max-width: 599px) {
+  .dashboard-toolbar__copy h2,
+  .dashboard-calendar__copy h3 {
+    font-size: 1.45rem;
+  }
 
-    div {
-      width: 100%;
-      margin-bottom: 1%;
-    }
+  .dashboard-calendar__header {
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .dashboard-calendar__copy {
+    display: none;
+  }
+
+  .dashboard-calendar__actions {
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .dashboard-calendar__surface {
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  :host ::ng-deep .dashboard-calendar__surface .cal-month-view .cal-cell-row {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  :host ::ng-deep .dashboard-calendar__surface .cal-month-view .cal-cell {
+    min-width: 0;
+  }
+
+  :host ::ng-deep .dashboard-calendar__surface .cal-month-view .cal-header .cal-cell {
+    padding: 8px 2px;
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  :host ::ng-deep .dashboard-calendar__surface .cal-month-view .cal-day-cell {
+    min-height: 92px;
+  }
+
+  :host ::ng-deep .dashboard-calendar__surface .cal-month-view .cal-cell-top {
+    min-height: 36px;
+    padding: 6px 6px 0;
+  }
+
+  :host ::ng-deep .dashboard-calendar__surface .cal-month-view .cal-day-number {
+    margin-top: 0;
+    margin-right: 0;
+    font-size: 1.35rem;
+  }
+
+  .cell-totals {
+    gap: 4px;
+    padding: 4px 6px 6px;
+  }
+
+  .badge {
+    min-width: 24px;
+    padding: 5px 8px;
+    font-size: 0.68rem;
+  }
+
+  .dashboard-metrics {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

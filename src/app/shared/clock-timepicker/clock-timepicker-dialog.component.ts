@@ -10,6 +10,7 @@ type TimepickerFormat = 12 | 24;
 type DialOption = {
   value: number;
   label: string;
+  displayLabel: string;
   top: number;
   left: number;
   active: boolean;
@@ -209,6 +210,7 @@ export class ClockTimepickerDialogComponent {
         40,
         this.minute === minute,
         !this.isSelectable(this.hour, minute),
+        minute % 15 === 0 ? this.pad(minute) : '',
       ));
     }
     return options;
@@ -221,9 +223,11 @@ export class ClockTimepickerDialogComponent {
     radius: number,
     active: boolean,
     disabled: boolean,
+    displayLabel: string = label,
   ): DialOption => ({
     value,
     label,
+    displayLabel,
     left: 50 + (Math.sin(this.toRadians(angle)) * radius),
     top: 50 - (Math.cos(this.toRadians(angle)) * radius),
     active,

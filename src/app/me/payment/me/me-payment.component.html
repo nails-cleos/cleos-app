@@ -25,13 +25,15 @@
             </div>
           </mat-card-content>
           <mat-card-actions class="card-actions">
-            <div class="spacer"></div>
-            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
-              {{ 'COMMON.BUTTON.BACK' | translate }}
-            </button>
-            <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
-              {{ 'COMMON.BUTTON.PAYMENT' | translate }}
-            </button>
+            <div class="app-detail-actions">
+              <button [form]="form" appBackButton mat-stroked-button type="button">
+                <mat-icon>keyboard_return</mat-icon>
+                <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+              </button>
+              <button [disabled]="form.invalid" mat-stroked-button class="icon-button" type="submit">
+                {{ 'COMMON.BUTTON.PAYMENT' | translate }}
+              </button>
+            </div>
           </mat-card-actions>
         </mat-card>
       </form>

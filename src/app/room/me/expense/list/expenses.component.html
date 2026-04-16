@@ -1,13 +1,19 @@
-<div>
-  <fieldset>
-    <legend>{{ 'COMMON.SEARCH.TITLE' | translate }}</legend>
-    <div class="row-column-space-evenly-center">
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <section class="app-surface-section">
+    <div class="app-detail-section-header">
+      <div>
+        <span class="app-surface-eyebrow">{{ 'COMMON.SEARCH.TITLE' | translate }}</span>
+      </div>
+    </div>
+
+    <div class="app-surface-filter-grid">
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COMMON.LABEL.FILTER' | translate }}</mat-label>
         <label>
           <input [formControl]="getForm.filter" autocomplete="off" matInput type="text">
         </label>
       </mat-form-field>
+
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}</mat-label>
         <input matInput [matDatepicker]="dp" [formControl]="getForm.date" (keydown)="keyDownHandler($event)">
@@ -16,207 +22,226 @@
         </mat-datepicker>
       </mat-form-field>
     </div>
-  </fieldset>
+  </section>
 
-  <div class="mat-elevation-z8">
-    @let resultsLength = resultsLengthSignal();
-    @let pageSize = pageSizeSignal();
-    @if (dataSourceSignal(); as dataSource) {
-      <table [dataSource]="dataSource" mat-table matSort matSortActive="timestamp" matSortDirection="desc"
-             matSortDisableClear multiTemplateDataRows>
-        <ng-container matColumnDef="position">
-          <th *matHeaderCellDef mat-header-cell>#</th>
-          <td *matCellDef="let expense; let i = dataIndex;" mat-cell>
-            @if (expense.id) {
-              <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
-            } @else {
-              <div class="ssc-line"></div>
-            }
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="timestamp">
-          <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.DATE' | translate }}</th>
-          <td *matCellDef="let expense" mat-cell>
-            @if (expense.id) {
-              <div>{{ expense.timestamp | timeDetail | date:'mediumDate':expense.room.timeZone:dateFormat }}</div>
-              @if (showTimeZone(expense)) {
-                <button (click)="openDialog(expense)" mat-icon-button type="button">
-                  <mat-icon>info_outline</mat-icon>
-                </button>
+  <section class="app-surface-section">
+    <div class="mat-elevation-z8 app-table-shell">
+      @let resultsLength = resultsLengthSignal();
+      @let pageSize = pageSizeSignal();
+      @if (dataSourceSignal(); as dataSource) {
+        <table [dataSource]="dataSource" mat-table matSort matSortActive="timestamp" matSortDirection="desc"
+               matSortDisableClear multiTemplateDataRows>
+          <ng-container matColumnDef="position">
+            <th *matHeaderCellDef mat-header-cell>#</th>
+            <td *matCellDef="let expense; let i = dataIndex;" mat-cell>
+              @if (expense.id) {
+                <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
+              } @else {
+                <div class="ssc-line"></div>
               }
-            } @else {
-              <div class="ssc-line"></div>
-            }
-          </td>
-        </ng-container>
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="invoice">
-          <th *matHeaderCellDef mat-header-cell class="hide-xs"
-              mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.INVOICE' | translate }}
-          </th>
-          <td *matCellDef="let expense" class="hide-xs" mat-cell>
-            @if (expense.id) {
-              <div>{{ expense.invoice }}</div>
-            } @else {
-              <div class="ssc-line"></div>
-            }
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="supplyStore.name">
-          <th *matHeaderCellDef mat-header-cell class="hide-xs"
-              mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.SUPPLY_STORE' | translate }}
-          </th>
-          <td *matCellDef="let expense" class="hide-xs" mat-cell>
-            @if (expense.id) {
-              <div>{{ expense.supplyStore.name }}</div>
-            } @else {
-              <div class="ssc-line"></div>
-            }
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="totalGross">
-          <th *matHeaderCellDef class="hide-xs" mat-header-cell
-              mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.GROSS' | translate }}
-          </th>
-          <td *matCellDef="let expense" class="hide-xs" mat-cell>
-            @if (expense.id) {
-              <mat-list-item>
-                <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
-                <div matListItemTitle>{{ expense.totalGross | number:'1.2-2' }}</div>
-              </mat-list-item>
-            } @else {
-              <div class="ssc-line"></div>
-            }
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="totalBtw">
-          <th *matHeaderCellDef class="hide-xs" mat-header-cell
-              mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.BTW' | translate }}
-          </th>
-          <td *matCellDef="let expense" class="hide-xs" mat-cell>
-            @if (expense.id) {
-              <mat-list-item>
-                <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
-                <div matListItemTitle>{{ (expense.totalGross - expense.totalNet) | number:'1.2-2' }}</div>
-              </mat-list-item>
-            } @else {
-              <div class="ssc-line"></div>
-            }
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="totalNet">
-          <th *matHeaderCellDef mat-header-cell>{{ 'EXPENSE.LIST.COLUMN.NET' | translate }}</th>
-          <td *matCellDef="let expense" mat-cell>
-            @if (expense.id) {
-              <mat-list-item>
-                <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
-                <div matListItemTitle>{{ expense.totalNet | number:'1.2-2' }}</div>
-              </mat-list-item>
-            } @else {
-              <div class="ssc-line"></div>
-            }
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="actions">
-          <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-          <td *matCellDef="let expense" class="hide-xs" mat-cell>
-            @if (expense.id) {
-              @if (!expense.deleted) {
-                <button [routerLink]="['/', language, 'rooms', roomIdSignal(), 'expenses', expense.id]" mat-icon-button
-                        matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
-                  <mat-icon color="primary">edit</mat-icon>
-                </button>
-                @if (expense.document && googleDriveUploadFile) {
-                  <button (click)="download(expense.document)" mat-icon-button
-                          matTooltip="{{ 'COMMON.BUTTON.DOWNLOAD' | translate }}" matTooltipPosition="left">
-                    <mat-icon color="accent">file_download</mat-icon>
+          <ng-container matColumnDef="timestamp">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.DATE' | translate }}</th>
+            <td *matCellDef="let expense" mat-cell>
+              @if (expense.id) {
+                <div>{{ expense.timestamp | timeDetail | date:'mediumDate':expense.room.timeZone:dateFormat }}</div>
+                @if (showTimeZone(expense)) {
+                  <button (click)="openDialog(expense)" mat-icon-button type="button">
+                    <mat-icon>info_outline</mat-icon>
                   </button>
                 }
-                <button (click)="delete(expense)" mat-icon-button matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}"
-                        matTooltipPosition="right">
-                  <mat-icon color="warn">delete</mat-icon>
-                </button>
+              } @else {
+                <div class="ssc-line"></div>
               }
-            } @else {
-              <div class="ssc-line"></div>
-            }
-          </td>
-        </ng-container>
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="expandedDetail">
-          <td *matCellDef="let expense" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
-            <div [class.detail-expanded]="expense === expanded" class="detail hide-gt-xs">
-              <mat-list>
-                <mat-list-item role="list">
-                  <div matListItemTitle>{{ 'EXPENSE.LIST.COLUMN.INVOICE' | translate }}</div>
-                  <div matListItemLine>{{ expense.invoice }}</div>
+          <ng-container matColumnDef="invoice">
+            <th *matHeaderCellDef mat-header-cell class="hide-xs"
+                mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.INVOICE' | translate }}
+            </th>
+            <td *matCellDef="let expense" class="hide-xs" mat-cell>
+              @if (expense.id) {
+                <div>{{ expense.invoice }}</div>
+              } @else {
+                <div class="ssc-line"></div>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="supplyStore.name">
+            <th *matHeaderCellDef mat-header-cell class="hide-xs"
+                mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.SUPPLY_STORE' | translate }}
+            </th>
+            <td *matCellDef="let expense" class="hide-xs" mat-cell>
+              @if (expense.id) {
+                <div>{{ expense.supplyStore.name }}</div>
+              } @else {
+                <div class="ssc-line"></div>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="totalGross">
+            <th *matHeaderCellDef class="hide-xs" mat-header-cell
+                mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.GROSS' | translate }}
+            </th>
+            <td *matCellDef="let expense" class="hide-xs" mat-cell>
+              @if (expense.id) {
+                <mat-list-item>
+                  <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
+                  <div matListItemTitle>{{ expense.totalGross | number:'1.2-2' }}</div>
                 </mat-list-item>
-                <mat-list-item role="list">
-                  <div matListItemTitle>{{ 'EXPENSE.LIST.COLUMN.SUPPLY_STORE' | translate }}</div>
-                  <div matListItemLine>{{ expense.supplyStore?.name }}</div>
+              } @else {
+                <div class="ssc-line"></div>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="totalBtw">
+            <th *matHeaderCellDef class="hide-xs" mat-header-cell
+                mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.BTW' | translate }}
+            </th>
+            <td *matCellDef="let expense" class="hide-xs" mat-cell>
+              @if (expense.id) {
+                <mat-list-item>
+                  <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
+                  <div matListItemTitle>{{ (expense.totalGross - expense.totalNet) | number:'1.2-2' }}</div>
                 </mat-list-item>
-                <mat-list-item role="list">
-                  <div matListItemTitle>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
-                  <div matListItemLine>{{ 'COMMON.EXPENSE.TYPE.' + expense.type | translate }}</div>
+              } @else {
+                <div class="ssc-line"></div>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="totalNet">
+            <th *matHeaderCellDef mat-header-cell>{{ 'EXPENSE.LIST.COLUMN.NET' | translate }}</th>
+            <td *matCellDef="let expense" mat-cell>
+              @if (expense.id) {
+                <mat-list-item>
+                  <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
+                  <div matListItemTitle>{{ expense.totalNet | number:'1.2-2' }}</div>
                 </mat-list-item>
-                @if (expense.gross) {
-                  <div mat-subheader>{{ 'EXPENSE.LIST.COLUMN.GROSS' | translate }}</div>
-                  <mat-list-item role="list">
-                    <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
-                    <div matListItemTitle>{{ expense.gross | number:'1.2-2' }}</div>
-                  </mat-list-item>
-                }
-                @if (expense.btw) {
-                  <div mat-subheader>{{ 'EXPENSE.LIST.COLUMN.BTW' | translate }}</div>
-                  <mat-list-item role="list">
-                    <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
-                    <div matListItemTitle>{{ (expense.gross - expense.net) | number:'1.2-2' }}</div>
-                  </mat-list-item>
-                }
-                <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
-                <mat-list-item role="list">
-                  @if (!expense.deleted) {
-                    <button (click)="edit(expense)" mat-icon-button color="primary"
-                            matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
-                      <mat-icon matListItemIcon>edit</mat-icon>
-                    </button>
-                    <button (click)="delete(expense)" color="warn" mat-icon-button>
-                      <mat-icon matListItemIcon>delete</mat-icon>
+              } @else {
+                <div class="ssc-line"></div>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th *matHeaderCellDef class="hide-xs" mat-header-cell>
+              {{ 'COMMON.COLUMN.ACTIONS' | translate }}
+            </th>
+            <td *matCellDef="let expense" class="hide-xs" mat-cell>
+              @if (expense.id) {
+                @if (!expense.deleted) {
+                  <button [routerLink]="['/', language, 'rooms', roomIdSignal(), 'expenses', expense.id]"
+                          mat-icon-button
+                          matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+                    <mat-icon color="primary">edit</mat-icon>
+                  </button>
+                  @if (expense.document && googleDriveUploadFile) {
+                    <button (click)="download(expense.document)" mat-icon-button
+                            matTooltip="{{ 'COMMON.BUTTON.DOWNLOAD' | translate }}" matTooltipPosition="left">
+                      <mat-icon color="accent">file_download</mat-icon>
                     </button>
                   }
-                </mat-list-item>
-              </mat-list>
-            </div>
-          </td>
-        </ng-container>
+                  <button (click)="delete(expense)" mat-icon-button
+                          matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}"
+                          matTooltipPosition="right">
+                    <mat-icon color="warn">delete</mat-icon>
+                  </button>
+                }
+              } @else {
+                <div class="ssc-line"></div>
+              }
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="noContent">
-          <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-            {{ 'EXPENSE.LIST.ERROR.NO_CONTENT' | translate }}
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="add">
+            <th *matHeaderCellDef mat-header-cell>
+              <button [routerLink]="['/', language, 'expenses', 'add']" mat-icon-button id="add-button"
+                      matTooltip="{{ 'EXPENSE.TITLE' | translate }}" matTooltipPosition="right" type="button">
+                <mat-icon color="primary">add_shopping_cart</mat-icon>
+              </button>
+            </th>
+            <td *matCellDef="let additional" mat-cell>
+              @if (!additional.id) {
+                <div class="ssc-line"></div>
+              }
+            </td>
+          </ng-container>
 
-        <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-        <tr (click)="expanded = expanded === expense ? null : expense"
-            *matRowDef="let expense; columns: displayedColumns;" class="row" mat-row></tr>
-        <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
+          <ng-container matColumnDef="expandedDetail">
+            <td *matCellDef="let expense" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
+              <div [class.detail-expanded]="expense === expanded" class="detail hide-gt-xs">
+                <mat-list>
+                  <mat-list-item role="list">
+                    <div matListItemTitle>{{ 'EXPENSE.LIST.COLUMN.INVOICE' | translate }}</div>
+                    <div matListItemLine>{{ expense.invoice }}</div>
+                  </mat-list-item>
+                  <mat-list-item role="list">
+                    <div matListItemTitle>{{ 'EXPENSE.LIST.COLUMN.SUPPLY_STORE' | translate }}</div>
+                    <div matListItemLine>{{ expense.supplyStore?.name }}</div>
+                  </mat-list-item>
+                  <mat-list-item role="list">
+                    <div matListItemTitle>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
+                    <div matListItemLine>{{ 'COMMON.EXPENSE.TYPE.' + expense.type | translate }}</div>
+                  </mat-list-item>
+                  @if (expense.gross) {
+                    <div mat-subheader>{{ 'EXPENSE.LIST.COLUMN.GROSS' | translate }}</div>
+                    <mat-list-item role="list">
+                      <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
+                      <div matListItemTitle>{{ expense.gross | number:'1.2-2' }}</div>
+                    </mat-list-item>
+                  }
+                  @if (expense.btw) {
+                    <div mat-subheader>{{ 'EXPENSE.LIST.COLUMN.BTW' | translate }}</div>
+                    <mat-list-item role="list">
+                      <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
+                      <div matListItemTitle>{{ (expense.gross - expense.net) | number:'1.2-2' }}</div>
+                    </mat-list-item>
+                  }
+                  <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+                  <mat-list-item role="list">
+                    @if (!expense.deleted) {
+                      <button (click)="edit(expense)" mat-icon-button color="primary"
+                              matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+                        <mat-icon matListItemIcon>edit</mat-icon>
+                      </button>
+                      <button (click)="delete(expense)" color="warn" mat-icon-button>
+                        <mat-icon matListItemIcon>delete</mat-icon>
+                      </button>
+                    }
+                  </mat-list-item>
+                </mat-list>
+              </div>
+            </td>
+          </ng-container>
 
-        <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
-      </table>
-      @if (resultsLength) {
-        <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+          <ng-container matColumnDef="noContent">
+            <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+              {{ 'EXPENSE.LIST.ERROR.NO_CONTENT' | translate }}
+            </td>
+          </ng-container>
+
+          <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+          <tr *matRowDef="let expense; columns: displayedColumns;" class="hide-xs" mat-row></tr>
+          <tr (click)="expanded = expanded === expense ? null : expense"
+              *matRowDef="let expense; columns: displayedColumns;" class="hide-gt-xs app-table-master-row" mat-row></tr>
+          <tr *matRowDef="let row; columns: ['expandedDetail']"
+              [class.app-table-detail-row--expanded]="row === expanded"
+              class="hide-gt-xs app-table-detail-row"
+              mat-row></tr>
+
+          <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+        </table>
+        @if (resultsLength) {
+          <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+        }
       }
-
-      <button color="accent" id="add-button" mat-fab matTooltip="{{ 'EXPENSE.TITLE' | translate }}"
-              [routerLink]="['/', language, 'rooms', roomIdSignal(), 'expenses', 'add']">
-        <mat-icon>add_shopping_cart</mat-icon>
-      </button>
-    }
-  </div>
+    </div>
+  </section>
 </div>

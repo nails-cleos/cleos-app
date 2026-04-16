@@ -84,8 +84,6 @@ type CalendarForm = {
   professional: FormControl<IUserAll | undefined>;
 };
 
-// TODO is not working
-// TODO update calendar events to signals.
 @Component({
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
@@ -482,7 +480,10 @@ export class CalendarComponent {
       const meta = new Meta(true, it.room.timeZone);
       meta.id = it.id;
       meta.customer = it.customer.displayName;
+      meta.professionalName = it.professional.displayName;
       meta.isReservation = true;
+      meta.treatmentName = it.treatment.name;
+      meta.additionalNames = it.additional?.map(additional => additional.name) || [];
       const draggable = [States.approved, States.created, States.partiallyPaid, States.paid].includes(
         it.state as States);
       const event = calendarEvent(detail, color, start, darkMode, end, `${this.language}/reservation/${it.id}`,

@@ -1,38 +1,53 @@
-<mat-card appearance="outlined">
-  @let currentCurrency = currency();
-  @let currentsSummaryTotals = summaryTotals();
-  <mat-card-content>
-    <div class="flex-row-wrap">
-      <div class="bottom" [ngClass]="{ 'year-cash-content': showCash(), 'year-content': !showCash() }">
-        <app-result-summary [summaryType]="'income'" [summaryTotals]="currentsSummaryTotals" [currency]="currentCurrency"
-                            [title]="'INCOME'"></app-result-summary>
+@let currentCurrency = currency();
+
+<div class="app-crud-view-grid">
+  <div class="app-surface-item app-crud-loading">
+    <div class="total-summary-operation__header">
+      <div class="total-summary-operation__spacer"></div>
+      <div class="total-summary-operation__title">{{ 'SUMMARY.INCOME' | translate }}</div>
+      <div class="total-summary-operation__operator">-</div>
+      <div class="total-summary-operation__title">{{ 'SUMMARY.EXPENSE' | translate }}</div>
+      <div class="total-summary-operation__operator">=</div>
+      <div class="total-summary-operation__title">{{ 'SUMMARY.TOTAL' | translate }}</div>
+    </div>
+
+    <div class="total-summary-operation__body">
+      @for (row of primaryOperation(); track row.key) {
+        <div class="total-summary-row">
+          <div class="total-summary-row__label">{{ row.label | translate }}</div>
+          <div class="total-summary-row__value">{{ valueOf(row.left, row.key) | currency: currentCurrency?.code: 'symbol': '1.2-2' }}</div>
+          <div class="total-summary-row__operator">-</div>
+          <div class="total-summary-row__value">{{ valueOf(row.right, row.key) | currency: currentCurrency?.code: 'symbol': '1.2-2' }}</div>
+          <div class="total-summary-row__operator">=</div>
+          <div class="total-summary-row__result">{{ valueOf(row.result, row.key) | currency: currentCurrency?.code: 'symbol': '1.2-2' }}</div>
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (showCash()) {
+    <div class="app-surface-item app-crud-loading">
+      <div class="total-summary-operation__header">
+        <div class="total-summary-operation__spacer"></div>
+        <div class="total-summary-operation__title">{{ 'SUMMARY.TOTAL' | translate }}</div>
+        <div class="total-summary-operation__operator">+</div>
+        <div class="total-summary-operation__title">{{ 'SUMMARY.CASH' | translate }}</div>
+        <div class="total-summary-operation__operator">=</div>
+        <div class="total-summary-operation__title">{{ 'SUMMARY.TOTAL_CASH' | translate }}</div>
       </div>
-      <div class="bottom" [ngClass]="{ 'year-cash-content': showCash(), 'year-content': !showCash() }">
-        <app-result-summary [summaryType]="'expense'" [summaryTotals]="currentsSummaryTotals"
-                            [currency]="currentCurrency"
-                            [title]="'EXPENSE'"></app-result-summary>
-      </div>
-      <div class="year-cash-content" style="margin: auto;">
-        <app-result-summary [summaryTotals]="currentsSummaryTotals" [currency]="currentCurrency"
-                            [title]="'TOTAL'"></app-result-summary>
+
+      <div class="total-summary-operation__body">
+        @for (row of cashOperation(); track row.key) {
+          <div class="total-summary-row">
+            <div class="total-summary-row__label">{{ row.label | translate }}</div>
+            <div class="total-summary-row__value">{{ valueOf(row.left, row.key) | currency: currentCurrency?.code: 'symbol': '1.2-2' }}</div>
+            <div class="total-summary-row__operator">+</div>
+            <div class="total-summary-row__value">{{ valueOf(row.right, row.key) | currency: currentCurrency?.code: 'symbol': '1.2-2' }}</div>
+            <div class="total-summary-row__operator">=</div>
+            <div class="total-summary-row__result">{{ valueOf(row.result, row.key) | currency: currentCurrency?.code: 'symbol': '1.2-2' }}</div>
+          </div>
+        }
       </div>
     </div>
-    @if (showCash()) {
-      <mat-card-footer>
-        <mat-divider class="top"></mat-divider>
-        <div class="flex-row-wrap">
-          <div class="bottom year-cash-content" style="margin: auto;">
-            <app-result-summary [summaryType]="'cash'" [summaryTotals]="currentsSummaryTotals"
-                                [currency]="currentCurrency"
-                                [title]="'CASH'"></app-result-summary>
-          </div>
-          <div class="bottom year-cash-content" style="margin: auto;">
-            <app-result-summary [summaryType]="'totals'" [summaryTotals]="currentsSummaryTotals"
-                                [currency]="currentCurrency"
-                                [title]="'TOTAL_CASH'"></app-result-summary>
-          </div>
-        </div>
-      </mat-card-footer>
-    }
-  </mat-card-content>
-</mat-card>
+  }
+</div>

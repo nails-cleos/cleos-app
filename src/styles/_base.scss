@@ -8,6 +8,15 @@ body {
   font-family: 'EB+Garamond', serif !important;
 }
 
+@media (max-width: 599px) {
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+}
+
 @font-face {
   font-family: 'EB+Garamond';
   font-style: normal;

@@ -249,7 +249,16 @@ export const reservationReducer = createReducer(
     subErrors: undefined,
     response: undefined,
   })),
-  on(updateReservationNote, updateReservationDiscount, updateReservationTimestamp, updateReservationById, (state) => ({
+  on(updateReservationNote, (state) => ({
+    ...state,
+    page: undefined,
+    filter: undefined,
+    error: undefined,
+    subErrors: undefined,
+    response: undefined,
+    isLoading: true,
+  })),
+  on(updateReservationDiscount, updateReservationTimestamp, updateReservationById, (state) => ({
     ...state,
     page: undefined,
     filter: undefined,

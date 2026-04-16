@@ -1,36 +1,33 @@
 @if (imageSrc) {
-  <div>
-    <div class="flex-container">
-      <div class="card-container">
-        @if (isCard()) {
-          <div>
-            <img alt="error" class="error" src="{{imageSrc}}">
-          </div>
-        } @else {
-          <mat-card appearance="outlined">
-            <mat-card-header>
-            </mat-card-header>
-            <img alt="error" class="error" mat-card-image src="{{imageSrc}}">
-          </mat-card>
-        }
-      </div>
+  <div class="app-surface-canvas app-surface-shell app-surface-stack">
+    <div class="card-container">
+      @if (isCard()) {
+        <div>
+          <img alt="error" class="error" src="{{imageSrc}}">
+        </div>
+      } @else {
+        <mat-card appearance="outlined">
+          <mat-card-header>
+          </mat-card-header>
+          <img alt="error" class="error" mat-card-image src="{{imageSrc}}">
+        </mat-card>
+      }
     </div>
-    <div class="card-actions">
-      <div class="spacer"></div>
-      <div class="only-button">
-        <button appBackButton color="accent" mat-fab extended class="icon-button" type="button">
-          {{ 'COMMON.BUTTON.BACK' | translate }}
+
+    <div class="app-detail-actions">
+      <button appBackButton mat-stroked-button type="button">
+        <mat-icon>keyboard_return</mat-icon>
+        <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+      </button>
+      @if (retry) {
+        <button (click)="reload()" mat-stroked-button type="button">
+          {{ 'COMMON.BUTTON.RELOAD' | translate }}
         </button>
-        @if (retry) {
-          <button (click)="reload()" color="primary" mat-fab extended class="icon-button" type="button">
-            {{ 'COMMON.BUTTON.RELOAD' | translate }}
-          </button>
-        }
-      </div>
+      }
     </div>
   </div>
 } @else {
-  <div class="flex-container">
+  <div class="app-surface-canvas app-surface-shell app-surface-stack">
     <div class="card-container">
       @if (isCard()) {
         <div class="card-content">

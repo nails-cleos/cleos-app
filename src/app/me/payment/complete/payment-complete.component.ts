@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { paymentNotComplete, paymentSave } from '../../../store/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
-import { PaymentStatus, PaymentType } from '../../../interfaces/payment';
+import { PaymentStatus } from '../../../interfaces/payment';
 import { SharedModule } from '../../../shared/shared.module';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -20,6 +20,7 @@ import {
   imports: [SharedModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
+// TODO remove?
 export class PaymentCompleteComponent {
   private readonly router: Router = inject(Router);
   private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
@@ -43,7 +44,7 @@ export class PaymentCompleteComponent {
       if (params) {
         this.id = params.id;
         this.path = params.path;
-        let status = params.status;
+        const status = params.status;
         // TODO analytic payment option
         let type;
         let referenceId;
@@ -51,26 +52,6 @@ export class PaymentCompleteComponent {
           this.router.navigate([this.language, 'me', this.path, this.id, 'payment'],
             { queryParams: { accountId: params.accountId } });
           return;
-        }
-        if (params.preferenceId && params.preferenceId !== 'null') {
-          type = PaymentType.ml;
-          referenceId = params.preferenceId;
-        } else if (params.payerId && params.paymentId !== 'null') {
-          type = PaymentType.paypal;
-          referenceId = params.payerId;
-        } else if (params.token) {
-          type = PaymentType.ideal;
-          referenceId = params.token;
-        } else if (status === 'status') {
-          if (params.orderStatusId === '100') {
-            status = 'approved';
-          } else if (params.orderStatusId && params.orderStatusId > '0') {
-            status = 'pending';
-          } else {
-            status = 'cancelled';
-          }
-          type = PaymentType.paynl;
-          referenceId = params.orderId;
         }
         if (!type || !referenceId) {
           const message = this.translate.instant('ME.PAYMENT.ERROR', { reason: 'incomplete' });

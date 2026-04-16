@@ -12,12 +12,13 @@ import { backendFormatDate, getNowTimeZone } from '../util/dates';
 import { getOfficeToInvoice } from '../store/invoice.actions';
 import { IUserAll } from '../interfaces/user';
 import { addDays } from 'date-fns';
-import { PaymentType } from '../interfaces/payment';
+import { IPaymentOption } from '../interfaces/payment';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { InvoiceState } from '../store/reducers/invoice.reducers';
 import { DriveAccessService } from '../services/drive-access.service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { SelectionModel } from '@angular/cdk/collections';
+import { PaymentService } from '../services/payment.service';
 
 describe('InvoiceComponent', () => {
   let component: InvoiceComponent;
@@ -27,6 +28,7 @@ describe('InvoiceComponent', () => {
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let routerSpy: jasmine.SpyObj<Router>;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
+  let paymentServiceSpy: jasmine.SpyObj<PaymentService>;
   let translate: TranslateService;
 
   const mockOffice: IOfficeAll = {
@@ -102,14 +104,60 @@ describe('InvoiceComponent', () => {
   ];
 
   const fakeBlob = new Blob(['test'], { type: 'application/pdf' });
+  const paymentOptions: IPaymentOption[] = [
+    {
+      label: 'Cash',
+      type: 'CASH',
+      enabled: true,
+      enabledCustomer: false,
+      default: true,
+      filter: true,
+      defaultFilter: false,
+      show: true,
+      icon: 'cash',
+    },
+    {
+      label: 'Transfer',
+      type: 'TRANSFER',
+      enabled: true,
+      enabledCustomer: false,
+      default: true,
+      filter: true,
+      defaultFilter: true,
+      show: true,
+      icon: 'transfer',
+    },
+    {
+      label: 'Mollie',
+      type: 'MOLLIE',
+      enabled: true,
+      enabledCustomer: true,
+      default: false,
+      filter: true,
+      defaultFilter: true,
+      show: true,
+    },
+    {
+      label: 'Account',
+      type: 'ACCOUNT',
+      enabled: true,
+      enabledCustomer: true,
+      default: false,
+      filter: false,
+      defaultFilter: false,
+      show: false,
+    },
+  ];
 
   let officeList$: BehaviorSubject<any>;
   let invoiceList$: BehaviorSubject<any>;
+  let paymentOptions$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
     officeList$ = new BehaviorSubject(undefined);
     invoiceList$ = new BehaviorSubject(undefined);
+    paymentOptions$ = new BehaviorSubject(paymentOptions);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -122,6 +170,8 @@ describe('InvoiceComponent', () => {
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     driveAccessServiceSpy = jasmine.createSpyObj('DriveAccessService', ['requestAccessIfNeeded']);
+    paymentServiceSpy = jasmine.createSpyObj('PaymentService', ['getPaymentOptions']);
+    paymentServiceSpy.getPaymentOptions.and.returnValue(new BehaviorSubject(paymentOptions).asObservable());
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
@@ -136,6 +186,8 @@ describe('InvoiceComponent', () => {
           return officeList$.asObservable();
         case 2:
           return invoiceList$.asObservable();
+        case 3:
+          return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -151,6 +203,7 @@ describe('InvoiceComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Router, useValue: routerSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
+        { provide: PaymentService, useValue: paymentServiceSpy },
       ],
     }).compileComponents();
 
@@ -172,9 +225,18 @@ describe('InvoiceComponent', () => {
     fixture.detectChanges();
   });
 
+  it('should filter payment types by label or type', () => {
+    const byLabel = component['filterTypes']('cash', paymentOptions);
+    const byType = component['filterTypes']('moll', paymentOptions);
+
+    expect(byLabel?.map(option => option.type)).toEqual(['CASH']);
+    expect(byType?.map(option => option.type)).toEqual(['MOLLIE']);
+  });
+
   afterEach(() => {
     officeList$.complete();
     invoiceList$.complete();
+    paymentOptions$.complete();
     breakpoint$.complete();
   });
 
@@ -237,7 +299,7 @@ describe('InvoiceComponent', () => {
         officeId: mockOffice.id,
         start: backendFormatDate(start)!,
         end: backendFormatDate(end)!,
-        types: [PaymentType.transfer, PaymentType.paynl, PaymentType.mollie],
+        types: ['TRANSFER', 'MOLLIE'],
       }),
     );
   });
@@ -267,42 +329,57 @@ describe('InvoiceComponent', () => {
   });
 
   it('should add payment type to selected when selected is called', () => {
+    const cashOption = paymentOptions.find(option => option.type === 'CASH')!;
     const event = {
-      option: { value: 'cash' },
+      option: { value: cashOption.type },
     } as MatAutocompleteSelectedEvent;
 
     component.selected(event);
 
-    expect(component.selectedPaymentTypesSignal()).toContain(PaymentType.cash);
+    expect(component.selectedPaymentOptionsSignal()).toContain(cashOption);
   });
 
   it('should remove payment type from available types when selected', () => {
-    component.allPaymentTypesWritableSignal.set([PaymentType.cash, PaymentType.transfer]);
+    const cashOption = paymentOptions.find(option => option.type === 'CASH')!;
+    component.allPaymentOptionsWritableSignal.set(paymentOptions.slice(0, 2));
     const event = {
-      option: { value: 'cash' },
+      option: { value: cashOption.type },
     } as MatAutocompleteSelectedEvent;
 
     component.selected(event);
     fixture.detectChanges();
 
-    expect(component.allPaymentTypesWritableSignal()).not.toContain(PaymentType.cash);
+    expect(component.allPaymentOptionsWritableSignal()?.map(option => option.type)).not.toContain('CASH');
   });
 
   it('should remove payment type from selected when remove is called', () => {
-    component.selectedPaymentTypesSignal.set([PaymentType.cash, PaymentType.transfer]);
+    const cashOption = paymentOptions.find(option => option.type === 'CASH')!;
+    const transferOption = paymentOptions.find(option => option.type === 'TRANSFER')!;
+    component.selectedPaymentOptionsSignal.set([cashOption, transferOption]);
 
-    component.remove(PaymentType.cash);
+    component.remove(cashOption);
 
-    expect(component.selectedPaymentTypesSignal()).not.toContain(PaymentType.cash);
+    expect(component.selectedPaymentOptionsSignal()).not.toContain(cashOption);
   });
 
   it('should add payment type back to available types when removed', () => {
-    component.allPaymentTypesWritableSignal.set(['transfer']);
-    component.selectedPaymentTypesSignal.set([PaymentType.cash, PaymentType.transfer]);
+    const cashOption = paymentOptions.find(option => option.type === 'CASH')!;
+    const transferOption = paymentOptions.find(option => option.type === 'TRANSFER')!;
+    component.allPaymentOptionsWritableSignal.set(
+      paymentOptions.filter(option => option.type === 'TRANSFER'));
+    component.selectedPaymentOptionsSignal.set([cashOption, transferOption]);
 
-    component.remove(PaymentType.cash);
+    component.remove(cashOption);
 
-    expect(component.allPaymentTypesWritableSignal()).toContain(PaymentType.cash);
+    expect(component.allPaymentOptionsWritableSignal()?.map(option => option.type)).toContain('CASH');
+  });
+
+  it('should initialize selected invoice filters from defaultFilter options only', () => {
+    expect(component.selectedPaymentOptionsSignal().map(option => option.type)).toEqual([
+      'TRANSFER',
+      'MOLLIE',
+    ]);
+    expect(component.allPaymentOptionsWritableSignal()?.map(option => option.type)).toEqual(['CASH']);
   });
 
   it('should return true when all rows are selected', () => {

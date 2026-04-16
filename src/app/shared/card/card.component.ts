@@ -38,8 +38,9 @@ export class CardComponent {
     const timeZone = this.timeZone();
     if (chart) {
       this.dialog.open(CardChartComponent, {
-        height: '85vh',
         width: '70vw',
+        maxHeight: '85vh',
+        panelClass: 'expanded-chart-dialog-panel',
         data: {
           chart: createChart(chart, currency, isDarkMode, locale, timeZone),
           title: title,

@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/payment.actions';
-import { IPaymentAll, PaymentType } from '../../interfaces/payment';
+import { IPaymentAll } from '../../interfaces/payment';
 import { PaymentState } from '../../store/reducers/payment.reducers';
 import { cleanPayment } from '../../store/payment.actions';
 
@@ -144,7 +144,7 @@ describe('PaymentComponent', () => {
       paymentId: '',
       preferenceId: '',
       status: '',
-      type: PaymentType.cash,
+      type: 'CASH',
       link: 'https://pay.com', id: 'p1',
     };
 
@@ -179,7 +179,7 @@ describe('PaymentComponent', () => {
       paymentId: '',
       preferenceId: '',
       status: '',
-      type: PaymentType.cash,
+      type: 'CASH',
       reservation: { id: 'reservation-1', room: { currency: { icon: '$' } } } as any,
     });
 
@@ -195,7 +195,7 @@ describe('PaymentComponent', () => {
       paymentId: '',
       preferenceId: '',
       status: '',
-      type: PaymentType.cash,
+      type: 'CASH',
       transaction: { id: 'transaction-1', account: { currency: { icon: '£' } } } as any,
     });
 
@@ -211,7 +211,7 @@ describe('PaymentComponent', () => {
       paymentId: '',
       preferenceId: '',
       status: '',
-      type: PaymentType.cash,
+      type: 'CASH',
     });
 
     expect(icon).toBe('euro');

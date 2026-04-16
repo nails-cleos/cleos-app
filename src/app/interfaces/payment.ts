@@ -1,152 +1,27 @@
 import { IReservationAll } from './reservation';
-import { TranslateService } from '@ngx-translate/core';
 import { ITransaction } from './account';
 
 export const PENALTY = 50;
 
-export interface IPaymentType {
-  name: string;
-  disabled: boolean;
-  checked: boolean;
-  deprecated: boolean;
-}
-
-export enum PaymentType {
-  cash = 'CASH',
-  ml = 'ML',
-  paypal = 'PAYPAL',
-  ideal = 'IDEAL',
-  transfer = 'TRANSFER',
-  paynl = 'PAY_NL',
-  account = 'ACCOUNT',
-  mollie = 'MOLLIE',
-}
-
-export type PaymentTypeKey = keyof typeof PaymentType;
-
 export interface IPaymentOption {
-  name: string;
-  svgIcon: string;
-  type: PaymentType;
-  hidePercentage?: boolean;
+  enabled: boolean;
+  default: boolean;
+  filter: boolean;
+  defaultFilter: boolean;
+  show: boolean;
+  label: string;
+  type: string;
   icon?: string;
-}
-
-export class PaymentOption implements IPaymentOption {
-  name: string;
-  type: PaymentType;
-  svgIcon: string;
+  name?: string;
+  enabledCustomer?: boolean;
+  enabledProfessional?: boolean;
   hidePercentage?: boolean;
-  icon?: string;
-
-  constructor(
-    name: string,
-    type: PaymentType,
-    svgIcon: string,
-    icon?: string,
-    hidePercentage: boolean = false,
-  ) {
-    this.name = name;
-    this.type = type;
-    this.svgIcon = svgIcon;
-    this.icon = icon;
-    this.hidePercentage = hidePercentage;
-  }
 }
-
-export const getPaymentOptions = (
-  translate: TranslateService,
-  types?: PaymentType[],
-  hidePercentage: boolean = false,
-): IPaymentOption[] => types?.map((it: any) => {
-  const name = translate.instant(`COMMON.PAYMENT.TYPE.${it}`);
-  let svgIcon = '';
-  let icon;
-  switch (it) {
-    case PaymentType.ideal:
-      svgIcon = 'IDEAL';
-      break;
-    case PaymentType.paypal:
-      svgIcon = 'PAYPAL';
-      break;
-    case PaymentType.mollie:
-      svgIcon = 'MOLLIE';
-      break;
-    case PaymentType.paynl:
-      svgIcon = 'PAY_NL';
-      break;
-    case PaymentType.cash:
-      icon = 'universal_currency';
-      break;
-    case PaymentType.transfer:
-      icon = 'send_money';
-      break;
-  }
-
-  return new PaymentOption(name, it, svgIcon, icon, hidePercentage);
-}) || [];
-
-export const filterPaymentOptions = (
-  options?: IPaymentOption[],
-  allowedTypes?: PaymentType[],
-): IPaymentOption[] => {
-  if (!options?.length) {
-    return [];
-  }
-  if (!allowedTypes?.length) {
-    return options;
-  }
-
-  return options
-    .filter(option => allowedTypes.includes(option.type));
-};
-
-export const accountCredit = (name: string): IPaymentOption[] => [
-  {
-    type: PaymentType.account,
-    name,
-    icon: 'account_balance',
-    hidePercentage: true,
-    svgIcon: 'account_balance',
-  },
-];
 
 export enum PaymentPercentage {
   deposit_50 = 'DEPOSIT_50',
   total = 'TOTAL'
 }
-
-export const paymentOptions = (): IPaymentType[] => [{
-  name: PaymentType.cash,
-  disabled: true,
-  checked: true,
-  deprecated: false,
-}, {
-  name: PaymentType.ml,
-  disabled: false,
-  checked: false,
-  deprecated: true,
-}, {
-  name: PaymentType.paypal,
-  disabled: false,
-  checked: false,
-  deprecated: true,
-}, {
-  name: PaymentType.ideal,
-  disabled: false,
-  checked: false,
-  deprecated: true,
-}, {
-  name: PaymentType.paynl,
-  disabled: false,
-  checked: false,
-  deprecated: true,
-}, {
-  name: PaymentType.mollie,
-  disabled: false,
-  checked: false,
-  deprecated: false,
-}];
 
 export interface IPaymentStatus {
   paymentId: string;
@@ -163,8 +38,9 @@ export interface IPay {
 
 export interface IPaymentRequest {
   paymentId: string;
-  paymentType: PaymentType;
+  paymentType: string;
   amount: number;
+  pointOfSale?: boolean;
 }
 
 export interface IPayment {
@@ -192,7 +68,7 @@ export interface IPaymentAll {
   transactionAmount?: number;
   status: string;
   timestamp: number;
-  type: PaymentType;
+  type: string;
   paymentId: string;
   preferenceId: string;
   reservation?: IReservationAll;

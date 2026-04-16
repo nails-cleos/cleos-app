@@ -57,7 +57,7 @@ export class CurrencyListComponent {
   resultsLengthSignal = computed(() => this.currencyListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'code', 'name', 'actions'];
+  displayedColumns: string[] = ['position', 'code', 'name', 'actions', 'add'];
   expanded?: ICurrency;
 
   language: string = this.translate.getCurrentLang();

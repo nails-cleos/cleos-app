@@ -1,95 +1,105 @@
-<div class="flex-container">
-  <div class="card-container">
-    <div class="card-content">
-      <mat-card appearance="outlined">
-        @let catalogue = catalogueSignal();
-        @let isAddMode = isAddModeSignal();
-        @if (isAddMode) {
-          <mat-card-header>
-            <mat-card-title>{{ 'CATALOGUE.TITLE' | translate }}</mat-card-title>
-          </mat-card-header>
-        } @else {
-          <mat-card-header>
-            <mat-card-title>{{ 'CATALOGUE.DETAIL' | translate }}</mat-card-title>
-            @if (catalogue) {
-              <mat-card-subtitle>{{ catalogue.name }}</mat-card-subtitle>
-            } @else {
-              <div class="ssc-line"></div>
-            }
-          </mat-card-header>
-        }
-        <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
-          <mat-card-content>
-            <div class="inner-container">
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'CATALOGUE.NAME.FIELD' | translate }}</mat-label>
-                <label>
-                  <input [formControl]="getForm.name" autocomplete="name" matInput required>
-                </label>
-                @if (getForm.name.hasError('required')) {
-                  <mat-error [innerHTML]="'CATALOGUE.NAME.REQUIRED' | translate"></mat-error>
-                } @else if (errors()['name']) {
-                  <mat-error>{{ errors()['name'] }}</mat-error>
-                }
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'CATALOGUE.DESCRIPTION.FIELD' | translate }}</mat-label>
-                <label>
-                  <textarea #message [formControl]="getForm.description" matInput maxlength="256"></textarea>
-                </label>
-                <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
-              </mat-form-field>
-              @if (filteredGroupSignal(); as groups) {
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
-                  <input (keydown)="keyDownGroup($event)" [formControl]="getForm.group" [matAutocomplete]="autoGroup"
-                         matInput type="text">
-                  <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
-                    @for (group of groups | sortBy: 'asc':'name'; track group) {
-                      <mat-option [value]="group">{{ group.name }}</mat-option>
-                    }
-                  </mat-autocomplete>
-                  @if (getForm.group.hasError('required')) {
-                    <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.REQUIRED' | translate"></mat-error>
-                  } @else if (getForm.group.hasError('requireMatch')) {
-                    <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate"></mat-error>
-                  } @else if (errors()['group']) {
-                    <mat-error>{{ errors()['group'] }}</mat-error>
-                  }
-                </mat-form-field>
-              } @else {
-                <div class="ssc-line"></div>
-              }
+@let catalogue = catalogueSignal();
+@let isAddMode = isAddModeSignal();
 
-              <div>
-                <mat-checkbox [formControl]="getForm.home" color="primary">
-                  {{ 'CATALOGUE.SHOW.HOME' | translate }}
-                </mat-checkbox>
-                <mat-checkbox [formControl]="getForm.catalog" color="primary">
-                  {{ 'CATALOGUE.SHOW.CATALOG' | translate }}
-                </mat-checkbox>
-              </div>
-              <app-file-drop accept="image/*" (image)="onImageSelected($event)"
-                             [currentFile]="file()" [undo]="!isAddModeSignal()"></app-file-drop>
-            </div>
-          </mat-card-content>
-          <mat-card-actions class="card-actions">
-            <div class="spacer"></div>
-            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button"
-                    type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
-            </button>
-            @if (isAddMode) {
-              <button [disabled]="form.invalid || !image()" color="primary" mat-fab extended
-                      class="icon-button" type="submit">{{ 'COMMON.BUTTON.CREATE' | translate }}
-              </button>
-            } @else {
-              <button [disabled]="form.invalid" color="primary"
-                      mat-fab extended class="icon-button" type="submit">{{ 'COMMON.BUTTON.UPDATE' | translate }}
-              </button>
-            }
-          </mat-card-actions>
-        </form>
-      </mat-card>
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <section class="app-surface-section app-crud-form">
+    <div class="app-detail-section-header">
+      <div>
+        @if (isAddMode) {
+          <span class="app-surface-eyebrow">{{ 'CATALOGUE.TITLE' | translate }}</span>
+        } @else {
+          <span class="app-surface-eyebrow">{{ 'CATALOGUE.DETAIL' | translate }}</span>
+          @if (catalogue) {
+            <p>{{ catalogue.name }}</p>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        }
+      </div>
     </div>
-  </div>
+
+    <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+      <div class="app-crud-form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'CATALOGUE.NAME.FIELD' | translate }}</mat-label>
+          <label>
+            <input [formControl]="getForm.name" autocomplete="name" matInput required>
+          </label>
+          @if (getForm.name.hasError('required')) {
+            <mat-error [innerHTML]="'CATALOGUE.NAME.REQUIRED' | translate"></mat-error>
+          } @else if (errors()['name']) {
+            <mat-error>{{ errors()['name'] }}</mat-error>
+          }
+        </mat-form-field>
+
+        @if (filteredGroupSignal(); as groups) {
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
+            <input (keydown)="keyDownGroup($event)" [formControl]="getForm.group" [matAutocomplete]="autoGroup"
+                   matInput type="text">
+            <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
+              @for (group of groups | sortBy: 'asc':'name'; track group) {
+                <mat-option [value]="group">{{ group.name }}</mat-option>
+              }
+            </mat-autocomplete>
+            @if (getForm.group.hasError('required')) {
+              <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.REQUIRED' | translate"></mat-error>
+            } @else if (getForm.group.hasError('requireMatch')) {
+              <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate"></mat-error>
+            } @else if (errors()['group']) {
+              <mat-error>{{ errors()['group'] }}</mat-error>
+            }
+          </mat-form-field>
+        } @else {
+          <div class="ssc-line"></div>
+        }
+
+        <mat-form-field appearance="outline" class="app-crud-form-grid__full">
+          <mat-label>{{ 'CATALOGUE.DESCRIPTION.FIELD' | translate }}</mat-label>
+          <label>
+            <textarea #message [formControl]="getForm.description" matInput maxlength="256"></textarea>
+          </label>
+          <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <div class="catalogue-options-grid">
+        <div class="app-surface-item catalogue-flags">
+          <span class="app-surface-item__label">{{ 'CATALOGUE.DISPLAY_OPTIONS' | translate }}</span>
+          <div class="catalogue-flags__list">
+            <mat-checkbox [formControl]="getForm.home" color="primary">
+              {{ 'CATALOGUE.SHOW.HOME' | translate }}
+            </mat-checkbox>
+            <mat-checkbox [formControl]="getForm.catalog" color="primary">
+              {{ 'CATALOGUE.SHOW.CATALOG' | translate }}
+            </mat-checkbox>
+          </div>
+        </div>
+
+        <div class="app-surface-item catalogue-upload">
+          <span class="app-surface-item__label">{{ 'CATALOGUE.TITLE' | translate }}</span>
+          <app-file-drop accept="image/*" (image)="onImageSelected($event)"
+                         [currentFile]="file()" [undo]="!isAddModeSignal()"></app-file-drop>
+        </div>
+      </div>
+
+      <div class="app-detail-actions">
+        <button [form]="form" appBackButton mat-stroked-button type="button">
+          <mat-icon>keyboard_return</mat-icon>
+          <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+        </button>
+        @if (isAddMode) {
+          <button [disabled]="form.invalid || !image()" mat-stroked-button type="submit">
+            <span>{{ 'COMMON.BUTTON.CREATE' | translate }}</span>
+            <mat-icon>add_photo_alternate</mat-icon>
+          </button>
+        } @else {
+          <button [disabled]="form.invalid" mat-stroked-button type="submit">
+            <span>{{ 'COMMON.BUTTON.UPDATE' | translate }}</span>
+            <mat-icon>published_with_changes</mat-icon>
+          </button>
+        }
+      </div>
+    </form>
+  </section>
 </div>

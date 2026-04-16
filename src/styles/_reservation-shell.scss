@@ -11,7 +11,7 @@
 
 :is(app-reservation, app-me-reservation) .step-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-columns: minmax(0, 1fr) 400px;
   gap: 24px;
   align-items: start;
 }
@@ -25,10 +25,8 @@
   flex-direction: column;
   gap: 16px;
   padding-bottom: 96px;
-}
-
-:is(app-reservation, app-me-reservation) .step-main {
-  min-width: 0;
+  width: 100%;
+  align-items: stretch;
 }
 
 :is(app-reservation, app-me-reservation) .step-sidebar {
@@ -38,17 +36,11 @@
   align-self: start;
 }
 
-:is(app-reservation, app-me-reservation) .step-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-:is(app-reservation, app-me-reservation) .step-form mat-form-field {
+:is(app-reservation, app-me-reservation) .app-surface-stack mat-form-field {
   width: 100%;
 }
 
-app-me-reservation .step-form ngx-material-intl-tel-input {
+app-me-reservation .app-surface-stack ngx-material-intl-tel-input {
   width: 100%;
 }
 
@@ -56,13 +48,6 @@ app-me-reservation .step-form ngx-material-intl-tel-input {
   display: flex;
   gap: 16px;
   align-items: flex-start;
-  padding: 24px;
-  border: 1px solid var(--reservation-border);
-  border-radius: 28px;
-  background:
-    radial-gradient(circle at top left, var(--reservation-heading-glow), transparent 42%),
-    linear-gradient(180deg, var(--reservation-heading-top), var(--reservation-heading-bottom));
-  box-shadow: var(--reservation-shadow);
 }
 
 :is(app-reservation, app-me-reservation) .step-heading__index {
@@ -110,34 +95,13 @@ app-me-reservation .step-form ngx-material-intl-tel-input {
   color: var(--reservation-text-muted);
 }
 
-:is(app-reservation, app-me-reservation) .step-section,
-:is(app-reservation, app-me-reservation) .support-card,
-:is(app-reservation, app-me-reservation) .booking-summary {
-  border: 1px solid var(--reservation-border);
-  border-radius: 28px;
-  background: var(--reservation-surface-raised);
-  box-shadow: var(--reservation-shadow);
-}
-
-app-reservation .preview-card {
-  border: 1px solid var(--reservation-border);
-  border-radius: 28px;
-  background: var(--reservation-surface-raised);
-  box-shadow: var(--reservation-shadow);
-}
-
-:is(app-reservation, app-me-reservation) .step-section,
-:is(app-reservation, app-me-reservation) .support-card {
-  padding: 24px;
-}
-
-app-reservation .preview-card {
-  padding: 24px;
-}
-
 :is(app-reservation, app-me-reservation) .field-grid {
   display: grid;
   gap: 16px;
+}
+
+:is(app-reservation, app-me-reservation) .field-grid--double {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 :is(app-reservation, app-me-reservation) .field-grid--triple {
@@ -173,6 +137,11 @@ app-reservation .preview-card {
   align-items: flex-start;
 }
 
+:is(app-reservation, app-me-reservation) .support-card__header--with-total .booking-summary__price {
+  margin-left: auto;
+  text-align: right;
+}
+
 :is(app-reservation, app-me-reservation) .support-card__header mat-icon {
   margin-top: 2px;
   color: var(--reservation-accent);
@@ -182,12 +151,6 @@ app-reservation .preview-card {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
-}
-
-:is(app-reservation, app-me-reservation) .info-item {
-  padding: 16px;
-  border-radius: 20px;
-  background: var(--reservation-surface-muted);
 }
 
 :is(app-reservation, app-me-reservation) .info-item span,
@@ -207,11 +170,6 @@ app-reservation .preview-card {
   line-height: 1.4;
 }
 
-:is(app-reservation, app-me-reservation) .info-item--wide,
-:is(app-reservation, app-me-reservation) .summary-item--wide {
-  grid-column: 1 / -1;
-}
-
 :is(app-reservation, app-me-reservation) .map-frame {
   min-height: 320px;
   overflow: hidden;
@@ -221,13 +179,6 @@ app-reservation .preview-card {
 :is(app-reservation, app-me-reservation) .map-frame app-google-map {
   display: block;
   width: 100%;
-}
-
-:is(app-reservation, app-me-reservation) .booking-summary {
-  padding: 20px;
-  background:
-    linear-gradient(180deg, var(--reservation-summary-top), var(--reservation-summary-bottom)),
-    linear-gradient(120deg, var(--reservation-summary-accent), transparent 45%);
 }
 
 :is(app-reservation, app-me-reservation) .booking-summary__header {
@@ -240,12 +191,17 @@ app-reservation .preview-card {
 
 :is(app-reservation, app-me-reservation) .booking-summary__price {
   text-align: right;
+  min-width: fit-content;
 }
 
 :is(app-reservation, app-me-reservation) .booking-summary__price small {
   display: block;
   color: var(--reservation-text-muted);
   text-decoration: line-through;
+}
+
+:is(app-reservation, app-me-reservation) .booking-summary__price span {
+  white-space: nowrap;
 }
 
 :is(app-reservation, app-me-reservation) .booking-summary__price strong {
@@ -259,13 +215,6 @@ app-reservation .preview-card {
   gap: 14px;
 }
 
-:is(app-reservation, app-me-reservation) .summary-item {
-  padding: 14px 16px;
-  border-radius: 20px;
-  background: var(--reservation-summary-item-bg);
-  border: 1px solid var(--reservation-summary-item-border);
-}
-
 :is(app-reservation, app-me-reservation) .booking-summary__slots {
   display: flex;
   flex-wrap: wrap;
@@ -275,12 +224,10 @@ app-reservation .preview-card {
 :is(app-reservation, app-me-reservation) .booking-summary__slot {
   display: inline-flex;
   align-items: center;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: var(--reservation-accent-soft);
-  color: var(--reservation-accent);
-  font-size: 0.88rem;
-  font-weight: 600;
+}
+
+:is(app-reservation, app-me-reservation) .booking-summary__slot.app-detail-chip {
+  padding: 9px 13px;
 }
 
 :is(app-reservation, app-me-reservation) .summary-slot-button {
@@ -300,6 +247,102 @@ app-reservation .preview-card {
 
 :is(app-reservation, app-me-reservation) .booking-summary--compact {
   padding: 16px;
+}
+
+:is(app-reservation, app-me-reservation) .array-form {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+}
+
+:is(app-reservation, app-me-reservation) .array-group {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 18px;
+  border: 1px solid var(--reservation-array-border);
+  border-radius: 24px;
+  background: var(--reservation-surface-muted);
+}
+
+:is(app-reservation, app-me-reservation) .array-group__index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 12px;
+  align-self: start;
+  margin-top: 18px;
+  border: 1px solid var(--app-chip-border);
+  border-radius: 999px;
+  background: var(--app-chip-bg);
+  color: var(--app-chip-text);
+  font-weight: 700;
+}
+
+:is(app-reservation, app-me-reservation) .date-time-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+:is(app-reservation, app-me-reservation) .remove-button {
+  align-self: start;
+  justify-self: center;
+  margin-top: 10px;
+}
+
+:is(app-reservation, app-me-reservation) .add-button-container {
+  display: flex;
+  justify-content: flex-start;
+}
+
+:is(app-reservation, app-me-reservation) .schedule-card {
+  overflow: hidden;
+}
+
+:is(app-reservation, app-me-reservation) .schedule-divider {
+  margin: 0 10px;
+}
+
+:is(app-reservation, app-me-reservation) .icon-button {
+  margin: 0;
+}
+
+:is(app-reservation, app-me-reservation) .raised-button {
+  margin: 0 0 0 10px;
+}
+
+:is(app-reservation, app-me-reservation) .empty-state--compact {
+  min-height: auto;
+}
+
+:is(app-reservation, app-me-reservation) .policy-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+app-me-reservation .availability-shell {
+  padding: 18px 0 4px;
+}
+
+app-me-reservation .availability-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+app-me-reservation .availability-grid .mat-mdc-raised-button {
+  min-width: 88px;
+}
+
+:is(app-reservation, app-me-reservation) .payment-shell app-price,
+:is(app-reservation, app-me-reservation) .support-card app-payment-preview {
+  display: block;
 }
 
 :is(app-reservation, app-me-reservation) .booking-summary--compact .booking-summary__grid {
@@ -399,6 +442,34 @@ app-reservation .preview-card {
   box-shadow: var(--reservation-actions-shadow);
 }
 
+:is(app-reservation, app-me-reservation) .step-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button) {
+  --mdc-outlined-button-label-text-color: var(--app-detail-action-text);
+  --mat-outlined-button-state-layer-color: var(--app-detail-action-state);
+  --mdc-filled-button-label-text-color: var(--app-detail-action-text);
+  --mat-filled-button-state-layer-color: var(--app-detail-action-state);
+  border-color: var(--app-detail-action-border);
+  background: linear-gradient(180deg, var(--app-detail-action-bg-top), var(--app-detail-action-bg-bottom));
+  color: var(--app-detail-action-text);
+  box-shadow: none;
+}
+
+:is(app-reservation, app-me-reservation) .step-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button):hover {
+  border-color: var(--app-detail-action-border-hover);
+  background: linear-gradient(180deg, var(--app-detail-action-hover-top), var(--app-detail-action-hover-bottom));
+}
+
+:is(app-reservation, app-me-reservation) .step-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button),
+:is(app-reservation, app-me-reservation) .step-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button) .mdc-button__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+:is(app-reservation, app-me-reservation) .step-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button) .mat-icon,
+:is(app-reservation, app-me-reservation) .step-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button) .mdc-button__label {
+  color: var(--app-detail-action-text) !important;
+}
+
 :is(app-reservation, app-me-reservation) .step-actions--mobile {
   bottom: 0;
   margin-top: 12px;
@@ -422,10 +493,26 @@ app-reservation .preview-card {
 }
 
 @media (max-width: 899px) {
+  :is(app-reservation, app-me-reservation) .field-grid--double,
   :is(app-reservation, app-me-reservation) .field-grid--triple,
   :is(app-reservation, app-me-reservation) .info-grid,
+  :is(app-reservation, app-me-reservation) .date-time-fields,
   :is(app-reservation, app-me-reservation) .booking-summary__grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  :is(app-reservation, app-me-reservation) .array-group {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :is(app-reservation, app-me-reservation) .array-group__index {
+    width: 32px;
+    height: 32px;
+  }
+
+  :is(app-reservation, app-me-reservation) .remove-button {
+    justify-self: flex-start;
+    margin-top: 0;
   }
 
   :is(app-reservation, app-me-reservation) .price-row {
@@ -439,27 +526,141 @@ app-reservation .preview-card {
 }
 
 @media (max-width: 599px) {
-  :is(app-reservation, app-me-reservation) .step-heading,
-  :is(app-reservation, app-me-reservation) .step-section,
-  :is(app-reservation, app-me-reservation) .support-card,
-  :is(app-reservation, app-me-reservation) .booking-summary,
-  app-reservation .preview-card {
-    border-radius: 24px;
-  }
-
-  :is(app-reservation, app-me-reservation) .step-heading,
-  :is(app-reservation, app-me-reservation) .step-section,
-  :is(app-reservation, app-me-reservation) .support-card,
-  app-reservation .preview-card {
-    padding: 18px;
+  :is(app-reservation, app-me-reservation) .reservation-flow-shell,
+  :is(app-reservation, app-me-reservation) .step-layout--mobile,
+  :is(app-reservation, app-me-reservation) .step-layout--mobile > *,
+  :is(app-reservation, app-me-reservation) .step-actions--mobile {
+    width: 100%;
+    max-width: 100%;
   }
 
   :is(app-reservation, app-me-reservation) .step-heading {
     gap: 12px;
   }
 
+  :is(app-reservation, app-me-reservation) .booking-summary.app-surface-section {
+    border-radius: 20px !important;
+    min-width: 0;
+  }
+
+  :is(app-reservation, app-me-reservation) .booking-summary.app-surface-section,
+  :is(app-reservation, app-me-reservation) .booking-summary.app-surface-section mat-card-content {
+    padding: 18px;
+  }
+
+  :is(app-reservation, app-me-reservation) .booking-summary__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  :is(app-reservation, app-me-reservation) .booking-summary__header h3 {
+    font-size: 1.15rem;
+    overflow-wrap: anywhere;
+  }
+
+  :is(app-reservation, app-me-reservation) .booking-summary__price {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    text-align: left;
+  }
+
+  :is(app-reservation, app-me-reservation) .booking-summary__price span,
+  :is(app-reservation, app-me-reservation) .booking-summary__price small,
+  :is(app-reservation, app-me-reservation) .booking-summary__price strong {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  :is(app-reservation, app-me-reservation) .summary-item {
+    min-width: 0;
+  }
+
+  :is(app-reservation, app-me-reservation) .summary-item strong,
+  :is(app-reservation, app-me-reservation) .app-surface-item__value {
+    overflow-wrap: anywhere;
+  }
+
+  :is(app-reservation, app-me-reservation) .booking-summary__slots {
+    gap: 10px;
+    min-width: 0;
+  }
+
+  :is(app-reservation, app-me-reservation) .booking-summary__slot.app-detail-chip {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    justify-content: space-between;
+    padding: 10px 12px;
+    min-width: 0;
+  }
+
+  :is(app-reservation, app-me-reservation) .booking-summary__slot.app-detail-chip > span {
+    overflow-wrap: anywhere;
+  }
+
+  :is(app-reservation, app-me-reservation) .summary-slot-button {
+    flex: 0 0 auto;
+    margin-left: 8px;
+  }
+
+  :is(app-reservation, app-me-reservation) .price-breakdown {
+    margin-top: 18px;
+    min-width: 0;
+  }
+
+  :is(app-reservation, app-me-reservation) .price-row {
+    min-width: 0;
+    gap: 6px;
+  }
+
+  :is(app-reservation, app-me-reservation) .price-row span,
+  :is(app-reservation, app-me-reservation) .price-row strong {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  :is(app-reservation, app-me-reservation) .booking-summary--compact {
+    padding: 12px;
+  }
+
+  :is(app-reservation, app-me-reservation) .booking-summary--compact.app-surface-section,
+  :is(app-reservation, app-me-reservation) .booking-summary--compact.app-surface-section mat-card-content {
+    padding: 14px;
+  }
+
+  :is(app-reservation, app-me-reservation) .booking-summary--compact .booking-summary__header {
+    margin-bottom: 12px;
+  }
+
+  :is(app-reservation, app-me-reservation) .booking-summary--compact .booking-summary__header h3 {
+    font-size: 1rem;
+  }
+
   :is(app-reservation, app-me-reservation) .booking-summary--compact .booking-summary__grid {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  :is(app-reservation, app-me-reservation) .booking-summary--compact .summary-item {
+    padding: 12px 14px;
+    border-radius: 16px;
+  }
+
+  :is(app-reservation, app-me-reservation) .booking-summary--compact .summary-item__label {
+    margin-bottom: 4px;
+    font-size: 0.68rem;
+  }
+
+  :is(app-reservation, app-me-reservation) .booking-summary--compact .summary-item strong,
+  :is(app-reservation, app-me-reservation) .booking-summary--compact .app-surface-item__value {
+    font-size: 0.95rem;
+  }
+
+  :is(app-reservation, app-me-reservation) .booking-summary--compact .summary-item--wide {
+    grid-column: 1 / -1;
   }
 
   :is(app-reservation, app-me-reservation) .step-actions {

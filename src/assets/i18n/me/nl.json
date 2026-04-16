@@ -105,6 +105,12 @@
       "ERROR_TEXT": "Betalingsfout",
       "ERROR": "Betaling onvolledig.\n{{reason}}",
       "DETAIL": "Betalingsdetails",
+      "FLOW": {
+        "STEPS": {
+          "OPTION": "Kies de betaalmethode en termijnoptie voor deze reservering.",
+          "PREVIEW": "Controleer de prijsopbouw en betaalgegevens voordat je doorgaat."
+        }
+      },
       "RESERVATION": "Afspraak {{reservationId}}",
       "LIST": {
         "ERROR": {

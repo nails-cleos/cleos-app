@@ -1,26 +1,18 @@
-[class*='mat-column-'] {
-  text-align: center;
+.statement-form {
+  display: flex;
+  flex-direction: column;
 }
 
-.mat-column-code {
-  flex: 0 0 55%;
-  width: 55%;
+.statement-filter-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-tr.detail-row {
-  height: 0 !important;
+.statement-upload-section {
+  display: block;
 }
 
-table {
-  border-collapse: collapse;
-}
-
-.newWeek {
-  padding: 16px 0;
-}
-
-fieldset {
-  form {
-    margin: 5% 0 5% 0;
+@media (max-width: 720px) {
+  .statement-filter-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

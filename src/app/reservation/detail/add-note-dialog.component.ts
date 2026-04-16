@@ -18,6 +18,7 @@ type NoteDialogData = {
 @Component({
   selector: 'app-add-note-dialog-component',
   templateUrl: './add-note-dialog.component.html',
+  styleUrls: ['./add-note-dialog.component.scss'],
   imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { Component, computed, effect, ElementRef, HostListener, inject, signal, untracked } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ActivatedRoute, NavigationStart, Router, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -22,7 +22,6 @@ import { newDateTimestamp } from '../util/dates';
 import { SharedModule } from '../shared/shared.module';
 import { MenuItemComponent } from './menu-item/menu-item.component';
 import { ErrorComponent } from '../shared/error/error.component';
-import { MatRipple } from '@angular/material/core';
 import { ToastService } from '../services/toast.service';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -40,9 +39,10 @@ import { clearGlobalError, clearGlobalResponse } from '../store/global.actions';
   selector: 'app-nav',
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.scss'],
-  imports: [SharedModule, MenuItemComponent, RouterLinkActive, RouterOutlet, ErrorComponent, MatRipple],
+  imports: [SharedModule, MenuItemComponent, RouterLinkActive, RouterOutlet, ErrorComponent],
 })
 export class NavComponent {
+  private readonly elementRef: ElementRef = inject(ElementRef);
   private readonly env: EnvService = inject(EnvService);
   private readonly tokenService: TokenService = inject(TokenService);
   private readonly translate: TranslateService = inject(TranslateService);
@@ -124,6 +124,7 @@ export class NavComponent {
   notifications = signal<INotification[]>([]);
   workDay = signal<INotification[]>([]);
   countNotifications = signal(0);
+  activeMenu = signal<'notifications' | 'workday' | 'settings' | null>(null);
 
   readonly loading = this.loadingService.isLoading;
 
@@ -164,7 +165,7 @@ export class NavComponent {
       }
 
       if (response.redirect) {
-        this.router.navigate([`/${this.language()}/${response.redirect}`]);
+        this.router.navigate([`/${ this.language() }/${ response.redirect }`]);
       }
 
       if (response.blob) {
@@ -257,7 +258,7 @@ export class NavComponent {
       if (isAuthorized) {
         this.store.dispatch(getNotificationsPage({ page: 0, sort: 'date', direction: 'desc', size: PAGE_SIZE }));
       }
-      if (this.router.url === `/${language}`) {
+      if (this.router.url === `/${ language }`) {
         if (isAuthorized && !redirectSignal) {
           this.store.dispatch(redirect());
         } else {
@@ -323,11 +324,12 @@ export class NavComponent {
     user.theme = theme;
     const redirectUrl = this.router.url;
     const message = this.translate.instant(
-      `COMMON.PROFILE.UPDATED.DARK_MODE_${this.isDarkMode().toString().toUpperCase()}`);
+      `COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode().toString().toUpperCase() }`);
     this.store.dispatch(updateMyUser({ user, redirectUrl, message }));
   }
 
   notification = (notification: INotification): void => {
+    this.closeActiveMenu();
     if (notification.read) {
       this.router.navigate([notification.navigation]);
     } else {
@@ -373,8 +375,26 @@ export class NavComponent {
 
   private getToastOptions = (res: IResponseSuccess): ToastOptions => {
     if (res.path) {
-      return { actionType: 'link', action: `/${this.language()}/${res.path}` };
+      return { actionType: 'link', action: `/${ this.language() }/${ res.path }` };
     }
     return { actionType: 'none' };
   };
+
+  toggleMenu = (menu: 'notifications' | 'workday' | 'settings'): void => {
+    this.activeMenu.update(current => current === menu ? null : menu);
+  };
+
+  closeActiveMenu = (): void => {
+    this.activeMenu.set(null);
+  };
+
+  @HostListener('document:click', ['$event']) onDocumentClick(event: MouseEvent): void {
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.closeActiveMenu();
+    }
+  }
+
+  @HostListener('document:keydown.escape') onEscape(): void {
+    this.closeActiveMenu();
+  }
 }

@@ -15,7 +15,7 @@ describe('ReservationFormErrorService', () => {
     'customerChange',
     'reference',
     'note',
-    'type',
+    'option',
     'amount',
     'transfer',
   ] as const satisfies readonly ReservationFormField[];

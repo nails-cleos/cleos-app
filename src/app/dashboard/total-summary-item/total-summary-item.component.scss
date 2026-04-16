@@ -1,13 +1,24 @@
-.result {
-  padding: 5px 0;
-  position: relative;
-  margin-bottom: 8px;
+.total-summary-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  color: var(--app-surface-text);
 }
 
-.result:after {
-  content: '';
-  width: 100%;
-  position: absolute;
-  bottom: -6px;
-  left: 0;
+.total-summary-item__label {
+  color: var(--app-surface-label);
+  font-weight: 600;
+}
+
+.total-summary-item__value {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.total-summary-item--result {
+  border-top: 1px solid var(--app-surface-card-border);
+  margin-top: 4px;
+  padding-top: 16px;
 }

@@ -1,15 +1,22 @@
-<mat-toolbar (click)="goToQuarter()" class="pointer summary-header">
-  Q{{ quarter() }}
-</mat-toolbar>
-<div class="flex-row-wrap">
-  @for (month of monthSummaries(); track month) {
-    <div class="quarter-content">
-      <mat-toolbar (click)="goToMonth(month.month)" class="pointer summary-header">
-        {{ getMonth(month.month) }}
-      </mat-toolbar>
-      <div class="margin-top">
-        <app-month [month]="month" [year]="year()" [currency]="currency()" [showCash]="showCash()"></app-month>
-      </div>
+<div class="app-crud-form">
+  <div (click)="goToQuarter()" class="app-detail-section-header quarter-header pointer">
+    <div>
+      <span class="app-surface-eyebrow">Q{{ quarter() }}</span>
     </div>
-  }
+  </div>
+
+  <div class="quarter-grid">
+  @for (month of monthSummaries(); track month) {
+    <div class="app-surface-section quarter-content">
+      <div (click)="goToMonth(month.month)" class="app-detail-section-header quarter-month-header pointer">
+        <div>
+            <span class="app-surface-eyebrow">{{ getMonth(month.month) }}</span>
+          </div>
+        </div>
+        <div class="quarter-month-body">
+          <app-month [month]="month" [year]="year()" [currency]="currency()" [showCash]="showCash()"></app-month>
+        </div>
+      </div>
+    }
+  </div>
 </div>

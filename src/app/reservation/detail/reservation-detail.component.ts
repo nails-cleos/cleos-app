@@ -49,15 +49,7 @@ import {
 } from '../../util/helper';
 import { IPrice, Price } from '../../interfaces/treatment';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import {
-  getPaymentOptions,
-  IPayment,
-  IPaymentAll,
-  IPaymentOption,
-  IPaymentRequest,
-  PaymentType,
-  PENALTY,
-} from '../../interfaces/payment';
+import { IPayment, IPaymentAll, IPaymentOption, IPaymentRequest, PENALTY } from '../../interfaces/payment';
 import { isToday, isTomorrow } from 'date-fns';
 import { ReservationIconName } from '../../util/icon';
 import { FormArray, FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
@@ -74,7 +66,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { RoomNamePipe } from '../../pipes/room-name.pipe';
 import { ReservationIconPipe } from '../../pipes/reservation-icon.pipe';
 import { PriceExtrasComponent } from '../../shared/price-extras/price-extras.component';
-import { PricePreviewComponent } from '../../shared/price-preview/price-preview.component';
+import { PaymentOptionSelectComponent } from '../../shared/payment-option-select/payment-option-select.component';
 import { TwoDigitsDirective } from '../../directives/two-digits.directive';
 import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
 import { BackButtonDirective } from '../../directives/back-button.directive';
@@ -90,10 +82,13 @@ import {
   getSelectedReservationPipe,
 } from '../../store/selectors/reservation.selectors';
 import { MatTableDataSource } from '@angular/material/table';
+import { getPaymentOptionsPipe } from '../../store/selectors/payment.selectors';
+import { findStateColor } from '../../util/theme';
+import { DurationTimePipe } from '../../pipes/durationTime.pipe';
 
 type PaymentForm = {
   amount: FormControl<string>;
-  type: FormControl<PaymentType>;
+  type: FormControl<string>;
 }
 
 type DetailForm = {
@@ -104,11 +99,14 @@ type DetailForm = {
   selector: 'app-reservation-detail',
   templateUrl: './reservation-detail.component.html',
   styleUrls: ['./reservation-detail.component.scss'],
-  imports: [SharedModule, RoomNamePipe, ReservationIconPipe, PriceExtrasComponent, PricePreviewComponent,
-    TwoDigitsDirective, TimeDetailPipe, BackButtonDirective, FabMenuComponent],
+  imports: [SharedModule, RoomNamePipe, ReservationIconPipe, PriceExtrasComponent,
+    PaymentOptionSelectComponent, TwoDigitsDirective, TimeDetailPipe, BackButtonDirective, FabMenuComponent,
+    DurationTimePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationDetailComponent {
+  private static readonly PROFESSIONAL_PAYMENT_TYPES = ['CASH', 'TRANSFER', 'MOLLIE'];
+
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
@@ -125,11 +123,13 @@ export class ReservationDetailComponent {
   private reservationSelected$ = this.store.pipe(getSelectedReservationPipe);
   private payments$ = this.store.pipe(getPaymentsPipe);
   private histories$ = this.store.pipe(getHistoriesPipe);
+  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
-  private authUserSignal = this.authUserService.authUser;
-  private reservationIdSignal = toSignal(this.reservationId$);
-  private navigationParams = toSignal(this.navigationParams$);
-  private breakpointsSignal = toSignal(
+  private readonly authUserSignal = this.authUserService.authUser;
+  private readonly reservationIdSignal = toSignal(this.reservationId$);
+  private readonly navigationParams = toSignal(this.navigationParams$);
+  private readonly paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
+  private readonly breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
         matches: false,
@@ -161,16 +161,16 @@ export class ReservationDetailComponent {
   pageSize = 5;
 
   price: IPrice = new Price();
+  private readonly paymentOptions = computed(() => this.paymentOptionsSignal().filter(
+    option => option.enabled && option.show,
+  ));
   options = signal<IPaymentOption[] | undefined>(undefined);
-  paymentTypes = signal<PaymentType[] | undefined>(undefined);
 
   showFireworks = false;
 
   paymentPaid = signal<IPaymentAll[]>([]);
   paymentDisplayedColumns: string[] = ['position', 'description', 'status', 'type', 'amount'];
   paymentExpanded?: IPayment;
-
-  allPaymentTypes: string[] = [PaymentType.cash, PaymentType.transfer];
 
   professionalId = computed(() => this.authUserSignal()?.professionalId);
 
@@ -199,10 +199,53 @@ export class ReservationDetailComponent {
   private static stateMachineDefinition: any;
   private machine: any;
   small = computed(() => this.breakpointsSignal()?.matches);
+  isDarkMode = computed(() => this.authUserSignal()?.isDarkMode ?? false);
   private hasRoomAdmin = computed(() => {
     const auth = this.authUserSignal();
     return (auth?.isAdmin || auth?.isManager || auth?.isRoomAdmin) ?? false;
   });
+
+  readonly switchablePaymentTypes = ['CASH', 'TRANSFER'];
+
+  private getReservationPaymentOptions = (
+    reservation: IReservationAll,
+    isCustomer: boolean,
+    isReservationAdmin: boolean,
+  ): IPaymentOption[] => {
+    const roomPaymentTypes = new Set(reservation.room.paymentTypes);
+    const options = this.paymentOptions().filter(option => roomPaymentTypes.has(option.type));
+
+    if (isCustomer) {
+      return options.filter(option => option.enabledCustomer);
+    }
+
+    if (isReservationAdmin) {
+      const professionalPaymentTypes = new Set(ReservationDetailComponent.PROFESSIONAL_PAYMENT_TYPES);
+      return options.filter(option => professionalPaymentTypes.has(option.type));
+    }
+
+    return [];
+  };
+
+  isEditablePaymentType = (paymentType?: string): boolean => {
+    return !!this.professionalId() && this.switchablePaymentTypes.includes(paymentType || '');
+  };
+
+  getAllowedPaymentTypes = (paymentType?: string): string[] => {
+    return this.isEditablePaymentType(paymentType) ? this.switchablePaymentTypes : [];
+  };
+
+  getStatusBadgeColor = (state?: string): string => findStateColor(state || 'DEFAULT', this.isDarkMode());
+
+  getStatusBadgeTextColor = (state?: string): string => {
+    const hex = this.getStatusBadgeColor(state).replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    const luminance = (0.299 * r) + (0.587 * g) + (0.114 * b);
+
+    return luminance > 160 ? '#2a241f' : '#f7f3ee';
+  };
 
   constructor() {
     this.payments.clear();
@@ -246,16 +289,12 @@ export class ReservationDetailComponent {
         const isProfessionalAdmin = professionalId &&
           isProfessional(professionalId, reservation?.room?.professionals);
         this.isReservationAdmin = isProfessionalAdmin || this.hasRoomAdmin();
+        this.options.set(this.getReservationPaymentOptions(reservation, isCustomer, this.isReservationAdmin));
         this.price = getPrice(reservation, this.paymentPaid());
         if (isProfessionalAdmin) {
           this.professionalMachine(this);
           this.changeState = this.machine.next(snakeToCamel(reservation.state));
         } else if (isCustomer) {
-          const types = reservation.room.paymentTypes.filter(
-            (p: PaymentType) => ![PaymentType.cash, PaymentType.transfer]
-              .includes(p));
-          this.paymentTypes.set(types);
-          this.options.set(getPaymentOptions(this.translate, types));
           this.customerMachine(this);
           this.changeState = this.machine.next(snakeToCamel(reservation.state));
           if (reservation.state === States.completed) {
@@ -408,6 +447,7 @@ export class ReservationDetailComponent {
             paymentId: p.id,
             amount: parseFloat(payment.amount) - parseFloat(amount),
             paymentType: payment.type,
+            pointOfSale: true,
           },
         ];
       }
@@ -416,13 +456,21 @@ export class ReservationDetailComponent {
     this.store.dispatch(adjustPayments({ payments: paymentRequests }));
   }
 
+  overview() {
+    if (this.isCustomer()) {
+      this.router.navigate(['/', this.language, 'me', 'overview']);
+    } else {
+      this.router.navigate(['/', this.language, 'users', this.reservation()?.customer?.id, 'overview']);
+    }
+  }
+
   addNote() {
     const reservation = this.reservation();
     if (reservation) {
       executeDialog(this.dialog, AddNoteDialogComponent, {
         note: reservation.note,
         customerNote: reservation.customerNote,
-        isCustomer: this.isCustomer,
+        isCustomer: this.isCustomer(),
       }, result => {
         if (result) {
           this.store.dispatch(
@@ -510,7 +558,7 @@ export class ReservationDetailComponent {
 
   private static getDateTimeDetail = (reservation: IReservationAll): Date => newDateTimestamp(reservation.timestamp);
 
-  private static createBullet = (name: string): string => `%0A\uD83D\uDC85\uD83C\uDFFB ${name}`;
+  private static createBullet = (name: string): string => `%0A\uD83D\uDC85\uD83C\uDFFB ${ name }`;
 
   openHistoryDialog = (history: IReservationAll): void => this.openDialog(
     ReservationDetailComponent.getDateTimeDetail(history));
@@ -537,7 +585,7 @@ export class ReservationDetailComponent {
       return;
     }
     const title = this.translate.instant('RESERVATION.CHANGE_STATE.TITLE');
-    const action = this.translate.instant(`RESERVATION.CHANGE_STATE.ACTION.${id.toUpperCase()}`);
+    const action = this.translate.instant(`RESERVATION.CHANGE_STATE.ACTION.${ id.toUpperCase() }`);
     const content = this.translate.instant('RESERVATION.CHANGE_STATE.CONTENT', { action });
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: id },
@@ -658,14 +706,14 @@ export class ReservationDetailComponent {
             key = 'APPROVE';
             break;
         }
-        const message = translate.instant(`WHATSAPP.SEND.${key}`, { date, treatment });
-        window.open(`https://api.whatsapp.com/send?phone=+${userPhone}&text=${message}`, '_blank');
+        const message = translate.instant(`WHATSAPP.SEND.${ key }`, { date, treatment });
+        window.open(`https://api.whatsapp.com/send?phone=+${ userPhone }&text=${ message }`, '_blank');
       }
     });
 
     const coffeeMessageTransaction = ReservationDetailComponent.createTransaction('send', (): void => {
       const message = translate.instant('WHATSAPP.SEND.COFFEE');
-      window.open(`https://api.whatsapp.com/send?phone=+${userPhone}&text=${message}`, '_blank');
+      window.open(`https://api.whatsapp.com/send?phone=+${ userPhone }&text=${ message }`, '_blank');
     });
 
     const startTransaction = ReservationDetailComponent.createTransaction('started', (): void => {
@@ -786,7 +834,7 @@ export class ReservationDetailComponent {
         },
         next: [cancel],
       },
-      editCancelled:  {
+      editCancelled: {
         transitions: {
           cancel: cancelTransaction,
         },

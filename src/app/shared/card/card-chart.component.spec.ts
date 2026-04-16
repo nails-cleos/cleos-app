@@ -4,6 +4,8 @@ import { IChartUtil } from '../../util/chart';
 import { By } from '@angular/platform-browser';
 import { CardChartComponent } from './card-chart.component';
 import { Chart, registerables } from 'chart.js';
+import { signal } from '@angular/core';
+import { AuthUserService, initialAuthUser } from '../../services/auth-user.service';
 
 Chart.register(...registerables);
 describe('CardChartComponent', () => {
@@ -29,6 +31,10 @@ describe('CardChartComponent', () => {
         {
           provide: MAT_DIALOG_DATA,
           useValue: { chart: fakeChart, title: 'Test Chart' },
+        },
+        {
+          provide: AuthUserService,
+          useValue: { authUser: signal(initialAuthUser).asReadonly() },
         },
       ],
     }).compileComponents();
@@ -56,6 +62,7 @@ describe('CardChartComponent', () => {
   });
 
   it('should render the close button', () => {
+    fixture.detectChanges();
     const buttonEl = fixture.debugElement.query(By.css('.close-button'));
     expect(buttonEl).toBeTruthy();
   });

@@ -1,44 +1,57 @@
-<mat-card appearance="outlined" class="dashboard-card">
+<mat-card appearance="outlined" class="dashboard-card app-surface-section app-detail-panel">
   @let currentValue = value();
   @let currentError = error();
   @let currentIsIncrease = isIncrease();
+  @let currentPeriod = period();
+  @let currentTitle = title();
+  @let currentProjection = projection();
+  @let currentPreviousValue = previousPeriodValue();
+  @let currentPercent = percentValue();
   @if (!isLoading() && (currentValue || currentValue === 0 || currentError)) {
     @if (currentValue || currentValue === 0) {
-      <div>
-        <div class="title-text period">{{ period() }}</div>
-        <mat-card-header class="card-header">
-          <mat-card-title>
-            <h1 class="value-text">{{ currentValue }}</h1>
-          </mat-card-title>
-          <div class="card-icon" mat-card-avatar>
-            <mat-icon [color]="color()" class="avatar-icon">{{ icon() }}</mat-icon>
+      <div class="mini-card-shell">
+        <div class="mini-card-topline">
+          <span class="mini-card-period">{{ currentPeriod }}</span>
+          <div class="mini-card-icon" [class.mini-card-icon--empty]="!icon()">
+            @if (icon()) {
+              <mat-icon [color]="color()">{{ icon() }}</mat-icon>
+            }
           </div>
-        </mat-card-header>
-        @if (isProjection()) {
-          <div class="projection red-text">({{ projection() }})</div>
-        }
-        <h3 class="title-text">{{ title() }}</h3>
-        <div class="difference-text">
-          @if (isInfinity()) {
-            <span [ngClass]="{ 'green-text': currentIsIncrease, 'red-text': !currentIsIncrease }">
-              {{ currentIsIncrease ? '+' : '-' }}∞
-              @if (currentIsIncrease) {
-                <mat-icon class="trending" matSuffix>trending_up</mat-icon>
-              } @else {
-                <mat-icon class="trending" matSuffix>trending_down</mat-icon>
-              }
-            </span>
-          } @else {
-            <span [ngClass]="{ 'green-text': currentIsIncrease, 'red-text': !currentIsIncrease }">
-              {{ previousPeriodValue() }}
-              @if (currentIsIncrease) {
-                <mat-icon class="trending" matSuffix>trending_up</mat-icon>
-              } @else {
-                <mat-icon class="trending" matSuffix>trending_down</mat-icon>
-              }
-              {{ currentIsIncrease ? '+' : '-' }}{{ percentValue() | percent:'1.0-2':locale }}
-            </span>
+        </div>
+
+        <div class="mini-card-value-row">
+          <h1 class="value-text">{{ currentValue }}</h1>
+          @if (isProjection()) {
+            <span class="projection-chip app-detail-chip app-detail-chip--ghost">{{ currentProjection }}</span>
           }
+        </div>
+
+        <h3 class="title-text">{{ currentTitle }}</h3>
+
+        <div class="difference-text">
+          <div class="trend-value">
+            @if (isInfinity()) {
+              <span [ngClass]="{ 'green-text': currentIsIncrease, 'red-text': !currentIsIncrease }">
+                {{ currentIsIncrease ? '+' : '-' }}∞
+                @if (currentIsIncrease) {
+                  <mat-icon class="trending" matSuffix>trending_up</mat-icon>
+                } @else {
+                  <mat-icon class="trending" matSuffix>trending_down</mat-icon>
+                }
+              </span>
+            } @else {
+              <span [ngClass]="{ 'green-text': currentIsIncrease, 'red-text': !currentIsIncrease }">
+                {{ currentPreviousValue }}
+                @if (currentIsIncrease) {
+                  <mat-icon class="trending" matSuffix>trending_up</mat-icon>
+                } @else {
+                  <mat-icon class="trending" matSuffix>trending_down</mat-icon>
+                }
+                {{ currentIsIncrease ? '+' : '-' }}{{ currentPercent | percent:'1.0-2':locale }}
+              </span>
+            }
+          </div>
+
           <p class="duration">{{ duration() }}</p>
         </div>
       </div>
@@ -46,6 +59,6 @@
       <app-error [error]="currentError" [isCard]="true"></app-error>
     }
   } @else {
-    <div class="ssc-square mb"></div>
+    <div class="mini-card-skeleton ssc-square mb"></div>
   }
 </mat-card>

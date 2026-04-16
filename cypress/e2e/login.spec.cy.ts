@@ -85,7 +85,7 @@ devices.forEach(({ name, width, height }) => {
 
           switch (role) {
             case Role.customer:
-              cy.get('mat-card-title').contains('No upcoming reservations');
+              cy.get('.app-surface-eyebrow').contains('No upcoming reservations');
               cy.get('tr').contains('No reservations');
               break;
             case Role.admin:

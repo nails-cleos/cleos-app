@@ -12,7 +12,7 @@ import { IExtras } from '../../../interfaces/reservation';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
 import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
-import { getPaymentOptions, IPaymentOption, PaymentType } from '../../../interfaces/payment';
+import { IPaymentOption } from '../../../interfaces/payment';
 import {
   addPayment,
   createTreatmentGroupService,
@@ -36,6 +36,7 @@ import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
 import { DurationTimePipe } from '../../../pipes/durationTime.pipe';
 import { FormFieldAdderComponent } from '../../../shared/form-field-adder/form-field-adder.component';
+import { PaymentOptionSelectComponent } from '../../../shared/payment-option-select/payment-option-select.component';
 import { PricePreviewComponent } from '../../../shared/price-preview/price-preview.component';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
@@ -47,6 +48,8 @@ import {
   getTreatmentDiscountPipe,
 } from '../../../store/selectors/reservation.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { PaymentState } from '../../../store/reducers/payment.reducers';
+import { getPaymentOptionsPipe } from '../../../store/selectors/payment.selectors';
 
 type ReservationCompleteForm = {
   group: FormControl<IGroupService | undefined>;
@@ -63,12 +66,12 @@ type ReservationCompleteForm = {
   templateUrl: './reservation-complete.component.html',
   styleUrls: ['./reservation-complete.component.scss'],
   imports: [SharedModule, TimeDetailPipe, CurrencySymbolPipe, DurationTimePipe, FormFieldAdderComponent,
-    PricePreviewComponent, BackButtonDirective],
+    PaymentOptionSelectComponent, PricePreviewComponent, BackButtonDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationCompleteComponent {
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
@@ -77,10 +80,12 @@ export class ReservationCompleteComponent {
   private treatmentDiscount$ = this.store.pipe(getTreatmentDiscountPipe);
   private additionalList$ = this.store.pipe(getAdditionalListPipe);
   private payments$ = this.store.pipe(getPaymentsPipe);
+  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
   private readonly completeReservationSignal = toSignal(this.completeReservation$);
   private readonly treatmentDiscountSignal = toSignal(this.treatmentDiscount$);
   private readonly paymentsSignal = toSignal(this.payments$);
+  private readonly paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
 
   readonly selectedReservationSignal = toSignal(this.selectedReservation$);
   readonly additionalListSignal = toSignal(this.additionalList$);
@@ -168,7 +173,10 @@ export class ReservationCompleteComponent {
     ),
   );
 
-  types: IPaymentOption[] = getPaymentOptions(this.translate, [PaymentType.cash, PaymentType.transfer]);
+  private readonly paymentOptions = computed(() => this.paymentOptionsSignal().filter(
+    option => option.enabled && option.show,
+  ));
+  options = signal<IPaymentOption[]>([]);
   price: WritableSignal<IPrice> = signal(new Price());
   totalTime = signal('');
   readonly isValidTime = computed(() => {
@@ -179,7 +187,7 @@ export class ReservationCompleteComponent {
   dateFormat: string = this.translate.getCurrentLang();
   split: boolean = false;
   isValid: boolean = true;
-  isValidSplit: boolean = true;
+  isValidSplit = signal(true);
 
   private currentExtraData?: IExtras[];
   private currentSplitData?: IExtras[];
@@ -198,7 +206,8 @@ export class ReservationCompleteComponent {
         if (additionalSelected) {
           this.additionalSelected.set(additionalSelected);
         }
-        this.types = getPaymentOptions(this.translate, [...reservation.room.paymentTypes, PaymentType.transfer]);
+        const options = this.paymentOptions();
+        this.options.set(options.filter(option => reservation.room.paymentTypes?.includes(option.type)));
         this.setAppointmentDuration();
       }
     });
@@ -287,7 +296,7 @@ export class ReservationCompleteComponent {
       if (isPaid) {
         this.getForm.type.setValue(undefined);
       } else {
-        this.getForm.type.setValue(PaymentType.mollie);
+        this.getForm.type.setValue('MOLLIE');
       }
     });
   }
@@ -320,11 +329,11 @@ export class ReservationCompleteComponent {
     return;
   }
 
-  displayFnGroup = (group: ITreatmentGroup): string => group ? `${group.name}` : '';
+  displayFnGroup = (group: ITreatmentGroup): string => group ? `${ group.name }` : '';
 
-  displayFnTreatment = (treatment: ITreatment): string => treatment ? `${treatment.name}` : '';
+  displayFnTreatment = (treatment: ITreatment): string => treatment ? `${ treatment.name }` : '';
 
-  displayFnColor = (color?: IColorAll): string => color ? `${color.name}` : '';
+  displayFnColor = (color?: IColorAll): string => color ? `${ color.name }` : '';
 
   keyDownHandler = (event: KeyboardEvent, form: FormControl): void => {
     if (event.code === 'Backspace') {
@@ -363,20 +372,15 @@ export class ReservationCompleteComponent {
   splitChange = () => {
     this.split = !this.split;
     if (!this.split) {
-      this.isValidSplit = true;
+      this.isValidSplit.set(true);
       return;
     }
 
     const totalSplit = this.currentSplitData?.map(t => t.price).reduce((acc, value) => acc + value, 0) || 0;
-    this.isValidSplit = totalSplit === this.price().toPaid;
+    this.isValidSplit.set(totalSplit === this.price().toPaid);
     if (!this.currentSplitData?.length) {
-      this.isValidSplit = false;
+      this.isValidSplit.set(false);
     }
-  };
-
-  getSelectedPaymentOption = (): IPaymentOption | undefined => {
-    const paymentType = this.getForm.type.value;
-    return this.types.find(option => option.type === paymentType);
   };
 
   private setAppointmentDuration = (): void => {
@@ -402,7 +406,7 @@ export class ReservationCompleteComponent {
     let splitData = this.currentSplitData;
     if (this.balance && this.currentSplitData) {
       splitData = [
-        { description: 'Balance', price: this.balance, paymentType: PaymentType.account },
+        { description: 'Balance', price: this.balance, paymentType: 'ACCOUNT' },
         ...this.currentSplitData,
       ];
     }
@@ -411,7 +415,7 @@ export class ReservationCompleteComponent {
         reservation.id,
         {
           treatmentId: valueChange(this.getForm.treatment.value?.key, reservation?.treatment.key),
-          paymentType: this.getForm.type.value || PaymentType.account,
+          paymentType: splitData ? undefined : this.getForm.type.value,
           additionalIds: this.additionalSelected().map(additional => additional.id),
           transfer: this.getForm.transfer.value,
           color: this.getForm.color.value?.id,
@@ -422,6 +426,7 @@ export class ReservationCompleteComponent {
           pointOfSale: true,
         },
         this.isDashboard(),
+        this.startDate,
       ),
     );
   };

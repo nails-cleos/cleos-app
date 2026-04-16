@@ -37,6 +37,7 @@
       "CLOSED": "Gesloten",
       "STARTED": "<div>Gestart {startText}</div>",
       "ELAPSED": "<div>Verstreken {elapsedText}</div>",
+      "EXPECTED_FINISH": "<div>Verwachte eindtijd {finishTime}</div>",
       "FINISH_IN": "<div>Klaar over {finishText}</div>"
     },
     "META": {

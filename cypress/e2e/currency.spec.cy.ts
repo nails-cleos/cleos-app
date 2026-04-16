@@ -32,7 +32,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.get('tr').contains('No currency');
       cy.get('button[id="add-button"]').click({ force: true });
       cy.url().should('include', '/currency/add');
-      cy.get('mat-card-title').contains('Add currency');
+      cy.get('.app-surface-eyebrow').contains('Add currency');
 
       cy.formControlType('code', code);
       cy.formControlType('name', name);
@@ -68,12 +68,12 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         });
         cy.intercept('PATCH', `**/api/v1/currency/${ currency.id }`).as('updateCurrency');
 
-        cy.buttonClickOnTable(breakpoints, currency.name, 'row', 'detail-row', 'edit',
+        cy.buttonClickOnTable(breakpoints, currency.name, 'app-table-master-row', 'app-table-detail-row', 'edit',
           breakpointToButtons(breakpoints, ['delete']));
         cy.wait('@getCurrency');
 
-        cy.get('mat-card-title').contains('Update currency');
-        cy.get('mat-card-subtitle').contains(currency.code);
+        cy.get('.app-surface-eyebrow').contains('Update currency');
+        cy.get('.app-crud-title').contains(currency.code);
         cy.get('[data-cy="name-input"]').should('have.value', currency.name);
         cy.get('[data-cy="code-input"]').should('have.value', currency.code);
         cy.get('#select-icon').contains(currency.icon);

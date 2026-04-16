@@ -345,6 +345,7 @@
           "CUSTOMER": "Cliente",
           "PROFESSIONAL": "Profesional",
           "START": "Inicio",
+          "END": "Fin",
           "STATE": "Estado",
           "TREATMENT": "Tratamiento"
         },

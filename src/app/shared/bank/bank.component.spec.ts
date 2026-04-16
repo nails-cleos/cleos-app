@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BankComponent, BankForm } from './bank.component';
 import { FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { IPaymentOption, PaymentPercentage, PaymentType } from '../../interfaces/payment';
+import { IPaymentOption, PaymentPercentage } from '../../interfaces/payment';
 import { TranslateModule } from '@ngx-translate/core';
 
 describe('BankComponent', () => {
@@ -9,17 +9,28 @@ describe('BankComponent', () => {
   let fixture: ComponentFixture<BankComponent>;
 
   const paymentTypeWithPercentage: IPaymentOption = {
-    svgIcon: '',
-    type: PaymentType.ideal,
-    name: 'Card',
+    type: 'MOLLIE',
+    label: 'Card',
+    enabled: true,
+    enabledCustomer: true,
+    default: false,
+    filter: true,
+    defaultFilter: false,
+    show: true,
     hidePercentage: false,
   };
 
   const paymentTypeWithoutPercentage: IPaymentOption = {
-    svgIcon: '',
-    type: PaymentType.ideal,
-    name: 'Cash',
+    type: 'CASH',
+    label: 'Cash',
+    enabled: true,
+    enabledCustomer: true,
+    default: false,
+    filter: true,
+    defaultFilter: false,
+    show: true,
     hidePercentage: true,
+    icon: 'cash',
   };
 
   let form: FormGroup<BankForm>;
@@ -35,7 +46,7 @@ describe('BankComponent', () => {
     const formBuilder = TestBed.inject(NonNullableFormBuilder);
 
     form = formBuilder.group<BankForm>({
-      type: formBuilder.control(undefined),
+      option: formBuilder.control(undefined),
       percentage: formBuilder.control(PaymentPercentage.total),
     });
 
@@ -51,13 +62,13 @@ describe('BankComponent', () => {
   });
 
   it('should hide percentage when type.hidePercentage is true', () => {
-    form.controls.type.setValue(paymentTypeWithoutPercentage);
+    form.controls.option.setValue(paymentTypeWithoutPercentage);
 
     expect(form.controls.percentage.validator).toBeNull();
   });
 
   it('should require percentage when hidePercentage is false', () => {
-    form.controls.type.setValue(paymentTypeWithPercentage);
+    form.controls.option.setValue(paymentTypeWithPercentage);
     fixture.detectChanges();
 
     expect(form.controls.percentage.hasValidator(Validators.required)).toBeTrue();
@@ -80,7 +91,7 @@ describe('BankComponent', () => {
     fixture.detectChanges();
 
     expect(form.controls.percentage.value).toBe(PaymentPercentage.total);
-    expect(form.controls.type.hasValidator(Validators.required)).toBeTrue();
+    expect(form.controls.option.hasValidator(Validators.required)).toBeTrue();
   });
 
   it('should auto-select type if firstTime and only one option', () => {
@@ -89,6 +100,6 @@ describe('BankComponent', () => {
 
     fixture.detectChanges();
 
-    expect(form.controls.type.value).toEqual(paymentTypeWithPercentage);
+    expect(form.controls.option.value).toEqual(paymentTypeWithPercentage);
   });
 });

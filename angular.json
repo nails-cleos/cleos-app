@@ -241,7 +241,13 @@
             ],
             "scripts": [
               "node_modules/cookieconsent/build/cookieconsent.min.js"
-            ]
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src",
+                "node_modules"
+              ]
+            }
           }
         },
         "lint": {

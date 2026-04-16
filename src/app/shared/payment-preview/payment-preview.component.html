@@ -1,14 +1,14 @@
 <mat-divider></mat-divider>
 <div mat-subheader>{{ 'ME.PAYMENT.DETAIL' | translate }}</div>
-@if (type(); as type) {
+@if (option(); as option) {
   <mat-list-item>
-    @if (type.icon) {
-      <mat-icon matListItemIcon>{{ type.icon }}</mat-icon>
+    @if (option.icon) {
+      <mat-icon matListItemIcon>{{ option.icon }}</mat-icon>
     } @else {
-      <mat-icon matListItemIcon [svgIcon]="type.svgIcon"></mat-icon>
+      <mat-icon matListItemIcon [svgIcon]="option.type"></mat-icon>
     }
     <div matListItemTitle>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</div>
-    <div matListItemLine>{{ type.name }}</div>
+    <div matListItemLine>{{ option.label }}</div>
   </mat-list-item>
   @if (price()) {
     <app-price-preview [price]="price()" [currencyIcon]="currencyIcon()" [isEditing]="isEditing()"

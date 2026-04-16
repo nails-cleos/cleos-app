@@ -105,6 +105,12 @@
       "ERROR_TEXT": "Payment error",
       "ERROR": "Payment incomplete.\n{{reason}}",
       "DETAIL": "Payment detail",
+      "FLOW": {
+        "STEPS": {
+          "OPTION": "Choose the payment method and installment option for this reservation.",
+          "PREVIEW": "Review the cost breakdown and payment detail before continuing."
+        }
+      },
       "RESERVATION": "Reservation {{reservationId}}",
       "LIST": {
         "ERROR": {

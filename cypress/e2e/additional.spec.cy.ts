@@ -35,7 +35,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.url().should('include', '/additional/add');
 
       cy.wait('@getTreatments');
-      cy.get('mat-card-title').contains('Add additional');
+      cy.get('.app-surface-eyebrow').contains('Add additional');
 
       cy.formControlType('name', additionalName);
       cy.formControlType('description', `${additionalName} Description`, 'textarea');
@@ -77,13 +77,13 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           });
           cy.intercept('PATCH', `**/api/v1/additional/${additional.id}`).as('updateAdditional');
 
-          cy.buttonClickOnTable(breakpoints, additional.name, 'row', 'detail-row', 'edit',
+          cy.buttonClickOnTable(breakpoints, additional.name, 'app-table-master-row', 'app-table-detail-row', 'edit',
             breakpointToButtons(breakpoints, ['delete']));
           cy.wait('@getAdditional');
           cy.wait('@getTreatments');
 
-          cy.get('mat-card-title').contains('Update additional');
-          cy.get('mat-card-subtitle').contains(additional.name);
+          cy.get('.app-surface-eyebrow').contains('Update additional');
+          cy.get('.app-crud-title').contains(additional.name);
           cy.get('[data-cy="name-input"]').should('have.value', additional.name);
           cy.get('[data-cy="description-textarea"]').should('have.value', additional.description);
           cy.get('[data-cy="duration-input"]').should('have.value', additional.duration.slice(0, 5));

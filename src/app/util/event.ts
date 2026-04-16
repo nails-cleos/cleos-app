@@ -41,6 +41,7 @@ export class Meta implements IMeta {
   total?: number;
   id?: string;
   customer?: string;
+  professionalName?: string;
   isReservation?: boolean;
   treatmentName?: string;
   additionalNames?: string[];

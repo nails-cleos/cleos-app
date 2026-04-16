@@ -37,6 +37,7 @@
       "CLOSED": "Cerrado",
       "STARTED": "<div>Iniciado {startText}</div>",
       "ELAPSED": "<div>Transcurrido {elapsedText}</div>",
+      "EXPECTED_FINISH": "<div>Finalización esperada {finishTime}</div>",
       "FINISH_IN": "<div>Finaliza en {finishText}</div>"
     },
     "META": {

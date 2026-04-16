@@ -9,15 +9,18 @@ import {
 } from '@angular/forms';
 import { IExtras } from '../../interfaces/reservation';
 import { ICurrencyAll } from '../../interfaces/currency';
-import { IPaymentOption, PaymentType } from '../../interfaces/payment';
+import { IPaymentOption } from '../../interfaces/payment';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CurrencyPipe } from '@angular/common';
+import { PaymentOptionSelectComponent } from '../payment-option-select/payment-option-select.component';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { startWith } from 'rxjs/operators';
 
 export type ExtraForm = {
   description: FormControl<string>;
   price: FormControl<number>;
-  paymentType?: FormControl<PaymentType | undefined>;
+  paymentOption?: FormControl<string | undefined>;
 };
 
 type FormFieldsForm = {
@@ -28,13 +31,13 @@ type FormFieldsForm = {
   selector: 'app-form-field-adder',
   templateUrl: './form-field-adder.component.html',
   styleUrl: './form-field-adder.component.scss',
-  imports: [AppMaterialModule, TranslatePipe, ReactiveFormsModule, CurrencyPipe],
+  imports: [AppMaterialModule, TranslatePipe, ReactiveFormsModule, CurrencyPipe, PaymentOptionSelectComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormFieldAdderComponent {
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  allPaymentTypes = input.required<IPaymentOption[]>();
+  allPaymentOptions = input.required<IPaymentOption[]>();
   key = input.required<string>();
   currency = input.required<ICurrencyAll>();
   split = input<boolean>(false);
@@ -46,6 +49,15 @@ export class FormFieldAdderComponent {
   form: FormGroup<FormFieldsForm> = this.formBuilder.group<FormFieldsForm>({
     items: this.formBuilder.array<FormGroup<ExtraForm>>([]),
   });
+
+  private readonly formValueSignal = toSignal(
+    this.form.valueChanges.pipe(startWith(this.form.getRawValue())),
+    { initialValue: this.form.getRawValue() },
+  );
+  private readonly formStatusSignal = toSignal(
+    this.form.statusChanges.pipe(startWith(this.form.status)),
+    { initialValue: this.form.status },
+  );
 
   extras = signal<IExtras[]>([]);
   total = computed(() => this.extras().reduce((acc, item) => acc + item.price, 0));
@@ -61,14 +73,17 @@ export class FormFieldAdderComponent {
 
   constructor() {
     effect(() => {
+      this.formValueSignal();
+      this.formStatusSignal();
+
       const extras = this.extras();
       this.formArray.controls.forEach((group, index) => {
         const row = extras[index];
         if (row) {
           row.description = group.controls.description.value;
           row.price = group.controls.price.value;
-          if (this.split() && group.controls.paymentType) {
-            row.paymentType = group.controls.paymentType.value;
+          if (this.split() && group.controls.paymentOption) {
+            row.paymentType = group.controls.paymentOption.value;
           }
         }
       });
@@ -105,13 +120,8 @@ export class FormFieldAdderComponent {
 
   getFormGroupControls = (index: number): ExtraForm => this.getFormGroup(index).controls;
 
-  getPaymentTypeControl = (index: number): FormControl<PaymentType | undefined> => this.getFormGroupControls(
-    index).paymentType!;
-
-  getSelectedPaymentOption = (index: number): IPaymentOption | undefined => {
-    const paymentType = this.getFormGroupControls(index).paymentType?.value;
-    return this.allPaymentTypes().find(option => option.type === paymentType);
-  };
+  getPaymentOptionControl = (index: number): FormControl<string | undefined> => this.getFormGroupControls(
+    index).paymentOption!;
 
   private createItemFormGroup = (): FormGroup<ExtraForm> => {
     return this.formBuilder.group<ExtraForm>({
@@ -121,7 +131,7 @@ export class FormFieldAdderComponent {
       price: this.formBuilder.control(0, {
         validators: [Validators.required],
       }),
-      ...(this.split() ? { paymentType: this.formBuilder.control(undefined, Validators.required) } : {}),
+      ...(this.split() ? { paymentOption: this.formBuilder.control(undefined, Validators.required) } : {}),
     });
   };
 
@@ -132,7 +142,7 @@ export class FormFieldAdderComponent {
       copy[index] = {
         description: group.description.value,
         price: group.price.value,
-        ...(this.split() ? { paymentType: group.paymentType?.value } : {}),
+        ...(this.split() ? { paymentType: group.paymentOption?.value } : {}),
       };
       return copy;
     });

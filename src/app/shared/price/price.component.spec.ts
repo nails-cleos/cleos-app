@@ -18,7 +18,7 @@ describe('PriceComponent', () => {
   };
 
   const typeForm = new FormGroup<BankForm>({
-    type: new FormControl(undefined as any),
+    option: new FormControl(undefined as any),
     percentage: new FormControl(undefined as any),
   });
 

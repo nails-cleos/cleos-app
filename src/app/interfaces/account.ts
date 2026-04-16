@@ -1,6 +1,6 @@
 import { IUser, IUserAll } from './user';
 import { ICurrency, ICurrencyAll } from './currency';
-import { IPayment, PaymentType } from './payment';
+import { IPayment } from './payment';
 import { Pagination } from './pagination';
 
 export interface IAccount {
@@ -24,7 +24,7 @@ export interface IAccountAll {
 }
 
 export interface IPaymentRequest {
-  type?: PaymentType;
+  type?: string;
   bic?: string;
   ipAddress?: string;
   paymentOptionId?: number | string;

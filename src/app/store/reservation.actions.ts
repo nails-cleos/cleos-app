@@ -284,10 +284,11 @@ export const updateReservationById = createAction(
 
 export const approveReservation = createAction(
   ReservationActionTypes.approveReservation,
-  (id: string, extras?: any, isDashboard?: boolean) => ({
+  (id: string, extras?: any, isDashboard?: boolean, dashboardDate?: Date) => ({
     id,
     extras,
     isDashboard,
+    dashboardDate,
     event: 'approve' as const,
     key: 'APPROVE' as const,
     state: States.approved,
@@ -296,10 +297,11 @@ export const approveReservation = createAction(
 
 export const startReservation = createAction(
   ReservationActionTypes.startReservation,
-  (id: string, extras?: any, isDashboard?: boolean) => ({
+  (id: string, extras?: any, isDashboard?: boolean, dashboardDate?: Date) => ({
     id,
     extras,
     isDashboard,
+    dashboardDate,
     event: 'start' as const,
     key: 'START' as const,
     state: States.started,
@@ -308,10 +310,11 @@ export const startReservation = createAction(
 
 export const completeReservation = createAction(
   ReservationActionTypes.completeReservation,
-  (id: string, extras?: any, isDashboard?: boolean) => ({
+  (id: string, extras?: any, isDashboard?: boolean, dashboardDate?: Date) => ({
     id,
     extras,
     isDashboard,
+    dashboardDate,
     event: 'complete' as const,
     key: 'COMPLETE' as const,
     state: States.completed,
@@ -320,10 +323,11 @@ export const completeReservation = createAction(
 
 export const cancelReservation = createAction(
   ReservationActionTypes.cancelReservation,
-  (id: string, extras?: any, isDashboard?: boolean) => ({
+  (id: string, extras?: any, isDashboard?: boolean, dashboardDate?: Date) => ({
     id,
     extras,
     isDashboard,
+    dashboardDate,
     event: 'cancel' as const,
     key: 'CANCEL' as const,
     state: States.cancelled,
@@ -332,10 +336,11 @@ export const cancelReservation = createAction(
 
 export const customerCancelReservation = createAction(
   ReservationActionTypes.customerCancelReservation,
-  (id: string, extras?: any, isDashboard?: boolean) => ({
+  (id: string, extras?: any, isDashboard?: boolean, dashboardDate?: Date) => ({
     id,
     extras,
     isDashboard,
+    dashboardDate,
     event: 'cancel/customer' as const,
     key: 'CANCEL' as const,
     state: States.cancelled,
@@ -344,10 +349,11 @@ export const customerCancelReservation = createAction(
 
 export const paymentCompleteReservation = createAction(
   ReservationActionTypes.paymentCompleteReservation,
-  (id: string, extras?: any, isDashboard?: boolean) => ({
+  (id: string, extras?: any, isDashboard?: boolean, dashboardDate?: Date) => ({
     id,
     extras,
     isDashboard,
+    dashboardDate,
     event: 'payment/complete' as const,
     key: 'COMPLETE' as const,
     state: States.completed,
@@ -366,7 +372,14 @@ export const updateReservationColor = createAction(
 
 export const stateSuccess = createAction(
   ReservationActionTypes.stateSuccess,
-  props<{ message: string; id: string; paymentLink?: string; isDashboard?: boolean; state?: States }>(),
+  props<{
+    message: string;
+    id: string;
+    paymentLink?: string;
+    isDashboard?: boolean;
+    state?: States;
+    dashboardDate?: Date
+  }>(),
 );
 
 export const getTrackingByReservationId = createAction(

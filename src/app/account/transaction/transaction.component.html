@@ -1,69 +1,64 @@
-<div class="flex-container">
-  <div class="card-container">
-    <div class="card-content">
-      @let account = accountSignal();
-      <app-balance [account]="account" [showView]="true" [showUser]="hasAdminRole()"
-                   [language]="language"></app-balance>
-      <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
-        @if (account) {
-          <mat-card appearance="outlined">
-            <mat-card-header>
-              <mat-card-title>{{ 'ACCOUNT.TRANSACTION.TITLE' | translate }}</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <div class="inner-container">
+@let account = accountSignal();
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <app-balance [account]="account" [showView]="true" [showUser]="hasAdminRole()" [language]="language"></app-balance>
+
+  <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+    @if (account) {
+      <section class="app-surface-section">
+        <div class="app-detail-section-header">
+          <div>
+            <span class="app-surface-eyebrow">{{ 'ACCOUNT.TRANSACTION.TITLE' | translate }}</span>
+          </div>
+        </div>
+
+        <div class="app-crud-form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'ACCOUNT.TRANSACTION.AMOUNT.FIELD' | translate }}</mat-label>
+            <mat-icon matPrefix>{{ currencyIcon }}</mat-icon>
+            <input [formControl]="getForm.amount" matInput matNativeControl required [type]="'number'" [step]="1"
+                   [min]="amountMin">
+            @if (getForm.amount.hasError('required')) {
+              <mat-error [innerHTML]="'ACCOUNT.TRANSACTION.AMOUNT.REQUIRED' | translate"></mat-error>
+            } @else if (getForm.amount.hasError('min')) {
+              <mat-error
+                [innerHTML]="'ACCOUNT.TRANSACTION.AMOUNT.MIN' | translate:{min: amountMin, currency: currencyIcon}">
+              </mat-error>
+            } @else if (errors()['amount']) {
+              <mat-error>{{ errors()['amount'] }}</mat-error>
+            }
+          </mat-form-field>
+
+          @if (!hasAdminRole()) {
+            <div class="app-surface-item app-crud-loading">
+              <span class="app-surface-item__label">{{ 'COMMON.PAYMENT.FIELD' | translate }}</span>
+              <app-bank [firstTime]="true" [form]="bankForm" [options]="optionsSignal()"></app-bank>
+            </div>
+          } @else {
+            <div class="app-crud-form-grid">
+
+              <app-payment-option-select [control]="getBankForm.option" [options]="optionsSignal()" [required]="false"></app-payment-option-select>
+
+              @if (getBankForm.option.value?.type === 'TRANSFER') {
                 <mat-form-field appearance="outline">
-                  <mat-label>{{ 'ACCOUNT.TRANSACTION.AMOUNT.FIELD' | translate }}</mat-label>
-                  <mat-icon matPrefix>{{ currencyIcon }}</mat-icon>
-                  <input [formControl]="getForm.amount" matInput matNativeControl required [type]="'number'" [step]="1"
-                         [min]="amountMin">
-                  @if (getForm.amount.hasError('required')) {
-                    <mat-error [innerHTML]="'ACCOUNT.TRANSACTION.AMOUNT.REQUIRED' | translate"></mat-error>
-                  } @else if (getForm.amount.hasError('min')) {
-                    <mat-error
-                      [innerHTML]="'ACCOUNT.TRANSACTION.AMOUNT.MIN' | translate:{min: amountMin, currency: currencyIcon}">
-                    </mat-error>
-                  } @else if (errors()['amount']) {
-                    <mat-error>{{ errors()['amount'] }}</mat-error>
-                  }
+                  <mat-label>{{ 'ACCOUNT.TRANSACTION.TRANSFER' | translate }}</mat-label>
+                  <input [formControl]="getForm.transfer" matInput>
                 </mat-form-field>
-                @if (!hasAdminRole()) {
-                  <app-bank [firstTime]="true" [form]="bankForm" [options]="optionsSignal()"></app-bank>
-                } @else {
-                  <mat-form-field appearance="outline">
-                    <mat-label>{{ 'ACCOUNT.TRANSACTION.TYPE.FIELD' | translate }}</mat-label>
-                    <mat-select [formControl]="getBankForm.type" [required]="true">
-                      @for (t of types; track t) {
-                        <mat-option [value]="t">{{ 'COMMON.PAYMENT.TYPE.' + (t.type || 'NONE') | translate }}</mat-option>
-                      }
-                    </mat-select>
-                    @if (getBankForm.type.hasError('required')) {
-                      <mat-error [innerHTML]="'ACCOUNT.TRANSACTION.TYPE.REQUIRED' | translate"></mat-error>
-                    } @else if (errors()['type']) {
-                      <mat-error>{{ errors()['type'] }}</mat-error>
-                    }
-                  </mat-form-field>
-                  @if (getBankForm.type.value?.type === transfer) {
-                    <mat-form-field appearance="outline">
-                      <mat-label>{{ 'ACCOUNT.TRANSACTION.TRANSFER' | translate }}</mat-label>
-                      <input [formControl]="getForm.transfer" matInput>
-                    </mat-form-field>
-                  }
-                }
-              </div>
-            </mat-card-content>
-            <mat-card-actions class="card-actions">
-              <div class="spacer"></div>
-              <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
-                {{ 'COMMON.BUTTON.BACK' | translate }}
-              </button>
-              <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
-                {{ 'COMMON.BUTTON.ADD' | translate }}
-              </button>
-            </mat-card-actions>
-          </mat-card>
-        }
-      </form>
-    </div>
-  </div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="app-detail-actions">
+          <button [form]="form" appBackButton mat-stroked-button type="button">
+            <mat-icon>keyboard_return</mat-icon>
+            <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+          </button>
+          <button [disabled]="form.invalid" mat-stroked-button type="submit">
+            <mat-icon>add</mat-icon>
+            <span>{{ 'COMMON.BUTTON.ADD' | translate }}</span>
+          </button>
+        </div>
+      </section>
+    }
+  </form>
 </div>

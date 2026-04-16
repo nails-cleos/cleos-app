@@ -57,7 +57,7 @@ export class ColorListComponent {
   resultsLengthSignal = computed(() => this.colorListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'name', 'description', 'actions'];
+  displayedColumns: string[] = ['position', 'name', 'description', 'actions', 'add'];
 
   expandedColor?: IColor;
 

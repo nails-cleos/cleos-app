@@ -30,7 +30,7 @@ describe('TotalSummaryItemComponent', () => {
     expect(component).toBeTruthy();
 
     const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.currency').textContent).toContain('$1,000.00');
+    expect(compiled.querySelector('.total-summary-item__value').textContent).toContain('$1,000.00');
     expect(component.label()).toBe('Gross');
     expect(component.value()).toBe(1000);
     expect(component.isResult()).toBeFalse();
@@ -42,7 +42,7 @@ describe('TotalSummaryItemComponent', () => {
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.result')).toBeTruthy();
+    expect(compiled.querySelector('.total-summary-item--result')).toBeTruthy();
     expect(component.isResult()).toBeTrue();
   });
 
@@ -51,7 +51,7 @@ describe('TotalSummaryItemComponent', () => {
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.currency').textContent).toContain('€1,000.00');
+    expect(compiled.querySelector('.total-summary-item__value').textContent).toContain('€1,000.00');
     expect(component.currencyCode()).toBe('EUR');
   });
 });

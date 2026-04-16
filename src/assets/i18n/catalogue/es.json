@@ -10,6 +10,7 @@
     "DESCRIPTION": {
       "FIELD": "Descripción"
     },
+    "DISPLAY_OPTIONS": "Opciones de visualización",
     "SHOW": {
       "HOME": "Mostar en principal",
       "CATALOG": "Mostrar en catálogo"

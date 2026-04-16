@@ -1,5 +1,28 @@
-.mat-toolbar {
-  justify-content: center;
+.year-summary-toolbar {
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) minmax(220px, 1fr) auto;
+  gap: 18px;
+  align-items: start;
+}
+
+.year-summary-room {
+  min-width: 220px;
+}
+
+.year-summary-actions,
+.year-summary-export {
+  margin-top: 0;
+}
+
+.year-summary-actions {
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  justify-self: end;
+}
+
+.year-summary-empty {
+  text-align: center;
 }
 
 .spinner:before {
@@ -16,4 +39,10 @@
   border: 2px solid #fff;
   border-top-color: #000;
   animation: spinner .8s linear infinite;
+}
+
+@media (max-width: 900px) {
+  .year-summary-toolbar {
+    grid-template-columns: 1fr;
+  }
 }

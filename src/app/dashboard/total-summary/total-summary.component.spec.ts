@@ -69,57 +69,50 @@ describe('TotalSummaryComponent', () => {
     });
 
     it('should render mat-card with outlined appearance', () => {
-      const matCard = fixture.debugElement.query(By.css('mat-card[appearance="outlined"]'));
-      expect(matCard).toBeTruthy();
+      const stack = fixture.debugElement.query(By.css('.app-crud-view-grid'));
+      expect(stack).toBeTruthy();
     });
 
-    it('should render three result summary components in main section', () => {
-      const resultSummaries = fixture.debugElement.queryAll(By.css('mat-card-content app-result-summary'));
-      expect(resultSummaries.length).toBe(3);
+    it('should render three rows in main section', () => {
+      const rows = fixture.debugElement.queryAll(By.css('.app-surface-item:first-child .total-summary-row'));
+      expect(rows.length).toBe(3);
     });
 
     it('should not render cash section when showCash is false', () => {
       fixture.componentRef.setInput('showCash', false);
       fixture.detectChanges();
 
-      const matCardFooter = fixture.debugElement.query(By.css('mat-card-footer'));
-      expect(matCardFooter).toBeFalsy();
+      const operations = fixture.debugElement.queryAll(By.css('.app-surface-item'));
+      expect(operations.length).toBe(1);
     });
 
     it('should render cash section when showCash is true', () => {
       fixture.componentRef.setInput('showCash', true);
       fixture.detectChanges();
 
-      const matCardFooter = fixture.debugElement.query(By.css('mat-card-footer'));
-      expect(matCardFooter).toBeTruthy();
+      const operations = fixture.debugElement.queryAll(By.css('.app-surface-item'));
+      expect(operations.length).toBe(2);
 
-      const matDivider = fixture.debugElement.query(By.css('mat-divider.top'));
-      expect(matDivider).toBeTruthy();
-
-      const cashResultSummaries = fixture.debugElement.queryAll(By.css('mat-card-footer app-result-summary'));
-      expect(cashResultSummaries.length).toBe(2);
+      const cashRows = fixture.debugElement.queryAll(By.css('.app-surface-item:nth-child(2) .total-summary-row'));
+      expect(cashRows.length).toBe(3);
     });
 
-    it('should apply correct CSS classes when showCash is false', () => {
+    it('should render only the primary operation when showCash is false', () => {
       fixture.componentRef.setInput('showCash', false);
       fixture.detectChanges();
 
-      const contentDivs = fixture.debugElement.queryAll(By.css('.bottom'));
-      expect(contentDivs[0].nativeElement.classList.contains('year-cash-content')).toBeFalse();
-      expect(contentDivs[0].nativeElement.classList.contains('year-content')).toBeTrue();
-      expect(contentDivs[1].nativeElement.classList.contains('year-cash-content')).toBeFalse();
-      expect(contentDivs[1].nativeElement.classList.contains('year-content')).toBeTrue();
+      const operations = fixture.debugElement.queryAll(By.css('.app-surface-item'));
+      expect(operations.length).toBe(1);
+      expect(operations[0].nativeElement.textContent).toContain('SUMMARY.INCOME');
     });
 
-    it('should apply correct CSS classes when showCash is true', () => {
+    it('should render the cash operation when showCash is true', () => {
       fixture.componentRef.setInput('showCash', true);
       fixture.detectChanges();
 
-      const contentDivs = fixture.debugElement.queryAll(By.css('.bottom'));
-      expect(contentDivs[0].nativeElement.classList.contains('year-cash-content')).toBeTrue();
-      expect(contentDivs[0].nativeElement.classList.contains('year-content')).toBeFalse();
-      expect(contentDivs[1].nativeElement.classList.contains('year-cash-content')).toBeTrue();
-      expect(contentDivs[1].nativeElement.classList.contains('year-content')).toBeFalse();
+      const operations = fixture.debugElement.queryAll(By.css('.app-surface-item'));
+      expect(operations.length).toBe(2);
+      expect(operations[1].nativeElement.textContent).toContain('SUMMARY.CASH');
     });
   });
 
@@ -128,14 +121,14 @@ describe('TotalSummaryComponent', () => {
       fixture.componentRef.setInput('showCash', false);
       fixture.detectChanges();
 
-      let matCardFooter = fixture.debugElement.query(By.css('mat-card-footer'));
-      expect(matCardFooter).toBeFalsy();
+      let operations = fixture.debugElement.queryAll(By.css('.app-surface-item'));
+      expect(operations.length).toBe(1);
 
       fixture.componentRef.setInput('showCash', true);
       fixture.detectChanges();
 
-      matCardFooter = fixture.debugElement.query(By.css('mat-card-footer'));
-      expect(matCardFooter).toBeTruthy();
+      operations = fixture.debugElement.queryAll(By.css('.app-surface-item'));
+      expect(operations.length).toBe(2);
     });
 
     it('should work without currency input', () => {
@@ -149,8 +142,8 @@ describe('TotalSummaryComponent', () => {
     it('should render with required summaryTotals input', () => {
       fixture.detectChanges();
 
-      const matCard = fixture.debugElement.query(By.css('mat-card'));
-      expect(matCard).toBeTruthy();
+      const stack = fixture.debugElement.query(By.css('.app-crud-view-grid'));
+      expect(stack).toBeTruthy();
     });
   });
 });

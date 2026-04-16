@@ -1,4 +1,8 @@
-<div mat-subheader class="header">{{ 'SUMMARY.' + title() | translate }}</div>
+<div class="app-detail-section-header result-summary-header">
+  <div>
+    <span class="app-surface-eyebrow">{{ 'SUMMARY.' + title() | translate }}</span>
+  </div>
+</div>
 @let currentCurrency = currency();
 <app-total-summary-item
   [label]="'SUMMARY.MONTHLY.TABLE.GROSS' | translate"

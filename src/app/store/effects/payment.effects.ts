@@ -5,6 +5,8 @@ import { map, switchMap, tap } from 'rxjs/operators';
 import {
   adjustPayments,
   createPaymentLinkByReservationId,
+  getOptions,
+  getOptionsSuccess,
   getPayment,
   getPaymentByResourceId,
   notifyPayment,
@@ -20,7 +22,7 @@ import {
 import { TranslateService } from '@ngx-translate/core';
 import { PaymentService } from '../../services/payment.service';
 import { Router } from '@angular/router';
-import { IPay, IPayment } from '../../interfaces/payment';
+import { IPay, IPayment, IPaymentOption } from '../../interfaces/payment';
 import { IApiResponse, successResponse } from '../../interfaces/common';
 import { effectRequest } from '../../util/rxjs';
 
@@ -35,6 +37,15 @@ export class PaymentEffects {
     ofType(getPayment),
     switchMap(({ id }) => effectRequest(
       this.paymentService.getPayment(id).pipe(map((selected?: IPayment) => paymentSelected({ selected }))),
+      action => action,
+      paymentFailure,
+    )),
+  ));
+
+  getOptions$ = createEffect(() => this.actions.pipe(
+    ofType(getOptions),
+    switchMap(() => effectRequest(
+      this.paymentService.getPaymentOptions().pipe(map((options: IPaymentOption[]) => getOptionsSuccess({ options }))),
       action => action,
       paymentFailure,
     )),

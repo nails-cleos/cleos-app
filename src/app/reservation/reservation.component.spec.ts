@@ -12,7 +12,7 @@ import { IUserAll } from '../interfaces/user';
 import { IRoomAll, ServiceType } from '../interfaces/room';
 import { IOfficeAll } from '../interfaces/office';
 import { IAdditionalAll } from '../interfaces/additional';
-import { PaymentType } from '../interfaces/payment';
+import { IPaymentOption } from '../interfaces/payment';
 import { IGroupService, ITreatment, ITreatmentAll, Price } from '../interfaces/treatment';
 import { DiscountType, IUserDiscount } from '../interfaces/discount';
 import { DataEvent } from '../util/event';
@@ -27,6 +27,7 @@ import { signal } from '@angular/core';
 describe('ReservationComponent', () => {
   let component: ReservationComponent;
   let fixture: ComponentFixture<ReservationComponent>;
+  const cashPaymentOption = { type: 'CASH' } as IPaymentOption;
 
   let matches$: BehaviorSubject<any>;
   let navigationParams$: BehaviorSubject<any>;
@@ -39,6 +40,7 @@ describe('ReservationComponent', () => {
   let selectedReservation$: BehaviorSubject<any>;
   let calendar$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
+  let paymentOptions$: BehaviorSubject<any>;
 
   let storeSpy: jasmine.SpyObj<Store>;
   let routerSpy: jasmine.SpyObj<Router>;
@@ -91,7 +93,7 @@ describe('ReservationComponent', () => {
       { day: 'TUESDAY', start: '09:00', end: '17:00' },
     ],
     primary: true,
-    paymentTypes: [PaymentType.cash],
+    paymentTypes: ['CASH'],
   };
 
   const mockTreatment: ITreatmentAll = {
@@ -116,7 +118,14 @@ describe('ReservationComponent', () => {
       discountCustomer: undefined,
     },
     additional: [
-      { id: 'additional-1', key: 'additional-1', name: 'Removal', price: 5, duration: '15M', type: ServiceType.additional },
+      {
+        id: 'additional-1',
+        key: 'additional-1',
+        name: 'Removal',
+        price: 5,
+        duration: '15M',
+        type: ServiceType.additional,
+      },
     ],
     note: 'Important note',
     configurationCanCustomerChange: true,
@@ -136,6 +145,19 @@ describe('ReservationComponent', () => {
     selectedReservation$ = new BehaviorSubject(undefined);
     calendar$ = new BehaviorSubject(undefined);
     subErrors$ = new BehaviorSubject(undefined);
+    paymentOptions$ = new BehaviorSubject([
+      {
+        type: 'CASH',
+        label: 'Cash',
+        enabled: true,
+        enabledProfessional: true,
+        default: true,
+        filter: true,
+        defaultFilter: false,
+        show: true,
+        icon: 'cash',
+      },
+    ]);
     matches$ = new BehaviorSubject(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
@@ -177,6 +199,8 @@ describe('ReservationComponent', () => {
           return calendar$.asObservable();
         case 10:
           return subErrors$.asObservable();
+        case 11:
+          return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -476,7 +500,7 @@ describe('ReservationComponent', () => {
 
     it('should include payment information when amount and type are provided', () => {
       component.getConfigurationForm.amount.setValue(150);
-      component.getConfigurationForm.type.setValue(PaymentType.cash);
+      component.getConfigurationForm.option.setValue(cashPaymentOption);
       component.getConfigurationForm.transfer.setValue('REF123');
       component.create();
       expect(storeSpy.dispatch).toHaveBeenCalled();
@@ -678,8 +702,7 @@ describe('ReservationComponent', () => {
 
     it('should map sub errors to form controls through the shared service', () => {
       spyOn(document, 'querySelector').and.returnValue(null);
-      subErrors$.next([{ field: 'room', message: 'Room is invalid' }] as any);
-      fixture.detectChanges();
+      component['applySubErrors']([{ field: 'room', message: 'Room is invalid' }] as any);
 
       expect(component.errors().room).toBe('Room is invalid');
       expect(component.getOfficeForm.room.hasError('incorrect')).toBeTrue();
@@ -997,8 +1020,8 @@ describe('ReservationComponent', () => {
     });
 
     it('should set payment type', () => {
-      component.getConfigurationForm.type.setValue(PaymentType.cash);
-      expect(component.getConfigurationForm.type.value).toBe(PaymentType.cash);
+      component.getConfigurationForm.option.setValue(cashPaymentOption);
+      expect(component.getConfigurationForm.option.value).toBe(cashPaymentOption);
     });
 
     it('should set transfer reference', () => {
@@ -1279,6 +1302,182 @@ describe('ReservationComponent', () => {
       const event = component['createNewEvent'](new Date(), new Date(), 'CREATED', mockRoom.timeZone, 'event-1');
 
       expect(event).toBeUndefined();
+    });
+  });
+
+  describe('Form Getters', () => {
+    it('should return customer form controls', () => {
+      expect(component.getCustomerForm).toBe(component['getForm'].customerForm.controls);
+    });
+
+    it('should return office form controls', () => {
+      expect(component.getOfficeForm).toBe(component['getForm'].officeForm.controls);
+    });
+
+    it('should return treatment form controls', () => {
+      expect(component.getTreatmentForm).toBe(component['getForm'].treatmentForm.controls);
+    });
+
+    it('should return event group form controls', () => {
+      expect(component.getEventGroupForm).toBe(component['getForm'].eventGroup.controls);
+    });
+
+    it('should return configuration form controls', () => {
+      expect(component.getConfigurationForm).toBe(component['getForm'].configurationForm.controls);
+    });
+  });
+
+  describe('FormArray Getters', () => {
+    it('should return events FormArray', () => {
+      expect(component.events).toBe(component['getForm'].eventGroup.controls.events);
+    });
+
+    it('should return dateTimeList FormArray', () => {
+      expect(component.dateTimeList).toBe(component['getForm'].treatmentForm.controls.dateTimeList);
+    });
+  });
+
+  describe('treatmentDetail', () => {
+    it('should return treatment name when customerInfo exists', () => {
+      component.customerInfo.set({
+        treatment: { name: 'Massage' },
+      } as any);
+
+      expect(component.treatmentDetail).toBe('Massage');
+    });
+
+    it('should return empty string when customerInfo is undefined', () => {
+      component.customerInfo.set(undefined);
+      expect(component.treatmentDetail).toBe('');
+    });
+  });
+
+  describe('roomDetail', () => {
+    it('should return formatted room detail when room exists', () => {
+      component.getOfficeForm.room.setValue(mockRoom);
+
+      expect(component.roomDetail).toBeTruthy();
+    });
+
+    it('should return empty string when room is undefined', () => {
+      component.getOfficeForm.room.setValue(undefined);
+      expect(component.roomDetail).toBe('');
+    });
+  });
+
+  describe('showTimeZone', () => {
+    it('should return true when timezones are different', () => {
+      component.getOfficeForm.room.setValue({ timeZone: 'UTC' } as any);
+
+      expect(component.showTimeZone).toBeTrue();
+    });
+
+    it('should return false when timezones are same', () => {
+      component.getOfficeForm.room.setValue({ timeZone: 'Europe/Amsterdam' } as any);
+
+      expect(component.showTimeZone).toBeFalse();
+    });
+  });
+
+  describe('summary getters', () => {
+    it('should return form value when present (customer)', () => {
+      const customer = { id: 'c1' } as any;
+      component.getCustomerForm.customer.setValue(customer);
+
+      expect(component.summaryCustomer).toBe(customer);
+    });
+
+    it('should fallback to selected reservation (customer)', () => {
+      component.getCustomerForm.customer.setValue(undefined);
+      const reservation = createEditReservation();
+      selectedReservation$.next({
+        ...reservation,
+        customer: { ...reservation.customer, id: 'c2' },
+      } as any);
+      fixture.detectChanges();
+
+      expect(component.summaryCustomer).toEqual({ ...reservation.customer, id: 'c2' });
+    });
+
+    it('should return room from form or fallback', () => {
+      const room = { id: 'r1' } as any;
+      component.getOfficeForm.room.setValue(room);
+
+      expect(component.summaryRoom).toBe(room);
+    });
+
+    it('should return professional from form or fallback', () => {
+      const prof = { id: 'p1' } as any;
+      component.getOfficeForm.professional.setValue(prof);
+
+      expect(component.summaryProfessional).toBe(prof);
+    });
+
+    it('should return treatment from form or fallback', () => {
+      const treatment = { id: 't1' } as any;
+      component.getTreatmentForm.treatment.setValue(treatment);
+
+      expect(component.summaryTreatment).toBe(treatment);
+    });
+  });
+
+  describe('summaryAdditionals', () => {
+    it('should return selected additionals when available', () => {
+      const additions = [{ id: 'a1' }] as any;
+
+      component.additionalSelected.set(additions);
+
+      expect(component.summaryAdditionals).toBe(additions);
+    });
+
+    it('should fallback to reservation additionals', () => {
+      component.additionalSelected.set([]);
+      const reservation = createEditReservation();
+      selectedReservation$.next(reservation);
+      fixture.detectChanges();
+
+      expect(component.summaryAdditionals).toEqual(reservation.additional);
+    });
+
+    it('should return empty array when nothing exists', () => {
+      component.additionalSelected.set([]);
+      selectedReservation$.next(undefined);
+      fixture.detectChanges();
+
+      expect(component.summaryAdditionals).toEqual([]);
+    });
+  });
+
+  describe('summaryDateTimes', () => {
+    it('should return current selectedDateTimes if present', () => {
+      const dt = [{ date: new Date(), start: '10:00' }];
+      component.dateTimeList.controls.at(0)?.setValue(dt[0]);
+
+      expect(component.summaryDateTimes).toEqual(dt);
+    });
+
+    it('should return empty array if no reservation', () => {
+      selectedReservation$.next(undefined);
+      fixture.detectChanges();
+
+      expect(component.summaryDateTimes).toEqual([]);
+    });
+
+    it('should build date from reservation timestamp when no current dates', () => {
+      const reservation = createEditReservation();
+
+      selectedReservation$.next({
+        ...reservation,
+        timestamp: 1700000000,
+        room: { timeZone: 'Europe/Amsterdam' },
+      });
+      fixture.detectChanges();
+
+      const result = component.summaryDateTimes;
+
+      expect(result.length).toBe(1);
+      expect(result[0].date).toBeTruthy();
+      expect(result[0].start).toBeDefined();
     });
   });
 });

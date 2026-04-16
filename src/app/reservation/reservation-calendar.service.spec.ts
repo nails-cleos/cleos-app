@@ -2,7 +2,6 @@ import { TestBed } from '@angular/core/testing';
 import { TranslateService } from '@ngx-translate/core';
 import { CalendarEvent } from 'angular-calendar';
 import { ReservationCalendarService } from './reservation-calendar.service';
-import { PaymentType } from '../interfaces/payment';
 import { ServiceType } from '../interfaces/room';
 import { FrequencyEnum } from '../util/helper';
 
@@ -13,7 +12,7 @@ describe('ReservationCalendarService', () => {
   const room: any = {
     id: 'room-1',
     timeZone: 'Europe/Amsterdam',
-    paymentTypes: [PaymentType.cash],
+    paymentTypes: ['CASH'],
     primary: true,
     address: { id: 1, name: 'Room', location: { x: 0, y: 0 } },
     office: { id: 'office-1', name: 'Office' },

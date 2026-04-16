@@ -39,7 +39,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.get('button[id="add-button"]').click({ force: true });
       cy.url().should('include', '/treatments/add');
       cy.wait('@getColors');
-      cy.get('mat-card-title').contains('Add treatment');
+      cy.get('.app-surface-eyebrow').contains('Add treatment');
 
       cy.formControlType('name', treatmentGroupName);
       cy.formControlType('description', `${ treatmentGroupName } Description`, 'textarea');
@@ -98,13 +98,13 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         });
         cy.intercept('POST', `**/api/v1/treatments/${ treatment.id }`).as('updateTreatment');
 
-        cy.buttonClickOnTable(breakpoints, treatment.name, 'row', 'detail-row', 'edit',
+        cy.buttonClickOnTable(breakpoints, treatment.name, 'app-table-master-row', 'app-table-detail-row', 'edit',
           breakpointToButtons(breakpoints, ['visibility', 'sort', 'delete']));
         cy.wait('@getColors');
         cy.wait('@getTreatment');
 
-        cy.get('mat-card-title').contains('Update treatments');
-        cy.get('mat-card-subtitle').contains(treatment.name);
+        cy.get('.app-surface-eyebrow').contains('Update treatments');
+        cy.get('.app-crud-title').contains(treatment.name);
         cy.get('[data-cy="name-input"]').should('have.value', treatment.name);
         cy.get('[data-cy="description-textarea"]').should('have.value', treatment.description);
         cy.get('[data-cy="priceFrom-input"]').should('have.value', treatment.priceFrom);

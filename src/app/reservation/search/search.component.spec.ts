@@ -12,7 +12,6 @@ import { SearchComponent } from './search.component';
 import { IUserAll } from '../../interfaces/user';
 import { getNowTimeZone } from '../../util/dates';
 import { ICurrencyAll } from '../../interfaces/currency';
-import { PaymentType } from '../../interfaces/payment';
 import { ServiceType } from '../../interfaces/room';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
@@ -61,7 +60,7 @@ describe('SearchComponent', () => {
       timeZone: 'Europe/Amsterdam',
       currency: mockCurrency,
       professionals: [professional],
-      paymentTypes: [PaymentType.cash, PaymentType.transfer],
+      paymentTypes: ['CASH', 'TRANSFER'],
       availabilities: [],
       address: { name: 'address', location: { x: 1.0, y: 1.0 }, id: 1 },
       office: { id: 'office-1', name: 'Office 1', manager: professional },

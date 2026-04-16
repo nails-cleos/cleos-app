@@ -1,7 +1,17 @@
 <ng-template #stepOne>
   @if (reservation()) {
-    <app-bank [firstTime]="first" [form]="form" [options]="options()"
-              [professionalName]="professionalName()" (percentageEmitter)="getPercentage($event)"></app-bank>
+    <section class="app-surface-section payment-option-step">
+      <div class="step-heading">
+        <div class="step-heading__index">1</div>
+        <div class="app-crud-fields">
+          <span class="step-heading__eyebrow">{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</span>
+          <p>{{ 'ME.PAYMENT.FLOW.STEPS.OPTION' | translate }}</p>
+        </div>
+      </div>
+
+      <app-bank [firstTime]="first" [form]="form" [options]="options()"
+                [professionalName]="professionalName()" (percentageEmitter)="getPercentage($event)"></app-bank>
+    </section>
   } @else {
     <div class="spinner-parent-center">
       <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
@@ -13,113 +23,101 @@
   @let currentReservation = reservation();
   @let currentPrice = price();
   @if (currentReservation && currentPrice) {
-    <mat-card appearance="outlined">
-      <mat-card-header>
-        <mat-card-title>{{ 'ME.RESERVATION.PREVIEW' | translate }}</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <mat-list>
-          <mat-divider></mat-divider>
-          <div mat-subheader>{{ 'COMMON.TREATMENT.FIELD' | translate }}</div>
-          <mat-list-item>
-            <mat-icon matListItemIcon>spa</mat-icon>
-            <div matListItemLine>{{ 'ME.RESERVATION.TREATMENT.NAME.FIELD' | translate }}</div>
-            <div matListItemLine>{{ currentReservation.treatment.name }}</div>
-          </mat-list-item>
-          <mat-list-item>
-            <mat-icon matListItemIcon>timer</mat-icon>
-            <div matListItemLine>{{ 'ME.RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</div>
-            <div matListItemLine>{{ currentReservation.treatment.duration | durationTime }}</div>
-          </mat-list-item>
-          <mat-list-item>
-            <mat-icon matListItemIcon>{{ currentReservation.room.currency.icon }}</mat-icon>
-            <div matListItemLine><span class="bold">{{ 'COMMON.LABEL.TOTAL' | translate }}</span></div>
-            <div matListItemLine><span class="bold">{{ currentPrice.total }}</span></div>
-          </mat-list-item>
-          <app-payment-preview [type]="form.get('type')?.value"
-                               [toPaid]="currentPrice.toPaid" [currencyIcon]="currentReservation.room.currency.icon">
-          </app-payment-preview>
-        </mat-list>
-      </mat-card-content>
-    </mat-card>
+    <section class="support-card support-card--price app-surface-section payment-option-step">
+      <div class="step-heading">
+        <div class="step-heading__index">2</div>
+        <div class="app-crud-fields">
+          <span class="step-heading__eyebrow">{{ 'ME.RESERVATION.PREVIEW' | translate }}</span>
+          <p>{{ 'ME.PAYMENT.FLOW.STEPS.PREVIEW' | translate }}</p>
+        </div>
+      </div>
+
+      <div class="app-detail-section-header">
+        <div>
+          <span class="app-surface-eyebrow">{{ 'ME.RESERVATION.FLOW.SUMMARY.BREAKDOWN' | translate }}</span>
+        </div>
+      </div>
+
+      <div class="price-breakdown price-breakdown--expanded">
+        <div class="price-row">
+          <span>{{ currentReservation.treatment.name }}</span>
+          <strong>{{ currentReservation.room.currency | currencySymbol }} {{ currentPrice.amount | number:'1.2-2' }}</strong>
+        </div>
+
+        @for (additional of currentReservation.additional; track additional.id) {
+          <div class="price-row">
+            <span>{{ additional.name }}</span>
+            <strong>{{ currentReservation.room.currency | currencySymbol }} {{ additional.price | number:'1.2-2' }}</strong>
+          </div>
+        }
+
+        @if (currentPrice.discount > 0) {
+          <div class="price-row price-row--discount">
+            <span>{{ 'ME.RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</span>
+            <strong>- {{ currentReservation.room.currency | currencySymbol }} {{ currentPrice.discount | number:'1.2-2' }}</strong>
+          </div>
+        }
+
+        <div class="price-row price-row--total">
+          <span>{{ 'ME.RESERVATION.FLOW.SUMMARY.TOTAL' | translate }}</span>
+          <strong>{{ currentReservation.room.currency | currencySymbol }} {{ currentPrice.total | number:'1.2-2' }}</strong>
+        </div>
+      </div>
+
+      <div class="app-detail-section-header payment-option-preview-card">
+        <div>
+          <span class="app-surface-eyebrow">{{ 'ME.PAYMENT.DETAIL' | translate }}</span>
+        </div>
+      </div>
+
+      <app-payment-preview [option]="form.get('option')?.value"
+                           [price]="currentPrice"
+                           [currencyIcon]="currentReservation.room.currency.icon"
+                           [toPaid]="currentPrice.toPaid">
+      </app-payment-preview>
+    </section>
   } @else {
     <div class="ssc-line"></div>
   }
 </ng-template>
 
-@if (smallScreen()) {
-  <mat-vertical-stepper #stepper [linear]="true" (selectionChange)="triggerClick($event)">
-    <mat-step [completed]="getStepCompleted(0)" [editable]="true" [state]="getStepName(0)"
-              [stepControl]="form">
-      <ng-template matStepLabel>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</ng-template>
-      <div class="flex-container full">
-        <div class="full column-space-between-start">
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  @switch (currentStepIndex()) {
+    @case (0) {
+      <div class="step-layout step-layout--single">
+        <div class="app-crud-fields">
           <ng-container *ngTemplateOutlet="stepOne"></ng-container>
         </div>
       </div>
-      <div>
-        <button [form]="form" appBackButton class="icon-button" color="accent" mat-mini-fab type="button">
+
+      <div class="step-actions">
+        <button [form]="form" appBackButton mat-stroked-button type="button">
           <mat-icon>keyboard_return</mat-icon>
+          <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
         </button>
-        <button (click)="callStepTwo(true)" [disabled]="form.invalid" class="icon-button" color="primary"
-                mat-mini-fab
-                type="button">
-          <mat-icon>arrow_downward</mat-icon>
-        </button>
-      </div>
-    </mat-step>
-    <mat-step [completed]="getStepCompleted(1)" [editable]="true" [state]="getStepName(1)">
-      <ng-template matStepLabel>{{ 'ME.RESERVATION.PREVIEW' | translate }}</ng-template>
-      <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
-      <div>
-        <button (click)="back()" class="icon-button" color="accent" mat-mini-fab>
-          <mat-icon>arrow_upward</mat-icon>
-        </button>
-        <button (click)="pay()" class="icon-button" color="primary" mat-mini-fab
-                type="button">
-          <mat-icon>credit_score</mat-icon>
-        </button>
-      </div>
-    </mat-step>
-  </mat-vertical-stepper>
-} @else {
-  <mat-horizontal-stepper #stepper [linear]="true" (selectionChange)="triggerClick($event)">
-    <mat-step [completed]="getStepCompleted(0)" [editable]="true" [state]="getStepName(0)"
-              [stepControl]="form">
-      <ng-template matStepLabel>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</ng-template>
-      <div class="flex-row-container">
-        <div class="full row-space-between-start">
-          <div class="middle flex-container">
-            <ng-container *ngTemplateOutlet="stepOne"></ng-container>
-          </div>
-        </div>
-      </div>
-      <div class="divider">
-        <button [form]="form" appBackButton color="accent" mat-fab extended type="button">
-          <mat-icon>keyboard_return</mat-icon>
-          {{ 'COMMON.BUTTON.BACK' | translate }}
-        </button>
-        <button (click)="callStepTwo(true)" [disabled]="form.invalid" class="raised-button" color="primary" mat-fab
-                extended type="button">
-          {{ 'COMMON.BUTTON.NEXT' | translate }}
+        <button (click)="callStepTwo(true)" [disabled]="form.invalid" mat-stroked-button type="button">
+          <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
           <mat-icon>arrow_forward</mat-icon>
         </button>
       </div>
-    </mat-step>
-    <mat-step [completed]="getStepCompleted(1)" [editable]="true" [state]="getStepName(1)">
-      <ng-template matStepLabel>{{ 'ME.RESERVATION.PREVIEW' | translate }}</ng-template>
-      <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
-      <div class="divider">
-        <button (click)="back()" color="accent" mat-fab extended>
+    }
+    @default {
+      <div class="step-layout step-layout--single">
+        <div class="app-crud-fields">
+          <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
+        </div>
+      </div>
+
+      <div class="step-actions">
+        <button (click)="back()" mat-stroked-button type="button">
           <mat-icon>arrow_back</mat-icon>
-          {{ 'COMMON.BUTTON.BACK' | translate }}
+          <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
         </button>
-        <button (click)="pay()" class="raised-button" color="primary" mat-fab extended
-                type="button">
-          {{ 'COMMON.BUTTON.PAYMENT' | translate }}
+        <button (click)="pay()" mat-stroked-button type="button">
+          <span>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</span>
           <mat-icon>credit_score</mat-icon>
         </button>
       </div>
-    </mat-step>
-  </mat-horizontal-stepper>
-}
+    }
+  }
+</div>

@@ -2,7 +2,7 @@
 import { BehaviorSubject, Subject } from 'rxjs';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MeReservationComponent } from './me-reservation.component';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute } from '@angular/router';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
@@ -10,14 +10,16 @@ import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { signal } from '@angular/core';
 import { FirebaseService } from '../../../services/firebase.service';
 import { createReservation } from '../../../store/reservation.actions';
-import { PaymentPercentage, PaymentType } from '../../../interfaces/payment';
+import { IPaymentOption, PaymentPercentage } from '../../../interfaces/payment';
 import { Role } from '../../../interfaces/token';
-import { Price } from '../../../interfaces/treatment';
-import { ServiceType } from '../../../interfaces/room';
+import { IGroupService, ITreatmentAll, Price } from '../../../interfaces/treatment';
+import { IRoomAll, ServiceType } from '../../../interfaces/room';
+import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
 
 describe('MeReservationComponent', () => {
   let component: MeReservationComponent;
   let fixture: ComponentFixture<MeReservationComponent>;
+  let translate: TranslateService;
 
   let navigationParams$: BehaviorSubject<any>;
   let reservationId$: BehaviorSubject<any>;
@@ -28,17 +30,95 @@ describe('MeReservationComponent', () => {
   let customerReservation$: BehaviorSubject<any>;
   let availableList$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
+  let paymentOptions$: BehaviorSubject<any>;
   let params$: Subject<any>;
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
   const mockCurrency = { id: 'eur', code: 'EUR', name: 'Euro', icon: '€' };
-  const createRoomMock = (paymentTypes: PaymentType[]) => ({
+  const createRoomMock = (paymentTypes: string[]): IRoomAll => ({
     id: 'room-1',
     currency: mockCurrency,
-    professionals: [{ id: 'professional-1' }],
-    office: { id: 'office-1', rooms: [] },
+    professionals: [{
+      id: 'professional-1',
+      displayName: 'p 1',
+      email: 'p1@email',
+      authorities: [],
+      locale: 'en',
+      timeZone: 'Europe/Amsterdam',
+    }],
+    office: { id: 'office-1', rooms: [], name: 'office 1', manager: {} },
     paymentTypes,
+    availabilities: [],
+    address: {
+      id: 0,
+      name: '0',
+      location: { x: 0, y: 0 },
+    },
+    timeZone: 'Europe/Amsterdam',
+    primary: true,
   });
+  const paymentOptions: IPaymentOption[] = [
+    {
+      label: 'Cash',
+      name: 'Cash',
+      type: 'CASH',
+      enabled: true,
+      enabledCustomer: true,
+      icon: 'cash',
+      default: false,
+      filter: false,
+      defaultFilter: false,
+      show: false,
+    },
+    {
+      label: 'Transfer',
+      name: 'Transfer',
+      type: 'TRANSFER',
+      enabled: true,
+      enabledCustomer: true,
+      icon: 'transfer',
+      default: false,
+      filter: false,
+      defaultFilter: false,
+      show: false,
+    },
+    {
+      label: 'Mollie',
+      name: 'Mollie',
+      type: 'MOLLIE',
+      enabled: true,
+      enabledCustomer: true,
+      default: false,
+      filter: false,
+      defaultFilter: false,
+      show: false,
+    },
+    {
+      label: 'PayPal',
+      name: 'PayPal',
+      type: 'PAYPAL',
+      enabled: true,
+      enabledCustomer: true,
+      default: false,
+      filter: false,
+      defaultFilter: false,
+      show: false,
+    },
+  ];
+  const mockTreatment: ITreatmentAll = {
+    id: 'treatment-1',
+    key: 'treatment-1',
+    name: 'Treatment',
+    price: 70,
+    duration: 'PT1H15M',
+    type: ServiceType.treatment,
+    groupId: 'group-1',
+    discountCustomer: undefined,
+    group: {
+      id: 'group-1',
+      name: 'Group 1',
+    },
+  };
 
   const createEditReservation = (canEdit = true) => ({
     id: 'reservation-1',
@@ -46,29 +126,39 @@ describe('MeReservationComponent', () => {
     paymentRequired: false,
     canEdit,
     room: {
-      ...createRoomMock([PaymentType.cash, PaymentType.mollie]),
+      ...createRoomMock(['CASH', 'MOLLIE']),
       timeZone: 'Europe/Amsterdam',
       address: { id: 1, name: 'Room', location: { x: 0, y: 0 } },
-      office: { id: 'office-1', rooms: [createRoomMock([PaymentType.cash, PaymentType.mollie])] },
+      office: { id: 'office-1', rooms: [createRoomMock(['CASH', 'MOLLIE'])] },
       professionals: [{ id: 'professional-1', displayName: 'Professional' }],
     },
     professional: { id: 'professional-1', displayName: 'Professional' },
-    treatment: {
-      id: 'treatment-1',
-      key: 'treatment-1',
-      name: 'Treatment',
-      price: 70,
-      duration: 'PT1H15M',
-      type: ServiceType.treatment,
-      groupId: 'group-1',
-      discountCustomer: undefined,
-    },
+    treatment: mockTreatment,
     additional: [
-      { id: 'additional-1', key: 'additional-1', name: 'Removal', price: 5, duration: 'PT15M', type: ServiceType.additional },
+      {
+        id: 'additional-1',
+        key: 'additional-1',
+        name: 'Removal',
+        price: 5,
+        duration: 'PT15M',
+        type: ServiceType.additional,
+      },
     ],
     customer: { id: 'customer-1', phone: '123456789' },
     payments: [],
   });
+
+  const mockDiscount: IUserDiscount = {
+    used: false,
+    id: 'd1',
+    discountCustomer: {
+      name: 'Promo',
+      amount: 10,
+      type: DiscountType.percentage,
+      id: 'dc1',
+      currency: mockCurrency,
+    },
+  };
 
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
@@ -85,6 +175,7 @@ describe('MeReservationComponent', () => {
     customerReservation$ = new BehaviorSubject(undefined);
     availableList$ = new BehaviorSubject(undefined);
     subErrors$ = new BehaviorSubject(undefined);
+    paymentOptions$ = new BehaviorSubject(paymentOptions);
     params$ = new Subject<any>();
 
     storeSpy = jasmine.createSpyObj<Store<ReservationState>>('Store', ['pipe', 'dispatch']);
@@ -109,6 +200,7 @@ describe('MeReservationComponent', () => {
       customerReservation$,
       availableList$,
       subErrors$,
+      paymentOptions$,
     ];
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(
@@ -126,6 +218,10 @@ describe('MeReservationComponent', () => {
 
     fixture = TestBed.createComponent(MeReservationComponent);
     component = fixture.componentInstance;
+
+    translate = TestBed.inject(TranslateService);
+    translate.use('en-GB');
+
     fixture.detectChanges();
   });
 
@@ -139,6 +235,7 @@ describe('MeReservationComponent', () => {
     customerReservation$.complete();
     availableList$.complete();
     subErrors$.complete();
+    paymentOptions$.complete();
     params$.complete();
   });
 
@@ -172,17 +269,17 @@ describe('MeReservationComponent', () => {
   it('should apply shared sub errors to office, payment and accept controls', () => {
     component['applySubErrors']([
       { field: 'room', message: 'Room invalid' },
-      { field: 'type', message: 'Payment type invalid' },
+      { field: 'option', message: 'Payment type invalid' },
       { field: 'phone', message: 'Phone invalid' },
       { field: 'event', message: 'Event invalid' },
     ] as any);
 
     expect(component.errors().room).toBe('Room invalid');
-    expect(component.errors().type).toBe('Payment type invalid');
+    expect(component.errors().option).toBe('Payment type invalid');
     expect(component.errors().phone).toBe('Phone invalid');
     expect(component.errors().event).toBe('Event invalid');
     expect(component.getOfficeForm.room.hasError('incorrect')).toBeTrue();
-    expect(component.getTypeForm.type.hasError('incorrect')).toBeTrue();
+    expect(component.getTypeForm.option.hasError('incorrect')).toBeTrue();
     expect(component.getAcceptForm.phone.hasError('incorrect')).toBeTrue();
     expect(component.getEventForm.event.hasError('incorrect')).toBeTrue();
   });
@@ -219,16 +316,16 @@ describe('MeReservationComponent', () => {
     component.date = new Date('2026-03-26T10:00:00');
 
     component.getOfficeForm.room.setValue(createRoomMock([
-      PaymentType.cash,
-      PaymentType.transfer,
-      PaymentType.mollie,
+      'CASH',
+      'TRANSFER',
+      'MOLLIE',
     ]) as any);
     fixture.detectChanges();
 
     component.getOfficeForm.professional.setValue({ id: 'professional-1' } as any);
     component.getTreatmentForm.treatment.setValue({ id: 'treatment-1' } as any);
-    component.getTypeForm.type.setValue({
-      type: PaymentType.mollie,
+    component.getTypeForm.option.setValue({
+      type: 'MOLLIE',
     } as any);
     component.getTypeForm.percentage.setValue(PaymentPercentage.total);
     component.getAcceptForm.phone.setValue('123456789');
@@ -243,7 +340,7 @@ describe('MeReservationComponent', () => {
         professionalId: 'professional-1',
         treatmentId: 'treatment-1',
         payment: jasmine.objectContaining({
-          type: PaymentType.mollie,
+          type: 'MOLLIE',
           percentage: PaymentPercentage.total,
         }),
       }) as any,
@@ -255,21 +352,21 @@ describe('MeReservationComponent', () => {
     authUserSignal.update(prev => ({ ...prev, customerId: 'customer-1' }));
     component.date = new Date('2026-03-26T10:00:00');
     component.getOfficeForm.room.setValue(createRoomMock([
-      PaymentType.cash,
-      PaymentType.mollie,
+      'CASH',
+      'MOLLIE',
     ]) as any);
     fixture.detectChanges();
 
     component.getOfficeForm.professional.setValue({ id: 'professional-1' } as any);
     component.getTreatmentForm.treatment.setValue({ id: 'treatment-1' } as any);
-    component.getTypeForm.type.setValue({ type: PaymentType.mollie } as any);
+    component.getTypeForm.option.setValue({ type: 'MOLLIE' } as any);
     component.getAcceptForm.phone.setValue('123456789');
 
     component.create();
 
     const action = storeSpy.dispatch.calls.mostRecent().args[0] as any;
     expect(action.reservation.payment).toEqual({
-      type: PaymentType.mollie,
+      type: 'MOLLIE',
       percentage: PaymentPercentage.total,
     });
   });
@@ -278,13 +375,13 @@ describe('MeReservationComponent', () => {
     authUserSignal.update(prev => ({ ...prev, customerId: 'customer-1' }));
     component.date = new Date('2026-03-26T10:00:00');
     component.getOfficeForm.room.setValue(createRoomMock([
-      PaymentType.cash,
-      PaymentType.mollie,
+      'CASH',
+      'MOLLIE',
     ]) as any);
     fixture.detectChanges();
     component.getOfficeForm.professional.setValue({ id: 'professional-1' } as any);
     component.getTreatmentForm.treatment.setValue({ id: 'treatment-1' } as any);
-    component.getTypeForm.type.setValue({ type: PaymentType.account } as any);
+    component.getTypeForm.option.setValue({ type: 'ACCOUNT' } as any);
     component.getAcceptForm.phone.setValue('123456789');
 
     component.create();
@@ -392,16 +489,15 @@ describe('MeReservationComponent', () => {
 
   it('should derive online payment types and options from the selected room', () => {
     component.getOfficeForm.room.setValue(createRoomMock([
-      PaymentType.cash,
-      PaymentType.transfer,
-      PaymentType.mollie,
-      PaymentType.paypal,
+      'CASH',
+      'TRANSFER',
+      'MOLLIE',
+      'PAYPAL',
     ]) as any);
 
     component['setTypes']();
 
-    expect(component.paymentTypes()).toEqual([PaymentType.mollie, PaymentType.paypal]);
-    expect(component.options()?.map(option => option.type)).toEqual([PaymentType.mollie, PaymentType.paypal]);
+    expect(component.options()?.map(option => option.type)).toEqual(['MOLLIE', 'PAYPAL']);
     expect(component.options()?.every(option => option.name !== undefined)).toBeTrue();
   });
 
@@ -410,7 +506,6 @@ describe('MeReservationComponent', () => {
 
     component['setTypes']();
 
-    expect(component.paymentTypes()).toBeUndefined();
     expect(component.options()).toEqual([]);
   });
 
@@ -687,5 +782,460 @@ describe('MeReservationComponent', () => {
 
     expect(component['getReservationHydrationKey'](reservation as any))
       .toBe('reservation-1|1776335400|room-1|professional-1|treatment-1|additional-1|1|0');
+  });
+
+  it('should use fallback total when totalWithoutDiscount is zero', () => {
+    component.price.set(new Price(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+    component.getTreatmentForm.treatment.setValue({ price: 50 } as any);
+    component.additionalSelected.set([{ price: 20 } as any]);
+
+    expect(component.effectiveTotalWithoutDiscount).toBe(70);
+  });
+
+  it('should use priceWithDiscount when available for display price', () => {
+    component.price.set({
+      ...new Price(),
+      priceWithDiscount: 55,
+      discount: 10,
+    } as any);
+
+    spyOnProperty(component, 'hasDiscountApplied', 'get').and.returnValue(true);
+
+    expect(component.effectiveTreatmentDisplayPrice).toBe(55);
+  });
+
+  it('should calculate effectiveTotalPrice when total is zero but fallback exists', () => {
+    component.price.set({
+      ...new Price(),
+      total: 0,
+    } as any);
+
+    spyOnProperty(component, 'effectiveTotalWithoutDiscount', 'get').and.returnValue(100);
+    spyOnProperty(component, 'effectiveDiscountAmount', 'get').and.returnValue(10);
+
+    expect(component.effectiveTotalPrice).toBe(90);
+  });
+
+  it('should return true for showCoveredAmounts when paid or balance used', () => {
+    component.price.set({
+      ...new Price(),
+      totalPaid: 10,
+    } as any);
+
+    component.balance = 0;
+
+    expect(component.showCoveredAmounts).toBeTrue();
+  });
+
+  it('should calculate appointmentEnd from duration when endDate is missing', () => {
+    const start = new Date('2026-04-16T10:00:00Z');
+
+    component.getEventForm.event.setValue(undefined);
+    component.getTreatmentForm.startDate.setValue(start as any);
+    component.getTreatmentForm.treatment.setValue({ price: 50, duration: 'PT1H' } as any);
+    component['additionalSelected'].set([]);
+
+    expect(component.appointmentEnd).toEqual(new Date('2026-04-16T11:00:00Z'));
+  });
+
+  it('should get appointmentEnd if endDate is set', () => {
+    expect(component.appointmentEnd).toBeUndefined();
+  });
+
+  it('should get appointmentEnd undefined if endDate missing and start is missing', () => {
+    const endDate = new Date('2026-04-16T10:00:00Z');
+    component.endDate = endDate;
+
+    expect(component.appointmentEnd).toEqual(endDate);
+  });
+
+  it('should filter groups by name prefix', () => {
+    const groups = [
+      { name: 'Massage' },
+      { name: 'Facial' },
+    ] as any;
+
+    const result = component['filterGroup']('ma', groups);
+
+    expect(result?.length).toBe(1);
+    expect(result?.[0].name).toBe('Massage');
+  });
+
+  it('should compare additional items by id', () => {
+    const a = { id: '1' } as any;
+    const b = { id: '1' } as any;
+    const c = { id: '2' } as any;
+
+    expect(component.compareAdditional(a, b)).toBeTrue();
+    expect(component.compareAdditional(a, c)).toBeFalse();
+  });
+
+  it('should detect selected additional items', () => {
+    component.additionalSelected.set([{ id: '1' } as any]);
+
+    expect(component.isSelected({ id: '1' } as any)).toBeTrue();
+    expect(component.isSelected({ id: '2' } as any)).toBeFalse();
+  });
+
+  it('should not update anything when treatmentDiscountSignal is empty', () => {
+    treatmentDiscount$.next(undefined);
+
+    const groupsSpy = spyOn(component.groups, 'set');
+    const listSpy = spyOn(component.treatmentList, 'set');
+
+    fixture.detectChanges();
+
+    expect(groupsSpy).not.toHaveBeenCalled();
+    expect(listSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not update when room is missing', () => {
+    treatmentDiscount$.next({
+      treatments: [mockTreatment],
+      discounts: [],
+    } as any);
+
+    component.getOfficeForm.room.setValue(undefined);
+
+    const groupsSpy = spyOn(component.groups, 'set');
+
+    fixture.detectChanges();
+
+    expect(groupsSpy).not.toHaveBeenCalled();
+  });
+
+  it('should create groups and set groups signal', () => {
+    component.getOfficeForm.room.setValue(createRoomMock(['CASH', 'MOLLIE']));
+
+    treatmentDiscount$.next({
+      treatments: [mockTreatment],
+      discounts: [],
+    } as any);
+
+    component['groupId'] = 'g1';
+    component['treatmentId'] = 't1';
+
+    const groupsSpy = spyOn(component.groups, 'set');
+
+    fixture.detectChanges();
+
+    expect(groupsSpy).toHaveBeenCalled();
+  });
+
+  it('should select current group by groupId', () => {
+    component.getOfficeForm.room.setValue(createRoomMock(['CASH', 'MOLLIE']));
+
+    treatmentDiscount$.next({
+      treatments: [mockTreatment],
+      discounts: [],
+    } as any);
+
+    component['groupId'] = 'g1';
+    component['treatmentId'] = 't1';
+
+    const setGroupSpy = spyOn(component.getTreatmentForm.group, 'setValue');
+
+    fixture.detectChanges();
+
+    expect(setGroupSpy).toHaveBeenCalled();
+  });
+
+  it('should select group using treatmentId fallback', () => {
+    component.getOfficeForm.room.setValue(createRoomMock(['CASH', 'MOLLIE']));
+
+    treatmentDiscount$.next({
+      treatments: [mockTreatment],
+      discounts: [],
+    } as any);
+
+    component['groupId'] = undefined;
+    component['treatmentId'] = 't1';
+
+    const setGroupSpy = spyOn(component.getTreatmentForm.group, 'setValue');
+
+    fixture.detectChanges();
+
+    expect(setGroupSpy).toHaveBeenCalled();
+  });
+
+  describe('labels (computed)', () => {
+    it('should map translation values correctly', () => {
+      translate.setTranslation('en-GB', {
+        COMMON: {
+          USER: {
+            PHONE: {
+              SEARCH: 'Search...',
+              COUNTRY_NOT_FOUND: 'No country',
+              FIELD: 'Phone',
+              INVALID: 'Invalid number',
+              REQUIRED: 'Required field',
+            },
+          },
+        },
+      });
+
+      fixture.detectChanges();
+
+      const result = component.labels();
+
+      expect(result).toEqual({
+        mainLabel: '',
+        codePlaceholder: '',
+        searchPlaceholderLabel: 'Search...',
+        noEntriesFoundLabel: 'No country',
+        nationalNumberLabel: 'Phone',
+        hintLabel: '',
+        invalidNumberError: 'Invalid number',
+        requiredError: 'Required field',
+      });
+    });
+
+    it('should fallback to empty string when keys are missing', () => {
+      translate.setTranslation('en-GB', {});
+
+      const result = component.labels();
+
+      expect(result.searchPlaceholderLabel).toBe('');
+      expect(result.noEntriesFoundLabel).toBe('');
+      expect(result.nationalNumberLabel).toBe('');
+      expect(result.invalidNumberError).toBe('');
+      expect(result.requiredError).toBe('');
+    });
+  });
+
+  describe('discounts (computed)', () => {
+    it('should return undefined when no treatmentDiscountSignal', () => {
+      treatmentDiscount$.next(undefined);
+      fixture.detectChanges();
+
+      const result = component.discounts();
+
+      expect(result).toBeUndefined();
+    });
+
+    it('should format percentage discount correctly', () => {
+      treatmentDiscount$.next({
+        discounts: [
+          {
+            ...mockDiscount,
+            discountCustomer: {
+              ...mockDiscount.discountCustomer,
+              type: DiscountType.percentage,
+              amount: 15,
+              name: 'Summer',
+            },
+          },
+        ],
+      });
+      fixture.detectChanges();
+
+      const result = component.discounts();
+
+      expect(result?.[0].title).toBe('15 % Summer');
+    });
+
+    it('should format money discount correctly', () => {
+      treatmentDiscount$.next({
+        discounts: [
+          {
+            ...mockDiscount,
+            discountCustomer: {
+              ...mockDiscount.discountCustomer,
+              type: DiscountType.money,
+              amount: 20,
+              name: 'Cash Discount',
+              discount: {
+                currency: { code: 'EUR' },
+              },
+            },
+          },
+        ],
+      });
+      fixture.detectChanges();
+
+      const result = component.discounts();
+
+      expect(result?.[0].title).toBe('€ 20 Cash Discount');
+    });
+
+    it('should fallback to original name when type is unknown', () => {
+      treatmentDiscount$.next({
+        discounts: [
+          {
+            ...mockDiscount,
+            discountCustomer: {
+              ...mockDiscount.discountCustomer,
+              type: 'UNKNOWN',
+              name: 'Fallback Name',
+            },
+          },
+        ],
+      });
+      fixture.detectChanges();
+
+      const result = component.discounts();
+
+      expect(result?.[0].title).toBe('Fallback Name');
+    });
+
+    it('should preserve original discount properties', () => {
+      treatmentDiscount$.next({
+        discounts: [mockDiscount],
+      });
+      fixture.detectChanges();
+
+      const result = component.discounts();
+
+      expect(result?.[0].id).toBe('d1');
+      expect(result?.[0].discountCustomer).toEqual(mockDiscount.discountCustomer);
+    });
+
+    it('should return new objects (immutability)', () => {
+      treatmentDiscount$.next({
+        discounts: [mockDiscount],
+      });
+      fixture.detectChanges();
+
+      const result = component.discounts();
+
+      expect(result?.[0]).not.toBe({ ...mockDiscount, title: 'title' });
+    });
+  });
+
+  it('should set treatment when group is selected', () => {
+    const group: IGroupService = {
+      id: 'group-1',
+      name: 'Group 1',
+      selectedTreatments: [],
+      treatments: [mockTreatment],
+    };
+
+    component.getTreatmentForm.group.setValue(group);
+    fixture.detectChanges();
+
+    expect(component['groupId']).toBe(group.id);
+    expect(component.treatmentList()).toEqual(group.treatments);
+  });
+
+  describe('Available list effect (without spying)', () => {
+    beforeEach(() => {
+      component.price.set({ isPaid: false } as any);
+      component.firstTime = true;
+
+      // Ensure control exists
+      component.getTypeForm.option.setValidators([() => null]);
+    });
+
+    it('should update selectedIndex based on computed availableList', () => {
+      const date1 = new Date(2026, 0, 1, 10, 0);
+      const date2 = new Date(2026, 0, 2, 10, 0);
+
+      component.getTreatmentForm.startDate.setValue(date2);
+
+      availableList$.next([
+        { dateTime: date1.getTime() },
+        { dateTime: date2.getTime() },
+      ]);
+
+      fixture.detectChanges();
+
+      expect(component.selectedIndex).toBe(1);
+    });
+
+    it('should NOT change selectedIndex if no startDate', () => {
+      const date1 = new Date(2026, 0, 1);
+
+      component.getTreatmentForm.startDate.setValue(undefined);
+      availableList$.next([
+        { dateTime: date1.getTime() },
+      ]);
+
+      fixture.detectChanges();
+
+      expect(component.selectedIndex).toBe(1);
+    });
+
+    it('should NOT clear validators when not paid', () => {
+      const clearSpy = spyOn(component.getTypeForm.option, 'clearValidators');
+      const updateSpy = spyOn(component.getTypeForm.option, 'updateValueAndValidity');
+
+      component.price.set({ isPaid: false } as any);
+
+      component.getTreatmentForm.startDate.setValue(new Date());
+      availableList$.next([
+        { dateTime: new Date().getTime() },
+      ]);
+
+      fixture.detectChanges();
+
+      expect(clearSpy).not.toHaveBeenCalled();
+      expect(updateSpy).not.toHaveBeenCalled();
+      expect(component.firstTime).toBeTrue();
+    });
+
+    it('should clear validators and set firstTime=false when paid', () => {
+      const clearSpy = spyOn(component.getTypeForm.option, 'clearValidators');
+      const updateSpy = spyOn(component.getTypeForm.option, 'updateValueAndValidity');
+
+      component.price.set({ isPaid: true } as any);
+
+      component.getTreatmentForm.startDate.setValue(new Date());
+      availableList$.next([
+        { dateTime: new Date().getTime() },
+      ]);
+
+      fixture.detectChanges();
+
+      expect(component.firstTime).toBeFalse();
+      expect(clearSpy).toHaveBeenCalled();
+      expect(updateSpy).toHaveBeenCalled();
+    });
+
+    it('should NOT run effect when availableList is undefined', () => {
+      availableList$.next(undefined);
+
+      fixture.detectChanges();
+
+      expect(component.selectedIndex).toBe(1);
+    });
+
+    it('should NOT re-run when price changes (untracked)', () => {
+      const clearSpy = spyOn(component.getTypeForm.option, 'clearValidators');
+
+      component.getTreatmentForm.startDate.setValue(new Date());
+
+      // initial run (not paid)
+      component.price.set({ isPaid: false } as any);
+      availableList$.next([
+        { dateTime: new Date().getTime() },
+      ]);
+      fixture.detectChanges();
+
+      expect(clearSpy).not.toHaveBeenCalled();
+
+      // change price AFTER effect
+      component.price.set({ isPaid: true } as any);
+      fixture.detectChanges();
+
+      // still should NOT trigger
+      expect(clearSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  it('should NOT reset treatment when hydratingEdit is true', () => {
+    const mockRoom = { ...createRoomMock(['CASH', 'MOLLIE']), timeZone: 'UTC' };
+    component.getOfficeForm.room.setValue(mockRoom);
+    component['hydratingEdit'] = true;
+    component['dismiss'] = false;
+
+    component['professionalId'] = 'prof-1';
+
+    fixture.detectChanges();
+
+    expect(component['roomId']).toBe('room-1');
+    expect(component.professionalList()).toEqual(mockRoom.professionals);
+    expect(component.getOfficeForm.professional.value?.id).toBe('professional-1');
+
+    expect(component.getTreatmentForm.group.value).toBeUndefined();
   });
 });

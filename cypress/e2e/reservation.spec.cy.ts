@@ -4,7 +4,7 @@ import { API_LOCALE } from '../../src/app/util/dates';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   const days = breakpointToDays('reservation', breakpoints);
-  describe(`Reservation with ${name}`, () => {
+  describe(`Reservation with ${ name }`, () => {
     beforeEach(() => cy.viewport(width, height));
     const email = 'nails.cleos@gmail.com';
     const customerId = '1c27715c-21a3-4255-97ac-9263d9f177e7';
@@ -17,7 +17,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
     const hourFormat = zeroPad(hour);
     const minute = 30;
     const minuteFormat = zeroPad(minute);
-    const reservationTime = `${hourFormat}:${minuteFormat}`;
+    const reservationTime = `${ hourFormat }:${ minuteFormat }`;
 
     const reservationDate = new Date();
     reservationDate.setMonth(reservationDate.getMonth() + 1, 1);
@@ -61,7 +61,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.get('.mat-calendar-next-button').click({ force: true });
 
       cy.wait(50);
-      cy.get(`button[aria-label="${formattedDate}"]`).click({ force: true });
+      cy.get(`button[aria-label="${ formattedDate }"]`).click({ force: true });
 
       cy.get('[data-cy="start-picker"]').click({ force: true });
       cy.setTime(hourFormat, minuteFormat);
@@ -95,35 +95,50 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
       // Calendar
       cy.checkAppDialog('Update reservation',
-        `Are you sure to change reservation to ${formattedDate}, ${reservationTime}:00?`, 'Yes');
+        `Are you sure to change reservation to ${ formattedDate }, ${ reservationTime }:00?`, 'Yes');
 
       cy.wait(500);
       calendarExpectations(reservationTime)[days].forEach((events, dayIndex) => validateCalendar(dayIndex, events));
+
+      cy.get('.booking-summary').within(() => {
+        cy.contains('.summary-item__label', 'Customer').parent().should('contain.text', customerName);
+        cy.contains('.summary-item__label', 'Room').parent().should('contain.text', 'Nails Cleos - EUR (€)');
+        cy.contains('.summary-item__label', 'Professional').parent().should('contain.text', 'Nails Cleos');
+        cy.contains('.summary-item__label', 'Treatment').parent().should('contain.text', 'Biab + Single Color');
+        cy.contains('.summary-item__label', 'Additional').parent().should('contain.text', 'Biab Removal')
+          .and('contain.text', 'Powder');
+        cy.contains('.summary-item__label', 'Date & time').parent().should('contain.text', reservationTime);
+        cy.contains('.price-row', 'Biab + Single Color').should('contain.text', '€ 85.00');
+        cy.contains('.price-row', 'Biab Removal').should('contain.text', '€ 5.00');
+        cy.contains('.price-row', 'Powder').should('contain.text', '€ 15.00');
+        cy.contains('.price-row--total', 'Current total').should('contain.text', '€ 105.00');
+      });
+
       cy.get('button[name="toStepSeven"]').click({ force: true });
 
-      // Preview
-      cy.get('mat-card-title').contains('Preview').should('exist');
-      cy.checkMatList('Customer', 'wash', customerName);
+      // Booking summary / preview
+      cy.contains('.step-heading h2', 'Booking summary').should('exist');
+      cy.contains('.support-card__header h3', 'Appointment').should('exist');
+      cy.get('.support-card').contains('Appointment').parents('.support-card').within(() => {
+        cy.contains('.info-item', customerName).should('exist');
+        cy.contains('.info-item', 'Nails Cleos - EUR (€)').should('exist');
+        cy.contains('.info-item', 'Nails Cleos').should('exist');
+        cy.contains('.info-item', 'Biab + Single Color').should('exist');
+        cy.contains('.info-item', 'Biab Removal').should('exist');
+        cy.contains('.info-item', 'Powder').should('exist');
+        cy.contains('.info-item', '02:00').should('exist');
+        cy.contains('.info-item', 'Mock address').should('exist');
+        cy.get('.booking-summary__slot').should('contain.text', reservationTime)
+          .and('contain.text', `${ zeroPad(hour) }:${ minuteFormat }`);
+      });
 
-      cy.get('div[mat-subheader]').contains('Room').should('exist');
-      cy.checkMatList('Name', 'store', 'Nails Cleos - EUR (€)');
-      cy.checkMatList('Professional', 'person_pin', 'Nails Cleos');
-      cy.checkMatList('Address', 'room', 'Mock address');
-
-      cy.get('div[mat-subheader]').contains('Treatment').should('exist');
-      cy.checkMatList('Name', 'spa', 'Biab + Single Color');
-      cy.checkMatList('Duration', 'timer', '01:30');
-      cy.checkMatList('Price', 'euro', '85.00');
-
-      cy.get('div[mat-subheader]').contains('Additional').should('exist');
-      cy.checkMatList('Biab Removal', 'add_post', '€ 5.00', '⏲ 00:15');
-      cy.checkMatList('Powder', 'add_post', '€ 5.00', '⏲ 00:15');
-
-      cy.get('div[mat-subheader]').contains('Appointment').should('exist');
-      cy.checkMatList(`${formattedDate}, ${reservationTime}`, 'spa',
-        `${formattedDate}, ${zeroPad(hour + 2)}:${minuteFormat}`);
-      cy.checkMatList('Duration', 'timer', '02:00');
-      cy.checkMatList('Total', 'euro', '105.00');
+      cy.contains('.support-card__header h3', 'Price').should('exist');
+      cy.get('.support-card').contains('Price').parents('.support-card').within(() => {
+        cy.contains('.price-row', 'Biab + Single Color').should('contain.text', '€ 85.00');
+        cy.contains('.price-row', 'Biab Removal').should('contain.text', '€ 5.00');
+        cy.contains('.price-row', 'Powder').should('contain.text', '€ 15.00');
+        cy.contains('.price-row--total', 'Total').should('contain.text', '€ 105.00');
+      });
 
       reservationDate.setHours(hour, minute, 0, 0);
       cy.randomUUID().then(reservationId => {
@@ -150,7 +165,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           expect(body.discountId).to.eq(undefined);
         });
 
-        cy.url().should('include', `reservation/${reservationId}`);
+        cy.url().should('include', `reservation/${ reservationId }`);
         cy.wait('@getReservation').its('response.statusCode').should('eq', 200);
         cy.wait('@getPayments').its('response.statusCode').should('eq', 204);
         cy.wait('@getHistory').its('response.statusCode').should('eq', 204);
@@ -169,7 +184,7 @@ const wednesday = (reservationTime: string) => [
   ...defaultEvents,
   { text: '10:00 - 11:30', length: 1 },
   { text: '15:30 - 17:00', length: 1 },
-  { text: `${reservationTime} - 15:30`, length: 1 },
+  { text: `${ reservationTime } - 15:30`, length: 1 },
 ];
 const thursday = [{ text: 'All day', length: 1 }];
 const weekend = [{ text: 'Out of work', length: 1 }];
@@ -187,6 +202,6 @@ const validateCalendar = (day: number, events: { text: string, length: number }[
   cy.get('mwl-calendar-week-view').find('.cal-day-column').eq(day).find('mwl-calendar-week-view-event')
     .then(eventsList => {
       events.forEach(
-        event => cy.wrap(eventsList).filter(`:contains("${event.text}")`).should('have.length', event.length));
+        event => cy.wrap(eventsList).filter(`:contains("${ event.text }")`).should('have.length', event.length));
     });
 };

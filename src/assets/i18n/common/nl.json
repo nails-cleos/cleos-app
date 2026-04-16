@@ -346,6 +346,7 @@
           "CUSTOMER": "Klant",
           "PROFESSIONAL": "Professional",
           "START": "Begin",
+          "END": "Einde",
           "STATE": "Status",
           "TREATMENT": "Behandeling"
         },

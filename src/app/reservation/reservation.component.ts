@@ -33,6 +33,7 @@ import {
   IReservation,
   IReservationAll,
   IReservationPayment,
+  IUpcomingAll,
   MAX_RESERVATION_MONTH,
   Reservation,
 } from '../interfaces/reservation';
@@ -92,7 +93,6 @@ import { SelectProfessionalDialogComponent } from './select-professional-dialog.
 import { ToastService } from '../services/toast.service';
 import { AuthUserService } from '../services/auth-user.service';
 import { enableStep, getBackIndex, getIndex, getStepCall, getStepName } from '../util/step';
-import { PaymentType } from '../interfaces/payment';
 import { SharedModule } from '../shared/shared.module';
 import { RoomNamePipe } from '../pipes/room-name.pipe';
 import { SortByPipe } from '../pipes/sort-by.pipe';
@@ -100,6 +100,7 @@ import { CurrencySymbolPipe } from '../pipes/currency-symbol.pipe';
 import { DurationTimePipe } from '../pipes/durationTime.pipe';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { GoogleMapComponent } from '../shared/google-map/google-map.component';
+import { PaymentOptionSelectComponent } from '../shared/payment-option-select/payment-option-select.component';
 import { ReservationState } from '../store/reducers/reservation.reducers';
 import {
   getAdditionalListPipe,
@@ -129,6 +130,9 @@ import {
 } from './reservation-form.types';
 import { ReservationFormErrorService } from './reservation-form-error.service';
 import { ReservationCalendarService } from './reservation-calendar.service';
+import { getPaymentOptionsPipe } from '../store/selectors/payment.selectors';
+import { PaymentState } from '../store/reducers/payment.reducers';
+import { IPaymentOption } from '../interfaces/payment';
 import PlaceResult = google.maps.places.PlaceResult;
 
 const RESERVATION_ERROR_FIELDS = [
@@ -152,14 +156,14 @@ const RESERVATION_ERROR_FIELDS = [
   templateUrl: './reservation.component.html',
   styleUrls: ['./reservation.component.scss'],
   imports: [SharedModule, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe,
-    BackButtonDirective, GoogleMapComponent, CalendarWeekViewComponent],
+    BackButtonDirective, GoogleMapComponent, PaymentOptionSelectComponent, CalendarWeekViewComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationComponent {
   private readonly dialog = inject(MatDialog);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly translate: TranslateService = inject(TranslateService);
-  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly router: Router = inject(Router);
@@ -177,18 +181,20 @@ export class ReservationComponent {
   private selectedReservation$ = this.store.pipe(getSelectedReservationPipe);
   private calendar$ = this.store.pipe(getCalendarPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
+  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
-  private navigationParams = toSignal(this.navigationParams$);
-  private reservationIdSignal = toSignal(this.reservationId$);
-  private roomsSignal = toSignal(this.rooms$);
-  private treatmentDiscountSignal = toSignal(this.treatmentDiscount$);
-  private customerInfoSignal = toSignal(this.customerInfo$);
-  private selectedReservationSignal = toSignal(this.selectedReservation$);
-  private calendarSignal = toSignal(this.calendar$);
-  private subErrorsSignal = toSignal(this.subErrors$);
-  private authUserSignal = this.authUserService.authUser;
-  private breakpointsSignal = toSignal(
+  private readonly navigationParams = toSignal(this.navigationParams$);
+  private readonly reservationIdSignal = toSignal(this.reservationId$);
+  private readonly roomsSignal = toSignal(this.rooms$);
+  private readonly treatmentDiscountSignal = toSignal(this.treatmentDiscount$);
+  private readonly customerInfoSignal = toSignal(this.customerInfo$);
+  private readonly selectedReservationSignal = toSignal(this.selectedReservation$);
+  private readonly calendarSignal = toSignal(this.calendar$);
+  private readonly subErrorsSignal = toSignal(this.subErrors$);
+  private readonly authUserSignal = this.authUserService.authUser;
+  private readonly paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
+  private readonly breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
         matches: false,
@@ -249,7 +255,7 @@ export class ReservationComponent {
     customerChange: this.formBuilder.control(false),
     reference: this.formBuilder.control(undefined),
     note: this.formBuilder.control(undefined),
-    type: this.formBuilder.control(undefined),
+    option: this.formBuilder.control(undefined),
     amount: this.formBuilder.control(undefined, [Validators.min(1)]),
     transfer: this.formBuilder.control(undefined),
   });
@@ -397,6 +403,11 @@ export class ReservationComponent {
   private selectAmountSignal = toSignal(this.getConfigurationForm.amount.valueChanges);
   private selectDateTimeListSignal = toSignal(this.dateTimeList.valueChanges);
 
+  private readonly paymentOptions = computed(() => this.paymentOptionsSignal().filter(
+    option => option.enabled && option.enabledProfessional,
+  ));
+  options = signal<IPaymentOption[] | undefined>(undefined);
+
   weekendDays: number[] = [0, 6];
   day: IDay = new Day();
   refresh: Subject<any> = new Subject();
@@ -410,7 +421,6 @@ export class ReservationComponent {
   isAdmin = computed(() => this.authUserSignal().isAdmin);
   maxCalendarDate: Date = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
 
-  types: string[] = [PaymentType.cash, PaymentType.transfer];
   screenConfig = computed(() => {
     const isSmall = !!this.breakpointsSignal()?.matches;
 
@@ -640,6 +650,8 @@ export class ReservationComponent {
         }
         this.getTreatmentForm.group.setValue(undefined);
         // this.cleanTreatment();
+        const options = this.paymentOptions();
+        this.options.set(options.filter(option => room.paymentTypes.includes(option.type)));
       }
     });
 
@@ -719,11 +731,11 @@ export class ReservationComponent {
     effect(() => {
       const amount = this.selectAmountSignal();
       if (amount) {
-        this.getConfigurationForm.type.setValidators([Validators.required]);
+        this.getConfigurationForm.option.setValidators([Validators.required]);
       } else {
-        this.getConfigurationForm.type.clearValidators();
+        this.getConfigurationForm.option.clearValidators();
       }
-      this.getConfigurationForm.type.updateValueAndValidity();
+      this.getConfigurationForm.option.updateValueAndValidity();
     });
 
     effect(() => {
@@ -940,7 +952,7 @@ export class ReservationComponent {
 
   private get summaryPriceSource(): IPrice {
     const reservation = this.selectedReservationSignal();
-    return reservation ? getPrice(reservation) : new Price();
+    return reservation ? getPrice(reservation, reservation.payments) : new Price();
   }
 
   get isAddButtonDisabled(): boolean {
@@ -1006,6 +1018,38 @@ export class ReservationComponent {
     return this.price().total || this.summaryPriceSource.total;
   }
 
+  get effectivePaidTotal(): number {
+    return this.price().totalPaid || this.summaryPriceSource.totalPaid || 0;
+  }
+
+  get effectiveBalanceUsed(): number {
+    return this.price().balance || this.summaryPriceSource.balance || 0;
+  }
+
+  get showCoveredAmounts(): boolean {
+    return this.effectivePaidTotal > 0 || this.effectiveBalanceUsed > 0;
+  }
+
+  get effectiveRemainingTotal(): number {
+    return Math.max(this.effectiveTotalPrice - this.effectivePaidTotal - this.effectiveBalanceUsed, 0);
+  }
+
+  get configuredPaymentAmount(): number {
+    return Math.max(Number(this.getConfigurationForm.amount.value || 0), 0);
+  }
+
+  get effectivePaidWithConfiguredAmount(): number {
+    return this.effectivePaidTotal + Math.min(this.configuredPaymentAmount, this.effectiveRemainingTotal);
+  }
+
+  get configuredPaymentToPay(): number {
+    return Math.max(this.effectiveTotalPrice - this.effectivePaidWithConfiguredAmount - this.effectiveBalanceUsed, 0);
+  }
+
+  get showConfigurationAmounts(): boolean {
+    return this.showCoveredAmounts || this.configuredPaymentAmount > 0;
+  }
+
   getFormEvent = (index: number): FormGroup<EventForm> => this.events.at(index);
 
   getFormEventControls = (index: number): EventForm => this.getFormEvent(index).controls;
@@ -1028,10 +1072,10 @@ export class ReservationComponent {
       reservation.reference = this.getConfigurationForm.reference.value;
       reservation.note = this.getConfigurationForm.note.value;
       const amount = this.getConfigurationForm.amount.value;
-      const type = this.getConfigurationForm.type.value;
+      const type = this.getConfigurationForm.option.value?.type;
       const transfer = this.getConfigurationForm.transfer.value;
       if (amount && type) {
-        reservation.payment = { type, amount, transfer } as IReservationPayment;
+        reservation.payment = { type, amount, transfer, pointOfSale: true } as IReservationPayment;
       }
 
       const role = this.isDashboard ? Role.roomAdmin : Role.professional;
@@ -1682,7 +1726,7 @@ export class ReservationComponent {
     }
   };
 
-  private setData = (reservation: IReservationAll): void => {
+  private setData = (reservation: IUpcomingAll): void => {
     this.hydratingEdit = true;
     this.treatmentDiscount = reservation.treatment.discountCustomer;
     this.isPreview = false;
@@ -1710,7 +1754,7 @@ export class ReservationComponent {
     } else {
       this.addDate(date, getTime(date, this.dateFormat));
     }
-    this.setPrice(getPrice(reservation));
+    this.setPrice(getPrice(reservation, reservation.payments));
     this.additionalSelected.set(reservation.additional ? reservation.additional
       .map(ad => Object.assign({}, ad, { id: ad.key })) : []);
     this.getConfigurationForm.note.setValue(reservation.note, { emitEvent: false });

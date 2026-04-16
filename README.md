@@ -87,11 +87,34 @@ Other important folders:
 
 ## Testing
 
-Run unit tests:
+Run unit tests with coverage:
+
+### Local Coverage Diff Check (optional)
+
+To verify how your current branch affects test coverage compared to `develop`, you can use `diff-cover`.
+
+This is **only for local development**. The CI pipeline already runs full LCOV coverage checks.
+
+#### Generate diff coverage report
+
+First make sure you have an LCOV report generated:
 
 ```bash
 npm run test
 ```
+
+Then run the diff coverage check against the `develop` branch:
+
+```bash
+BASE=develop npm run coverage:diff
+```
+
+### What it does
+
+- Compares your current branch against develop
+- Shows coverage impact only for changed lines
+- Fails if diff coverage drops below 80%
+- Generates an HTML report at: coverage/diff-cover-report.html
 
 Run a TypeScript-only spec compile check:
 

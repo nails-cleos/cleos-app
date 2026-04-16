@@ -27,7 +27,7 @@ import { ICurrency, ICurrencyAll } from '../interfaces/currency';
 import { GroupService, IPrice, ITreatmentAll, Price } from '../interfaces/treatment';
 import { IExtras, IReservationAll } from '../interfaces/reservation';
 import { getCurrentTimeZone } from './dates';
-import { IPayment, PaymentType } from '../interfaces/payment';
+import { IPayment } from '../interfaces/payment';
 import { DiscountType, IDiscount } from '../interfaces/discount';
 import { IAdditionalAll } from '../interfaces/additional';
 import { MatDialog } from '@angular/material/dialog';
@@ -79,7 +79,7 @@ describe('Helper Utils', () => {
       },
     },
     timeZone: getCurrentTimeZone(),
-    paymentTypes: [PaymentType.transfer],
+    paymentTypes: ['TRANSFER'],
     primary: true,
   };
 

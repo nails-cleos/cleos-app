@@ -1,6 +1,6 @@
 {
   "DASHBOARD": {
-    "FIELD": "Tablero",
+    "FIELD": "Dashboard",
     "SIGN_IN": "Sign In",
     "RESERVATION": {
       "COMPLETED": "<span class='bold'>Completed: </span>{{completed}} - {{total}}",
@@ -37,6 +37,7 @@
       "CLOSED": "Closed",
       "STARTED": "<div>Started {startText}</div>",
       "ELAPSED": "<div>Elapsed {elapsedText}</div>",
+      "EXPECTED_FINISH": "<div>Expected finish {finishTime}</div>",
       "FINISH_IN": "<div>Finish in {finishText}</div>"
     },
     "META": {

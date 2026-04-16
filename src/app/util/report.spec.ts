@@ -2,7 +2,6 @@ import { createYearlyWorkbook } from './report';
 import { EnvService } from '../services/env.service';
 import { TranslateService } from '@ngx-translate/core';
 import { IMonthlyExport, IMonthlySummaryExpense, IMonthlySummarySale, ISummaryTotal } from '../interfaces/dashboard';
-import { PaymentType } from '../interfaces/payment';
 import { States } from '../interfaces/reservation';
 import { monthViewTitle } from './dates';
 
@@ -13,7 +12,7 @@ const buildSummaryTotal = (
   overrides?: Partial<ISummaryTotal>,
 ): ISummaryTotal => ({
   id: 'T1',
-  paymentType: PaymentType.cash,
+  paymentType: 'CASH',
   expenseType: 'DIRECT_COSTS',
   expenseSubType: 'DIRECT_COSTS',
   type: 'INCOME',

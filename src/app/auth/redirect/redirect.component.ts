@@ -12,8 +12,7 @@ import { AuthState } from '../../store/reducers/auth.reducers';
 
 @Component({
   selector: 'app-redirect',
-  templateUrl: './redirect.component.html',
-  styleUrls: ['./redirect.component.scss'],
+  template: '',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RedirectComponent {

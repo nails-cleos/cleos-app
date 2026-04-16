@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+.full-field {
+  width: 100%;
+}
+
+.list-item-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.list-item-label {
+  line-height: 1.2;
+}
+
+.select-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.select-trigger__label {
+  line-height: 1.2;
+}

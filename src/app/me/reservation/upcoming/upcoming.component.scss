@@ -1,51 +1,93 @@
-.mat-mdc-card-content {
-  .container {
-    margin: auto;
-    text-align: center;
+.upcoming-section {
+  position: relative;
+}
 
-    table {
-      border-spacing: 0 1px;
-      border-collapse: separate;
-      margin: auto;
+.upcoming-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
 
-      td {
-        width: 50%;
-      }
+.upcoming-info-button {
+  margin-left: auto;
+}
 
-      tbody {
-        tr:last-child {
-          td {
-            border-bottom: 1px solid #000;
-            padding-bottom: 5px;
-          }
-        }
-      }
+.upcoming-breakdown-card {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
-      .left {
-        text-align: left;
-      }
+.upcoming-breakdown-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
 
-      .right {
-        padding: 0 5% 0;
-        font-weight: bold;
-        text-align: right;
-      }
+.upcoming-breakdown-card__header .mat-icon {
+  color: var(--app-surface-text);
+}
 
-      tfoot {
-        tr:nth-last-child(2) {
-          th, td {
-            border-bottom: 1px double #000;
-            padding-bottom: 5px;
-          }
-        }
-        tr:last-child {
-          th, td {
-            border-top: 1px double #000;
-          }
-        }
-      }
-    }
-  }
+.upcoming-breakdown-card__subtitle {
+  margin: 4px 0 0;
+  color: var(--app-surface-text-muted);
+  line-height: 1.4;
+}
+
+.price-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--app-surface-text);
+}
+
+.price-row--discount {
+  color: var(--app-surface-text-muted);
+}
+
+.price-row--total {
+  padding-top: 10px;
+  border-top: 1px solid var(--app-surface-card-border);
+}
+
+.upcoming-additional-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.upcoming-additional-item,
+.upcoming-total-breakdown {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--app-surface-text);
+}
+
+.upcoming-total-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.upcoming-warning {
+  margin-top: 18px;
+  color: var(--warn-color, #b42318);
+}
+
+.upcoming-actions {
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
 }
 
 .stamp {
@@ -84,5 +126,17 @@
   }
   to {
     transform: scale(1) rotate(var(--stamp-rotate));
+  }
+}
+
+@media (max-width: 720px) {
+  .upcoming-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .upcoming-actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
   }
 }

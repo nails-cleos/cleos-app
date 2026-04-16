@@ -14,7 +14,7 @@ import { PricePreviewComponent } from '../price-preview/price-preview.component'
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentPreviewComponent {
-  type = input<IPaymentOption>();
+  option = input<IPaymentOption>();
   currencyIcon = input<string>();
   toPaid = input<number>();
   penalty = input<number>();

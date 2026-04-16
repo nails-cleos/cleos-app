@@ -1,142 +1,143 @@
-<div class="flex-container">
-  <div class="card-container">
-    <div class="card-content">
-      <mat-card appearance="outlined">
-        <mat-card-header>
-          <mat-card-title>{{ 'AUTH.SIGN_IN.TITLE' | translate }}</mat-card-title>
-        </mat-card-header>
-        <mat-divider></mat-divider>
-        <mat-card-content>
-          @let status = statusSignal();
-          <form [formGroup]="form" (ngSubmit)="onSubmit()">
-            @if (!showForm) {
-              <div class="button-container">
-                <ng-container [ngTemplateOutlet]="googleButton"></ng-container>
-                <button class="button" mat-raised-button style="background-color: #DA4437; color: white;"
-                        (click)="showForm=true" type="button">
-                  <mat-icon matIconPrefix>email</mat-icon>
-                  {{ 'COMMON.USER.WITH.EMAIL' | translate }}
-                </button>
-                <p style="text-align: center"
-                   [innerHTML]="'COMMON.USER.LOGIN.ACCEPT' | translate:{tos: tos, privacyPolicy:privacyPolicy}">
-                </p>
-              </div>
-            }
-            @if (showForm) {
-              <div class="flex-container" style="margin: 10px 0 10px">
-                <div class="card-container">
-                  <div class="card-content">
-                    <mat-card appearance="outlined">
-                      <mat-card-header>
-                        <mat-card-title>
-                          @if (['init', 'password', 'password|google.com', 'google.com|password'].includes(status)) {
-                            {{ 'COMMON.USER.WITH.EMAIL' | translate }}
-                          } @else if (status === 'google.com') {
-                            {{ 'COMMON.USER.WITH.IN' | translate }}
-                          } @else {
-                            {{ 'COMMON.USER.WITH.REGISTER' | translate }}
-                          }
-                        </mat-card-title>
-                      </mat-card-header>
-                      <mat-card-content>
-                        <div class="inner-container">
-                          @if (['init', 'password', 'password|google.com', 'google.com|password', ''].includes(status)) {
-                            <mat-form-field appearance="outline">
-                              <mat-label>{{ 'COMMON.USER.EMAIL.FIELD' | translate }}</mat-label>
-                              <input matInput [formControl]="getForm.email" required type="email" name="email"/>
-                              @if (getForm.email.hasError('required')) {
-                                <mat-error [innerHTML]="'COMMON.USER.EMAIL.REQUIRED' | translate"></mat-error>
-                              } @else if (getForm.email.hasError('email')) {
-                                <mat-error [innerHTML]="'COMMON.USER.EMAIL.VALID' | translate"></mat-error>
-                              }
-                            </mat-form-field>
-                          }
+<div class="app-surface-canvas app-surface-shell auth-page">
+  <div class="app-surface-stack">
+    <section class="app-surface-hero app-detail-panel auth-hero">
+      <div class="app-surface-eyebrow">{{ 'AUTH.SIGN_IN.TITLE' | translate }}</div>
 
-                          @if (status === '') {
-                            <mat-form-field appearance="outline">
-                              <mat-label>{{ 'COMMON.USER.DISPLAY_NAME.FIELD' | translate }}</mat-label>
-                              <input matInput [formControl]="getForm.displayName" required autocomplete="given-name"
-                                     name="displayName"/>
-                              @if (getForm.displayName.hasError('required')) {
-                                <mat-error [innerHTML]="'COMMON.USER.DISPLAY_NAME.REQUIRED' | translate"></mat-error>
-                              }
-                            </mat-form-field>
-                          }
+      @let status = statusSignal();
+      <form class="auth-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+        @if (!showForm) {
+          <section class="app-surface-section auth-section">
+            <div class="auth-section__header">
+              <div class="app-surface-eyebrow">{{ 'COMMON.USER.WITH.IN' | translate }}</div>
+            </div>
 
-                          @if (['password', 'password|google.com', 'google.com|password', ''].includes(statusSignal())) {
-                            <mat-form-field appearance="outline">
-                              <mat-label>{{ 'COMMON.USER.PASSWORD.FIELD' | translate }}</mat-label>
-                              <input matInput type="password" [formControl]="getForm.password" required
-                                     name="password"/>
-                              @if (getForm.password.hasError('required')) {
-                                <mat-error [innerHTML]="'COMMON.USER.PASSWORD.REQUIRED' | translate"></mat-error>
-                              } @else if (getForm.password.hasError('weak')) {
-                                <mat-error [innerHTML]="'COMMON.USER.PASSWORD.WEAK' | translate"></mat-error>
-                              } @else if (getForm.password.hasError('wrong')) {
-                                <mat-error [innerHTML]="'COMMON.USER.PASSWORD.WRONG' | translate"></mat-error>
-                              } @else if (getForm.password.hasError('error')) {
-                                <mat-error>{{ getForm.password.errors?.error }}</mat-error>
-                              }
-                            </mat-form-field>
-                          }
+            <div class="auth-choice-list">
+              <ng-container [ngTemplateOutlet]="googleButton"></ng-container>
 
-                          @if (status === 'google.com') {
-                            <h3>{{ 'COMMON.USER.LOGIN.ACCOUNT.TITLE' | translate }}</h3>
-                            <p
-                              [innerHTML]="'COMMON.USER.LOGIN.ACCOUNT.MESSAGE' | translate:{email: getForm.email.value}"></p>
-                          }
-                        </div>
-                      </mat-card-content>
-                      <mat-card-actions>
-                        @if (['password', 'password|google.com', 'google.com|password', ''].includes(status)) {
-                          <div class="link-container">
-                            <a type="button"
-                               [routerLink]="['/', language, 'auth', 'forgot-password']">{{ 'AUTH.SIGN_IN.FORGOT_PASSWORD' | translate }}</a>
-                          </div>
-                          <div class="spacer"></div>
-                          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
-                            {{ 'COMMON.BUTTON.LOGIN' | translate }}
-                          </button>
-                        } @else if ('google.com' === status) {
-                          <div class="spacer"></div>
-                          <ng-container [ngTemplateOutlet]="googleButton"></ng-container>
-                        } @else {
-                          <div class="spacer"></div>
-                          <button mat-button type="button" color="accent" (click)="showForm = false">
-                            {{ 'COMMON.BUTTON.CANCEL' | translate }}
-                          </button>
-                          <button mat-raised-button color="accent" type="button" (click)="validateEmail()"
-                                  [disabled]="getForm.email.invalid">
-                            {{ 'COMMON.BUTTON.NEXT' | translate }}
-                          </button>
-                        }
-                      </mat-card-actions>
-                    </mat-card>
-                  </div>
-                </div>
-              </div>
-            }
-
-            <ng-template #googleButton>
-              <button mat-raised-button class="gsi-material-button button" (click)="loginWithGoogle()" type="button">
-                <div class="gsi-material-button-state"></div>
-                  <div class="gsi-material-button-content-wrapper">
-                    <div class="gsi-material-button-icon">
-                      <img src="assets/google-logo.svg" alt="Google">
-                    </div>
-                  <span class="gsi-material-button-contents">{{ 'COMMON.USER.WITH.GOOGLE' | translate }}</span>
-                  <span style="display: none;">{{ 'COMMON.USER.WITH.GOOGLE' | translate }}</span>
-                </div>
+              <button class="auth-choice-button auth-choice-button--email"
+                      mat-stroked-button
+                      (click)="showForm = true"
+                      type="button">
+                <mat-icon>email</mat-icon>
+                <span>{{ 'COMMON.USER.WITH.EMAIL' | translate }}</span>
               </button>
-            </ng-template>
+            </div>
 
-            <mat-form-field appearance="outline" style="width: 100%">
+            <p class="auth-legal"
+               [innerHTML]="'COMMON.USER.LOGIN.ACCEPT' | translate:{tos: tos, privacyPolicy:privacyPolicy}">
+            </p>
+          </section>
+        }
+
+        @if (showForm) {
+          <div class="auth-section__header">
+            <div class="auth-title">
+              @if (['init', 'password', 'password|google.com', 'google.com|password'].includes(status)) {
+                {{ 'COMMON.USER.WITH.EMAIL' | translate }}
+              } @else if (status === 'google.com') {
+                {{ 'COMMON.USER.WITH.IN' | translate }}
+              } @else {
+                {{ 'COMMON.USER.WITH.REGISTER' | translate }}
+              }
+            </div>
+          </div>
+
+          <div class="app-crud-form-grid">
+            @if (['init', 'password', 'password|google.com', 'google.com|password', ''].includes(status)) {
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'COMMON.USER.EMAIL.FIELD' | translate }}</mat-label>
+                <input matInput [formControl]="getForm.email" required type="email" name="email"/>
+                @if (getForm.email.hasError('required')) {
+                  <mat-error [innerHTML]="'COMMON.USER.EMAIL.REQUIRED' | translate"></mat-error>
+                } @else if (getForm.email.hasError('email')) {
+                  <mat-error [innerHTML]="'COMMON.USER.EMAIL.VALID' | translate"></mat-error>
+                }
+              </mat-form-field>
+            }
+
+            @if (status === '') {
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'COMMON.USER.DISPLAY_NAME.FIELD' | translate }}</mat-label>
+                <input matInput [formControl]="getForm.displayName" required autocomplete="given-name"
+                       name="displayName"/>
+                @if (getForm.displayName.hasError('required')) {
+                  <mat-error [innerHTML]="'COMMON.USER.DISPLAY_NAME.REQUIRED' | translate"></mat-error>
+                }
+              </mat-form-field>
+            }
+
+            @if (['password', 'password|google.com', 'google.com|password', ''].includes(status)) {
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'COMMON.USER.PASSWORD.FIELD' | translate }}</mat-label>
+                <input matInput type="password" [formControl]="getForm.password" required name="password"/>
+                @if (getForm.password.hasError('required')) {
+                  <mat-error [innerHTML]="'COMMON.USER.PASSWORD.REQUIRED' | translate"></mat-error>
+                } @else if (getForm.password.hasError('weak')) {
+                  <mat-error [innerHTML]="'COMMON.USER.PASSWORD.WEAK' | translate"></mat-error>
+                } @else if (getForm.password.hasError('wrong')) {
+                  <mat-error [innerHTML]="'COMMON.USER.PASSWORD.WRONG' | translate"></mat-error>
+                } @else if (getForm.password.hasError('error')) {
+                  <mat-error>{{ getForm.password.errors?.error }}</mat-error>
+                }
+              </mat-form-field>
+            }
+
+            @if (status === 'google.com') {
+              <div class="app-surface-item app-surface-item--section app-crud-fields app-crud-form-grid__full">
+                <div class="app-surface-item__label">{{ 'COMMON.USER.LOGIN.ACCOUNT.TITLE' | translate }}</div>
+                <div class="app-surface-item__value"
+                     [innerHTML]="'COMMON.USER.LOGIN.ACCOUNT.MESSAGE' | translate:{email: getForm.email.value}"></div>
+              </div>
+            }
+
+            <mat-form-field appearance="outline" class="app-crud-form-grid__full">
               <mat-label>{{ 'AUTH.SIGN_IN.CODE.FIELD' | translate }}</mat-label>
               <input [formControl]="getForm.code" matInput autocomplete="one-time-code">
             </mat-form-field>
-          </form>
-        </mat-card-content>
-      </mat-card>
-    </div>
+          </div>
+
+          <div class="app-detail-actions auth-actions">
+            @if (['password', 'password|google.com', 'google.com|password', ''].includes(status)) {
+              <a class="auth-actions__link"
+                 [routerLink]="['/', language, 'auth', 'forgot-password']">
+                {{ 'AUTH.SIGN_IN.FORGOT_PASSWORD' | translate }}
+              </a>
+              <div class="spacer"></div>
+              <button mat-stroked-button type="submit" [disabled]="form.invalid">
+                <mat-icon>login</mat-icon>
+                {{ 'COMMON.BUTTON.LOGIN' | translate }}
+              </button>
+            } @else if (status === 'google.com') {
+              <div class="spacer"></div>
+              <ng-container [ngTemplateOutlet]="googleButton"></ng-container>
+            } @else {
+              <div class="spacer"></div>
+              <button mat-stroked-button type="button" (click)="showForm = false">
+                {{ 'COMMON.BUTTON.CANCEL' | translate }}
+              </button>
+              <button mat-stroked-button type="button" (click)="validateEmail()"
+                      [disabled]="getForm.email.invalid">
+                <mat-icon>arrow_forward</mat-icon>
+                {{ 'COMMON.BUTTON.NEXT' | translate }}
+              </button>
+            }
+          </div>
+        }
+
+        <ng-template #googleButton>
+          <button mat-stroked-button class="gsi-material-button auth-choice-button" (click)="loginWithGoogle()"
+                  type="button">
+            <div class="gsi-material-button-state"></div>
+            <div class="gsi-material-button-content-wrapper">
+              <div class="gsi-material-button-icon">
+                <img src="assets/google-logo.svg" alt="Google">
+              </div>
+              <span class="gsi-material-button-contents">{{ 'COMMON.USER.WITH.GOOGLE' | translate }}</span>
+              <span style="display: none;">{{ 'COMMON.USER.WITH.GOOGLE' | translate }}</span>
+            </div>
+          </button>
+        </ng-template>
+      </form>
+    </section>
   </div>
 </div>

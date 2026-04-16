@@ -1,42 +1,51 @@
-<h1 mat-dialog-title>{{ 'RESERVATION.CUSTOMER.CHANGE' | translate }}</h1>
-<div mat-dialog-content>
-  <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
-    @if (customersSignal()) {
-      <mat-form-field appearance="outline">
-        <mat-label>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</mat-label>
-        <label>
-          <input (keydown)="keyDownHandler($event)" [formControl]="getForm.customer" [matAutocomplete]="autoCustomer"
-                 autocomplete="off" matInput required type="text">
-        </label>
-        <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
-          @for (customer of filteredCustomerSignal(); track customer.id) {
-            <mat-option [value]="customer">{{ customer.displayName }}</mat-option>
+<div class="app-surface-dialog-shell">
+  <div class="app-surface-dialog-header">
+    <div class="app-surface-dialog-title-wrap">
+      <div class="app-surface-dialog-badge" aria-hidden="true">
+        <mat-icon>person_search</mat-icon>
+      </div>
+      <h1 mat-dialog-title class="app-surface-dialog-title">{{ 'RESERVATION.CUSTOMER.CHANGE' | translate }}</h1>
+    </div>
+    <button (click)="onNoClick()" aria-label="Close dialog" class="app-surface-dialog-close" type="button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="app-surface-dialog-divider" aria-hidden="true"></div>
+
+  <div mat-dialog-content class="app-surface-dialog-content">
+    <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
+      @if (customersSignal()) {
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</mat-label>
+          <label>
+            <input (keydown)="keyDownHandler($event)" [formControl]="getForm.customer" [matAutocomplete]="autoCustomer"
+                   autocomplete="off" matInput required type="text">
+          </label>
+          <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
+            @for (customer of filteredCustomerSignal(); track customer.id) {
+              <mat-option [value]="customer">{{ customer.displayName }}</mat-option>
+            }
+          </mat-autocomplete>
+          @if (getForm.customer.hasError('required')) {
+            <mat-error [innerHTML]="'RESERVATION.CUSTOMER.REQUIRED' | translate"></mat-error>
+          } @else if (getForm.customer.hasError('requireMatch')) {
+            <mat-error [innerHTML]="'RESERVATION.CUSTOMER.INVALID' | translate"></mat-error>
           }
-        </mat-autocomplete>
-        @if (getForm.customer.hasError('required')) {
-          <mat-error [innerHTML]="'RESERVATION.CUSTOMER.REQUIRED' | translate"></mat-error>
-        } @else if (getForm.customer.hasError('requireMatch')) {
-          <mat-error [innerHTML]="'RESERVATION.CUSTOMER.INVALID' | translate"></mat-error>
-        }
-      </mat-form-field>
-    } @else {
-      <div class="ssc-line"></div>
-    }
-  </form>
-</div>
-<div mat-dialog-actions class="card-actions">
-  <div class="spacer"></div>
-  @if (data.small) {
-    <button (click)="onNoClick()" mat-icon-button>
-      <mat-icon>clear</mat-icon>
-    </button>
-    <button (click)="doAction()" color="primary" [disabled]="form.invalid" mat-icon-button>
-      <mat-icon>published_with_changes</mat-icon>
-    </button>
-  } @else {
-    <button (click)="onNoClick()" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
-    <button (click)="doAction()" color="primary" [disabled]="form.invalid" mat-fab extended class="icon-button">
+        </mat-form-field>
+      } @else {
+        <div class="ssc-line"></div>
+      }
+    </form>
+  </div>
+
+  <div class="app-surface-dialog-divider" aria-hidden="true"></div>
+
+  <div mat-dialog-actions class="app-surface-dialog-actions">
+    <div class="app-surface-dialog-spacer"></div>
+    <button (click)="onNoClick()" mat-stroked-button type="button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+    <button (click)="doAction()" color="primary" [disabled]="form.invalid" mat-flat-button type="button">
       {{ 'RESERVATION.CUSTOMER.UPDATE' | translate }}
     </button>
-  }
+  </div>
 </div>

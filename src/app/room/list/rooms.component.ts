@@ -66,7 +66,7 @@ export class RoomsComponent {
   resultsLengthSignal = computed(() => this.roomListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'currency', 'office', 'address', 'timeZone', 'availability', 'actions'];
+  displayedColumns: string[] = ['position', 'currency', 'office', 'address', 'timeZone', 'availability', 'actions', 'add'];
   expanded?: IRoom;
 
   language: string = this.translate.getCurrentLang();

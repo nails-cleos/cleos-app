@@ -1,6 +1,6 @@
 @if (canCreate) {
   <ng-template #stepHeading let-step="step" let-title="title" let-description="description">
-    <div class="step-heading">
+    <div class="step-heading app-surface-hero app-detail-panel">
       <div class="step-heading__index">{{ step }}</div>
       <div class="step-heading__copy">
         <h2>{{ title | translate }}</h2>
@@ -15,7 +15,8 @@
     @let currentTreatment = summaryTreatment;
     @let currentAdditionalSelected = additionalSelected();
 
-    <mat-card appearance="outlined" class="booking-summary" [class.booking-summary--compact]="compact">
+    <mat-card appearance="outlined" class="booking-summary app-surface-section"
+              [class.booking-summary--compact]="compact">
       <mat-card-content>
         <div class="booking-summary__header">
           <div>
@@ -35,31 +36,38 @@
         </div>
 
         <div class="booking-summary__grid">
-          <div class="summary-item">
-            <span class="summary-item__label">{{ 'COMMON.ROOM.FIELD' | translate }}</span>
-            <strong>{{ (currentRoom | roomName) || ('ME.RESERVATION.FLOW.SUMMARY.EMPTY' | translate) }}</strong>
+          <div class="summary-item app-surface-item">
+            <span class="summary-item__label app-surface-item__label">{{ 'COMMON.ROOM.FIELD' | translate }}</span>
+            <strong
+              class="app-surface-item__value">{{ (currentRoom | roomName) || ('ME.RESERVATION.FLOW.SUMMARY.EMPTY' | translate) }}</strong>
           </div>
 
-          <div class="summary-item">
-            <span class="summary-item__label">{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</span>
-            <strong>{{ currentProfessional?.displayName || ('ME.RESERVATION.FLOW.SUMMARY.EMPTY' | translate) }}</strong>
+          <div class="summary-item app-surface-item">
+            <span
+              class="summary-item__label app-surface-item__label">{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</span>
+            <strong
+              class="app-surface-item__value">{{ currentProfessional?.displayName || ('ME.RESERVATION.FLOW.SUMMARY.EMPTY' | translate) }}</strong>
           </div>
 
-          <div class="summary-item">
-            <span class="summary-item__label">{{ 'COMMON.TREATMENT.FIELD' | translate }}</span>
-            <strong>{{ currentTreatment?.name || ('ME.RESERVATION.FLOW.SUMMARY.EMPTY' | translate) }}</strong>
+          <div class="summary-item app-surface-item">
+            <span class="summary-item__label app-surface-item__label">{{ 'COMMON.TREATMENT.FIELD' | translate }}</span>
+            <strong
+              class="app-surface-item__value">{{ currentTreatment?.name || ('ME.RESERVATION.FLOW.SUMMARY.EMPTY' | translate) }}</strong>
           </div>
 
-          <div class="summary-item">
-            <span class="summary-item__label">{{ 'ME.RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</span>
-            <strong>{{ totalDurationFormatted || (currentTreatment?.duration | durationTime) || ('ME.RESERVATION.FLOW.SUMMARY.EMPTY' | translate) }}</strong>
+          <div class="summary-item app-surface-item">
+            <span
+              class="summary-item__label app-surface-item__label">{{ 'ME.RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</span>
+            <strong
+              class="app-surface-item__value">{{ totalDurationFormatted || (currentTreatment?.duration | durationTime) || ('ME.RESERVATION.FLOW.SUMMARY.EMPTY' | translate) }}</strong>
           </div>
 
-          <div class="summary-item summary-item--wide">
-            <span class="summary-item__label">{{ 'ME.RESERVATION.FLOW.SUMMARY.DATE_TIME' | translate }}</span>
+          <div class="summary-item app-crud-form-grid__full app-surface-item">
+            <span
+              class="summary-item__label app-surface-item__label">{{ 'ME.RESERVATION.FLOW.SUMMARY.DATE_TIME' | translate }}</span>
             @if (appointmentStart) {
               <div class="booking-summary__slots">
-                <span class="booking-summary__slot">
+                <span class="booking-summary__slot app-detail-chip">
                   {{ appointmentStart | date:'EEE d MMM, HH:mm':currentRoom?.timeZone:dateFormat }}
                   @if (appointmentEnd) {
                     <span> - {{ appointmentEnd | date:'HH:mm':currentRoom?.timeZone:dateFormat }}</span>
@@ -73,20 +81,20 @@
                 </span>
               </div>
             } @else {
-              <strong>{{ 'ME.RESERVATION.FLOW.SUMMARY.EMPTY' | translate }}</strong>
+              <strong class="app-surface-item__value">{{ 'ME.RESERVATION.FLOW.SUMMARY.EMPTY' | translate }}</strong>
             }
           </div>
 
-          <div class="summary-item summary-item--wide">
-            <span class="summary-item__label">{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</span>
+          <div class="summary-item app-crud-form-grid__full app-surface-item">
+            <span class="summary-item__label app-surface-item__label">{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</span>
             @if (currentAdditionalSelected.length) {
               <div class="booking-summary__slots">
                 @for (additional of currentAdditionalSelected; track additional.id) {
-                  <span class="booking-summary__slot">{{ additional.name }}</span>
+                  <span class="booking-summary__slot app-detail-chip">{{ additional.name }}</span>
                 }
               </div>
             } @else {
-              <strong>{{ 'ME.RESERVATION.FLOW.SUMMARY.NONE' | translate }}</strong>
+              <strong class="app-surface-item__value">{{ 'ME.RESERVATION.FLOW.SUMMARY.NONE' | translate }}</strong>
             }
           </div>
         </div>
@@ -118,6 +126,27 @@
               <span>{{ 'ME.RESERVATION.FLOW.SUMMARY.TOTAL' | translate }}</span>
               <strong>{{ currentRoom?.currency | currencySymbol }} {{ effectiveTotalPrice | number:'1.2-2' }}</strong>
             </div>
+
+            @if (showCoveredAmounts) {
+              @if (effectivePaidTotal > 0) {
+                <div class="price-row">
+                  <span>{{ 'COMMON.PAYMENT.OPTIONS.PAID' | translate }}</span>
+                  <strong>{{ currentRoom?.currency | currencySymbol }} {{ effectivePaidTotal | number:'1.2-2' }}</strong>
+                </div>
+              }
+
+              @if (accountBalanceUsed > 0) {
+                <div class="price-row">
+                  <span>{{ 'COMMON.PAYMENT.OPTIONS.BALANCE' | translate }}</span>
+                  <strong>{{ currentRoom?.currency | currencySymbol }} {{ accountBalanceUsed | number:'1.2-2' }}</strong>
+                </div>
+              }
+
+              <div class="price-row price-row--total">
+                <span>{{ 'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate }}</span>
+                <strong>{{ currentRoom?.currency | currencySymbol }} {{ paymentToPay | number:'1.2-2' }}</strong>
+              </div>
+            }
           </div>
         }
       </mat-card-content>
@@ -125,7 +154,7 @@
   </ng-template>
 
   <ng-template #stepOne>
-    <form class="step-form" [formGroup]="officeForm" (keydown.enter)="$event.preventDefault()">
+    <form class="app-surface-stack" [formGroup]="officeForm" (keydown.enter)="$event.preventDefault()">
       <ng-container *ngTemplateOutlet="stepHeading; context: {
         step: 1,
         title: 'COMMON.ROOM.FIELD',
@@ -139,7 +168,7 @@
           <div class="empty-state__title">{{ 'ME.RESERVATION.ROOM.NO_CONTENT' | translate }}</div>
         </div>
       } @else {
-        <div class="step-section">
+        <div class="app-surface-section">
           <div class="field-grid field-grid--triple">
             <mat-form-field appearance="outline">
               <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
@@ -209,7 +238,7 @@
 
         @if (room && room.address && getOfficeForm.professional.value) {
           <div class="support-grid">
-            <div class="support-card">
+            <div class="support-card app-surface-section">
               <div class="support-card__header">
                 <mat-icon>store</mat-icon>
                 <div>
@@ -220,42 +249,32 @@
 
               <div class="info-grid">
                 @if (getOfficeForm.office.value) {
-                  <div class="info-item">
-                    <span>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</span>
-                    <strong>{{ getOfficeForm.office.value.name }}</strong>
+                  <div class="info-item app-surface-item">
+                    <span class="app-surface-item__label">{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</span>
+                    <strong class="app-surface-item__value">{{ getOfficeForm.office.value.name }}</strong>
                   </div>
                 }
 
-                <div class="info-item">
-                  <span>{{ 'COMMON.ROOM.FIELD' | translate }}</span>
-                  <strong>{{ roomDetail }}</strong>
+                <div class="info-item app-surface-item">
+                  <span class="app-surface-item__label">{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</span>
+                  <strong class="app-surface-item__value">{{ professionalName }}</strong>
                 </div>
 
-                <div class="info-item">
-                  <span>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</span>
-                  <strong>{{ professionalName }}</strong>
-                </div>
-
-                <div class="info-item">
-                  <span>{{ 'ME.RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</span>
-                  <strong>{{ room.currency | currencySymbol }}</strong>
-                </div>
-
-                <div class="info-item info-item--wide">
-                  <span>{{ 'COMMON.ADDRESS.FIELD' | translate }}</span>
-                  <strong>{{ addressName }}</strong>
+                <div class="info-item app-crud-form-grid__full app-surface-item">
+                  <span class="app-surface-item__label">{{ 'COMMON.ADDRESS.FIELD' | translate }}</span>
+                  <strong class="app-surface-item__value">{{ addressName }}</strong>
                   @if (addressDescription) {
-                    <p>{{ addressDescription }}</p>
+                    <p class="app-surface-item__muted">{{ addressDescription }}</p>
                   }
                   @if (distance) {
-                    <p [innerHTML]="distance"></p>
+                    <p class="app-surface-item__muted" [innerHTML]="distance"></p>
                   }
                 </div>
               </div>
             </div>
 
             @if (room.address.location) {
-              <div class="support-card">
+              <div class="support-card app-surface-section">
                 <div class="support-card__header">
                   <mat-icon>map</mat-icon>
                   <div>
@@ -277,7 +296,7 @@
   </ng-template>
 
   <ng-template #stepTwo>
-    <form class="step-form" [formGroup]="treatmentForm" (keydown.enter)="$event.preventDefault()">
+    <form class="app-surface-stack" [formGroup]="treatmentForm" (keydown.enter)="$event.preventDefault()">
       <ng-container *ngTemplateOutlet="stepHeading; context: {
         step: 2,
         title: 'COMMON.TREATMENT.FIELD',
@@ -291,12 +310,12 @@
           <div class="empty-state__title">{{ 'ME.RESERVATION.TREATMENT.NO_CONTENT' | translate }}</div>
         </div>
       } @else {
-        <div class="step-section">
+        <div class="app-surface-section">
           <div class="field-grid field-grid--triple">
             <mat-form-field appearance="outline">
               <mat-label>{{ 'ME.RESERVATION.DATE.FIELD' | translate }}</mat-label>
               <input (focus)="picker.open()" [formControl]="getTreatmentForm.startDate" [matDatepickerFilter]="myFilter"
-                     [matDatepicker]="picker" [max]="maxDate" [min]="minDate" matInput required>
+                     [matDatepicker]="picker" [max]="maxDate" [min]="minDate" data-cy="date-picker" matInput required>
               <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
               <mat-datepicker #picker touchUi></mat-datepicker>
               @if (getTreatmentForm.startDate.hasError('required')) {
@@ -314,7 +333,7 @@
               <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
               <input (keydown)="keyDownGroup($event)" [formControl]="getTreatmentForm.group"
                      [matAutocomplete]="autoGroup"
-                     matInput required type="text">
+                     data-cy="group-input" matInput required type="text">
               <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
                 @for (group of filteredGroupSignal() | sortBy: 'asc':'order'; track group) {
                   <mat-option [value]="group">{{ group.name }}</mat-option>
@@ -335,7 +354,7 @@
                 <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
                 <input (keydown)="keyDownHandler($event, getTreatmentForm.treatment)"
                        [formControl]="getTreatmentForm.treatment" [matAutocomplete]="autoTreatment"
-                       matInput required type="text">
+                       data-cy="treatment-input" matInput required type="text">
                 <mat-autocomplete #autoTreatment="matAutocomplete" [displayWith]="displayFnTreatment">
                   @for (treatment of filteredTreatmentSignal() | sortBy: 'asc':'order'; track treatment) {
                     <mat-option [value]="treatment">{{ treatment.name }}</mat-option>
@@ -376,7 +395,7 @@
         </div>
 
         @if (treatment) {
-          <div class="support-card">
+          <div class="support-card app-surface-section">
             <div class="support-card__header">
               <mat-icon>spa</mat-icon>
               <div>
@@ -386,17 +405,17 @@
             </div>
 
             @if (treatment.description) {
-              <div class="info-item info-item--wide">
-                <span>{{ 'ME.RESERVATION.TREATMENT.DETAIL' | translate }}</span>
-                <p>{{ treatment.description }}</p>
+              <div class="info-item app-crud-form-grid__full app-surface-item">
+                <span class="app-surface-item__label">{{ 'ME.RESERVATION.TREATMENT.DETAIL' | translate }}</span>
+                <p class="app-surface-item__muted">{{ treatment.description }}</p>
               </div>
             }
 
             <div class="info-grid">
-              <div class="info-item">
-                <span>{{ 'ME.RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</span>
+              <div class="info-item app-surface-item">
+                <span class="app-surface-item__label">{{ 'ME.RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</span>
                 @if (hasDiscountApplied && !isEditing) {
-                  <div class="summary-price">
+                  <div class="summary-price app-surface-item__value">
                     <span class="summary-price--old">
                       {{ room?.currency | currencySymbol }} {{ selectedTreatmentPrice | number:'1.2-2' }}
                     </span>
@@ -405,13 +424,14 @@
                     </strong>
                   </div>
                 } @else {
-                  <strong>{{ room?.currency | currencySymbol }} {{ effectiveTreatmentDisplayPrice | number:'1.2-2' }}</strong>
+                  <strong
+                    class="app-surface-item__value">{{ room?.currency | currencySymbol }} {{ effectiveTreatmentDisplayPrice | number:'1.2-2' }}</strong>
                 }
               </div>
 
-              <div class="info-item">
-                <span>{{ 'ME.RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</span>
-                <strong>{{ treatment.duration | durationTime }}</strong>
+              <div class="info-item app-surface-item">
+                <span class="app-surface-item__label">{{ 'ME.RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</span>
+                <strong class="app-surface-item__value">{{ treatment.duration | durationTime }}</strong>
               </div>
             </div>
           </div>
@@ -421,7 +441,7 @@
   </ng-template>
 
   <ng-template #stepThree>
-    <div class="step-form">
+    <div class="app-surface-stack">
       <ng-container *ngTemplateOutlet="stepHeading; context: {
         step: 3,
         title: 'COMMON.ADDITIONAL.FIELD',
@@ -430,7 +450,7 @@
 
       @if (additionalListSignal(); as additionalList) {
         @if (additionalList.length) {
-          <div class="step-section">
+          <div class="app-surface-section">
             <mat-selection-list #additional [compareWith]="compareAdditional" (selectionChange)="onChange(additional)"
                                 class="app-class additional-list">
               @for (it of additionalList; track it) {
@@ -463,7 +483,7 @@
   </ng-template>
 
   <ng-template #stepFour>
-    <div class="step-form">
+    <div class="app-surface-stack">
       <ng-container *ngTemplateOutlet="stepHeading; context: {
         step: 4,
         title: 'ME.RESERVATION.SCHEDULE.FIELD',
@@ -471,7 +491,7 @@
       }"></ng-container>
 
       @let currentAvailableList = availableList();
-      <div class="support-card">
+      <div class="support-card app-surface-section">
         @if (currentAvailableList.size) {
           <mat-tab-group [selectedIndex]="selectedIndex" fitInkBarToContent mat-align-tabs="center">
             @for (available of currentAvailableList | keyvalue: sortDate; track available) {
@@ -516,7 +536,7 @@
   </ng-template>
 
   <ng-template #stepFive>
-    <form class="step-form" [formGroup]="typeForm" (keydown.enter)="$event.preventDefault()">
+    <form class="app-surface-stack" [formGroup]="typeForm" (keydown.enter)="$event.preventDefault()">
       <ng-container *ngTemplateOutlet="stepHeading; context: {
         step: 5,
         title: 'ME.PAYMENT.DETAIL',
@@ -524,7 +544,7 @@
       }"></ng-container>
 
       @if (room) {
-        <div class="support-card support-card--price">
+        <div class="support-card support-card--price app-surface-section">
           <div class="support-card__header">
             <mat-icon>{{ room.currency.icon }}</mat-icon>
             <div>
@@ -562,7 +582,7 @@
           </div>
         </div>
 
-        <div class="step-section payment-shell">
+        <div class="app-surface-section">
           @let currentOptions = options();
           @if (price().isPaid) {
             <app-price [price]="oldPrice" [paymentPrice]="price()" [hasChanges]="hasReservationChanges"
@@ -591,7 +611,7 @@
   </ng-template>
 
   <ng-template #stepSix>
-    <form class="step-form" [formGroup]="acceptForm" (keydown.enter)="$event.preventDefault()">
+    <form class="app-surface-stack" [formGroup]="acceptForm" (keydown.enter)="$event.preventDefault()">
       <ng-container *ngTemplateOutlet="stepHeading; context: {
         step: 6,
         title: 'ME.RESERVATION.FLOW.SUMMARY.TITLE',
@@ -599,60 +619,72 @@
       }"></ng-container>
 
       @if (isPreview) {
-        <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
-
-        <div class="support-card">
-          <div class="support-card__header">
+        <div class="support-card app-surface-section">
+          <div class="support-card__header support-card__header--with-total">
             <mat-icon>event_note</mat-icon>
             <div>
               <h3>{{ 'ME.RESERVATION.APPOINTMENT' | translate }}</h3>
               <p>{{ 'ME.RESERVATION.FLOW.STEPS.PREVIEW' | translate }}</p>
             </div>
+            @if (room && treatment) {
+              <div class="booking-summary__price">
+                <span>{{ 'COMMON.LABEL.TOTAL' | translate }}</span>
+                <strong>{{ room.currency | currencySymbol }} {{ effectiveTotalPrice | number:'1.2-2' }}</strong>
+              </div>
+            }
           </div>
 
           <div class="info-grid">
-            <div class="info-item">
-              <span>{{ 'COMMON.ROOM.FIELD' | translate }}</span>
-              <strong>{{ room | roomName:true:true }}</strong>
+            <div class="info-item app-surface-item">
+              <span class="app-surface-item__label">{{ 'COMMON.ROOM.FIELD' | translate }}</span>
+              <strong class="app-surface-item__value">{{ room | roomName:true:true }}</strong>
             </div>
 
-            <div class="info-item">
-              <span>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</span>
-              <strong>{{ professionalName }}</strong>
+            <div class="info-item app-surface-item">
+              <span class="app-surface-item__label">{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</span>
+              <strong class="app-surface-item__value">{{ professionalName }}</strong>
             </div>
 
-            <div class="info-item">
-              <span>{{ 'COMMON.TREATMENT.FIELD' | translate }}</span>
-              <strong>{{ treatment?.name }}</strong>
-            </div>
-
-            <div class="info-item">
-              <span>{{ 'ME.RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</span>
-              <strong>{{ totalDurationFormatted }}</strong>
-            </div>
-
-            @if (addressName) {
-              <div class="info-item info-item--wide">
-                <span>{{ 'COMMON.ADDRESS.FIELD' | translate }}</span>
-                <strong>
-                  <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + addressName"
+            <div class="info-item app-crud-form-grid__full app-surface-item">
+              <span class="app-surface-item__label">{{ 'COMMON.ADDRESS.FIELD' | translate }}</span>
+              @if (addressName) {
+                <strong class="app-surface-item__value">
+                  <a class="app-detail-link"
+                     [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + addressName"
                      rel="noreferrer" target="_blank">{{ addressName }}</a>
                 </strong>
                 @if (addressDescription) {
-                  <p>{{ addressDescription }}</p>
+                  <p class="app-surface-item__muted">{{ addressDescription }}</p>
                 }
-              </div>
-            }
+              } @else {
+                <strong class="app-surface-item__value">{{ 'ME.RESERVATION.FLOW.SUMMARY.EMPTY' | translate }}</strong>
+              }
+            </div>
 
-            <div class="info-item info-item--wide">
-              <span>{{ 'ME.RESERVATION.APPOINTMENT' | translate }}</span>
+            <div class="info-item app-surface-item">
+              <span class="app-surface-item__label">{{ 'COMMON.TREATMENT.FIELD' | translate }}</span>
+              <strong class="app-surface-item__value">{{ treatment?.name }}</strong>
+            </div>
+
+            <div class="info-item app-surface-item">
+              <span class="app-surface-item__label">{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</span>
+              @if (additionalSelected().length) {
+                <div class="booking-summary__slots">
+                  @for (additional of additionalSelected(); track additional.id) {
+                    <span class="booking-summary__slot app-detail-chip">{{ additional.name }}</span>
+                  }
+                </div>
+              } @else {
+                <strong class="app-surface-item__value">{{ 'ME.RESERVATION.FLOW.SUMMARY.NONE' | translate }}</strong>
+              }
+            </div>
+
+            <div class="info-item app-surface-item">
+              <span class="app-surface-item__label">{{ 'ME.RESERVATION.APPOINTMENT' | translate }}</span>
               @if (appointmentStart) {
                 <div class="booking-summary__slots">
-                  <span class="booking-summary__slot">
+                  <span class="booking-summary__slot app-detail-chip">
                     {{ appointmentStart | date:'EEE d MMM, HH:mm':room?.timeZone:dateFormat }}
-                    @if (appointmentEnd) {
-                      <span> - {{ appointmentEnd | date:'HH:mm':room?.timeZone:dateFormat }}</span>
-                    }
                     @if (showTimeZone) {
                       <button (click)="openDialog(appointmentStart)" class="summary-slot-button" mat-icon-button
                               type="button">
@@ -661,13 +693,79 @@
                     }
                   </span>
                 </div>
+              } @else {
+                <strong class="app-surface-item__value">{{ 'ME.RESERVATION.FLOW.SUMMARY.EMPTY' | translate }}</strong>
               }
+            </div>
+
+            <div class="info-item app-surface-item">
+              <span class="app-surface-item__label">{{ 'ME.RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</span>
+              <strong class="app-surface-item__value">{{ totalDurationFormatted }}</strong>
             </div>
           </div>
         </div>
 
+        @if (treatment && room) {
+          <div class="support-card support-card--price app-surface-section">
+            <div class="support-card__header">
+              <mat-icon>{{ room.currency.icon }}</mat-icon>
+              <div>
+                <h3>{{ 'ME.RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</h3>
+                <p>{{ 'ME.RESERVATION.FLOW.SUMMARY.BREAKDOWN' | translate }}</p>
+              </div>
+            </div>
+
+            <div class="price-breakdown price-breakdown--expanded">
+              <div class="price-row">
+                <span>{{ treatment.name }}</span>
+                <strong>{{ room.currency | currencySymbol }} {{ selectedTreatmentPrice | number:'1.2-2' }}</strong>
+              </div>
+
+              @for (additional of additionalSelected(); track additional.id) {
+                <div class="price-row">
+                  <span>{{ additional.name }}</span>
+                  <strong>{{ room.currency | currencySymbol }} {{ additional.price | number:'1.2-2' }}</strong>
+                </div>
+              }
+
+              @if (hasDiscountApplied && effectiveDiscountAmount > 0) {
+                <div class="price-row price-row--discount">
+                  <span>{{ 'ME.RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</span>
+                  <strong>- {{ room.currency | currencySymbol }} {{ effectiveDiscountAmount | number:'1.2-2' }}</strong>
+                </div>
+              }
+
+              @if (showCoveredAmounts) {
+                @if (effectivePaidTotal > 0) {
+                  <div class="price-row">
+                    <span>{{ 'COMMON.PAYMENT.OPTIONS.PAID' | translate }}</span>
+                    <strong>{{ room.currency | currencySymbol }} {{ effectivePaidTotal | number:'1.2-2' }}</strong>
+                  </div>
+                }
+
+                @if (accountBalanceUsed > 0) {
+                  <div class="price-row">
+                    <span>{{ 'COMMON.PAYMENT.OPTIONS.BALANCE' | translate }}</span>
+                    <strong>{{ room.currency | currencySymbol }} {{ accountBalanceUsed | number:'1.2-2' }}</strong>
+                  </div>
+                }
+
+                <div class="price-row price-row--total">
+                  <span>{{ 'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate }}</span>
+                  <strong>{{ room.currency | currencySymbol }} {{ paymentToPay | number:'1.2-2' }}</strong>
+                </div>
+              }
+
+              <div class="price-row price-row--total">
+                <span>{{ 'ME.RESERVATION.FLOW.SUMMARY.TOTAL' | translate }}</span>
+                <strong>{{ room.currency | currencySymbol }} {{ effectiveTotalPrice | number:'1.2-2' }}</strong>
+              </div>
+            </div>
+          </div>
+        }
+
         @if (paymentToPay > 0 || paymentCredit > 0) {
-          <div class="support-card">
+          <div class="support-card app-surface-section">
             <div class="support-card__header">
               <mat-icon>payments</mat-icon>
               <div>
@@ -677,7 +775,7 @@
             </div>
 
             @if (paymentToPay > 0) {
-              <app-payment-preview [type]="getTypeForm.type.value"
+              <app-payment-preview [option]="getTypeForm.option.value"
                                    [currencyIcon]="room?.currency?.icon" [toPaid]="paymentToPay"
                                    [penalty]="oldPrice?.penalty"
                                    [accountBalanceUsed]="accountBalanceUsed"
@@ -698,7 +796,7 @@
           </div>
         }
 
-        <div class="support-card">
+        <div class="support-card app-surface-section">
           <div class="support-card__header">
             <mat-icon>phone_enabled</mat-icon>
             <div>
@@ -714,7 +812,7 @@
           </ngx-material-intl-tel-input>
         </div>
 
-        <div class="support-card">
+        <div class="support-card app-surface-section">
           <div class="support-card__header">
             <mat-icon>gavel</mat-icon>
             <div>
@@ -740,239 +838,243 @@
     </form>
   </ng-template>
 
-  @if (smallScreen()) {
-    @switch (activeStepIndex()) {
-      @case (0) {
-        <div class="step-layout step-layout--mobile">
-          <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="stepOne"></ng-container>
-        </div>
-        @if (!isEditing) {
+  <div class="app-surface-canvas app-surface-shell app-surface-stack reservation-flow-shell">
+    @if (smallScreen()) {
+      @switch (activeStepIndex()) {
+        @case (0) {
+          <div class="step-layout step-layout--mobile">
+            <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
+            <ng-container *ngTemplateOutlet="stepOne"></ng-container>
+          </div>
+          @if (!isEditing) {
+            <div class="step-actions step-actions--mobile">
+              <button [disabled]="isEditing" [form]="officeForm" appBackButton mat-stroked-button type="button">
+                <mat-icon>keyboard_return</mat-icon>
+                <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+              </button>
+              <button (click)="callStepTwo(true)" [disabled]="officeForm.invalid" mat-stroked-button type="button">
+                <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+                <mat-icon>arrow_forward</mat-icon>
+              </button>
+            </div>
+          }
+        }
+        @case (1) {
+          <div class="step-layout step-layout--mobile">
+            <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
+            <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
+          </div>
           <div class="step-actions step-actions--mobile">
-            <button [disabled]="isEditing" [form]="officeForm" appBackButton class="icon-button" color="accent"
-                    mat-fab type="button">
-              <mat-icon>keyboard_return</mat-icon>
+            @if (isEditing) {
+              <button [form]="treatmentForm" appBackButton mat-stroked-button type="button">
+                <mat-icon>keyboard_return</mat-icon>
+                <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+              </button>
+            } @else {
+              <button (click)="back()" [disabled]="isEditing" mat-stroked-button type="button">
+                <mat-icon>arrow_back</mat-icon>
+                <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+              </button>
+            }
+            <button (click)="callStepThree(true)" [disabled]="treatmentForm.invalid" mat-stroked-button type="button">
+              <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+              <mat-icon>arrow_forward</mat-icon>
             </button>
-            <button (click)="callStepTwo(true)" [disabled]="officeForm.invalid" class="icon-button"
-                    color="primary" mat-fab type="button">
-              <mat-icon>arrow_downward</mat-icon>
+          </div>
+        }
+        @case (2) {
+          <div class="step-layout step-layout--mobile">
+            <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
+            <ng-container *ngTemplateOutlet="stepThree"></ng-container>
+          </div>
+          <div class="step-actions step-actions--mobile">
+            <button (click)="back()" mat-stroked-button type="button">
+              <mat-icon>arrow_back</mat-icon>
+              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+            </button>
+            <button (click)="callStepFour(true)" mat-stroked-button type="button">
+              <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+        @case (3) {
+          <div class="step-layout step-layout--mobile">
+            <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
+            <ng-container *ngTemplateOutlet="stepFour"></ng-container>
+          </div>
+          <div class="step-actions step-actions--mobile">
+            <button (click)="back()" mat-stroked-button type="button">
+              <mat-icon>arrow_back</mat-icon>
+              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+            </button>
+            <button (click)="callStepFive(true)" [disabled]="eventGroup.invalid" mat-stroked-button type="button">
+              <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+        @case (4) {
+          <div class="step-layout step-layout--mobile">
+            <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
+            <ng-container *ngTemplateOutlet="stepFive"></ng-container>
+          </div>
+          <div class="step-actions step-actions--mobile">
+            <button (click)="back()" mat-stroked-button type="button">
+              <mat-icon>arrow_back</mat-icon>
+              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+            </button>
+            <button (click)="callStepSix(true)" [disabled]="typeForm.invalid" mat-stroked-button type="button">
+              <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+        @default {
+          <div class="step-layout step-layout--mobile">
+            <ng-container *ngTemplateOutlet="stepSix"></ng-container>
+          </div>
+          <div class="step-actions step-actions--mobile">
+            <button (click)="back()" mat-stroked-button type="button">
+              <mat-icon>arrow_back</mat-icon>
+              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+            </button>
+            <button (click)="create()" [disabled]="acceptForm.invalid" mat-stroked-button type="button">
+              <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
+              <mat-icon>add_task</mat-icon>
             </button>
           </div>
         }
       }
-      @case (1) {
-        <div class="step-layout step-layout--mobile">
-          <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
-        </div>
-        <div class="step-actions step-actions--mobile">
-          @if (isEditing) {
-            <button [form]="treatmentForm" appBackButton color="accent" class="icon-button" mat-fab type="button">
-              <mat-icon>keyboard_return</mat-icon>
-            </button>
-          } @else {
-            <button (click)="back()" [disabled]="isEditing" color="accent" class="icon-button" mat-fab type="button">
-              <mat-icon>arrow_upward</mat-icon>
-            </button>
-          }
-          <button (click)="callStepThree(true)" [disabled]="treatmentForm.invalid" class="icon-button"
-                  color="primary" mat-fab type="button">
-            <mat-icon>arrow_downward</mat-icon>
-          </button>
-        </div>
-      }
-      @case (2) {
-        <div class="step-layout step-layout--mobile">
-          <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="stepThree"></ng-container>
-        </div>
-        <div class="step-actions step-actions--mobile">
-          <button (click)="back()" color="accent" class="icon-button" mat-fab type="button">
-            <mat-icon>arrow_upward</mat-icon>
-          </button>
-          <button (click)="callStepFour(true)" class="icon-button" color="primary" mat-fab type="button">
-            <mat-icon>arrow_downward</mat-icon>
-          </button>
-        </div>
-      }
-      @case (3) {
-        <div class="step-layout step-layout--mobile">
-          <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="stepFour"></ng-container>
-        </div>
-        <div class="step-actions step-actions--mobile">
-          <button (click)="back()" class="icon-button" color="accent" mat-fab type="button">
-            <mat-icon>arrow_upward</mat-icon>
-          </button>
-          <button (click)="callStepFive(true)" [disabled]="eventGroup.invalid" class="icon-button"
-                  color="primary" mat-fab type="button">
-            <mat-icon>arrow_downward</mat-icon>
-          </button>
-        </div>
-      }
-      @case (4) {
-        <div class="step-layout step-layout--mobile">
-          <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="stepFive"></ng-container>
-        </div>
-        <div class="step-actions step-actions--mobile">
-          <button (click)="back()" class="icon-button" color="accent" mat-fab type="button">
-            <mat-icon>arrow_upward</mat-icon>
-          </button>
-          <button (click)="callStepSix(true)" [disabled]="typeForm.invalid" class="icon-button" color="primary"
-                  mat-fab type="button">
-            <mat-icon>arrow_downward</mat-icon>
-          </button>
-        </div>
-      }
-      @default {
-        <div class="step-layout step-layout--mobile">
-          <ng-container *ngTemplateOutlet="stepSix"></ng-container>
-        </div>
-        <div class="step-actions step-actions--mobile">
-          <button (click)="back()" class="icon-button" color="accent" mat-fab type="button">
-            <mat-icon>arrow_upward</mat-icon>
-          </button>
-          <button (click)="create()" [disabled]="acceptForm.invalid" class="icon-button" color="primary" mat-fab
-                  type="button">
-            <mat-icon>add_task</mat-icon>
-          </button>
-        </div>
-      }
-    }
-  } @else {
-    @switch (activeStepIndex()) {
-      @case (0) {
-        <div class="step-layout">
-          <div class="step-main">
-            <ng-container *ngTemplateOutlet="stepOne"></ng-container>
+    } @else {
+      @switch (activeStepIndex()) {
+        @case (0) {
+          <div class="step-layout">
+            <div class="app-crud-fields">
+              <ng-container *ngTemplateOutlet="stepOne"></ng-container>
+            </div>
+            <aside class="step-sidebar">
+              <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
+            </aside>
           </div>
-          <aside class="step-sidebar">
-            <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
-          </aside>
-        </div>
-        <div class="step-actions">
-          <button [disabled]="isEditing" [form]="officeForm" appBackButton color="accent" mat-fab extended
-                  type="button">
-            <mat-icon>keyboard_return</mat-icon>
-            {{ 'COMMON.BUTTON.BACK' | translate }}
-          </button>
-          <button (click)="callStepTwo(true)" [disabled]="officeForm.invalid" color="primary" mat-fab extended
-                  type="button">
-            {{ 'COMMON.BUTTON.NEXT' | translate }}
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      }
-      @case (1) {
-        <div class="step-layout">
-          <div class="step-main">
-            <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
-          </div>
-          <aside class="step-sidebar">
-            <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
-          </aside>
-        </div>
-        <div class="step-actions">
-          @if (isEditing) {
-            <button [form]="treatmentForm" appBackButton color="accent" mat-fab extended type="button">
+          <div class="step-actions">
+            <button [disabled]="isEditing" [form]="officeForm" appBackButton mat-stroked-button type="button">
               <mat-icon>keyboard_return</mat-icon>
-              {{ 'COMMON.BUTTON.BACK' | translate }}
+              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-          } @else {
-            <button (click)="back()" [disabled]="isEditing" color="accent" mat-fab extended type="button">
+            <button (click)="callStepTwo(true)" [disabled]="officeForm.invalid" mat-stroked-button type="button">
+              <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+        @case (1) {
+          <div class="step-layout">
+            <div class="app-crud-fields">
+              <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
+            </div>
+            <aside class="step-sidebar">
+              <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
+            </aside>
+          </div>
+          <div class="step-actions">
+            @if (isEditing) {
+              <button [form]="treatmentForm" appBackButton mat-stroked-button type="button">
+                <mat-icon>keyboard_return</mat-icon>
+                <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+              </button>
+            } @else {
+              <button (click)="back()" [disabled]="isEditing" mat-stroked-button type="button">
+                <mat-icon>arrow_back</mat-icon>
+                <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+              </button>
+            }
+            <button (click)="callStepThree(true)" [disabled]="treatmentForm.invalid" mat-stroked-button type="button">
+              <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+        @case (2) {
+          <div class="step-layout">
+            <div class="app-crud-fields">
+              <ng-container *ngTemplateOutlet="stepThree"></ng-container>
+            </div>
+            <aside class="step-sidebar">
+              <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
+            </aside>
+          </div>
+          <div class="step-actions">
+            <button (click)="back()" mat-stroked-button type="button">
               <mat-icon>arrow_back</mat-icon>
-              {{ 'COMMON.BUTTON.BACK' | translate }}
+              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-          }
-          <button (click)="callStepThree(true)" [disabled]="treatmentForm.invalid" color="primary" mat-fab extended
-                  type="button">
-            {{ 'COMMON.BUTTON.NEXT' | translate }}
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      }
-      @case (2) {
-        <div class="step-layout">
-          <div class="step-main">
-            <ng-container *ngTemplateOutlet="stepThree"></ng-container>
+            <button (click)="callStepFour(true)" mat-stroked-button type="button">
+              <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
           </div>
-          <aside class="step-sidebar">
-            <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
-          </aside>
-        </div>
-        <div class="step-actions">
-          <button (click)="back()" color="accent" mat-fab extended type="button">
-            <mat-icon>arrow_back</mat-icon>
-            {{ 'COMMON.BUTTON.BACK' | translate }}
-          </button>
-          <button (click)="callStepFour(true)" color="primary" mat-fab extended type="button">
-            {{ 'COMMON.BUTTON.NEXT' | translate }}
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      }
-      @case (3) {
-        <div class="step-layout">
-          <div class="step-main">
-            <ng-container *ngTemplateOutlet="stepFour"></ng-container>
+        }
+        @case (3) {
+          <div class="step-layout">
+            <div class="app-crud-fields">
+              <ng-container *ngTemplateOutlet="stepFour"></ng-container>
+            </div>
+            <aside class="step-sidebar">
+              <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
+            </aside>
           </div>
-          <aside class="step-sidebar">
-            <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
-          </aside>
-        </div>
-        <div class="step-actions">
-          <button (click)="back()" color="accent" mat-fab extended type="button">
-            <mat-icon>arrow_back</mat-icon>
-            {{ 'COMMON.BUTTON.BACK' | translate }}
-          </button>
-          <button (click)="callStepFive(true)" [disabled]="eventGroup.invalid" color="primary" mat-fab extended
-                  type="button">
-            {{ 'COMMON.BUTTON.NEXT' | translate }}
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      }
-      @case (4) {
-        <div class="step-layout">
-          <div class="step-main">
-            <ng-container *ngTemplateOutlet="stepFive"></ng-container>
+          <div class="step-actions">
+            <button (click)="back()" mat-stroked-button type="button">
+              <mat-icon>arrow_back</mat-icon>
+              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+            </button>
+            <button (click)="callStepFive(true)" [disabled]="eventGroup.invalid" mat-stroked-button type="button">
+              <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
           </div>
-          <aside class="step-sidebar">
-            <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
-          </aside>
-        </div>
-        <div class="step-actions">
-          <button (click)="back()" color="accent" mat-fab extended type="button">
-            <mat-icon>arrow_back</mat-icon>
-            {{ 'COMMON.BUTTON.BACK' | translate }}
-          </button>
-          <button (click)="callStepSix(true)" [disabled]="typeForm.invalid" color="primary" mat-fab extended
-                  type="button">
-            {{ 'COMMON.BUTTON.NEXT' | translate }}
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      }
-      @default {
-        <div class="step-layout step-layout--single">
-          <div class="step-main">
-            <ng-container *ngTemplateOutlet="stepSix"></ng-container>
+        }
+        @case (4) {
+          <div class="step-layout">
+            <div class="app-crud-fields">
+              <ng-container *ngTemplateOutlet="stepFive"></ng-container>
+            </div>
+            <aside class="step-sidebar">
+              <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
+            </aside>
           </div>
-        </div>
-        <div class="step-actions">
-          <button (click)="back()" color="accent" mat-fab extended type="button">
-            <mat-icon>arrow_back</mat-icon>
-            {{ 'COMMON.BUTTON.BACK' | translate }}
-          </button>
-          <button (click)="create()" [disabled]="acceptForm.invalid" color="primary" mat-fab extended type="button">
-            {{ 'COMMON.BUTTON.BOOK' | translate }}
-            <mat-icon>add_task</mat-icon>
-          </button>
-        </div>
+          <div class="step-actions">
+            <button (click)="back()" mat-stroked-button type="button">
+              <mat-icon>arrow_back</mat-icon>
+              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+            </button>
+            <button (click)="callStepSix(true)" [disabled]="typeForm.invalid" mat-stroked-button type="button">
+              <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+        @default {
+          <div class="step-layout step-layout--single">
+            <div class="app-crud-fields">
+              <ng-container *ngTemplateOutlet="stepSix"></ng-container>
+            </div>
+          </div>
+          <div class="step-actions">
+            <button (click)="back()" mat-stroked-button type="button">
+              <mat-icon>arrow_back</mat-icon>
+              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+            </button>
+            <button (click)="create()" [disabled]="acceptForm.invalid" mat-stroked-button type="button">
+              <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
+              <mat-icon>add_task</mat-icon>
+            </button>
+          </div>
+        }
       }
     }
-  }
+  </div>
 } @else {
   <div class="ssc-square mb"></div>
 }

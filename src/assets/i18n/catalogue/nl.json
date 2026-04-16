@@ -10,6 +10,7 @@
     "DESCRIPTION": {
       "FIELD": "Beschrijving"
     },
+    "DISPLAY_OPTIONS": "Weergaveopties",
     "SHOW": {
       "HOME": "Op home tonen",
       "CATALOG": "In catalogus tonen"

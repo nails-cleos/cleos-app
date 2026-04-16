@@ -1,6 +1,7 @@
 @use '@angular/material' as mat;
 @use './styles-theme' as style;
 @use 'sass:color';
+@use './styles/theme/calendar';
 
 @include mat.core();
 
@@ -174,6 +175,14 @@ $dark-theme: mat.m2-define-dark-theme((
   --toast-error-soft: #f7d9d8;
 
   --invert-text: #fff;
+
+  :is(.mat-mdc-outlined-button, .mat-mdc-unelevated-button) {
+    color: #111111;
+  }
+
+  :is(.mat-mdc-outlined-button, .mat-mdc-unelevated-button) :is(.mdc-button__label, .mat-icon, .material-icons) {
+    color: #111111 !important;
+  }
 }
 
 /* -----------------------------
@@ -211,6 +220,14 @@ $dark-theme: mat.m2-define-dark-theme((
   --toast-error-soft: rgba(240, 128, 128, .18);
 
   --invert-text: rgba(0, 0, 0, .87);
+
+  :is(.mat-mdc-outlined-button, .mat-mdc-unelevated-button) {
+    color: #ffffff;
+  }
+
+  :is(.mat-mdc-outlined-button, .mat-mdc-unelevated-button) :is(.mdc-button__label, .mat-icon, .material-icons) {
+    color: #ffffff !important;
+  }
 }
 
 /* -----------------------------

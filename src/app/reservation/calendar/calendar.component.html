@@ -1,15 +1,16 @@
-<div>
-  <fieldset>
-    <legend>{{ 'COMMON.SEARCH.TITLE' | translate }}</legend>
-    <form [formGroup]="form" (keydown.enter)="$event.preventDefault()" (ngSubmit)="search()">
+<div class="calendar-page app-surface-canvas app-surface-shell app-surface-stack">
+  <section class="app-surface-section app-detail-panel">
+    <div class="calendar-search__eyebrow app-surface-eyebrow">{{ 'COMMON.SEARCH.TITLE' | translate }}</div>
+    <form [formGroup]="form" class="calendar-search__form" (keydown.enter)="$event.preventDefault()"
+          (ngSubmit)="search()">
       @let currentOffices = offices();
       @if (!currentOffices?.length) {
-        <button class="only-button" color="accent" mat-fab extended [routerLink]="['/', language, 'rooms', 'add']"
-                type="button">
+        <button class="only-button app-detail-action-button" mat-stroked-button
+                [routerLink]="['/', language, 'rooms', 'add']" type="button">
           <mat-icon>add_business</mat-icon> &nbsp;{{ 'RESERVATION.ROOM.TITLE' | translate }}
         </button>
       } @else {
-        <div class="row-column-space-evenly-center">
+        <div class="calendar-search__grid">
           @if (currentOffices) {
             <mat-form-field appearance="outline">
               <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
@@ -66,63 +67,75 @@
           } @else {
             <div class="ssc-line"></div>
           }
+
+          <button type="submit" [disabled]="form.invalid"
+                  class="hide-gt-xs app-surface-filter-action calendar-search__button calendar-toolbar__compact"
+                  color="accent" mat-stroked-button>
+            <mat-icon matPrefix>search</mat-icon>
+          </button>
+          <button type="submit" [disabled]="form.invalid"
+                  class="hide-xs app-surface-filter-action calendar-search__button"
+                  color="accent" mat-stroked-button>
+            <mat-icon matPrefix>search</mat-icon>
+            <span>{{ 'COMMON.SEARCH.TITLE' | translate }}</span>
+          </button>
         </div>
       }
-      <button type="submit" [disabled]="form.invalid" class="hide-gt-xs only-button" color="accent" mat-fab>
-        <mat-icon matPrefix>search</mat-icon>
-      </button>
-      <button type="submit" [disabled]="form.invalid" class="hide-xs only-button" color="accent" mat-fab extended>
-        <mat-icon matPrefix>search</mat-icon>
-        <span>{{ 'COMMON.SEARCH.TITLE' | translate }}</span>
-      </button>
     </form>
-  </fieldset>
-</div>
-
-  <div class="divider card-actions">
-    <button class="hide-gt-xs" (click)="decrement()" color="accent" mat-fab>
-      <mat-icon>navigate_before</mat-icon>
-    </button>
-    <button class="hide-xs" (click)="decrement()" color="accent" mat-fab extended>
-      <mat-icon>navigate_before</mat-icon>
-      <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
-    </button>
-    <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [value]="viewDate"
-           hidden matInput [max]="maxDate" [min]="minDate">
-    <mat-datepicker #picker touchUi></mat-datepicker>
-    <button class="hide-gt-xs" (click)="picker.open()" color="primary" mat-fab>
-      <mat-icon>today</mat-icon>
-    </button>
-    <button class="hide-xs" (click)="picker.open()" color="primary" mat-fab extended>
-      <mat-icon>today</mat-icon>
-      <span>{{ 'COMMON.BUTTON.GOTO' | translate }}</span>
-    </button>
-    <button class="hide-gt-xs" (click)="increment()" color="accent" mat-fab>
-      <mat-icon>navigate_next</mat-icon>
-    </button>
-    <button class="hide-xs" (click)="increment()" color="accent" mat-fab extended>
-      <mat-icon>navigate_next</mat-icon>
-      <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
-    </button>
-    <div class="spacer"></div>
-    @if (daysInWeekSignal() >= 5) {
-      <button (click)="downloadPDF()" color="accent" mat-fab extended [disabled]="isDarkMode()">
-        <mat-icon>print</mat-icon>
-        <span>{{ 'COMMON.BUTTON.PRINT' | translate }}</span>
-      </button>
-    }
-    <button class="hide-gt-xs" color="primary" mat-fab [routerLink]="['/', language, 'reservation']">
-      <mat-icon>book_online</mat-icon>
-    </button>
-    <button class="hide-xs" color="primary" mat-fab extended [routerLink]="['/', language, 'reservation']">
-      <mat-icon>book_online</mat-icon>
-      <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
-    </button>
-  </div>
+  </section>
 
   @let calendarDay = calendarDaySignal();
-  <div id="weekViewPDF">
-    <div class="divider">
+  <section class="app-surface-section">
+    <div class="divider card-actions calendar-toolbar app-detail-actions">
+      <button class="hide-gt-xs calendar-toolbar__compact" (click)="decrement()" color="accent" mat-stroked-button>
+        <mat-icon>navigate_before</mat-icon>
+      </button>
+      <button class="hide-xs" (click)="decrement()" color="accent" mat-stroked-button>
+        <mat-icon>navigate_before</mat-icon>
+        <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
+      </button>
+      <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [value]="viewDate"
+             hidden matInput [max]="maxDate" [min]="minDate">
+      <mat-datepicker #picker touchUi></mat-datepicker>
+      <button class="hide-gt-xs calendar-toolbar__compact" (click)="picker.open()" color="primary" mat-stroked-button>
+        <mat-icon>today</mat-icon>
+      </button>
+      <button class="hide-xs" (click)="picker.open()" color="primary" mat-stroked-button>
+        <mat-icon>today</mat-icon>
+        <span>{{ 'COMMON.BUTTON.GOTO' | translate }}</span>
+      </button>
+      <button class="hide-gt-xs calendar-toolbar__compact" (click)="increment()" color="accent" mat-stroked-button>
+        <mat-icon>navigate_next</mat-icon>
+      </button>
+      <button class="hide-xs" (click)="increment()" color="accent" mat-stroked-button>
+        <mat-icon>navigate_next</mat-icon>
+        <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+      </button>
+      <div class="spacer"></div>
+      @if (daysInWeekSignal() >= 5) {
+        <button class="hide-gt-xs calendar-toolbar__compact"
+                (click)="downloadPDF()"
+                color="accent"
+                mat-stroked-button
+                [disabled]="isDarkMode()">
+          <mat-icon>print</mat-icon>
+        </button>
+        <button class="hide-xs" (click)="downloadPDF()" color="accent" mat-stroked-button [disabled]="isDarkMode()">
+          <mat-icon>print</mat-icon>
+          <span>{{ 'COMMON.BUTTON.PRINT' | translate }}</span>
+        </button>
+      }
+      <button class="hide-gt-xs calendar-toolbar__compact" color="primary" mat-stroked-button
+              [routerLink]="['/', language, 'reservation']">
+        <mat-icon>book_online</mat-icon>
+      </button>
+      <button class="hide-xs" color="primary" mat-stroked-button [routerLink]="['/', language, 'reservation']">
+        <mat-icon>book_online</mat-icon>
+        <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
+      </button>
+    </div>
+
+    <div class="divider calendar-week__surface app-surface-item app-surface-item--section" id="weekViewPDF">
       <mwl-calendar-week-view
         (beforeViewRender)="beforeMonthViewRender($event)"
         (eventClicked)="view($event.event)"
@@ -135,9 +148,71 @@
         [dayStartMinute]="calendarDay?.dayStartMinute ?? 0"
         [daysInWeek]="totalDays"
         [events]="calendarEventsSignal()"
+        [eventTitleTemplate]="calendarEventTitle"
         [hourSegments]="hourSegments"
         [locale]="locale"
+        [tooltipTemplate]="calendarTooltip"
         [viewDate]="viewDate()"
         [weekendDays]="[]"></mwl-calendar-week-view>
+
+      <ng-template #calendarEventTitle let-event="event">
+        @if (event.meta?.isReservation) {
+          <span class="calendar-event-detail calendar-event-detail--reservation">
+            <strong class="calendar-event-detail__time">
+              {{ event.start | date:'HH:mm':event.meta?.timeZone }}
+              - {{ event.end | date:'HH:mm':event.meta?.timeZone }}
+            </strong>
+            @if (event.meta?.customer) {
+              <span class="calendar-event-detail__line">{{ event.meta?.customer }}</span>
+            }
+            @if (event.meta?.treatmentName) {
+              <span class="calendar-event-detail__line">{{ event.meta?.treatmentName }}</span>
+            }
+          </span>
+        } @else {
+          <span class="calendar-event-detail" [innerHTML]="event.title"></span>
+        }
+      </ng-template>
+      <ng-template #calendarTooltip let-event="event" let-placement="placement" let-contents="contents">
+        @if (!event?.allDay) {
+          <div class="cal-tooltip" [ngClass]="'cal-tooltip-' + placement">
+            <div class="cal-tooltip-arrow"></div>
+            <div class="cal-tooltip-inner reservation-tooltip-inner">
+              @if (event?.meta?.isReservation) {
+                <div class="calendar-tooltip-card">
+                  <div class="calendar-tooltip-card__time">
+                    {{ event.start | date:'EEE d MMM, HH:mm':event.meta?.timeZone:locale }}
+                    -
+                    {{ event.end | date:'HH:mm':event.meta?.timeZone:locale }}
+                  </div>
+                  <div class="calendar-tooltip-card__row">
+                    <span>{{ 'COMMON.RESERVATION.LIST.COLUMN.CUSTOMER' | translate }}</span>
+                    <strong>{{ event.meta?.customer }}</strong>
+                  </div>
+                  <div class="calendar-tooltip-card__row">
+                    <span>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</span>
+                    <strong>{{ event.meta?.professionalName }}</strong>
+                  </div>
+                  <div class="calendar-tooltip-card__row">
+                    <span>{{ 'COMMON.TREATMENT.FIELD' | translate }}</span>
+                    <strong>{{ event.meta?.treatmentName }}</strong>
+                  </div>
+                  <div class="calendar-tooltip-card__row">
+                    <span>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</span>
+                    @if (event.meta?.additionalNames?.length) {
+                      <strong>{{ event.meta.additionalNames.join(', ') }}</strong>
+                    } @else {
+                      <strong>{{ 'RESERVATION.FLOW.SUMMARY.NONE' | translate }}</strong>
+                    }
+                  </div>
+                </div>
+              } @else {
+                <div class="calendar-tooltip-fallback" [innerHTML]="contents"></div>
+              }
+            </div>
+          </div>
+        }
+      </ng-template>
     </div>
-  </div>
+  </section>
+</div>

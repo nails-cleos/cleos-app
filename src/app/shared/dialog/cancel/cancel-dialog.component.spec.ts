@@ -3,7 +3,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CancelDialogComponent } from './cancel-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
-import { PaymentType } from '../../../interfaces/payment';
 import { CancelOption } from '../../../interfaces/reservation';
 
 describe('CancelDialogComponent', () => {
@@ -38,13 +37,13 @@ describe('CancelDialogComponent', () => {
 
   it('should close with selected cancel option and payment type', () => {
     component.getForm.paymentCancellation.setValue(CancelOption.chargeAndAccount);
-    component.getTypeForm.type.setValue({ type: PaymentType.mollie } as any);
+    component.getTypeForm.option.setValue({ type: 'MOLLIE' } as any);
 
     component.doAction();
 
     expect(dialogRefSpy.close).toHaveBeenCalledWith({
       cancelOption: CancelOption.chargeAndAccount,
-      type: PaymentType.mollie,
+      type: 'MOLLIE',
     });
   });
 
@@ -86,7 +85,7 @@ describe('CancelDialogComponent', () => {
           useValue: {
             options: [CancelOption.refund],
             currency: { code: 'EUR', icon: 'EUR' },
-            paymentOptions: [{ type: PaymentType.mollie, name: 'Mollie' }],
+            paymentOptions: [{ type: 'MOLLIE', name: 'Mollie' }],
           },
         },
       ],

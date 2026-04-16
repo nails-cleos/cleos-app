@@ -17,7 +17,8 @@ type PriceForm = {
 
 @Component({
   selector: 'app-price-dialog',
-  templateUrl: 'price-dialog.html',
+  templateUrl: 'price-dialog.component.html',
+  styleUrls: ['./price-dialog.component.scss'],
   imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -28,7 +29,8 @@ export class PriceDialogComponent {
   readonly data = inject<PriceDialogData>(MAT_DIALOG_DATA);
 
   form: FormGroup<PriceForm> = this.formBuilder.group<PriceForm>({
-    price: this.formBuilder.control(this.data.currentPrice ?? 0, { validators: [Validators.required] }),
+    price: this.formBuilder.control(this.data.currentPrice ?? 0,
+      { validators: [Validators.required, Validators.min(1)] }),
   });
 
   get getForm(): PriceForm {
