@@ -9,12 +9,12 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { combineLatestWith, of } from 'rxjs';
+import { combineLatestWith } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { getOfficeToInvoice, updateOfficeById, uploadInvoices } from '../store/invoice.actions';
 import { backendFormatDate, datesInSameWeek, invoiceFormat, newDateTimestamp } from '../util/dates';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { PaymentType, PaymentTypeKey } from '../interfaces/payment';
+import { IPaymentOption } from '../interfaces/payment';
 import { map, startWith } from 'rxjs/operators';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { TranslateService } from '@ngx-translate/core';
@@ -28,7 +28,7 @@ import { requireMatch } from '../util/validators';
 import { SharedModule } from '../shared/shared.module';
 import { TimeDetailPipe } from '../pipes/time-detail.pipe';
 import { getInvoicesPipe } from '../store/selectors/invoice.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../interfaces/pagination';
 import { InvoiceState } from '../store/reducers/invoice.reducers';
@@ -39,6 +39,8 @@ import { BackButtonDirective } from '../directives/back-button.directive';
 import { getMyOfficesPipe } from '../store/selectors/office.selectors';
 import { OfficeState } from '../store/reducers/office.reducers';
 import { EnvService } from '../services/env.service';
+import { getPaymentOptionsPipe } from '../store/selectors/payment.selectors';
+import { PaymentState } from '../store/reducers/payment.reducers';
 
 // Set up VFS fonts for pdfMake (provides fallback Roboto fonts)
 (pdfMake as any).vfs = (pdfFonts as any).pdfMake?.vfs || pdfFonts;
@@ -46,7 +48,7 @@ import { EnvService } from '../services/env.service';
 type InvoiceForm = {
   office: FormControl<IOfficeAll | undefined>;
   dateRange: FormGroup<DateRangeForm>;
-  type: FormControl<PaymentType | ''>;
+  type: FormControl<string>;
   startNumber: FormControl<number>;
 };
 
@@ -72,7 +74,8 @@ export class InvoiceComponent {
   private readonly env: EnvService = inject(EnvService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<InvoiceState | OfficeState> = inject(Store<InvoiceState | OfficeState>);
+  private readonly store: Store<InvoiceState | OfficeState | PaymentState> = inject(
+    Store<InvoiceState | OfficeState | PaymentState>);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly router: Router = inject(Router);
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
@@ -80,10 +83,10 @@ export class InvoiceComponent {
   private allOffices$ = this.store.pipe(getMyOfficesPipe);
   private invoiceList$ = this.store.pipe(getInvoicesPipe);
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private allPaymentTypes$ = of(Object.keys(PaymentType));
+  private readonly paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
   private allOfficesSignal = toSignal(this.allOffices$);
-  private allPaymentTypesSignal = toSignal(this.allPaymentTypes$);
+  private paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
   private invoiceListSignal = toSignal(this.invoiceList$);
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
@@ -133,16 +136,8 @@ export class InvoiceComponent {
       }),
     ));
 
-  filteredTypesSignal = toSignal(
-    this.getForm.type.valueChanges.pipe(
-      startWith(''),
-      map((type: string | undefined) => type),
-      combineLatestWith(this.allPaymentTypes$),
-      map(([type, allPaymentTypes]) => type ? this.filterTypes(type, allPaymentTypes) : allPaymentTypes),
-    ));
-
-  selectedPaymentTypesSignal = signal<string[]>([PaymentType.transfer, PaymentType.paynl, PaymentType.mollie]);
-  allPaymentTypesWritableSignal = signal<string[] | undefined>(undefined);
+  selectedPaymentOptionsSignal = signal<IPaymentOption[]>([]);
+  allPaymentOptionsWritableSignal = signal<IPaymentOption[] | undefined>(undefined);
   dataSourceSignal = computed(() => {
     const invoiceList = this.invoiceListSignal();
     return invoiceList?.map((invoice: IInvoice, position: number) => {
@@ -164,6 +159,14 @@ export class InvoiceComponent {
   resultsLengthSignal = computed(() => this.dataSourceSignal()?.length || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
+  filteredTypesSignal = toSignal(
+    this.getForm.type.valueChanges.pipe(
+      startWith(''),
+      map((type: string | undefined) => type),
+      combineLatestWith(toObservable(this.allPaymentOptionsWritableSignal)),
+      map(([type, allPaymentTypes]) => type ? this.filterTypes(type, allPaymentTypes) : allPaymentTypes),
+    ));
+
   typeInput = viewChild.required<ElementRef<HTMLInputElement>>('typeInput');
 
   displayedColumns: string[] = ['select', 'position', 'customer', 'timestamp', 'description', 'actions'];
@@ -177,16 +180,18 @@ export class InvoiceComponent {
   language: string = this.translate.getCurrentLang();
 
   constructor() {
-    const initial = this.allPaymentTypesSignal();
-    this.allPaymentTypesWritableSignal.set(initial ? [...initial] : []);
-
     effect(() => {
-      const paymentTypes = this.allPaymentTypesSignal();
-      if (!paymentTypes) {
+      const paymentOptions = this.paymentOptionsSignal();
+      if (!paymentOptions.length) {
         return;
       }
 
-      this.allPaymentTypesWritableSignal.set(paymentTypes);
+      const filteredOptions = paymentOptions.filter(option => option.enabled && option.filter);
+      const selectedTypes = filteredOptions.filter(option => option.defaultFilter);
+      const availableOptions = filteredOptions.filter(option => !selectedTypes.includes(option));
+
+      this.selectedPaymentOptionsSignal.set(selectedTypes);
+      this.allPaymentOptionsWritableSignal.set(availableOptions);
     });
 
     effect(() => {
@@ -208,7 +213,7 @@ export class InvoiceComponent {
       const start = backendFormatDate(this.startDateSignal());
       const end = backendFormatDate(this.endDateSignal());
       if (start && end) {
-        const types = this.selectedPaymentTypesSignal();
+        const types = this.selectedPaymentOptionsSignal().map((option: IPaymentOption) => option.type);
         this.store.dispatch(getOfficeToInvoice({ officeId, start, end, types }));
       }
     });
@@ -241,7 +246,7 @@ export class InvoiceComponent {
       this.store.dispatch(updateOfficeById({ id: selectedOffice.id, office }));
     }
     await this.loadFonts();
-    const fileName = `Sales ${invoiceFormat(this.getDateRangeForm.startDate.value!)}.pdf`;
+    const fileName = `Sales ${ invoiceFormat(this.getDateRangeForm.startDate.value!) }.pdf`;
     const createPDF = pdf(this.selectionSignal().selected, selectedOffice, start, fileName, this.env);
     const printPdf: any = pdfMake.createPdf(createPDF);
 
@@ -259,22 +264,25 @@ export class InvoiceComponent {
   displayFnOffice = (office: IOfficeAll): string => office ? office.name : '';
 
   selected = (event: MatAutocompleteSelectedEvent): void => {
-    const type = PaymentType[event.option.value as PaymentTypeKey];
-    this.selectedPaymentTypesSignal.update((current) => [...current, type]);
-    this.allPaymentTypesWritableSignal.update((current) =>
-      current?.filter((c) => c !== type));
+    const type = event.option.value as string;
+    const option = this.paymentOptionsSignal().find(option => option.type === type);
+    if (option) {
+      this.selectedPaymentOptionsSignal.update((current) => current.includes(option) ? current : [...current, option]);
+      this.allPaymentOptionsWritableSignal.update((current) =>
+        current?.filter((filter) => filter !== option));
 
-    if (this.typeInput()) {
-      this.typeInput().nativeElement.value = '';
+      if (this.typeInput()) {
+        this.typeInput().nativeElement.value = '';
+      }
+      this.getForm.type.setValue('');
     }
-    this.getForm.type.setValue('');
   };
 
-  remove = (type: string): void => {
-    this.selectedPaymentTypesSignal.update((current) =>
+  remove = (type: IPaymentOption): void => {
+    this.selectedPaymentOptionsSignal.update((current) =>
       current.filter((c) => c !== type));
 
-    this.allPaymentTypesWritableSignal.update((current) =>
+    this.allPaymentOptionsWritableSignal.update((current) =>
       current ? [...current, type] : [type]);
 
     this.getForm.type.setValue('');
@@ -301,8 +309,8 @@ export class InvoiceComponent {
   };
 
   checkboxLabel = (row?: IInvoice): string =>
-    !row ? `${this.isAllSelected() ? 'deselect' : 'select'} all` :
-      `${this.selectionSignal().isSelected(row) ? 'deselect' : 'select'} row ${row.position + 1}`;
+    !row ? `${ this.isAllSelected() ? 'deselect' : 'select' } all` :
+      `${ this.selectionSignal().isSelected(row) ? 'deselect' : 'select' } row ${ row.position + 1 }`;
 
   goToPath = (invoice: IInvoice): void => {
     this.router.navigate(invoice.paths);
@@ -310,8 +318,11 @@ export class InvoiceComponent {
 
   private filterTypes = (
     value: string,
-    allPaymentTypes: string[],
-  ): string[] => allPaymentTypes.filter(state => state.toLowerCase().indexOf(value.toLowerCase()) === 0);
+    allPaymentTypes?: IPaymentOption[],
+  ): IPaymentOption[] | undefined => allPaymentTypes?.filter(option => {
+    return option.label.toLowerCase().includes(value.toLowerCase()) ||
+      option.type.toLowerCase().includes(value.toLowerCase());
+  });
 
   private filterOffice = (name: string, offices: IOfficeAll[]): IOfficeAll[] | undefined => offices?.filter(
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);

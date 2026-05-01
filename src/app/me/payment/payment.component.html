@@ -1,3 +1,4 @@
+<div class="app-surface-shell app-surface-stack">
 @if (showError) {
   <fieldset id="error-box">
     <mat-icon (click)="close()" id="close">close</mat-icon>
@@ -6,7 +7,7 @@
   </fieldset>
 }
 
-<div class="mat-elevation-z8">
+<div class="mat-elevation-z8 app-table-shell">
   @if (dataSourceSignal(); as dataSource) {
     <table [dataSource]="dataSource" mat-table>
       <ng-container matColumnDef="position">
@@ -101,10 +102,10 @@
     </table>
   }
 </div>
+</div>
 <div class="top card-actions">
   <div class="spacer"></div>
   <button (click)="goBack()" color="accent" mat-fab extended class="icon-button"
           type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
   </button>
 </div>
-

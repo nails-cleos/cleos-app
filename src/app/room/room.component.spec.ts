@@ -15,6 +15,8 @@ import { Role } from '../interfaces/token';
 import { getRoom } from '../store/room.actions';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.component';
+import { PaymentService } from '../services/payment.service';
+import { IPaymentOption } from '../interfaces/payment';
 
 describe('RoomComponent', () => {
   let component: RoomComponent;
@@ -28,12 +30,14 @@ describe('RoomComponent', () => {
   let currencies$: BehaviorSubject<any>;
   let offices$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
+  let paymentOptions$: BehaviorSubject<any>;
 
   let storeSpy: jasmine.SpyObj<Store>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
   let geocodeServiceSpy: jasmine.SpyObj<GeocodeService>;
   let authUserService: jasmine.SpyObj<AuthUserService>;
+  let paymentServiceSpy: jasmine.SpyObj<PaymentService>;
 
   const monday: IAvailability = { day: 'MONDAY', start: '09:00', end: '18:00' };
   const tuesday: IAvailability = { day: 'TUESDAY' };
@@ -84,6 +88,41 @@ describe('RoomComponent', () => {
     professionals: [mockProfessional],
   };
 
+  const paymentOptions: IPaymentOption[] = [
+    {
+      label: 'Cash',
+      type: 'CASH',
+      enabled: true,
+      enabledCustomer: false,
+      default: true,
+      filter: true,
+      defaultFilter: false,
+      show: true,
+      icon: 'cash',
+    },
+    {
+      label: 'Transfer',
+      type: 'TRANSFER',
+      enabled: true,
+      enabledCustomer: false,
+      default: false,
+      filter: true,
+      defaultFilter: true,
+      show: true,
+      icon: 'transfer',
+    },
+    {
+      label: 'Account',
+      type: 'ACCOUNT',
+      enabled: true,
+      enabledCustomer: true,
+      default: false,
+      filter: false,
+      defaultFilter: false,
+      show: false,
+    },
+  ];
+
   beforeEach(async () => {
     roomId$ = new BehaviorSubject(undefined);
     selectedRoom$ = new BehaviorSubject(undefined);
@@ -91,6 +130,7 @@ describe('RoomComponent', () => {
     currencies$ = new BehaviorSubject(undefined);
     offices$ = new BehaviorSubject(undefined);
     subErrors$ = new BehaviorSubject(undefined);
+    paymentOptions$ = new BehaviorSubject(paymentOptions);
     authUserSignal.update(prev => ({
       ...prev,
       isDarkMode: false,
@@ -101,6 +141,8 @@ describe('RoomComponent', () => {
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
     geocodeServiceSpy = jasmine.createSpyObj('GeocodeService', ['getCoordinates']);
+    paymentServiceSpy = jasmine.createSpyObj('PaymentService', ['getPaymentOptions']);
+    paymentServiceSpy.getPaymentOptions.and.returnValue(new BehaviorSubject(paymentOptions).asObservable());
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj<ParamMap>('ParamMap', ['get']),
@@ -126,6 +168,8 @@ describe('RoomComponent', () => {
           return offices$.asObservable();
         case 6:
           return subErrors$.asObservable();
+        case 7:
+          return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -138,6 +182,7 @@ describe('RoomComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
         { provide: GeocodeService, useValue: geocodeServiceSpy },
+        { provide: PaymentService, useValue: paymentServiceSpy },
         { provide: AuthUserService, useValue: authUserService },
         provideHttpClient(),
         provideHttpClientTesting(),
@@ -248,6 +293,7 @@ describe('RoomComponent', () => {
         officeId: 'office-123',
         currencyId: 'currency-id',
         timeZone: 'Europe/Amsterdam',
+        paymentTypes: ['CASH'],
       }),
       type: '[Room] Create room',
     }));

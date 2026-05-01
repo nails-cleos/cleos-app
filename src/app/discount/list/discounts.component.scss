@@ -2,18 +2,12 @@
   text-align: center;
 }
 
-tr.detail-row {
-  height: 0 !important;
-}
-
 table {
   width: 100%;
 }
 
-/* TODO(mdc-migration): The following rule targets internal classes of tabs that may no longer apply for the MDC version. */
-/* TODO(mdc-migration): The following rule targets internal classes of tabs that may no longer apply for the MDC version. */
-mat-table {
-  overflow-x: scroll;
+.mat-column-add {
+  width: 1% !important;
 }
 
 .icon-text {

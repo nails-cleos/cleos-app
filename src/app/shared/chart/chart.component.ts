@@ -16,6 +16,7 @@ import { IError } from '../../interfaces/common';
 })
 export class ChartComponent {
   chartSummary = input<IChart>();
+  chartData = input<IChartUtil>();
   currency = input<ICurrency>();
   locale = input<string>();
   timeZone = input<string>();
@@ -34,7 +35,13 @@ export class ChartComponent {
 
   constructor() {
     effect(() => {
+      const chartData = this.chartData();
       const chartSummary = this.chartSummary();
+      if (chartData) {
+        this.errorSignal.set(undefined);
+        this.chart.set(chartData);
+        return;
+      }
       if (!chartSummary || this.error() || !chartSummary.type) {
         this.errorSignal.set({ status: 'NO_CONTENT' });
         return;

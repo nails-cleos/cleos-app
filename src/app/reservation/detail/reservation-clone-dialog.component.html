@@ -1,38 +1,47 @@
-<h1 mat-dialog-title>{{ 'RESERVATION.CLONE' | translate }}</h1>
-<div mat-dialog-content>
-  <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
-    <mat-form-field appearance="outline" class="full">
-      <mat-label>{{ 'RESERVATION.DATE.FIELD' | translate }}</mat-label>
-      <input (focus)="picker.open()" [formControl]="getForm.date" [matDatepickerFilter]="myFilter"
-             [matDatepicker]="picker" [max]="maxCalendarDate" matInput required>
-      <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
-      <mat-datepicker #picker touchUi></mat-datepicker>
-      @if (getForm.date.hasError('required')) {
-        <mat-error [innerHTML]="'RESERVATION.DATE.REQUIRED' | translate"></mat-error>
-      }
-    </mat-form-field>
-    <mat-form-field appearance="outline" class="full">
-      <mat-label>{{ 'RESERVATION.START.FIELD' | translate }}</mat-label>
-      <input [formControl]="getForm.time" [format]="24" [max]="maxDate()" [min]="minDate()" [timepicker]="t"
-             matInput name="time" readonly/>
-      <span matPrefix> &nbsp;<mat-icon (click)="t.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
-      <app-timepicker #t [minutesGap]="15"></app-timepicker>
-    </mat-form-field>
-  </form>
-</div>
-<div mat-dialog-actions class="card-actions">
-  <div class="spacer"></div>
-  @if (data.small) {
-    <button (click)="onNoClick()" mat-icon-button>
-      <mat-icon>clear</mat-icon>
+<div class="app-surface-dialog-shell">
+  <div class="app-surface-dialog-header">
+    <div class="app-surface-dialog-title-wrap">
+      <div class="app-surface-dialog-badge" aria-hidden="true">
+        <mat-icon>content_copy</mat-icon>
+      </div>
+      <h1 mat-dialog-title class="app-surface-dialog-title">{{ 'RESERVATION.CLONE' | translate }}</h1>
+    </div>
+    <button (click)="onNoClick()" aria-label="Close dialog" class="app-surface-dialog-close" type="button">
+      <mat-icon>close</mat-icon>
     </button>
-    <button (click)="doAction()" color="primary" [disabled]="form.invalid" mat-icon-button>
-      <mat-icon>file_copy</mat-icon>
-    </button>
-  } @else {
-    <button (click)="onNoClick()" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
-    <button (click)="doAction()" color="primary" [disabled]="form.invalid" mat-fab extended class="icon-button">
+  </div>
+
+  <div class="app-surface-dialog-divider" aria-hidden="true"></div>
+
+  <div mat-dialog-content class="app-surface-dialog-content">
+    <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'RESERVATION.DATE.FIELD' | translate }}</mat-label>
+        <input (focus)="picker.open()" [formControl]="getForm.date" [matDatepickerFilter]="myFilter"
+               [matDatepicker]="picker" [max]="maxCalendarDate" matInput required>
+        <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
+        <mat-datepicker #picker touchUi></mat-datepicker>
+        @if (getForm.date.hasError('required')) {
+          <mat-error [innerHTML]="'RESERVATION.DATE.REQUIRED' | translate"></mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>{{ 'RESERVATION.START.FIELD' | translate }}</mat-label>
+        <input [formControl]="getForm.time" [format]="24" [max]="maxDate()" [min]="minDate()" [timepicker]="t"
+               matInput name="time" readonly/>
+        <span matPrefix> &nbsp;<mat-icon (click)="t.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
+        <app-timepicker #t [minutesGap]="15"></app-timepicker>
+      </mat-form-field>
+    </form>
+  </div>
+
+  <div class="app-surface-dialog-divider" aria-hidden="true"></div>
+
+  <div mat-dialog-actions class="app-surface-dialog-actions">
+    <div class="app-surface-dialog-spacer"></div>
+    <button (click)="onNoClick()" mat-stroked-button type="button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+    <button (click)="doAction()" color="primary" [disabled]="form.invalid" mat-flat-button type="button">
       {{ 'RESERVATION.ACTION.CLONE' | translate }}
     </button>
-  }
+  </div>
 </div>

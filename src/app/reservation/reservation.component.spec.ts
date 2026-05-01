@@ -12,12 +12,11 @@ import { IUserAll } from '../interfaces/user';
 import { IRoomAll, ServiceType } from '../interfaces/room';
 import { IOfficeAll } from '../interfaces/office';
 import { IAdditionalAll } from '../interfaces/additional';
-import { PaymentType } from '../interfaces/payment';
-import { IGroupService, ITreatment, ITreatmentAll } from '../interfaces/treatment';
+import { IPaymentOption } from '../interfaces/payment';
+import { IGroupService, ITreatment, ITreatmentAll, Price } from '../interfaces/treatment';
 import { DiscountType, IUserDiscount } from '../interfaces/discount';
-import { MatStepper } from '@angular/material/stepper';
 import { DataEvent } from '../util/event';
-import { Duration } from '../util/dates';
+import { Duration, getTime, newDateTimestamp } from '../util/dates';
 import { addMonths } from 'date-fns';
 import { MAX_RESERVATION_MONTH } from '../interfaces/reservation';
 import { provideHttpClient } from '@angular/common/http';
@@ -28,6 +27,7 @@ import { signal } from '@angular/core';
 describe('ReservationComponent', () => {
   let component: ReservationComponent;
   let fixture: ComponentFixture<ReservationComponent>;
+  const cashPaymentOption = { type: 'CASH' } as IPaymentOption;
 
   let matches$: BehaviorSubject<any>;
   let navigationParams$: BehaviorSubject<any>;
@@ -40,6 +40,7 @@ describe('ReservationComponent', () => {
   let selectedReservation$: BehaviorSubject<any>;
   let calendar$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
+  let paymentOptions$: BehaviorSubject<any>;
 
   let storeSpy: jasmine.SpyObj<Store>;
   let routerSpy: jasmine.SpyObj<Router>;
@@ -92,7 +93,7 @@ describe('ReservationComponent', () => {
       { day: 'TUESDAY', start: '09:00', end: '17:00' },
     ],
     primary: true,
-    paymentTypes: [PaymentType.cash],
+    paymentTypes: ['CASH'],
   };
 
   const mockTreatment: ITreatmentAll = {
@@ -106,6 +107,32 @@ describe('ReservationComponent', () => {
     primary: true,
   };
 
+  const createEditReservation = () => ({
+    id: 'reservation-1',
+    customer: mockCustomer,
+    room: mockRoom,
+    professional: mockRoom.professionals![0],
+    treatment: {
+      ...mockTreatment,
+      groupId: 'group-1',
+      discountCustomer: undefined,
+    },
+    additional: [
+      {
+        id: 'additional-1',
+        key: 'additional-1',
+        name: 'Removal',
+        price: 5,
+        duration: '15M',
+        type: ServiceType.additional,
+      },
+    ],
+    note: 'Important note',
+    configurationCanCustomerChange: true,
+    configurationReference: 'REF-1',
+    timestamp: new Date('2026-04-16T08:00:00Z').getTime() / 1000,
+  });
+
   beforeEach(async () => {
     authUserSignal.set({ ...initialAuthUser, isDarkMode: true, professionalId: 'prof-123' });
     navigationParams$ = new BehaviorSubject(undefined);
@@ -118,6 +145,19 @@ describe('ReservationComponent', () => {
     selectedReservation$ = new BehaviorSubject(undefined);
     calendar$ = new BehaviorSubject(undefined);
     subErrors$ = new BehaviorSubject(undefined);
+    paymentOptions$ = new BehaviorSubject([
+      {
+        type: 'CASH',
+        label: 'Cash',
+        enabled: true,
+        enabledProfessional: true,
+        default: true,
+        filter: true,
+        defaultFilter: false,
+        show: true,
+        icon: 'cash',
+      },
+    ]);
     matches$ = new BehaviorSubject(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
@@ -159,6 +199,8 @@ describe('ReservationComponent', () => {
           return calendar$.asObservable();
         case 10:
           return subErrors$.asObservable();
+        case 11:
+          return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -385,8 +427,12 @@ describe('ReservationComponent', () => {
         { key: 'add-2', id: 'add-2', name: 'Additional 2', price: 30, duration: '15M', type: ServiceType.additional },
       ];
 
-      const mockOptions = mockAdditional.map(item => ({ value: item })) as any;
-      component.onChange(mockOptions);
+      const selectionList = {
+        selectedOptions: {
+          selected: mockAdditional.map(item => ({ value: item })),
+        },
+      } as any;
+      component.onChange(selectionList);
 
       expect(component.additionalSelected()).toEqual(mockAdditional);
     });
@@ -454,7 +500,7 @@ describe('ReservationComponent', () => {
 
     it('should include payment information when amount and type are provided', () => {
       component.getConfigurationForm.amount.setValue(150);
-      component.getConfigurationForm.type.setValue(PaymentType.cash);
+      component.getConfigurationForm.option.setValue(cashPaymentOption);
       component.getConfigurationForm.transfer.setValue('REF123');
       component.create();
       expect(storeSpy.dispatch).toHaveBeenCalled();
@@ -477,9 +523,11 @@ describe('ReservationComponent', () => {
       component.isEditing.set(true);
       selectedReservation$.next({
         id: 'reservation-1',
+        customer: mockCustomer,
         treatment: mockTreatment,
         room: mockRoom,
         professional: mockRoom.professionals![0],
+        timestamp: new Date('2026-04-16T08:00:00Z').getTime() / 1000,
       });
       fixture.detectChanges();
 
@@ -504,13 +552,7 @@ describe('ReservationComponent', () => {
 
   describe('back method', () => {
     beforeEach(() => {
-      const stepperSpy = jasmine.createSpyObj<MatStepper>('MatStepper', [], {
-        selectedIndex: 0,
-      });
-      Object.defineProperty(component, 'stepper', {
-        get: () => () => stepperSpy,
-        configurable: true,
-      });
+      component.currentStepIndex.set(1);
     });
 
     it('should set isPreview to false when currently in preview mode', () => {
@@ -551,16 +593,9 @@ describe('ReservationComponent', () => {
       expect(component['cleanEvent']).not.toHaveBeenCalled();
     });
 
-    it('should update stepper selectedIndex', () => {
-      const stepperSpy = component['stepper'] as any;
-      if (stepperSpy && stepperSpy.selectedIndex !== undefined) {
-        component.back();
-        // After back, selectedIndex should change
-        expect(stepperSpy.selectedIndex).toBeDefined();
-      } else {
-        // If no stepper, just ensure back completes without error
-        expect(() => component.back()).not.toThrow();
-      }
+    it('should update current step index', () => {
+      component.back();
+      expect(component.currentStepIndex()).toBe(0);
     });
   });
 
@@ -590,6 +625,24 @@ describe('ReservationComponent', () => {
     it('should check if add button is disabled', () => {
       component.dateTimeList.setErrors({ invalid: true });
       expect(component.isAddButtonDisabled).toBeTrue();
+    });
+
+    it('should use the selected reservation as summary fallback and derive summary totals', () => {
+      const reservation = createEditReservation();
+      selectedReservation$.next(reservation);
+      fixture.detectChanges();
+
+      component.price.set(new Price());
+
+      expect(component.summaryCustomer).toEqual(reservation.customer);
+      expect(component.summaryRoom).toEqual(reservation.room);
+      expect(component.summaryProfessional).toEqual(reservation.professional);
+      expect(component.summaryTreatment).toEqual(reservation.treatment);
+      expect(component.summaryAdditionals).toEqual(reservation.additional);
+      expect(component.summaryDateTimes.length).toBe(1);
+      expect(component.selectedTreatmentPrice).toBe(100);
+      expect(component.effectiveTotalWithoutDiscount).toBe(105);
+      expect(component.effectiveTotalPrice).toBe(105);
     });
   });
 
@@ -649,8 +702,7 @@ describe('ReservationComponent', () => {
 
     it('should map sub errors to form controls through the shared service', () => {
       spyOn(document, 'querySelector').and.returnValue(null);
-      subErrors$.next([{ field: 'room', message: 'Room is invalid' }] as any);
-      fixture.detectChanges();
+      component['applySubErrors']([{ field: 'room', message: 'Room is invalid' }] as any);
 
       expect(component.errors().room).toBe('Room is invalid');
       expect(component.getOfficeForm.room.hasError('incorrect')).toBeTrue();
@@ -674,54 +726,38 @@ describe('ReservationComponent', () => {
     });
 
     it('should move the stepper to the mapped step when applying shared sub errors', () => {
-      const stepper = { selectedIndex: 0 };
-      Object.defineProperty(component, 'stepper', {
-        get: () => () => stepper,
-        configurable: true,
-      });
+      component.currentStepIndex.set(0);
       spyOn(document, 'querySelector').and.returnValue(null);
 
       component['applySubErrors']([{ field: 'professional', message: 'Professional is invalid' }] as any);
 
-      expect(stepper.selectedIndex).toBe(3);
+      expect(component.currentStepIndex()).toBe(3);
     });
 
     it('should use the editing default step for unmapped sub errors when the user is not admin', () => {
-      const stepper = { selectedIndex: 0 };
-      Object.defineProperty(component, 'stepper', {
-        get: () => () => stepper,
-        configurable: true,
-      });
+      component.currentStepIndex.set(0);
       component.isEditing.set(true);
       spyOn(document, 'querySelector').and.returnValue(null);
 
       component['applySubErrors']([{ field: 'customer', message: 'Customer is invalid' }] as any);
 
-      expect(stepper.selectedIndex).toBe(2);
+      expect(component.currentStepIndex()).toBe(2);
       expect(component.getCustomerForm.customer.hasError('incorrect')).toBeTrue();
     });
 
     it('should use the admin editing default step for unmapped sub errors', () => {
-      const stepper = { selectedIndex: 0 };
-      Object.defineProperty(component, 'stepper', {
-        get: () => () => stepper,
-        configurable: true,
-      });
+      component.currentStepIndex.set(0);
       component.isEditing.set(true);
       authUserSignal.update(prev => ({ ...prev, isAdmin: true }));
       spyOn(document, 'querySelector').and.returnValue(null);
 
       component['applySubErrors']([{ field: 'customer', message: 'Customer is invalid' }] as any);
 
-      expect(stepper.selectedIndex).toBe(1);
+      expect(component.currentStepIndex()).toBe(1);
       expect(component.getCustomerForm.customer.hasError('incorrect')).toBeTrue();
     });
 
-    it('should still map shared sub errors when no stepper is available', () => {
-      Object.defineProperty(component, 'stepper', {
-        get: () => () => undefined,
-        configurable: true,
-      });
+    it('should still map shared sub errors without throwing', () => {
       spyOn(document, 'querySelector').and.returnValue(null);
 
       expect(() => component['applySubErrors']([{ field: 'note', message: 'Note is invalid' }] as any)).not.toThrow();
@@ -797,6 +833,79 @@ describe('ReservationComponent', () => {
       component.getTreatmentForm.discount.setValue(mockDiscount.id);
       component.getTreatmentForm.discount.setValue(undefined);
       expect(component.getTreatmentForm.discount.value).toBeUndefined();
+    });
+  });
+
+  describe('Edit Hydration', () => {
+    it('should hydrate the edit reservation into the form state', async () => {
+      const reservation = createEditReservation();
+      component.isEditing.set(true);
+
+      component['setData'](reservation as any);
+      await Promise.resolve();
+
+      expect(component.getCustomerForm.customer.value).toEqual(reservation.customer);
+      expect(component.getOfficeForm.office.value).toEqual(reservation.room.office);
+      expect(component.getOfficeForm.room.value).toEqual(reservation.room);
+      expect(component.getOfficeForm.professional.value).toEqual(reservation.professional);
+      expect(component.getTreatmentForm.treatment.value).toEqual(reservation.treatment);
+      expect(component.getConfigurationForm.note.value).toBe('Important note');
+      expect(component.getConfigurationForm.reference.value).toBe('REF-1');
+      expect(component.getConfigurationForm.customerChange.value).toBeTrue();
+      expect(component.additionalSelected().map(item => item.id)).toEqual(['additional-1']);
+      expect(component.price().total).toBe(105);
+      expect(component.currentStepIndex()).toBe(2);
+      expect(component['hydratingEdit']).toBeFalse();
+    });
+
+    it('should reuse the first date-time control when hydrating edit data', async () => {
+      const reservation = createEditReservation();
+      component.isEditing.set(true);
+      const expectedDate = newDateTimestamp(reservation.timestamp, reservation.room.timeZone);
+      const expectedStart = getTime(expectedDate, component['dateFormat']);
+
+      component['setData'](reservation as any);
+      await Promise.resolve();
+
+      expect(component.dateTimeList.length).toBe(1);
+      expect(component.getFormDateTimeControls(0).date.value).toEqual(expectedDate);
+      expect(component.getFormDateTimeControls(0).start.value).toBe(expectedStart);
+    });
+  });
+
+  describe('Additional Selection Sync', () => {
+    it('should compare additionals by id', () => {
+      expect(component.compareAdditional(
+        { id: 'additional-1' } as any,
+        { id: 'additional-1' } as any,
+      )).toBeTrue();
+      expect(component.compareAdditional(
+        { id: 'additional-1' } as any,
+        { id: 'additional-2' } as any,
+      )).toBeFalse();
+    });
+
+    it('should sync rendered additional selections from stored ids', async () => {
+      const selected = { id: 'additional-1', name: 'Removal' } as IAdditionalAll;
+      const optionA = { value: selected, selected: false };
+      const optionB = { value: { id: 'additional-2', name: 'Powder' }, selected: true };
+      (component as any).additionalLists = () => [{ options: [optionA, optionB] }];
+      component.additionalSelected.set([selected]);
+
+      component['syncRenderedAdditionalSelections']();
+      await Promise.resolve();
+
+      expect(optionA.selected).toBeTrue();
+      expect(optionB.selected).toBeFalse();
+    });
+
+    it('should detect when additional selections need syncing', () => {
+      const current = [{ id: 'additional-1' }, { id: 'additional-2' }] as IAdditionalAll[];
+      const same = current.slice();
+      const differentOrder = [{ id: 'additional-2' }, { id: 'additional-1' }] as IAdditionalAll[];
+
+      expect(component['shouldSyncAdditionalSelection'](current, same)).toBeFalse();
+      expect(component['shouldSyncAdditionalSelection'](current, differentOrder)).toBeTrue();
     });
   });
 
@@ -911,8 +1020,8 @@ describe('ReservationComponent', () => {
     });
 
     it('should set payment type', () => {
-      component.getConfigurationForm.type.setValue(PaymentType.cash);
-      expect(component.getConfigurationForm.type.value).toBe(PaymentType.cash);
+      component.getConfigurationForm.option.setValue(cashPaymentOption);
+      expect(component.getConfigurationForm.option.value).toBe(cashPaymentOption);
     });
 
     it('should set transfer reference', () => {
@@ -939,7 +1048,9 @@ describe('ReservationComponent', () => {
     });
 
     it('should handle empty additional selection', () => {
-      component.onChange([]);
+      component.onChange({
+        selectedOptions: { selected: [] },
+      } as any);
       expect(component.additionalSelected()).toEqual([]);
     });
 
@@ -1191,6 +1302,182 @@ describe('ReservationComponent', () => {
       const event = component['createNewEvent'](new Date(), new Date(), 'CREATED', mockRoom.timeZone, 'event-1');
 
       expect(event).toBeUndefined();
+    });
+  });
+
+  describe('Form Getters', () => {
+    it('should return customer form controls', () => {
+      expect(component.getCustomerForm).toBe(component['getForm'].customerForm.controls);
+    });
+
+    it('should return office form controls', () => {
+      expect(component.getOfficeForm).toBe(component['getForm'].officeForm.controls);
+    });
+
+    it('should return treatment form controls', () => {
+      expect(component.getTreatmentForm).toBe(component['getForm'].treatmentForm.controls);
+    });
+
+    it('should return event group form controls', () => {
+      expect(component.getEventGroupForm).toBe(component['getForm'].eventGroup.controls);
+    });
+
+    it('should return configuration form controls', () => {
+      expect(component.getConfigurationForm).toBe(component['getForm'].configurationForm.controls);
+    });
+  });
+
+  describe('FormArray Getters', () => {
+    it('should return events FormArray', () => {
+      expect(component.events).toBe(component['getForm'].eventGroup.controls.events);
+    });
+
+    it('should return dateTimeList FormArray', () => {
+      expect(component.dateTimeList).toBe(component['getForm'].treatmentForm.controls.dateTimeList);
+    });
+  });
+
+  describe('treatmentDetail', () => {
+    it('should return treatment name when customerInfo exists', () => {
+      component.customerInfo.set({
+        treatment: { name: 'Massage' },
+      } as any);
+
+      expect(component.treatmentDetail).toBe('Massage');
+    });
+
+    it('should return empty string when customerInfo is undefined', () => {
+      component.customerInfo.set(undefined);
+      expect(component.treatmentDetail).toBe('');
+    });
+  });
+
+  describe('roomDetail', () => {
+    it('should return formatted room detail when room exists', () => {
+      component.getOfficeForm.room.setValue(mockRoom);
+
+      expect(component.roomDetail).toBeTruthy();
+    });
+
+    it('should return empty string when room is undefined', () => {
+      component.getOfficeForm.room.setValue(undefined);
+      expect(component.roomDetail).toBe('');
+    });
+  });
+
+  describe('showTimeZone', () => {
+    it('should return true when timezones are different', () => {
+      component.getOfficeForm.room.setValue({ timeZone: 'UTC' } as any);
+
+      expect(component.showTimeZone).toBeTrue();
+    });
+
+    it('should return false when timezones are same', () => {
+      component.getOfficeForm.room.setValue({ timeZone: 'Europe/Amsterdam' } as any);
+
+      expect(component.showTimeZone).toBeFalse();
+    });
+  });
+
+  describe('summary getters', () => {
+    it('should return form value when present (customer)', () => {
+      const customer = { id: 'c1' } as any;
+      component.getCustomerForm.customer.setValue(customer);
+
+      expect(component.summaryCustomer).toBe(customer);
+    });
+
+    it('should fallback to selected reservation (customer)', () => {
+      component.getCustomerForm.customer.setValue(undefined);
+      const reservation = createEditReservation();
+      selectedReservation$.next({
+        ...reservation,
+        customer: { ...reservation.customer, id: 'c2' },
+      } as any);
+      fixture.detectChanges();
+
+      expect(component.summaryCustomer).toEqual({ ...reservation.customer, id: 'c2' });
+    });
+
+    it('should return room from form or fallback', () => {
+      const room = { id: 'r1' } as any;
+      component.getOfficeForm.room.setValue(room);
+
+      expect(component.summaryRoom).toBe(room);
+    });
+
+    it('should return professional from form or fallback', () => {
+      const prof = { id: 'p1' } as any;
+      component.getOfficeForm.professional.setValue(prof);
+
+      expect(component.summaryProfessional).toBe(prof);
+    });
+
+    it('should return treatment from form or fallback', () => {
+      const treatment = { id: 't1' } as any;
+      component.getTreatmentForm.treatment.setValue(treatment);
+
+      expect(component.summaryTreatment).toBe(treatment);
+    });
+  });
+
+  describe('summaryAdditionals', () => {
+    it('should return selected additionals when available', () => {
+      const additions = [{ id: 'a1' }] as any;
+
+      component.additionalSelected.set(additions);
+
+      expect(component.summaryAdditionals).toBe(additions);
+    });
+
+    it('should fallback to reservation additionals', () => {
+      component.additionalSelected.set([]);
+      const reservation = createEditReservation();
+      selectedReservation$.next(reservation);
+      fixture.detectChanges();
+
+      expect(component.summaryAdditionals).toEqual(reservation.additional);
+    });
+
+    it('should return empty array when nothing exists', () => {
+      component.additionalSelected.set([]);
+      selectedReservation$.next(undefined);
+      fixture.detectChanges();
+
+      expect(component.summaryAdditionals).toEqual([]);
+    });
+  });
+
+  describe('summaryDateTimes', () => {
+    it('should return current selectedDateTimes if present', () => {
+      const dt = [{ date: new Date(), start: '10:00' }];
+      component.dateTimeList.controls.at(0)?.setValue(dt[0]);
+
+      expect(component.summaryDateTimes).toEqual(dt);
+    });
+
+    it('should return empty array if no reservation', () => {
+      selectedReservation$.next(undefined);
+      fixture.detectChanges();
+
+      expect(component.summaryDateTimes).toEqual([]);
+    });
+
+    it('should build date from reservation timestamp when no current dates', () => {
+      const reservation = createEditReservation();
+
+      selectedReservation$.next({
+        ...reservation,
+        timestamp: 1700000000,
+        room: { timeZone: 'Europe/Amsterdam' },
+      });
+      fixture.detectChanges();
+
+      const result = component.summaryDateTimes;
+
+      expect(result.length).toBe(1);
+      expect(result[0].date).toBeTruthy();
+      expect(result[0].start).toBeDefined();
     });
   });
 });

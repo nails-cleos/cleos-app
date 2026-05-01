@@ -35,7 +35,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         cy.wait('@getUsers');
         cy.get('tr').contains('No users');
         cy.get('button[id="add-button"]').click({ force: true });
-        cy.get('mat-card-title').contains('Add user');
+        cy.get('.app-surface-eyebrow').contains('Add user');
         cy.selectOption('select-role', role);
 
         cy.formControlType('email', `${ role }@email.com`);
@@ -87,12 +87,12 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           cy.intercept('PATCH', `**/api/v1/users/${ user.id }`).as('updateUser');
           cy.mockUser(user.id, user);
 
-          cy.buttonClickOnTable(breakpoints, user.displayName, 'user-row', 'user-detail-row.user-expanded-row', 'edit',
+          cy.buttonClickOnTable(breakpoints, user.displayName, 'app-table-master-row', 'app-table-detail-row', 'edit',
             breakpointToButtons(breakpoints, ['analytics', 'today', 'delete'], ['account_circle'], value.otherButtons));
           cy.wait('@getUser');
 
-          cy.get('mat-card-title').contains('Update user');
-          cy.get('mat-card-subtitle').contains(value.displayName);
+          cy.get('.app-surface-eyebrow').contains('Update user');
+          cy.get('.app-crud-title').contains(value.displayName);
           cy.get('[data-cy="email-input"]').should('have.value', user.email);
           cy.get('[data-cy="displayName-input"]').should('have.value', user.displayName);
           cy.get('#select-lang').contains('English');

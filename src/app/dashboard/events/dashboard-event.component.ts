@@ -21,7 +21,7 @@ import {
 } from '../../util/dates';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
-import { IProfessionalEvent } from '../../interfaces/dashboard';
+import { ICalendarNote, ICalendarReservations, IProfessionalEvent } from '../../interfaces/dashboard';
 import { getMyEvent, updateEvent } from '../../store/dashboard.actions';
 import { approveReservation, startReservation } from '../../store/reservation.actions';
 import {
@@ -37,7 +37,7 @@ import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { createEventColor, getProfessionalColor } from '../../util/color';
 import { CalendarDialogComponent } from '../../shared/dialog/calendar/calendar-dialog.component';
-import { executeDialogNoWidth, FrequencyEnum } from '../../util/helper';
+import { currencySymbol, executeDialogNoWidth, FrequencyEnum } from '../../util/helper';
 import { AuthUserService } from '../../services/auth-user.service';
 import { SharedModule } from '../../shared/shared.module';
 import { CounterComponent } from '../../util/counter/counter.component';
@@ -93,14 +93,6 @@ export class DashboardEventComponent {
   prevBtnDisabled = false;
   nextBtnDisabled = false;
 
-  private readonly approveText: string = this.translate.instant('DASHBOARD.ROOM.APPROVE') ?? 'APPROVE';
-  private readonly startText: string = this.translate.instant('DASHBOARD.ROOM.START');
-  private readonly completeText: string = this.translate.instant('DASHBOARD.ROOM.COMPLETE');
-  private readonly viewText: string = this.translate.instant('DASHBOARD.ROOM.VIEW');
-  private readonly moreText: string = this.translate.instant('DASHBOARD.ROOM.MORE_INFO');
-  private readonly startedText: string = this.translate.instant('DASHBOARD.ROOM.STARTED');
-  private readonly elapsedText: string = this.translate.instant('DASHBOARD.ROOM.ELAPSED');
-  private readonly finishInText: string = this.translate.instant('DASHBOARD.ROOM.FINISH_IN');
   private readonly language: string = this.translate.getCurrentLang();
 
   private calendarReady = signal(false);
@@ -152,6 +144,7 @@ export class DashboardEventComponent {
             const start = newDateTimestamp(it.start);
             const end = it.end ? newDateTimestamp(it.end) : null;
             const started = it.started ? newDateTimestamp(it.started) : null;
+            const finished = it.finished ? newDateTimestamp(it.finished) : null;
 
             const event = {
               start, end, color, title, draggable, id: it.reservationId,
@@ -159,8 +152,14 @@ export class DashboardEventComponent {
                 professional,
                 started,
                 time: true,
+                timeZone: dashboard.timeZone,
                 customerId: it.customerId,
+                professionalName: professional.name,
+                currency: dashboard.currencyCode,
+                finished,
+                durationSeconds: DashboardEventComponent.reservationDurationSeconds(it),
                 state: it.state,
+                total: it.total,
                 viewDate,
               },
               resizable: { beforeStart: true, afterEnd: true },
@@ -175,9 +174,9 @@ export class DashboardEventComponent {
           professionalEvent.calendarSummary.unavailable?.forEach(it => {
             const start = newDateTimestamp(it.start);
             const title = it.duration ?
-              it.title : `${this.translate.instant('COMMON.ALL_DAY.CHECK')} - ${it.title}`;
+              it.title : `${ this.translate.instant('COMMON.ALL_DAY.CHECK') } - ${ it.title }`;
 
-            let path = `${this.language}/unavailable/`;
+            let path = `${ this.language }/unavailable/`;
             if (it.type === 'BLOCK_AGENDA') {
               path += 'block-agenda/';
             }
@@ -186,8 +185,14 @@ export class DashboardEventComponent {
             if (it.repeat === FrequencyEnum.none) {
               const end = getEnd(start, it.duration);
               const event = {
-                start, end, title: it.title, id: it.unavailableId, color: createEventColor(color, darkMode),
-                draggable: true, meta: { professional, time: true }, resizable: { beforeStart: true, afterEnd: true },
+                start,
+                end,
+                title,
+                id: it.unavailableId,
+                color: createEventColor(color, darkMode),
+                draggable: true,
+                meta: { professional, time: true, state },
+                resizable: { beforeStart: true, afterEnd: true },
               } as CalendarEvent;
 
               this.calendar.addEvent(event);
@@ -197,6 +202,18 @@ export class DashboardEventComponent {
                 getDurationOrUndefined(it.duration));
             }
           });
+
+          professionalEvent.calendarSummary.birthdays?.forEach(it =>
+            this.calendar.addEvent(this.createDashboardAllDayEvent(
+              it.title, it.userId, 'BIRTHDAY', professional, darkMode,
+              this.normalizeYearDate(newDateTimestamp(it.date), viewDate))));
+
+          professionalEvent.calendarSummary.transactions?.forEach(it =>
+            this.calendar.addEvent(this.createDashboardAllDayEvent(
+              it.title, it.transactionId, 'TRANSACTION', professional, darkMode, newDateTimestamp(it.createdAt),
+              it.total)));
+
+          professionalEvent.calendarSummary.notes?.forEach(it => this.addNoteEvent(it, professional, darkMode));
         });
         this.calendar.recurringEvent?.execute();
       }
@@ -214,7 +231,7 @@ export class DashboardEventComponent {
         image = professional.imageUrl;
       }
     } else if (professional.image) {
-      image = `data:image/jpg;base64,${professional.image}`;
+      image = `data:image/jpg;base64,${ professional.image }`;
     }
 
     return image || 'assets/icons/icon-512x512.png';
@@ -224,6 +241,56 @@ export class DashboardEventComponent {
     professional: IProfessionalEvent,
     isDark: boolean,
   ): EventColor => getProfessionalColor(isDark, professional.darkColor, professional.lightColor);
+
+  private static reservationDurationSeconds = (reservation: ICalendarReservations): number | undefined => {
+    const started = reservation.started ? newDateTimestamp(reservation.started) : null;
+    const completed = reservation.finished ? newDateTimestamp(reservation.finished) : null;
+    if (started && completed) {
+      return Math.abs((completed.getTime() - started.getTime()) / 1000);
+    }
+
+    return undefined;
+  };
+
+  private addNoteEvent = (note: ICalendarNote, professional: Professional, darkMode: boolean): void => {
+    const start = newDateTimestamp(note.date);
+    if (note.repeat === FrequencyEnum.none) {
+      this.calendar.addEvent(this.createDashboardAllDayEvent(note.title, note.noteId, 'NOTE', professional, darkMode,
+        start));
+      return;
+    }
+
+    let repeatDate: Date;
+    if (this.calendar.calendarStart && this.calendar.calendarStart >= start) {
+      repeatDate = new Date(this.calendar.calendarStart);
+      repeatDate.setDate(start.getDate());
+    } else {
+      repeatDate = start;
+    }
+
+    this.calendar.recurringEvent?.addFrequency(note.repeat, repeatDate, note.noteId, note.title, 'NOTE',
+      `${ this.language }/notes/`, (date, recurring) => {
+        this.calendar.addEvent(this.createDashboardAllDayEvent(recurring.title, recurring.id, recurring.state,
+          professional, darkMode, date));
+      }, undefined, undefined, true);
+  };
+
+  private createDashboardAllDayEvent = (
+    title: string,
+    id: string,
+    state: string,
+    professional: Professional,
+    darkMode: boolean,
+    start: Date,
+    total?: number,
+  ): CalendarEvent => ({
+    id,
+    start,
+    title,
+    allDay: true,
+    color: createEventColor(findStateColor(state, darkMode), darkMode),
+    meta: { professional, time: false, state, total },
+  } as CalendarEvent);
 
   increment() {
     this.picker()?.select(addPeriod('day', this.viewDate(), 1));
@@ -298,8 +365,19 @@ export class DashboardEventComponent {
   };
 
   private createTitle = (calendarEvent: CalendarEvent, now: Date = getNowTimeZone()): CalendarEvent => {
-    const matcher = calendarEvent.title.match(/(?<=<b>\s*).*?(?=\s*<\/b>)/gs);
-    const title = matcher ? `<b>${matcher[0]}</b>` : calendarEvent.title;
+    if (!this.isReservationState(calendarEvent.meta?.state)) {
+      return calendarEvent;
+    }
+
+    const originalTitle = calendarEvent.meta?.originalTitle ?? calendarEvent.title ?? '';
+    const matcher = originalTitle.match(/(?<=<b>\s*).*?(?=\s*<\/b>)/gs);
+    const title = matcher ? `<b>${ matcher[0] }</b>` : originalTitle;
+
+    if (calendarEvent.meta.state === States.completed) {
+      calendarEvent.title = this.createCompletedReservationTitle(calendarEvent);
+    } else {
+      calendarEvent.title = this.createReservationTitle(calendarEvent, title);
+    }
 
     if (calendarEvent.meta.state === States.started && calendarEvent.end) {
       const dateTime = calendarEvent.meta.started instanceof Date ? calendarEvent.meta.started
@@ -312,42 +390,39 @@ export class DashboardEventComponent {
       const diffStart = getMinutesBetweenTimesABS(calendarEvent.start, dateTime);
       let startText;
       if (startTime > startedTime) {
-        startText = `<span class="green-text-contrast"><b id="start">-${diffStart} min.</b></span>`;
+        startText = `<span class="green-text-contrast"><b id="start">-${ this.formatMinutes(diffStart) }</b></span>`;
       } else if (startTime < startedTime) {
-        startText = `<span class="red-text"><b id="start">+${diffStart} min.</b></span>`;
+        startText = `<span class="red-text"><b id="start">+${ this.formatMinutes(diffStart) }</b></span>`;
       } else {
-        startText = '<b id="start">0 min.</b>';
+        startText = `<b id="start">${ this.formatMinutes(0) }</b>`;
       }
 
-      const start = this.startedText.replace('{startText}', startText);
+      const start = this.roomTranslation('STARTED', '<div>Started {startText}</div>')
+        .replace('{startText}', startText);
 
       const diffElapsed = getMinutesBetweenTimesABS(now, dateTime);
       const duration = getMinutesBetweenTimesABS(calendarEvent.end, calendarEvent.start);
 
-      let elapsedText;
-      if (duration > diffElapsed) {
-        elapsedText = `<span class="green-text-contrast"><b id="elapsed">${diffElapsed} min.</b></span>`;
-      } else if (duration < diffElapsed) {
-        elapsedText = `<span class="red-text"><b id="elapsed">+${diffElapsed} min.</b></span>`;
-      } else {
-        elapsedText = '<b id="elapsed">0 min.</b>';
-      }
+      const elapsedText = `<b id="elapsed">${ this.formatMinutes(diffElapsed) }</b>`;
 
-      const timeElapsed = this.elapsedText.replace('{elapsedText}', elapsedText);
+      const timeElapsed = this.roomTranslation('ELAPSED', '<div>Elapsed {elapsedText}</div>')
+        .replace('{elapsedText}', elapsedText);
+
+      const projectedEnd = new Date(startedTime + (duration * 60 * 1000));
+      const projectedFinish = this.roomTranslation('EXPECTED_FINISH', '<div>Expected finish {finishTime}</div>')
+        .replace('{finishTime}', `<b id="projected-finish">${ this.formatTime(projectedEnd) }</b>`);
 
       const diffFinish = getMinutesBetweenTimesABS(calendarEvent.end, now);
-      let finishText;
+      let timeFinish = '';
       if (endTime > nowTime) {
-        finishText = `<span class="green-text-contrast"><b id="finish">-${diffFinish} min.</b></span>`;
-      } else if (endTime < nowTime) {
-        finishText = `<span class="red-text"><b id="finish">+${diffFinish} min.</b></span>`;
-      } else {
-        finishText = '<b id="finish">0 min.</b>';
+        const finishText = `<span class="green-text-contrast"><b id="finish">-${ this.formatMinutes(
+          diffFinish) }</b></span>`;
+        timeFinish = this.roomTranslation('FINISH_IN', '<div>Finish in {finishText}</div>')
+          .replace('{finishText}', finishText);
       }
 
-      const timeFinish = this.finishInText.replace('{finishText}', finishText);
-
-      calendarEvent.title = `${title} <div class="timing"> ${start} ${timeElapsed} ${timeFinish}</div>`;
+      calendarEvent.title =
+        `${ calendarEvent.title } <div class="timing"> ${ start } ${ timeElapsed } ${ timeFinish } ${ projectedFinish }</div>`;
     }
 
     const isNow = isToday(calendarEvent.start);
@@ -358,12 +433,12 @@ export class DashboardEventComponent {
 
     if (!calendarEvent.actions) {
       calendarEvent.actions = [{
-        label: this.createLabel('visibility', this.viewText),
+        label: this.createLabel('visibility', this.roomTranslation('VIEW', 'View')),
         onClick: ({ event }: { event: CalendarEvent }): void => {
           this.eventClick(event, 'VIEW');
         },
       }, {
-        label: this.createLabel('read_more', this.moreText),
+        label: this.createLabel('read_more', this.roomTranslation('MORE_INFO', 'More')),
         onClick: ({ event }: { event: CalendarEvent }): void => {
           this.eventClick(event, 'MORE_INFO');
         },
@@ -371,7 +446,7 @@ export class DashboardEventComponent {
 
       if (showApprove) {
         calendarEvent.actions = [{
-          label: this.createLabel('check_circle', this.approveText),
+          label: this.createLabel('check_circle', this.roomTranslation('APPROVE', 'Approve')),
           onClick: ({ event }: { event: CalendarEvent }): void => {
             this.eventClick(event, 'APPROVE');
           },
@@ -380,7 +455,7 @@ export class DashboardEventComponent {
 
       if (showStart) {
         calendarEvent.actions = [{
-          label: this.createLabel('play_arrow', this.startText),
+          label: this.createLabel('play_arrow', this.roomTranslation('START', 'Start')),
           onClick: ({ event }: { event: CalendarEvent }): void => {
             this.eventClick(event, 'START');
           },
@@ -389,7 +464,7 @@ export class DashboardEventComponent {
 
       if (showComplete) {
         calendarEvent.actions = [{
-          label: this.createLabel('done_all', this.completeText),
+          label: this.createLabel('done_all', this.roomTranslation('COMPLETE', 'Complete')),
           onClick: ({ event }: { event: CalendarEvent }): void => {
             this.eventClick(event, 'COMPLETE');
           },
@@ -399,6 +474,133 @@ export class DashboardEventComponent {
 
     return calendarEvent;
   };
+
+  private isReservationState = (state?: string): boolean =>
+    Object.values(States).includes(state as States);
+
+  private normalizeYearDate = (date: Date, viewDate: Date): Date => {
+    const normalized = new Date(date);
+    normalized.setFullYear(viewDate.getFullYear());
+    return normalized;
+  };
+
+  private createReservationTitle = (calendarEvent: CalendarEvent, title: string): string => {
+    const customer = calendarEvent.meta?.customer;
+    const meta = calendarEvent.meta ?? {};
+    const total = typeof meta.total === 'number' ? meta.total : undefined;
+    const time = calendarEvent.end
+      ? `${ this.formatTime(calendarEvent.start) } - ${ this.formatTime(calendarEvent.end) }`
+      : this.formatTime(calendarEvent.start);
+
+    return `<div class="dashboard-reservation-card">
+      <div class="dashboard-reservation-card__header">
+        <strong>${ this.escapeHtml(customer || this.stripHtml(title)) }</strong>
+        ${ this.createStatusBadge(calendarEvent.meta?.state) }
+      </div>
+      ${ customer ? `<div class="dashboard-reservation-card__body">${ title }</div>` : '' }
+      <div class="dashboard-reservation-card__badges">
+        ${ this.createInfoBadge('schedule', time) }
+        ${ total !== undefined ? this.createInfoBadge('payments', this.formatAmount(total, meta.currency)) : '' }
+      </div>
+    </div>`;
+  };
+
+  private createCompletedReservationTitle = (calendarEvent: CalendarEvent): string => {
+    const meta = calendarEvent.meta ?? {};
+    const time = this.completedTime(calendarEvent);
+    const total = typeof meta.total === 'number' ? meta.total : undefined;
+    const fallbackTitle = calendarEvent.title;
+    const duration = typeof meta.durationSeconds === 'number' ? this.formatDuration(meta.durationSeconds) : undefined;
+    const detail = `<div class="completed-reservation-card__details completed-reservation-card__details--html">
+      ${ this.createInfoBadge('schedule', time) }
+      ${ total !== undefined ? this.createInfoBadge('payments', this.formatAmount(total, meta.currency)) : '' }
+      ${ duration ? this.createInfoBadge('timer', duration) : '' }
+    </div>`;
+
+    return `<div class="completed-reservation-card">
+      <div class="completed-reservation-card__header">
+        <strong>${ this.escapeHtml(meta.customer || this.stripHtml(fallbackTitle)) }</strong>
+        ${ this.createStatusBadge(meta.state) }
+      </div>
+      ${ detail }
+    </div>`;
+  };
+
+  private formatTime = (date: Date): string => `${ String(date.getHours()).padStart(2, '0') }:${ String(
+    date.getMinutes()).padStart(2, '0') }`;
+
+  private formatMinutes = (minutes: number): string => {
+    if (minutes < 60) {
+      return `${ minutes } min.`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+
+    return remainingMinutes ? `${ hours }h ${ remainingMinutes } min.` : `${ hours }h`;
+  };
+
+  private completedTime = (calendarEvent: CalendarEvent): string => {
+    const meta = calendarEvent.meta ?? {};
+    if (meta.started && meta.finished) {
+      return `${ this.formatTime(meta.started) } - ${ this.formatTime(meta.finished) }`;
+    }
+
+    return calendarEvent.end
+      ? `${ this.formatTime(calendarEvent.start) } - ${ this.formatTime(calendarEvent.end) }`
+      : this.formatTime(calendarEvent.start);
+  };
+
+  private formatAmount = (amount: number, currency?: any): string => `${ currencySymbol(
+    currency) } ${ new Intl.NumberFormat(this.translate.getCurrentLang(), {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount) }`;
+
+  private formatDuration = (seconds: number): string => {
+    const totalMinutes = Math.round(seconds / 60);
+
+    return `${ this.formatMinutes(totalMinutes) }`;
+  };
+
+  private createStatusBadge = (state?: string): string => {
+    const label = this.statusLabel(state);
+    return `<span class="dashboard-reservation-status">${ this.escapeHtml(label) }</span>`;
+  };
+
+  private createInfoBadge = (icon: string, text: string): string =>
+    `<span class="dashboard-reservation-badge">
+      <span class="custom-material-icons material-icons">${ icon }</span>
+      <span>${ this.escapeHtml(text) }</span>
+    </span>`;
+
+  private statusLabel = (state?: string): string => {
+    if (!state) {
+      return '';
+    }
+    return this.translation(`COMMON.STATUS.RESERVATION.${ state }`, state);
+  };
+
+  private translation = (key: string, fallback: string): string => {
+    const value = this.translate.instant(key);
+
+    return value && value !== key ? this.stripHtml(value) : fallback;
+  };
+
+  private stripHtml = (value: string): string => value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+
+  private escapeHtml = (value: string): string => value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
+  private roomTranslation(key: string, fallback: string): string {
+    const translationKey = `DASHBOARD.ROOM.${ key }`;
+    const value = this.translate.instant(translationKey);
+
+    return value && value !== translationKey ? value : fallback;
+  }
 
   private updateEvent = (id: string, dateStart?: Date, professionalId?: string): void => {
     const reservation: IReservation = { id };
@@ -434,7 +636,7 @@ export class DashboardEventComponent {
   private dateIsValid = (date: Date): boolean => isBetween(this.today, this.maxDate, date);
 
   private createLabel = (icon: string, text: string) => `<div class="contrast-text mat-raised-button">
-                   <div class="custom-material-icons material-icons">${icon}</div>&nbsp;${text}
+                   <div class="custom-material-icons material-icons">${ icon }</div>&nbsp;${ text }
                </div>`;
 
   private createUnavailableEvent = (start: Date, recurring: any, professional: Professional, darkMode: boolean) => {
@@ -447,27 +649,27 @@ export class DashboardEventComponent {
       id: recurring.id,
       color: createEventColor(color, darkMode),
       draggable: true,
-      meta: { professional, time: true },
+      meta: { professional, time: true, state: recurring.state },
       resizable: { beforeStart: true, afterEnd: true },
     } as CalendarEvent;
     this.calendar.addEvent(event);
   };
 
   private eventClick = (event: CalendarEvent, type: 'VIEW' | 'START' | 'APPROVE' | 'COMPLETE' | 'MORE_INFO'): void => {
-    const reservationId = `${event.id!}`;
+    const reservationId = `${ event.id! }`;
     switch (type) {
       case 'VIEW':
         this.router.navigate([this.language, 'reservation', reservationId]);
         break;
       case 'APPROVE':
         this.calendar.filterEvent(event);
-        this.store.dispatch(approveReservation(reservationId));
+        this.store.dispatch(approveReservation(reservationId, undefined, true));
         event.meta.state = States.approved;
         setTimeout(() => this.calendar.addEvent(event), 1);
         break;
       case 'START':
         this.calendar.filterEvent(event);
-        this.store.dispatch(startReservation(reservationId));
+        this.store.dispatch(startReservation(reservationId, undefined, true, event.meta.viewDate ?? this.viewDate()));
         event.meta.state = States.started;
         event.meta.started = dateToTimestamp();
         event.draggable = false;
@@ -476,7 +678,7 @@ export class DashboardEventComponent {
         break;
       case 'COMPLETE':
         this.router.navigate([this.language, 'reservation', reservationId, 'rooms', this.dashboardSignal()?.roomId,
-          'customer', event.meta.customerId, 'complete'], { state: { data: { isDashboard: true } } });
+          'customer', event.meta.customerId, 'complete'], { state: { isDashboard: true } });
         break;
       case 'MORE_INFO':
         this.router.navigate([this.language, 'reservation', reservationId, 'more-info']);

@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PaymentPreviewComponent } from './payment-preview.component';
 import { SharedModule } from '../shared.module';
 import { By } from '@angular/platform-browser';
-import { IPaymentOption, PaymentType } from '../../interfaces/payment';
+import { IPaymentOption } from '../../interfaces/payment';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { matIconRegistryStub } from '../../util/app-material-registry-stub';
@@ -12,9 +12,14 @@ describe('PaymentPreviewComponent', () => {
   let fixture: ComponentFixture<PaymentPreviewComponent>;
 
   const mockType: IPaymentOption = {
-    name: 'Credit Card',
-    svgIcon: 'credit_card',
-    type: PaymentType.ideal,
+    label: 'Credit Card',
+    type: 'IDEAL',
+    enabled: true,
+    enabledCustomer: true,
+    default: false,
+    filter: true,
+    defaultFilter: false,
+    show: true,
     icon: 'credit_card',
   };
 
@@ -33,7 +38,7 @@ describe('PaymentPreviewComponent', () => {
   });
 
   it('should render type info when type is provided', () => {
-    fixture.componentRef.setInput('type', mockType);
+    fixture.componentRef.setInput('option', mockType);
     fixture.detectChanges();
 
     const typeName = fixture.debugElement.query(By.css('[matListItemLine]')).nativeElement;
@@ -41,7 +46,7 @@ describe('PaymentPreviewComponent', () => {
   });
 
   it('should render total when toPaid is provided', () => {
-    fixture.componentRef.setInput('type', mockType);
+    fixture.componentRef.setInput('option', mockType);
     fixture.componentRef.setInput('toPaid', 100);
     fixture.componentRef.setInput('currencyIcon', 'euro');
     fixture.detectChanges();
@@ -54,7 +59,7 @@ describe('PaymentPreviewComponent', () => {
   });
 
   it('should prefer penalty if toPaid is not defined', () => {
-    fixture.componentRef.setInput('type', mockType);
+    fixture.componentRef.setInput('option', mockType);
     fixture.componentRef.setInput('penalty', 50);
     fixture.componentRef.setInput('currencyIcon', 'euro');
     fixture.detectChanges();

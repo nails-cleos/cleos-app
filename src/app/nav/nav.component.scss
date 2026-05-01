@@ -3,9 +3,21 @@ mat-drawer-container {
 
   .sidenav {
     width: auto;
+    background: var(--app-drawer-panel-bg) !important;
+    background-color: var(--app-drawer-panel-bg) !important;
+    color: var(--app-drawer-text) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+    box-shadow: none !important;
   }
+
   mat-card {
     padding: 16px 0 0 0;
+    background: var(--app-drawer-panel-bg) !important;
+    background-color: var(--app-drawer-panel-bg) !important;
+    color: var(--app-drawer-text) !important;
+    border: 1px solid transparent !important;
+    box-shadow: none !important;
+
     mat-card-header {
       padding: 0 16px 0 16px;
     }
@@ -70,6 +82,29 @@ mat-drawer-container {
   }
 }
 
+:host ::ng-deep mat-drawer-container .sidenav .mat-mdc-card,
+:host ::ng-deep mat-drawer-container .sidenav .mat-elevation-z0,
+:host ::ng-deep .mat-drawer.sidenav .mat-mdc-card,
+:host ::ng-deep .mat-drawer.sidenav .mat-elevation-z0 {
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+.mat-drawer-inner-container {
+  background: var(--app-drawer-panel-bg) !important;
+  background-color: var(--app-drawer-panel-bg) !important;
+}
+
+:host-context(.dark-theme) mat-drawer-container .sidenav mat-card,
+:host-context(.dark-theme) .mat-drawer.sidenav mat-card,
+:host-context(.dark-theme) mat-drawer.sidenav mat-card {
+  background: var(--app-drawer-panel-bg) !important;
+  background-color: var(--app-drawer-panel-bg) !important;
+  color: var(--app-drawer-text) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
 .sidenav .mat-toolbar {
   background: inherit;
 }
@@ -83,6 +118,8 @@ mat-drawer-container {
 .grid-container {
   margin: 20px;
   position: relative;
+  border-radius: 24px;
+  min-width: 0;
 }
 
 .route-shell-hidden {
@@ -91,6 +128,41 @@ mat-drawer-container {
 
 .route-error {
   width: 100%;
+}
+
+.page-wrap,
+.content,
+main,
+.grid-container,
+.route-shell,
+.route-error {
+  min-width: 0;
+}
+
+:host ::ng-deep .mat-mdc-list-item,
+:host ::ng-deep .mat-mdc-list-item .mdc-list-item__primary-text,
+:host ::ng-deep .mat-mdc-list-item .mdc-list-item__content,
+:host ::ng-deep .mat-mdc-list-item .mdc-list-item__start,
+:host ::ng-deep .mat-mdc-list-item .mdc-list-item__end,
+:host ::ng-deep .mat-mdc-list-item .mat-icon,
+:host ::ng-deep .mat-mdc-card-title,
+:host ::ng-deep .mat-mdc-card-subtitle {
+  color: var(--app-drawer-text) !important;
+  opacity: 1 !important;
+}
+
+:host-context(.dark-theme) ::ng-deep .mat-mdc-card-title,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-card-subtitle,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-list-item,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-list-item .mdc-list-item__content,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-list-item .mdc-list-item__primary-text,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-list-item .mdc-list-item__supporting-text,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-list-item .mdc-list-item__start,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-list-item .mdc-list-item__end,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-list-item .mat-icon {
+  color: #ffffff !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 .dot {
@@ -102,6 +174,10 @@ mat-drawer-container {
   font-weight: bold;
 }
 
+.app-crud-view-grid {
+  min-width: 0;
+}
+
 .circle {
   border-radius: 50%;
   width: 60px;
@@ -110,9 +186,13 @@ mat-drawer-container {
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  background:
+    radial-gradient(circle at top left, var(--app-surface-hero-accent), transparent 30%),
+    linear-gradient(180deg, var(--app-surface-hero-top), var(--app-surface-hero-bottom));
+  border: 1px solid var(--app-surface-card-border);
 
   .initials {
-    color: #FFFFFF;
+    color: var(--app-surface-text);
     font-size: 20px;
     line-height: 19px;
     letter-spacing: 0.2625px;
@@ -133,40 +213,6 @@ img {
 @media not all and (max-device-width: 812px) and (orientation: portrait) {
   img {
     max-width: 60px !important;
-  }
-}
-
-@media (max-width: 599px) {
-  mat-drawer-container {
-    .header {
-      padding-inline: 8px;
-
-      img {
-        margin-right: 0 !important;
-      }
-
-      .header-logo {
-        width: 40px;
-        height: 40px;
-      }
-
-      .header-title {
-        font-size: 0.95rem;
-      }
-
-      .badge-padding,
-      .header-action-button,
-      button[mat-icon-button] {
-        width: 40px;
-        height: 40px;
-        min-width: 40px;
-        padding: 0;
-      }
-
-      .badge-padding {
-        padding-right: 0;
-      }
-    }
   }
 }
 
@@ -211,4 +257,59 @@ main {
   background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(2px);
   z-index: 999;
+}
+
+@media (max-width: 599px) {
+  .page-wrap,
+  .content,
+  main,
+  .grid-container,
+  .route-shell,
+  .route-error {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  .grid-container {
+    margin: 8px 0 0;
+    border-radius: 0;
+  }
+
+  .route-shell,
+  .route-error {
+    width: 100%;
+  }
+
+  mat-drawer-container {
+    .header {
+      padding-inline: 8px;
+
+      img {
+        margin-right: 0 !important;
+      }
+
+      .header-logo {
+        width: 40px;
+        height: 40px;
+      }
+
+      .header-title {
+        font-size: 0.95rem;
+      }
+
+      .badge-padding,
+      .header-action-button,
+      button[mat-icon-button] {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        padding: 0;
+      }
+
+      .badge-padding {
+        padding-right: 0;
+      }
+    }
+  }
 }

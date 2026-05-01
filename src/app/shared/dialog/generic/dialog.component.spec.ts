@@ -60,13 +60,13 @@ describe('DialogComponent', () => {
 
   it('should show both buttons when both hideNoButton and hideOkButton are false', () => {
     const compiled = fixture.nativeElement;
-    const buttons = compiled.querySelectorAll('.dialog-actions button');
+    const buttons = compiled.querySelectorAll('.app-surface-dialog-actions button');
     expect(buttons.length).toBe(2);
   });
 
   it('should show No button when hideNoButton is false', () => {
     const compiled = fixture.nativeElement;
-    const buttons = Array.from(compiled.querySelectorAll('.dialog-actions button')) as HTMLButtonElement[];
+    const buttons = Array.from(compiled.querySelectorAll('.app-surface-dialog-actions button')) as HTMLButtonElement[];
     const noButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.NO'));
     expect(noButton).toBeTruthy();
   });
@@ -74,7 +74,7 @@ describe('DialogComponent', () => {
 
   it('should show Yes button when hideOkButton is false', () => {
     const compiled = fixture.nativeElement;
-    const buttons = Array.from(compiled.querySelectorAll('.dialog-actions button')) as HTMLButtonElement[];
+    const buttons = Array.from(compiled.querySelectorAll('.app-surface-dialog-actions button')) as HTMLButtonElement[];
     const yesButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.YES'));
     expect(yesButton).toBeTruthy();
   });
@@ -92,7 +92,7 @@ describe('DialogComponent', () => {
 
   it('should call dialogRef.close when No button is clicked', () => {
     const compiled = fixture.nativeElement;
-    const buttons = Array.from(compiled.querySelectorAll('.dialog-actions button')) as HTMLButtonElement[];
+    const buttons = Array.from(compiled.querySelectorAll('.app-surface-dialog-actions button')) as HTMLButtonElement[];
     const noButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.NO'));
     expect(noButton).toBeTruthy();
     noButton?.click();
@@ -102,7 +102,7 @@ describe('DialogComponent', () => {
 
   it('should have cdkFocusInitial directive on No button', () => {
     const compiled = fixture.nativeElement;
-    const buttons = Array.from(compiled.querySelectorAll('.dialog-actions button')) as HTMLButtonElement[];
+    const buttons = Array.from(compiled.querySelectorAll('.app-surface-dialog-actions button')) as HTMLButtonElement[];
     const noButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.NO'));
     expect(noButton).toBeTruthy();
     expect(noButton?.hasAttribute('cdkfocusinitial')).toBeTrue();
@@ -110,7 +110,7 @@ describe('DialogComponent', () => {
 
   it('should display translated button texts', () => {
     const compiled = fixture.nativeElement;
-    const buttons = Array.from(compiled.querySelectorAll('.dialog-actions button')) as HTMLButtonElement[];
+    const buttons = Array.from(compiled.querySelectorAll('.app-surface-dialog-actions button')) as HTMLButtonElement[];
 
     const noButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.NO'));
     const yesButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.YES'));
@@ -121,7 +121,7 @@ describe('DialogComponent', () => {
 
   it('should render a close button in the header', () => {
     const compiled = fixture.nativeElement;
-    const closeButton = compiled.querySelector('.dialog-header .close-button');
+    const closeButton = compiled.querySelector('.app-surface-dialog-header .app-surface-dialog-close');
     expect(closeButton).toBeTruthy();
   });
 

@@ -1,60 +1,117 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
 .dashboard-card {
   position: absolute;
-  top: 15px;
-  left: 15px;
-  right: 15px;
-  bottom: 15px;
+  inset: 15px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+}
+
+.mini-card-shell {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+}
+
+.mini-card-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.mini-card-period {
+  color: var(--app-surface-label);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.mini-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  min-height: 28px;
+  flex-shrink: 0;
+}
+
+.mini-card-icon--empty {
+  visibility: hidden;
+}
+
+.mini-card-icon mat-icon {
+  width: 28px;
+  height: 28px;
+  font-size: 28px;
+  line-height: 28px;
+}
+
+.mini-card-value-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
 }
 
 .value-text {
   margin: 0;
+  font-size: clamp(1.9rem, 3vw, 2.6rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--app-surface-text);
+}
+
+.projection-chip {
+  font-size: 0.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .title-text {
-  font-weight: 400;
   margin: 0;
-  text-align: center;
-  color: grey;
-}
-
-.card-icon {
-  margin-right: 0 !important;
-  transform: scale(2.2);
-}
-
-.avatar-icon {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-}
-
-.duration {
-  color: grey;
+  color: var(--app-surface-text-muted);
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.35;
 }
 
 .difference-text {
-  text-align: center;
-  margin-top: 10px;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--app-surface-card-border);
 }
 
-.card-header {
-  justify-content: center;
+.trend-value {
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+  font-weight: 700;
+}
+
+.duration {
+  margin: 6px 0 0;
+  color: var(--app-surface-text-muted);
+  font-size: 0.82rem;
 }
 
 .trending {
-  margin-bottom: 5px !important;
+  width: 18px;
+  height: 18px;
+  margin: 0 2px 2px;
+  font-size: 18px;
+  line-height: 18px;
   vertical-align: middle;
 }
 
-.projection {
-  text-align: center;
-  margin-bottom: 5px;
-}
-
-.period {
-  margin-top: 5px;
+.mini-card-skeleton {
+  width: 88%;
+  margin: auto;
 }

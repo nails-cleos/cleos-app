@@ -12,6 +12,7 @@ import {
   setReservationParams,
 } from '../store/reservation.actions';
 import { Router } from '@angular/router';
+import { getOptions } from '../store/payment.actions';
 
 @Injectable()
 export class ReservationNavigationEffects {
@@ -38,11 +39,12 @@ export class ReservationNavigationEffects {
         if (completeDetailMatch) {
           return [
             cleanReservation(),
+            getOptions(),
             setCurrentCompleteReservation({
               reservationId: completeDetailMatch[1],
               roomId: completeDetailMatch[2],
               customerId: completeDetailMatch[3],
-              isDashboard: (navigationState && navigationState['isDashboard'] !== undefined) ?? false,
+              isDashboard: navigationState?.['isDashboard'] ?? false,
             }),
           ];
         }
@@ -67,6 +69,7 @@ export class ReservationNavigationEffects {
           if (navigationState) {
             return [
               cleanReservation(),
+              getOptions(),
               setCurrentReservationId({ reservationId: editMatch[1] }),
               setReservationParams({
                 customerId: navigationState['customerId'],
@@ -81,7 +84,7 @@ export class ReservationNavigationEffects {
               }),
             ];
           }
-          return [cleanReservation(), setCurrentReservationId({ reservationId: editMatch[1] })];
+          return [cleanReservation(), getOptions(), setCurrentReservationId({ reservationId: editMatch[1] })];
         }
 
         // 7) /reservation/:id
@@ -89,6 +92,7 @@ export class ReservationNavigationEffects {
         if (detailMatch) {
           return [
             cleanReservation(),
+            getOptions(),
             setCurrentReservationId({ reservationId: detailMatch[1] }),
             setDetailReservationParams({ step: navigationState?.['step'] }),
           ];
@@ -101,6 +105,7 @@ export class ReservationNavigationEffects {
             return [
               cleanReservation(),
               getCustomers(),
+              getOptions(),
               setReservationParams({
                 isDashboard: navigationState['isDashboard'],
                 skip: navigationState['skip'],
@@ -115,7 +120,7 @@ export class ReservationNavigationEffects {
               }),
             ];
           }
-          return [cleanReservation(), getCustomers()];
+          return [cleanReservation(), getCustomers(), getOptions()];
         }
 
         return [];

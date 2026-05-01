@@ -1,71 +1,74 @@
-<div class="flex-container">
-  <div class="card-container">
-    <div class="card-content">
-      <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
-        @let isAddMode = isAddModeSignal();
-        @let color = colorSignal();
-        <mat-card appearance="outlined">
-          @if (isAddMode) {
-            <mat-card-header>
-              <mat-card-title>{{ 'COLOR.TITLE' | translate }}</mat-card-title>
-            </mat-card-header>
+@let isAddMode = isAddModeSignal();
+@let color = colorSignal();
+
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <section class="app-surface-section">
+    <div class="app-detail-section-header">
+      <div>
+        <span class="app-surface-eyebrow">
+          {{ (isAddMode ? 'COLOR.TITLE' : 'COLOR.DETAIL') | translate }}
+        </span>
+        @if (!isAddMode) {
+          @if (color) {
+            <h2 class="app-crud-title">{{ color.name }}</h2>
           } @else {
-            <mat-card-header>
-              <mat-card-title>{{ 'COLOR.DETAIL' | translate }}</mat-card-title>
-              @if (color) {
-                <mat-card-subtitle>{{ color.name }}</mat-card-subtitle>
-              } @else {
-                <div class="ssc-line"></div>
-              }
-            </mat-card-header>
+            <div class="ssc-line app-skeleton-title"></div>
           }
-          @if (isAddMode || color) {
-            <mat-card-content>
-              <div class="inner-container">
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'COLOR.NAME.FIELD' | translate }}</mat-label>
-                  <input [formControl]="getForm.name" matInput required data-cy="name-input">
-                  @if (getForm.name.hasError('required')) {
-                    <mat-error [innerHTML]="'COLOR.NAME.REQUIRED' | translate"></mat-error>
-                  } @else if (errors()['code']) {
-                    <mat-error>{{ errors()['code'] }}</mat-error>
-                  }
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'COLOR.DESCRIPTION.FIELD' | translate }}</mat-label>
-                  <textarea #message [formControl]="getForm.description" matInput maxlength="256"
-                            data-cy="description-textarea"></textarea>
-                  <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
-                </mat-form-field>
-              </div>
-            </mat-card-content>
-            <mat-card-actions class="card-actions">
-              <div class="spacer"></div>
-              <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
-                {{ 'COMMON.BUTTON.BACK' | translate }}
-              </button>
-              @if (isAddMode) {
-                <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
-                  {{ 'COMMON.BUTTON.CREATE' | translate }}
-                </button>
-              } @else {
-                <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
-                  {{ 'COMMON.BUTTON.UPDATE' | translate }}
-                </button>
-              }
-            </mat-card-actions>
-          } @else {
-            <mat-card-content>
-              <div class="ssc-hr"></div>
-              <div class="ssc-square mb"></div>
-              <div class="ssc-hr"></div>
-            </mat-card-content>
-            <mat-card-actions class="card-actions">
-              <div class="ssc-head-line"></div>
-            </mat-card-actions>
-          }
-        </mat-card>
-      </form>
+        }
+      </div>
     </div>
-  </div>
+
+    <form (ngSubmit)="submit()"
+          [formGroup]="form"
+          novalidate
+          (keydown.enter)="$event.preventDefault()"
+          class="app-crud-form">
+      @if (isAddMode || color) {
+        <div class="app-crud-form-grid app-crud-form-grid--single">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'COLOR.NAME.FIELD' | translate }}</mat-label>
+            <input [formControl]="getForm.name" matInput required data-cy="name-input">
+            @if (getForm.name.hasError('required')) {
+              <mat-error [innerHTML]="'COLOR.NAME.REQUIRED' | translate"></mat-error>
+            } @else if (errors()['name']) {
+              <mat-error>{{ errors()['name'] }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="app-crud-form-grid__full">
+            <mat-label>{{ 'COLOR.DESCRIPTION.FIELD' | translate }}</mat-label>
+            <textarea #message [formControl]="getForm.description"
+                      matInput
+                      maxlength="256"
+                      data-cy="description-textarea"></textarea>
+            <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div class="app-detail-actions">
+          <button appBackButton mat-stroked-button type="button">
+            <mat-icon>keyboard_return</mat-icon>
+            <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+          </button>
+          @if (isAddMode) {
+            <button [disabled]="form.invalid" mat-stroked-button type="submit">
+              <mat-icon>add</mat-icon>
+              <span>{{ 'COMMON.BUTTON.CREATE' | translate }}</span>
+            </button>
+          } @else {
+            <button [disabled]="form.invalid" mat-stroked-button type="submit">
+              <mat-icon>published_with_changes</mat-icon>
+              <span>{{ 'COMMON.BUTTON.UPDATE' | translate }}</span>
+            </button>
+          }
+        </div>
+      } @else {
+        <div class="app-crud-loading">
+          <div class="ssc-hr"></div>
+          <div class="ssc-square app-crud-loading__block"></div>
+          <div class="ssc-hr"></div>
+        </div>
+      }
+    </form>
+  </section>
 </div>

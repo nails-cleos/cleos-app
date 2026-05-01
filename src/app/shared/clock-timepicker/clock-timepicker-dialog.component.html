@@ -50,11 +50,12 @@
           [class.active]="option.active"
           [class.disabled]="option.disabled"
           [disabled]="option.disabled"
+          [attr.aria-label]="option.label"
           [style.left.%]="option.left"
           [style.top.%]="option.top"
           class="clock-face__number timepicker-dial__item"
           type="button">
-          {{ option.label }}
+          {{ option.displayLabel }}
         </button>
       }
     </div>

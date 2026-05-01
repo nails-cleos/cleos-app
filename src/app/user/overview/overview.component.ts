@@ -89,6 +89,8 @@ export class OverviewComponent {
     };
   });
 
+  chartColumns = computed(() => this.breakpointsSignal().matches ? 1 : 2);
+
   constructor() {
     effect(() => {
       const id = this.userId();

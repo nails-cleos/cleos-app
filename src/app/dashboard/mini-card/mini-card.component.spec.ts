@@ -15,9 +15,8 @@ describe('MiniCardComponent', () => {
 
     fixture = TestBed.createComponent(MiniCardComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
-
     fixture.componentRef.setInput('title', 'Test Title');
+    fixture.detectChanges();
   });
 
   it('should create', () => {

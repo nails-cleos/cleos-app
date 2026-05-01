@@ -1,48 +1,28 @@
-.mat-card-table {
-  .container {
-    margin: auto;
-    text-align: center;
+.transaction-detail-title {
+  margin: 6px 0 0;
+  color: var(--app-surface-text);
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
 
-    table {
-      border-spacing: 0 1px;
-      border-collapse: separate;
-      margin: auto;
+.transaction-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
 
-      td {
-        width: 50%;
-      }
+.transaction-detail-skeleton-title {
+  max-width: 220px;
+}
 
-      .left {
-        text-align: left;
-      }
+.transaction-detail-skeleton-footer {
+  width: 100%;
+  max-width: 240px;
+}
 
-      .right {
-        padding: 0 5% 0;
-        font-weight: bold;
-        text-align: right;
-      }
-
-      tfoot {
-        tr:nth-last-child(2) {
-          th, td {
-            border-bottom: 1px double #000;
-            padding-bottom: 5px;
-          }
-        }
-        tr:last-child {
-          th, td {
-            border-top: 1px double #000;
-          }
-        }
-      }
-    }
+@media (max-width: 720px) {
+  .transaction-detail-grid {
+    grid-template-columns: 1fr;
   }
-}
-
-.header-icon {
-  margin: auto;
-}
-
-mat-divider {
-  margin: 1em 0;
 }

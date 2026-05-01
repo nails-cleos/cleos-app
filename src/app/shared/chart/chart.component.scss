@@ -1,0 +1,48 @@
+:host {
+  display: block;
+  height: 100%;
+  --chart-surface: rgba(255, 255, 255, 0.42);
+  --chart-border: rgba(148, 163, 184, 0.16);
+  --chart-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+:host-context(.dark-theme) {
+  --chart-surface: rgba(255, 255, 255, 0.03);
+  --chart-border: rgba(255, 255, 255, 0.08);
+  --chart-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.chartContainer {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  height: 100%;
+  min-height: 100%;
+}
+
+.chartFrame {
+  width: 100%;
+  min-height: 240px;
+  padding: 10px 12px 6px;
+  border: 1px solid var(--chart-border);
+  border-radius: 20px;
+  background: linear-gradient(180deg, var(--chart-surface), transparent 90%);
+  box-shadow: var(--chart-shadow);
+}
+
+.chartFrame--round {
+  display: flex;
+  align-items: center;
+}
+
+.chartCanvas {
+  display: block;
+  width: 100% !important;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.chartSkeleton {
+  min-height: 180px;
+  border-radius: 18px;
+}

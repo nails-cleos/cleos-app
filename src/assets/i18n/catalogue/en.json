@@ -10,6 +10,7 @@
     "DESCRIPTION": {
       "FIELD": "Description"
     },
+    "DISPLAY_OPTIONS": "Display options",
     "SHOW": {
       "HOME": "Show in home",
       "CATALOG": "Show in catalog"

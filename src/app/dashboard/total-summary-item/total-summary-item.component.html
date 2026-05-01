@@ -1,8 +1,6 @@
-<mat-list-item>
-  <div class="fields-container" [ngClass]="{ 'result': isResult() }" matListItemTitle>
-    <div>{{ label() }}</div>
-    <div class="currency">
-      {{ value() | currency: currencyCode(): 'symbol': '1.2-2' }}
-    </div>
+<div class="total-summary-item" [class.total-summary-item--result]="isResult()">
+  <div class="total-summary-item__label">{{ label() }}</div>
+  <div class="total-summary-item__value app-detail-summary-value">
+    <span>{{ value() | currency: currencyCode(): 'symbol': '1.2-2' }}</span>
   </div>
-</mat-list-item>
+</div>

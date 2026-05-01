@@ -1,95 +1,94 @@
-<div class="flex-container">
-  <div class="card-container">
-    <div class="card-content">
-      @let account = accountSignal();
-      @if (account) {
-        <app-balance [account]="account" [showAdd]="showAdd()" [showView]="true" [language]="language"></app-balance>
-        <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
-          <mat-card appearance="outlined">
-            <mat-card-header>
-              <mat-card-title>{{ 'ACCOUNT.TITLE' | translate }}</mat-card-title>
-              @if (account?.customer) {
-                <mat-card-subtitle>
-                  @if (userId() === account?.customer?.id) {
-                    <a [routerLink]="['/', language, 'me', 'overview']" type="button">
-                      {{ account?.customer?.displayName }}
-                    </a>
-                  } @else {
-                    <a [routerLink]="['/', language, 'users', account?.customer?.id, 'overview']" type="button">
-                      {{ account?.customer?.displayName }}
-                    </a>
-                  }
-                </mat-card-subtitle>
-              } @else {
-                <div class="ssc-line"></div>
-              }
-            </mat-card-header>
-            <mat-card-content>
-              <div class="inner-container">
-                @if (account?.currencies) {
-                  <div class="fields-container">
-                    <mat-form-field appearance="outline">
-                      <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
-                      <input (keydown)="keyDownHandler($event)" [formControl]="getForm.currency" [matAutocomplete]="auto"
-                             matInput required type="text">
-                      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCurrencyFn">
-                        @for (currency of filteredCurrencyOptionsSignal(); track currency) {
-                          <mat-option [value]="currency">
-                            {{ currency.code }}
-                          </mat-option>
-                        }
-                      </mat-autocomplete>
-                      @if (getForm.currency.hasError('required')) {
-                        <mat-error [innerHTML]="'COMMON.CURRENCY.REQUIRED' | translate"></mat-error>
-                      } @else if (getForm.currency.hasError('requireMatch')) {
-                        <mat-error [innerHTML]="'COMMON.CURRENCY.INVALID' | translate"></mat-error>
-                      } @else if (errors()['currency']) {
-                        <mat-error>{{ errors()['currency'] }}</mat-error>
-                      }
-                    </mat-form-field>
-                    <button class="hide-on-mobile" type="button" [routerLink]="['/', language, 'currency', 'add']"
-                            color="accent" mat-fab>
-                      <mat-icon matPrefix>add_card</mat-icon>
-                    </button>
-                    <button class="show-on-mobile" type="button" [routerLink]="['/', language, 'currency', 'add']"
-                            color="accent" mat-fab extended>
-                      <mat-icon matPrefix>add_card</mat-icon>
-                      <span>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
-                    </button>
-                  </div>
+@let account = accountSignal();
+@if (account) {
+  <div class="app-surface-canvas app-surface-shell app-surface-stack">
+    <app-balance [account]="account" [showAdd]="showAdd()" [showView]="true" [language]="language"></app-balance>
+
+    <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+      <section class="app-surface-section">
+        <div class="app-detail-section-header">
+          <div>
+            <span class="app-surface-eyebrow">{{ 'ACCOUNT.TITLE' | translate }}</span>
+            @if (account.customer) {
+              <h2 class="account-title">
+                @if (userId() === account.customer.id) {
+                  <a [routerLink]="['/', language, 'me', 'overview']" class="app-detail-link">
+                    {{ account.customer.displayName }}
+                  </a>
                 } @else {
-                  <div class="ssc-line"></div>
+                  <a [routerLink]="['/', language, 'users', account.customer.id, 'overview']" class="app-detail-link">
+                    {{ account.customer.displayName }}
+                  </a>
                 }
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'ACCOUNT.GIFT.FIELD' | translate }}</mat-label>
-                  <mat-icon matIconPrefix>percent</mat-icon>
-                  <input [formControl]="getForm.gift" matInput required [step]="1" [min]="0" [max]="100"
-                         type="number" (keydown)="keyDownNumberHandler($event)">
-                  @if (getForm.gift.hasError('required')) {
-                    <mat-error [innerHTML]="'ACCOUNT.GIFT.REQUIRED' | translate"></mat-error>
-                  } @else if (getForm.gift.hasError('min')) {
-                    <mat-error>{{ 'ACCOUNT.GIFT.GREATER' | translate }}</mat-error>
-                  } @else if (getForm.gift.hasError('max')) {
-                    <mat-error>{{ 'ACCOUNT.GIFT.LESS' | translate }}</mat-error>
-                  } @else if (errors()['gift']) {
-                    <mat-error>{{ errors()['gift'] }}</mat-error>
+              </h2>
+            } @else {
+              <div class="ssc-line app-skeleton-title"></div>
+            }
+          </div>
+        </div>
+
+        <div class="app-crud-form-grid">
+          @if (account.currencies) {
+            <div class="app-inline-field-action">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
+                <input (keydown)="keyDownHandler($event)" [formControl]="getForm.currency" [matAutocomplete]="auto"
+                       matInput required type="text">
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCurrencyFn">
+                  @for (currency of filteredCurrencyOptionsSignal(); track currency) {
+                    <mat-option [value]="currency">
+                      {{ currency.code }}
+                    </mat-option>
                   }
-                </mat-form-field>
-              </div>
-            </mat-card-content>
-          </mat-card>
-          <mat-card-actions class="card-actions">
-            <div class="spacer"></div>
-            <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
-              {{ 'COMMON.BUTTON.BACK' | translate }}
-            </button>
-            <button [disabled]="form.invalid || form.pristine" color="primary" mat-fab extended class="icon-button"
-                    type="submit">
-              {{ 'COMMON.BUTTON.UPDATE' | translate }}
-            </button>
-          </mat-card-actions>
-        </form>
-      }
-    </div>
+                </mat-autocomplete>
+                @if (getForm.currency.hasError('required')) {
+                  <mat-error [innerHTML]="'COMMON.CURRENCY.REQUIRED' | translate"></mat-error>
+                } @else if (getForm.currency.hasError('requireMatch')) {
+                  <mat-error [innerHTML]="'COMMON.CURRENCY.INVALID' | translate"></mat-error>
+                } @else if (errors()['currency']) {
+                  <mat-error>{{ errors()['currency'] }}</mat-error>
+                }
+              </mat-form-field>
+
+              <button type="button"
+                      [routerLink]="['/', language, 'currency', 'add']"
+                      mat-stroked-button
+                      class="app-detail-action-button">
+                <mat-icon>add_card</mat-icon>
+                <span>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
+              </button>
+            </div>
+          } @else {
+            <div class="ssc-line app-crud-skeleton-field"></div>
+          }
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'ACCOUNT.GIFT.FIELD' | translate }}</mat-label>
+            <mat-icon matIconPrefix>percent</mat-icon>
+            <input [formControl]="getForm.gift" matInput required [step]="1" [min]="0" [max]="100"
+                   type="number" (keydown)="keyDownNumberHandler($event)">
+            @if (getForm.gift.hasError('required')) {
+              <mat-error [innerHTML]="'ACCOUNT.GIFT.REQUIRED' | translate"></mat-error>
+            } @else if (getForm.gift.hasError('min')) {
+              <mat-error>{{ 'ACCOUNT.GIFT.GREATER' | translate }}</mat-error>
+            } @else if (getForm.gift.hasError('max')) {
+              <mat-error>{{ 'ACCOUNT.GIFT.LESS' | translate }}</mat-error>
+            } @else if (errors()['gift']) {
+              <mat-error>{{ errors()['gift'] }}</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div class="app-detail-actions">
+          <button [form]="form" appBackButton mat-stroked-button type="button">
+            <mat-icon>keyboard_return</mat-icon>
+            <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+          </button>
+          <button [disabled]="form.invalid || form.pristine" mat-stroked-button type="submit">
+            <mat-icon>published_with_changes</mat-icon>
+            <span>{{ 'COMMON.BUTTON.UPDATE' | translate }}</span>
+          </button>
+        </div>
+      </section>
+    </form>
   </div>
-</div>
+}

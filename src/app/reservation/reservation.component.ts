@@ -6,9 +6,8 @@ import {
   inject,
   signal,
   untracked,
-  viewChild,
+  viewChildren,
 } from '@angular/core';
-import { STEPPER_GLOBAL_OPTIONS, StepperSelectionEvent } from '@angular/cdk/stepper';
 import { FormArray, FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 import { IUser, IUserAll } from '../interfaces/user';
@@ -26,7 +25,6 @@ import {
 } from '../store/reservation.actions';
 import { noDuplicateDatesValidator, requireMatch, valueChange } from '../util/validators';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../interfaces/treatment';
-import { MatStepper } from '@angular/material/stepper';
 import { IRoom, IRoomAll, IService } from '../interfaces/room';
 import {
   Day,
@@ -35,6 +33,7 @@ import {
   IReservation,
   IReservationAll,
   IReservationPayment,
+  IUpcomingAll,
   MAX_RESERVATION_MONTH,
   Reservation,
 } from '../interfaces/reservation';
@@ -87,32 +86,21 @@ import {
 } from '../util/helper';
 import { addDays, addMonths, isEqual } from 'date-fns';
 import { IAdditionalAll } from '../interfaces/additional';
-import { MatListOption } from '@angular/material/list';
+import { MatListOption, MatSelectionList } from '@angular/material/list';
 import { IOffice, IOfficeAll } from '../interfaces/office';
 import { IStep, Step } from '../interfaces/step';
 import { SelectProfessionalDialogComponent } from './select-professional-dialog.component';
 import { ToastService } from '../services/toast.service';
 import { AuthUserService } from '../services/auth-user.service';
-import {
-  completeAndNext,
-  enableStep,
-  getBackIndex,
-  getIndex,
-  getStepCall,
-  getStepCompleted,
-  getStepEnabled,
-  getStepName,
-  getStepOptional,
-} from '../util/step';
-import { PaymentType } from '../interfaces/payment';
+import { enableStep, getBackIndex, getIndex, getStepCall, getStepName } from '../util/step';
 import { SharedModule } from '../shared/shared.module';
 import { RoomNamePipe } from '../pipes/room-name.pipe';
 import { SortByPipe } from '../pipes/sort-by.pipe';
 import { CurrencySymbolPipe } from '../pipes/currency-symbol.pipe';
 import { DurationTimePipe } from '../pipes/durationTime.pipe';
-import { PricePreviewComponent } from '../shared/price-preview/price-preview.component';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { GoogleMapComponent } from '../shared/google-map/google-map.component';
+import { PaymentOptionSelectComponent } from '../shared/payment-option-select/payment-option-select.component';
 import { ReservationState } from '../store/reducers/reservation.reducers';
 import {
   getAdditionalListPipe,
@@ -142,6 +130,9 @@ import {
 } from './reservation-form.types';
 import { ReservationFormErrorService } from './reservation-form-error.service';
 import { ReservationCalendarService } from './reservation-calendar.service';
+import { getPaymentOptionsPipe } from '../store/selectors/payment.selectors';
+import { PaymentState } from '../store/reducers/payment.reducers';
+import { IPaymentOption } from '../interfaces/payment';
 import PlaceResult = google.maps.places.PlaceResult;
 
 const RESERVATION_ERROR_FIELDS = [
@@ -164,18 +155,15 @@ const RESERVATION_ERROR_FIELDS = [
   selector: 'app-reservation',
   templateUrl: './reservation.component.html',
   styleUrls: ['./reservation.component.scss'],
-  imports: [SharedModule, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe, PricePreviewComponent,
-    BackButtonDirective, GoogleMapComponent, CalendarWeekViewComponent],
-  providers: [{
-    provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false },
-  }],
+  imports: [SharedModule, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe,
+    BackButtonDirective, GoogleMapComponent, PaymentOptionSelectComponent, CalendarWeekViewComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationComponent {
   private readonly dialog = inject(MatDialog);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly translate: TranslateService = inject(TranslateService);
-  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly router: Router = inject(Router);
@@ -193,18 +181,20 @@ export class ReservationComponent {
   private selectedReservation$ = this.store.pipe(getSelectedReservationPipe);
   private calendar$ = this.store.pipe(getCalendarPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
+  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
-  private navigationParams = toSignal(this.navigationParams$);
-  private reservationIdSignal = toSignal(this.reservationId$);
-  private roomsSignal = toSignal(this.rooms$);
-  private treatmentDiscountSignal = toSignal(this.treatmentDiscount$);
-  private customerInfoSignal = toSignal(this.customerInfo$);
-  private selectedReservationSignal = toSignal(this.selectedReservation$);
-  private calendarSignal = toSignal(this.calendar$);
-  private subErrorsSignal = toSignal(this.subErrors$);
-  private authUserSignal = this.authUserService.authUser;
-  private breakpointsSignal = toSignal(
+  private readonly navigationParams = toSignal(this.navigationParams$);
+  private readonly reservationIdSignal = toSignal(this.reservationId$);
+  private readonly roomsSignal = toSignal(this.rooms$);
+  private readonly treatmentDiscountSignal = toSignal(this.treatmentDiscount$);
+  private readonly customerInfoSignal = toSignal(this.customerInfo$);
+  private readonly selectedReservationSignal = toSignal(this.selectedReservation$);
+  private readonly calendarSignal = toSignal(this.calendar$);
+  private readonly subErrorsSignal = toSignal(this.subErrors$);
+  private readonly authUserSignal = this.authUserService.authUser;
+  private readonly paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
+  private readonly breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
         matches: false,
@@ -220,7 +210,7 @@ export class ReservationComponent {
   additionalSelected = signal<IAdditionalAll[]>([]);
 
   dataEvents: Map<string, IDataEvent> = new Map();
-  private stepper = viewChild<MatStepper>('stepper');
+  private additionalLists = viewChildren<MatSelectionList>('additional');
 
   minDate: string = '';
   maxDate: string = '';
@@ -265,7 +255,7 @@ export class ReservationComponent {
     customerChange: this.formBuilder.control(false),
     reference: this.formBuilder.control(undefined),
     note: this.formBuilder.control(undefined),
-    type: this.formBuilder.control(undefined),
+    option: this.formBuilder.control(undefined),
     amount: this.formBuilder.control(undefined, [Validators.min(1)]),
     transfer: this.formBuilder.control(undefined),
   });
@@ -343,16 +333,16 @@ export class ReservationComponent {
       switch (ud.discountCustomer.type) {
         case DiscountType.money:
           title =
-            `${currencySymbol(ud.discountCustomer.discount?.currency)} ${ud.discountCustomer.amount} ${title}`;
+            `${ currencySymbol(ud.discountCustomer.discount?.currency) } ${ ud.discountCustomer.amount } ${ title }`;
           break;
         case DiscountType.percentage:
-          title = `${ud.discountCustomer.amount} % ${title}`;
+          title = `${ ud.discountCustomer.amount } % ${ title }`;
           break;
       }
       return Object.assign({}, ud, { title });
     }));
   showDiscount = false;
-  price: IPrice = new Price();
+  price = signal<IPrice>(new Price());
 
   roomList = signal<IRoomAll[] | undefined>(undefined);
   filteredRoomSignal = toSignal(
@@ -413,6 +403,11 @@ export class ReservationComponent {
   private selectAmountSignal = toSignal(this.getConfigurationForm.amount.valueChanges);
   private selectDateTimeListSignal = toSignal(this.dateTimeList.valueChanges);
 
+  private readonly paymentOptions = computed(() => this.paymentOptionsSignal().filter(
+    option => option.enabled && option.enabledProfessional,
+  ));
+  options = signal<IPaymentOption[] | undefined>(undefined);
+
   weekendDays: number[] = [0, 6];
   day: IDay = new Day();
   refresh: Subject<any> = new Subject();
@@ -422,10 +417,10 @@ export class ReservationComponent {
   totalDurationFormatted?: string;
 
   isEditing = signal(false);
+  currentStepIndex = signal(0);
   isAdmin = computed(() => this.authUserSignal().isAdmin);
   maxCalendarDate: Date = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
 
-  types: string[] = [PaymentType.cash, PaymentType.transfer];
   screenConfig = computed(() => {
     const isSmall = !!this.breakpointsSignal()?.matches;
 
@@ -455,6 +450,7 @@ export class ReservationComponent {
   private alreadyCreated = false;
   private groupId?: string;
   private isDashboard = false;
+  private hydratingEdit = false;
   private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
@@ -494,7 +490,9 @@ export class ReservationComponent {
     effect(() => {
       const id = this.reservationIdSignal();
       if (id) {
+        this.reservationId = id;
         this.isEditing.set(true);
+        this.currentStepIndex.set(this.isAdmin() ? 1 : 2);
         this.steps = this.steps.map(value => {
           switch (value.order) {
             case 0:
@@ -593,10 +591,13 @@ export class ReservationComponent {
     effect(() => {
       const customer = this.selectCustomerSignal();
       this.customerId = customer?.id;
-      this.customerInfo.set(undefined);
       if (!customer) {
         return;
       }
+      if (this.hydratingEdit) {
+        return;
+      }
+      this.customerInfo.set(undefined);
       this.cleanTreatment();
       if (!this.isEditing()) {
         this.store.dispatch(getCustomerInformation({ id: customer.id }));
@@ -624,7 +625,7 @@ export class ReservationComponent {
           const warning = this.translate.instant('COMMON.TIME_ZONE.WARNING');
           const localDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.LOCAL', { date: localDate });
           const roomDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.ROOM', { date: timeZoneDate });
-          const message = `${warning} - ${localDateLabel} / ${roomDateLabel}`;
+          const message = `${ warning } - ${ localDateLabel } / ${ roomDateLabel }`;
           const toastRef = this.toastService.show(message, 'warning', 0, { actionType: 'none' });
           toastRef.onAction().subscribe(() => {
             this.dismiss = true;
@@ -649,6 +650,8 @@ export class ReservationComponent {
         }
         this.getTreatmentForm.group.setValue(undefined);
         // this.cleanTreatment();
+        const options = this.paymentOptions();
+        this.options.set(options.filter(option => room.paymentTypes.includes(option.type)));
       }
     });
 
@@ -678,7 +681,8 @@ export class ReservationComponent {
     effect(() => {
       const treatment = this.selectTreatmentSignal();
       if (treatment) {
-        this.price = newPrice(this.price, treatment.price, this.treatmentDiscount);
+        const currentPrice = untracked(() => this.price());
+        this.setPrice(newPrice(currentPrice, treatment.price, this.treatmentDiscount));
         this.cleanEvent();
       }
     });
@@ -702,12 +706,14 @@ export class ReservationComponent {
         const userDiscount = discounts.find(d => d.id === discountId);
         if (userDiscount) {
           this.treatmentDiscount = userDiscount.discountCustomer;
-          this.price = newDiscount(this.price, this.treatmentDiscount);
+          const currentPrice = untracked(() => this.price());
+          this.setPrice(newDiscount(currentPrice, this.treatmentDiscount));
           this.cleanEvent();
         }
       } else {
         this.treatmentDiscount = undefined;
-        this.price = removeDiscount(this.price);
+        const currentPrice = untracked(() => this.price());
+        this.setPrice(removeDiscount(currentPrice));
         this.cleanEvent();
       }
     });
@@ -725,11 +731,11 @@ export class ReservationComponent {
     effect(() => {
       const amount = this.selectAmountSignal();
       if (amount) {
-        this.getConfigurationForm.type.setValidators([Validators.required]);
+        this.getConfigurationForm.option.setValidators([Validators.required]);
       } else {
-        this.getConfigurationForm.type.clearValidators();
+        this.getConfigurationForm.option.clearValidators();
       }
-      this.getConfigurationForm.type.updateValueAndValidity();
+      this.getConfigurationForm.option.updateValueAndValidity();
     });
 
     effect(() => {
@@ -743,19 +749,21 @@ export class ReservationComponent {
       if (additionalList?.length) {
         const additionalIndex = enableStep(this.steps, 'post_add');
         if (this.customerAdditionalIds?.length && !this.additionalSelected().length &&
-          this.myStepper?.selectedIndex === additionalIndex) {
+          this.currentStepIndex() === additionalIndex) {
           const selected = additionalList.filter(ad => this.customerAdditionalIds?.includes(ad.id))
             .map(ad => Object.assign({}, ad, { id: ad.id }));
           this.additionalSelected.set(selected);
-          this.price = newAdditional(this.price, selected, reservation?.treatment?.discountCustomer);
+          const currentPrice = untracked(() => this.price());
+          this.setPrice(newAdditional(currentPrice, selected, reservation?.treatment?.discountCustomer));
         }
         const additionalSelected = this.additionalSelected();
         if (additionalSelected?.length) {
           const selectIds = additionalSelected?.map(value => value.id);
           const newList = additionalList.filter(al => selectIds.includes(al.id));
-          if (newList.length !== additionalSelected.length) {
+          if (this.shouldSyncAdditionalSelection(additionalSelected, newList)) {
             this.additionalSelected.set(newList);
-            this.price = newAdditional(this.price, additionalSelected, reservation?.treatment?.discountCustomer);
+            const currentPrice = untracked(() => this.price());
+            this.setPrice(newAdditional(currentPrice, newList, reservation?.treatment?.discountCustomer));
           }
         }
         if (this.additionalIds?.length) {
@@ -764,7 +772,8 @@ export class ReservationComponent {
           if (newList.length !== additionalSelected.length) {
             this.additionalSelected.set(newList);
             this.additionalIds = [];
-            this.price = newAdditional(this.price, newList, reservation?.treatment?.discountCustomer);
+            const currentPrice = untracked(() => this.price());
+            this.setPrice(newAdditional(currentPrice, newList, reservation?.treatment?.discountCustomer));
           }
         }
       }
@@ -779,7 +788,14 @@ export class ReservationComponent {
     });
 
     effect(() => {
+      this.additionalSelected();
+      this.additionalLists();
+      this.syncRenderedAdditionalSelections();
+    });
+
+    effect(() => {
       const customerInfo = this.customerInfoSignal();
+      this.customerInfo.set(customerInfo);
       if (customerInfo) {
         this.customerAdditionalIds = customerInfo.additionalIds;
         this.treatmentId.update(prev => prev || customerInfo.treatment.key);
@@ -790,7 +806,7 @@ export class ReservationComponent {
 
     effect(() => {
       const reservation = this.selectedReservationSignal();
-      const stepper = untracked(() => this.stepper());
+      const stepper = untracked(() => this.currentStepIndex());
       if (reservation && stepper) {
         this.setData(reservation);
       }
@@ -811,7 +827,7 @@ export class ReservationComponent {
             const dateTime = this.dateTimeList.at(dataEvent.index);
             const start = dateTime.get('start')?.value;
             const dateValue = dateTime?.get('date')?.value;
-            if (reservation && dateValue && this.myStepper?.selectedIndex === bookOrder) {
+            if (reservation && dateValue && this.currentStepIndex() === bookOrder) {
               let date: Date;
               if (start) {
                 const time = getTimeNumber(start);
@@ -832,7 +848,7 @@ export class ReservationComponent {
               } else {
                 this.segmentClick(date, 'EDITING', data.date, reservation.id);
               }
-            } else if (start && this.myStepper?.selectedIndex === bookOrder) {
+            } else if (start && this.currentStepIndex() === bookOrder) {
               if (dateValue) {
                 this.segmentClick(dateValue, 'CREATED', data.date);
               }
@@ -841,10 +857,6 @@ export class ReservationComponent {
         });
       }
     });
-  }
-
-  get myStepper(): MatStepper | undefined {
-    return this.stepper();
   }
 
   private get getForm(): ReservationForms {
@@ -901,12 +913,141 @@ export class ReservationComponent {
     return !isSameTimeZone(this.getOfficeForm.room.value?.timeZone);
   }
 
+  get summaryCustomer() {
+    return this.getCustomerForm.customer.value || this.selectedReservationSignal()?.customer;
+  }
+
+  get summaryRoom() {
+    return this.getOfficeForm.room.value || this.selectedReservationSignal()?.room;
+  }
+
+  get summaryProfessional() {
+    return this.getOfficeForm.professional.value || this.selectedReservationSignal()?.professional;
+  }
+
+  get summaryTreatment() {
+    return this.getTreatmentForm.treatment.value || this.selectedReservationSignal()?.treatment;
+  }
+
+  get summaryAdditionals(): IAdditionalAll[] {
+    return this.additionalSelected().length
+      ? this.additionalSelected()
+      : this.selectedReservationSignal()?.additional || [];
+  }
+
+  get summaryDateTimes(): Array<{ date: Date; start?: string }> {
+    const current = this.selectedDateTimes;
+    if (current.length) {
+      return current;
+    }
+
+    const reservation = this.selectedReservationSignal();
+    if (!reservation) {
+      return [];
+    }
+
+    const date = newDateTimestamp(reservation.timestamp, reservation.room.timeZone);
+    return [{ date, start: getTime(date, this.dateFormat) }];
+  }
+
+  private get summaryPriceSource(): IPrice {
+    const reservation = this.selectedReservationSignal();
+    return reservation ? getPrice(reservation, reservation.payments) : new Price();
+  }
+
   get isAddButtonDisabled(): boolean {
     if (this.dateTimeList.invalid) {
       return true;
     }
 
     return this.dateTimeList.controls.some(control => control.invalid || !control.get('date')?.value);
+  }
+
+  get selectedDateTimes(): Array<{ date: Date; start?: string }> {
+    return this.dateTimeList.controls
+      .map(control => {
+        const date = control.controls.date.value;
+        const start = control.controls.start.value;
+
+        return date ? { date, start } : undefined;
+      })
+      .filter((value): value is { date: Date; start: string | undefined } => !!value);
+  }
+
+  get hasDiscountApplied(): boolean {
+    return !!this.getTreatmentForm.discount.value ||
+      this.price().total !== this.price().totalWithoutDiscount || this.price().discount > 0;
+  }
+
+  get selectedTreatmentPrice(): number {
+    return Number(
+      this.summaryTreatment?.price ?? this.price().amount ?? this.summaryPriceSource.amount ?? 0,
+    );
+  }
+
+  get selectedAdditionalTotal(): number {
+    return this.summaryAdditionals.reduce((total, additional) => total + Number(additional.price || 0), 0);
+  }
+
+  get effectiveTotalWithoutDiscount(): number {
+    const fallbackTotal = this.selectedTreatmentPrice + this.selectedAdditionalTotal;
+
+    return this.price().totalWithoutDiscount === 0 && fallbackTotal > 0
+      ? fallbackTotal
+      : this.price().totalWithoutDiscount || this.summaryPriceSource.totalWithoutDiscount;
+  }
+
+  get effectiveDiscountAmount(): number {
+    return this.price().discount || this.summaryPriceSource.discount || 0;
+  }
+
+  get effectiveTreatmentDisplayPrice(): number {
+    if (this.hasDiscountApplied && this.effectiveDiscountAmount > 0) {
+      const discountedPrice = this.price().priceWithDiscount;
+      return discountedPrice || Math.max(this.selectedTreatmentPrice - this.effectiveDiscountAmount, 0);
+    }
+
+    return this.selectedTreatmentPrice;
+  }
+
+  get effectiveTotalPrice(): number {
+    if (this.price().total === 0 && this.effectiveTotalWithoutDiscount > 0) {
+      return Math.max(this.effectiveTotalWithoutDiscount - this.effectiveDiscountAmount, 0);
+    }
+
+    return this.price().total || this.summaryPriceSource.total;
+  }
+
+  get effectivePaidTotal(): number {
+    return this.price().totalPaid || this.summaryPriceSource.totalPaid || 0;
+  }
+
+  get effectiveBalanceUsed(): number {
+    return this.price().balance || this.summaryPriceSource.balance || 0;
+  }
+
+  get showCoveredAmounts(): boolean {
+    return this.effectivePaidTotal > 0 || this.effectiveBalanceUsed > 0;
+  }
+
+  get effectiveRemainingTotal(): number {
+    return Math.max(this.effectiveTotalPrice - this.effectivePaidTotal - this.effectiveBalanceUsed, 0);
+  }
+
+  get configuredPaymentAmount(): number {
+    return Math.max(Number(this.getConfigurationForm.amount.value || 0), 0);
+  }
+
+  get effectivePaidWithConfiguredAmount(): number {
+    return this.effectivePaidTotal + Math.min(this.configuredPaymentAmount, this.effectiveRemainingTotal);
+  }
+
+  get configuredPaymentToPay(): number {
+    return Math.max(this.effectiveTotalPrice - this.effectivePaidWithConfiguredAmount - this.effectiveBalanceUsed, 0);
+  }
+
+  get showConfigurationAmounts(): boolean {
+    return this.showCoveredAmounts || this.configuredPaymentAmount > 0;
   }
 
   getFormEvent = (index: number): FormGroup<EventForm> => this.events.at(index);
@@ -931,10 +1072,10 @@ export class ReservationComponent {
       reservation.reference = this.getConfigurationForm.reference.value;
       reservation.note = this.getConfigurationForm.note.value;
       const amount = this.getConfigurationForm.amount.value;
-      const type = this.getConfigurationForm.type.value;
+      const type = this.getConfigurationForm.option.value?.type;
       const transfer = this.getConfigurationForm.transfer.value;
       if (amount && type) {
-        reservation.payment = { type, amount, transfer } as IReservationPayment;
+        reservation.payment = { type, amount, transfer, pointOfSale: true } as IReservationPayment;
       }
 
       const role = this.isDashboard ? Role.roomAdmin : Role.professional;
@@ -968,25 +1109,22 @@ export class ReservationComponent {
       this.cleanEvent();
     }
 
-    if (this.myStepper) {
-      this.myStepper.selectedIndex = getBackIndex(this.steps, this.myStepper.selectedIndex);
+    const previousIndex = getBackIndex(this.steps, this.currentStepIndex());
+    if (previousIndex >= 0) {
+      this.setCurrentStep(previousIndex);
     }
     return;
   }
-
-  triggerClick = (event: StepperSelectionEvent): void => getStepCall(this.steps, event.selectedIndex - 1);
 
   callStepTwo = (goNext: boolean): void => {
     if (this.customerForm.invalid) {
       return;
     }
-    if (!goNext) {
-      this.isPreview = false;
-      this.getRoomList(this.customerId);
-      this.cleanEvent();
-    }
-    if (this.myStepper) {
-      completeAndNext(this.steps, this.myStepper, goNext);
+    this.isPreview = false;
+    this.getRoomList(this.customerId);
+    this.cleanEvent();
+    if (goNext) {
+      this.completeAndGoToNextStep(0);
     }
   };
 
@@ -994,13 +1132,11 @@ export class ReservationComponent {
     if (this.officeForm.invalid) {
       return;
     }
-    if (!goNext) {
-      this.isPreview = false;
-      this.getTreatmentList(this.roomId(), this.customerId);
-      this.cleanEvent();
-    }
-    if (this.myStepper) {
-      completeAndNext(this.steps, this.myStepper, goNext);
+    this.isPreview = false;
+    this.getTreatmentList(this.roomId(), this.customerId);
+    this.cleanEvent();
+    if (goNext) {
+      this.completeAndGoToNextStep(1);
     }
   };
 
@@ -1008,23 +1144,19 @@ export class ReservationComponent {
     if (this.treatmentForm.invalid) {
       return;
     }
-    if (!goNext) {
-      this.isPreview = false;
-      this.getAdditionalList(this.roomId(), this.groupId);
-      this.cleanEvent();
-    }
-    if (this.myStepper) {
-      completeAndNext(this.steps, this.myStepper, goNext);
+    this.isPreview = false;
+    this.getAdditionalList(this.roomId(), this.groupId);
+    this.cleanEvent();
+    if (goNext) {
+      this.completeAndGoToNextStep(2);
     }
   };
 
   callStepFive = (goNext: boolean): void => {
-    if (!goNext) {
-      this.isPreview = false;
-      this.cleanEvent();
-    }
-    if (this.myStepper) {
-      completeAndNext(this.steps, this.myStepper, goNext);
+    this.isPreview = false;
+    this.cleanEvent();
+    if (goNext) {
+      this.completeAndGoToNextStep(3);
     }
   };
 
@@ -1034,7 +1166,7 @@ export class ReservationComponent {
     }
     const treatment = this.getTreatmentForm.treatment.value;
     const room = this.getOfficeForm.room.value;
-    if (!goNext && treatment && room) {
+    if (treatment && room) {
       this.isPreview = false;
       const duration = totalDuration(treatment, this.additionalSelected());
       this.totalDuration = duration.duration;
@@ -1072,8 +1204,8 @@ export class ReservationComponent {
         }),
       );
     }
-    if (this.myStepper) {
-      completeAndNext(this.steps, this.myStepper, goNext);
+    if (goNext) {
+      this.completeAndGoToNextStep(4);
     }
   };
 
@@ -1105,31 +1237,53 @@ export class ReservationComponent {
     if (scheduleErrors?.length) {
       return;
     }
-    if (!goNext) {
-      this.isPreview = true;
-    }
-    if (this.myStepper) {
-      completeAndNext(this.steps, this.myStepper, goNext);
+    this.isPreview = true;
+    if (goNext) {
+      this.completeAndGoToNextStep(5);
     }
   };
 
-  getStepName = (index: number): string => getStepName(this.steps, index);
+  private setCurrentStep = (index: number): void => {
+    this.currentStepIndex.set(index);
+    if (getStepName(this.steps, index) === 'post_add') {
+      queueMicrotask(() => this.syncRenderedAdditionalSelections());
+    }
+  };
 
-  getStepEnabled = (index: number): boolean => getStepEnabled(this.steps, index);
+  private completeAndGoToNextStep = (index: number): void => {
+    const step = this.steps.find(value => value.order === index);
+    if (!step) {
+      return;
+    }
+    step.completed = true;
+    this.steps[step.order] = step;
+    const nextIndex = this.getNextEnabledStepIndex(index);
+    if (nextIndex !== undefined) {
+      this.setCurrentStep(nextIndex);
+    }
+    if (step.next && !step.next.enable) {
+      step.next.call(true);
+    }
+  };
 
-  getStepOptional = (index: number): boolean => getStepOptional(this.steps, index);
-
-  getStepCompleted = (index: number): boolean => getStepCompleted(this.steps, index);
+  private getNextEnabledStepIndex = (currentIndex: number): number | undefined => {
+    for (const step of this.steps.slice(currentIndex + 1)) {
+      if (step.enable) {
+        return step.order;
+      }
+    }
+    return undefined;
+  };
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.getOfficeForm.room.value);
 
   displayFnUser = (user: IUser): string => user?.displayName ? user.displayName : '';
 
-  displayFnGroup = (group: ITreatmentGroup): string => group ? `${group.name}` : '';
+  displayFnGroup = (group: ITreatmentGroup): string => group ? `${ group.name }` : '';
 
-  displayFnTreatment = (treatment: ITreatment): string => treatment ? `${treatment.name}` : '';
+  displayFnTreatment = (treatment: ITreatment): string => treatment ? `${ treatment.name }` : '';
 
-  displayFnOffice = (office: IOffice): string => office ? `${office.name}` : '';
+  displayFnOffice = (office: IOffice): string => office ? `${ office.name }` : '';
 
   displayFnRoom = (room: IRoom): string => room.address ? room.address.name : '';
 
@@ -1143,7 +1297,7 @@ export class ReservationComponent {
     openDialog(room, this.dateFormat, this.translate, this.dialog, reservationDate);
   };
 
-  segmentClick = (date: Date, state: string, eventKey: string, id: string = `${Math.random()}`): void => {
+  segmentClick = (date: Date, state: string, eventKey: string, id: string = `${ Math.random() }`): void => {
     const eventData = this.dataEvents.get(eventKey);
     if (eventData) {
       if (!this.dateIsValid(date)) {
@@ -1247,13 +1401,25 @@ export class ReservationComponent {
     dateTimeForm.start.setValue(getTime(newStart));
   };
 
-  onChange = (options: MatListOption[]): void => {
-    this.additionalSelected.set(options.map(o => o.value));
-    this.price = newAdditional(this.price, this.additionalSelected(), this.treatmentDiscount);
+  onChange = (list: MatSelectionList): void => {
+    // Promise.resolve().then(() => {
+    const additionalSelected = list.selectedOptions.selected.map(option => option.value as IAdditionalAll);
+    const currentIds = this.additionalSelected().map(item => item.id).sort();
+    const nextIds = additionalSelected.map(item => item.id).sort();
+
+    if (currentIds.length === nextIds.length && currentIds.every((id, index) => id === nextIds[index])) {
+      return;
+    }
+
+    this.additionalSelected.set(additionalSelected);
+    this.setPrice(newAdditional(this.price(), additionalSelected, this.treatmentDiscount));
     this.cleanEvent();
+    // });
   };
 
   isSelected = (it: IAdditionalAll): boolean => this.additionalSelected().filter(el => el.id === it.id).length > 0;
+
+  compareAdditional = (first?: IAdditionalAll, second?: IAdditionalAll): boolean => first?.id === second?.id;
 
   addDate = (dateValue?: Date, startTime?: string): void => {
     this.dateTimeList.push(this.createDate(dateValue, startTime));
@@ -1288,12 +1454,10 @@ export class ReservationComponent {
       const selectedEvent = this.events.at(eventData.index)?.get('event')?.value;
       const eventsOverlapping = eventData.getOverlapEvent(start, end, this.professionalId());
       if (eventsOverlapping?.length && eventsOverlapping[0] !== selectedEvent) {
-        let message = '';
-        eventsOverlapping.forEach(e => {
-          message += `<div>${e.title}</div>`;
-        });
         title = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.TITLE');
-        content = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.CONTENT', { data: message });
+        content = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.CONTENT', {
+          data: this.createOverlapMessage(eventsOverlapping),
+        });
       } else {
         if (!selectedEvent && !id) {
           title = this.translate.instant('RESERVATION.EVENT.TITLE');
@@ -1348,9 +1512,75 @@ export class ReservationComponent {
 
   private dateIsValid = (date: Date): boolean => isBetween(getNowTimeZone(), this.maxCalendarDate, date);
 
+  private setPrice = (price: IPrice): void => {
+    this.price.set(price);
+  };
+
+  private shouldSyncAdditionalSelection = (current: IAdditionalAll[], next: IAdditionalAll[]): boolean => {
+    if (current.length !== next.length) {
+      return true;
+    }
+
+    return next.some((item, index) => current[index]?.id !== item.id || current[index] !== item);
+  };
+
+  private syncRenderedAdditionalSelections = (): void => {
+    queueMicrotask(() => {
+      const selectedIds = new Set(this.additionalSelected().map(item => item.id));
+      this.additionalLists().forEach(list => {
+        list.options.forEach((option: MatListOption) => {
+          const additionalId = (option.value as IAdditionalAll | undefined)?.id;
+          option.selected = additionalId ? selectedIds.has(additionalId) : false;
+        });
+      });
+    });
+  };
+
+  private createOverlapMessage = (eventsOverlapping: CalendarEvent[]): string => eventsOverlapping
+    .map(event => this.createOverlapSummary(event))
+    .join('');
+
+  private createOverlapSummary = (event: CalendarEvent): string => {
+    const timeZone = this.getOfficeForm.room.value?.timeZone;
+    const start = this.formatOverlapDate(event.start, {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }, timeZone);
+    const end = event.end ? this.formatOverlapDate(event.end, {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }, timeZone) : undefined;
+    const schedule = end ? `${ start } - ${ end }` : start;
+
+    if (event.meta?.isReservation) {
+      const none = this.translate.instant('RESERVATION.FLOW.SUMMARY.NONE');
+      const treatment = event.meta.treatmentName || this.stripHtml(event.title);
+      const additionals = event.meta.additionalNames?.length ? event.meta.additionalNames.join(', ') : none;
+
+      return `<div><strong>${ schedule }</strong></div>
+        <div>${ treatment }</div>
+        <div>${ additionals }</div>`;
+    }
+
+    return `<div><strong>${ schedule }</strong></div><div>${ this.stripHtml(event.title) }</div>`;
+  };
+
+  private formatOverlapDate = (
+    value: Date,
+    options: Intl.DateTimeFormatOptions,
+    timeZone?: string,
+  ): string => value.toLocaleString(API_LOCALE, { ...options, ...(timeZone ? { timeZone } : {}) });
+
+  private stripHtml = (value: string): string => value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+
   private cleanTreatment = (): void => {
     if (!this.skip() && !this.reservationId) {
-      this.price = new Price();
+      this.price.set(new Price());
       this.getTreatmentForm.discount.setValue(undefined);
       this.getTreatmentForm.treatment.setValue(undefined);
       this.showDiscount = false;
@@ -1408,8 +1638,8 @@ export class ReservationComponent {
       defaultStepIndex: this.isEditing() ? (this.isAdmin() ? 1 : 2) : 0,
       stepByField: { room: 1, professional: 3 },
     });
-    if (this.myStepper !== undefined && state.stepIndex !== undefined) {
-      this.myStepper.selectedIndex = state.stepIndex;
+    if (state.stepIndex !== undefined) {
+      this.setCurrentStep(state.stepIndex);
     }
 
     state.fields.forEach(field => {
@@ -1429,7 +1659,7 @@ export class ReservationComponent {
         this.eventGroup.controls[field as keyof EventGroupForm]?.setErrors({ incorrect: true });
       }
 
-      const inputField = document.querySelector(`input[formControlName="${field}"]`) as HTMLInputElement | null;
+      const inputField = document.querySelector(`input[formControlName="${ field }"]`) as HTMLInputElement | null;
       inputField?.focus();
       inputField?.blur();
     });
@@ -1496,39 +1726,55 @@ export class ReservationComponent {
     }
   };
 
-  private setData = (reservation: IReservationAll): void => {
+  private setData = (reservation: IUpcomingAll): void => {
+    this.hydratingEdit = true;
     this.treatmentDiscount = reservation.treatment.discountCustomer;
     this.isPreview = false;
     const date = newDateTimestamp(reservation.timestamp, reservation.room.timeZone);
+    this.customerId = reservation.customer.id;
+    this.groupId = reservation.treatment.groupId;
     this.professionalId.set(reservation.professional.id);
     this.roomId.set(reservation.room.id);
-    this.getCustomerForm.customer.setValue(reservation.customer);
+    this.getCustomerForm.customer.setValue(reservation.customer, { emitEvent: false });
+    this.getOfficeForm.office.setValue(reservation.room.office, { emitEvent: false });
+    this.getOfficeForm.room.setValue(reservation.room, { emitEvent: false });
+    this.getOfficeForm.professional.setValue(reservation.professional, { emitEvent: false });
     this.treatmentId.set(reservation.treatment.key);
-    // this.getTreatmentForm.group.setValue(reservation.treatment.group)
+    this.getTreatmentForm.treatment.setValue(reservation.treatment, { emitEvent: false });
     const time = getTime(date, this.dateFormat);
     if (this.dateTimeList.controls?.length === 1) {
       const control = this.getFormDateTimeControls(0);
       const controlDate = control.date;
       if (!controlDate.value) {
-        controlDate.setValue(date);
-        control.start.setValue(time);
+        controlDate.setValue(date, { emitEvent: false });
+        control.start.setValue(time, { emitEvent: false });
       } else {
         this.addDate(date, getTime(date, this.dateFormat));
       }
     } else {
       this.addDate(date, getTime(date, this.dateFormat));
     }
-    this.price = getPrice(reservation);
+    this.setPrice(getPrice(reservation, reservation.payments));
     this.additionalSelected.set(reservation.additional ? reservation.additional
       .map(ad => Object.assign({}, ad, { id: ad.key })) : []);
-    this.getConfigurationForm.note.setValue(reservation.note);
+    this.getConfigurationForm.note.setValue(reservation.note, { emitEvent: false });
     if (reservation.configurationCanCustomerChange !== undefined || reservation.configurationReference) {
-      this.getConfigurationForm.reference.setValue(reservation.configurationReference);
-      this.getConfigurationForm.customerChange.setValue(reservation.configurationCanCustomerChange ?? false);
+      this.getConfigurationForm.reference.setValue(reservation.configurationReference, { emitEvent: false });
+      this.getConfigurationForm.customerChange.setValue(reservation.configurationCanCustomerChange ?? false, {
+        emitEvent: false,
+      });
     }
-    if (this.myStepper) {
-      completeAndNext(this.steps, this.myStepper, true);
+    if (this.isEditing()) {
+      const treatmentIndex = getIndex(this.steps, 'spa');
+      if (treatmentIndex !== undefined) {
+        this.setCurrentStep(treatmentIndex);
+      }
+    } else {
+      this.completeAndGoToNextStep(0);
     }
+    queueMicrotask(() => {
+      this.hydratingEdit = false;
+    });
   };
 
   private getRoomList = (customerId?: string): void => this.store.dispatch(

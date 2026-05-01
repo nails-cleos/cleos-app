@@ -88,7 +88,7 @@ export class ExpensesComponent {
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
   displayedColumns: string[] = ['position', 'invoice', 'supplyStore.name', 'timestamp', 'totalGross', 'totalBtw',
-    'totalNet', 'actions'];
+    'totalNet', 'actions', 'add'];
   expanded?: IExpenseAll;
 
   dateFormat: string = this.translate.getCurrentLang();

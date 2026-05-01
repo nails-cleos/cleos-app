@@ -1,3 +1,62 @@
+.room-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.room-meta-grid {
+  display: grid;
+  grid-template-columns: minmax(180px, auto) minmax(220px, 320px);
+  gap: 18px;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.room-selection-block {
+  margin-top: 18px;
+}
+
+.room-accordion {
+  margin-top: 8px;
+}
+
+.room-accordion .mat-expansion-panel {
+  border: 1px solid var(--app-surface-card-border);
+  border-radius: 18px !important;
+  background: color-mix(in srgb, var(--app-surface-card-bg) 94%, transparent);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+}
+
+.room-accordion .mat-expansion-panel + .mat-expansion-panel {
+  margin-top: 14px;
+}
+
+.room-accordion .mat-expansion-panel-header {
+  min-height: 68px;
+  padding-inline: 20px;
+  background: color-mix(in srgb, var(--app-table-header) 60%, transparent);
+}
+
+.room-accordion .mat-expansion-panel-header-title {
+  color: var(--app-surface-text);
+  font-weight: 700;
+}
+
+.room-accordion .mat-expansion-panel-header-description {
+  color: var(--app-surface-text-muted);
+}
+
+.room-accordion .mat-expansion-panel-header-description .mat-icon {
+  color: var(--app-surface-label);
+}
+
+.room-error-block {
+  display: block;
+  margin-top: 12px;
+}
+
 .headers-align .mat-expansion-panel-header-title,
 .headers-align .mat-expansion-panel-header-description {
   flex-basis: 0;
@@ -8,11 +67,17 @@
   align-items: center;
 }
 
-.headers-align .mat-mdc-form-field {
-  margin-right: 8px;
-}
-
 .deprecated-option {
   text-decoration: line-through;
   opacity: 0.7;
+}
+
+@media (max-width: 1080px) {
+  .room-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .room-meta-grid {
+    grid-template-columns: 1fr;
+  }
 }

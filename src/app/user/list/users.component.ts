@@ -85,7 +85,7 @@ export class UsersComponent {
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
   smallScreen = computed(() => this.breakpointsSignal()?.matches ?? false);
 
-  displayedColumns: string[] = ['position', 'displayName', 'email', 'status', 'actions'];
+  displayedColumns: string[] = ['position', 'displayName', 'email', 'status', 'actions', 'add'];
 
   expandedUser?: IUserAll;
 

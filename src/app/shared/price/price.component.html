@@ -6,22 +6,31 @@
 @let currentOptions = options();
 @let currentProfessionalName = professionalName();
 @if (currentPrice) {
-  <app-price-preview [price]="currentPrice" [currencyIcon]="currentCurrency?.icon" [summaryOnly]="true"
-                     [updatedTotal]="paymentPrice()?.total" [paidTotal]="currentPrice.totalPaid"
-                     [penalty]="showPenalty() ? currentPrice.penalty : undefined"
-                     [accountBalanceUsedInput]="appliedBalance"
-                     [toPaid]="adjustedAmountToPay" [accountCredit]="adjustedCredit"></app-price-preview>
+  <div class="app-surface-stack price-stack">
+    <div class="app-surface-item app-crud-loading">
+      <span class="app-surface-item__label">{{ 'COMMON.LABEL.TOTAL' | translate }}</span>
+      <app-price-preview [price]="currentPrice" [currencyIcon]="currentCurrency?.icon" [summaryOnly]="true"
+                         [updatedTotal]="paymentPrice()?.total" [paidTotal]="currentPrice.totalPaid"
+                         [penalty]="showPenalty() ? currentPrice.penalty : undefined"
+                         [accountBalanceUsedInput]="appliedBalance"
+                         [toPaid]="adjustedAmountToPay" [accountCredit]="adjustedCredit"></app-price-preview>
+    </div>
 
-  @if (shouldShowBankForm) {
-    <app-bank [firstTime]="currentFirstTime" [form]="form" [options]="currentOptions"
-              [showPaymentMessage]="!currentPrice?.isPaid"
-              [professionalName]="currentProfessionalName" (percentageEmitter)="emitter($event)"></app-bank>
-  }
+    @if (shouldShowBankForm) {
+      <mat-divider class="price-divider"></mat-divider>
 
-  @if (shouldShowBankForm) {
-    <mat-divider></mat-divider>
-  }
+      <div class="app-surface-item app-crud-loading price-card--bank">
+        <span class="app-surface-item__label">{{ 'COMMON.PAYMENT.FIELD' | translate }}</span>
+        <app-bank [firstTime]="currentFirstTime" [form]="form" [options]="currentOptions"
+                  [showPaymentMessage]="!currentPrice?.isPaid"
+                  [professionalName]="currentProfessionalName" (percentageEmitter)="emitter($event)"></app-bank>
+      </div>
+    }
+  </div>
 } @else if (currentShowBank) {
-  <app-bank [firstTime]="currentFirstTime" [form]="form" [options]="currentOptions"
-            [professionalName]="currentProfessionalName" (percentageEmitter)="emitter($event)"></app-bank>
+  <div class="app-surface-item app-crud-loading price-card--bank">
+    <span class="app-surface-item__label">{{ 'COMMON.PAYMENT.FIELD' | translate }}</span>
+    <app-bank [firstTime]="currentFirstTime" [form]="form" [options]="currentOptions"
+              [professionalName]="currentProfessionalName" (percentageEmitter)="emitter($event)"></app-bank>
+  </div>
 }

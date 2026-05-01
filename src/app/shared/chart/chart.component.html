@@ -4,19 +4,19 @@
       <app-error [error]="error" [isCard]="true"></app-error>
     } @else {
       @if (chart(); as chart) {
-        <div>
+        <div class="chartFrame" [class.chartFrame--round]="chart.type === 'pie' || chart.type === 'doughnut'">
           <canvas [type]="chart.type"
                   [datasets]="chart.charData.datasets"
                   [labels]="chart.labels"
                   [legend]="true"
                   [options]="chart.options"
-                  baseChart class="block">
+                  baseChart class="chartCanvas">
           </canvas>
         </div>
       }
     }
   </div>
 } @else {
-  <div class="ssc-square"></div>
-  <div class="ssc-square"></div>
+  <div class="chartSkeleton ssc-square"></div>
+  <div class="chartSkeleton ssc-square"></div>
 }

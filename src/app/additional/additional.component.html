@@ -1,130 +1,125 @@
-<div class="flex-container">
-  <div class="card-container">
-    <div class="card-content">
-      <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
-        @let isAddMode = isAddModeSignal();
-        @let additional = additionalSignal();
-        <mat-card appearance="outlined">
-          @if (isAddMode) {
-            <mat-card-header>
-              <mat-card-title>{{ 'ADDITIONAL.TITLE' | translate }}</mat-card-title>
-            </mat-card-header>
+@let isAddMode = isAddModeSignal();
+@let additional = additionalSignal();
+
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <section class="app-surface-section">
+    <div class="app-detail-section-header">
+      <div>
+        <span class="app-surface-eyebrow">
+          {{ (isAddMode ? 'ADDITIONAL.TITLE' : 'ADDITIONAL.DETAIL') | translate }}
+        </span>
+        @if (!isAddMode) {
+          @if (additional) {
+            <h2 class="app-crud-title">{{ additional.name }}</h2>
           } @else {
-            <mat-card-header>
-              <mat-card-title>{{ 'ADDITIONAL.DETAIL' | translate }}</mat-card-title>
-              @if (additional) {
-                <mat-card-subtitle>{{ additional.name }}</mat-card-subtitle>
-              } @else {
-                <div class="ssc-line"></div>
-              }
-            </mat-card-header>
+            <div class="ssc-line app-skeleton-title"></div>
           }
-          @if (isAddMode || additional) {
-            <mat-card-content>
-              <div class="inner-container">
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'ADDITIONAL.NAME.FIELD' | translate }}</mat-label>
-                  <label>
-                    <input [formControl]="getForm.name" autocomplete="name" matInput required data-cy="name-input">
-                  </label>
-                  @if (getForm.name.hasError('required')) {
-                    <mat-error [innerHTML]="'ADDITIONAL.NAME.REQUIRED' | translate"></mat-error>
-                  } @else if (errors()['name']) {
-                    <mat-error>
-                      {{ errors()['name'] }}
-                    </mat-error>
-                  }
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'ADDITIONAL.DESCRIPTION.FIELD' | translate }}</mat-label>
-                  <label>
-                    <textarea #message [formControl]="getForm.description" matInput maxlength="256"
-                              data-cy="description-textarea"></textarea>
-                  </label>
-                  <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'ADDITIONAL.DURATION.FIELD' | translate }}</mat-label>
-                  <label>
-                    <input [formControl]="getForm.duration" [format]="24" [timepicker]="t" matInput
-                           name="duration" required readonly data-cy="duration-input"/>
-                  </label>
-                  <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
-                  <app-timepicker #t [minutesGap]="15"></app-timepicker>
-                  @if (getForm.duration.hasError('required')) {
-                    <mat-error [innerHTML]="'ADDITIONAL.DURATION.REQUIRED' | translate"></mat-error>
-                  } @else if (errors()['duration']) {
-                    <mat-error>
-                      {{ errors()['duration'] }}
-                    </mat-error>
-                  }
-                </mat-form-field>
-                @if (allGroupsWritableSignal(); as allGroups) {
-                  <div class="fields-container" id="groups">
-                    @if (allGroups!.length || groupsSignal().length) {
-                      <mat-form-field class="chip-list">
-                        <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
-                        <mat-chip-grid #chipList aria-label="Group selection">
-                          @for (group of groupsSignal(); track group.id) {
-                            <mat-chip-row (removed)="remove(group)" [removable]="true">
-                              {{ group.name }}
-                              <mat-icon matChipRemove>cancel</mat-icon>
-                            </mat-chip-row>
-                          }
-                          <input #groupInput matInput [formControl]="getForm.group" [matAutocomplete]="auto"
-                                 [matChipInputFor]="chipList">
-                        </mat-chip-grid>
-                        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedGroup($event)">
-                          @for (group of sortGroups(filteredGroupSignal()); track group.id) {
-                            <mat-option [value]="group">
-                              {{ group.name }}
-                            </mat-option>
-                          }
-                        </mat-autocomplete>
-                      </mat-form-field>
-                      <button class="hide-gt-xs" [routerLink]="['/', language, 'treatments', 'add']" color="accent"
-                              mat-fab type="button">
-                        <mat-icon matPrefix>add</mat-icon>
-                      </button>
-                      <button class="hide-xs" [routerLink]="['/', language, 'treatments', 'add']" color="accent" mat-fab
-                              extended type="button">
-                        <mat-icon matPrefix>add</mat-icon>
-                        <span>{{ 'COMMON.TREATMENT.GROUP.ADD_BUTTON' | translate }}</span>
-                      </button>
-                    }
-                  </div>
-                } @else {
-                  <div class="ssc-line"></div>
-                }
-              </div>
-            </mat-card-content>
-            <mat-card-actions class="card-actions">
-              <div class="spacer"></div>
-              <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
-                {{ 'COMMON.BUTTON.BACK' | translate }}
-              </button>
-              @if (isAddMode) {
-                <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
-                  {{ 'COMMON.BUTTON.CREATE' | translate }}
-                </button>
-              } @else {
-                <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
-                  {{ 'COMMON.BUTTON.UPDATE' | translate }}
-                </button>
-              }
-            </mat-card-actions>
-          } @else {
-            <mat-card-content>
-              <div class="ssc-hr"></div>
-              <div class="ssc-square mb"></div>
-              <div class="ssc-hr"></div>
-            </mat-card-content>
-            <mat-card-actions class="card-actions">
-              <div class="ssc-head-line"></div>
-            </mat-card-actions>
-          }
-        </mat-card>
-      </form>
+        }
+      </div>
     </div>
-  </div>
+
+    <form (ngSubmit)="submit()"
+          [formGroup]="form"
+          novalidate
+          (keydown.enter)="$event.preventDefault()"
+          class="app-crud-form">
+      @if (isAddMode || additional) {
+        <div class="app-crud-form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'ADDITIONAL.NAME.FIELD' | translate }}</mat-label>
+            <input [formControl]="getForm.name" autocomplete="name" matInput required data-cy="name-input">
+            @if (getForm.name.hasError('required')) {
+              <mat-error [innerHTML]="'ADDITIONAL.NAME.REQUIRED' | translate"></mat-error>
+            } @else if (errors()['name']) {
+              <mat-error>{{ errors()['name'] }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'ADDITIONAL.DURATION.FIELD' | translate }}</mat-label>
+            <input [formControl]="getForm.duration"
+                   [format]="24"
+                   [timepicker]="t"
+                   data-cy="duration-input"
+                   matInput
+                   name="duration"
+                   readonly
+                   required />
+            <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
+            <app-timepicker #t [minutesGap]="15"></app-timepicker>
+            @if (getForm.duration.hasError('required')) {
+              <mat-error [innerHTML]="'ADDITIONAL.DURATION.REQUIRED' | translate"></mat-error>
+            } @else if (errors()['duration']) {
+              <mat-error>{{ errors()['duration'] }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="app-crud-form-grid__full">
+            <mat-label>{{ 'ADDITIONAL.DESCRIPTION.FIELD' | translate }}</mat-label>
+            <textarea #message [formControl]="getForm.description"
+                      data-cy="description-textarea"
+                      matInput
+                      maxlength="256"></textarea>
+            <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
+          </mat-form-field>
+
+          @if (allGroupsWritableSignal(); as allGroups) {
+            <div class="app-inline-field-action app-crud-form-grid__full" id="groups">
+              @if (allGroups.length || groupsSignal().length) {
+                <mat-form-field class="chip-list" appearance="outline">
+                  <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
+                  <mat-chip-grid #chipList aria-label="Group selection">
+                    @for (group of groupsSignal(); track group.id) {
+                      <mat-chip-row (removed)="remove(group)" [removable]="true">
+                        {{ group.name }}
+                        <mat-icon matChipRemove>cancel</mat-icon>
+                      </mat-chip-row>
+                    }
+                    <input #groupInput
+                           [formControl]="getForm.group"
+                           [matAutocomplete]="auto"
+                           [matChipInputFor]="chipList"
+                           matInput>
+                  </mat-chip-grid>
+                  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedGroup($event)">
+                    @for (group of sortGroups(filteredGroupSignal()); track group.id) {
+                      <mat-option [value]="group">{{ group.name }}</mat-option>
+                    }
+                  </mat-autocomplete>
+                </mat-form-field>
+
+                <button mat-stroked-button
+                        type="button"
+                        [routerLink]="['/', language, 'treatments', 'add']"
+                        class="app-detail-action-button">
+                  <mat-icon>add</mat-icon>
+                  <span>{{ 'COMMON.TREATMENT.GROUP.ADD_BUTTON' | translate }}</span>
+                </button>
+              }
+            </div>
+          } @else {
+            <div class="ssc-line app-crud-skeleton-field app-crud-form-grid__full"></div>
+          }
+        </div>
+
+        <div class="app-detail-actions">
+          <button appBackButton mat-stroked-button type="button">
+            <mat-icon>keyboard_return</mat-icon>
+            <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+          </button>
+
+          <button [disabled]="form.invalid" mat-stroked-button type="submit">
+            <mat-icon>{{ isAddMode ? 'add' : 'published_with_changes' }}</mat-icon>
+            <span>{{ (isAddMode ? 'COMMON.BUTTON.CREATE' : 'COMMON.BUTTON.UPDATE') | translate }}</span>
+          </button>
+        </div>
+      } @else {
+        <div class="app-crud-loading">
+          <div class="ssc-hr"></div>
+          <div class="ssc-square app-crud-loading__block"></div>
+          <div class="ssc-hr"></div>
+        </div>
+      }
+    </form>
+  </section>
 </div>

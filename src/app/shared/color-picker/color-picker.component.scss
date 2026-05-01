@@ -32,3 +32,7 @@
   margin-top: -6px;
   margin-bottom: 16px;
 }
+
+.color-preview-card mat-card-subtitle {
+  color: var(--color-preview-title-color) !important;
+}

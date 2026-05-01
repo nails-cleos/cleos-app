@@ -214,6 +214,35 @@ describe('NavComponent', () => {
     expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'home']);
   });
 
+  it('should toggle and close menus', () => {
+    component.toggleMenu('settings');
+    expect(component.activeMenu()).toBe('settings');
+
+    component.toggleMenu('settings');
+    expect(component.activeMenu()).toBeNull();
+
+    component.toggleMenu('notifications');
+    component.closeActiveMenu();
+    expect(component.activeMenu()).toBeNull();
+  });
+
+  it('should close the active menu on outside click and escape', () => {
+    component.activeMenu.set('settings');
+    component.onDocumentClick({ target: document.createElement('div') } as unknown as MouseEvent);
+    expect(component.activeMenu()).toBeNull();
+
+    component.activeMenu.set('settings');
+    component.onEscape();
+    expect(component.activeMenu()).toBeNull();
+  });
+
+  it('should keep the active menu on inside click', () => {
+    component.activeMenu.set('settings');
+    component.onDocumentClick({ target: fixture.nativeElement } as unknown as MouseEvent);
+
+    expect(component.activeMenu()).toBe('settings');
+  });
+
   it('should navigate to the notification navigation when it is read', () => {
     component.notification(mockNotification);
 

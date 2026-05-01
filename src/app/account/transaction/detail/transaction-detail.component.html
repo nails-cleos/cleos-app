@@ -1,137 +1,93 @@
-<div class="flex-container">
-  <div class="card-container">
-    <div class="card-content">
-      @let transaction = transactionSignal();
-      <mat-card appearance="outlined">
-        @if (transaction) {
-          <mat-card-header>
-            <mat-card-title>{{ 'ACCOUNT.TRANSACTION.DETAIL' | translate }}</mat-card-title>
-            <div class="spacer"></div>
-            <button mat-icon-button class="header-icon" color="primary"
-                    [routerLink]="['/', language, 'accounts', transaction.account?.id, 'transactions', 'view']">
-              <mat-icon>account_balance</mat-icon>
-            </button>
-          </mat-card-header>
-          <mat-divider></mat-divider>
-          <mat-card-content class="mat-card-table">
-            <div class="container">
-              <table>
-                <tbody>
-                <tr>
-                  <td class="right">{{ 'ACCOUNT.TRANSACTION.ID' | translate }}</td>
-                  <td class="left">{{ transaction.id }}
-                  </td>
-                </tr>
-                <tr>
-                  <td class="right">{{ 'ACCOUNT.TRANSACTION.DATE' | translate }}</td>
-                  <td class="left">{{ transaction.date | date:'short':undefined:dateFormat }}
-                  </td>
-                </tr>
-                <tr>
-                  <td class="right">{{ 'ACCOUNT.TRANSACTION.AMOUNT.FIELD' | translate }}</td>
-                  <td class="left">{{ transaction.amount | number:'1.2-2' }}</td>
-                </tr>
-                <tr>
-                  <td class="right">{{ 'ACCOUNT.TRANSACTION.AMOUNT_GIFTED' | translate }}</td>
-                  <td class="left">{{ transaction.amountGifted | number:'1.2-2' }}</td>
-                </tr>
-                <tr>
-                  @if (transaction) {
-                    <td>
-                      <mat-divider></mat-divider>
-                    </td>
-                    <td>
-                      <mat-divider></mat-divider>
-                    </td>
-                  } @else {
-                    <td>
-                    </td>
-                    <td>
-                    </td>
-                  }
-                </tr>
-                <tr>
-                  <td class="right">{{ 'ACCOUNT.TRANSACTION.PAYMENT_ID' | translate }}</td>
-                  <td class="left">{{ transaction.payment?.paymentId }}</td>
-                </tr>
-                  @if (transaction.payment?.preferenceId) {
-                    <tr>
-                      <td class="right">{{ 'ACCOUNT.TRANSACTION.PREFERENCE_ID' | translate }}</td>
-                      <td class="left">{{ transaction.payment?.preferenceId }}
-                      </td>
-                    </tr>
-                  }
-                <tr>
-                  <td class="right">{{ 'ACCOUNT.TRANSACTION.STATUS' | translate }}</td>
-                  <td class="left">{{ 'COMMON.STATUS.PAYMENT.' + (transaction.payment?.status || 'NONE') | translate }}
-                  </td>
-                </tr>
-                <tr>
-                  <td class="right">{{ 'ACCOUNT.TRANSACTION.TYPE.FIELD' | translate }}</td>
-                  <td class="left">{{ 'COMMON.PAYMENT.TYPE.' + (transaction.payment?.type || 'NONE') | translate }}</td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-          </mat-card-content>
-          <mat-divider></mat-divider>
-          <mat-card-actions>
-            <div class="spacer"></div>
-            <button appBackButton [date]="transaction.date" [step]="step" color="accent" mat-fab
-                    class="icon-button hide-gt-xs">
-              <mat-icon matIconPrefix>arrow_back</mat-icon>
-            </button>
-            <button appBackButton [date]="transaction.date" [step]="step" color="accent" mat-fab
-                    extended class="icon-button hide-xs">
-              {{ 'COMMON.BUTTON.BACK' | translate }}
-              <mat-icon matIconPrefix>arrow_back</mat-icon>
-            </button>
-            @if (transaction.payment) {
-              @switch (transaction.payment.status) {
-                @case ('CREATED') {
-                  @if (transaction.payment.type) {
-                    <button class="hide-gt-xs icon-button" (click)="pay()" mat-fab color="primary">
-                      <mat-icon [svgIcon]="transaction.payment.type" class="svg-icon"></mat-icon>
-                    </button>
-                    <button (click)="pay()" mat-fab extended color="primary" class="icon-button hide-xs">
-                      <mat-icon matIconPrefix>payment</mat-icon>
-                      {{ 'COMMON.BUTTON.PAYMENT' | translate }}
-                    </button>
-                  }
-                }
-                @case ('PENDING') {
-                  <button class="hide-gt-xs icon-button" (click)="notify()" mat-fab>
-                    <mat-icon color="primary">published_with_changes</mat-icon>
-                  </button>
+@let transaction = transactionSignal();
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <section class="app-surface-section">
+    @if (transaction) {
+      <div class="app-detail-section-header">
+        <div>
+          <span class="app-surface-eyebrow">{{ 'ACCOUNT.TRANSACTION.DETAIL' | translate }}</span>
+          <h2 class="transaction-detail-title">{{ transaction.id }}</h2>
+        </div>
 
-                  <button (click)="notify()" color="primary" mat-fab extended class="icon-button hide-xs">
-                    <mat-icon matIconPrefix>published_with_changes</mat-icon>
-                    {{ 'COMMON.BUTTON.NOTIFY' | translate }}
-                  </button>
-                }
+        <div class="app-detail-actions">
+          <button mat-stroked-button type="button"
+                  [routerLink]="['/', language, 'accounts', transaction.account?.id, 'transactions', 'view']">
+            <mat-icon>account_balance</mat-icon>
+            <span>{{ 'COMMON.BUTTON.VIEW' | translate }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="transaction-detail-grid">
+        <div class="app-surface-item">
+          <span class="app-surface-item__label">{{ 'ACCOUNT.TRANSACTION.DATE' | translate }}</span>
+          <strong class="app-surface-item__value">{{ transaction.date | date:'short':undefined:dateFormat }}</strong>
+        </div>
+        <div class="app-surface-item">
+          <span class="app-surface-item__label">{{ 'ACCOUNT.TRANSACTION.AMOUNT.FIELD' | translate }}</span>
+          <strong class="app-surface-item__value">{{ transaction.amount | number:'1.2-2' }}</strong>
+        </div>
+        <div class="app-surface-item">
+          <span class="app-surface-item__label">{{ 'ACCOUNT.TRANSACTION.AMOUNT_GIFTED' | translate }}</span>
+          <strong class="app-surface-item__value">{{ transaction.amountGifted | number:'1.2-2' }}</strong>
+        </div>
+        <div class="app-surface-item">
+          <span class="app-surface-item__label">{{ 'ACCOUNT.TRANSACTION.PAYMENT_ID' | translate }}</span>
+          <strong class="app-surface-item__value">{{ transaction.payment?.paymentId }}</strong>
+        </div>
+        @if (transaction.payment?.preferenceId) {
+          <div class="app-surface-item">
+            <span class="app-surface-item__label">{{ 'ACCOUNT.TRANSACTION.PREFERENCE_ID' | translate }}</span>
+            <strong class="app-surface-item__value">{{ transaction.payment?.preferenceId }}</strong>
+          </div>
+        }
+        <div class="app-surface-item">
+          <span class="app-surface-item__label">{{ 'ACCOUNT.TRANSACTION.STATUS' | translate }}</span>
+          <strong
+            class="app-surface-item__value">{{ 'COMMON.STATUS.PAYMENT.' + (transaction.payment?.status || 'NONE') | translate }}</strong>
+        </div>
+        <div class="app-surface-item">
+          <span class="app-surface-item__label">{{ 'ACCOUNT.TRANSACTION.TYPE.FIELD' | translate }}</span>
+          <strong
+            class="app-surface-item__value">{{ 'COMMON.PAYMENT.TYPE.' + (transaction.payment?.type || 'NONE') | translate }}</strong>
+        </div>
+      </div>
+    } @else {
+      <div class="ssc-head-line transaction-detail-skeleton-title"></div>
+      <div class="transaction-detail-grid">
+        <div class="ssc-square app-detail-skeleton-card"></div>
+        <div class="ssc-square app-detail-skeleton-card"></div>
+        <div class="ssc-square app-detail-skeleton-card"></div>
+        <div class="ssc-square app-detail-skeleton-card"></div>
+      </div>
+    }
+
+    @if (transaction) {
+      <div class="app-detail-actions">
+        <button appBackButton [date]="transaction.date" [step]="step" mat-stroked-button type="button">
+          <mat-icon>keyboard_return</mat-icon>
+          <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+        </button>
+        @if (transaction.payment) {
+          @switch (transaction.payment.status) {
+            @case ('CREATED') {
+              @if (transaction.payment.type) {
+                <button (click)="pay()" mat-stroked-button type="button">
+                  <mat-icon>payment</mat-icon>
+                  <span>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</span>
+                </button>
               }
             }
-          </mat-card-actions>
-        } @else {
-          <mat-card-header>
-            <div class="ssc-head-line"></div>
-          </mat-card-header>
-          <mat-divider></mat-divider>
-          <mat-card-content>
-            <div class="ssc-line margin-bottom-eight"></div>
-            <div class="ssc-line margin-bottom-eight"></div>
-            <div class="ssc-line margin-bottom-eight"></div>
-            <mat-divider></mat-divider>
-            <div class="ssc-line margin-bottom-eight"></div>
-            <div class="ssc-line margin-bottom-eight"></div>
-            <div class="ssc-line margin-bottom-eight"></div>
-          </mat-card-content>
-          <mat-divider></mat-divider>
-          <mat-card-actions>
-            <div class="ssc-head-line"></div>
-          </mat-card-actions>
+            @case ('PENDING') {
+              <button (click)="notify()" mat-stroked-button type="button">
+                <mat-icon>published_with_changes</mat-icon>
+                <span>{{ 'COMMON.BUTTON.NOTIFY' | translate }}</span>
+              </button>
+            }
+          }
         }
-      </mat-card>
-    </div>
-  </div>
+      </div>
+    } @else {
+      <div class="ssc-head-line transaction-detail-skeleton-footer"></div>
+    }
+  </section>
 </div>

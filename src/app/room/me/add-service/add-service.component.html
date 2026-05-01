@@ -1,87 +1,131 @@
-<div class="flex-container">
-  <div class="card-container">
-    <div class="card-content">
-      <mat-card appearance="outlined">
-        <mat-card-content>
-          <h2>{{ 'ROOM.ME.SERVICES.ADDITIONAL.TITLE' | translate }}</h2>
-          @if ((selectedAdditional().length && !additional().length) || (!selectedAdditional().length && additional().length) || (selectedAdditional().length && additional().length)) {
-            <div class="inner-row-container">
-              <div class="drag-container">
-                <div class="section-heading">{{ 'ROOM.ME.SERVICES.ALL' | translate }}</div>
-                <div #additionalList="cdkDropList" (cdkDropListDropped)="dropAdditional($event, false)"
-                     [cdkDropListConnectedTo]="[selectedAdditionalList]" [cdkDropListData]="additional()" cdkDropList
-                     class="item-list">
-                  @for (item of additional(); track item.id) {
-                    <div cdkDrag class="item-box">{{ item.name }}</div>
-                  }
-                </div>
-              </div>
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <section class="app-surface-section">
+    <div class="app-detail-section-header">
+      <div>
+        <span class="app-surface-eyebrow">{{ 'ROOM.ME.SERVICES.ADDITIONAL.TITLE' | translate }}</span>
+      </div>
+    </div>
 
-              <div class="drag-container">
-                <div class="section-heading">{{ 'ROOM.ME.SERVICES.SELECTED' | translate }}</div>
-                <div #selectedAdditionalList="cdkDropList" (cdkDropListDropped)="dropAdditional($event,true)"
-                     [cdkDropListConnectedTo]="[additionalList]" [cdkDropListData]="selectedAdditional()"
-                     cdkDropList class="item-list">
-                  @for (item of selectedAdditional(); track item.id) {
-                    <div (click)="changePrice(item)" cdkDrag class="item-box">
-                      <div>
-                        <div>{{ item.name }}</div>
-                        <div>{{ item.currency | currencySymbol }} {{ item.price }}</div>
-                      </div>
-                    </div>
-                  }
-                </div>
+    @if ((selectedAdditional().length && !additional().length) || (!selectedAdditional().length && additional().length) || (selectedAdditional().length && additional().length)) {
+      <div class="app-crud-form-grid">
+        <div class="app-surface-item service-column">
+          <div class="service-column__header">
+            <span class="app-surface-item__label">{{ 'ROOM.ME.SERVICES.ALL' | translate }}</span>
+          </div>
+
+          <div #additionalList="cdkDropList"
+               (cdkDropListDropped)="dropAdditional($event, false)"
+               [cdkDropListConnectedTo]="[selectedAdditionalList]"
+               [cdkDropListData]="additional()"
+               cdkDropList
+               class="service-list">
+            @for (item of additional(); track item.id) {
+              <div cdkDrag class="service-item">
+                <span class="service-item__name">{{ item.name }}</span>
               </div>
-            </div>
-          } @else {
-            <div class="ssc-square mb"></div>
-          }
-          <h2>{{ 'ROOM.ME.SERVICES.TREATMENT.TITLE' | translate }}</h2>
-          @if (groups(); as groups) {
-            @for (group of groups | keyvalue; track group) {
-              <div class="inner-row-container">
-                <div class="drag-container">
-                  <div class="section-heading">{{ group.value.name }}</div>
-                  <div #treatmentList="cdkDropList" (cdkDropListDropped)="dropTreatment($event, false)"
-                       [cdkDropListConnectedTo]="[selectedTreatmentList]" [cdkDropListData]="group.value.treatments"
-                       cdkDropList class="item-list">
-                    @for (item of group.value.treatments; track item.id) {
-                      <div cdkDrag class="item-box">{{ item.name }}</div>
-                    }
-                  </div>
-                </div>
-                <div class="drag-container">
-                  <div class="section-heading">{{ group.value.name }}</div>
-                  <div #selectedTreatmentList="cdkDropList" (cdkDropListDropped)="dropTreatment($event,true)"
-                       [cdkDropListConnectedTo]="[treatmentList]" [cdkDropListData]="group.value.selectedTreatments"
-                       cdkDropList class="item-list">
-                    @for (item of group.value.selectedTreatments; track item.id) {
-                      <div (click)="changePrice(item)" cdkDrag class="item-box">
-                        <div>
-                          <div>{{ item.name }}</div>
-                          <div>{{ item.currency | currencySymbol }} {{ item.price }}</div>
-                        </div>
-                      </div>
-                    }
-                  </div>
+            }
+          </div>
+        </div>
+
+        <div class="app-surface-item service-column">
+          <div class="service-column__header">
+            <span class="app-surface-item__label">{{ 'ROOM.ME.SERVICES.SELECTED' | translate }}</span>
+          </div>
+
+          <div #selectedAdditionalList="cdkDropList"
+               (cdkDropListDropped)="dropAdditional($event,true)"
+               [cdkDropListConnectedTo]="[additionalList]"
+               [cdkDropListData]="selectedAdditional()"
+               cdkDropList
+               class="service-list">
+            @for (item of selectedAdditional(); track item.id) {
+              <div (click)="changePrice(item)" cdkDrag class="service-item service-item--priced">
+                <div>
+                  <div class="service-item__name">{{ item.name }}</div>
+                  <div class="service-item__meta">{{ item.currency | currencySymbol }} {{ item.price }}</div>
                 </div>
               </div>
             }
-          } @else {
-            <div class="ssc-square mb"></div>
-          }
-        </mat-card-content>
-        <mat-card-actions class="card-actions">
-          <div class="spacer"></div>
-          <button appBackButton class="margin-right-eight icon-button" color="accent" mat-fab extended type="button">
-            {{ 'COMMON.BUTTON.BACK' | translate }}
-          </button>
-          <button (click)="save()" class="margin-right-eight icon-button" color="primary" mat-fab extended>
-            {{ 'COMMON.BUTTON.UPDATE' | translate }}
-          </button>
-        </mat-card-actions>
-      </mat-card>
-    </div>
-  </div>
-</div>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="ssc-square add-service-skeleton"></div>
+    }
+  </section>
 
+  <section class="app-surface-section">
+    <div class="app-detail-section-header">
+      <div>
+        <span class="app-surface-eyebrow">{{ 'ROOM.ME.SERVICES.TREATMENT.TITLE' | translate }}</span>
+      </div>
+    </div>
+
+    @if (groups(); as groups) {
+      <div class="app-crud-view-grid">
+        @for (group of groups | keyvalue; track group) {
+          <div class="app-crud-form-grid">
+            <div class="app-surface-item service-column">
+              <div class="service-column__header">
+                <span class="app-surface-item__label">{{ 'ROOM.ME.SERVICES.ALL' | translate }}</span>
+                <strong class="service-column__title">{{ group.value.name }}</strong>
+              </div>
+
+              <div #treatmentList="cdkDropList"
+                   (cdkDropListDropped)="dropTreatment($event, false)"
+                   [cdkDropListConnectedTo]="[selectedTreatmentList]"
+                   [cdkDropListData]="group.value.treatments"
+                   cdkDropList
+                   class="service-list">
+                @for (item of group.value.treatments; track item.id) {
+                  <div cdkDrag class="service-item">
+                    <span class="service-item__name">{{ item.name }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="app-surface-item service-column">
+              <div class="service-column__header">
+                <span class="app-surface-item__label">{{ 'ROOM.ME.SERVICES.SELECTED' | translate }}</span>
+                <strong class="service-column__title">{{ group.value.name }}</strong>
+              </div>
+
+              <div #selectedTreatmentList="cdkDropList"
+                   (cdkDropListDropped)="dropTreatment($event,true)"
+                   [cdkDropListConnectedTo]="[treatmentList]"
+                   [cdkDropListData]="group.value.selectedTreatments"
+                   cdkDropList
+                   class="service-list">
+                @for (item of group.value.selectedTreatments; track item.id) {
+                  <div (click)="changePrice(item)" cdkDrag class="service-item service-item--priced">
+                    <div>
+                      <div class="service-item__name">{{ item.name }}</div>
+                      <div class="service-item__meta">{{ item.currency | currencySymbol }} {{ item.price }}</div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="ssc-square add-service-skeleton"></div>
+    }
+  </section>
+
+  <section class="app-surface-section">
+    <div class="app-detail-actions">
+      <button appBackButton mat-stroked-button type="button">
+        <mat-icon>keyboard_return</mat-icon>
+        <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+      </button>
+
+      <button (click)="save()" mat-stroked-button type="button">
+        <mat-icon>published_with_changes</mat-icon>
+        <span>{{ 'COMMON.BUTTON.UPDATE' | translate }}</span>
+      </button>
+    </div>
+  </section>
+</div>

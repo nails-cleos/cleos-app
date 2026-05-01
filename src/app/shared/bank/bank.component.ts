@@ -3,9 +3,10 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { IPaymentOption, PaymentPercentage } from '../../interfaces/payment';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslateModule } from '@ngx-translate/core';
+import { PaymentOptionSelectComponent } from '../payment-option-select/payment-option-select.component';
 
 export type BankForm = {
-  type: FormControl<IPaymentOption | undefined>;
+  option: FormControl<IPaymentOption | undefined>;
   percentage: FormControl<PaymentPercentage | undefined>;
 };
 
@@ -13,7 +14,7 @@ export type BankForm = {
   selector: 'app-bank',
   templateUrl: './bank.component.html',
   styleUrls: ['./bank.component.scss'],
-  imports: [AppMaterialModule, TranslateModule, ReactiveFormsModule, FormsModule],
+  imports: [AppMaterialModule, TranslateModule, ReactiveFormsModule, FormsModule, PaymentOptionSelectComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BankComponent {
@@ -24,10 +25,10 @@ export class BankComponent {
   showPaymentMessage = input<boolean>(true);
   percentageEmitter = output<number>();
 
-  private selectedType = signal<IPaymentOption | undefined>(undefined);
+  private selectedOption = signal<IPaymentOption | undefined>(undefined);
   private selectedPercentage = signal<PaymentPercentage | undefined>(undefined);
 
-  type = computed(() => this.selectedType() ?? this.form().controls.type.value);
+  option = computed(() => this.selectedOption() ?? this.form().controls.option.value);
 
   constructor() {
     // Subscribe to form valueChanges once form is available
@@ -38,9 +39,9 @@ export class BankComponent {
       }
 
       // Subscribe to type changes
-      this.selectedType.set(form.controls.type.value);
-      form.controls.type.valueChanges.subscribe(value => {
-        this.selectedType.set(value);
+      this.selectedOption.set(form.controls.option.value);
+      form.controls.option.valueChanges.subscribe(value => {
+        this.selectedOption.set(value);
       });
 
       // Subscribe to percentage changes
@@ -59,14 +60,14 @@ export class BankComponent {
       const firstTime = this.firstTime();
       this.getForm.percentage.setValue(PaymentPercentage.total);
       if (firstTime) {
-        this.getForm.type.setValidators([Validators.required]);
-        this.getForm.type.updateValueAndValidity();
+        this.getForm.option.setValidators([Validators.required]);
+        this.getForm.option.updateValueAndValidity();
         this.getForm.percentage.setValidators([Validators.required]);
         this.getForm.percentage.updateValueAndValidity();
 
         const options = this.options();
         if (options?.length === 1) {
-          this.getForm.type.setValue(options[0]);
+          this.getForm.option.setValue(options[0]);
         }
       }
     });
@@ -77,7 +78,7 @@ export class BankComponent {
         return;
       }
 
-      const type = this.selectedType();
+      const type = this.selectedOption();
       if (type) {
         if (type.hidePercentage) {
           this.getForm.percentage.setValidators([]);

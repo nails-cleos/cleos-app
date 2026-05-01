@@ -1,0 +1,66 @@
+@if (variant() === 'list-item') {
+  <mat-list-item role="list">
+    @let currentOption = getSelectedOption();
+    <div class="list-item-content">
+      @if (currentOption) {
+        @if (currentOption.icon) {
+          <mat-icon>{{ currentOption.icon }}</mat-icon>
+        } @else {
+          <mat-icon [svgIcon]="currentOption.type" class="svg-icon"></mat-icon>
+        }
+      } @else {
+        <mat-icon>{{ defaultIcon() }}</mat-icon>
+      }
+      <div class="list-item-label">
+        @if (currentOption?.label || currentOption?.name) {
+          {{ currentOption?.label || currentOption?.name }}
+        } @else {
+          {{ 'COMMON.PAYMENT.TYPE.' + (getSelectedType() || 'NONE') | translate }}
+        }
+      </div>
+    </div>
+  </mat-list-item>
+} @else {
+  <mat-form-field appearance="outline" class="full-field">
+    @let currentOption = getSelectedOption();
+    <mat-label>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</mat-label>
+    <mat-select [formControl]="control()" [required]="required()">
+      <mat-select-trigger>
+        <span class="select-trigger">
+          @if (currentOption) {
+            @if (currentOption.icon) {
+              <mat-icon>{{ currentOption.icon }}</mat-icon>
+            } @else {
+              <mat-icon [svgIcon]="currentOption.type" class="svg-icon"></mat-icon>
+            }
+          } @else {
+            <mat-icon>{{ defaultIcon() }}</mat-icon>
+          }
+          <span class="select-trigger__label">
+            @if (getSelectedLabel()) {
+              {{ getSelectedLabel() }}
+            } @else {
+              {{ 'COMMON.PAYMENT.TYPE.' + (getSelectedType() || 'NONE') | translate }}
+            }
+          </span>
+        </span>
+      </mat-select-trigger>
+      @if (!required()) {
+        <mat-option [value]="null">-</mat-option>
+      }
+      @for (option of filteredOptions(); track option) {
+        <mat-option [value]="valueMode() === 'type' ? option.type : option">
+          @if (option.icon) {
+            <mat-icon>{{ option.icon }}</mat-icon>
+          } @else {
+            <mat-icon [svgIcon]="option.type" class="svg-icon"></mat-icon>
+          }
+          {{ option.label || option.name || ('COMMON.PAYMENT.TYPE.' + option.type | translate) }}
+        </mat-option>
+      }
+    </mat-select>
+    @if (control().hasError('required')) {
+      <mat-error [innerHTML]="'COMMON.PAYMENT.TYPE.FIELD.REQUIRED' | translate"></mat-error>
+    }
+  </mat-form-field>
+}

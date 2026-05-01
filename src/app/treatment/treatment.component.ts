@@ -10,12 +10,18 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { createTreatment, getTreatmentGroup, updateTreatmentGroup } from '../store/treatment.actions';
+import {
+  createTreatment,
+  getAllTreatmentsHistory,
+  getTreatmentGroup,
+  treatmentSelected,
+  updateTreatmentGroup,
+} from '../store/treatment.actions';
 import { Store } from '@ngrx/store';
 import { combineLatestWith } from 'rxjs';
 import { ITreatment, ITreatmentGroup, Treatment, TreatmentGroup } from '../interfaces/treatment';
 import { createNewDate, formatDuration, getNowTimeZone, getTime, getTimeNumber } from '../util/dates';
-import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { IColorAll } from '../interfaces/color';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { map, startWith } from 'rxjs/operators';
@@ -29,10 +35,15 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import {
   getColorsPipe,
   getCurrentTreatmentIdPipe,
+  getHistoriesPipe,
   getSelectedTreatmentPipe,
   getSubErrorsPipe,
 } from '../store/selectors/treatment.selectors';
 import { IError, isString } from '../interfaces/common';
+import { DurationTimePipe } from '../pipes/durationTime.pipe';
+import { TreatmentTableComponent } from './table/treatment-table.component';
+
+type TreatmentMode = 'add' | 'edit' | 'view';
 
 type TreatmentForm = {
   name: FormControl<string>;
@@ -45,28 +56,60 @@ type TreatmentForm = {
   selector: 'app-treatment',
   templateUrl: './treatment.component.html',
   styleUrls: ['./treatment.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [SharedModule, BackButtonDirective, DurationTimePipe, TreatmentTableComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreatmentComponent {
   private readonly store: Store<TreatmentState> = inject(Store<TreatmentState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly router: Router = inject(Router);
+  private readonly route: ActivatedRoute = inject(ActivatedRoute);
   private readonly translate: TranslateService = inject(TranslateService);
 
   private treatmentId$ = this.store.pipe(getCurrentTreatmentIdPipe);
   private selectedTreatment$ = this.store.pipe(getSelectedTreatmentPipe);
   private allColors$ = this.store.pipe(getColorsPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
+  private histories$ = this.store.pipe(getHistoriesPipe);
 
   private treatmentIdSignal = toSignal(this.treatmentId$);
   private selectedTreatmentSignal = toSignal(this.selectedTreatment$);
   private allColorsSignal = toSignal(this.allColors$);
   private subErrorsSignal = toSignal(this.subErrors$);
+  private historiesSignal = toSignal(this.histories$);
+  private routeModeSignal = toSignal(
+    this.route.url.pipe(map(segments => segments.at(-1)?.path ?? 'add')),
+    { initialValue: this.route.snapshot.url.at(-1)?.path ?? 'add' },
+  );
 
   private treatmentId = computed(() => this.treatmentIdSignal());
+  private selectedHistoryTreatmentId = signal<string | undefined>(undefined);
 
+  mode = computed<TreatmentMode>(() => {
+    if (this.routeModeSignal() === 'view') {
+      return 'view';
+    }
+    return this.treatmentId() ? 'edit' : 'add';
+  });
   treatmentSignal = computed(() => this.selectedTreatmentSignal());
+  viewTreatmentSignal = computed(() => {
+    const group = this.selectedTreatmentSignal();
+    const histories = this.historiesSignal();
+    const selectedHistoryTreatmentId = this.selectedHistoryTreatmentId();
+
+    if (!group) {
+      return group;
+    }
+
+    return {
+      ...group,
+      treatments: group.treatments?.map(treatment => {
+        if (treatment.id === selectedHistoryTreatmentId) {
+          return { ...treatment, showHistory: true, history: histories };
+        }
+        return treatment;
+      }),
+    };
+  });
 
   form: FormGroup<TreatmentForm> = this.formBuilder.group<TreatmentForm>({
     name: this.formBuilder.control('', {
@@ -91,12 +134,13 @@ export class TreatmentComponent {
       }),
     ),
   );
-  isAddModeSignal = computed(() => !this.treatmentId());
+  isAddModeSignal = computed(() => this.mode() === 'add');
+  isViewModeSignal = computed(() => this.mode() === 'view');
   colorsSignal = signal<IColorAll[]>([]);
   allColorsWritableSignal = signal<IColorAll[] | undefined>(undefined);
   errors = signal<Record<string, unknown>>({});
 
-  colorInput = viewChild.required<ElementRef<HTMLInputElement>>('colorInput');
+  colorInput = viewChild<ElementRef<HTMLInputElement>>('colorInput');
   nameInput = viewChild<ElementRef<HTMLInputElement>>('nameInput');
 
   selected = new FormControl(0);
@@ -125,8 +169,9 @@ export class TreatmentComponent {
 
     effect(() => {
       const id = this.treatmentId();
+      const mode = this.mode();
       if (id) {
-        this.store.dispatch(getTreatmentGroup({ id, path: 'edit' }));
+        this.store.dispatch(getTreatmentGroup({ id, path: mode }));
       }
     });
 
@@ -262,8 +307,25 @@ export class TreatmentComponent {
     const color = event.option.value;
     this.colorsSignal.update(current => [...current, color]);
     this.allColorsWritableSignal.update(current => current?.filter(c => c.id !== color.id));
-    this.colorInput().nativeElement.value = '';
+    const input = this.colorInput();
+    if (input) {
+      input.nativeElement.value = '';
+    }
     this.getForm.color.setValue(undefined);
+  };
+
+  edit = (): void => {
+    this.store.dispatch(treatmentSelected({ selected: this.selectedTreatmentSignal(), path: 'edit' }));
+  };
+
+  getHistory = (treatmentId?: string): void => {
+    const id = this.selectedTreatmentSignal()?.id;
+    if (!id || !treatmentId) {
+      return;
+    }
+
+    this.selectedHistoryTreatmentId.set(treatmentId);
+    this.store.dispatch(getAllTreatmentsHistory({ id, treatmentId }));
   };
 
   sortColors = (data?: IColorAll[]): IColorAll[] | undefined => data?.sort((a: any, b: any) => {

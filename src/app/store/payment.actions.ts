@@ -1,6 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 import { IError, IResponseSuccess } from '../interfaces/common';
-import { IPayment, IPaymentRequest, PaymentStatus, PaymentType } from '../interfaces/payment';
+import { IPayment, IPaymentOption, IPaymentRequest, PaymentStatus } from '../interfaces/payment';
 import { IReservationPayment } from '../interfaces/reservation';
 
 enum PaymentActionTypes {
@@ -20,6 +20,8 @@ enum PaymentActionTypes {
   setPaymentResultParams = '[Payment] Set payment result params',
   setCurrentPaymentId = '[Payment] Set current payment id',
   setCurrentPathId = '[Payment] Set current path id',
+  options = '[Payment] Get options',
+  optionsSuccess = '[Payment] Options success',
   clean = '[Payment] Clean',
 }
 
@@ -107,7 +109,7 @@ export const setPaymentResultParams = createAction(
     reason?: string;
     orderId?: string;
     orderStatusId?: string;
-    paymentType?: PaymentType;
+    paymentType?: string;
     accountId?: string;
   }>(),
 );
@@ -120,6 +122,13 @@ export const setCurrentPaymentId = createAction(
 export const setCurrentPathId = createAction(
   PaymentActionTypes.setCurrentPathId,
   props<{ path: 'reservation' | 'transaction'; id: string; accountId?: string; }>(),
+);
+
+export const getOptions = createAction(PaymentActionTypes.options);
+
+export const getOptionsSuccess = createAction(
+  PaymentActionTypes.optionsSuccess,
+  props<{ options: IPaymentOption[] }>(),
 );
 
 export const cleanPayment = createAction(PaymentActionTypes.clean);

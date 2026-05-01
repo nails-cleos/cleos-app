@@ -1,6 +1,6 @@
 @let currentUpcoming = upcomingComputed();
 @if (currentUpcoming) {
-  <mat-card appearance="outlined">
+  <section class="app-surface-section upcoming-section">
     @if (currentUpcoming.price.isPaid) {
       <span class="stamp stamp-paid stamp-enter">
         {{ 'ME.RESERVATION.UPCOMING.PAID' | translate }}
@@ -11,214 +11,153 @@
         {{ 'ME.RESERVATION.UPCOMING.APPROVED' | translate }}
       </span>
     }
+
     @if (currentUpcoming.id) {
-      <mat-card-header>
-        <mat-card-subtitle>{{ currentUpcoming.id }}</mat-card-subtitle>
-      </mat-card-header>
-      <mat-divider></mat-divider>
-    } @else {
-      <div class="divider-padding-bottom">
-        <div class="ssc-head-line"></div>
+      <div class="app-detail-section-header">
+        <div>
+          <span class="app-surface-eyebrow">{{ currentUpcoming.id }}</span>
+        </div>
       </div>
+    } @else {
+      <div class="ssc-head-line"></div>
     }
-    <mat-card-content>
-      <div class="container">
-        <table>
-          <tbody>
-            @if (currentUpcoming.id) {
-              <tr>
-                <td class="right">{{ 'ME.RESERVATION.UPCOMING.START' | translate }}</td>
-                <td class="left">{{ currentUpcoming.start | date:'short':currentUpcoming.room.timeZone:dateFormat }}
-                  @if (showTimeZone()) {
-                    <button (click)="openDialog(currentUpcoming.start)" mat-icon-button type="button">
-                      <mat-icon>info_outline</mat-icon>
-                    </button>
-                  }
-                </td>
-              </tr>
-              @if (currentUpcoming.end) {
-                <tr>
-                  <td class="right">{{ 'ME.RESERVATION.UPCOMING.END' | translate }}</td>
-                  <td class="left">{{ currentUpcoming.end | date:'short':currentUpcoming.room.timeZone:dateFormat }}
-                    @if (showTimeZone()) {
-                      <button (click)="openDialog(currentUpcoming.end)" mat-icon-button type="button">
-                        <mat-icon>info_outline</mat-icon>
-                      </button>
-                    }
-                  </td>
-                </tr>
-              }
-              <tr>
-                <td class="right">{{ 'COMMON.ROOM.FIELD' | translate }}</td>
-                <td class="left">{{ currentUpcoming.room | roomName }}</td>
-              </tr>
-              <tr>
-                <td class="right">{{ 'COMMON.ADDRESS.FIELD' | translate }}</td>
-                <td class="left">
-                  <a
-                    [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + currentUpcoming.room.address.name"
-                    rel="noreferrer" target="_blank">
-                    {{ currentUpcoming.room.address.name }}
-                  </a>
-                </td>
-              </tr>
-              <tr>
-                <td class="right">{{ 'COMMON.TREATMENT.FIELD' | translate }}</td>
-                <td class="left">{{ currentUpcoming.treatment.name }}</td>
-              </tr>
-              @if (currentUpcoming.price) {
-                <tr>
-                  <td class="right">{{ 'ME.RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</td>
-                  <td
-                    class="left">{{ currentUpcoming.room.currency | currencySymbol }} {{ currentUpcoming.price.amount | number:'1.2-2' }}
-                  </td>
-                </tr>
-              }
-              @if (currentUpcoming.rowSpan) {
-                <tr>
-                  <td [rowSpan]="currentUpcoming.rowSpan" class="right">{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</td>
-                  <td class="left">
-                    @for (additional of currentUpcoming.additional; track additional) {
-                      <div>{{ additional.name }}
-                        - {{ currentUpcoming.room.currency | currencySymbol }} {{ additional.price | number:'1.2-2' }}
-                      </div>
-                    }
-                  </td>
-                </tr>
-              }
-            } @else {
-              <tr>
-                <div class="ssc-line"></div>
-              </tr>
-              <tr>
-                <div class="ssc-line"></div>
-              </tr>
-              <tr>
-                <div class="ssc-line"></div>
-              </tr>
-              <tr>
-                <div class="ssc-line"></div>
-              </tr>
-              <tr>
-                <div class="ssc-line"></div>
-              </tr>
-              <tr>
-                <div class="ssc-line"></div>
-              </tr>
-              <tr>
-                <div class="ssc-line"></div>
-              </tr>
-            }
-          </tbody>
-          @if (currentUpcoming.price) {
-            @let hasDiscount = currentUpcoming.price.total !== currentUpcoming.price.totalWithoutDiscount ||
-              currentUpcoming.price.discount > 0;
-            <tfoot class="foot">
-            <tr>
-              <th class="right">{{ 'COMMON.LABEL.TOTAL' | translate }}</th>
-              @if (hasDiscount) {
-                <td class="left">
-                <span [class.strikethrough]="hasDiscount">
-                  {{ currentUpcoming.room.currency | currencySymbol }} {{ currentUpcoming.price.totalWithoutDiscount | number:'1.2-2' }}
-                </span>
-                  <span class="raised-button bold discount-enter">
-                  {{ currentUpcoming.room.currency | currencySymbol }} {{ currentUpcoming.price.total | number:'1.2-2' }}
-                </span>
-                </td>
-              } @else {
-                <td
-                  class="left">{{ currentUpcoming.room.currency | currencySymbol }} {{ currentUpcoming.price.total | number:'1.2-2' }}
-                </td>
-              }
-            </tr>
-              @if (currentUpcoming.price && currentUpcoming.price.totalPaid) {
-                <tr>
-                  <th class="right">{{ 'ME.RESERVATION.UPCOMING.PAID' | translate }}</th>
-                  <td
-                    class="left minus">{{ currentUpcoming.room.currency | currencySymbol }}
-                    ({{ currentUpcoming.price.totalPaid | number:'1.2-2' }})
-                  </td>
-                </tr>
-                <tr>
-                  <th class="right">{{ 'ME.RESERVATION.UPCOMING.TO_PAY' | translate }}</th>
-                  <td
-                    class="left bold">{{ currentUpcoming.room.currency | currencySymbol }} {{ (currentUpcoming.price.total - currentUpcoming.price.totalPaid) | number:'1.2-2' }}
-                  </td>
-                </tr>
-              }
-            </tfoot>
-          } @else {
-            <div class="ssc-line"></div>
+
+    <div class="upcoming-grid">
+      @if (currentUpcoming.id) {
+        <div class="app-surface-item">
+          <span class="app-surface-item__label">{{ 'ME.RESERVATION.UPCOMING.START' | translate }}</span>
+          <strong class="app-surface-item__value">
+            {{ currentUpcoming.start | date:'short':currentUpcoming.room.timeZone:dateFormat }}
+          </strong>
+          @if (showTimeZone()) {
+            <button (click)="openDialog(currentUpcoming.start)" mat-icon-button type="button" class="upcoming-info-button">
+              <mat-icon>info_outline</mat-icon>
+            </button>
           }
-        </table>
-        @if (currentUpcoming.state === 'CREATED') {
-          <div class="red-text">{{ 'ME.RESERVATION.UPCOMING.CREATED' | translate }}
-            <span class="bold">
-          {{ currentUpcoming.professional.displayName }}
-        </span>
+        </div>
+
+        @if (currentUpcoming.end) {
+          <div class="app-surface-item">
+            <span class="app-surface-item__label">{{ 'ME.RESERVATION.UPCOMING.END' | translate }}</span>
+            <strong class="app-surface-item__value">
+              {{ currentUpcoming.end | date:'short':currentUpcoming.room.timeZone:dateFormat }}
+            </strong>
+            @if (showTimeZone()) {
+              <button (click)="openDialog(currentUpcoming.end)" mat-icon-button type="button" class="upcoming-info-button">
+                <mat-icon>info_outline</mat-icon>
+              </button>
+            }
           </div>
         }
-        <!--        @if (upcoming.state === 'APPROVED') {-->
-        <!--          <div class="red-text">-->
-        <!--            {{ 'ME.RESERVATION.UPCOMING.PAY_NOW' | translate }}-->
-        <!--          </div>-->
+
+        <div class="app-surface-item">
+          <span class="app-surface-item__label">{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</span>
+          <strong class="app-surface-item__value">{{ currentUpcoming.professional.displayName }}</strong>
+        </div>
+
+        <div class="app-surface-item">
+          <span class="app-surface-item__label">{{ 'COMMON.ADDRESS.FIELD' | translate }}</span>
+          <a class="app-detail-link app-surface-item__value"
+             [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + currentUpcoming.room.address.name"
+             rel="noreferrer"
+             target="_blank">
+            {{ currentUpcoming.room.address.name }}
+          </a>
+        </div>
+
+        @if (currentUpcoming.price) {
+          <div class="app-surface-item upcoming-breakdown-card">
+            <div class="upcoming-breakdown-card__header">
+              <mat-icon>{{ currentUpcoming.room.currency.icon }}</mat-icon>
+              <div>
+                <span class="app-surface-item__label">{{ 'ME.RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</span>
+                <p class="upcoming-breakdown-card__subtitle">{{ 'ME.RESERVATION.FLOW.SUMMARY.BREAKDOWN' | translate }}</p>
+              </div>
+            </div>
+
+            <div class="price-breakdown">
+              <div class="price-row">
+                <span>{{ currentUpcoming.treatment.name }}</span>
+                <strong>{{ currentUpcoming.room.currency | currencySymbol }} {{ currentUpcoming.price.amount | number:'1.2-2' }}</strong>
+              </div>
+
+              @for (additional of currentUpcoming.additional; track additional) {
+                <div class="price-row">
+                  <span>{{ additional.name }}</span>
+                  <strong>{{ currentUpcoming.room.currency | currencySymbol }} {{ additional.price | number:'1.2-2' }}</strong>
+                </div>
+              }
+
+              @if (currentUpcoming.price.discount > 0) {
+                <div class="price-row price-row--discount">
+                  <span>{{ 'ME.RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</span>
+                  <strong>- {{ currentUpcoming.room.currency | currencySymbol }} {{ currentUpcoming.price.discount | number:'1.2-2' }}</strong>
+                </div>
+              }
+
+              <div class="price-row price-row--total">
+                <span>{{ 'ME.RESERVATION.FLOW.SUMMARY.TOTAL' | translate }}</span>
+                <strong>{{ currentUpcoming.room.currency | currencySymbol }} {{ currentUpcoming.price.total | number:'1.2-2' }}</strong>
+              </div>
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="ssc-square app-detail-skeleton-card"></div>
+        <div class="ssc-square app-detail-skeleton-card"></div>
+        <div class="ssc-square app-detail-skeleton-card"></div>
+      }
+    </div>
+
+    @if (currentUpcoming.price) {
+      <div class="app-surface-item upcoming-total-card app-crud-form-grid__full">
+        <span class="app-surface-item__label">{{ 'ME.PAYMENT.DETAIL' | translate }}</span>
+        <app-payment-preview [price]="currentUpcoming.price"
+                             [currencyIcon]="currentUpcoming.room.currency.icon"
+                             [toPaid]="(currentUpcoming.price.total - currentUpcoming.price.totalPaid)"
+                             [paidTotal]="currentUpcoming.price.totalPaid">
+        </app-payment-preview>
       </div>
-    </mat-card-content>
-    <mat-divider></mat-divider>
+    } @else {
+      <div class="ssc-line"></div>
+    }
+
+    @if (currentUpcoming.state === 'CREATED') {
+      <div class="upcoming-warning">
+        {{ 'ME.RESERVATION.UPCOMING.CREATED' | translate }}
+        <span class="bold">{{ currentUpcoming.professional.displayName }}</span>
+      </div>
+    }
+
     @if (currentUpcoming.id) {
-      <mat-card-actions class="card-actions">
-        <div class="spacer"></div>
+      <div class="app-detail-actions upcoming-actions">
         @if (!['CANCELLED_PAYMENT_REQUIRED', 'PAID'].includes(currentUpcoming.state) && currentUpcoming.room.paymentTypes.length > 1) {
-          <button class="hide-gt-xs icon-button"
-                  [routerLink]="['/', language, 'me', 'reservation', currentUpcoming.id, 'payment', 'option']"
-                  mat-fab>
-            <mat-icon class="payment-button" color="primary">payment</mat-icon>
-          </button>
-          <button class="hide-xs icon-button"
-                  [routerLink]="['/', language, 'me', 'reservation', currentUpcoming.id, 'payment', 'option']"
-                  mat-fab extended>
-            <mat-icon class="payment-button" color="primary">payment</mat-icon>
+          <button [routerLink]="['/', language, 'me', 'reservation', currentUpcoming.id, 'payment', 'option']"
+                  mat-stroked-button
+                  type="button">
+            <mat-icon>payment</mat-icon>
             <span>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</span>
           </button>
         }
         @if (currentUpcoming.state === 'CANCELLED_PAYMENT_REQUIRED' && currentUpcoming.room.paymentTypes.length > 1) {
-          <button class="hide-gt-xs icon-button"
-                  [routerLink]="['/', language, 'me', 'reservation', currentUpcoming.id, 'payment']" mat-fab>
-            <mat-icon class="payment-button" color="primary">payment</mat-icon>
-          </button>
-          <button class="hide-xs icon-button"
-                  [routerLink]="['/', language, 'me', 'reservation', currentUpcoming.id, 'payment']"
-                  mat-fab extended>
-            <mat-icon class="payment-button" color="primary">payment</mat-icon>
+          <button [routerLink]="['/', language, 'me', 'reservation', currentUpcoming.id, 'payment']"
+                  mat-stroked-button
+                  type="button">
+            <mat-icon>payment</mat-icon>
             <span>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</span>
           </button>
         }
-        <button class="hide-gt-xs icon-button" (click)="edit()" color="primary"
-                mat-fab>
-          <mat-icon>edit_calendar</mat-icon>
-        </button>
-        <button class="hide-xs icon-button" (click)="edit()" color="primary"
-                mat-fab extended>
+        <button (click)="edit()" mat-stroked-button type="button">
           <mat-icon>edit_calendar</mat-icon>
           <span>{{ 'COMMON.BUTTON.EDIT' | translate }}</span>
         </button>
-        <button class="hide-gt-xs icon-button" [routerLink]="['/', language, 'reservation', currentUpcoming.id]"
-                color="primary"
-                mat-fab>
-          <mat-icon>visibility</mat-icon>
-        </button>
-        <button class="hide-xs icon-button" [routerLink]="['/', language, 'reservation', currentUpcoming.id]"
-                color="primary"
-                mat-fab
-                extended>
+        <button [routerLink]="['/', language, 'reservation', currentUpcoming.id]" mat-stroked-button type="button">
           <mat-icon>visibility</mat-icon>
           <span>{{ 'COMMON.BUTTON.VIEW' | translate }}</span>
         </button>
-      </mat-card-actions>
-    } @else {
-      <div class="divider-padding">
-        <div class="ssc-head-line"></div>
       </div>
+    } @else {
+      <div class="ssc-head-line"></div>
     }
-  </mat-card>
+  </section>
 }

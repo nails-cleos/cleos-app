@@ -29,6 +29,84 @@
   width: 50%;
 }
 
+.app-inline-field-action {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+}
+
+.app-crud-title {
+  margin: 6px 0 0;
+  color: var(--app-surface-text);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.app-crud-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.app-crud-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.app-crud-view-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.app-crud-form-grid--triple {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.app-crud-form-grid--single {
+  grid-template-columns: 1fr;
+}
+
+.app-crud-form-grid__full {
+  grid-column: 1 / -1;
+}
+
+.app-skeleton-title {
+  margin-top: 8px;
+  max-width: 220px;
+}
+
+.app-detail-skeleton-card {
+  width: 100%;
+  height: 110px;
+  border-radius: 20px;
+}
+
+.app-crud-skeleton-field {
+  min-height: 56px;
+  margin-top: 6px;
+}
+
+.app-crud-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.app-crud-loading__block {
+  width: 100%;
+  height: 88px;
+  border-radius: 20px;
+}
+
+.app-crud-fields {
+  min-width: 0;
+}
+
 .vertical-divider {
   margin-left: 10px;
 }
@@ -68,14 +146,6 @@
   padding-bottom: 10px;
 }
 
-#add-button {
-  top: 83px;
-  right: 30px;
-  bottom: auto;
-  left: auto;
-  position: fixed;
-}
-
 .cc-floating {
   top: 9% !important;
 }
@@ -86,19 +156,6 @@
 
 .note {
   border-radius: 20px;
-}
-
-.chartContainer canvas {
-  max-height: 250px;
-  width: auto;
-}
-
-.chartContainer {
-  height: 100%;
-  display: block;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 
 .pointer,
@@ -128,6 +185,41 @@
 
 .mat-fab-menu, .custom-material-icons {
   vertical-align: middle !important;
+}
+
+.mat-mdc-form-field:has(app-timepicker) .mat-mdc-form-field-icon-prefix {
+  margin-left: 16px !important;
+  padding-right: 20px !important;
+}
+
+.mat-mdc-form-field:has(app-timepicker) .mat-mdc-form-field-infix {
+  margin-left: -12px !important;
+}
+
+.mat-mdc-form-field:has(app-timepicker) .mat-mdc-form-field-flex {
+  align-items: center;
+}
+
+.mat-mdc-form-field:has(app-timepicker) .mat-mdc-form-field-text-prefix {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  width: 48px;
+  min-width: 48px;
+  box-sizing: border-box;
+  line-height: 1;
+}
+
+.mat-mdc-form-field:has(app-timepicker) .mat-mdc-form-field-text-prefix .mat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  font-size: 24px;
+  height: 24px;
+  width: 24px;
+  vertical-align: middle;
 }
 
 .margin-right-eight {
@@ -195,6 +287,15 @@
 
 .cal-disabled {
   pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .app-crud-form-grid,
+  .app-crud-form-grid--triple,
+  .app-crud-form-grid--single,
+  .app-inline-field-action {
+    grid-template-columns: 1fr;
+  }
 }
 
 .cal-disabled .cal-day-number {

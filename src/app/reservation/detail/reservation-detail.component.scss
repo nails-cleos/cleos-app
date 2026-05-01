@@ -1,3 +1,60 @@
+:host {
+  display: block;
+}
+
+.detail-layout {
+  display: block;
+}
+
+.detail-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.detail-main--full {
+  width: 100%;
+}
+
+.price-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.extras-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.extras-panel__title {
+  margin-bottom: 10px;
+}
+
+.extras-panel app-price-extras {
+  display: block;
+}
+
+.extras-panel :is(mat-list-item, .mat-mdc-list-item) {
+  min-height: 56px;
+  border-top: 1px solid var(--app-surface-card-border);
+}
+
+.extras-panel :is(mat-list-item, .mat-mdc-list-item):first-of-type {
+  border-top: 0;
+}
+
+.extras-panel :is([matListItemTitle], .mdc-list-item__primary-text) {
+  font-weight: 600;
+  color: var(--app-surface-text);
+}
+
+.extras-panel :is([matListItemLine], .mdc-list-item__secondary-text) {
+  color: var(--app-surface-text-muted);
+}
+
 [class*='mat-column-'] {
   text-align: center;
 }
@@ -11,22 +68,36 @@ tr.detail-row {
   height: 0 !important;
 }
 
-@media all and (max-device-width: 812px) and (orientation: portrait) {
-  #action-button {
-    top: 90px;
-    right: 33px;
-    bottom: auto;
-    left: auto;
-    position: fixed;
-  }
+.payment-actions {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
 }
 
-@media not all and (max-device-width: 812px) and (orientation: portrait) {
-  #action-button {
-    top: 95px;
-    right: 50px;
-    bottom: auto;
-    left: auto;
-    position: fixed;
-  }
+.payment-amount-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.payment-amount-edit mat-form-field {
+  width: 108px;
+}
+
+.card-actions {
+  margin-top: 18px;
+}
+
+.reservation-detail-footer-actions {
+  margin-top: 18px;
+}
+
+.summary-slot-button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+}
+
+.detail-loading {
+  margin-top: 8px;
 }

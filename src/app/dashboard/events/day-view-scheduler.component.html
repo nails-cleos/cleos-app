@@ -1,3 +1,11 @@
+<ng-template #hourSegmentTemplate let-segment="segment" let-isTimeLabel="isTimeLabel">
+  @if (isTimeLabel) {
+    <div class="cal-time">
+      {{ segment.date | date:'HH:mm' }}
+    </div>
+  }
+</ng-template>
+
 <div class="cal-week-view" role="grid">
   <div class="cal-day-headers" role="row">
     @for (professional of professionals(); track trackByProfessionalId($index, professional)) {
@@ -9,14 +17,44 @@
             <div [style.background-image]="'url(' + professional.img + ')'" [style.background-size]="'cover'"
                  mat-card-avatar></div>
             <mat-card-title>{{ professional.name | titlecase }}</mat-card-title>
-            <mat-card-subtitle>
-              {{ professional.reservations }} - {{ professional.time | convertHM }}
+            <mat-card-subtitle class="professional-summary-badges">
+              <span class="professional-summary-badge">
+                <mat-icon>spa</mat-icon>
+                <strong>{{ professional.reservations }}</strong>
+              </span>
+              <span class="professional-summary-badge">
+                <mat-icon>schedule</mat-icon>
+                <strong>{{ professional.time | convertHM }}</strong>
+              </span>
             </mat-card-subtitle>
           </mat-card-header>
         </mat-card>
       </div>
     }
   </div>
+  @if (view.allDayEventRows.length) {
+    <div class="dashboard-events-all-day">
+      <div class="cal-time-label-column dashboard-events-all-day__label"></div>
+      <div class="dashboard-events-all-day__columns">
+        @for (column of view.hourColumns; track column.date; let i = $index) {
+          <div class="dashboard-events-all-day__column">
+            @for (row of view.allDayEventRows; track row; let rowIndex = $index) {
+              @for (allDayEvent of row.row; track allDayEvent.event.id ?? allDayEvent.event.title) {
+                @if (allDayEvent.offset === i) {
+                  <button type="button" class="dashboard-events-all-day__event"
+                          [style.border-color]="allDayEvent.event.color?.primary"
+                          [style.background-color]="allDayEvent.event.color?.secondary"
+                          [innerHTML]="allDayEvent.event.title"
+                          (click)="eventClicked.emit({event: allDayEvent.event, sourceEvent: $event})">
+                  </button>
+                }
+              }
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
   <div (dragEnter)="dragEnter('time')" (dragLeave)="dragLeave('time')" class="cal-time-events" mwlDroppable>
     @if (view.hourColumns.length > 0) {
       <div class="cal-time-label-column">

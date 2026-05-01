@@ -3,6 +3,25 @@
     "RESERVATION": {
       "PREVIEW": "Vista previa",
       "APPOINTMENT": "Cita",
+      "FLOW": {
+        "SUMMARY": {
+          "EYEBROW": "Flujo de reserva",
+          "TITLE": "Resumen de la reserva",
+          "BREAKDOWN": "Desglose del precio",
+          "EMPTY": "Aún no seleccionado",
+          "NONE": "Ninguno",
+          "DATE_TIME": "Fecha y hora",
+          "TOTAL": "Total actual"
+        },
+        "STEPS": {
+          "ROOM": "Elige la oficina, la sala y el profesional para esta reserva.",
+          "TREATMENT": "Elegí una fecha, tratamiento y descuento antes de revisar la disponibilidad.",
+          "ADDITIONALS": "Agrega extras opcionales que afectan la duración y el precio.",
+          "SCHEDULE": "Elegí el mejor horario disponible para esta reserva.",
+          "PAYMENT": "Revisa el importe pendiente y completa los detalles del pago.",
+          "PREVIEW": "Revisa el flujo de la reserva y confirma tus datos de contacto y políticas."
+        }
+      },
       "UPCOMING": {
         "TITLE": "Próxima Reserva",
         "START": "Inicio",
@@ -87,6 +106,12 @@
       "ERROR_TEXT": "Error",
       "ERROR": "Pago incompleto.\n{{reason}}",
       "DETAIL": "Detalle de pago",
+      "FLOW": {
+        "STEPS": {
+          "OPTION": "Elegí el método de pago y la opción de cuotas para esta reserva.",
+          "PREVIEW": "Revisá el desglose del costo y el detalle del pago antes de continuar."
+        }
+      },
       "RESERVATION": "Reserva {{reservationId}}",
       "LIST": {
         "ERROR": {

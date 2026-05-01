@@ -23,7 +23,7 @@ import { RoomIconName } from '../util/icon';
 import { ICurrencyAll } from '../interfaces/currency';
 import { IOfficeAll } from '../interfaces/office';
 import { MatListOption } from '@angular/material/list';
-import { IPaymentType, paymentOptions } from '../interfaces/payment';
+import { IPaymentOption } from '../interfaces/payment';
 import timezones, { TimeZone } from 'timezones-list';
 import {
   API_LOCALE,
@@ -53,8 +53,11 @@ import {
 } from '../store/selectors/room.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IError, isString } from '../interfaces/common';
+import { PaymentState } from '../store/reducers/payment.reducers';
+import { getPaymentOptionsPipe } from '../store/selectors/payment.selectors';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
+import { RoomNamePipe } from '../pipes/room-name.pipe';
 
 export interface IIcon {
   monday: RoomIconName;
@@ -79,11 +82,11 @@ type RoomForm = {
   selector: 'app-room',
   templateUrl: './room.component.html',
   styleUrls: ['./room.component.scss'],
-  imports: [SharedModule, AvailabilityComponent, GoogleMapComponent, BackButtonDirective],
+  imports: [SharedModule, AvailabilityComponent, GoogleMapComponent, BackButtonDirective, RoomNamePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RoomComponent {
-  private readonly store: Store<RoomState> = inject(Store<RoomState>);
+  private readonly store: Store<RoomState | PaymentState> = inject(Store<RoomState | PaymentState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
@@ -94,10 +97,12 @@ export class RoomComponent {
   private currencies$ = this.store.pipe(getCurrenciesPipe);
   private offices$ = this.store.pipe(getOfficesPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
+  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
   private roomIdSignal = toSignal(this.roomId$);
   private professionalsSignal = toSignal(this.professionals$);
   private subErrorsSignal = toSignal(this.subErrors$);
+  private paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
 
   roomSignal = toSignal(this.selectedRoom$);
   isAddModeSignal = computed(() => !this.roomIdSignal());
@@ -209,7 +214,7 @@ export class RoomComponent {
       )),
   );
 
-  paymentOptions: IPaymentType[] = paymentOptions();
+  paymentOptions = computed(() => this.paymentOptionsSignal().filter(option => option.enabled && option.show));
 
   private availabilities: IAvailability[] = [];
   private paymentTypes: string[] = [];
@@ -221,10 +226,21 @@ export class RoomComponent {
 
   constructor() {
     effect(() => {
+      const paymentOptions = this.paymentOptions();
+      if (!paymentOptions.length || !this.isAddModeSignal() || this.paymentTypes.length) {
+        return;
+      }
+
+      this.paymentTypes = paymentOptions
+        .filter(option => option.default)
+        .map(option => option.type);
+    });
+
+    effect(() => {
       const selected = this.roomSignal();
       if (selected?.id) {
         const timeZone = this.timeZoneList.find(
-          timeZone => timeZone.label.toLowerCase().indexOf(getTimeZone(selected.timeZone).label.toLowerCase()) === 0);
+          timeZone => timeZone.label.toLowerCase().indexOf(getTimeZone(selected.timeZone).tzCode.toLowerCase()) === 0);
         const room = {
           currency: selected.currency,
           office: selected.office,
@@ -418,7 +434,7 @@ export class RoomComponent {
     this.paymentTypes = options.map(o => o.value);
   };
 
-  isSelected = (it: IPaymentType): boolean => it.checked || this.paymentTypes.includes(it.name);
+  isSelected = (it: IPaymentOption): boolean => this.paymentTypes.includes(it.type);
 
   remove = (professional: IUserAll): void => {
     this.selectedProfessionalsSignal.update((current) =>
@@ -482,40 +498,45 @@ export class RoomComponent {
     }
   };
 
-  private getAvailabilities = (availabilities: IAvailability[]): void => availabilities.forEach((av: IAvailability) => {
-    this.currentAvailabilities = [...this.currentAvailabilities, av];
-    this.addAvailability(av, 0);
+  private getAvailabilities = (availabilities: IAvailability[]): void => {
+    ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY']
+      .forEach(day => this.setIcon(day, RoomIconName.eventBusy));
 
-    const availability: IAvailabilityDate = new AvailabilityDate();
-    const timeZone = this.getForm.timeZone.value?.tzCode;
-    availability.startDate = RoomComponent.createAv(av.start, timeZone);
-    availability.endDate = RoomComponent.createAv(av.end, timeZone);
-    availability.startLunchDate = RoomComponent.createAv(av.startLunch, timeZone);
-    availability.endLunchDate = RoomComponent.createAv(av.endLunch, timeZone);
+    availabilities.forEach((av: IAvailability) => {
+      this.currentAvailabilities = [...this.currentAvailabilities, av];
+      this.addAvailability(av, 0);
 
-    switch (av.day) {
-      case 'MONDAY':
-        this.monDate = availability;
-        break;
-      case 'TUESDAY':
-        this.tueDate = availability;
-        break;
-      case 'WEDNESDAY':
-        this.wedDate = availability;
-        break;
-      case 'THURSDAY':
-        this.thuDate = availability;
-        break;
-      case 'FRIDAY':
-        this.friDate = availability;
-        break;
-      case 'SATURDAY':
-        this.satDate = availability;
-        break;
-      case 'SUNDAY':
-        this.sunDate = availability;
-    }
-  });
+      const availability: IAvailabilityDate = new AvailabilityDate();
+      const timeZone = this.getForm.timeZone.value?.tzCode;
+      availability.startDate = RoomComponent.createAv(av.start, timeZone);
+      availability.endDate = RoomComponent.createAv(av.end, timeZone);
+      availability.startLunchDate = RoomComponent.createAv(av.startLunch, timeZone);
+      availability.endLunchDate = RoomComponent.createAv(av.endLunch, timeZone);
+
+      switch (av.day) {
+        case 'MONDAY':
+          this.monDate = availability;
+          break;
+        case 'TUESDAY':
+          this.tueDate = availability;
+          break;
+        case 'WEDNESDAY':
+          this.wedDate = availability;
+          break;
+        case 'THURSDAY':
+          this.thuDate = availability;
+          break;
+        case 'FRIDAY':
+          this.friDate = availability;
+          break;
+        case 'SATURDAY':
+          this.satDate = availability;
+          break;
+        case 'SUNDAY':
+          this.sunDate = availability;
+      }
+    });
+  };
 
   private validate = (): boolean => {
     if (this.form.invalid) {
@@ -555,7 +576,7 @@ export class RoomComponent {
     if (step > -1) {
       this.errors.update((prev) => {
         const newErrors = { ...prev };
-        newErrors[`day${step}`] = true;
+        newErrors[`day${ step }`] = true;
         return newErrors;
       });
       this.setStep(step);

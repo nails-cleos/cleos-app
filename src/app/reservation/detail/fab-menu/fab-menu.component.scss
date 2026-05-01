@@ -2,6 +2,25 @@
   position: relative;
 }
 
+.fab-trigger,
+.menu-item {
+  --mdc-outlined-button-container-height: 40px;
+  --mdc-outlined-button-label-text-color: #111111;
+  --mat-outlined-button-state-layer-color: rgba(125, 104, 82, 0.1);
+  justify-content: flex-start;
+  align-items: center;
+  min-width: 0;
+  height: 40px;
+  border-color: rgba(125, 104, 82, 0.16);
+  background: linear-gradient(180deg, rgba(255, 251, 245, 0.96), rgba(242, 232, 219, 0.96));
+  color: #111111;
+  box-shadow: none;
+}
+
+.fab-trigger {
+  padding-inline: 16px;
+}
+
 .fab-trigger .mat-icon {
   transition: transform 200ms ease-in-out;
 }
@@ -17,15 +36,20 @@
   display: none; /* Initially hide the menu items */
   flex-direction: column;
   align-items: flex-end;
+  gap: 8px;
   z-index: 1000; /* Ensure the menu appears above other content */
 }
 
-.menu-items button {
-  margin-bottom: 8px; /* Adjust as needed */
+.menu-item {
+  padding-inline: 16px;
+  border-radius: 999px;
+  white-space: nowrap;
 }
 
-.menu-items button:last-child {
-  margin-bottom: 0;
+.fab-trigger:hover,
+.menu-item:hover {
+  border-color: rgba(125, 104, 82, 0.24);
+  background: linear-gradient(180deg, rgba(250, 242, 232, 0.98), rgba(236, 222, 206, 0.98));
 }
 
 .menu-item-enter {
@@ -37,6 +61,39 @@
 
 .fab-menu.open .menu-items {
   display: flex; /* Show the menu items when the menu is open */
+}
+
+.menu-item .mat-icon,
+.fab-trigger .mat-icon {
+  margin-right: 8px;
+}
+
+.menu-item .mdc-button__label,
+.fab-trigger .mdc-button__label {
+  display: inline-flex;
+  align-items: center;
+}
+
+:host-context(.dark-theme) .fab-trigger,
+:host-context(.dark-theme) .menu-item {
+  --mdc-outlined-button-label-text-color: #ffffff;
+  --mat-outlined-button-state-layer-color: rgba(214, 184, 159, 0.12);
+  border-color: rgba(214, 184, 159, 0.2);
+  background: linear-gradient(180deg, rgba(54, 48, 43, 0.96), rgba(41, 35, 31, 0.96));
+  color: #ffffff;
+}
+
+:host-context(.dark-theme) .fab-trigger:hover,
+:host-context(.dark-theme) .menu-item:hover {
+  border-color: rgba(214, 184, 159, 0.3);
+  background: linear-gradient(180deg, rgba(68, 59, 52, 0.98), rgba(49, 42, 37, 0.98));
+}
+
+:host-context(.dark-theme) .fab-trigger .mat-icon,
+:host-context(.dark-theme) .menu-item .mat-icon,
+:host-context(.dark-theme) .fab-trigger .mdc-button__label,
+:host-context(.dark-theme) .menu-item .mdc-button__label {
+  color: #ffffff !important;
 }
 
 @keyframes fab-menu-item-in {

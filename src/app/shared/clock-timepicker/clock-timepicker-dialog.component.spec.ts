@@ -278,6 +278,7 @@ describe('ClockTimepickerDialogComponent', () => {
     const customHourOption = {
       value: 9,
       label: '09',
+      displayLabel: '09',
       top: 0,
       left: 0,
       active: false,
@@ -298,6 +299,19 @@ describe('ClockTimepickerDialogComponent', () => {
 
     expect(values.length).toBe(60);
     expect(values.slice(0, 4)).toEqual([0, 1, 2, 3]);
+  });
+
+  it('should keep every minute selectable but only display quarter labels', () => {
+    createComponent({ format: 24, initialTime: '10:00', minutesGap: 1 });
+    component.setView('minute');
+
+    const minuteSeven = component.dialOptions.find(option => option.value === 7);
+    const minuteFifteen = component.dialOptions.find(option => option.value === 15);
+
+    expect(minuteSeven?.label).toBe('07');
+    expect(minuteSeven?.displayLabel).toBe('');
+    expect(minuteSeven?.disabled).toBeFalse();
+    expect(minuteFifteen?.displayLabel).toBe('15');
   });
 
   it('should floor and cap minutes gap to 30', () => {

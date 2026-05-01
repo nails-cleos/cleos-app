@@ -1,56 +1,34 @@
-.mat-mdc-card-actions {
+.review-dialog-content {
   text-align: center;
 }
-
-.mat-mdc-card-header {
-  justify-content: center;
-}
-
-.mat-mdc-card-content {
-  .container {
-    margin: auto;
-    text-align: center;
-
-    table {
-      margin: auto;
-
-      td {
-        width: 50%;
-      }
-
-      .left {
-        text-align: left;
-      }
-
-      .right {
-        padding: 0 5% 0;
-        font-weight: bold;
-        text-align: right;
-      }
-    }
-  }
-}
-
-.dialog-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.close-button {
-  margin-left: auto; /* Ensures the button is pushed to the right */
-}
-
-.mat-mdc-dialog-content {
-  text-align: center;
-}
-
-
 
 .dialog-title {
-  width: calc(100% - 48px); /* Adjust width to account for the button's width */
-  word-wrap: break-word; /* Ensures words will wrap onto the next line */
-  white-space: normal; /* Allows wrapping */
-  max-width: 250px; /* Adjust this value based on your layout requirements */
-  margin: 0; /* Remove any default margin */
+  width: calc(100% - 48px);
+  word-wrap: break-word;
+  white-space: normal;
+  max-width: 250px;
+  margin: 0;
+}
+
+.upcoming {
+  margin: auto;
+  text-align: center;
+}
+
+.upcoming table {
+  margin: auto;
+}
+
+.upcoming td {
+  width: 50%;
+}
+
+.upcoming .left {
+  text-align: left;
+}
+
+.upcoming .right {
+  padding: 0 5% 0;
+  font-weight: bold;
+  text-align: right;
 }

@@ -6,7 +6,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../services/navigation.service';
 import { zoneDateToDate } from '../util/dates';
 import { SharedModule } from '../shared/shared.module';
-import { MatRipple } from '@angular/material/core';
 import { deleteNotification, getNotificationsPage, readNotification } from '../store/notification.actions';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { getNotificationsPipe } from '../store/selectors/notification.selectors';
@@ -17,7 +16,7 @@ import { NotificationState } from '../store/reducers/notification.reducers';
   selector: 'app-notifications',
   templateUrl: './notifications.component.html',
   styleUrls: ['./notifications.component.scss'],
-  imports: [SharedModule, MatRipple],
+  imports: [SharedModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationsComponent {

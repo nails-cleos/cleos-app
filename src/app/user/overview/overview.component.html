@@ -1,175 +1,172 @@
-<div class="grid-container">
-  <h1 class="mat-h1">Overview</h1>
-  @let layout = layoutSignal();
-  <mat-grid-list [cols]="layout?.columns" rowHeight="200px">
-    <mat-grid-tile [colspan]="layout?.miniCardInfo?.cols" [rowspan]="layout?.miniCardInfo?.rows">
-      <mat-card appearance="outlined" class="dashboard-card">
+<div class="overview-canvas app-surface-canvas app-surface-shell app-surface-stack">
+    <div class="overview-hero">
+      <mat-card appearance="outlined" class="overview-card--hero app-surface-hero app-detail-panel">
         <mat-card-content>
-          @if (customer) {
-            <div class="center-circle circle profile-background">
-              @if (image) {
-                <img [src]="image" alt="Profile" mat-card-image>
-              } @else {
-                <div class="initials">{{ initials | uppercase }}</div>
-              }
-            </div>
-          } @else {
-            <div class="center-circle ssc-circle w-100 initials"></div>
-          }
-          <div class="dashboard-card-content">
-            @if (customer) {
-              <div class="top-space">
-                <h2 class="bold">{{ customer.displayName }}</h2>
-              </div>
-              <div class="text-center">
-                <mat-icon color="primary">cake</mat-icon>
-                <span
-                  class="super">{{ customer.dob ? customer.dob : 'N/A' }}</span>
-              </div>
-              <div class="text-center">
-                <mat-icon color="primary">phone</mat-icon>
-                <span
-                  class="super">{{ customer.phone ? customer.phone : 'N/A' }}</span>
-              </div>
-              <div class="text-center">
-                <mat-icon color="primary">mail_outline</mat-icon>
-                <span
-                  class="super">{{ customer.email ? customer.email : 'N/A' }}</span>
-              </div>
-            } @else {
-              <div class="card-margin ssc-head-line"></div>
-              <div class="card-margin ssc-head-line"></div>
-              <div class="card-margin ssc-head-line"></div>
-              <div class="card-margin ssc-head-line"></div>
-            }
-          </div>
-          <ng-template #skeletonTitle>
-            <div class="card-margin ssc-head-line"></div>
-          </ng-template>
-        </mat-card-content>
-        <mat-card-actions class="top-space" style="margin: auto">
-          @if (customer) {
-            <button class="hide-gt-xs only-button" color="accent" mat-fab (click)="goToProfile()">
-              <mat-icon matPrefix>edit</mat-icon>
-            </button>
-            <button class="hide-xs only-button" color="accent" mat-fab extended (click)="goToProfile()">
-              <mat-icon matPrefix>edit</mat-icon>
-              <span>{{ 'COMMON.BUTTON.EDIT' | translate }}</span>
-            </button>
-          } @else {
-            <div class="card-margin divider ssc-line"></div>
-          }
-        </mat-card-actions>
-      </mat-card>
-    </mat-grid-tile>
-    <mat-grid-tile [colspan]="layout?.miniCardAccount?.cols"
-                   [rowspan]="layout?.miniCardAccount?.rows">
-      <mat-card appearance="outlined" class="dashboard-card">
-        @if (account) {
-          <mat-card-header class="card-header">
-            <mat-card-title>{{ 'COMMON.ACCOUNT.BALANCE' | translate }}</mat-card-title>
-          </mat-card-header>
-        } @else {
-          <div class="card-margin ssc-head-line"></div>
-        }
-        <mat-card-content>
-          @if (account && customer) {
-            <div>
-              <div class="card-icon top-space bottom-space" mat-card-avatar>
-                <mat-icon class="avatar-icon pointer-only" color="primary" [matBadgeOverlap]="true" [matBadge]="'+'"
-                          [matBadgeColor]="'primary'" (click)="goTo()" aria-hidden="false">
-                  account_balance
-                </mat-icon>
-              </div>
-              <div class="text-center">
-                <h2 class="no-bottom">{{ account.balance | currency: account.currency.code }}</h2>
-              </div>
-            </div>
-          } @else {
-            <div style="height: 80px" class="ssc-square mb"></div>
-          }
-        </mat-card-content>
-      </mat-card>
-    </mat-grid-tile>
-    @for (mc of miniCardData; let i = $index; track mc) {
-      <mat-grid-tile [colspan]="layout?.miniCard?.cols" [rowspan]="layout?.miniCard?.rows">
-        <mat-card appearance="outlined" class="dashboard-card">
-          @if (mc.title) {
-            <mat-card-header class="card-header">
-              <mat-card-title>{{ mc.title | translate }}</mat-card-title>
-            </mat-card-header>
-          } @else {
-            <div class="card-margin ssc-head-line"></div>
-          }
-          @if (!mc.error) {
-            <mat-card-content>
-              @if (mc.title) {
-                <div>
-                  <div class="card-icon top-space bottom-space" mat-card-avatar>
-                    <mat-icon class="avatar-icon" color="primary">{{ mc.icon }}</mat-icon>
-                  </div>
-                  @if (mc.split) {
-                    <div class="text-center">
-                      @if (mc.link) {
-                        <div>
-                          <h3 (click)="mc.link(mc.primaryId)" [ngClass]="{'pointer': mc.primaryId}" class="no-bottom">
-                            {{ mc.primaryValue }}
-                          </h3>
-                          @if (mc.secondaryValue) {
-                            <h3 (click)="mc.link(mc.secondaryId)" [ngClass]=" {'pointer': mc.secondaryId}">
-                              {{ mc.secondaryValue }}
-                            </h3>
-                          }
-                        </div>
-                      } @else {
-                        <h3 class="no-bottom">{{ mc.primaryValue }}</h3>
-                        @if (mc.secondaryValue) {
-                          <h3>{{ mc.secondaryValue }}</h3>
-                        }
-                      }
-                    </div>
+          <div class="overview-card__eyebrow app-surface-eyebrow">Customer overview</div>
+
+          <div class="overview-hero__header">
+            <div class="overview-hero__identity">
+              @if (customer) {
+                <div class="overview-avatar" [class.overview-avatar--placeholder]="!image">
+                  @if (image) {
+                    <img [src]="image" alt="Profile">
                   } @else {
-                    <h1 class="text-center">{{ mc.primaryValue }}/{{ mc.secondaryValue }}</h1>
+                    <div class="overview-avatar__initials">{{ initials | uppercase }}</div>
                   }
                 </div>
               } @else {
-                <div style="height: 80px" class="ssc-square mb"></div>
+                <div class="overview-avatar ssc-circle"></div>
+              }
+
+              <div class="overview-hero__copy">
+                @if (customer) {
+                  <h1>{{ customer.displayName }}</h1>
+
+                  <div class="overview-hero__meta">
+                    <span class="overview-chip app-detail-chip">
+                      <mat-icon>cake</mat-icon>
+                      {{ customer.dob || 'N/A' }}
+                    </span>
+
+                    <span class="overview-chip app-detail-chip">
+                      <mat-icon>phone</mat-icon>
+                      {{ customer.phone || 'N/A' }}
+                    </span>
+
+                    <span class="overview-chip app-detail-chip">
+                      <mat-icon>mail_outline</mat-icon>
+                      {{ customer.email || 'N/A' }}
+                    </span>
+                  </div>
+                } @else {
+                  <div class="ssc-head-line"></div>
+                  <div class="ssc-head-line"></div>
+                }
+              </div>
+            </div>
+
+            <div class="overview-hero__actions app-detail-actions">
+              @if (customer) {
+                @if (customer.phone) {
+                  <button color="accent" mat-stroked-button type="button" (click)="notification()">
+                    <mat-icon>campaign</mat-icon>
+                    Notify
+                  </button>
+                }
+
+                <button color="accent" mat-stroked-button type="button" (click)="goToProfile()">
+                  <mat-icon>edit</mat-icon>
+                  {{ 'COMMON.BUTTON.EDIT' | translate }}
+                </button>
+              }
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <mat-card appearance="outlined" class="app-surface-section">
+      <mat-card-content>
+        <div class="overview-card__eyebrow app-surface-eyebrow">Insights</div>
+
+        <div class="overview-stats-grid">
+          <mat-card appearance="outlined" class="overview-stat-card overview-stat-card--balance app-surface-item app-surface-item--section">
+            <mat-card-content>
+              <div class="overview-stat-card__icon overview-stat-card__icon--action">
+                <mat-icon>account_balance_wallet</mat-icon>
+                @if (account) {
+                  <button aria-label="Open transactions" class="overview-stat-card__plus-button"
+                          color="accent" mat-mini-fab type="button" (click)="goTo()">
+                    <mat-icon>add</mat-icon>
+                  </button>
+                }
+              </div>
+
+              <div class="overview-stat-card__label app-surface-item__label">{{ 'COMMON.ACCOUNT.BALANCE' | translate }}</div>
+
+              @if (account) {
+                <div class="overview-stat-card__balance app-surface-item__value">{{ account.balance | currency: account.currency.code }}</div>
+              } @else {
+                <div class="ssc-square"></div>
               }
             </mat-card-content>
-          } @else {
-            <app-error [error]="mc.error" [isCard]="true" class="text-center"></app-error>
+          </mat-card>
+
+          @for (mc of miniCardData; track mc) {
+            <mat-card appearance="outlined" class="overview-stat-card app-surface-item app-surface-item--section">
+              @if (!mc.error) {
+                <mat-card-content>
+                  @if (mc.title) {
+                    <div class="overview-stat-card__icon">
+                      <mat-icon>{{ mc.icon }}</mat-icon>
+                    </div>
+
+                    <div class="overview-stat-card__label app-surface-item__label">{{ mc.title | translate }}</div>
+
+                    @if (mc.split) {
+                      <div class="overview-stat-card__split">
+                        @if (mc.link) {
+                          <button mat-button type="button" [disabled]="!mc.primaryId" (click)="mc.link(mc.primaryId)">
+                            {{ mc.primaryValue }}
+                          </button>
+
+                          @if (mc.secondaryValue) {
+                            <button mat-button type="button" [disabled]="!mc.secondaryId"
+                                    (click)="mc.link(mc.secondaryId)">
+                              {{ mc.secondaryValue }}
+                            </button>
+                          }
+                        } @else {
+                          <strong>{{ mc.primaryValue }}</strong>
+                          @if (mc.secondaryValue) {
+                            <strong>{{ mc.secondaryValue }}</strong>
+                          }
+                        }
+                      </div>
+                    } @else {
+                      <div class="overview-stat-card__value app-surface-item__value">{{ mc.primaryValue }}/{{ mc.secondaryValue }}</div>
+                    }
+                  } @else {
+                    <div class="ssc-square"></div>
+                  }
+                </mat-card-content>
+              } @else {
+                <app-error [error]="mc.error" [isCard]="true" class="text-center"></app-error>
+              }
+            </mat-card>
           }
-        </mat-card>
-      </mat-grid-tile>
-    }
-    @for (chart of charts; track chart) {
-      <mat-grid-tile [colspan]="layout?.chart?.cols" [rowspan]="layout?.chart?.rows">
-        <app-card [chart]="chart" [title]="chart.title">
-          <app-chart [chartSummary]="chart" [error]="errorSignal()" [locale]="language"></app-chart>
-        </app-card>
-      </mat-grid-tile>
-    }
-  </mat-grid-list>
-  @if (customer) {
-    <div>
-      @if (customer.address) {
-        <app-google-map [latitudeMarker]="customer.address.location.y"
-                        [longitudeMarker]="customer.address.location.x"
-                        [markInfo]="'<b>' + customer.address.name + '</b>'"></app-google-map>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-grid-list class="overview-chart-grid" [cols]="chartColumns()" rowHeight="430px" gutterSize="16px">
+      @for (chart of charts; track chart) {
+        <mat-grid-tile>
+          <app-card [chart]="chart" [title]="chart.title">
+            <app-chart [chartSummary]="chart" [error]="errorSignal()" [locale]="language"></app-chart>
+          </app-card>
+        </mat-grid-tile>
       }
+    </mat-grid-list>
+
+    @if (customer?.address; as address) {
+      <mat-card appearance="outlined" class="app-surface-section">
+        <mat-card-content>
+          <div class="overview-card__eyebrow app-surface-eyebrow">Location</div>
+
+          <div class="overview-map app-surface-item app-surface-item--section">
+            <app-google-map [latitudeMarker]="address.location.y"
+                            [longitudeMarker]="address.location.x"
+                            [markInfo]="'<b>' + address.name + '</b>'"></app-google-map>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+
+    <div class="app-detail-actions">
+      <button appBackButton mat-stroked-button type="button">
+        <mat-icon>keyboard_return</mat-icon>
+        <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+      </button>
     </div>
-  } @else {
-    <div class="ssc-square mb"></div>
-  }
 </div>
-<div class="grid-container">
-  <div class="card-actions">
-    <div class="spacer"></div>
-    <button appBackButton color="accent" mat-fab extended type="button">{{ 'COMMON.BUTTON.BACK' | translate }}</button>
-  </div>
-</div>
-@if (upcoming.length && customer?.phone) {
-  <button color="accent" id="add-button" mat-fab (click)="notification()">
-    <mat-icon>campaign</mat-icon>
-  </button>
-}

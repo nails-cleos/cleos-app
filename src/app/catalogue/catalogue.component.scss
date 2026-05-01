@@ -1,0 +1,26 @@
+.catalogue-options-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.catalogue-flags,
+.catalogue-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+}
+
+.catalogue-flags__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (max-width: 880px) {
+  .catalogue-options-grid {
+    grid-template-columns: 1fr;
+  }
+}

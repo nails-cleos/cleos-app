@@ -1,7 +1,13 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
 .more-button {
   position: absolute;
   top: 5px;
   right: 10px;
+  color: var(--app-surface-text-muted);
 }
 
 .dashboard-card {
@@ -10,15 +16,25 @@
   left: 15px;
   right: 15px;
   bottom: 15px;
+  overflow: hidden;
 }
 
 .dashboard-card-content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
   text-align: center;
   flex-grow: 1;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   max-height: 100%;
-  justify-content: center;
+  justify-content: flex-start;
+}
+
+:host ::ng-deep .dashboard-card .mat-mdc-card-title {
+  color: var(--app-surface-text);
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 /*TODO(mdc-migration): The following rule targets internal classes of card that may no longer apply for the MDC version.*/

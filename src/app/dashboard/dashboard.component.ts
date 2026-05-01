@@ -123,7 +123,7 @@ export class DashboardComponent {
         miniCard,
         calendar: { cols: 2, rows: 4 },
         chart: { cols: 2, rows: 2 },
-        table: { cols: 2, rows: 4 },
+        table: { cols: 2, rows: 3 },
       };
     }
 
@@ -134,7 +134,7 @@ export class DashboardComponent {
         miniCard,
         calendar: { cols: 1, rows: 4 },
         chart: { cols: 1, rows: 1.5 },
-        table: { cols: 1, rows: 4.5 },
+        table: { cols: 1, rows: 3 },
       };
     }
 
@@ -144,7 +144,7 @@ export class DashboardComponent {
       miniCard,
       calendar: { cols: 4, rows: 4 },
       chart: { cols: 2, rows: 2 },
-      table: { cols: 4, rows: 4 },
+      table: { cols: 4, rows: 3 },
     };
   });
 

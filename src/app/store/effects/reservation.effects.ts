@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
-import { concatMap, delay, switchMap, tap } from 'rxjs/operators';
+import { concatMap, delay, filter, map, switchMap, tap } from 'rxjs/operators';
 import { from, Observable, of } from 'rxjs';
 import {
   approveReservation,
@@ -80,6 +80,7 @@ import {
   IReservation,
   IReservationAll,
   IRoomReservation,
+  States,
   ITracking,
   IUpcomingAll,
 } from '../../interfaces/reservation';
@@ -93,6 +94,7 @@ import { IReview } from '../../interfaces/review';
 import { IColorAll } from '../../interfaces/color';
 import { ToastType } from '../../shared/toast/toast.model';
 import { effectRequest } from '../../util/rxjs';
+import { getMyEvent } from '../dashboard.actions';
 
 @Injectable()
 export class ReservationEffects {
@@ -299,7 +301,7 @@ export class ReservationEffects {
   changeState$ = createEffect(() => this.actions.pipe(
     ofType(approveReservation, startReservation, completeReservation,
       cancelReservation, customerCancelReservation, paymentCompleteReservation),
-    switchMap(({ id, event, key, extras, isDashboard, state }) => effectRequest(
+    switchMap(({ id, event, key, extras, isDashboard, state, dashboardDate }) => effectRequest(
       this.reservationService.changeState(id, event, extras),
       (response: IReservation | void) => stateSuccess({
         message: this.translate.instant(`COMMON.RESERVATION.STATE.${ key }`),
@@ -307,9 +309,16 @@ export class ReservationEffects {
         paymentLink: response?.paymentLink,
         isDashboard,
         state,
+        dashboardDate,
       }),
       reservationFailure,
     )),
+  ));
+
+  dashboardEventsRefresh$ = createEffect(() => this.actions.pipe(
+    ofType(stateSuccess),
+    filter(({ isDashboard, state }) => !!isDashboard && [States.started, States.completed].includes(state!)),
+    map(({ dashboardDate }) => getMyEvent({ date: dashboardDate ?? new Date() })),
   ));
 
   changeCustomer$ = createEffect(() => this.actions.pipe(
@@ -387,14 +396,17 @@ export class ReservationEffects {
     ofType(updateReservationNote),
     switchMap(({ id, note, customerNote, role, timestamp, timeZone, paymentLink }) => effectRequest(
       this.reservationService.updateReservationNote(id, note, customerNote),
-      (response: IApiResponse) => this.requestSuccess(
-        'COMMON.RESERVATION.UPDATED.MESSAGE',
-        true,
-        role,
-        response.id,
-        newDateTimestamp(timestamp, timeZone),
-        response.paymentLink || paymentLink,
-      ),
+      (response: IApiResponse) => [
+        this.requestSuccess(
+          'COMMON.RESERVATION.UPDATED.MESSAGE',
+          true,
+          role,
+          response.id,
+          newDateTimestamp(timestamp, timeZone),
+          response.paymentLink || paymentLink,
+        ),
+        getReservation({ id: response.id }),
+      ],
       reservationFailure,
     )),
   ));

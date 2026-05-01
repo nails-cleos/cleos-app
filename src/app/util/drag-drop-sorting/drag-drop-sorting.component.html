@@ -1,30 +1,33 @@
-<div class="flex-container">
-  <div class="card-container">
-    <div class="card-content">
-      <mat-card appearance="outlined">
-        <mat-card-header>
-          <mat-card-title>{{ title() }}</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div cdkDropList class="sorting-item-list" (cdkDropListDropped)="drop($event)">
-            @for (item of items(); track item) {
-              <div class="sorting-item-box" cdkDrag>
-                <div class="sorting-item-placeholder" *cdkDragPlaceholder></div>
-                {{ item.order }} - {{ item.name }}
-              </div>
-            }
-          </div>
-        </mat-card-content>
-        <mat-card-actions class="card-actions">
-          <div class="spacer"></div>
-          <button appBackButton color="accent" mat-fab extended class="icon-button"
-                  type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
-          </button>
-          <button color="primary" mat-fab extended class="icon-button"
-                  (click)="sort()">{{ 'COMMON.BUTTON.UPDATE' | translate }}
-          </button>
-        </mat-card-actions>
-      </mat-card>
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <section class="app-surface-section">
+    <div class="app-detail-section-header">
+      <div>
+        <span class="app-surface-eyebrow">{{ title() }}</span>
+      </div>
     </div>
-  </div>
+
+    <div cdkDropList class="sorting-item-list" (cdkDropListDropped)="drop($event)">
+      @for (item of items(); track item) {
+        <div class="app-surface-item sorting-item-box" cdkDrag>
+          <div class="sorting-item-placeholder" *cdkDragPlaceholder></div>
+          <span class="sorting-item-box__order">{{ item.order }}</span>
+          <strong class="sorting-item-box__name">{{ item.name }}</strong>
+          <div class="sorting-item-box__handle" cdkDragHandle>
+            <mat-icon class="sorting-item-box__icon">drag_indicator</mat-icon>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="app-detail-actions">
+      <button appBackButton mat-stroked-button type="button">
+        <mat-icon>keyboard_return</mat-icon>
+        <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+      </button>
+      <button mat-stroked-button type="button" (click)="sort()">
+        <mat-icon>published_with_changes</mat-icon>
+        <span>{{ 'COMMON.BUTTON.UPDATE' | translate }}</span>
+      </button>
+    </div>
+  </section>
 </div>

@@ -1,24 +1,39 @@
 <form (ngSubmit)="doAction()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
-  <h1 mat-dialog-title>{{ 'RESERVATION.DISCOUNT.ADD' | translate }}</h1>
-  <div mat-dialog-content>
-    <mat-form-field appearance="outline">
-      <mat-label>{{ 'RESERVATION.DISCOUNT.FIELD' | translate }}</mat-label>
-      <mat-select [formControl]="getForm.discount">
-        @for (cd of userDiscountsSignal(); track cd) {
-          <mat-option [value]="cd.id">{{ cd.discountCustomer.name }}</mat-option>
+  <div class="app-surface-dialog-shell">
+    <div class="app-surface-dialog-header">
+      <div class="app-surface-dialog-title-wrap">
+        <div class="app-surface-dialog-badge" aria-hidden="true">
+          <mat-icon>sell</mat-icon>
+        </div>
+        <h1 mat-dialog-title class="app-surface-dialog-title">{{ 'RESERVATION.DISCOUNT.ADD' | translate }}</h1>
+      </div>
+      <button (click)="onNoClick()" aria-label="Close dialog" class="app-surface-dialog-close" type="button">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="app-surface-dialog-divider" aria-hidden="true"></div>
+
+    <div mat-dialog-content class="app-surface-dialog-content">
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'RESERVATION.DISCOUNT.FIELD' | translate }}</mat-label>
+        <mat-select [formControl]="getForm.discount">
+          @for (cd of userDiscountsSignal(); track cd) {
+            <mat-option [value]="cd.id">{{ cd.discountCustomer.name }}</mat-option>
+          }
+        </mat-select>
+        @if (getForm.discount.hasError('required')) {
+          <mat-error [innerHTML]="'RESERVATION.DISCOUNT.REQUIRED' | translate"></mat-error>
         }
-      </mat-select>
-      @if (getForm.discount.hasError('required')) {
-        <mat-error [innerHTML]="'RESERVATION.DISCOUNT.REQUIRED' | translate"></mat-error>
-      }
-    </mat-form-field>
-  </div>
-  <div mat-dialog-actions>
-    <button (click)="onNoClick()" color="accent" mat-fab extended class="icon-button"
-            type="button">{{ 'COMMON.BUTTON.CANCEL' | translate }}
-    </button>
-    <button [disabled]="form.invalid || form.pristine" cdkFocusInitial color="primary" mat-fab extended
-            class="icon-button" type="submit">Ok
-    </button>
+      </mat-form-field>
+    </div>
+
+    <div class="app-surface-dialog-divider" aria-hidden="true"></div>
+
+    <div mat-dialog-actions class="app-surface-dialog-actions">
+      <div class="app-surface-dialog-spacer"></div>
+      <button (click)="onNoClick()" mat-stroked-button type="button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+      <button [disabled]="form.invalid || form.pristine" cdkFocusInitial color="primary" mat-flat-button type="submit">Ok</button>
+    </div>
   </div>
 </form>

@@ -66,7 +66,7 @@ export class UnavailableListComponent {
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
   displayedColumns: string[] = ['position', 'professional', 'description', 'timestamp', 'duration', 'repeat',
-    'actions'];
+    'actions', 'add'];
 
   expandedUnavailable?: IUnavailable;
 

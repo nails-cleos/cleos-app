@@ -1,11 +1,29 @@
+:host {
+  --price-preview-border: rgba(0, 0, 0, 0.08);
+  --price-preview-surface: rgba(0, 0, 0, 0.02);
+  --price-preview-label: rgba(0, 0, 0, 0.68);
+  --price-preview-strong: rgba(0, 0, 0, 0.88);
+  --price-preview-positive: #a9441b;
+  --price-preview-negative: #146c43;
+}
+
+:host-context(.dark-theme) {
+  --price-preview-border: rgba(255, 255, 255, 0.12);
+  --price-preview-surface: rgba(255, 255, 255, 0.04);
+  --price-preview-label: rgba(255, 255, 255, 0.72);
+  --price-preview-strong: rgba(255, 255, 255, 0.92);
+  --price-preview-positive: #f0a577;
+  --price-preview-negative: #7bd4a4;
+}
+
 .price-table {
   display: grid;
   gap: 8px;
   margin: 8px 0 12px;
   padding: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--price-preview-border);
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.02);
+  background: var(--price-preview-surface);
 }
 
 .row {
@@ -16,15 +34,16 @@
 }
 
 .label {
-  color: rgba(0, 0, 0, 0.68);
+  color: var(--price-preview-label);
 }
 
 .label.strong,
 .value.strong {
-  color: rgba(0, 0, 0, 0.88);
+  color: var(--price-preview-strong);
 }
 
 .value {
+  color: var(--price-preview-strong);
   font-weight: 600;
   text-align: right;
   white-space: nowrap;
@@ -32,7 +51,7 @@
 
 .subtract-row {
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--price-preview-border);
 }
 
 .balance-row {
@@ -42,10 +61,10 @@
 
 .balance-row.positive .value,
 .balance-row.positive .label {
-  color: #a9441b;
+  color: var(--price-preview-positive);
 }
 
 .balance-row.negative .value,
 .balance-row.negative .label {
-  color: #146c43;
+  color: var(--price-preview-negative);
 }

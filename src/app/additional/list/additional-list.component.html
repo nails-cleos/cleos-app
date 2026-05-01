@@ -1,132 +1,154 @@
-<div class="mat-elevation-z8">
-  @let resultsLength = resultsLengthSignal();
-  @if (dataSourceSignal(); as dataSource) {
-    <table [dataSource]="dataSource" mat-table matSort matSortActive="order" matSortDirection="asc" matSortDisableClear
-           multiTemplateDataRows>
-      <ng-container matColumnDef="order">
-        <th *matHeaderCellDef mat-header-cell mat-sort-header>#</th>
-        <td *matCellDef="let additional;" mat-cell>
-          @if (additional.id) {
-            <div>{{ additional.order }}</div>
-          } @else {
-            <div class="ssc-line"></div>
-          }
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="name">
-        <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
-        <td *matCellDef="let additional" mat-cell>
-          @if (additional.id) {
-            <div>{{ additional.name }}</div>
-          } @else {
-            <div class="ssc-line"></div>
-          }
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="description">
-        <th *matHeaderCellDef class="hide-xs" mat-header-cell
-            mat-sort-header>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}
-        </th>
-        <td *matCellDef="let additional" class="column-large-text hide-xs" mat-cell>
-          @if (additional.id) {
-            <div>{{ additional.description }}</div>
-          } @else {
-            <div class="ssc-line"></div>
-          }
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="duration">
-        <th *matHeaderCellDef class="hide-xs" mat-header-cell
-            mat-sort-header>{{ 'ADDITIONAL.LIST.COLUMN.DURATION' | translate }}
-        </th>
-        <td *matCellDef="let additional" class="hide-xs" mat-cell>
-          @if (additional.id) {
-            <mat-icon matPrefix>timer</mat-icon>&nbsp;
-            {{ additional.hour | number:'2.0-0' }}:{{ additional.minute | number:'2.0-0' }}
-          } @else {
-            <div class="ssc-line"></div>
-          }
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="actions">
-        <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-        <td *matCellDef="let additional" class="hide-xs" mat-cell>
-          @if (additional.id) {
-            <div>
-              @if (!additional.deleted) {
-                <button (click)="edit(additional)" mat-icon-button
-                        matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
-                  <mat-icon color="primary">edit</mat-icon>
-                </button>
-                <button (click)="delete(additional)" mat-icon-button
-                        matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
-                  <mat-icon color="warn">delete</mat-icon>
-                </button>
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <section class="app-surface-section">
+    <div class="mat-elevation-z8 app-table-shell">
+      @let resultsLength = resultsLengthSignal();
+      @if (dataSourceSignal(); as dataSource) {
+        <table [dataSource]="dataSource" mat-table matSort matSortActive="order" matSortDirection="asc"
+               matSortDisableClear
+               multiTemplateDataRows>
+          <ng-container matColumnDef="order">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>#</th>
+            <td *matCellDef="let additional;" mat-cell>
+              @if (additional.id) {
+                <div>{{ additional.order }}</div>
+              } @else {
+                <div class="ssc-line"></div>
               }
-            </div>
-          } @else {
-            <div class="ssc-line"></div>
-          }
-        </td>
-      </ng-container>
+            </td>
+          </ng-container>
 
-      <ng-container matColumnDef="expandedDetail">
-        <td *matCellDef="let additional" [attr.colspan]="displayedColumns.length" class="hide-gt-xs" mat-cell>
-          <div [class.detail-expanded]="additional === expandedAdditional"
-               class="detail hide-gt-xs">
-            <mat-list>
-              @if (additional.description) {
-                <mat-list-item lines="3">
-                  <span matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</span>
-                  {{ additional.description }}
-                </mat-list-item>
+          <ng-container matColumnDef="name">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
+            <td *matCellDef="let additional" mat-cell>
+              @if (additional.id) {
+                <div>{{ additional.name }}</div>
+              } @else {
+                <div class="ssc-line"></div>
               }
-              <mat-list-item role="list">
-                <div matListItemTitle>{{ 'ADDITIONAL.LIST.COLUMN.DURATION' | translate }}</div>
-                <div matListItemLine>
-                  <mat-icon matPrefix>timer</mat-icon>&nbsp;
-                  {{ additional.hour | number:'2.0-0' }}:{{ additional.minute | number:'2.0-0' }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="description">
+            <th *matHeaderCellDef class="hide-xs" mat-header-cell
+                mat-sort-header>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}
+            </th>
+            <td *matCellDef="let additional" class="column-large-text hide-xs" mat-cell>
+              @if (additional.id) {
+                <div>{{ additional.description }}</div>
+              } @else {
+                <div class="ssc-line"></div>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="duration">
+            <th *matHeaderCellDef class="hide-xs" mat-header-cell
+                mat-sort-header>{{ 'ADDITIONAL.LIST.COLUMN.DURATION' | translate }}
+            </th>
+            <td *matCellDef="let additional" class="hide-xs" mat-cell>
+              @if (additional.id) {
+                <mat-icon matPrefix>timer</mat-icon>&nbsp;
+                {{ additional.hour | number:'2.0-0' }}:{{ additional.minute | number:'2.0-0' }}
+              } @else {
+                <div class="ssc-line"></div>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th *matHeaderCellDef class="hide-xs" mat-header-cell>
+              {{ 'COMMON.COLUMN.ACTIONS' | translate }}
+            </th>
+            <td *matCellDef="let additional" class="hide-xs" mat-cell>
+              @if (additional.id) {
+                <div>
+                  @if (!additional.deleted) {
+                    <button (click)="edit(additional)" mat-icon-button
+                            matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+                      <mat-icon color="primary">edit</mat-icon>
+                    </button>
+                    <button (click)="delete(additional)" mat-icon-button
+                            matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
+                      <mat-icon color="warn">delete</mat-icon>
+                    </button>
+                  }
                 </div>
-              </mat-list-item>
-              @if (!additional.deleted) {
-                <mat-list-item role="list">
-                  <button (click)="edit(additional)" color="primary" mat-icon-button>
-                    <mat-icon matListItemIcon>edit</mat-icon>
-                  </button>
-                  <button (click)="delete(additional)" color="warn" mat-icon-button>
-                    <mat-icon matListItemIcon>delete</mat-icon>
-                  </button>
-                </mat-list-item>
+              } @else {
+                <div class="ssc-line"></div>
               }
-            </mat-list>
-          </div>
-        </td>
-      </ng-container>
+            </td>
+          </ng-container>
 
-      <ng-container matColumnDef="noContent">
-        <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-          {{ 'ADDITIONAL.LIST.ERROR.NO_CONTENT' | translate }}
-        </td>
-      </ng-container>
+          <ng-container matColumnDef="add">
+            <th *matHeaderCellDef mat-header-cell>
+              <button [routerLink]="['/', language, 'additional', 'add']" mat-icon-button id="add-button"
+                      matTooltip="{{ 'ADDITIONAL.TITLE' | translate }}" matTooltipPosition="right" type="button">
+                <mat-icon color="primary">add</mat-icon>
+              </button>
+            </th>
+            <td *matCellDef="let additional" mat-cell>
+              @if (!additional.id) {
+                <div class="ssc-line"></div>
+              }
+            </td>
+          </ng-container>
 
-      <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-      <tr (click)="expandedAdditional = expandedAdditional === additional ? null : additional"
-          *matRowDef="let additional; columns: displayedColumns;" class="row" mat-row></tr>
-      <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
+          <ng-container matColumnDef="expandedDetail">
+            <td *matCellDef="let additional" [attr.colspan]="displayedColumns.length" class="hide-gt-xs" mat-cell>
+              <div [class.detail-expanded]="additional === expandedAdditional"
+                   class="detail hide-gt-xs">
+                <mat-list>
+                  @if (additional.description) {
+                    <mat-list-item lines="3">
+                      <span matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</span>
+                      {{ additional.description }}
+                    </mat-list-item>
+                  }
+                  <mat-list-item role="list">
+                    <div matListItemTitle>{{ 'ADDITIONAL.LIST.COLUMN.DURATION' | translate }}</div>
+                    <div matListItemLine>
+                      <mat-icon matPrefix>timer</mat-icon>&nbsp;
+                      {{ additional.hour | number:'2.0-0' }}:{{ additional.minute | number:'2.0-0' }}
+                    </div>
+                  </mat-list-item>
+                  @if (!additional.deleted) {
+                    <mat-list-item role="list">
+                      <button (click)="edit(additional)" color="primary" mat-icon-button>
+                        <mat-icon matListItemIcon>edit</mat-icon>
+                      </button>
+                      <button (click)="delete(additional)" color="warn" mat-icon-button>
+                        <mat-icon matListItemIcon>delete</mat-icon>
+                      </button>
+                    </mat-list-item>
+                  }
+                </mat-list>
+              </div>
+            </td>
+          </ng-container>
 
-      <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
-    </table>
-    @if (resultsLength) {
-      <mat-paginator [length]="resultsLength" [pageSize]="pageSizeSignal()"></mat-paginator>
-    }
+          <ng-container matColumnDef="noContent">
+            <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+              {{ 'ADDITIONAL.LIST.ERROR.NO_CONTENT' | translate }}
+            </td>
+          </ng-container>
 
-    <button color="accent" id="add-button" mat-fab matTooltip="{{ 'ADDITIONAL.TITLE' | translate }}"
-            [routerLink]="['/', language, 'additional', 'add']">
-      <mat-icon>add</mat-icon>
-    </button>
-  }
+          <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+          <tr *matRowDef="let additional; columns: displayedColumns;" class="hide-xs" mat-row></tr>
+          <tr (click)="expandedAdditional = expandedAdditional === additional ? null : additional"
+              *matRowDef="let additional; columns: displayedColumns;" class="hide-gt-xs app-table-master-row"
+              mat-row></tr>
+          <tr *matRowDef="let row; columns: ['expandedDetail']"
+              [class.app-table-detail-row--expanded]="row === expandedAdditional"
+              class="hide-gt-xs app-table-detail-row"
+              mat-row></tr>
+
+          <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+        </table>
+        @if (resultsLength) {
+          <mat-paginator [length]="resultsLength" [pageSize]="pageSizeSignal()"></mat-paginator>
+        }
+
+      }
+    </div>
+  </section>
 </div>

@@ -221,4 +221,105 @@ describe('YearSummaryComponent', () => {
       expect(component['getExportData']).not.toHaveBeenCalled();
     });
   });
+
+  describe('setYear', () => {
+    it('should update only the year and close datepicker', () => {
+      const date = new Date(2020, 5, 10);
+      component.getForm.date.setValue(date);
+
+      const datepickerSpy = jasmine.createSpyObj('MatDatepicker', ['close']);
+
+      component.setYear(new Date(2024, 0, 1), datepickerSpy);
+
+      expect(component.getForm.date.value.getFullYear()).toBe(2024);
+      expect(component.getForm.date.value.getMonth()).toBe(5);
+      expect(datepickerSpy.close).toHaveBeenCalled();
+    });
+  });
+
+  describe('createExportData', () => {
+    it('should merge monthly data when room is "All"', () => {
+      component.getForm.selectedRoom.setValue('All');
+
+      const mockExport = new Map<any, any>([
+        ['room1', {
+          monthlyExport: [
+            { month: 1, saleSummary: [1], expenseSummary: [], cashSummary: [] },
+          ],
+        }],
+        ['room2', {
+          monthlyExport: [
+            { month: 1, saleSummary: [2], expenseSummary: [], cashSummary: [] },
+          ],
+        }],
+      ]);
+
+      component['createExportData'](mockExport as any);
+
+      const result = component.sheetData;
+      expect(result.length).toBe(1);
+      expect(result[0].saleSummary.length).toBe(2);
+    });
+
+    it('should set data for selected room only', () => {
+      const room = { roomId: '1' } as any;
+      component.getForm.selectedRoom.setValue(room);
+
+      const mockExport = new Map<any, any>([
+        [{ roomId: '1' }, { monthlyExport: [{ month: 1, saleSummary: [], expenseSummary: [], cashSummary: [] }] }],
+        [{ roomId: '2' }, { monthlyExport: [{ month: 2, saleSummary: [], expenseSummary: [], cashSummary: [] }] }],
+      ]);
+
+      component['createExportData'](mockExport as any);
+
+      expect(component.sheetData.length).toBe(1);
+      expect(component.sheetData[0].month).toBe(1);
+    });
+  });
+
+  describe('getAllQuarterSummaries', () => {
+    it('should merge quarter summaries correctly', () => {
+      const base = [
+        {
+          quarter: 1,
+          monthSummaries: [
+            {
+              month: 1,
+              total: [{ type: 'INCOME', net: 10, btw: 2, gross: 12 }],
+            },
+          ],
+        },
+      ];
+
+      const incoming = [
+        {
+          quarter: 1,
+          monthSummaries: [
+            {
+              month: 1,
+              total: [{ type: 'INCOME', net: 5, btw: 1, gross: 6 }],
+            },
+          ],
+        },
+      ];
+
+      const result = component['getAllQuarterSummaries'](incoming as any, base as any);
+
+      expect(result[0].monthSummaries[0].total[0].net).toBe(15);
+      expect(result[0].monthSummaries[0].total[0].btw).toBe(3);
+      expect(result[0].monthSummaries[0].total[0].gross).toBe(18);
+    });
+  });
+
+  describe('computed signals', () => {
+    it('should return false for showCash by default', () => {
+      expect(component.showCash()).toBeFalse();
+    });
+
+    it('should return userName from authUserSignal', () => {
+      authUserSignal.set({ ...initialAuthUser, displayName: 'Lucas' });
+
+      expect(component['userName']()).toBe('Lucas');
+    });
+  });
 });

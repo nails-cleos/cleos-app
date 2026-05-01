@@ -1,9 +1,146 @@
-.divider {
-  button {
-    margin: 10px;
-  }
+@use 'styles/mixin' as mixin;
+
+.dashboard-events {
+  --app-surface-shell-width: 1560px;
+  padding-bottom: 32px;
+}
+
+.dashboard-events-toolbar {
+  align-items: center;
+  gap: 12px;
+  margin-top: 0;
+}
+
+.dashboard-events-toolbar__compact {
+  width: 52px;
+  min-width: 52px;
+  height: 52px;
+  padding: 0;
+}
+
+.dashboard-events-title {
+  @include mixin.flex-center(flex, flex-end, 4px);
+  flex-direction: column;
+  min-width: min(100%, 260px);
+  text-align: right;
+}
+
+.dashboard-events-title h2 {
+  margin: 0;
+  color: var(--app-surface-text);
+  font-size: clamp(1.1rem, 2vw, 1.45rem);
+  line-height: 1.2;
+}
+
+.dashboard-events-title app-counter {
+  color: var(--app-surface-text-muted);
+}
+
+.dashboard-events-calendar {
+  overflow: hidden;
+  padding: 0;
+}
+
+.dashboard-events-empty {
+  @include mixin.flex-center(flex, center, 12px);
+  flex-direction: column;
+  justify-content: center;
+  min-height: 220px;
+  text-align: center;
+}
+
+.dashboard-events-empty mat-icon {
+  width: 44px;
+  height: 44px;
+  color: var(--app-surface-label);
+  font-size: 44px;
+}
+
+.dashboard-events-empty h2 {
+  max-width: 620px;
+  margin: 0;
+  color: var(--app-surface-text);
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+  line-height: 1.35;
+}
+
+.dashboard-events-all-day {
+  display: flex;
+  border-bottom: 1px solid var(--app-surface-shell-border);
+  background: color-mix(in srgb, var(--app-table-header) 28%, transparent);
+}
+
+.dashboard-events-all-day__label {
+  flex: 0 0 70px;
+}
+
+.dashboard-events-all-day__columns {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dashboard-events-all-day__column {
+  display: flex;
+  flex: 1 1 0;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+  padding: 8px;
+  border-left: 1px solid var(--app-table-border);
+}
+
+.dashboard-events-all-day__event {
+  max-width: 100%;
+  min-height: 30px;
+  padding: 5px 10px;
+  overflow: hidden;
+  border: 1px solid;
+  border-radius: 999px;
+  color: var(--app-surface-text);
+  box-shadow: 0 6px 12px rgba(15, 23, 42, 0.08);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
 .contrast-text {
+  @include mixin.flex-center(inline-flex, center, 5px);
+  @include mixin.chip(currentColor, 18%, var(--app-surface-card-bg), 82%);
+  min-height: 28px;
+  padding: 5px 8px;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.12);
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
   text-align: left;
+}
+
+.contrast-text .custom-material-icons {
+  font-size: 16px;
+  line-height: 1;
+}
+
+@media (max-width: 720px) {
+  .dashboard-events-toolbar {
+    justify-content: space-between;
+  }
+
+  .dashboard-events-title {
+    flex-basis: 100%;
+    order: -1;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .dashboard-events-calendar {
+    overflow-x: auto;
+  }
+
+  .cal-week-view {
+    min-width: 820px;
+  }
 }

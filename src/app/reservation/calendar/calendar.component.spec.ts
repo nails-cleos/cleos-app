@@ -17,6 +17,7 @@ import { IOfficeAll } from '../../interfaces/office';
 import { IRoomAll } from '../../interfaces/room';
 import { ICurrencyAll } from '../../interfaces/currency';
 import { IUserAll } from '../../interfaces/user';
+import { States } from '../../interfaces/reservation';
 import { createNewDate } from '../../util/dates';
 import { signal } from '@angular/core';
 
@@ -641,6 +642,28 @@ describe('CalendarComponent', () => {
       expect(header[1].cssClass).toBe('cal-disabled');
       expect(header[2].cssClass).toBe('');
     });
+  });
+
+  it('should include reservation meta details when creating calendar reservation events', () => {
+    const reservation = {
+      id: 'reservation-1',
+      timestamp: new Date(2026, 4, 6, 13, 30).getTime() / 1000,
+      state: States.approved,
+      customer: { displayName: 'Customer 1' },
+      professional: { displayName: 'Professional 1' },
+      room: { timeZone: 'Europe/Amsterdam' },
+      treatment: { name: 'Treatment 1', duration: 'PT30M' },
+      additional: [{ name: 'Additional 1' }],
+      showNotification: true,
+    } as any;
+
+    const events = component['addReservations']({ reservations: [reservation] } as any, false);
+
+    expect(events[0].meta.professionalName).toBe('Professional 1');
+    expect(events[0].meta.isReservation).toBeTrue();
+    expect(events[0].meta.treatmentName).toBe('Treatment 1');
+    expect(events[0].meta.additionalNames).toEqual(['Additional 1']);
+    expect(events[0].cssClass).toContain('approved');
   });
 
   describe('Max and Min Dates', () => {

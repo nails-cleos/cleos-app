@@ -11,7 +11,6 @@ import {
   getReservation,
   reservationFindPayments,
 } from '../../../store/reservation.actions';
-import { PaymentType } from '../../../interfaces/payment';
 import { IExtras } from '../../../interfaces/reservation';
 import { MatListOption } from '@angular/material/list';
 import { ServiceType } from '../../../interfaces/room';
@@ -28,6 +27,7 @@ describe('ReservationCompleteComponent', () => {
   let treatmentDiscount$: BehaviorSubject<any>;
   let additionalList$: BehaviorSubject<any>;
   let payments$: BehaviorSubject<any>;
+  let paymentOptions$: BehaviorSubject<any>;
 
   const mockReservation = {
     id: 'reservation-1',
@@ -57,7 +57,7 @@ describe('ReservationCompleteComponent', () => {
     },
     room: {
       timeZone: 'Europe/Amsterdam',
-      paymentTypes: [PaymentType.cash],
+      paymentTypes: ['CASH', 'TRANSFER'],
       currency: { code: 'EUR' },
     },
     additional: [
@@ -105,7 +105,30 @@ describe('ReservationCompleteComponent', () => {
   ];
 
   const mockPayments = [
-    { id: 'payment-1', amount: 50, type: PaymentType.cash },
+    { id: 'payment-1', amount: 50, type: 'CASH' },
+  ];
+
+  const mockPaymentOptions = [
+    {
+      label: 'Cash',
+      type: 'CASH',
+      enabled: true,
+      show: true,
+      icon: 'cash',
+    },
+    {
+      label: 'Transfer',
+      type: 'TRANSFER',
+      enabled: true,
+      show: true,
+      icon: 'transfer',
+    },
+    {
+      label: 'Mollie',
+      type: 'MOLLIE',
+      enabled: true,
+      show: true,
+    },
   ];
 
   beforeEach(async () => {
@@ -114,6 +137,7 @@ describe('ReservationCompleteComponent', () => {
     treatmentDiscount$ = new BehaviorSubject(mockTreatmentDiscount);
     additionalList$ = new BehaviorSubject(mockAdditionalList);
     payments$ = new BehaviorSubject(mockPayments);
+    paymentOptions$ = new BehaviorSubject(mockPaymentOptions);
 
     storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
 
@@ -131,6 +155,8 @@ describe('ReservationCompleteComponent', () => {
           return additionalList$.asObservable();
         case 5:
           return payments$.asObservable();
+        case 6:
+          return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -159,6 +185,7 @@ describe('ReservationCompleteComponent', () => {
     treatmentDiscount$.complete();
     additionalList$.complete();
     payments$.complete();
+    paymentOptions$.complete();
   });
 
   it('should create', () => {
@@ -204,8 +231,11 @@ describe('ReservationCompleteComponent', () => {
     });
 
     it('should initialize types array', () => {
-      expect(component.types.map(type => type.type)).toContain(PaymentType.cash);
-      expect(component.types.map(type => type.type)).toContain(PaymentType.transfer);
+      selectedReservation$.next(mockReservation);
+      fixture.detectChanges();
+
+      expect(component.options().map(type => type.type)).toContain('CASH');
+      expect(component.options().map(type => type.type)).toContain('TRANSFER');
     });
   });
 
@@ -326,8 +356,8 @@ describe('ReservationCompleteComponent', () => {
   describe('Extras and Split', () => {
     it('should update currentExtraData on onExtrasChanges', () => {
       const extras: IExtras[] = [
-        { description: 'Extra 1', price: 10, paymentType: PaymentType.cash },
-        { description: 'Extra 2', price: 20, paymentType: PaymentType.cash },
+        { description: 'Extra 1', price: 10, paymentType: 'CASH' },
+        { description: 'Extra 2', price: 20, paymentType: 'CASH' },
       ];
 
       component.onExtrasChanges(extras);
@@ -337,7 +367,7 @@ describe('ReservationCompleteComponent', () => {
 
     it('should update price on onExtrasChanges', () => {
       const extras: IExtras[] = [
-        { description: 'Extra 1', price: 10, paymentType: PaymentType.cash },
+        { description: 'Extra 1', price: 10, paymentType: 'CASH' },
       ];
 
       component.onExtrasChanges(extras);
@@ -347,8 +377,8 @@ describe('ReservationCompleteComponent', () => {
 
     it('should update currentSplitData on onSplitChanges', () => {
       const split: IExtras[] = [
-        { description: 'Split 1', price: 50, paymentType: PaymentType.cash },
-        { description: 'Split 2', price: 50, paymentType: PaymentType.ideal },
+        { description: 'Split 1', price: 50, paymentType: 'CASH' },
+        { description: 'Split 2', price: 50, paymentType: 'IDEAL' },
       ];
 
       component.onSplitChanges(split);
@@ -367,23 +397,23 @@ describe('ReservationCompleteComponent', () => {
     it('should validate split total matches toPaid', () => {
       component.price.set({ toPaid: 100, isPaid: false } as any);
       component['currentSplitData'] = [
-        { description: 'Split 1', price: 50, paymentType: PaymentType.cash },
-        { description: 'Split 2', price: 40, paymentType: PaymentType.ideal },
+        { description: 'Split 1', price: 50, paymentType: 'CASH' },
+        { description: 'Split 2', price: 40, paymentType: 'IDEAL' },
       ];
 
       component.splitChange();
 
-      expect(component.isValidSplit).toBe(false);
+      expect(component.isValidSplit()).toBe(false);
     });
 
     it('should reset split validity when split is turned off', () => {
       component.split = true;
-      component.isValidSplit = false;
+      component.isValidSplit.set(false);
 
       component.splitChange();
 
       expect(component.split).toBe(false);
-      expect(component.isValidSplit).toBe(true);
+      expect(component.isValidSplit()).toBe(true);
     });
   });
 
@@ -598,7 +628,7 @@ describe('ReservationCompleteComponent', () => {
       component.price.set({ isPaid: false } as any);
       fixture.detectChanges();
 
-      expect(component.getForm.type.value).toBe(PaymentType.mollie);
+      expect(component.getForm.type.value).toBe('MOLLIE');
     });
 
     it('should clear type when payment is paid', () => {

@@ -1,72 +1,83 @@
-<div class="dialog-header">
-  <h1 mat-dialog-title>{{ 'ME.REVIEW.TITLE' | translate }}</h1>
-  <button (click)="onNoClick()" class="close-button" mat-icon-button>
-    <mat-icon>close</mat-icon>
-  </button>
-</div>
-<mat-divider class="divider-padding"></mat-divider>
-<div mat-dialog-content>
-  @if (reservation) {
-    <div class="upcoming">
-      <table>
-        <tr>
-          <td class="right">{{ 'ME.RESERVATION.UPCOMING.START' | translate }}</td>
-          <td class="left">{{ reservation.start | date:'short':reservation.room.timeZone:dateFormat }}</td>
-        </tr>
-        @if (end) {
-          <tr>
-            <td class="right">{{ 'ME.RESERVATION.UPCOMING.END' | translate }}</td>
-            <td class="left">{{ end | date:'short':reservation.room.timeZone:dateFormat }}</td>
-          </tr>
-        }
-        <tr>
-          <td class="right">{{ 'COMMON.ROOM.FIELD' | translate }}</td>
-          <td class="left">{{ reservation.room | roomName }}</td>
-        </tr>
-        <tr>
-          <td class="right">{{ 'COMMON.ADDRESS.FIELD' | translate }}</td>
-          <td class="left dialog-title">
-            <a
-              [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + reservation.room.address.name"
-              rel="noreferrer" target="_blank">
-              {{ reservation.room.address.name }}
-            </a>
-          </td>
-        </tr>
-        <tr>
-          <td class="right">{{ 'COMMON.TREATMENT.FIELD' | translate }}</td>
-          <td class="left">{{ reservation.treatment.name }}</td>
-        </tr>
-        <tr>
-          <td class="right">{{ 'ME.RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</td>
-          <td class="left">$ {{ price.total | number:'1.2-2' }}</td>
-        </tr>
-      </table>
+<div class="app-surface-dialog-shell">
+  <div class="app-surface-dialog-header">
+    <div class="app-surface-dialog-title-wrap">
+      <div class="app-surface-dialog-badge" aria-hidden="true">
+        <mat-icon>reviews</mat-icon>
+      </div>
+      <h1 mat-dialog-title class="app-surface-dialog-title">{{ 'ME.REVIEW.TITLE' | translate }}</h1>
     </div>
-  }
-  <mat-divider class="divider-padding"></mat-divider>
-  @if (review) {
-    <app-rating [detail]="review.detail" [rating]="review.rating" [starCount]="starCount" color="primary"
-                [canEdit]="false"></app-rating>
-  } @else {
-    <app-rating (ratingHover)="onRatingHover($event)" (ratingUpdated)="onRatingChanged($event)" [hover]="hover"
-                [rating]="rating" [starCount]="starCount" color="primary" [canEdit]="true"></app-rating>
-    <mat-form-field appearance="outline">
-      <mat-label>{{ 'ME.REVIEW.DETAIL' | translate }}</mat-label>
-      <label>
-        <textarea #message [formControl]="detail" matInput maxlength="256"></textarea>
-      </label>
-      <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
-    </mat-form-field>
-  }
-</div>
-<mat-divider class="divider-padding"></mat-divider>
-<div mat-dialog-actions class="card-actions">
-  <div class="spacer"></div>
-  <button (click)="onNoClick()" color="accent" mat-fab extended>{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
-  @if (!review) {
-    <button (click)="doAction()" [disabled]="rating < 1" color="primary" mat-fab extended>
-      {{ 'COMMON.BUTTON.ADD' | translate }}
+    <button (click)="onNoClick()" aria-label="Close dialog" class="app-surface-dialog-close" type="button">
+      <mat-icon>close</mat-icon>
     </button>
-  }
+  </div>
+
+  <div class="app-surface-dialog-divider" aria-hidden="true"></div>
+
+  <div mat-dialog-content class="app-surface-dialog-content review-dialog-content">
+    @if (reservation) {
+      <div class="upcoming">
+        <table>
+          <tr>
+            <td class="right">{{ 'ME.RESERVATION.UPCOMING.START' | translate }}</td>
+            <td class="left">{{ reservation.start | date:'short':reservation.room.timeZone:dateFormat }}</td>
+          </tr>
+          @if (end) {
+            <tr>
+              <td class="right">{{ 'ME.RESERVATION.UPCOMING.END' | translate }}</td>
+              <td class="left">{{ end | date:'short':reservation.room.timeZone:dateFormat }}</td>
+            </tr>
+          }
+          <tr>
+            <td class="right">{{ 'COMMON.ROOM.FIELD' | translate }}</td>
+            <td class="left">{{ reservation.room | roomName }}</td>
+          </tr>
+          <tr>
+            <td class="right">{{ 'COMMON.ADDRESS.FIELD' | translate }}</td>
+            <td class="left dialog-title">
+              <a
+                [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + reservation.room.address.name"
+                rel="noreferrer" target="_blank">
+                {{ reservation.room.address.name }}
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td class="right">{{ 'COMMON.TREATMENT.FIELD' | translate }}</td>
+            <td class="left">{{ reservation.treatment.name }}</td>
+          </tr>
+          <tr>
+            <td class="right">{{ 'ME.RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</td>
+            <td class="left">$ {{ price.total | number:'1.2-2' }}</td>
+          </tr>
+        </table>
+      </div>
+    }
+    <mat-divider class="divider-padding"></mat-divider>
+    @if (review) {
+      <app-rating [detail]="review.detail" [rating]="review.rating" [starCount]="starCount" color="primary"
+                  [canEdit]="false"></app-rating>
+    } @else {
+      <app-rating (ratingHover)="onRatingHover($event)" (ratingUpdated)="onRatingChanged($event)" [hover]="hover"
+                  [rating]="rating" [starCount]="starCount" color="primary" [canEdit]="true"></app-rating>
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'ME.REVIEW.DETAIL' | translate }}</mat-label>
+        <label>
+          <textarea #message [formControl]="detail" matInput maxlength="256"></textarea>
+        </label>
+        <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
+      </mat-form-field>
+    }
+  </div>
+
+  <div class="app-surface-dialog-divider" aria-hidden="true"></div>
+
+  <div mat-dialog-actions class="app-surface-dialog-actions">
+    <div class="app-surface-dialog-spacer"></div>
+    <button (click)="onNoClick()" mat-stroked-button type="button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+    @if (!review) {
+      <button (click)="doAction()" [disabled]="rating < 1" color="primary" mat-flat-button type="button">
+        {{ 'COMMON.BUTTON.ADD' | translate }}
+      </button>
+    }
+  </div>
 </div>

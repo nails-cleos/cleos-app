@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
@@ -6,7 +7,7 @@ import { BehaviorSubject, of } from 'rxjs';
 import { ReservationDetailComponent } from './reservation-detail.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { CancelOption, IReservationAll, States } from '../../interfaces/reservation';
-import { IPaymentAll, PaymentType } from '../../interfaces/payment';
+import { IPaymentAll } from '../../interfaces/payment';
 import {
   approveReservation,
   cancelReservation,
@@ -37,6 +38,7 @@ describe('ReservationDetailComponent', () => {
   let reservationSelected$: BehaviorSubject<any>;
   let payments$: BehaviorSubject<any>;
   let histories$: BehaviorSubject<any>;
+  let paymentOptions$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
@@ -76,7 +78,7 @@ describe('ReservationDetailComponent', () => {
       timeZone: 'Europe/Amsterdam',
       currency: mockCurrency,
       professionals: [professional],
-      paymentTypes: [PaymentType.cash, PaymentType.transfer],
+      paymentTypes: ['CASH', 'TRANSFER'],
       availabilities: [],
       address: { name: 'address', location: { x: 1.0, y: 1.0 }, id: 1 },
       office: { id: 'office-1', name: 'Office 1', manager: professional },
@@ -108,7 +110,7 @@ describe('ReservationDetailComponent', () => {
       id: 'payment-1',
       transactionAmount: 25.00,
       status: 'APPROVED',
-      type: PaymentType.cash,
+      type: 'CASH',
       description: '',
       amount: 25,
       timestamp: mockDate.getTime() / 1000,
@@ -119,7 +121,7 @@ describe('ReservationDetailComponent', () => {
       id: 'payment-2',
       transactionAmount: 25.00,
       status: 'APPROVED',
-      type: PaymentType.transfer,
+      type: 'TRANSFER',
       description: '',
       amount: 25,
       timestamp: mockDate.getTime() / 1000,
@@ -128,12 +130,45 @@ describe('ReservationDetailComponent', () => {
     },
   ];
 
+  const addPaymentForm = (amount = '100.00', type = 'TRANSFER') => {
+    component.payments.push(new FormGroup({
+      amount: new FormControl(amount),
+      type: new FormControl(type),
+    }) as any);
+  };
+
   beforeEach(async () => {
     reservationId$ = new BehaviorSubject(undefined);
     navigationParams$ = new BehaviorSubject(undefined);
     reservationSelected$ = new BehaviorSubject(undefined);
     payments$ = new BehaviorSubject(undefined);
     histories$ = new BehaviorSubject(undefined);
+    paymentOptions$ = new BehaviorSubject([
+      {
+        type: 'CASH',
+        label: 'Cash',
+        enabled: true,
+        enabledCustomer: true,
+        enabledProfessional: true,
+        default: true,
+        filter: true,
+        defaultFilter: false,
+        show: true,
+        icon: 'cash',
+      },
+      {
+        type: 'TRANSFER',
+        label: 'Transfer',
+        enabled: true,
+        enabledCustomer: true,
+        enabledProfessional: true,
+        default: true,
+        filter: true,
+        defaultFilter: false,
+        show: true,
+        icon: 'transfer',
+      },
+    ]);
 
     storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -159,6 +194,8 @@ describe('ReservationDetailComponent', () => {
           return payments$.asObservable();
         case 5:
           return histories$.asObservable();
+        case 6:
+          return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -191,6 +228,7 @@ describe('ReservationDetailComponent', () => {
     reservationSelected$.complete();
     payments$.complete();
     histories$.complete();
+    paymentOptions$.complete();
   });
 
   it('should create', () => {
@@ -464,6 +502,27 @@ describe('ReservationDetailComponent', () => {
       );
     });
 
+    it('should navigate to me overview for customer users', () => {
+      authUserSignal.update(prev => ({ ...prev, customerId: 'customer-1223', isCustomer: true }));
+      reservationSelected$.next({ ...mockReservation, customer: { ...mockReservation.customer, id: 'customer-1223' } });
+
+      fixture.detectChanges();
+
+      component.overview();
+
+      expect(navigateSpy).toHaveBeenCalledWith(['/', 'en-GB', 'me', 'overview']);
+    });
+
+    it('should navigate to customer overview for non-customer users', () => {
+      authUserSignal.update(prev => ({ ...prev, customerId: undefined, isCustomer: false }));
+      reservationSelected$.next(mockReservation);
+      fixture.detectChanges();
+
+      component.overview();
+
+      expect(navigateSpy).toHaveBeenCalledWith(['/', 'en-GB', 'users', mockReservation.customer.id, 'overview']);
+    });
+
     it('should allow clone from completed state', () => {
       const startedReservation = { ...mockReservation, state: States.completed };
       reservationSelected$.next(startedReservation);
@@ -660,12 +719,13 @@ describe('ReservationDetailComponent', () => {
         preferenceId: 'preference-123',
         amount: 100,
         status: 'PENDING',
-        type: PaymentType.ideal,
+        type: 'IDEAL',
         reservation: mockReservation,
       } as any;
+      payments$.next([pendingPayment]);
+      addPaymentForm('100.00', 'IDEAL');
       reservationSelected$.next({ ...mockReservation, state: States.cancelledPaymentRequired, paymentRequired: true });
       histories$.next([]);
-      payments$.next([pendingPayment]);
       fixture.detectChanges();
 
       component.onChangeState('notify');
@@ -685,12 +745,13 @@ describe('ReservationDetailComponent', () => {
         preferenceId: 'preference-123',
         amount: 100,
         status: 'CREATED',
-        type: PaymentType.ideal,
+        type: 'IDEAL',
         reservation: mockReservation,
       } as any;
+      payments$.next([createdPayment]);
+      addPaymentForm('100.00', 'IDEAL');
       reservationSelected$.next({ ...mockReservation, state: States.cancelledPaymentRequired, paymentRequired: true });
       histories$.next([]);
-      payments$.next([createdPayment]);
       fixture.detectChanges();
 
       component.onChangeState('pay');
@@ -765,9 +826,10 @@ describe('ReservationDetailComponent', () => {
     });
 
     it('should allow canceling when is edit mode with payments', () => {
-      reservationSelected$.next({ ...mockReservation, canEdit: true });
       payments$.next(
-        [{ id: 'payment-1', transactionAmount: 100, status: 'APPROVED', type: PaymentType.transfer } as any]);
+        [{ id: 'payment-1', transactionAmount: 100, status: 'APPROVED', type: 'TRANSFER' } as any]);
+      addPaymentForm('100.00', 'TRANSFER');
+      reservationSelected$.next({ ...mockReservation, canEdit: true });
       histories$.next([]);
       fixture.detectChanges();
 
@@ -826,9 +888,10 @@ describe('ReservationDetailComponent', () => {
       dialogSpy.and.returnValue({
         afterClosed: () => of({ option: CancelOption.none }),
       });
-      reservationSelected$.next({ ...mockReservation, canEdit: false });
       payments$.next(
-        [{ id: 'payment-1', transactionAmount: 50, status: 'APPROVED', type: PaymentType.transfer } as any]);
+        [{ id: 'payment-1', transactionAmount: 50, status: 'APPROVED', type: 'TRANSFER' } as any]);
+      addPaymentForm('50.00', 'TRANSFER');
+      reservationSelected$.next({ ...mockReservation, canEdit: false });
       histories$.next([]);
       fixture.detectChanges();
 
@@ -856,9 +919,10 @@ describe('ReservationDetailComponent', () => {
       dialogSpy.and.returnValue({
         afterClosed: () => of({ option: CancelOption.chargeAndAccount }),
       });
-      reservationSelected$.next({ ...mockReservation, canEdit: false });
       payments$.next(
-        [{ id: 'payment-1', transactionAmount: 100, status: 'APPROVED', type: PaymentType.transfer } as any]);
+        [{ id: 'payment-1', transactionAmount: 100, status: 'APPROVED', type: 'TRANSFER' } as any]);
+      addPaymentForm('100.00', 'TRANSFER');
+      reservationSelected$.next({ ...mockReservation, canEdit: false });
       histories$.next([]);
       fixture.detectChanges();
 

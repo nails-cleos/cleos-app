@@ -4,13 +4,13 @@ import { ICurrencyAll } from '../../../interfaces/currency';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AppMaterialModule } from '../../../util/app-material.module';
-import { CurrencyPipe, NgClass } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-month',
   templateUrl: './month.component.html',
   styleUrls: ['./month.component.scss'],
-  imports: [AppMaterialModule, TranslatePipe, CurrencyPipe, NgClass],
+  imports: [AppMaterialModule, TranslatePipe, CurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MonthComponent {
@@ -71,6 +71,6 @@ export class MonthComponent {
         break;
     }
     this.router.navigate([this.language, 'dashboard', 'monthly', 'summary'],
-      { state: { date: `${month}-${this.year()}`, step } });
+      { state: { date: `${ month }-${ this.year() }`, step } });
   };
 }

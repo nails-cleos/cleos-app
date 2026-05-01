@@ -1,162 +1,73 @@
-<mat-card>
-  <mat-card-content>
-    @let currentCurrency = currency();
-    @let currentMonth = month();
-    @let currentShowCash = showCash();
-    <mat-card appearance="outlined">
-      <mat-card-content>
-        <mat-list>
-          <div mat-subheader (click)="goToMonth(currentMonth.month, 'INCOME')"
-               class="header pointer">{{ 'SUMMARY.INCOME' | translate }}
-          </div>
-          <mat-list-item>
-            <div class="fields-container" matListItemTitle>
-              <div>{{ 'SUMMARY.MONTHLY.TABLE.GROSS' | translate }}</div>
-              <div class="currency">
-                {{ income?.gross | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}
-              </div>
-            </div>
-          </mat-list-item>
-          <mat-list-item>
-            <div class="fields-container result" matListItemTitle>
-              <div>{{ 'SUMMARY.MONTHLY.TABLE.BTW' | translate }}</div>
-              <div class="currency">
-                {{ income?.btw | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}
-              </div>
-            </div>
-          </mat-list-item>
-          <mat-list-item>
-            <div class="fields-container" matListItemTitle>
-              <div>{{ 'SUMMARY.MONTHLY.TABLE.NET' | translate }}</div>
-              <div class="currency">
-                {{ income?.net | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}
-              </div>
-            </div>
-          </mat-list-item>
-          <div mat-subheader (click)="goToMonth(currentMonth.month, 'EXPENSE')"
-               class="header pointer">{{ 'SUMMARY.EXPENSE' | translate }}
-          </div>
-          <mat-list-item [ngClass]="{'bottom':!currentShowCash}">
-            <div class="fields-container" matListItemTitle>
-              <div>{{ 'SUMMARY.MONTHLY.TABLE.GROSS' | translate }}</div>
-              <div class="currency">
-                {{ expense?.gross | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}
-              </div>
-            </div>
-          </mat-list-item>
-          <mat-list-item [ngClass]="{'bottom':!currentShowCash}">
-            <div class="fields-container result" matListItemTitle>
-              <div>{{ 'SUMMARY.MONTHLY.TABLE.BTW' | translate }}</div>
-              <div class="currency">
-                {{ expense?.btw | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}
-              </div>
-            </div>
-          </mat-list-item>
-          <mat-list-item [ngClass]="{'bottom':!currentShowCash}">
-            <div class="fields-container" matListItemTitle>
-              <div>{{ 'SUMMARY.MONTHLY.TABLE.NET' | translate }}</div>
-              <div class="currency">
-                {{ expense?.net | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}
-              </div>
-            </div>
-          </mat-list-item>
-        </mat-list>
-      </mat-card-content>
-      <mat-divider></mat-divider>
-      <mat-card-footer>
-        <mat-list>
-          <mat-list-item class="bottom" matListItemTitle>
-            <div class="fields-container">
-              <div>{{ 'SUMMARY.MONTHLY.TABLE.GROSS' | translate }}</div>
-              <div class="currency">
-                {{ currentMonth.totalWithoutGross | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}
-              </div>
-            </div>
-          </mat-list-item>
-          <mat-list-item>
-            <div class="fields-container result" matListItemTitle>
-              <div>{{ 'SUMMARY.MONTHLY.TABLE.BTW' | translate }}</div>
-              <div class="currency">
-                {{ currentMonth.totalWithoutBTW | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}
-              </div>
-            </div>
-          </mat-list-item>
-          <mat-list-item>
-            <div class="fields-container" matListItemTitle>
-              <div>{{ 'SUMMARY.MONTHLY.TABLE.NET' | translate }}</div>
-              <div class="currency">
-                {{ currentMonth.totalWithoutNet | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}
-              </div>
-            </div>
-          </mat-list-item>
-        </mat-list>
-      </mat-card-footer>
-    </mat-card>
+@let currentCurrency = currency();
+@let currentMonth = month();
+@let currentShowCash = showCash();
 
-    @if (currentShowCash) {
-      <mat-card appearance="outlined" class="bottom">
-        <mat-card-content>
-          <mat-list>
-            <div mat-subheader (click)="goToMonth(currentMonth.month, 'CASH')"
-                 class="header pointer">{{ 'SUMMARY.CASH' | translate }}
-            </div>
-            <mat-list-item class="bottom">
-              <div class="fields-container" matListItemTitle>
-                <div>{{ 'SUMMARY.MONTHLY.TABLE.GROSS' | translate }}</div>
-                <div class="currency">
-                  {{ cash?.gross | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}
-                </div>
-              </div>
-            </mat-list-item>
-            <mat-list-item>
-              <div class="fields-container result" matListItemTitle>
-                <div>{{ 'SUMMARY.MONTHLY.TABLE.BTW' | translate }}</div>
-                <div class="currency">
-                  {{ cash?.btw | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}
-                </div>
-              </div>
-            </mat-list-item>
-            <mat-list-item>
-              <div class="fields-container" matListItemTitle>
-                <div>{{ 'SUMMARY.MONTHLY.TABLE.NET' | translate }}</div>
-                <div class="currency">
-                  {{ cash?.net | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}
-                </div>
-              </div>
-            </mat-list-item>
-          </mat-list>
-        </mat-card-content>
-        <mat-divider></mat-divider>
-        <mat-card-footer>
-          <mat-list>
-            <div mat-subheader class="header">{{ 'SUMMARY.TOTAL_CASH' | translate }}</div>
-            <mat-list-item class="bottom">
-              <div class="fields-container" matListItemTitle>
-                <div>{{ 'SUMMARY.MONTHLY.TABLE.GROSS' | translate }}</div>
-                <div class="currency">
-                  {{ currentMonth.totalGross | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}
-                </div>
-              </div>
-            </mat-list-item>
-            <mat-list-item class="bottom" matListItemTitle>
-              <div class="fields-container result">
-                <div>{{ 'SUMMARY.MONTHLY.TABLE.BTW' | translate }}</div>
-                <div class="currency">
-                  {{ currentMonth.totalBTW | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}
-                </div>
-              </div>
-            </mat-list-item>
-            <mat-list-item class="bottom" matListItemTitle>
-              <div class="fields-container">
-                <div>{{ 'SUMMARY.MONTHLY.TABLE.NET' | translate }}</div>
-                <div class="currency">
-                  {{ currentMonth.totalNet | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}
-                </div>
-              </div>
-            </mat-list-item>
-          </mat-list>
-        </mat-card-footer>
-      </mat-card>
-    }
-  </mat-card-content>
-</mat-card>
+<div class="month-summary">
+  <section class="app-surface-item month-summary-card">
+    <div class="month-summary-card__header">
+      <div></div>
+      <button (click)="goToMonth(currentMonth.month, 'INCOME')" class="month-summary-card__heading month-summary-card__heading--action" type="button">
+        {{ 'SUMMARY.INCOME' | translate }}
+      </button>
+      <button (click)="goToMonth(currentMonth.month, 'EXPENSE')" class="month-summary-card__heading month-summary-card__heading--action" type="button">
+        {{ 'SUMMARY.EXPENSE' | translate }}
+      </button>
+      <div class="month-summary-card__heading">{{ 'SUMMARY.TOTAL' | translate }}</div>
+    </div>
+
+    <div class="month-summary-card__rows">
+      <div class="month-summary-card__row">
+        <div class="month-summary-card__label">{{ 'SUMMARY.MONTHLY.TABLE.GROSS' | translate }}</div>
+        <div class="month-summary-card__value">{{ income?.gross | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+        <div class="month-summary-card__value">{{ expense?.gross | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+        <div class="month-summary-card__value month-summary-card__value--result">{{ currentMonth.totalWithoutGross | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+      </div>
+
+      <div class="month-summary-card__row">
+        <div class="month-summary-card__label">{{ 'SUMMARY.MONTHLY.TABLE.BTW' | translate }}</div>
+        <div class="month-summary-card__value">{{ income?.btw | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+        <div class="month-summary-card__value">{{ expense?.btw | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+        <div class="month-summary-card__value month-summary-card__value--result">{{ currentMonth.totalWithoutBTW | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+      </div>
+
+      <div class="month-summary-card__row">
+        <div class="month-summary-card__label">{{ 'SUMMARY.MONTHLY.TABLE.NET' | translate }}</div>
+        <div class="month-summary-card__value">{{ income?.net | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+        <div class="month-summary-card__value">{{ expense?.net | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+        <div class="month-summary-card__value month-summary-card__value--result">{{ currentMonth.totalWithoutNet | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+      </div>
+    </div>
+  </section>
+
+  @if (currentShowCash) {
+    <section class="app-surface-item month-summary-card">
+      <div class="month-summary-card__header month-summary-card__header--cash">
+        <div></div>
+        <button (click)="goToMonth(currentMonth.month, 'CASH')" class="month-summary-card__heading month-summary-card__heading--action" type="button">
+          {{ 'SUMMARY.CASH' | translate }}
+        </button>
+        <div class="month-summary-card__heading">{{ 'SUMMARY.TOTAL_CASH' | translate }}</div>
+      </div>
+
+      <div class="month-summary-card__rows">
+        <div class="month-summary-card__row month-summary-card__row--cash">
+          <div class="month-summary-card__label">{{ 'SUMMARY.MONTHLY.TABLE.GROSS' | translate }}</div>
+          <div class="month-summary-card__value">{{ cash?.gross | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+          <div class="month-summary-card__value month-summary-card__value--result">{{ currentMonth.totalGross | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+        </div>
+
+        <div class="month-summary-card__row month-summary-card__row--cash">
+          <div class="month-summary-card__label">{{ 'SUMMARY.MONTHLY.TABLE.BTW' | translate }}</div>
+          <div class="month-summary-card__value">{{ cash?.btw | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+          <div class="month-summary-card__value month-summary-card__value--result">{{ currentMonth.totalBTW | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+        </div>
+
+        <div class="month-summary-card__row month-summary-card__row--cash">
+          <div class="month-summary-card__label">{{ 'SUMMARY.MONTHLY.TABLE.NET' | translate }}</div>
+          <div class="month-summary-card__value">{{ cash?.net | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+          <div class="month-summary-card__value month-summary-card__value--result">{{ currentMonth.totalNet | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+        </div>
+      </div>
+    </section>
+  }
+</div>

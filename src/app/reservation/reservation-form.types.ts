@@ -1,12 +1,10 @@
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { CalendarEvent } from 'angular-calendar';
-import { IService } from '../interfaces/room';
-import { ICustomerLastReservation } from '../interfaces/reservation';
-import { PaymentType } from '../interfaces/payment';
+import { IRoomAll, IService } from '../interfaces/room';
 import { IUserAll } from '../interfaces/user';
 import { IOfficeAll } from '../interfaces/office';
-import { IRoomAll } from '../interfaces/room';
-import { IGroupService, IPrice } from '../interfaces/treatment';
+import { IGroupService } from '../interfaces/treatment';
+import { IPaymentOption } from '../interfaces/payment';
 
 export type CustomerForm = {
   customer: FormControl<IUserAll | undefined>;
@@ -34,7 +32,7 @@ export type ConfigurationForm = {
   customerChange: FormControl<boolean>;
   reference: FormControl<string | undefined>;
   note: FormControl<string | undefined>;
-  type: FormControl<PaymentType | undefined>;
+  option: FormControl<IPaymentOption | undefined>;
   amount: FormControl<number | undefined>;
   transfer: FormControl<string | undefined>;
 };
@@ -66,11 +64,6 @@ export type ReservationErrors = Partial<Record<ReservationFormField, string>> & 
   dateTimeList?: string[];
   events?: string[];
   overlapping: boolean;
-};
-
-export type ReservationViewState = {
-  customerInfo?: ICustomerLastReservation;
-  price: IPrice;
 };
 
 export const createReservationErrors = (): ReservationErrors => ({

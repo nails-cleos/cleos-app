@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { IPaymentOption, PaymentType } from '../../../interfaces/payment';
+import { IPaymentOption } from '../../../interfaces/payment';
 import { getPaymentByResourceId } from '../../../store/payment.actions';
 import { IReservationAll } from '../../../interfaces/reservation';
 import { provideHttpClient } from '@angular/common/http';
@@ -20,11 +20,56 @@ describe('OptionComponent', () => {
 
   let reservationId$: BehaviorSubject<any>;
   let payments$: BehaviorSubject<any>;
+  let paymentOptions$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
     reservationId$ = new BehaviorSubject(undefined);
     payments$ = new BehaviorSubject(undefined);
+    paymentOptions$ = new BehaviorSubject([
+      {
+        type: 'PAYPAL',
+        label: 'PayPal',
+        enabled: true,
+        enabledCustomer: true,
+        default: false,
+        filter: true,
+        defaultFilter: false,
+        show: true,
+      },
+      {
+        type: 'IDEAL',
+        label: 'iDeal',
+        enabled: true,
+        enabledCustomer: true,
+        default: false,
+        filter: true,
+        defaultFilter: false,
+        show: true,
+      },
+      {
+        type: 'CASH',
+        label: 'Cash',
+        enabled: true,
+        enabledCustomer: false,
+        default: true,
+        filter: true,
+        defaultFilter: false,
+        show: true,
+        icon: 'cash',
+      },
+      {
+        type: 'TRANSFER',
+        label: 'Transfer',
+        enabled: true,
+        enabledCustomer: false,
+        default: true,
+        filter: true,
+        defaultFilter: true,
+        show: true,
+        icon: 'transfer',
+      },
+    ]);
     breakpoint$ = new BehaviorSubject(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
@@ -41,6 +86,8 @@ describe('OptionComponent', () => {
           return reservationId$.asObservable();
         case 2:
           return payments$.asObservable();
+        case 3:
+          return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -82,7 +129,7 @@ describe('OptionComponent', () => {
     const paymentsMock = [{
       reservation: {
         id: 'res1',
-        room: { paymentTypes: [PaymentType.paypal, PaymentType.ideal], currency: { icon: 'euro' } },
+        room: { paymentTypes: ['PAYPAL', 'IDEAL'], currency: { icon: 'euro' } },
         state: 'CONFIRMED',
         treatment: { price: 100 },
       } as IReservationAll,
@@ -93,8 +140,8 @@ describe('OptionComponent', () => {
     fixture.detectChanges();
 
     expect(component.options()).toEqual(jasmine.arrayContaining([
-      jasmine.objectContaining({ type: PaymentType.paypal }),
-      jasmine.objectContaining({ type: PaymentType.ideal }),
+      jasmine.objectContaining({ type: 'PAYPAL' }),
+      jasmine.objectContaining({ type: 'IDEAL' }),
     ]));
     expect(component.reservation()).toEqual(paymentsMock[0].reservation);
   });
@@ -103,7 +150,7 @@ describe('OptionComponent', () => {
     const paymentsMock = [{
       reservation: {
         id: 'res2',
-        room: { paymentTypes: [PaymentType.cash, PaymentType.transfer], currency: { icon: 'euro' } },
+        room: { paymentTypes: ['CASH', 'TRANSFER'], currency: { icon: 'euro' } },
         state: 'CONFIRMED',
         treatment: { price: 100 },
       },
@@ -120,7 +167,7 @@ describe('OptionComponent', () => {
     payments$.next([{
       reservation: {
         id: 'res-123',
-        room: { paymentTypes: [PaymentType.paypal], currency: { icon: 'euro' } },
+        room: { paymentTypes: ['PAYPAL'], currency: { icon: 'euro' } },
         state: 'CONFIRMED',
         treatment: { price: 100 },
       },
@@ -129,8 +176,17 @@ describe('OptionComponent', () => {
 
     fixture.detectChanges();
 
-    const option: IPaymentOption = { name: '', svgIcon: '', type: PaymentType.paypal };
-    component.form.controls.type.setValue(option);
+    const option: IPaymentOption = {
+      label: 'PayPal',
+      type: 'PAYPAL',
+      enabled: true,
+      enabledCustomer: true,
+      default: false,
+      filter: true,
+      defaultFilter: false,
+      show: true,
+    };
+    component.form.controls.option.setValue(option);
 
     component.pay();
 
@@ -143,7 +199,7 @@ describe('OptionComponent', () => {
   it('should not dispatch createPaymentLinkByReservationId if form type is undefined', () => {
     reservationId$.next('res-123');
 
-    component.form.controls.type.setValue(undefined);
+    component.form.controls.option.setValue(undefined);
     component.pay();
 
     expect(storeSpy.dispatch).not.toHaveBeenCalledWith(jasmine.objectContaining({
@@ -151,9 +207,33 @@ describe('OptionComponent', () => {
     }));
   });
 
-  it('should update smallScreen signal based on breakpointObserver', () => {
-    breakpoint$.next({ matches: true });
-    fixture.detectChanges();
-    expect(component.smallScreen()).toBeTrue();
+  it('should move one step back without going below zero', () => {
+    component.currentStepIndex.set(2);
+    component.back();
+    expect(component.currentStepIndex()).toBe(1);
+
+    component.back();
+    component.back();
+    expect(component.currentStepIndex()).toBe(0);
   });
+
+  it('should advance to step two only when requested and form is valid', () => {
+    component.form.controls.option.setValue({
+      label: 'PayPal',
+      type: 'PAYPAL',
+      enabled: true,
+      enabledCustomer: true,
+      default: false,
+      filter: true,
+      defaultFilter: false,
+      show: true,
+    });
+
+    component.callStepTwo(false);
+    expect(component.currentStepIndex()).toBe(0);
+
+    component.callStepTwo(true);
+    expect(component.currentStepIndex()).toBe(1);
+  });
+
 });

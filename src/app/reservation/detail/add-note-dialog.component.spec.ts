@@ -53,7 +53,7 @@ describe('AddNoteDialogComponent', () => {
 
   it('should show both buttons when both hideNoButton and hideOkButton are false', () => {
     const compiled = fixture.nativeElement;
-    const buttons = compiled.querySelectorAll('button');
+    const buttons = compiled.querySelectorAll('[mat-dialog-actions] button');
     expect(buttons.length).toBe(2);
   });
 
@@ -79,10 +79,10 @@ describe('AddNoteDialogComponent', () => {
     const buttons = Array.from(compiled.querySelectorAll('button')) as HTMLButtonElement[];
 
     const noButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.CANCEL'));
-    const yesButton = buttons.find(btn => btn.textContent?.includes('Ok'));
+    const yesButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.SAVE'));
 
     expect(noButton?.textContent?.trim()).toContain('COMMON.BUTTON.CANCEL');
-    expect(yesButton?.textContent?.trim()).toContain('Ok');
+    expect(yesButton?.textContent?.trim()).toContain('COMMON.BUTTON.SAVE');
   });
 
   it('should initialize form with empty values', () => {
