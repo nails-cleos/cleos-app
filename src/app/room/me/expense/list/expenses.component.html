@@ -162,7 +162,7 @@
 
           <ng-container matColumnDef="add">
             <th *matHeaderCellDef mat-header-cell>
-              <button [routerLink]="['/', language, 'expenses', 'add']" mat-icon-button id="add-button"
+              <button [routerLink]="['/', language, 'rooms', roomIdSignal(), 'expenses', 'add']" mat-icon-button id="add-button"
                       matTooltip="{{ 'EXPENSE.TITLE' | translate }}" matTooltipPosition="right" type="button">
                 <mat-icon color="primary">add_shopping_cart</mat-icon>
               </button>
