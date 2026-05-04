@@ -1,169 +1,306 @@
-<div class="flex-container">
-  <div class="card-container">
-    <div class="card-content" style="width: 80%">
-      <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
-        @let isAddMode = isAddModeSignal();
-        @let group = treatmentSignal();
-        <mat-card appearance="outlined">
-          @if (isAddMode) {
-            <mat-card-header>
-              <mat-card-title>{{ 'TREATMENT.TITLE' | translate }}</mat-card-title>
-            </mat-card-header>
-          } @else {
-            <mat-card-header>
-              <mat-card-title>{{ 'TREATMENT.DETAIL' | translate }}</mat-card-title>
-              @if (group) {
-                <mat-card-subtitle>{{ group.name }}</mat-card-subtitle>
-              } @else {
-                <div class="ssc-line"></div>
-              }
-            </mat-card-header>
-          }
-          @if (isAddMode || group) {
-            <mat-card-content>
-              <div class="inner-container">
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
-                  <input [formControl]="getForm.name" autocomplete="name" matInput required data-cy="name-input">
-                  @if (getForm.name.hasError('required')) {
-                    <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.REQUIRED' | translate"></mat-error>
-                  } @else if (errors['name']) {
-                    <mat-error>{{ errors['name'] }}</mat-error>
-                  }
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'TREATMENT.DESCRIPTION.FIELD' | translate }}</mat-label>
-                  <textarea #message [formControl]="getForm.description" matInput maxlength="256"
-                            data-cy="description-textarea"></textarea>
-                  <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="full-margin">
-                  <mat-icon matIconPrefix>euro</mat-icon>
-                  <mat-label>{{ 'TREATMENT.PRICE_FROM.FIELD' | translate }}</mat-label>
-                  <input [formControl]="getForm.priceFrom" matInput type="number" [min]="0" data-cy="priceFrom-input">
+@let modeValue = mode();
+@let isAddMode = isAddModeSignal();
+@let isViewMode = isViewModeSignal();
+@let group = isViewMode ? viewTreatmentSignal() : treatmentSignal();
 
-                  @if (getForm.priceFrom.hasError('min')) {
-                    <mat-error [innerHTML]="'TREATMENT.PRICE_FROM.MIN' | translate"></mat-error>
-                  } @else if (errors()['priceFrom']) {
-                    <mat-error>{{ errors()['priceFrom'] }}</mat-error>
-                  }
-                </mat-form-field>
-                @if (allColorsWritableSignal(); as allColors) {
-                  <div class="fields-container" id="colors">
-                    @if (allColors.length || colorsSignal().length) {
-                      <mat-form-field class="chip-list">
-                        <mat-label>{{ 'TREATMENT.COLOR.FIELD' | translate }}</mat-label>
-                        <mat-chip-grid #chipList aria-label="Color selection">
-                          @for (color of colorsSignal(); track color.id) {
-                            <mat-chip-row (removed)="remove(color)" [removable]="true">
-                              {{ color.name }}
-                              <mat-icon matChipRemove>cancel</mat-icon>
-                            </mat-chip-row>
-                          }
-                          <input #colorInput matInput [formControl]="getForm.color" [matAutocomplete]="auto"
-                                 [matChipInputFor]="chipList">
-                        </mat-chip-grid>
-                        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedColor($event)">
-                          @for (color of sortColors(filteredColorSignal()); track color.id) {
-                            <mat-option [value]="color">{{ color.name }}</mat-option>
-                          }
-                        </mat-autocomplete>
-                      </mat-form-field>
-                      <button class="hide-gt-xs" [routerLink]="['/', language, 'colors', 'add']" color="accent" mat-fab
-                              type="button">
-                        <mat-icon matPrefix>palette</mat-icon>
-                      </button>
-                      <button style="margin-left: 10px" class="hide-xs" [routerLink]="['/', language, 'colors', 'add']"
-                              color="accent" mat-fab extended type="button">
-                        <mat-icon matPrefix>palette</mat-icon>
-                        <span>{{ 'COMMON.TREATMENT.COLOR.ADD_BUTTON' | translate }}</span>
-                      </button>
-                    }
-                  </div>
-                } @else {
-                  <div class="ssc-line"></div>
-                }
-                <mat-form-field appearance="outline">
-                  <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
-                  <input #nameInput matInput id="add-treatment">
-                  <button (click)="addTab()" [attr.aria-label]="'Add treatment'" [disabled]="!nameInput.value"
-                          color="primary" mat-icon-button matSuffix type="button">
-                    <mat-icon>inventory</mat-icon>
-                  </button>
-                  @if (errors()['treatments']) {
-                    <mat-hint [innerHTML]="'TREATMENT.LIST.ERROR.REQUIRED' | translate"
-                              class="mat-mdc-form-field-error"></mat-hint>
-                  }
-                </mat-form-field>
-                <mat-tab-group (selectedIndexChange)="selected.setValue($event)" [selectedIndex]="selected.value">
-                  @for (tab of treatmentsSignal(); let index = $index; track tab) {
-                    <mat-tab [label]="tab.name || ''">
-                      <mat-form-field appearance="outline" class="tab-field">
-                        <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
-                        <input (change)="setValue(tab, 'name', $event)" [value]="tab.name" matInput required
-                               id="treatment-name">
-                        @if (tab.errors['name']) {
-                          <mat-hint [innerHTML]="'TREATMENT.NAME.' + tab.errors['name'] | translate"
-                                    class="mat-mdc-form-field-error"></mat-hint>
-                        }
-                      </mat-form-field>
-                      <mat-form-field appearance="outline" class="tab-field">
-                        <mat-label>{{ 'TREATMENT.DESCRIPTION.FIELD' | translate }}</mat-label>
-                        <input (change)="setValue(tab, 'description', $event)" [value]="tab.description" matInput
-                               id="treatment-description">
-                      </mat-form-field>
-                      <mat-form-field appearance="outline" class="tab-field">
-                        <mat-label>{{ 'TREATMENT.DURATION.FIELD' | translate }}</mat-label>
-                        <input [format]="24" [timepicker]="t" [value]="tab.time || ''" matInput readonly required
-                               id="treatment-duration"/>
-                        <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
-                        <app-timepicker #t (timeSet)="setTime(tab, $event)"
-                                                 [minutesGap]="15"></app-timepicker>
-                        @if (tab.errors['time']) {
-                          <mat-hint [innerHTML]="'TREATMENT.DURATION.' + tab.errors['time'] | translate"
-                                    class="mat-mdc-form-field-error"></mat-hint>
-                        }
-                      </mat-form-field>
-                      <div class="divider">
-                        <button (click)="removeTab(index)" [disabled]="treatmentsSignal().length === 1"
-                                class="tab-field"
-                                color="warn" mat-fab extended type="button">
-                          <mat-icon>delete</mat-icon>
-                          {{ 'COMMON.BUTTON.DELETE' | translate }}
-                        </button>
-                      </div>
-                    </mat-tab>
-                  }
-                </mat-tab-group>
-              </div>
-            </mat-card-content>
-            <mat-card-actions class="card-actions">
-              <div class="spacer"></div>
-              <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
-                {{ 'COMMON.BUTTON.BACK' | translate }}
-              </button>
-              @if (isAddMode) {
-                <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
-                  {{ 'COMMON.BUTTON.CREATE' | translate }}
-                </button>
-              } @else {
-                <button [disabled]="form.invalid" color="primary" mat-fab extended class="icon-button" type="submit">
-                  {{ 'COMMON.BUTTON.UPDATE' | translate }}
-                </button>
-              }
-            </mat-card-actions>
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <section class="app-surface-section">
+    <div class="app-detail-section-header">
+      <div>
+        <span class="app-surface-eyebrow">
+          @if (modeValue === 'add') {
+            {{ 'TREATMENT.TITLE' | translate }}
           } @else {
-            <mat-card-content>
-              <div class="ssc-hr"></div>
-              <div class="ssc-square mb"></div>
-              <div class="ssc-hr"></div>
-            </mat-card-content>
-            <mat-card-actions class="card-actions">
-              <div class="ssc-head-line"></div>
-            </mat-card-actions>
+            {{ 'TREATMENT.DETAIL' | translate }}
           }
-        </mat-card>
-      </form>
+        </span>
+        @if (modeValue !== 'add') {
+          @if (group; as currentGroup) {
+            @if (currentGroup.id) {
+              <h2 class="app-crud-title">{{ currentGroup.name }}</h2>
+            } @else {
+              <div class="ssc-line app-skeleton-title"></div>
+            }
+          } @else {
+            <div class="ssc-line app-skeleton-title"></div>
+          }
+        }
+      </div>
     </div>
-  </div>
+
+    @if (!isViewMode) {
+      <form (ngSubmit)="submit()"
+            [formGroup]="form"
+            novalidate
+            (keydown.enter)="$event.preventDefault()"
+            class="app-crud-form">
+        @if (isAddMode || group?.id) {
+          <div class="app-crud-form-grid app-crud-form-grid--triple">
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
+              <input [formControl]="getForm.name" autocomplete="name" matInput required data-cy="name-input">
+              @if (getForm.name.hasError('required')) {
+                <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.REQUIRED' | translate"></mat-error>
+              } @else if (errors()['name']) {
+                <mat-error>{{ errors()['name'] }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-icon matIconPrefix>euro</mat-icon>
+              <mat-label>{{ 'TREATMENT.PRICE_FROM.FIELD' | translate }}</mat-label>
+              <input [formControl]="getForm.priceFrom" matInput type="number" [min]="0" data-cy="priceFrom-input">
+              @if (getForm.priceFrom.hasError('min')) {
+                <mat-error [innerHTML]="'TREATMENT.PRICE_FROM.MIN' | translate"></mat-error>
+              } @else if (errors()['priceFrom']) {
+                <mat-error>{{ errors()['priceFrom'] }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="app-crud-form-grid__full">
+              <mat-label>{{ 'TREATMENT.DESCRIPTION.FIELD' | translate }}</mat-label>
+              <textarea #message [formControl]="getForm.description"
+                        matInput
+                        maxlength="256"
+                        data-cy="description-textarea"></textarea>
+              <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
+            </mat-form-field>
+
+            @if (allColorsWritableSignal(); as allColors) {
+              <div class="app-inline-field-action app-crud-form-grid__full" id="colors">
+                @if (allColors.length || colorsSignal().length) {
+                  <mat-form-field class="chip-list" appearance="outline">
+                    <mat-label>{{ 'TREATMENT.COLOR.FIELD' | translate }}</mat-label>
+                    <mat-chip-grid #chipList aria-label="Color selection">
+                      @for (color of colorsSignal(); track color.id) {
+                        <mat-chip-row (removed)="remove(color)" [removable]="true">
+                          {{ color.name }}
+                          <mat-icon matChipRemove>cancel</mat-icon>
+                        </mat-chip-row>
+                      }
+                      <input #colorInput
+                             [formControl]="getForm.color"
+                             [matAutocomplete]="auto"
+                             [matChipInputFor]="chipList"
+                             matInput>
+                    </mat-chip-grid>
+                    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedColor($event)">
+                      @for (color of sortColors(filteredColorSignal()); track color.id) {
+                        <mat-option [value]="color">{{ color.name }}</mat-option>
+                      }
+                    </mat-autocomplete>
+                  </mat-form-field>
+
+                  <button mat-stroked-button
+                          type="button"
+                          [routerLink]="['/', language, 'colors', 'add']"
+                          class="app-detail-action-button">
+                    <mat-icon>palette</mat-icon>
+                    <span>{{ 'COMMON.TREATMENT.COLOR.ADD_BUTTON' | translate }}</span>
+                  </button>
+                }
+              </div>
+            } @else {
+              <div class="ssc-line app-crud-skeleton-field app-crud-form-grid__full"></div>
+            }
+          </div>
+
+          <section class="app-surface-item app-surface-item--section treatment-builder">
+            <div class="app-detail-section-header mb">
+              <div>
+                <span class="app-surface-eyebrow">{{ 'COMMON.TREATMENT.FIELD' | translate }}</span>
+              </div>
+            </div>
+
+            <div class="treatment-builder__create">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
+                <input #nameInput matInput id="add-treatment">
+                <button (click)="addTab()"
+                        [attr.aria-label]="'Add treatment'"
+                        [disabled]="!nameInput.value"
+                        mat-icon-button
+                        matSuffix
+                        type="button">
+                  <mat-icon>inventory</mat-icon>
+                </button>
+                @if (errors()['treatments']) {
+                  <mat-hint [innerHTML]="'TREATMENT.LIST.ERROR.REQUIRED' | translate"
+                            class="mat-mdc-form-field-error"></mat-hint>
+                }
+              </mat-form-field>
+            </div>
+
+            <mat-tab-group (selectedIndexChange)="selected.setValue($event)" [selectedIndex]="selected.value">
+              @for (tab of treatmentsSignal(); let index = $index; track tab) {
+                <mat-tab [label]="tab.name || ''">
+                  <div class="treatment-tab-grid">
+                    <mat-form-field appearance="outline" class="tab-field">
+                      <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
+                      <input (change)="setValue(tab, 'name', $event)" [value]="tab.name" matInput required
+                             id="treatment-name">
+                      @if (tab.errors['name']) {
+                        <mat-hint [innerHTML]="'TREATMENT.NAME.' + tab.errors['name'] | translate"
+                                  class="mat-mdc-form-field-error"></mat-hint>
+                      }
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="tab-field">
+                      <mat-label>{{ 'TREATMENT.DESCRIPTION.FIELD' | translate }}</mat-label>
+                      <input (change)="setValue(tab, 'description', $event)" [value]="tab.description" matInput
+                             id="treatment-description">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="tab-field">
+                      <mat-label>{{ 'TREATMENT.DURATION.FIELD' | translate }}</mat-label>
+                      <input [format]="24" [timepicker]="t" [value]="tab.time || ''" matInput readonly required
+                             id="treatment-duration"/>
+                      <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
+                      <app-timepicker #t (timeSet)="setTime(tab, $event)" [minutesGap]="15"></app-timepicker>
+                      @if (tab.errors['time']) {
+                        <mat-hint [innerHTML]="'TREATMENT.DURATION.' + tab.errors['time'] | translate"
+                                  class="mat-mdc-form-field-error"></mat-hint>
+                      }
+                    </mat-form-field>
+
+                    <div class="app-detail-actions">
+                      <button (click)="removeTab(index)"
+                              [disabled]="treatmentsSignal().length === 1"
+                              mat-stroked-button
+                              type="button">
+                        <mat-icon>delete</mat-icon>
+                        <span>{{ 'COMMON.BUTTON.DELETE' | translate }}</span>
+                      </button>
+                    </div>
+                  </div>
+                </mat-tab>
+              }
+            </mat-tab-group>
+          </section>
+
+          <div class="app-detail-actions">
+            <button appBackButton mat-stroked-button type="button">
+              <mat-icon>keyboard_return</mat-icon>
+              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+            </button>
+
+            <button [disabled]="form.invalid" mat-stroked-button type="submit">
+              <mat-icon>{{ isAddMode ? 'add' : 'published_with_changes' }}</mat-icon>
+              <span>{{ (isAddMode ? 'COMMON.BUTTON.CREATE' : 'COMMON.BUTTON.UPDATE') | translate }}</span>
+            </button>
+          </div>
+        } @else {
+          <div class="app-crud-loading">
+            <div class="ssc-hr"></div>
+            <div class="ssc-square app-crud-loading__block"></div>
+            <div class="ssc-hr"></div>
+          </div>
+        }
+      </form>
+    } @else {
+      @if (group; as viewGroup) {
+        @if (viewGroup.id) {
+          <div class="app-crud-form">
+            <div class="app-surface-grid app-surface-grid--auto">
+              <div class="app-surface-item">
+                <span class="app-surface-item__label">{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</span>
+                <div class="app-surface-item__value">{{ viewGroup.name }}</div>
+              </div>
+
+              <div class="app-surface-item">
+                <span class="app-surface-item__label">{{ 'TREATMENT.PRICE_FROM.FIELD' | translate }}</span>
+                <div class="app-surface-item__value app-detail-icon">
+                  <mat-icon>euro</mat-icon>
+                  <span>{{ viewGroup.priceFrom || '-' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="app-surface-item app-surface-item--section app-crud-form-grid__full">
+              <span class="app-surface-item__label">{{ 'TREATMENT.DESCRIPTION.FIELD' | translate }}</span>
+              <div class="app-surface-item__value">{{ viewGroup.description || '-' }}</div>
+            </div>
+
+            @if (viewGroup.colors?.length) {
+              <section class="app-surface-item app-surface-item--section treatment-view-colors">
+                <span class="app-surface-item__label">{{ 'TREATMENT.COLORS' | translate }}</span>
+                <mat-chip-listbox>
+                  @for (color of viewGroup.colors; track color.id) {
+                    <mat-chip>{{ color.name }}</mat-chip>
+                  }
+                </mat-chip-listbox>
+              </section>
+            }
+
+            <section class="app-surface-item app-surface-item--section treatment-builder">
+              <div class="app-detail-section-header treatment-view-treatments__header">
+                <div>
+                  <span class="app-surface-eyebrow">{{ 'COMMON.TREATMENT.FIELD' | translate }}</span>
+                </div>
+              </div>
+
+              <div class="app-crud-loading">
+                @for (tab of viewGroup.treatments; track tab.id || tab.name) {
+                  <article class="app-surface-item app-crud-view-grid">
+                    <div class="treatment-view-card__header">
+                      <div>
+                        <span class="app-surface-item__label">{{ tab.name }}</span>
+                      </div>
+                      <button (click)="getHistory(tab.id)" mat-stroked-button type="button">
+                        <mat-icon>timeline</mat-icon>
+                        <span>{{ 'COMMON.COLUMN.LAST_UPDATE' | translate }}</span>
+                      </button>
+                    </div>
+
+                    <div class="treatment-view-card__grid">
+                      <div>
+                        <span class="app-surface-item__label">{{ 'TREATMENT.DESCRIPTION.FIELD' | translate }}</span>
+                        <div class="app-surface-item__value">{{ tab.description || '-' }}</div>
+                      </div>
+                      <div>
+                        <span class="app-surface-item__label">{{ 'TREATMENT.DURATION.FIELD' | translate }}</span>
+                        <div class="app-surface-item__value app-detail-icon">
+                          <mat-icon>timer</mat-icon>
+                          <span>{{ tab.duration | durationTime }}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    @if (tab.history && tab.showHistory) {
+                      <div class="treatment-view-history app-table-panel">
+                        <div class="app-table-panel__header">
+                          <h3>{{ 'COMMON.COLUMN.LAST_UPDATE' | translate }}</h3>
+                        </div>
+                        <div class="app-table-shell">
+                          <app-treatment-table [treatment]="tab.history"></app-treatment-table>
+                        </div>
+                      </div>
+                    }
+                  </article>
+                }
+              </div>
+            </section>
+
+            <div class="app-detail-actions">
+              <button appBackButton mat-stroked-button type="button">
+                <mat-icon>keyboard_return</mat-icon>
+                <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+              </button>
+
+              <button (click)="edit()" mat-stroked-button type="button">
+                <mat-icon>edit</mat-icon>
+                <span>{{ 'COMMON.BUTTON.EDIT' | translate }}</span>
+              </button>
+            </div>
+          </div>
+        } @else {
+          <div class="app-crud-loading">
+            <div class="ssc-hr"></div>
+            <div class="ssc-square app-crud-loading__block"></div>
+            <div class="ssc-hr"></div>
+          </div>
+        }
+      }
+    }
+  </section>
 </div>

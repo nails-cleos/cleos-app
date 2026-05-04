@@ -3,6 +3,27 @@
     "CLONE": "Fecha y hora para clonar",
     "PREVIEW": "Vista previa",
     "APPOINTMENT": "Cita",
+    "FLOW": {
+      "STEP": "Paso",
+      "SUMMARY": {
+        "EYEBROW": "Flujo de reserva",
+        "TITLE": "Resumen de la reserva",
+        "BREAKDOWN": "Desglose del precio",
+        "EMPTY": "Aún no seleccionado",
+        "NONE": "Ninguno",
+        "DATE_TIME": "Fecha y hora",
+        "TOTAL": "Total actual"
+      },
+      "STEPS": {
+        "CUSTOMER": "Selecciona el cliente y revisa el contexto de su última reserva.",
+        "ROOM": "Elige la oficina, sala y profesional para esta reserva.",
+        "TREATMENT": "Define fechas, hora, tratamiento y descuento antes de revisar la disponibilidad.",
+        "ADDITIONALS": "Agrega extras opcionales que afectan la duración y el precio.",
+        "CONFIGURATION": "Registra notas, datos de pago y opciones de cambio por parte del cliente.",
+        "SCHEDULE": "Elige los horarios finales de la cita desde el calendario disponible.",
+        "PREVIEW": "Revisa el flujo de la reserva y el total final antes de confirmar la cita."
+      }
+    },
     "LIST": {
       "CANCEL": {
         "TITLE": "Cancelar reserva",

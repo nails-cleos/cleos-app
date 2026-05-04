@@ -11,6 +11,7 @@ enum MainActionTypes {
   sendMessage = '[Main] Send message',
   updateMyUser = '[Main] Update user',
   catalogueSuccess = '[Main] Catalogue Success',
+  catalogueFailure = '[Main] Catalogue Failure',
   treatmentSuccess = '[Main] Treatment success',
   requestSuccess = '[Main] Success',
   requestFailure = '[Main] Failure',
@@ -37,6 +38,8 @@ export const catalogueSuccess = createAction(
   MainActionTypes.catalogueSuccess,
   props<{ catalogues: ICatalogueAll[] }>(),
 );
+
+export const catalogueFailure = createAction(MainActionTypes.catalogueFailure);
 
 export const treatmentSuccess = createAction(
   MainActionTypes.treatmentSuccess,

@@ -12,7 +12,6 @@ import { RoomState } from '../../store/reducers/room.reducers';
 import { RoomsComponent } from './rooms.component';
 import { ICurrencyAll } from '../../interfaces/currency';
 import { getCurrentTimeZone } from '../../util/dates';
-import { PaymentType } from '../../interfaces/payment';
 
 describe('RoomsComponent', () => {
   let component: RoomsComponent;
@@ -49,7 +48,7 @@ describe('RoomsComponent', () => {
       },
     },
     timeZone: getCurrentTimeZone(),
-    paymentTypes: [PaymentType.transfer],
+    paymentTypes: ['TRANSFER'],
     primary: true,
   };
 

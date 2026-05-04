@@ -1,95 +1,65 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
-import {
-  createPaymentLinkByReservationId,
-  getPaymentByResourceId,
-} from '../../../store/payment.actions';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { createPaymentLinkByReservationId, getPaymentByResourceId } from '../../../store/payment.actions';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { FormGroup, NonNullableFormBuilder } from '@angular/forms';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { getPrice, newPercentage } from '../../../util/helper';
-import { completeAndNext, getBackIndex, getStepCall, getStepCompleted, getStepName } from '../../../util/step';
-import { IStep, Step } from '../../../interfaces/step';
-import { MatStepper } from '@angular/material/stepper';
-import {
-  getPaymentOptions,
-  IPaymentOption,
-  PaymentPercentage,
-  PaymentType,
-} from '../../../interfaces/payment';
+import { IPaymentOption, PaymentPercentage } from '../../../interfaces/payment';
 import { IPrice, Price } from '../../../interfaces/treatment';
 import { IReservationAll, IReservationPayment } from '../../../interfaces/reservation';
 import { TranslateService } from '@ngx-translate/core';
-import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { SharedModule } from '../../../shared/shared.module';
 import { BankComponent, BankForm } from '../../../shared/bank/bank.component';
-import { DurationTimePipe } from '../../../pipes/durationTime.pipe';
 import { PaymentPreviewComponent } from '../../../shared/payment-preview/payment-preview.component';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { getCurrentReservationIdPipe } from '../../../store/selectors/reservation.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { getPaymentsPipe } from '../../../store/selectors/payment.selectors';
+import { getPaymentOptionsPipe, getPaymentsPipe } from '../../../store/selectors/payment.selectors';
+import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
 
 @Component({
   selector: 'app-option',
   templateUrl: './option.component.html',
   styleUrls: ['./option.component.scss'],
-  imports: [SharedModule, BankComponent, DurationTimePipe, PaymentPreviewComponent, BackButtonDirective],
+  imports: [SharedModule, BankComponent, PaymentPreviewComponent, BackButtonDirective, CurrencySymbolPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OptionComponent {
   private readonly store: Store<PaymentState | ReservationState> = inject(Store<PaymentState | ReservationState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
 
   private reservationId$ = this.store.pipe(getCurrentReservationIdPipe);
   private payments$ = this.store.pipe(getPaymentsPipe);
-  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
-  private reservationIdSignal = toSignal(this.reservationId$);
-  private breakpointsSignal = toSignal(
-    this.breakpointObserver$, {
-      initialValue: {
-        matches: false,
-        breakpoints: {
-          [Breakpoints.XSmall]: false,
-          [Breakpoints.Small]: false,
-        },
-      },
-    },
-  );
+  private readonly reservationIdSignal = toSignal(this.reservationId$);
+  private readonly paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
   private paymentsSignal = toSignal(this.payments$);
 
-  private stepper = viewChild.required(MatStepper);
-
   form: FormGroup<BankForm> = this.formBuilder.group<BankForm>({
-    type: this.formBuilder.control(undefined),
+    option: this.formBuilder.control(undefined),
     percentage: this.formBuilder.control(undefined),
   });
 
   options = signal<IPaymentOption[] | undefined>(undefined);
-  paymentTypes = signal<PaymentType[] | undefined>(undefined);
-
-  smallScreen = computed(() => this.breakpointsSignal()?.matches);
+  private readonly paymentOptions = computed(
+    () => this.paymentOptionsSignal().filter(option => option.enabled && option.enabledCustomer),
+  );
 
   reservation = signal<IReservationAll | undefined>(undefined);
   price = signal<IPrice>(new Price());
   professionalName = computed(() => this.reservation()?.professional?.displayName ?? '');
   first = true;
-
-  private readonly steps: IStep[];
+  currentStepIndex = signal(0);
 
   private reservationId?: string;
   private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
-    const preview = new Step(1, 'preview', () => this.pay());
-    const type = new Step(0, 'type', (goNext: boolean) => this.callStepTwo(goNext), preview);
-    this.steps = [type, preview];
     effect(() => {
       const id = this.reservationIdSignal();
       if (id) {
@@ -103,10 +73,10 @@ export class OptionComponent {
       if (payments) {
         const reservation = payments[0]?.reservation;
         if (reservation) {
+          const options = this.paymentOptions();
           const types = reservation.room.paymentTypes.filter(
-            (p: PaymentType) => ![PaymentType.cash, PaymentType.transfer].includes(p));
-          this.paymentTypes.set(types);
-          this.options.set(getPaymentOptions(this.translate, types));
+            p => !['cash', 'transfer'].includes(p.toLowerCase()));
+          this.options.set(options.filter(option => types?.includes(option.type)));
           const price = getPrice(reservation, payments);
           this.price.set(price);
           if (price.isPaid) {
@@ -129,16 +99,12 @@ export class OptionComponent {
     return this.form.controls;
   }
 
-  private get myStepper() {
-    return this.stepper();
-  }
-
   back() {
-    this.myStepper.selectedIndex = getBackIndex(this.steps, this.myStepper.selectedIndex);
+    this.currentStepIndex.update(index => Math.max(index - 1, 0));
   }
 
   pay() {
-    const option = this.getForm.type?.value;
+    const option = this.getForm.option?.value;
     if (!option) {
       return;
     }
@@ -149,19 +115,14 @@ export class OptionComponent {
     this.store.dispatch(createPaymentLinkByReservationId({ reservationId, payment }));
   }
 
-  triggerClick = (event: StepperSelectionEvent): void => getStepCall(this.steps, event.selectedIndex - 1);
-
   callStepTwo = (goNext: boolean): void => {
     if (this.form.invalid) {
       return;
     }
-
-    completeAndNext(this.steps, this.myStepper, goNext);
+    if (goNext) {
+      this.currentStepIndex.set(1);
+    }
   };
-
-  getStepName = (index: number): string => getStepName(this.steps, index);
-
-  getStepCompleted = (index: number): boolean => getStepCompleted(this.steps, index);
 
   getPercentage = (percentage: number): void => {
     this.price.set(newPercentage(this.price(), percentage));

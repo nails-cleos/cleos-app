@@ -1,51 +1,108 @@
-.dot {
-  margin-right: 1%;
+.notifications-subtitle {
+  margin: 8px 0 0;
+  color: var(--app-surface-text-muted);
+}
+
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.notification-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+
+.notification-card__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.notification-card__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--accent-color);
+  flex: 0 0 9px;
+}
+
+.notification-card__message {
+  color: var(--app-surface-text);
+  font-weight: 600;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.notification-card__message--read {
+  color: var(--app-surface-text-muted);
+  font-weight: 500;
+}
+
+.notification-card__delete {
+  color: var(--app-surface-label);
+}
+
+.notification-card__delete:hover {
+  color: var(--app-surface-text);
+}
+
+.notification-card--loading {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notification-card__skeleton-title {
+  max-width: 82%;
+}
+
+.notification-card__skeleton-date {
+  max-width: 180px;
 }
 
 .notification-enter {
   opacity: 0;
-  transform: scale(0.5);
-  transform-origin: top right;
-  animation: notification-enter 500ms cubic-bezier(.8, -0.6, 0.2, 1.5) forwards;
+  transform: translateY(10px);
+  animation: notification-enter 320ms cubic-bezier(.2, .8, .2, 1) forwards;
   animation-delay: var(--notification-enter-delay, 0ms);
 }
 
 .notification-leave {
   animation: none;
   opacity: 0;
-  transform: scale(0.5);
+  transform: scale(0.98);
   height: 0;
   margin: 0;
+  padding-top: 0;
+  padding-bottom: 0;
   overflow: hidden;
   pointer-events: none;
-  transition: transform 300ms ease-in-out, opacity 300ms ease-in-out, height 300ms ease-in-out,
-  margin 300ms ease-in-out;
+  transition: transform 260ms ease, opacity 260ms ease, height 260ms ease, margin 260ms ease, padding 260ms ease;
 }
 
 @keyframes notification-enter {
   from {
     opacity: 0;
-    transform: scale(0.5);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0);
   }
 }
 
-/* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
-/* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
-::ng-deep .mat-list-item-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.pointer:hover {
-  transform: scale(1);
-  font-weight: bold;
-}
-
-.notification-list:hover {
-  background-color: rgba(#fafafa, 0.12);
+@media (max-width: 720px) {
+  .notification-card__delete {
+    justify-self: end;
+  }
 }

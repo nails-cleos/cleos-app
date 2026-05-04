@@ -22,6 +22,12 @@ import { Role } from '../interfaces/token';
 import { IReview } from '../interfaces/review';
 import { IColorAll } from '../interfaces/color';
 import { ToastType } from '../shared/toast/toast.model';
+import {
+  CurrentCompleteReservationParams,
+  DetailReservationParams,
+  MeReservationParams,
+  ReservationParams,
+} from './reservation.models';
 
 enum ReservationActionTypes {
   getPage = '[Reservation] Find paged',
@@ -59,7 +65,8 @@ enum ReservationActionTypes {
   updateReservationCustomer = '[Reservation] Update customer by reservation id',
   updateReservationColor = '[Reservation] Update color by reservation id',
   stateSuccess = '[Reservation] State success',
-  reservationSuccess = '[Reservation] Success',
+  reservationGroupingByRoomSuccess = '[Reservation] Grouping by room success',
+  reservationAvailabilitySuccess = '[Reservation] Availability success',
   reservationPageSuccess = '[Reservation] Page Success',
   reservationFilterPageSuccess = '[Reservation] Filter Page Success',
   customersSuccess = '[Reservation] Customers success',
@@ -155,9 +162,14 @@ export const getAllAdditionalByGroupId = createAction(
 
 export const getUpcomingReservation = createAction(ReservationActionTypes.getUpcomingReservation);
 
-export const reservationSuccess = createAction(
-  ReservationActionTypes.reservationSuccess,
-  props<{ data: IRoomReservation[] | IAvailableDTO[] }>(),
+export const reservationGroupingByRoomSuccess = createAction(
+  ReservationActionTypes.reservationGroupingByRoomSuccess,
+  props<{ groupedRooms: IRoomReservation[] }>(),
+);
+
+export const reservationAvailabilitySuccess = createAction(
+  ReservationActionTypes.reservationAvailabilitySuccess,
+  props<{ availability: IAvailableDTO[] }>(),
 );
 
 export const reservationPageSuccess = createAction(
@@ -272,10 +284,11 @@ export const updateReservationById = createAction(
 
 export const approveReservation = createAction(
   ReservationActionTypes.approveReservation,
-  (id: string, extras?: any, isDashboard?: boolean) => ({
+  (id: string, extras?: any, isDashboard?: boolean, dashboardDate?: Date) => ({
     id,
     extras,
     isDashboard,
+    dashboardDate,
     event: 'approve' as const,
     key: 'APPROVE' as const,
     state: States.approved,
@@ -284,10 +297,11 @@ export const approveReservation = createAction(
 
 export const startReservation = createAction(
   ReservationActionTypes.startReservation,
-  (id: string, extras?: any, isDashboard?: boolean) => ({
+  (id: string, extras?: any, isDashboard?: boolean, dashboardDate?: Date) => ({
     id,
     extras,
     isDashboard,
+    dashboardDate,
     event: 'start' as const,
     key: 'START' as const,
     state: States.started,
@@ -296,10 +310,11 @@ export const startReservation = createAction(
 
 export const completeReservation = createAction(
   ReservationActionTypes.completeReservation,
-  (id: string, extras?: any, isDashboard?: boolean) => ({
+  (id: string, extras?: any, isDashboard?: boolean, dashboardDate?: Date) => ({
     id,
     extras,
     isDashboard,
+    dashboardDate,
     event: 'complete' as const,
     key: 'COMPLETE' as const,
     state: States.completed,
@@ -308,10 +323,11 @@ export const completeReservation = createAction(
 
 export const cancelReservation = createAction(
   ReservationActionTypes.cancelReservation,
-  (id: string, extras?: any, isDashboard?: boolean) => ({
+  (id: string, extras?: any, isDashboard?: boolean, dashboardDate?: Date) => ({
     id,
     extras,
     isDashboard,
+    dashboardDate,
     event: 'cancel' as const,
     key: 'CANCEL' as const,
     state: States.cancelled,
@@ -320,10 +336,11 @@ export const cancelReservation = createAction(
 
 export const customerCancelReservation = createAction(
   ReservationActionTypes.customerCancelReservation,
-  (id: string, extras?: any, isDashboard?: boolean) => ({
+  (id: string, extras?: any, isDashboard?: boolean, dashboardDate?: Date) => ({
     id,
     extras,
     isDashboard,
+    dashboardDate,
     event: 'cancel/customer' as const,
     key: 'CANCEL' as const,
     state: States.cancelled,
@@ -332,10 +349,11 @@ export const customerCancelReservation = createAction(
 
 export const paymentCompleteReservation = createAction(
   ReservationActionTypes.paymentCompleteReservation,
-  (id: string, extras?: any, isDashboard?: boolean) => ({
+  (id: string, extras?: any, isDashboard?: boolean, dashboardDate?: Date) => ({
     id,
     extras,
     isDashboard,
+    dashboardDate,
     event: 'payment/complete' as const,
     key: 'COMPLETE' as const,
     state: States.completed,
@@ -354,7 +372,14 @@ export const updateReservationColor = createAction(
 
 export const stateSuccess = createAction(
   ReservationActionTypes.stateSuccess,
-  props<{ message: string; id: string; paymentLink?: string; isDashboard?: boolean; state?: States }>(),
+  props<{
+    message: string;
+    id: string;
+    paymentLink?: string;
+    isDashboard?: boolean;
+    state?: States;
+    dashboardDate?: Date
+  }>(),
 );
 
 export const getTrackingByReservationId = createAction(
@@ -427,13 +452,7 @@ export const updateReservationTimestamp = createAction(
 
 export const setMeReservationParams = createAction(
   ReservationActionTypes.setMeReservationParams,
-  props<{
-    treatmentId?: string;
-    roomId?: string;
-    professionalId?: string;
-    date?: Date;
-    discountId?: string
-  }>(),
+  props<MeReservationParams>(),
 );
 
 export const setCurrentReservationId = createAction(
@@ -443,28 +462,17 @@ export const setCurrentReservationId = createAction(
 
 export const setCurrentCompleteReservation = createAction(
   ReservationActionTypes.setCurrentCompleteReservation,
-  props<{ reservationId: string; roomId: string; customerId: string; isDashboard: boolean }>(),
+  props<CurrentCompleteReservationParams>(),
 );
 
 export const setDetailReservationParams = createAction(
   ReservationActionTypes.setDetailReservationParams,
-  props<{ step?: number }>(),
+  props<DetailReservationParams>(),
 );
 
 export const setReservationParams = createAction(
   ReservationActionTypes.setReservationParams,
-  props<{
-    isDashboard: boolean;
-    skip: boolean;
-    customerId?: string;
-    roomId?: string;
-    treatmentId?: string;
-    groupId?: string;
-    professionalId?: string;
-    additionalIds?: string[];
-    date?: Date;
-    discountId?: string;
-  }>(),
+  props<ReservationParams>(),
 );
 
 export const cleanReservation = createAction(ReservationActionTypes.clean);

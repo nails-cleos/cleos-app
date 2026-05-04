@@ -4,7 +4,7 @@ import { IRoom, IRoomAll } from './room';
 import { ThemePalette } from '@angular/material/core';
 import { IUnavailableAll } from './unavailable';
 import { Pagination } from './pagination';
-import { IPayment, PaymentPercentage, PaymentType } from './payment';
+import { IPayment, PaymentPercentage } from './payment';
 import { IReview } from './review';
 import { IAdditionalAll } from './additional';
 import { addHours, isSameDay } from 'date-fns';
@@ -22,7 +22,7 @@ export interface IFabMenu {
 export interface IExtras {
   price: number;
   description?: string;
-  paymentType?: PaymentType;
+  paymentType?: string;
   name?: string; // To make compatible with additional in price-extra
 }
 
@@ -55,7 +55,7 @@ export interface IReservation {
 }
 
 export interface IReservationPayment {
-  type: PaymentType;
+  type: string;
   percentage: PaymentPercentage;
   bic?: string;
   paymentOptionId?: string;
@@ -63,6 +63,7 @@ export interface IReservationPayment {
   countryCode?: string;
   amount?: number;
   transfer?: string;
+  pointOfSale?: boolean;
 }
 
 export interface IReservationAll {

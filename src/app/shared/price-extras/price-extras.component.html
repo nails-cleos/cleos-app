@@ -10,7 +10,11 @@
           {{ extra.name || extra.description || 'Extra' }}
         </div>
         <div matListItemLine>
-          {{ currency() | currencySymbol }} {{ extra.price | number:'1.2-2' }}
+          @if (getDuration(extra); as duration) {
+            &#9202; {{ duration | durationTime }} · {{ currency() | currencySymbol }} {{ extra.price | number:'1.2-2' }}
+          } @else {
+            {{ currency() | currencySymbol }} {{ extra.price | number:'1.2-2' }}
+          }
         </div>
       </mat-list-item>
     }

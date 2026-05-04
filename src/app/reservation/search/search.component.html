@@ -1,7 +1,11 @@
-<div>
-  <fieldset>
-    <legend>{{ 'COMMON.SEARCH.TITLE' | translate }}</legend>
-    <div class="row-column-space-evenly-center">
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <section class="app-surface-section">
+    <div class="app-detail-section-header">
+      <div>
+        <span class="app-surface-eyebrow">{{ 'COMMON.SEARCH.TITLE' | translate }}</span>
+      </div>
+    </div>
+    <div class="app-surface-filter-grid">
       <mat-form-field appearance="outline">
         <mat-label>{{ 'RESERVATION.STATE.SEARCH' | translate }}</mat-label>
         <mat-chip-grid #chipList aria-label="Status selection">
@@ -37,12 +41,13 @@
         </mat-form-field>
       }
     </div>
-  </fieldset>
+  </section>
 
   @let resultsLength = resultsLengthSignal();
   @let pageSize = pageSizeSignal();
   @if (dataSourceSignal(); as dataSource) {
-    <div class="mat-elevation-z8">
+    <section class="app-surface-section">
+      <div class="app-table-shell">
       <table [dataSource]="dataSource" mat-table matSort matSortActive="timestamp" matSortDirection="desc"
              matSortDisableClear
              multiTemplateDataRows>
@@ -191,8 +196,11 @@
       @if (resultsLength) {
         <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
       }
-    </div>
+      </div>
+    </section>
   } @else {
-    <mat-spinner></mat-spinner>
+    <section class="app-surface-section app-surface-loading-state">
+      <mat-spinner></mat-spinner>
+    </section>
   }
 </div>

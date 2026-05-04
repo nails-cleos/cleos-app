@@ -5,7 +5,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 import { getPayment, updatePaymentById } from '../../../store/payment.actions';
-import { PaymentPercentage, PaymentType } from '../../../interfaces/payment';
+import { PaymentPercentage } from '../../../interfaces/payment';
 import { ActivatedRoute } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 
@@ -19,10 +19,33 @@ describe('MePaymentComponent', () => {
   // streams returned by store.pipe()
   let paymentId$: Subject<string | null>;
   let payment$: Subject<any>;
+  let paymentOptions$: BehaviorSubject<any>;
 
   beforeEach(async () => {
     paymentId$ = new Subject();
     payment$ = new Subject();
+    paymentOptions$ = new BehaviorSubject([
+      {
+        type: 'MOLLIE',
+        label: 'Mollie',
+        enabled: true,
+        enabledCustomer: true,
+        default: false,
+        filter: true,
+        defaultFilter: false,
+        show: true,
+      },
+      {
+        type: 'PAYPAL',
+        label: 'PayPal',
+        enabled: true,
+        enabledCustomer: true,
+        default: false,
+        filter: true,
+        defaultFilter: false,
+        show: true,
+      },
+    ]);
 
     storeSpy = jasmine.createSpyObj<Store<PaymentState>>('Store', ['dispatch', 'pipe']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -39,6 +62,8 @@ describe('MePaymentComponent', () => {
           return paymentId$.asObservable();
         case 2:
           return payment$.asObservable();
+        case 3:
+          return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -60,6 +85,7 @@ describe('MePaymentComponent', () => {
   afterEach(() => {
     paymentId$.complete();
     payment$.complete();
+    paymentOptions$.complete();
   });
 
   it('should create', () => {
@@ -80,7 +106,7 @@ describe('MePaymentComponent', () => {
     payment$.next({
       reservation: {
         room: {
-          paymentTypes: [PaymentType.cash, PaymentType.transfer],
+          paymentTypes: ['CASH', 'TRANSFER'],
         },
       },
     });
@@ -94,7 +120,7 @@ describe('MePaymentComponent', () => {
     payment$.next({
       reservation: {
         room: {
-          paymentTypes: [PaymentType.cash, PaymentType.mollie],
+          paymentTypes: ['CASH', 'MOLLIE'],
         },
       },
     });
@@ -102,7 +128,7 @@ describe('MePaymentComponent', () => {
     fixture.detectChanges();
 
     expect(component.options()).toEqual(jasmine.arrayContaining([
-      jasmine.objectContaining({ type: PaymentType.mollie }),
+      jasmine.objectContaining({ type: 'MOLLIE' }),
     ]));
   });
 
@@ -111,15 +137,15 @@ describe('MePaymentComponent', () => {
       id: 'payment-1',
       reservation: {
         room: {
-          paymentTypes: [PaymentType.paypal],
+          paymentTypes: ['PAYPAL'],
         },
       },
     });
 
     fixture.detectChanges();
 
-    component.getForm.type.setValue({
-      type: PaymentType.mollie,
+    component.getForm.option.setValue({
+      type: 'MOLLIE',
     } as any);
 
     component.update();
@@ -128,7 +154,7 @@ describe('MePaymentComponent', () => {
       updatePaymentById({
         id: 'payment-1',
         payment: {
-          type: PaymentType.mollie,
+          type: 'MOLLIE',
           percentage: PaymentPercentage.total,
         },
       }),

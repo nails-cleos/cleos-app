@@ -1,11 +1,16 @@
-@use 'styles/skeleton';
-@use 'styles/base';
 @use 'theme';
 @use 'styles-theme';
+@use 'styles/skeleton';
+@use 'styles/base';
 @use 'styles/material-overrides';
 @use 'styles/utilities';
 @use 'styles/animations';
 @use 'styles/layout';
+@use 'styles/reservation-shell';
+@use 'styles/surface-system';
+@use 'styles/detail-view';
+@use 'styles/table';
+@use 'styles/mixin';
 
 $flag-icon-css-path: '~flag-icon-css/flags' !default;
 

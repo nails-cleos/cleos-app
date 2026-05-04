@@ -5,7 +5,6 @@ import { addMonths } from 'date-fns';
 import { getCurrentTimeZone, getNowTimeZone } from '../../util/dates';
 import { MAX_RESERVATION_MONTH } from '../../interfaces/reservation';
 import { IRoomAll } from '../../interfaces/room';
-import { PaymentType } from '../../interfaces/payment';
 import { TranslateModule } from '@ngx-translate/core';
 
 describe('ReservationCloneDialogComponent', () => {
@@ -30,7 +29,7 @@ describe('ReservationCloneDialogComponent', () => {
       },
     },
     timeZone: getCurrentTimeZone(),
-    paymentTypes: [PaymentType.cash],
+    paymentTypes: ['CASH'],
     primary: true,
   };
 

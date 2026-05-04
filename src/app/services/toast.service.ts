@@ -13,8 +13,10 @@ export class ToastService {
   private injector = inject(Injector);
 
   private overlayRefs: OverlayRef[] = [];
-  private topSpace = 20;
-  private spaceBetween = 110;
+  private desktopTopSpace = 20;
+  private mobileBottomSpace = 16;
+  private desktopSpaceBetween = 110;
+  private mobileSpaceBetween = 96;
 
   /**
    * Show a toast with the specified message and type
@@ -30,8 +32,7 @@ export class ToastService {
     duration: number = 5000,
     options: ToastOptions = { actionType: 'none' },
   ): ToastRef {
-    const topOffset = this.topSpace + (this.overlayRefs.length * this.spaceBetween);
-    const positionStrategy = this.overlay.position().global().top(`${topOffset}px`).centerHorizontally();
+    const positionStrategy = this.createPositionStrategy(this.overlayRefs.length);
     const toastDismissed = new Subject<void>();
     const toastAction = new Subject<void>();
 
@@ -101,10 +102,23 @@ export class ToastService {
    */
   private repositionToasts() {
     this.overlayRefs.forEach((overlayRef, index) => {
-      const topOffset = this.topSpace + (index * this.spaceBetween);
-      overlayRef.updatePositionStrategy(
-        this.overlay.position().global().top(`${topOffset}px`).centerHorizontally(),
-      );
+      overlayRef.updatePositionStrategy(this.createPositionStrategy(index));
     });
+  }
+
+  private createPositionStrategy(index: number) {
+    const strategy = this.overlay.position().global();
+
+    if (this.isMobileViewport()) {
+      const bottomOffset = this.mobileBottomSpace + (index * this.mobileSpaceBetween);
+      return strategy.bottom(`${bottomOffset}px`).centerHorizontally();
+    }
+
+    const topOffset = this.desktopTopSpace + (index * this.desktopSpaceBetween);
+    return strategy.top(`${topOffset}px`).centerHorizontally();
+  }
+
+  private isMobileViewport(): boolean {
+    return window.innerWidth <= 640;
   }
 }

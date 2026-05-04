@@ -4,12 +4,10 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { paymentNotComplete, paymentSave } from '../../../store/payment.actions';
-import { PaymentType } from '../../../interfaces/payment';
+import { paymentNotComplete } from '../../../store/payment.actions';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 
 describe('PaymentCompleteComponent', () => {
-  let component: PaymentCompleteComponent;
   let fixture: ComponentFixture<PaymentCompleteComponent>;
 
   let storeSpy: jasmine.SpyObj<Store<PaymentState>>;
@@ -54,7 +52,6 @@ describe('PaymentCompleteComponent', () => {
     translateService.use('en-GB');
 
     fixture = TestBed.createComponent(PaymentCompleteComponent);
-    component = fixture.componentInstance;
   });
 
   afterEach(() => {
@@ -63,7 +60,7 @@ describe('PaymentCompleteComponent', () => {
     response$.complete();
   });
 
-  it('should create and dispatch paymentSave when params are valid', () => {
+  it('should dispatch incomplete payment for mollie params while callback parsing is disabled', () => {
     paymentResultParams$.next({
       id: '123',
       path: 'reservation',
@@ -79,20 +76,12 @@ describe('PaymentCompleteComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component).toBeTruthy();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentSave({
-      id: '123',
-      path: 'reservation',
-      status: 'approved',
-      paymentStatus: jasmine.objectContaining({
-        paymentId: 'pid',
-        paymentType: PaymentType.ml,
-        preferenceId: 'pref-1',
-      }) as any,
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentNotComplete({
+      subError: [{ message: 'ME.PAYMENT.ERROR' }],
     }));
   });
 
-  it('should dispatch paymentSave for paypal params', () => {
+  it('should dispatch incomplete payment for paypal params while callback parsing is disabled', () => {
     paymentResultParams$.next({
       id: '123',
       path: 'transaction',
@@ -103,18 +92,12 @@ describe('PaymentCompleteComponent', () => {
 
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentSave({
-      id: '123',
-      path: 'transaction',
-      status: 'approved',
-      paymentStatus: jasmine.objectContaining({
-        paymentType: PaymentType.paypal,
-        preferenceId: 'payer-1',
-      }) as any,
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentNotComplete({
+      subError: [{ message: 'ME.PAYMENT.ERROR' }],
     }));
   });
 
-  it('should dispatch paymentSave for ideal params', () => {
+  it('should dispatch incomplete payment for ideal params while callback parsing is disabled', () => {
     paymentResultParams$.next({
       id: '123',
       path: 'reservation',
@@ -125,18 +108,12 @@ describe('PaymentCompleteComponent', () => {
 
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentSave({
-      id: '123',
-      path: 'reservation',
-      status: 'approved',
-      paymentStatus: jasmine.objectContaining({
-        paymentType: PaymentType.ideal,
-        preferenceId: 'token-1',
-      }) as any,
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentNotComplete({
+      subError: [{ message: 'ME.PAYMENT.ERROR' }],
     }));
   });
 
-  it('should dispatch paymentSave for paynl status callback', () => {
+  it('should dispatch incomplete payment for paynl status callback while callback parsing is disabled', () => {
     paymentResultParams$.next({
       id: '123',
       path: 'reservation',
@@ -148,14 +125,8 @@ describe('PaymentCompleteComponent', () => {
 
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentSave({
-      id: '123',
-      path: 'reservation',
-      status: 'approved',
-      paymentStatus: jasmine.objectContaining({
-        paymentType: PaymentType.paynl,
-        preferenceId: 'order-1',
-      }) as any,
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentNotComplete({
+      subError: [{ message: 'ME.PAYMENT.ERROR' }],
     }));
   });
 
@@ -165,7 +136,7 @@ describe('PaymentCompleteComponent', () => {
       path: 'reservation',
       status: 'created',
       paymentId: 'pid',
-      paymentType: PaymentType.mollie,
+      paymentType: 'MOLLIE',
       accountId: 'account-1',
     });
 

@@ -1,9 +1,13 @@
 .container {
-  width: 80%;
-  //height: 200px;
+  box-sizing: border-box;
+  width: min(100%, 760px);
+  max-width: 100%;
   padding: 2rem;
   text-align: center;
-  border: dashed 1px #979797;
+  border: 1px dashed var(--app-surface-shell-border, #979797);
+  border-radius: 22px;
+  background: var(--app-surface-card-bg, rgba(255, 255, 255, 0.96));
+  color: var(--app-surface-text, inherit);
   position: relative;
   margin: 0 auto;
 
@@ -20,7 +24,20 @@
   .file-text {
     font-size: 20px;
     font-weight: 600;
+    color: var(--app-surface-text, inherit);
   }
+}
+
+.file-drop-icon {
+  width: 63px;
+  height: 64px;
+  opacity: 0.72;
+}
+
+.file-drop-card {
+  border-color: var(--app-surface-card-border, rgba(32, 28, 25, 0.06)) !important;
+  border-radius: 18px !important;
+  background: var(--app-surface-card-bg, rgba(255, 255, 255, 0.96)) !important;
 }
 
 .fileover {
@@ -139,4 +156,3 @@ img {
 canvas {
   display: none;
 }
-

@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+
+.note-dialog-content {
+  min-width: min(680px, 92vw);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.note-dialog-message {
+  margin: 0;
+}
+
+.note-dialog-field {
+  width: 100%;
+}
+
+@media (max-width: 720px) {
+  .note-dialog-content {
+    min-width: 0;
+  }
+}

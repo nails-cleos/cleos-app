@@ -37,11 +37,11 @@ export const getDisplayNameInitials = (user?: IUserAll | IUser): string | undefi
 
 export const getUserImage = (user?: IUser | IUserAll): string | undefined => {
   let image;
-  if (user && user.imageUrl) {
-    if (user.imageUrl.indexOf('http') >= 0) {
+  if (user) {
+    if (user.imageUrl && user.imageUrl.indexOf('http') >= 0) {
       image = user.imageUrl;
     } else if (user.image) {
-      image = `data:image/jpeg;base64,${user.image}`;
+      image = `data:image/jpeg;base64,${ user.image }`;
     }
   }
 
@@ -255,21 +255,21 @@ export const roomName = (room: IRoom | IRoomAll): string => {
   const gmt = roomGMT(room);
   const currency = roomCurrency(room);
   return room.currency && room.office ?
-    `${room.office.name} - ${currency}${gmt}` : '';
+    `${ room.office.name } - ${ currency }${ gmt }` : '';
 };
 
 export const roomDetail = (room: IRoom | IRoomAll): string => {
   const gmt = roomGMT(room);
   const currency = roomCurrency(room);
-  return `${currency}${gmt}`;
+  return `${ currency }${ gmt }`;
 };
 
 export const roomCurrency = (room: IRoom | IRoomAll): string =>
-  room.currency ? `${room.currency.code} (${currencySymbol(room.currency)})` : '';
+  room.currency ? `${ room.currency.code } (${ currencySymbol(room.currency) })` : '';
 
 export const roomGMT = (room: IRoom | IRoomAll): string => {
   const tz = getTimeZone(room.timeZone);
-  return tz.gmt ? ` - (${tz.gmt})` : '';
+  return tz.gmt ? ` - (${ tz.gmt })` : '';
 };
 
 export const currencySymbol = (currency?: ICurrency | string): string => {
@@ -330,7 +330,7 @@ export const createDialog = (
   }
 
   const title = translate.instant('COMMON.TIME_ZONE.TITLE');
-  const content = translate.instant(`COMMON.TIME_ZONE.${key}`, { localTime, timeZoneTime, value, arg });
+  const content = translate.instant(`COMMON.TIME_ZONE.${ key }`, { localTime, timeZoneTime, value, arg });
   dialog.open(DialogComponent, {
     data: { title, content, hideNoButton: true, hideOkButton: true },
   });

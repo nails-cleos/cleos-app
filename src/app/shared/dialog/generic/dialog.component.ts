@@ -15,6 +15,18 @@ export class DialogComponent {
   readonly dialogRef = inject(MatDialogRef<DialogComponent>);
   readonly data = inject<IDialog>(MAT_DIALOG_DATA);
 
+  get isWarning(): boolean {
+    return this.data.variant === 'warning';
+  }
+
+  get icon(): string {
+    return this.isWarning ? 'warning_amber' : 'info_outline';
+  }
+
+  get confirmColor(): string {
+    return this.isWarning ? 'warn' : 'primary';
+  }
+
   onNoClick() {
     this.dialogRef.close();
   }

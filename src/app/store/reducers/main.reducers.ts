@@ -1,4 +1,5 @@
 import {
+  catalogueFailure,
   catalogueSuccess,
   cleanMain,
   getAllCatalogue,
@@ -60,6 +61,11 @@ export const mainReducer = createReducer(
   on(catalogueSuccess, (state, { catalogues }) => ({
     ...state,
     catalogue: catalogues,
+    response: undefined,
+    isLoading: false,
+  })),
+  on(catalogueFailure, (state) => ({
+    ...state,
     response: undefined,
     isLoading: false,
   })),

@@ -66,7 +66,7 @@ export class RoomsComponent {
   resultsLengthSignal = computed(() => this.roomListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'currency', 'office', 'address', 'timeZone', 'availability', 'actions'];
+  displayedColumns: string[] = ['position', 'currency', 'office', 'address', 'timeZone', 'availability', 'actions', 'add'];
   expanded?: IRoom;
 
   language: string = this.translate.getCurrentLang();
@@ -111,7 +111,7 @@ export class RoomsComponent {
   delete = (room: IRoom): void => {
     const title = this.translate.instant('ROOM.DELETED.TITLE');
     const content = this.translate.instant('ROOM.DELETED.CONTENT', { name: room.address?.name });
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: room }, result => {
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: room, variant: 'warning' }, result => {
       if (result) {
         this.store.dispatch(deleteRoom({ id: result.id, room: result }));
       }

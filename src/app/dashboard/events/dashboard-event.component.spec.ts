@@ -13,6 +13,7 @@ import { FrequencyEnum } from '../../util/helper';
 import { daysOfWeek } from '../../util/dates';
 import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { signal } from '@angular/core';
+import { approveReservation, startReservation } from '../../store/reservation.actions';
 
 describe('DashboardEventComponent', () => {
   let fixture: ComponentFixture<DashboardEventComponent>;
@@ -117,6 +118,123 @@ describe('DashboardEventComponent', () => {
     expect(result.title).toContain('timing');
   });
 
+  it('should return the original event for non-reservation states', () => {
+    const event: any = {
+      id: '1',
+      title: 'Plain title',
+      start: new Date(),
+      meta: { state: 'NOTE' },
+    };
+
+    const result = component['createTitle'](event);
+
+    expect(result).toBe(event);
+    expect(result.title).toBe('Plain title');
+  });
+
+  it('should render completed reservation card with actual time, total and duration badges', () => {
+    const event: any = {
+      id: '1',
+      title: '<b>Valerie Merien</b>',
+      start: new Date(2026, 3, 24, 8, 0),
+      end: new Date(2026, 3, 24, 9, 30),
+      meta: {
+        state: States.completed,
+        started: new Date(2026, 3, 24, 8, 0),
+        finished: new Date(2026, 3, 24, 9, 30),
+        durationSeconds: 90 * 60,
+        total: 75,
+        currency: 'EUR',
+      },
+    };
+
+    const result = component['createTitle'](event);
+
+    expect(result.title).toContain('08:00 - 09:30');
+    expect(result.title).toContain('€ 75.00');
+    expect(result.title).toContain('1h 30 min.');
+    expect(result.title).toContain('COMPLETED');
+  });
+
+  it('should render reservation card body and total badge when customer and total are present', () => {
+    const event: any = {
+      id: '1',
+      title: '<b>Valerie Merien</b>',
+      start: new Date(2026, 3, 24, 8, 0),
+      end: new Date(2026, 3, 24, 9, 0),
+      meta: {
+        state: States.approved,
+        customer: 'Late Customer',
+        total: 50,
+        currency: 'EUR',
+      },
+    };
+
+    const result = component['createTitle'](event);
+
+    expect(result.title).toContain('dashboard-reservation-card__body');
+    expect(result.title).toContain('<b>Valerie Merien</b>');
+    expect(result.title).toContain('€ 50.00');
+  });
+
+  it('should keep expected finish for started reservations and hide finish in when scheduled end is in the past', () => {
+    const startedAt = new Date();
+    startedAt.setHours(10, 20, 0, 0);
+    const scheduledStart = new Date(startedAt);
+    scheduledStart.setHours(10, 0, 0, 0);
+    const scheduledEnd = new Date(startedAt);
+    scheduledEnd.setHours(11, 0, 0, 0);
+    const now = new Date(startedAt);
+    now.setHours(11, 30, 0, 0);
+
+    const event: any = {
+      id: '1',
+      title: '<b>Late Customer</b>',
+      start: scheduledStart,
+      end: scheduledEnd,
+      meta: {
+        state: States.started,
+        started: startedAt,
+      },
+    };
+
+    const result = component['createTitle'](event, now);
+
+    expect(result.title).toContain('id="elapsed">1h 10 min.');
+    expect(result.title).not.toContain('Elapsed +');
+    expect(result.title).toContain('id="projected-finish">11:20');
+    expect(result.title).not.toContain('Finish in');
+    expect(result.title).not.toContain('id="finish"');
+  });
+
+  it('should show early start and finish-in details for started reservations still in progress', () => {
+    const startedAt = new Date();
+    startedAt.setHours(9, 50, 0, 0);
+    const scheduledStart = new Date(startedAt);
+    scheduledStart.setHours(10, 0, 0, 0);
+    const scheduledEnd = new Date(startedAt);
+    scheduledEnd.setHours(11, 0, 0, 0);
+    const now = new Date(startedAt);
+    now.setHours(10, 20, 0, 0);
+
+    const event: any = {
+      id: '1',
+      title: '<b>Early Customer</b>',
+      start: scheduledStart,
+      end: scheduledEnd,
+      meta: {
+        state: States.started,
+        started: startedAt,
+      },
+    };
+
+    const result = component['createTitle'](event, now);
+
+    expect(result.title).toContain('id="start">-10 min.');
+    expect(result.title).toContain('Finish in');
+    expect(result.title).toContain('id="finish">-40 min.');
+  });
+
   it('should return base64 image if image is present', () => {
     const prof: IProfessionalEvent = {
       calendarSummary: {
@@ -174,6 +292,7 @@ describe('DashboardEventComponent', () => {
       roomId: 'r1',
       roomName: 'Room 1',
       timeZone: 'Europe/Amsterdam',
+      currencyCode: 'EUR',
       availability: { day: daysOfWeek[now.getDay()], start: '09:00', end: '17:00' },
       professionals: [
         {
@@ -262,14 +381,27 @@ describe('DashboardEventComponent', () => {
     eventDashboard$.next(dashboard);
     fixture.detectChanges();
 
-    expect(component.calendar.calendarEvents).toEqual([
+    expect(component.calendar.calendarEvents.length).toBe(6);
+    expect(component.calendar.calendarEvents).toEqual(jasmine.arrayContaining([
       jasmine.objectContaining({
-        title: 'Reservation 1',
-      }), jasmine.objectContaining({
+        title: jasmine.stringContaining('Reservation 1'),
+      }),
+      jasmine.objectContaining({
         title: 'Unavailable 2',
-      }), jasmine.objectContaining({
+      }),
+      jasmine.objectContaining({
         title: 'Unavailable 3',
-      })]);
+      }),
+      jasmine.objectContaining({
+        title: 'Birthday 1',
+      }),
+      jasmine.objectContaining({
+        title: 'Transaction 1',
+      }),
+      jasmine.objectContaining({
+        title: 'Note 1',
+      }),
+    ]));
   });
 
   it('should allow segment click', () => {
@@ -289,5 +421,118 @@ describe('DashboardEventComponent', () => {
 
     expect(routerSpy.navigate).toHaveBeenCalledWith(
       ['en-GB', 'unavailable', 'block-agenda'], { state: { date, professionalId, isDashboard: true } });
+  });
+
+  it('should calculate reservation duration seconds from started and finished timestamps', () => {
+    const duration = DashboardEventComponent['reservationDurationSeconds']({
+      started: new Date(2026, 3, 24, 8, 0).getTime() / 1000,
+      finished: new Date(2026, 3, 24, 9, 30).getTime() / 1000,
+    } as any);
+
+    expect(duration).toBe(90 * 60);
+  });
+
+  it('should schedule recurring note events from the visible calendar start', () => {
+    const professional = new Professional('p1', 'Prof 1', 'img1.png', { primary: '#000', secondary: '#fff' });
+    const addFrequencySpy = jasmine.createSpy('addFrequency');
+    const addEventSpy = spyOn(component.calendar, 'addEvent');
+    const start = new Date(2026, 3, 10, 0, 0, 0, 0);
+    const calendarStart = new Date(2026, 3, 15, 0, 0, 0, 0);
+
+    component.calendar.calendarStart = calendarStart;
+    component.calendar.recurringEvent = { addFrequency: addFrequencySpy } as any;
+
+    component['addNoteEvent']({
+      noteId: 'note-1',
+      title: 'Recurring note',
+      date: start.getTime() / 1000,
+      repeat: FrequencyEnum.everyDay,
+    } as any, professional, false);
+
+    expect(addFrequencySpy).toHaveBeenCalled();
+    const callback = addFrequencySpy.calls.mostRecent().args[6];
+    const repeatDate = addFrequencySpy.calls.mostRecent().args[1] as Date;
+    expect(repeatDate.getDate()).toBe(start.getDate());
+    callback(new Date(2026, 3, 16), { title: 'Recurring note', id: 'note-1', state: 'NOTE' });
+    expect(addEventSpy).toHaveBeenCalled();
+  });
+
+  it('should schedule recurring note events from the original start date when calendar start is earlier', () => {
+    const professional = new Professional('p1', 'Prof 1', 'img1.png', { primary: '#000', secondary: '#fff' });
+    const addFrequencySpy = jasmine.createSpy('addFrequency');
+    const start = new Date(2026, 3, 20, 0, 0, 0, 0);
+
+    component.calendar.calendarStart = new Date(2026, 3, 15, 0, 0, 0, 0);
+    component.calendar.recurringEvent = { addFrequency: addFrequencySpy } as any;
+
+    component['addNoteEvent']({
+      noteId: 'note-2',
+      title: 'Recurring note',
+      date: start.getTime() / 1000,
+      repeat: FrequencyEnum.everyDay,
+    } as any, professional, false);
+
+    expect(addFrequencySpy.calls.mostRecent().args[1]).toEqual(start);
+  });
+
+  it('should create start action for approved reservations on the current day', () => {
+    const event: any = {
+      id: 'reservation-3',
+      title: '<b>Customer</b>',
+      start: new Date(),
+      end: addHours(new Date(), 1),
+      meta: {
+        state: States.approved,
+        customerId: 'customer-1',
+      },
+    };
+
+    const result = component['createTitle'](event);
+    const startAction = result.actions?.find((action: any) => action.label.includes('play_arrow'));
+
+    expect(startAction).toBeDefined();
+    if (!startAction) {
+      fail('Expected start action to be defined');
+      return;
+    }
+    startAction.onClick({ event, sourceEvent: {} as MouseEvent });
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(startReservation('reservation-3', undefined, true, component.viewDate()));
+  });
+
+  it('should return empty status label when no state is provided', () => {
+    expect(component['statusLabel'](undefined)).toBe('');
+  });
+
+  it('should dispatch approve reservation with dashboard flag', () => {
+    const event: any = {
+      id: 'reservation-1',
+      start: new Date(),
+      meta: {
+        state: States.created,
+      },
+    };
+
+    component['eventClick'](event, 'APPROVE');
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(approveReservation('reservation-1', undefined, true));
+  });
+
+  it('should dispatch start reservation with dashboard date', () => {
+    const viewDate = new Date(2026, 3, 24, 0, 0, 0, 0);
+    const event: any = {
+      id: 'reservation-2',
+      title: '<b>Customer</b>',
+      start: new Date(),
+      meta: {
+        state: States.approved,
+        customerId: 'customer-1',
+        viewDate,
+      },
+    };
+
+    component['eventClick'](event, 'START');
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(startReservation('reservation-2', undefined, true, viewDate));
   });
 });

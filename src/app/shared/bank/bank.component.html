@@ -6,39 +6,8 @@
            [innerHTML]="'COMMON.RESERVATION.PAYMENT_MESSAGE' | translate: {professional: professionalName()}">
       </div>
     }
-    <mat-form-field appearance="outline">
-      @let currentType = type();
-      @if (currentType && currentType.icon) {
-        <mat-icon matPrefix>{{ currentType.icon }}</mat-icon>
-      } @else if (currentType && !currentType.icon) {
-        <mat-icon matPrefix [svgIcon]="currentType.svgIcon" class="svg-icon"></mat-icon>
-      } @else if (!currentType?.svgIcon) {
-        <mat-icon matPrefix>account_balance</mat-icon>
-      }
-      <mat-label>{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</mat-label>
-      <mat-select [formControl]="getForm.type" [required]="isFirstTime">
-        @if (!isFirstTime) {
-          <mat-option>
-            <mat-icon>account_balance</mat-icon>
-            --
-          </mat-option>
-        }
-        @for (t of options(); track t) {
-          <mat-option [value]="t">
-            @if (t.icon) {
-              <mat-icon>{{ t.icon }}</mat-icon>
-            } @else {
-              <mat-icon [svgIcon]="t.svgIcon" class="svg-icon"></mat-icon>
-            }
-            {{ t.name }}
-          </mat-option>
-        }
-      </mat-select>
-      @if (getForm.type.hasError('required')) {
-        <mat-error [innerHTML]="'COMMON.PAYMENT.TYPE.FIELD.REQUIRED' | translate"></mat-error>
-      }
-    </mat-form-field>
-    @if (getForm.percentage && getForm.type.value && !getForm.type.value.hidePercentage) {
+    <app-payment-option-select [control]="getForm.option" [options]="options()" [required]="isFirstTime"></app-payment-option-select>
+    @if (getForm.percentage && getForm.option.value && !getForm.option.value.hidePercentage) {
       <mat-radio-group [formControl]="getForm.percentage" aria-label="Select an option" required>
         <mat-radio-button value="DEPOSIT_50">{{ 'COMMON.PAYMENT.DEPOSIT_50' | translate }}</mat-radio-button>
         <mat-radio-button value="TOTAL">{{ 'COMMON.PAYMENT.TOTAL' | translate }}</mat-radio-button>

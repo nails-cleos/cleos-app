@@ -1,3 +1,86 @@
-.tab-field {
+.treatment-builder {
+  padding: 20px;
+}
+
+.treatment-builder__create {
+  margin-bottom: 0;
+}
+
+.tab-field,
+.treatment-builder__create .mat-mdc-form-field {
   width: 100%;
+}
+
+.treatment-tab-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding-top: 12px;
+}
+
+.app-detail-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.treatment-view-colors,
+.treatment-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.treatment-view-treatments__header {
+  margin-bottom: 0;
+}
+
+.treatment-view-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.treatment-view-card__header h3 {
+  margin: 4px 0 0;
+  color: var(--app-detail-title);
+  font-size: 1.2rem;
+  line-height: 1.2;
+}
+
+.treatment-view-card__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 0.35fr);
+  gap: 16px;
+}
+
+.treatment-view-history {
+  width: 100%;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  gap: 12px;
+}
+
+@media (max-width: 960px) {
+  .treatment-tab-grid,
+  .treatment-view-card__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .treatment-builder__create,
+  .treatment-builder__create .mat-mdc-form-field {
+    width: 100%;
+  }
+}
+
+@media (max-width: 720px) {
+  .treatment-builder {
+    padding: 16px;
+  }
+
+  .treatment-view-card__header {
+    flex-direction: column;
+  }
 }

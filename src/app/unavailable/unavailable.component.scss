@@ -1,0 +1,22 @@
+.unavailable-date-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+}
+
+.unavailable-all-day {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+}
+
+@media (max-width: 720px) {
+  .unavailable-date-row {
+    grid-template-columns: 1fr;
+  }
+
+  .unavailable-all-day {
+    min-height: auto;
+  }
+}

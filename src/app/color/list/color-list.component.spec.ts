@@ -195,6 +195,7 @@ describe('ColorListComponent', () => {
           title: 'COLOR.DELETED.TITLE',
           content: 'COLOR.DELETED.CONTENT',
           value: item,
+          variant: 'warning',
         },
       }));
 

@@ -89,12 +89,13 @@ export const createChart = (
     labels: chart.labels || [],
     type: chart.type || 'bar',
     charData,
-    options,
+    options: { ...options, maintainAspectRatio: false },
   };
 };
 
 const defaultOptions = (): ChartOptions => ({
   responsive: true,
+  maintainAspectRatio: false,
 });
 
 const radarChartDefaultOptions = (isDark?: boolean): ChartOptions<'radar'> => {
@@ -142,7 +143,7 @@ const radarChartDefaultOptions = (isDark?: boolean): ChartOptions<'radar'> => {
       },
     };
   }
-  return options;
+  return { ...options, maintainAspectRatio: false };
 };
 
 const barChartDefaultOptions = (
@@ -220,7 +221,7 @@ const barChartDefaultOptions = (
       },
     };
   }
-  return options;
+  return { ...options, maintainAspectRatio: false };
 };
 
 const lineChartDefaultOptions = (
@@ -293,7 +294,7 @@ const lineChartDefaultOptions = (
       },
     };
   }
-  return options;
+  return { ...options, maintainAspectRatio: false };
 };
 
 const footer = (tooltipItems: any, currency?: ICurrency, sum?: boolean, locale?: string, title?: string) => {
@@ -317,7 +318,7 @@ const label = (tooltipItem: any, currency?: ICurrency, sum?: boolean, locale?: s
 };
 
 const createTooltip = (title: string, value: string | number, currency?: ICurrency, locale?: string) =>
-  `${title} ${numberFormat(value, currency, locale)}`;
+  `${ title } ${ numberFormat(value, currency, locale) }`;
 
 const barChartNoLabelOptions = (isDark?: boolean): ChartOptions<'bar'> => {
   let options: ChartOptions<'bar'>;
@@ -369,7 +370,7 @@ const barChartNoLabelOptions = (isDark?: boolean): ChartOptions<'bar'> => {
     };
   }
 
-  return options;
+  return { ...options, maintainAspectRatio: false };
 };
 
 const getOrCreateTooltip = (chart: any) => {
@@ -531,11 +532,12 @@ const barChartTimeOptions = (isDark?: boolean): ChartOptions<'bar'> => {
     };
   }
 
-  return options;
+  return { ...options, maintainAspectRatio: false };
 };
 
 const pieChartPercentageOptions = (): ChartOptions<'pie'> => ({
   responsive: true,
+  maintainAspectRatio: false,
   plugins: {
     tooltip: {
       callbacks: {
@@ -547,7 +549,7 @@ const pieChartPercentageOptions = (): ChartOptions<'pie'> => ({
 
 const pieChatPercentageLabel = (tooltipItem: TooltipItem<'pie'>): string => {
   const total = tooltipItem.dataset.data.reduce((a, b) => Number(a) + Number(b));
-  return `${tooltipItem.label}: ${(Number(tooltipItem.raw) * 100 / total).toFixed(2)}%`;
+  return `${ tooltipItem.label }: ${ (Number(tooltipItem.raw) * 100 / total).toFixed(2) }%`;
 };
 
 const barChatTimeLabel = (tooltipItem: any): string => {

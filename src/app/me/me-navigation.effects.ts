@@ -11,7 +11,13 @@ import {
   setMeReservationParams,
 } from '../store/reservation.actions';
 import { Router } from '@angular/router';
-import { cleanPayment, setCurrentPathId, setCurrentPaymentId, setPaymentResultParams } from '../store/payment.actions';
+import {
+  cleanPayment,
+  getOptions,
+  setCurrentPathId,
+  setCurrentPaymentId,
+  setPaymentResultParams,
+} from '../store/payment.actions';
 import { cleanUser, setCurrentUserId } from '../store/user.actions';
 
 @Injectable()
@@ -52,7 +58,7 @@ export class MeNavigationEffects {
         // 4) /me/payment/:id
         const paymentIdMatch = url.match(/\/me\/payment\/([^\/]+)$/);
         if (paymentIdMatch) {
-          return [cleanPayment(), setCurrentPaymentId({ paymentId: paymentIdMatch[1] })];
+          return [cleanPayment(), getOptions(), setCurrentPaymentId({ paymentId: paymentIdMatch[1] })];
         }
 
         // 5) /me/reservation/:id/payment/option
@@ -61,6 +67,7 @@ export class MeNavigationEffects {
           return [
             cleanPayment(),
             cleanReservation(),
+            getOptions(),
             setCurrentReservationId({ reservationId: paymentReservationIdMatch[1] }),
           ];
         }
@@ -96,6 +103,7 @@ export class MeNavigationEffects {
         if (reservationIdMatch) {
           return [
             cleanReservation(),
+            getOptions(),
             setCurrentReservationId({ reservationId: reservationIdMatch[1] }),
             getUpcomingReservation(),
           ];
@@ -109,6 +117,7 @@ export class MeNavigationEffects {
             navigationState['discount'] !== undefined)) {
             return [
               cleanReservation(),
+              getOptions(),
               setMeReservationParams({
                 treatmentId: navigationState['treatmentId'],
                 roomId: navigationState['roomId'],
@@ -120,7 +129,7 @@ export class MeNavigationEffects {
               getUpcomingReservation(),
             ];
           }
-          return [cleanReservation(), getUpcomingReservation(), getAllRooms({})];
+          return [cleanReservation(), getOptions(), getUpcomingReservation(), getAllRooms({})];
         }
 
         // 9) /me/reservations

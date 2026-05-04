@@ -6,12 +6,13 @@ import { IPaymentOption } from '../../interfaces/payment';
 import { BankComponent, BankForm } from '../bank/bank.component';
 import { MatDivider } from '@angular/material/divider';
 import { PricePreviewComponent } from '../price-preview/price-preview.component';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-price',
   templateUrl: './price.component.html',
   styleUrls: ['./price.component.scss'],
-  imports: [BankComponent, MatDivider, PricePreviewComponent],
+  imports: [BankComponent, MatDivider, PricePreviewComponent, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PriceComponent {

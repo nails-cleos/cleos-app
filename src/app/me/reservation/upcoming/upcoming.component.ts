@@ -6,14 +6,14 @@ import { createNewDate, isSameTimeZone, newDateTimestamp, reservationDuration } 
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { SharedModule } from '../../../shared/shared.module';
-import { RoomNamePipe } from '../../../pipes/room-name.pipe';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
+import { PaymentPreviewComponent } from '../../../shared/payment-preview/payment-preview.component';
 
 @Component({
   selector: 'app-upcoming',
   templateUrl: './upcoming.component.html',
   styleUrls: ['./upcoming.component.scss'],
-  imports: [SharedModule, RoomNamePipe, CurrencySymbolPipe],
+  imports: [SharedModule, CurrencySymbolPipe, PaymentPreviewComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UpcomingComponent {

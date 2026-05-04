@@ -10,7 +10,7 @@
           </div>
         </mat-list-item>
         @if (isSubMenuOpen(i)) {
-          <mat-nav-list>
+          <mat-nav-list class="menu-level menu-level--sub">
             @for (subMenu of menu.subMenus; track subMenu; let j = $index) {
               @if (subMenu.subMenus && subMenu.subMenus.length) {
                 <div>
@@ -22,7 +22,7 @@
                     </div>
                   </mat-list-item>
                   @if (isSubSubMenuOpen(i, j)) {
-                    <mat-nav-list>
+                    <mat-nav-list class="menu-level menu-level--sub-sub">
                       @for (subSubMenu of subMenu.subMenus; track subSubMenu) {
                         @if (isHandsetSignal()) {
                           <mat-list-item

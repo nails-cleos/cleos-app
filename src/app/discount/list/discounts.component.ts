@@ -74,7 +74,7 @@ export class DiscountsComponent {
   resultsLengthSignal = computed(() => this.discountListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'name', 'description', 'type', 'amount', 'actions'];
+  displayedColumns: string[] = ['position', 'name', 'description', 'type', 'amount', 'actions', 'add'];
   expanded?: IDiscount;
 
   language: string = this.translate.getCurrentLang();
@@ -116,7 +116,7 @@ export class DiscountsComponent {
     const title = this.translate.instant('DISCOUNT.DELETED.TITLE');
     const content = this.translate.instant('DISCOUNT.DELETED.CONTENT', { name: discount.name });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: discount },
+      data: { title, content, value: discount, variant: 'warning' },
     });
 
     dialogRef.afterClosed().subscribe(result => {

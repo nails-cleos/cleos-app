@@ -1,8 +1,12 @@
-<div>
-  <fieldset>
-    <legend>{{ 'COMMON.SEARCH.TITLE' | translate }}</legend>
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <section class="app-surface-section">
+    <div class="app-detail-section-header">
+      <div>
+        <span class="app-surface-eyebrow">{{ 'COMMON.SEARCH.TITLE' | translate }}</span>
+      </div>
+    </div>
     <form [formGroup]="form" (keydown.enter)="$event.preventDefault()" (ngSubmit)="downloadZip()">
-      <div class="row-column-space-around-center">
+      <div class="app-surface-filter-grid">
         <mat-form-field appearance="outline">
           <mat-label>{{ 'COMMON.OFFICE.SEARCH' | translate }}</mat-label>
           <input (keydown)="keyDownHandler($event)" [formControl]="getForm.office" [matAutocomplete]="autoOffice"
@@ -28,13 +32,16 @@
           <mat-datepicker #dp startView="multi-year" (monthSelected)="setMonthAndYear($event, dp)">
           </mat-datepicker>
         </mat-form-field>
-        <button color="accent" id="download" mat-fab type="submit" [disabled]="form.invalid">
+        <button mat-stroked-button type="submit" [disabled]="form.invalid || !resultsLengthSignal()" class="app-detail-action-button">
           <mat-icon>folder_zip</mat-icon>
+          <span>{{ 'COMMON.BUTTON.DOWNLOAD' | translate }}</span>
         </button>
       </div>
     </form>
-  </fieldset>
-  <div class="mat-elevation-z8">
+  </section>
+
+  <section class="app-surface-section">
+  <div class="mat-elevation-z8 app-table-shell">
     @let resultsLength = resultsLengthSignal();
     @let pageSize = pageSizeSignal();
     @if (dataSourceSignal(); as dataSource) {
@@ -136,9 +143,13 @@
         </ng-container>
 
         <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+        <tr *matRowDef="let document; columns: displayedColumns;" class="hide-xs" mat-row></tr>
         <tr (click)="expandedDocument = expandedDocument === document ? null : document"
-            *matRowDef="let document; columns: displayedColumns;" class="row" mat-row></tr>
-        <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
+            *matRowDef="let document; columns: displayedColumns;" class="hide-gt-xs app-table-master-row" mat-row></tr>
+        <tr *matRowDef="let row; columns: ['expandedDetail']"
+            [class.app-table-detail-row--expanded]="row === expandedDocument"
+            class="hide-gt-xs app-table-detail-row"
+            mat-row></tr>
 
         <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
       </table>
@@ -147,4 +158,5 @@
       }
     }
   </div>
+  </section>
 </div>

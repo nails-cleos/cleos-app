@@ -10,7 +10,6 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../../interfaces/pagination';
 import { IExpenseAll } from '../../../../interfaces/expense';
 import { dateToTimestamp, getCurrentTimeZone, getDateFormat, getNowTimeZone } from '../../../../util/dates';
 import { IRoomAll } from '../../../../interfaces/room';
-import { PaymentType } from '../../../../interfaces/payment';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { ExpenseState } from '../../../../store/reducers/expense.reducers';
 import { RoomState } from '../../../../store/reducers/room.reducers';
@@ -54,7 +53,7 @@ describe('ExpensesComponent', () => {
       },
     },
     timeZone: getCurrentTimeZone(),
-    paymentTypes: [PaymentType.transfer],
+    paymentTypes: ['TRANSFER'],
     primary: true,
   };
 
@@ -320,6 +319,7 @@ describe('ExpensesComponent', () => {
           title: 'EXPENSE.DELETED.TITLE',
           content: 'EXPENSE.DELETED.CONTENT',
           value: testExpense,
+          variant: 'warning',
         },
       }));
 
@@ -355,7 +355,7 @@ describe('ExpensesComponent', () => {
 
   it('should maintain correct displayedColumns order', () => {
     const expectedColumns = ['position', 'invoice', 'supplyStore.name', 'timestamp', 'totalGross',
-      'totalBtw', 'totalNet', 'actions'];
+      'totalBtw', 'totalNet', 'actions', 'add'];
     expect(component.displayedColumns).toEqual(expectedColumns);
   });
 

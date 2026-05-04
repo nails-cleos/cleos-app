@@ -88,7 +88,7 @@ export class ExpensesComponent {
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
   displayedColumns: string[] = ['position', 'invoice', 'supplyStore.name', 'timestamp', 'totalGross', 'totalBtw',
-    'totalNet', 'actions'];
+    'totalNet', 'actions', 'add'];
   expanded?: IExpenseAll;
 
   dateFormat: string = this.translate.getCurrentLang();
@@ -186,7 +186,7 @@ export class ExpensesComponent {
     const title = this.translate.instant('EXPENSE.DELETED.TITLE');
     const content = this.translate.instant('EXPENSE.DELETED.CONTENT', { invoice: expense.invoice });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: expense },
+      data: { title, content, value: expense, variant: 'warning' },
     });
 
     dialogRef.afterClosed().subscribe(result => {

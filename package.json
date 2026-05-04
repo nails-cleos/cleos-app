@@ -1,9 +1,9 @@
 {
-  "name": "cleos",
-  "version": "1.3.3",
+  "name": "nails-cleos",
+  "version": "1.3.4-rc",
   "engines": {
-    "node": "v24.12.0",
-    "npm": "11.6.2"
+    "node": "v24.14.1",
+    "npm": "11.12.1"
   },
   "scripts": {
     "ng": "ng",
@@ -16,6 +16,7 @@
     "postbuild-pwa": "cp -r ./src/manifest-dev.json ./dist/cleos/browser/manifest.json && cp ./src/firebase-messaging-sw-dev.js ./dist/cleos/browser/firebase-messaging-sw-dev.js",
     "build:source": "ng build --source-map",
     "test": "TZ=Europe/Amsterdam ng test --no-watch",
+    "coverage:diff": "diff-cover coverage/cleos/lcov.info --compare-branch=$BASE --fail-under=80 --format html:coverage/diff-cover-report.html",
     "lint": "NODE_OPTIONS=--max-old-space-size=8192 ng lint",
     "lint:fix": "NODE_OPTIONS=--max-old-space-size=8192 ng lint --fix",
     "eslint": "eslint src --fix",

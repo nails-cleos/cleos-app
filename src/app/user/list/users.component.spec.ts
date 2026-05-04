@@ -218,6 +218,7 @@ describe('UsersComponent', () => {
           title: 'USER.DELETED.TITLE',
           content: 'USER.DELETED.CONTENT',
           value: item,
+          variant: 'warning',
         },
       }));
 
@@ -282,4 +283,3 @@ describe('UsersComponent', () => {
     expect(storeSpy.dispatch).toHaveBeenCalledWith(mergeUsers({ oldUserId: oldUser.id, newUserId: newUser.id }));
   });
 });
-

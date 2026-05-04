@@ -57,7 +57,7 @@ export class ColorListComponent {
   resultsLengthSignal = computed(() => this.colorListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'name', 'description', 'actions'];
+  displayedColumns: string[] = ['position', 'name', 'description', 'actions', 'add'];
 
   expandedColor?: IColor;
 
@@ -100,7 +100,7 @@ export class ColorListComponent {
     const title = this.translate.instant('COLOR.DELETED.TITLE');
     const content = this.translate.instant('COLOR.DELETED.CONTENT', { name: color.name });
 
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: color }, result => {
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: color, variant: 'warning' }, result => {
       if (result) {
         this.store.dispatch(deleteColor({ id: result.id, name: result.name }));
       }

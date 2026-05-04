@@ -1,33 +1,48 @@
-<button (click)="onNoClick()" class="close-button" mat-icon-button>
-  <mat-icon>close</mat-icon>
-</button>
-<h1 mat-dialog-title>{{ title }}</h1>
-@if (allCustomersWritableSignal()) {
-  <div mat-dialog-content>
-    <mat-form-field class="chip-list">
-      <mat-label>{{ 'DISCOUNT.LIST.DIALOG.CUSTOMER' | translate }}</mat-label>
-      <mat-chip-grid #chipList aria-label="Customer selection">
-        @for (customer of selectedCustomersSignal(); track customer.id) {
-          <mat-chip-row (removed)="remove(customer)" [removable]="true">
-            {{ customer.displayName }}
-            <mat-icon matChipRemove>cancel</mat-icon>
-          </mat-chip-row>
-        }
-        <input #customerInput matInput [formControl]="getForm.customers" [matAutocomplete]="auto"
-               [matChipInputFor]="chipList">
-      </mat-chip-grid>
-      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-        @for (customer of sortCustomers(filteredCustomerSignal()); track customer.id) {
-          <mat-option [value]="customer">{{ customer.displayName }}</mat-option>
-        }
-      </mat-autocomplete>
-    </mat-form-field>
+<div class="app-surface-dialog-shell">
+  <div class="app-surface-dialog-header">
+    <div class="app-surface-dialog-title-wrap">
+      <div class="app-surface-dialog-badge" aria-hidden="true">
+        <mat-icon>sell</mat-icon>
+      </div>
+      <h1 mat-dialog-title class="app-surface-dialog-title">{{ title }}</h1>
+    </div>
+    <button (click)="onNoClick()" aria-label="Close dialog" class="app-surface-dialog-close" type="button">
+      <mat-icon>close</mat-icon>
+    </button>
   </div>
-}
-<div mat-dialog-actions class="card-actions">
-  <div class="spacer"></div>
-  <button (click)="doAction()" cdkFocusInitial color="primary"
-          mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.DISCOUNT.SEND' | translate }}
-  </button>
-  <button (click)="onNoClick()" mat-fab extended class="icon-button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+
+  <div class="app-surface-dialog-divider" aria-hidden="true"></div>
+
+  @if (allCustomersWritableSignal()) {
+    <div mat-dialog-content class="app-surface-dialog-content">
+      <mat-form-field class="chip-list">
+        <mat-label>{{ 'DISCOUNT.LIST.DIALOG.CUSTOMER' | translate }}</mat-label>
+        <mat-chip-grid #chipList aria-label="Customer selection">
+          @for (customer of selectedCustomersSignal(); track customer.id) {
+            <mat-chip-row (removed)="remove(customer)" [removable]="true">
+              {{ customer.displayName }}
+              <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip-row>
+          }
+          <input #customerInput matInput [formControl]="getForm.customers" [matAutocomplete]="auto"
+                 [matChipInputFor]="chipList">
+        </mat-chip-grid>
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+          @for (customer of sortCustomers(filteredCustomerSignal()); track customer.id) {
+            <mat-option [value]="customer">{{ customer.displayName }}</mat-option>
+          }
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+  }
+
+  <div class="app-surface-dialog-divider" aria-hidden="true"></div>
+
+  <div mat-dialog-actions class="app-surface-dialog-actions">
+    <div class="app-surface-dialog-spacer"></div>
+    <button (click)="onNoClick()" mat-stroked-button type="button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+    <button (click)="doAction()" cdkFocusInitial color="primary" mat-flat-button type="button">
+      {{ 'COMMON.BUTTON.DISCOUNT.SEND' | translate }}
+    </button>
+  </div>
 </div>

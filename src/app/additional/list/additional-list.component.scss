@@ -14,6 +14,10 @@
   width: 5% !important;
 }
 
+.mat-column-add {
+  width: 1% !important;
+}
+
 .mat-column-name {
   width: 30% !important;
 }
@@ -26,8 +30,4 @@ td, th {
   white-space: normal;
   word-wrap: break-word;
   max-width: 200px;
-}
-
-tr.detail-row {
-  height: 0 !important;
 }

@@ -1,0 +1,126 @@
+.step-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.step-layout--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.payment-option-step {
+  margin-top: 0;
+}
+
+.step-heading {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.step-heading__index {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--accent-color), #d8a35d);
+  color: var(--invert-text, white);
+  font-weight: 700;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.step-heading__eyebrow {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: var(--app-surface-text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.app-crud-fields h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  color: var(--app-surface-text);
+}
+
+.app-crud-fields p,
+.payment-option-breakdown-subtitle {
+  margin: 0;
+  color: var(--app-surface-text-muted);
+}
+
+.payment-option-preview-card {
+  margin-top: 16px;
+}
+
+.price-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.price-breakdown--expanded {
+  margin-top: 0;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--app-surface-text);
+}
+
+.price-row--discount {
+  color: var(--app-surface-text-muted);
+}
+
+.price-row--total {
+  padding-top: 10px;
+  border-top: 1px solid var(--app-surface-card-border);
+}
+
+.step-actions {
+  position: sticky;
+  bottom: 16px;
+  z-index: 4;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 14px 16px;
+  border: 1px solid var(--app-surface-shell-border);
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--app-surface-card-bg) 88%, transparent);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--app-surface-shadow);
+}
+
+@media (max-width: 899px) {
+  .price-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .step-actions {
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 599px) {
+  .step-heading {
+    gap: 12px;
+  }
+
+  .step-actions {
+    flex-direction: column;
+    padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+  }
+}

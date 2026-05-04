@@ -1,83 +1,247 @@
-.grid-container {
-  margin: 20px;
+:host {
+  display: block;
 }
 
-.dashboard-card {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  right: 15px;
-  bottom: 15px;
+.overview-hero__header {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
 }
 
-.dashboard-card-content {
-  text-align: center;
-  flex-grow: 1;
-  flex-direction: column;
+.overview-hero__identity {
+  display: flex;
   align-items: center;
-  max-height: 100%;
-  justify-content: center;
+  gap: 20px;
+  min-width: 0;
 }
 
-img {
-  align-items: center;
-  justify-content: center;
-}
-
-.center-circle {
-  width: 100px !important;
-  height: 100px;
-  top: 50%;
-  margin: auto;
-}
-
-.ssc-circle {
-  position: unset;
-}
-
-.super {
-  margin-left: 5px;
-  vertical-align: super;
-}
-
-.circle {
-  border-radius: 50%;
+.overview-avatar {
+  display: flex;
   align-items: center;
   justify-content: center;
+  width: 112px;
+  height: 112px;
+  border-radius: 28px;
   overflow: hidden;
+  flex: 0 0 112px;
+  background: var(--app-surface-card-bg);
+}
+
+.overview-avatar--placeholder {
+  background:
+    radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--accent-color, #dcc8c2) 28%, white), transparent 24%),
+    linear-gradient(145deg, color-mix(in srgb, var(--accent-color, #dcc8c2) 72%, white), color-mix(in srgb, var(--primary-color, #b5ac9e) 78%, #d5b089));
+  border: 1px solid var(--app-surface-card-border);
+}
+
+.overview-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.overview-avatar__initials {
   display: flex;
-  vertical-align: middle;
-
-  .initials {
-    color: #FFFFFF;
-    line-height: 100px;
-    letter-spacing: 0.2625px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: xxx-large;
-    vertical-align: middle;
-  }
-}
-
-.avatar-icon {
-  margin: 0 15px !important;
-  transform: scale(2);
-}
-
-.card-icon {
-  height: auto;
   align-items: center;
   justify-content: center;
-  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--app-surface-text);
 }
 
-.card-header {
+.overview-hero__copy {
+  min-width: 0;
+}
+
+.overview-hero__copy h1 {
+  margin: 0;
+  font-size: clamp(1.9rem, 3vw, 2.8rem);
+  line-height: 1;
+  color: var(--app-surface-text);
+}
+
+.overview-hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.overview-chip {
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.overview-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.overview-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 260px));
   justify-content: center;
+  gap: 14px;
 }
 
-.no-bottom {
-  margin-bottom: 0;
+.overview-stat-card {
+  height: 100%;
+}
+
+.overview-stat-card mat-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  padding: 22px;
+}
+
+.overview-stat-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--accent-color, #dcc8c2) 20%, var(--app-surface-card-bg));
+  border: 1px solid var(--app-surface-card-border);
+}
+
+.overview-stat-card__icon--action {
+  overflow: visible;
+}
+
+.overview-stat-card__icon .mat-icon {
+  color: var(--app-surface-text);
+}
+
+.overview-stat-card__value {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.overview-stat-card__balance {
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.overview-stat-card__plus-button {
+  --mdc-fab-container-color: var(--app-detail-action-bg-bottom);
+  --mat-fab-small-state-layer-color: var(--app-detail-action-state);
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  color: var(--app-detail-action-text);
+  box-shadow: none;
+  border: 1px solid var(--app-detail-action-border);
+}
+
+.overview-stat-card__plus-button .mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--app-detail-action-text);
+}
+
+.overview-stat-card__split {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.overview-stat-card__split strong,
+.overview-stat-card__split button {
+  padding: 0;
+  min-width: 0;
+  line-height: 1.35;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--app-surface-text);
+}
+
+.overview-chart-grid {
+  width: 100%;
+}
+
+:host ::ng-deep .overview-chart-grid .mat-grid-tile-content {
+  padding: 0;
+}
+
+.overview-map {
+  min-height: 320px;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.overview-map app-google-map {
+  display: block;
+}
+
+.overview-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+:host-context(.dark-theme) .overview-avatar--placeholder {
+  background:
+    radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--accent-color, #ceb4ac) 22%, white), transparent 24%),
+    linear-gradient(145deg, color-mix(in srgb, var(--accent-color, #ceb4ac) 38%, #3a312b), color-mix(in srgb, var(--primary-color, #9d9282) 34%, #241f1a));
+}
+
+:host-context(.dark-theme) .overview-avatar__initials {
+  color: var(--app-surface-text);
+}
+
+:host-context(.dark-theme) .overview-stat-card__icon {
+  background: color-mix(in srgb, var(--accent-color, #ceb4ac) 16%, var(--app-surface-card-bg));
+  border: 1px solid var(--app-surface-card-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+:host-context(.dark-theme) .overview-stat-card__plus-button {
+  background: linear-gradient(180deg, var(--app-detail-action-hover-top), var(--app-detail-action-hover-bottom));
+  color: var(--app-detail-action-text) !important;
+  border: 1px solid var(--app-detail-action-border-hover);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.24);
+}
+
+:host-context(.dark-theme) .overview-stat-card__plus-button .mat-icon {
+  color: var(--app-detail-action-text) !important;
+}
+
+@media (max-width: 720px) {
+  .overview-hero__header,
+  .overview-hero__identity {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .overview-avatar {
+    width: 88px;
+    height: 88px;
+    flex-basis: 88px;
+    border-radius: 24px;
+  }
+
+  .overview-hero__actions {
+    justify-content: flex-start;
+  }
 }

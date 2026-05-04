@@ -1,3 +1,8 @@
+.user-phone-field {
+  min-width: 0;
+  padding-top: 9px;
+}
+
 .icon-margin {
   margin-left: 16px;
   margin-right: 16px;
@@ -13,5 +18,9 @@
 @media (max-width: 959px) {
   .color-picker-row {
     grid-template-columns: 1fr;
+  }
+
+  .user-phone-field {
+    padding-top: 0;
   }
 }

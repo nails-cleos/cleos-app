@@ -1,6 +1,16 @@
-<form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
-  <div>
-    <div class="row-space-around-container">
+<form (ngSubmit)="submit()"
+      [formGroup]="form"
+      class="app-surface-canvas app-surface-shell app-surface-stack statement-form"
+      novalidate
+      (keydown.enter)="$event.preventDefault()">
+  <section class="app-surface-section">
+    <div class="app-detail-section-header">
+      <div>
+        <span class="app-surface-eyebrow">{{ 'STATEMENT.TITLE' | translate }}</span>
+      </div>
+    </div>
+
+    <div class="app-surface-filter-grid statement-filter-grid">
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}</mat-label>
         <input matInput [matDatepicker]="dp" [formControl]="getForm.date">
@@ -8,6 +18,7 @@
         <mat-datepicker #dp startView="multi-year" (monthSelected)="setMonthAndYear($event, dp)">
         </mat-datepicker>
       </mat-form-field>
+
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COMMON.OFFICE.SEARCH' | translate }}</mat-label>
         <input (keydown)="keyDownHandler($event)" [formControl]="getForm.office" [matAutocomplete]="autoOffice"
@@ -27,18 +38,22 @@
         }
       </mat-form-field>
     </div>
+  </section>
 
-    @if (!form.invalid) {
+  @if (!form.invalid) {
+    <section class="app-surface-section statement-upload-section">
       <app-file-drop (fileSelected)="onSelectedFile($event)" [fileName]="fileName()" [animate]="false"></app-file-drop>
-    }
-  </div>
-  <div class="card-actions top-space">
-    <div class="spacer"></div>
-    <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
-      {{ 'COMMON.BUTTON.BACK' | translate }}
+    </section>
+  }
+
+  <div class="app-detail-actions">
+    <button [form]="form" appBackButton mat-stroked-button type="button">
+      <mat-icon>arrow_back</mat-icon>
+      <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
     </button>
-    <button [disabled]="form.invalid || !blob()" color="primary" mat-fab extended class="icon-button" type="submit">
-      {{ 'COMMON.BUTTON.ADD' | translate }}
+    <button [disabled]="form.invalid || !blob()" mat-stroked-button type="submit">
+      <mat-icon>upload_file</mat-icon>
+      <span>{{ 'COMMON.BUTTON.ADD' | translate }}</span>
     </button>
   </div>
 </form>

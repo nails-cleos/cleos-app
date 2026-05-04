@@ -3,7 +3,7 @@
   @let resultsLength = resultsLengthSignal();
   @let pageSize = pageSizeSignal();
   @if (dataSourceSignal(); as dataSource) {
-    <div>
+    <div class="app-table-shell">
       <table [dataSource]="dataSource" mat-table matSort matSortActive="timestamp" matSortDirection="desc"
              matSortDisableClear multiTemplateDataRows>
         <ng-container matColumnDef="position">
@@ -111,7 +111,7 @@
 
         <ng-container matColumnDef="expandedDetail">
           <td *matCellDef="let reservation" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
-            <div [class.detail-expanded]="reservation === expanded" class="detail hide-gt-xs">
+            <div [class.detail-expanded]="reservation === expanded" class="app-table-detail hide-gt-xs">
               @if (reservation.id) {
                 <mat-list>
                   <mat-list-item>
@@ -159,20 +159,20 @@
         </ng-container>
 
         <ng-container matColumnDef="noContent">
-          <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+          <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="app-table-no-content bold" mat-footer-cell>
             {{ 'COMMON.RESERVATION.LIST.ERROR.NO_CONTENT' | translate }}
           </td>
         </ng-container>
 
         <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
         <tr (click)="expanded = expanded === reservation ? null : reservation"
-            *matRowDef="let reservation; columns: displayedColumns;" class="row" mat-row></tr>
-        <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
+            *matRowDef="let reservation; columns: displayedColumns;" class="app-table-row" mat-row></tr>
+        <tr *matRowDef="let row; columns: ['expandedDetail']" class="app-table-detail-row" mat-row></tr>
 
         <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
       </table>
       @if (resultsLength) {
-        <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+        <mat-paginator [length]="resultsLength" [pageSize]="pageSize" class="app-table-paginator"></mat-paginator>
       }
     </div>
   }

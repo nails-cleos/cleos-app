@@ -1,10 +1,15 @@
-<div>
-  <fieldset>
-    <legend>{{ 'COMMON.SEARCH.TITLE' | translate }}</legend>
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <section class="app-surface-section">
+    <div class="app-detail-section-header">
+      <div>
+        <span class="app-surface-eyebrow">{{ 'COMMON.SEARCH.TITLE' | translate }}</span>
+      </div>
+    </div>
+
     @let selection = selectionSignal();
     <form [formGroup]="form" (keydown.enter)="$event.preventDefault()" (ngSubmit)="print()">
-      <div class="row-column-space-around-center">
-        <mat-form-field appearance="outline">
+      <div class="app-surface-filter-grid invoice-filter-grid">
+        <mat-form-field appearance="outline" class="invoice-filter-grid__office">
           <mat-label>{{ 'COMMON.OFFICE.SEARCH' | translate }}</mat-label>
           <input (keydown)="keyDownHandler($event)" [formControl]="getForm.office" [matAutocomplete]="autoOffice"
                  autocomplete="off" matInput placeholder="{{ 'COMMON.OFFICE.FIELD' | translate }}"
@@ -22,12 +27,12 @@
             <mat-error [innerHTML]="'COMMON.OFFICE.INVALID' | translate"></mat-error>
           }
         </mat-form-field>
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" class="invoice-filter-grid__payment">
           <mat-label>{{ 'INVOICE.PAYMENT.SEARCH' | translate }}</mat-label>
           <mat-chip-grid #chipList aria-label="Payment type selection">
-            @for (type of selectedPaymentTypesSignal(); track type) {
-              <mat-chip-row (removed)="remove(type)" [removable]="true" color="primary">
-                {{ 'COMMON.PAYMENT.TYPE.' + type?.toUpperCase() | translate }}
+            @for (option of selectedPaymentOptionsSignal(); track option) {
+              <mat-chip-row (removed)="remove(option)" [removable]="true" color="primary">
+                {{ option.label }}
                 <mat-icon matChipRemove>cancel</mat-icon>
               </mat-chip-row>
             }
@@ -36,13 +41,13 @@
           </mat-chip-grid>
           <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
             @for (type of filteredTypesSignal(); track type) {
-              <mat-option [value]="type">
-                {{ 'COMMON.PAYMENT.TYPE.' + type?.toUpperCase() | translate }}
+              <mat-option [value]="type.type">
+                {{ type.label }}
               </mat-option>
             }
           </mat-autocomplete>
         </mat-form-field>
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" class="invoice-filter-grid__range">
           <mat-label>{{ 'INVOICE.SEARCH.RANGE.FIELD' | translate }}</mat-label>
           <mat-date-range-input [rangePicker]="drp" [formGroup]="getForm.dateRange">
             <input matStartDate [formControl]="getDateRangeForm.startDate" matInput
@@ -55,7 +60,7 @@
           <mat-error [innerHTML]="'INVOICE.SEARCH.RANGE.REQUIRED' | translate">
           </mat-error>
         </mat-form-field>
-        <mat-form-field appearance="outline" ngStyle.gt-sm="margin-left: -15px">
+        <mat-form-field appearance="outline" class="invoice-filter-grid__start">
           <mat-label>{{ 'INVOICE.SEARCH.START.FIELD' | translate }}</mat-label>
           <input [formControl]="getForm.startNumber" matInput matNativeControl required [type]="'number'" [step]="1"
                  [min]="1">
@@ -65,32 +70,38 @@
             <mat-error [innerHTML]="'INVOICE.SEARCH.START.MIN' | translate"></mat-error>
           }
         </mat-form-field>
-        <button color="accent" id="print" mat-fab type="submit" [disabled]="!selection.selected.length">
+        <button class="app-detail-action-button invoice-filter-grid__print"
+                id="print"
+                mat-stroked-button
+                type="submit"
+                [disabled]="!selection.selected.length">
           <mat-icon>print</mat-icon>
+          <span>{{ 'COMMON.BUTTON.PRINT' | translate }}</span>
         </button>
       </div>
     </form>
-  </fieldset>
+  </section>
 
   @if (dataSourceSignal(); as dataSource) {
-    <div class="mat-elevation-z8">
-      <table [dataSource]="dataSource" mat-table multiTemplateDataRows>
-        <ng-container matColumnDef="select">
-          <th mat-header-cell *matHeaderCellDef>
-            <mat-checkbox (change)="toggleAllRows()"
-                          [checked]="isAllSelected()"
-                          [indeterminate]="isIndeterminate()"
-                          [aria-label]="checkboxLabel()" [disabled]="!resultsLengthSignal()">
-            </mat-checkbox>
-          </th>
-          <td mat-cell *matCellDef="let row">
-            <mat-checkbox (click)="$event.stopPropagation()"
-                          (change)="toggleRow(row)"
-                          [checked]="selectionSignal().isSelected(row)"
-                          [aria-label]="checkboxLabel(row)">
-            </mat-checkbox>
-          </td>
-        </ng-container>
+    <section class="app-surface-section">
+      <div class="mat-elevation-z8 app-table-shell">
+        <table [dataSource]="dataSource" mat-table multiTemplateDataRows>
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-checkbox (change)="toggleAllRows()"
+                            [checked]="isAllSelected()"
+                            [indeterminate]="isIndeterminate()"
+                            [aria-label]="checkboxLabel()" [disabled]="!resultsLengthSignal()">
+              </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+              <mat-checkbox (click)="$event.stopPropagation()"
+                            (change)="toggleRow(row)"
+                            [checked]="selectionSignal().isSelected(row)"
+                            [aria-label]="checkboxLabel(row)">
+              </mat-checkbox>
+            </td>
+          </ng-container>
 
         <ng-container matColumnDef="position">
           <th *matHeaderCellDef mat-header-cell class="hide-xs">#</th>
@@ -178,19 +189,28 @@
           </td>
         </ng-container>
 
-        <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-        <tr (click)="expandedInvoice = expandedInvoice === invoice ? null : invoice"
-            *matRowDef="let invoice; columns: displayedColumns;" class="row" mat-row [ngClass]="invoice.order"></tr>
-        <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row hide-gt-xs" mat-row></tr>
+          <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+          <tr *matRowDef="let invoice; columns: displayedColumns;" class="hide-xs" mat-row [ngClass]="invoice.order"></tr>
+          <tr (click)="expandedInvoice = expandedInvoice === invoice ? null : invoice"
+              *matRowDef="let invoice; columns: displayedColumns;"
+              class="hide-gt-xs app-table-master-row"
+              mat-row
+              [ngClass]="invoice.order"></tr>
+          <tr *matRowDef="let row; columns: ['expandedDetail']"
+              [class.app-table-detail-row--expanded]="row === expandedInvoice"
+              class="hide-gt-xs app-table-detail-row"
+              mat-row></tr>
 
-        <tr *matFooterRowDef="['noContent']" [hidden]="resultsLengthSignal() > 0" mat-footer-row></tr>
-      </table>
-    </div>
+          <tr *matFooterRowDef="['noContent']" [hidden]="resultsLengthSignal() > 0" mat-footer-row></tr>
+        </table>
+      </div>
+    </section>
   }
-</div>
-<div class="card-actions top-space">
-  <div class="spacer"></div>
-  <button [form]="form" appBackButton color="accent" mat-fab extended class="icon-button" type="button">
-    {{ 'COMMON.BUTTON.BACK' | translate }}
-  </button>
+
+  <div class="app-detail-actions">
+    <button [form]="form" appBackButton mat-stroked-button type="button">
+      <mat-icon>keyboard_return</mat-icon>
+      <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+    </button>
+  </div>
 </div>

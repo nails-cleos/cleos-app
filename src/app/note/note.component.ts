@@ -172,7 +172,7 @@ export class NoteComponent {
     const description = note.description;
     const content = this.translate.instant('NOTE.DELETED.CONTENT', { description });
 
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: note }, result => {
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: note, variant: 'warning' }, result => {
       if (result) {
         this.store.dispatch(deleteNote({ id: result.id, description: result.description }));
       }

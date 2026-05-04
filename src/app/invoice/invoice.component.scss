@@ -7,20 +7,52 @@
   width: 55%;
 }
 
-tr.detail-row {
-  height: 0 !important;
-}
-
-table {
-  border-collapse: collapse;
-}
-
 .newWeek {
   padding: 16px 0;
 }
 
-fieldset {
-  form {
-    margin: 5% 0 5% 0;
+.invoice-filter-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  grid-template-areas:
+    'office payment print'
+    'range start print';
+  align-items: start;
+}
+
+.invoice-filter-grid__office {
+  grid-area: office;
+}
+
+.invoice-filter-grid__payment {
+  grid-area: payment;
+}
+
+.invoice-filter-grid__range {
+  grid-area: range;
+}
+
+.invoice-filter-grid__start {
+  grid-area: start;
+}
+
+.invoice-filter-grid__print {
+  grid-area: print;
+  justify-self: end;
+  align-self: center;
+}
+
+@media (max-width: 720px) {
+  .invoice-filter-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'office'
+      'payment'
+      'range'
+      'start'
+      'print';
+  }
+
+  .invoice-filter-grid__print {
+    justify-self: stretch;
   }
 }

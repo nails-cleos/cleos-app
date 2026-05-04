@@ -218,7 +218,8 @@
       "CONTENT": "You have changes on extras, if you complete the reservation, you will lose your changes. Are you sure to complete the reservation?"
     },
     "ERROR": {
-      "NO_CONTENT": "No content"
+      "NO_CONTENT": "No content",
+      "TRY_LATER": "Something went wrong. Please try again later"
     },
     "LABEL": {
       "FILTER": "Filter",
@@ -345,6 +346,7 @@
           "CUSTOMER": "Customer",
           "PROFESSIONAL": "Professional",
           "START": "Start",
+          "END": "End",
           "STATE": "State",
           "TREATMENT": "Tratamiento"
         },

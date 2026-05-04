@@ -3,6 +3,8 @@ import {
   adjustPayments,
   cleanPayment,
   createPaymentLinkByReservationId,
+  getOptions,
+  getOptionsSuccess,
   getPayment,
   getPaymentByResourceId,
   notifyPayment,
@@ -18,7 +20,7 @@ import {
   setPaymentResultParams,
   updatePaymentById,
 } from '../payment.actions';
-import { IPayment, PaymentType } from '../../interfaces/payment';
+import { IPayment, IPaymentOption } from '../../interfaces/payment';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
 import { clearGlobalError, clearGlobalResponse } from '../global.actions';
@@ -28,6 +30,7 @@ export const PAYMENT_FEATURE_KEY = 'payment';
 export interface PaymentState {
   response?: IResponseSuccess;
   data?: IPayment | Pagination<IPayment>;
+  options?: IPaymentOption[];
   error?: IError;
   subErrors?: IError[];
   selected?: IPayment | IPayment[];
@@ -43,7 +46,7 @@ export interface PaymentState {
     reason?: string;
     orderId?: string;
     orderStatusId?: string;
-    paymentType?: PaymentType;
+    paymentType?: string;
     accountId?: string;
   };
   currentPaymentId?: string;
@@ -58,6 +61,7 @@ export interface PaymentState {
 export const initialState: PaymentState = {
   response: undefined,
   data: undefined,
+  options: undefined,
   error: undefined,
   subErrors: undefined,
   selected: undefined,
@@ -75,6 +79,14 @@ export const paymentReducer = createReducer(
     subErrors: undefined,
     selected: [{}, {}, {}] as IPayment[],
     response: undefined,
+  })),
+  on(getOptions, (state) => ({
+    ...state,
+    options: undefined,
+  })),
+  on(getOptionsSuccess, (state, { options }) => ({
+    ...state,
+    options: options,
   })),
   on(createPaymentLinkByReservationId, getPayment, (state) => ({
     ...state,

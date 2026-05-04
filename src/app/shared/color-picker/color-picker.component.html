@@ -12,9 +12,11 @@
 </mat-form-field>
 
 @if (controlValue()) {
-  <mat-card appearance="outlined" class="color-preview-card" [style.background-color]="previewCardBackground()">
+  <mat-card appearance="outlined" class="color-preview-card"
+            [style.background-color]="previewCardBackground()"
+            [style.--color-preview-title-color]="previewTitleColor()">
     <mat-card-header>
-      <mat-card-subtitle [style.color]="previewTitleColor()">
+      <mat-card-subtitle>
         {{ previewTitle() }}
       </mat-card-subtitle>
     </mat-card-header>

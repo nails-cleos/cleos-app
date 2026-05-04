@@ -57,7 +57,7 @@ export class TreatmentsComponent {
   resultsLengthSignal = computed(() => this.treatmentListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['order', 'name', 'priceFrom', 'actions'];
+  displayedColumns: string[] = ['order', 'name', 'priceFrom', 'actions', 'add'];
 
   expanded?: ITreatmentGroup;
 
@@ -99,7 +99,7 @@ export class TreatmentsComponent {
     const title = this.translate.instant('TREATMENT.DELETED.TITLE');
     const content = this.translate.instant('TREATMENT.DELETED.CONTENT', { name: treatment.name });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: treatment },
+      data: { title, content, value: treatment, variant: 'warning' },
     });
 
     dialogRef.afterClosed().subscribe(result => {

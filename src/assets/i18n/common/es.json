@@ -217,7 +217,8 @@
       "CONTENT": "Tiene cambios en extras, si completas las reserva, perderás tus cambios. ¿Estás seguro de completar la reserva?"
     },
     "ERROR": {
-      "NO_CONTENT": "Sin datos"
+      "NO_CONTENT": "Sin datos",
+      "TRY_LATER": "Algo salió mal. Inténtalo de nuevo más tarde"
     },
     "LABEL": {
       "FILTER": "Filtrar",
@@ -344,6 +345,7 @@
           "CUSTOMER": "Cliente",
           "PROFESSIONAL": "Profesional",
           "START": "Inicio",
+          "END": "Fin",
           "STATE": "Estado",
           "TREATMENT": "Tratamiento"
         },

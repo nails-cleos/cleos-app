@@ -1,12 +1,33 @@
-<h1 mat-dialog-title>{{ data.title }}</h1>
-<div [innerHTML]="data.content" mat-dialog-content></div>
-<div mat-dialog-actions>
-  @if (!data.hideNoButton) {
-    <button (click)="onNoClick()" cdkFocusInitial mat-button>
-      {{ 'COMMON.BUTTON.NO' | translate }}
+<div class="app-surface-dialog-shell" [class.app-surface-dialog-shell--warning]="isWarning">
+  <div class="app-surface-dialog-header">
+    <div class="app-surface-dialog-title-wrap">
+      <div class="app-surface-dialog-badge" aria-hidden="true">
+        <mat-icon>{{ icon }}</mat-icon>
+      </div>
+      <h1 mat-dialog-title class="app-surface-dialog-title">{{ data.title }}</h1>
+    </div>
+    <button (click)="onNoClick()" aria-label="Close dialog" class="app-surface-dialog-close" type="button">
+      <mat-icon>close</mat-icon>
     </button>
-  }
-  @if (!data.hideOkButton) {
-    <button [mat-dialog-close]="data.value" mat-button>{{ 'COMMON.BUTTON.YES' | translate }}</button>
-  }
+  </div>
+
+  <div class="app-surface-dialog-divider" aria-hidden="true"></div>
+
+  <div class="app-surface-dialog-content" [innerHTML]="data.content" mat-dialog-content></div>
+
+  <div class="app-surface-dialog-divider" aria-hidden="true"></div>
+
+  <div mat-dialog-actions class="app-surface-dialog-actions">
+    <div class="app-surface-dialog-spacer"></div>
+    @if (!data.hideNoButton) {
+      <button (click)="onNoClick()" cdkFocusInitial mat-stroked-button type="button">
+        {{ 'COMMON.BUTTON.NO' | translate }}
+      </button>
+    }
+    @if (!data.hideOkButton) {
+      <button [mat-dialog-close]="data.value" [color]="confirmColor" mat-flat-button type="button">
+        {{ 'COMMON.BUTTON.YES' | translate }}
+      </button>
+    }
+  </div>
 </div>

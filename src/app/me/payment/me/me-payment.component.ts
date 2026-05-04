@@ -1,12 +1,10 @@
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { getPayment, updatePaymentById } from '../../../store/payment.actions';
 import {
-  getPaymentOptions,
   IPaymentOption,
   PaymentPercentage,
-  PaymentType,
 } from '../../../interfaces/payment';
 import { TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../../../shared/shared.module';
@@ -16,7 +14,7 @@ import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
 import { IReservationPayment } from '../../../interfaces/reservation';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 import {
-  getCurrentPaymentIdPipe,
+  getCurrentPaymentIdPipe, getPaymentOptionsPipe,
   getSelectedPaymentPipe,
 } from '../../../store/selectors/payment.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -37,17 +35,21 @@ export class MePaymentComponent {
 
   private paymentId$ = this.store.pipe(getCurrentPaymentIdPipe);
   private payment$ = this.store.pipe(getSelectedPaymentPipe);
+  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
   private paymentIdSignal = toSignal(this.paymentId$);
+  private paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
   paymentSignal = toSignal(this.payment$);
 
   form = this.formBuilder.group<BankForm>({
-    type: this.formBuilder.control(undefined),
+    option: this.formBuilder.control(undefined),
     percentage: this.formBuilder.control(undefined),
   });
 
   options = signal<IPaymentOption[] | undefined>(undefined);
-  paymentTypes = signal<PaymentType[] | undefined>(undefined);
+  private readonly paymentOptions = computed(
+    () => this.paymentOptionsSignal().filter(option => option.enabled && option.enabledCustomer),
+  );
 
   language: string = this.translate.getCurrentLang();
 
@@ -57,7 +59,7 @@ export class MePaymentComponent {
       if (id) {
         this.firebaseService.logEvent('screen_view', {
           // eslint-disable-next-line camelcase
-          firebase_screen: `Customer missing payment ${id}`,
+          firebase_screen: `Customer missing payment ${ id }`,
           // eslint-disable-next-line camelcase
           firebase_screen_class: 'MePaymentComponent',
         });
@@ -68,11 +70,10 @@ export class MePaymentComponent {
     effect(() => {
       const payment = this.paymentSignal();
       if (payment) {
-        const reservation = payment?.reservation;
-        const types = reservation?.room?.paymentTypes.filter(
-          p => ![PaymentType.cash, PaymentType.transfer].includes(p));
-        this.paymentTypes.set(types);
-        this.options.set(getPaymentOptions(this.translate, types));
+        const options = this.paymentOptions();
+        const types = payment?.reservation?.room?.paymentTypes.filter(
+          p => !['cash', 'transfer'].includes(p.toLowerCase()));
+        this.options.set(options.filter(option => types?.includes(option.type)));
       }
     });
   }
@@ -86,7 +87,7 @@ export class MePaymentComponent {
       return;
     }
 
-    const option = this.getForm.type?.value;
+    const option = this.getForm.option?.value;
     if (!option) {
       return;
     }

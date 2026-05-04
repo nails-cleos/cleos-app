@@ -18,7 +18,7 @@ import {
   reservationFindPayments,
   updateTrackingByReservationId,
 } from '../../../store/reservation.actions';
-import { IPaymentAll, PaymentType } from '../../../interfaces/payment';
+import { IPaymentAll } from '../../../interfaces/payment';
 import { recreate } from '../../../store/payment.actions';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { ToastService } from '../../../services/toast.service';
@@ -218,7 +218,7 @@ describe('MoreInfoComponent', () => {
   });
 
   it('should call resend', () => {
-    const payment = { id: 'payment-1', reservation: mockReservation, type: PaymentType.ideal } as IPaymentAll;
+    const payment = { id: 'payment-1', reservation: mockReservation, type: 'IDEAL' } as IPaymentAll;
 
     component.resend(payment);
 
@@ -226,7 +226,7 @@ describe('MoreInfoComponent', () => {
   });
 
   it('should not call copy when payment link is missing', () => {
-    const payment = { id: 'payment-1', reservation: mockReservation, type: PaymentType.ideal } as IPaymentAll;
+    const payment = { id: 'payment-1', reservation: mockReservation, type: 'IDEAL' } as IPaymentAll;
 
     component.copy(payment);
 
@@ -236,7 +236,7 @@ describe('MoreInfoComponent', () => {
 
   it('should call copy', () => {
     const link = 'link';
-    const payment = { id: 'payment-1', reservation: mockReservation, type: PaymentType.ideal, link } as IPaymentAll;
+    const payment = { id: 'payment-1', reservation: mockReservation, type: 'IDEAL', link } as IPaymentAll;
 
     component.copy(payment);
 

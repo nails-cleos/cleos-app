@@ -328,7 +328,7 @@ export class UnavailableComponent {
       formatFullDate(this.getForm.startDate.value, this.translate.getCurrentLang()) : unavailable?.start;
     const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', { date });
 
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: unavailable }, result => {
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: unavailable, variant: 'warning' }, result => {
       if (result) {
         this.store.dispatch(
           deleteUnavailable({ id: result.id, timestamp: result.timestamp, timeZone: result.timeZone }),

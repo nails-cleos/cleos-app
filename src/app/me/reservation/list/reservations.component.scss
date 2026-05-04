@@ -1,3 +1,20 @@
+.reservations-top-actions {
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.reservations-tabs {
+  margin-top: 8px;
+}
+
+.reservations-tab-content {
+  padding-top: 18px;
+}
+
+.reservations-empty-state {
+  min-height: 180px;
+}
+
 .mat-column-professional,
 .mat-column-state,
 .mat-column-treatment,
@@ -5,18 +22,10 @@
   text-align: center;
 }
 
-.mat-mdc-card-header {
-  justify-content: center;
-}
-
-.title-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 2%;
-}
-
-.title-container span {
-  flex-grow: 1;
+@media (max-width: 720px) {
+  .reservations-top-actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
 }

@@ -120,7 +120,8 @@ export class Price implements IPrice {
     priceWithExtras = 0,
     priceWithAdditional = 0,
     percentageToPaid = 100,
-    balance = 0) {
+    balance = 0,
+    penalty?: number) {
     this.amount = price;
     this.discount = discount;
     this.extra = extra;
@@ -134,25 +135,40 @@ export class Price implements IPrice {
     this.percentageToPaid = percentageToPaid;
     this.balance = balance;
     this.toPaid = this.calculateToPaid(); // Total to pay
-    this.penalty = this.calculatePenalty();
+    this.penalty = penalty ? penalty : this.calculatePenalty();
     this.isPaid = this.calculateIsPaid();
   }
 
   withTotalPaid = (totalPaid: number = 0): IPrice => {
-    this.totalPaid = totalPaid;
-    this.isPaid = this.calculateIsPaid();
-    return this;
+    return this.clone({ totalPaid });
   };
 
   withBalance = (balance: number = 0): IPrice => {
-    this.balance = balance;
-    this.isPaid = this.calculateIsPaid();
-    return this;
+    return this.clone({ balance });
   };
 
   setPenalty = (penalty: number): void => {
     this.penalty = penalty;
   };
+
+  private clone = ({ totalPaid = this.totalPaid, balance = this.balance }: {
+    totalPaid?: number;
+    balance?: number;
+  }): IPrice => new Price(
+    this.amount,
+    this.discount,
+    this.extra,
+    this.additional,
+    this.total,
+    totalPaid,
+    this.totalWithoutDiscount,
+    this.priceWithDiscount,
+    this.priceWithExtras,
+    this.priceWithAdditional,
+    this.percentageToPaid,
+    balance,
+    this.penalty,
+  );
 
   private calculateIsPaid = (): boolean => this.amount > 0 && this.totalPaid + this.balance >= this.total;
 

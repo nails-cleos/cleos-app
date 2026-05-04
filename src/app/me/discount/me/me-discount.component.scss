@@ -1,0 +1,43 @@
+.me-discount-amount,
+.me-discount-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.me-discount-amount {
+  gap: 5px;
+  font-weight: 700;
+  color: var(--app-surface-text);
+}
+
+.me-discount-amount .mat-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--app-surface-label);
+  font-size: 16px;
+}
+
+.me-discount-status {
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--app-surface-card-border);
+  border-radius: 12px;
+  background: var(--app-chip-ghost-bg);
+}
+
+.me-discount-status--used {
+  background: color-mix(in srgb, var(--warn-color) 10%, var(--app-surface-card-bg));
+}
+
+.used-icon {
+  color: var(--warn-color);
+}
+
+.unused-icon {
+  color: var(--app-surface-label);
+}
+
+.icon-text {
+  vertical-align: middle;
+}

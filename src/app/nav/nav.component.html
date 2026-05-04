@@ -13,7 +13,7 @@
               class="sidenav">
     @let currentUser = currentUserSignal();
     @if (showInformation()) {
-      <mat-card appearance="outlined" class="mat-elevation-z0">
+      <mat-card appearance="outlined" class="app-surface-section app-detail-panel">
         @if (currentUser) {
           <mat-card-header>
             <div class="circle pointer-only" mat-card-avatar [routerLink]="['/', language(), 'auth', 'profile']">
@@ -68,118 +68,161 @@
           <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
         </button>
       }
-      <img alt="logo" src="assets/icons/icon-512x512.png" (click)="goToHome()" class="pointer-only">
-      <span (click)="goToHome()" class="pointer-only">{{ title }}</span>
+      <img alt="logo" src="assets/icons/icon-512x512.png" (click)="goToHome()" class="pointer-only header-logo">
+      <span (click)="goToHome()" class="pointer-only header-title">{{ title }}</span>
       <span class="align-right"></span>
       @if (currentUser?.email) {
-        <div>
-          @if (isProfessional() && workDay.length) {
-            <button [matMenuTriggerFor]="menuWorkDay" class="badge-padding" mat-icon-button>
-              <mat-icon [matBadgeHidden]="!workDay.length" [matBadgeOverlap]="true" [matBadge]="workDay.length"
-                        matBadgeColor="warn" aria-hidden="false">work
-              </mat-icon>
-            </button>
+        <div class="header-actions">
+          @if (isProfessional() && workDay().length) {
+            <div class="app-surface-header-menu">
+              <button (click)="toggleMenu('workday')"
+                      [attr.aria-expanded]="activeMenu() === 'workday'"
+                      class="badge-padding"
+                      mat-icon-button
+                      type="button">
+                <mat-icon [matBadgeHidden]="!workDay().length" [matBadgeOverlap]="true" [matBadge]="workDay().length"
+                          matBadgeColor="warn" aria-hidden="false">work
+                </mat-icon>
+              </button>
+              @if (activeMenu() === 'workday') {
+                <div class="app-surface-header-menu__panel app-surface-header-menu__panel--notifications">
+                  <div class="app-surface-notification-menu__content">
+                    @for (not of workDay(); track not) {
+                      <button type="button"
+                              (click)="notification(not)"
+                              class="app-surface-item app-surface-notification-card">
+                        <div class="app-surface-notification-card__top">
+                          <span class="app-surface-item__label">{{ 'NOTIFICATION.TITLE' | translate }}</span>
+                        </div>
+                        <div [matTooltip]="not.message" class="app-surface-notification-card__message">{{ not.message }}</div>
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
           } @else if (isProfessional()) {
             <button class="badge-padding" mat-icon-button>
               <mat-icon>work_off</mat-icon>
             </button>
           }
-          @if (notifications().length && showInformation()) {
-            <button [matMenuTriggerFor]="menuNotification" class="badge-padding" mat-icon-button>
-              <mat-icon [matBadgeHidden]="!countNotifications()" [matBadgeOverlap]="true"
-                        [matBadge]="plusNotification ? plusNotification : countNotifications()"
-                        matBadgeColor="warn" aria-hidden="false">
-                notifications
+          @if (showInformation()) {
+            <div class="app-surface-header-menu">
+              <button (click)="toggleMenu('notifications')"
+                      [attr.aria-expanded]="activeMenu() === 'notifications'"
+                      class="badge-padding"
+                      mat-icon-button
+                      type="button">
+                <mat-icon [matBadgeHidden]="!countNotifications()" [matBadgeOverlap]="true"
+                          [matBadge]="plusNotification ? plusNotification : countNotifications()"
+                          matBadgeColor="warn" aria-hidden="false">
+                  notifications
+                </mat-icon>
+              </button>
+              @if (activeMenu() === 'notifications') {
+                <div class="app-surface-header-menu__panel app-surface-header-menu__panel--notifications">
+                  @if (notifications().length) {
+                    <div class="app-surface-notification-menu__content">
+                      @for (not of notifications(); track not) {
+                        <button type="button"
+                                (click)="notification(not)"
+                                class="app-surface-item app-surface-notification-card"
+                                [class.app-surface-notification-card--read]="not.read">
+                          <div class="app-surface-notification-card__top">
+                            @if (!not.read) {
+                              <span class="app-surface-notification-card__dot"></span>
+                            }
+                            <span class="app-surface-item__label">{{ not.notDate | date:'short':undefined:dateFormat }}</span>
+                          </div>
+                          <div [matTooltip]="not.message" class="app-surface-notification-card__message">
+                            {{ not.message }}
+                          </div>
+                        </button>
+                      }
+                      <div class="app-detail-actions app-surface-notification-menu__actions">
+                        <button mat-stroked-button
+                                type="button"
+                                [routerLink]="['/', language(), 'notifications']"
+                                (click)="closeActiveMenu()">
+                          <mat-icon>notifications</mat-icon>
+                          <span>{{ 'COMMON.NOTIFICATION.LOAD_MORE' | translate }}</span>
+                        </button>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="app-surface-notification-menu__content app-crud-fields">
+                      <div class="app-surface-item app-surface-notification-card app-surface-notification-card--empty">
+                        <span class="app-surface-item__label">{{ 'NOTIFICATION.TITLE' | translate }}</span>
+                        <strong class="app-surface-notification-card__message">{{ 'COMMON.NOTIFICATION.NO' | translate }}</strong>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          <div class="app-surface-header-menu">
+            <button (click)="toggleMenu('settings')"
+                    [attr.aria-expanded]="activeMenu() === 'settings'"
+                    [ngClass]="{'badge-padding': incomplete}"
+                    mat-icon-button
+                    type="button"
+                    name="settings">
+              <mat-icon [matBadgeHidden]="!incomplete" [matBadgeOverlap]="true" [matBadge]="'*'" matBadgeColor="warn"
+                        aria-hidden="false">
+                settings
               </mat-icon>
             </button>
-          } @else {
-            @if (showInformation()) {
-              <button [matMenuTriggerFor]="menuNoNotification" class="badge-padding" mat-icon-button>
-                <mat-icon>notifications</mat-icon>
-              </button>
-            }
-            <mat-menu #menuNoNotification="matMenu" xPosition="before">
-              <mat-list>
-                <mat-list-item class="pointer" matRipple>
-                  <div matListItemTitle>{{ 'COMMON.NOTIFICATION.NO' | translate }}</div>
-                </mat-list-item>
-              </mat-list>
-            </mat-menu>
-          }
-          <mat-menu #menuNotification="matMenu" xPosition="before">
-            <mat-list>
-              @for (not of notifications(); track not) {
-                <mat-list-item (click)="notification(not)" class="pointer" matRipple>
-                  <div [matTooltip]="not.message" [ngClass]="{ 'gray-text': not.read}" matListItemTitle>
-                    @if (!not.read) {
-                      <span class="dot"></span>
-                    }
-                    {{ not.message }}
-                  </div>
-                  <div [ngClass]="{ 'gray-text': not.read}" matListItemLine>
-                    {{ not.notDate | date:'short':undefined:dateFormat }}
-                  </div>
-                  <mat-divider class="divider"></mat-divider>
-                </mat-list-item>
-              }
-              <mat-list-item>
-                <button color="primary" mat-button [routerLink]="['/', language(), 'notifications']">
-                  {{ 'COMMON.NOTIFICATION.LOAD_MORE' | translate }}
-                </button>
-              </mat-list-item>
-            </mat-list>
-          </mat-menu>
-          <mat-menu #menuWorkDay="matMenu" xPosition="before">
-            <mat-list>
-              @for (not of workDay(); track not; let isLast = $last) {
-                <mat-list-item (click)="notification(not)" class="pointer" matRipple>
-                  <div [matTooltip]="not.message" matListItemTitle>{{ not.message }}</div>
-                </mat-list-item>
-                @if (!isLast) {
-                  <mat-divider class="divider"></mat-divider>
-                }
-              }
-            </mat-list>
-          </mat-menu>
+            @if (activeMenu() === 'settings') {
+              <div class="app-surface-header-menu__panel app-surface-header-menu__panel--settings">
+                <div class="app-crud-view-grid">
+                  <button type="button"
+                          class="app-surface-item app-surface-config-card"
+                          [routerLink]="['/', language(), 'home']"
+                          routerLinkActive="app-surface-config-card--active"
+                          (click)="closeActiveMenu()">
+                    <span class="app-surface-config-card__icon">
+                      <mat-icon>home</mat-icon>
+                    </span>
+                    <span class="app-surface-config-card__title">{{ 'COMMON.DASHBOARD.HOME' | translate }}</span>
+                  </button>
 
-          <button [matMenuTriggerFor]="menuLogged" [ngClass]="{'badge-padding': incomplete}" mat-icon-button
-                  name="settings">
-            <mat-icon [matBadgeHidden]="!incomplete" [matBadgeOverlap]="true" [matBadge]="'*'" matBadgeColor="warn"
-                      aria-hidden="false">
-              settings
-            </mat-icon>
-          </button>
-          <mat-menu #menuLogged="matMenu">
-            <mat-nav-list>
-              <mat-list-item [routerLinkActive]="['active']" [routerLink]="['/', language(), 'home']">
-                <mat-icon matListItemIcon>home</mat-icon>
-                <div matListItemTitle>{{ 'COMMON.DASHBOARD.HOME' | translate }}</div>
-              </mat-list-item>
-              <mat-divider></mat-divider>
-              <mat-list-item [routerLink]="['/', language(), 'auth', 'profile']">
-                @if (incomplete) {
-                  <mat-icon matListItemIcon matBadgeColor="warn" [matBadge]="'*'" [matBadgeOverlap]="true"
-                            aria-hidden="false">badge
-                  </mat-icon>
-                } @else {
-                  <mat-icon matListItemIcon>badge</mat-icon>
-                }
-                <div matListItemTitle>{{ 'COMMON.DASHBOARD.PROFILE' | translate }}</div>
-              </mat-list-item>
-              <mat-divider></mat-divider>
-              <mat-list-item (click)="changeTheme()">
-                <mat-icon matListItemIcon>{{ isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
-                <div
-                  matListItemTitle>{{ 'COMMON.DASHBOARD.' + (isDarkMode() ? 'LIGHT_MODE' : 'DARK_MODE') | translate }}
+                  <button type="button"
+                          class="app-surface-item app-surface-config-card"
+                          [routerLink]="['/', language(), 'auth', 'profile']"
+                          (click)="closeActiveMenu()">
+                    <span class="app-surface-config-card__icon">
+                      @if (incomplete) {
+                        <mat-icon matBadgeColor="warn" [matBadge]="'*'" [matBadgeOverlap]="true" aria-hidden="false">badge</mat-icon>
+                      } @else {
+                        <mat-icon>badge</mat-icon>
+                      }
+                    </span>
+                    <span class="app-surface-config-card__title">{{ 'COMMON.DASHBOARD.PROFILE' | translate }}</span>
+                  </button>
+
+                  <button type="button" class="app-surface-item app-surface-config-card" (click)="changeTheme(); closeActiveMenu()">
+                    <span class="app-surface-config-card__icon">
+                      <mat-icon>{{ isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+                    </span>
+                    <span class="app-surface-config-card__title">
+                      {{ 'COMMON.DASHBOARD.' + (isDarkMode() ? 'LIGHT_MODE' : 'DARK_MODE') | translate }}
+                    </span>
+                  </button>
+
+                  <button type="button"
+                          class="app-surface-item app-surface-config-card app-surface-config-card--logout"
+                          (click)="logout(); closeActiveMenu()">
+                    <span class="app-surface-config-card__icon">
+                      <mat-icon>exit_to_app</mat-icon>
+                    </span>
+                    <span class="app-surface-config-card__title">{{ 'COMMON.DASHBOARD.SIGN_OUT' | translate }}</span>
+                  </button>
                 </div>
-              </mat-list-item>
-              <mat-divider></mat-divider>
-              <mat-list-item (click)="logout()">
-                <mat-icon matListItemIcon>exit_to_app</mat-icon>
-                <div matListItemTitle>{{ 'COMMON.DASHBOARD.SIGN_OUT' | translate }}</div>
-              </mat-list-item>
-            </mat-nav-list>
-          </mat-menu>
+              </div>
+            }
+          </div>
         </div>
       } @else if (!isHandsetSignal()) {
         <button mat-button [routerLink]="['/', language(), 'home']">
@@ -187,17 +230,20 @@
           {{ 'COMMON.DASHBOARD.HOME' | translate }}
         </button>
       } @else {
-        <button mat-icon-button [routerLink]="['/', language(), 'home']">
+        <button class="header-action-button" mat-icon-button [routerLink]="['/', language(), 'home']">
           <mat-icon>home</mat-icon>
         </button>
       }
     </mat-toolbar>
     <main class="content">
       <div class="grid-container">
-        @if (error(); as error) {
-          <app-error [error]="error"></app-error>
-        } @else {
+        <div class="route-shell" [class.route-shell-hidden]="!!pageError()">
           <router-outlet></router-outlet>
+        </div>
+        @if (pageError(); as error) {
+          <div class="route-error">
+            <app-error [error]="error"></app-error>
+          </div>
         }
       </div>
     </main>

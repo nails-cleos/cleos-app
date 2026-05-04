@@ -26,6 +26,7 @@ describe('NavigationService', () => {
   };
 
   beforeEach(() => {
+    sessionStorage.clear();
     lang = new BehaviorSubject('en-GB');
     routerEventsSubject = new Subject();
 
@@ -55,8 +56,16 @@ describe('NavigationService', () => {
   });
 
   afterEach(() => {
+    sessionStorage.clear();
     routerEventsSubject.complete();
   });
+
+  const setRouterUrl = (url: string) => {
+    Object.defineProperty(routerSpy, 'url', {
+      configurable: true,
+      value: url,
+    });
+  };
 
   it('should be created', () => {
     expect(service).toBeTruthy();
@@ -69,8 +78,8 @@ describe('NavigationService', () => {
       const navigationEndEvent = new NavigationEnd(1, '/test/path', '/test/path');
       routerEventsSubject.next(navigationEndEvent);
 
-      // Access private history to verify the path was added
       expect((service as any).history).toContain('/test/path');
+      expect(JSON.parse(sessionStorage.getItem('cleos-navigation-history') || '[]')).toContain('/test/path');
     });
 
     it('should not add payment success URLs to history', () => {
@@ -91,13 +100,35 @@ describe('NavigationService', () => {
       expect((service as any).history).not.toContain('/payment/failure?error=1');
     });
 
+    it('should not add payment status callback routes to history', () => {
+      service.subscribe();
+
+      const paymentStatusEvent = new NavigationEnd(
+        1,
+        '/en-GB/me/reservation/res-1/payment/approved',
+        '/en-GB/me/reservation/res-1/payment/approved',
+      );
+      routerEventsSubject.next(paymentStatusEvent);
+
+      expect((service as any).history).not.toContain('/en-GB/me/reservation/res-1/payment/approved');
+    });
+
     it('should ignore non-NavigationEnd events', () => {
       service.subscribe();
 
       const otherEvent = { id: 1, url: '/test' };
       routerEventsSubject.next(otherEvent);
 
-      expect((service as any).history).toEqual([]);
+      expect((service as any).history).toEqual(['/test/path']);
+    });
+
+    it('should avoid duplicate consecutive entries', () => {
+      service.subscribe();
+
+      routerEventsSubject.next(new NavigationEnd(1, '/test/path', '/test/path'));
+      routerEventsSubject.next(new NavigationEnd(2, '/test/path', '/test/path'));
+
+      expect((service as any).history).toEqual(['/test/path']);
     });
   });
 
@@ -110,39 +141,75 @@ describe('NavigationService', () => {
     it('should navigate to previous URL when history is available', () => {
       const testDate = new Date('2024-01-15');
       const step = 2;
+      setRouterUrl('/page3');
+      sessionStorage.setItem('cleos-navigation-history', JSON.stringify(['/page1', '/page2', '/page3']));
 
       service.back(testDate, step);
 
       expect((service as any).history).toEqual(['/page1', '/page2']);
-      expect(routerSpy.navigate).toHaveBeenCalledWith(['/page2'], { state: { date: testDate, step } });
+      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/page2', { state: { date: testDate, step } });
     });
 
     it('should navigate to previous URL with default parameters', () => {
+      setRouterUrl('/page3');
+      sessionStorage.setItem('cleos-navigation-history', JSON.stringify(['/page1', '/page2', '/page3']));
+
       service.back();
 
       expect((service as any).history).toEqual(['/page1', '/page2']);
-      expect(routerSpy.navigate).toHaveBeenCalledWith(['/page2'], { state: { date: undefined, step: 0 } });
+      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/page2', { state: { date: undefined, step: 0 } });
     });
 
-    it('should reload page when no history is available', () => {
+    it('should navigate to parent route when no previous history is available', () => {
       (service as any).history = ['/last-page'];
-      spyOn(service, 'reloadPage');
+      setRouterUrl('/en-GB/colors/123');
 
       service.back();
 
       expect((service as any).history).toEqual([]);
-      expect(service.reloadPage).toHaveBeenCalled();
+      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/en-GB/colors', { state: { date: undefined, step: 0 } });
       expect(routerSpy.navigate).not.toHaveBeenCalled();
     });
 
-    it('should reload page when history is empty', () => {
+    it('should fallback to language root when current route has no parent segment', () => {
       (service as any).history = [];
-      spyOn(service, 'reloadPage');
+      setRouterUrl('/en-GB');
 
       service.back();
 
-      expect(service.reloadPage).toHaveBeenCalled();
-      expect(routerSpy.navigate).not.toHaveBeenCalled();
+      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/en-GB', { state: { date: undefined, step: 0 } });
+    });
+
+    it('should read persisted history when in-memory history is empty after reload', () => {
+      (service as any).history = [];
+      setRouterUrl('/page-b');
+      sessionStorage.setItem('cleos-navigation-history', JSON.stringify(['/page-a', '/page-b']));
+
+      service.back();
+
+      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/page-a', { state: { date: undefined, step: 0 } });
+      expect(JSON.parse(sessionStorage.getItem('cleos-navigation-history') || '[]')).toEqual(['/page-a']);
+    });
+
+    it('should sync current route before going back when current page was not persisted', () => {
+      (service as any).history = [];
+      setRouterUrl('/en-GB/colors/123');
+      sessionStorage.setItem('cleos-navigation-history', JSON.stringify(['/en-GB/colors']));
+
+      service.back();
+
+      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/en-GB/colors', { state: { date: undefined, step: 0 } });
+      expect(JSON.parse(sessionStorage.getItem('cleos-navigation-history') || '[]')).toEqual(['/en-GB/colors']);
+    });
+
+    it('should fallback to parent route when history is empty', () => {
+      (service as any).history = [];
+      setRouterUrl('/en-GB/rooms/room-1/expenses/add');
+
+      service.back();
+
+      expect(routerSpy.navigateByUrl)
+        .toHaveBeenCalledWith('/en-GB/rooms/room-1/expenses', { state: { date: undefined, step: 0 } });
     });
   });
 
@@ -311,17 +378,21 @@ describe('NavigationService', () => {
       routerEventsSubject.next(new NavigationEnd(2, '/page2', '/page2'));
       routerEventsSubject.next(new NavigationEnd(3, '/page3', '/page3'));
 
-      expect((service as any).history).toEqual(['/page1', '/page2', '/page3']);
+      expect((service as any).history).toEqual(['/test/path', '/page1', '/page2', '/page3']);
     });
 
     it('should handle back navigation correctly', () => {
-      (service as any).history = ['/page1', '/page2', '/page3'];
+      setRouterUrl('/page3');
+      sessionStorage.setItem('cleos-navigation-history', JSON.stringify(['/page1', '/page2', '/page3']));
 
       service.back();
       expect((service as any).history).toEqual(['/page1', '/page2']);
+      expect(JSON.parse(sessionStorage.getItem('cleos-navigation-history') || '[]')).toEqual(['/page1', '/page2']);
 
+      setRouterUrl('/page2');
       service.back();
       expect((service as any).history).toEqual(['/page1']);
+      expect(JSON.parse(sessionStorage.getItem('cleos-navigation-history') || '[]')).toEqual(['/page1']);
     });
   });
 });

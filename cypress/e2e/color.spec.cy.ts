@@ -30,7 +30,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.get('tr').contains('No Color');
       cy.get('button[id="add-button"]').click({ force: true });
       cy.url().should('include', '/colors/add');
-      cy.get('mat-card-title').contains('Add color');
+      cy.get('.app-surface-eyebrow').contains('Add color');
 
       cy.formControlType('name', colorName);
       cy.formControlType('description', `${ colorName } Description`, 'textarea');
@@ -62,12 +62,12 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         });
         cy.intercept('PATCH', `**/api/v1/colors/${ color.id }`).as('updateColor');
 
-        cy.buttonClickOnTable(breakpoints, color.name, 'row', 'detail-row', 'edit',
+        cy.buttonClickOnTable(breakpoints, color.name, 'app-table-master-row', 'app-table-detail-row', 'edit',
           breakpointToButtons(breakpoints, ['delete']));
         cy.wait('@getColor');
 
-        cy.get('mat-card-title').contains('Update Color');
-        cy.get('mat-card-subtitle').contains(color.name);
+        cy.get('.app-surface-eyebrow').contains('Update Color');
+        cy.get('.app-crud-title').contains(color.name);
         cy.get('[data-cy="name-input"]').should('have.value', color.name);
         cy.get('[data-cy="description-textarea"]').should('have.value', color.description);
 

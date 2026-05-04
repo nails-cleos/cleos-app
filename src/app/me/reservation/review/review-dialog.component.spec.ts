@@ -8,7 +8,6 @@ import { IUserAll } from '../../../interfaces/user';
 import { ICurrencyAll } from '../../../interfaces/currency';
 import { ITreatmentAll } from '../../../interfaces/treatment';
 import { getCurrentTimeZone } from '../../../util/dates';
-import { PaymentType } from '../../../interfaces/payment';
 
 describe('ReviewDialogComponent', () => {
   let component: ReviewDialogComponent;
@@ -56,7 +55,7 @@ describe('ReviewDialogComponent', () => {
         },
       },
       timeZone: getCurrentTimeZone(),
-      paymentTypes: [PaymentType.transfer],
+      paymentTypes: ['TRANSFER'],
       primary: true,
     };
 

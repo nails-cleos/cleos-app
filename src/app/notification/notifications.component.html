@@ -1,66 +1,69 @@
-<div class="flex-container">
-  <div class="card-container">
-    <div class="card-content">
-      <mat-card appearance="outlined">
-        @let currentNotifications = notifications();
-        <mat-card-header>
-          <mat-card-title [matBadgeHidden]="badge <= 0" [matBadge]="badge" matBadgeColor="warn"
-                          [matBadgeOverlap]="false">
-            {{ 'NOTIFICATION.TITLE' | translate }}
-          </mat-card-title>
-          @if (!currentNotifications.length) {
-            <mat-card-subtitle>{{ 'COMMON.NOTIFICATION.NO' | translate }}</mat-card-subtitle>
-          }
-        </mat-card-header>
-        <mat-card-content>
-          @if (currentNotifications.length) {
-            <div class="inner-container">
-              @for (not of currentNotifications; let last = $last; let first = $first; let i = $index; track not) {
-                <mat-list matRipple style="padding: 0"
-                          class="notification-enter"
-                          [class.notification-leave]="not.deleted"
-                          [style.--notification-enter-delay]="(i * 40) + 'ms'">
-                  @if (first) {
-                    <mat-divider></mat-divider>
-                  }
-                  <mat-list-item class="notification-list">
-                    <div (click)="notification(not)" [matTooltip]="not.message" [ngClass]="{ 'gray-text': not.read}"
-                         matListItemTitle class="pointer">
-                      @if (!not.read) {
-                        <span class="pointer dot"></span>
-                      }
-                      {{ not.message }}
-                    </div>
-                    <div matListItemLine>{{ not.date | date:'short':undefined:dateFormat }}</div>
-                    <button matListItemMeta mat-icon-button (click)="remove(i)">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </mat-list-item>
-                  @if (!last || showMore) {
-                    <mat-divider></mat-divider>
-                  }
-                </mat-list>
-              }
-              <mat-list>
-                @for (n of loadingNotifications; track n) {
-                  <mat-list-item>
-                    <div class="ssc-line" matListItemTitle></div>
-                    <div class="ssc-line top" matListItemLine></div>
-                  </mat-list-item>
-                  <mat-divider class="divider"></mat-divider>
+@let currentNotifications = notifications();
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <section class="app-surface-section">
+    <div class="app-detail-section-header">
+      <div>
+        <span class="app-surface-eyebrow">{{ 'NOTIFICATION.TITLE' | translate }}</span>
+        @if (!currentNotifications.length && !loadingNotifications?.length) {
+          <p class="notifications-subtitle">{{ 'COMMON.NOTIFICATION.NO' | translate }}</p>
+        }
+      </div>
+    </div>
+
+    @if (currentNotifications.length) {
+      <div class="notifications-list">
+        @for (not of currentNotifications; let i = $index; track not) {
+          <div class="app-surface-item app-inline-field-action notification-enter"
+               [class.notification-leave]="not.deleted"
+               [style.--notification-enter-delay]="(i * 40) + 'ms'">
+            <button class="notification-card__body"
+                    type="button"
+                    (click)="notification(not)"
+                    [matTooltip]="not.message">
+              <div class="notification-card__header">
+                @if (!not.read) {
+                  <span class="notification-card__dot"></span>
                 }
-                @if (showMore) {
-                  <mat-list-item>
-                    <button (click)="getMoreNotifications()" color="primary" mat-button>
-                      {{ 'COMMON.NOTIFICATION.LOAD_MORE' | translate }}
-                    </button>
-                  </mat-list-item>
-                }
-              </mat-list>
+                <span class="app-surface-item__label">{{ not.date | date:'short':undefined:dateFormat }}</span>
+              </div>
+              <div class="notification-card__message" [class.notification-card__message--read]="not.read">
+                {{ not.message }}
+              </div>
+            </button>
+
+            <button mat-icon-button type="button" class="notification-card__delete" (click)="remove(i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        }
+
+        @if (loadingNotifications; as loading) {
+          @for (n of loading; track n) {
+            <div class="app-surface-item app-inline-field-action notification-card--loading">
+              <div class="ssc-line notification-card__skeleton-title"></div>
+              <div class="ssc-line notification-card__skeleton-date"></div>
             </div>
           }
-        </mat-card-content>
-      </mat-card>
-    </div>
-  </div>
+        }
+      </div>
+
+      @if (showMore) {
+        <div class="app-detail-actions">
+          <button (click)="getMoreNotifications()" mat-stroked-button type="button">
+            <mat-icon>expand_more</mat-icon>
+            <span>{{ 'COMMON.NOTIFICATION.LOAD_MORE' | translate }}</span>
+          </button>
+        </div>
+      }
+    } @else if (loadingNotifications?.length) {
+      <div class="notifications-list">
+        @for (n of loadingNotifications; track n) {
+          <div class="app-surface-item app-inline-field-action notification-card--loading">
+            <div class="ssc-line notification-card__skeleton-title"></div>
+            <div class="ssc-line notification-card__skeleton-date"></div>
+          </div>
+        }
+      </div>
+    }
+  </section>
 </div>

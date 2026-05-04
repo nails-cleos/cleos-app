@@ -7,7 +7,6 @@ import { TreatmentsComponent } from './list/treatments.component';
 import { provideEffects } from '@ngrx/effects';
 import { TreatmentEffects } from '../store/effects/treatment.effects';
 import { TreatmentService } from '../services/treatment.service';
-import { TreatmentViewComponent } from './view/treatment-view.component';
 import { TreatmentTableComponent } from './table/treatment-table.component';
 import { MissingTranslateHandler, TranslateLoaderFactory } from '../shared/translate-loader.factory';
 import { TreatmentGroupSortingComponent } from './sorting/treatment-group-sorting.component';
@@ -25,7 +24,6 @@ import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
   imports: [
     TreatmentComponent,
     TreatmentsComponent,
-    TreatmentViewComponent,
     TreatmentTableComponent,
     TreatmentGroupSortingComponent,
     TreatmentSortingComponent,

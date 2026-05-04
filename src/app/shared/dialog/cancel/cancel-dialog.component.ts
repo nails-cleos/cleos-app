@@ -40,7 +40,7 @@ export class CancelDialogComponent {
     }),
   });
   typeForm: FormGroup<BankForm> = this.formBuilder.group<BankForm>({
-    type: this.formBuilder.control(undefined),
+    option: this.formBuilder.control(undefined),
     percentage: this.formBuilder.control(undefined),
   });
   paymentOptions?: IPaymentOption[] = this.data.paymentOptions?.map(it => {
@@ -77,7 +77,7 @@ export class CancelDialogComponent {
       return;
     }
     const cancelOption = this.getForm.paymentCancellation.value;
-    const option = this.getTypeForm.type.value;
+    const option = this.getTypeForm.option.value;
     const type = option?.type;
     const cancelRequest = { cancelOption, type };
     this.dialogRef.close(cancelRequest);

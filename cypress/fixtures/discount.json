@@ -1,0 +1,155 @@
+[
+  {
+    "deleted": false,
+    "id": "09ae64ab-547d-43b4-8c7b-a5947296e207",
+    "name": "10% Off Birthday",
+    "description": "Cash",
+    "amount": 10,
+    "type": "PERCENTAGE",
+    "currency": {
+      "deleted": false,
+      "id": "e5fa4fd7-74bb-4a02-bf11-fc30ad9fb358",
+      "name": "Euro",
+      "code": "EUR",
+      "icon": "euro"
+    },
+    "currencyId": null,
+    "referral": false
+  },
+  {
+    "deleted": false,
+    "id": "88b82a17-2a40-4288-8e29-d5ccd22856d5",
+    "name": "CND Spa Treatment",
+    "description": null,
+    "amount": 20,
+    "type": "MONEY",
+    "currency": {
+      "deleted": false,
+      "id": "e5fa4fd7-74bb-4a02-bf11-fc30ad9fb358",
+      "name": "Euro",
+      "code": "EUR",
+      "icon": "euro"
+    },
+    "currencyId": null,
+    "referral": false
+  },
+  {
+    "deleted": false,
+    "id": "76349419-1329-47f5-b081-68781bb9f6f3",
+    "name": "Discount 20%",
+    "description": null,
+    "amount": 20,
+    "type": "PERCENTAGE",
+    "currency": {
+      "deleted": false,
+      "id": "e5fa4fd7-74bb-4a02-bf11-fc30ad9fb358",
+      "name": "Euro",
+      "code": "EUR",
+      "icon": "euro"
+    },
+    "currencyId": null,
+    "referral": false
+  },
+  {
+    "deleted": false,
+    "id": "de347f57-474d-4b47-aa95-c358235a7ccd",
+    "name": "Free treatment ",
+    "description": "For free",
+    "amount": 100,
+    "type": "PERCENTAGE",
+    "currency": {
+      "deleted": false,
+      "id": "e5fa4fd7-74bb-4a02-bf11-fc30ad9fb358",
+      "name": "Euro",
+      "code": "EUR",
+      "icon": "euro"
+    },
+    "currencyId": null,
+    "referral": false
+  },
+  {
+    "deleted": false,
+    "id": "0245b0a6-2d62-4443-b121-48ce891a58cc",
+    "name": "Gift card 45€",
+    "description": null,
+    "amount": 45,
+    "type": "MONEY",
+    "currency": {
+      "deleted": false,
+      "id": "e5fa4fd7-74bb-4a02-bf11-fc30ad9fb358",
+      "name": "Euro",
+      "code": "EUR",
+      "icon": "euro"
+    },
+    "currencyId": null,
+    "referral": false
+  },
+  {
+    "deleted": false,
+    "id": "69196d7f-cd18-4772-88ea-077a4f5a722e",
+    "name": "Referral 10%",
+    "description": null,
+    "amount": 10,
+    "type": "PERCENTAGE",
+    "currency": {
+      "deleted": false,
+      "id": "e5fa4fd7-74bb-4a02-bf11-fc30ad9fb358",
+      "name": "Euro",
+      "code": "EUR",
+      "icon": "euro"
+    },
+    "currencyId": null,
+    "referral": true
+  },
+  {
+    "deleted": false,
+    "id": "86a1df4d-cd5a-45a1-b277-93a3a0cffc22",
+    "name": "Saldo a favor ",
+    "description": null,
+    "amount": 5,
+    "type": "MONEY",
+    "currency": {
+      "deleted": false,
+      "id": "e5fa4fd7-74bb-4a02-bf11-fc30ad9fb358",
+      "name": "Euro",
+      "code": "EUR",
+      "icon": "euro"
+    },
+    "currencyId": null,
+    "referral": false
+  },
+  {
+    "deleted": false,
+    "id": "f245b0a6-2d62-4443-b121-48ce891a58cc",
+    "name": "Saldo a Favor 10€ ",
+    "description": null,
+    "amount": 10,
+    "type": "MONEY",
+    "currency": {
+      "deleted": false,
+      "id": "e5fa4fd7-74bb-4a02-bf11-fc30ad9fb358",
+      "name": "Euro",
+      "code": "EUR",
+      "icon": "euro"
+    },
+    "currencyId": null,
+    "referral": false
+  },
+  {
+    "deleted": false,
+    "id": "cfdfb4c7-66d1-4700-b7ca-169b508c7a8f",
+    "name": "Total",
+    "description": "Total ",
+    "amount": 100,
+    "type": "PERCENTAGE",
+    "currency": {
+      "deleted": false,
+      "id": "e5fa4fd7-74bb-4a02-bf11-fc30ad9fb358",
+      "name": "Euro",
+      "code": "EUR",
+      "icon": "euro"
+    },
+    "currencyId": null,
+    "referral": false
+  }
+]

@@ -4,6 +4,7 @@ import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 import { concatMap } from 'rxjs/operators';
 import { cleanRoom, getAllRoomsInfo, setCurrentRoomId } from '../store/room.actions';
 import { cleanExpense, setCurrentExpenseId } from '../store/expense.actions';
+import { getOptions } from '../store/payment.actions';
 
 @Injectable()
 export class RoomNavigationEffects {
@@ -18,7 +19,7 @@ export class RoomNavigationEffects {
         // 1) /rooms/add
         const addMatch = url.match(/\/rooms\/add$/);
         if (addMatch) {
-          return [cleanRoom(), getAllRoomsInfo()];
+          return [cleanRoom(), getOptions(), getAllRoomsInfo()];
         }
 
         // 2) /rooms/:id
@@ -26,6 +27,7 @@ export class RoomNavigationEffects {
         if (detailMatch) {
           return [
             cleanRoom(),
+            getOptions(),
             setCurrentRoomId({ roomId: detailMatch[1] }),
             getAllRoomsInfo(),
           ];
@@ -36,6 +38,7 @@ export class RoomNavigationEffects {
         if (meMatch) {
           return [
             cleanRoom(),
+            getOptions(),
             setCurrentRoomId({ roomId: meMatch[1] }),
             getAllRoomsInfo(),
           ];
@@ -58,6 +61,7 @@ export class RoomNavigationEffects {
         if (detailExpenseMatch) {
           return [
             cleanExpense(),
+            getOptions(),
             setCurrentRoomId({ roomId: detailExpenseMatch[1] }),
             setCurrentExpenseId({ expenseId: detailExpenseMatch[2] }),
           ];

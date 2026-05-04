@@ -13,28 +13,119 @@ env:
   VERSION_PART: 'patch'
 
 jobs:
-  snapshot:
-    if: github.event_name == 'push'
+  release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      release_version: ${{ steps.release.outputs.release_version }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Configure Git
         run: |
           git config --global user.email "nails.cleos@gmail.com"
           git config --global user.name "Nails Cleos"
-          git fetch
+          git checkout "${GITHUB_REF_NAME}"
+
+      - name: Use Node.js 24.12.0
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.12.0
+          cache: 'npm'
+
+      - name: Make script executable
+        run: chmod +x "${GITHUB_WORKSPACE}/version-update.sh"
+
+      - name: Release version
+        id: release
+        run: |
+          VERSION=$("${GITHUB_WORKSPACE}/version-update.sh")
+          TAG_NAME="v${VERSION}"
+
+          if ! git diff --quiet -- package.json package-lock.json; then
+            git add package.json package-lock.json
+            git commit -m "Release version ${VERSION}"
+            git push origin "${GITHUB_REF_NAME}"
+          fi
+
+          if git rev-parse "${TAG_NAME}" >/dev/null 2>&1; then
+            echo "Tag ${TAG_NAME} already exists locally" >&2
+            exit 1
+          fi
+
+          git tag -a "${TAG_NAME}" -m "Release ${TAG_NAME}"
+          git push origin "${TAG_NAME}"
+
+          echo "release_version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release.outputs.tag_name }}
+          name: ${{ steps.release.outputs.tag_name }}
+          generate_release_notes: true
+
+      - name: Add Release Summary
+        if: always()
+        run: |
+          echo "## 🚀 Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** main" >> $GITHUB_STEP_SUMMARY
+          echo "- **Released Version:** ${{ steps.release.outputs.release_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag:** ${{ steps.release.outputs.tag_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **GitHub Release:** created automatically" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Release completed successfully" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Release failed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  snapshot:
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "nails.cleos@gmail.com"
+          git config --global user.name "Nails Cleos"
           git checkout develop
+
+      - name: Use Node.js 24.12.0
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.12.0
+          cache: 'npm'
 
       - name: Make script executable
         run: chmod +x "${GITHUB_WORKSPACE}/version-update.sh"
 
       - name: Run snapshot bump
+        id: snapshot
         run: |
-          "${GITHUB_WORKSPACE}/version-update.sh" $VERSION_PART
-          git commit -am "Update rc version"
-          git push
+          VERSION=$("${GITHUB_WORKSPACE}/version-update.sh" "${VERSION_PART}")
+
+          if ! git diff --quiet -- package.json package-lock.json; then
+            git add package.json package-lock.json
+            git commit -m "Update rc version to ${VERSION}"
+            git push origin develop
+          fi
+
+          echo "snapshot_version=${VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Add Snapshot Summary
         if: always()
@@ -44,7 +135,7 @@ jobs:
           echo "- **Triggered by:** push to main" >> $GITHUB_STEP_SUMMARY
           echo "- **Target Branch:** develop" >> $GITHUB_STEP_SUMMARY
           echo "- **Version Part Incremented:** ${{ env.VERSION_PART }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Commit Author:** Nails Cleos" >> $GITHUB_STEP_SUMMARY
+          echo "- **Next RC Version:** ${{ steps.snapshot.outputs.snapshot_version }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           if [ "${{ job.status }}" == "success" ]; then
@@ -53,43 +144,13 @@ jobs:
             echo "❌ Snapshot version bump failed" >> $GITHUB_STEP_SUMMARY
           fi
 
-  version:
-    if: github.event_name == 'push'
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Configure Git
-        run: |
-          git config --global user.email "nails.cleos@gmail.com"
-          git config --global user.name "Nails Cleos"
-          git fetch
-          git checkout main
-
-      - name: Make script executable
-        run: chmod +x "${GITHUB_WORKSPACE}/version-update.sh"
-
-      - name: Release version
-        id: version
-        run: |
-          VERSION=$("${GITHUB_WORKSPACE}/version-update.sh")
-          git commit -am "Release version $VERSION"
-          git push
-
-      - name: Add Release Summary
-        if: always()
-        run: |
-          echo "## 🚀 Release Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Branch:** main" >> $GITHUB_STEP_SUMMARY
-          echo "- **Released Version:** ${{ env.release_version }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Version Strategy:** Automatic bump" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "✅ Release completed successfully" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ Release failed" >> $GITHUB_STEP_SUMMARY
-          fi
+  deploy:
+    needs: release
+    uses: ./.github/workflows/deploy.yml
+    permissions:
+      id-token: write
+      contents: read
+    secrets: inherit
+    with:
+      release_version: ${{ needs.release.outputs.release_version }}
+      tag_name: ${{ needs.release.outputs.tag_name }}

@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AuthUserService } from '../../services/auth-user.service';
 import { ITransaction } from '../../interfaces/account';
-import { getPaymentOptions, IPaymentOption, PaymentType } from '../../interfaces/payment';
 import { currencySymbol } from '../../util/helper';
 import { TranslateService } from '@ngx-translate/core';
 import { SharedModule } from '../../shared/shared.module';
@@ -21,6 +20,9 @@ import {
   getSubErrorsPipe,
 } from '../../store/selectors/account.selectors';
 import { AccountState } from '../../store/reducers/account.reducers';
+import { PaymentState } from '../../store/reducers/payment.reducers';
+import { getPaymentOptionsPipe } from '../../store/selectors/payment.selectors';
+import { PaymentOptionSelectComponent } from '../../shared/payment-option-select/payment-option-select.component';
 
 export type TransactionForm = {
   amount: FormControl<number>;
@@ -32,20 +34,21 @@ export type TransactionForm = {
   selector: 'app-transaction',
   templateUrl: './transaction.component.html',
   styleUrls: ['./transaction.component.scss'],
-  imports: [SharedModule, BalanceComponent, BackButtonDirective, BankComponent],
+  imports: [SharedModule, BalanceComponent, BackButtonDirective, BankComponent, PaymentOptionSelectComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransactionComponent {
-  private readonly store: Store<AccountState> = inject(Store<AccountState>);
+  private readonly store: Store<AccountState | PaymentState> = inject(Store<AccountState | PaymentState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private accountId$ = this.store.pipe(getCurrentAccountIdPipe);
-  private selectedAccount$ = this.store.pipe(getSelectedAccountPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getAccountResponsePipe);
+  private readonly accountId$ = this.store.pipe(getCurrentAccountIdPipe);
+  private readonly selectedAccount$ = this.store.pipe(getSelectedAccountPipe);
+  private readonly subErrors$ = this.store.pipe(getSubErrorsPipe);
+  private readonly response$ = this.store.pipe(getAccountResponsePipe);
+  private readonly paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
   private accountIdSignal = toSignal(this.accountId$, { initialValue: null });
   private selectedAccountSignal = toSignal(this.selectedAccount$);
@@ -53,24 +56,28 @@ export class TransactionComponent {
   private responseSignal = toSignal(this.response$);
   private authUserSignal = this.authUserService.authUser;
   private accountId = computed(() => this.accountIdSignal());
+  private paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
 
   errors = signal<Record<string, unknown>>({});
   accountSignal = computed(() => this.selectedAccountSignal());
+  types = computed(() => this.paymentOptionsSignal()
+    .filter(option => option.enabled)
+    .filter(option => ['cash', 'transfer'].includes(option.type.toLowerCase())));
   optionsSignal = computed(() => {
     if (!this.hasAdminRole()) {
-      return getPaymentOptions(this.translate, [PaymentType.mollie], true);
+      return this.paymentOptionsSignal()
+        .filter(option => option.enabled)
+        .map(option => ({ ...option, hidePercentage: true }));
     }
-    return getPaymentOptions(this.translate, [PaymentType.cash, PaymentType.transfer]);
+    return this.types();
   });
   hasAdminRole = computed(() => this.authUserSignal().hasAdminRole);
-
-  types = [{ type: PaymentType.cash }, { type: PaymentType.transfer }] as IPaymentOption[];
   amountMin: number = 100;
   language: string = this.translate.getCurrentLang();
 
   bankForm = this.formBuilder.group<BankForm>({
     percentage: this.formBuilder.control(undefined),
-    type: this.formBuilder.control(undefined, {
+    option: this.formBuilder.control(undefined, {
       validators: [Validators.required],
     }),
   });
@@ -82,8 +89,6 @@ export class TransactionComponent {
     transfer: this.formBuilder.control(undefined),
     bankForm: this.bankForm,
   });
-
-  transfer = PaymentType.transfer;
 
   constructor() {
     effect(() => {
@@ -143,7 +148,7 @@ export class TransactionComponent {
       return;
     }
 
-    const option = this.getBankForm.type?.value;
+    const option = this.getBankForm.option?.value;
     const customerId = this.accountSignal()?.customer?.id;
     const amount = this.getForm.amount.value;
     let type;

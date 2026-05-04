@@ -5,11 +5,11 @@ import { of, throwError } from 'rxjs';
 import { PaymentService } from './payment.service';
 import {
   IPay,
+  IPaymentOption,
   IPaymentAll,
   IPaymentRequest,
   IPaymentStatus,
   PaymentPercentage,
-  PaymentType,
 } from '../interfaces/payment';
 import { IReservationPayment } from '../interfaces/reservation';
 import { IApiResponse } from '../interfaces/common';
@@ -23,7 +23,7 @@ describe('PaymentService', () => {
     paymentId: 'paymentId',
     id: 'payment-123',
     status: 'completed',
-    type: PaymentType.mollie,
+    type: 'MOLLIE',
     amount: 100,
     timestamp: Date.now(),
     preferenceId: 'pref-123',
@@ -31,7 +31,7 @@ describe('PaymentService', () => {
 
   const mockPaymentStatus: IPaymentStatus = {
     paymentId: 'status-123',
-    paymentType: PaymentType.ideal,
+    paymentType: 'IDEAL',
     preferenceId: 'pref-123',
   };
 
@@ -42,16 +42,28 @@ describe('PaymentService', () => {
   };
 
   const mockReservationPayment: IReservationPayment = {
-    type: PaymentType.ideal,
+    type: 'IDEAL',
     amount: 150,
     percentage: PaymentPercentage.total,
   };
 
   const mockPaymentRequest: IPaymentRequest = {
-    paymentType: PaymentType.ideal,
+    paymentType: 'IDEAL',
     paymentId: 'option-123',
     amount: 100,
   };
+
+  const mockPaymentOptions: IPaymentOption[] = [{
+    label: 'Cash',
+    type: 'CASH',
+    enabled: true,
+    enabledCustomer: false,
+    default: true,
+    filter: true,
+    defaultFilter: false,
+    show: true,
+    icon: 'cash',
+  }];
 
   const mockApiResponse: IApiResponse = {
     id: 'response-123',
@@ -83,6 +95,18 @@ describe('PaymentService', () => {
       });
 
       expect(httpSpy.get).toHaveBeenCalledWith('v1/payments/payment-123');
+    });
+  });
+
+  describe('getPaymentOptions', () => {
+    it('should get payment options', () => {
+      httpSpy.get.and.returnValue(of(mockPaymentOptions));
+
+      service.getPaymentOptions().subscribe(result => {
+        expect(result).toEqual(mockPaymentOptions);
+      });
+
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/payments/options');
     });
   });
 
@@ -159,7 +183,7 @@ describe('PaymentService', () => {
     it('should recreate payment with new type', () => {
       httpSpy.patch.and.returnValue(of(mockPayment));
 
-      service.recreate('payment-123', PaymentType.ideal).subscribe(result => {
+      service.recreate('payment-123', 'IDEAL').subscribe(result => {
         expect(result).toEqual(mockPayment);
       });
 
@@ -203,14 +227,14 @@ describe('PaymentService', () => {
         'reservation',
         'res-123',
         'pref-456',
-        PaymentType.ideal,
+        'IDEAL',
       ).subscribe(result => {
         expect(result).toEqual(mockPay);
       });
 
       expect(httpSpy.patch).toHaveBeenCalledWith(
         'v1/reservations/res-123/payments/payment-123',
-        { preferenceId: 'pref-456', paymentType: PaymentType.ideal },
+        { preferenceId: 'pref-456', paymentType: 'IDEAL' },
       );
     });
 
@@ -222,14 +246,14 @@ describe('PaymentService', () => {
         'transaction',
         'trans-789',
         'pref-999',
-        PaymentType.ideal,
+        'IDEAL',
       ).subscribe(result => {
         expect(result).toEqual(mockPay);
       });
 
       expect(httpSpy.patch).toHaveBeenCalledWith(
         'v1/accounts/transactions/trans-789/payments/payment-456',
-        { preferenceId: 'pref-999', paymentType: PaymentType.ideal },
+        { preferenceId: 'pref-999', paymentType: 'IDEAL' },
       );
     });
   });

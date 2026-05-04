@@ -1,47 +1,50 @@
 .calendar {
   display: block;
-  margin-left: auto;
-  margin-right: auto;
   width: 40%;
+  margin-inline: auto;
 }
 
 .cal-week-view .cal-event {
-  color: black;
+  color: var(--invert-text, black);
 }
 
-.raised-button {
-  margin: 7% 0 0 10px;
+.calendar-tooltip-card,
+.calendar-tooltip-fallback {
+  max-width: 260px;
+  padding: 10px 12px;
+  color: #fff;
 }
 
-.app-class .mat-mdc-list-item {
-  height: auto;
+.calendar-tooltip-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.array-form {
-  flex: 1;
+.calendar-tooltip-card__time {
+  font-weight: 700;
+  line-height: 1.4;
+}
 
-  .array-group {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 16px;
-    border-radius: 24px;
-    margin-bottom: 16px;
+.calendar-tooltip-card__row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 
-    .date-time-fields {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 8px;
-      margin: 5px;
+.calendar-tooltip-card__row span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  opacity: 0.8;
+  text-transform: uppercase;
+}
 
-      .date-field, .time-field {
-        width: 100%;
-      }
-    }
+.calendar-tooltip-card__row strong {
+  line-height: 1.4;
+}
 
-    .remove-button {
-      align-self: center;
-      justify-self: center;
-      margin-right: 5px;
-    }
-  }
+.date-field,
+.time-field {
+  width: 100%;
 }

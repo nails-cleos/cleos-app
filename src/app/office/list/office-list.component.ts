@@ -56,7 +56,7 @@ export class OfficeListComponent {
   resultsLengthSignal = computed(() => this.officeListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'name', 'manager', 'subject', 'actions'];
+  displayedColumns: string[] = ['position', 'name', 'manager', 'subject', 'actions', 'add'];
   expanded?: IOffice;
 
   language: string = this.translate.getCurrentLang();
@@ -98,7 +98,7 @@ export class OfficeListComponent {
     const title = this.translate.instant('OFFICE.DELETED.TITLE');
     const content = this.translate.instant('OFFICE.DELETED.CONTENT', { name: office.name });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: office },
+      data: { title, content, value: office, variant: 'warning' },
     });
 
     dialogRef.afterClosed().subscribe(result => {

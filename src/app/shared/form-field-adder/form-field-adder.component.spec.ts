@@ -1,14 +1,34 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormFieldAdderComponent } from './form-field-adder.component';
-import { IPaymentOption, PaymentType } from '../../interfaces/payment';
+import { IPaymentOption } from '../../interfaces/payment';
 import { TranslateModule } from '@ngx-translate/core';
 
 describe('FormFieldAdderComponent', () => {
   let component: FormFieldAdderComponent;
   let fixture: ComponentFixture<FormFieldAdderComponent>;
   const paymentOptions: IPaymentOption[] = [
-    { name: 'Cash', type: PaymentType.cash, icon: 'universal_currency', svgIcon: '' },
-    { name: 'Transfer', type: PaymentType.transfer, icon: 'send_money', svgIcon: '' },
+    {
+      label: 'Cash',
+      type: 'CASH',
+      icon: 'universal_currency',
+      enabled: true,
+      enabledCustomer: false,
+      default: false,
+      filter: true,
+      defaultFilter: false,
+      show: true,
+    },
+    {
+      label: 'Transfer',
+      type: 'TRANSFER',
+      icon: 'send_money',
+      enabled: true,
+      enabledCustomer: false,
+      default: false,
+      filter: true,
+      defaultFilter: false,
+      show: true,
+    },
   ];
 
   beforeEach(async () => {
@@ -20,7 +40,7 @@ describe('FormFieldAdderComponent', () => {
     component = fixture.componentInstance;
 
     // Provide required inputs
-    fixture.componentRef.setInput('allPaymentTypes', paymentOptions);
+    fixture.componentRef.setInput('allPaymentOptions', paymentOptions);
     fixture.componentRef.setInput('key', 'test');
     fixture.componentRef.setInput('currency', { code: 'EUR', icon: '€' });
     fixture.componentRef.setInput('split', false);
@@ -113,10 +133,10 @@ describe('FormFieldAdderComponent', () => {
     component.addNewRow();
     fixture.detectChanges();
 
-    component.getPaymentTypeControl(0).setValue(PaymentType.transfer);
+    component.getPaymentOptionControl(0).setValue('TRANSFER');
 
-    expect(component.getPaymentTypeControl(0).value).toBe(PaymentType.transfer);
-    expect(component.getSelectedPaymentOption(0)).toEqual(paymentOptions[1]);
+    expect(component.getPaymentOptionControl(0).value).toBe('TRANSFER');
+    expect(component.getFormGroupControls(0).paymentOption?.value).toBe(paymentOptions[1].type);
   });
 
   it('should emit invalid split state when total does not match toPaid', () => {
@@ -130,7 +150,7 @@ describe('FormFieldAdderComponent', () => {
     const group = component.getFormGroup(0);
     group.controls.description.setValue('Split payment');
     group.controls.price.setValue(10);
-    component.getPaymentTypeControl(0).setValue(PaymentType.cash);
+    component.getPaymentOptionControl(0).setValue('CASH');
     component.updateExtra(0);
     fixture.detectChanges();
 

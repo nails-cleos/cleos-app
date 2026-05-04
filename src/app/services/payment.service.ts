@@ -20,7 +20,7 @@ export class PaymentService {
 
   getPayment = (id: string): Observable<IPayment | undefined> => this.http.get<IPayment>(toUrl(this.urlV1, id));
 
-  getPaymentOptions = (): Observable<IPaymentOption[] | undefined> => this.http.get<IPaymentOption[]>(this.urlV1);
+  getPaymentOptions = (): Observable<IPaymentOption[]> => this.http.get<IPaymentOption[]>(toUrl(this.urlV1, 'options'));
 
   add = (
     id: string,

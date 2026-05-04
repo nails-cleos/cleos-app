@@ -3,6 +3,25 @@
     "RESERVATION": {
       "PREVIEW": "Voorbeeld",
       "APPOINTMENT": "Afspraak",
+      "FLOW": {
+        "SUMMARY": {
+          "EYEBROW": "Afspraakflow",
+          "TITLE": "Boekingsoverzicht",
+          "BREAKDOWN": "Prijsopbouw",
+          "EMPTY": "Nog niet geselecteerd",
+          "NONE": "Geen",
+          "DATE_TIME": "Datum en tijd",
+          "TOTAL": "Huidig totaal"
+        },
+        "STEPS": {
+          "ROOM": "Kies de vestiging, ruimte en professional voor deze boeking.",
+          "TREATMENT": "Kies een datum, behandeling en korting voordat je beschikbaarheid bekijkt.",
+          "ADDITIONALS": "Voeg optionele extra's toe die de duur en prijs beïnvloeden.",
+          "SCHEDULE": "Kies het beste beschikbare afspraakmoment voor deze reservering.",
+          "PAYMENT": "Controleer het openstaande bedrag en rond de betaalgegevens af.",
+          "PREVIEW": "Controleer de afspraakflow en bevestig je contact- en beleidsgegevens."
+        }
+      },
       "UPCOMING": {
         "TITLE": "Komende afspraak",
         "START": "Begin",
@@ -86,6 +105,12 @@
       "ERROR_TEXT": "Betalingsfout",
       "ERROR": "Betaling onvolledig.\n{{reason}}",
       "DETAIL": "Betalingsdetails",
+      "FLOW": {
+        "STEPS": {
+          "OPTION": "Kies de betaalmethode en termijnoptie voor deze reservering.",
+          "PREVIEW": "Controleer de prijsopbouw en betaalgegevens voordat je doorgaat."
+        }
+      },
       "RESERVATION": "Afspraak {{reservationId}}",
       "LIST": {
         "ERROR": {

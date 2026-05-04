@@ -7,7 +7,7 @@ import { BehaviorSubject } from 'rxjs';
 import { TransactionComponent } from './transaction.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { IAccountAll, ITransaction } from '../../interfaces/account';
-import { IPaymentOption, PaymentOption, PaymentType } from '../../interfaces/payment';
+import { IPaymentOption } from '../../interfaces/payment';
 import { createTransaction, getAccount } from '../../store/account.actions';
 import { AccountState } from '../../store/reducers/account.reducers';
 import { signal } from '@angular/core';
@@ -20,6 +20,7 @@ describe('TransactionComponent', () => {
   let selectedAccount$: BehaviorSubject<IAccountAll | undefined>;
   let subErrors$: BehaviorSubject<any>;
   let response$: BehaviorSubject<any>;
+  let paymentOptions$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   let storeSpy: jasmine.SpyObj<Store<AccountState>>;
@@ -52,6 +53,37 @@ describe('TransactionComponent', () => {
     selectedAccount$ = new BehaviorSubject<any>(undefined);
     subErrors$ = new BehaviorSubject<any>(undefined);
     response$ = new BehaviorSubject<any>(undefined);
+    paymentOptions$ = new BehaviorSubject([
+      {
+        type: 'CASH',
+        label: 'Cash',
+        enabled: true,
+        default: true,
+        filter: true,
+        defaultFilter: false,
+        show: true,
+        icon: 'cash',
+      },
+      {
+        type: 'TRANSFER',
+        label: 'Transfer',
+        enabled: true,
+        default: true,
+        filter: true,
+        defaultFilter: false,
+        show: true,
+        icon: 'transfer',
+      },
+      {
+        type: 'MOLLIE',
+        label: 'Mollie',
+        enabled: true,
+        default: false,
+        filter: true,
+        defaultFilter: false,
+        show: true,
+      },
+    ]);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
@@ -76,6 +108,8 @@ describe('TransactionComponent', () => {
           return subErrors$.asObservable();
         case 4:
           return response$.asObservable();
+        case 5:
+          return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -105,6 +139,7 @@ describe('TransactionComponent', () => {
     selectedAccount$.complete();
     subErrors$.complete();
     response$.complete();
+    paymentOptions$.complete();
   });
 
   it('should create', () => {
@@ -114,21 +149,21 @@ describe('TransactionComponent', () => {
   it('should initialize with default values', () => {
     expect(component.amountMin).toBe(100);
     expect(component.language).toBe('en-GB');
-    expect(component.types).toEqual([{ type: PaymentType.cash }, { type: PaymentType.transfer }] as IPaymentOption[]);
+    expect(component.types().map(option => option.type)).toEqual(['CASH', 'TRANSFER']);
     expect(component.errors()).toEqual({});
   });
 
   it('should have created the reactive form', () => {
     expect(component.form).toBeDefined();
     expect(component.getForm.amount).toBeDefined();
-    expect(component.getBankForm.type).toBeDefined();
+    expect(component.getBankForm.option).toBeDefined();
     expect(component.getForm.transfer).toBeDefined();
     expect(component.getBankForm.percentage).toBeDefined();
   });
 
   it('should have validators configured (required & min)', () => {
     const amountControl = component.getForm.amount!;
-    const typeControl = component.getBankForm.type!;
+    const typeControl = component.getBankForm.option!;
 
     expect(typeControl.hasError('required')).toBeTrue();
 
@@ -161,7 +196,7 @@ describe('TransactionComponent', () => {
     authUserSignal.update(prev => ({ ...prev, hasAdminRole: true }));
     fixture.detectChanges();
 
-    expect(component.optionsSignal().map(option => option.type)).toEqual([PaymentType.cash, PaymentType.transfer]);
+    expect(component.optionsSignal().map(option => option.type)).toEqual(['CASH', 'TRANSFER']);
   });
 
   it('should compute non-admin payment options locally', () => {
@@ -169,24 +204,24 @@ describe('TransactionComponent', () => {
     fixture.detectChanges();
 
     const options = component.optionsSignal();
-    expect(options.map(option => option.type)).toEqual([PaymentType.mollie]);
-    expect(options[0].hidePercentage).toBeTrue();
+    expect(options.map(option => option.type)).toEqual(['CASH', 'TRANSFER', 'MOLLIE']);
+    expect(options.every(option => option.hidePercentage)).toBeTrue();
   });
 
   it('should set errors signal when subErrors arrive and set form control errors', () => {
     const errors = [
       { field: 'amount', message: 'Amount is invalid' },
-      { field: 'type', message: 'Type is required' },
+      { field: 'option', message: 'Type is required' },
     ];
     subErrors$.next(errors);
     fixture.detectChanges();
 
     const currentErrors = component.errors();
     expect(currentErrors['amount']).toBe('Amount is invalid');
-    expect(currentErrors['type']).toBe('Type is required');
+    expect(currentErrors['option']).toBe('Type is required');
 
     expect(component.getForm.amount?.hasError('incorrect')).toBeTrue();
-    expect(component.getBankForm.type?.hasError('incorrect')).toBeTrue();
+    expect(component.getBankForm.option?.hasError('incorrect')).toBeTrue();
   });
 
   it('should navigate to appropriate route when response arrives (admin)', () => {
@@ -214,12 +249,12 @@ describe('TransactionComponent', () => {
     expect(storeSpy.dispatch).not.toHaveBeenCalled();
   });
 
-  it('should dispatch createTransaction for string PaymentType', () => {
+  it('should dispatch createTransaction for selected payment option', () => {
     accountId$.next('account-123');
     selectedAccount$.next(mockAccount);
 
     component.bankForm.patchValue({
-      type: { type: PaymentType.cash } as PaymentOption,
+      option: { type: 'CASH', icon: 'cash' } as IPaymentOption,
     });
 
     component.form.patchValue({
@@ -236,7 +271,7 @@ describe('TransactionComponent', () => {
           customerId: 'customer-123',
           amount: 200,
           paymentRequest: {
-            type: PaymentType.cash,
+            type: 'CASH',
             transfer: 'test-transfer',
           },
         } as ITransaction,
@@ -244,14 +279,14 @@ describe('TransactionComponent', () => {
     );
   });
 
-  it('should dispatch createTransaction for PaymentOption type', () => {
+  it('should dispatch createTransaction for another payment option', () => {
     accountId$.next('account-123');
     selectedAccount$.next(mockAccount);
 
-    const paymentOption = new PaymentOption('Test Payment', PaymentType.paypal, 'PAYPAL');
+    const paymentOption = { label: 'Test Payment', type: 'PAYPAL' } as IPaymentOption;
 
     component.bankForm.patchValue({
-      type: paymentOption,
+      option: paymentOption,
     });
 
     component.form.patchValue({
@@ -270,7 +305,7 @@ describe('TransactionComponent', () => {
           customerId: 'customer-123',
           amount: 300,
           paymentRequest: {
-            type: PaymentType.paypal,
+            type: 'PAYPAL',
             transfer: 'test-transfer',
           },
         } as ITransaction,
@@ -295,6 +330,6 @@ describe('TransactionComponent', () => {
     response$.next(undefined);
 
     expect(component.accountSignal()).toBeUndefined();
-    expect(component.optionsSignal().map(option => option.type)).toEqual([PaymentType.mollie]);
+    expect(component.optionsSignal().map(option => option.type)).toEqual(['CASH', 'TRANSFER', 'MOLLIE']);
   });
 });

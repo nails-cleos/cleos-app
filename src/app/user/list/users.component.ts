@@ -85,7 +85,7 @@ export class UsersComponent {
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
   smallScreen = computed(() => this.breakpointsSignal()?.matches ?? false);
 
-  displayedColumns: string[] = ['position', 'displayName', 'email', 'status', 'actions'];
+  displayedColumns: string[] = ['position', 'displayName', 'email', 'status', 'actions', 'add'];
 
   expandedUser?: IUserAll;
 
@@ -143,7 +143,7 @@ export class UsersComponent {
     const title = this.translate.instant('USER.DELETED.TITLE');
     const content = this.translate.instant('USER.DELETED.CONTENT', { displayName: user.displayName });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: { title, content, value: user },
+      data: { title, content, value: user, variant: 'warning' },
     });
 
     dialogRef.afterClosed().subscribe(result => {
