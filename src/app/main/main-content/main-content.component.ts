@@ -25,6 +25,7 @@ import { MainContentService } from '../../services/main-content.service';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Router } from '@angular/router';
 import { SharedModule } from '../../shared/shared.module';
+import { FaqComponent } from '../faq/faq.component';
 import { ToastService } from '../../services/toast.service';
 import { BottomSheetBookAppointmentComponent } from './bottom-sheet-book-appointment';
 import { getCataloguePipe, getMainErrorPipe, getResponsePipe } from '../../store/selectors/main.selectors';
@@ -46,7 +47,7 @@ type MainForm = {
   selector: 'app-main-content',
   templateUrl: './main-content.component.html',
   styleUrls: ['./main-content.component.scss'],
-  imports: [SharedModule],
+  imports: [SharedModule, FaqComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainContentComponent {
@@ -73,6 +74,7 @@ export class MainContentComponent {
   private contactTitle = viewChild<ElementRef<HTMLDivElement>>('contactTitle');
   private contactText = viewChild<ElementRef<HTMLDivElement>>('contactText');
   private contactMap = viewChild<ElementRef<HTMLDivElement>>('contactMap');
+  private faqTitle = viewChild<ElementRef<HTMLDivElement>>('faqTitle');
   private contactItem1 = viewChild<ElementRef<HTMLDivElement>>('contactItem1');
   private contactItem2 = viewChild<ElementRef<HTMLDivElement>>('contactItem2');
   private contactItem3 = viewChild<ElementRef<HTMLDivElement>>('contactItem3');
@@ -112,6 +114,7 @@ export class MainContentComponent {
   contactItem1State = signal<'open' | 'close'>('open');
   contactItem2State = signal<'open' | 'close'>('open');
   contactItem3State = signal<'open' | 'close'>('open');
+  faqTitleState = signal<'open' | 'close'>('open');
   groups = signal<ITreatmentGroupAll[]>([]);
   filter = signal<ITreatmentGroupAll | undefined>(undefined);
 
@@ -301,6 +304,12 @@ export class MainContentComponent {
       const cMapEl = this.contactMap()?.nativeElement;
       if (cMapEl) {
         const obs = observeElementSignal(this.contactMapState, cMapEl, false, 0.1);
+        onCleanup(() => obs?.disconnect());
+      }
+
+      const faqEl = this.faqTitle()?.nativeElement;
+      if (faqEl) {
+        const obs = observeElementSignal(this.faqTitleState, faqEl, false, 0.1);
         onCleanup(() => obs?.disconnect());
       }
 

@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MainContentService } from '../../services/main-content.service';
 import { ToastService } from '../../services/toast.service';
 import { sendMessage } from '../../store/main.actions';
@@ -16,6 +16,7 @@ import { MainState } from '../../store/reducers/main.reducers';
 import { GoogleMapStubComponent } from '../../shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
+import { BreakpointObserver } from '@angular/cdk/layout';
 
 describe('MainContentComponent', () => {
   let component: MainContentComponent;
@@ -24,6 +25,7 @@ describe('MainContentComponent', () => {
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
   let response$: BehaviorSubject<any>;
   let error$: BehaviorSubject<any>;
+  let breakpoint$: BehaviorSubject<any>;
 
   let storeSpy: jasmine.SpyObj<Store<MainState>>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
@@ -31,12 +33,15 @@ describe('MainContentComponent', () => {
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
   let bottomSheetSpy: jasmine.SpyObj<MatBottomSheet>;
   let mainContentServiceSpy: jasmine.SpyObj<MainContentService>;
+  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
 
   let translateService: TranslateService;
 
   beforeEach(async () => {
     response$ = new BehaviorSubject(undefined);
     error$ = new BehaviorSubject(undefined);
+    breakpoint$ = new BehaviorSubject(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
@@ -46,6 +51,14 @@ describe('MainContentComponent', () => {
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
     bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
     mainContentServiceSpy = jasmine.createSpyObj('MainContentService', ['configure']);
+    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      snapshot: {
+        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+      },
+    });
+
+    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
@@ -69,6 +82,8 @@ describe('MainContentComponent', () => {
         { provide: Router, useValue: routerSpy },
         { provide: MainContentService, useValue: mainContentServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
+        { provide: BreakpointObserver, useValue: breakpointObserverSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
         provideHttpClient(),
         provideHttpClientTesting(),
       ],
@@ -117,6 +132,7 @@ describe('MainContentComponent', () => {
   });
 
   it('should not dispatch SendMessage action when form is invalid', () => {
+    storeSpy.dispatch.calls.reset();
     component.form.patchValue({
       name: '',
       email: 'invalid-email',
@@ -184,5 +200,55 @@ describe('MainContentComponent', () => {
 
     expect(component.groups()).toBeDefined();
     expect(component.groups().length).toBe(1);
+  });
+
+  it('should display error toast when error message is received', () => {
+    error$.next({ message: 'Error occurred' });
+    fixture.detectChanges();
+
+    expect(toastServiceSpy.show).toHaveBeenCalledWith('Error occurred', 'error');
+  });
+
+  it('should display success toast when response is received', () => {
+    response$.next({ message: 'Success', toastType: 'success' });
+    fixture.detectChanges();
+
+    expect(toastServiceSpy.show).toHaveBeenCalledWith('Success', 'success');
+  });
+
+  it('should set dark mode based on auth user', () => {
+    authUserSignal.update(prev => ({
+      ...prev,
+      isAuthenticated: false,
+      email: 'test@test.com',
+      displayName: 'Test',
+      isDarkMode: true,
+    }));
+
+    expect(component.isDarkMode()).toBeTrue();
+
+    authUserSignal.update(prev => ({
+      ...prev,
+      isAuthenticated: false,
+      email: 'test@test.com',
+      displayName: 'Test',
+      isDarkMode: false,
+    }));
+
+    expect(component.isDarkMode()).toBeFalse();
+  });
+
+  it('should set small true when breakpoint match', () => {
+    breakpoint$.next({ matches: true });
+    fixture.detectChanges();
+
+    expect(component.isSmall()).toBeTrue();
+  });
+
+  it('should set small false when breakpoint does not match', () => {
+    breakpoint$.next({ matches: false });
+    fixture.detectChanges();
+
+    expect(component.isSmall()).toBeFalse();
   });
 });

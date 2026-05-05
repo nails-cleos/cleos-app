@@ -6,6 +6,7 @@ import { CatalogComponent } from './catalog/catalog.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-conditions.component';
 import { MainTreatmentComponent } from './treatment/main-treatment.component';
+import { FaqComponent } from './faq/faq.component';
 
 const routes: Routes = [
   {
@@ -15,6 +16,7 @@ const routes: Routes = [
       { path: 'privacy', component: PrivacyComponent },
       { path: 'term-and-conditions', component: TermsAndConditionsComponent },
       { path: ':id/treatment', component: MainTreatmentComponent },
+      { path: 'faqs', component: FaqComponent },
     ],
   },
 ];

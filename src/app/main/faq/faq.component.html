@@ -1,0 +1,31 @@
+<div class="content">
+  @if (!limit()) {
+    <div class="section-title text-center mb-50">
+      <h2 style="margin-top: 10%;">{{ 'FAQs' | translate }}</h2>
+      <div class="home-divider">
+        <mat-icon color="warn" class="material-icons">favorite</mat-icon>
+      </div>
+    </div>
+  }
+  <div class="faq-container" [ngClass]="{'no-limit': !limit()}">
+    <mat-accordion>
+      @for (faq of faqs(); track faq) {
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{ faq.question }}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-divider></mat-divider>
+          <div style="margin-top: 2%">{{ faq.answer }}</div>
+        </mat-expansion-panel>
+      }
+    </mat-accordion>
+    @if (limit()) {
+      <button color="accent" mat-fab extended class="icon-button" type="button" [routerLink]="'faqs'">
+        {{ 'COMMON.BUTTON.LOAD_MORE' | translate }}
+        <mat-icon matIconPrefix>unfold_more</mat-icon>
+      </button>
+    }
+  </div>
+</div>

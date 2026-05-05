@@ -48,6 +48,7 @@
       "SORT": "Ordenar",
       "PRINT": "Imprimir",
       "LOGIN": "Ingresar",
+      "LOAD_MORE": "Ver mas",
       "EXPAND": {
         "TRUE": "Presiona para mostrar menos",
         "FALSE": "Presiona para mostrar más"
@@ -90,8 +91,7 @@
       "ONCE_A_YEAR": "Una vez al año"
     },
     "NOTIFICATION": {
-      "NO": "No hay notificaciones",
-      "LOAD_MORE": "Ver mas"
+      "NO": "No hay notificaciones"
     },
     "LANG": {
       "ES": "Español",
@@ -485,6 +485,24 @@
       "id": "cnd-spa-manicure",
       "name": "CND Spa Manicure",
       "description": ""
+    }
+  ],
+  "FAQS": [
+    {
+      "question": "¿Qué es Angular?",
+      "answer": "Angular es una plataforma para construir aplicaciones web móviles y de escritorio."
+    },
+    {
+      "question": "¿Cómo instalo Angular?",
+      "answer": "Puedes instalar Angular utilizando el Angular CLI con el comando `npm install -g @angular/cli`."
+    },
+    {
+      "question": "¿Qué es un componente?",
+      "answer": "Los componentes son los bloques básicos de construcción de las aplicaciones Angular. Cada componente consta de una plantilla HTML, una hoja de estilos CSS y una clase TypeScript."
+    },
+    {
+      "question": "¿Realizan envíos internacionales?",
+      "answer": "Sí, enviamos a más de 100 países..."
     }
   ]
 }

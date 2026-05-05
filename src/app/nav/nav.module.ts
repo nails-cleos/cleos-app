@@ -70,6 +70,7 @@ import { InvoiceEffects } from '../store/effects/invoice.effects';
 import { StatementEffects } from '../store/effects/statement.effects';
 import { DocumentEffects } from '../store/effects/document.effects';
 import { AwsEffects } from '../store/effects/aws.effects';
+import { I18NEffects } from '../store/effects/i18n.effects';
 
 @NgModule({
   imports: [
@@ -155,6 +156,8 @@ import { AwsEffects } from '../store/effects/aws.effects';
       DocumentEffects,
       StatementEffects,
       InvoiceEffects,
+      AwsLambdaService,
+      I18NEffects,
     ),
   ],
 })

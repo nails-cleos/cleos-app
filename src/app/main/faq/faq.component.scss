@@ -1,0 +1,21 @@
+.faq-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.no-limit {
+  margin: 2% auto !important;
+}
+
+mat-expansion-panel {
+  margin-bottom: 10px;
+}
+
+.icon-button {
+  margin-top: 20px; /* Adds spacing above the button */
+}
