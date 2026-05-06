@@ -1,4 +1,5 @@
 .toast {
+  box-sizing: border-box;
   position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -187,10 +188,11 @@
 @media (max-width: 640px) {
   .toast {
     grid-template-columns: auto minmax(0, 1fr) auto;
-    min-width: calc(100vw - 12px);
+    width: calc(100vw - 12px);
+    min-width: 0;
     max-width: calc(100vw - 12px);
     gap: 12px;
-    padding: 14px 14px 12px;
+    padding: 14px 46px 12px 14px;
     border-radius: 20px;
     box-shadow:
       0 14px 34px rgb(15 23 42 / 0.18),
@@ -204,7 +206,7 @@
   .toast-actions {
     grid-column: 1 / -1;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 12px;
     margin-left: 0;
     padding-top: 4px;
@@ -216,14 +218,27 @@
     overflow: hidden;
   }
 
+  .toast-actions--empty {
+    display: block;
+    grid-column: auto;
+    margin: 0;
+    padding: 0;
+  }
+
+  .toast-actions--empty .toast-primary-actions {
+    display: none;
+  }
+
   .toast-action-button {
     width: 100%;
   }
 
   .toast-close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
     flex: 0 0 auto;
-    margin-right: -4px;
-    margin-bottom: -4px;
+    margin: 0;
   }
 
   .toast-title {

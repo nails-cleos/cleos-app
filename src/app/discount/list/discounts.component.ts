@@ -74,7 +74,7 @@ export class DiscountsComponent {
   resultsLengthSignal = computed(() => this.discountListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'name', 'description', 'type', 'amount', 'actions', 'add'];
+  displayedColumns: string[] = ['position', 'name', 'description', 'type', 'amount', 'actions'];
   expanded?: IDiscount;
 
   language: string = this.translate.getCurrentLang();

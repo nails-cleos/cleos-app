@@ -47,8 +47,12 @@
           </ng-container>
 
           <ng-container matColumnDef="actions">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell>
-              {{ 'COMMON.COLUMN.ACTIONS' | translate }}
+            <th *matHeaderCellDef mat-header-cell>
+              <span class="hide-xs">{{ 'COMMON.COLUMN.ACTIONS' | translate }}</span>
+              <button [routerLink]="['/', language, 'treatments', 'add']" mat-icon-button id="add-button"
+                      matTooltip="{{ 'TREATMENT.TITLE' | translate }}" matTooltipPosition="right" type="button">
+                <mat-icon color="primary">add</mat-icon>
+              </button>
             </th>
             <td *matCellDef="let treatment" class="hide-xs" mat-cell>
               @if (treatment.id) {
@@ -74,20 +78,6 @@
                   }
                 </div>
               } @else {
-                <div class="ssc-line"></div>
-              }
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="add">
-            <th *matHeaderCellDef mat-header-cell>
-              <button [routerLink]="['/', language, 'treatments', 'add']" mat-icon-button id="add-button"
-                      matTooltip="{{ 'TREATMENT.TITLE' | translate }}" matTooltipPosition="right" type="button">
-                <mat-icon color="primary">add</mat-icon>
-              </button>
-            </th>
-            <td *matCellDef="let additional" mat-cell>
-              @if (!additional.id) {
                 <div class="ssc-line"></div>
               }
             </td>

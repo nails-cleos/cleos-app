@@ -66,7 +66,7 @@
   --app-chip-ghost-bg: rgba(255, 255, 255, 0.05);
   --app-surface-field-bg: rgba(34, 34, 34, 0.96);
   --app-surface-field-bg-hover: rgba(42, 42, 42, 0.98);
-  --app-drawer-panel-bg: var(--app-drawer-card-bg);
+  --app-drawer-panel-bg: var(--app-surface-card-bg);
   --app-drawer-item-bg: rgba(255, 255, 255, 0.03);
   --app-drawer-item-bg-hover: rgba(255, 255, 255, 0.05);
   --app-drawer-item-bg-active: color-mix(in srgb, var(--accent-color, #ceb4ac) 10%, rgba(255, 255, 255, 0.04));

@@ -217,7 +217,8 @@
           </mat-form-field>
 
           @if (currentIsAdmin) {
-            <button type="button" (click)="addCustomer" mat-stroked-button class="app-detail-action-button">
+            <button type="button" (click)="addCustomer" mat-stroked-button
+                    class="app-surface-filter-action app-detail-action-button">
               <mat-icon>person_add</mat-icon>
               {{ 'RESERVATION.CUSTOMER.ADD_BUTTON' | translate }}
             </button>
@@ -1020,15 +1021,153 @@
   </ng-template>
 
   <div class="app-surface-canvas app-surface-shell app-surface-stack reservation-flow-shell">
-  @if (screenConfig.isSmall) {
-    @switch (currentStepIndex()) {
-      @case (0) {
-        <div class="step-layout step-layout--mobile">
-          <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="stepOne"></ng-container>
-        </div>
-        @if (!currentIsEditing) {
+    @if (screenConfig.isSmall) {
+      @switch (currentStepIndex()) {
+        @case (0) {
+          <div class="step-layout step-layout--mobile">
+            <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
+            <ng-container *ngTemplateOutlet="stepOne"></ng-container>
+          </div>
+          @if (!currentIsEditing) {
+            <div class="step-actions step-actions--mobile">
+              <button type="button" [form]="customerForm" appBackButton mat-stroked-button>
+                <mat-icon>keyboard_return</mat-icon>
+                <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+              </button>
+              <button type="button" (click)="callStepTwo(true)" [disabled]="customerForm.invalid" mat-stroked-button
+                      name="toStepTwo">
+                <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+                <mat-icon>arrow_forward</mat-icon>
+              </button>
+            </div>
+          }
+        }
+        @case (1) {
+          <div class="step-layout step-layout--mobile">
+            <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
+            <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
+          </div>
           <div class="step-actions step-actions--mobile">
+            @if (!currentIsEditing) {
+              <button type="button" (click)="back()" mat-stroked-button>
+                <mat-icon>arrow_back</mat-icon>
+                <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+              </button>
+            } @else {
+              <button type="button" [form]="officeForm" appBackButton mat-stroked-button>
+                <mat-icon>keyboard_return</mat-icon>
+                <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+              </button>
+            }
+            <button type="button" (click)="callStepThree(true)" [disabled]="officeForm.invalid" mat-stroked-button
+                    name="toStepThree">
+              <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+        @case (2) {
+          <div class="step-layout step-layout--mobile">
+            <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
+            <ng-container *ngTemplateOutlet="stepThree"></ng-container>
+          </div>
+          <div class="step-actions step-actions--mobile">
+            @if (!currentIsEditing || (currentIsEditing && currentIsAdmin)) {
+              <button type="button" (click)="back()" mat-stroked-button>
+                <mat-icon>arrow_back</mat-icon>
+                <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+              </button>
+            } @else {
+              <button type="button" [form]="treatmentForm" appBackButton mat-stroked-button>
+                <mat-icon>keyboard_return</mat-icon>
+                <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+              </button>
+            }
+            <button type="button" (click)="callStepFour(true)" [disabled]="treatmentForm.invalid || isAddButtonDisabled"
+                    mat-stroked-button name="toStepFour">
+              <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+        @case (3) {
+          <div class="step-layout step-layout--mobile">
+            <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
+            <ng-container *ngTemplateOutlet="stepFour"></ng-container>
+          </div>
+          <div class="step-actions step-actions--mobile">
+            <button type="button" (click)="back()" mat-stroked-button>
+              <mat-icon>arrow_back</mat-icon>
+              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+            </button>
+            <button type="button" (click)="callStepFive(true)" mat-stroked-button name="toStepFive">
+              <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+        @case (4) {
+          <div class="step-layout step-layout--mobile">
+            <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
+            <ng-container *ngTemplateOutlet="stepFive"></ng-container>
+          </div>
+          <div class="step-actions step-actions--mobile">
+            <button type="button" (click)="back()" mat-stroked-button>
+              <mat-icon>arrow_back</mat-icon>
+              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+            </button>
+            <button type="button" (click)="callStepSix(true)" [disabled]="configurationForm.invalid" mat-stroked-button
+                    name="toStepSix">
+              <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+        @case (5) {
+          <div class="step-layout step-layout--mobile">
+            <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
+            <ng-container *ngTemplateOutlet="stepSix"></ng-container>
+          </div>
+          <div class="step-actions step-actions--mobile">
+            <button type="button" (click)="back()" mat-stroked-button>
+              <mat-icon>arrow_back</mat-icon>
+              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+            </button>
+            <button type="button" (click)="callStepSeven(true)" [disabled]="eventGroup.invalid" mat-stroked-button
+                    name="toStepSeven">
+              <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+        @default {
+          <div class="step-layout step-layout--mobile">
+            <ng-container *ngTemplateOutlet="stepSeven"></ng-container>
+          </div>
+          <div class="step-actions step-actions--mobile">
+            <button type="button" (click)="back()" mat-stroked-button>
+              <mat-icon>arrow_back</mat-icon>
+              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+            </button>
+            <button type="button" (click)="create()" mat-stroked-button name="create">
+              <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
+              <mat-icon>add_task</mat-icon>
+            </button>
+          </div>
+        }
+      }
+    } @else {
+      @switch (currentStepIndex()) {
+        @case (0) {
+          <div class="step-layout">
+            <div class="app-crud-fields">
+              <ng-container *ngTemplateOutlet="stepOne"></ng-container>
+            </div>
+            <aside class="step-sidebar">
+              <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
+            </aside>
+          </div>
+          <div class="step-actions">
             <button type="button" [form]="customerForm" appBackButton mat-stroked-button>
               <mat-icon>keyboard_return</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
@@ -1040,280 +1179,142 @@
             </button>
           </div>
         }
-      }
-      @case (1) {
-        <div class="step-layout step-layout--mobile">
-          <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
-        </div>
-        <div class="step-actions step-actions--mobile">
-          @if (!currentIsEditing) {
+        @case (1) {
+          <div class="step-layout">
+            <div class="app-crud-fields">
+              <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
+            </div>
+            <aside class="step-sidebar">
+              <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
+            </aside>
+          </div>
+          <div class="step-actions">
+            @if (!currentIsEditing) {
+              <button type="button" (click)="back()" mat-stroked-button>
+                <mat-icon>arrow_back</mat-icon>
+                <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+              </button>
+            } @else {
+              <button type="button" [form]="officeForm" appBackButton mat-stroked-button>
+                <mat-icon>keyboard_return</mat-icon>
+                <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+              </button>
+            }
+            <button type="button" (click)="callStepThree(true)" [disabled]="officeForm.invalid" mat-stroked-button
+                    name="toStepThree">
+              <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+        @case (2) {
+          <div class="step-layout">
+            <div class="app-crud-fields">
+              <ng-container *ngTemplateOutlet="stepThree"></ng-container>
+            </div>
+            <aside class="step-sidebar">
+              <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
+            </aside>
+          </div>
+          <div class="step-actions">
+            @if (!currentIsEditing || (currentIsEditing && currentIsAdmin)) {
+              <button type="button" (click)="back()" mat-stroked-button>
+                <mat-icon>arrow_back</mat-icon>
+                <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+              </button>
+            } @else {
+              <button type="button" [form]="treatmentForm" appBackButton mat-stroked-button>
+                <mat-icon>keyboard_return</mat-icon>
+                <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+              </button>
+            }
+            <button type="button" (click)="callStepFour(true)" [disabled]="treatmentForm.invalid || isAddButtonDisabled"
+                    mat-stroked-button name="toStepFour">
+              <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+        @case (3) {
+          <div class="step-layout">
+            <div class="app-crud-fields">
+              <ng-container *ngTemplateOutlet="stepFour"></ng-container>
+            </div>
+            <aside class="step-sidebar">
+              <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
+            </aside>
+          </div>
+          <div class="step-actions">
             <button type="button" (click)="back()" mat-stroked-button>
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-          } @else {
-            <button type="button" [form]="officeForm" appBackButton mat-stroked-button>
-              <mat-icon>keyboard_return</mat-icon>
-              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+            <button type="button" (click)="callStepFive(true)" mat-stroked-button name="toStepFive">
+              <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+              <mat-icon>arrow_forward</mat-icon>
             </button>
-          }
-          <button type="button" (click)="callStepThree(true)" [disabled]="officeForm.invalid" mat-stroked-button
-                  name="toStepThree">
-            <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      }
-      @case (2) {
-        <div class="step-layout step-layout--mobile">
-          <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="stepThree"></ng-container>
-        </div>
-        <div class="step-actions step-actions--mobile">
-          @if (!currentIsEditing || (currentIsEditing && currentIsAdmin)) {
+          </div>
+        }
+        @case (4) {
+          <div class="step-layout">
+            <div class="app-crud-fields">
+              <ng-container *ngTemplateOutlet="stepFive"></ng-container>
+            </div>
+            <aside class="step-sidebar">
+              <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
+            </aside>
+          </div>
+          <div class="step-actions">
             <button type="button" (click)="back()" mat-stroked-button>
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-          } @else {
-            <button type="button" [form]="treatmentForm" appBackButton mat-stroked-button>
-              <mat-icon>keyboard_return</mat-icon>
+            <button type="button" (click)="callStepSix(true)" [disabled]="configurationForm.invalid" mat-stroked-button
+                    name="toStepSix">
+              <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+        @case (5) {
+          <div class="step-layout">
+            <div class="app-crud-fields">
+              <ng-container *ngTemplateOutlet="stepSix"></ng-container>
+            </div>
+            <aside class="step-sidebar">
+              <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
+            </aside>
+          </div>
+          <div class="step-actions">
+            <button type="button" (click)="back()" mat-stroked-button>
+              <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-          }
-          <button type="button" (click)="callStepFour(true)" [disabled]="treatmentForm.invalid || isAddButtonDisabled"
-                  mat-stroked-button name="toStepFour">
-            <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      }
-      @case (3) {
-        <div class="step-layout step-layout--mobile">
-          <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="stepFour"></ng-container>
-        </div>
-        <div class="step-actions step-actions--mobile">
-          <button type="button" (click)="back()" mat-stroked-button>
-            <mat-icon>arrow_back</mat-icon>
-            <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
-          </button>
-          <button type="button" (click)="callStepFive(true)" mat-stroked-button name="toStepFive">
-            <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      }
-      @case (4) {
-        <div class="step-layout step-layout--mobile">
-          <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="stepFive"></ng-container>
-        </div>
-        <div class="step-actions step-actions--mobile">
-          <button type="button" (click)="back()" mat-stroked-button>
-            <mat-icon>arrow_back</mat-icon>
-            <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
-          </button>
-          <button type="button" (click)="callStepSix(true)" [disabled]="configurationForm.invalid" mat-stroked-button
-                  name="toStepSix">
-            <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      }
-      @case (5) {
-        <div class="step-layout step-layout--mobile">
-          <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
-          <ng-container *ngTemplateOutlet="stepSix"></ng-container>
-        </div>
-        <div class="step-actions step-actions--mobile">
-          <button type="button" (click)="back()" mat-stroked-button>
-            <mat-icon>arrow_back</mat-icon>
-            <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
-          </button>
-          <button type="button" (click)="callStepSeven(true)" [disabled]="eventGroup.invalid" mat-stroked-button
-                  name="toStepSeven">
-            <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      }
-      @default {
-        <div class="step-layout step-layout--mobile">
-          <ng-container *ngTemplateOutlet="stepSeven"></ng-container>
-        </div>
-        <div class="step-actions step-actions--mobile">
-          <button type="button" (click)="back()" mat-stroked-button>
-            <mat-icon>arrow_back</mat-icon>
-            <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
-          </button>
-          <button type="button" (click)="create()" mat-stroked-button name="create">
-            <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
-            <mat-icon>add_task</mat-icon>
-          </button>
-        </div>
+            <button type="button" (click)="callStepSeven(true)" [disabled]="eventGroup.invalid" mat-stroked-button
+                    name="toStepSeven">
+              <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        }
+        @default {
+          <div class="step-layout step-layout--single">
+            <div class="app-crud-fields">
+              <ng-container *ngTemplateOutlet="stepSeven"></ng-container>
+            </div>
+          </div>
+          <div class="step-actions">
+            <button type="button" (click)="back()" mat-stroked-button>
+              <mat-icon>arrow_back</mat-icon>
+              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+            </button>
+            <button (click)="create()" mat-stroked-button type="button" name="create">
+              <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
+              <mat-icon>add_task</mat-icon>
+            </button>
+          </div>
+        }
       }
     }
-  } @else {
-    @switch (currentStepIndex()) {
-      @case (0) {
-        <div class="step-layout">
-          <div class="app-crud-fields">
-            <ng-container *ngTemplateOutlet="stepOne"></ng-container>
-          </div>
-          <aside class="step-sidebar">
-            <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
-          </aside>
-        </div>
-        <div class="step-actions">
-          <button type="button" [form]="customerForm" appBackButton mat-stroked-button>
-            <mat-icon>keyboard_return</mat-icon>
-            <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
-          </button>
-          <button type="button" (click)="callStepTwo(true)" [disabled]="customerForm.invalid" mat-stroked-button
-                  name="toStepTwo">
-            <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      }
-      @case (1) {
-        <div class="step-layout">
-          <div class="app-crud-fields">
-            <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
-          </div>
-          <aside class="step-sidebar">
-            <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
-          </aside>
-        </div>
-        <div class="step-actions">
-          @if (!currentIsEditing) {
-            <button type="button" (click)="back()" mat-stroked-button>
-              <mat-icon>arrow_back</mat-icon>
-              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
-            </button>
-          } @else {
-            <button type="button" [form]="officeForm" appBackButton mat-stroked-button>
-              <mat-icon>keyboard_return</mat-icon>
-              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
-            </button>
-          }
-          <button type="button" (click)="callStepThree(true)" [disabled]="officeForm.invalid" mat-stroked-button
-                  name="toStepThree">
-            <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      }
-      @case (2) {
-        <div class="step-layout">
-          <div class="app-crud-fields">
-            <ng-container *ngTemplateOutlet="stepThree"></ng-container>
-          </div>
-          <aside class="step-sidebar">
-            <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
-          </aside>
-        </div>
-        <div class="step-actions">
-          @if (!currentIsEditing || (currentIsEditing && currentIsAdmin)) {
-            <button type="button" (click)="back()" mat-stroked-button>
-              <mat-icon>arrow_back</mat-icon>
-              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
-            </button>
-          } @else {
-            <button type="button" [form]="treatmentForm" appBackButton mat-stroked-button>
-              <mat-icon>keyboard_return</mat-icon>
-              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
-            </button>
-          }
-          <button type="button" (click)="callStepFour(true)" [disabled]="treatmentForm.invalid || isAddButtonDisabled"
-                  mat-stroked-button name="toStepFour">
-            <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      }
-      @case (3) {
-        <div class="step-layout">
-          <div class="app-crud-fields">
-            <ng-container *ngTemplateOutlet="stepFour"></ng-container>
-          </div>
-          <aside class="step-sidebar">
-            <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
-          </aside>
-        </div>
-        <div class="step-actions">
-          <button type="button" (click)="back()" mat-stroked-button>
-            <mat-icon>arrow_back</mat-icon>
-            <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
-          </button>
-          <button type="button" (click)="callStepFive(true)" mat-stroked-button name="toStepFive">
-            <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      }
-      @case (4) {
-        <div class="step-layout">
-          <div class="app-crud-fields">
-            <ng-container *ngTemplateOutlet="stepFive"></ng-container>
-          </div>
-          <aside class="step-sidebar">
-            <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
-          </aside>
-        </div>
-        <div class="step-actions">
-          <button type="button" (click)="back()" mat-stroked-button>
-            <mat-icon>arrow_back</mat-icon>
-            <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
-          </button>
-          <button type="button" (click)="callStepSix(true)" [disabled]="configurationForm.invalid" mat-stroked-button
-                  name="toStepSix">
-            <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      }
-      @case (5) {
-        <div class="step-layout">
-          <div class="app-crud-fields">
-            <ng-container *ngTemplateOutlet="stepSix"></ng-container>
-          </div>
-          <aside class="step-sidebar">
-            <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
-          </aside>
-        </div>
-        <div class="step-actions">
-          <button type="button" (click)="back()" mat-stroked-button>
-            <mat-icon>arrow_back</mat-icon>
-            <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
-          </button>
-          <button type="button" (click)="callStepSeven(true)" [disabled]="eventGroup.invalid" mat-stroked-button
-                  name="toStepSeven">
-            <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
-            <mat-icon>arrow_forward</mat-icon>
-          </button>
-        </div>
-      }
-      @default {
-        <div class="step-layout step-layout--single">
-          <div class="app-crud-fields">
-            <ng-container *ngTemplateOutlet="stepSeven"></ng-container>
-          </div>
-        </div>
-        <div class="step-actions">
-          <button type="button" (click)="back()" mat-stroked-button>
-            <mat-icon>arrow_back</mat-icon>
-            <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
-          </button>
-          <button (click)="create()" mat-stroked-button type="button" name="create">
-            <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
-            <mat-icon>add_task</mat-icon>
-          </button>
-        </div>
-      }
-    }
-  }
   </div>
 }

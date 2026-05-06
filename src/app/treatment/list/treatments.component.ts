@@ -57,7 +57,7 @@ export class TreatmentsComponent {
   resultsLengthSignal = computed(() => this.treatmentListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['order', 'name', 'priceFrom', 'actions', 'add'];
+  displayedColumns: string[] = ['order', 'name', 'priceFrom', 'actions'];
 
   expanded?: ITreatmentGroup;
 

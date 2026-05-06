@@ -46,7 +46,8 @@
                     <mat-error>{{ errors()['currency'] }}</mat-error>
                   }
                 </mat-form-field>
-                <button mat-stroked-button type="button" (click)="addCurrency()" class="app-detail-action-button">
+                <button mat-stroked-button type="button" (click)="addCurrency()"
+                        class="app-surface-filter-action app-detail-action-button">
                   <mat-icon>add_card</mat-icon>
                   <span>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
                 </button>
@@ -78,7 +79,8 @@
                     <mat-error>{{ errors()['office'] }}</mat-error>
                   }
                 </mat-form-field>
-                <button mat-stroked-button type="button" (click)="addOffice()" class="app-detail-action-button">
+                <button mat-stroked-button type="button" (click)="addOffice()"
+                        class="app-surface-filter-action app-detail-action-button">
                   <mat-icon>add_business</mat-icon>
                   <span>{{ 'ROOM.OFFICE.ADD_BUTTON' | translate }}</span>
                 </button>
@@ -161,7 +163,8 @@
               </mat-autocomplete>
             </mat-form-field>
 
-            <button mat-stroked-button type="button" (click)="addProfessional()" class="app-detail-action-button">
+            <button mat-stroked-button type="button" (click)="addProfessional()"
+                    class="app-surface-filter-action app-detail-action-button">
               <mat-icon>person_add_alt_1</mat-icon>
               <span>{{ 'COMMON.PROFESSIONAL.ADD_BUTTON' | translate }}</span>
             </button>

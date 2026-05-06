@@ -3,6 +3,7 @@
   --app-table-header: color-mix(in srgb, var(--accent-color, #dcc8c2) 14%, rgba(255, 255, 255, 0.92));
   --app-table-text: #111111;
   --app-table-header-text: #6d5e52;
+  --app-table-column-min: 7rem;
 }
 
 .dark-theme {
@@ -10,6 +11,7 @@
   --app-table-header: color-mix(in srgb, var(--primary-color, #9d9282) 12%, rgba(255, 255, 255, 0.03));
   --app-table-text: #f1e7dc;
   --app-table-header-text: rgba(255, 255, 255, 0.58);
+  --app-table-column-min: 7rem;
 }
 
 .app-table-shell {
@@ -17,8 +19,9 @@
   flex-direction: column;
   height: 100%;
   min-height: 0;
+  min-width: 0;
   gap: 12px;
-  overflow: hidden;
+  overflow: auto;
   padding: 8px;
   border: 1px solid var(--app-table-border);
   border-radius: 20px;
@@ -50,7 +53,8 @@
 }
 
 table[mat-table] {
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
   background: transparent;
 }
 
@@ -92,6 +96,42 @@ table[mat-table] td.mat-mdc-cell .mat-icon,
 table[mat-table] td.mat-mdc-footer-cell,
 table[mat-table] td.mat-mdc-footer-cell .mat-icon {
   color: var(--app-table-text);
+}
+
+table[mat-table] th.mat-mdc-header-cell,
+table[mat-table] td.mat-mdc-cell,
+table[mat-table] td.mat-mdc-footer-cell {
+  min-width: var(--app-table-column-min);
+}
+
+table[mat-table] th.mat-mdc-header-cell,
+table[mat-table] th.mat-mdc-header-cell > * {
+  white-space: nowrap;
+}
+
+table[mat-table] th.mat-mdc-header-cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+table[mat-table] .mat-column-actions,
+table[mat-table] .mat-column-add {
+  min-width: max-content;
+}
+
+table[mat-table] .mat-column-position {
+  min-width: 2rem;
+}
+
+table[mat-table] td.mat-mdc-cell,
+table[mat-table] td.mat-mdc-footer-cell {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+table[mat-table] td.mat-mdc-cell > *,
+table[mat-table] td.mat-mdc-footer-cell > * {
+  min-width: 0;
 }
 
 .app-table-row {
@@ -138,6 +178,7 @@ tr.app-table-detail-row:not(.app-table-detail-row--expanded) td.mat-mdc-cell {
 .detail,
 .app-table-detail {
   overflow: hidden;
+  min-width: 0;
 }
 
 .app-table-master-row td.mat-mdc-cell {
@@ -146,6 +187,14 @@ tr.app-table-detail-row:not(.app-table-detail-row--expanded) td.mat-mdc-cell {
 
 .app-table-detail-fill {
   width: 100%;
+}
+
+.app-table-detail mat-list-item,
+.app-table-detail .mat-mdc-list-item,
+.app-table-detail [matListItemLine],
+.app-table-detail [matListItemTitle] {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .app-table-no-content {
@@ -172,4 +221,29 @@ mat-paginator,
   padding: 0 8px;
   border-bottom-left-radius: 16px;
   border-bottom-right-radius: 16px;
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --app-table-column-min: 5.5rem;
+  }
+
+  table[mat-table] th.mat-mdc-header-cell,
+  table[mat-table] td.mat-mdc-cell,
+  table[mat-table] td.mat-mdc-footer-cell {
+    padding-inline: 10px;
+  }
+}
+
+@media (max-width: 599px) {
+  :root {
+    --app-table-column-min: 4.5rem;
+  }
+
+  table[mat-table] th.mat-column-actions,
+  table[mat-table] td.mat-column-actions {
+    width: 1% !important;
+    min-width: 3rem !important;
+    white-space: nowrap;
+  }
 }

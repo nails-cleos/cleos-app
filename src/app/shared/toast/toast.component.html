@@ -8,7 +8,7 @@
     <div class="toast-title">{{ data.type | titlecase }}</div>
     <div class="toast-message" [innerHTML]="data.message | translate"></div>
   </div>
-  <div class="toast-actions">
+  <div class="toast-actions" [class.toast-actions--empty]="data.actionType === 'none'">
     <div class="toast-primary-actions app-detail-actions">
       @switch (data.actionType) {
         @case ('link') {

@@ -56,7 +56,7 @@ export class OfficeListComponent {
   resultsLengthSignal = computed(() => this.officeListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'name', 'manager', 'subject', 'actions', 'add'];
+  displayedColumns: string[] = ['position', 'name', 'manager', 'subject', 'actions'];
   expanded?: IOffice;
 
   language: string = this.translate.getCurrentLang();

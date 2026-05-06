@@ -27,6 +27,7 @@ import { DriveAccessService } from '../../../../services/drive-access.service';
 import { IDocument } from '../../../../interfaces/document';
 import { documentView } from '../../../../store/document.actions';
 import { DocumentState } from '../../../../store/reducers/document.reducers';
+import { CurrencySymbolPipe } from '../../../../pipes/currency-symbol.pipe';
 
 type ExpensesForm = {
   date: FormControl<Date | undefined>;
@@ -37,7 +38,7 @@ type ExpensesForm = {
   selector: 'app-expenses',
   templateUrl: './expenses.component.html',
   styleUrls: ['./expenses.component.scss'],
-  imports: [SharedModule, TimeDetailPipe],
+  imports: [SharedModule, TimeDetailPipe, CurrencySymbolPipe],
   providers: [
     { provide: DateAdapter, useClass: YearMonthAdapter },
   ],
@@ -87,8 +88,7 @@ export class ExpensesComponent {
   resultsLengthSignal = computed(() => this.expenseListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'invoice', 'supplyStore.name', 'timestamp', 'totalGross', 'totalBtw',
-    'totalNet', 'actions', 'add'];
+  displayedColumns: string[] = ['position', 'invoice', 'supplyStore.name', 'timestamp', 'actions'];
   expanded?: IExpenseAll;
 
   dateFormat: string = this.translate.getCurrentLang();

@@ -65,7 +65,7 @@ export class AdditionalListComponent {
   resultsLengthSignal = computed(() => this.additionalListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['order', 'name', 'description', 'duration', 'actions', 'add'];
+  displayedColumns: string[] = ['order', 'name', 'description', 'duration', 'actions'];
 
   expandedAdditional: IAdditional | undefined;
 

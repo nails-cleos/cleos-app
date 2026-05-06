@@ -24,6 +24,24 @@ mat-header-cell, mat-cell {
   }
 }
 
+button[mat-icon-button],
+a[mat-icon-button] {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+button[mat-icon-button] .mat-icon,
+a[mat-icon-button] .mat-icon,
+button[mat-icon-button] .material-icons,
+a[mat-icon-button] .material-icons,
+button[mat-icon-button] .material-symbols-outlined,
+a[mat-icon-button] .material-symbols-outlined {
+  margin: 0 !important;
+  line-height: 1;
+}
+
 .clock-timepicker-panel .mat-mdc-dialog-container {
   padding: 0 !important;
 }

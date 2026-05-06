@@ -32,7 +32,8 @@
           <mat-datepicker #dp startView="multi-year" (monthSelected)="setMonthAndYear($event, dp)">
           </mat-datepicker>
         </mat-form-field>
-        <button mat-stroked-button type="submit" [disabled]="form.invalid || !resultsLengthSignal()" class="app-detail-action-button">
+        <button mat-stroked-button type="submit" [disabled]="form.invalid || !resultsLengthSignal()"
+                class="app-surface-filter-action app-detail-action-button">
           <mat-icon>folder_zip</mat-icon>
           <span>{{ 'COMMON.BUTTON.DOWNLOAD' | translate }}</span>
         </button>
@@ -41,122 +42,123 @@
   </section>
 
   <section class="app-surface-section">
-  <div class="mat-elevation-z8 app-table-shell">
-    @let resultsLength = resultsLengthSignal();
-    @let pageSize = pageSizeSignal();
-    @if (dataSourceSignal(); as dataSource) {
-      <table [dataSource]="dataSource" mat-table matSort matSortActive="date" matSortDirection="desc"
-             matSortDisableClear
-             multiTemplateDataRows>
-        <ng-container matColumnDef="position">
-          <th *matHeaderCellDef mat-header-cell>#</th>
-          <td *matCellDef="let document; let i = dataIndex;" mat-cell>
-            @if (document.id) {
-              <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
-            } @else {
-              <div class="ssc-line"></div>
-            }
-          </td>
-        </ng-container>
+    <div class="mat-elevation-z8 app-table-shell">
+      @let resultsLength = resultsLengthSignal();
+      @let pageSize = pageSizeSignal();
+      @if (dataSourceSignal(); as dataSource) {
+        <table [dataSource]="dataSource" mat-table matSort matSortActive="date" matSortDirection="desc"
+               matSortDisableClear
+               multiTemplateDataRows>
+          <ng-container matColumnDef="position">
+            <th *matHeaderCellDef mat-header-cell>#</th>
+            <td *matCellDef="let document; let i = dataIndex;" mat-cell>
+              @if (document.id) {
+                <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
+              } @else {
+                <div class="ssc-line"></div>
+              }
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="name">
-          <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
-          <td *matCellDef="let document" mat-cell>
-            @if (document.id) {
-              <div>{{ document.name }}</div>
-            } @else {
-              <div class="ssc-line"></div>
-            }
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="name">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
+            <td *matCellDef="let document" mat-cell>
+              @if (document.id) {
+                <div>{{ document.name }}</div>
+              } @else {
+                <div class="ssc-line"></div>
+              }
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="date">
-          <th *matHeaderCellDef class="hide-xs" mat-header-cell
-              mat-sort-header>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}
-          </th>
-          <td *matCellDef="let document" class="hide-xs" mat-cell>
-            @if (document.id) {
-              <div>{{ document.date | date:'MM-yyyy' }}</div>
-            } @else {
-              <div class="ssc-line"></div>
-            }
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="date">
+            <th *matHeaderCellDef class="hide-xs" mat-header-cell
+                mat-sort-header>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}
+            </th>
+            <td *matCellDef="let document" class="hide-xs" mat-cell>
+              @if (document.id) {
+                <div>{{ document.date | date:'MM-yyyy' }}</div>
+              } @else {
+                <div class="ssc-line"></div>
+              }
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="type">
-          <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
-          <td *matCellDef="let document" mat-cell>
-            @if (document.id) {
-              <div>{{ document.type }}</div>
-            } @else {
-              <div class="ssc-line"></div>
-            }
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="type">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
+            <td *matCellDef="let document" mat-cell>
+              @if (document.id) {
+                <div>{{ document.type }}</div>
+              } @else {
+                <div class="ssc-line"></div>
+              }
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="actions">
-          <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-          <td *matCellDef="let document" class="hide-xs" mat-cell>
-            @if (document.id) {
-              <div>
-                @if (!document.deleted && googleDriveUploadFile) {
-                  <button (click)="download(document)" mat-icon-button
-                          matTooltip="{{ 'COMMON.BUTTON.DOWNLOAD' | translate }}" matTooltipPosition="left">
-                    <mat-icon color="primary">file_download</mat-icon>
-                  </button>
-                }
-              </div>
-            } @else {
-              <div class="ssc-line"></div>
-            }
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="expandedDetail">
-          <td *matCellDef="let document" [attr.colspan]="displayedColumns.length" class="hide-gt-xs" mat-cell>
-            <div [class.detail-expanded]="document === expandedDocument"
-                 class="detail hide-gt-xs">
-              <mat-list>
-                @if (document.date) {
-                  <mat-list-item role="list">
-                    <div matListItemTitle>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}</div>
-                    <div matListItemLine>{{ document.date | date:'MM-yyyy' }}</div>
-                  </mat-list-item>
-                }
-                @if (!document.deleted && googleDriveUploadFile) {
-                  <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
-                  <mat-list-item role="list">
-                    <button (click)="download(document)" color="primary" mat-icon-button>
-                      <mat-icon matListItemIcon>file_download</mat-icon>
+          <ng-container matColumnDef="actions">
+            <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+            <td *matCellDef="let document" class="hide-xs" mat-cell>
+              @if (document.id) {
+                <div>
+                  @if (!document.deleted && googleDriveUploadFile) {
+                    <button (click)="download(document)" mat-icon-button
+                            matTooltip="{{ 'COMMON.BUTTON.DOWNLOAD' | translate }}" matTooltipPosition="left">
+                      <mat-icon color="primary">file_download</mat-icon>
                     </button>
-                  </mat-list-item>
-                }
-              </mat-list>
-            </div>
-          </td>
-        </ng-container>
+                  }
+                </div>
+              } @else {
+                <div class="ssc-line"></div>
+              }
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="noContent">
-          <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-            {{ 'DOCUMENT.LIST.ERROR.NO_CONTENT' | translate }}
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="expandedDetail">
+            <td *matCellDef="let document" [attr.colspan]="displayedColumns.length" class="hide-gt-xs" mat-cell>
+              <div [class.detail-expanded]="document === expandedDocument"
+                   class="detail hide-gt-xs">
+                <mat-list>
+                  @if (document.date) {
+                    <mat-list-item role="list">
+                      <div matListItemTitle>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}</div>
+                      <div matListItemLine>{{ document.date | date:'MM-yyyy' }}</div>
+                    </mat-list-item>
+                  }
+                  @if (!document.deleted && googleDriveUploadFile) {
+                    <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+                    <mat-list-item role="list">
+                      <button (click)="download(document)" color="primary" mat-icon-button>
+                        <mat-icon matListItemIcon>file_download</mat-icon>
+                      </button>
+                    </mat-list-item>
+                  }
+                </mat-list>
+              </div>
+            </td>
+          </ng-container>
 
-        <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-        <tr *matRowDef="let document; columns: displayedColumns;" class="hide-xs" mat-row></tr>
-        <tr (click)="expandedDocument = expandedDocument === document ? null : document"
-            *matRowDef="let document; columns: displayedColumns;" class="hide-gt-xs app-table-master-row" mat-row></tr>
-        <tr *matRowDef="let row; columns: ['expandedDetail']"
-            [class.app-table-detail-row--expanded]="row === expandedDocument"
-            class="hide-gt-xs app-table-detail-row"
-            mat-row></tr>
+          <ng-container matColumnDef="noContent">
+            <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+              {{ 'DOCUMENT.LIST.ERROR.NO_CONTENT' | translate }}
+            </td>
+          </ng-container>
 
-        <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
-      </table>
-      @if (resultsLength) {
-        <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+          <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+          <tr *matRowDef="let document; columns: displayedColumns;" class="hide-xs" mat-row></tr>
+          <tr (click)="expandedDocument = expandedDocument === document ? null : document"
+              *matRowDef="let document; columns: displayedColumns;" class="hide-gt-xs app-table-master-row"
+              mat-row></tr>
+          <tr *matRowDef="let row; columns: ['expandedDetail']"
+              [class.app-table-detail-row--expanded]="row === expandedDocument"
+              class="hide-gt-xs app-table-detail-row"
+              mat-row></tr>
+
+          <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+        </table>
+        @if (resultsLength) {
+          <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+        }
       }
-    }
-  </div>
+    </div>
   </section>
 </div>

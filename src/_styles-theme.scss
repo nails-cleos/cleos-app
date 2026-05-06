@@ -846,11 +846,6 @@
     }
   }
 
-  .active-link {
-    color: mat.m2-get-color-from-palette($primary-palette, 900) !important;
-    font-weight: bold;
-  }
-
   mat-drawer-container {
     .footer {
       border-top: 2px solid mat.m2-get-color-from-palette($background, disabled-button);

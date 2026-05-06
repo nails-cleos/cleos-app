@@ -94,8 +94,12 @@
           </ng-container>
 
           <ng-container matColumnDef="actions">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell>
-              {{ 'COMMON.COLUMN.ACTIONS' | translate }}
+            <th *matHeaderCellDef mat-header-cell>
+              <span class="hide-xs">{{ 'COMMON.COLUMN.ACTIONS' | translate }}</span>
+              <button [routerLink]="['/', language, 'unavailable', 'add']" mat-icon-button id="add-button"
+                      matTooltip="{{ 'UNAVAILABLE.TITLE' | translate }}" matTooltipPosition="right" type="button">
+                <mat-icon color="primary">calendar_lock</mat-icon>
+              </button>
             </th>
             <td *matCellDef="let unavailable" class="hide-xs" mat-cell>
               @if (unavailable.id) {
@@ -112,20 +116,6 @@
                   </button>
                 }
               } @else {
-                <div class="ssc-line"></div>
-              }
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="add">
-            <th *matHeaderCellDef mat-header-cell>
-              <button [routerLink]="['/', language, 'unavailable', 'add']" mat-icon-button id="add-button"
-                      matTooltip="{{ 'UNAVAILABLE.TITLE' | translate }}" matTooltipPosition="right" type="button">
-                <mat-icon color="primary">calendar_lock</mat-icon>
-              </button>
-            </th>
-            <td *matCellDef="let additional" mat-cell>
-              @if (!additional.id) {
                 <div class="ssc-line"></div>
               }
             </td>
