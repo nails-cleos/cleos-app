@@ -69,13 +69,8 @@
           }
 
           <button type="submit" [disabled]="form.invalid"
-                  class="hide-gt-xs app-surface-filter-action calendar-search__button calendar-toolbar__compact"
-                  color="accent" mat-stroked-button>
-            <mat-icon matPrefix>search</mat-icon>
-          </button>
-          <button type="submit" [disabled]="form.invalid"
-                  class="hide-xs app-surface-filter-action calendar-search__button"
-                  color="accent" mat-stroked-button>
+                  class="app-surface-filter-action app-detail-action-button"
+                  mat-stroked-button>
             <mat-icon matPrefix>search</mat-icon>
             <span>{{ 'COMMON.SEARCH.TITLE' | translate }}</span>
           </button>
@@ -87,55 +82,55 @@
   @let calendarDay = calendarDaySignal();
   <section class="app-surface-section">
     <div class="divider card-actions calendar-toolbar app-detail-actions">
-      <button class="hide-gt-xs calendar-toolbar__compact" (click)="decrement()" color="accent" mat-stroked-button>
-        <mat-icon>navigate_before</mat-icon>
-      </button>
-      <button class="hide-xs" (click)="decrement()" color="accent" mat-stroked-button>
+      <div class="hide-gt-xs">
+        <button (click)="decrement()" mat-icon-button>
+          <mat-icon>navigate_before</mat-icon>
+        </button>
+      </div>
+      <button class="hide-xs" (click)="decrement()" mat-stroked-button>
         <mat-icon>navigate_before</mat-icon>
         <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
       </button>
       <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [value]="viewDate"
              hidden matInput [max]="maxDate" [min]="minDate">
       <mat-datepicker #picker touchUi></mat-datepicker>
-      <button class="hide-gt-xs calendar-toolbar__compact" (click)="picker.open()" color="primary" mat-stroked-button>
-        <mat-icon>today</mat-icon>
-      </button>
-      <button class="hide-xs" (click)="picker.open()" color="primary" mat-stroked-button>
+      <div class="hide-gt-xs">
+        <button (click)="picker.open()" mat-icon-button>
+          <mat-icon>today</mat-icon>
+        </button>
+      </div>
+      <button class="hide-xs" (click)="picker.open()" mat-stroked-button>
         <mat-icon>today</mat-icon>
         <span>{{ 'COMMON.BUTTON.GOTO' | translate }}</span>
       </button>
-      <button class="hide-gt-xs calendar-toolbar__compact" (click)="increment()" color="accent" mat-stroked-button>
-        <mat-icon>navigate_next</mat-icon>
-      </button>
-      <button class="hide-xs" (click)="increment()" color="accent" mat-stroked-button>
+      <div class="hide-gt-xs">
+        <button (click)="increment()" mat-icon-button>
+          <mat-icon>navigate_next</mat-icon>
+        </button>
+      </div>
+      <button class="hide-xs" (click)="increment()" mat-stroked-button>
         <mat-icon>navigate_next</mat-icon>
         <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
       </button>
       <div class="spacer"></div>
       @if (daysInWeekSignal() >= 5) {
-        <button class="hide-gt-xs calendar-toolbar__compact"
-                (click)="downloadPDF()"
-                color="accent"
-                mat-stroked-button
-                [disabled]="isDarkMode()">
-          <mat-icon>print</mat-icon>
-        </button>
-        <button class="hide-xs" (click)="downloadPDF()" color="accent" mat-stroked-button [disabled]="isDarkMode()">
+        <button class="hide-xs" (click)="downloadPDF()" mat-stroked-button>
           <mat-icon>print</mat-icon>
           <span>{{ 'COMMON.BUTTON.PRINT' | translate }}</span>
         </button>
       }
-      <button class="hide-gt-xs calendar-toolbar__compact" color="primary" mat-stroked-button
-              [routerLink]="['/', language, 'reservation']">
-        <mat-icon>book_online</mat-icon>
-      </button>
-      <button class="hide-xs" color="primary" mat-stroked-button [routerLink]="['/', language, 'reservation']">
+      <div class="hide-gt-xs">
+        <button mat-icon-button [routerLink]="['/', language, 'reservation']">
+          <mat-icon>book_online</mat-icon>
+        </button>
+      </div>
+      <button class="hide-xs" mat-stroked-button [routerLink]="['/', language, 'reservation']">
         <mat-icon>book_online</mat-icon>
         <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
       </button>
     </div>
 
-    <div class="divider calendar-week__surface app-surface-item app-surface-item--section" id="weekViewPDF">
+    <div class="divider" id="weekViewPDF">
       <mwl-calendar-week-view
         (beforeViewRender)="beforeMonthViewRender($event)"
         (eventClicked)="view($event.event)"

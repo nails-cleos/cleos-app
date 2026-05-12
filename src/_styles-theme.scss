@@ -39,25 +39,6 @@
     background-color: mat.m2-get-color-from-palette($background, hover);
   }
 
-  .treatment-table {
-    background-color: mat.m2-get-color-from-palette($primary-palette, 400);
-  }
-
-  table {
-    .inner-border {
-      border: 1px solid mat.m2-get-color-from-palette($foreground, contrast);
-    }
-
-    .table-header {
-      background-color: color.scale(#2c2c2c, $lightness: +60%);
-      color: black;
-    }
-
-    .table-column-header {
-      background-color: mat.m2-get-color-from-palette($background, hover) !important;
-    }
-  }
-
   .work-filter ul li a {
     color: mat.m2-get-color-from-palette($foreground, text);
   }
@@ -92,47 +73,39 @@
 
   .footer {
     color: mat.m2-get-color-from-palette($foreground, text);
-
-    #subs {
-      color: mat.m2-get-color-from-palette($foreground, text);
-    }
-  }
-
-  .copyright {
-    color: mat.m2-get-color-from-palette($foreground, text);
   }
 
   // firebase-ui
-  .mdl-card {
-    background: mat.m2-get-color-from-palette($background, card);
-
-    .progressbar {
-      background-color: mat.m2-get-color-from-palette($primary-palette) !important;
-    }
-
-    .mdl-button--raised.mdl-button--colored {
-      background-color: mat.m2-get-color-from-palette($accent-palette) !important;
-      color: black
-    }
-
-    .mdl-button.mdl-js-button.mdl-button--primary {
-      color: mat.m2-get-color-from-palette($accent-palette) !important;
-    }
-
-    .progressbar {
-      background-color: mat.m2-get-color-from-palette($primary-palette) !important;
-    }
-
-    .bufferbar {
-      background-image: none !important;
-      background-color: mat.m2-get-color-from-palette($accent-palette)
-    }
-
-    .auxbar {
-      background-image: none !important;
-      background-color: mat.m2-get-color-from-palette($primary-palette) !important;
-    }
-  }
+  //.mdl-card {
+  //  background: mat.m2-get-color-from-palette($background, card);
+  //
+  //  .progressbar {
+  //    background-color: mat.m2-get-color-from-palette($primary-palette) !important;
+  //  }
+  //
+  //  .mdl-button--raised.mdl-button--colored {
+  //    background-color: mat.m2-get-color-from-palette($accent-palette) !important;
+  //    color: black
+  //  }
+  //
+  //  .mdl-button.mdl-js-button.mdl-button--primary {
+  //    color: mat.m2-get-color-from-palette($accent-palette) !important;
+  //  }
+  //
+  //  .progressbar {
+  //    background-color: mat.m2-get-color-from-palette($primary-palette) !important;
+  //  }
+  //
+  //  .bufferbar {
+  //    background-image: none !important;
+  //    background-color: mat.m2-get-color-from-palette($accent-palette)
+  //  }
+  //
+  //  .auxbar {
+  //    background-image: none !important;
+  //    background-color: mat.m2-get-color-from-palette($primary-palette) !important;
+  //  }
+  //}
   // firebase-ui
 
   .text-bg-partially_completed {
@@ -171,10 +144,6 @@
     border: solid 1px mat.m2-get-color-from-palette($warn-palette) !important;
   }
 
-  .bottom-divider {
-    border-bottom: 1px solid mat.m2-get-color-from-palette($background, tooltip);
-  }
-
   .week {
     background-color: mat.m2-get-color-from-palette($primary-palette, A700) !important;
     color: black;
@@ -194,18 +163,6 @@
         }
       }
     }
-  }
-
-  .result {
-    border-bottom: solid 3px mat.m2-get-color-from-palette($accent-palette);
-  }
-
-  .result:after {
-    border-bottom: solid 3px mat.m2-get-color-from-palette($primary-palette);
-  }
-
-  .summary-header {
-    border: 1px solid mat.m2-get-color-from-palette($background, hover) !important;
   }
 
   .map-info {
@@ -401,12 +358,6 @@
     }
   }
 
-  .active {
-    .active-header-title {
-      color: mat.m2-get-color-from-palette($primary-palette);
-    }
-  }
-
   .mat-mdc-list-item.active {
     color: mat.m2-get-color-from-palette($primary-palette);
   }
@@ -499,188 +450,6 @@
     button:not(.timepicker-dial__item):not(.timepicker__time-part):not(.timepicker__meridiem-button) {
       color: mat.m2-get-color-from-palette($primary-palette) !important;
     }
-  }
-
-  .cal-month-view {
-    .cal-header {
-      .cal-cell:hover {
-        background-color: mat.m2-get-color-from-palette($background, loading) !important;
-      }
-
-      background-color: mat.m2-get-color-from-palette($background, background);
-    }
-
-    .cal-cell-top:hover {
-      background-color: mat.m2-get-color-from-palette($background, loading) !important;
-    }
-
-    .cal-day-cell:hover {
-      background-color: mat.m2-get-color-from-palette($background, loading) !important;
-    }
-
-    .cal-day-cell:not(:last-child) {
-      border-right: 1px solid mat.m2-get-color-from-palette($foreground, divider) !important;
-    }
-
-    .cal-cell {
-      border: 1px solid mat.m2-get-color-from-palette($foreground, divider);
-      background-color: mat.m2-get-color-from-palette($background, background);
-    }
-
-    .cal-open-day-events {
-      box-shadow: none;
-      background-color: mat.m2-get-color-from-palette($background, background);
-      border-bottom: 1px solid mat.m2-get-color-from-palette($foreground, divider);
-      border-left: 1px solid mat.m2-get-color-from-palette($foreground, divider);
-      border-right: 1px solid mat.m2-get-color-from-palette($foreground, divider);
-      color: mat.m2-get-color-from-palette($foreground, base);
-    }
-
-    .cal-day-cell.cal-weekend .cal-day-number {
-      color: mat.m2-get-color-from-palette($warn-palette) !important;
-    }
-
-    .cal-day-number {
-      color: mat.m2-get-color-from-palette($foreground, base);
-    }
-
-    .cal-open {
-      .cal-day-number {
-        color: mat.m2-get-color-from-palette($primary-palette, A700) !important;
-        font-size: 2.6em !important;
-        opacity: 1 !important;
-      }
-    }
-
-    .cal-out-month .cal-day-number {
-      color: mat.m2-get-color-from-palette($foreground, base);
-      opacity: 1;
-    }
-
-    .cal-day-cell.cal-today .cal-day-number {
-      color: mat.m2-get-color-from-palette($foreground, base);
-      opacity: 1;
-    }
-
-    .cal-cell.cal-has-events.cal-open {
-      background-color: mat.m2-get-color-from-palette($background, loading);
-      color: mat.m2-get-color-from-palette($primary-palette, A100);
-    }
-
-    .cal-day-cell.cal-in-month.cal-has-events:hover {
-      background-color: mat.m2-get-color-from-palette($background, loading) !important;
-    }
-
-    .cal-day-cell.cal-in-month.cal-has-events {
-      background-color: mat.m2-get-color-from-palette($background, background) !important;
-    }
-
-    // The cal-event-highlight class was added to angular-calendar in version 0.26.0-alpha.26
-    // For earlier versions, you will need to specify the event secondary color in code (eg #8E24AA)
-    .cal-cell.cal-event-highlight {
-      background-color: mat.m2-get-color-from-palette($primary-palette, 600) !important;
-    }
-
-    .cal-day-cell.cal-today.cal-open,
-    .cal-day-cell.cal-today {
-      background-color: mat.m2-get-color-from-palette($primary-palette, 200);
-      color: mat.m2-get-color-from-palette($primary-palette, A100);
-    }
-
-    .cal-event {
-      background-color: mat.m2-get-color-from-palette($primary-palette, 600);
-      color: mat.m2-get-color-from-palette($background, background);
-      border: 1px solid rgba(0, 0, 0, 0.2);
-    }
-
-    .cal-days {
-      border: 0 solid mat.m2-get-color-from-palette($foreground, divider) !important;
-
-      .cal-cell-row {
-        border-bottom: 0 solid mat.m2-get-color-from-palette($foreground, divider) !important;
-      }
-    }
-  }
-
-  .cal-week-view {
-    .cal-day-columns {
-      background-color: mat.m2-get-color-from-palette($background, background);
-    }
-
-    .cal-day-headers {
-      .cal-header:hover {
-        background-color: mat.m2-get-color-from-palette($background, hover);
-      }
-
-      background-color: mat.m2-get-color-from-palette($background, background);
-    }
-
-    .cal-header.cal-weekend b,
-    .cal-header.cal-weekend span {
-      color: mat.m2-get-color-from-palette($warn-palette);
-    }
-
-    .cal-header.cal-today {
-      background-color: mat.m2-get-color-from-palette($primary-palette, 200);
-
-      span {
-        color: mat.m2-get-color-from-palette($primary-palette, default-contrast);
-        opacity: 1;
-      }
-    }
-
-    .cal-event {
-      background-color: mat.m2-get-color-from-palette($primary-palette, 600);
-      color: mat.m2-get-color-from-palette($foreground, text);
-      border: 1px solid #000000;
-    }
-
-    .cal-starts-within-week .cal-event {
-      border-top-left-radius: 2px;
-      border-bottom-left-radius: 2px;
-    }
-
-    .cal-ends-within-week .cal-event {
-      border-top-right-radius: 2px;
-      border-bottom-right-radius: 2px;
-    }
-
-    .cal-hour:nth-child(odd) {
-      background-color: mat.m2-get-color-from-palette($background, background) !important;
-    }
-
-    .cal-hour:nth-child(even) {
-      background-color: mat.m2-get-color-from-palette($background, card) !important;
-    }
-
-    .cal-drag-over .cal-hour-segment {
-      background-color: mat.m2-get-color-from-palette($background, background);
-    }
-
-    .cal-hour-segment:hover {
-      background-color: mat.m2-get-color-from-palette($background, hover) !important;
-    }
-
-    .cal-hour-segment.cal-after-hour-start .cal-time {
-      display: block;
-    }
-
-    .cal-hour:not(:last-child) .cal-hour-segment,
-    .cal-hour:last-child :not(:last-child) .cal-hour-segment {
-      border-bottom: thin dashed mat.m2-get-color-from-palette($primary-palette, lighter);
-    }
-  }
-
-  .cal-disabled {
-    background-color: mat.m2-get-color-from-palette($background, disabled-button-toggle);
-  }
-
-  .cal-custom-event:hover {
-    box-shadow: -10px 15px 25px 1px mat.m2-get-color-from-palette($background, hoverable) !important;
-  }
-
-  .cal-custom-event:after {
-    background: mat.m2-get-color-from-palette($background, hoverable);
   }
 
   pre, .rejected, .dot {
