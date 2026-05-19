@@ -26,7 +26,14 @@
 
         <div class="detail-hero__header app-detail-header">
           <div class="detail-hero__identity">
-            <h1 class="app-detail-title">{{ reservation.customer.displayName }}</h1>
+            <div class="detail-hero__title-row">
+              <h1 class="app-detail-title">{{ reservation.customer.displayName }}</h1>
+              @if (changeState && changeState.length) {
+                <div class="detail-hero__fab app-detail-action-shell">
+                  <app-fab-menu (fabMenuItemSelected)="onChangeState($event)" [fabMenus]="changeState"></app-fab-menu>
+                </div>
+              }
+            </div>
             <div class="detail-hero__meta app-detail-meta">
               <span class="detail-chip app-detail-chip app-detail-chip--status detail-chip--status"
                     [style.background-color]="getStatusBadgeColor(currentState)"
@@ -46,31 +53,6 @@
                 {{ duration.hour | number:'2.0-0' }}:{{ duration.minute | number:'2.0-0' }}
               </span>
             </div>
-          </div>
-
-          <div class="app-detail-actions">
-            <button (click)="overview()" mat-stroked-button type="button">
-              <mat-icon>person</mat-icon>
-              {{ 'COMMON.BUTTON.VIEW' | translate }}
-            </button>
-
-            <button (click)="addNote()" mat-stroked-button type="button">
-              <mat-icon>note_add</mat-icon>
-              {{ 'RESERVATION.NOTE.FIELD' | translate }}
-            </button>
-
-            @if (isReservationAdmin && currentState === 'APPROVED') {
-              <button (click)="addDiscount()" mat-stroked-button type="button">
-                <mat-icon>switch_access_shortcut_add</mat-icon>
-                {{ 'RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}
-              </button>
-            }
-
-            @if (changeState && changeState.length) {
-              <div class="detail-hero__fab app-detail-action-shell">
-                <app-fab-menu (fabMenuItemSelected)="onChangeState($event)" [fabMenus]="changeState"></app-fab-menu>
-              </div>
-            }
           </div>
         </div>
 

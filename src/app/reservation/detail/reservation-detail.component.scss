@@ -23,6 +23,24 @@
   margin-bottom: 20px;
 }
 
+.detail-hero__identity {
+  width: 100%;
+  min-width: 0;
+}
+
+.detail-hero__title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.detail-hero__title-row .app-detail-title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .app-detail-chip--status {
   border-width: 1px;
   border-style: solid;
@@ -31,6 +49,7 @@
 .app-detail-action-shell {
   display: inline-flex;
   align-items: center;
+  flex: 0 0 auto;
 }
 
 .app-detail-value {

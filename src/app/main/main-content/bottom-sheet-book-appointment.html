@@ -1,23 +1,55 @@
-<mat-nav-list>
-  <div mat-subheader>{{'MAIN.BOOK.APPOINTMENT' | translate}}</div>
-  <a mat-list-item (click)="openLink($event, 'whatsapp')">
-    <span matListItemTitle>{{'MAIN.BOOK.VIA.WHATSAPP' | translate}}</span>
-    <mat-icon matListItemIcon [svgIcon]="'WHATSAPP'"></mat-icon>
-  </a>
-  <a mat-list-item (click)="openLink($event, 'instagram')">
-    <span matListItemTitle>{{'MAIN.BOOK.VIA.INSTAGRAM' | translate}}</span>
-    <mat-icon matListItemIcon [svgIcon]="'INSTAGRAM'"></mat-icon>
-  </a>
-  <a mat-list-item (click)="openLink($event, 'facebook')">
-    <span matListItemTitle>{{'MAIN.BOOK.VIA.FACEBOOK' | translate}}</span>
-    <mat-icon matListItemIcon [svgIcon]="'FACEBOOK'"></mat-icon>
-  </a>
-  <a mat-list-item (click)="openLink($event, 'phone')">
-    <span matListItemTitle>{{'MAIN.BOOK.VIA.PHONE' | translate}}</span>
-    <mat-icon matListItemIcon>phone</mat-icon>
-  </a>
-  <a mat-list-item (click)="openLink($event, 'email')">
-    <span matListItemTitle>{{'MAIN.BOOK.VIA.EMAIL' | translate}}</span>
-    <mat-icon matListItemIcon>email</mat-icon>
-  </a>
-</mat-nav-list>
+<div class="app-book-sheet">
+  <div class="app-book-sheet__handle" aria-hidden="true"></div>
+
+  <div class="app-book-sheet__header">
+    <div class="app-book-sheet__badge" aria-hidden="true">
+      <mat-icon>calendar_month</mat-icon>
+    </div>
+    <h2 class="app-book-sheet__title">{{ 'MAIN.BOOK.APPOINTMENT' | translate }}</h2>
+    <button (click)="close()" aria-label="Close" class="app-book-sheet__close" type="button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="app-book-sheet__actions">
+    <button (click)="openLink($event, 'whatsapp')" class="app-book-sheet__option" type="button">
+      <span class="app-book-sheet__option-icon" aria-hidden="true">
+        <mat-icon [svgIcon]="'WHATSAPP'"></mat-icon>
+      </span>
+      <span class="app-book-sheet__option-text">{{ 'MAIN.BOOK.VIA.WHATSAPP' | translate }}</span>
+      <mat-icon class="app-book-sheet__option-arrow" aria-hidden="true">north_east</mat-icon>
+    </button>
+
+    <button (click)="openLink($event, 'instagram')" class="app-book-sheet__option" type="button">
+      <span class="app-book-sheet__option-icon" aria-hidden="true">
+        <mat-icon [svgIcon]="'INSTAGRAM'"></mat-icon>
+      </span>
+      <span class="app-book-sheet__option-text">{{ 'MAIN.BOOK.VIA.INSTAGRAM' | translate }}</span>
+      <mat-icon class="app-book-sheet__option-arrow" aria-hidden="true">north_east</mat-icon>
+    </button>
+
+    <button (click)="openLink($event, 'facebook')" class="app-book-sheet__option" type="button">
+      <span class="app-book-sheet__option-icon" aria-hidden="true">
+        <mat-icon [svgIcon]="'FACEBOOK'"></mat-icon>
+      </span>
+      <span class="app-book-sheet__option-text">{{ 'MAIN.BOOK.VIA.FACEBOOK' | translate }}</span>
+      <mat-icon class="app-book-sheet__option-arrow" aria-hidden="true">north_east</mat-icon>
+    </button>
+
+    <button (click)="openLink($event, 'phone')" class="app-book-sheet__option" type="button">
+      <span class="app-book-sheet__option-icon" aria-hidden="true">
+        <mat-icon>phone</mat-icon>
+      </span>
+      <span class="app-book-sheet__option-text">{{ 'MAIN.BOOK.VIA.PHONE' | translate }}</span>
+      <mat-icon class="app-book-sheet__option-arrow" aria-hidden="true">north_east</mat-icon>
+    </button>
+
+    <button (click)="openLink($event, 'email')" class="app-book-sheet__option" type="button">
+      <span class="app-book-sheet__option-icon" aria-hidden="true">
+        <mat-icon>email</mat-icon>
+      </span>
+      <span class="app-book-sheet__option-text">{{ 'MAIN.BOOK.VIA.EMAIL' | translate }}</span>
+      <mat-icon class="app-book-sheet__option-arrow" aria-hidden="true">north_east</mat-icon>
+    </button>
+  </div>
+</div>

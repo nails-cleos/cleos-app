@@ -1,0 +1,169 @@
+:host {
+  display: block;
+}
+
+.app-book-sheet {
+  display: grid;
+  gap: 18px;
+  padding: 14px 18px 20px;
+  color: var(--app-surface-text);
+}
+
+.app-book-sheet__handle {
+  width: 56px;
+  height: 5px;
+  margin: 0 auto;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.app-book-sheet__header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+}
+
+.app-book-sheet__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  border-radius: 16px;
+  background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--primary-lighter-color) 92%, transparent),
+      color-mix(in srgb, var(--primary-color) 12%, transparent)
+  );
+  color: var(--primary-darker-color);
+}
+
+.app-book-sheet__badge .mat-icon {
+  margin: 0;
+}
+
+.app-book-sheet__title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+
+.app-book-sheet__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--app-chip-bg) 92%, transparent);
+  color: color-mix(in srgb, currentColor 82%, transparent);
+  cursor: pointer;
+  transition: transform .18s ease, background-color .18s ease, border-color .18s ease;
+}
+
+.app-book-sheet__close:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, currentColor 16%, transparent);
+  background: color-mix(in srgb, var(--app-chip-bg) 100%, transparent);
+}
+
+.app-book-sheet__actions {
+  display: grid;
+  gap: 10px;
+}
+
+.app-book-sheet__option {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--primary-color) 12%, var(--app-surface-card-border));
+  border-radius: 18px;
+  background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--app-chip-bg) 96%, transparent),
+      color-mix(in srgb, var(--app-chip-bg) 82%, transparent)
+  );
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .18s ease, border-color .18s ease, background-color .18s ease, box-shadow .18s ease;
+}
+
+.app-book-sheet__option:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--primary-color) 22%, var(--app-surface-card-border));
+  background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--app-chip-bg) 100%, transparent),
+      color-mix(in srgb, var(--app-chip-bg) 88%, transparent)
+  );
+  box-shadow: 0 16px 30px color-mix(in srgb, var(--primary-color) 12%, transparent);
+}
+
+.app-book-sheet__option-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+  color: var(--primary-darker-color);
+}
+
+.app-book-sheet__option-icon .mat-icon {
+  margin: 0;
+}
+
+.app-book-sheet__option-text {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: .01em;
+}
+
+.app-book-sheet__option-arrow {
+  color: color-mix(in srgb, currentColor 54%, transparent);
+}
+
+@media (max-width: 599px) {
+  .app-book-sheet {
+    gap: 16px;
+    padding: 12px 14px 18px;
+  }
+
+  .app-book-sheet__header {
+    gap: 12px;
+  }
+
+  .app-book-sheet__badge {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+  }
+
+  .app-book-sheet__title {
+    font-size: 1.2rem;
+  }
+
+  .app-book-sheet__option {
+    grid-template-columns: 40px minmax(0, 1fr) 18px;
+    gap: 12px;
+    padding: 13px 14px;
+    border-radius: 16px;
+  }
+
+  .app-book-sheet__option-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+}

@@ -294,6 +294,18 @@ export class ReservationDetailComponent {
         if (isProfessionalAdmin) {
           this.professionalMachine(this);
           this.changeState = this.machine.next(snakeToCamel(reservation.state));
+          if (reservation.state === 'APPROVED') {
+            const discount = this.createAction(this.translate.instant('RESERVATION.TREATMENT.DISCOUNT.FIELD'),
+              ReservationIconName.discount, 'discount');
+            const discountTransaction = ReservationDetailComponent.createTransaction('discount',
+              (): void => this.addDiscount());
+            ReservationDetailComponent.addTransitionToAllStates(
+              'discount',
+              discountTransaction,
+              discount,
+              false,
+            );
+          }
         } else if (isCustomer) {
           this.customerMachine(this);
           this.changeState = this.machine.next(snakeToCamel(reservation.state));
@@ -304,6 +316,26 @@ export class ReservationDetailComponent {
             }, 5000);
           }
         }
+        const note = this.createAction(this.translate.instant('RESERVATION.NOTE.FIELD'),
+          ReservationIconName.note, 'note');
+        const noteTransaction = ReservationDetailComponent.createTransaction('note',
+          (): void => this.addNote());
+        ReservationDetailComponent.addTransitionToAllStates(
+          'note',
+          noteTransaction,
+          note,
+          false,
+        );
+        const overview = this.createAction(this.translate.instant('COMMON.BUTTON.VIEW'),
+          ReservationIconName.overview, 'overview');
+        const overviewTransaction = ReservationDetailComponent.createTransaction('overview',
+          (): void => this.overview());
+        ReservationDetailComponent.addTransitionToAllStates(
+          'overview',
+          overviewTransaction,
+          overview,
+          false,
+        );
         this.isCustomer.set(isCustomer);
       }
     });
@@ -363,7 +395,6 @@ export class ReservationDetailComponent {
           this.translate.instant('RESERVATION.ACTION.PREVIOUS'),
           ReservationIconName.previous,
           previous,
-          'gray',
         );
 
         const previousTransition =
@@ -391,7 +422,6 @@ export class ReservationDetailComponent {
           this.translate.instant('RESERVATION.ACTION.NEXT'),
           ReservationIconName.next,
           next,
-          'gray',
         );
 
         const nextTransition =
@@ -412,10 +442,6 @@ export class ReservationDetailComponent {
       }
     });
 
-  }
-
-  get getForm(): DetailForm {
-    return this.form.controls;
   }
 
   get payments(): FormArray<FormGroup<PaymentForm>> {
@@ -575,7 +601,7 @@ export class ReservationDetailComponent {
 
   onChangeState = (id: string): void => {
     const list = ['send', 'coffee', 'book', 'more', 'change', 'cancel', 'cancel_edit', 'notify', 'pay', 'color',
-      'clone', 'previous', 'next'];
+      'clone', 'previous', 'next', 'overview', 'note', 'discount'];
     const state = this.state();
     if (!state) {
       return;
@@ -617,13 +643,11 @@ export class ReservationDetailComponent {
     });
   };
 
-
   private createAction = (
-    tooltip: string,
+    name: string,
     icon: string,
     id: string,
-    color?: string,
-  ): IFabMenu => ({ tooltip, icon, id, color } as IFabMenu);
+  ): IFabMenu => ({ name, icon, id });
 
   private professionalMachine = (self: this): any => {
     const reservation = self.reservation();
@@ -638,23 +662,23 @@ export class ReservationDetailComponent {
     const translate = self.translate;
 
     const approve = this.createAction(translate.instant('RESERVATION.ACTION.APPROVE'),
-      ReservationIconName.approved, 'approve', 'primary');
+      ReservationIconName.approved, 'approve');
     const start = this.createAction(translate.instant('RESERVATION.ACTION.START'),
-      ReservationIconName.started, 'start', 'primary');
+      ReservationIconName.started, 'start');
     const complete = this.createAction(translate.instant('RESERVATION.ACTION.COMPLETE'),
-      ReservationIconName.completed, 'complete', 'primary');
+      ReservationIconName.completed, 'complete');
     const edit = this.createAction(translate.instant('RESERVATION.ACTION.EDIT'),
-      ReservationIconName.edit, 'edit', 'accent');
+      ReservationIconName.edit, 'edit');
     const cancel = this.createAction(translate.instant('RESERVATION.ACTION.CANCEL'),
-      ReservationIconName.cancelled, 'cancel', 'warn');
+      ReservationIconName.cancelled, 'cancel');
     const book = this.createAction(translate.instant('RESERVATION.ACTION.BOOK'),
-      ReservationIconName.book, 'book', 'primary');
+      ReservationIconName.book, 'book');
     const sendMessage = this.createAction(translate.instant('RESERVATION.ACTION.SEND'),
-      ReservationIconName.send, 'send', 'green');
+      ReservationIconName.send, 'send');
     const coffeeMessage = this.createAction(translate.instant('RESERVATION.ACTION.COFFEE'),
-      ReservationIconName.coffee, 'coffee', 'accent');
+      ReservationIconName.coffee, 'coffee');
     const change = this.createAction(translate.instant('RESERVATION.ACTION.CHANGE'),
-      ReservationIconName.change, 'change', 'accent');
+      ReservationIconName.change, 'change');
 
     const more = this.createAction(translate.instant('RESERVATION.ACTION.MORE'),
       ReservationIconName.more, 'more');
@@ -853,7 +877,7 @@ export class ReservationDetailComponent {
     const translate = self.translate;
 
     const book = this.createAction(translate.instant('RESERVATION.ACTION.BOOK'),
-      ReservationIconName.book, 'book', 'primary');
+      ReservationIconName.book, 'book');
 
     let cancelIcon = ReservationIconName.cancelled;
     let cancelOptions: string[] = [];
@@ -883,7 +907,7 @@ export class ReservationDetailComponent {
       }
     }
 
-    const cancel = this.createAction(translate.instant('RESERVATION.ACTION.CANCEL'), cancelIcon, 'cancel', 'warn');
+    const cancel = this.createAction(translate.instant('RESERVATION.ACTION.CANCEL'), cancelIcon, 'cancel');
 
     const cancelTransaction = ReservationDetailComponent.createTransaction('cancelled', (): void =>
       self.cancel(reservation, cancelOptions, price, result => {
@@ -946,7 +970,7 @@ export class ReservationDetailComponent {
     /* EDIT */
     if (reservation.canEdit || price.totalPaid >= price.penalty) {
       const edit = this.createAction(translate.instant('RESERVATION.ACTION.EDIT'),
-        ReservationIconName.edit, 'edit', 'accent');
+        ReservationIconName.edit, 'edit');
 
       const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void => {
         self.router.navigate([this.language, 'me', 'reservation', reservationId]);
@@ -962,7 +986,7 @@ export class ReservationDetailComponent {
       paid.next.unshift(edit);
     } else {
       const edit = this.createAction(translate.instant('RESERVATION.ACTION.EDIT'),
-        ReservationIconName.edit, 'cancel_edit', 'accent');
+        ReservationIconName.edit, 'cancel_edit');
 
       const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void =>
         customerEditDialog(self.dialog, self.router, reservationId, reservation.room.currency, self.small(),
@@ -992,7 +1016,7 @@ export class ReservationDetailComponent {
           });
       } else {
         const pay = this.createAction(translate.instant('RESERVATION.ACTION.PAY'),
-          ReservationIconName.payment, 'pay', 'blue');
+          ReservationIconName.payment, 'pay');
         cancelledPaymentRequired.next = [pay];
 
         cancelledPaymentRequired.transitions.pay =
@@ -1006,7 +1030,7 @@ export class ReservationDetailComponent {
 
     if (price.total > price.totalPaid) {
       const next = this.createAction(translate.instant('RESERVATION.ACTION.PAY'),
-        ReservationIconName.payment, 'pay', 'blue');
+        ReservationIconName.payment, 'pay');
       approved.next = [...approved.next, next];
       partiallyCompleted.next = [...partiallyCompleted.next, next];
 

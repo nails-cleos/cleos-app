@@ -356,7 +356,9 @@ export class MainContentComponent {
   }
 
   openBottomSheet(): void {
-    this.bottomSheet.open(BottomSheetBookAppointmentComponent);
+    this.bottomSheet.open(BottomSheetBookAppointmentComponent, {
+      panelClass: 'app-surface-bottom-sheet-panel',
+    });
   }
 
   sendEmail(): void {

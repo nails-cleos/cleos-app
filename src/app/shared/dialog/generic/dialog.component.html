@@ -1,4 +1,5 @@
-<div class="app-surface-dialog-shell" [class.app-surface-dialog-shell--warning]="isWarning">
+<div class="app-surface-dialog-shell app-surface-dialog-shell--confirm"
+     [class.app-surface-dialog-shell--warning]="isWarning">
   <div class="app-surface-dialog-header">
     <div class="app-surface-dialog-title-wrap">
       <div class="app-surface-dialog-badge" aria-hidden="true">
@@ -20,12 +21,12 @@
   <div mat-dialog-actions class="app-surface-dialog-actions">
     <div class="app-surface-dialog-spacer"></div>
     @if (!data.hideNoButton) {
-      <button (click)="onNoClick()" cdkFocusInitial mat-stroked-button type="button">
+      <button (click)="onNoClick()" cdkFocusInitial class="app-surface-dialog-action-secondary" mat-flat-button type="button">
         {{ 'COMMON.BUTTON.NO' | translate }}
       </button>
     }
     @if (!data.hideOkButton) {
-      <button [mat-dialog-close]="data.value" [color]="confirmColor" mat-flat-button type="button">
+      <button [mat-dialog-close]="data.value" [color]="confirmColor" class="app-surface-dialog-action-primary" mat-flat-button type="button">
         {{ 'COMMON.BUTTON.YES' | translate }}
       </button>
     }

@@ -12,7 +12,7 @@ import { createNewDate, getNowTimeZone } from '../util/dates';
 import { INoteAll } from './note';
 
 export interface IFabMenu {
-  tooltip: string;
+  name: string;
   icon: string;
   id: string;
   // To add a new color need to create a new theme class for .mat-{colorName}

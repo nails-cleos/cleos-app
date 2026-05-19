@@ -81,6 +81,25 @@
   color: var(--app-detail-action-text) !important;
 }
 
+@media (max-width: 720px) {
+  .fab-trigger {
+    width: 40px;
+    min-width: 40px;
+    padding-inline: 0;
+    justify-content: center;
+    border-radius: 999px;
+  }
+
+  .fab-trigger .mat-icon {
+    margin: 0 !important;
+  }
+
+  :host ::ng-deep .fab-trigger .mdc-button__label,
+  :host ::ng-deep .fab-trigger .mdc-button__label span {
+    display: none;
+  }
+}
+
 @keyframes fab-menu-item-in {
   from {
     opacity: 0;
