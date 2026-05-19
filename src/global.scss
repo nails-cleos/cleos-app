@@ -1,0 +1,14 @@
+@use 'styles/theme/material-theme';
+@use 'styles/skeleton';
+@use 'styles/base';
+@use 'styles/material-overrides';
+@use 'styles/utilities';
+@use 'styles/animations';
+@use 'styles/reservation-shell';
+@use 'styles/surface-system';
+@use 'styles/detail-view';
+@use 'styles/table';
+
+$flag-icon-css-path: '~flag-icon-css/flags' !default;
+
+@include material-theme.render();

@@ -59,10 +59,10 @@
           </ng-container>
 
           <ng-container matColumnDef="invoice">
-            <th *matHeaderCellDef mat-header-cell class="hide-xs"
+            <th *matHeaderCellDef mat-header-cell class="app-surface-hide-mobile"
                 mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.INVOICE' | translate }}
             </th>
-            <td *matCellDef="let expense" class="hide-xs" mat-cell>
+            <td *matCellDef="let expense" class="app-surface-hide-mobile" mat-cell>
               @if (expense.id) {
                 <div>{{ expense.invoice }}</div>
               } @else {
@@ -72,10 +72,10 @@
           </ng-container>
 
           <ng-container matColumnDef="supplyStore.name">
-            <th *matHeaderCellDef mat-header-cell class="hide-xs"
+            <th *matHeaderCellDef mat-header-cell class="app-surface-hide-mobile"
                 mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.SUPPLY_STORE' | translate }}
             </th>
-            <td *matCellDef="let expense" class="hide-xs" mat-cell>
+            <td *matCellDef="let expense" class="app-surface-hide-mobile" mat-cell>
               @if (expense.id) {
                 <div>{{ expense.supplyStore.name }}</div>
               } @else {
@@ -85,10 +85,10 @@
           </ng-container>
 
           <ng-container matColumnDef="totalGross">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
                 mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.GROSS' | translate }}
             </th>
-            <td *matCellDef="let expense" class="hide-xs" mat-cell>
+            <td *matCellDef="let expense" class="app-surface-hide-mobile" mat-cell>
               @if (expense.id) {
                 <mat-list-item>
                   <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
@@ -101,10 +101,10 @@
           </ng-container>
 
           <ng-container matColumnDef="totalBtw">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
                 mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.BTW' | translate }}
             </th>
-            <td *matCellDef="let expense" class="hide-xs" mat-cell>
+            <td *matCellDef="let expense" class="app-surface-hide-mobile" mat-cell>
               @if (expense.id) {
                 <mat-list-item>
                   <mat-icon matListItemIcon>{{ expense.room.currency.icon }}</mat-icon>
@@ -132,14 +132,14 @@
 
           <ng-container matColumnDef="actions">
             <th *matHeaderCellDef mat-header-cell>
-              <span class="hide-xs">{{ 'COMMON.COLUMN.ACTIONS' | translate }}</span>
+              <span class="app-surface-hide-mobile">{{ 'COMMON.COLUMN.ACTIONS' | translate }}</span>
               <button [routerLink]="['/', language, 'rooms', roomIdSignal(), 'expenses', 'add']" mat-icon-button
                       id="add-button"
                       matTooltip="{{ 'EXPENSE.TITLE' | translate }}" matTooltipPosition="right" type="button">
                 <mat-icon color="primary">add_shopping_cart</mat-icon>
               </button>
             </th>
-            <td *matCellDef="let expense" class="hide-xs" mat-cell>
+            <td *matCellDef="let expense" class="app-surface-hide-mobile" mat-cell>
               @if (expense.id) {
                 @if (!expense.deleted) {
                   <button [routerLink]="['/', language, 'rooms', roomIdSignal(), 'expenses', expense.id]"
@@ -168,7 +168,7 @@
           <ng-container matColumnDef="expandedDetail">
             <td *matCellDef="let expense" [attr.colspan]="displayedColumns.length">
               <div [class.detail-expanded]="expense === expanded" class="detail">
-                <mat-list class="hide-gt-xs">
+                <mat-list class="app-surface-hide-desktop">
                   <mat-list-item role="list">
                     <div matListItemTitle>{{ 'EXPENSE.LIST.COLUMN.INVOICE' | translate }}</div>
                     <div matListItemLine>{{ expense.invoice }}</div>
@@ -204,7 +204,7 @@
                     </mat-list-item>
                   </mat-list>
                 }
-                <mat-list class="hide-gt-xs">
+                <mat-list class="app-surface-hide-desktop">
                   <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
                   <mat-list-item role="list">
                     @if (!expense.deleted) {

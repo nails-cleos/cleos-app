@@ -104,8 +104,8 @@
           </ng-container>
 
         <ng-container matColumnDef="position">
-          <th *matHeaderCellDef mat-header-cell class="hide-xs">#</th>
-          <td *matCellDef="let invoice; let i = dataIndex;" mat-cell class="hide-xs">
+          <th *matHeaderCellDef mat-header-cell class="app-surface-hide-mobile">#</th>
+          <td *matCellDef="let invoice; let i = dataIndex;" mat-cell class="app-surface-hide-mobile">
             @if (invoice.id) {
               {{ i + 1 }}
             } @else {
@@ -142,10 +142,10 @@
         </ng-container>
 
         <ng-container matColumnDef="description">
-          <th *matHeaderCellDef class="hide-xs"
+          <th *matHeaderCellDef class="app-surface-hide-mobile"
               mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}
           </th>
-          <td *matCellDef="let invoice" class="hide-xs" mat-cell>
+          <td *matCellDef="let invoice" class="app-surface-hide-mobile" mat-cell>
             @if (invoice.id) {
               {{ invoice.items?.[0].name }}
             } @else {
@@ -155,8 +155,8 @@
         </ng-container>
 
         <ng-container matColumnDef="actions">
-          <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-          <td *matCellDef="let invoice" class="hide-xs" mat-cell>
+          <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+          <td *matCellDef="let invoice" class="app-surface-hide-mobile" mat-cell>
             @if (invoice.id) {
               <button (click)="goToPath(invoice)" type="button" mat-icon-button
                       matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
@@ -169,8 +169,8 @@
         </ng-container>
 
         <ng-container matColumnDef="expandedDetail">
-          <td *matCellDef="let invoice" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
-            <div [class.detail-expanded]="invoice === expandedInvoice" class="detail hide-gt-xs">
+          <td *matCellDef="let invoice" [attr.colspan]="displayedColumns.length" class="app-surface-hide-desktop">
+            <div [class.detail-expanded]="invoice === expandedInvoice" class="detail app-surface-hide-desktop">
               <mat-list>
                 <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
                 <mat-list-item role="list">
@@ -190,15 +190,15 @@
         </ng-container>
 
           <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-          <tr *matRowDef="let invoice; columns: displayedColumns;" class="hide-xs" mat-row [ngClass]="invoice.order"></tr>
+          <tr *matRowDef="let invoice; columns: displayedColumns;" class="app-surface-hide-mobile" mat-row [ngClass]="invoice.order"></tr>
           <tr (click)="expandedInvoice = expandedInvoice === invoice ? null : invoice"
               *matRowDef="let invoice; columns: displayedColumns;"
-              class="hide-gt-xs app-table-master-row"
+              class="app-surface-hide-desktop app-table-master-row"
               mat-row
               [ngClass]="invoice.order"></tr>
           <tr *matRowDef="let row; columns: ['expandedDetail']"
               [class.app-table-detail-row--expanded]="row === expandedInvoice"
-              class="hide-gt-xs app-table-detail-row"
+              class="app-surface-hide-desktop app-table-detail-row"
               mat-row></tr>
 
           <tr *matFooterRowDef="['noContent']" [hidden]="resultsLengthSignal() > 0" mat-footer-row></tr>

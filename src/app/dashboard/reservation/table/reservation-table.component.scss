@@ -1,11 +1,4 @@
 :host {
   display: block;
   height: 100%;
-  --app-table-border: rgba(148, 163, 184, 0.14);
-  --app-table-header: rgba(148, 163, 184, 0.08);
-}
-
-:host-context(.dark-theme) {
-  --app-table-border: rgba(255, 255, 255, 0.08);
-  --app-table-header: rgba(255, 255, 255, 0.04);
 }

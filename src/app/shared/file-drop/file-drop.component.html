@@ -1,6 +1,6 @@
 @if (!file() && !(isImage() && file()?.image)) {
   <div (fileDropped)="onFileDropped($event)" appDragDrop
-       class="container hide-xs">
+       class="container app-surface-hide-mobile">
     <input #fileDropRef (change)="fileBrowseHandler($event.target)" [multiple]="false" id="fileDropRef"
            type="file" [accept]="accept()"/>
     @if (isImage()) {
@@ -18,7 +18,7 @@
   </div>
 }
 
-<div class="hide-gt-xs">
+<div class="app-surface-hide-desktop">
   <button (click)="fileInput.click()" mat-stroked-button
           class="app-detail-action-button app-detail-action-button--mobile"
           type="button">
@@ -46,7 +46,7 @@
           <mat-card-subtitle> {{ formatBytes(currentFile.size, 0) }}</mat-card-subtitle>
         }
       </mat-card-title-group>
-      <div class="spacer"></div>
+      <div class="app-surface-spacer"></div>
       <button (click)="delete()" color="warn" mat-icon-button type="button">
         <mat-icon>delete</mat-icon>
       </button>
@@ -55,7 +55,7 @@
       <mat-progress-bar [value]="currentFile.progress" [mode]="'determinate'"></mat-progress-bar>
       @if (animate()) {
         <div>
-          <div class="spacer"></div>
+          <div class="app-surface-spacer"></div>
           {{ currentFile.progress / 100 | percent }}
         </div>
       }

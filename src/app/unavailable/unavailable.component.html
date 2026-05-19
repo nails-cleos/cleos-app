@@ -137,7 +137,7 @@
         </div>
 
         <div class="app-detail-actions">
-          <div class="spacer"></div>
+          <div class="app-surface-spacer"></div>
           <button [form]="form" appBackButton mat-stroked-button type="button">
             <mat-icon>keyboard_return</mat-icon>
             {{ 'COMMON.BUTTON.BACK' | translate }}
@@ -160,9 +160,9 @@
         </div>
       } @else {
         <div class="app-crud-loading">
-          <div class="ssc-hr"></div>
+          <div class="app-surface-skeleton-spacer"></div>
           <div class="ssc-square mb"></div>
-          <div class="ssc-hr"></div>
+          <div class="app-surface-skeleton-spacer"></div>
         </div>
       }
     </section>

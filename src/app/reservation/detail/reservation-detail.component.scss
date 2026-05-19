@@ -2,6 +2,52 @@
   display: block;
 }
 
+.app-detail-shell {
+  position: relative;
+}
+
+.app-detail-topline,
+.app-detail-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.app-detail-topline {
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.app-detail-header {
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.app-detail-chip--status {
+  border-width: 1px;
+  border-style: solid;
+}
+
+.app-detail-action-shell {
+  display: inline-flex;
+  align-items: center;
+}
+
+.app-detail-value {
+  font-size: 1rem;
+  color: var(--app-surface-text);
+}
+
+.app-detail-value.app-detail-value--rich {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.app-detail-value.app-detail-value--rich .mat-icon {
+  color: var(--app-surface-text);
+}
+
 .detail-layout {
   display: block;
 }
@@ -84,7 +130,7 @@ tr.detail-row {
   width: 108px;
 }
 
-.card-actions {
+.app-surface-actions {
   margin-top: 18px;
 }
 
@@ -100,4 +146,12 @@ tr.detail-row {
 
 .detail-loading {
   margin-top: 8px;
+}
+
+@media (max-width: 720px) {
+  .app-detail-topline,
+  .app-detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

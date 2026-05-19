@@ -30,10 +30,10 @@
           </ng-container>
 
           <ng-container matColumnDef="name">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
                 mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}
             </th>
-            <td *matCellDef="let currency" class="hide-xs" mat-cell>
+            <td *matCellDef="let currency" class="app-surface-hide-mobile" mat-cell>
               @if (currency.id) {
                 <div>{{ currency.name }}</div>
               } @else {
@@ -44,13 +44,13 @@
 
           <ng-container matColumnDef="actions">
             <th *matHeaderCellDef mat-header-cell>
-              <span class="hide-xs">{{ 'COMMON.COLUMN.ACTIONS' | translate }}</span>
+              <span class="app-surface-hide-mobile">{{ 'COMMON.COLUMN.ACTIONS' | translate }}</span>
               <button [routerLink]="['/', language, 'currency', 'add']" mat-icon-button id="add-button"
                       matTooltip="{{ 'CURRENCY.TITLE' | translate }}" matTooltipPosition="right" type="button">
                 <mat-icon color="primary">add</mat-icon>
               </button>
             </th>
-            <td *matCellDef="let currency" class="hide-xs" mat-cell>
+            <td *matCellDef="let currency" class="app-surface-hide-mobile" mat-cell>
               @if (currency.id) {
                 <div>
                   @if (!currency.deleted) {
@@ -71,8 +71,8 @@
           </ng-container>
 
           <ng-container matColumnDef="expandedDetail">
-            <td *matCellDef="let currency" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
-              <div [class.detail-expanded]="currency === expanded" class="detail hide-gt-xs">
+            <td *matCellDef="let currency" [attr.colspan]="displayedColumns.length" class="app-surface-hide-desktop">
+              <div [class.detail-expanded]="currency === expanded" class="detail app-surface-hide-desktop">
                 <mat-list>
                   <mat-list-item role="list">
                     <div matListItemTitle>{{ 'COMMON.COLUMN.NAME' | translate }}</div>
@@ -102,13 +102,13 @@
           </ng-container>
 
           <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-          <tr *matRowDef="let currency; columns: displayedColumns;" class="hide-xs" mat-row></tr>
+          <tr *matRowDef="let currency; columns: displayedColumns;" class="app-surface-hide-mobile" mat-row></tr>
           <tr (click)="expanded = expanded === currency ? null : currency"
-              *matRowDef="let currency; columns: displayedColumns;" class="hide-gt-xs app-table-master-row"
+              *matRowDef="let currency; columns: displayedColumns;" class="app-surface-hide-desktop app-table-master-row"
               mat-row></tr>
           <tr *matRowDef="let row; columns: ['expandedDetail']"
               [class.app-table-detail-row--expanded]="row === expanded"
-              class="hide-gt-xs app-table-detail-row"
+              class="app-surface-hide-desktop app-table-detail-row"
               mat-row></tr>
 
           <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>

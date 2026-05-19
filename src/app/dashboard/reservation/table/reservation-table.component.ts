@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { createMatTableState } from 'src/app/util/mat-table-state';
 import { Store } from '@ngrx/store';
 import { deleteReservation, getPage } from '../../../store/reservation.actions';
 import { IReservation, IReservationAll } from '../../../interfaces/reservation';
@@ -44,6 +45,7 @@ export class ReservationTableComponent {
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
+  private tableState = createMatTableState(this.paginator, this.sort, 'timestamp', 'desc');
 
   private reservationListSignal = toSignal(this.reservationList$);
   private authUserSignal = this.authUserService.authUser;
@@ -58,12 +60,8 @@ export class ReservationTableComponent {
       },
     },
   );
-  private sortActive = computed(() => this.sort()?.active ?? 'timestamp');
-
-  private sortDirection = computed(() => this.sort()?.direction ?? 'desc');
-
   errorSignal = toSignal(this.error$);
-  paginatorPageIndex = signal(0);
+  paginatorPageIndex = this.tableState.pageIndex;
 
   hasAdminRole = computed(() => this.authUserSignal().hasAdminRole);
   dataSourceSignal = computed(() => this.reservationListSignal()?.content);
@@ -77,23 +75,11 @@ export class ReservationTableComponent {
   language: string = this.translate.getCurrentLang();
 
   constructor() {
-    effect((onCleanup) => {
-      const paginator = this.paginator();
-      if (paginator) {
-        const sub = paginator.page.subscribe((pageEvent) => {
-          this.paginatorPageIndex.set(pageEvent.pageIndex);
-        });
-        onCleanup(() => sub.unsubscribe());
-      }
-    });
-
     effect(() => {
-      const page = this.paginatorPageIndex();
+      const request = this.tableState.baseRequest();
       this.store.dispatch(
         getPage({
-          page,
-          sort: this.sortActive(),
-          direction: this.sortDirection(),
+          ...request,
           size: this.pageSizeSignal(),
           roomId: this.roomId(),
           all: this.all(),

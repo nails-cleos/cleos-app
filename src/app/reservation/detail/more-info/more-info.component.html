@@ -71,7 +71,7 @@
         }
 
         <div class="app-detail-actions">
-          <div class="spacer"></div>
+          <div class="app-surface-spacer"></div>
           @if (!tracking.process && tracking.completedTimestamp) {
             <button type="button" (click)="execute()" mat-stroked-button>
               <mat-icon>sync_problem</mat-icon>
@@ -138,8 +138,8 @@
             </ng-container>
 
             <ng-container matColumnDef="type">
-              <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
-              <td *matCellDef="let payment" class="hide-xs" mat-cell>
+              <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
+              <td *matCellDef="let payment" class="app-surface-hide-mobile" mat-cell>
                 @if (payment.id) {
                   {{ payment.type }}
                 } @else {
@@ -163,8 +163,8 @@
             </ng-container>
 
             <ng-container matColumnDef="status">
-              <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
-              <td *matCellDef="let payment" class="hide-xs" mat-cell>
+              <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
+              <td *matCellDef="let payment" class="app-surface-hide-mobile" mat-cell>
                 @if (payment.id) {
                   {{ 'COMMON.STATUS.PAYMENT.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate }}
                 } @else {

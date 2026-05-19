@@ -16,22 +16,26 @@
   flex: 1;
   flex-direction: column;
   gap: 14px;
-  padding: 22px;
 }
 
 .mini-card-topline {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 12px;
+  align-items: start;
 }
 
 .mini-card-period {
+  display: block;
   color: var(--app-surface-label);
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .mini-card-icon {
@@ -41,6 +45,8 @@
   min-width: 28px;
   min-height: 28px;
   flex-shrink: 0;
+  justify-self: end;
+  align-self: start;
 }
 
 .mini-card-icon--empty {
@@ -78,28 +84,38 @@
 .title-text {
   margin: 0;
   color: var(--app-surface-text-muted);
-  font-size: 0.98rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  line-height: 1.35;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
 }
 
 .difference-text {
   margin-top: auto;
   padding-top: 14px;
   border-top: 1px solid var(--app-surface-card-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .trend-value {
   display: flex;
   align-items: center;
+  justify-content: center;
   min-height: 28px;
   font-weight: 700;
+  text-align: center;
 }
 
 .duration {
   margin: 6px 0 0;
   color: var(--app-surface-text-muted);
   font-size: 0.82rem;
+  text-align: center;
 }
 
 .trending {

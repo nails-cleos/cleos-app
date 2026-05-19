@@ -50,10 +50,10 @@
           </ng-container>
 
           <ng-container matColumnDef="used">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
                 mat-sort-header>{{ 'ME.DISCOUNT.LIST.COLUMN.USED' | translate }}
             </th>
-            <td *matCellDef="let userDiscount" class="hide-xs" mat-cell>
+            <td *matCellDef="let userDiscount" class="app-surface-hide-mobile" mat-cell>
               @if (userDiscount.id) {
                 <span class="me-discount-status" [class.me-discount-status--used]="userDiscount.used">
                   <mat-icon [ngClass]="userDiscount.used ? 'used-icon' : 'unused-icon'">redeem</mat-icon>

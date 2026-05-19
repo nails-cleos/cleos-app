@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { IOffice } from '../../interfaces/office';
 import { TranslateService } from '@ngx-translate/core';
@@ -33,6 +34,7 @@ export class OfficeListComponent {
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
+  private tableState = createMatTableState(this.paginator, this.sort, 'name', 'asc');
 
   private officeListSignal = toSignal(this.officeList$);
   private responseSignal = toSignal(this.response$);
@@ -48,10 +50,7 @@ export class OfficeListComponent {
     },
   );
 
-  private sortActive = computed(() => this.sort()?.active ?? 'name');
-  private sortDirection = computed(() => this.sort()?.direction ?? 'asc');
-
-  paginatorPageIndex = signal(0);
+  paginatorPageIndex = this.tableState.pageIndex;
   dataSourceSignal = computed(() => this.officeListSignal()?.content);
   resultsLengthSignal = computed(() => this.officeListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
@@ -62,34 +61,16 @@ export class OfficeListComponent {
   language: string = this.translate.getCurrentLang();
 
   constructor() {
-    effect((onCleanup) => {
-      const paginator = this.paginator();
-      if (paginator) {
-        const sub = paginator.page.subscribe((pageEvent) => {
-          this.paginatorPageIndex.set(pageEvent.pageIndex);
-        });
-        onCleanup(() => sub.unsubscribe());
-      }
-    });
-
     effect(() => {
-      const page = this.paginatorPageIndex();
+      const request = this.tableState.baseRequest();
       this.store.dispatch(
         getOfficesPage({
-          page: page,
-          sort: this.sortActive(),
-          direction: this.sortDirection(),
+          ...request,
           size: this.pageSizeSignal(),
         }),
       );
     });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.store.dispatch(cleanOffice());
-        this.paginator()?.firstPage();
-      }
-    });
+    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanOffice()));
   }
 
   edit = (selected: IOffice): void => this.store.dispatch(officeSelected({ selected }));

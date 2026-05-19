@@ -30,8 +30,8 @@
           </ng-container>
 
           <ng-container matColumnDef="description">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
-            <td *matCellDef="let discount" class="hide-xs" mat-cell>
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
+            <td *matCellDef="let discount" class="app-surface-hide-mobile" mat-cell>
               @if (discount.id) {
                 <div>{{ discount.description }}</div>
               } @else {
@@ -41,8 +41,8 @@
           </ng-container>
 
           <ng-container matColumnDef="type">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
-            <td *matCellDef="let discount" class="hide-xs" mat-cell>
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
+            <td *matCellDef="let discount" class="app-surface-hide-mobile" mat-cell>
               @if (discount.id) {
                 <div>{{ 'COMMON.DISCOUNT.' + discount.type | translate }}</div>
               } @else {
@@ -52,8 +52,8 @@
           </ng-container>
 
           <ng-container matColumnDef="amount">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
-            <td *matCellDef="let discount" class="hide-xs" mat-cell>
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
+            <td *matCellDef="let discount" class="app-surface-hide-mobile" mat-cell>
               @if (discount.id) {
                 @if (discount.type === 'PERCENTAGE') {
                   <span>{{ discount.amount | number:'1.2-2' }}</span>
@@ -72,13 +72,13 @@
 
           <ng-container matColumnDef="actions">
             <th *matHeaderCellDef mat-header-cell>
-              <span class="hide-xs">{{ 'COMMON.COLUMN.ACTIONS' | translate }}</span>
+              <span class="app-surface-hide-mobile">{{ 'COMMON.COLUMN.ACTIONS' | translate }}</span>
               <button [routerLink]="['/', language, 'discounts', 'add']" mat-icon-button id="add-button"
                       matTooltip="{{ 'DISCOUNT.TITLE' | translate }}" matTooltipPosition="right" type="button">
                 <mat-icon color="primary">add</mat-icon>
               </button>
             </th>
-            <td *matCellDef="let discount" class="hide-xs" mat-cell>
+            <td *matCellDef="let discount" class="app-surface-hide-mobile" mat-cell>
               @if (discount.id) {
                 @if (!discount.deleted) {
                   <button (click)="edit(discount)" mat-icon-button
@@ -105,8 +105,8 @@
           </ng-container>
 
           <ng-container matColumnDef="expandedDetail">
-            <td *matCellDef="let discount" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
-              <div [class.detail-expanded]="discount === expanded" class="detail hide-gt-xs">
+            <td *matCellDef="let discount" [attr.colspan]="displayedColumns.length" class="app-surface-hide-desktop">
+              <div [class.detail-expanded]="discount === expanded" class="detail app-surface-hide-desktop">
                 <mat-list>
                   <mat-list-item role="list">
                     <div matListItemTitle>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
@@ -149,13 +149,13 @@
           </ng-container>
 
           <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-          <tr *matRowDef="let discount; columns: displayedColumns;" class="hide-xs" mat-row></tr>
+          <tr *matRowDef="let discount; columns: displayedColumns;" class="app-surface-hide-mobile" mat-row></tr>
           <tr (click)="expanded = expanded === discount ? null : discount"
-              *matRowDef="let discount; columns: displayedColumns;" class="hide-gt-xs app-table-master-row"
+              *matRowDef="let discount; columns: displayedColumns;" class="app-surface-hide-desktop app-table-master-row"
               mat-row></tr>
           <tr *matRowDef="let row; columns: ['expandedDetail']"
               [class.app-table-detail-row--expanded]="row === expanded"
-              class="hide-gt-xs app-table-detail-row"
+              class="app-surface-hide-desktop app-table-detail-row"
               mat-row></tr>
 
           <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>

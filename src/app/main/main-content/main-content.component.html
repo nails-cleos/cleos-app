@@ -324,8 +324,8 @@
                   <mat-error [innerHTML]="'MAIN.CONTACT.BODY.REQUIRED' | translate"></mat-error>
                 }
               </mat-form-field>
-              <div class="card-actions">
-                <div class="spacer"></div>
+              <div class="app-surface-actions">
+                <div class="app-surface-spacer"></div>
                 <button [disabled]="form.invalid" color="primary" mat-fab extended type="submit"
                         aria-label="Submit contact form">
                   <mat-icon>mail</mat-icon>
@@ -378,13 +378,13 @@
 </section>
 <!-- End Contact Us-->
 
-<button color="primary" class="hide-xs book-button fab-book-button" (click)="openBottomSheet()" mat-fab
+<button color="primary" class="app-surface-hide-mobile book-button fab-book-button" (click)="openBottomSheet()" mat-fab
         extended type="button" aria-label="Book your appointment">
   <mat-icon matPrefix>book_online</mat-icon>
   <span>{{ 'MAIN.BOOK.APPOINTMENT' | translate }}</span>
 </button>
 
-<button color="primary" class="hide-gt-xs book-button raised-book-button" style="height: 64px"
+<button color="primary" class="app-surface-hide-desktop book-button raised-book-button" style="height: 64px"
         (click)="openBottomSheet()" mat-raised-button type="button" aria-label="Book your appointment">
   <mat-icon matPrefix>book_online</mat-icon>
   <span>{{ 'MAIN.BOOK.APPOINTMENT' | translate }}</span>

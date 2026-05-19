@@ -81,50 +81,50 @@
 
   @let calendarDay = calendarDaySignal();
   <section class="app-surface-section">
-    <div class="divider card-actions calendar-toolbar app-detail-actions">
-      <div class="hide-gt-xs">
+    <div class="divider app-surface-actions calendar-toolbar app-detail-actions">
+      <div class="app-surface-hide-desktop">
         <button (click)="decrement()" mat-icon-button>
           <mat-icon>navigate_before</mat-icon>
         </button>
       </div>
-      <button class="hide-xs" (click)="decrement()" mat-stroked-button>
+      <button class="app-surface-hide-mobile" (click)="decrement()" mat-stroked-button>
         <mat-icon>navigate_before</mat-icon>
         <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
       </button>
       <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [value]="viewDate"
              hidden matInput [max]="maxDate" [min]="minDate">
       <mat-datepicker #picker touchUi></mat-datepicker>
-      <div class="hide-gt-xs">
+      <div class="app-surface-hide-desktop">
         <button (click)="picker.open()" mat-icon-button>
           <mat-icon>today</mat-icon>
         </button>
       </div>
-      <button class="hide-xs" (click)="picker.open()" mat-stroked-button>
+      <button class="app-surface-hide-mobile" (click)="picker.open()" mat-stroked-button>
         <mat-icon>today</mat-icon>
         <span>{{ 'COMMON.BUTTON.GOTO' | translate }}</span>
       </button>
-      <div class="hide-gt-xs">
+      <div class="app-surface-hide-desktop">
         <button (click)="increment()" mat-icon-button>
           <mat-icon>navigate_next</mat-icon>
         </button>
       </div>
-      <button class="hide-xs" (click)="increment()" mat-stroked-button>
+      <button class="app-surface-hide-mobile" (click)="increment()" mat-stroked-button>
         <mat-icon>navigate_next</mat-icon>
         <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
       </button>
-      <div class="spacer"></div>
+      <div class="app-surface-spacer"></div>
       @if (daysInWeekSignal() >= 5) {
-        <button class="hide-xs" (click)="downloadPDF()" mat-stroked-button>
+        <button class="app-surface-hide-mobile" (click)="downloadPDF()" mat-stroked-button>
           <mat-icon>print</mat-icon>
           <span>{{ 'COMMON.BUTTON.PRINT' | translate }}</span>
         </button>
       }
-      <div class="hide-gt-xs">
+      <div class="app-surface-hide-desktop">
         <button mat-icon-button [routerLink]="['/', language, 'reservation']">
           <mat-icon>book_online</mat-icon>
         </button>
       </div>
-      <button class="hide-xs" mat-stroked-button [routerLink]="['/', language, 'reservation']">
+      <button class="app-surface-hide-mobile" mat-stroked-button [routerLink]="['/', language, 'reservation']">
         <mat-icon>book_online</mat-icon>
         <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
       </button>

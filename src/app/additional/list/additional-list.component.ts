@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { IAdditional } from '../../interfaces/additional';
 import { TranslateService } from '@ngx-translate/core';
@@ -11,7 +12,12 @@ import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { convertDuration } from '../../util/dates';
 import { executeDialogNoWidth } from '../../util/helper';
 import { SharedModule } from '../../shared/shared.module';
-import { additionalSelected, cleanAdditional, deleteAdditional, getAdditionalPage } from '../../store/additional.actions';
+import {
+  additionalSelected,
+  cleanAdditional,
+  deleteAdditional,
+  getAdditionalPage,
+} from '../../store/additional.actions';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getAdditionalPaginationPipe, getAdditionalResponsePipe } from '../../store/selectors/additional.selectors';
 import { AdditionalState } from '../../store/reducers/additional.reducers';
@@ -35,6 +41,7 @@ export class AdditionalListComponent {
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
+  private tableState = createMatTableState(this.paginator, this.sort, 'order', 'asc');
 
   private additionalListSignal = toSignal(this.additionalList$);
   private responseSignal = toSignal(this.response$);
@@ -50,10 +57,7 @@ export class AdditionalListComponent {
     },
   );
 
-  private sortActive = computed(() => this.sort()?.active ?? 'order');
-  private sortDirection = computed(() => this.sort()?.direction ?? 'asc');
-
-  paginatorPageIndex = signal(0);
+  paginatorPageIndex = this.tableState.pageIndex;
   dataSourceSignal = computed(() => this.additionalListSignal()?.content?.map((additional: IAdditional) => {
     if (additional.duration) {
       const duration = convertDuration(additional.duration);
@@ -72,34 +76,16 @@ export class AdditionalListComponent {
   language: string = this.translate.getCurrentLang();
 
   constructor() {
-    effect((onCleanup) => {
-      const paginator = this.paginator();
-      if (paginator) {
-        const sub = paginator.page.subscribe((pageEvent) => {
-          this.paginatorPageIndex.set(pageEvent.pageIndex);
-        });
-        onCleanup(() => sub.unsubscribe());
-      }
-    });
-
     effect(() => {
-      const page = this.paginatorPageIndex();
+      const request = this.tableState.baseRequest();
       this.store.dispatch(
         getAdditionalPage({
-          page: page,
-          sort: this.sortActive(),
-          direction: this.sortDirection(),
+          ...request,
           size: this.pageSizeSignal(),
         }),
       );
     });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.store.dispatch(cleanAdditional());
-        this.paginator()?.firstPage();
-      }
-    });
+    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanAdditional()));
   }
 
   edit = (selected: IAdditional): void => this.store.dispatch(

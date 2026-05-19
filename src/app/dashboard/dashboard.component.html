@@ -34,8 +34,8 @@
         <h3>{{ currentPeriod }}</h3>
       </div>
       <div class="dashboard-calendar__actions">
-        <div class="hide-gt-xs">
-          <button class="app-detail-action-button hide-gt-xs"
+        <div class="app-surface-hide-desktop">
+          <button class="app-detail-action-button app-surface-hide-desktop"
                   (viewDateChange)="closeOpenMonthViewDay($event)"
                   [viewDate]="viewDate()"
                   [view]="view"
@@ -45,7 +45,7 @@
             <mat-icon>navigate_before</mat-icon>
           </button>
         </div>
-        <button class="app-detail-action-button hide-xs"
+        <button class="app-detail-action-button app-surface-hide-mobile"
                 (viewDateChange)="closeOpenMonthViewDay($event)"
                 [viewDate]="viewDate()"
                 [view]="view"
@@ -55,7 +55,7 @@
           <mat-icon>navigate_before</mat-icon>
           <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
         </button>
-        <div class="hide-gt-xs">
+        <div class="app-surface-hide-desktop">
           <button class="app-detail-action-button"
                   [viewDate]="viewDate()"
                   (viewDateChange)="closeOpenMonthViewDay($event)"
@@ -65,7 +65,7 @@
             <mat-icon>today</mat-icon>
           </button>
         </div>
-        <button class="app-detail-action-button hide-xs"
+        <button class="app-detail-action-button app-surface-hide-mobile"
                 [viewDate]="viewDate()"
                 (viewDateChange)="closeOpenMonthViewDay($event)"
                 mat-stroked-button
@@ -74,7 +74,7 @@
           <mat-icon>today</mat-icon>
           <span>{{ 'COMMON.BUTTON.TODAY' | translate }}</span>
         </button>
-        <div class="hide-gt-xs">
+        <div class="app-surface-hide-desktop">
           <button class="app-detail-action-button"
                   (viewDateChange)="closeOpenMonthViewDay($event)"
                   [viewDate]="viewDate()"
@@ -85,7 +85,7 @@
             <mat-icon>navigate_next</mat-icon>
           </button>
         </div>
-        <button class="app-detail-action-button hide-xs"
+        <button class="app-detail-action-button app-surface-hide-mobile"
                 (viewDateChange)="closeOpenMonthViewDay($event)"
                 [viewDate]="viewDate()"
                 [view]="view"
@@ -137,9 +137,7 @@
            [innerHTML]="'DASHBOARD.RESERVATION.PAYMENT' | translate:{total: thisMonthTotal}">
       </div>
     </div>
-  </section>
 
-  <section class="dashboard-grid-shell">
     <mat-grid-list class="dashboard-grid" [cols]="cardLayout.columns" [rowHeight]="cardLayout.rowHeight">
       @for (mc of miniCardData; track mc.title) {
         <mat-grid-tile [colspan]="cardLayout.miniCard.cols" [rowspan]="cardLayout.miniCard.rows">

@@ -72,10 +72,10 @@
           </ng-container>
 
           <ng-container matColumnDef="date">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
                 mat-sort-header>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}
             </th>
-            <td *matCellDef="let document" class="hide-xs" mat-cell>
+            <td *matCellDef="let document" class="app-surface-hide-mobile" mat-cell>
               @if (document.id) {
                 <div>{{ document.date | date:'MM-yyyy' }}</div>
               } @else {
@@ -96,8 +96,8 @@
           </ng-container>
 
           <ng-container matColumnDef="actions">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-            <td *matCellDef="let document" class="hide-xs" mat-cell>
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+            <td *matCellDef="let document" class="app-surface-hide-mobile" mat-cell>
               @if (document.id) {
                 <div>
                   @if (!document.deleted && googleDriveUploadFile) {
@@ -114,9 +114,9 @@
           </ng-container>
 
           <ng-container matColumnDef="expandedDetail">
-            <td *matCellDef="let document" [attr.colspan]="displayedColumns.length" class="hide-gt-xs" mat-cell>
+            <td *matCellDef="let document" [attr.colspan]="displayedColumns.length" class="app-surface-hide-desktop" mat-cell>
               <div [class.detail-expanded]="document === expandedDocument"
-                   class="detail hide-gt-xs">
+                   class="detail app-surface-hide-desktop">
                 <mat-list>
                   @if (document.date) {
                     <mat-list-item role="list">
@@ -144,13 +144,13 @@
           </ng-container>
 
           <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-          <tr *matRowDef="let document; columns: displayedColumns;" class="hide-xs" mat-row></tr>
+          <tr *matRowDef="let document; columns: displayedColumns;" class="app-surface-hide-mobile" mat-row></tr>
           <tr (click)="expandedDocument = expandedDocument === document ? null : document"
-              *matRowDef="let document; columns: displayedColumns;" class="hide-gt-xs app-table-master-row"
+              *matRowDef="let document; columns: displayedColumns;" class="app-surface-hide-desktop app-table-master-row"
               mat-row></tr>
           <tr *matRowDef="let row; columns: ['expandedDetail']"
               [class.app-table-detail-row--expanded]="row === expandedDocument"
-              class="hide-gt-xs app-table-detail-row"
+              class="app-surface-hide-desktop app-table-detail-row"
               mat-row></tr>
 
           <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>

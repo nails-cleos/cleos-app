@@ -5,6 +5,25 @@
   margin: auto;
 }
 
+.card-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+
+  @media (max-width: 599px) {
+    flex-direction: column;
+  }
+}
+
+.card-content {
+  flex: 0 0 60%;
+
+  @media (max-width: 599px) {
+    flex: 0 0 80%;
+  }
+}
+
 .only-button {
   display: block;
   margin: 20px 20% 20px auto;

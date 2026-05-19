@@ -1,4 +1,4 @@
-@use 'reservation-flow' as reservation-flow;
+@use 'styles/reservation-flow' as reservation-flow;
 
 @include reservation-flow.theme-vars(
   'app-reservation, app-me-reservation',
@@ -56,7 +56,7 @@ app-me-reservation .app-surface-stack ngx-material-intl-tel-input {
   width: 44px;
   height: 44px;
   border-radius: 16px;
-  background: linear-gradient(135deg, var(--reservation-accent), #d8a35d);
+  background: linear-gradient(135deg, var(--reservation-accent), var(--cta-highlight-color));
   color: var(--invert-text, white);
   font-weight: 700;
   font-size: 1rem;
@@ -293,11 +293,6 @@ app-me-reservation .app-surface-stack ngx-material-intl-tel-input {
   align-self: start;
   justify-self: center;
   margin-top: 10px;
-}
-
-:is(app-reservation, app-me-reservation) .add-button-container {
-  display: flex;
-  justify-content: flex-start;
 }
 
 :is(app-reservation, app-me-reservation) .schedule-card {

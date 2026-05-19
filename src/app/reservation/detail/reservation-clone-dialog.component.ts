@@ -21,6 +21,7 @@ type CloneDialogData = {
 @Component({
   selector: 'app-reservation-clone-dialog',
   templateUrl: './reservation-clone-dialog.component.html',
+  styleUrl: './reservation-clone-dialog.component.scss',
   imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

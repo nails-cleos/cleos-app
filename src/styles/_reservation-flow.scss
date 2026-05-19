@@ -1,3 +1,5 @@
+@use 'styles/theme/shared-primitives' as primitives;
+
 @mixin theme-vars($host-selector: ':host', $dark-host-selector: ':host-context(.dark-theme)') {
   #{$host-selector} {
     display: block;
@@ -5,27 +7,27 @@
     --reservation-surface: var(--mat-sys-surface, #fffdf8);
     --reservation-surface-raised: var(--mat-sys-surface-container-low, #ffffff);
     --reservation-surface-muted: var(--mat-sys-surface-container, #f7f3ee);
-    --reservation-border: rgba(148, 163, 184, 0.28);
-    --reservation-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    --reservation-border: #{rgba(primitives.$slate-base, .28)};
+    --reservation-shadow: 0 18px 40px #{rgba(primitives.$shadow-ink, .08)};
     --reservation-text-muted: var(--mat-sys-on-surface-variant, #6b7280);
-    --reservation-accent: var(--primary-color, #2f6c5d);
+    --reservation-accent: var(--primary-color);
     --reservation-accent-soft: rgba(47, 108, 93, 0.12);
     --reservation-heading-glow: rgba(212, 180, 131, 0.16);
-    --reservation-heading-top: rgba(255, 255, 255, 0.92);
+    --reservation-heading-top: #{rgba(primitives.$white-base, .92)};
     --reservation-heading-bottom: rgba(247, 243, 238, 0.82);
-    --reservation-summary-top: rgba(255, 255, 255, 0.96);
+    --reservation-summary-top: #{rgba(primitives.$white-base, .96)};
     --reservation-summary-bottom: rgba(247, 243, 238, 0.92);
     --reservation-summary-accent: rgba(47, 108, 93, 0.08);
-    --reservation-summary-item-bg: rgba(255, 255, 255, 0.78);
-    --reservation-summary-item-border: rgba(148, 163, 184, 0.18);
-    --reservation-row-border: rgba(148, 163, 184, 0.14);
-    --reservation-array-border: rgba(148, 163, 184, 0.16);
+    --reservation-summary-item-bg: #{rgba(primitives.$white-base, .78)};
+    --reservation-summary-item-border: #{rgba(primitives.$slate-base, .18)};
+    --reservation-row-border: #{rgba(primitives.$slate-base, .14)};
+    --reservation-array-border: #{rgba(primitives.$slate-base, .16)};
     --reservation-array-index-bg: rgba(47, 108, 93, 0.14);
-    --reservation-empty-border: rgba(148, 163, 184, 0.4);
+    --reservation-empty-border: #{rgba(primitives.$slate-base, .4)};
     --reservation-empty-bg: rgba(248, 250, 252, 0.66);
     --reservation-actions-bg: rgba(255, 253, 248, 0.92);
-    --reservation-actions-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
-    --reservation-price-card-top: rgba(255, 255, 255, 0.98);
+    --reservation-actions-shadow: 0 12px 30px #{rgba(primitives.$shadow-ink, .12)};
+    --reservation-price-card-top: #{rgba(primitives.$white-base, .98)};
     --reservation-price-card-bottom: rgba(247, 243, 238, 0.94);
     --reservation-price-card-accent: rgba(47, 108, 93, 0.05);
   }
@@ -34,10 +36,10 @@
     --reservation-surface: #171717;
     --reservation-surface-raised: #1f1f1f;
     --reservation-surface-muted: #2a2a2a;
-    --reservation-border: rgba(255, 255, 255, 0.12);
-    --reservation-shadow: 0 20px 44px rgba(0, 0, 0, 0.42);
-    --reservation-text-muted: rgba(255, 255, 255, 0.68);
-    --reservation-accent: var(--accent-color, #ceb4ac);
+    --reservation-border: #{rgba(primitives.$white-base, .12)};
+    --reservation-shadow: 0 20px 44px #{rgba(primitives.$black-base, .42)};
+    --reservation-text-muted: #{rgba(primitives.$white-base, .68)};
+    --reservation-accent: var(--accent-color);
     --reservation-accent-soft: rgba(206, 180, 172, 0.18);
     --reservation-heading-glow: rgba(206, 180, 172, 0.12);
     --reservation-heading-top: rgba(37, 37, 37, 0.96);
@@ -45,15 +47,15 @@
     --reservation-summary-top: rgba(34, 34, 34, 0.96);
     --reservation-summary-bottom: rgba(25, 25, 25, 0.94);
     --reservation-summary-accent: rgba(206, 180, 172, 0.1);
-    --reservation-summary-item-bg: rgba(255, 255, 255, 0.04);
-    --reservation-summary-item-border: rgba(255, 255, 255, 0.08);
-    --reservation-row-border: rgba(255, 255, 255, 0.09);
-    --reservation-array-border: rgba(255, 255, 255, 0.08);
+    --reservation-summary-item-bg: #{rgba(primitives.$white-base, .04)};
+    --reservation-summary-item-border: #{rgba(primitives.$white-base, .08)};
+    --reservation-row-border: #{rgba(primitives.$white-base, .09)};
+    --reservation-array-border: #{rgba(primitives.$white-base, .08)};
     --reservation-array-index-bg: rgba(206, 180, 172, 0.16);
-    --reservation-empty-border: rgba(255, 255, 255, 0.16);
-    --reservation-empty-bg: rgba(255, 255, 255, 0.03);
+    --reservation-empty-border: #{rgba(primitives.$white-base, .16)};
+    --reservation-empty-bg: #{rgba(primitives.$white-base, .03)};
     --reservation-actions-bg: rgba(22, 22, 22, 0.92);
-    --reservation-actions-shadow: 0 16px 34px rgba(0, 0, 0, 0.38);
+    --reservation-actions-shadow: 0 16px 34px #{rgba(primitives.$black-base, .38)};
     --reservation-price-card-top: rgba(37, 37, 37, 0.98);
     --reservation-price-card-bottom: rgba(28, 28, 28, 0.96);
     --reservation-price-card-accent: rgba(206, 180, 172, 0.08);

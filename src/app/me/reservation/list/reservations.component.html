@@ -49,8 +49,8 @@
                 <table [dataSource]="dataSource" mat-table matSort matSortActive="timestamp"
                        matSortDirection="desc" matSortDisableClear>
                     <ng-container matColumnDef="position">
-                        <th *matHeaderCellDef class="hide-xs" mat-header-cell>#</th>
-                        <td *matCellDef="let reservation; let i = index;" class="hide-xs" mat-cell>
+                        <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>#</th>
+                        <td *matCellDef="let reservation; let i = index;" class="app-surface-hide-mobile" mat-cell>
                             @if (reservation.id) {
                                 {{ (paginatorPageIndex() * pageSize) + i + 1 }}
                             } @else {
@@ -60,10 +60,10 @@
                     </ng-container>
 
                     <ng-container matColumnDef="professional">
-                        <th *matHeaderCellDef class="hide-xs"
+                        <th *matHeaderCellDef class="app-surface-hide-mobile"
                             mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}
                         </th>
-                        <td *matCellDef="let reservation" class="hide-xs" mat-cell>
+                        <td *matCellDef="let reservation" class="app-surface-hide-mobile" mat-cell>
                             @if (reservation.id) {
                                 {{ reservation.professional.displayName }}
                             } @else {
@@ -91,10 +91,10 @@
                     </ng-container>
 
                     <ng-container matColumnDef="treatment">
-                        <th *matHeaderCellDef class="hide-xs"
+                        <th *matHeaderCellDef class="app-surface-hide-mobile"
                             mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}
                         </th>
-                        <td *matCellDef="let reservation" class="hide-xs" mat-cell>
+                        <td *matCellDef="let reservation" class="app-surface-hide-mobile" mat-cell>
                             @if (reservation.id) {
                                 {{ reservation.treatment.name }}
                             } @else {

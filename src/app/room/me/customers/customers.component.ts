@@ -1,13 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { getAllCustomersInfo } from '../../../store/room.actions';
-import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatSort } from '@angular/material/sort';
 import { IRoomCustomer } from '../../../interfaces/room';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { MatSort } from '@angular/material/sort';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
+import { createMatTableState } from 'src/app/util/mat-table-state';
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
 import { RoomState } from '../../../store/reducers/room.reducers';
 import { getCurrentRoomIdPipe, getCustomersPipe } from '../../../store/selectors/room.selectors';
@@ -48,8 +49,9 @@ export class CustomersComponent {
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
+  private tableState = createMatTableState(this.paginator, this.sort, 'days', 'asc');
 
-  paginatorPageIndex = signal(0);
+  paginatorPageIndex = this.tableState.pageIndex;
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
   dataSource = computed(() => new MatTableDataSource(this.customersSignal()));
@@ -60,20 +62,10 @@ export class CustomersComponent {
   language: string = this.translate.getCurrentLang();
 
   constructor() {
-    effect((onCleanup) => {
-      const paginator = this.paginator();
-      if (paginator) {
-        const sub = paginator.page.subscribe((pageEvent) => {
-          this.paginatorPageIndex.set(pageEvent.pageIndex);
-        });
-        onCleanup(() => sub.unsubscribe());
-      }
-    });
-
     effect(() => {
       const dataSource = this.dataSource();
-      const paginator = this.paginator();
-      const sort = this.sort();
+      const paginator = this.tableState.paginator();
+      const sort = this.tableState.sort();
       if (dataSource && paginator && sort) {
         dataSource.paginator = paginator;
         dataSource.sort = sort;

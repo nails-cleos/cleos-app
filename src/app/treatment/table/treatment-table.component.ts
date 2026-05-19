@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { createMatTableState } from 'src/app/util/mat-table-state';
 import { ITreatmentAll } from '../../interfaces/treatment';
 import { convertDuration } from '../../util/dates';
 import { TranslateService } from '@ngx-translate/core';
@@ -22,10 +23,11 @@ export class TreatmentTableComponent {
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
+  private tableState = createMatTableState(this.paginator, this.sort, 'date', 'asc');
 
   displayedColumns: string[] = ['date', 'price', 'duration'];
 
-  paginatorPageIndex = signal(0);
+  paginatorPageIndex = this.tableState.pageIndex;
 
   dataSource = computed(() => new MatTableDataSource(this.treatment().map(p => {
     if (p.duration) {
@@ -41,20 +43,10 @@ export class TreatmentTableComponent {
   dateFormat: string = this.translate.getCurrentLang();
 
   constructor() {
-    effect((onCleanup) => {
-      const paginator = this.paginator();
-      if (paginator) {
-        const sub = paginator.page.subscribe((pageEvent) => {
-          this.paginatorPageIndex.set(pageEvent.pageIndex);
-        });
-        onCleanup(() => sub.unsubscribe());
-      }
-    });
-
     effect(() => {
       const dataSource = this.dataSource();
-      const paginator = this.paginator();
-      const sort = this.sort();
+      const paginator = this.tableState.paginator();
+      const sort = this.tableState.sort();
       if (dataSource && paginator && sort) {
         dataSource.paginator = paginator;
         dataSource.sort = sort;

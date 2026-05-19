@@ -100,16 +100,16 @@
                  [routerLink]="['/', language, 'auth', 'forgot-password']">
                 {{ 'AUTH.SIGN_IN.FORGOT_PASSWORD' | translate }}
               </a>
-              <div class="spacer"></div>
+              <div class="app-surface-spacer"></div>
               <button mat-stroked-button type="submit" [disabled]="form.invalid">
                 <mat-icon>login</mat-icon>
                 {{ 'COMMON.BUTTON.LOGIN' | translate }}
               </button>
             } @else if (status === 'google.com') {
-              <div class="spacer"></div>
+              <div class="app-surface-spacer"></div>
               <ng-container [ngTemplateOutlet]="googleButton"></ng-container>
             } @else {
-              <div class="spacer"></div>
+              <div class="app-surface-spacer"></div>
               <button mat-stroked-button type="button" (click)="showForm = false">
                 {{ 'COMMON.BUTTON.CANCEL' | translate }}
               </button>

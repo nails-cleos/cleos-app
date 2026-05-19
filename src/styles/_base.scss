@@ -34,6 +34,10 @@ a, u {
   text-decoration: none;
 }
 
+a:hover {
+  text-decoration: underline;
+}
+
 pre {
   padding: 15px;
 }

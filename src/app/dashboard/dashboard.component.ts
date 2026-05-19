@@ -232,14 +232,18 @@ export class DashboardComponent {
               if (!miniCard.isCurrency) {
                 return miniCard;
               }
+
+              const currentValue = miniCard.value;
+              const currentPreviousPeriodValue = miniCard.previousPeriodValue;
+
               return {
                 ...miniCard,
-                value: miniCard.value
-                  ? numberFormat(miniCard.value, this.currency, this.dateFormat)
-                  : miniCard.value,
-                previousPeriodValue: miniCard.previousPeriodValue
-                  ? numberFormat(miniCard.previousPeriodValue, this.currency, this.dateFormat)
-                  : miniCard.previousPeriodValue,
+                value: currentValue !== null && currentValue !== undefined
+                  ? numberFormat(currentValue, this.currency, this.dateFormat)
+                  : currentValue,
+                previousPeriodValue: currentPreviousPeriodValue !== null && currentPreviousPeriodValue !== undefined
+                  ? numberFormat(currentPreviousPeriodValue, this.currency, this.dateFormat)
+                  : currentPreviousPeriodValue,
               };
             });
           } else {

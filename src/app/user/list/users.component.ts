@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { IUser, IUserAll, User } from '../../interfaces/user';
 import { Store } from '@ngrx/store';
 import {
@@ -12,9 +12,10 @@ import {
   userSelected,
 } from '../../store/user.actions';
 import { MatDialog } from '@angular/material/dialog';
-import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
+import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { TranslateService } from '@ngx-translate/core';
 import { Role } from '../../interfaces/token';
@@ -23,7 +24,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { RoleIconKey, RoleIconName } from '../../util/icon';
 import { Router } from '@angular/router';
 import { SharedModule } from '../../shared/shared.module';
-import { getUserResponsePipe, getUserPaginationPipe } from '../../store/selectors/user.selectors';
+import { getUserPaginationPipe, getUserResponsePipe } from '../../store/selectors/user.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { UserState } from '../../store/reducers/user.reducers';
 import { SelectUserDialogComponent } from './select-user-dialog.component';
@@ -54,6 +55,7 @@ export class UsersComponent {
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
+  private tableState = createMatTableState(this.paginator, this.sort, 'displayName', 'asc');
 
   private userListSignal = toSignal(this.userList$);
   private responseSignal = toSignal(this.response$);
@@ -69,10 +71,7 @@ export class UsersComponent {
     },
   );
 
-  private sortActive = computed(() => this.sort()?.active ?? 'displayName');
-  private sortDirection = computed(() => this.sort()?.direction ?? 'asc');
-
-  paginatorPageIndex = signal(0);
+  paginatorPageIndex = this.tableState.pageIndex;
   dataSourceSignal = computed(() => this.userListSignal()?.content?.map((user: IUserAll) => {
     if (user.authorities) {
       const missing = this.allRole.filter(au => !user.authorities.some(u => u.authority === au));
@@ -100,36 +99,18 @@ export class UsersComponent {
   private allRole: Role[] = [Role.customer, Role.professional, Role.manager, Role.admin];
 
   constructor() {
-    effect((onCleanup) => {
-      const paginator = this.paginator();
-      if (paginator) {
-        const sub = paginator.page.subscribe((pageEvent) => {
-          this.paginatorPageIndex.set(pageEvent.pageIndex);
-        });
-        onCleanup(() => sub.unsubscribe());
-      }
-    });
-
     effect(() => {
-      const page = this.paginatorPageIndex();
+      const request = this.tableState.baseRequest();
       const filter = this.selectedFilter()?.trim()?.toLowerCase();
       this.store.dispatch(
         getUsersPage({
-          page,
-          sort: this.sortActive(),
-          direction: this.sortDirection(),
+          ...request,
           size: this.pageSizeSignal(),
           filter,
         }),
       );
     });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.store.dispatch(cleanUser());
-        this.paginator()?.firstPage();
-      }
-    });
+    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanUser()));
   }
 
   get getForm(): UsersForm {

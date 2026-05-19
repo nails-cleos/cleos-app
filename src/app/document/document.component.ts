@@ -1,9 +1,10 @@
-import { Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, effect, inject, viewChild } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { createMatTableState } from 'src/app/util/mat-table-state';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../interfaces/pagination';
 import { DocumentState } from '../store/reducers/document.reducers';
@@ -52,6 +53,7 @@ export class DocumentComponent {
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
+  private tableState = createMatTableState(this.paginator, this.sort, 'date', 'desc');
 
   private allOfficesSignal = toSignal(this.allOffices$);
   private documentListSignal = toSignal(this.documentList$);
@@ -68,10 +70,7 @@ export class DocumentComponent {
     },
   );
 
-  private sortActive = computed(() => this.sort()?.active ?? 'date');
-  private sortDirection = computed(() => this.sort()?.direction ?? 'desc');
-
-  paginatorPageIndex = signal(0);
+  paginatorPageIndex = this.tableState.pageIndex;
   dataSourceSignal = computed(() => this.documentListSignal()?.content ?? []);
   resultsLengthSignal = computed(() => this.documentListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
@@ -110,41 +109,23 @@ export class DocumentComponent {
   private selectedDate = toSignal(this.getForm.date.valueChanges);
 
   constructor() {
-    effect((onCleanup) => {
-      const paginator = this.paginator();
-      if (paginator) {
-        const sub = paginator.page.subscribe((pageEvent) => {
-          this.paginatorPageIndex.set(pageEvent.pageIndex);
-        });
-        onCleanup(() => sub.unsubscribe());
-      }
-    });
-
     effect(() => {
       const officeId = this.selectedOffice()?.id;
       const date = this.selectedDate();
       if (!officeId || !date) {
         return;
       }
-      const page = this.paginatorPageIndex();
+      const request = this.tableState.baseRequest();
       this.store.dispatch(
         getDocumentsPage({
+          ...request,
           officeId,
           date: getDateFormat(date),
-          page: page,
-          sort: this.sortActive(),
-          direction: this.sortDirection(),
           size: this.pageSizeSignal(),
         }),
       );
     });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.store.dispatch(cleanDocument());
-        this.paginator()?.firstPage();
-      }
-    });
+    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanDocument()));
 
     effect(() => {
       const data = this.dataSourceSignal()?.[0]?.id;
