@@ -174,4 +174,37 @@ describe('FileDropComponent', () => {
 
     expect(emitSpy).toHaveBeenCalledWith(file);
   });
+
+  it('should keep a locally selected file when currentFile input is undefined', () => {
+    fixture.componentRef.setInput('currentFile', undefined);
+    fixture.detectChanges();
+
+    const file = {
+      name: 'file.txt',
+      size: 100,
+      progress: 100,
+      raw: new File(['x'], 'file.txt'),
+    };
+
+    component.file.set(file);
+    fixture.detectChanges();
+
+    expect(component.file()).toEqual(file);
+  });
+
+  it('should clear the internal file when currentFile input becomes undefined', () => {
+    fixture.componentRef.setInput('currentFile', {
+      name: 'file.txt',
+      size: 100,
+      progress: 100,
+      raw: new File(['x'], 'file.txt'),
+    });
+    fixture.detectChanges();
+
+    fixture.componentRef.setInput('currentFile', undefined);
+    fixture.detectChanges();
+
+    expect(component.file()).toBeUndefined();
+    expect(component.isImage()).toBeFalse();
+  });
 });

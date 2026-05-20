@@ -9,24 +9,20 @@
     <div class="toast-message" [innerHTML]="data.message | translate"></div>
   </div>
   <div class="toast-actions" [class.toast-actions--empty]="data.actionType === 'none'">
-    <div class="toast-primary-actions app-detail-actions">
-      @switch (data.actionType) {
-        @case ('link') {
-          <a class="toast-action-button" mat-stroked-button [href]="data.action" target="_blank" rel="noopener">
-            <mat-icon>open_in_new</mat-icon>
-            <span>Open</span>
-          </a>
-        }
-        @case ('button') {
-          <button class="toast-action-button" mat-stroked-button (click)="onAction()">
-            <mat-icon>{{ data.action || 'done_all' }}</mat-icon>
-            <span>Action</span>
-          </button>
-        }
+    @switch (data.actionType) {
+      @case ('link') {
+        <a class="toast-action-button" mat-icon-button [href]="data.action" target="_blank" rel="noopener">
+          <mat-icon>open_in_new</mat-icon>
+        </a>
       }
-    </div>
-    <button class="toast-close-button" mat-icon-button (click)="onDismiss()">
-      <mat-icon>close</mat-icon>
-    </button>
+      @case ('button') {
+        <button class="toast-action-button" mat-icon-button (click)="onAction()">
+          <mat-icon>{{ data.action || 'done_all' }}</mat-icon>
+        </button>
+      }
+    }
   </div>
+  <button class="toast-close-button" mat-icon-button (click)="onDismiss()">
+    <mat-icon>close</mat-icon>
+  </button>
 </div>

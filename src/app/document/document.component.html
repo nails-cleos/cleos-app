@@ -6,7 +6,7 @@
       </div>
     </div>
     <form [formGroup]="form" (keydown.enter)="$event.preventDefault()" (ngSubmit)="downloadZip()">
-      <div class="app-surface-filter-grid">
+      <div class="app-surface-filter-grid app-inline-field-action">
         <mat-form-field appearance="outline">
           <mat-label>{{ 'COMMON.OFFICE.SEARCH' | translate }}</mat-label>
           <input (keydown)="keyDownHandler($event)" [formControl]="getForm.office" [matAutocomplete]="autoOffice"

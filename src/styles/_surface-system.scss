@@ -140,6 +140,11 @@
   --mdc-dialog-container-color: transparent;
 }
 
+.cdk-overlay-pane:has(.app-surface-dialog-shell) {
+  width: min(var(--app-dialog-shell-width), calc(100vw - 48px)) !important;
+  max-width: calc(100vw - 48px) !important;
+}
+
 .mat-mdc-dialog-container .mdc-dialog__surface {
   overflow: hidden !important;
   padding: 0 !important;
@@ -412,19 +417,20 @@
 }
 
 .app-surface-dialog-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: flex-start;
-  justify-content: space-between;
   gap: 16px;
   min-height: 48px;
 }
 
 .app-surface-dialog-title-wrap {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: flex-start;
   gap: 16px;
-  flex: 1 1 auto;
   min-width: 0;
+  overflow: hidden;
 }
 
 .app-surface-dialog-badge {
@@ -451,19 +457,25 @@
 }
 
 .app-surface-dialog-title {
+  display: block;
+  flex: 1 1 auto;
   margin: 0;
+  max-width: 100%;
+  min-width: 0;
   line-height: 1.15;
   font-size: clamp(1.3rem, 1.05rem + .8vw, 1.75rem);
   font-weight: 800;
   letter-spacing: -.02em;
   white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
 }
 
 .app-surface-dialog-close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 40px;
   width: 40px;
   height: 40px;
   min-width: 40px;
@@ -476,6 +488,8 @@
   overflow: hidden;
   cursor: pointer;
   appearance: none;
+  position: relative;
+  z-index: 1;
   transition: transform .18s ease, background-color .18s ease, border-color .18s ease;
 }
 
@@ -568,13 +582,16 @@
 }
 
 .app-surface-dialog-actions .mat-mdc-unelevated-button.mat-warn {
-  border-color: color-mix(in srgb, var(--warn-color) 34%, transparent);
+  --mdc-filled-button-label-text-color: color-mix(in srgb, var(--warn-color) 88%, black 12%);
+  --mat-filled-button-state-layer-color: color-mix(in srgb, var(--warn-color) 14%, transparent);
+  border-color: color-mix(in srgb, var(--warn-color) 24%, transparent);
   background: linear-gradient(
       180deg,
-      color-mix(in srgb, var(--warn-color) 88%, white 12%),
-      color-mix(in srgb, var(--warn-color) 92%, black 8%)
+      color-mix(in srgb, var(--warn-color) 10%, white 90%),
+      color-mix(in srgb, var(--warn-color) 16%, white 84%)
   );
-  box-shadow: 0 12px 22px color-mix(in srgb, var(--warn-color) 22%, transparent);
+  color: color-mix(in srgb, var(--warn-color) 88%, black 12%);
+  box-shadow: none;
 }
 
 .app-surface-dialog-actions button {
@@ -611,6 +628,12 @@
   color: var(--app-detail-action-text) !important;
 }
 
+.app-surface-dialog-actions .mat-mdc-unelevated-button.mat-warn,
+.app-surface-dialog-actions .mat-mdc-unelevated-button.mat-warn .mdc-button__label,
+.app-surface-dialog-actions .mat-mdc-unelevated-button.mat-warn .mat-icon {
+  color: color-mix(in srgb, var(--warn-color) 88%, black 12%) !important;
+}
+
 .app-surface-dialog-actions .mat-mdc-unelevated-button:hover {
   transform: translateY(-1px);
   filter: saturate(1.05) brightness(.98);
@@ -625,7 +648,13 @@
 }
 
 .app-surface-dialog-actions .mat-mdc-unelevated-button.mat-warn:hover {
-  box-shadow: 0 14px 24px color-mix(in srgb, var(--warn-color) 28%, transparent);
+  border-color: color-mix(in srgb, var(--warn-color) 32%, transparent);
+  background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--warn-color) 14%, white 86%),
+      color-mix(in srgb, var(--warn-color) 22%, white 78%)
+  );
+  box-shadow: none;
 }
 
 .app-surface-dialog-spacer {
@@ -795,7 +824,7 @@
   .app-surface-dialog-actions[mat-dialog-actions] {
     display: flex;
     justify-content: flex-end;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 10px;
     padding: 8px 0 0 !important;
   }
@@ -805,8 +834,9 @@
   }
 
   .app-surface-dialog-actions[mat-dialog-actions] button {
-    width: auto;
-    min-width: 112px;
+    flex: 1 1 0;
+    width: 0;
+    min-width: 0;
   }
 
   .app-surface-stack {

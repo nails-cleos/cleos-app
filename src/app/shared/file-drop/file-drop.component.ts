@@ -39,6 +39,7 @@ export class FileDropComponent {
   private readonly destroyRef: DestroyRef = inject(DestroyRef);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly toastService: ToastService = inject(ToastService);
+  private hadCurrentFile = false;
 
   accept = input<string>('*');
   fileName = input<string>();
@@ -61,6 +62,12 @@ export class FileDropComponent {
     effect(() => {
       const currentFile = this.currentFile();
       if (!currentFile) {
+        if (this.hadCurrentFile) {
+          this.hadCurrentFile = false;
+          this.file.set(undefined);
+          this.isImage.set(false);
+          return;
+        }
         const file = this.file();
         if (file === undefined || file?.progress === 100) {
           this.fileSelected.emit(this.file());
@@ -71,7 +78,9 @@ export class FileDropComponent {
     effect(() => {
       const currentFile = this.currentFile();
       if (currentFile) {
+        this.hadCurrentFile = true;
         this.file.set(currentFile);
+        this.isImage.set(!!currentFile.image);
       }
     });
   }

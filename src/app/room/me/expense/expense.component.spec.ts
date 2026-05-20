@@ -279,6 +279,7 @@ describe('ExpenseComponent', () => {
     expect(invoiceControl.value).toBe('');
     expect(dateControl.value).toBeNull();
     expect(component.totals.length).toBe(0);
+    expect(component['file']()).toBeUndefined();
   });
 
   it('should dispatch updateExpense when in edit mode and form valid', () => {

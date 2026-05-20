@@ -1,8 +1,9 @@
+<input #fileInput (change)="fileBrowseHandler($event.target)" [multiple]="false" hidden id="fileInput" type="file"
+       [accept]="accept()">
+
 @if (!file() && !(isImage() && file()?.image)) {
   <div (fileDropped)="onFileDropped($event)" appDragDrop
        class="container app-surface-hide-mobile">
-    <input #fileDropRef (change)="fileBrowseHandler($event.target)" [multiple]="false" id="fileDropRef"
-           type="file" [accept]="accept()"/>
     @if (isImage()) {
       <canvas #canvas></canvas>
     }
@@ -10,7 +11,7 @@
 
     <h3 class="file-text">{{ 'COMMON.FILE.DRAG_DROP' | translate }}</h3>
     <h3 class="file-text">{{ 'COMMON.FILE.OR' | translate }}</h3>
-    <button (click)="fileDropRef.click()" mat-stroked-button class="app-surface-filter-action app-detail-action-button"
+    <button (click)="fileInput.click()" mat-stroked-button class="app-surface-filter-action app-detail-action-button"
             type="button">
       <mat-icon>upload_file</mat-icon>
       <span>{{ 'COMMON.FILE.CHOOSE' | translate }}</span>
@@ -25,8 +26,6 @@
     <mat-icon>upload_file</mat-icon>
     <span>{{ 'COMMON.FILE.CHOOSE' | translate }}</span>
   </button>
-  <input #fileInput (change)="fileBrowseHandler($event.target)" [multiple]="false" hidden id="file" type="file"
-         [accept]="accept()">
   @if (isImage()) {
     <canvas #canvasXs></canvas>
   }
