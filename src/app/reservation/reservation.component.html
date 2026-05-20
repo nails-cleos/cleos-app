@@ -1029,7 +1029,7 @@
             <ng-container *ngTemplateOutlet="stepOne"></ng-container>
           </div>
           @if (!currentIsEditing) {
-            <div class="step-actions step-actions--mobile">
+            <div class="app-detail-actions app-detail-actions--mobile">
               <button type="button" [form]="customerForm" appBackButton mat-stroked-button>
                 <mat-icon>keyboard_return</mat-icon>
                 <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
@@ -1047,7 +1047,7 @@
             <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
             <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
           </div>
-          <div class="step-actions step-actions--mobile">
+          <div class="app-detail-actions app-detail-actions--mobile">
             @if (!currentIsEditing) {
               <button type="button" (click)="back()" mat-stroked-button>
                 <mat-icon>arrow_back</mat-icon>
@@ -1071,7 +1071,7 @@
             <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
             <ng-container *ngTemplateOutlet="stepThree"></ng-container>
           </div>
-          <div class="step-actions step-actions--mobile">
+          <div class="app-detail-actions app-detail-actions--mobile">
             @if (!currentIsEditing || (currentIsEditing && currentIsAdmin)) {
               <button type="button" (click)="back()" mat-stroked-button>
                 <mat-icon>arrow_back</mat-icon>
@@ -1095,7 +1095,7 @@
             <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
             <ng-container *ngTemplateOutlet="stepFour"></ng-container>
           </div>
-          <div class="step-actions step-actions--mobile">
+          <div class="app-detail-actions app-detail-actions--mobile">
             <button type="button" (click)="back()" mat-stroked-button>
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
@@ -1111,7 +1111,7 @@
             <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
             <ng-container *ngTemplateOutlet="stepFive"></ng-container>
           </div>
-          <div class="step-actions step-actions--mobile">
+          <div class="app-detail-actions app-detail-actions--mobile">
             <button type="button" (click)="back()" mat-stroked-button>
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
@@ -1128,7 +1128,7 @@
             <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
             <ng-container *ngTemplateOutlet="stepSix"></ng-container>
           </div>
-          <div class="step-actions step-actions--mobile">
+          <div class="app-detail-actions app-detail-actions--mobile">
             <button type="button" (click)="back()" mat-stroked-button>
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
@@ -1144,7 +1144,7 @@
           <div class="step-layout step-layout--mobile">
             <ng-container *ngTemplateOutlet="stepSeven"></ng-container>
           </div>
-          <div class="step-actions step-actions--mobile">
+          <div class="app-detail-actions app-detail-actions--mobile">
             <button type="button" (click)="back()" mat-stroked-button>
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
@@ -1167,7 +1167,7 @@
               <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
             </aside>
           </div>
-          <div class="step-actions">
+          <div class="app-detail-actions">
             <button type="button" [form]="customerForm" appBackButton mat-stroked-button>
               <mat-icon>keyboard_return</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
@@ -1188,7 +1188,7 @@
               <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
             </aside>
           </div>
-          <div class="step-actions">
+          <div class="app-detail-actions">
             @if (!currentIsEditing) {
               <button type="button" (click)="back()" mat-stroked-button>
                 <mat-icon>arrow_back</mat-icon>
@@ -1216,7 +1216,7 @@
               <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
             </aside>
           </div>
-          <div class="step-actions">
+          <div class="app-detail-actions">
             @if (!currentIsEditing || (currentIsEditing && currentIsAdmin)) {
               <button type="button" (click)="back()" mat-stroked-button>
                 <mat-icon>arrow_back</mat-icon>
@@ -1244,7 +1244,7 @@
               <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
             </aside>
           </div>
-          <div class="step-actions">
+          <div class="app-detail-actions">
             <button type="button" (click)="back()" mat-stroked-button>
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
@@ -1264,7 +1264,7 @@
               <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
             </aside>
           </div>
-          <div class="step-actions">
+          <div class="app-detail-actions">
             <button type="button" (click)="back()" mat-stroked-button>
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
@@ -1285,7 +1285,7 @@
               <ng-container *ngTemplateOutlet="bookingSummary"></ng-container>
             </aside>
           </div>
-          <div class="step-actions">
+          <div class="app-detail-actions">
             <button type="button" (click)="back()" mat-stroked-button>
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
@@ -1303,7 +1303,7 @@
               <ng-container *ngTemplateOutlet="stepSeven"></ng-container>
             </div>
           </div>
-          <div class="step-actions">
+          <div class="app-detail-actions">
             <button type="button" (click)="back()" mat-stroked-button>
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>

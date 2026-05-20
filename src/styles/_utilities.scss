@@ -5,6 +5,10 @@
   align-items: start;
 }
 
+.app-inline-field-action > :is(.app-surface-filter-action, .app-detail-action-button) {
+  margin-top: 10px;
+}
+
 .app-crud-title {
   margin: 6px 0 0;
   color: var(--app-surface-text);

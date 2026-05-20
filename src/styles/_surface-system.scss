@@ -47,6 +47,8 @@
   --app-dialog-border: color-mix(in srgb, var(--primary-color) 12%, #{rgba(primitives.$warm-ink, .08)});
   --app-dialog-shadow: 0 26px 72px #{rgba(primitives.$shadow-ink, .18)};
   --app-dialog-shell-width: 560px;
+  --app-menu-panel-top: #{primitives.$surface-light-top};
+  --app-menu-panel-bottom: #{primitives.$surface-light-bottom};
   --app-overlay-backdrop: rgba(34, 28, 24, .28);
 }
 
@@ -97,6 +99,8 @@
   --app-dialog-border: color-mix(in srgb, var(--accent-color) 18%, #{rgba(primitives.$white-base, .08)});
   --app-dialog-shadow: 0 30px 82px #{rgba(primitives.$black-base, .42)};
   --app-dialog-shell-width: 560px;
+  --app-menu-panel-top: #{primitives.$surface-dark-top};
+  --app-menu-panel-bottom: #{primitives.$surface-dark-bottom};
   --app-overlay-backdrop: rgba(0, 0, 0, .48);
   --mdc-list-list-item-label-text-color: #{colors.$text-strong-dark};
   --mdc-list-list-item-supporting-text-color: #{rgba(primitives.$white-base, .72)};
@@ -292,13 +296,21 @@
 }
 
 @media screen and (max-width: 599px) {
-  .app-surface-hide-mobile {
+  .app-surface-hide-mobile,
+  button.app-surface-hide-mobile,
+  a.app-surface-hide-mobile,
+  button[mat-icon-button].app-surface-hide-mobile,
+  a[mat-icon-button].app-surface-hide-mobile {
     display: none !important;
   }
 }
 
 @media screen and (min-width: 600px) {
-  .app-surface-hide-desktop {
+  .app-surface-hide-desktop,
+  button.app-surface-hide-desktop,
+  a.app-surface-hide-desktop,
+  button[mat-icon-button].app-surface-hide-desktop,
+  a[mat-icon-button].app-surface-hide-desktop {
     display: none !important;
   }
 }

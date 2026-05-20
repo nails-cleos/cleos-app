@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, shareReplay } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { EnvService } from './env.service';
 
@@ -18,21 +18,35 @@ export enum MapStatus {
 export class GeocodeService {
   private readonly env: EnvService = inject(EnvService);
   private http: HttpClient = inject(HttpClient);
+  private mapLoader$?: Observable<MapStatus>;
 
   createMap = (): Observable<MapStatus> => {
     const showMap = this.env.showMap;
-    if (showMap) {
-      const mapUrl = 'https://maps.googleapis.com/maps/api/js';
-      return this.http.jsonp(
-        `${ mapUrl }?libraries=geometry,places&key=${ this.env.googleMapKey }&sensor=false`, 'callback')
-        .pipe(map(() => MapStatus.ready),
-          catchError((e) => {
-            console.error(e);
-            return of(MapStatus.notAvailable);
-          }),
-        );
+    if (!showMap) {
+      return of(MapStatus.notAvailable);
     }
-    return new Observable((observer) => observer.next(MapStatus.notAvailable));
+
+    if (typeof google !== 'undefined' && google?.maps) {
+      return of(MapStatus.ready);
+    }
+
+    if (!this.mapLoader$) {
+      const mapUrl = 'https://maps.googleapis.com/maps/api/js';
+      this.mapLoader$ = this.http.jsonp(
+        `${ mapUrl }?libraries=geometry,places&key=${ this.env.googleMapKey }&sensor=false`,
+        'callback',
+      ).pipe(
+        map(() => MapStatus.ready),
+        catchError((e) => {
+          console.error(e);
+          this.mapLoader$ = undefined;
+          return of(MapStatus.notAvailable);
+        }),
+        shareReplay(1),
+      );
+    }
+
+    return this.mapLoader$;
   };
 
   geocodeAddress = (
