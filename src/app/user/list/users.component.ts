@@ -174,7 +174,7 @@ export class UsersComponent {
   merge = (user: IUserAll): void => {
     this.noExpanded(user);
     const data = {
-      small: this.smallScreen,
+      small: this.smallScreen(),
       newUser: user,
     };
 

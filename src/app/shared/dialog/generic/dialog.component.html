@@ -7,9 +7,6 @@
       </div>
       <h1 mat-dialog-title class="app-surface-dialog-title">{{ data.title }}</h1>
     </div>
-    <button (click)="onNoClick()" aria-label="Close dialog" class="app-surface-dialog-close" type="button">
-      <mat-icon>close</mat-icon>
-    </button>
   </div>
 
   <div class="app-surface-dialog-divider" aria-hidden="true"></div>
@@ -20,15 +17,13 @@
 
   <div mat-dialog-actions class="app-surface-dialog-actions">
     <div class="app-surface-dialog-spacer"></div>
-    @if (!data.hideNoButton) {
-      <button (click)="onNoClick()" cdkFocusInitial class="app-surface-dialog-action-secondary" mat-flat-button type="button">
-        {{ 'COMMON.BUTTON.NO' | translate }}
-      </button>
-    }
-    @if (!data.hideOkButton) {
-      <button [mat-dialog-close]="data.value" [color]="confirmColor" class="app-surface-dialog-action-primary" mat-flat-button type="button">
-        {{ 'COMMON.BUTTON.YES' | translate }}
-      </button>
-    }
+    <button (click)="onNoClick()" cdkFocusInitial class="app-surface-dialog-action-secondary" mat-flat-button
+            type="button">
+      {{ 'COMMON.BUTTON.NO' | translate }}
+    </button>
+    <button [mat-dialog-close]="data.value" [color]="confirmColor" class="app-surface-dialog-action-primary"
+            mat-flat-button type="button">
+      {{ 'COMMON.BUTTON.YES' | translate }}
+    </button>
   </div>
 </div>

@@ -282,6 +282,29 @@ describe('ExpenseComponent', () => {
     expect(component['file']()).toBeUndefined();
   });
 
+  it('should not crash when create-another reset runs before form directive is ready', () => {
+    const formDirectiveMock = { form: null, submitted: true };
+    spyOn<any>(component, 'formDirective').and.returnValue(formDirectiveMock);
+
+    component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: mockFile });
+    fixture.detectChanges();
+
+    component.getForm.supplyStore.setValue('New Expense');
+    component.getForm.invoice.setValue('New Description');
+    component.getForm.date.setValue(getNowTimeZone());
+    prepareSingleTotal();
+
+    expect(() => {
+      component['file'].set(undefined);
+      fixture.detectChanges();
+    }).not.toThrow();
+
+    expect(component.getForm.supplyStore.value).toBe('');
+    expect(component.getForm.invoice.value).toBe('');
+    expect(component.getForm.date.value).toBeNull();
+    expect(component.totals.length).toBe(0);
+  });
+
   it('should dispatch updateExpense when in edit mode and form valid', () => {
     storeSpy.dispatch.calls.reset();
 

@@ -30,7 +30,6 @@
 
           @if (!hasAdminRole()) {
             <div class="app-surface-item app-crud-loading">
-              <span class="app-surface-item__label">{{ 'COMMON.PAYMENT.FIELD' | translate }}</span>
               <app-bank [firstTime]="true" [form]="bankForm" [options]="optionsSignal()"></app-bank>
             </div>
           } @else {

@@ -202,17 +202,7 @@ export class ExpenseComponent {
         if (!this.isAddModeSignal()) {
           return;
         }
-        this.formDirective()?.resetForm();
-        this.form.reset();
-        this.errors.set({});
-        this.totals.clear();
-        this.totals.controls.forEach(control => {
-          control.markAsPristine({ emitEvent: false });
-          control.markAsUntouched({ emitEvent: false });
-        });
-        this.form.markAsPristine({ emitEvent: false });
-        this.form.markAsUntouched({ emitEvent: false });
-        this.totalMap = new Map();
+        this.resetCreateAnotherForm();
         return;
       }
       const token = this.tokenService.token();
@@ -277,6 +267,24 @@ export class ExpenseComponent {
     return this.totals.controls.some(control => {
       return control.invalid;
     });
+  }
+
+  private resetCreateAnotherForm(): void {
+    const formDirective = this.formDirective();
+    if (formDirective?.form) {
+      (formDirective as FormGroupDirective & { submitted: boolean }).submitted = false;
+    }
+
+    this.form.reset();
+    this.errors.set({});
+    this.totals.clear();
+    this.totals.controls.forEach(control => {
+      control.markAsPristine({ emitEvent: false });
+      control.markAsUntouched({ emitEvent: false });
+    });
+    this.form.markAsPristine({ emitEvent: false });
+    this.form.markAsUntouched({ emitEvent: false });
+    this.totalMap = new Map();
   }
 
   submit() {

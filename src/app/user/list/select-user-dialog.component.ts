@@ -17,7 +17,7 @@ type SelectUserForm = {
   user: FormControl<IUserAll | undefined>;
 }
 
-type SelectUserDialogData = {
+export type SelectUserDialogData = {
   newUser: IUserAll;
   small: boolean;
 }

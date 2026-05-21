@@ -7,9 +7,6 @@
         </div>
         <h1 mat-dialog-title class="app-surface-dialog-title">{{ 'RESERVATION.NOTE.ADD' | translate }}</h1>
       </div>
-      <button (click)="onNoClick()" aria-label="Close dialog" class="app-surface-dialog-close" type="button">
-        <mat-icon>close</mat-icon>
-      </button>
     </div>
 
     <div class="app-surface-dialog-divider" aria-hidden="true"></div>
@@ -20,14 +17,14 @@
       @if (!data.isCustomer) {
         <mat-form-field appearance="outline" class="note-dialog-field">
           <mat-label>{{ 'RESERVATION.NOTE.FIELD' | translate }}</mat-label>
-          <textarea #message [formControl]="getForm.note" matInput [maxlength]="256" rows="5"></textarea>
+          <textarea #message class="note-dialog-textarea" [formControl]="getForm.note" matInput [maxlength]="256" rows="5"></textarea>
           <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
         </mat-form-field>
       }
 
       <mat-form-field appearance="outline" class="note-dialog-field">
         <mat-label>{{ 'RESERVATION.NOTE.' + (data.isCustomer ? 'FIELD' : 'CUSTOMER') | translate }}</mat-label>
-        <textarea #customerMessage [formControl]="getForm.customerNote" matInput [maxlength]="256" rows="5"></textarea>
+        <textarea #customerMessage class="note-dialog-textarea" [formControl]="getForm.customerNote" matInput [maxlength]="256" rows="5"></textarea>
         <mat-hint align="end">{{ customerMessage.value.length }} / 256</mat-hint>
       </mat-form-field>
     </div>

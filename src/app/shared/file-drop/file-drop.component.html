@@ -11,7 +11,7 @@
 
     <h3 class="file-text">{{ 'COMMON.FILE.DRAG_DROP' | translate }}</h3>
     <h3 class="file-text">{{ 'COMMON.FILE.OR' | translate }}</h3>
-    <button (click)="fileInput.click()" mat-stroked-button class="app-surface-filter-action app-detail-action-button"
+    <button (click)="openFileBrowser()" mat-stroked-button class="app-surface-filter-action app-detail-action-button"
             type="button">
       <mat-icon>upload_file</mat-icon>
       <span>{{ 'COMMON.FILE.CHOOSE' | translate }}</span>
@@ -20,7 +20,7 @@
 }
 
 <div class="app-surface-hide-desktop">
-  <button (click)="fileInput.click()" mat-stroked-button
+  <button (click)="openFileBrowser()" mat-stroked-button
           class="app-detail-action-button app-detail-action-button--mobile"
           type="button">
     <mat-icon>upload_file</mat-icon>
