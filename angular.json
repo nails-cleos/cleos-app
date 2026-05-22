@@ -23,6 +23,7 @@
           "options": {
             "allowedCommonJsDependencies": [
               "chart.js",
+              "bowser",
               "deepmerge",
               "exceljs",
               "google-libphonenumber",
