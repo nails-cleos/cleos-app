@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input } from '@angular/core';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -17,6 +17,36 @@ export class ErrorComponent {
 
   imageSrc: string | undefined;
   retry = false;
+  readonly titleKey = computed(() => {
+    switch (this.error()?.status) {
+      case 'NOT_FOUND':
+        return 'COMMON.ERROR.PAGE.NOT_FOUND.TITLE';
+      case 'BAD_REQUEST':
+        return 'COMMON.ERROR.PAGE.BAD_REQUEST.TITLE';
+      case 'SERVER_ERROR':
+        return 'COMMON.ERROR.PAGE.SERVER_ERROR.TITLE';
+      default:
+        return 'COMMON.ERROR.PAGE.DEFAULT.TITLE';
+    }
+  });
+  readonly descriptionKey = computed(() => {
+    const message = this.error()?.message;
+
+    if (message) {
+      return message;
+    }
+
+    switch (this.error()?.status) {
+      case 'NOT_FOUND':
+        return 'COMMON.ERROR.PAGE.NOT_FOUND.DESCRIPTION';
+      case 'BAD_REQUEST':
+        return 'COMMON.ERROR.PAGE.BAD_REQUEST.DESCRIPTION';
+      case 'SERVER_ERROR':
+        return 'COMMON.ERROR.PAGE.SERVER_ERROR.DESCRIPTION';
+      default:
+        return 'COMMON.ERROR.PAGE.DEFAULT.DESCRIPTION';
+    }
+  });
 
   constructor() {
     effect(() => {
@@ -35,6 +65,8 @@ export class ErrorComponent {
       }
     });
   }
+
+  readonly errorCode = computed(() => this.error()?.status || 'ERROR');
 
   reload() {
     window.location.reload();

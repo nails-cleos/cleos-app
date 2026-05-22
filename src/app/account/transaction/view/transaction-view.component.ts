@@ -35,7 +35,7 @@ export class TransactionViewComponent {
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
-  private tableState = createMatTableState(this.paginator, this.sort, 'timestamp', 'asc');
+  private tableState = createMatTableState(this.paginator, this.sort, 'timestamp', 'desc');
 
   private accountIdSignal = toSignal(this.accountId$);
   private accountTransactionSignal = toSignal(this.accountTransaction$);

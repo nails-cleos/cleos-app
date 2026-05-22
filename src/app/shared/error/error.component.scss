@@ -1,8 +1,14 @@
+.error-page-shell {
+  justify-content: center;
+}
+
 .error {
-  width: 95%;
-  height: 95%;
   display: block;
-  margin: auto;
+  width: min(100%, 620px);
+  max-height: 320px;
+  height: auto;
+  margin: 0 auto;
+  object-fit: contain;
 }
 
 .card-container {
@@ -10,10 +16,81 @@
   justify-content: center;
   align-items: center;
   flex-direction: row;
+  width: 100%;
 
   @media (max-width: 599px) {
     flex-direction: column;
   }
+}
+
+.card-container--card {
+  width: auto;
+}
+
+.error-media--card {
+  width: min(100%, 320px);
+}
+
+.error-state {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.25rem, 2.2vw, 2rem);
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: clamp(20px, 3vw, 36px);
+  text-align: center;
+}
+
+.error-state__media {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.error-state__content {
+  display: grid;
+  gap: 0.85rem;
+  min-width: 0;
+  justify-items: center;
+}
+
+.error-state__eyebrow {
+  color: var(--app-surface-eyebrow);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.error-state__title {
+  margin: 0;
+  color: var(--app-detail-title);
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.error-state__description {
+  max-width: 52ch;
+  margin: 0;
+  color: var(--app-detail-body);
+  font-size: 1.02rem;
+  line-height: 1.7;
+  text-align: center;
+  text-wrap: pretty;
+}
+
+.error-state__actions {
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: 0.35rem;
 }
 
 .card-content {
@@ -31,4 +108,42 @@
 
 .raised-button {
   margin-left: 10px
+}
+
+@media (max-width: 599px) {
+  .error-page-shell {
+    min-height: calc(100dvh - 140px);
+    gap: 12px;
+  }
+
+  .error {
+    width: min(100%, 220px);
+    max-height: 160px;
+  }
+
+  .error-state {
+    gap: 0.75rem;
+    padding: 14px 12px;
+  }
+
+  .error-state__content {
+    gap: 0.55rem;
+  }
+
+  .error-state__title {
+    font-size: clamp(1.45rem, 6vw, 1.9rem);
+    line-height: 1.08;
+  }
+
+  .error-state__description {
+    max-width: 28ch;
+    font-size: 0.94rem;
+    line-height: 1.45;
+  }
+
+  .error-state__actions {
+    justify-content: center;
+    width: 100%;
+    margin-top: 0.2rem;
+  }
 }

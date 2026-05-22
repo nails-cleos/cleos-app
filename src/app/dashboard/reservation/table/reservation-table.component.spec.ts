@@ -172,7 +172,10 @@ describe('ReservationTableComponent', () => {
   });
 
   it('should dispatch getReservationPage when paginatorPageIndex changes', () => {
-    component.paginatorPageIndex.set(1);
+    const paginator = component['paginator']();
+
+    paginator!.pageIndex = 1;
+    paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
     fixture.componentRef.setInput('professionalId', professional.id);
     fixture.componentRef.setInput('all', true);
     fixture.componentRef.setInput('roomId', room.id);

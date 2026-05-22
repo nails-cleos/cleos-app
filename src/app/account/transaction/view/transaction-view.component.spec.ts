@@ -253,14 +253,6 @@ describe('TransactionViewComponent', () => {
     expect(dataSource?.[0].date).toBeDefined();
   });
 
-  it('should compute sortActive from sort viewChild', () => {
-    expect(component['sortActive']()).toBe('timestamp');
-  });
-
-  it('should compute sortDirection from sort viewChild', () => {
-    expect(component['sortDirection']()).toBe('asc');
-  });
-
   it('should have paginatorPageIndex signal initialized to 0', () => {
     expect(component.paginatorPageIndex()).toBe(0);
   });

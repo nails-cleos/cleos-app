@@ -206,7 +206,10 @@ describe('SearchComponent', () => {
   });
 
   it('should dispatch getColorPage when paginatorPageIndex changes', () => {
-    component.paginatorPageIndex.set(1);
+    const paginator = component['paginator']();
+
+    paginator!.pageIndex = 1;
+    paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(
