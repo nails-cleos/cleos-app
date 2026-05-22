@@ -358,8 +358,7 @@ describe('ExpensesComponent', () => {
   });
 
   it('should maintain correct displayedColumns order', () => {
-    const expectedColumns = ['position', 'invoice', 'supplyStore.name', 'timestamp', 'totalGross',
-      'totalBtw', 'totalNet', 'actions'];
+    const expectedColumns = ['position', 'invoice', 'supplyStore.name', 'timestamp', 'actions'];
     expect(component.displayedColumns).toEqual(expectedColumns);
   });
 

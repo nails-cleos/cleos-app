@@ -1,16 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { IChartUtil } from '../../util/chart';
 import { By } from '@angular/platform-browser';
 import { CardChartComponent } from './card-chart.component';
 import { Chart, registerables } from 'chart.js';
 import { signal } from '@angular/core';
 import { AuthUserService, initialAuthUser } from '../../services/auth-user.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 Chart.register(...registerables);
 describe('CardChartComponent', () => {
   let component: CardChartComponent;
   let fixture: ComponentFixture<CardChartComponent>;
+  let dialogRefSpy: jasmine.SpyObj<MatDialogRef<CardChartComponent>>;
 
   const fakeChart: IChartUtil = {
     type: 'bar',
@@ -25,12 +27,18 @@ describe('CardChartComponent', () => {
   };
 
   beforeEach(async () => {
+    dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
+
     await TestBed.configureTestingModule({
-      imports: [CardChartComponent],
+      imports: [CardChartComponent, TranslateModule.forRoot()],
       providers: [
         {
           provide: MAT_DIALOG_DATA,
           useValue: { chart: fakeChart, title: 'Test Chart' },
+        },
+        {
+          provide: MatDialogRef,
+          useValue: dialogRefSpy,
         },
         {
           provide: AuthUserService,
@@ -57,14 +65,15 @@ describe('CardChartComponent', () => {
   it('should render the dialog title in the template', () => {
     fixture.detectChanges();
 
-    const titleEl = fixture.debugElement.query(By.css('h1')).nativeElement;
+    const titleEl = fixture.debugElement.query(By.css('.app-surface-dialog-title')).nativeElement;
     expect(titleEl.textContent).toContain('Test Chart');
   });
 
   it('should render the close button', () => {
     fixture.detectChanges();
-    const buttonEl = fixture.debugElement.query(By.css('.close-button'));
+    const buttonEl = fixture.debugElement.query(By.css('button[mat-stroked-button]'));
     expect(buttonEl).toBeTruthy();
+    expect(buttonEl.nativeElement.textContent).toContain('COMMON.BUTTON.CLOSE');
   });
 
   it('should have datasets available in injected chart data', () => {

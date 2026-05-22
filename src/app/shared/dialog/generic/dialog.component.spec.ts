@@ -119,10 +119,10 @@ describe('DialogComponent', () => {
     expect(yesButton?.textContent?.trim()).toContain('COMMON.BUTTON.YES');
   });
 
-  it('should render a close button in the header', () => {
+  it('should render the header icon', () => {
     const compiled = fixture.nativeElement;
-    const closeButton = compiled.querySelector('.app-surface-dialog-header .app-surface-dialog-close');
-    expect(closeButton).toBeTruthy();
+    const icon = compiled.querySelector('.app-surface-dialog-header mat-icon');
+    expect(icon?.textContent?.trim()).toBe('info_outline');
   });
 
   it('should render warning variant styles and confirm color', () => {

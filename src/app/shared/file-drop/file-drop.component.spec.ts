@@ -212,7 +212,15 @@ describe('FileDropComponent', () => {
 
   it('should clear the hidden file input when currentFile input becomes undefined', () => {
     const input = fixture.nativeElement.querySelector('#fileInput') as HTMLInputElement;
-    input.value = 'C:\\\\fakepath\\\\file.txt';
+    let inputValue = 'C:\\\\fakepath\\\\file.txt';
+    const valueSetter = jasmine.createSpy('valueSetter').and.callFake((value: string) => {
+      inputValue = value;
+    });
+    Object.defineProperty(input, 'value', {
+      configurable: true,
+      get: () => inputValue,
+      set: valueSetter,
+    });
 
     fixture.componentRef.setInput('currentFile', {
       name: 'file.txt',
@@ -225,17 +233,27 @@ describe('FileDropComponent', () => {
     fixture.componentRef.setInput('currentFile', undefined);
     fixture.detectChanges();
 
-    expect(input.value).toBe('');
+    expect(valueSetter).toHaveBeenCalledWith('');
+    expect(inputValue).toBe('');
   });
 
   it('should clear the hidden file input before opening the picker', () => {
     const input = fixture.nativeElement.querySelector('#fileInput') as HTMLInputElement;
-    input.value = 'C:\\\\fakepath\\\\file.txt';
+    let inputValue = 'C:\\\\fakepath\\\\file.txt';
+    const valueSetter = jasmine.createSpy('valueSetter').and.callFake((value: string) => {
+      inputValue = value;
+    });
+    Object.defineProperty(input, 'value', {
+      configurable: true,
+      get: () => inputValue,
+      set: valueSetter,
+    });
     spyOn(input, 'click');
 
     component.openFileBrowser();
 
-    expect(input.value).toBe('');
+    expect(valueSetter).toHaveBeenCalledWith('');
+    expect(inputValue).toBe('');
     expect(input.click).toHaveBeenCalled();
   });
 
