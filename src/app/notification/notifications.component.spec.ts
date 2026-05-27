@@ -120,4 +120,50 @@ describe('NotificationsComponent', () => {
     expect(() => component.remove(0)).not.toThrow();
   });
 
+  it('should ignore remove when the index does not exist', fakeAsync(() => {
+    const notif: INotification = {
+      id: '1',
+      read: false,
+      navigation: '/test',
+      date: mockTimestamp,
+      deleted: false,
+      message: 'not 1',
+      notDate: mockNoteDate,
+    };
+    component.notifications.set([notif]);
+    component.badge = 1;
+
+    component.remove(5);
+    tick(260);
+
+    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(deleteNotification({ notification: jasmine.anything() as any }));
+    expect(component.notifications()).toEqual([notif]);
+    expect(component.badge).toBe(1);
+  }));
+
+  it('should keep the badge for read notifications and request the next page when showMore is enabled', fakeAsync(() => {
+    const notif: INotification = {
+      id: '1',
+      read: true,
+      navigation: '/test',
+      date: mockTimestamp,
+      deleted: false,
+      message: 'not 1',
+      notDate: mockNoteDate,
+    };
+    component.notifications.set([notif]);
+    component.badge = 3;
+    component.showMore = true;
+    component['page'].set(2);
+
+    component.remove(0);
+
+    expect(component.badge).toBe(3);
+    expect(component['page']()).toBe(1);
+
+    tick(260);
+
+    expect(component.notifications()).toEqual([]);
+  }));
+
 });
