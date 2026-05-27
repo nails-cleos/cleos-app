@@ -90,6 +90,7 @@
       "ONCE_A_YEAR": "Una vez al año"
     },
     "NOTIFICATION": {
+      "TITLE": "Notificaciones",
       "NO": "No hay notificaciones",
       "LOAD_MORE": "Ver mas"
     },
@@ -347,7 +348,10 @@
       "PROFILE": "Perfil",
       "SIGN_OUT": "Cerrar sesión",
       "DARK_MODE": "Modo oscuro",
-      "LIGHT_MODE": "Modo claro"
+      "LIGHT_MODE": "Modo claro",
+      "CALENDAR": "Calendario",
+      "SEARCH": "Búsqueda",
+      "BLOCK_TIME": "Bloquear"
     },
     "CURRENCY": {
       "FIELD": "Moneda",

@@ -35,10 +35,14 @@
 }
 
 .cal-month-view .cal-day-number,
-.cal-month-view .cal-out-month .cal-day-number,
 .cal-month-view .cal-day-cell.cal-today .cal-day-number {
-  color: var(--invert-text);
+  color: var(--app-surface-text);
   opacity: 1;
+}
+
+.cal-month-view .cal-day-cell.cal-out-month .cal-day-number {
+  color: color-mix(in srgb, var(--app-surface-text) 62%, var(--app-surface-card-bg) 38%);
+  opacity: 0.4;
 }
 
 .cal-month-view .cal-open .cal-day-number {

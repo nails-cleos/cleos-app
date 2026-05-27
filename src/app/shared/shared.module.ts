@@ -11,6 +11,7 @@ import { CustomDateFormatter } from './CustomDateFormatter';
 import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { RouterLink } from '@angular/router';
+import { AvatarComponent } from './avatar/avatar.component';
 
 const importExport = [
   CommonModule,
@@ -20,6 +21,7 @@ const importExport = [
   BaseChartDirective,
   FormsModule,
   RouterLink,
+  AvatarComponent,
 ];
 
 @NgModule({

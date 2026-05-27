@@ -90,6 +90,7 @@
       "ONCE_A_YEAR": "Once a year"
     },
     "NOTIFICATION": {
+      "TITLE": "Notifications",
       "NO": "No notifications",
       "LOAD_MORE": "Load more"
     },
@@ -348,7 +349,10 @@
       "PROFILE": "Profile",
       "SIGN_OUT": "Sign out",
       "DARK_MODE": "Dark mode",
-      "LIGHT_MODE": "Light mode"
+      "LIGHT_MODE": "Light mode",
+      "CALENDAR": "Calendar",
+      "SEARCH": "Search",
+      "BLOCK_TIME": "Block Time"
     },
     "CURRENCY": {
       "FIELD": "Currency",

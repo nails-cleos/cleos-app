@@ -34,6 +34,7 @@ describe('NavComponent', () => {
   let menus$: BehaviorSubject<any>;
   let redirect$: BehaviorSubject<any>;
   let dataDeleted$: BehaviorSubject<any>;
+  let dataRead$: BehaviorSubject<any>;
   let notification$: BehaviorSubject<any>;
   let action$: BehaviorSubject<any>;
 
@@ -90,6 +91,7 @@ describe('NavComponent', () => {
     menus$ = new BehaviorSubject(undefined);
     redirect$ = new BehaviorSubject(undefined);
     dataDeleted$ = new BehaviorSubject(undefined);
+    dataRead$ = new BehaviorSubject(undefined);
     action$ = new BehaviorSubject(undefined);
 
     const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
@@ -146,6 +148,8 @@ describe('NavComponent', () => {
         case 5:
           return dataDeleted$.asObservable();
         case 6:
+          return dataRead$.asObservable();
+        case 7:
           return notification$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -425,6 +429,48 @@ describe('NavComponent', () => {
       jasmine.objectContaining({ id: '1', read: true }),
       jasmine.objectContaining({ id: '2', read: false }),
     ]);
+  });
+
+  it('should decrease the badge when an unread notification is read outside the dropdown preload', () => {
+    notification$.next({
+      page: {
+        content: [
+          mockNotification,
+          { ...mockNotification, id: '2', read: false },
+        ],
+        number: 0,
+        totalElements: 2,
+      },
+      workDay: [],
+      unread: 2,
+    });
+    fixture.detectChanges();
+
+    dataRead$.next({ ...mockNotification, id: 'external-read', read: true });
+    fixture.detectChanges();
+
+    expect(component.countNotifications()).toBe(1);
+  });
+
+  it('should decrease the badge when an unread notification is deleted outside the dropdown preload', () => {
+    notification$.next({
+      page: {
+        content: [
+          mockNotification,
+          { ...mockNotification, id: '2', read: false },
+        ],
+        number: 0,
+        totalElements: 2,
+      },
+      workDay: [],
+      unread: 2,
+    });
+    fixture.detectChanges();
+
+    dataDeleted$.next({ ...mockNotification, id: 'external-delete', deleted: true, read: false });
+    fixture.detectChanges();
+
+    expect(component.countNotifications()).toBe(1);
   });
 
   it('should create response and navigate', () => {
