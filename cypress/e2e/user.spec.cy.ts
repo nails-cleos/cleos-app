@@ -30,8 +30,8 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         });
         cy.intercept('POST', `**/api/v1/${ value.url }`).as('saveUser');
 
-        cy.openMenu(breakpoints, ['App settings', 'Users']);
         cy.mockUsers(0);
+        cy.openMenu(breakpoints, ['App settings', 'Users']);
         cy.wait('@getUsers');
         cy.get('tr').contains('No users');
         cy.get('button[id="add-button"]').click({ force: true });
@@ -52,8 +52,8 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         cy.get('td[data-mat-row="1"][data-mat-col="1"]').find('button').click({ force: true });
 
         if (role !== 'Customer') {
-          cy.get('[data-cy="dark-color-picker"]').clear().type('#0f0');
-          cy.get('[data-cy="light-color-picker"]').clear().type('#00f');
+          cy.get('[data-cy="dark-color-picker"]').should('not.be.disabled').clear().type('#0f0', { force: true });
+          cy.get('[data-cy="light-color-picker"]').should('not.be.disabled').clear().type('#00f', { force: true });
         }
 
         cy.get('button[type="submit"]').click({ force: true });
@@ -75,8 +75,8 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       });
 
       it(`should edit a ${ role }`, () => {
-        cy.openMenu(breakpoints, ['App settings', 'Users']);
         cy.mockUsers(undefined, value.displayName);
+        cy.openMenu(breakpoints, ['App settings', 'Users']);
         cy.wait('@getUsers');
 
         cy.get('@selectedUser').then((user: any) => {
