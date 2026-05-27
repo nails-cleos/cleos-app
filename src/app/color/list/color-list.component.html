@@ -30,10 +30,10 @@
           </ng-container>
 
           <ng-container matColumnDef="description">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
                 mat-sort-header>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}
             </th>
-            <td *matCellDef="let color" class="hide-xs" mat-cell>
+            <td *matCellDef="let color" class="app-surface-hide-mobile" mat-cell>
               @if (color.id) {
                 <div>{{ color.description }}</div>
               } @else {
@@ -43,10 +43,14 @@
           </ng-container>
 
           <ng-container matColumnDef="actions">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell>
-              {{ 'COMMON.COLUMN.ACTIONS' | translate }}
+            <th *matHeaderCellDef mat-header-cell>
+              <span class="app-surface-hide-mobile">{{ 'COMMON.COLUMN.ACTIONS' | translate }}</span>
+              <button [routerLink]="['/', language, 'colors', 'add']" mat-icon-button id="add-button"
+                      matTooltip="{{ 'COLOR.TITLE' | translate }}" matTooltipPosition="right" type="button">
+                <mat-icon color="primary">add</mat-icon>
+              </button>
             </th>
-            <td *matCellDef="let color" class="hide-xs" mat-cell>
+            <td *matCellDef="let color" class="app-surface-hide-mobile" mat-cell>
               @if (color.id) {
                 @if (!color.deleted) {
                   <button (click)="edit(color)" mat-icon-button
@@ -64,24 +68,10 @@
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="add">
-            <th *matHeaderCellDef mat-header-cell>
-              <button [routerLink]="['/', language, 'colors', 'add']" mat-icon-button id="add-button"
-                      matTooltip="{{ 'COLOR.TITLE' | translate }}" matTooltipPosition="right" type="button">
-                <mat-icon color="primary">add</mat-icon>
-              </button>
-            </th>
-            <td *matCellDef="let additional" mat-cell>
-              @if (!additional.id) {
-                <div class="ssc-line"></div>
-              }
-            </td>
-          </ng-container>
-
           <ng-container matColumnDef="expandedDetail">
-            <td *matCellDef="let color" [attr.colspan]="displayedColumns.length" class="hide-gt-xs" mat-cell>
+            <td *matCellDef="let color" [attr.colspan]="displayedColumns.length" class="app-surface-hide-desktop" mat-cell>
               <div [class.detail-expanded]="color === expandedColor"
-                   class="detail hide-gt-xs">
+                   class="detail app-surface-hide-desktop">
                 <mat-list>
                   @if (color.description) {
                     <mat-list-item role="list">
@@ -112,14 +102,14 @@
           </ng-container>
 
           <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-          <tr *matRowDef="let color; columns: displayedColumns;" class="hide-xs" mat-row></tr>
+          <tr *matRowDef="let color; columns: displayedColumns;" class="app-surface-hide-mobile" mat-row></tr>
           <tr (click)="expandedColor = expandedColor === color ? null : color"
               *matRowDef="let color; columns: displayedColumns;"
-              class="hide-gt-xs app-table-master-row"
+              class="app-surface-hide-desktop app-table-master-row"
               mat-row></tr>
           <tr *matRowDef="let row; columns: ['expandedDetail']"
               [class.app-table-detail-row--expanded]="row === expandedColor"
-              class="hide-gt-xs app-table-detail-row"
+              class="app-surface-hide-desktop app-table-detail-row"
               mat-row></tr>
 
           <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>

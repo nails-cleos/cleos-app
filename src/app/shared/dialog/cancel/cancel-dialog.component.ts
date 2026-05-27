@@ -54,6 +54,8 @@ export class CancelDialogComponent {
   showPenalty: boolean = this.data.showPenalty || false;
   penalty = PENALTY;
 
+  showBank = !!this.data.paymentOptions?.length;
+
   constructor() {
     if (this.options.length === 1) {
       this.getForm.paymentCancellation.setValue(this.options[0]);

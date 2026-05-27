@@ -11,16 +11,6 @@
   position: relative;
   margin: 0 auto;
 
-  input {
-    opacity: 0;
-    position: absolute;
-    z-index: 2;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-  }
-
   .file-text {
     font-size: 20px;
     font-weight: 600;
@@ -38,6 +28,32 @@
   border-color: var(--app-surface-card-border, rgba(32, 28, 25, 0.06)) !important;
   border-radius: 18px !important;
   background: var(--app-surface-card-bg, rgba(255, 255, 255, 0.96)) !important;
+
+  .mat-mdc-card-header {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .mat-mdc-card-title-group {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .mat-mdc-card-header-text,
+  .mat-mdc-card-title,
+  .mat-mdc-card-subtitle {
+    min-width: 0;
+  }
+}
+
+.file-drop-card__title {
+  margin-left: 20px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.app-detail-action-button--mobile {
+  width: 100%;
 }
 
 .fileover {
@@ -155,4 +171,24 @@ img {
 
 canvas {
   display: none;
+}
+
+@media (max-width: 720px) {
+  .container {
+    padding: 1.25rem;
+  }
+
+  .container .file-text {
+    font-size: 1rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .file-drop-card .mat-mdc-card-header {
+    flex-wrap: wrap;
+  }
+
+  .file-drop-card__title {
+    margin-left: 0;
+  }
 }

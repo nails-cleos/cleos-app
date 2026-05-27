@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { ITransaction } from '../../../interfaces/account';
 import { Store } from '@ngrx/store';
@@ -34,6 +35,7 @@ export class TransactionViewComponent {
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
+  private tableState = createMatTableState(this.paginator, this.sort, 'timestamp', 'desc');
 
   private accountIdSignal = toSignal(this.accountId$);
   private accountTransactionSignal = toSignal(this.accountTransaction$);
@@ -50,11 +52,9 @@ export class TransactionViewComponent {
     },
   );
 
-  private sortActive = computed(() => this.sort()?.active ?? 'timestamp');
-  private sortDirection = computed(() => this.sort()?.direction ?? 'asc');
   private transactionsSignal = computed(() => this.accountTransactionSignal()?.transactions);
 
-  paginatorPageIndex = signal(0);
+  paginatorPageIndex = this.tableState.pageIndex;
   dataSourceSignal = computed(() => this.transactionsSignal()?.content?.map((it: ITransaction) =>
     Object.assign({}, it, { date: newDateTimestamp(it.timestamp ?? it.payment?.timestamp) }),
   ));
@@ -72,35 +72,23 @@ export class TransactionViewComponent {
   language = this.translate.getCurrentLang();
 
   constructor() {
-    effect((onCleanup) => {
-      const paginator = this.paginator();
-      if (paginator) {
-        const sub = paginator.page.subscribe((pageEvent) => {
-          this.paginatorPageIndex.set(pageEvent.pageIndex);
-        });
-        onCleanup(() => sub.unsubscribe());
-      }
-    });
-
     effect(() => {
-      const page = this.paginatorPageIndex();
       const accountId = this.accountIdSignal();
 
       if (accountId) {
-        this.getTransactions(page);
+        this.getTransactions();
       }
     });
   }
 
-  private getTransactions = (page: number = 0): void => {
+  private getTransactions = (): void => {
     const accountId = this.accountIdSignal();
     if (accountId) {
+      const request = this.tableState.baseRequest();
       this.store.dispatch(
         getTransactionsByAccountId({
           id: accountId,
-          page: page,
-          sort: this.sortActive(),
-          direction: this.sortDirection(),
+          ...request,
           size: this.pageSizeSignal(),
         }),
       );

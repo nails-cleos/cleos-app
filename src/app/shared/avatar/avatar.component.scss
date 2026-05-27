@@ -1,0 +1,51 @@
+:host {
+  display: inline-flex;
+  flex-shrink: 0;
+  --app-avatar-size: 40px;
+  --app-avatar-radius: 50%;
+  --app-avatar-border: 1px solid var(--app-surface-card-border);
+  --app-avatar-placeholder-border: var(--app-avatar-border);
+  --app-avatar-background: var(--app-chip-ghost-bg);
+  --app-avatar-placeholder-background: var(--app-avatar-background);
+  --app-avatar-box-shadow: none;
+  --app-avatar-color: var(--app-surface-text);
+  --app-avatar-font-size: 1rem;
+  --app-avatar-font-weight: 700;
+  --app-avatar-letter-spacing: 0.05em;
+  --app-avatar-image-radius: inherit;
+}
+
+.app-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--app-avatar-size);
+  height: var(--app-avatar-size);
+  overflow: hidden;
+  border: var(--app-avatar-border);
+  border-radius: var(--app-avatar-radius);
+  background: var(--app-avatar-background);
+  box-shadow: var(--app-avatar-box-shadow);
+}
+
+.app-avatar--placeholder {
+  border: var(--app-avatar-placeholder-border);
+  background: var(--app-avatar-placeholder-background);
+}
+
+.app-avatar img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: var(--app-avatar-image-radius);
+}
+
+.app-avatar__initials {
+  color: var(--app-avatar-color);
+  font-size: var(--app-avatar-font-size);
+  font-weight: var(--app-avatar-font-weight);
+  line-height: 1;
+  letter-spacing: var(--app-avatar-letter-spacing);
+  text-transform: uppercase;
+}

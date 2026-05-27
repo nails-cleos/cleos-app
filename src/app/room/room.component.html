@@ -46,7 +46,8 @@
                     <mat-error>{{ errors()['currency'] }}</mat-error>
                   }
                 </mat-form-field>
-                <button mat-stroked-button type="button" (click)="addCurrency()" class="app-detail-action-button">
+                <button mat-stroked-button type="button" (click)="addCurrency()"
+                        class="app-surface-filter-action app-detail-action-button">
                   <mat-icon>add_card</mat-icon>
                   <span>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
                 </button>
@@ -78,7 +79,8 @@
                     <mat-error>{{ errors()['office'] }}</mat-error>
                   }
                 </mat-form-field>
-                <button mat-stroked-button type="button" (click)="addOffice()" class="app-detail-action-button">
+                <button mat-stroked-button type="button" (click)="addOffice()"
+                        class="app-surface-filter-action app-detail-action-button">
                   <mat-icon>add_business</mat-icon>
                   <span>{{ 'ROOM.OFFICE.ADD_BUTTON' | translate }}</span>
                 </button>
@@ -130,9 +132,9 @@
         </div>
       } @else {
         <div class="app-crud-loading">
-          <div class="ssc-hr"></div>
+          <div class="app-surface-skeleton-spacer"></div>
           <div class="ssc-square app-crud-loading__block"></div>
-          <div class="ssc-hr"></div>
+          <div class="app-surface-skeleton-spacer"></div>
         </div>
       }
 
@@ -161,7 +163,8 @@
               </mat-autocomplete>
             </mat-form-field>
 
-            <button mat-stroked-button type="button" (click)="addProfessional()" class="app-detail-action-button">
+            <button mat-stroked-button type="button" (click)="addProfessional()"
+                    class="app-surface-filter-action app-detail-action-button">
               <mat-icon>person_add_alt_1</mat-icon>
               <span>{{ 'COMMON.PROFESSIONAL.ADD_BUTTON' | translate }}</span>
             </button>
@@ -223,7 +226,7 @@
           <mat-expansion-panel (opened)="setStep(0)" [expanded]="step === 0" hideToggle>
             <mat-expansion-panel-header>
               <mat-panel-title>{{ 'ROOM.MONDAY_TIME.FIELD' | translate }}</mat-panel-title>
-              <mat-panel-description class="hide-xs">
+              <mat-panel-description class="app-surface-hide-mobile">
                 {{ 'ROOM.MONDAY_TIME.DESCRIPTION' | translate }}
                 <mat-icon>{{ icons.monday }}</mat-icon>
               </mat-panel-description>
@@ -237,7 +240,7 @@
           <mat-expansion-panel (opened)="setStep(1)" [expanded]="step === 1" hideToggle>
             <mat-expansion-panel-header>
               <mat-panel-title>{{ 'ROOM.TUESDAY_TIME.FIELD' | translate }}</mat-panel-title>
-              <mat-panel-description class="hide-xs">
+              <mat-panel-description class="app-surface-hide-mobile">
                 {{ 'ROOM.TUESDAY_TIME.DESCRIPTION' | translate }}
                 <mat-icon>{{ icons.tuesday }}</mat-icon>
               </mat-panel-description>
@@ -251,7 +254,7 @@
           <mat-expansion-panel (opened)="setStep(2)" [expanded]="step === 2" hideToggle>
             <mat-expansion-panel-header>
               <mat-panel-title>{{ 'ROOM.WEDNESDAY_TIME.FIELD' | translate }}</mat-panel-title>
-              <mat-panel-description class="hide-xs">
+              <mat-panel-description class="app-surface-hide-mobile">
                 {{ 'ROOM.WEDNESDAY_TIME.DESCRIPTION' | translate }}
                 <mat-icon>{{ icons.wednesday }}</mat-icon>
               </mat-panel-description>
@@ -265,7 +268,7 @@
           <mat-expansion-panel (opened)="setStep(3)" [expanded]="step === 3" hideToggle>
             <mat-expansion-panel-header>
               <mat-panel-title>{{ 'ROOM.THURSDAY_TIME.FIELD' | translate }}</mat-panel-title>
-              <mat-panel-description class="hide-xs">
+              <mat-panel-description class="app-surface-hide-mobile">
                 {{ 'ROOM.THURSDAY_TIME.DESCRIPTION' | translate }}
                 <mat-icon>{{ icons.thursday }}</mat-icon>
               </mat-panel-description>
@@ -279,7 +282,7 @@
           <mat-expansion-panel (opened)="setStep(4)" [expanded]="step === 4" hideToggle>
             <mat-expansion-panel-header>
               <mat-panel-title>{{ 'ROOM.FRIDAY_TIME.FIELD' | translate }}</mat-panel-title>
-              <mat-panel-description class="hide-xs">
+              <mat-panel-description class="app-surface-hide-mobile">
                 {{ 'ROOM.FRIDAY_TIME.DESCRIPTION' | translate }}
                 <mat-icon>{{ icons.friday }}</mat-icon>
               </mat-panel-description>
@@ -293,7 +296,7 @@
           <mat-expansion-panel (opened)="setStep(5)" [expanded]="step === 5" hideToggle>
             <mat-expansion-panel-header>
               <mat-panel-title>{{ 'ROOM.SATURDAY_TIME.FIELD' | translate }}</mat-panel-title>
-              <mat-panel-description class="hide-xs">
+              <mat-panel-description class="app-surface-hide-mobile">
                 {{ 'ROOM.SATURDAY_TIME.DESCRIPTION' | translate }}
                 <mat-icon>{{ icons.saturday }}</mat-icon>
               </mat-panel-description>
@@ -307,7 +310,7 @@
           <mat-expansion-panel (opened)="setStep(6)" [expanded]="step === 6" hideToggle>
             <mat-expansion-panel-header>
               <mat-panel-title>{{ 'ROOM.SUNDAY_TIME.FIELD' | translate }}</mat-panel-title>
-              <mat-panel-description class="hide-xs">
+              <mat-panel-description class="app-surface-hide-mobile">
                 {{ 'ROOM.SUNDAY_TIME.DESCRIPTION' | translate }}
                 <mat-icon>{{ icons.sunday }}</mat-icon>
               </mat-panel-description>

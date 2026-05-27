@@ -77,7 +77,6 @@
             <div class="app-surface-header-menu">
               <button (click)="toggleMenu('workday')"
                       [attr.aria-expanded]="activeMenu() === 'workday'"
-                      class="badge-padding"
                       mat-icon-button
                       type="button">
                 <mat-icon [matBadgeHidden]="!workDay().length" [matBadgeOverlap]="true" [matBadge]="workDay().length"
@@ -102,7 +101,7 @@
               }
             </div>
           } @else if (isProfessional()) {
-            <button class="badge-padding" mat-icon-button>
+            <button mat-icon-button>
               <mat-icon>work_off</mat-icon>
             </button>
           }
@@ -110,7 +109,6 @@
             <div class="app-surface-header-menu">
               <button (click)="toggleMenu('notifications')"
                       [attr.aria-expanded]="activeMenu() === 'notifications'"
-                      class="badge-padding"
                       mat-icon-button
                       type="button">
                 <mat-icon [matBadgeHidden]="!countNotifications()" [matBadgeOverlap]="true"
@@ -165,7 +163,6 @@
           <div class="app-surface-header-menu">
             <button (click)="toggleMenu('settings')"
                     [attr.aria-expanded]="activeMenu() === 'settings'"
-                    [ngClass]="{'badge-padding': incomplete}"
                     mat-icon-button
                     type="button"
                     name="settings">
@@ -249,7 +246,7 @@
     </main>
     @if (isHandsetSignal() && (isProfessional() || isManager() || isAdmin())) {
       <footer>
-        <mat-toolbar class="footer">
+        <mat-toolbar class="header nav-gradient footer">
           <a [routerLinkActive]="['active-link']" [routerLink]="['/', language(), 'reservation', 'calendar']">
             <mat-icon>event</mat-icon>
           </a>

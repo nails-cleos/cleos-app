@@ -23,7 +23,7 @@
 
       <ng-container matColumnDef="description">
         <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
-        <td *matCellDef="let payment" class="column-large-text" mat-cell>
+        <td *matCellDef="let payment" class="app-surface-cell-wrap" mat-cell>
           @if (payment.id) {
             <div>{{ payment.description }}</div>
           } @else {
@@ -34,7 +34,7 @@
 
       <ng-container matColumnDef="type">
         <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
-        <td *matCellDef="let payment" class="column-large-text" mat-cell>
+        <td *matCellDef="let payment" class="app-surface-cell-wrap" mat-cell>
           @if (payment.id) {
             <div>{{ 'COMMON.PAYMENT.TYPE.' + (payment.type || 'NONE') | translate }}</div>
           } @else {
@@ -55,8 +55,8 @@
       </ng-container>
 
       <ng-container matColumnDef="status">
-        <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
-        <td *matCellDef="let payment" class="hide-xs" mat-cell>
+        <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
+        <td *matCellDef="let payment" class="app-surface-hide-mobile" mat-cell>
           @if (payment.id) {
             {{ 'COMMON.STATUS.PAYMENT.' + (payment.status || 'NONE') | translate }}
           } @else {
@@ -103,8 +103,8 @@
   }
 </div>
 </div>
-<div class="top card-actions">
-  <div class="spacer"></div>
+<div class="top app-surface-actions">
+  <div class="app-surface-spacer"></div>
   <button (click)="goBack()" color="accent" mat-fab extended class="icon-button"
           type="button">{{ 'COMMON.BUTTON.BACK' | translate }}
   </button>

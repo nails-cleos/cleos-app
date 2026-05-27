@@ -94,7 +94,7 @@
                   <button mat-stroked-button
                           type="button"
                           [routerLink]="['/', language, 'colors', 'add']"
-                          class="app-detail-action-button">
+                          class="app-surface-filter-action app-detail-action-button">
                     <mat-icon>palette</mat-icon>
                     <span>{{ 'COMMON.TREATMENT.COLOR.ADD_BUTTON' | translate }}</span>
                   </button>
@@ -191,9 +191,9 @@
           </div>
         } @else {
           <div class="app-crud-loading">
-            <div class="ssc-hr"></div>
+            <div class="app-surface-skeleton-spacer"></div>
             <div class="ssc-square app-crud-loading__block"></div>
-            <div class="ssc-hr"></div>
+            <div class="app-surface-skeleton-spacer"></div>
           </div>
         }
       </form>
@@ -295,9 +295,9 @@
           </div>
         } @else {
           <div class="app-crud-loading">
-            <div class="ssc-hr"></div>
+            <div class="app-surface-skeleton-spacer"></div>
             <div class="ssc-square app-crud-loading__block"></div>
-            <div class="ssc-hr"></div>
+            <div class="app-surface-skeleton-spacer"></div>
           </div>
         }
       }

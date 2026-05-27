@@ -1,9 +1,8 @@
-.mat-mdc-header-cell, .mat-column-actions {
+.mat-column-actions {
   text-align: center !important;
 }
 
 mat-header-cell, mat-cell {
-  justify-content: center;
   border-bottom-width: 1px;
   border-bottom-style: solid;
 }
@@ -22,6 +21,24 @@ mat-header-cell, mat-cell {
     display: inherit !important;
     margin-right: 5px;
   }
+}
+
+button[mat-icon-button],
+a[mat-icon-button] {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+button[mat-icon-button] .mat-icon,
+a[mat-icon-button] .mat-icon,
+button[mat-icon-button] .material-icons,
+a[mat-icon-button] .material-icons,
+button[mat-icon-button] .material-symbols-outlined,
+a[mat-icon-button] .material-symbols-outlined {
+  margin: 0 !important;
+  line-height: 1;
 }
 
 .clock-timepicker-panel .mat-mdc-dialog-container {

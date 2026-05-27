@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -42,6 +43,7 @@ export class UnavailableListComponent {
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
+  private tableState = createMatTableState(this.paginator, this.sort, 'timestamp', 'desc');
 
   private unavailableListSignal = toSignal(this.unavailableList$);
   private responseSignal = toSignal(this.response$);
@@ -57,16 +59,13 @@ export class UnavailableListComponent {
     },
   );
 
-  private sortActive = computed(() => this.sort()?.active ?? 'timestamp');
-  private sortDirection = computed(() => this.sort()?.direction ?? 'desc');
-
-  paginatorPageIndex = signal(0);
+  paginatorPageIndex = this.tableState.pageIndex;
   dataSourceSignal = computed(() => this.unavailableListSignal()?.content);
   resultsLengthSignal = computed(() => this.unavailableListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
   displayedColumns: string[] = ['position', 'professional', 'description', 'timestamp', 'duration', 'repeat',
-    'actions', 'add'];
+    'actions'];
 
   expandedUnavailable?: IUnavailable;
 
@@ -74,34 +73,16 @@ export class UnavailableListComponent {
   language: string = this.translate.getCurrentLang();
 
   constructor() {
-    effect((onCleanup) => {
-      const paginator = this.paginator();
-      if (paginator) {
-        const sub = paginator.page.subscribe((pageEvent) => {
-          this.paginatorPageIndex.set(pageEvent.pageIndex);
-        });
-        onCleanup(() => sub.unsubscribe());
-      }
-    });
-
     effect(() => {
-      const page = this.paginatorPageIndex();
+      const request = this.tableState.baseRequest();
       this.store.dispatch(
         getUnavailablePage({
-          page: page,
-          sort: this.sortActive(),
-          direction: this.sortDirection(),
+          ...request,
           size: this.pageSizeSignal(),
         }),
       );
     });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.store.dispatch(cleanUnavailable());
-        this.paginator()?.firstPage();
-      }
-    });
+    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanUnavailable()));
   }
 
   edit = (selected: IUnavailableAll): void => this.store.dispatch(unavailableSelected({ selected }));

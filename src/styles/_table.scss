@@ -1,15 +1,40 @@
+@use 'styles/theme/color-literals' as colors;
+@use 'styles/theme/shared-primitives' as primitives;
+
 :root {
-  --app-table-border: color-mix(in srgb, var(--primary-color, #b5ac9e) 16%, rgba(32, 28, 25, 0.04));
-  --app-table-header: color-mix(in srgb, var(--accent-color, #dcc8c2) 14%, rgba(255, 255, 255, 0.92));
-  --app-table-text: #111111;
-  --app-table-header-text: #6d5e52;
+  --app-table-border: rgba(148, 163, 184, 0.14);
+  --app-table-header: rgba(148, 163, 184, 0.08);
+  --app-table-footer: rgba(148, 163, 184, 0.08);
+  --app-table-shell-bg: linear-gradient(
+      180deg,
+      #{rgba(primitives.$white-base, .985)},
+      color-mix(in srgb, var(--accent-color) 3%, #{rgba(primitives.$white-base, .97)})
+  );
+  --app-table-text: #{colors.$text-strong-light};
+  --app-table-header-text: #65584d;
+  --app-table-footer-text: #65584d;
+  --app-table-header-shadow: inset 0 -1px 0 color-mix(in srgb, var(--primary-color) 18%, transparent);
+  --app-table-row-hover: color-mix(in srgb, var(--accent-color) 14%, #{rgba(primitives.$white-base, .96)});
+  --app-table-row-stripe: color-mix(in srgb, var(--accent-color) 2%, transparent);
+  --app-table-column-min: 5rem;
 }
 
 .dark-theme {
-  --app-table-border: color-mix(in srgb, var(--accent-color, #ceb4ac) 18%, rgba(255, 255, 255, 0.04));
-  --app-table-header: color-mix(in srgb, var(--primary-color, #9d9282) 12%, rgba(255, 255, 255, 0.03));
+  --app-table-border: rgba(255, 255, 255, 0.08);
+  --app-table-header: rgba(255, 255, 255, 0.04);
+  --app-table-footer: rgba(255, 255, 255, 0.04);
+  --app-table-shell-bg: linear-gradient(
+      180deg,
+      rgba(36, 36, 36, 0.98),
+      color-mix(in srgb, var(--accent-color) 5%, rgba(30, 30, 30, 0.98))
+  );
   --app-table-text: #f1e7dc;
-  --app-table-header-text: rgba(255, 255, 255, 0.58);
+  --app-table-header-text: #{rgba(primitives.$white-base, .58)};
+  --app-table-footer-text: #{rgba(primitives.$white-base, .72)};
+  --app-table-header-shadow: inset 0 -1px 0 color-mix(in srgb, var(--accent-color) 18%, transparent);
+  --app-table-row-hover: color-mix(in srgb, var(--accent-color) 14%, rgba(255, 255, 255, 0.04));
+  --app-table-row-stripe: rgba(255, 255, 255, 0.015);
+  --app-table-column-min: 5rem;
 }
 
 .app-table-shell {
@@ -17,12 +42,14 @@
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  gap: 12px;
-  overflow: hidden;
-  padding: 8px;
+  min-width: 0;
+  gap: 8px;
+  overflow: auto;
+  padding: 14px 18px 8px;
   border: 1px solid var(--app-table-border);
-  border-radius: 20px;
-  background: var(--app-surface-card-bg, rgba(255, 255, 255, 0.96));
+  border-radius: 24px;
+  background: var(--app-table-shell-bg);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
   color: var(--app-table-text);
 }
 
@@ -51,6 +78,7 @@
 
 table[mat-table] {
   width: 100%;
+  min-width: 100%;
   background: transparent;
 }
 
@@ -63,14 +91,23 @@ table[mat-table] {
   border-spacing: 0;
 }
 
-table[mat-table] [class*='mat-column-'] {
-  text-align: center;
+table[mat-table] th.mat-mdc-header-cell {
+  background: var(--app-table-header) !important;
+  font-weight: 700;
+  font-size: 0.84rem;
+  color: var(--app-table-header-text);
+  box-shadow: var(--app-table-header-shadow);
 }
 
-table[mat-table] th.mat-mdc-header-cell {
-  background: var(--app-table-header);
-  font-weight: 700;
-  color: var(--app-table-header-text);
+table[mat-table] tr.mat-mdc-header-row,
+table[mat-table] tr.mat-mdc-row,
+table[mat-table] tr.mat-mdc-footer-row {
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+table[mat-table] tr.mat-mdc-header-row {
+  background: var(--app-table-header) !important;
 }
 
 table[mat-table] tr.mat-mdc-header-row th.mat-mdc-header-cell:first-child {
@@ -85,6 +122,9 @@ table[mat-table] th.mat-mdc-header-cell,
 table[mat-table] td.mat-mdc-cell,
 table[mat-table] td.mat-mdc-footer-cell {
   border-bottom-color: var(--app-table-border);
+  padding: 6px 12px;
+  text-align: left;
+  justify-content: flex-start;
 }
 
 table[mat-table] td.mat-mdc-cell,
@@ -94,18 +134,98 @@ table[mat-table] td.mat-mdc-footer-cell .mat-icon {
   color: var(--app-table-text);
 }
 
-.app-table-row {
+table[mat-table] td.mat-mdc-cell {
+  font-size: 0.9rem;
+  line-height: 1.15;
+}
+
+table[mat-table] tr.mat-mdc-row td.mat-mdc-cell,
+table[mat-table] tr.mat-mdc-header-row th.mat-mdc-header-cell {
+  height: 36px !important;
+}
+
+table[mat-table] td.mat-mdc-cell .mat-icon,
+table[mat-table] th.mat-mdc-header-cell .mat-icon,
+table[mat-table] td.mat-mdc-cell .material-icons,
+table[mat-table] th.mat-mdc-header-cell .material-icons {
+  font-size: 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+table[mat-table] tr.mat-mdc-row:nth-child(even) td.mat-mdc-cell {
+  background: var(--app-table-row-stripe);
+}
+
+table[mat-table] th.mat-mdc-header-cell,
+table[mat-table] td.mat-mdc-cell,
+table[mat-table] td.mat-mdc-footer-cell {
+  min-width: var(--app-table-column-min);
+}
+
+table[mat-table] th.mat-mdc-header-cell,
+table[mat-table] th.mat-mdc-header-cell > * {
+  white-space: nowrap;
+}
+
+.app-table-shell table[mat-table] .mat-sort-header-container {
+  margin-left: 0;
+}
+
+table[mat-table] th.mat-mdc-header-cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+table[mat-table] .mat-column-actions,
+table[mat-table] .mat-column-add {
+  min-width: max-content;
+}
+
+table[mat-table] :is(th, td).mat-column-actions,
+table[mat-table] :is(th, td).mat-column-add {
+  text-align: center !important;
+  justify-content: center !important;
+}
+
+table[mat-table] :is(th, td).mat-column-actions > *,
+table[mat-table] :is(th, td).mat-column-add > * {
+  width: auto;
+}
+
+table[mat-table] :is(th, td).mat-column-position,
+table[mat-table] :is(th, td).cdk-column-position {
+  min-width: 2.5rem !important;
+  max-width: 2.5rem !important;
+  width: 2.5rem !important;
+  white-space: nowrap;
+  text-align: center !important;
+  justify-content: center !important;
+  padding-inline: 0 !important;
+}
+
+table[mat-table] :is(td.mat-column-position, td.cdk-column-position) > * {
+  width: 100%;
+  text-align: center !important;
+}
+
+table[mat-table] td.mat-mdc-cell,
+table[mat-table] td.mat-mdc-footer-cell {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+table[mat-table] td.mat-mdc-cell > *,
+table[mat-table] td.mat-mdc-footer-cell > * {
+  min-width: 0;
+}
+
+table[mat-table] tr.mat-mdc-row:not(.detail-row):not(.app-table-detail-row) {
   transition: background-color 160ms ease;
 }
 
-tr[mat-row]:not(.detail-row):not(.app-table-detail-row),
-.app-table-row {
-  transition: background-color 160ms ease;
-}
-
-tr[mat-row]:not(.detail-row):not(.app-table-detail-row):hover,
-.app-table-row:hover {
-  background: var(--app-table-header);
+table[mat-table] tr.mat-mdc-row:not(.detail-row):not(.app-table-detail-row):hover td.mat-mdc-cell {
+  background: var(--app-table-row-hover) !important;
 }
 
 .detail-row,
@@ -138,6 +258,7 @@ tr.app-table-detail-row:not(.app-table-detail-row--expanded) td.mat-mdc-cell {
 .detail,
 .app-table-detail {
   overflow: hidden;
+  min-width: 0;
 }
 
 .app-table-master-row td.mat-mdc-cell {
@@ -146,6 +267,14 @@ tr.app-table-detail-row:not(.app-table-detail-row--expanded) td.mat-mdc-cell {
 
 .app-table-detail-fill {
   width: 100%;
+}
+
+.app-table-detail mat-list-item,
+.app-table-detail .mat-mdc-list-item,
+.app-table-detail [matListItemLine],
+.app-table-detail [matListItemTitle] {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .app-table-no-content {
@@ -159,17 +288,71 @@ tr.app-table-detail-row:not(.app-table-detail-row--expanded) td.mat-mdc-cell {
   gap: 8px;
 }
 
-mat-paginator,
-.app-table-paginator {
-  background: var(--app-table-header);
+mat-paginator {
+  background: var(--app-table-footer) !important;
   border-top: 1px solid var(--app-table-border);
+  color: var(--app-table-footer-text);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
-.app-table-shell mat-paginator,
-.app-table-shell .app-table-paginator {
+.app-table-shell mat-paginator {
   flex-shrink: 0;
-  margin: 0 -8px 0;
+  margin: 4px -8px -2px;
   padding: 0 8px;
   border-bottom-left-radius: 16px;
   border-bottom-right-radius: 16px;
+}
+
+.app-table-shell mat-paginator .mat-mdc-paginator-container {
+  min-height: 38px;
+  padding: 0 6px;
+  gap: 6px;
+}
+
+.app-table-shell mat-paginator .mat-mdc-paginator-page-size,
+.app-table-shell mat-paginator .mat-mdc-paginator-range-label,
+.app-table-shell mat-paginator .mat-mdc-paginator-navigation-previous,
+.app-table-shell mat-paginator .mat-mdc-paginator-navigation-next,
+.app-table-shell mat-paginator .mat-mdc-paginator-navigation-first,
+.app-table-shell mat-paginator .mat-mdc-paginator-navigation-last {
+  color: var(--app-table-footer-text);
+}
+
+.app-table-shell mat-paginator .mat-mdc-select-trigger {
+  color: var(--app-table-footer-text);
+  font-size: 0.82rem;
+}
+
+.app-table-shell mat-paginator .mat-mdc-icon-button {
+  border-radius: 10px;
+  transform: scale(0.9);
+}
+
+.app-table-shell mat-paginator .mat-mdc-icon-button:hover {
+  background: color-mix(in srgb, var(--accent-color) 12%, transparent);
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --app-table-column-min: 5.5rem;
+  }
+
+  table[mat-table] th.mat-mdc-header-cell,
+  table[mat-table] td.mat-mdc-cell,
+  table[mat-table] td.mat-mdc-footer-cell {
+    padding-inline: 10px;
+  }
+}
+
+@media (max-width: 599px) {
+  :root {
+    --app-table-column-min: 4.5rem;
+  }
+
+  table[mat-table] th.mat-column-actions,
+  table[mat-table] td.mat-column-actions {
+    width: 1% !important;
+    min-width: 3rem !important;
+    white-space: nowrap;
+  }
 }

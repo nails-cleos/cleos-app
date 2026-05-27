@@ -1,30 +1,34 @@
+@use 'styles/theme/color-literals' as colors;
+@use 'styles/theme/shared-primitives' as primitives;
+
 :root {
-  --app-surface-canvas-top: rgba(255, 255, 255, 0.96);
+  --app-surface-canvas-top: #{rgba(primitives.$white-base, .96)};
   --app-surface-canvas-bottom: rgba(247, 243, 238, 0.9);
-  --app-surface-canvas-glow: color-mix(in srgb, var(--accent-color, #dcc8c2) 16%, transparent);
-  --app-surface-hero-top: #fffdf9;
-  --app-surface-hero-bottom: #f6f1ea;
-  --app-surface-hero-glow: color-mix(in srgb, var(--accent-color, #dcc8c2) 28%, transparent);
-  --app-surface-hero-accent: color-mix(in srgb, var(--primary-color, #b5ac9e) 14%, transparent);
-  --app-surface-section-top: #fffdf9;
-  --app-surface-section-bottom: #f6f1ea;
-  --app-surface-section-glow: color-mix(in srgb, var(--accent-color, #dcc8c2) 18%, transparent);
-  --app-surface-section-accent: color-mix(in srgb, var(--primary-color, #b5ac9e) 10%, transparent);
-  --app-surface-card-bg: rgba(255, 255, 255, 0.96);
-  --app-surface-card-border: rgba(32, 28, 25, 0.06);
-  --app-surface-shell-border: color-mix(in srgb, var(--primary-color, #b5ac9e) 16%, rgba(32, 28, 25, 0.04));
+  --app-surface-canvas-glow: color-mix(in srgb, var(--accent-color) 16%, transparent);
+  --app-surface-hero-top: #{primitives.$surface-light-top};
+  --app-surface-hero-bottom: #{primitives.$surface-light-bottom};
+  --app-surface-hero-glow: color-mix(in srgb, var(--accent-color) 28%, transparent);
+  --app-surface-hero-accent: color-mix(in srgb, var(--primary-color) 14%, transparent);
+  --app-surface-section-top: var(--app-drawer-panel-bg);
+  --app-surface-section-bottom: var(--app-drawer-panel-bg);
+  --app-surface-section-glow: color-mix(in srgb, var(--accent-color) 18%, transparent);
+  --app-surface-section-accent: color-mix(in srgb, var(--primary-color) 10%, transparent);
+  --app-surface-card-bg: #{rgba(primitives.$white-base, .96)};
+  --app-surface-card-border: #{rgba(primitives.$warm-ink, .06)};
+  --app-surface-shell-border: color-mix(in srgb, var(--primary-color) 16%, #{rgba(primitives.$warm-ink, .04)});
   --app-surface-shell-width: 1200px;
-  --app-surface-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+  --app-surface-shadow: 0 18px 42px #{rgba(primitives.$shadow-ink, .08)};
   --app-surface-eyebrow: #75695d;
   --app-surface-label: #8a7767;
-  --app-surface-text: #111111;
+  --app-surface-text: #{colors.$text-strong-light};
   --app-surface-text-muted: #5f5f5f;
-  --app-chip-bg: rgba(255, 255, 255, 0.9);
-  --app-chip-border: rgba(32, 28, 25, 0.08);
+  --app-surface-disabled: #303030;
+  --app-chip-bg: #{rgba(primitives.$white-base, .9)};
+  --app-chip-border: #{rgba(primitives.$warm-ink, .08)};
   --app-chip-text: #2f2925;
-  --app-chip-ghost-bg: rgba(255, 255, 255, 0.6);
-  --app-surface-field-bg: rgba(255, 255, 255, 0.96);
-  --app-surface-field-bg-hover: rgba(255, 255, 255, 1);
+  --app-chip-ghost-bg: #{rgba(primitives.$white-base, .6)};
+  --app-surface-field-bg: #{rgba(primitives.$white-base, .96)};
+  --app-surface-field-bg-hover: #{rgba(primitives.$white-base, 1)};
   --app-drawer-panel-bg: var(--app-surface-hero-bottom);
   --app-drawer-side-bg: radial-gradient(circle at top right, var(--app-surface-hero-glow), transparent 32%),
   linear-gradient(180deg, var(--app-surface-hero-top), var(--app-surface-hero-bottom));
@@ -33,49 +37,75 @@
   --app-drawer-card-border: var(--app-surface-card-border);
   --app-drawer-text: var(--app-surface-text);
   --app-drawer-text-muted: var(--app-surface-text-muted);
-  --app-drawer-item-bg: rgba(255, 255, 255, 0.78);
-  --app-drawer-item-bg-hover: rgba(255, 255, 255, 0.96);
-  --app-drawer-item-bg-active: color-mix(in srgb, var(--accent-color, #dcc8c2) 26%, rgba(255, 255, 255, 0.98));
+  --app-drawer-item-bg: #{rgba(primitives.$white-base, .78)};
+  --app-drawer-item-bg-hover: #{rgba(primitives.$white-base, .96)};
+  --app-drawer-item-bg-active: color-mix(in srgb, var(--accent-color) 26%, #{rgba(primitives.$white-base, .98)});
   --app-drawer-item-border: var(--app-surface-card-border);
-  --app-drawer-item-border-active: color-mix(in srgb, var(--primary-color, #b5ac9e) 24%, var(--app-surface-card-border));
+  --app-drawer-item-border-active: color-mix(in srgb, var(--primary-color) 24%, var(--app-surface-card-border));
+  --app-dialog-top: #{rgba(primitives.$white-base, .98)};
+  --app-dialog-bottom: #{rgba(247, 243, 238, .98)};
+  --app-dialog-border: color-mix(in srgb, var(--primary-color) 12%, #{rgba(primitives.$warm-ink, .08)});
+  --app-dialog-shadow: 0 26px 72px #{rgba(primitives.$shadow-ink, .18)};
+  --app-dialog-shell-width: 560px;
+  --app-menu-panel-top: #{primitives.$surface-light-top};
+  --app-menu-panel-bottom: #{primitives.$surface-light-bottom};
+  --app-overlay-backdrop: rgba(34, 28, 24, .28);
+}
+
+.nav-gradient {
+  background: linear-gradient(
+      135deg,
+      var(--primary-darker-color) 0%,
+      var(--primary-color) 60%,
+      var(--accent-color) 100%
+  ) !important;
 }
 
 .dark-theme {
   --app-surface-canvas-top: rgba(28, 28, 28, 0.96);
   --app-surface-canvas-bottom: rgba(18, 18, 18, 0.94);
-  --app-surface-canvas-glow: color-mix(in srgb, var(--accent-color, #ceb4ac) 12%, transparent);
-  --app-surface-hero-top: #252525;
-  --app-surface-hero-bottom: #1b1b1b;
-  --app-surface-hero-glow: color-mix(in srgb, var(--accent-color, #ceb4ac) 16%, transparent);
-  --app-surface-hero-accent: color-mix(in srgb, var(--primary-color, #9d9282) 14%, transparent);
-  --app-surface-section-top: #252525;
-  --app-surface-section-bottom: #1b1b1b;
-  --app-surface-section-glow: color-mix(in srgb, var(--accent-color, #ceb4ac) 14%, transparent);
-  --app-surface-section-accent: color-mix(in srgb, var(--primary-color, #9d9282) 12%, transparent);
+  --app-surface-canvas-glow: color-mix(in srgb, var(--accent-color) 12%, transparent);
+  --app-surface-hero-top: #{primitives.$surface-dark-top};
+  --app-surface-hero-bottom: #{primitives.$surface-dark-bottom};
+  --app-surface-hero-glow: color-mix(in srgb, var(--accent-color) 16%, transparent);
+  --app-surface-hero-accent: color-mix(in srgb, var(--primary-color) 14%, transparent);
+  --app-surface-section-top: var(--app-drawer-panel-bg);
+  --app-surface-section-bottom: var(--app-drawer-panel-bg);
+  --app-surface-section-glow: color-mix(in srgb, var(--accent-color) 14%, transparent);
+  --app-surface-section-accent: color-mix(in srgb, var(--primary-color) 12%, transparent);
   --app-surface-card-bg: rgba(34, 34, 34, 0.96);
-  --app-surface-card-border: rgba(255, 255, 255, 0.08);
-  --app-surface-shell-border: color-mix(in srgb, var(--accent-color, #ceb4ac) 18%, rgba(255, 255, 255, 0.04));
-  --app-surface-shadow: 0 18px 42px rgba(0, 0, 0, 0.32);
-  --app-surface-eyebrow: rgba(255, 255, 255, 0.58);
-  --app-surface-label: rgba(255, 255, 255, 0.58);
-  --app-surface-text: #ffffff;
-  --app-surface-text-muted: rgba(255, 255, 255, 0.58);
+  --app-surface-card-border: #{rgba(primitives.$white-base, .08)};
+  --app-surface-shell-border: color-mix(in srgb, var(--accent-color) 18%, #{rgba(primitives.$white-base, .04)});
+  --app-surface-shadow: 0 18px 42px #{rgba(primitives.$black-base, .32)};
+  --app-surface-eyebrow: #{rgba(primitives.$white-base, .58)};
+  --app-surface-label: #{rgba(primitives.$white-base, .58)};
+  --app-surface-text: #{colors.$text-strong-dark};
+  --app-surface-text-muted: #{rgba(primitives.$white-base, .58)};
+  --app-surface-disabled: #a0a0a0;
   --app-chip-bg: rgba(36, 36, 36, 0.9);
-  --app-chip-border: rgba(255, 255, 255, 0.08);
-  --app-chip-text: #ffffff;
-  --app-chip-ghost-bg: rgba(255, 255, 255, 0.05);
+  --app-chip-border: #{rgba(primitives.$white-base, .08)};
+  --app-chip-text: #{colors.$text-strong-dark};
+  --app-chip-ghost-bg: #{rgba(primitives.$white-base, .05)};
   --app-surface-field-bg: rgba(34, 34, 34, 0.96);
   --app-surface-field-bg-hover: rgba(42, 42, 42, 0.98);
-  --app-drawer-panel-bg: var(--app-drawer-card-bg);
-  --app-drawer-item-bg: rgba(255, 255, 255, 0.03);
-  --app-drawer-item-bg-hover: rgba(255, 255, 255, 0.05);
-  --app-drawer-item-bg-active: color-mix(in srgb, var(--accent-color, #ceb4ac) 10%, rgba(255, 255, 255, 0.04));
-  --app-drawer-item-border: rgba(255, 255, 255, 0.08);
-  --app-drawer-item-border-active: color-mix(in srgb, var(--accent-color, #ceb4ac) 16%, rgba(255, 255, 255, 0.08));
-  --mdc-list-list-item-label-text-color: #ffffff;
-  --mdc-list-list-item-supporting-text-color: rgba(255, 255, 255, 0.72);
-  --mdc-list-list-item-leading-icon-color: #ffffff;
-  --mdc-list-list-item-trailing-icon-color: #ffffff;
+  --app-drawer-panel-bg: var(--app-surface-card-bg);
+  --app-drawer-item-bg: #{rgba(primitives.$white-base, .03)};
+  --app-drawer-item-bg-hover: #{rgba(primitives.$white-base, .05)};
+  --app-drawer-item-bg-active: color-mix(in srgb, var(--accent-color) 10%, #{rgba(primitives.$white-base, .04)});
+  --app-drawer-item-border: #{rgba(primitives.$white-base, .08)};
+  --app-drawer-item-border-active: color-mix(in srgb, var(--accent-color) 16%, #{rgba(primitives.$white-base, .08)});
+  --app-dialog-top: rgba(38, 38, 38, .98);
+  --app-dialog-bottom: rgba(24, 24, 24, .98);
+  --app-dialog-border: color-mix(in srgb, var(--accent-color) 18%, #{rgba(primitives.$white-base, .08)});
+  --app-dialog-shadow: 0 30px 82px #{rgba(primitives.$black-base, .42)};
+  --app-dialog-shell-width: 560px;
+  --app-menu-panel-top: #{primitives.$surface-dark-top};
+  --app-menu-panel-bottom: #{primitives.$surface-dark-bottom};
+  --app-overlay-backdrop: rgba(0, 0, 0, .48);
+  --mdc-list-list-item-label-text-color: #{colors.$text-strong-dark};
+  --mdc-list-list-item-supporting-text-color: #{rgba(primitives.$white-base, .72)};
+  --mdc-list-list-item-leading-icon-color: #{colors.$text-strong-dark};
+  --mdc-list-list-item-trailing-icon-color: #{colors.$text-strong-dark};
   --mat-list-active-indicator-color: transparent;
 }
 
@@ -99,6 +129,55 @@
   width: min(100%, var(--app-surface-shell-width));
   max-width: 100%;
   margin-inline: auto;
+}
+
+.cdk-overlay-backdrop.cdk-overlay-dark-backdrop {
+  background: var(--app-overlay-backdrop);
+  backdrop-filter: blur(14px);
+}
+
+.mat-mdc-dialog-container {
+  --mdc-dialog-container-color: transparent;
+}
+
+.cdk-overlay-pane:has(.app-surface-dialog-shell) {
+  width: min(var(--app-dialog-shell-width), calc(100vw - 48px)) !important;
+  max-width: calc(100vw - 48px) !important;
+}
+
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  overflow: hidden !important;
+  padding: 0 !important;
+  border: 1px solid var(--app-dialog-border);
+  border-radius: 30px !important;
+  background-color: color-mix(in srgb, var(--app-dialog-bottom) 96%, white 4%) !important;
+  background-image: linear-gradient(180deg, var(--app-dialog-top), var(--app-dialog-bottom)) !important;
+  box-shadow: var(--app-dialog-shadow) !important;
+  color: var(--app-surface-text);
+}
+
+.mat-mdc-dialog-container:has(app-dialog) .mdc-dialog__surface {
+  width: min(var(--app-dialog-shell-width), calc(100vw - 48px));
+  max-width: calc(100vw - 48px);
+  background-color: color-mix(in srgb, var(--app-dialog-bottom) 90%, white 10%) !important;
+  background-image: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--app-dialog-top) 99%, white 1%),
+      color-mix(in srgb, var(--app-dialog-bottom) 90%, white 10%)
+  ) !important;
+}
+
+.app-surface-bottom-sheet-panel .mat-bottom-sheet-container {
+  overflow: hidden;
+  padding: 0 !important;
+  border: 1px solid var(--app-dialog-border);
+  border-bottom: 0;
+  border-radius: 30px 30px 0 0;
+  background: radial-gradient(circle at top right, var(--app-surface-hero-glow), transparent 36%),
+  radial-gradient(circle at 14% 18%, var(--app-surface-hero-accent), transparent 22%),
+  linear-gradient(180deg, var(--app-dialog-top), var(--app-dialog-bottom)) !important;
+  box-shadow: var(--app-dialog-shadow) !important;
+  color: var(--app-surface-text);
 }
 
 .app-surface-hero,
@@ -163,10 +242,95 @@
   margin-top: 10px;
 }
 
-.app-surface-loading-state {
+.app-surface-skeleton-spacer {
+  margin: 5px 0;
+}
+
+.app-surface-spacer {
+  flex-grow: 1;
+}
+
+.app-surface-actions {
   display: flex;
-  justify-content: center;
-  padding: 48px 28px;
+  align-items: center;
+}
+
+.content {
+  .section-style {
+    margin: 70px 35px;
+    padding-top: 58px;
+  }
+}
+
+.detail,
+.app-table-detail {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  pointer-events: none;
+  transition: grid-template-rows 225ms cubic-bezier(0.4, 0, 0.2, 1), opacity 225ms ease-in-out;
+}
+
+.detail:not(.detail-expanded),
+.app-table-detail:not(.detail-expanded) {
+  grid-template-rows: 0fr !important;
+  opacity: 0 !important;
+}
+
+.detail.detail-expanded,
+.app-table-detail.detail-expanded {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.detail > *,
+.app-table-detail > * {
+  min-height: 0;
+}
+
+.detail:not(.detail-expanded) > *,
+.app-table-detail:not(.detail-expanded) > * {
+  overflow: hidden;
+}
+
+.detail.detail-expanded > *,
+.app-table-detail.detail-expanded > * {
+  overflow: visible;
+  min-height: auto;
+}
+
+@media screen and (max-width: 599px) {
+  .app-surface-hide-mobile,
+  button.app-surface-hide-mobile,
+  a.app-surface-hide-mobile,
+  button[mat-icon-button].app-surface-hide-mobile,
+  a[mat-icon-button].app-surface-hide-mobile {
+    display: none !important;
+  }
+}
+
+@media screen and (min-width: 600px) {
+  .app-surface-hide-desktop,
+  button.app-surface-hide-desktop,
+  a.app-surface-hide-desktop,
+  button[mat-icon-button].app-surface-hide-desktop,
+  a[mat-icon-button].app-surface-hide-desktop {
+    display: none !important;
+  }
+}
+
+.app-surface-cell-wrap {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 20% !important;
+  width: 20% !important;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
 }
 
 .app-surface-item,
@@ -207,8 +371,44 @@
 }
 
 .app-surface-dialog-shell {
-  min-width: min(100%, 480px);
-  padding: 10px 36px 14px 8px;
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 24px 24px 22px;
+  color: var(--app-surface-text);
+  overflow: hidden;
+}
+
+.app-surface-dialog-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background-color: color-mix(in srgb, var(--app-dialog-bottom) 96%, white 4%);
+  background-image: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--app-dialog-top) 98%, white 2%),
+      color-mix(in srgb, var(--app-dialog-bottom) 96%, var(--app-dialog-top) 4%)
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45);
+}
+
+.app-surface-dialog-shell > * {
+  position: relative;
+  z-index: 1;
+}
+
+.app-surface-dialog-shell--confirm::before {
+  background-color: color-mix(in srgb, var(--app-dialog-bottom) 90%, white 10%);
+  background-image: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--app-dialog-top) 99%, white 1%),
+      color-mix(in srgb, var(--app-dialog-bottom) 90%, white 10%)
+  );
 }
 
 .app-surface-dialog-shell.app-surface-dialog-shell--warning .app-surface-dialog-badge {
@@ -217,81 +417,88 @@
 }
 
 .app-surface-dialog-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-height: 44px;
-  padding-right: 4px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: flex-start;
+  gap: 16px;
+  min-height: 48px;
 }
 
 .app-surface-dialog-title-wrap {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: flex-start;
+  gap: 16px;
   min-width: 0;
+  overflow: hidden;
 }
 
 .app-surface-dialog-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  flex: 0 0 40px;
-  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  border: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+  border-radius: 16px;
   color: var(--primary-darker-color);
-  background: color-mix(in srgb, var(--primary-lighter-color) 78%, transparent);
+  background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--primary-lighter-color) 92%, transparent),
+      color-mix(in srgb, var(--primary-color) 12%, transparent)
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45);
+}
+
+.app-surface-dialog-badge .mat-icon {
+  margin: 0;
+  transform: scale(1.08);
 }
 
 .app-surface-dialog-title {
+  display: block;
+  flex: 1 1 auto;
   margin: 0;
-  line-height: 1.2;
-  font-size: 1.25rem;
-  font-weight: 700;
+  max-width: 100%;
+  min-width: 0;
+  line-height: 1.15;
+  font-size: clamp(1.3rem, 1.05rem + .8vw, 1.75rem);
+  font-weight: 800;
+  letter-spacing: -.02em;
   white-space: normal;
-}
-
-.app-surface-dialog-close {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 40px;
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  padding: 0;
-  margin: -2px -2px 0 0;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: inherit;
-  overflow: hidden;
-  cursor: pointer;
-  appearance: none;
-}
-
-.app-surface-dialog-close:hover {
-  background: color-mix(in srgb, currentColor 8%, transparent);
-}
-
-.app-surface-dialog-close mat-icon {
-  margin: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
 }
 
 .app-surface-dialog-divider {
   height: 1px;
-  margin: 20px -24px 20px -18px;
-  background: color-mix(in srgb, currentColor 12%, transparent);
+  margin: 18px 0;
+  background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, currentColor 18%, transparent) 12%,
+      color-mix(in srgb, currentColor 18%, transparent) 88%,
+      transparent
+  );
 }
 
 .app-surface-dialog-content[mat-dialog-content] {
   margin: 0;
-  padding: 8px 14px 12px !important;
+  padding: 2px 2px 6px !important;
   color: color-mix(in srgb, currentColor 82%, transparent);
-  line-height: 1.6;
+  font-size: .98rem;
+  line-height: 1.7;
   max-height: none;
+}
+
+.app-surface-dialog-content[mat-dialog-content] > :first-child {
+  margin-top: 0;
+}
+
+.app-surface-dialog-content[mat-dialog-content] > :last-child {
+  margin-bottom: 0;
 }
 
 .app-surface-dialog-shell--warning .app-surface-dialog-content[mat-dialog-content] {
@@ -306,14 +513,35 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 20px 0 14px !important;
+  padding: 6px 0 0 !important;
   margin: 0;
   min-height: 0;
 }
 
-.app-surface-dialog-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button) {
+.app-surface-dialog-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button) {
   --mdc-outlined-button-label-text-color: var(--app-detail-action-text);
   --mat-outlined-button-state-layer-color: var(--app-detail-action-state);
+  border-color: var(--app-detail-action-border);
+  background: linear-gradient(180deg, var(--app-detail-action-bg-top), var(--app-detail-action-bg-bottom));
+  color: var(--app-detail-action-text);
+  box-shadow: none;
+}
+
+.app-surface-dialog-actions .mat-mdc-unelevated-button {
+  --mdc-filled-button-container-color: transparent;
+  --mdc-filled-button-label-text-color: rgba(255, 255, 255, .98);
+  --mat-filled-button-state-layer-color: rgba(255, 255, 255, .18);
+  border: 1px solid color-mix(in srgb, var(--primary-darker-color) 36%, transparent);
+  background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--primary-darker-color) 94%, white 6%),
+      color-mix(in srgb, var(--primary-color) 90%, black 10%)
+  );
+  color: rgba(255, 255, 255, .98);
+  box-shadow: 0 12px 22px color-mix(in srgb, var(--primary-color) 20%, transparent);
+}
+
+.app-surface-dialog-actions .mat-mdc-unelevated-button.app-surface-dialog-action-secondary {
   --mdc-filled-button-label-text-color: var(--app-detail-action-text);
   --mat-filled-button-state-layer-color: var(--app-detail-action-state);
   border-color: var(--app-detail-action-border);
@@ -322,18 +550,116 @@
   box-shadow: none;
 }
 
-.app-surface-dialog-actions :is(a.mat-mdc-stroked-button, a.mat-mdc-outlined-button, a.mat-mdc-unelevated-button),
-.app-surface-dialog-actions :is(button.mat-mdc-stroked-button, button.mat-mdc-outlined-button, button.mat-mdc-unelevated-button),
-.app-surface-dialog-actions :is(a.mat-mdc-stroked-button, a.mat-mdc-outlined-button, a.mat-mdc-unelevated-button) .mdc-button__label,
-.app-surface-dialog-actions :is(button.mat-mdc-stroked-button, button.mat-mdc-outlined-button, button.mat-mdc-unelevated-button) .mdc-button__label,
-.app-surface-dialog-actions :is(a.mat-mdc-stroked-button, a.mat-mdc-outlined-button, a.mat-mdc-unelevated-button) .mat-icon,
-.app-surface-dialog-actions :is(button.mat-mdc-stroked-button, button.mat-mdc-outlined-button, button.mat-mdc-unelevated-button) .mat-icon {
+.app-surface-dialog-actions .mat-mdc-unelevated-button.mat-warn {
+  --mdc-filled-button-label-text-color: color-mix(in srgb, var(--warn-color) 88%, black 12%);
+  --mat-filled-button-state-layer-color: color-mix(in srgb, var(--warn-color) 14%, transparent);
+  border-color: color-mix(in srgb, var(--warn-color) 24%, transparent);
+  background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--warn-color) 10%, white 90%),
+      color-mix(in srgb, var(--warn-color) 16%, white 84%)
+  );
+  color: color-mix(in srgb, var(--warn-color) 88%, black 12%);
+  box-shadow: none;
+}
+
+.app-surface-dialog-actions button {
+  min-height: 44px;
+  padding-inline: 18px;
+  border-radius: 14px;
+  font-weight: 700;
+  letter-spacing: .01em;
+}
+
+.app-surface-dialog-actions :is(a.mat-mdc-stroked-button, a.mat-mdc-outlined-button),
+.app-surface-dialog-actions :is(button.mat-mdc-stroked-button, button.mat-mdc-outlined-button),
+.app-surface-dialog-actions :is(a.mat-mdc-stroked-button, a.mat-mdc-outlined-button) .mdc-button__label,
+.app-surface-dialog-actions :is(button.mat-mdc-stroked-button, button.mat-mdc-outlined-button) .mdc-button__label,
+.app-surface-dialog-actions :is(a.mat-mdc-stroked-button, a.mat-mdc-outlined-button) .mat-icon,
+.app-surface-dialog-actions :is(button.mat-mdc-stroked-button, button.mat-mdc-outlined-button) .mat-icon {
   color: var(--app-detail-action-text) !important;
 }
 
-.app-surface-dialog-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button):hover {
+.app-surface-dialog-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button):hover {
   border-color: var(--app-detail-action-border-hover);
   background: linear-gradient(180deg, var(--app-detail-action-hover-top), var(--app-detail-action-hover-bottom));
+}
+
+.app-surface-dialog-actions .mat-mdc-unelevated-button,
+.app-surface-dialog-actions .mat-mdc-unelevated-button .mdc-button__label,
+.app-surface-dialog-actions .mat-mdc-unelevated-button .mat-icon {
+  color: rgba(255, 255, 255, .98) !important;
+}
+
+.app-surface-dialog-actions .mat-mdc-unelevated-button.app-surface-dialog-action-secondary,
+.app-surface-dialog-actions .mat-mdc-unelevated-button.app-surface-dialog-action-secondary .mdc-button__label,
+.app-surface-dialog-actions .mat-mdc-unelevated-button.app-surface-dialog-action-secondary .mat-icon {
+  color: var(--app-detail-action-text) !important;
+}
+
+.app-surface-dialog-actions .mat-mdc-unelevated-button.mat-warn,
+.app-surface-dialog-actions .mat-mdc-unelevated-button.mat-warn .mdc-button__label,
+.app-surface-dialog-actions .mat-mdc-unelevated-button.mat-warn .mat-icon {
+  color: color-mix(in srgb, var(--warn-color) 88%, black 12%) !important;
+}
+
+.app-surface-dialog-actions .mat-mdc-unelevated-button:hover {
+  transform: translateY(-1px);
+  filter: saturate(1.05) brightness(.98);
+  box-shadow: 0 14px 24px color-mix(in srgb, var(--primary-color) 24%, transparent);
+}
+
+.app-surface-dialog-actions .mat-mdc-unelevated-button.app-surface-dialog-action-secondary:hover {
+  filter: none;
+  box-shadow: none;
+  border-color: var(--app-detail-action-border-hover);
+  background: linear-gradient(180deg, var(--app-detail-action-hover-top), var(--app-detail-action-hover-bottom));
+}
+
+.app-surface-dialog-actions .mat-mdc-unelevated-button.mat-warn:hover {
+  border-color: color-mix(in srgb, var(--warn-color) 32%, transparent);
+  background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--warn-color) 14%, white 86%),
+      color-mix(in srgb, var(--warn-color) 22%, white 78%)
+  );
+  box-shadow: none;
+}
+
+.app-surface-dialog-actions :is(button, a).mat-mdc-button-disabled,
+.app-surface-dialog-actions :is(button, a)[disabled] {
+  border-color: color-mix(in srgb, currentColor 8%, transparent) !important;
+  background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--app-detail-action-bg-top) 78%, var(--app-dialog-bottom) 22%),
+      color-mix(in srgb, var(--app-detail-action-bg-bottom) 82%, var(--app-dialog-bottom) 18%)
+  ) !important;
+  color: color-mix(in srgb, var(--app-surface-text-muted) 88%, transparent) !important;
+  box-shadow: none !important;
+  filter: grayscale(.12) saturate(.7) !important;
+  cursor: not-allowed;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.app-surface-dialog-actions :is(button, a).mat-mdc-button-disabled .mdc-button__label,
+.app-surface-dialog-actions :is(button, a).mat-mdc-button-disabled .mat-icon,
+.app-surface-dialog-actions :is(button, a)[disabled] .mdc-button__label,
+.app-surface-dialog-actions :is(button, a)[disabled] .mat-icon {
+  color: color-mix(in srgb, var(--app-surface-text-muted) 88%, transparent) !important;
+}
+
+.app-surface-dialog-actions :is(button, a).mat-mdc-button-disabled:hover,
+.app-surface-dialog-actions :is(button, a)[disabled]:hover {
+  border-color: color-mix(in srgb, currentColor 8%, transparent) !important;
+  background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--app-detail-action-bg-top) 78%, var(--app-dialog-bottom) 22%),
+      color-mix(in srgb, var(--app-detail-action-bg-bottom) 82%, var(--app-dialog-bottom) 18%)
+  ) !important;
+  box-shadow: none !important;
+  filter: grayscale(.12) saturate(.7) !important;
+  transform: none !important;
 }
 
 .app-surface-dialog-spacer {
@@ -459,160 +785,6 @@
   color: var(--app-surface-text);
 }
 
-.app-surface-config-card {
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-  min-height: 68px;
-  padding: 16px 18px;
-  border-radius: 18px;
-  border-color: var(--app-surface-card-border);
-  background: radial-gradient(circle at top left, color-mix(in srgb, var(--accent-color) 10%, transparent), transparent 40%),
-  linear-gradient(180deg, color-mix(in srgb, var(--app-surface-card-bg) 92%, #ffffff 8%), var(--app-surface-card-bg));
-  color: var(--app-surface-text);
-  text-align: left;
-  cursor: pointer;
-  transition: transform 180ms ease,
-  border-color 180ms ease,
-  box-shadow 180ms ease,
-  background-color 180ms ease;
-}
-
-.app-surface-config-card:hover {
-  border-color: color-mix(in srgb, var(--accent-color) 28%, var(--app-surface-card-border));
-  box-shadow: 0 18px 32px rgba(58, 40, 31, 0.12);
-  transform: translateY(-1px);
-  background: radial-gradient(circle at top left, color-mix(in srgb, var(--accent-color) 14%, transparent), transparent 42%),
-  linear-gradient(180deg, color-mix(in srgb, var(--app-surface-card-bg) 88%, #ffffff 12%), var(--app-surface-card-bg));
-}
-
-.app-surface-config-card--active {
-  border-color: color-mix(in srgb, var(--accent-color) 34%, var(--app-surface-card-border));
-  background: radial-gradient(circle at top right, color-mix(in srgb, var(--accent-color) 16%, transparent), transparent 58%),
-  radial-gradient(circle at top left, color-mix(in srgb, var(--accent-color) 10%, transparent), transparent 40%),
-  linear-gradient(180deg, color-mix(in srgb, var(--app-surface-card-bg) 90%, #ffffff 10%), var(--app-surface-card-bg));
-}
-
-.app-surface-config-card__icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  border: 1px solid color-mix(in srgb, var(--accent-color) 18%, var(--app-surface-card-border));
-  background: radial-gradient(circle at top left, color-mix(in srgb, var(--accent-color) 14%, transparent), transparent 48%),
-  color-mix(in srgb, var(--app-surface-card-bg) 72%, #ffffff 28%);
-  color: var(--app-surface-text);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
-}
-
-.app-surface-config-card__title {
-  color: var(--app-surface-text);
-  font-size: 0.94rem;
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
-
-.app-surface-config-card--logout .app-surface-config-card__title,
-.app-surface-config-card--logout .app-surface-config-card__icon {
-  color: color-mix(in srgb, var(--warn-color, #b85c38) 82%, var(--app-surface-text) 18%);
-}
-
-.app-surface-config-card--logout .app-surface-config-card__icon {
-  border-color: color-mix(in srgb, var(--warn-color, #b85c38) 28%, var(--app-surface-card-border));
-  background: radial-gradient(circle at top left, color-mix(in srgb, var(--warn-color, #b85c38) 14%, transparent), transparent 48%),
-  color-mix(in srgb, var(--app-surface-card-bg) 78%, #ffffff 22%);
-}
-
-.app-surface-header-menu {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.app-surface-header-menu__panel {
-  position: absolute;
-  top: calc(100% + 12px);
-  right: 0;
-  z-index: 1200;
-  box-sizing: border-box;
-  padding: 12px;
-  border: 1px solid var(--app-surface-shell-border);
-  border-radius: 24px;
-  background: radial-gradient(circle at top right, var(--app-surface-section-glow), transparent 30%),
-  radial-gradient(circle at 12% 24%, var(--app-surface-section-accent), transparent 22%),
-  linear-gradient(180deg, var(--app-surface-section-top), var(--app-surface-section-bottom));
-  box-shadow: var(--app-surface-shadow);
-}
-
-.app-surface-header-menu__panel--notifications {
-  width: min(340px, calc(100vw - 24px));
-}
-
-.app-surface-header-menu__panel--settings {
-  width: min(320px, calc(100vw - 24px));
-}
-
-.app-surface-notification-menu__content {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.app-surface-notification-card {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-  padding: 16px 18px;
-  border-radius: 18px;
-  text-align: left;
-  border-color: var(--app-surface-card-border);
-  background: var(--app-surface-card-bg);
-  color: inherit;
-  cursor: pointer;
-}
-
-.app-surface-notification-card--empty {
-  cursor: default;
-}
-
-.app-surface-notification-card__top {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.app-surface-notification-card__dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 999px;
-  background: var(--accent-color);
-  flex: 0 0 9px;
-}
-
-.app-surface-notification-card__message {
-  color: var(--app-surface-text);
-  font-weight: 600;
-  line-height: 1.4;
-  overflow-wrap: anywhere;
-  white-space: normal;
-}
-
-.app-surface-notification-card--read .app-surface-notification-card__message {
-  color: var(--app-surface-text-muted);
-  font-weight: 500;
-}
-
-.app-surface-notification-menu__actions {
-  justify-content: flex-end;
-}
-
 @media (max-width: 1100px) {
   .app-surface-canvas {
     padding: 14px 14px 88px;
@@ -640,14 +812,26 @@
 
   .app-surface-dialog-shell {
     min-width: 0;
-    padding: 8px 24px 12px 10px;
+    padding: 18px 18px 16px;
+  }
+
+  .app-surface-dialog-title-wrap {
+    gap: 12px;
+  }
+
+  .app-surface-dialog-badge {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+    border-radius: 14px;
   }
 
   .app-surface-dialog-actions[mat-dialog-actions] {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
     gap: 10px;
-    padding: 12px 18px 0 12px !important;
+    padding: 8px 0 0 !important;
   }
 
   .app-surface-dialog-actions[mat-dialog-actions] .app-surface-dialog-spacer {
@@ -655,7 +839,8 @@
   }
 
   .app-surface-dialog-actions[mat-dialog-actions] button {
-    width: 100%;
+    flex: 1 1 0;
+    width: 0;
     min-width: 0;
   }
 

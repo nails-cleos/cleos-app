@@ -21,7 +21,10 @@ export enum ReservationIconName {
   color = 'palette',
   previous = 'line_start_arrow_notch',
   next = 'line_end_arrow_notch',
-  clone = 'file_copy'
+  clone = 'file_copy',
+  overview = 'person',
+  note = 'note_add',
+  discount = 'switch_access_shortcut_add'
 }
 
 export enum RoomIconName {

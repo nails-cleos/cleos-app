@@ -13,8 +13,8 @@ type ProfessionalForm = {
   professional: FormControl<IUserAll | undefined>;
 }
 
-type ProfessionalDialogData = {
-  professionals: IUserAll[],
+export type ProfessionalDialogData = {
+  professionals?: IUserAll[],
   small: boolean;
 }
 

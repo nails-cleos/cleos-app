@@ -19,10 +19,10 @@
           </ng-container>
 
           <ng-container matColumnDef="professional">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
                 mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.PROFESSIONAL' | translate }}
             </th>
-            <td *matCellDef="let unavailable" class="hide-xs" mat-cell>
+            <td *matCellDef="let unavailable" class="app-surface-hide-mobile" mat-cell>
               @if (unavailable.id) {
                 <div>{{ unavailable.professional?.displayName }}</div>
               } @else {
@@ -32,10 +32,10 @@
           </ng-container>
 
           <ng-container matColumnDef="description">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
                 mat-sort-header>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}
             </th>
-            <td *matCellDef="let unavailable" class="hide-xs" mat-cell>
+            <td *matCellDef="let unavailable" class="app-surface-hide-mobile" mat-cell>
               @if (unavailable.id) {
                 <div>{{ unavailable.description }}</div>
               } @else {
@@ -64,10 +64,10 @@
           </ng-container>
 
           <ng-container matColumnDef="duration">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
                 mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.DURATION' | translate }}
             </th>
-            <td *matCellDef="let unavailable" class="column-large-text hide-xs" mat-cell>
+            <td *matCellDef="let unavailable" class="app-surface-cell-wrap app-surface-hide-mobile" mat-cell>
               @if (unavailable.id) {
                 @if (!unavailable.allDay) {
                   <mat-icon matPrefix>timer</mat-icon>&nbsp;{{ unavailable.duration | durationTime }}
@@ -81,10 +81,10 @@
           </ng-container>
 
           <ng-container matColumnDef="repeat">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
                 mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.REPEAT' | translate }}
             </th>
-            <td *matCellDef="let unavailable" class="column-large-text hide-xs" mat-cell>
+            <td *matCellDef="let unavailable" class="app-surface-cell-wrap app-surface-hide-mobile" mat-cell>
               @if (unavailable.id) {
                 {{ 'COMMON.REPEAT.' + unavailable.repeat | translate }}
               } @else {
@@ -94,10 +94,14 @@
           </ng-container>
 
           <ng-container matColumnDef="actions">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell>
-              {{ 'COMMON.COLUMN.ACTIONS' | translate }}
+            <th *matHeaderCellDef mat-header-cell>
+              <span class="app-surface-hide-mobile">{{ 'COMMON.COLUMN.ACTIONS' | translate }}</span>
+              <button [routerLink]="['/', language, 'unavailable', 'add']" mat-icon-button id="add-button"
+                      matTooltip="{{ 'UNAVAILABLE.TITLE' | translate }}" matTooltipPosition="right" type="button">
+                <mat-icon color="primary">calendar_lock</mat-icon>
+              </button>
             </th>
-            <td *matCellDef="let unavailable" class="hide-xs" mat-cell>
+            <td *matCellDef="let unavailable" class="app-surface-hide-mobile" mat-cell>
               @if (unavailable.id) {
                 @if (!unavailable.deleted) {
                   <button (click)="edit(unavailable)" mat-icon-button
@@ -117,38 +121,24 @@
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="add">
-            <th *matHeaderCellDef mat-header-cell>
-              <button [routerLink]="['/', language, 'unavailable', 'add']" mat-icon-button id="add-button"
-                      matTooltip="{{ 'UNAVAILABLE.TITLE' | translate }}" matTooltipPosition="right" type="button">
-                <mat-icon color="primary">calendar_lock</mat-icon>
-              </button>
-            </th>
-            <td *matCellDef="let additional" mat-cell>
-              @if (!additional.id) {
-                <div class="ssc-line"></div>
-              }
-            </td>
-          </ng-container>
-
           <ng-container matColumnDef="expandedDetail">
             <td *matCellDef="let unavailable" [attr.colspan]="displayedColumns.length" mat-cell>
               <div [class.detail-expanded]="unavailable === expandedUnavailable"
                    class="detail app-table-detail-fill">
                 <mat-list>
-                  <mat-list-item class="hide-gt-xs" role="list">
-                    <div class="hide-gt-xs" matListItemTitle>{{ 'UNAVAILABLE.LIST.COLUMN.PROFESSIONAL' | translate }}
+                  <mat-list-item class="app-surface-hide-desktop" role="list">
+                    <div class="app-surface-hide-desktop" matListItemTitle>{{ 'UNAVAILABLE.LIST.COLUMN.PROFESSIONAL' | translate }}
                     </div>
                     <div matListItemLine>{{ unavailable.professional?.displayName }}</div>
                   </mat-list-item>
                   @if (unavailable.description) {
-                    <mat-list-item class="hide-gt-xs" role="list">
-                      <div class="hide-gt-xs" matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
+                    <mat-list-item class="app-surface-hide-desktop" role="list">
+                      <div class="app-surface-hide-desktop" matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
                       <div matListItemLine>{{ unavailable.description }}</div>
                     </mat-list-item>
                   }
-                  <mat-list-item class="hide-gt-xs" role="list">
-                    <div class="hide-gt-xs" matListItemTitle>{{ 'UNAVAILABLE.LIST.COLUMN.DURATION' | translate }}</div>
+                  <mat-list-item class="app-surface-hide-desktop" role="list">
+                    <div class="app-surface-hide-desktop" matListItemTitle>{{ 'UNAVAILABLE.LIST.COLUMN.DURATION' | translate }}</div>
                     @if (!unavailable.allDay) {
                       <div matListItemLine>
                         <mat-icon matPrefix>timer</mat-icon>&nbsp;{{ unavailable.duration | durationTime }}
@@ -159,12 +149,12 @@
                       </div>
                     }
                   </mat-list-item>
-                  <mat-list-item class="hide-gt-xs" role="list">
-                    <div class="hide-gt-xs" matListItemTitle>{{ 'UNAVAILABLE.LIST.COLUMN.REPEAT' | translate }}</div>
+                  <mat-list-item class="app-surface-hide-desktop" role="list">
+                    <div class="app-surface-hide-desktop" matListItemTitle>{{ 'UNAVAILABLE.LIST.COLUMN.REPEAT' | translate }}</div>
                     <div matListItemLine>{{ 'COMMON.REPEAT.' + unavailable.repeat | translate }}</div>
                   </mat-list-item>
-                  <div class="hide-gt-xs" mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
-                  <mat-list-item class="hide-gt-xs">
+                  <div class="app-surface-hide-desktop" mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+                  <mat-list-item class="app-surface-hide-desktop">
                     @if (!unavailable.deleted) {
                       <button (click)="edit(unavailable)" mat-icon-button>
                         <mat-icon matListItemIcon color="primary">edit</mat-icon>
@@ -186,13 +176,13 @@
           </ng-container>
 
           <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-          <tr *matRowDef="let unavailable; columns: displayedColumns;" class="hide-xs" mat-row></tr>
+          <tr *matRowDef="let unavailable; columns: displayedColumns;" class="app-surface-hide-mobile" mat-row></tr>
           <tr (click)="expandedUnavailable = expandedUnavailable === unavailable ? null : unavailable"
-              *matRowDef="let unavailable; columns: displayedColumns;" class="hide-gt-xs app-table-master-row"
+              *matRowDef="let unavailable; columns: displayedColumns;" class="app-surface-hide-desktop app-table-master-row"
               mat-row></tr>
           <tr *matRowDef="let row; columns: ['expandedDetail']"
               [class.app-table-detail-row--expanded]="row === expandedUnavailable"
-              class="hide-gt-xs app-table-detail-row"
+              class="app-surface-hide-desktop app-table-detail-row"
               mat-row></tr>
 
           <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>

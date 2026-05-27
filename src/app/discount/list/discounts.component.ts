@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { DiscountType, IDiscount, IDiscountAll } from '../../interfaces/discount';
 import { TranslateService } from '@ngx-translate/core';
@@ -41,6 +42,7 @@ export class DiscountsComponent {
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
+  private tableState = createMatTableState(this.paginator, this.sort, 'name', 'asc');
 
   private discountListSignal = toSignal(this.discountList$);
   private responseSignal = toSignal(this.response$);
@@ -56,10 +58,7 @@ export class DiscountsComponent {
     },
   );
 
-  private sortActive = computed(() => this.sort()?.active ?? 'name');
-  private sortDirection = computed(() => this.sort()?.direction ?? 'asc');
-
-  paginatorPageIndex = signal(0);
+  paginatorPageIndex = this.tableState.pageIndex;
   dataSourceSignal = computed(() => this.discountListSignal()?.content?.map((it: IDiscount) => {
     let icon = '';
     switch (it.type) {
@@ -74,40 +73,22 @@ export class DiscountsComponent {
   resultsLengthSignal = computed(() => this.discountListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'name', 'description', 'type', 'amount', 'actions', 'add'];
+  displayedColumns: string[] = ['position', 'name', 'description', 'type', 'amount', 'actions'];
   expanded?: IDiscount;
 
   language: string = this.translate.getCurrentLang();
 
   constructor() {
-    effect((onCleanup) => {
-      const paginator = this.paginator();
-      if (paginator) {
-        const sub = paginator.page.subscribe((pageEvent) => {
-          this.paginatorPageIndex.set(pageEvent.pageIndex);
-        });
-        onCleanup(() => sub.unsubscribe());
-      }
-    });
-
     effect(() => {
-      const page = this.paginatorPageIndex();
+      const request = this.tableState.baseRequest();
       this.store.dispatch(
         getDiscountsPage({
-          page: page,
-          sort: this.sortActive(),
-          direction: this.sortDirection(),
+          ...request,
           size: this.pageSizeSignal(),
         }),
       );
     });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.store.dispatch(cleanDiscount());
-        this.paginator()?.firstPage();
-      }
-    });
+    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanDiscount()));
   }
 
   edit = (selected: IDiscount): void => this.store.dispatch(discountSelected({ selected }));

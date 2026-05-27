@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { IAvailability, IRoom } from '../../interfaces/room';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { createMatTableState } from 'src/app/util/mat-table-state';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
@@ -14,7 +15,7 @@ import { executeDialogNoWidth } from '../../util/helper';
 import { SharedModule } from '../../shared/shared.module';
 import { SortByPipe } from '../../pipes/sort-by.pipe';
 import { RoomState } from '../../store/reducers/room.reducers';
-import { getRoomResponsePipe, getRoomPaginationPipe } from '../../store/selectors/room.selectors';
+import { getRoomPaginationPipe, getRoomResponsePipe } from '../../store/selectors/room.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -36,6 +37,7 @@ export class RoomsComponent {
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
+  private tableState = createMatTableState(this.paginator, this.sort, 'office', 'asc');
 
   private roomListSignal = toSignal(this.roomList$);
   private responseSignal = toSignal(this.response$);
@@ -51,10 +53,7 @@ export class RoomsComponent {
     },
   );
 
-  private sortActive = computed(() => this.sort()?.active ?? 'office');
-  private sortDirection = computed(() => this.sort()?.direction ?? 'asc');
-
-  paginatorPageIndex = signal(0);
+  paginatorPageIndex = this.tableState.pageIndex;
   dataSourceSignal = computed(() => this.roomListSignal()?.content?.map((room: IRoom) => {
     if (room && room.availabilities && room.availabilities.length) {
       const availabilities = room.availabilities.map((i: IAvailability) =>
@@ -66,40 +65,22 @@ export class RoomsComponent {
   resultsLengthSignal = computed(() => this.roomListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'currency', 'office', 'address', 'timeZone', 'availability', 'actions', 'add'];
+  displayedColumns: string[] = ['position', 'currency', 'office', 'address', 'timeZone', 'availability', 'actions'];
   expanded?: IRoom;
 
   language: string = this.translate.getCurrentLang();
 
   constructor() {
-    effect((onCleanup) => {
-      const paginator = this.paginator();
-      if (paginator) {
-        const sub = paginator.page.subscribe((pageEvent) => {
-          this.paginatorPageIndex.set(pageEvent.pageIndex);
-        });
-        onCleanup(() => sub.unsubscribe());
-      }
-    });
-
     effect(() => {
-      const page = this.paginatorPageIndex();
+      const request = this.tableState.baseRequest();
       this.store.dispatch(
         getRoomsPage({
-          page: page,
-          sort: this.sortActive(),
-          direction: this.sortDirection(),
+          ...request,
           size: this.pageSizeSignal(),
         }),
       );
     });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.store.dispatch(cleanRoom());
-        this.paginator()?.firstPage();
-      }
-    });
+    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanRoom()));
   }
 
   getTimeZone = (timeZone?: string): ITimeZone => getTimeZone(timeZone);

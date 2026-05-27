@@ -61,6 +61,7 @@ describe('FileDropComponent', () => {
     spyOn(component as any, 'simulateUpload');
     const mockFile = new File(['test content'], 'file.jpg', { type: 'image/jpeg' });
     const mockTarget = {
+      value: 'C:\\\\fakepath\\\\file.jpg',
       files: [mockFile],
     } as any as EventTarget;
 
@@ -73,6 +74,7 @@ describe('FileDropComponent', () => {
       raw: mockFile,
     }));
     expect(component['simulateUpload']).toHaveBeenCalled();
+    expect((mockTarget as HTMLInputElement).value).toBe('');
   });
 
   it('should set resizedImageDataUrl when catalogue emits an image', () => {
@@ -173,5 +175,114 @@ describe('FileDropComponent', () => {
     fixture.detectChanges();
 
     expect(emitSpy).toHaveBeenCalledWith(file);
+  });
+
+  it('should keep a locally selected file when currentFile input is undefined', () => {
+    fixture.componentRef.setInput('currentFile', undefined);
+    fixture.detectChanges();
+
+    const file = {
+      name: 'file.txt',
+      size: 100,
+      progress: 100,
+      raw: new File(['x'], 'file.txt'),
+    };
+
+    component.file.set(file);
+    fixture.detectChanges();
+
+    expect(component.file()).toEqual(file);
+  });
+
+  it('should clear the internal file when currentFile input becomes undefined', () => {
+    fixture.componentRef.setInput('currentFile', {
+      name: 'file.txt',
+      size: 100,
+      progress: 100,
+      raw: new File(['x'], 'file.txt'),
+    });
+    fixture.detectChanges();
+
+    fixture.componentRef.setInput('currentFile', undefined);
+    fixture.detectChanges();
+
+    expect(component.file()).toBeUndefined();
+    expect(component.isImage()).toBeFalse();
+  });
+
+  it('should clear the hidden file input when currentFile input becomes undefined', () => {
+    const input = fixture.nativeElement.querySelector('#fileInput') as HTMLInputElement;
+    let inputValue = 'C:\\\\fakepath\\\\file.txt';
+    const valueSetter = jasmine.createSpy('valueSetter').and.callFake((value: string) => {
+      inputValue = value;
+    });
+    Object.defineProperty(input, 'value', {
+      configurable: true,
+      get: () => inputValue,
+      set: valueSetter,
+    });
+
+    fixture.componentRef.setInput('currentFile', {
+      name: 'file.txt',
+      size: 100,
+      progress: 100,
+      raw: new File(['x'], 'file.txt'),
+    });
+    fixture.detectChanges();
+
+    fixture.componentRef.setInput('currentFile', undefined);
+    fixture.detectChanges();
+
+    expect(valueSetter).toHaveBeenCalledWith('');
+    expect(inputValue).toBe('');
+  });
+
+  it('should clear the hidden file input before opening the picker', () => {
+    const input = fixture.nativeElement.querySelector('#fileInput') as HTMLInputElement;
+    let inputValue = 'C:\\\\fakepath\\\\file.txt';
+    const valueSetter = jasmine.createSpy('valueSetter').and.callFake((value: string) => {
+      inputValue = value;
+    });
+    Object.defineProperty(input, 'value', {
+      configurable: true,
+      get: () => inputValue,
+      set: valueSetter,
+    });
+    spyOn(input, 'click');
+
+    component.openFileBrowser();
+
+    expect(valueSetter).toHaveBeenCalledWith('');
+    expect(inputValue).toBe('');
+    expect(input.click).toHaveBeenCalled();
+  });
+
+  it('should emit a new local file after currentFile was cleared by the parent', () => {
+    const emitSpy = spyOn(component.fileSelected, 'emit');
+    const previousFile = {
+      name: 'previous.txt',
+      size: 100,
+      progress: 100,
+      raw: new File(['x'], 'previous.txt'),
+    };
+    const newFile = {
+      name: 'new.txt',
+      size: 100,
+      progress: 100,
+      raw: new File(['y'], 'new.txt'),
+    };
+
+    fixture.componentRef.setInput('currentFile', previousFile);
+    fixture.detectChanges();
+    emitSpy.calls.reset();
+
+    fixture.componentRef.setInput('currentFile', undefined);
+    fixture.detectChanges();
+    emitSpy.calls.reset();
+
+    component.file.set(newFile);
+    fixture.detectChanges();
+
+    expect(emitSpy).toHaveBeenCalledWith(newFile);
   });
 });

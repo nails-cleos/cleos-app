@@ -45,10 +45,10 @@
           </ng-container>
 
           <ng-container matColumnDef="email">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
                 mat-sort-header>{{ 'USER.LIST.COLUMN.EMAIL' | translate }}
             </th>
-            <td *matCellDef="let user" class="column-large-text hide-xs" mat-cell>
+            <td *matCellDef="let user" class="app-surface-cell-wrap app-surface-hide-mobile" mat-cell>
               @if (user.id) {
                 <div>{{ user.email }}</div>
               } @else {
@@ -94,10 +94,14 @@
           </ng-container>
 
           <ng-container matColumnDef="actions">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell>
-              {{ 'COMMON.COLUMN.ACTIONS' | translate }}
+            <th *matHeaderCellDef mat-header-cell>
+              <span class="app-surface-hide-mobile">{{ 'COMMON.COLUMN.ACTIONS' | translate }}</span>
+              <button [routerLink]="['/', language, 'users', 'add']" mat-icon-button id="add-button"
+                      matTooltip="{{ 'USER.TITLE' | translate }}" matTooltipPosition="right" type="button">
+                <mat-icon color="primary">person_add</mat-icon>
+              </button>
             </th>
-            <td *matCellDef="let user" class="hide-xs" mat-cell>
+            <td *matCellDef="let user" class="app-surface-hide-mobile" mat-cell>
               @if (user.id) {
                 <div>
                   @if (!user.deleted) {
@@ -138,36 +142,22 @@
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="add">
-            <th *matHeaderCellDef mat-header-cell>
-              <button [routerLink]="['/', language, 'users', 'add']" mat-icon-button id="add-button"
-                      matTooltip="{{ 'USER.TITLE' | translate }}" matTooltipPosition="right" type="button">
-                <mat-icon color="primary">person_add</mat-icon>
-              </button>
-            </th>
-            <td *matCellDef="let additional" mat-cell>
-              @if (!additional.id) {
-                <div class="ssc-line"></div>
-              }
-            </td>
-          </ng-container>
-
           <ng-container matColumnDef="expandedDetail">
             <td *matCellDef="let user" [attr.colspan]="displayedColumns.length" mat-cell>
               <div [class.detail-expanded]="user === expandedUser"
                    class="detail app-table-detail-fill">
                 <mat-list>
-                  <mat-list-item class="hide-gt-xs" role="list">
-                    <span class="hide-gt-xs" matListItemTitle>{{ 'USER.LIST.COLUMN.DISPLAY_NAME' | translate }}</span>
+                  <mat-list-item class="app-surface-hide-desktop" role="list">
+                    <span class="app-surface-hide-desktop" matListItemTitle>{{ 'USER.LIST.COLUMN.DISPLAY_NAME' | translate }}</span>
                     <span matListItemLine>{{ user.displayName }}</span>
                   </mat-list-item>
-                  <mat-list-item class="hide-gt-xs" role="list">
-                    <span class="hide-gt-xs" matListItemTitle>{{ 'USER.LIST.COLUMN.EMAIL' | translate }}</span>
+                  <mat-list-item class="app-surface-hide-desktop" role="list">
+                    <span class="app-surface-hide-desktop" matListItemTitle>{{ 'USER.LIST.COLUMN.EMAIL' | translate }}</span>
                     <span matListItemLine>{{ user.email }}</span>
                   </mat-list-item>
-                  <span class="hide-xs" mat-subheader>{{ 'USER.LIST.COLUMN.DETAIL.TITLE' | translate }}</span>
+                  <span class="app-surface-hide-mobile" mat-subheader>{{ 'USER.LIST.COLUMN.DETAIL.TITLE' | translate }}</span>
                   @if (!user.deleted) {
-                    <div class="flex-container hide-xs">
+                    <div class="flex-container app-surface-hide-mobile">
                       <div class="flex-child">
                         @for (it of user.authorities; track it) {
                           <mat-list-item>
@@ -193,9 +183,9 @@
                       </div>
                     </div>
                   }
-                  <div class="hide-gt-xs" matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+                  <div class="app-surface-hide-desktop" matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
                   @if (!user.deleted) {
-                    <div class="hide-gt-xs">
+                    <div class="app-surface-hide-desktop">
                       <button (click)="edit(user)" mat-icon-button>
                         <mat-icon color="primary">edit</mat-icon>
                       </button>
@@ -220,7 +210,7 @@
                       </button>
                     </div>
                   } @else {
-                    <div class="hide-gt-xs">
+                    <div class="app-surface-hide-desktop">
                       <button (click)="restore(user)" mat-icon-button>
                         <mat-icon color="primary">restore_from_trash</mat-icon>
                       </button>
@@ -240,10 +230,10 @@
           <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
           <tr (click)="expandedUser = expandedUser === user ? null : user"
               *matRowDef="let user; columns: displayedColumns;"
-              [ngClass]="{'deadLine': user.deleted}" class="hide-xs app-table-master-row" mat-row></tr>
+              [ngClass]="{'deadLine': user.deleted}" class="app-surface-hide-mobile app-table-master-row" mat-row></tr>
           <tr (click)="expandedUser = expandedUser === user ? null : user"
               *matRowDef="let user; columns: displayedColumns;"
-              [ngClass]="{'deadLine': user.deleted}" class="hide-gt-xs app-table-master-row" mat-row></tr>
+              [ngClass]="{'deadLine': user.deleted}" class="app-surface-hide-desktop app-table-master-row" mat-row></tr>
           <tr *matRowDef="let row; columns: ['expandedDetail']"
               [class.app-table-detail-row--expanded]="row === expandedUser"
               class="app-table-detail-row"

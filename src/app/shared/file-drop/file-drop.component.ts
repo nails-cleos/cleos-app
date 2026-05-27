@@ -39,6 +39,7 @@ export class FileDropComponent {
   private readonly destroyRef: DestroyRef = inject(DestroyRef);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly toastService: ToastService = inject(ToastService);
+  private hadCurrentFile = false;
 
   accept = input<string>('*');
   fileName = input<string>();
@@ -53,6 +54,7 @@ export class FileDropComponent {
   file = signal<UploadFile | undefined>(undefined);
   isImage = signal(false);
 
+  private fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
   private canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
   private canvasXs = viewChild<ElementRef<HTMLCanvasElement>>('canvasXs');
   private resizedImage = viewChild<ElementRef<HTMLImageElement>>('resizedImage');
@@ -60,10 +62,17 @@ export class FileDropComponent {
   constructor() {
     effect(() => {
       const currentFile = this.currentFile();
+      const file = this.file();
       if (!currentFile) {
-        const file = this.file();
+        if (this.hadCurrentFile) {
+          this.hadCurrentFile = false;
+          this.file.set(undefined);
+          this.isImage.set(false);
+          this.resetNativeInput();
+          return;
+        }
         if (file === undefined || file?.progress === 100) {
-          this.fileSelected.emit(this.file());
+          this.fileSelected.emit(file);
         }
       }
     });
@@ -71,7 +80,9 @@ export class FileDropComponent {
     effect(() => {
       const currentFile = this.currentFile();
       if (currentFile) {
+        this.hadCurrentFile = true;
         this.file.set(currentFile);
+        this.isImage.set(!!currentFile.image);
       }
     });
   }
@@ -84,15 +95,25 @@ export class FileDropComponent {
   };
 
   fileBrowseHandler = (target: EventTarget | null): void => {
-    const rawFile = (target as HTMLInputElement)?.files?.[0];
+    const input = target as HTMLInputElement | null;
+    const rawFile = input?.files?.[0];
     if (rawFile) {
       this.handleFile(rawFile);
     }
+    if (input) {
+      input.value = '';
+    }
   };
+
+  openFileBrowser(): void {
+    this.resetNativeInput();
+    this.fileInput()?.nativeElement.click();
+  }
 
   delete() {
     const file = this.file();
     this.file.set(undefined);
+    this.resetNativeInput();
     if (!this.undo()) {
       this.fileSelected.emit(undefined);
     } else {
@@ -155,6 +176,13 @@ export class FileDropComponent {
       img.src = e.target.result;
     };
     reader.readAsDataURL(file);
+  }
+
+  private resetNativeInput(): void {
+    const input = this.fileInput()?.nativeElement;
+    if (input) {
+      input.value = '';
+    }
   }
 
   protected readonly formatBytes = formatBytes;

@@ -1,4 +1,84 @@
+@use 'angular-calendar/scss/angular-calendar.scss';
 @use 'styles/mixin' as mixin;
+
+.cal-month-view .cal-header {
+  background: var(--app-surface-card-bg);
+}
+
+.cal-month-view .cal-header .cal-cell:hover,
+.cal-month-view .cal-cell-top:hover,
+.cal-month-view .cal-day-cell:hover,
+.cal-month-view .cal-day-cell.cal-in-month.cal-has-events:hover {
+  background: color-mix(in srgb, var(--app-surface-section-accent) 56%, transparent) !important;
+}
+
+.cal-month-view .cal-day-cell:not(:last-child) {
+  border-right: 1px solid var(--app-surface-card-border) !important;
+}
+
+.cal-month-view .cal-cell {
+  border: 1px solid var(--app-surface-card-border);
+  background: var(--app-surface-card-bg);
+}
+
+.cal-month-view .cal-open-day-events {
+  box-shadow: none;
+  background: var(--app-surface-card-bg);
+  border-right: 1px solid var(--app-surface-card-border);
+  border-bottom: 1px solid var(--app-surface-card-border);
+  border-left: 1px solid var(--app-surface-card-border);
+  color: var(--app-surface-text);
+}
+
+.cal-month-view .cal-day-cell.cal-weekend .cal-day-number {
+  color: var(--warn-color) !important;
+}
+
+.cal-month-view .cal-day-number,
+.cal-month-view .cal-out-month .cal-day-number,
+.cal-month-view .cal-day-cell.cal-today .cal-day-number {
+  color: var(--invert-text);
+  opacity: 1;
+}
+
+.cal-month-view .cal-open .cal-day-number {
+  color: var(--primary-darker-color) !important;
+  font-size: 2.6em !important;
+  opacity: 1 !important;
+}
+
+.cal-month-view .cal-cell.cal-has-events.cal-open {
+  background: color-mix(in srgb, var(--app-surface-section-accent) 56%, transparent);
+  color: var(--primary-lighter-color);
+}
+
+.cal-month-view .cal-day-cell.cal-in-month.cal-has-events {
+  background: var(--app-surface-card-bg) !important;
+}
+
+.cal-month-view .cal-cell.cal-event-highlight {
+  background: color-mix(in srgb, var(--primary-color) 72%, transparent) !important;
+}
+
+.cal-month-view .cal-day-cell.cal-today.cal-open,
+.cal-month-view .cal-day-cell.cal-today {
+  background: color-mix(in srgb, var(--primary-color) 32%, transparent);
+  color: var(--primary-lighter-color);
+}
+
+.cal-month-view .cal-event {
+  background: var(--primary-color);
+  color: var(--app-surface-card-bg);
+  border: 1px solid color-mix(in srgb, #000000 20%, transparent);
+}
+
+.cal-month-view .cal-days {
+  border: 0 solid var(--app-surface-card-border) !important;
+}
+
+.cal-month-view .cal-days .cal-cell-row {
+  border-bottom: 0 solid var(--app-surface-card-border) !important;
+}
 
 .cal-week-view .cal-header {
   padding: 0 8px;
@@ -72,6 +152,25 @@
   border-color: var(--app-table-border);
 }
 
+.cal-week-view .cal-day-columns,
+.cal-week-view .cal-day-headers {
+  background: var(--app-surface-card-bg);
+}
+
+.cal-week-view .cal-header.cal-weekend b,
+.cal-week-view .cal-header.cal-weekend span {
+  color: var(--warn-color);
+}
+
+.cal-week-view .cal-header.cal-today {
+  background: color-mix(in srgb, var(--primary-color) 32%, transparent);
+}
+
+.cal-week-view .cal-header.cal-today span {
+  color: var(--toast-text) !important;
+  opacity: 1;
+}
+
 .cal-week-view .cal-time-events {
   background: linear-gradient(90deg, color-mix(in srgb, var(--app-table-header) 34%, transparent), transparent 92px),
   color-mix(in srgb, var(--app-surface-card-bg) 88%, transparent);
@@ -122,6 +221,16 @@
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.1);
   line-height: 1.25 !important;
   white-space: normal !important;
+}
+
+.cal-week-view .cal-starts-within-week .cal-event {
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+.cal-week-view .cal-ends-within-week .cal-event {
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
 }
 
 :host ::ng-deep .cal-week-view .cal-event-container:hover .cal-event,
@@ -286,6 +395,18 @@
   transform: none;
 }
 
+.cal-disabled {
+  background: color-mix(in srgb, var(--app-surface-disabled) 18%, transparent);
+}
+
+.cal-custom-event:hover {
+  box-shadow: -10px 15px 25px 1px color-mix(in srgb, var(--app-surface-text) 12%, transparent) !important;
+}
+
+.cal-custom-event::after {
+  background: color-mix(in srgb, var(--app-surface-text) 12%, transparent);
+}
+
 :host ::ng-deep .cal-week-view span.cal-event-actions {
   position: absolute;
   right: 10px;
@@ -341,10 +462,4 @@
 
 :host ::ng-deep .cal-week-view .cal-event-container:hover .cal-resize-handle {
   opacity: 0.65;
-}
-
-@media (max-width: 720px) {
-  .cal-week-view {
-    min-width: 820px;
-  }
 }

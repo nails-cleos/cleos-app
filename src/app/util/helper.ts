@@ -17,6 +17,10 @@ import { CancelDialogComponent } from '../shared/dialog/cancel/cancel-dialog.com
 import { Router } from '@angular/router';
 import { CustomerEditDialogComponent } from '../shared/dialog/customer-edit/customer-edit-dialog.component';
 import { ISummaryRoom } from '../interfaces/dashboard';
+import { IDialog } from '../interfaces/dialog';
+import { ProfessionalDialogData } from '../reservation/select-professional-dialog.component';
+import { PriceDialogData } from '../room/me/add-service/price-dialog.component';
+import { SelectUserDialogData } from '../user/list/select-user-dialog.component';
 
 export const VERIFICATION_EMAIL = 'verification_email';
 
@@ -422,7 +426,7 @@ export const customerEditDialog = (
 export const executeDialogNoWidth = (
   dialog: MatDialog,
   dialogComponent: any,
-  data: any,
+  data: IDialog | IReservationAll | ProfessionalDialogData | PriceDialogData | SelectUserDialogData | null,
   afterClose: (result: any) => void,
   disableClose: boolean = false,
 ): void => {

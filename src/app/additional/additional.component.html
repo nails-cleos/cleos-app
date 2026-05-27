@@ -44,7 +44,7 @@
                    matInput
                    name="duration"
                    readonly
-                   required />
+                   required/>
             <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
             <app-timepicker #t [minutesGap]="15"></app-timepicker>
             @if (getForm.duration.hasError('required')) {
@@ -91,7 +91,7 @@
                 <button mat-stroked-button
                         type="button"
                         [routerLink]="['/', language, 'treatments', 'add']"
-                        class="app-detail-action-button">
+                        class="app-surface-filter-action app-detail-action-button">
                   <mat-icon>add</mat-icon>
                   <span>{{ 'COMMON.TREATMENT.GROUP.ADD_BUTTON' | translate }}</span>
                 </button>
@@ -115,9 +115,9 @@
         </div>
       } @else {
         <div class="app-crud-loading">
-          <div class="ssc-hr"></div>
+          <div class="app-surface-skeleton-spacer"></div>
           <div class="ssc-square app-crud-loading__block"></div>
-          <div class="ssc-hr"></div>
+          <div class="app-surface-skeleton-spacer"></div>
         </div>
       }
     </form>

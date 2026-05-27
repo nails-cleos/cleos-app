@@ -219,7 +219,25 @@
     },
     "ERROR": {
       "NO_CONTENT": "Geen inhoud",
-      "TRY_LATER": "Er is iets misgegaan. Probeer het later opnieuw"
+      "TRY_LATER": "Er is iets misgegaan. Probeer het later opnieuw",
+      "PAGE": {
+        "DEFAULT": {
+          "TITLE": "Deze pagina kon niet worden geladen",
+          "DESCRIPTION": "Er ging iets mis bij het laden van deze inhoud. Je kunt teruggaan of het opnieuw proberen."
+        },
+        "NOT_FOUND": {
+          "TITLE": "Deze pagina kon niet worden gevonden",
+          "DESCRIPTION": "Wat je probeert te openen bestaat niet meer, is niet beschikbaar of de link is niet langer geldig."
+        },
+        "BAD_REQUEST": {
+          "TITLE": "Deze aanvraag is niet beschikbaar",
+          "DESCRIPTION": "We konden deze pagina niet openen met de aangeleverde informatie. Ga terug en probeer het opnieuw vanuit de vorige stap."
+        },
+        "SERVER_ERROR": {
+          "TITLE": "De server reageert niet",
+          "DESCRIPTION": "Er is een serverprobleem opgetreden tijdens het laden van deze pagina. Probeer het zo opnieuw."
+        }
+      }
     },
     "LABEL": {
       "FILTER": "Filter",

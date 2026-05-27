@@ -30,10 +30,10 @@
           </ng-container>
 
           <ng-container matColumnDef="days">
-            <th *matHeaderCellDef mat-header-cell mat-sort-header class="hide-xs">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header class="app-surface-hide-mobile">
               {{ 'CUSTOMER.DAYS.TITLE' | translate }}
             </th>
-            <td *matCellDef="let customer" mat-cell class="hide-xs">
+            <td *matCellDef="let customer" mat-cell class="app-surface-hide-mobile">
               @if (customer.reservationId) {
                 <div [innerHTML]="'CUSTOMER.DAYS.VALUE' | translate: {days: customer.days}"></div>
               } @else {
@@ -43,10 +43,10 @@
           </ng-container>
 
           <ng-container matColumnDef="lastTime">
-            <th *matHeaderCellDef mat-header-cell mat-sort-header class="hide-xs">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header class="app-surface-hide-mobile">
               {{ 'CUSTOMER.LAST_TIME' | translate }}
             </th>
-            <td *matCellDef="let customer" mat-cell class="hide-xs">
+            <td *matCellDef="let customer" mat-cell class="app-surface-hide-mobile">
               @if (customer.reservationId) {
                 {{ customer.lastTime | timeDetail | date:'short' }}
               } @else {
@@ -56,10 +56,10 @@
           </ng-container>
 
           <ng-container matColumnDef="actions">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell mat-sort-header>
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell mat-sort-header>
               {{ 'COMMON.COLUMN.ACTIONS' | translate }}
             </th>
-            <td *matCellDef="let customer" class="hide-xs" mat-cell>
+            <td *matCellDef="let customer" class="app-surface-hide-mobile" mat-cell>
               @if (customer.reservationId) {
                 <button [routerLink]="['/', language, 'reservation', customer.reservationId]" mat-icon-button
                         matTooltip="{{ 'CUSTOMER.RESERVATION' | translate }}" matTooltipPosition="below">
@@ -76,8 +76,8 @@
           </ng-container>
 
           <ng-container matColumnDef="expandedDetail">
-            <td *matCellDef="let customer" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
-              <div [class.detail-expanded]="customer === expanded" class="detail hide-gt-xs">
+            <td *matCellDef="let customer" [attr.colspan]="displayedColumns.length" class="app-surface-hide-desktop">
+              <div [class.detail-expanded]="customer === expanded" class="detail app-surface-hide-desktop">
                 @if (customer.reservationId) {
                   <mat-list>
                     <mat-list-item role="list">
@@ -112,12 +112,12 @@
           <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
 
           <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-          <tr *matRowDef="let customer; columns: displayedColumns;" class="hide-xs" mat-row></tr>
+          <tr *matRowDef="let customer; columns: displayedColumns;" class="app-surface-hide-mobile" mat-row></tr>
           <tr (click)="expanded = expanded === customer ? null : customer"
-              *matRowDef="let customer; columns: displayedColumns;" class="hide-gt-xs app-table-master-row" mat-row></tr>
+              *matRowDef="let customer; columns: displayedColumns;" class="app-surface-hide-desktop app-table-master-row" mat-row></tr>
           <tr *matRowDef="let row; columns: ['expandedDetail']"
               [class.app-table-detail-row--expanded]="row === expanded"
-              class="hide-gt-xs app-table-detail-row"
+              class="app-surface-hide-desktop app-table-detail-row"
               mat-row></tr>
         </table>
 

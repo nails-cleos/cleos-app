@@ -8,6 +8,7 @@ type ContactKey = 'whatsapp' | 'instagram' | 'facebook' | 'phone' | 'email';
 @Component({
   selector: 'app-bottom-sheet-book-appointment',
   templateUrl: 'bottom-sheet-book-appointment.html',
+  styleUrls: ['./bottom-sheet-book-appointment.scss'],
   imports: [AppMaterialModule, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -64,5 +65,9 @@ export class BottomSheetBookAppointmentComponent {
     this.bottomSheetRef.dismiss();
 
     this.actionSignal.set(key);
+  }
+
+  close(): void {
+    this.bottomSheetRef.dismiss();
   }
 }

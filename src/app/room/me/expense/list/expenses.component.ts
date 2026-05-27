@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../../interfaces/pagination';
 import { IExpenseAll } from '../../../../interfaces/expense';
 import { TranslateService } from '@ngx-translate/core';
@@ -27,6 +28,7 @@ import { DriveAccessService } from '../../../../services/drive-access.service';
 import { IDocument } from '../../../../interfaces/document';
 import { documentView } from '../../../../store/document.actions';
 import { DocumentState } from '../../../../store/reducers/document.reducers';
+import { CurrencySymbolPipe } from '../../../../pipes/currency-symbol.pipe';
 
 type ExpensesForm = {
   date: FormControl<Date | undefined>;
@@ -37,7 +39,7 @@ type ExpensesForm = {
   selector: 'app-expenses',
   templateUrl: './expenses.component.html',
   styleUrls: ['./expenses.component.scss'],
-  imports: [SharedModule, TimeDetailPipe],
+  imports: [SharedModule, TimeDetailPipe, CurrencySymbolPipe],
   providers: [
     { provide: DateAdapter, useClass: YearMonthAdapter },
   ],
@@ -60,6 +62,7 @@ export class ExpensesComponent {
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
+  private tableState = createMatTableState(this.paginator, this.sort, 'timestamp', 'desc');
 
   private expenseListSignal = toSignal(this.expenseList$);
   private responseSignal = toSignal(this.response$);
@@ -75,20 +78,16 @@ export class ExpensesComponent {
     },
   );
 
-  private sortActive = computed(() => this.sort()?.active ?? 'timestamp');
-  private sortDirection = computed(() => this.sort()?.direction ?? 'desc');
-
   roomIdSignal = toSignal(this.roomId$);
 
-  paginatorPageIndex = signal(0);
+  paginatorPageIndex = this.tableState.pageIndex;
 
   dataSourceSignal = computed(() => this.expenseListSignal()?.content?.map((expense: IExpenseAll) => Object.assign({},
     expense, { totalBtw: expense.totalGross - expense.totalNet })));
   resultsLengthSignal = computed(() => this.expenseListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'invoice', 'supplyStore.name', 'timestamp', 'totalGross', 'totalBtw',
-    'totalNet', 'actions', 'add'];
+  displayedColumns: string[] = ['position', 'invoice', 'supplyStore.name', 'timestamp', 'actions'];
   expanded?: IExpenseAll;
 
   dateFormat: string = this.translate.getCurrentLang();
@@ -103,43 +102,25 @@ export class ExpensesComponent {
   private selectedFilter = toSignal(this.getForm.filter.valueChanges);
 
   constructor() {
-    effect((onCleanup) => {
-      const paginator = this.paginator();
-      if (paginator) {
-        const sub = paginator.page.subscribe((pageEvent) => {
-          this.paginatorPageIndex.set(pageEvent.pageIndex);
-        });
-        onCleanup(() => sub.unsubscribe());
-      }
-    });
-
     effect(() => {
-      const page = this.paginatorPageIndex();
       const roomId = this.roomIdSignal();
       if (!roomId) {
         return;
       }
+      const request = this.tableState.baseRequest();
       const date = this.selectedDate();
       const filter = this.selectedFilter();
       this.store.dispatch(
         getExpensesPage({
           roomId: roomId,
-          page: page,
-          sort: this.sortActive(),
-          direction: this.sortDirection(),
+          ...request,
           size: this.pageSizeSignal(),
           filter: filter?.trim()?.toLowerCase(),
           dateFilter: getDateFormat(date),
         }),
       );
     });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.store.dispatch(cleanExpense());
-        this.paginator()?.firstPage();
-      }
-    });
+    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanExpense()));
 
     effect(() => {
       this.driveAccessService.requestAccessIfNeeded(this.googleDriveUploadFile);

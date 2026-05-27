@@ -236,7 +236,11 @@ describe('ExpensesComponent', () => {
 
   it('should dispatch getExpensePage when paginatorPageIndex changes', () => {
     roomId$.next(room.id);
-    component.paginatorPageIndex.set(1);
+    fixture.detectChanges();
+    const paginator = component['paginator']();
+
+    paginator!.pageIndex = 1;
+    paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(
@@ -354,8 +358,7 @@ describe('ExpensesComponent', () => {
   });
 
   it('should maintain correct displayedColumns order', () => {
-    const expectedColumns = ['position', 'invoice', 'supplyStore.name', 'timestamp', 'totalGross',
-      'totalBtw', 'totalNet', 'actions', 'add'];
+    const expectedColumns = ['position', 'invoice', 'supplyStore.name', 'timestamp', 'actions'];
     expect(component.displayedColumns).toEqual(expectedColumns);
   });
 

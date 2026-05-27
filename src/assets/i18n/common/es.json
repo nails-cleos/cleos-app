@@ -218,7 +218,25 @@
     },
     "ERROR": {
       "NO_CONTENT": "Sin datos",
-      "TRY_LATER": "Algo salió mal. Inténtalo de nuevo más tarde"
+      "TRY_LATER": "Algo salió mal. Inténtalo de nuevo más tarde",
+      "PAGE": {
+        "DEFAULT": {
+          "TITLE": "No pudimos cargar esta página",
+          "DESCRIPTION": "Algo salió mal al cargar este contenido. Puedes volver atrás o intentarlo de nuevo."
+        },
+        "NOT_FOUND": {
+          "TITLE": "No se pudo encontrar esta página",
+          "DESCRIPTION": "Lo que intentas abrir no existe, ya no está disponible o el enlace ya no es válido."
+        },
+        "BAD_REQUEST": {
+          "TITLE": "Esta solicitud no está disponible",
+          "DESCRIPTION": "No pudimos abrir esta página con la información proporcionada. Vuelve atrás e inténtalo otra vez desde el paso anterior."
+        },
+        "SERVER_ERROR": {
+          "TITLE": "El servidor no está respondiendo",
+          "DESCRIPTION": "Tuvimos un problema del servidor al cargar esta página. Inténtalo de nuevo en un momento."
+        }
+      }
     },
     "LABEL": {
       "FILTER": "Filtrar",

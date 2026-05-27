@@ -113,22 +113,30 @@ const isSmallBreakpoint = (breakpoint: string): boolean =>
 const usesDrawerMenu = (breakpoint: string): boolean =>
   DRAWER_MENU_BREAKPOINTS.includes(breakpoint as typeof DRAWER_MENU_BREAKPOINTS[number]);
 
+const clickVisibleMenuItem = (selector: string, label: string) => {
+  cy.get(selector)
+    .filter(':visible')
+    .contains('[matListItemTitle]', label)
+    .scrollIntoView()
+    .parents('mat-list-item')
+    .first()
+    .click();
+};
+
 Cypress.Commands.add('randomUUID', () => cy.wrap('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
   const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
   return v.toString(16);
 })));
 
 Cypress.Commands.add('logout', () => {
-  cy.document({ log: false }).then((doc) => {
-    const body = doc.body;
-    if (!body || !body.querySelector('button[name="settings"]')) {
-      return;
-    }
-
-    cy.get('button[name="settings"]').click();
-    cy.get('div').contains('Sign out').click();
-    cy.url().should('include', 'home');
+  cy.window({ log: false }).then((win) => {
+    win.localStorage.clear();
+    win.sessionStorage.clear();
   });
+
+  cy.clearCookies({ log: false });
+  cy.visit('en-GB/home');
+  cy.url({ timeout: 20000 }).should('include', 'home');
 });
 
 Cypress.Commands.add('checkAppDialog', (title: string, message: string, buttonClick: string) => {
@@ -162,13 +170,15 @@ Cypress.Commands.add('checkMatList', (title?: string, icon?: string, ...details:
 
 Cypress.Commands.add('openMenu', (breakpoint: string, menus: string[]) => {
   if (usesDrawerMenu(breakpoint)) {
-    cy.get('button[name="cleosMenu"]').click();
+    cy.get('button[name="cleosMenu"]').should('be.visible').click({ force: true });
+    cy.get('mat-drawer').should('have.class', 'mat-drawer-opened');
   }
+
   menus.forEach((menu, index) => {
     if (index === 0) {
-      cy.get('mat-list-item').contains(menu).click();
+      clickVisibleMenuItem('mat-list-item', menu);
     } else {
-      cy.get('mat-list-item.sub-menu').contains(menu).click();
+      clickVisibleMenuItem('mat-list-item.sub-menu, mat-list-item.sub-sub-menu', menu);
     }
   });
 });

@@ -92,10 +92,10 @@
         </ng-container>
 
         <ng-container matColumnDef="state">
-          <th *matHeaderCellDef class="hide-xs" mat-header-cell
+          <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
               mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}
           </th>
-          <td *matCellDef="let reservation" class="hide-xs" mat-cell>
+          <td *matCellDef="let reservation" class="app-surface-hide-mobile" mat-cell>
             @if (reservation.id) {
               <mat-icon matPrefix>{{ reservation.state | reservationIcon }}</mat-icon>&nbsp;
               <div>{{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate }}</div>
@@ -106,10 +106,10 @@
         </ng-container>
 
         <ng-container matColumnDef="treatment">
-          <th *matHeaderCellDef class="hide-xs"
+          <th *matHeaderCellDef class="app-surface-hide-mobile"
               mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}
           </th>
-          <td *matCellDef="let reservation" class="hide-xs" mat-cell>
+          <td *matCellDef="let reservation" class="app-surface-hide-mobile" mat-cell>
             @if (reservation.id) {
               <div>{{ reservation.treatment.name }}</div>
             } @else {
@@ -119,8 +119,8 @@
         </ng-container>
 
         <ng-container matColumnDef="actions">
-          <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-          <td *matCellDef="let reservation" class="hide-xs" mat-cell>
+          <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+          <td *matCellDef="let reservation" class="app-surface-hide-mobile" mat-cell>
             @if (reservation.id) {
               <div>
                 @if (!reservation.deleted) {
@@ -130,7 +130,7 @@
                   </button>
                 }
                 @if (reservation.deadLine) {
-                  <button (click)="cancel(reservation)" class="hide-xs" mat-icon-button
+                  <button (click)="cancel(reservation)" class="app-surface-hide-mobile" mat-icon-button
                           matTooltip="{{ 'COMMON.BUTTON.CANCEL' | translate }}" matTooltipPosition="right">
                     <mat-icon color="warn">close</mat-icon>
                   </button>
@@ -143,9 +143,9 @@
         </ng-container>
 
         <ng-container matColumnDef="expandedDetail">
-          <td *matCellDef="let reservation" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
+          <td *matCellDef="let reservation" [attr.colspan]="displayedColumns.length" class="app-surface-hide-desktop">
             <div [class.detail-expanded]="reservation === expandedReservation"
-                 class="detail hide-gt-xs">
+                 class="detail app-surface-hide-desktop">
               <mat-list>
                 <mat-list-item role="list">
                   <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>

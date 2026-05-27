@@ -36,3 +36,17 @@
 .color-preview-card mat-card-subtitle {
   color: var(--color-preview-title-color) !important;
 }
+
+.reservation-example {
+  box-sizing: border-box;
+  display: block;
+  height: 100px;
+  padding: 0 5px;
+  margin-bottom: 1px;
+  border-style: solid;
+  border-width: 3px;
+  border-radius: 5px;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

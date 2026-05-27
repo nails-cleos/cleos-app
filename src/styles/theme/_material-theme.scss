@@ -1,0 +1,196 @@
+@use '@angular/material' as mat;
+@use 'styles/theme/calendar';
+@use 'styles/theme/home' as home-theme;
+@use 'styles/theme/status-colors' as status-theme;
+@use 'styles/theme/legacy-overrides' as legacy-theme;
+@use 'styles/theme/semantic-tokens';
+
+$dark-text: #000;
+$light-text: #fff;
+
+$dark-primary-text: rgba($dark-text, .87);
+$light-primary-text: $light-text;
+
+$font-config: (
+  display-4: mat.m2-define-typography-level(112px, 112px, 300, 'EB+Garamond', -0.0134em),
+  display-3: mat.m2-define-typography-level(56px, 56px, 400, 'EB+Garamond', -0.0089em),
+  display-2: mat.m2-define-typography-level(45px, 48px, 400, 'EB+Garamond', 0),
+  display-1: mat.m2-define-typography-level(34px, 40px, 400, 'EB+Garamond', 0.0074em),
+  headline: mat.m2-define-typography-level(24px, 32px, 400, 'EB+Garamond', 0),
+  title: mat.m2-define-typography-level(20px, 32px, 500, 'EB+Garamond', 0.0075em),
+  subheading-2: mat.m2-define-typography-level(16px, 28px, 400, 'EB+Garamond', 0.0094em),
+  subheading-1: mat.m2-define-typography-level(15px, 24px, 500, 'EB+Garamond', 0.0067em),
+  body-2: mat.m2-define-typography-level(14px, 24px, 500, 'EB+Garamond', 0.0179em),
+  body-1: mat.m2-define-typography-level(14px, 20px, 400, 'EB+Garamond', 0.0179em),
+  button: mat.m2-define-typography-level(14px, 14px, 500, 'EB+Garamond', 0.0893em),
+  caption: mat.m2-define-typography-level(12px, 20px, 400, 'EB+Garamond', 0.0333em),
+  input: mat.m2-define-typography-level(inherit, 1.125, 400, 'EB+Garamond', 1.5px)
+);
+
+$mat-primary: (
+  50:#f6f5f3,
+  100:#e9e6e2,
+  200:#dad6cf,
+  300:#cbc5bb,
+  400:#c0b8ad,
+  500:#b5ac9e,
+  600:#aea596,
+  700:#a59b8c,
+  800:#9d9282,
+  900:#8d8270,
+  contrast:(
+    50:$dark-primary-text,
+    100:$dark-primary-text,
+    200:$dark-primary-text,
+    300:$dark-primary-text,
+    400:$dark-primary-text,
+    500:$dark-primary-text,
+    600:$dark-primary-text,
+    700:$dark-primary-text,
+    800:$dark-primary-text,
+    900:$dark-primary-text
+  )
+);
+
+$mat-accent: (
+  50:#fbf8f8,
+  100:#f5efed,
+  200:#eee4e1,
+  300:#e7d9d4,
+  400:#e1d0cb,
+  500:#dcc8c2,
+  600:#d8c2bc,
+  700:#d3bbb4,
+  800:#ceb4ac,
+  900:#c5a79f,
+  contrast:(
+    50:$dark-primary-text,
+    100:$dark-primary-text,
+    200:$dark-primary-text,
+    300:$dark-primary-text,
+    400:$dark-primary-text,
+    500:$dark-primary-text,
+    600:$dark-primary-text,
+    700:$dark-primary-text,
+    800:$dark-primary-text,
+    900:$dark-primary-text
+  )
+);
+
+$mat-warn: (
+  50:#f4e4e3,
+  100:#e4baba,
+  200:#d28d8c,
+  300:#c05f5e,
+  400:#b33c3c,
+  500:#a51a19,
+  600:#9d1716,
+  700:#931312,
+  800:#8a0f0e,
+  900:#790808,
+  contrast:(
+    50:$dark-primary-text,
+    100:$dark-primary-text,
+    200:$dark-primary-text,
+    300:$light-primary-text,
+    400:$light-primary-text,
+    500:$light-primary-text,
+    600:$light-primary-text,
+    700:$light-primary-text,
+    800:$light-primary-text,
+    900:$light-primary-text
+  )
+);
+
+$light-theme: mat.m2-define-light-theme((
+  color: (
+    primary: mat.m2-define-palette($mat-primary, 500),
+    accent: mat.m2-define-palette($mat-accent),
+    warn: mat.m2-define-palette($mat-warn)
+  )
+));
+
+$dark-theme: mat.m2-define-dark-theme((
+  color: (
+    primary: mat.m2-define-palette($mat-primary, 500),
+    accent: mat.m2-define-palette($mat-accent),
+    warn: mat.m2-define-palette($mat-warn)
+  )
+));
+
+@mixin render() {
+  @include mat.core();
+  @include mat.all-component-typographies($font-config);
+  @include mat.elevation-classes();
+  @include mat.app-background();
+  @include mat.all-component-themes($light-theme);
+
+  .light-theme {
+    @include mat.all-component-colors($light-theme);
+    @include home-theme.color($light-theme);
+    @include status-theme.color($light-theme);
+    @include legacy-theme.color($light-theme);
+    @include mat.strong-focus-indicators-color($light-theme);
+    @include semantic-tokens.light();
+  }
+
+  .dark-theme {
+    @include mat.all-component-colors($dark-theme);
+    @include home-theme.color($dark-theme);
+    @include status-theme.color($dark-theme);
+    @include legacy-theme.color($dark-theme);
+    @include mat.strong-focus-indicators-color($dark-theme);
+    @include semantic-tokens.dark();
+  }
+
+  .home-page-form {
+    @include mat.form-field-density(-5);
+    @include mat.button-density(-3);
+  }
+
+  .mat-mdc-raised-button,
+  .mat-mdc-outlined-button,
+  .mat-mdc-unelevated-button {
+    padding: 0 1.15em;
+    margin: 0 .65em;
+    min-width: 3em;
+    line-height: 36.4px;
+  }
+
+  .mat-mdc-standard-chip {
+    padding: .5em .85em;
+    min-height: 2.5em;
+  }
+
+  .material-symbols-outlined,
+  .material-icons {
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+
+    .mat-badge-content {
+      font-family: 'EB+Garamond', "Helvetica Neue", serif;
+    }
+
+    .mat-slide-toggle-thumb {
+      background-color: #a51a19 !important;
+    }
+  }
+
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined', 'Material Symbols', sans-serif;
+  }
+
+  .material-icons {
+    font-family: 'Material Icons', 'Material Symbols', sans-serif;
+  }
+}

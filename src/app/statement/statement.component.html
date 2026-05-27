@@ -38,13 +38,11 @@
         }
       </mat-form-field>
     </div>
-  </section>
 
-  @if (!form.invalid) {
-    <section class="app-surface-section statement-upload-section">
+    @if (!form.invalid) {
       <app-file-drop (fileSelected)="onSelectedFile($event)" [fileName]="fileName()" [animate]="false"></app-file-drop>
-    </section>
-  }
+    }
+  </section>
 
   <div class="app-detail-actions">
     <button [form]="form" appBackButton mat-stroked-button type="button">

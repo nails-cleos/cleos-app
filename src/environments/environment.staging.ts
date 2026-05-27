@@ -30,5 +30,5 @@ export const environment = {
   awsExtractEnable: false,
   googleDriveUploadFile: true,
   googleMapKey: 'AIzaSyAkKXZ_Qi3MLge6Jjhi1bw0OXawDAbJgXc',
-  showMap: false,
+  showMap: true,
 };

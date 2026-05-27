@@ -38,8 +38,8 @@
           </ng-container>
 
           <ng-container matColumnDef="amount">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
-            <td *matCellDef="let transaction" class="hide-xs" mat-cell>
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
+            <td *matCellDef="let transaction" class="app-surface-hide-mobile" mat-cell>
               @if (transaction.id) {
                 <div>{{ transaction.amount | number:'1.2-2'| currency: account?.currency?.code }}</div>
               } @else {
@@ -49,8 +49,8 @@
           </ng-container>
 
           <ng-container matColumnDef="amountGifted">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell mat-sort-header>{{ 'ACCOUNT.TRANSACTION.LIST.COLUMN.AMOUNT_GIFTED' | translate }}</th>
-            <td *matCellDef="let transaction" class="hide-xs" mat-cell>
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell mat-sort-header>{{ 'ACCOUNT.TRANSACTION.LIST.COLUMN.AMOUNT_GIFTED' | translate }}</th>
+            <td *matCellDef="let transaction" class="app-surface-hide-mobile" mat-cell>
               @if (transaction.id) {
                 <div>{{ transaction.amountGifted | number:'1.2-2'| currency: account?.currency?.code }}</div>
               } @else {
@@ -60,8 +60,8 @@
           </ng-container>
 
           <ng-container matColumnDef="payment.status">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
-            <td *matCellDef="let transaction" class="hide-xs" mat-cell>
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
+            <td *matCellDef="let transaction" class="app-surface-hide-mobile" mat-cell>
               @if (transaction.id) {
                 <div>{{ 'COMMON.STATUS.PAYMENT.' + (transaction.payment?.status || 'NONE') | translate }}</div>
               } @else {
@@ -71,8 +71,8 @@
           </ng-container>
 
           <ng-container matColumnDef="payment.type">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
-            <td *matCellDef="let transaction" class="hide-xs" mat-cell>
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
+            <td *matCellDef="let transaction" class="app-surface-hide-mobile" mat-cell>
               @if (transaction.id) {
                 <div>{{ transaction.payment?.type }}</div>
               } @else {
@@ -82,8 +82,8 @@
           </ng-container>
 
           <ng-container matColumnDef="actions">
-            <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-            <td *matCellDef="let transaction" class="hide-xs" mat-cell>
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+            <td *matCellDef="let transaction" class="app-surface-hide-mobile" mat-cell>
               @if (transaction.id) {
                 @if (!transaction.deleted) {
                   <button mat-icon-button
@@ -99,8 +99,8 @@
           </ng-container>
 
           <ng-container matColumnDef="expandedDetail">
-            <td *matCellDef="let transaction" [attr.colspan]="displayedColumns.length" class="hide-gt-xs" mat-cell>
-              <div [class.detail-expanded]="transaction === expandedTransaction" class="detail hide-gt-xs">
+            <td *matCellDef="let transaction" [attr.colspan]="displayedColumns.length" class="app-surface-hide-desktop" mat-cell>
+              <div [class.detail-expanded]="transaction === expandedTransaction" class="detail app-surface-hide-desktop">
                 <mat-list>
                   @if (transaction.payment?.description) {
                     <div matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>

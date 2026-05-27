@@ -5,7 +5,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ServiceType } from '../../../interfaces/room';
 
-type PriceDialogData = {
+export type PriceDialogData = {
   name: string;
   type: ServiceType;
   currentPrice?: number;

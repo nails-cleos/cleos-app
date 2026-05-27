@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { FormArray, FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { FormArray, FormControl, FormGroup, FormGroupDirective, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Expense, IExpense, ISupplyStore, ITotalExpense } from '../../../interfaces/expense';
 import { TranslateService } from '@ngx-translate/core';
@@ -67,6 +67,7 @@ export class ExpenseComponent {
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
   private readonly tokenService: TokenService = inject(TokenService);
+  private readonly formDirective = viewChild(FormGroupDirective);
 
   private roomId$ = this.store.pipe(getCurrentRoomIdPipe);
   private expenseId$ = this.store.pipe(getCurrentExpenseIdPipe);
@@ -201,15 +202,7 @@ export class ExpenseComponent {
         if (!this.isAddModeSignal()) {
           return;
         }
-        this.form.reset();
-        this.form.markAsPristine({ emitEvent: false });
-        this.form.markAsUntouched({ emitEvent: false });
-        this.totals.clear();
-        this.totals.controls.forEach(control => {
-          control.markAsPristine({ emitEvent: false });
-          control.markAsUntouched({ emitEvent: false });
-        });
-        this.totalMap = new Map();
+        this.resetCreateAnotherForm();
         return;
       }
       const token = this.tokenService.token();
@@ -274,6 +267,24 @@ export class ExpenseComponent {
     return this.totals.controls.some(control => {
       return control.invalid;
     });
+  }
+
+  private resetCreateAnotherForm(): void {
+    const formDirective = this.formDirective();
+    if (formDirective?.form) {
+      (formDirective as FormGroupDirective & { submitted: boolean }).submitted = false;
+    }
+
+    this.form.reset();
+    this.errors.set({});
+    this.totals.clear();
+    this.totals.controls.forEach(control => {
+      control.markAsPristine({ emitEvent: false });
+      control.markAsUntouched({ emitEvent: false });
+    });
+    this.form.markAsPristine({ emitEvent: false });
+    this.form.markAsUntouched({ emitEvent: false });
+    this.totalMap = new Map();
   }
 
   submit() {

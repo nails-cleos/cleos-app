@@ -1,0 +1,12 @@
+@use 'styles/theme/color-literals' as colors;
+
+$white-base: colors.$white;
+$black-base: colors.$black;
+$warm-ink: #201c19;
+$shadow-ink: #0f172a;
+$slate-base: #94a3b8;
+
+$surface-light-top: #fffdf9;
+$surface-light-bottom: #f6f1ea;
+$surface-dark-top: #252525;
+$surface-dark-bottom: #1b1b1b;

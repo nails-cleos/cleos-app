@@ -285,7 +285,7 @@
               </tfoot>
             </table>
             <mat-action-row class="monthly-summary-actions-row">
-              <div class="spacer"></div>
+              <div class="app-surface-spacer"></div>
               <div class="app-detail-actions">
                 <button mat-stroked-button [disabled]="!summaryReservations?.length"
                         (click)="updateMonthlySummary(reservationMonth, monthlySummaryPayment)" type="button">
@@ -405,7 +405,7 @@
               </tfoot>
             </table>
             <mat-action-row class="monthly-summary-actions-row">
-              <div class="spacer"></div>
+              <div class="app-surface-spacer"></div>
               <div class="app-detail-actions">
                 <button mat-stroked-button [disabled]="!summaryExpenses?.length"
                         (click)="updateMonthlySummary(expenseMonth, monthlySummaryExpense)" type="button">
@@ -525,7 +525,7 @@
                 </tfoot>
               </table>
               <mat-action-row class="monthly-summary-actions-row">
-                <div class="spacer"></div>
+                <div class="app-surface-spacer"></div>
                 <div class="app-detail-actions">
                   <button mat-stroked-button [disabled]="!summaryCash?.length"
                           (click)="updateMonthlySummary(cashMonth, monthlySummaryCash)" type="button">
@@ -553,7 +553,7 @@
 
   <section class="app-surface-section">
     <div class="app-detail-actions">
-      <div class="spacer"></div>
+      <div class="app-surface-spacer"></div>
       <button (click)="goBack()" mat-stroked-button type="button">
         <mat-icon>keyboard_return</mat-icon>
         <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>

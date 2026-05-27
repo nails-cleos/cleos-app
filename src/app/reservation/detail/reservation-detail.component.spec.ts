@@ -339,7 +339,15 @@ describe('ReservationDetailComponent', () => {
       fixture.detectChanges();
 
       expect(component.changeState).toBeDefined();
-      expect(component.changeState.length).toBe(5);
+      expect(component.changeState.map(action => action.id)).toEqual([
+        'overview',
+        'note',
+        'approve',
+        'edit',
+        'cancel',
+        'more',
+        'clone',
+      ]);
     });
 
     it('should transition from created to approved state', () => {
@@ -680,7 +688,12 @@ describe('ReservationDetailComponent', () => {
       fixture.detectChanges();
 
       expect(component.changeState).toBeDefined();
-      expect(component.changeState.length).toBe(2);
+      expect(component.changeState.map(action => action.id)).toEqual([
+        'overview',
+        'note',
+        'edit',
+        'cancel',
+      ]);
     });
 
     it('should allow booking from completed state', () => {

@@ -45,15 +45,15 @@
 
           <div class="app-crud-fields">
             <div class="app-crud-form-grid">
-            <mat-form-field appearance="outline">
-              <mat-label>{{ 'EXPENSE.INVOICE.FIELD' | translate }}</mat-label>
-              <input [formControl]="getForm.invoice" matInput required>
-              @if (getForm.invoice.hasError('required')) {
-                <mat-error [innerHTML]="'EXPENSE.INVOICE.REQUIRED' | translate"></mat-error>
-              } @else if (errors()['invoice']) {
-                <mat-error>{{ errors()['invoice'] }}</mat-error>
-              }
-            </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'EXPENSE.INVOICE.FIELD' | translate }}</mat-label>
+                <input [formControl]="getForm.invoice" matInput required>
+                @if (getForm.invoice.hasError('required')) {
+                  <mat-error [innerHTML]="'EXPENSE.INVOICE.REQUIRED' | translate"></mat-error>
+                } @else if (errors()['invoice']) {
+                  <mat-error>{{ errors()['invoice'] }}</mat-error>
+                }
+              </mat-form-field>
             </div>
 
             <div class="app-crud-form-grid">
@@ -101,9 +101,9 @@
         </div>
       } @else {
         <div class="app-crud-loading">
-          <div class="ssc-hr"></div>
+          <div class="app-surface-skeleton-spacer"></div>
           <div class="ssc-square app-crud-loading__block"></div>
-          <div class="ssc-hr"></div>
+          <div class="app-surface-skeleton-spacer"></div>
         </div>
       }
     </section>
@@ -199,7 +199,7 @@
 
               <div class="expense-array__actions">
                 <button [disabled]="totals.controls.length === 1" (click)="removeExpense(i)" mat-stroked-button
-                        type="button">
+                        type="button" class="app-surface-filter-action app-detail-action-button">
                   <mat-icon>delete</mat-icon>
                   <span>{{ 'COMMON.BUTTON.DELETE' | translate }}</span>
                 </button>
@@ -208,34 +208,37 @@
           }
 
           <div class="expense-array__footer">
-            <button (click)="addDate()" [disabled]="isAddButtonDisabled" mat-stroked-button type="button">
+            <button (click)="addDate()" [disabled]="isAddButtonDisabled" mat-stroked-button type="button"
+                    class="app-detail-action-button">
               <mat-icon>list_alt_add</mat-icon>
               <span>{{ 'COMMON.BUTTON.ADD' | translate }}</span>
             </button>
           </div>
         </div>
+
       </section>
-
       <section class="app-surface-section">
-        <div class="expense-summary-grid">
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'EXPENSE.TOTAL.GROSS' | translate }}</mat-label>
-            <input disabled [value]="totalGross | number:'1.2-2'" matInput>
-            <mat-icon matPrefix>{{ currentCurrencyIcon }}</mat-icon>
-          </mat-form-field>
+        @if (totals.controls.length > 0) {
+          <div class="expense-summary-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'EXPENSE.TOTAL.GROSS' | translate }}</mat-label>
+              <input disabled [value]="totalGross | number:'1.2-2'" matInput>
+              <mat-icon matPrefix>{{ currentCurrencyIcon }}</mat-icon>
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'EXPENSE.TOTAL.NET' | translate }}</mat-label>
-            <input disabled [value]="totalNet | number:'1.2-2'" matInput>
-            <mat-icon matPrefix>{{ currentCurrencyIcon }}</mat-icon>
-          </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'EXPENSE.TOTAL.NET' | translate }}</mat-label>
+              <input disabled [value]="totalNet | number:'1.2-2'" matInput>
+              <mat-icon matPrefix>{{ currentCurrencyIcon }}</mat-icon>
+            </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'EXPENSE.TOTAL.BTW' | translate }}</mat-label>
-            <input disabled [value]="totalBTW | number:'1.2-2'" matInput>
-            <mat-icon matPrefix>{{ currentCurrencyIcon }}</mat-icon>
-          </mat-form-field>
-        </div>
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'EXPENSE.TOTAL.BTW' | translate }}</mat-label>
+              <input disabled [value]="totalBTW | number:'1.2-2'" matInput>
+              <mat-icon matPrefix>{{ currentCurrencyIcon }}</mat-icon>
+            </mat-form-field>
+          </div>
+        }
 
         <div class="expense-footer">
           <div class="expense-footer__end">

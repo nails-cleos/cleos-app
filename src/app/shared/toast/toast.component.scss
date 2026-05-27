@@ -1,7 +1,8 @@
 .toast {
+  box-sizing: border-box;
   position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: start;
   column-gap: 14px;
   min-width: min(560px, calc(100vw - 24px));
@@ -94,19 +95,13 @@
 
 .toast-actions {
   display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  gap: 8px;
-  min-width: 0;
-  margin-left: auto;
-}
-
-.toast-primary-actions {
-  display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
   min-width: 0;
+  margin-left: auto;
+  grid-column: 3;
+  grid-row: 1;
 }
 
 .toast-action-button {
@@ -120,6 +115,9 @@
 .toast-close-button {
   opacity: 0.72;
   color: inherit;
+  grid-column: 4;
+  grid-row: 1;
+  align-self: start;
 }
 
 .toast-success {
@@ -186,11 +184,12 @@
 
 @media (max-width: 640px) {
   .toast {
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    min-width: calc(100vw - 12px);
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    width: calc(100vw - 12px);
+    min-width: 0;
     max-width: calc(100vw - 12px);
     gap: 12px;
-    padding: 14px 14px 12px;
+    padding: 14px;
     border-radius: 20px;
     box-shadow:
       0 14px 34px rgb(15 23 42 / 0.18),
@@ -202,28 +201,27 @@
   }
 
   .toast-actions {
-    grid-column: 1 / -1;
+    grid-column: 3;
+    grid-row: 1;
+    align-self: start;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-left: 0;
-    padding-top: 4px;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-left: auto;
+    padding-top: 0;
   }
 
-  .toast-primary-actions {
-    flex: 1;
-    justify-content: flex-start;
-    overflow: hidden;
+  .toast-actions--empty {
+    display: none;
   }
 
   .toast-action-button {
-    width: 100%;
+    width: auto;
   }
 
   .toast-close-button {
     flex: 0 0 auto;
-    margin-right: -4px;
-    margin-bottom: -4px;
+    margin: 0;
   }
 
   .toast-title {

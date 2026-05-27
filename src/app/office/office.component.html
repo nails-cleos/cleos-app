@@ -55,7 +55,8 @@
                   }
                 </mat-form-field>
 
-                <button mat-stroked-button type="button" (click)="addManager()" class="app-detail-action-button">
+                <button mat-stroked-button type="button" (click)="addManager()"
+                        class="app-surface-filter-action app-detail-action-button">
                   <mat-icon>person_add</mat-icon>
                   <span>{{ 'OFFICE.MANAGER.ADD_BUTTON' | translate }}</span>
                 </button>
@@ -144,9 +145,9 @@
         </div>
       } @else {
         <div class="app-crud-loading">
-          <div class="ssc-hr"></div>
+          <div class="app-surface-skeleton-spacer"></div>
           <div class="ssc-square app-crud-loading__block"></div>
-          <div class="ssc-hr"></div>
+          <div class="app-surface-skeleton-spacer"></div>
         </div>
       }
     </form>

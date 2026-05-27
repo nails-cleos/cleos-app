@@ -10,10 +10,11 @@ import {
   viewChild,
 } from '@angular/core';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { CancelOption, IReservation, IReservationAll, States } from '../../interfaces/reservation';
-import { combineLatestWith } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { CancelOption, IReservation, IReservationAll, States } from '../../interfaces/reservation';
+import { combineLatestWith } from 'rxjs';
+import { createMatTableState } from 'src/app/util/mat-table-state';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
@@ -64,6 +65,7 @@ export class SearchComponent {
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
+  private tableState = createMatTableState(this.paginator, this.sort, 'timestamp', 'desc');
 
   private reservationListSignal = toSignal(this.reservationList$);
   private responseSignal = toSignal(this.response$);
@@ -79,10 +81,7 @@ export class SearchComponent {
     },
   );
 
-  private sortActive = computed(() => this.sort()?.active ?? 'timestamp');
-  private sortDirection = computed(() => this.sort()?.direction ?? 'desc');
-
-  paginatorPageIndex = signal(0);
+  paginatorPageIndex = this.tableState.pageIndex;
   dataSourceSignal = computed(() => {
     const now = getNowTimeZone();
     return this.reservationListSignal()?.content?.map((reservation: IReservationAll) => {
@@ -148,35 +147,18 @@ export class SearchComponent {
   );
 
   constructor() {
-    effect((onCleanup) => {
-      const paginator = this.paginator();
-      if (paginator) {
-        const sub = paginator.page.subscribe((pageEvent) => {
-          this.paginatorPageIndex.set(pageEvent.pageIndex);
-        });
-        onCleanup(() => sub.unsubscribe());
-      }
-    });
-
     effect(() => {
+      const request = this.tableState.baseRequest();
       this.store.dispatch(
         getAllFilterReservations({
-          page: this.paginatorPageIndex(),
-          sort: this.sortActive(),
-          direction: this.sortDirection(),
+          ...request,
           size: this.pageSizeSignal(),
           userId: this.userId(),
           states: this.selectedStatesSignal(),
         }),
       );
     });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.store.dispatch(cleanReservation());
-        this.paginator()?.firstPage();
-      }
-    });
+    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanReservation()));
   }
 
   get getForm(): SearchForm {

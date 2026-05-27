@@ -1,4 +1,4 @@
-@use 'reservation-flow' as reservation-flow;
+@use 'styles/reservation-flow' as reservation-flow;
 
 @include reservation-flow.theme-vars(
   'app-reservation, app-me-reservation',
@@ -56,7 +56,7 @@ app-me-reservation .app-surface-stack ngx-material-intl-tel-input {
   width: 44px;
   height: 44px;
   border-radius: 16px;
-  background: linear-gradient(135deg, var(--reservation-accent), #d8a35d);
+  background: linear-gradient(135deg, var(--reservation-accent), var(--cta-highlight-color));
   color: var(--invert-text, white);
   font-weight: 700;
   font-size: 1rem;
@@ -295,11 +295,6 @@ app-me-reservation .app-surface-stack ngx-material-intl-tel-input {
   margin-top: 10px;
 }
 
-:is(app-reservation, app-me-reservation) .add-button-container {
-  display: flex;
-  justify-content: flex-start;
-}
-
 :is(app-reservation, app-me-reservation) .schedule-card {
   overflow: hidden;
 }
@@ -426,7 +421,7 @@ app-me-reservation .availability-grid .mat-mdc-raised-button {
   padding-top: 0;
 }
 
-:is(app-reservation, app-me-reservation) .step-actions {
+:is(app-reservation, app-me-reservation) .app-detail-actions {
   position: sticky;
   bottom: 16px;
   z-index: 4;
@@ -442,35 +437,14 @@ app-me-reservation .availability-grid .mat-mdc-raised-button {
   box-shadow: var(--reservation-actions-shadow);
 }
 
-:is(app-reservation, app-me-reservation) .step-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button) {
-  --mdc-outlined-button-label-text-color: var(--app-detail-action-text);
-  --mat-outlined-button-state-layer-color: var(--app-detail-action-state);
-  --mdc-filled-button-label-text-color: var(--app-detail-action-text);
-  --mat-filled-button-state-layer-color: var(--app-detail-action-state);
-  border-color: var(--app-detail-action-border);
-  background: linear-gradient(180deg, var(--app-detail-action-bg-top), var(--app-detail-action-bg-bottom));
-  color: var(--app-detail-action-text);
-  box-shadow: none;
-}
-
-:is(app-reservation, app-me-reservation) .step-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button):hover {
-  border-color: var(--app-detail-action-border-hover);
-  background: linear-gradient(180deg, var(--app-detail-action-hover-top), var(--app-detail-action-hover-bottom));
-}
-
-:is(app-reservation, app-me-reservation) .step-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button),
-:is(app-reservation, app-me-reservation) .step-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button) .mdc-button__label {
+:is(app-reservation, app-me-reservation) .app-detail-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button),
+:is(app-reservation, app-me-reservation) .app-detail-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button) .mdc-button__label {
   display: inline-flex;
   align-items: center;
   gap: 8px;
 }
 
-:is(app-reservation, app-me-reservation) .step-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button) .mat-icon,
-:is(app-reservation, app-me-reservation) .step-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button) .mdc-button__label {
-  color: var(--app-detail-action-text) !important;
-}
-
-:is(app-reservation, app-me-reservation) .step-actions--mobile {
+:is(app-reservation, app-me-reservation) .app-detail-actions--mobile {
   bottom: 0;
   margin-top: 12px;
   border-radius: 20px 20px 0 0;
@@ -520,7 +494,7 @@ app-me-reservation .availability-grid .mat-mdc-raised-button {
     align-items: flex-start;
   }
 
-  :is(app-reservation, app-me-reservation) .step-actions {
+  :is(app-reservation, app-me-reservation) .app-detail-actions {
     align-items: stretch;
   }
 }
@@ -529,9 +503,14 @@ app-me-reservation .availability-grid .mat-mdc-raised-button {
   :is(app-reservation, app-me-reservation) .reservation-flow-shell,
   :is(app-reservation, app-me-reservation) .step-layout--mobile,
   :is(app-reservation, app-me-reservation) .step-layout--mobile > *,
-  :is(app-reservation, app-me-reservation) .step-actions--mobile {
+  :is(app-reservation, app-me-reservation) .app-detail-actions--mobile {
     width: 100%;
     max-width: 100%;
+  }
+
+  :is(app-reservation, app-me-reservation) .app-detail-actions,
+  :is(app-reservation, app-me-reservation) .app-detail-actions--mobile {
+    box-sizing: border-box;
   }
 
   :is(app-reservation, app-me-reservation) .step-heading {
@@ -663,7 +642,18 @@ app-me-reservation .availability-grid .mat-mdc-raised-button {
     grid-column: 1 / -1;
   }
 
-  :is(app-reservation, app-me-reservation) .step-actions {
+  :is(app-reservation, app-me-reservation) .app-detail-actions {
     padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+  }
+
+  :is(app-reservation, app-me-reservation) .app-detail-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button) {
+    flex: 1 1 0;
+    min-width: 0;
+    justify-content: center;
+    padding-inline: 12px;
+  }
+
+  :is(app-reservation, app-me-reservation) .app-detail-actions :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button, .mat-mdc-unelevated-button) .mdc-button__label {
+    min-width: 0;
   }
 }
