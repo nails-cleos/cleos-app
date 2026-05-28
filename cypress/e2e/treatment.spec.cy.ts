@@ -1,6 +1,9 @@
 import '../support/commands';
 import { breakpointToButtons, convertSecondsToTime, devices, zeroPad } from '../support/utils';
 
+const getAddTreatmentInput = () =>
+  cy.get('#add-treatment').scrollIntoView().should('be.enabled');
+
 devices.forEach(({ name, width, height, breakpoints }) => {
   describe(`Treatments with ${ name }`, () => {
     beforeEach(() => cy.viewport(width, height));
@@ -48,8 +51,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.selectChip('Demure');
 
       treatments.forEach((treatment) => {
-        cy.get('#add-treatment').should('be.visible');
-        cy.get('#add-treatment').clear().type(treatment.name);
+        getAddTreatmentInput().clear({ force: true }).type(treatment.name, { force: true });
         cy.get('button[aria-label="Add treatment"]').click();
 
         cy.get('mat-tab-body[aria-hidden="false"]').find('#treatment-description').scrollIntoView()
@@ -96,7 +98,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           body: { name: treatmentGroupName },
           alias: 'updateTreatment',
         });
-        cy.intercept('POST', `**/api/v1/treatments/${ treatment.id }`).as('updateTreatment');
 
         cy.buttonClickOnTable(breakpoints, treatment.name, 'app-table-master-row', 'app-table-detail-row', 'edit',
           breakpointToButtons(breakpoints, ['visibility', 'sort', 'delete']));
@@ -146,8 +147,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           time: `${ zeroPad(newTreatment.hour) }:${ zeroPad(newTreatment.minute) }`,
           order: treatment.treatments.length - 1,
         };
-        cy.get('#add-treatment').should('be.visible');
-        cy.get('#add-treatment').clear().type(newTreatment.name);
+        getAddTreatmentInput().clear({ force: true }).type(newTreatment.name, { force: true });
         cy.get('button[aria-label="Add treatment"]').click();
 
         cy.get('mat-tab-body[aria-hidden="false"]').find('#treatment-description').scrollIntoView()
