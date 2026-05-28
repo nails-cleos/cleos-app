@@ -96,7 +96,7 @@ describe('NavComponent', () => {
 
     const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
     cookieServiceSpy = jasmine.createSpyObj('CookieService', ['get', 'set']);
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['subscribe', 'attachLang']);
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['attachLang']);
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'select', 'dispatch']);
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['cookieConsent', 'reloadUser', 'updateMode'], {
@@ -115,7 +115,6 @@ describe('NavComponent', () => {
     });
 
     paramMapSpy.get.and.returnValue(null);
-    navigationServiceSpy.subscribe.and.returnValue({} as any);
     navigationServiceSpy.attachLang.and.returnValue('en-GB');
 
     let selectCallIndex = 0;

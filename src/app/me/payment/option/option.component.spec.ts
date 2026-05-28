@@ -9,6 +9,8 @@ import { IPaymentOption } from '../../../interfaces/payment';
 import { getPaymentByResourceId } from '../../../store/payment.actions';
 import { IReservationAll } from '../../../interfaces/reservation';
 import { provideHttpClient } from '@angular/common/http';
+import { NavigationService } from '../../../services/navigation.service';
+import { provideAppIcons } from '../../../util/app-icons.provider';
 
 describe('OptionComponent', () => {
   let component: OptionComponent;
@@ -77,6 +79,8 @@ describe('OptionComponent', () => {
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
+    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
+
     // Simulate the signal order
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
@@ -98,8 +102,10 @@ describe('OptionComponent', () => {
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: Router, useValue: routerSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         provideHttpClient(),
+        provideAppIcons(),
       ],
     }).compileComponents();
 

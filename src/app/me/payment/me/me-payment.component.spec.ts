@@ -8,6 +8,7 @@ import { getPayment, updatePaymentById } from '../../../store/payment.actions';
 import { PaymentPercentage } from '../../../interfaces/payment';
 import { ActivatedRoute } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
+import { provideAppIcons } from '../../../util/app-icons.provider';
 
 describe('MePaymentComponent', () => {
   let component: MePaymentComponent;
@@ -75,6 +76,7 @@ describe('MePaymentComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         provideHttpClient(),
+        provideAppIcons(),
       ],
     }).compileComponents();
 

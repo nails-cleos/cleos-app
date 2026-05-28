@@ -8,6 +8,7 @@ import { BehaviorSubject, of, Subject } from 'rxjs';
 import { AuthState } from '../../store/reducers/auth.reducers';
 import { IError } from '../../interfaces/common';
 import { FirebaseService } from '../../services/firebase.service';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('ForgotPasswordComponent', () => {
   let component: ForgotPasswordComponent;
@@ -31,6 +32,8 @@ describe('ForgotPasswordComponent', () => {
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     firebaseServiceSpy = jasmine.createSpyObj('FirebaseService', ['sendPasswordResetEmail']);
+
+    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
@@ -56,6 +59,7 @@ describe('ForgotPasswordComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: Router, useValue: routerSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: FirebaseService, useValue: firebaseServiceSpy },
       ],
     }).compileComponents();

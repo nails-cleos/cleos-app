@@ -4,6 +4,7 @@ import { CancelDialogComponent } from './cancel-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
 import { CancelOption } from '../../../interfaces/reservation';
+import { provideAppIcons } from '../../../util/app-icons.provider';
 
 describe('CancelDialogComponent', () => {
   let component: CancelDialogComponent;
@@ -17,6 +18,7 @@ describe('CancelDialogComponent', () => {
       providers: [
         { provide: MatDialogRef, useValue: dialogRefSpy },
         { provide: MAT_DIALOG_DATA, useValue: { options: [] } },
+        provideAppIcons(),
       ],
     }).compileComponents();
 
@@ -88,6 +90,7 @@ describe('CancelDialogComponent', () => {
             paymentOptions: [{ type: 'MOLLIE', name: 'Mollie' }],
           },
         },
+        provideAppIcons(),
       ],
     }).compileComponents();
 

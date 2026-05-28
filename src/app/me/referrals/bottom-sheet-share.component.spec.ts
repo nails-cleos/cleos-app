@@ -4,6 +4,7 @@ import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { environment } from '../../../environments/environment';
 import { provideHttpClient } from '@angular/common/http';
+import { provideAppIcons } from '../../util/app-icons.provider';
 
 describe('BottomSheetShareComponent', () => {
   let component: BottomSheetShareComponent;
@@ -17,6 +18,7 @@ describe('BottomSheetShareComponent', () => {
       providers: [
         { provide: MAT_BOTTOM_SHEET_DATA, useValue: mockData },
         provideHttpClient(),
+        provideAppIcons(),
       ],
     }).compileComponents();
 

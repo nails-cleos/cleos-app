@@ -16,6 +16,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { FirebaseService } from '../services/firebase.service';
 import { updateMyUser } from '../store/main.actions';
+import { provideAppIcons } from '../util/app-icons.provider';
 
 describe('MainComponent', () => {
   let component: MainComponent;
@@ -84,6 +85,7 @@ describe('MainComponent', () => {
         { provide: FirebaseService, useValue: firebaseServiceSpy },
         provideHttpClient(),
         provideHttpClientTesting(),
+        provideAppIcons(),
       ],
     }).compileComponents();
 

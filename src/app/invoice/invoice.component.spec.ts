@@ -20,6 +20,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import { SelectionModel } from '@angular/cdk/collections';
 import { PaymentService } from '../services/payment.service';
 import { provideAppDateAdapter } from '../util/adapter/app-date.provider';
+import { NavigationService } from '../services/navigation.service';
 
 describe('InvoiceComponent', () => {
   let component: InvoiceComponent;
@@ -179,6 +180,8 @@ describe('InvoiceComponent', () => {
       },
     });
 
+    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
+
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
       pipeCallIndex++;
@@ -203,6 +206,7 @@ describe('InvoiceComponent', () => {
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Router, useValue: routerSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
         { provide: PaymentService, useValue: paymentServiceSpy },
         provideAppDateAdapter(),

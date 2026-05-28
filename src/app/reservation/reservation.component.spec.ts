@@ -24,6 +24,7 @@ import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.com
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { NavigationService } from '../services/navigation.service';
 
 describe('ReservationComponent', () => {
   let component: ReservationComponent;
@@ -177,6 +178,8 @@ describe('ReservationComponent', () => {
       authUser: authUserSignal.asReadonly(),
     });
 
+    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
+
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
       pipeCallIndex++;
@@ -219,6 +222,7 @@ describe('ReservationComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: Router, useValue: routerSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: MatSnackBar, useValue: snackBarSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: MatDialog, useValue: dialogSpy },

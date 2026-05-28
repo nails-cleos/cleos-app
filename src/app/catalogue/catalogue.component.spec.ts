@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ICatalogueAll } from '../interfaces/catalogue';
 import { ITreatmentGroup, ITreatmentGroupAll } from '../interfaces/treatment';
 import { CatalogueState } from '../store/reducers/catalogue.reducers';
+import { NavigationService } from '../services/navigation.service';
 
 describe('CatalogueComponent', () => {
   let component: CatalogueComponent;
@@ -49,6 +50,8 @@ describe('CatalogueComponent', () => {
       },
     });
 
+    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
+
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
       pipeCallIndex++;
@@ -72,6 +75,7 @@ describe('CatalogueComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: Router, useValue: routerSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
 

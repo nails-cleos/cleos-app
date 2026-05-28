@@ -12,6 +12,7 @@ import { IError } from '../interfaces/common';
 import { backendFormatDate, getNowTimeZone } from '../util/dates';
 import { addDays } from 'date-fns';
 import { provideAppDateAdapter } from '../util/adapter/app-date.provider';
+import { NavigationService } from '../services/navigation.service';
 
 describe('NoteComponent', () => {
   let component: NoteComponent;
@@ -75,11 +76,14 @@ describe('NoteComponent', () => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
 
+    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
+
     await TestBed.configureTestingModule({
       imports: [NoteComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: Router, useValue: routerSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: MatDialog, useValue: dialogSpy },
         provideAppDateAdapter(),
       ],

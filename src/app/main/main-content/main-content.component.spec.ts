@@ -16,6 +16,7 @@ import { MainState } from '../../store/reducers/main.reducers';
 import { GoogleMapStubComponent } from '../../shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
+import { provideAppIcons } from '../../util/app-icons.provider';
 
 describe('MainContentComponent', () => {
   let component: MainContentComponent;
@@ -71,6 +72,7 @@ describe('MainContentComponent', () => {
         { provide: ToastService, useValue: toastServiceSpy },
         provideHttpClient(),
         provideHttpClientTesting(),
+        provideAppIcons(),
       ],
     }).compileComponents();
 

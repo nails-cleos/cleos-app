@@ -9,6 +9,7 @@ import { IOfficeAll } from '../interfaces/office';
 import { StatementState } from '../store/reducers/statement.reducers';
 import { DriveAccessService } from '../services/drive-access.service';
 import { uploadStatement } from '../store/statement.actions';
+import { NavigationService } from '../services/navigation.service';
 
 describe('StatementComponent', () => {
   let component: StatementComponent;
@@ -57,6 +58,8 @@ describe('StatementComponent', () => {
       },
     });
 
+    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
+
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
       pipeCallIndex++;
@@ -79,6 +82,7 @@ describe('StatementComponent', () => {
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Router, useValue: routerSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
       ],
     }).compileComponents();

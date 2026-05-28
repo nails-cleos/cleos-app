@@ -3,6 +3,7 @@ import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BottomSheetBookAppointmentComponent } from './bottom-sheet-book-appointment';
 import { provideHttpClient } from '@angular/common/http';
+import { provideAppIcons } from '../../util/app-icons.provider';
 
 describe('BottomSheetBookAppointmentComponent', () => {
   let component: BottomSheetBookAppointmentComponent;
@@ -20,6 +21,7 @@ describe('BottomSheetBookAppointmentComponent', () => {
       providers: [
         { provide: MatBottomSheetRef, useValue: bottomSheetRefSpy },
         provideHttpClient(),
+        provideAppIcons(),
       ],
     }).compileComponents();
 

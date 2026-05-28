@@ -153,7 +153,6 @@ export class NavComponent {
   private cssClass?: string;
 
   constructor() {
-    this.navigationService.subscribe();
     this.authUserService.cookieConsent(this.translate);
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart && this.isBlockingPageError(this.globalErrorSignal())) {

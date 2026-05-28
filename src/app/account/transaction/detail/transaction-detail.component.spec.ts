@@ -9,6 +9,7 @@ import { ITransaction } from '../../../interfaces/account';
 import { getTransaction } from '../../../store/account.actions';
 import { notifyPayment, paymentSend } from '../../../store/payment.actions';
 import { AccountState } from '../../../store/reducers/account.reducers';
+import { NavigationService } from '../../../services/navigation.service';
 
 describe('TransactionDetailComponent', () => {
   let component: TransactionDetailComponent;
@@ -54,6 +55,8 @@ describe('TransactionDetailComponent', () => {
       },
     });
 
+    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
+
     // Return observables in order for toSignal
     let callIndex = 0;
     storeSpy.pipe.and.callFake(() => {
@@ -82,6 +85,7 @@ describe('TransactionDetailComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Router, useValue: routerSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
 

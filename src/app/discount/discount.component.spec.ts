@@ -8,6 +8,7 @@ import { ToastService } from '../services/toast.service';
 import { DiscountType, IDiscountAll } from '../interfaces/discount';
 import { ICurrency } from '../interfaces/currency';
 import { DiscountState } from '../store/reducers/discount.reducers';
+import { NavigationService } from '../services/navigation.service';
 
 describe('DiscountComponent', () => {
   let component: DiscountComponent;
@@ -56,6 +57,8 @@ describe('DiscountComponent', () => {
       },
     });
 
+    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
+
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
       pipeCallIndex++;
@@ -84,6 +87,7 @@ describe('DiscountComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: Router, useValue: routerSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
       ],
     }).compileComponents();

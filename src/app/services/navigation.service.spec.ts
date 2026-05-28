@@ -71,10 +71,8 @@ describe('NavigationService', () => {
     expect(service).toBeTruthy();
   });
 
-  describe('subscribe', () => {
-    it('should subscribe to router events', () => {
-      service.subscribe();
-
+  describe('constructor', () => {
+    it('should subscribe to router events on creation', () => {
       const navigationEndEvent = new NavigationEnd(1, '/test/path', '/test/path');
       routerEventsSubject.next(navigationEndEvent);
 
@@ -83,8 +81,6 @@ describe('NavigationService', () => {
     });
 
     it('should not add payment success URLs to history', () => {
-      service.subscribe();
-
       const paymentSuccessEvent = new NavigationEnd(1, '/payment/success?token=123', '/payment/success?token=123');
       routerEventsSubject.next(paymentSuccessEvent);
 
@@ -92,8 +88,6 @@ describe('NavigationService', () => {
     });
 
     it('should not add payment failure URLs to history', () => {
-      service.subscribe();
-
       const paymentFailureEvent = new NavigationEnd(1, '/payment/failure?error=1', '/payment/failure?error=1');
       routerEventsSubject.next(paymentFailureEvent);
 
@@ -101,8 +95,6 @@ describe('NavigationService', () => {
     });
 
     it('should not add payment status callback routes to history', () => {
-      service.subscribe();
-
       const paymentStatusEvent = new NavigationEnd(
         1,
         '/en-GB/me/reservation/res-1/payment/approved',
@@ -114,8 +106,6 @@ describe('NavigationService', () => {
     });
 
     it('should ignore non-NavigationEnd events', () => {
-      service.subscribe();
-
       const otherEvent = { id: 1, url: '/test' };
       routerEventsSubject.next(otherEvent);
 
@@ -123,12 +113,19 @@ describe('NavigationService', () => {
     });
 
     it('should avoid duplicate consecutive entries', () => {
-      service.subscribe();
-
       routerEventsSubject.next(new NavigationEnd(1, '/test/path', '/test/path'));
       routerEventsSubject.next(new NavigationEnd(2, '/test/path', '/test/path'));
 
       expect((service as any).history).toEqual(['/test/path']);
+    });
+
+    it('should keep subscribe as a safe no-op after construction', () => {
+      service.subscribe();
+
+      routerEventsSubject.next(new NavigationEnd(1, '/page-1', '/page-1'));
+      routerEventsSubject.next(new NavigationEnd(2, '/page-1', '/page-1'));
+
+      expect((service as any).history).toEqual(['/test/path', '/page-1']);
     });
   });
 
@@ -161,7 +158,7 @@ describe('NavigationService', () => {
     });
 
     it('should navigate to parent route when no previous history is available', () => {
-      (service as any).history = ['/last-page'];
+      sessionStorage.setItem('cleos-navigation-history', JSON.stringify([]));
       setRouterUrl('/en-GB/colors/123');
 
       service.back();
@@ -172,7 +169,7 @@ describe('NavigationService', () => {
     });
 
     it('should fallback to language root when current route has no parent segment', () => {
-      (service as any).history = [];
+      sessionStorage.setItem('cleos-navigation-history', JSON.stringify([]));
       setRouterUrl('/en-GB');
 
       service.back();
@@ -203,7 +200,7 @@ describe('NavigationService', () => {
     });
 
     it('should fallback to parent route when history is empty', () => {
-      (service as any).history = [];
+      sessionStorage.setItem('cleos-navigation-history', JSON.stringify([]));
       setRouterUrl('/en-GB/rooms/room-1/expenses/add');
 
       service.back();
@@ -371,8 +368,6 @@ describe('NavigationService', () => {
 
   describe('navigation history management', () => {
     it('should maintain history correctly through multiple navigations', () => {
-      service.subscribe();
-
       // Add multiple navigation events
       routerEventsSubject.next(new NavigationEnd(1, '/page1', '/page1'));
       routerEventsSubject.next(new NavigationEnd(2, '/page2', '/page2'));

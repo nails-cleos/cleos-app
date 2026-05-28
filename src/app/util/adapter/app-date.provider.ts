@@ -1,11 +1,16 @@
 import { Provider } from '@angular/core';
-import { DateAdapter, MAT_DATE_FORMATS, provideNativeDateAdapter } from '@angular/material/core';
+import { DateAdapter as MaterialDateAdapter, MAT_DATE_FORMATS, provideNativeDateAdapter } from '@angular/material/core';
 import { MAT_DATE_RANGE_SELECTION_STRATEGY } from '@angular/material/datepicker';
 import { YearMonthDateAdapter } from './year-month-date.adapter';
 import { YearMonthAdapter } from './year-month.adapter';
 import { YearAdapter } from './year.adapter';
 import { MonthPeriodAdapter } from './month-period-adapter.service';
-import { CalendarDateFormatter, CalendarEventTitleFormatter, provideCalendar } from 'angular-calendar';
+import {
+  CalendarDateFormatter,
+  CalendarEventTitleFormatter,
+  DateAdapter as CalendarDateAdapter,
+  provideCalendar,
+} from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { CustomDateFormatter } from '../../shared/CustomDateFormatter';
 import { CustomEventTitleFormatter } from '../../shared/CustomEventTitleFormatter';
@@ -37,14 +42,14 @@ const YEAR_FORMATS = {
 export const provideAppDateAdapter = () => [
   ...provideNativeDateAdapter(),
   {
-    provide: DateAdapter,
+    provide: MaterialDateAdapter,
     useClass: YearMonthDateAdapter,
   },
 ];
 
 export const provideAppCalendar = () => provideCalendar(
   {
-    provide: DateAdapter,
+    provide: CalendarDateAdapter,
     useFactory: adapterFactory,
   },
   {
@@ -61,7 +66,7 @@ export const provideAppCalendar = () => provideCalendar(
 
 export const provideYearMonthDateAdapter = (): Provider[] => [
   {
-    provide: DateAdapter,
+    provide: MaterialDateAdapter,
     useClass: YearMonthAdapter,
   },
   {
@@ -72,7 +77,7 @@ export const provideYearMonthDateAdapter = (): Provider[] => [
 
 export const provideYearDateAdapter = (): Provider[] => [
   {
-    provide: DateAdapter,
+    provide: MaterialDateAdapter,
     useClass: YearAdapter,
   },
   {

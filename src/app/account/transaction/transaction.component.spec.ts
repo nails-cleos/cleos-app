@@ -11,6 +11,8 @@ import { IPaymentOption } from '../../interfaces/payment';
 import { createTransaction, getAccount } from '../../store/account.actions';
 import { AccountState } from '../../store/reducers/account.reducers';
 import { signal } from '@angular/core';
+import { NavigationService } from '../../services/navigation.service';
+import { provideAppIcons } from '../../util/app-icons.provider';
 
 describe('TransactionComponent', () => {
   let component: TransactionComponent;
@@ -96,6 +98,8 @@ describe('TransactionComponent', () => {
       },
     });
 
+    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
+
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
       pipeCallIndex++;
@@ -121,7 +125,9 @@ describe('TransactionComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Router, useValue: routerSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
+        provideAppIcons(),
       ],
     }).compileComponents();
 

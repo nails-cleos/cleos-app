@@ -1,4 +1,5 @@
-import { inject, Injectable } from '@angular/core';
+import { DestroyRef, inject, Injectable } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { getLocale } from '../util/helper';
 import { IUser, User } from '../interfaces/user';
@@ -18,18 +19,31 @@ export class NavigationService {
 
   private store: Store<I18NState> = inject(Store<I18NState>);
   private router: Router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   private readonly languageSignal = toSignal(this.store.pipe(getI18NLanguagePipe));
 
   private history: string[] = this.readHistory();
+  private isTrackingHistory = false;
+
+  constructor() {
+    this.subscribe();
+  }
 
   subscribe(): void {
+    if (this.isTrackingHistory) {
+      return;
+    }
+
+    this.isTrackingHistory = true;
     this.syncCurrentUrl();
-    this.router.events.subscribe((event) => {
-      if (event instanceof NavigationEnd) {
-        this.pushHistory(event.urlAfterRedirects);
-      }
-    });
+    this.router.events
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((event) => {
+        if (event instanceof NavigationEnd) {
+          this.pushHistory(event.urlAfterRedirects);
+        }
+      });
   }
 
   back(date?: Date, step: number = 0): void {
