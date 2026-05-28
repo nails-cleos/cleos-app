@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { NotificationsComponent } from './notifications.component';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
@@ -90,7 +90,7 @@ describe('NotificationsComponent', () => {
     expect(storeSpy.dispatch).toHaveBeenCalledWith(readNotification({ id: notif.id }));
   });
 
-  it('should mark notification as deleted and dispatch deleteNotification', () => {
+  it('should mark notification as deleted and dispatch deleteNotification', fakeAsync(() => {
     const notif: INotification = {
       id: '1',
       read: false,
@@ -109,11 +109,61 @@ describe('NotificationsComponent', () => {
     expect(updated[0].deleted).toBeTrue();
     expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteNotification({ notification: updated[0] }));
     expect(component.badge).toBe(0);
-  });
+
+    tick(260);
+
+    expect(component.notifications()).toEqual([]);
+  }));
 
   it('should not throw if remove is called on empty list', () => {
     component.notifications.set([]);
     expect(() => component.remove(0)).not.toThrow();
   });
+
+  it('should ignore remove when the index does not exist', fakeAsync(() => {
+    const notif: INotification = {
+      id: '1',
+      read: false,
+      navigation: '/test',
+      date: mockTimestamp,
+      deleted: false,
+      message: 'not 1',
+      notDate: mockNoteDate,
+    };
+    component.notifications.set([notif]);
+    component.badge = 1;
+
+    component.remove(5);
+    tick(260);
+
+    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(deleteNotification({ notification: jasmine.anything() as any }));
+    expect(component.notifications()).toEqual([notif]);
+    expect(component.badge).toBe(1);
+  }));
+
+  it('should keep the badge for read notifications and request the next page when showMore is enabled', fakeAsync(() => {
+    const notif: INotification = {
+      id: '1',
+      read: true,
+      navigation: '/test',
+      date: mockTimestamp,
+      deleted: false,
+      message: 'not 1',
+      notDate: mockNoteDate,
+    };
+    component.notifications.set([notif]);
+    component.badge = 3;
+    component.showMore = true;
+    component['page'].set(2);
+
+    component.remove(0);
+
+    expect(component.badge).toBe(3);
+    expect(component['page']()).toBe(1);
+
+    tick(260);
+
+    expect(component.notifications()).toEqual([]);
+  }));
 
 });

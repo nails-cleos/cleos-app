@@ -16,13 +16,14 @@
       <mat-card appearance="outlined" class="app-surface-section app-detail-panel">
         @if (currentUser) {
           <mat-card-header>
-            <div class="circle pointer-only" mat-card-avatar [routerLink]="['/', language(), 'auth', 'profile']">
-              @if (image) {
-                <img alt="profile" src="{{image}}">
-              } @else {
-                <div class="initials">{{ initials | uppercase }}</div>
-              }
-            </div>
+            @if (isHandsetSignal()) {
+              <app-avatar class="circle pointer-only"
+                          mat-card-avatar
+                          [routerLink]="['/', language(), 'auth', 'profile']"
+                          [src]="image"
+                          [initials]="initials">
+              </app-avatar>
+            }
             <mat-card-title class="pointer-only" [routerLink]="['/', language(), 'auth', 'profile']">
               {{ currentUser.displayName | uppercase }}
             </mat-card-title>
@@ -35,9 +36,10 @@
           </mat-card-content>
         } @else {
           <mat-card-header>
-            <div class="circle" mat-card-avatar>
-              <img alt="profile" src="assets/icons/icon-512x512.png">
-            </div>
+            <app-avatar class="circle"
+                        mat-card-avatar
+                        src="assets/icons/icon-512x512.png">
+            </app-avatar>
             <mat-card-title>{{ title }}</mat-card-title>
             <mat-card-subtitle>&#64;nails.cleos</mat-card-subtitle>
           </mat-card-header>
@@ -73,106 +75,126 @@
       <span class="align-right"></span>
       @if (currentUser?.email) {
         <div class="header-actions">
-          @if (isProfessional() && workDay().length) {
-            <div class="app-surface-header-menu">
-              <button (click)="toggleMenu('workday')"
-                      [attr.aria-expanded]="activeMenu() === 'workday'"
-                      mat-icon-button
-                      type="button">
-                <mat-icon [matBadgeHidden]="!workDay().length" [matBadgeOverlap]="true" [matBadge]="workDay().length"
-                          matBadgeColor="warn" aria-hidden="false">work
-                </mat-icon>
-              </button>
-              @if (activeMenu() === 'workday') {
-                <div class="app-surface-header-menu__panel app-surface-header-menu__panel--notifications">
-                  <div class="app-surface-notification-menu__content">
-                    @for (not of workDay(); track not) {
-                      <button type="button"
-                              (click)="notification(not)"
-                              class="app-surface-item app-surface-notification-card">
-                        <div class="app-surface-notification-card__top">
-                          <span class="app-surface-item__label">{{ 'NOTIFICATION.TITLE' | translate }}</span>
-                        </div>
-                        <div [matTooltip]="not.message" class="app-surface-notification-card__message">{{ not.message }}</div>
-                      </button>
-                    }
-                  </div>
-                </div>
-              }
-            </div>
-          } @else if (isProfessional()) {
-            <button mat-icon-button>
-              <mat-icon>work_off</mat-icon>
-            </button>
-          }
-          @if (showInformation()) {
-            <div class="app-surface-header-menu">
-              <button (click)="toggleMenu('notifications')"
-                      [attr.aria-expanded]="activeMenu() === 'notifications'"
-                      mat-icon-button
-                      type="button">
-                <mat-icon [matBadgeHidden]="!countNotifications()" [matBadgeOverlap]="true"
-                          [matBadge]="plusNotification ? plusNotification : countNotifications()"
-                          matBadgeColor="warn" aria-hidden="false">
-                  notifications
-                </mat-icon>
-              </button>
-              @if (activeMenu() === 'notifications') {
-                <div class="app-surface-header-menu__panel app-surface-header-menu__panel--notifications">
-                  @if (notifications().length) {
+          <div class="header-status-group">
+            @if (isProfessional() && workDay().length) {
+              <div class="app-surface-header-menu">
+                <button (click)="toggleMenu('workday')"
+                        [attr.aria-expanded]="activeMenu() === 'workday'"
+                        class="header-action-btn"
+                        mat-icon-button
+                        type="button">
+                  <mat-icon [matBadgeHidden]="!workDay().length" [matBadgeOverlap]="true" [matBadge]="workDay().length"
+                            matBadgeColor="warn" aria-hidden="false">work
+                  </mat-icon>
+                </button>
+                @if (activeMenu() === 'workday') {
+                  <div class="app-surface-header-menu__panel app-surface-header-menu__panel--notifications">
                     <div class="app-surface-notification-menu__content">
-                      @for (not of notifications(); track not) {
+                      @for (not of workDay(); track not) {
                         <button type="button"
                                 (click)="notification(not)"
-                                class="app-surface-item app-surface-notification-card"
-                                [class.app-surface-notification-card--read]="not.read">
+                                class="app-surface-item app-surface-notification-card">
                           <div class="app-surface-notification-card__top">
-                            @if (!not.read) {
-                              <span class="app-surface-notification-card__dot"></span>
-                            }
-                            <span class="app-surface-item__label">{{ not.notDate | date:'short':undefined:dateFormat }}</span>
+                            <span class="app-surface-item__label">{{ 'COMMON.NOTIFICATION.TITLE' | translate }}</span>
                           </div>
-                          <div [matTooltip]="not.message" class="app-surface-notification-card__message">
-                            {{ not.message }}
-                          </div>
+                          <div [matTooltip]="not.message" class="app-surface-notification-card__message">{{ not.message }}</div>
                         </button>
                       }
-                      <div class="app-detail-actions app-surface-notification-menu__actions">
-                        <button mat-stroked-button
-                                type="button"
-                                [routerLink]="['/', language(), 'notifications']"
-                                (click)="closeActiveMenu()">
-                          <mat-icon>notifications</mat-icon>
-                          <span>{{ 'COMMON.NOTIFICATION.LOAD_MORE' | translate }}</span>
-                        </button>
-                      </div>
                     </div>
-                  } @else {
-                    <div class="app-surface-notification-menu__content app-crud-fields">
-                      <div class="app-surface-item app-surface-notification-card app-surface-notification-card--empty">
-                        <span class="app-surface-item__label">{{ 'NOTIFICATION.TITLE' | translate }}</span>
-                        <strong class="app-surface-notification-card__message">{{ 'COMMON.NOTIFICATION.NO' | translate }}</strong>
+                  </div>
+                }
+              </div>
+            } @else if (isProfessional()) {
+              <button mat-icon-button class="header-action-btn header-action-btn--disabled" disabled matTooltip="No workday items">
+                <mat-icon>work_off</mat-icon>
+              </button>
+            }
+            @if (showInformation()) {
+              <div class="app-surface-header-menu">
+                <button (click)="toggleMenu('notifications')"
+                        [attr.aria-expanded]="activeMenu() === 'notifications'"
+                        class="header-action-btn"
+                        mat-icon-button
+                        type="button">
+                  <mat-icon [matBadgeHidden]="!countNotifications()" [matBadgeOverlap]="true"
+                            [matBadge]="plusNotification ? plusNotification : countNotifications()"
+                            matBadgeColor="warn" aria-hidden="false">
+                    notifications
+                  </mat-icon>
+                </button>
+                @if (activeMenu() === 'notifications') {
+                  <div class="app-surface-header-menu__panel app-surface-header-menu__panel--notifications">
+                    @if (notifications().length) {
+                      <div class="app-surface-notification-menu__content">
+                        @for (not of notifications(); track not) {
+                          <button type="button"
+                                  (click)="notification(not)"
+                                  class="app-surface-item app-surface-notification-card"
+                                  [class.app-surface-notification-card--read]="not.read">
+                            <div class="app-surface-notification-card__top">
+                              @if (!not.read) {
+                                <span class="app-surface-notification-card__dot"></span>
+                              }
+                              <span class="app-surface-item__label">{{ not.notDate | date:'short':undefined:dateFormat }}</span>
+                            </div>
+                            <div [matTooltip]="not.message" class="app-surface-notification-card__message">
+                              {{ not.message }}
+                            </div>
+                          </button>
+                        }
+                        <div class="app-detail-actions app-surface-notification-menu__actions">
+                          <button mat-stroked-button
+                                  type="button"
+                                  [routerLink]="['/', language(), 'notifications']"
+                                  (click)="closeActiveMenu()">
+                            <mat-icon>notifications</mat-icon>
+                            <span>{{ 'COMMON.NOTIFICATION.LOAD_MORE' | translate }}</span>
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-          }
+                    } @else {
+                      <div class="app-surface-notification-menu__content app-crud-fields">
+                        <div class="app-surface-item app-surface-notification-card app-surface-notification-card--empty">
+                          <span class="app-surface-item__label">{{ 'COMMON.NOTIFICATION.TITLE' | translate }}</span>
+                          <strong class="app-surface-notification-card__message">{{ 'COMMON.NOTIFICATION.NO' | translate }}</strong>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="header-actions-divider"></div>
 
           <div class="app-surface-header-menu">
             <button (click)="toggleMenu('settings')"
                     [attr.aria-expanded]="activeMenu() === 'settings'"
-                    mat-icon-button
+                    class="avatar-button"
                     type="button"
                     name="settings">
-              <mat-icon [matBadgeHidden]="!incomplete" [matBadgeOverlap]="true" [matBadge]="'*'" matBadgeColor="warn"
-                        aria-hidden="false">
-                settings
-              </mat-icon>
+              <app-avatar class="header-avatar-circle"
+                          [src]="image"
+                          [initials]="initials">
+              </app-avatar>
+              @if (incomplete) {
+                <span class="avatar-badge-dot"></span>
+              }
             </button>
             @if (activeMenu() === 'settings') {
               <div class="app-surface-header-menu__panel app-surface-header-menu__panel--settings">
+                <div class="settings-user-header">
+                  <app-avatar class="header-avatar-circle settings-header-avatar"
+                              [src]="image"
+                              [initials]="initials">
+                  </app-avatar>
+                  <div class="settings-user-details">
+                    <div class="settings-user-name">{{ currentUser?.displayName }}</div>
+                    <div class="settings-user-email">{{ currentUser?.email }}</div>
+                  </div>
+                </div>
+                <div class="settings-header-divider"></div>
                 <div class="app-crud-view-grid">
                   <button type="button"
                           class="app-surface-item app-surface-config-card"
@@ -249,17 +271,21 @@
         <mat-toolbar class="header nav-gradient footer">
           <a [routerLinkActive]="['active-link']" [routerLink]="['/', language(), 'reservation', 'calendar']">
             <mat-icon>event</mat-icon>
+            <span class="footer-label">{{ 'COMMON.DASHBOARD.CALENDAR' | translate }}</span>
           </a>
           <a [routerLinkActive]="['active-link']" [routerLink]="['/', language(), 'dashboard']">
             <mat-icon>dashboard</mat-icon>
+            <span class="footer-label">{{ 'DASHBOARD.FIELD' | translate }}</span>
           </a>
           @if (isAdmin()) {
             <a [routerLinkActive]="['active-link']" [routerLink]="['/', language(), 'reservation', 'search']">
               <mat-icon>find_in_page</mat-icon>
+              <span class="footer-label">{{ 'COMMON.DASHBOARD.SEARCH' | translate }}</span>
             </a>
           }
           <a [routerLinkActive]="['active-link']" [routerLink]="['/', language(), 'unavailable', 'add']">
             <mat-icon>event_busy</mat-icon>
+            <span class="footer-label">{{ 'COMMON.DASHBOARD.BLOCK_TIME' | translate }}</span>
           </a>
         </mat-toolbar>
       </footer>

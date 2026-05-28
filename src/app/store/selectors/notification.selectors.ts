@@ -23,6 +23,15 @@ export const getDataDeletedPipe = pipe(
   filter((val): val is INotification => val !== undefined),
 );
 
+const selectDataRead = createSelector(
+  selectNotificationState,
+  (state: NotificationState) => state?.dataRead,
+);
+export const getDataReadPipe = pipe(
+  select(selectDataRead),
+  filter((val): val is INotification => val !== undefined),
+);
+
 export const selectNotificationIsLoading = createSelector(
   selectNotificationState,
   (state: NotificationState) => state?.isLoading,

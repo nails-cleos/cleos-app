@@ -90,6 +90,7 @@
       "ONCE_A_YEAR": "Een keer per jaar"
     },
     "NOTIFICATION": {
+      "TITLE": "Meldingen",
       "NO": "Geen meldingen",
       "LOAD_MORE": "Meer laden"
     },
@@ -348,7 +349,10 @@
       "PROFILE": "Profiel",
       "SIGN_OUT": "Uitloggen",
       "DARK_MODE": "Donkere modus",
-      "LIGHT_MODE": "Lichte modus"
+      "LIGHT_MODE": "Lichte modus",
+      "CALENDAR": "Kalender",
+      "SEARCH": "Zoeken",
+      "BLOCK_TIME": "Blokkeren"
     },
     "CURRENCY": {
       "FIELD": "Valuta",

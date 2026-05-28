@@ -16,39 +16,23 @@
 }
 
 .overview-avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  --app-avatar-size: 112px;
+  --app-avatar-radius: 28px;
+  --app-avatar-border: none;
+  --app-avatar-placeholder-border: 1px solid var(--app-surface-card-border);
+  --app-avatar-background: var(--app-surface-card-bg);
+  --app-avatar-placeholder-background:
+    radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--accent-color, #dcc8c2) 28%, white), transparent 24%),
+    linear-gradient(145deg, color-mix(in srgb, var(--accent-color, #dcc8c2) 72%, white), color-mix(in srgb, var(--primary-color, #b5ac9e) 78%, #d5b089));
+  --app-avatar-font-size: 2.25rem;
+  flex: 0 0 112px;
+}
+
+.overview-avatar-skeleton {
   width: 112px;
   height: 112px;
   border-radius: 28px;
-  overflow: hidden;
   flex: 0 0 112px;
-  background: var(--app-surface-card-bg);
-}
-
-.overview-avatar--placeholder {
-  background:
-    radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--accent-color, #dcc8c2) 28%, white), transparent 24%),
-    linear-gradient(145deg, color-mix(in srgb, var(--accent-color, #dcc8c2) 72%, white), color-mix(in srgb, var(--primary-color, #b5ac9e) 78%, #d5b089));
-  border: 1px solid var(--app-surface-card-border);
-}
-
-.overview-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.overview-avatar__initials {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  font-size: 2.25rem;
-  font-weight: 700;
-  color: var(--app-surface-text);
 }
 
 .overview-hero__copy {
@@ -200,14 +184,10 @@
   flex: 1 1 auto;
 }
 
-:host-context(.dark-theme) .overview-avatar--placeholder {
-  background:
+:host-context(.dark-theme) .overview-avatar {
+  --app-avatar-placeholder-background:
     radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--accent-color, #ceb4ac) 22%, white), transparent 24%),
     linear-gradient(145deg, color-mix(in srgb, var(--accent-color, #ceb4ac) 38%, #3a312b), color-mix(in srgb, var(--primary-color, #9d9282) 34%, #241f1a));
-}
-
-:host-context(.dark-theme) .overview-avatar__initials {
-  color: var(--app-surface-text);
 }
 
 :host-context(.dark-theme) .overview-stat-card__icon {
@@ -235,10 +215,16 @@
   }
 
   .overview-avatar {
+    --app-avatar-size: 88px;
+    --app-avatar-radius: 24px;
+    flex-basis: 88px;
+  }
+
+  .overview-avatar-skeleton {
     width: 88px;
     height: 88px;
-    flex-basis: 88px;
     border-radius: 24px;
+    flex-basis: 88px;
   }
 
   .overview-hero__actions {

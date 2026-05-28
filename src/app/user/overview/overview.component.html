@@ -7,15 +7,13 @@
           <div class="overview-hero__header">
             <div class="overview-hero__identity">
               @if (customer) {
-                <div class="overview-avatar" [class.overview-avatar--placeholder]="!image">
-                  @if (image) {
-                    <img [src]="image" alt="Profile">
-                  } @else {
-                    <div class="overview-avatar__initials">{{ initials | uppercase }}</div>
-                  }
-                </div>
+                <app-avatar class="overview-avatar"
+                            [src]="image"
+                            [initials]="initials"
+                            alt="Profile">
+                </app-avatar>
               } @else {
-                <div class="overview-avatar ssc-circle"></div>
+                <div class="overview-avatar-skeleton ssc-circle"></div>
               }
 
               <div class="overview-hero__copy">

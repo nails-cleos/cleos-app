@@ -12,6 +12,8 @@ import { getNotificationsPipe } from '../store/selectors/notification.selectors'
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NotificationState } from '../store/reducers/notification.reducers';
 
+const NOTIFICATION_LEAVE_ANIMATION_MS = 260;
+
 @Component({
   selector: 'app-notifications',
   templateUrl: './notifications.component.html',
@@ -81,27 +83,30 @@ export class NotificationsComponent {
       return;
     }
 
-    this.notifications.update(currents => {
-      const updated = [...currents];
-      const notification = updated[index];
+    const notification = this.notifications()[index];
+    if (!notification) {
+      return;
+    }
 
-      if (notification) {
-        updated[index] = { ...notification, deleted: true };
-        this.store.dispatch(deleteNotification({ notification: updated[index] }));
+    this.notifications.update(currents => currents.map((current, currentIndex) => currentIndex === index
+      ? { ...current, deleted: true }
+      : current));
 
-        if (!notification.read) {
-          --this.badge;
-        }
+    this.store.dispatch(deleteNotification({ notification: { ...notification, deleted: true } }));
 
-        const visibleNotifications = updated.filter(n => !n.deleted);
-        if (visibleNotifications.length === 0 && this.showMore) {
-          this.page.set(0);
-          this.getMoreNotifications();
-        }
-      }
+    if (!notification.read) {
+      --this.badge;
+    }
 
-      return updated;
-    });
+    const visibleNotifications = this.notifications().filter(n => !n.deleted);
+    if (visibleNotifications.length === 0 && this.showMore) {
+      this.page.set(0);
+      this.getMoreNotifications();
+    }
+
+    setTimeout(() => {
+      this.notifications.update(currents => currents.filter(current => current.id !== notification.id));
+    }, NOTIFICATION_LEAVE_ANIMATION_MS);
   };
 
 }

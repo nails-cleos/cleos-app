@@ -33,7 +33,7 @@ export class NotificationService {
 
   deleteNotification = (
     id: string,
-  ): Observable<INotification | undefined> => this.http.delete<INotification>(
+  ) => this.http.delete(
     toUrl(this.urlV1, id),
   );
 

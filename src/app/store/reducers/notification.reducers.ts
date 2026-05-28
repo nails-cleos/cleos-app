@@ -18,6 +18,7 @@ export const NOTIFICATION_FEATURE_KEY = 'notification';
 export interface NotificationState {
   data?: INotificationDTO | Pagination<INotification> | string;
   dataDeleted?: INotification;
+  dataRead?: INotification;
   error?: IError;
   subErrors?: IError[];
   isLoading: boolean;
@@ -26,6 +27,7 @@ export interface NotificationState {
 export const initialState: NotificationState = {
   data: undefined,
   dataDeleted: undefined,
+  dataRead: undefined,
   error: undefined,
   subErrors: undefined,
   isLoading: false,
@@ -37,6 +39,7 @@ export const notificationReducer = createReducer(
     ...state,
     data: { page: { content: [{}, {}, {}] } as Pagination<INotification>, unread: -1, workDay: [] },
     dataDeleted: undefined,
+    dataRead: undefined,
     subErrors: undefined,
   })),
   on(notificationSuccess, (state, { data }): NotificationState => ({
@@ -44,8 +47,9 @@ export const notificationReducer = createReducer(
     data,
     subErrors: undefined,
   })),
-  on(notificationReadSuccess, (state): NotificationState => ({
+  on(notificationReadSuccess, (state, { data }): NotificationState => ({
     ...state,
+    dataRead: data,
     subErrors: undefined,
     isLoading: false,
   })),
@@ -57,14 +61,13 @@ export const notificationReducer = createReducer(
   })),
   on(readNotification, (state): NotificationState => ({
     ...state,
-    data: undefined,
+    dataRead: undefined,
     subErrors: undefined,
     isLoading: true,
   })),
   on(deleteNotification, (state): NotificationState => ({
     ...state,
     dataDeleted: undefined,
-    data: undefined,
     subErrors: undefined,
     isLoading: false,
   })),

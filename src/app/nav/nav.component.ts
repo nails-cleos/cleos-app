@@ -26,7 +26,7 @@ import { ToastService } from '../services/toast.service';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getIsAuthenticatedPipe, getMenusPipe, getRedirectPipe, getUserPipe } from '../store/selectors/auth.selectors';
-import { getDataDeletedPipe, getNotificationsPipe } from '../store/selectors/notification.selectors';
+import { getDataDeletedPipe, getDataReadPipe, getNotificationsPipe } from '../store/selectors/notification.selectors';
 import { of } from 'rxjs';
 import { selectGlobalError, selectGlobalIsLoading, selectGlobalResponse } from '../store/selectors/global.selectors';
 import { ToastOptions } from '../shared/toast/toast.model';
@@ -67,6 +67,7 @@ export class NavComponent {
   private menus$ = this.store.pipe(getMenusPipe);
   private redirect$ = this.store.pipe(getRedirectPipe);
   private dataDeleted$ = this.store.pipe(getDataDeletedPipe);
+  private dataRead$ = this.store.pipe(getDataReadPipe);
   private notification$ = this.store.pipe(getNotificationsPipe);
 
   private breakpointsSignal = toSignal(
@@ -88,6 +89,7 @@ export class NavComponent {
   private redirectSignal = toSignal(this.redirect$);
   private menuItemsSignal = toSignal(this.menus$);
   private dataDeletedSignal = toSignal(this.dataDeleted$);
+  private dataReadSignal = toSignal(this.dataRead$);
   private notificationSignal = toSignal(this.notification$);
   private messageSignal = toSignal(this.messagingService.message$ ?? of(undefined));
   private globalIsLoadingSignal = toSignal(this.store.select(selectGlobalIsLoading), { initialValue: true });
@@ -290,18 +292,48 @@ export class NavComponent {
     });
 
     effect(() => {
+      const readNotification = this.dataReadSignal();
+      if (!readNotification) {
+        return;
+      }
+
+      untracked(() => {
+        const currentNotifications = this.notifications();
+        const target = currentNotifications.find(it => it.id === readNotification.id);
+        const shouldDecreaseCounter = !target || !target.read;
+
+        if (target) {
+          this.notifications.update(prev => prev.map(it => it.id === readNotification.id
+            ? { ...it, read: true }
+            : it));
+        }
+
+        if (shouldDecreaseCounter && this.countNotifications() > 0) {
+          this.countNotifications.update(prev => prev - 1);
+          this.updateCount();
+        }
+      });
+    });
+
+    effect(() => {
       const deleted = this.dataDeletedSignal();
       if (!deleted) {
         return;
       }
 
-      if (!this.notifications().some(n => n.id === deleted.id) || !deleted.deleted || deleted.read) {
+      if (!deleted.deleted) {
         return;
       }
 
       untracked(() => {
-        this.notifications.update(prev => prev.filter(it => it.id !== deleted.id));
-        this.countNotifications.update(prev => prev - 1);
+        if (this.notifications().some(n => n.id === deleted.id)) {
+          this.notifications.update(prev => prev.filter(it => it.id !== deleted.id));
+        }
+
+        if (!deleted.read && this.countNotifications() > 0) {
+          this.countNotifications.update(prev => prev - 1);
+        }
+
         this.updateCount();
       });
     });
