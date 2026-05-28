@@ -4,6 +4,7 @@ import { lightenDarkenColor } from '../../util/color';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardContent, MatCardHeader, MatCardSubtitle } from '@angular/material/card';
+import { MatSuffix } from '@angular/material/form-field';
 
 type PreviewMode = 'dark' | 'light';
 
@@ -12,7 +13,7 @@ type PreviewMode = 'dark' | 'light';
   templateUrl: './color-picker.component.html',
   styleUrls: ['./color-picker.component.scss'],
   imports: [MatFormField, MatLabel, MatInput, MatIconButton, ReactiveFormsModule, MatError, MatCard, MatCardHeader,
-    MatCardSubtitle, MatCardContent],
+    MatCardSubtitle, MatCardContent, MatSuffix],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ColorPickerComponent {

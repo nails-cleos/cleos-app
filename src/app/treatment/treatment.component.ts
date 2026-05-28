@@ -42,10 +42,11 @@ import { IError, isString } from '../interfaces/common';
 import { DurationTimePipe } from '../pipes/durationTime.pipe';
 import { TreatmentTableComponent } from './table/treatment-table.component';
 import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatSuffix } from '@angular/material/form-field';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
-import { MatChip, MatChipGrid, MatChipInput, MatChipListbox, MatChipRow } from '@angular/material/chips';
+import { MatChip, MatChipGrid, MatChipInput, MatChipListbox, MatChipRemove, MatChipRow } from '@angular/material/chips';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
 import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
@@ -66,7 +67,8 @@ type TreatmentForm = {
   imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatIconButton, MatButton, ReactiveFormsModule,
     TranslatePipe, RouterLink, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix, BackButtonDirective,
     BackButtonDirective, DurationTimePipe, TreatmentTableComponent, MatHint, MatChipGrid, MatChipRow, MatChipInput,
-    MatTabGroup, MatTab, TimepickerDirective, TimepickerComponent, MatChipListbox, MatChip],
+    MatTabGroup, MatTab, TimepickerDirective, TimepickerComponent, MatChipListbox, MatChip, MatChipRemove,
+    MatSuffix],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreatmentComponent {

@@ -74,7 +74,7 @@ import {
   MatExpansionPanelTitle,
 } from '@angular/material/expansion';
 import { MatButton, MatIconButton } from '@angular/material/button';
-import { MatChipGrid, MatChipInput, MatChipRow } from '@angular/material/chips';
+import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/material/chips';
 import { MatCheckbox } from '@angular/material/checkbox';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
@@ -106,7 +106,7 @@ type RoomForm = {
     MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription, MatIconButton,
     MatButton, ReactiveFormsModule, TranslatePipe, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix,
     BackButtonDirective, AvailabilityComponent, GoogleMapComponent, BackButtonDirective, RoomNamePipe, MatChipGrid,
-    MatChipRow, MatChipInput, MatCheckbox, MatSelectionList, MatListOption],
+    MatChipRow, MatChipInput, MatChipRemove, MatCheckbox, MatSelectionList, MatListOption],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RoomComponent {

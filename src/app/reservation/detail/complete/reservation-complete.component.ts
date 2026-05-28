@@ -50,6 +50,7 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 import { getPaymentOptionsPipe } from '../../../store/selectors/payment.selectors';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatSuffix } from '@angular/material/form-field';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
@@ -77,7 +78,7 @@ type ReservationCompleteForm = {
     TranslatePipe, DecimalPipe, NgClass, DatePipe, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix,
     BackButtonDirective, CurrencySymbolPipe, TimeDetailPipe, CurrencySymbolPipe, DurationTimePipe,
     FormFieldAdderComponent, PaymentOptionSelectComponent, PricePreviewComponent, BackButtonDirective,
-    TimepickerDirective, TimepickerComponent, MatSelectionList, MatListOption, MatCheckbox],
+    TimepickerDirective, TimepickerComponent, MatSelectionList, MatListOption, MatCheckbox, MatSuffix],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationCompleteComponent {

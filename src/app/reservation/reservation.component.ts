@@ -140,6 +140,7 @@ import { getPaymentOptionsPipe } from '../store/selectors/payment.selectors';
 import { PaymentState } from '../store/reducers/payment.reducers';
 import { IPaymentOption } from '../interfaces/payment';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatSuffix } from '@angular/material/form-field';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
@@ -178,7 +179,7 @@ const RESERVATION_ERROR_FIELDS = [
     NgClass, NgTemplateOutlet, DatePipe, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix, MatFabButton,
     BackButtonDirective, CurrencySymbolPipe, MatCard, MatCardContent, RoomNamePipe, SortByPipe, CurrencySymbolPipe,
     DurationTimePipe, BackButtonDirective, GoogleMapComponent, PaymentOptionSelectComponent, CalendarWeekViewComponent,
-    TimepickerDirective, TimepickerComponent, MatSelectionList, MatListOption, MatDivider, MatCheckbox],
+    TimepickerDirective, TimepickerComponent, MatSelectionList, MatListOption, MatDivider, MatCheckbox, MatSuffix],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationComponent {

@@ -68,7 +68,8 @@ import {
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { MatChipGrid, MatChipInput, MatChipRow } from '@angular/material/chips';
+import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/material/chips';
+import { MatSuffix } from '@angular/material/form-field';
 
 // Set up VFS fonts for pdfMake (provides fallback Roboto fonts)
 (pdfMake as any).vfs = (pdfFonts as any).pdfMake?.vfs || pdfFonts;
@@ -94,7 +95,8 @@ type DateRangeForm = {
     DatePipe, MatAutocomplete, MatError, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
     MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow,
     MatFooterRow, MatFooterRowDef, MatAutocompleteTrigger, TimeDetailPipe, BackButtonDirective, MatCheckbox,
-    MatChipGrid, MatChipRow, MatChipInput, MatDateRangeInput, MatDateRangePicker, MatStartDate, MatEndDate],
+    MatChipGrid, MatChipRow, MatChipInput, MatChipRemove, MatDateRangeInput, MatDateRangePicker, MatStartDate,
+    MatEndDate, MatSuffix],
   providers: [...provideMonthPeriodAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

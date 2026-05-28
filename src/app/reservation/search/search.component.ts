@@ -61,7 +61,7 @@ import {
   MatTable,
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
-import { MatChipGrid, MatChipInput, MatChipRow } from '@angular/material/chips';
+import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/material/chips';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 type SearchForm = {
@@ -78,7 +78,7 @@ type SearchForm = {
     MatAutocomplete, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
     MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow,
     MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, MatAutocompleteTrigger, MatPrefix, TimeDetailPipe,
-    ReservationIconPipe, MatChipGrid, MatChipRow, MatChipInput, MatProgressSpinner],
+    ReservationIconPipe, MatChipGrid, MatChipRow, MatChipInput, MatChipRemove, MatProgressSpinner],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchComponent {

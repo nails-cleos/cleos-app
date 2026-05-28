@@ -114,6 +114,7 @@ import { OfficeForm } from '../../../reservation/reservation-form.types';
 import { ReservationFormErrorService } from '../../../reservation/reservation-form-error.service';
 import { getPaymentOptionsPipe } from '../../../store/selectors/payment.selectors';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatSuffix } from '@angular/material/form-field';
 import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
@@ -169,7 +170,7 @@ const ME_RESERVATION_ERROR_FIELDS = [
     NgTemplateOutlet, DatePipe, MatAutocomplete, MatError, MatAutocompleteTrigger, BackButtonDirective,
     CurrencySymbolPipe, MatCard, MatCardContent, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe,
     PriceComponent, PaymentPreviewComponent, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective,
-    MatSelectionList, MatListOption, MatDivider, MatTabGroup, MatTab, MatCheckbox],
+    MatSelectionList, MatListOption, MatDivider, MatTabGroup, MatTab, MatCheckbox, MatSuffix],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MeReservationComponent {

@@ -38,7 +38,7 @@ import { RouterLink } from '@angular/router';
 import { MatOption } from '@angular/material/core';
 import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
 import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
-import { MatChipGrid, MatChipInput, MatChipRow } from '@angular/material/chips';
+import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/material/chips';
 
 type AdditionalForm = {
   name: FormControl<string>;
@@ -53,7 +53,8 @@ type AdditionalForm = {
   styleUrls: ['./additional.component.scss'],
   imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, TranslatePipe,
     RouterLink, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix, BackButtonDirective, BackButtonDirective,
-    ReactiveFormsModule, TimepickerDirective, TimepickerComponent, MatHint, MatChipGrid, MatChipRow, MatChipInput],
+    ReactiveFormsModule, TimepickerDirective, TimepickerComponent, MatHint, MatChipGrid, MatChipRow, MatChipInput,
+    MatChipRemove],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdditionalComponent {
