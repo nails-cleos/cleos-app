@@ -10,6 +10,7 @@ import { additionalSelected, deleteAdditional, getAdditionalPage } from '../../s
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { AdditionalState } from '../../store/reducers/additional.reducers';
+import { MatDialog } from '@angular/material/dialog';
 
 describe('AdditionalListComponent', () => {
   let component: AdditionalListComponent;
@@ -18,7 +19,7 @@ describe('AdditionalListComponent', () => {
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let translate: TranslateService;
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
 
   const mockAdditional: IAdditional[] = [
     { id: '1', name: 'Additional 1', description: 'Desc 1', duration: 'PT15M' },
@@ -47,6 +48,7 @@ describe('AdditionalListComponent', () => {
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
@@ -76,6 +78,7 @@ describe('AdditionalListComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: MatDialog, useValue: dialogSpy },
       ],
     }).compileComponents();
 
@@ -86,8 +89,6 @@ describe('AdditionalListComponent', () => {
     translate.use('en-GB');
 
     fixture.detectChanges();
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   afterEach(() => {
@@ -188,7 +189,7 @@ describe('AdditionalListComponent', () => {
 
   it('should dispatch deleteAdditional when dialog returns a result', () => {
     const item = mockAdditional[0];
-    dialogSpy.and.returnValue({
+    dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
     } as any);
 

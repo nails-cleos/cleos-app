@@ -1,28 +1,31 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { getTransaction } from '../../../store/account.actions';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { notifyPayment, paymentSend } from '../../../store/payment.actions';
 import { newDateTimestamp } from '../../../util/dates';
-import { SharedModule } from '../../../shared/shared.module';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import {
+  getAccountResponsePipe,
   getCurrentAccountIdPipe,
   getCurrentTransactionIdPipe,
-  getAccountResponsePipe,
   getSelectedTransactionPipe,
   getSubErrorsPipe,
 } from '../../../store/selectors/account.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AccountState } from '../../../store/reducers/account.reducers';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { DatePipe, DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-transaction-detail',
   templateUrl: './transaction-detail.component.html',
   styleUrls: ['./transaction-detail.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [MatIcon, MatButton, TranslatePipe, DecimalPipe, RouterLink, DatePipe,
+    BackButtonDirective, BackButtonDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransactionDetailComponent {
@@ -68,7 +71,7 @@ export class TransactionDetailComponent {
     effect(() => {
       const path = this.responseSignal()?.path;
       if (path) {
-        this.router.navigate([`${this.language}/${path}`]);
+        this.router.navigate([`${ this.language }/${ path }`]);
       } else if (this.subErrorsSignal()?.[0]?.message) {
         this.router.navigate([this.language, 'me', 'transaction', this.transactionIdSignal(), 'payment']);
       }

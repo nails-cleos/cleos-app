@@ -9,10 +9,12 @@ import { UserState } from '../store/reducers/user.reducers';
 import { UserComponent } from './user.component';
 import { Role } from '../interfaces/token';
 import { getUser } from '../store/user.actions';
+import { GoogleMapComponent } from '../shared/google-map/google-map.component';
 import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { signal } from '@angular/core';
+import { provideAppDateAdapter } from '../util/adapter/app-date.provider';
 
 describe('UserComponent', () => {
   let component: UserComponent;
@@ -60,15 +62,21 @@ describe('UserComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [UserComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
+      imports: [UserComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: GeocodeService, useValue: geocodeServiceSpy },
         provideHttpClient(),
         provideHttpClientTesting(),
+        provideAppDateAdapter(),
       ],
-    }).compileComponents();
+    })
+      .overrideComponent(UserComponent, {
+        remove: { imports: [GoogleMapComponent] },
+        add: { imports: [GoogleMapStubComponent] },
+      })
+      .compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
     translateService.use('en-GB');

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { getUser, saveUser } from '../store/user.actions';
 import { IUser, User } from '../interfaces/user';
@@ -8,9 +8,8 @@ import { randomColor } from '../util/color';
 import { backendFormatDate, createDateFromString, newDate } from '../util/dates';
 import { fieldChange, validColorValidator, valueChange } from '../util/validators';
 import { createAddress } from '../util/helper';
-import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
+import { LangChangeEvent, TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Role } from '../interfaces/token';
-import { SharedModule } from '../shared/shared.module';
 import { GoogleMapComponent, GoogleMapForm } from '../shared/google-map/google-map.component';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
@@ -25,6 +24,12 @@ import {
 } from '../store/selectors/user.selectors';
 import { IError } from '../interfaces/common';
 import { ColorPickerComponent } from '../shared/color-picker/color-picker.component';
+import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 import PlaceResult = google.maps.places.PlaceResult;
 
@@ -44,8 +49,9 @@ type UserForm = {
   selector: 'app-user',
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss'],
-  imports: [SharedModule, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective,
-    NgIcon, ColorPickerComponent],
+  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepicker, MatSelect, MatOption, MatIcon,
+    MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe, MatError, MatPrefix, BackButtonDirective,
+    NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective, NgIcon, ColorPickerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserComponent {

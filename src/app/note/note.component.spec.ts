@@ -11,6 +11,7 @@ import { FrequencyEnum } from '../util/helper';
 import { IError } from '../interfaces/common';
 import { backendFormatDate, getNowTimeZone } from '../util/dates';
 import { addDays } from 'date-fns';
+import { provideAppDateAdapter } from '../util/adapter/app-date.provider';
 
 describe('NoteComponent', () => {
   let component: NoteComponent;
@@ -80,6 +81,7 @@ describe('NoteComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: Router, useValue: routerSpy },
         { provide: MatDialog, useValue: dialogSpy },
+        provideAppDateAdapter(),
       ],
     }).compileComponents();
 
@@ -218,7 +220,7 @@ describe('NoteComponent', () => {
     };
     spyOn(component, 'noteSignal').and.returnValue(mockNote as any);
 
-    spyOn(component['dialog'], 'open').and.returnValue({ afterClosed: () => of(mockNote) } as any);
+    dialogSpy.open.and.returnValue({ afterClosed: () => of(mockNote) } as any);
 
     component.delete();
 

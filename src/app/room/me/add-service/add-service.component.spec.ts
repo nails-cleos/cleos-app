@@ -7,12 +7,13 @@ import { getServices, updateServices } from '../../../store/room.actions';
 import { IService, ServicePrice, ServiceType } from '../../../interfaces/room';
 import { TranslateModule } from '@ngx-translate/core';
 import { ITreatmentAll } from '../../../interfaces/treatment';
+import { MatDialog } from '@angular/material/dialog';
 
 describe('AddServiceComponent', () => {
   let component: AddServiceComponent;
   let fixture: ComponentFixture<AddServiceComponent>;
   let storeSpy: jasmine.SpyObj<Store>;
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
 
   let roomId$: BehaviorSubject<any>;
   let services$: BehaviorSubject<any>;
@@ -44,6 +45,7 @@ describe('AddServiceComponent', () => {
       imports: [AddServiceComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
+        { provide: MatDialog, useValue: dialogSpy },
       ],
     }).compileComponents();
 
@@ -51,8 +53,6 @@ describe('AddServiceComponent', () => {
     component = fixture.componentInstance;
 
     fixture.detectChanges();
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   it('should dispatch getServices when roomId is emitted', () => {
@@ -203,10 +203,10 @@ describe('AddServiceComponent', () => {
 
     component.selectedAdditional.set([service]);
 
-    dialogSpy.and.callFake(() => {
+    dialogSpy.open.and.callFake(() => {
       return {
         afterClosed: () => of({ price: 99, type: ServiceType.additional }),
-      };
+      } as any;
     });
 
     component.changePrice(service);
@@ -236,10 +236,10 @@ describe('AddServiceComponent', () => {
       ],
     ]));
 
-    dialogSpy.and.callFake(() => {
+    dialogSpy.open.and.callFake(() => {
       return {
         afterClosed: () => of({ price: 80, type: ServiceType.treatment }),
-      };
+      } as any;
     });
 
     component.changePrice(treatment);

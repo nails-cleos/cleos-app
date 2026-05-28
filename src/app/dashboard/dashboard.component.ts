@@ -3,7 +3,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Store } from '@ngrx/store';
 import { getCards, getEvents } from '../store/dashboard.actions';
 import { IReservationSummary, States } from '../interfaces/reservation';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   getDurationOrUndefined,
   getEnd,
@@ -28,7 +28,7 @@ import { allDayEvent, DataEvent, IDataEvent, IMeta, Meta, monthEvent } from '../
 import { Router } from '@angular/router';
 import { isSameDay, isSameMonth, startOfMonth } from 'date-fns';
 import { ICalendarNote, ICalendarSummary, IChart } from '../interfaces/dashboard';
-import { FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { IRoom } from '../interfaces/room';
 import { CalendarDialogComponent } from '../shared/dialog/calendar/calendar-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -36,7 +36,6 @@ import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { numberFormat } from '../util/numbers';
 import { ICurrency } from '../interfaces/currency';
 import { AuthUserService } from '../services/auth-user.service';
-import { SharedModule } from '../shared/shared.module';
 import { MiniCardComponent } from './mini-card/mini-card.component';
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';
 import { CardComponent } from '../shared/card/card.component';
@@ -50,6 +49,13 @@ import {
 } from '../store/selectors/dashboard.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DashboardState } from '../store/reducers/dashboard.reducers';
+import { MatFormField } from '@angular/material/input';
+import { MatSelect } from '@angular/material/select';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { KeyValuePipe } from '@angular/common';
+import { MatOption } from '@angular/material/core';
+import { MatGridList, MatGridTile } from '@angular/material/grid-list';
 
 type DashboardForm = {
   selectedDash: FormControl<string | undefined>;
@@ -59,9 +65,10 @@ type DashboardForm = {
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  imports: [SharedModule, MiniCardComponent, ReservationTableComponent, CardComponent, ChartComponent, CalendarDatePipe,
+  imports: [MatFormField, MatSelect, MatOption, MatIcon, MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe,
+    KeyValuePipe, MiniCardComponent, ReservationTableComponent, CardComponent, ChartComponent, CalendarDatePipe,
     CalendarNextViewDirective, CalendarTodayDirective, CalendarPreviousViewDirective, CalendarMonthViewComponent,
-    ClickDirective],
+    ClickDirective, MatGridList, MatGridTile],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent {

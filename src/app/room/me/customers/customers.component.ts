@@ -2,8 +2,24 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild
 import { Store } from '@ngrx/store';
 import { getAllCustomersInfo } from '../../../store/room.actions';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatSort } from '@angular/material/sort';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+  MatTableDataSource,
+} from '@angular/material/table';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { IRoomCustomer } from '../../../interfaces/room';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -13,15 +29,21 @@ import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
 import { RoomState } from '../../../store/reducers/room.reducers';
 import { getCurrentRoomIdPipe, getCustomersPipe } from '../../../store/selectors/room.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { AppMaterialModule } from '../../../util/app-material.module';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { MatIcon } from '@angular/material/icon';
+import { MatList, MatListItem, MatListSubheaderCssMatStyler } from '@angular/material/list';
+import { MatIconButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-customers',
   templateUrl: './customers.component.html',
   styleUrl: './customers.component.scss',
-  imports: [AppMaterialModule, TimeDetailPipe, TranslatePipe, DatePipe, RouterLink],
+  imports: [TimeDetailPipe, MatIcon, MatList, MatListItem, MatListSubheaderCssMatStyler, MatIconButton, TranslatePipe,
+    RouterLink, DatePipe, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
+    MatSortHeader, MatTooltip, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow,
+    MatFooterRow, MatFooterRowDef, MatPaginator],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomersComponent {

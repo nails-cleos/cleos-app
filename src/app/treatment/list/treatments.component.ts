@@ -2,25 +2,49 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { ITreatmentGroup, ITreatmentGroupAll } from '../../interfaces/treatment';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { cleanTreatment, deleteTreatmentGroup, getTreatmentsPage } from '../../store/treatment.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { SharedModule } from '../../shared/shared.module';
 import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
 import { TreatmentState } from '../../store/reducers/treatment.reducers';
 import { getTreatmentPaginationPipe, getTreatmentResponsePipe } from '../../store/selectors/treatment.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatIcon } from '@angular/material/icon';
+import { MatIconButton } from '@angular/material/button';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';
+import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-treatments',
   templateUrl: './treatments.component.html',
   styleUrls: ['./treatments.component.scss'],
-  imports: [SharedModule, CurrencySymbolPipe],
+  imports: [MatIcon, MatList, MatListItem, MatListSubheaderCssMatStyler, MatIconButton,
+    TranslatePipe, RouterLink, DatePipe, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef,
+    MatCell, MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow,
+    MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, CurrencySymbolPipe, CurrencySymbolPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreatmentsComponent {

@@ -9,13 +9,12 @@ import {
   updateTrackingByReservationId,
 } from '../../../store/reservation.actions';
 import { recreate } from '../../../store/payment.actions';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { getDiffTime, newDateTimestamp } from '../../../util/dates';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { executeDialog } from '../../../util/helper';
 import { MatDialog } from '@angular/material/dialog';
 import { UpdateTrackingDialogComponent } from './update-tracking-dialog.component';
-import { SharedModule } from '../../../shared/shared.module';
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
 import { RatingComponent } from '../../../shared/rating/rating.component';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
@@ -29,12 +28,35 @@ import {
   getTrackingPipe,
 } from '../../../store/selectors/reservation.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-more-info',
   templateUrl: './more-info.component.html',
   styleUrls: ['./more-info.component.scss'],
-  imports: [SharedModule, TimeDetailPipe, RatingComponent, BackButtonDirective],
+  imports: [TimeDetailPipe, MatIcon, MatIconButton, MatButton, TranslatePipe, DecimalPipe, NgClass,
+    DatePipe, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatTooltip,
+    MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef,
+    BackButtonDirective, TimeDetailPipe, RatingComponent, BackButtonDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MoreInfoComponent {

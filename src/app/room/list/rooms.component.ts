@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { IAvailability, IRoom } from '../../interfaces/room';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { cleanRoom, deleteRoom, getRoomsPage, roomSelected } from '../../store/room.actions';
@@ -12,17 +12,40 @@ import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { findDayOfWeek, getTimeZone, ITimeZone } from '../../util/dates';
 import { executeDialogNoWidth } from '../../util/helper';
-import { SharedModule } from '../../shared/shared.module';
 import { SortByPipe } from '../../pipes/sort-by.pipe';
 import { RoomState } from '../../store/reducers/room.reducers';
 import { getRoomPaginationPipe, getRoomResponsePipe } from '../../store/selectors/room.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatIcon } from '@angular/material/icon';
+import { MatIconButton } from '@angular/material/button';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-rooms',
   templateUrl: './rooms.component.html',
   styleUrls: ['./rooms.component.scss'],
-  imports: [SharedModule, SortByPipe],
+  imports: [MatIcon, MatList, MatListItem, MatListSubheaderCssMatStyler, MatIconButton,
+    TranslatePipe, RouterLink, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
+    MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow,
+    MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, SortByPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RoomsComponent {

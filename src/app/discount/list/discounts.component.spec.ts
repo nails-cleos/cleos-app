@@ -10,6 +10,7 @@ import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { DiscountsComponent } from './discounts.component';
 import { DiscountState } from '../../store/reducers/discount.reducers';
+import { MatDialog } from '@angular/material/dialog';
 
 describe('DiscountsComponent', () => {
   let component: DiscountsComponent;
@@ -18,7 +19,7 @@ describe('DiscountsComponent', () => {
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let translate: TranslateService;
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
 
   const mockDiscount: IDiscount[] = [
     { id: '1', name: 'Discount 1', description: 'Desc 1' },
@@ -46,6 +47,7 @@ describe('DiscountsComponent', () => {
     });
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -76,6 +78,7 @@ describe('DiscountsComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: MatDialog, useValue: dialogSpy },
       ],
     }).compileComponents();
 
@@ -86,8 +89,6 @@ describe('DiscountsComponent', () => {
     translate.use('en-GB');
 
     fixture.detectChanges();
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   afterEach(() => {
@@ -186,7 +187,7 @@ describe('DiscountsComponent', () => {
 
   it('should dispatch deleteDiscount when dialog returns a result', () => {
     const item = mockDiscount[0];
-    dialogSpy.and.returnValue({
+    dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
     } as any);
 

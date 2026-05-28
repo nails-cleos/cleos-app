@@ -14,6 +14,7 @@ import { IRoom } from '../../../interfaces/room';
 import { ITreatment } from '../../../interfaces/treatment';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { signal } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 
 describe('ReservationTableComponent', () => {
   let component: ReservationTableComponent;
@@ -23,7 +24,7 @@ describe('ReservationTableComponent', () => {
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let translate: TranslateService;
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
   const customer: IUser = {
@@ -75,6 +76,7 @@ describe('ReservationTableComponent', () => {
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
@@ -106,6 +108,7 @@ describe('ReservationTableComponent', () => {
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
+        { provide: MatDialog, useValue: dialogSpy },
       ],
     }).compileComponents();
 
@@ -116,8 +119,6 @@ describe('ReservationTableComponent', () => {
     translate.use('en-GB');
 
     fixture.detectChanges();
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   afterEach(() => {
@@ -212,7 +213,7 @@ describe('ReservationTableComponent', () => {
 
   it('should dispatch deleteReservation when dialog returns a result', () => {
     const item = mockReservation[0];
-    dialogSpy.and.returnValue({
+    dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
     } as any);
 

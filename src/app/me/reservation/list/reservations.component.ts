@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { IReservationAll, States } from '../../../interfaces/reservation';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -14,9 +14,8 @@ import { executeDialogNoWidth, openDialog } from '../../../util/helper';
 import { IReview, Review } from '../../../interfaces/review';
 import { ReviewDialogComponent } from '../review/review-dialog.component';
 import { isToday } from 'date-fns';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { IPayment } from '../../../interfaces/payment';
-import { SharedModule } from '../../../shared/shared.module';
 import { UpcomingComponent } from '../upcoming/upcoming.component';
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
 import { ReservationIconPipe } from '../../../pipes/reservation-icon.pipe';
@@ -30,12 +29,38 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { cleanDiscount } from '../../../store/discount.actions';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { FirebaseService } from '../../../services/firebase.service';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatPrefix } from '@angular/material/input';
+import { DatePipe } from '@angular/common';
+import { MatTab, MatTabGroup } from '@angular/material/tabs';
 
 @Component({
   selector: 'app-reservations',
   templateUrl: './reservations.component.html',
   styleUrls: ['./reservations.component.scss'],
-  imports: [SharedModule, UpcomingComponent, TimeDetailPipe, ReservationIconPipe, ErrorComponent],
+  imports: [TimeDetailPipe, MatIcon, MatIconButton, MatButton, TranslatePipe, RouterLink, DatePipe,
+    MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatTooltip,
+    MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef,
+    MatPaginator, MatPrefix, UpcomingComponent, TimeDetailPipe, ReservationIconPipe, ErrorComponent, MatTabGroup,
+    MatTab],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationsComponent {
@@ -154,7 +179,7 @@ export class ReservationsComponent {
         const review: IReview = new Review(result.rating);
         review.reservationId = reservation?.id;
         review.detail = result.detail ? result.detail :
-          this.translate.instant(`ME.REVIEW.RATING.${result.rating}`);
+          this.translate.instant(`ME.REVIEW.RATING.${ result.rating }`);
         this.store.dispatch(createReview({ review }));
       }
     },

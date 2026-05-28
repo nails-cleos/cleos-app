@@ -14,9 +14,11 @@ import { IUserAll } from '../interfaces/user';
 import { Role } from '../interfaces/token';
 import { getRoom } from '../store/room.actions';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { GoogleMapComponent } from '../shared/google-map/google-map.component';
 import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.component';
 import { PaymentService } from '../services/payment.service';
 import { IPaymentOption } from '../interfaces/payment';
+import { provideAppDateAdapter } from '../util/adapter/app-date.provider';
 
 describe('RoomComponent', () => {
   let component: RoomComponent;
@@ -176,7 +178,7 @@ describe('RoomComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [RoomComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
+      imports: [RoomComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
@@ -186,8 +188,14 @@ describe('RoomComponent', () => {
         { provide: AuthUserService, useValue: authUserService },
         provideHttpClient(),
         provideHttpClientTesting(),
+        provideAppDateAdapter(),
       ],
-    }).compileComponents();
+    })
+      .overrideComponent(RoomComponent, {
+        remove: { imports: [GoogleMapComponent] },
+        add: { imports: [GoogleMapStubComponent] },
+      })
+      .compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
     translateService.use('en-GB');

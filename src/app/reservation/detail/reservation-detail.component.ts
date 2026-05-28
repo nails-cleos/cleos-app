@@ -15,7 +15,7 @@ import {
   updateReservationNote,
 } from '../../store/reservation.actions';
 import { CancelOption, IFabMenu, IReservationAll, IUpcomingAll, States } from '../../interfaces/reservation';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {
   createNewDate,
   Duration,
@@ -34,7 +34,7 @@ import {
 } from '../../util/dates';
 import { MatPaginator } from '@angular/material/paginator';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import {
   areEquals,
@@ -52,7 +52,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { IPayment, IPaymentAll, IPaymentOption, IPaymentRequest, PENALTY } from '../../interfaces/payment';
 import { isToday, isTomorrow } from 'date-fns';
 import { ReservationIconName } from '../../util/icon';
-import { FormArray, FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { startWith } from 'rxjs/operators';
 import { adjustPayments, notifyPayment, paymentSend } from '../../store/payment.actions';
 import { ChangeCustomerDialogComponent } from './change-customer-dialog.component';
@@ -62,7 +62,6 @@ import { AddDiscountDialogComponent } from './add-discount-dialog.component';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Role } from '../../interfaces/token';
 import { ReservationCloneDialogComponent } from './reservation-clone-dialog.component';
-import { SharedModule } from '../../shared/shared.module';
 import { RoomNamePipe } from '../../pipes/room-name.pipe';
 import { ReservationIconPipe } from '../../pipes/reservation-icon.pipe';
 import { PriceExtrasComponent } from '../../shared/price-extras/price-extras.component';
@@ -81,10 +80,47 @@ import {
   getPaymentsPipe,
   getSelectedReservationPipe,
 } from '../../store/selectors/reservation.selectors';
-import { MatTableDataSource } from '@angular/material/table';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+  MatTableDataSource,
+} from '@angular/material/table';
 import { getPaymentOptionsPipe } from '../../store/selectors/payment.selectors';
 import { findStateColor } from '../../util/theme';
 import { DurationTimePipe } from '../../pipes/durationTime.pipe';
+import { MatFormField, MatInput, MatPrefix } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import {
+  MatDivider,
+  MatList,
+  MatListItem,
+  MatListItemIcon,
+  MatListSubheaderCssMatStyler,
+} from '@angular/material/list';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
+import { MatSort } from '@angular/material/sort';
+import { MatTooltip } from '@angular/material/tooltip';
+import {
+  MatCard,
+  MatCardActions,
+  MatCardContent,
+  MatCardHeader,
+  MatCardSubtitle,
+  MatCardTitle,
+} from '@angular/material/card';
 
 type PaymentForm = {
   amount: FormControl<string>;
@@ -99,9 +135,14 @@ type DetailForm = {
   selector: 'app-reservation-detail',
   templateUrl: './reservation-detail.component.html',
   styleUrls: ['./reservation-detail.component.scss'],
-  imports: [SharedModule, RoomNamePipe, ReservationIconPipe, PriceExtrasComponent,
+  imports: [TimeDetailPipe, TwoDigitsDirective, MatFormField, MatInput, MatIcon, MatList, MatListItem,
+    MatListSubheaderCssMatStyler, MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe, DecimalPipe, NgClass,
+    RouterLink, DatePipe, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
+    MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow,
+    MatFooterRow, MatFooterRowDef, MatPaginator, MatPrefix, BackButtonDirective, MatCard, MatCardHeader, MatCardTitle,
+    MatCardSubtitle, MatCardContent, MatCardActions, RoomNamePipe, ReservationIconPipe, PriceExtrasComponent,
     PaymentOptionSelectComponent, TwoDigitsDirective, TimeDetailPipe, BackButtonDirective, FabMenuComponent,
-    DurationTimePipe],
+    DurationTimePipe, MatDivider],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationDetailComponent {

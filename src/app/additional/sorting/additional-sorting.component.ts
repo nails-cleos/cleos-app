@@ -6,17 +6,17 @@ import {
 } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
 import { Store } from '@ngrx/store';
 import { IAdditionalAll } from '../../interfaces/additional';
-import { SharedModule } from '../../shared/shared.module';
 import { getAdditionalList, sortAdditional } from '../../store/additional.actions';
 import { getAdditionalListPipe, getAdditionalResponsePipe } from '../../store/selectors/additional.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AdditionalState } from '../../store/reducers/additional.reducers';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-sorting',
   templateUrl: './additional-sorting.component.html',
   styleUrls: ['./additional-sorting.component.scss'],
-  imports: [SharedModule, DragDropSortingComponent],
+  imports: [DragDropSortingComponent, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdditionalSortingComponent {

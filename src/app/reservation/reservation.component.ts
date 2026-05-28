@@ -8,7 +8,14 @@ import {
   untracked,
   viewChildren,
 } from '@angular/core';
-import { FormArray, FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import {
+  FormArray,
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
 import { IUser, IUserAll } from '../interfaces/user';
 import { combineLatestWith, Subject } from 'rxjs';
@@ -38,7 +45,7 @@ import {
   Reservation,
 } from '../interfaces/reservation';
 import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarWeekViewComponent } from 'angular-calendar';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -86,14 +93,13 @@ import {
 } from '../util/helper';
 import { addDays, addMonths, isEqual } from 'date-fns';
 import { IAdditionalAll } from '../interfaces/additional';
-import { MatListOption, MatSelectionList } from '@angular/material/list';
+import { MatDivider, MatListOption, MatSelectionList } from '@angular/material/list';
 import { IOffice, IOfficeAll } from '../interfaces/office';
 import { IStep, Step } from '../interfaces/step';
 import { SelectProfessionalDialogComponent } from './select-professional-dialog.component';
 import { ToastService } from '../services/toast.service';
 import { AuthUserService } from '../services/auth-user.service';
 import { enableStep, getBackIndex, getIndex, getStepCall, getStepName } from '../util/step';
-import { SharedModule } from '../shared/shared.module';
 import { RoomNamePipe } from '../pipes/room-name.pipe';
 import { SortByPipe } from '../pipes/sort-by.pipe';
 import { CurrencySymbolPipe } from '../pipes/currency-symbol.pipe';
@@ -133,7 +139,19 @@ import { ReservationCalendarService } from './reservation-calendar.service';
 import { getPaymentOptionsPipe } from '../store/selectors/payment.selectors';
 import { PaymentState } from '../store/reducers/payment.reducers';
 import { IPaymentOption } from '../interfaces/payment';
+import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatFabButton, MatIconButton } from '@angular/material/button';
+import { DatePipe, DecimalPipe, KeyValuePipe, NgClass, NgTemplateOutlet } from '@angular/common';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { MatCard, MatCardContent } from '@angular/material/card';
 import PlaceResult = google.maps.places.PlaceResult;
+import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
+import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 const RESERVATION_ERROR_FIELDS = [
   'customer',
@@ -155,8 +173,12 @@ const RESERVATION_ERROR_FIELDS = [
   selector: 'app-reservation',
   templateUrl: './reservation.component.html',
   styleUrls: ['./reservation.component.scss'],
-  imports: [SharedModule, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe,
-    BackButtonDirective, GoogleMapComponent, PaymentOptionSelectComponent, CalendarWeekViewComponent],
+  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatSelect,
+    MatOption, MatIcon, MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe, KeyValuePipe, DecimalPipe,
+    NgClass, NgTemplateOutlet, DatePipe, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix, MatFabButton,
+    BackButtonDirective, CurrencySymbolPipe, MatCard, MatCardContent, RoomNamePipe, SortByPipe, CurrencySymbolPipe,
+    DurationTimePipe, BackButtonDirective, GoogleMapComponent, PaymentOptionSelectComponent, CalendarWeekViewComponent,
+    TimepickerDirective, TimepickerComponent, MatSelectionList, MatListOption, MatDivider, MatCheckbox],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationComponent {

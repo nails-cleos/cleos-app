@@ -9,7 +9,6 @@ import {
 import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
-import { AppRoutingModule } from './app/app-routing.module';
 import { TranslateLoaderFactory } from './app/shared/translate-loader.factory';
 import { ActionReducer, MetaReducer, provideStore } from '@ngrx/store';
 import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
@@ -58,6 +57,11 @@ import { accountReducer } from './app/store/reducers/account.reducers';
 import { i18nReducer } from './app/store/reducers/i18n.reducers';
 import { I18NEffects } from './app/store/effects/i18n.effects';
 import { provideEffects } from '@ngrx/effects';
+import { provideRouter, withInMemoryScrolling } from '@angular/router';
+import { routes } from './app/app.routes';
+import { I18nBridgeService } from './app/services/i18n-bridge.service';
+import { provideAppIcons } from './app/util/app-icons.provider';
+import { provideAppDateAdapter, provideAppCalendar } from './app/util/adapter/app-date.provider';
 
 export interface ISendMessage {
   name: string;
@@ -128,6 +132,7 @@ const providers = [
     accounts: accountReducer,
     i18n: i18nReducer,
   }, { metaReducers }),
+  provideRouter(routes, withInMemoryScrolling({ anchorScrolling: 'enabled' })),
   provideRouterStore(),
   importProvidersFrom(
     BrowserModule,
@@ -141,7 +146,6 @@ const providers = [
       extend: true,
     }),
     NgcCookieConsentModule.forRoot(cookieConfig),
-    AppRoutingModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
       registrationStrategy: 'registerWhenStable:30000',
@@ -168,6 +172,12 @@ const providers = [
     provide: MAT_ICON_DEFAULT_OPTIONS,
     useValue: { fontSet: 'material-symbols-outlined' },
   },
+  ...provideAppDateAdapter(),
+  ...provideAppCalendar(),
+  provideAppIcons(),
+  provideAppInitializer(() => {
+    inject(I18nBridgeService);
+  }),
   provideAppInitializer(() => initializePwaService(inject(PwaService))),
   provideCharts(withDefaultRegisterables()),
   provideEffects(I18NEffects),

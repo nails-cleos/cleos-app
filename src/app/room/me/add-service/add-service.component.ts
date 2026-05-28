@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
-import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Store } from '@ngrx/store';
 import { MatDialog } from '@angular/material/dialog';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -8,18 +8,22 @@ import { getServices, updateServices } from '../../../store/room.actions';
 import { IService, IServicePrice, ServicePrice, ServiceType } from '../../../interfaces/room';
 import { IGroupService } from '../../../interfaces/treatment';
 import { createTreatmentGroupService, executeDialogNoWidth } from '../../../util/helper';
-import { SharedModule } from '../../../shared/shared.module';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { PriceDialogComponent } from './price-dialog.component';
 import { getCurrentRoomIdPipe, getRoomResponsePipe, getServicesPipe } from '../../../store/selectors/room.selectors';
 import { RoomState } from '../../../store/reducers/room.reducers';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { TranslatePipe } from '@ngx-translate/core';
+import { KeyValuePipe } from '@angular/common';
 
 @Component({
   selector: 'app-add-service',
   templateUrl: './add-service.component.html',
   styleUrls: ['./add-service.component.scss'],
-  imports: [SharedModule, CurrencySymbolPipe, BackButtonDirective],
+  imports: [MatIcon, MatButton, TranslatePipe, KeyValuePipe, BackButtonDirective,
+    CurrencySymbolPipe, CurrencySymbolPipe, BackButtonDirective, CdkDropList, CdkDrag],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddServiceComponent {

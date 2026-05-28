@@ -13,6 +13,8 @@ import { IAvailability, IRoomAll } from '../../interfaces/room';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { FrequencyEnum } from '../../util/helper';
 import { UnavailableState } from '../../store/reducers/unavailable.reducers';
+import { MatDialog } from '@angular/material/dialog';
+import { provideAppDateAdapter } from '../../util/adapter/app-date.provider';
 
 describe('BlockAgendaComponent', () => {
   let component: BlockAgendaComponent;
@@ -29,7 +31,7 @@ describe('BlockAgendaComponent', () => {
   let storeSpy: jasmine.SpyObj<Store<UnavailableState>>;
   let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
 
   const mockProfessionals: IUserAll[] = [
     { id: 'a', displayName: 'Alice' } as IUserAll,
@@ -99,6 +101,7 @@ describe('BlockAgendaComponent', () => {
     subErrors$ = new BehaviorSubject(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),
@@ -131,6 +134,8 @@ describe('BlockAgendaComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
+        { provide: MatDialog, useValue: dialogSpy },
+        provideAppDateAdapter(),
       ],
     }).compileComponents();
 
@@ -141,8 +146,6 @@ describe('BlockAgendaComponent', () => {
     component = fixture.componentInstance;
 
     fixture.detectChanges();
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   it('should create', () => {
@@ -258,7 +261,7 @@ describe('BlockAgendaComponent', () => {
     startDateControl.markAsDirty();
 
     const startTimeControl = component.getForm.startTime;
-    startTimeControl.setValue(`${hours}:${minutes}`);
+    startTimeControl.setValue(`${ hours }:${ minutes }`);
     startTimeControl.markAsDirty();
 
     fixture.detectChanges();
@@ -450,13 +453,13 @@ describe('BlockAgendaComponent', () => {
   it('should dispatch deleteUnavailable when dialog returns a result', () => {
     selectedUnavailable$.next(mockUnavailable);
     fixture.detectChanges();
-    dialogSpy.and.returnValue({
+    dialogSpy.open.and.returnValue({
       afterClosed: () => of(mockUnavailable),
     } as any);
 
     component.delete();
 
-    expect(dialogSpy).toHaveBeenCalledWith(
+    expect(dialogSpy.open).toHaveBeenCalledWith(
       jasmine.any(Function),
       jasmine.objectContaining({
         data: {

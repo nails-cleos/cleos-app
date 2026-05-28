@@ -1,19 +1,22 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { IUpcomingAll } from '../../../interfaces/reservation';
 import { customerEditDialog, getPrice, openDialog } from '../../../util/helper';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { createNewDate, isSameTimeZone, newDateTimestamp, reservationDuration } from '../../../util/dates';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
-import { SharedModule } from '../../../shared/shared.module';
+import { Router, RouterLink } from '@angular/router';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
 import { PaymentPreviewComponent } from '../../../shared/payment-preview/payment-preview.component';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { DatePipe, DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-upcoming',
   templateUrl: './upcoming.component.html',
   styleUrls: ['./upcoming.component.scss'],
-  imports: [SharedModule, CurrencySymbolPipe, PaymentPreviewComponent],
+  imports: [MatIcon, MatIconButton, MatButton, TranslatePipe, DecimalPipe, RouterLink, DatePipe,
+    CurrencySymbolPipe, CurrencySymbolPipe, PaymentPreviewComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UpcomingComponent {

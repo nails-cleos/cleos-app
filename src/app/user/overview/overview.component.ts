@@ -5,13 +5,12 @@ import { getDisplayNameInitials, getUserImage } from '../../util/helper';
 import { getCustomerOverview } from '../../store/user.actions';
 import { Router } from '@angular/router';
 import { IReservationOverview } from '../../interfaces/reservation';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { IChart } from '../../interfaces/dashboard';
 import { formatDateTime, newDateTimestamp } from '../../util/dates';
 import { IAccountAll } from '../../interfaces/account';
 import { IUserAll } from '../../interfaces/user';
 import { AuthUserService } from '../../services/auth-user.service';
-import { SharedModule } from '../../shared/shared.module';
 import { ErrorComponent } from '../../shared/error/error.component';
 import { CardComponent } from '../../shared/card/card.component';
 import { ChartComponent } from '../../shared/chart/chart.component';
@@ -20,12 +19,20 @@ import { BackButtonDirective } from '../../directives/back-button.directive';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { UserState } from '../../store/reducers/user.reducers';
 import { getCurrentUserIdPipe, getOverviewPipe, getUserErrorPipe } from '../../store/selectors/user.selectors';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatMiniFabButton } from '@angular/material/button';
+import { CurrencyPipe } from '@angular/common';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { AvatarComponent } from '../../shared/avatar/avatar.component';
+import { MatGridList, MatGridTile } from '@angular/material/grid-list';
 
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.scss'],
-  imports: [SharedModule, ErrorComponent, CardComponent, ChartComponent, GoogleMapComponent, BackButtonDirective],
+  imports: [MatIcon, MatButton, TranslatePipe, CurrencyPipe, BackButtonDirective, MatCard,
+    MatCardContent, ErrorComponent, CardComponent, ChartComponent, GoogleMapComponent, BackButtonDirective,
+    AvatarComponent, MatMiniFabButton, MatGridList, MatGridTile],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OverviewComponent {

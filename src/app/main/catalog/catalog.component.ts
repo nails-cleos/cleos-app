@@ -5,15 +5,24 @@ import { MainContentService } from '../../services/main-content.service';
 import { getImage } from '../../util/file';
 import { getCatalogueListPipe } from '../../store/selectors/catalogue.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CatalogueState } from '../../store/reducers/catalogue.reducers';
+import { MatIcon } from '@angular/material/icon';
+import {
+  MatCard,
+  MatCardActions,
+  MatCardContent,
+  MatCardHeader, MatCardMdImage,
+  MatCardSubtitle,
+  MatCardTitle,
+} from '@angular/material/card';
 
 @Component({
   selector: 'app-catalog',
   templateUrl: './catalog.component.html',
   styleUrls: ['./catalog.component.scss'],
-  imports: [AppMaterialModule, TranslatePipe],
+  imports: [MatIcon, TranslatePipe, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent,
+    MatCardActions, MatCardMdImage],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogComponent {

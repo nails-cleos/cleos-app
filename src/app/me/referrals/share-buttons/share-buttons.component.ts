@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { AppMaterialModule } from '../../../util/app-material.module';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-share-buttons',
   templateUrl: './share-buttons.component.html',
   styleUrls: ['./share-buttons.component.scss'],
-  imports: [AppMaterialModule],
+  imports: [MatIcon, MatButton],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShareButtonsComponent {

@@ -1,26 +1,49 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { cleanDiscount, getMyDiscountsPage } from '../../../store/discount.actions';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { SharedModule } from '../../../shared/shared.module';
 import { currencySymbol } from '../../../util/helper';
 import { getDiscountResponsePipe, getMyDiscountPaginationPipe } from '../../../store/selectors/discount.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { DiscountState } from '../../../store/reducers/discount.reducers';
 import { FirebaseService } from '../../../services/firebase.service';
+import { MatIcon } from '@angular/material/icon';
+import { MatIconButton } from '@angular/material/button';
+import { DecimalPipe, NgClass } from '@angular/common';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatSuffix } from '@angular/material/input';
 
 @Component({
   selector: 'app-me-discount',
   templateUrl: './me-discount.component.html',
   styleUrls: ['./me-discount.component.scss'],
-  imports: [SharedModule],
+  imports: [MatIcon, MatIconButton, TranslatePipe, DecimalPipe, NgClass, MatTable, MatSort,
+    MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatTooltip, MatFooterCellDef,
+    MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator,
+    MatSuffix],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MeDiscountComponent {

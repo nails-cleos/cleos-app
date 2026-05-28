@@ -13,22 +13,49 @@ import {
 } from '../../store/user.actions';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Role } from '../../interfaces/token';
 import { executeDialogNoWidth, snakeToCamel } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { RoleIconKey, RoleIconName } from '../../util/icon';
-import { Router } from '@angular/router';
-import { SharedModule } from '../../shared/shared.module';
+import { Router, RouterLink } from '@angular/router';
 import { getUserPaginationPipe, getUserResponsePipe } from '../../store/selectors/user.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { UserState } from '../../store/reducers/user.reducers';
 import { SelectUserDialogComponent } from './select-user-dialog.component';
-import { FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
+import {
+  MatDivider,
+  MatList,
+  MatListItem,
+  MatListItemIcon, MatListItemTitle,
+  MatListSubheaderCssMatStyler,
+} from '@angular/material/list';
+import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { LowerCasePipe, NgClass } from '@angular/common';
 
 type UsersForm = {
   filter: FormControl<string | undefined>;
@@ -38,7 +65,11 @@ type UsersForm = {
   selector: 'app-users',
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.scss'],
-  imports: [SharedModule],
+  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatList, MatListItem, MatListSubheaderCssMatStyler,
+    MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe, NgClass, RouterLink, MatTable, MatSort, MatColumnDef,
+    MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef,
+    MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator,
+    MatDivider, LowerCasePipe, MatListItemTitle],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsersComponent {

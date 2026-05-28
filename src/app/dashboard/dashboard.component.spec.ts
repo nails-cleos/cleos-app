@@ -12,6 +12,7 @@ import { getNowTimeZone } from '../util/dates';
 import { endOfMonth, startOfMonth } from 'date-fns';
 import { States } from '../interfaces/reservation';
 import { FrequencyEnum } from '../util/helper';
+import { provideAppCalendar } from '../util/adapter/app-date.provider';
 
 describe('DashComponent', () => {
   let component: DashboardComponent;
@@ -88,6 +89,7 @@ describe('DashComponent', () => {
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
+        provideAppCalendar(),
       ],
     }).compileComponents();
 

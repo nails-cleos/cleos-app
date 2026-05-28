@@ -22,9 +22,10 @@ import {
 import { DragEndEvent, DraggableDirective, DragMoveEvent, DroppableDirective } from 'angular-draggable-droppable';
 import { Day } from '../../interfaces/reservation';
 import { ConvertHMPipe } from '../../pipes/convert-hm.pipe';
-import { AppMaterialModule } from '../../util/app-material.module';
 import { DatePipe, NgClass, TitleCasePipe } from '@angular/common';
 import { ResizableDirective, ResizeHandleDirective } from 'angular-resizable-element';
+import { MatIcon } from '@angular/material/icon';
+import { MatCard, MatCardHeader, MatCardSubtitle, MatCardTitle } from '@angular/material/card';
 
 export interface IProfessional {
   id: string;
@@ -99,7 +100,8 @@ export class DayViewSchedulerCalendarUtils extends CalendarUtils {
   selector: 'app-mwl-day-view-scheduler',
   templateUrl: './day-view-scheduler.component.html',
   styleUrls: ['./dashboard-event.component.scss'],
-  imports: [AppMaterialModule, ConvertHMPipe, DatePipe, NgClass, TitleCasePipe, CalendarWeekViewHourSegmentComponent,
+  imports: [MatIcon, NgClass, DatePipe, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle,
+    ConvertHMPipe, DatePipe, NgClass, TitleCasePipe, CalendarWeekViewHourSegmentComponent,
     CalendarWeekViewCurrentTimeMarkerComponent, DroppableDirective, DraggableDirective, ResizableDirective,
     ResizeHandleDirective, CalendarWeekViewEventComponent, ClickDirective],
   providers: [

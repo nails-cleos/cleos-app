@@ -10,6 +10,7 @@ import { deleteTreatmentGroup, getTreatmentsPage } from '../../store/treatment.a
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { TreatmentState } from '../../store/reducers/treatment.reducers';
+import { MatDialog } from '@angular/material/dialog';
 
 describe('TreatmentsComponent', () => {
   let component: TreatmentsComponent;
@@ -18,7 +19,7 @@ describe('TreatmentsComponent', () => {
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let translate: TranslateService;
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
 
   const mockTreatments: ITreatmentGroupAll[] = [
     { id: '1', name: 'Treatment Red', description: 'Red treatment' },
@@ -49,6 +50,7 @@ describe('TreatmentsComponent', () => {
     });
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -78,6 +80,7 @@ describe('TreatmentsComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: MatDialog, useValue: dialogSpy },
       ],
     }).compileComponents();
 
@@ -88,8 +91,6 @@ describe('TreatmentsComponent', () => {
     translate.use('en-GB');
 
     fixture.detectChanges();
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   afterEach(() => {
@@ -181,13 +182,13 @@ describe('TreatmentsComponent', () => {
 
   it('should dispatch deleteTreatment when dialog returns a result', () => {
     const item = mockTreatments[0];
-    dialogSpy.and.returnValue({
+    dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
     } as any);
 
     component.delete(item);
 
-    expect(dialogSpy).toHaveBeenCalledWith(
+    expect(dialogSpy.open).toHaveBeenCalledWith(
       jasmine.any(Function),
       jasmine.objectContaining({
         data: {

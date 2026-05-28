@@ -1,10 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Currency, ICurrency } from '../interfaces/currency';
 import { createCurrency, getCurrency, updateCurrency } from '../store/currency.actions';
 import { fieldChange } from '../util/validators';
-import { SharedModule } from '../shared/shared.module';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import {
   getCurrentCurrencyIdPipe,
@@ -14,6 +13,12 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../interfaces/common';
 import { CurrencyState } from '../store/reducers/currency.reducers';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatSelect, MatSelectTrigger } from '@angular/material/select';
+import { TranslatePipe } from '@ngx-translate/core';
+import { MatOption } from '@angular/material/core';
 
 type CurrencyForm = {
   code: FormControl<string>;
@@ -25,7 +30,8 @@ type CurrencyForm = {
   selector: 'app-currency',
   templateUrl: './currency.component.html',
   styleUrls: ['./currency.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [MatFormField, MatLabel, MatInput, MatSelect, MatOption, MatIcon, MatButton, ReactiveFormsModule,
+    TranslatePipe, MatError, BackButtonDirective, BackButtonDirective, MatSelectTrigger],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CurrencyComponent {

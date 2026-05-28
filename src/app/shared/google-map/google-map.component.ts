@@ -1,19 +1,11 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  input,
-  output,
-  viewChild,
-} from '@angular/core';
-import { ControlContainer, FormControl, FormGroup, NgForm } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, viewChild } from '@angular/core';
+import { ControlContainer, FormControl, FormGroup, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { GeocodeService, MapStatus } from '../../services/geocode.service';
 import { GoogleMap, MapInfoWindow, MapMarker } from '@angular/google-maps';
 import { AuthUserService } from '../../services/auth-user.service';
-import { SharedModule } from '../shared.module';
 import { EnvService } from '../../services/env.service';
+import { MatError, MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
+import { TranslatePipe } from '@ngx-translate/core';
 import PlaceResult = google.maps.places.PlaceResult;
 import MapMouseEvent = google.maps.MapMouseEvent;
 
@@ -27,7 +19,8 @@ export type GoogleMapForm = {
   templateUrl: './google-map.component.html',
   styleUrls: ['./google-map.component.scss'],
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
-  imports: [SharedModule, GoogleMap, MapInfoWindow, MapMarker],
+  imports: [MatFormField, MatLabel, MatInput, ReactiveFormsModule, TranslatePipe, MatError, GoogleMap, MapInfoWindow,
+    MapMarker, MatHint],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GoogleMapComponent {

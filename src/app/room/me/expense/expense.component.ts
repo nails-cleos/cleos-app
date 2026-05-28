@@ -1,15 +1,22 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
-import { FormArray, FormControl, FormGroup, FormGroupDirective, NonNullableFormBuilder, Validators } from '@angular/forms';
+import {
+  FormArray,
+  FormControl,
+  FormGroup,
+  FormGroupDirective,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { Expense, IExpense, ISupplyStore, ITotalExpense } from '../../../interfaces/expense';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { combineLatestWith } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { createExpense, getAllExpensesInfo, getExpense, updateExpense } from '../../../store/expense.actions';
 import { API_LOCALE, createNewDateZonedTime, getNowTimeZone } from '../../../util/dates';
 import { fieldChange, noDuplicateDatesValidator } from '../../../util/validators';
 import { map, startWith } from 'rxjs/operators';
-import { SharedModule } from '../../../shared/shared.module';
 import { TwoDigitsDirective } from '../../../directives/two-digits.directive';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { ExpenseState } from '../../../store/reducers/expense.reducers';
@@ -35,6 +42,16 @@ import { AuthUserService } from '../../../services/auth-user.service';
 import { DriveAccessService } from '../../../services/drive-access.service';
 import { EnvService } from '../../../services/env.service';
 import { TokenService } from '../../../services/token.service';
+import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatSuffix } from '@angular/material/form-field';
+import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
+import { MatOptgroup, MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { DecimalPipe, KeyValuePipe } from '@angular/common';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 type TotalsForm = {
   type: FormControl<string>;
@@ -54,7 +71,11 @@ type ExpenseForm = {
   selector: 'app-expense',
   templateUrl: './expense.component.html',
   styleUrls: ['./expense.component.scss'],
-  imports: [SharedModule, TwoDigitsDirective, BackButtonDirective, FileDropComponent],
+  imports: [TwoDigitsDirective, MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle,
+    MatDatepicker, MatSelect, MatOption, MatIcon, MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe,
+    KeyValuePipe, DecimalPipe, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix, MatSuffix,
+    BackButtonDirective, TwoDigitsDirective, BackButtonDirective, FileDropComponent, MatOptgroup, MatHint,
+    MatCheckbox],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExpenseComponent {

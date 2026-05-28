@@ -13,6 +13,7 @@ import { UnavailableState } from '../../store/reducers/unavailable.reducers';
 import { IUserAll } from '../../interfaces/user';
 import { getNowTimeZone } from '../../util/dates';
 import { FrequencyEnum } from '../../util/helper';
+import { MatDialog } from '@angular/material/dialog';
 
 describe('UnavailableListComponent', () => {
   let component: UnavailableListComponent;
@@ -21,7 +22,7 @@ describe('UnavailableListComponent', () => {
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let translate: TranslateService;
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
 
   const mockProfessional: IUserAll = {
     id: 'prof-1',
@@ -77,6 +78,7 @@ describe('UnavailableListComponent', () => {
     });
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -106,6 +108,7 @@ describe('UnavailableListComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: MatDialog, useValue: dialogSpy },
       ],
     }).compileComponents();
 
@@ -124,8 +127,6 @@ describe('UnavailableListComponent', () => {
     });
 
     fixture.detectChanges();
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   afterEach(() => {
@@ -224,13 +225,13 @@ describe('UnavailableListComponent', () => {
 
   it('should dispatch deleteUnavailable when dialog returns a result', () => {
     const item = mockUnavailable[0];
-    dialogSpy.and.returnValue({
+    dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
     } as any);
 
     component.delete(item);
 
-    expect(dialogSpy).toHaveBeenCalledWith(
+    expect(dialogSpy.open).toHaveBeenCalledWith(
       jasmine.any(Function),
       jasmine.objectContaining({
         data: {
@@ -276,12 +277,12 @@ describe('UnavailableListComponent', () => {
 
     component.openDialog(unavailable);
 
-    expect(dialogSpy).toHaveBeenCalledWith(
+    expect(dialogSpy.open).toHaveBeenCalledWith(
       jasmine.any(Function),
       jasmine.objectContaining({
         data: {
           title: 'Time Zone',
-          content: `You are in a different time zone than <b>${mockProfessional.displayName}</b>. <br><br>Your time: <b>01:30</b><br>Professional time: <b>21:30 <b><sup class="warning">-1D</sup></b></b>`,
+          content: `You are in a different time zone than <b>${ mockProfessional.displayName }</b>. <br><br>Your time: <b>01:30</b><br>Professional time: <b>21:30 <b><sup class="warning">-1D</sup></b></b>`,
           hideNoButton: true,
           hideOkButton: true,
         },
@@ -306,12 +307,12 @@ describe('UnavailableListComponent', () => {
 
     component.openDialog(unavailable);
 
-    expect(dialogSpy).toHaveBeenCalledWith(
+    expect(dialogSpy.open).toHaveBeenCalledWith(
       jasmine.any(Function),
       jasmine.objectContaining({
         data: {
           title: 'Time Zone',
-          content: `You are in a different time zone than <b>${mockProfessional.displayName}</b>. <br><br>Your time: <b>23:30</b><br>Professional time: <b>01:30 <b><sup class="success">+1D</sup></b></b>`,
+          content: `You are in a different time zone than <b>${ mockProfessional.displayName }</b>. <br><br>Your time: <b>23:30</b><br>Professional time: <b>01:30 <b><sup class="success">+1D</sup></b></b>`,
           hideNoButton: true,
           hideOkButton: true,
         },

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, Signal, signal } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { combineLatestWith } from 'rxjs';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { backendFormatDate, createDateFromString } from '../util/dates';
 import { fieldChange, requireMatch, valueChange } from '../util/validators';
@@ -12,7 +12,6 @@ import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { map, startWith } from 'rxjs/operators';
-import { SharedModule } from '../shared/shared.module';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { NoteState } from '../store/reducers/note.reducers';
 import {
@@ -24,6 +23,14 @@ import {
 } from '../store/selectors/note.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../interfaces/common';
+import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { KeyValuePipe } from '@angular/common';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 
 type NoteForm = {
   description: FormControl<string>;
@@ -36,7 +43,9 @@ type NoteForm = {
   selector: 'app-note',
   templateUrl: './note.component.html',
   styleUrls: ['./note.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepicker, MatSelect, MatOption, MatIcon,
+    MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe, KeyValuePipe, MatAutocomplete, MatError,
+    MatAutocompleteTrigger, MatPrefix, BackButtonDirective, BackButtonDirective, MatHint],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NoteComponent {

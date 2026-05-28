@@ -3,8 +3,7 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { IPayment, IPaymentAll } from '../../interfaces/payment';
 import { cleanPayment, getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/payment.actions';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../shared/shared.module';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   getCurrentPathIdPipe,
   getPaymentResponsePipe,
@@ -13,12 +12,35 @@ import {
 } from '../../store/selectors/payment.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { PaymentState } from '../../store/reducers/payment.reducers';
+import { MatPrefix } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatFabButton, MatIconButton } from '@angular/material/button';
+import { DecimalPipe } from '@angular/common';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-payment',
   templateUrl: './payment.component.html',
   styleUrls: ['./payment.component.scss'],
-  imports: [SharedModule],
+  imports: [MatIcon, MatIconButton, TranslatePipe, DecimalPipe, MatTable, MatColumnDef,
+    MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatTooltip, MatFooterCellDef, MatFooterCell, MatHeaderRowDef,
+    MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPrefix, MatFabButton],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentComponent {

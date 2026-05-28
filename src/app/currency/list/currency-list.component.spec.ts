@@ -10,6 +10,7 @@ import { currencySelected, deleteCurrency, getCurrenciesPage } from '../../store
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { CurrencyState } from '../../store/reducers/currency.reducers';
+import { MatDialog } from '@angular/material/dialog';
 
 describe('CurrencyListComponent', () => {
   let component: CurrencyListComponent;
@@ -18,7 +19,7 @@ describe('CurrencyListComponent', () => {
   let storeSpy: jasmine.SpyObj<Store<CurrencyState>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
 
   let translate: TranslateService;
 
@@ -51,6 +52,7 @@ describe('CurrencyListComponent', () => {
     });
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -80,6 +82,7 @@ describe('CurrencyListComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: MatDialog, useValue: dialogSpy },
       ],
     }).compileComponents();
 
@@ -90,8 +93,6 @@ describe('CurrencyListComponent', () => {
     translate.use('en-GB');
 
     fixture.detectChanges();
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   afterEach(() => {
@@ -190,7 +191,7 @@ describe('CurrencyListComponent', () => {
 
   it('should dispatch deleteCurrency when dialog returns a result', () => {
     const item = mockCurrencyList[0];
-    dialogSpy.and.returnValue({
+    dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
     } as any);
 

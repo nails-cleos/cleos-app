@@ -10,21 +10,17 @@ import {
 } from '@angular/core';
 import { ITreatmentGroupAll } from '../../interfaces/treatment';
 import { IExperience, ISlide, ISocialLink, IStory, IWork } from '../../interfaces/main';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { sendMessage } from '../../store/main.actions';
 import { AuthUserService } from '../../services/auth-user.service';
-import {
-  goTo,
-  observeElementSignal,
-} from '../../util/animation';
+import { goTo, observeElementSignal } from '../../util/animation';
 import { isMobile } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MainContentService } from '../../services/main-content.service';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Router } from '@angular/router';
-import { SharedModule } from '../../shared/shared.module';
 import { ToastService } from '../../services/toast.service';
 import { BottomSheetBookAppointmentComponent } from './bottom-sheet-book-appointment';
 import { getCataloguePipe, getMainErrorPipe, getResponsePipe } from '../../store/selectors/main.selectors';
@@ -34,6 +30,10 @@ import { MainState } from '../../store/reducers/main.reducers';
 import { EnvService } from '../../services/env.service';
 import { ICatalogueAll } from '../../interfaces/catalogue';
 import { getImage } from '../../util/file';
+import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatFabButton, MatIconButton } from '@angular/material/button';
+import { NgClass, NgStyle } from '@angular/common';
 
 type MainForm = {
   name: FormControl<string>;
@@ -46,7 +46,8 @@ type MainForm = {
   selector: 'app-main-content',
   templateUrl: './main-content.component.html',
   styleUrls: ['./main-content.component.scss'],
-  imports: [SharedModule],
+  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe,
+    NgClass, MatError, NgStyle, MatPrefix, MatHint, MatFabButton],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainContentComponent {

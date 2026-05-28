@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Additional, IAdditional } from '../interfaces/additional';
 import { createAdditional, getAdditional, updateAdditional } from '../store/additional.actions';
 import { ITreatmentGroupAll } from '../interfaces/treatment';
@@ -19,9 +19,8 @@ import { fieldChange, valueChange } from '../util/validators';
 import { map, startWith } from 'rxjs/operators';
 import { formatDuration } from '../util/dates';
 import { areEquals } from '../util/helper';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../shared/shared.module';
+import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
@@ -32,6 +31,14 @@ import {
 } from '../store/selectors/additional.selectors';
 import { IError, isString } from '../interfaces/common';
 import { AdditionalState } from '../store/reducers/additional.reducers';
+import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { RouterLink } from '@angular/router';
+import { MatOption } from '@angular/material/core';
+import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
+import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
+import { MatChipGrid, MatChipInput, MatChipRow } from '@angular/material/chips';
 
 type AdditionalForm = {
   name: FormControl<string>;
@@ -44,7 +51,9 @@ type AdditionalForm = {
   selector: 'app-additional',
   templateUrl: './additional.component.html',
   styleUrls: ['./additional.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, TranslatePipe,
+    RouterLink, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix, BackButtonDirective, BackButtonDirective,
+    ReactiveFormsModule, TimepickerDirective, TimepickerComponent, MatHint, MatChipGrid, MatChipRow, MatChipInput],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdditionalComponent {

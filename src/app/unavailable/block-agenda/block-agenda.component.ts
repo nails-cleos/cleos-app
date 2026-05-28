@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, Signal, signal } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { IRoomAll } from '../../interfaces/room';
 import { combineLatestWith } from 'rxjs';
@@ -32,9 +32,8 @@ import {
 import { executeDialogNoWidth } from '../../util/helper';
 import { map, startWith } from 'rxjs/operators';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { SharedModule } from '../../shared/shared.module';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { AuthUserService } from '../../services/auth-user.service';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -49,6 +48,14 @@ import {
 } from '../../store/selectors/unavailable.selectors';
 import { IError } from '../../interfaces/common';
 import { closest } from '../../util/numbers';
+import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { TimepickerDirective } from '../../shared/clock-timepicker/timepicker.directive';
+import { TimepickerComponent } from '../../shared/clock-timepicker/timepicker.component';
 
 type BlockAgendaForm = {
   professional: FormControl<IUserAll | undefined>;
@@ -61,7 +68,9 @@ type BlockAgendaForm = {
   selector: 'app-block-agenda',
   templateUrl: './block-agenda.component.html',
   styleUrls: ['./block-agenda.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepicker, MatOption, MatIcon, MatIconButton,
+    MatButton, ReactiveFormsModule, TranslatePipe, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix,
+    BackButtonDirective, BackButtonDirective, TimepickerDirective, TimepickerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BlockAgendaComponent {

@@ -1,17 +1,16 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { IAdditional } from '../../interfaces/additional';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { convertDuration } from '../../util/dates';
 import { executeDialogNoWidth } from '../../util/helper';
-import { SharedModule } from '../../shared/shared.module';
 import {
   additionalSelected,
   cleanAdditional,
@@ -21,12 +20,38 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getAdditionalPaginationPipe, getAdditionalResponsePipe } from '../../store/selectors/additional.selectors';
 import { AdditionalState } from '../../store/reducers/additional.reducers';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatIconButton } from '@angular/material/button';
+import { MatPrefix } from '@angular/material/input';
+import { MatList, MatListItem, MatListItemIcon } from '@angular/material/list';
+import { DecimalPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-additional-list',
   templateUrl: './additional-list.component.html',
   styleUrls: ['./additional-list.component.scss'],
-  imports: [SharedModule],
+  imports: [MatIcon, MatList, MatListItem, MatIconButton, TranslatePipe, DecimalPipe, RouterLink,
+    MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatTooltip,
+    MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow,
+    MatFooterRowDef, MatPaginator, MatPrefix],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdditionalListComponent {
@@ -96,12 +121,13 @@ export class AdditionalListComponent {
     const title = this.translate.instant('ADDITIONAL.DELETED.TITLE');
     const content = this.translate.instant('ADDITIONAL.DELETED.CONTENT', { name: additional.name });
 
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: additional, variant: 'warning' }, result => {
-      if (result) {
-        this.store.dispatch(
-          deleteAdditional({ id: result.id, name: result.name }),
-        );
-      }
-    });
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: additional, variant: 'warning' },
+      result => {
+        if (result) {
+          this.store.dispatch(
+            deleteAdditional({ id: result.id, name: result.name }),
+          );
+        }
+      });
   };
 }

@@ -10,16 +10,15 @@ import {
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { IUser, User } from '../../interfaces/user';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { cleanUser, getMyUser, updateMyPhoto, updateMyUser } from '../../store/user.actions';
 import { fieldChange, validColorValidator, valueChange } from '../../util/validators';
 import { flags, IFlag } from '../../util/flags';
 import { createAddress, getDisplayNameInitials, getLocale, getUserImage } from '../../util/helper';
 import { backendFormatDate, createDateFromString, newDate } from '../../util/dates';
 import { Role } from '../../interfaces/token';
-import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
+import { LangChangeEvent, TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { resizeImage } from '../../util/file';
-import { SharedModule } from '../../shared/shared.module';
 import { GoogleMapComponent, GoogleMapForm } from '../../shared/google-map/google-map.component';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
@@ -29,8 +28,16 @@ import { getSelectedUserPipe, getSubErrorsPipe, getUserResponsePipe } from '../.
 import { IError } from '../../interfaces/common';
 import { UserState } from '../../store/reducers/user.reducers';
 import { ColorPickerComponent } from '../../shared/color-picker/color-picker.component';
+import { MatIcon } from '@angular/material/icon';
+import { NgClass, UpperCasePipe } from '@angular/common';
+import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
+import { MatCheckbox } from '@angular/material/checkbox';
 
 type ProfileForm = {
   lang: FormControl<string | undefined>;
@@ -46,8 +53,10 @@ type ProfileForm = {
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
-  imports: [SharedModule, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective, NgIcon,
-    ColorPickerComponent],
+  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepicker, MatSelect, MatOption, MatIcon,
+    MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe, NgClass, MatError, MatPrefix, BackButtonDirective,
+    NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective, NgIcon,
+    ColorPickerComponent, UpperCasePipe, MatCheckbox],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileComponent {

@@ -1,26 +1,50 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { ITransaction } from '../../../interfaces/account';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { getTransactionsByAccountId } from '../../../store/account.actions';
 import { newDateTimestamp } from '../../../util/dates';
 import { AuthUserService } from '../../../services/auth-user.service';
-import { SharedModule } from '../../../shared/shared.module';
 import { BalanceComponent } from '../../balance/balance.component';
 import { getAccountTransactionPipe, getCurrentAccountIdPipe } from '../../../store/selectors/account.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AccountState } from '../../../store/reducers/account.reducers';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
+import { MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatList, MatListItem, MatListItemIcon, MatListItemTitle } from '@angular/material/list';
+import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-transaction-view',
   templateUrl: './transaction-view.component.html',
   styleUrls: ['./transaction-view.component.scss'],
-  imports: [SharedModule, BalanceComponent],
+  imports: [MatIcon, MatList, MatListItem, MatIconButton, TranslatePipe, CurrencyPipe, DecimalPipe,
+    RouterLink, DatePipe, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
+    MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow,
+    MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, BalanceComponent, MatListItemTitle],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransactionViewComponent {

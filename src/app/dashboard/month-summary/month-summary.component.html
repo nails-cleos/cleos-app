@@ -10,9 +10,9 @@
     <div class="monthly-summary-toolbar">
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}</mat-label>
-        <input matInput [matDatepicker]="dp" [formControl]="getForm.date">
-        <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
-        <mat-datepicker #dp startView="multi-year" (monthSelected)="setMonthAndYear($event, dp)">
+        <input matInput [matDatepicker]="dp" [formControl]="getForm.date" readonly (click)="dp.open()">
+        <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+        <mat-datepicker #dp startView="multi-year" (monthSelected)="setMonthAndYear($event, dp)" touchUi>
         </mat-datepicker>
       </mat-form-field>
 

@@ -1,25 +1,29 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { combineLatestWith } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { getNowTimeZone, invoiceFormat } from '../util/dates';
 import { map, startWith } from 'rxjs/operators';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { IOfficeAll } from '../interfaces/office';
 import { requireMatch } from '../util/validators';
-import { SharedModule } from '../shared/shared.module';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { StatementState } from '../store/reducers/statement.reducers';
 import { DriveAccessService } from '../services/drive-access.service';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import { YearMonthAdapter } from '../util/adapter/year-month.adapter';
-import { MatDatepicker } from '@angular/material/datepicker';
+import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { FileDropComponent, UploadFile } from '../shared/file-drop/file-drop.component';
 import { uploadStatement } from '../store/statement.actions';
 import { getMyOfficesPipe } from '../store/selectors/office.selectors';
 import { OfficeState } from '../store/reducers/office.reducers';
-import { DateAdapter } from '@angular/material/core';
+import { MatOption } from '@angular/material/core';
+import { provideYearMonthDateAdapter } from '../util/adapter/app-date.provider';
 import { EnvService } from '../services/env.service';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatSuffix } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 
 type StatementForm = {
   office: FormControl<IOfficeAll | undefined>;
@@ -30,8 +34,11 @@ type StatementForm = {
   selector: 'app-statement',
   templateUrl: './statement.component.html',
   styleUrls: ['./statement.component.scss'],
-  imports: [SharedModule, BackButtonDirective, FileDropComponent],
-  providers: [{ provide: DateAdapter, useClass: YearMonthAdapter }],
+  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatOption,
+    MatIcon, MatButton, MatSuffix, ReactiveFormsModule, TranslatePipe, MatAutocomplete, MatError,
+    MatAutocompleteTrigger,
+    BackButtonDirective, BackButtonDirective, FileDropComponent],
+  providers: [...provideYearMonthDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StatementComponent {

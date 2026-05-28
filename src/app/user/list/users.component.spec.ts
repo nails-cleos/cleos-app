@@ -11,6 +11,7 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagina
 import { UserState } from '../../store/reducers/user.reducers';
 import { deleteUser, getUsersPage, mergeUsers, resendToken, restore, userSelected } from '../../store/user.actions';
 import { signal } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 
 describe('UsersComponent', () => {
   let component: UsersComponent;
@@ -20,7 +21,7 @@ describe('UsersComponent', () => {
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let translate: TranslateService;
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
 
   let userList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
@@ -51,6 +52,7 @@ describe('UsersComponent', () => {
     });
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -80,6 +82,7 @@ describe('UsersComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: MatDialog, useValue: dialogSpy },
       ],
     }).compileComponents();
 
@@ -90,8 +93,6 @@ describe('UsersComponent', () => {
     translate.use('en-GB');
 
     fixture.detectChanges();
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   afterEach(() => {
@@ -208,13 +209,13 @@ describe('UsersComponent', () => {
 
   it('should dispatch deleteUser when dialog returns a result', () => {
     const item = mockUsers[0];
-    dialogSpy.and.returnValue({
+    dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
     } as any);
 
     component.delete(item);
 
-    expect(dialogSpy).toHaveBeenCalledWith(
+    expect(dialogSpy.open).toHaveBeenCalledWith(
       jasmine.any(Function),
       jasmine.objectContaining({
         data: {
@@ -230,13 +231,13 @@ describe('UsersComponent', () => {
 
   it('should dispatch restore when dialog returns a result', () => {
     const item = mockUsers[0];
-    dialogSpy.and.returnValue({
+    dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
     } as any);
 
     component.restore(item);
 
-    expect(dialogSpy).toHaveBeenCalledWith(
+    expect(dialogSpy.open).toHaveBeenCalledWith(
       jasmine.any(Function),
       jasmine.objectContaining({
         data: {
@@ -255,13 +256,13 @@ describe('UsersComponent', () => {
 
   it('should dispatch sendInvite when dialog returns a result', () => {
     const item = mockUsers[0];
-    dialogSpy.and.returnValue({
+    dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
     } as any);
 
     component.sendInvite(item);
 
-    expect(dialogSpy).toHaveBeenCalledWith(
+    expect(dialogSpy.open).toHaveBeenCalledWith(
       jasmine.any(Function),
       jasmine.objectContaining({
         data: {
@@ -277,7 +278,7 @@ describe('UsersComponent', () => {
   it('should dispatch merge when dialog returns a result', () => {
     const oldUser = mockUsers[0];
     const newUser = mockUsers[1];
-    dialogSpy.and.returnValue({
+    dialogSpy.open.and.returnValue({
       afterClosed: () => of(oldUser),
     } as any);
 

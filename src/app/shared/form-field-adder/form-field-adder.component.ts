@@ -10,12 +10,30 @@ import {
 import { IExtras } from '../../interfaces/reservation';
 import { ICurrencyAll } from '../../interfaces/currency';
 import { IPaymentOption } from '../../interfaces/payment';
-import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CurrencyPipe } from '@angular/common';
 import { PaymentOptionSelectComponent } from '../payment-option-select/payment-option-select.component';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { startWith } from 'rxjs/operators';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatFabButton, MatIconButton } from '@angular/material/button';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
 
 export type ExtraForm = {
   description: FormControl<string>;
@@ -31,7 +49,10 @@ type FormFieldsForm = {
   selector: 'app-form-field-adder',
   templateUrl: './form-field-adder.component.html',
   styleUrl: './form-field-adder.component.scss',
-  imports: [AppMaterialModule, TranslatePipe, ReactiveFormsModule, CurrencyPipe, PaymentOptionSelectComponent],
+  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatIconButton, TranslatePipe, CurrencyPipe, MatError, MatTable,
+    MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatFooterCellDef, MatFooterCell,
+    MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatFabButton, ReactiveFormsModule,
+    PaymentOptionSelectComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormFieldAdderComponent {

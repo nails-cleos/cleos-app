@@ -20,6 +20,7 @@ import { IUserAll } from '../../interfaces/user';
 import { States } from '../../interfaces/reservation';
 import { createNewDate } from '../../util/dates';
 import { signal } from '@angular/core';
+import { provideAppCalendar, provideAppDateAdapter } from '../../util/adapter/app-date.provider';
 
 describe('CalendarComponent', () => {
   let component: CalendarComponent;
@@ -28,7 +29,7 @@ describe('CalendarComponent', () => {
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let routerSpy: jasmine.SpyObj<Router>;
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
@@ -137,6 +138,7 @@ describe('CalendarComponent', () => {
     });
 
     storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
+    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
@@ -172,6 +174,8 @@ describe('CalendarComponent', () => {
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        provideAppDateAdapter(),
+        provideAppCalendar(),
       ],
     }).compileComponents();
 
@@ -181,8 +185,6 @@ describe('CalendarComponent', () => {
     fixture = TestBed.createComponent(CalendarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   afterEach(() => {
@@ -469,13 +471,13 @@ describe('CalendarComponent', () => {
       component.getForm.room.setValue(mockRoom1);
       const futureDate = addDays(new Date(), 5);
 
-      dialogSpy.and.returnValue({
+      dialogSpy.open.and.returnValue({
         afterClosed: () => of('en,reservation,new'),
       } as any);
 
       component.segmentClick(futureDate, mockRoom1);
 
-      expect(dialogSpy).toHaveBeenCalled();
+      expect(dialogSpy.open).toHaveBeenCalled();
     });
   });
 
@@ -534,7 +536,7 @@ describe('CalendarComponent', () => {
     it('should dispatch updateReservationTimestamp when event times changed is confirmed', () => {
       rooms$.next([mockRoom1]);
       fixture.detectChanges();
-      dialogSpy.and.returnValue({ afterClosed: () => of(true) } as any);
+      dialogSpy.open.and.returnValue({ afterClosed: () => of(true) } as any);
 
       const oldStart = new Date(2024, 5, 15, 10, 0);
       const newStart = new Date(2024, 5, 15, 11, 0);
@@ -554,7 +556,7 @@ describe('CalendarComponent', () => {
 
       component.eventTimesChanged({ event, newStart, newEnd, type: '' } as any);
 
-      expect(dialogSpy).toHaveBeenCalled();
+      expect(dialogSpy.open).toHaveBeenCalled();
       expect(storeSpy.dispatch).toHaveBeenCalledWith(
         jasmine.objectContaining({
           type: updateReservationTimestamp.type,
@@ -565,7 +567,7 @@ describe('CalendarComponent', () => {
     it('should revert event times when eventTimesChanged is cancelled', () => {
       rooms$.next([mockRoom1]);
       fixture.detectChanges();
-      dialogSpy.and.returnValue({ afterClosed: () => of(false) } as any);
+      dialogSpy.open.and.returnValue({ afterClosed: () => of(false) } as any);
 
       const oldStart = new Date(2024, 5, 15, 10, 0);
       const oldEnd = new Date(2024, 5, 15, 11, 0);
@@ -592,7 +594,7 @@ describe('CalendarComponent', () => {
 
     it('should not trigger eventTimesChanged when start date is the same', () => {
       const start = new Date(2024, 5, 15, 10, 0);
-      dialogSpy.and.returnValue({ afterClosed: () => of(false) } as any);
+      dialogSpy.open.and.returnValue({ afterClosed: () => of(false) } as any);
       const event: CalendarEvent = {
         id: 'reservation-123',
         start: start,
@@ -603,7 +605,7 @@ describe('CalendarComponent', () => {
 
       component.eventTimesChanged({ event, newStart: start, newEnd: new Date(2024, 5, 15, 11, 0), type: '' } as any);
 
-      expect(dialogSpy).not.toHaveBeenCalled();
+      expect(dialogSpy.open).not.toHaveBeenCalled();
     });
   });
 
@@ -684,7 +686,7 @@ describe('CalendarComponent', () => {
       authUserSignal.update(prev => ({ ...prev, isDarkMode: false, professionalId: 'prof-1', isRoomAdmin: true }));
       fixture.detectChanges();
 
-      dialogSpy.and.returnValue({ afterClosed: () => of(true) } as any);
+      dialogSpy.open.and.returnValue({ afterClosed: () => of(true) } as any);
 
       const event: CalendarEvent = {
         id: 'reservation-123',
@@ -718,7 +720,7 @@ describe('CalendarComponent', () => {
       authUserSignal.update(prev => ({ ...prev, isDarkMode: false, professionalId: 'prof-1', isRoomAdmin: false }));
       fixture.detectChanges();
 
-      dialogSpy.and.returnValue({ afterClosed: () => of(true) } as any);
+      dialogSpy.open.and.returnValue({ afterClosed: () => of(true) } as any);
 
       const event: CalendarEvent = {
         id: 'reservation-123',

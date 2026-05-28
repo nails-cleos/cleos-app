@@ -1,17 +1,29 @@
 import { ChangeDetectionStrategy, Component, computed, inject, Signal } from '@angular/core';
-import { AppMaterialModule } from '../../util/app-material.module';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { IUser, IUserAll } from '../../interfaces/user';
 import { combineLatestWith } from 'rxjs';
 import { requireMatch } from '../../util/validators';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { map, startWith } from 'rxjs/operators';
 import { cleanUser, getAllDisableUsers } from '../../store/user.actions';
 import { UserState } from '../../store/reducers/user.reducers';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getAllUsersPipe } from '../../store/selectors/user.selectors';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatList, MatListItem } from '@angular/material/list';
+import { MatButton } from '@angular/material/button';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
 
 type SelectUserForm = {
   user: FormControl<IUserAll | undefined>;
@@ -25,7 +37,9 @@ export type SelectUserDialogData = {
 @Component({
   selector: 'app-select-user-dialog-component',
   templateUrl: './select-user-dialog.component.html',
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
+  imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatList, MatListItem, MatButton, TranslatePipe,
+    MatAutocomplete, MatError, MatAutocompleteTrigger, MatCard, MatCardHeader, MatCardTitle, MatCardContent,
+    MatDialogTitle, MatDialogContent, MatDialogActions, ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SelectUserDialogComponent {

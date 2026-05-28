@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, ElementRef, HostListener, inject, input, output } from '@angular/core';
 import { IFabMenu } from '../../../interfaces/reservation';
-import { AppMaterialModule } from '../../../util/app-material.module';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-fab-menu',
   templateUrl: './fab-menu.component.html',
   styleUrls: ['./fab-menu.component.scss'],
-  imports: [AppMaterialModule],
+  imports: [MatIcon, MatButton],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FabMenuComponent {

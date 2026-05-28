@@ -1,17 +1,16 @@
 import { Component, computed, effect, inject, viewChild } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Store } from '@ngrx/store';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../interfaces/pagination';
 import { DocumentState } from '../store/reducers/document.reducers';
 import { cleanDocument, documentDownloadZip, documentView, getDocumentsPage } from '../store/document.actions';
 import { DriveAccessService } from '../services/drive-access.service';
-import { SharedModule } from '../shared/shared.module';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { requireMatch } from '../util/validators';
 import { IOfficeAll } from '../interfaces/office';
 import { map, startWith } from 'rxjs/operators';
@@ -20,11 +19,35 @@ import { IDocument } from '../interfaces/document';
 import { OfficeState } from '../store/reducers/office.reducers';
 import { getMyOfficesPipe } from '../store/selectors/office.selectors';
 import { getDocumentResponsePipe, getDocumentsPagePipe } from '../store/selectors/document.selectors';
-import { DateAdapter } from '@angular/material/core';
-import { YearMonthAdapter } from '../util/adapter/year-month.adapter';
+import { MatOption } from '@angular/material/core';
+import { provideYearMonthDateAdapter } from '../util/adapter/app-date.provider';
 import { getDateFormat, getDateQuarter, getNowTimeZone, monthViewTitle } from '../util/dates';
-import { MatDatepicker } from '@angular/material/datepicker';
+import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { EnvService } from '../services/env.service';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatSuffix } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
+import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { DatePipe } from '@angular/common';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
 
 type DocumentsForm = {
   office: FormControl<IOfficeAll | undefined>;
@@ -33,9 +56,14 @@ type DocumentsForm = {
 
 @Component({
   selector: 'app-document',
-  imports: [SharedModule],
+  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatOption,
+    MatIcon, MatList, MatListItem, MatListSubheaderCssMatStyler, MatIconButton, MatButton, ReactiveFormsModule,
+    TranslatePipe, DatePipe, MatAutocomplete, MatError, MatTable, MatSort, MatColumnDef, MatHeaderCellDef,
+    MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell,
+    MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, MatSuffix,
+    MatAutocompleteTrigger],
   templateUrl: './document.component.html',
-  providers: [{ provide: DateAdapter, useClass: YearMonthAdapter }],
+  providers: [...provideYearMonthDateAdapter()],
   styleUrl: './document.component.scss',
 })
 export class DocumentComponent {
@@ -171,7 +199,7 @@ export class DocumentComponent {
     if (!office || !date) {
       return;
     }
-    const fileName = `${office.name} Q${getDateQuarter(date)} ${monthViewTitle(date)}.zip`;
+    const fileName = `${ office.name } Q${ getDateQuarter(date) } ${ monthViewTitle(date) }.zip`;
     this.store.dispatch(documentDownloadZip({ officeId: office.id, date: getDateFormat(date), fileName }));
   };
 

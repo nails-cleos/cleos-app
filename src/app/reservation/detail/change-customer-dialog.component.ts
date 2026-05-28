@@ -3,15 +3,25 @@ import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Va
 import { IUser, IUserAll } from '../../interfaces/user';
 import { combineLatestWith } from 'rxjs';
 import { requireMatch } from '../../util/validators';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { map, startWith } from 'rxjs/operators';
 import { cleanUser, getAllCustomers } from '../../store/user.actions';
-import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
 import { UserState } from '../../store/reducers/user.reducers';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getAllCustomersPipe } from '../../store/selectors/user.selectors';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 
 type ChangeCustomerForm = {
   customer: FormControl<IUserAll | undefined>,
@@ -25,7 +35,8 @@ type ChangeCustomerDialogData = {
 @Component({
   selector: 'app-change-customer-dialog-component',
   templateUrl: './change-customer-dialog.component.html',
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
+  imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, TranslatePipe, MatAutocomplete, MatError,
+    MatAutocompleteTrigger, ReactiveFormsModule, MatDialogTitle, MatDialogContent, MatDialogActions],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChangeCustomerDialogComponent {

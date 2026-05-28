@@ -8,7 +8,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { combineLatestWith } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { getOfficeToInvoice, updateOfficeById, uploadInvoices } from '../store/invoice.actions';
@@ -16,8 +16,8 @@ import { backendFormatDate, datesInSameWeek, invoiceFormat, newDateTimestamp } f
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { IPaymentOption } from '../interfaces/payment';
 import { map, startWith } from 'rxjs/operators';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { TranslateService } from '@ngx-translate/core';
+import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
@@ -25,15 +25,18 @@ import { IInvoice } from '../interfaces/invoice';
 import { IOffice, IOfficeAll, Office } from '../interfaces/office';
 import { pdf } from '../util/invoice';
 import { requireMatch } from '../util/validators';
-import { SharedModule } from '../shared/shared.module';
 import { TimeDetailPipe } from '../pipes/time-detail.pipe';
 import { getInvoicesPipe } from '../store/selectors/invoice.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../interfaces/pagination';
 import { InvoiceState } from '../store/reducers/invoice.reducers';
-import { MAT_DATE_RANGE_SELECTION_STRATEGY } from '@angular/material/datepicker';
-import { MonthPeriodAdapter } from '../util/adapter/month-period-adapter.service';
+import {
+  MatEndDate,
+  MatDatepickerToggle,
+  MatDateRangeInput, MatDateRangePicker, MatStartDate,
+} from '@angular/material/datepicker';
+import { provideMonthPeriodAdapter } from '../util/adapter/app-date.provider';
 import { DriveAccessService } from '../services/drive-access.service';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { getMyOfficesPipe } from '../store/selectors/office.selectors';
@@ -41,6 +44,31 @@ import { OfficeState } from '../store/reducers/office.reducers';
 import { EnvService } from '../services/env.service';
 import { getPaymentOptionsPipe } from '../store/selectors/payment.selectors';
 import { PaymentState } from '../store/reducers/payment.reducers';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { DatePipe, NgClass } from '@angular/common';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatChipGrid, MatChipInput, MatChipRow } from '@angular/material/chips';
 
 // Set up VFS fonts for pdfMake (provides fallback Roboto fonts)
 (pdfMake as any).vfs = (pdfFonts as any).pdfMake?.vfs || pdfFonts;
@@ -61,13 +89,13 @@ type DateRangeForm = {
   selector: 'app-invoice',
   templateUrl: './invoice.component.html',
   styleUrls: ['./invoice.component.scss'],
-  imports: [SharedModule, TimeDetailPipe, BackButtonDirective],
-  providers: [
-    {
-      provide: MAT_DATE_RANGE_SELECTION_STRATEGY,
-      useClass: MonthPeriodAdapter,
-    },
-  ],
+  imports: [TimeDetailPipe, MatFormField, MatLabel, MatInput, MatDatepickerToggle, MatOption, MatIcon, MatList,
+    MatListItem, MatListSubheaderCssMatStyler, MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe, NgClass,
+    DatePipe, MatAutocomplete, MatError, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
+    MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow,
+    MatFooterRow, MatFooterRowDef, MatAutocompleteTrigger, TimeDetailPipe, BackButtonDirective, MatCheckbox,
+    MatChipGrid, MatChipRow, MatChipInput, MatDateRangeInput, MatDateRangePicker, MatStartDate, MatEndDate],
+  providers: [...provideMonthPeriodAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InvoiceComponent {

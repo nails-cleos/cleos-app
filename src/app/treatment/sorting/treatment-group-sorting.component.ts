@@ -7,16 +7,16 @@ import {
 import { Store } from '@ngrx/store';
 import { getAllTreatmentsGroup, sortGroupTreatment } from '../../store/treatment.actions';
 import { ITreatmentGroupAll } from '../../interfaces/treatment';
-import { SharedModule } from '../../shared/shared.module';
-import { getTreatmentResponsePipe, getTreatmentGroupListPipe } from '../../store/selectors/treatment.selectors';
+import { getTreatmentGroupListPipe, getTreatmentResponsePipe } from '../../store/selectors/treatment.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { TreatmentState } from '../../store/reducers/treatment.reducers';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-treatment-group-sorting',
   templateUrl: './treatment-sorting.component.html',
   styleUrls: ['./treatment-group-sorting.component.scss'],
-  imports: [SharedModule, DragDropSortingComponent],
+  imports: [TranslatePipe, DragDropSortingComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreatmentGroupSortingComponent {

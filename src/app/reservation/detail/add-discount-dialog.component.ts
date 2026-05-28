@@ -1,13 +1,23 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { cleanDiscount, getUserDiscountByCustomerId } from '../../store/discount.actions';
-import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
 import { DiscountState } from '../../store/reducers/discount.reducers';
 import { getUserDiscountsPipe } from '../../store/selectors/discount.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatError, MatFormField, MatLabel } from '@angular/material/input';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
 
 type DiscountForm = {
   discount: FormControl<string>;
@@ -20,7 +30,8 @@ type DiscountDialogData = {
 @Component({
   selector: 'app-add-discount-dialog-component',
   templateUrl: './add-discount-dialog.component.html',
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
+  imports: [MatFormField, MatLabel, MatSelect, MatOption, MatIcon, MatButton, TranslatePipe, MatError,
+    ReactiveFormsModule, MatDialogTitle, MatDialogContent, MatDialogActions],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddDiscountDialogComponent {

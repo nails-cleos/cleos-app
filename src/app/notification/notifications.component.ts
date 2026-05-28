@@ -2,15 +2,18 @@ import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@ang
 import { Store } from '@ngrx/store';
 import { INotification } from '../interfaces/notification';
 import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../services/navigation.service';
 import { zoneDateToDate } from '../util/dates';
-import { SharedModule } from '../shared/shared.module';
 import { deleteNotification, getNotificationsPage, readNotification } from '../store/notification.actions';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { getNotificationsPipe } from '../store/selectors/notification.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NotificationState } from '../store/reducers/notification.reducers';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { DatePipe } from '@angular/common';
+import { MatTooltip } from '@angular/material/tooltip';
 
 const NOTIFICATION_LEAVE_ANIMATION_MS = 260;
 
@@ -18,7 +21,7 @@ const NOTIFICATION_LEAVE_ANIMATION_MS = 260;
   selector: 'app-notifications',
   templateUrl: './notifications.component.html',
   styleUrls: ['./notifications.component.scss'],
-  imports: [SharedModule],
+  imports: [MatIcon, MatIconButton, MatButton, TranslatePipe, DatePipe, MatTooltip],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationsComponent {

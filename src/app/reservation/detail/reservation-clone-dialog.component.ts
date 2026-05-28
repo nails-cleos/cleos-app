@@ -1,12 +1,23 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { filterDateRoom, getAvailability, getNowTimeZone, getStartEndDay, getTime } from '../../util/dates';
 import { addMonths } from 'date-fns';
 import { MAX_RESERVATION_MONTH } from '../../interfaces/reservation';
-import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
 import { IRoomAll } from '../../interfaces/room';
+import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { TimepickerComponent } from '../../shared/clock-timepicker/timepicker.component';
+import { TimepickerDirective } from '../../shared/clock-timepicker/timepicker.directive';
 
 type CloneForm = {
   date: FormControl<Date | undefined>,
@@ -22,7 +33,9 @@ type CloneDialogData = {
   selector: 'app-reservation-clone-dialog',
   templateUrl: './reservation-clone-dialog.component.html',
   styleUrl: './reservation-clone-dialog.component.scss',
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
+  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatIcon,
+    MatButton, TranslatePipe, MatError, MatPrefix, ReactiveFormsModule, TimepickerComponent, TimepickerDirective,
+    MatDialogContent, MatDialogTitle, MatDialogActions],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationCloneDialogComponent {

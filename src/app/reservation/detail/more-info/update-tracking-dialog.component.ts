@@ -1,9 +1,20 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { API_LOCALE, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
-import { AppMaterialModule } from '../../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
+import { MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { TimepickerComponent } from '../../../shared/clock-timepicker/timepicker.component';
+import { TimepickerDirective } from '../../../shared/clock-timepicker/timepicker.directive';
 
 type TrackingForm = {
   startedDate: FormControl<Date | undefined>;
@@ -21,7 +32,9 @@ type TrackingDialogData = {
   selector: 'app-update-tracking-dialog',
   templateUrl: './update-tracking-dialog.component.html',
   styleUrl: './update-tracking-dialog.component.scss',
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
+  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatIcon,
+    MatButton, TranslatePipe, MatPrefix, ReactiveFormsModule, MatDialogTitle, MatDialogContent, TimepickerComponent,
+    TimepickerDirective, MatDialogActions],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UpdateTrackingDialogComponent {

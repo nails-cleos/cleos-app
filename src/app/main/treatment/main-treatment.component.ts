@@ -5,16 +5,16 @@ import { NgClass, NgOptimizedImage } from '@angular/common';
 import { getCurrentLangPipe, getCurrentTreatmentIdPipe } from '../../store/selectors/main.selectors';
 import { Store } from '@ngrx/store';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { AppMaterialModule } from '../../util/app-material.module';
 import { MainState } from '../../store/reducers/main.reducers';
 import { combineLatest, map, of, switchMap } from 'rxjs';
 import { TranslateLoaderFactory } from '../../shared/translate-loader.factory';
+import { MatDivider, MatList } from '@angular/material/list';
 
 @Component({
   selector: 'app-main-treatment',
   templateUrl: './main-treatment.component.html',
   styleUrl: './main-treatment.component.scss',
-  imports: [AppMaterialModule, NgOptimizedImage, NgClass],
+  imports: [MatList, NgOptimizedImage, NgClass, MatDivider],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainTreatmentComponent {

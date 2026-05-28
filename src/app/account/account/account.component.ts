@@ -1,28 +1,32 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, Signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { combineLatestWith } from 'rxjs';
 import { getAccountByCustomerId, updateAccount } from '../../store/account.actions';
 import { IAccountAll, ITransaction, Transaction } from '../../interfaces/account';
 import { ICurrency, ICurrencyAll } from '../../interfaces/currency';
 import { map, startWith } from 'rxjs/operators';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../util/validators';
 import { AuthUserService } from '../../services/auth-user.service';
 import { getLocale } from '../../util/helper';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../shared/shared.module';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BalanceComponent } from '../balance/balance.component';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import {
-  getCurrentCustomerIdPipe,
   getAccountResponsePipe,
+  getCurrentCustomerIdPipe,
   getSelectedAccountPipe,
   getSubErrorsPipe,
 } from '../../store/selectors/account.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../../interfaces/common';
 import { AccountState } from '../../store/reducers/account.reducers';
+import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatOption } from '@angular/material/core';
 
 type BalanceForm = {
   currency: FormControl<ICurrencyAll | undefined>;
@@ -33,7 +37,9 @@ type BalanceForm = {
   selector: 'app-account',
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.scss'],
-  imports: [SharedModule, BalanceComponent, BackButtonDirective],
+  imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, ReactiveFormsModule, TranslatePipe,
+    RouterLink, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix, BackButtonDirective, BalanceComponent,
+    BackButtonDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountComponent {

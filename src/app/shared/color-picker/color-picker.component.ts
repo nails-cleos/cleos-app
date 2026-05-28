@@ -1,7 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, effect, input, signal } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { SharedModule } from '../shared.module';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { lightenDarkenColor } from '../../util/color';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatIconButton } from '@angular/material/button';
+import { MatCard, MatCardContent, MatCardHeader, MatCardSubtitle } from '@angular/material/card';
 
 type PreviewMode = 'dark' | 'light';
 
@@ -9,7 +11,8 @@ type PreviewMode = 'dark' | 'light';
   selector: 'app-color-picker',
   templateUrl: './color-picker.component.html',
   styleUrls: ['./color-picker.component.scss'],
-  imports: [SharedModule],
+  imports: [MatFormField, MatLabel, MatInput, MatIconButton, ReactiveFormsModule, MatError, MatCard, MatCardHeader,
+    MatCardSubtitle, MatCardContent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ColorPickerComponent {

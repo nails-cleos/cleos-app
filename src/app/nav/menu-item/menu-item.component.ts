@@ -5,13 +5,14 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDrawer } from '@angular/material/sidenav';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { AppMaterialModule } from '../../util/app-material.module';
+import { MatIcon } from '@angular/material/icon';
+import { MatListItem, MatListItemIcon, MatNavList } from '@angular/material/list';
 
 @Component({
   selector: 'app-menu-item',
   templateUrl: './menu-item.component.html',
   styleUrls: ['./menu-item.component.scss'],
-  imports: [AppMaterialModule, RouterLinkActive, RouterLink],
+  imports: [MatIcon, MatListItem, RouterLink, MatListItemIcon, RouterLinkActive, MatNavList],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuItemComponent {

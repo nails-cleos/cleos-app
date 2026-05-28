@@ -1,30 +1,42 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { NonNullableFormBuilder } from '@angular/forms';
+import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { getPayment, updatePaymentById } from '../../../store/payment.actions';
-import {
-  IPaymentOption,
-  PaymentPercentage,
-} from '../../../interfaces/payment';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../../shared/shared.module';
+import { IPaymentOption, PaymentPercentage } from '../../../interfaces/payment';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BankComponent, BankForm } from '../../../shared/bank/bank.component';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
 import { IReservationPayment } from '../../../interfaces/reservation';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 import {
-  getCurrentPaymentIdPipe, getPaymentOptionsPipe,
+  getCurrentPaymentIdPipe,
+  getPaymentOptionsPipe,
   getSelectedPaymentPipe,
 } from '../../../store/selectors/payment.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FirebaseService } from '../../../services/firebase.service';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { DecimalPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import {
+  MatCard,
+  MatCardActions,
+  MatCardContent,
+  MatCardHeader,
+  MatCardSubtitle,
+  MatCardTitle,
+} from '@angular/material/card';
 
 @Component({
   selector: 'app-me-payment',
   templateUrl: './me-payment.component.html',
   styleUrls: ['./me-payment.component.scss'],
-  imports: [SharedModule, BankComponent, BackButtonDirective, CurrencySymbolPipe],
+  imports: [MatIcon, MatIconButton, MatButton, ReactiveFormsModule,
+    TranslatePipe, DecimalPipe, RouterLink, BankComponent, BackButtonDirective, CurrencySymbolPipe, MatCard,
+    MatCardHeader, MatCardTitle, MatCardSubtitle,
+    MatCardContent, MatCardActions],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MePaymentComponent {

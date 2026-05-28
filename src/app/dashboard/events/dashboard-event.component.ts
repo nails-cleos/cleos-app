@@ -20,7 +20,7 @@ import {
   subPeriod,
 } from '../../util/dates';
 import { Store } from '@ngrx/store';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ICalendarNote, ICalendarReservations, IProfessionalEvent } from '../../interfaces/dashboard';
 import { getMyEvent, updateEvent } from '../../store/dashboard.actions';
 import { approveReservation, startReservation } from '../../store/reservation.actions';
@@ -39,21 +39,24 @@ import { createEventColor, getProfessionalColor } from '../../util/color';
 import { CalendarDialogComponent } from '../../shared/dialog/calendar/calendar-dialog.component';
 import { currencySymbol, executeDialogNoWidth, FrequencyEnum } from '../../util/helper';
 import { AuthUserService } from '../../services/auth-user.service';
-import { SharedModule } from '../../shared/shared.module';
 import { CounterComponent } from '../../util/counter/counter.component';
 import { findStateColor } from '../../util/theme';
 import { DataEvent, IDataEvent } from '../../util/event';
-import { MatDatepicker } from '@angular/material/datepicker';
+import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
 import { getDashboardNavigationParamsPipe, getEventDashboardPipe } from '../../store/selectors/dashboard.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatInput } from '@angular/material/input';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard-event.component.html',
   styleUrls: ['./dashboard-event.component.scss'],
-  imports: [SharedModule, DayViewSchedulerComponent, CounterComponent, CalendarDatePipe],
+  imports: [DayViewSchedulerComponent, CounterComponent, CalendarDatePipe, MatIcon, MatButton,
+    MatDatepickerInput, MatDatepicker, MatInput, TranslatePipe],
   providers: [DayViewSchedulerCalendarUtils],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

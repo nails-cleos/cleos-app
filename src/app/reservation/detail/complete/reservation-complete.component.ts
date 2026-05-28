@@ -10,7 +10,7 @@ import {
 } from '../../../store/reservation.actions';
 import { IExtras } from '../../../interfaces/reservation';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IPaymentOption } from '../../../interfaces/payment';
 import {
@@ -23,15 +23,14 @@ import {
   newPrice,
 } from '../../../util/helper';
 import { API_LOCALE, getDiffTime, getNowTimeZone, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
 import { IAdditionalAll } from '../../../interfaces/additional';
-import { MatListOption } from '@angular/material/list';
+import { MatListOption, MatSelectionList } from '@angular/material/list';
 import { IService } from '../../../interfaces/room';
 import { IColorAll } from '../../../interfaces/color';
 import { DialogComponent } from '../../../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { SharedModule } from '../../../shared/shared.module';
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
 import { DurationTimePipe } from '../../../pipes/durationTime.pipe';
@@ -50,6 +49,15 @@ import {
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 import { getPaymentOptionsPipe } from '../../../store/selectors/payment.selectors';
+import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { TimepickerDirective } from '../../../shared/clock-timepicker/timepicker.directive';
+import { TimepickerComponent } from '../../../shared/clock-timepicker/timepicker.component';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 type ReservationCompleteForm = {
   group: FormControl<IGroupService | undefined>;
@@ -65,8 +73,11 @@ type ReservationCompleteForm = {
   selector: 'app-reservation-complete',
   templateUrl: './reservation-complete.component.html',
   styleUrls: ['./reservation-complete.component.scss'],
-  imports: [SharedModule, TimeDetailPipe, CurrencySymbolPipe, DurationTimePipe, FormFieldAdderComponent,
-    PaymentOptionSelectComponent, PricePreviewComponent, BackButtonDirective],
+  imports: [TimeDetailPipe, MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, ReactiveFormsModule,
+    TranslatePipe, DecimalPipe, NgClass, DatePipe, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix,
+    BackButtonDirective, CurrencySymbolPipe, TimeDetailPipe, CurrencySymbolPipe, DurationTimePipe,
+    FormFieldAdderComponent, PaymentOptionSelectComponent, PricePreviewComponent, BackButtonDirective,
+    TimepickerDirective, TimepickerComponent, MatSelectionList, MatListOption, MatCheckbox],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationCompleteComponent {

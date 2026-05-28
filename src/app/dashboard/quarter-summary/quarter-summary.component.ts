@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { getQuarterSummary } from '../../store/dashboard.actions';
-import { FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import {
   IMonthSummary,
   ISummaryRoom,
@@ -13,16 +13,15 @@ import {
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { Router } from '@angular/router';
-import { MatDatepicker } from '@angular/material/datepicker';
+import { Router, RouterLink } from '@angular/router';
+import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { dateMonthYear, getDateQuarter, getNowTimeZone } from '../../util/dates';
 import { AuthUserService } from '../../services/auth-user.service';
 import { allElementsHaveSameKeyFilterValue, currencySymbol, getCurrencyFromRoom } from '../../util/helper';
 import { ICurrencyAll } from '../../interfaces/currency';
 import { createQuarterSummary } from '../../util/report';
 import fs from 'file-saver';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../shared/shared.module';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { QuarterComponent } from './quarter/quarter.component';
 import { TotalSummaryComponent } from '../total-summary/total-summary.component';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -32,8 +31,14 @@ import {
   isDashboardLoadingPipe,
 } from '../../store/selectors/dashboard.selectors';
 import { DashboardState } from '../../store/reducers/dashboard.reducers';
-import { DateAdapter } from '@angular/material/core';
-import { YearAdapter } from '../../util/adapter/year.adapter';
+import { MatOption } from '@angular/material/core';
+import { provideYearDateAdapter } from '../../util/adapter/app-date.provider';
+import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatSuffix } from '@angular/material/form-field';
+import { MatSelect } from '@angular/material/select';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { KeyValuePipe } from '@angular/common';
 
 type QuarterSummaryForm = {
   selectedRoom: FormControl<ISummaryRoom | 'All' | undefined>;
@@ -45,8 +50,10 @@ type QuarterSummaryForm = {
   selector: 'app-quarter-summary',
   templateUrl: './quarter-summary.component.html',
   styleUrls: ['./quarter-summary.component.scss'],
-  imports: [SharedModule, QuarterComponent, TotalSummaryComponent],
-  providers: [{ provide: DateAdapter, useClass: YearAdapter }],
+  imports: [QuarterComponent, TotalSummaryComponent, MatFormField, MatLabel, MatInput, MatDatepicker,
+    MatDatepickerInput, MatDatepickerToggle, MatSelect, MatOption, MatButton, MatIcon, MatSuffix,
+    ReactiveFormsModule, TranslatePipe, KeyValuePipe, RouterLink],
+  providers: [...provideYearDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuarterSummaryComponent {

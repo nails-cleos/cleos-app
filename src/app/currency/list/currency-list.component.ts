@@ -1,26 +1,55 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { ICurrency } from '../../interfaces/currency';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { clean, currencySelected, deleteCurrency, getCurrenciesPage } from '../../store/currency.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { executeDialogNoWidth } from '../../util/helper';
-import { SharedModule } from '../../shared/shared.module';
 import { getCurrencyPaginationPipe, getCurrencyResponsePipe } from '../../store/selectors/currency.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CurrencyState } from '../../store/reducers/currency.reducers';
+import { MatIcon } from '@angular/material/icon';
+import { MatIconButton } from '@angular/material/button';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
+import { RouterLink } from '@angular/router';
+import {
+  MatList,
+  MatListItem,
+  MatListItemIcon,
+  MatListItemTitle,
+  MatListSubheaderCssMatStyler,
+} from '@angular/material/list';
 
 @Component({
   selector: 'app-currency-list',
   templateUrl: './currency-list.component.html',
   styleUrls: ['./currency-list.component.scss'],
-  imports: [SharedModule],
+  imports: [MatIcon, MatList, MatListItem, MatListSubheaderCssMatStyler, MatIconButton,
+    TranslatePipe, RouterLink, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
+    MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow,
+    MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, MatListItemTitle],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CurrencyListComponent {
@@ -79,10 +108,11 @@ export class CurrencyListComponent {
   delete = (currency: ICurrency): void => {
     const title = this.translate.instant('CURRENCY.DELETED.TITLE');
     const content = this.translate.instant('CURRENCY.DELETED.CONTENT', { code: currency.code });
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: currency, variant: 'warning' }, result => {
-      if (result) {
-        this.store.dispatch(deleteCurrency({ id: result.id, code: result.code }));
-      }
-    });
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: currency, variant: 'warning' },
+      result => {
+        if (result) {
+          this.store.dispatch(deleteCurrency({ id: result.id, code: result.code }));
+        }
+      });
   };
 }

@@ -1,13 +1,13 @@
 import { Component, computed, effect, ElementRef, HostListener, inject, signal, untracked } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ActivatedRoute, NavigationStart, Router, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { IUser, User } from '../interfaces/user';
 import { logOut, redirect } from '../store/auth.actions';
 import { getNotificationsPage, readNotification } from '../store/notification.actions';
 import { updateMyUser } from '../store/user.actions';
 import { INotification } from '../interfaces/notification';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessagingService } from '../services/messaging.service';
 import { getDisplayNameInitials, getLocale, getUserImage } from '../util/helper';
 import { NavigationService } from '../services/navigation.service';
@@ -19,7 +19,6 @@ import { ThemeService } from 'ng2-charts';
 import { AuthUserService } from '../services/auth-user.service';
 import { SeoService } from '../services/seo.service';
 import { newDateTimestamp } from '../util/dates';
-import { SharedModule } from '../shared/shared.module';
 import { MenuItemComponent } from './menu-item/menu-item.component';
 import { ErrorComponent } from '../shared/error/error.component';
 import { ToastService } from '../services/toast.service';
@@ -34,12 +33,26 @@ import { IResponseSuccess } from '../interfaces/common';
 import { EnvService } from '../services/env.service';
 import { LoadingOverlayService } from '../services/loading-overlay.service';
 import { clearGlobalError, clearGlobalResponse } from '../store/global.actions';
+import { MatIcon } from '@angular/material/icon';
+import { MatDivider, MatListItem, MatListItemIcon, MatNavList } from '@angular/material/list';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { DatePipe, UpperCasePipe } from '@angular/common';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle } from '@angular/material/card';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatDrawer, MatDrawerContainer, MatDrawerContent } from '@angular/material/sidenav';
+import { AvatarComponent } from '../shared/avatar/avatar.component';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatBadge } from '@angular/material/badge';
 
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.scss'],
-  imports: [SharedModule, MenuItemComponent, RouterLinkActive, RouterOutlet, ErrorComponent],
+  imports: [MatIcon, MatListItem, MatIconButton, MatButton, TranslatePipe, RouterLink, DatePipe,
+    MatTooltip, MatListItemIcon, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent,
+    MenuItemComponent, RouterLinkActive, RouterOutlet, ErrorComponent, MatProgressSpinner, MatDrawerContainer,
+    MatDrawer, AvatarComponent, UpperCasePipe, MatDivider, MatNavList, MatDrawerContent, MatToolbar, MatBadge],
 })
 export class NavComponent {
   private readonly elementRef: ElementRef = inject(ElementRef);

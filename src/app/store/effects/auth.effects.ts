@@ -41,8 +41,8 @@ export class LoginEffects {
         const decodedURI = state.returnUrl;
         const paramsIndex = decodedURI.indexOf('?');
         if (paramsIndex > -1) {
-          const queryParams = JSON.parse('{"' + decodeURI(decodedURI?.slice(paramsIndex + 1)
-            ?.replace(/&/g, '","')?.replace(/=/g, '":"')) + '"}');
+          const queryString = decodedURI.slice(paramsIndex + 1);
+          const queryParams = Object.fromEntries(new URLSearchParams(queryString).entries());
           this.navigationService.reload(decodedURI?.slice(0, paramsIndex)?.split('/'), state.data, queryParams);
         } else {
           if (decodedURI) {

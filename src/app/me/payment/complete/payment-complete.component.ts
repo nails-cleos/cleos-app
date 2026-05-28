@@ -4,7 +4,6 @@ import { Store } from '@ngrx/store';
 import { paymentNotComplete, paymentSave } from '../../../store/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { PaymentStatus } from '../../../interfaces/payment';
-import { SharedModule } from '../../../shared/shared.module';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
@@ -17,7 +16,7 @@ import {
   selector: 'app-payment-complete',
   templateUrl: './payment-complete.component.html',
   styleUrls: ['./payment-complete.component.scss'],
-  imports: [SharedModule],
+  imports: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 // TODO remove?

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
-import { MatDatepicker } from '@angular/material/datepicker';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
   dateMonthYear,
@@ -17,7 +17,7 @@ import {
   getMonthlySummaryMapPipe,
   isDashboardLoadingPipe,
 } from '../../store/selectors/dashboard.selectors';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { getMonthlySummary, updateMonthlySummary } from '../../store/dashboard.actions';
 import {
   AmountFormat,
@@ -40,18 +40,40 @@ import {
   getTimeZoneFromRoom,
   titleCase,
 } from '../../util/helper';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthUserService } from '../../services/auth-user.service';
 import fs from 'file-saver';
 import { createMonthlyExpenseWorkbook, createMonthlyIncomeWorkbook, createMonthlySummary } from '../../util/report';
-import { SharedModule } from '../../shared/shared.module';
 import { FilterByPipe } from '../../pipes/filterBy.pipe';
 import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
 import { TwoDigitsDirective } from '../../directives/two-digits.directive';
 import { DashboardState } from '../../store/reducers/dashboard.reducers';
-import { YearMonthAdapter } from '../../util/adapter/year-month.adapter';
-import { DateAdapter } from '@angular/material/core';
+import { MatOption } from '@angular/material/core';
+import { provideYearMonthDateAdapter } from '../../util/adapter/app-date.provider';
 import { EnvService } from '../../services/env.service';
+import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatSuffix } from '@angular/material/form-field';
+import { MatSelect } from '@angular/material/select';
+import { MatIcon } from '@angular/material/icon';
+import { MatList, MatListItem, MatListSubheaderCssMatStyler } from '@angular/material/list';
+import {
+  MatAccordion,
+  MatExpansionPanel,
+  MatExpansionPanelActionRow,
+  MatExpansionPanelDescription,
+  MatExpansionPanelHeader,
+  MatExpansionPanelTitle,
+} from '@angular/material/expansion';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import {
+  CurrencyPipe,
+  DatePipe,
+  DecimalPipe,
+  KeyValuePipe,
+  NgClass,
+  NgTemplateOutlet,
+  SlicePipe,
+} from '@angular/common';
 
 type MonthlySummaryForm = {
   date: FormControl<Date>;
@@ -63,8 +85,13 @@ type MonthlySummaryForm = {
   selector: 'app-month-summary',
   templateUrl: './month-summary.component.html',
   styleUrls: ['./month-summary.component.scss'],
-  imports: [SharedModule, FilterByPipe, TimeDetailPipe, TwoDigitsDirective],
-  providers: [{ provide: DateAdapter, useClass: YearMonthAdapter }],
+  imports: [FilterByPipe, TimeDetailPipe, TwoDigitsDirective, MatFormField, MatLabel, MatInput,
+    MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatSelect, MatOption, MatIcon, MatList, MatListItem,
+    MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription,
+    MatListSubheaderCssMatStyler, MatIconButton, MatExpansionPanelActionRow, MatButton, ReactiveFormsModule,
+    TranslatePipe, KeyValuePipe, CurrencyPipe, DecimalPipe, NgClass, RouterLink, NgTemplateOutlet, DatePipe,
+    SlicePipe, MatSuffix],
+  providers: [...provideYearMonthDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MonthSummaryComponent {
@@ -499,7 +526,7 @@ export class MonthSummaryComponent {
       const blob = new Blob([content], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
-      fs.saveAs(blob, `Report_${title.replace(' ', '_')}.xlsx`);
+      fs.saveAs(blob, `Report_${ title.replace(' ', '_') }.xlsx`);
     });
   };
 
@@ -510,8 +537,8 @@ export class MonthSummaryComponent {
     data?: IMonthlySummary[],
   ): void => {
     if (data?.length) {
-      const workbookName = `${titleCase(totalTypes.type)}-${getDateFormat(this.getForm.date.value)}`;
-      const name = this.translate.instant(`SUMMARY.${title}`);
+      const workbookName = `${ titleCase(totalTypes.type) }-${ getDateFormat(this.getForm.date.value) }`;
+      const name = this.translate.instant(`SUMMARY.${ title }`);
 
       let workbook;
       const header = monthViewTitle(this.getForm.date.value || getNowTimeZone(this.timeZone()));
@@ -541,7 +568,7 @@ export class MonthSummaryComponent {
         const blob = new Blob([content], {
           type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         });
-        fs.saveAs(blob, `${workbookName}.xlsx`);
+        fs.saveAs(blob, `${ workbookName }.xlsx`);
       });
 
       this.updateMonthlySummary(totalTypes, values);
@@ -645,7 +672,7 @@ export class MonthSummaryComponent {
 
   private getNewObject = (s: IMonthlySummary): any => {
     if (s?.paths) {
-      const paths = Array.isArray(s.paths) ? `/${this.language}/${s.paths.join('/')}` : s.paths;
+      const paths = Array.isArray(s.paths) ? `/${ this.language }/${ s.paths.join('/') }` : s.paths;
       return Object.assign({}, s, { paths });
     }
     return s;

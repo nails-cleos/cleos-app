@@ -1,5 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import {
+  CdkDrag,
+  CdkDragDrop,
+  CdkDragHandle,
+  CdkDragPreview,
+  CdkDropList,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
 import { Store } from '@ngrx/store';
 import {
   catalogueSelected,
@@ -10,19 +17,21 @@ import {
 } from '../../store/catalogue.actions';
 import { ICatalogueAll } from '../../interfaces/catalogue';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { executeDialogNoWidth } from '../../util/helper';
-import { SharedModule } from '../../shared/shared.module';
 import { getCatalogueListPipe, getCatalogueResponsePipe } from '../../store/selectors/catalogue.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CatalogueState } from '../../store/reducers/catalogue.reducers';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-catalogue-list',
   templateUrl: './catalogues.component.html',
   styleUrls: ['./catalogues.component.scss'],
-  imports: [SharedModule],
+  imports: [MatIcon, MatButton, TranslatePipe, RouterLink, CdkDropList, CdkDrag, CdkDragHandle, CdkDragPreview],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CataloguesComponent {

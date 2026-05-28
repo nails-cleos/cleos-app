@@ -1,15 +1,18 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../shared/shared.module';
 import { ErrorComponent } from '../../shared/error/error.component';
 import { IError } from '../../interfaces/common';
+import { MatCard } from '@angular/material/card';
+import { MatIcon } from '@angular/material/icon';
+import { MatSuffix } from '@angular/material/input';
+import { NgClass, PercentPipe } from '@angular/common';
 
 @Component({
   selector: 'app-mini-card',
   templateUrl: './mini-card.component.html',
   styleUrls: ['./mini-card.component.scss'],
-  imports: [SharedModule, ErrorComponent],
+  imports: [ErrorComponent, MatCard, MatIcon, MatSuffix, PercentPipe, NgClass],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MiniCardComponent {

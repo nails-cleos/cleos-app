@@ -1,10 +1,9 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal, WritableSignal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Clipboard } from '@angular/cdk/clipboard';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { AuthUserService } from '../../services/auth-user.service';
-import { SharedModule } from '../../shared/shared.module';
 import { ToastService } from '../../services/toast.service';
 import { BottomSheetShareComponent } from './bottom-sheet-share.component';
 import { BottomSheetReferralComponent } from './bottom-sheet-referral.component';
@@ -12,12 +11,14 @@ import { getReferralsPipe } from '../../store/selectors/discount.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DiscountState } from '../../store/reducers/discount.reducers';
 import { FirebaseService } from '../../services/firebase.service';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-referrals',
   templateUrl: './referrals.component.html',
   styleUrls: ['./referrals.component.scss'],
-  imports: [SharedModule],
+  imports: [MatIcon, MatButton, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReferralsComponent {

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { AppMaterialModule } from '../../util/app-material.module';
+import { MatIcon } from '@angular/material/icon';
 
 type ContactKey = 'whatsapp' | 'instagram' | 'facebook' | 'phone' | 'email';
 
@@ -9,7 +9,7 @@ type ContactKey = 'whatsapp' | 'instagram' | 'facebook' | 'phone' | 'email';
   selector: 'app-bottom-sheet-book-appointment',
   templateUrl: 'bottom-sheet-book-appointment.html',
   styleUrls: ['./bottom-sheet-book-appointment.scss'],
-  imports: [AppMaterialModule, TranslatePipe],
+  imports: [MatIcon, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BottomSheetBookAppointmentComponent {

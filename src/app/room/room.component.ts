@@ -10,7 +10,14 @@ import {
   viewChild,
 } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
-import { AbstractControl, FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { createRoom, getRoom, updateRoom } from '../store/room.actions';
 import { AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, Room } from '../interfaces/room';
@@ -22,7 +29,7 @@ import { Role } from '../interfaces/token';
 import { RoomIconName } from '../util/icon';
 import { ICurrencyAll } from '../interfaces/currency';
 import { IOfficeAll } from '../interfaces/office';
-import { MatListOption } from '@angular/material/list';
+import { MatListOption, MatSelectionList } from '@angular/material/list';
 import { IPaymentOption } from '../interfaces/payment';
 import timezones, { TimeZone } from 'timezones-list';
 import {
@@ -34,11 +41,10 @@ import {
   getTimeNumber,
   getTimeZone,
 } from '../util/dates';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { goTo } from '../util/animation';
 import { areEquals, createAddress } from '../util/helper';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../shared/shared.module';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AvailabilityComponent } from './availability/availability.component';
 import { GoogleMapComponent, GoogleMapForm } from '../shared/google-map/google-map.component';
 import { BackButtonDirective } from '../directives/back-button.directive';
@@ -55,9 +61,23 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { IError, isString } from '../interfaces/common';
 import { PaymentState } from '../store/reducers/payment.reducers';
 import { getPaymentOptionsPipe } from '../store/selectors/payment.selectors';
+import { RoomNamePipe } from '../pipes/room-name.pipe';
+import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import {
+  MatAccordion,
+  MatExpansionPanel,
+  MatExpansionPanelDescription,
+  MatExpansionPanelHeader,
+  MatExpansionPanelTitle,
+} from '@angular/material/expansion';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatChipGrid, MatChipInput, MatChipRow } from '@angular/material/chips';
+import { MatCheckbox } from '@angular/material/checkbox';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
-import { RoomNamePipe } from '../pipes/room-name.pipe';
 
 export interface IIcon {
   monday: RoomIconName;
@@ -82,7 +102,11 @@ type RoomForm = {
   selector: 'app-room',
   templateUrl: './room.component.html',
   styleUrls: ['./room.component.scss'],
-  imports: [SharedModule, AvailabilityComponent, GoogleMapComponent, BackButtonDirective, RoomNamePipe],
+  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepicker, MatOption, MatIcon, MatAccordion,
+    MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription, MatIconButton,
+    MatButton, ReactiveFormsModule, TranslatePipe, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix,
+    BackButtonDirective, AvailabilityComponent, GoogleMapComponent, BackButtonDirective, RoomNamePipe, MatChipGrid,
+    MatChipRow, MatChipInput, MatCheckbox, MatSelectionList, MatListOption],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RoomComponent {

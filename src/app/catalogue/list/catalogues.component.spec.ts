@@ -14,6 +14,7 @@ import {
 import { CataloguesComponent } from './catalogues.component';
 import { ActivatedRoute } from '@angular/router';
 import { CatalogueState } from '../../store/reducers/catalogue.reducers';
+import { MatDialog } from '@angular/material/dialog';
 
 describe('CataloguesComponent', () => {
   let component: CataloguesComponent;
@@ -24,7 +25,7 @@ describe('CataloguesComponent', () => {
 
   let storeSpy: jasmine.SpyObj<Store<CatalogueState>>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
 
   const mockCatalogues: ICatalogueAll[] = [
     {
@@ -83,13 +84,12 @@ describe('CataloguesComponent', () => {
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: MatDialog, useValue: dialogSpy },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CataloguesComponent);
     component = fixture.componentInstance;
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   afterEach(() => {
@@ -142,13 +142,11 @@ describe('CataloguesComponent', () => {
   it('should call delete method without errors', () => {
     const testCatalogue = mockCatalogues[0];
 
-    dialogSpy.and.returnValue({
-      afterClosed: () => of(testCatalogue),
-    });
+    dialogSpy.open.and.returnValue({ afterClosed: () => of(testCatalogue) } as any);
 
     component.delete(testCatalogue);
 
-    expect(dialogSpy).toHaveBeenCalledWith(
+    expect(dialogSpy.open).toHaveBeenCalledWith(
       jasmine.any(Function),
       jasmine.objectContaining({
         data: {

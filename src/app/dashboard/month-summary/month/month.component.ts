@@ -3,14 +3,13 @@ import { IMonthSummary, ISummaryTotal, Total } from '../../../interfaces/dashboa
 import { ICurrencyAll } from '../../../interfaces/currency';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { AppMaterialModule } from '../../../util/app-material.module';
 import { CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-month',
   templateUrl: './month.component.html',
   styleUrls: ['./month.component.scss'],
-  imports: [AppMaterialModule, TranslatePipe, CurrencyPipe],
+  imports: [TranslatePipe, CurrencyPipe, TranslatePipe, CurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MonthComponent {

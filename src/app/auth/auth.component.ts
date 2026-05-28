@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal, untracked } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { cleanAuth, login, redirect, setCurrentCode, signupSuccess } from '../store/auth.actions';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { VERIFICATION_EMAIL } from '../util/helper';
 import { THEME } from '../util/theme';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../shared/shared.module';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ToastService } from '../services/toast.service';
 import {
   getAuthErrorPipe,
@@ -22,6 +21,10 @@ import { AuthState } from '../store/reducers/auth.reducers';
 import { EnvService } from '../services/env.service';
 import { FirebaseService } from '../services/firebase.service';
 import { User } from 'firebase/auth';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { NgTemplateOutlet } from '@angular/common';
 
 type AuthForm = {
   email: FormControl<string>;
@@ -34,7 +37,8 @@ type AuthForm = {
   selector: 'app-auth',
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.scss'],
-  imports: [SharedModule],
+  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatButton, ReactiveFormsModule, TranslatePipe, RouterLink,
+    NgTemplateOutlet, MatError],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthComponent {

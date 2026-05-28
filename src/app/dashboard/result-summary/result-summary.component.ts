@@ -1,14 +1,14 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { SharedModule } from '../../shared/shared.module';
 import { ICurrencyAll } from '../../interfaces/currency';
 import { TotalSummaryItemComponent } from '../total-summary-item/total-summary-item.component';
 import { ISummaryTotals } from '../../interfaces/dashboard';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-result-summary',
   templateUrl: './result-summary.component.html',
   styleUrl: './result-summary.component.scss',
-  imports: [SharedModule, TotalSummaryItemComponent],
+  imports: [TranslatePipe, TotalSummaryItemComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResultSummaryComponent {

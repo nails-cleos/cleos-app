@@ -9,7 +9,6 @@ import { Store } from '@ngrx/store';
 
 import { resetTheme, Theme } from './util/theme';
 import { getLocale } from './util/helper';
-import { YearMonthDateAdapter } from './util/adapter/year-month-date.adapter';
 import { AuthUserService } from './services/auth-user.service';
 import { SeoService } from './services/seo.service';
 import { setLanguage } from './store/i18n.actions';
@@ -20,12 +19,6 @@ import { I18NState } from './store/reducers/i18n.reducers';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    {
-      provide: DateAdapter,
-      useClass: YearMonthDateAdapter,
-    },
-  ],
   imports: [RouterOutlet],
 })
 export class AppComponent {

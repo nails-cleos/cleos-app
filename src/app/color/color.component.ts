@@ -1,15 +1,18 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Color, IColor } from '../interfaces/color';
 import { createColor, getColor, updateColor } from '../store/color.actions';
 import { fieldChange, valueChange } from '../util/validators';
-import { SharedModule } from '../shared/shared.module';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { getCurrentColorIdPipe, getSelectedColorPipe, getSubErrorsPipe } from '../store/selectors/color.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../interfaces/common';
 import { ColorState } from '../store/reducers/color.reducers';
+import { MatError, MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { TranslatePipe } from '@ngx-translate/core';
 
 type ColorForm = {
   name: FormControl<string>;
@@ -20,7 +23,8 @@ type ColorForm = {
   selector: 'app-colors',
   templateUrl: './color.component.html',
   styleUrls: ['./color.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatButton, ReactiveFormsModule, TranslatePipe, MatError,
+    BackButtonDirective, BackButtonDirective, MatHint],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ColorComponent {

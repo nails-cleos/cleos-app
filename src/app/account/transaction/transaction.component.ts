@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { createTransaction, getAccount } from '../../store/account.actions';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AuthUserService } from '../../services/auth-user.service';
 import { ITransaction } from '../../interfaces/account';
 import { currencySymbol } from '../../util/helper';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../shared/shared.module';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BalanceComponent } from '../balance/balance.component';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { BankComponent, BankForm } from '../../shared/bank/bank.component';
@@ -23,6 +22,9 @@ import { AccountState } from '../../store/reducers/account.reducers';
 import { PaymentState } from '../../store/reducers/payment.reducers';
 import { getPaymentOptionsPipe } from '../../store/selectors/payment.selectors';
 import { PaymentOptionSelectComponent } from '../../shared/payment-option-select/payment-option-select.component';
+import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
 
 export type TransactionForm = {
   amount: FormControl<number>;
@@ -34,7 +36,9 @@ export type TransactionForm = {
   selector: 'app-transaction',
   templateUrl: './transaction.component.html',
   styleUrls: ['./transaction.component.scss'],
-  imports: [SharedModule, BalanceComponent, BackButtonDirective, BankComponent, PaymentOptionSelectComponent],
+  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatButton, ReactiveFormsModule, TranslatePipe, MatError,
+    MatPrefix, BankComponent, BackButtonDirective, BalanceComponent, BackButtonDirective, BankComponent,
+    PaymentOptionSelectComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransactionComponent {

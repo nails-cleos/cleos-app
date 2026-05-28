@@ -1,14 +1,15 @@
 import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
-import { AppMaterialModule } from '../../util/app-material.module';
 import { NgClass } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatIconButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-rating',
   templateUrl: './rating.component.html',
   styleUrls: ['./rating.component.scss'],
-  imports: [AppMaterialModule, NgClass, TranslatePipe],
+  imports: [MatIcon, MatIconButton, TranslatePipe, NgClass],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RatingComponent {

@@ -8,9 +8,11 @@ import { provideHttpClient } from '@angular/common/http';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { GeocodeService, MapStatus } from '../../services/geocode.service';
 import { UserState } from '../../store/reducers/user.reducers';
+import { GoogleMapComponent } from '../../shared/google-map/google-map.component';
 import { GoogleMapStubComponent } from '../../shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
+import { provideAppDateAdapter } from '../../util/adapter/app-date.provider';
 
 describe('ProfileComponent', () => {
   let component: ProfileComponent;
@@ -54,15 +56,21 @@ describe('ProfileComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [ProfileComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
+      imports: [ProfileComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: GeocodeService, useValue: geocodeServiceSpy },
         provideHttpClient(),
         provideHttpClientTesting(),
+        provideAppDateAdapter(),
       ],
-    }).compileComponents();
+    })
+      .overrideComponent(ProfileComponent, {
+        remove: { imports: [GoogleMapComponent] },
+        add: { imports: [GoogleMapStubComponent] },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(ProfileComponent);
     component = fixture.componentInstance;

@@ -1,13 +1,22 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
 import { IPrice } from '../../../interfaces/treatment';
 import { ICurrency } from '../../../interfaces/currency';
 import { IPaymentOption, PENALTY } from '../../../interfaces/payment';
 import { PriceComponent } from '../../price/price.component';
-import { AppMaterialModule } from '../../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
 import { BankForm } from '../../bank/bank.component';
+import { MatError, MatLabel } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
 
 type CancelForm = {
   paymentCancellation: FormControl<any>,
@@ -26,7 +35,8 @@ type CancelDialogData = {
   selector: 'app-cancel-dialog',
   templateUrl: './cancel-dialog.component.html',
   styleUrls: ['./cancel-dialog.component.scss'],
-  imports: [PriceComponent, AppMaterialModule, ReactiveFormsModule, TranslatePipe],
+  imports: [PriceComponent, MatLabel, MatIcon, MatButton, TranslatePipe, MatError, ReactiveFormsModule, MatDialogTitle,
+    MatDialogContent, MatRadioGroup, MatRadioButton, MatDialogActions],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CancelDialogComponent {

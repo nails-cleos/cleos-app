@@ -1,31 +1,57 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { Store } from '@ngrx/store';
 import { deleteReservation, getPage } from '../../../store/reservation.actions';
 import { IReservation, IReservationAll } from '../../../interfaces/reservation';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { DialogComponent } from '../../../shared/dialog/generic/dialog.component';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { executeDialogNoWidth, openDialog } from '../../../util/helper';
 import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
 import { AuthUserService } from '../../../services/auth-user.service';
-import { SharedModule } from '../../../shared/shared.module';
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
 import { ReservationIconPipe } from '../../../pipes/reservation-icon.pipe';
 import { ErrorComponent } from '../../../shared/error/error.component';
 import { getReservationErrorPipe, getReservationPaginationPipe } from '../../../store/selectors/reservation.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
+import { MatPrefix } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatList, MatListItem, MatListItemIcon } from '@angular/material/list';
+import { MatIconButton } from '@angular/material/button';
+import { ReactiveFormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell, MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-reservation-table',
   templateUrl: './reservation-table.component.html',
   styleUrls: ['./reservation-table.component.scss'],
-  imports: [SharedModule, TimeDetailPipe, ReservationIconPipe, ErrorComponent],
+  imports: [TimeDetailPipe, ReservationIconPipe, ErrorComponent, TimeDetailPipe, MatIcon, MatList, MatListItem,
+    MatIconButton, ReactiveFormsModule, TranslatePipe, RouterLink, DatePipe, MatTable, MatSort, MatHeaderCell,
+    MatCellDef, MatHeaderCellDef, MatColumnDef, MatCell, MatPrefix, MatTooltip, MatListItemIcon, MatFooterCell,
+    MatHeaderRow, MatRow, MatFooterRow, MatPaginator, MatHeaderRowDef, MatRowDef, MatFooterRowDef, MatSortHeader,
+    MatFooterCellDef],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationTableComponent {
@@ -101,12 +127,13 @@ export class ReservationTableComponent {
     const content = this.translate.instant('RESERVATION.DELETED.CONTENT',
       { date: newDateTimestamp(reservation.timestamp) });
 
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: reservation, variant: 'warning' }, result => {
-      if (result) {
-        this.store.dispatch(
-          deleteReservation({ id: result.id, timestamp: result.timestamp, timeZone: result.room.timeZone }),
-        );
-      }
-    });
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: reservation, variant: 'warning' },
+      result => {
+        if (result) {
+          this.store.dispatch(
+            deleteReservation({ id: result.id, timestamp: result.timestamp, timeZone: result.room.timeZone }),
+          );
+        }
+      });
   };
 }

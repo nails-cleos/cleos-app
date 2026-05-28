@@ -4,14 +4,13 @@ import { IChart } from '../../../../interfaces/dashboard';
 import { ICurrency } from '../../../../interfaces/currency';
 import { ErrorComponent } from '../../../../shared/error/error.component';
 import { IError } from '../../../../interfaces/common';
-import { AppMaterialModule } from '../../../../util/app-material.module';
 import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
   selector: 'app-overview-chart',
   templateUrl: './overview-chart.component.html',
   styleUrls: ['./overview-chart.component.scss'],
-  imports: [AppMaterialModule, ErrorComponent, BaseChartDirective],
+  imports: [ErrorComponent, BaseChartDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OverviewChartComponent {

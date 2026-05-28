@@ -10,7 +10,7 @@ import {
   viewChildren,
 } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
 import { IRoom, IRoomAll, IService } from '../../../interfaces/room';
@@ -42,7 +42,7 @@ import {
   plusMonthDate,
   totalDuration,
 } from '../../../util/dates';
-import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
+import { LangChangeEvent, TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Router } from '@angular/router';
@@ -74,21 +74,16 @@ import {
 import { DiscountType, IDiscount, IUserDiscount } from '../../../interfaces/discount';
 import { isEqual } from 'date-fns';
 import { IAdditionalAll } from '../../../interfaces/additional';
-import { MatListOption, MatSelectionList } from '@angular/material/list';
-import { MatDatepicker } from '@angular/material/datepicker';
+import { MatDivider, MatListOption, MatSelectionList } from '@angular/material/list';
+import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { IOffice, IOfficeAll } from '../../../interfaces/office';
 import { IStep, Step } from '../../../interfaces/step';
 import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../../interfaces/token';
 import { IUser, IUserAll } from '../../../interfaces/user';
-import {
-  IPaymentOption,
-  PaymentPercentage,
-  PENALTY,
-} from '../../../interfaces/payment';
+import { IPaymentOption, PaymentPercentage, PENALTY } from '../../../interfaces/payment';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { enableStep, getBackIndex, getIndex } from '../../../util/step';
-import { SharedModule } from '../../../shared/shared.module';
 import { RoomNamePipe } from '../../../pipes/room-name.pipe';
 import { SortByPipe } from '../../../pipes/sort-by.pipe';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
@@ -118,6 +113,16 @@ import { FirebaseService } from '../../../services/firebase.service';
 import { OfficeForm } from '../../../reservation/reservation-form.types';
 import { ReservationFormErrorService } from '../../../reservation/reservation-form-error.service';
 import { getPaymentOptionsPipe } from '../../../store/selectors/payment.selectors';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { DatePipe, DecimalPipe, KeyValuePipe, NgTemplateOutlet } from '@angular/common';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { MatTab, MatTabGroup } from '@angular/material/tabs';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 const MAX_UPCOMING_RESERVATION = 10;
 
@@ -159,8 +164,12 @@ const ME_RESERVATION_ERROR_FIELDS = [
 @Component({
   selector: 'app-me-reservation',
   templateUrl: './me-reservation.component.html',
-  imports: [SharedModule, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe, PriceComponent,
-    PaymentPreviewComponent, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective],
+  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatSelect,
+    MatOption, MatIcon, MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe, KeyValuePipe, DecimalPipe,
+    NgTemplateOutlet, DatePipe, MatAutocomplete, MatError, MatAutocompleteTrigger, BackButtonDirective,
+    CurrencySymbolPipe, MatCard, MatCardContent, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe,
+    PriceComponent, PaymentPreviewComponent, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective,
+    MatSelectionList, MatListOption, MatDivider, MatTabGroup, MatTab, MatCheckbox],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MeReservationComponent {

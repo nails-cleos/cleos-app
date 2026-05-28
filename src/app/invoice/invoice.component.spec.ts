@@ -19,6 +19,7 @@ import { DriveAccessService } from '../services/drive-access.service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { SelectionModel } from '@angular/cdk/collections';
 import { PaymentService } from '../services/payment.service';
+import { provideAppDateAdapter } from '../util/adapter/app-date.provider';
 
 describe('InvoiceComponent', () => {
   let component: InvoiceComponent;
@@ -204,6 +205,7 @@ describe('InvoiceComponent', () => {
         { provide: Router, useValue: routerSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
         { provide: PaymentService, useValue: paymentServiceSpy },
+        provideAppDateAdapter(),
       ],
     }).compileComponents();
 

@@ -2,8 +2,13 @@ import { ChangeDetectionStrategy, Component, effect, inject, input, output } fro
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Availability, IAvailability, IAvailabilityDate } from '../../interfaces/room';
 import { createDate, getCurrentTimeZone, getTime } from '../../util/dates';
-import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
+import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { TimepickerComponent } from '../../shared/clock-timepicker/timepicker.component';
+import { TimepickerDirective } from '../../shared/clock-timepicker/timepicker.directive';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 type AvailabilityForm = {
   start: FormControl<string>;
@@ -16,7 +21,8 @@ type AvailabilityForm = {
   selector: 'app-availability',
   templateUrl: './availability.component.html',
   styleUrls: ['./availability.component.scss'],
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
+  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatButton, TranslatePipe, MatError, MatPrefix,
+    ReactiveFormsModule, TimepickerComponent, TimepickerDirective, MatCheckbox],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AvailabilityComponent {

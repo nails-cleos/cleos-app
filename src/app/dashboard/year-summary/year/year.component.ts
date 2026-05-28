@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { IMonthSummary, IQuarterSummary } from '../../../interfaces/dashboard';
 import { ICurrencyAll } from '../../../interfaces/currency';
-import { AppMaterialModule } from '../../../util/app-material.module';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { dateMonthYear, monthTitle } from '../../../util/dates';
@@ -22,7 +21,7 @@ type YearQuarterRow = {
   selector: 'app-year',
   templateUrl: './year.component.html',
   styleUrls: ['./year.component.scss'],
-  imports: [AppMaterialModule, MonthComponent],
+  imports: [MonthComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class YearComponent {

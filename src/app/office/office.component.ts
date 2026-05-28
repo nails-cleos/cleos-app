@@ -1,16 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, Signal, signal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IUser } from '../interfaces/user';
 import { fieldChange, requireMatch } from '../util/validators';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { createOffice, getOffice, updateOffice } from '../store/office.actions';
 import { Role } from '../interfaces/token';
 import { map, startWith } from 'rxjs/operators';
 import { IOffice, Office } from '../interfaces/office';
-import { SharedModule } from '../shared/shared.module';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { OfficeState } from '../store/reducers/office.reducers';
 import {
@@ -21,6 +20,11 @@ import {
 } from '../store/selectors/office.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../interfaces/common';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 
 type OfficeForm = {
   name: FormControl<string>;
@@ -37,7 +41,8 @@ type OfficeForm = {
   selector: 'app-office',
   templateUrl: './office.component.html',
   styleUrls: ['./office.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, ReactiveFormsModule, TranslatePipe,
+    MatAutocomplete, MatError, MatAutocompleteTrigger, BackButtonDirective, BackButtonDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OfficeComponent {

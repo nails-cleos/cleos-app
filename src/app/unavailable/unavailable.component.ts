@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, Signal, signal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { IUnavailable, Unavailable } from '../interfaces/unavailable';
 import {
@@ -34,9 +34,8 @@ import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { closest } from '../util/numbers';
 import { fieldChange, requireMatch, valueChange } from '../util/validators';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { SharedModule } from '../shared/shared.module';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { AuthUserService } from '../services/auth-user.service';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -50,6 +49,17 @@ import {
   getUnavailableParamsPipe,
 } from '../store/selectors/unavailable.selectors';
 import { IError } from '../interfaces/common';
+import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { KeyValuePipe } from '@angular/common';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
+import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
 
 type UnavailableForm = {
   professional: FormControl<IUserAll | undefined>;
@@ -66,7 +76,10 @@ type UnavailableForm = {
   selector: 'app-unavailable',
   templateUrl: './unavailable.component.html',
   styleUrls: ['./unavailable.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepicker, MatSelect, MatOption, MatIcon,
+    MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe, KeyValuePipe, MatAutocomplete, MatError,
+    MatAutocompleteTrigger, MatPrefix, BackButtonDirective, BackButtonDirective, MatHint, MatCheckbox,
+    TimepickerDirective, TimepickerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UnavailableComponent {

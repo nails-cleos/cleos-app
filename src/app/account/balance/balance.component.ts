@@ -1,12 +1,24 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { IAccountAll } from '../../interfaces/account';
-import { SharedModule } from '../../shared/shared.module';
+import { TranslatePipe } from '@ngx-translate/core';
+import { CurrencyPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-balance',
   templateUrl: './balance.component.html',
   styleUrls: ['./balance.component.scss'],
-  imports: [SharedModule],
+  imports: [
+    TranslatePipe,
+    CurrencyPipe,
+    RouterLink,
+    MatButton,
+    MatIcon,
+    MatProgressSpinner,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BalanceComponent {

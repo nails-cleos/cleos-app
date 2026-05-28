@@ -1,19 +1,39 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+  MatTableDataSource,
+} from '@angular/material/table';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { ITreatmentAll } from '../../interfaces/treatment';
 import { convertDuration } from '../../util/dates';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../shared/shared.module';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PAGE_SIZE } from '../../interfaces/pagination';
+import { MatPrefix } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { DatePipe, DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-treatment-table',
   templateUrl: './treatment-table.component.html',
   styleUrls: ['./treatment-table.component.scss'],
-  imports: [SharedModule],
+  imports: [MatIcon, TranslatePipe, DecimalPipe, DatePipe, MatTable, MatColumnDef,
+    MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatFooterCellDef, MatFooterCell, MatHeaderRowDef,
+    MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, MatPrefix],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreatmentTableComponent {

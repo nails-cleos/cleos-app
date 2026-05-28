@@ -2,13 +2,12 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } 
 import { createPaymentLinkByReservationId, getPaymentByResourceId } from '../../../store/payment.actions';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { FormGroup, NonNullableFormBuilder } from '@angular/forms';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { getPrice, newPercentage } from '../../../util/helper';
 import { IPaymentOption, PaymentPercentage } from '../../../interfaces/payment';
 import { IPrice, Price } from '../../../interfaces/treatment';
 import { IReservationAll, IReservationPayment } from '../../../interfaces/reservation';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../../shared/shared.module';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BankComponent, BankForm } from '../../../shared/bank/bank.component';
 import { PaymentPreviewComponent } from '../../../shared/payment-preview/payment-preview.component';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
@@ -18,12 +17,18 @@ import { getCurrentReservationIdPipe } from '../../../store/selectors/reservatio
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getPaymentOptionsPipe, getPaymentsPipe } from '../../../store/selectors/payment.selectors';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { DecimalPipe, NgTemplateOutlet } from '@angular/common';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-option',
   templateUrl: './option.component.html',
   styleUrls: ['./option.component.scss'],
-  imports: [SharedModule, BankComponent, PaymentPreviewComponent, BackButtonDirective, CurrencySymbolPipe],
+  imports: [MatIcon, MatButton, ReactiveFormsModule, TranslatePipe, DecimalPipe, NgTemplateOutlet, BankComponent,
+    BackButtonDirective, CurrencySymbolPipe, BankComponent, PaymentPreviewComponent, BackButtonDirective,
+    CurrencySymbolPipe, MatProgressSpinner],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OptionComponent {

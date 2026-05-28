@@ -23,6 +23,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 
 describe('ReservationComponent', () => {
   let component: ReservationComponent;
@@ -51,7 +52,7 @@ describe('ReservationComponent', () => {
 
   const authUserSignal = signal<IAuthUser>({ ...initialAuthUser, isDarkMode: true, professionalId: 'prof-123' });
 
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
 
   const mockCustomer: IUserAll = {
     authorities: [],
@@ -161,6 +162,7 @@ describe('ReservationComponent', () => {
     matches$ = new BehaviorSubject(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe'], {
       observe: () => matches$.asObservable(),
@@ -219,6 +221,7 @@ describe('ReservationComponent', () => {
         { provide: Router, useValue: routerSpy },
         { provide: MatSnackBar, useValue: snackBarSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
+        { provide: MatDialog, useValue: dialogSpy },
         provideHttpClient(),
         provideHttpClientTesting(),
       ],
@@ -231,8 +234,6 @@ describe('ReservationComponent', () => {
 
     fixture = TestBed.createComponent(ReservationComponent);
     component = fixture.componentInstance;
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   it('should create', () => {
@@ -1098,15 +1099,15 @@ describe('ReservationComponent', () => {
       component['professionalId'].set('professional-1');
       component['totalDuration'] = new Duration(1);
 
-      dialogSpy.and.callFake((_: any, config: any) => {
+      dialogSpy.open.and.callFake((_: any, config: any) => {
         return {
           afterClosed: () => of({ value: config.data.value }),
-        };
+        } as any;
       });
 
       component.segmentClick(nextMonday, 'CREATED', 'event');
 
-      expect(dialogSpy).toHaveBeenCalledWith(
+      expect(dialogSpy.open).toHaveBeenCalledWith(
         jasmine.any(Function),
         {
           data: {
@@ -1137,15 +1138,15 @@ describe('ReservationComponent', () => {
       component['totalDuration'] = new Duration(1);
       matches$.next({ matches: true });
 
-      dialogSpy.and.callFake((_: any, config: any) => {
+      dialogSpy.open.and.callFake((_: any, config: any) => {
         return {
           afterClosed: () => of({ value: config.data.value, professional: mockProfessional }),
-        };
+        } as any;
       });
 
       component.segmentClick(nextMonday, 'CREATED', 'event');
 
-      expect(dialogSpy).toHaveBeenCalledWith(
+      expect(dialogSpy.open).toHaveBeenCalledWith(
         jasmine.any(Function),
         {
           disableClose: true,
@@ -1155,7 +1156,7 @@ describe('ReservationComponent', () => {
           },
         });
 
-      expect(dialogSpy).toHaveBeenCalledWith(
+      expect(dialogSpy.open).toHaveBeenCalledWith(
         jasmine.any(Function),
         {
           data: {
@@ -1185,7 +1186,7 @@ describe('ReservationComponent', () => {
 
       component.segmentClick(nextMonday, 'CREATED', 'invalid-key');
 
-      expect(dialogSpy).not.toHaveBeenCalled();
+      expect(dialogSpy.open).not.toHaveBeenCalled();
     });
 
     it('should not set the segment if date is older than today', () => {
@@ -1197,7 +1198,7 @@ describe('ReservationComponent', () => {
 
       component.segmentClick(oldDate, 'CREATED', 'event');
 
-      expect(dialogSpy).not.toHaveBeenCalled();
+      expect(dialogSpy.open).not.toHaveBeenCalled();
     });
 
     it('should not set the segment if date is after max reservation date', () => {
@@ -1208,7 +1209,7 @@ describe('ReservationComponent', () => {
 
       component.segmentClick(invalidDate, 'CREATED', 'event');
 
-      expect(dialogSpy).not.toHaveBeenCalled();
+      expect(dialogSpy.open).not.toHaveBeenCalled();
     });
   });
 

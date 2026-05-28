@@ -12,6 +12,7 @@ import { RoomState } from '../../store/reducers/room.reducers';
 import { RoomsComponent } from './rooms.component';
 import { ICurrencyAll } from '../../interfaces/currency';
 import { getCurrentTimeZone } from '../../util/dates';
+import { MatDialog } from '@angular/material/dialog';
 
 describe('RoomsComponent', () => {
   let component: RoomsComponent;
@@ -20,7 +21,7 @@ describe('RoomsComponent', () => {
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let translate: TranslateService;
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
 
   const address: IAddress = {
     id: 1,
@@ -78,6 +79,7 @@ describe('RoomsComponent', () => {
     });
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -107,6 +109,7 @@ describe('RoomsComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: MatDialog, useValue: dialogSpy },
       ],
     }).compileComponents();
 
@@ -117,8 +120,6 @@ describe('RoomsComponent', () => {
     translate.use('en-GB');
 
     fixture.detectChanges();
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   afterEach(() => {
@@ -217,7 +218,7 @@ describe('RoomsComponent', () => {
 
   it('should dispatch deleteRoom when dialog returns a result', () => {
     const item = mockRooms[0];
-    dialogSpy.and.returnValue({
+    dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
     } as any);
 

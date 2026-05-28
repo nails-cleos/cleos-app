@@ -10,6 +10,7 @@ import { colorSelected, deleteColor, getColorsPage } from '../../store/color.act
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { ColorState } from '../../store/reducers/color.reducers';
+import { MatDialog } from '@angular/material/dialog';
 
 describe('ColorListComponent', () => {
   let component: ColorListComponent;
@@ -18,7 +19,7 @@ describe('ColorListComponent', () => {
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let translate: TranslateService;
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
 
   const mockColor: IColor[] = [
     { id: '1', name: 'Color 1', description: 'Desc 1' },
@@ -46,6 +47,7 @@ describe('ColorListComponent', () => {
     });
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -75,6 +77,7 @@ describe('ColorListComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: MatDialog, useValue: dialogSpy },
       ],
     }).compileComponents();
 
@@ -85,8 +88,6 @@ describe('ColorListComponent', () => {
     translate.use('en-GB');
 
     fixture.detectChanges();
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   afterEach(() => {
@@ -185,13 +186,13 @@ describe('ColorListComponent', () => {
 
   it('should dispatch deleteColor when dialog returns a result', () => {
     const item = mockColor[0];
-    dialogSpy.and.returnValue({
+    dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
     } as any);
 
     component.delete(item);
 
-    expect(dialogSpy).toHaveBeenCalledWith(
+    expect(dialogSpy.open).toHaveBeenCalledWith(
       jasmine.any(Function),
       jasmine.objectContaining({
         data: {

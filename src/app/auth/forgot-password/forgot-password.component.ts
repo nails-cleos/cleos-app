@@ -1,16 +1,18 @@
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { signupSuccess } from '../../store/auth.actions';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../shared/shared.module';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { ToastService } from '../../services/toast.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getAuthErrorPipe, getAuthResponsePipe } from '../../store/selectors/auth.selectors';
 import { AuthState } from '../../store/reducers/auth.reducers';
 import { FirebaseService } from '../../services/firebase.service';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
 
 type ForgotPasswordForm = {
   email: FormControl<string>;
@@ -20,7 +22,8 @@ type ForgotPasswordForm = {
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatButton, ReactiveFormsModule, TranslatePipe, MatError,
+    BackButtonDirective, BackButtonDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForgotPasswordComponent {
@@ -70,6 +73,6 @@ export class ForgotPasswordComponent {
     this.firebaseService.sendPasswordResetEmail(this.getForm.email.value.trim()).then(() => {
       const message = this.translate.instant('AUTH.FORGOT_PASSWORD.MESSAGE');
       this.store.dispatch(signupSuccess({ message }));
-    }).catch(e => console.error(`Error sending reset password. ${e}`));
+    }).catch(e => console.error(`Error sending reset password. ${ e }`));
   }
 }

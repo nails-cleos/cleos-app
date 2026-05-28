@@ -14,6 +14,7 @@ import { daysOfWeek } from '../../util/dates';
 import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { signal } from '@angular/core';
 import { approveReservation, startReservation } from '../../store/reservation.actions';
+import { provideAppCalendar, provideAppDateAdapter } from '../../util/adapter/app-date.provider';
 
 describe('DashboardEventComponent', () => {
   let fixture: ComponentFixture<DashboardEventComponent>;
@@ -58,6 +59,8 @@ describe('DashboardEventComponent', () => {
         { provide: Router, useValue: routerSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         DayViewSchedulerCalendarUtils,
+        provideAppDateAdapter(),
+        provideAppCalendar(),
       ],
     }).compileComponents();
 

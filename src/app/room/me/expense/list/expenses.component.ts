@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../../interfaces/pagination';
 import { IExpenseAll } from '../../../../interfaces/expense';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -12,23 +12,45 @@ import { cleanExpense, deleteExpense, expenseSelected, getExpensesPage } from '.
 import { DialogComponent } from '../../../../shared/dialog/generic/dialog.component';
 import { getDateFormat, getNowTimeZone, isSameTimeZone, newDateTimestamp } from '../../../../util/dates';
 import { openDialog } from '../../../../util/helper';
-import { FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
-import { MatDatepicker } from '@angular/material/datepicker';
-import { SharedModule } from '../../../../shared/shared.module';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { TimeDetailPipe } from '../../../../pipes/time-detail.pipe';
 import { RoomState } from '../../../../store/reducers/room.reducers';
 import { ExpenseState } from '../../../../store/reducers/expense.reducers';
 import { getCurrentRoomIdPipe } from '../../../../store/selectors/room.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getExpensePaginationPipe, getExpenseResponsePipe } from '../../../../store/selectors/expense.selectors';
-import { DateAdapter } from '@angular/material/core';
-import { YearMonthAdapter } from '../../../../util/adapter/year-month.adapter';
+import { provideYearMonthDateAdapter } from '../../../../util/adapter/app-date.provider';
 import { EnvService } from '../../../../services/env.service';
 import { DriveAccessService } from '../../../../services/drive-access.service';
 import { IDocument } from '../../../../interfaces/document';
 import { documentView } from '../../../../store/document.actions';
 import { DocumentState } from '../../../../store/reducers/document.reducers';
 import { CurrencySymbolPipe } from '../../../../pipes/currency-symbol.pipe';
+import { MatIcon } from '@angular/material/icon';
+import { MatIconButton } from '@angular/material/button';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';
+import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatSuffix } from '@angular/material/form-field';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 type ExpensesForm = {
   date: FormControl<Date | undefined>;
@@ -39,10 +61,13 @@ type ExpensesForm = {
   selector: 'app-expenses',
   templateUrl: './expenses.component.html',
   styleUrls: ['./expenses.component.scss'],
-  imports: [SharedModule, TimeDetailPipe, CurrencySymbolPipe],
-  providers: [
-    { provide: DateAdapter, useClass: YearMonthAdapter },
-  ],
+  imports: [TimeDetailPipe, MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker,
+    MatIcon, MatList, MatListItem, MatListSubheaderCssMatStyler, MatIconButton, ReactiveFormsModule, TranslatePipe,
+    DecimalPipe, RouterLink, DatePipe, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef,
+    MatCell, MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow,
+    MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, CurrencySymbolPipe, TimeDetailPipe, MatSuffix,
+    CurrencySymbolPipe],
+  providers: [...provideYearMonthDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExpensesComponent {

@@ -9,7 +9,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   createTreatment,
   getAllTreatmentsHistory,
@@ -21,14 +21,13 @@ import { Store } from '@ngrx/store';
 import { combineLatestWith } from 'rxjs';
 import { ITreatment, ITreatmentGroup, Treatment, TreatmentGroup } from '../interfaces/treatment';
 import { createNewDate, formatDuration, getNowTimeZone, getTime, getTimeNumber } from '../util/dates';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { IColorAll } from '../interfaces/color';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { map, startWith } from 'rxjs/operators';
 import { fieldChange } from '../util/validators';
 import { areEquals } from '../util/helper';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../shared/shared.module';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { TreatmentState } from '../store/reducers/treatment.reducers';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -42,6 +41,14 @@ import {
 import { IError, isString } from '../interfaces/common';
 import { DurationTimePipe } from '../pipes/durationTime.pipe';
 import { TreatmentTableComponent } from './table/treatment-table.component';
+import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatChip, MatChipGrid, MatChipInput, MatChipListbox, MatChipRow } from '@angular/material/chips';
+import { MatTab, MatTabGroup } from '@angular/material/tabs';
+import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
+import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
 
 type TreatmentMode = 'add' | 'edit' | 'view';
 
@@ -56,7 +63,10 @@ type TreatmentForm = {
   selector: 'app-treatment',
   templateUrl: './treatment.component.html',
   styleUrls: ['./treatment.component.scss'],
-  imports: [SharedModule, BackButtonDirective, DurationTimePipe, TreatmentTableComponent],
+  imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatIconButton, MatButton, ReactiveFormsModule,
+    TranslatePipe, RouterLink, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix, BackButtonDirective,
+    BackButtonDirective, DurationTimePipe, TreatmentTableComponent, MatHint, MatChipGrid, MatChipRow, MatChipInput,
+    MatTabGroup, MatTab, TimepickerDirective, TimepickerComponent, MatChipListbox, MatChip],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreatmentComponent {

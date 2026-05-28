@@ -15,6 +15,7 @@ import { callAwsLambda } from '../../../store/aws.actions';
 import { DriveAccessService } from '../../../services/drive-access.service';
 import { EnvService } from '../../../services/env.service';
 import { TokenService } from '../../../services/token.service';
+import { provideAppDateAdapter } from '../../../util/adapter/app-date.provider';
 
 describe('ExpenseComponent', () => {
   let component: ExpenseComponent;
@@ -116,6 +117,7 @@ describe('ExpenseComponent', () => {
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
         { provide: TokenService, useValue: tokenServiceMock },
+        provideAppDateAdapter(),
       ],
     }).compileComponents();
 

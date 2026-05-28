@@ -30,10 +30,10 @@ export const errorInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn)
       if (authService.authUser().isAuthenticated) {
         store.dispatch(reLogin());
       } else {
-        return throwError(err);
+        return throwError(() => err);
       }
     }
 
-    return throwError(err);
+    return throwError(() => err);
   }));
 };

@@ -88,7 +88,7 @@
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'EXPENSE.DATE.FIELD' | translate }}</mat-label>
                 <input matInput [matDatepicker]="dp" [formControl]="getForm.date" required [max]="today()">
-                <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
+                <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
                 <mat-datepicker #dp startView="year"></mat-datepicker>
                 @if (getForm.date.hasError('required')) {
                   <mat-error [innerHTML]="'EXPENSE.DATE.REQUIRED' | translate"></mat-error>

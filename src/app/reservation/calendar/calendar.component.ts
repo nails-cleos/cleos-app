@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { combineLatestWith, Subject } from 'rxjs';
 import { getAllGroupingByRoom, updateReservationTimestamp } from '../../store/reservation.actions';
 import { Day, IDay, IRoomReservation, MAX_RESERVATION_MONTH, States } from '../../interfaces/reservation';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import {
   addPeriod,
@@ -35,7 +35,7 @@ import {
   OUT_OF_WORK,
   OUT_OF_WORK_ALL_DAY,
 } from '../../util/event';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarWeekViewComponent } from 'angular-calendar';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { IUser, IUserAll } from '../../interfaces/user';
@@ -44,7 +44,7 @@ import { createRoomOffice, executeDialogNoWidth, FrequencyEnum, getList } from '
 import { addDays, addMonths, isEqual } from 'date-fns';
 import { findStateColor } from '../../util/theme';
 import { map, startWith } from 'rxjs/operators';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IOffice, IOfficeAll } from '../../interfaces/office';
 import { requireMatch } from '../../util/validators';
 import { CalendarDialogComponent } from '../../shared/dialog/calendar/calendar-dialog.component';
@@ -52,12 +52,17 @@ import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { INoteAll } from '../../interfaces/note';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Role } from '../../interfaces/token';
-import { SharedModule } from '../../shared/shared.module';
 import { RoomNamePipe } from '../../pipes/room-name.pipe';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { getCalendarPipe, getRoomsPipe } from '../../store/selectors/reservation.selectors';
-import { MatDatepicker } from '@angular/material/datepicker';
+import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
+import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { DatePipe, NgClass } from '@angular/common';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 
 const CALENDAR_RESPONSIVE = {
   xsmall: {
@@ -88,7 +93,9 @@ type CalendarForm = {
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.scss'],
-  imports: [SharedModule, RoomNamePipe, CalendarWeekViewComponent],
+  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepicker, MatOption, MatIcon, MatIconButton,
+    MatButton, ReactiveFormsModule, TranslatePipe, NgClass, RouterLink, DatePipe, MatAutocomplete, MatError,
+    MatAutocompleteTrigger, MatPrefix, RoomNamePipe, CalendarWeekViewComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CalendarComponent {

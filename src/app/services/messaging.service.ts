@@ -37,22 +37,39 @@ export class MessagingService {
    *
    * @param user user
    */
-  requestPermission(user: any): void {
-    this.firebaseService.appCheckToken.then(appCheckToken => {
-      if (!appCheckToken) {
+  async requestPermission(user: any): Promise<void> {
+    try {
+      const appCheckToken = await this.firebaseService.appCheckToken;
+      if (!appCheckToken || typeof Notification === 'undefined') {
         return;
       }
-      Notification.requestPermission().then(permission => {
-        if (permission === 'granted') {
-          navigator.serviceWorker
-            .register(this.env.firebaseMessaging, { type: 'module', scope: '__' })
-            .then(serviceWorkerRegistration =>
-              this.firebaseService.getMessagingToken(
-                { serviceWorkerRegistration, vapidKey: this.env.firebase.vapidKey }))
-            .then(token => this.updateToken(user, token))
-            .catch(err => console.error(err));
-        }
+
+      if (Notification.permission === 'denied') {
+        console.warn('Notifications are blocked by the browser settings.');
+        return;
+      }
+
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        return;
+      }
+
+      const serviceWorkerRegistration = await navigator.serviceWorker.register(
+        this.env.firebaseMessaging,
+        { type: 'module', scope: '__' },
+      );
+      const token = await this.firebaseService.getMessagingToken({
+        serviceWorkerRegistration,
+        vapidKey: this.env.firebase.vapidKey,
       });
-    }).catch(err => console.error(err));
+
+      this.updateToken(user, token);
+    } catch (err: any) {
+      if (err?.code === 'messaging/permission-blocked') {
+        console.warn('Notifications are blocked by the browser settings.');
+        return;
+      }
+      console.error(err);
+    }
   }
 }

@@ -10,6 +10,7 @@ import { deleteOffice, getOfficesPage, officeSelected } from '../../store/office
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { OfficeState } from '../../store/reducers/office.reducers';
+import { MatDialog } from '@angular/material/dialog';
 
 describe('OfficeListComponent', () => {
   let component: OfficeListComponent;
@@ -18,7 +19,7 @@ describe('OfficeListComponent', () => {
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let translate: TranslateService;
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
 
   const mockOffice: IOffice[] = [
     { id: '1', name: 'Office 1' },
@@ -46,6 +47,7 @@ describe('OfficeListComponent', () => {
     });
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -76,6 +78,7 @@ describe('OfficeListComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: MatDialog, useValue: dialogSpy },
       ],
     }).compileComponents();
 
@@ -86,8 +89,6 @@ describe('OfficeListComponent', () => {
     translate.use('en-GB');
 
     fixture.detectChanges();
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   afterEach(() => {
@@ -186,7 +187,7 @@ describe('OfficeListComponent', () => {
 
   it('should dispatch deleteOffice when dialog returns a result', () => {
     const item = mockOffice[0];
-    dialogSpy.and.returnValue({
+    dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
     } as any);
 
