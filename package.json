@@ -67,7 +67,6 @@
     "file-saver": "^2.0.5",
     "firebase": "^12.11.0",
     "libphonenumber-js": "^1.12.40",
-    "luxon": "^3.7.2",
     "ng2-charts": "^10.0.0",
     "ngrx-store-localstorage": "^20.1.0",
     "ngx-cookie-service": "^21.3.1",
