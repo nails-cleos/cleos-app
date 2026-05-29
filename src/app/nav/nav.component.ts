@@ -27,7 +27,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { getIsAuthenticatedPipe, getMenusPipe, getRedirectPipe, getUserPipe } from '../store/selectors/auth.selectors';
 import { getDataDeletedPipe, getDataReadPipe, getNotificationsPipe } from '../store/selectors/notification.selectors';
 import { of } from 'rxjs';
-import { selectGlobalError, selectGlobalIsLoading, selectGlobalResponse } from '../store/selectors/global.selectors';
+import { selectGlobalError, selectGlobalResponse } from '../store/selectors/global.selectors';
 import { ToastOptions } from '../shared/toast/toast.model';
 import { IResponseSuccess } from '../interfaces/common';
 import { EnvService } from '../services/env.service';
@@ -105,7 +105,6 @@ export class NavComponent {
   private dataReadSignal = toSignal(this.dataRead$);
   private notificationSignal = toSignal(this.notification$);
   private messageSignal = toSignal(this.messagingService.message$ ?? of(undefined));
-  private globalIsLoadingSignal = toSignal(this.store.select(selectGlobalIsLoading), { initialValue: true });
   private globalResponseSignal = toSignal(this.store.select(selectGlobalResponse));
   private globalErrorSignal = toSignal(this.store.select(selectGlobalError));
 
@@ -163,14 +162,6 @@ export class NavComponent {
     const meta = this.translate.instant('DASHBOARD.META');
     this.seoService.setMetaDescription(meta.CONTENT);
     this.seoService.setMetaTitle(meta.TITLE);
-
-    effect(() => {
-      if (this.globalIsLoadingSignal()) {
-        this.loadingService.show();
-      } else {
-        this.loadingService.hide();
-      }
-    });
 
     effect(() => {
       const response = this.response();

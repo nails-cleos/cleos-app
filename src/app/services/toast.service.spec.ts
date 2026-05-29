@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { DestroyableInjector, Injector } from '@angular/core';
+import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { EMPTY, Subject } from 'rxjs';
@@ -12,8 +13,8 @@ describe('ToastService', () => {
   let overlay: jasmine.SpyObj<Overlay>;
   let injector: jasmine.SpyObj<DestroyableInjector>;
   let overlayRef: jasmine.SpyObj<OverlayRef>;
+  let breakpointState$: Subject<BreakpointState>;
   let positionStrategy: jasmine.SpyObj<any>;
-  let innerWidthSpy: jasmine.Spy<() => number>;
 
   beforeEach(() => {
     const overlayRefSpy = jasmine.createSpyObj('OverlayRef', [
@@ -39,12 +40,16 @@ describe('ToastService', () => {
     overlaySpy.create.and.returnValue(overlayRefSpy);
 
     const injectorSpy = jasmine.createSpyObj('Injector', ['get']);
+    breakpointState$ = new Subject<BreakpointState>();
+    const breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    breakpointObserverSpy.observe.and.returnValue(breakpointState$.asObservable());
 
     TestBed.configureTestingModule({
       providers: [
         ToastService,
         { provide: Overlay, useValue: overlaySpy },
         { provide: Injector, useValue: injectorSpy },
+        { provide: BreakpointObserver, useValue: breakpointObserverSpy },
       ],
     });
 
@@ -63,10 +68,6 @@ describe('ToastService', () => {
   });
 
   describe('show', () => {
-    beforeEach(() => {
-      innerWidthSpy = spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1024);
-    });
-
     it('should create toast with default parameters', () => {
       const message = 'Test message';
 
@@ -87,7 +88,7 @@ describe('ToastService', () => {
     });
 
     it('should position toast from the bottom on mobile', () => {
-      innerWidthSpy.and.returnValue(375);
+      breakpointState$.next({ matches: true, breakpoints: { '(max-width: 640px)': true } });
 
       service.show('Mobile toast');
 
@@ -209,6 +210,16 @@ describe('ToastService', () => {
 
       // Verify that updatePositionStrategy was called for each remaining toast
       expect(overlayRef.updatePositionStrategy).toHaveBeenCalled();
+    });
+
+    it('should reposition active toasts when viewport breakpoint changes', () => {
+      service.show('Responsive toast');
+
+      breakpointState$.next({ matches: true, breakpoints: { '(max-width: 640px)': true } });
+      TestBed.flushEffects();
+
+      expect(overlayRef.updatePositionStrategy).toHaveBeenCalled();
+      expect(positionStrategy.bottom).toHaveBeenCalledWith('16px');
     });
   });
 

@@ -25,6 +25,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { NavigationService } from '../services/navigation.service';
+import { ToastService } from '../services/toast.service';
 
 describe('ReservationComponent', () => {
   let component: ReservationComponent;
@@ -50,6 +51,7 @@ describe('ReservationComponent', () => {
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let snackBarSpy: jasmine.SpyObj<MatSnackBar>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let toastServiceSpy: jasmine.SpyObj<ToastService>;
 
   const authUserSignal = signal<IAuthUser>({ ...initialAuthUser, isDarkMode: true, professionalId: 'prof-123' });
 
@@ -177,6 +179,11 @@ describe('ReservationComponent', () => {
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
     });
+    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
+    toastServiceSpy.show.and.returnValue({
+      onAction: () => of(void 0),
+      onDismiss: () => of(void 0),
+    });
 
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
@@ -223,6 +230,7 @@ describe('ReservationComponent', () => {
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: ToastService, useValue: toastServiceSpy },
         { provide: MatSnackBar, useValue: snackBarSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: MatDialog, useValue: dialogSpy },

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
 import { YearSummaryComponent } from './year-summary.component';
-import { Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { TranslateModule } from '@ngx-translate/core';
@@ -10,6 +10,9 @@ import { IMonthlyExport, IMonthlySummaryExpense, IMonthlySummarySale, ISummaryTo
 import fs from 'file-saver';
 import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { signal } from '@angular/core';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { By } from '@angular/platform-browser';
+import { YearComponent } from './year/year.component';
 
 describe('YearSummaryComponent', () => {
   let component: YearSummaryComponent;
@@ -20,20 +23,49 @@ describe('YearSummaryComponent', () => {
   let storeSpy: jasmine.SpyObj<Store<DashboardState>>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let saveAsSpy: jasmine.Spy;
+  let yearSummaryMap$: BehaviorSubject<any>;
+  let yearExport$: BehaviorSubject<any>;
+  let navigationParams$: BehaviorSubject<any>;
+  let isLoading$: BehaviorSubject<any>;
+  let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
+    yearSummaryMap$ = new BehaviorSubject(undefined);
+    yearExport$ = new BehaviorSubject(undefined);
+    navigationParams$ = new BehaviorSubject(undefined);
+    isLoading$ = new BehaviorSubject(false);
+    breakpoint$ = new BehaviorSubject({
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
+        [Breakpoints.Medium]: false,
+      },
+    });
+
     storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
       },
     });
+    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),
     });
 
-    storeSpy.pipe.and.returnValue(new Subject().asObservable());
+    const storeStreams = [
+      yearSummaryMap$,
+      yearExport$,
+      navigationParams$,
+      isLoading$,
+    ];
+    let pipeCallIndex = 0;
+    storeSpy.pipe.and.callFake(
+      () => storeStreams[pipeCallIndex++]?.asObservable() ?? new BehaviorSubject(undefined).asObservable());
+    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [YearSummaryComponent, TranslateModule.forRoot()],
@@ -41,6 +73,7 @@ describe('YearSummaryComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: BreakpointObserver, useValue: breakpointObserverSpy },
       ],
     }).compileComponents();
 
@@ -53,6 +86,11 @@ describe('YearSummaryComponent', () => {
   });
 
   afterEach(() => {
+    yearSummaryMap$.complete();
+    yearExport$.complete();
+    navigationParams$.complete();
+    isLoading$.complete();
+    breakpoint$.complete();
   });
 
   it('should create', () => {
@@ -320,6 +358,47 @@ describe('YearSummaryComponent', () => {
       authUserSignal.set({ ...initialAuthUser, displayName: 'Lucas' });
 
       expect(component['userName']()).toBe('Lucas');
+    });
+
+    it('should pass short measure to year view on handset breakpoints', () => {
+      const room = {
+        roomId: 'room-1',
+        roomName: 'Main room',
+        primary: true,
+        currency: { code: 'EUR', icon: 'EUR' },
+        timeZone: 'Europe/Amsterdam',
+      };
+      const quarterSummaries = [{
+        quarter: 1,
+        monthSummaries: [{ month: 1, total: [] }],
+      }];
+
+      yearSummaryMap$.next(new Map([
+        [room, { quarterSummaries }],
+      ]));
+      fixture.detectChanges();
+      TestBed.flushEffects();
+      fixture.detectChanges();
+
+      let yearComponent = fixture.debugElement.query(By.directive(YearComponent)).componentInstance as YearComponent;
+      expect(component.isHandset()).toBeFalse();
+      expect(yearComponent.measure()).toBe('long');
+
+      breakpoint$.next({
+        matches: true,
+        breakpoints: {
+          [Breakpoints.XSmall]: true,
+          [Breakpoints.Small]: false,
+          [Breakpoints.Medium]: false,
+        },
+      });
+      fixture.detectChanges();
+      TestBed.flushEffects();
+      fixture.detectChanges();
+
+      yearComponent = fixture.debugElement.query(By.directive(YearComponent)).componentInstance as YearComponent;
+      expect(component.isHandset()).toBeTrue();
+      expect(yearComponent.measure()).toBe('short');
     });
   });
 });

@@ -1,54 +1,23 @@
 import { createSelector } from '@ngrx/store';
-import { selectRoomError, selectRoomIsLoading, selectRoomResponse } from './room.selectors';
-import { selectTreatmentError, selectTreatmentIsLoading, selectTreatmentResponse } from './treatment.selectors';
-import { selectCatalogueError, selectCatalogueIsLoading, selectCatalogueResponse } from './catalogue.selectors';
-import { selectDiscountError, selectDiscountIsLoading, selectDiscountResponse } from './discount.selectors';
-import { selectUnavailableError, selectUnavailableIsLoading, selectUnavailableResponse } from './unavailable.selectors';
-import { selectUserError, selectUserIsLoading, selectUserResponse } from './user.selectors';
-import { selectReservationError, selectReservationIsLoading, selectReservationResponse } from './reservation.selectors';
-import { selectPaymentError, selectPaymentIsLoading, selectPaymentResponse } from './payment.selectors';
-import { selectAdditionalError, selectAdditionalIsLoading, selectAdditionalResponse } from './additional.selectors';
-import { selectCurrencyError, selectCurrencyIsLoading, selectCurrencyResponse } from './currency.selectors';
-import { selectOfficeError, selectOfficeIsLoading, selectOfficeResponse } from './office.selectors';
-import { selectColorError, selectColorIsLoading, selectColorResponse } from './color.selectors';
-import { selectExpenseError, selectExpenseIsLoading, selectExpenseResponse } from './expense.selectors';
-import { selectNoteError, selectNoteIsLoading, selectNoteResponse } from './note.selectors';
-import { selectAccountError, selectAccountIsLoading, selectAccountResponse } from './account.selectors';
-import { selectAuthError, selectAuthIsLoading, selectAuthResponse } from './auth.selectors';
-import { selectNotificationIsLoading } from './notification.selectors';
-import { selectAwsIsLoading } from './aws.selectors';
-import { selectInvoiceError, selectInvoiceIsLoading, selectInvoiceResponse } from './invoice.selectors';
-import { selectStatementError, selectStatementIsLoading, selectStatementResponse } from './statement.selectors';
-import { selectDocumentError, selectDocumentIsLoading, selectDocumentResponse } from './document.selectors';
-import { selectDashboardIsLoading } from './dashboard.selectors';
-
-export const selectGlobalIsLoading = createSelector(
-  selectAccountIsLoading,
-  selectAdditionalIsLoading,
-  selectAuthIsLoading,
-  selectAwsIsLoading,
-  selectCatalogueIsLoading,
-  selectColorIsLoading,
-  selectCurrencyIsLoading,
-  selectDashboardIsLoading,
-  selectDiscountIsLoading,
-  selectDocumentIsLoading,
-  selectExpenseIsLoading,
-
-  selectInvoiceIsLoading,
-
-  selectNoteIsLoading,
-  selectNotificationIsLoading,
-  selectOfficeIsLoading,
-  selectPaymentIsLoading,
-  selectReservationIsLoading,
-  selectRoomIsLoading,
-  selectStatementIsLoading,
-  selectTreatmentIsLoading,
-  selectUnavailableIsLoading,
-  selectUserIsLoading,
-  (...loadings) => loadings.some(Boolean),
-);
+import { selectRoomError, selectRoomResponse } from './room.selectors';
+import { selectTreatmentError, selectTreatmentResponse } from './treatment.selectors';
+import { selectCatalogueError, selectCatalogueResponse } from './catalogue.selectors';
+import { selectDiscountError, selectDiscountResponse } from './discount.selectors';
+import { selectUnavailableError, selectUnavailableResponse } from './unavailable.selectors';
+import { selectUserError, selectUserResponse } from './user.selectors';
+import { selectReservationError, selectReservationResponse } from './reservation.selectors';
+import { selectPaymentError, selectPaymentResponse } from './payment.selectors';
+import { selectAdditionalError, selectAdditionalResponse } from './additional.selectors';
+import { selectCurrencyError, selectCurrencyResponse } from './currency.selectors';
+import { selectOfficeError, selectOfficeResponse } from './office.selectors';
+import { selectColorError, selectColorResponse } from './color.selectors';
+import { selectExpenseError, selectExpenseResponse } from './expense.selectors';
+import { selectNoteError, selectNoteResponse } from './note.selectors';
+import { selectAccountError, selectAccountResponse } from './account.selectors';
+import { selectAuthError, selectAuthResponse } from './auth.selectors';
+import { selectInvoiceError, selectInvoiceResponse } from './invoice.selectors';
+import { selectStatementError, selectStatementResponse } from './statement.selectors';
+import { selectDocumentError, selectDocumentResponse } from './document.selectors';
 
 export const selectGlobalResponse = createSelector(
   selectAccountResponse,

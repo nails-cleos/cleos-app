@@ -1,5 +1,4 @@
 import {
-  enableProdMode,
   importProvidersFrom,
   inject,
   LOCALE_ID,
@@ -183,14 +182,6 @@ const providers = [
   provideEffects(I18NEffects),
 ];
 
-if (environment.production) {
-  enableProdMode();
-}
-
 bootstrapApplication(AppComponent, {
   providers: [provideZoneChangeDetection(), ...providers],
-}).then(() => {
-  if ('serviceWorker' in navigator && environment.production) {
-    navigator.serviceWorker.register('ngsw-worker.js');
-  }
 }).catch(err => console.error(err));

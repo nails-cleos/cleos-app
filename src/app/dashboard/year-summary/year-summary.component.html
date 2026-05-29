@@ -57,7 +57,7 @@
   @if (getForm.date.value) {
     @if (yearSummaryMap?.size) {
       <app-year [quarterSummaries]="quarterSummaries" [year]="getForm.date.value.getFullYear()"
-                [measure]="(isHandset$ | async) ? 'short' : 'long'" [currency]="currencySignal()"
+                [measure]="isHandset() ? 'short' : 'long'" [currency]="currencySignal()"
                 [showCash]="showCash()"></app-year>
 
       <section class="app-surface-section">

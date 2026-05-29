@@ -26,7 +26,6 @@ describe('NavComponent', () => {
   let fixture: ComponentFixture<NavComponent>;
 
   let response$: BehaviorSubject<any>;
-  let isLoading$: BehaviorSubject<any>;
   let error$: BehaviorSubject<any>;
   let message$: BehaviorSubject<any>;
   let isAuthenticated$: BehaviorSubject<any>;
@@ -82,7 +81,6 @@ describe('NavComponent', () => {
 
   beforeEach(async () => {
     response$ = new BehaviorSubject(undefined);
-    isLoading$ = new BehaviorSubject(true);
     error$ = new BehaviorSubject(undefined);
     message$ = new BehaviorSubject(undefined);
     notification$ = new BehaviorSubject(undefined);
@@ -122,10 +120,8 @@ describe('NavComponent', () => {
       selectCallIndex++;
       switch (selectCallIndex) {
         case 1:
-          return isLoading$.asObservable();
-        case 2:
           return response$.asObservable();
-        case 3:
+        case 2:
           return error$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -270,7 +266,6 @@ describe('NavComponent', () => {
     expect(component.countNotifications()).toBe(0);
 
     isAuthenticated$.next(true);
-    isLoading$.next(false);
     user$.next(mockUser);
 
     fixture.detectChanges();
@@ -340,7 +335,6 @@ describe('NavComponent', () => {
 
   it('should dispatch redirect', () => {
     isAuthenticated$.next(true);
-    isLoading$.next(false);
     user$.next(mockUser);
     redirect$.next(false);
     fixture.detectChanges();
@@ -350,7 +344,6 @@ describe('NavComponent', () => {
 
   it('should navigate to home when not authenticated', () => {
     isAuthenticated$.next(false);
-    isLoading$.next(false);
     redirect$.next(false);
     fixture.detectChanges();
 
@@ -359,7 +352,6 @@ describe('NavComponent', () => {
 
   it('should navigate to home when redirect', () => {
     isAuthenticated$.next(true);
-    isLoading$.next(false);
     user$.next(mockUser);
     redirect$.next(true);
     fixture.detectChanges();

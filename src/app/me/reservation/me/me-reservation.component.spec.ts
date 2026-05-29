@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, of, Subject } from 'rxjs';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MeReservationComponent } from './me-reservation.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -15,6 +15,7 @@ import { Role } from '../../../interfaces/token';
 import { IGroupService, ITreatmentAll, Price } from '../../../interfaces/treatment';
 import { IRoomAll, ServiceType } from '../../../interfaces/room';
 import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
+import { ToastService } from '../../../services/toast.service';
 
 describe('MeReservationComponent', () => {
   let component: MeReservationComponent;
@@ -164,6 +165,7 @@ describe('MeReservationComponent', () => {
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let firebaseServiceSpy: jasmine.SpyObj<FirebaseService>;
+  let toastServiceSpy: jasmine.SpyObj<ToastService>;
 
   beforeEach(async () => {
     navigationParams$ = new BehaviorSubject(undefined);
@@ -189,6 +191,11 @@ describe('MeReservationComponent', () => {
       authUser: authUserSignal.asReadonly(),
     });
     firebaseServiceSpy = jasmine.createSpyObj('FirebaseService', ['logEvent']);
+    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
+    toastServiceSpy.show.and.returnValue({
+      onAction: () => of(void 0),
+      onDismiss: () => of(void 0),
+    });
 
     const storeStreams = [
       navigationParams$,
@@ -213,6 +220,7 @@ describe('MeReservationComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: FirebaseService, useValue: firebaseServiceSpy },
+        { provide: ToastService, useValue: toastServiceSpy },
       ],
     }).compileComponents();
 

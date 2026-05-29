@@ -1,7 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { dateMonthYear, getNowTimeZone } from '../../util/dates';
@@ -46,7 +44,7 @@ import { MatSuffix } from '@angular/material/form-field';
 import { MatSelect } from '@angular/material/select';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { AsyncPipe, KeyValuePipe } from '@angular/common';
+import { KeyValuePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 type YearSummaryForm = {
@@ -60,7 +58,7 @@ type YearSummaryForm = {
   styleUrls: ['./year-summary.component.scss'],
   imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatSelect,
     MatOption, MatIcon, MatButton, MatSuffix, ReactiveFormsModule, TranslatePipe, KeyValuePipe,
-    RouterLink, YearComponent, TotalSummaryComponent, AsyncPipe],
+    RouterLink, YearComponent, TotalSummaryComponent],
   providers: [...provideYearDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -100,8 +98,26 @@ export class YearSummaryComponent {
 
   yearSummaryMapSignal = toSignal(this.yearSummaryMap$);
   yearExportSignal = toSignal(this.yearExport$);
+  private breakpointsSignal = toSignal(
+    this.breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small,
+      Breakpoints.Medium,
+    ]),
+    {
+      initialValue: {
+        matches: false,
+        breakpoints: {
+          [Breakpoints.XSmall]: false,
+          [Breakpoints.Small]: false,
+          [Breakpoints.Medium]: false,
+        },
+      },
+    },
+  );
 
   showCash = computed(() => this.authUserSignal()?.showCash || false);
+  isHandset = computed(() => this.breakpointsSignal().matches);
   currencySignal = computed(() => getCurrencyFromRoom(this.selectedRoomSignal(), this.primaryRoomSignal()));
   yearSummaryTotalsSignal = computed(() => {
     const quarterSummaries = this.quarterSummariesSignal();
@@ -136,12 +152,6 @@ export class YearSummaryComponent {
 
     return yearSummaryTotals;
   });
-
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe([
-    Breakpoints.XSmall,
-    Breakpoints.Small,
-    Breakpoints.Medium,
-  ]).pipe(map(result => result.matches), shareReplay());
 
   isExportLoading = signal<boolean>(false);
   language: string = this.translate.getCurrentLang();
