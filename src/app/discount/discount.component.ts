@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
@@ -12,7 +12,6 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import {
   getCurrenciesPipe,
-  getCurrentDiscountIdPipe,
   getSelectedDiscountPipe,
   getSubErrorsPipe,
 } from '../store/selectors/discount.selectors';
@@ -44,17 +43,17 @@ type DiscountForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DiscountComponent {
+  id = input<string>();
+
   private readonly store: Store<DiscountState> = inject(Store<DiscountState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private discountId$ = this.store.pipe(getCurrentDiscountIdPipe);
   private selectedDiscount$ = this.store.pipe(getSelectedDiscountPipe);
   private allCurrencies$ = this.store.pipe(getCurrenciesPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
-  private discountIdSignal = toSignal(this.discountId$, { initialValue: null });
   private selectedDiscountSignal = toSignal(this.selectedDiscount$);
   private subErrorsSignal = toSignal(this.subErrors$);
 
@@ -90,7 +89,7 @@ export class DiscountComponent {
     ),
   );
 
-  isAddModeSignal = computed(() => !this.discountIdSignal());
+  isAddModeSignal = computed(() => !this.id());
   errors = signal<Record<string, unknown>>({});
 
   private readonly language: string = this.translate.getCurrentLang();
@@ -122,7 +121,7 @@ export class DiscountComponent {
     });
 
     effect(() => {
-      const id = this.discountIdSignal();
+      const id = this.id();
       if (id) {
         this.store.dispatch(getDiscount({ id }));
       }
@@ -145,7 +144,7 @@ export class DiscountComponent {
     discount.type = fieldChange(this.getForm.type, discountSignal?.type);
     discount.amount = fieldChange(this.getForm.amount, discountSignal?.amount);
 
-    const id = this.discountIdSignal();
+    const id = this.id();
     if (!id) {
       discount.currencyId = this.getForm.currency.value?.id;
       this.store.dispatch(createDiscount({ discount }));

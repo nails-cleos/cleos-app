@@ -1,15 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Currency, ICurrency } from '../interfaces/currency';
 import { createCurrency, getCurrency, updateCurrency } from '../store/currency.actions';
 import { fieldChange } from '../util/validators';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import {
-  getCurrentCurrencyIdPipe,
-  getSelectedCurrencyPipe,
-  getSubErrorsPipe,
-} from '../store/selectors/currency.selectors';
+import { getSelectedCurrencyPipe, getSubErrorsPipe } from '../store/selectors/currency.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../interfaces/common';
 import { CurrencyState } from '../store/reducers/currency.reducers';
@@ -35,22 +31,20 @@ type CurrencyForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CurrencyComponent {
+  id = input<string>();
+
   private readonly store: Store<CurrencyState> = inject(Store<CurrencyState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  private currencyId$ = this.store.pipe(getCurrentCurrencyIdPipe);
   private selectedCurrency$ = this.store.pipe(getSelectedCurrencyPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
-  private currencyIdSignal = toSignal(this.currencyId$);
   private selectedCurrencySignal = toSignal(this.selectedCurrency$);
   private subErrorsSignal = toSignal(this.subErrors$);
 
-  private currencyId = computed(() => this.currencyIdSignal());
-
   currencySignal = computed(() => this.selectedCurrencySignal());
 
-  isAddModeSignal = computed(() => !this.currencyId());
+  isAddModeSignal = computed(() => !this.id());
   errors = signal<Record<string, unknown>>({});
 
   form: FormGroup<CurrencyForm> = this.formBuilder.group<CurrencyForm>({
@@ -89,7 +83,7 @@ export class CurrencyComponent {
     });
 
     effect(() => {
-      const id = this.currencyId();
+      const id = this.id();
       if (id) {
         this.store.dispatch(getCurrency({ id }));
       }
@@ -111,7 +105,7 @@ export class CurrencyComponent {
     currency.name = fieldChange(this.getForm.name, currencySignal?.name);
     currency.icon = fieldChange(this.getForm.icon, currencySignal?.icon);
 
-    const id = this.currencyId();
+    const id = this.id();
     if (!id) {
       this.store.dispatch(createCurrency({ currency }));
     } else {

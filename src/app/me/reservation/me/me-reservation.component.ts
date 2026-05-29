@@ -4,6 +4,7 @@ import {
   computed,
   effect,
   inject,
+  input,
   signal,
   untracked,
   viewChild,
@@ -96,7 +97,6 @@ import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
 import {
   getAdditionalListPipe,
   getAvailableListPipe,
-  getCurrentReservationIdPipe,
   getCustomerReservationPipe,
   getMeNavigationParamsPipe,
   getRoomsPipe,
@@ -174,6 +174,8 @@ const ME_RESERVATION_ERROR_FIELDS = [
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MeReservationComponent {
+  id = input<string>();
+
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
@@ -186,7 +188,6 @@ export class MeReservationComponent {
   private readonly formErrorService = inject(ReservationFormErrorService);
 
   private navigationParams$ = this.store.pipe(getMeNavigationParamsPipe);
-  private reservationId$ = this.store.pipe(getCurrentReservationIdPipe);
   private additionalList$ = this.store.pipe(getAdditionalListPipe);
   private treatmentDiscount$ = this.store.pipe(getTreatmentDiscountPipe);
   private rooms$ = this.store.pipe(getRoomsPipe);
@@ -199,7 +200,6 @@ export class MeReservationComponent {
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
   private readonly navigationParams = toSignal(this.navigationParams$);
-  private readonly reservationIdSignal = toSignal(this.reservationId$);
   private readonly treatmentDiscountSignal = toSignal(this.treatmentDiscount$);
   private readonly roomsSignal = toSignal(this.rooms$);
   private readonly selectedReservationSignal = toSignal(this.selectedReservation$);
@@ -493,7 +493,7 @@ export class MeReservationComponent {
     });
 
     effect(() => {
-      const reservationId = this.reservationIdSignal();
+      const reservationId = this.id();
       if (reservationId) {
         this.firebaseService.logEvent('screen_view', {
           // eslint-disable-next-line camelcase

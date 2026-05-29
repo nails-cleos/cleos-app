@@ -17,7 +17,6 @@ describe('TreatmentComponent', () => {
   let storeSpy: jasmine.SpyObj<Store<TreatmentState>>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
 
-  let treatmentId$: BehaviorSubject<any>;
   let selectedTreatment$: BehaviorSubject<any>;
   let allColors$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
@@ -37,7 +36,6 @@ describe('TreatmentComponent', () => {
   };
 
   beforeEach(async () => {
-    treatmentId$ = new BehaviorSubject<any>(null);
     selectedTreatment$ = new BehaviorSubject<any>(undefined);
     allColors$ = new BehaviorSubject<any>(undefined);
     subErrors$ = new BehaviorSubject<any>(undefined);
@@ -58,14 +56,12 @@ describe('TreatmentComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return treatmentId$.asObservable();
-        case 2:
           return selectedTreatment$.asObservable();
-        case 3:
+        case 2:
           return allColors$.asObservable();
-        case 4:
+        case 3:
           return subErrors$.asObservable();
-        case 5:
+        case 4:
           return histories$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -98,7 +94,7 @@ describe('TreatmentComponent', () => {
   it('should derive mode from route and treatment id', () => {
     expect(component.mode()).toBe('add');
 
-    treatmentId$.next('123');
+    fixture.componentRef.setInput('id', '123');
     fixture.detectChanges();
     expect(component.mode()).toBe('edit');
 
@@ -108,11 +104,8 @@ describe('TreatmentComponent', () => {
   });
 
   it('should dispatch getTreatment when treatmentId emits a value', () => {
-    // reset calls
     storeSpy.dispatch.calls.reset();
-
-    // emit an id (simulate edit mode)
-    treatmentId$.next('123');
+    fixture.componentRef.setInput('id', '123');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getTreatmentGroup({ id: '123', path: 'edit' }));
@@ -215,8 +208,7 @@ describe('TreatmentComponent', () => {
   it('should dispatch updateTreatment when in edit mode and form valid', () => {
     storeSpy.dispatch.calls.reset();
 
-    // simulate edit mode
-    treatmentId$.next('abc-123');
+    fixture.componentRef.setInput('id', 'abc-123');
     selectedTreatment$.next(
       { id: 'abc-123', name: 'Old', description: 'old', treatments: [{ name: 't1', duration: 'PT10M' }] },
     );

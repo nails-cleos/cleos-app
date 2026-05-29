@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { createTransaction, getAccount } from '../../store/account.actions';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -14,7 +14,6 @@ import { IError } from '../../interfaces/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
   getAccountResponsePipe,
-  getCurrentAccountIdPipe,
   getSelectedAccountPipe,
   getSubErrorsPipe,
 } from '../../store/selectors/account.selectors';
@@ -42,24 +41,24 @@ export type TransactionForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransactionComponent {
+  id = input<string>();
+
   private readonly store: Store<AccountState | PaymentState> = inject(Store<AccountState | PaymentState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private readonly accountId$ = this.store.pipe(getCurrentAccountIdPipe);
   private readonly selectedAccount$ = this.store.pipe(getSelectedAccountPipe);
   private readonly subErrors$ = this.store.pipe(getSubErrorsPipe);
   private readonly response$ = this.store.pipe(getAccountResponsePipe);
   private readonly paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
-  private accountIdSignal = toSignal(this.accountId$, { initialValue: null });
   private selectedAccountSignal = toSignal(this.selectedAccount$);
   private subErrorsSignal = toSignal(this.subErrors$);
   private responseSignal = toSignal(this.response$);
   private authUserSignal = this.authUserService.authUser;
-  private accountId = computed(() => this.accountIdSignal());
+  private accountId = computed(() => this.id());
   private paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
 
   errors = signal<Record<string, unknown>>({});
@@ -165,7 +164,7 @@ export class TransactionComponent {
       amount,
       paymentRequest: { type, transfer },
     };
-    const id = this.accountIdSignal()!;
+    const id = this.id()!;
     this.store.dispatch(createTransaction({ id, transaction }));
     return;
   }

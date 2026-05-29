@@ -12,15 +12,6 @@ const selectCurrencyPaginationData = createSelector(
 );
 export const getCurrencyPaginationPipe = pipe(select(selectCurrencyPaginationData));
 
-const selectCurrentCurrencyId = createSelector(
-  selectCurrencyState,
-  (state: CurrencyState) => state?.currentCurrencyId,
-);
-export const getCurrentCurrencyIdPipe = pipe(
-  select(selectCurrentCurrencyId),
-  filter((val): val is string => val !== undefined),
-);
-
 const selectedCurrency = createSelector(
   selectCurrencyState,
   (state: CurrencyState) => state?.selected,

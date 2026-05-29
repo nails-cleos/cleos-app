@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 import { concatMap } from 'rxjs/operators';
-import { cleanCatalogue, getAllCatalogues, getAllTreatmentsGroup, setCurrentCatalogueId } from '../store/catalogue.actions';
+import { cleanCatalogue, getAllCatalogues, getAllTreatmentsGroup } from '../store/catalogue.actions';
 
 @Injectable()
 export class CatalogueNavigationEffects {
@@ -23,11 +23,7 @@ export class CatalogueNavigationEffects {
         // 2) /catalogues/:id
         const detailMatch = url.match(/\/catalogues\/([^\/]+)$/);
         if (detailMatch) {
-          return [
-            cleanCatalogue(),
-            getAllTreatmentsGroup(),
-            setCurrentCatalogueId({ catalogueId: detailMatch[1] }),
-          ];
+          return [cleanCatalogue(), getAllTreatmentsGroup()];
         }
 
         // 3) /catalogues

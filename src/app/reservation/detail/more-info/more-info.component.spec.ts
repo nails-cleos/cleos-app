@@ -27,7 +27,6 @@ describe('MoreInfoComponent', () => {
   let component: MoreInfoComponent;
   let fixture: ComponentFixture<MoreInfoComponent>;
 
-  let reservationId$: BehaviorSubject<any>;
   let payments$: BehaviorSubject<any>;
   let tracking$: BehaviorSubject<any>;
   let review$: BehaviorSubject<any>;
@@ -60,7 +59,6 @@ describe('MoreInfoComponent', () => {
   } as IReservationAll;
 
   beforeEach(async () => {
-    reservationId$ = new BehaviorSubject<any>(undefined);
     payments$ = new BehaviorSubject<any>(undefined);
     tracking$ = new BehaviorSubject<any>(undefined);
     review$ = new BehaviorSubject<any>(undefined);
@@ -74,12 +72,10 @@ describe('MoreInfoComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return reservationId$.asObservable();
-        case 2:
           return payments$.asObservable();
-        case 3:
+        case 2:
           return tracking$.asObservable();
-        case 4:
+        case 3:
           return review$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -103,7 +99,6 @@ describe('MoreInfoComponent', () => {
   });
 
   afterEach(() => {
-    reservationId$.complete();
     payments$.complete();
     tracking$.complete();
     review$.complete();
@@ -117,10 +112,9 @@ describe('MoreInfoComponent', () => {
   describe('should initialize signals', () => {
     it('should initialize reservationIdSignal', () => {
       const id = 'reservation-1';
-      reservationId$.next(id);
+      fixture.componentRef.setInput('id', id);
       fixture.detectChanges();
 
-      expect(component['reservationIdSignal']()).toBe(id);
       expect(storeSpy.dispatch).toHaveBeenCalledWith(getTrackingByReservationId({ id }));
       expect(storeSpy.dispatch).toHaveBeenCalledWith(reservationFindPayments({ id }));
       expect(storeSpy.dispatch).toHaveBeenCalledWith(getReview({ id }));
@@ -171,7 +165,7 @@ describe('MoreInfoComponent', () => {
 
   it('should call execute when reservationId is defined', () => {
     const id = 'reservation-1';
-    reservationId$.next(id);
+    fixture.componentRef.setInput('id', id);
     fixture.detectChanges();
 
     component.execute();
@@ -199,7 +193,7 @@ describe('MoreInfoComponent', () => {
       completedTimestamp: now.getTime() / 1000,
     };
 
-    reservationId$.next(id);
+    fixture.componentRef.setInput('id', id);
     tracking$.next(tracking);
 
     fixture.detectChanges();

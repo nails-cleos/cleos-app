@@ -15,7 +15,6 @@ import {
   getUnavailablePage,
   professionalSuccess,
   roomSuccess,
-  setCurrentUnavailableId,
   setUnavailableParams,
   unavailableFailure,
   unavailableSaveSuccess,
@@ -35,7 +34,6 @@ export interface UnavailableState {
   error?: IError;
   subErrors?: IError[];
   selected?: IUnavailableAll;
-  currentUnavailableId?: string;
   unavailableParams?: { date?: Date; room?: IRoomAll; };
   isLoading: boolean;
 }
@@ -48,7 +46,6 @@ export const initialState: UnavailableState = {
   subErrors: undefined,
   selected: undefined,
   response: undefined,
-  currentUnavailableId: undefined,
   unavailableParams: undefined,
   isLoading: false,
 };
@@ -124,10 +121,6 @@ export const unavailableReducer = createReducer(
     rooms,
     subErrors: undefined,
     response: undefined,
-  })),
-  on(setCurrentUnavailableId, (state, { unavailableId }) => ({
-    ...state,
-    currentUnavailableId: unavailableId,
   })),
   on(setUnavailableParams, (state, { date, room }) => ({
     ...state,

@@ -9,7 +9,6 @@ import {
   deleteCurrency,
   getCurrenciesPage,
   getCurrency,
-  setCurrentCurrencyId,
   updateCurrency,
 } from '../currency.actions';
 import { ICurrency } from '../../interfaces/currency';
@@ -26,7 +25,6 @@ export interface CurrencyState {
   subErrors?: IError[];
   selected?: ICurrency;
   isLoading: boolean;
-  currentCurrencyId?: string;
 }
 
 export const initialState: CurrencyState = {
@@ -36,7 +34,6 @@ export const initialState: CurrencyState = {
   selected: undefined,
   response: undefined,
   isLoading: false,
-  currentCurrencyId: undefined,
 };
 
 export const currencyReducer = createReducer(
@@ -86,10 +83,6 @@ export const currencyReducer = createReducer(
     response: undefined,
     isLoading: true,
     selected: undefined,
-  })),
-  on(setCurrentCurrencyId, (state, { currencyId }) => ({
-    ...state,
-    currentCurrencyId: currencyId,
   })),
   on(clean, () => initialState),
 

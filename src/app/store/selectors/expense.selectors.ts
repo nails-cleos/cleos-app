@@ -12,15 +12,6 @@ const selectExpensePaginationData = createSelector(
 );
 export const getExpensePaginationPipe = pipe(select(selectExpensePaginationData));
 
-const selectCurrentExpenseId = createSelector(
-  selectExpenseState,
-  (state: ExpenseState) => state?.currentExpenseId,
-);
-export const getCurrentExpenseIdPipe = pipe(
-  select(selectCurrentExpenseId),
-  filter((val): val is string => val !== undefined),
-);
-
 const selectedExpense = createSelector(
   selectExpenseState,
   (state: ExpenseState) => state?.selected,

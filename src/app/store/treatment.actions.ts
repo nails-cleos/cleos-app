@@ -22,7 +22,6 @@ enum TreatmentActionTypes {
   deleteTreatmentGroup = '[Treatment] Delete treatment group by id',
   getAllTreatmentsHistory = '[Treatment] Get all treatments history',
   treatmentHistorySuccess = '[Treatment] History success',
-  setCurrentTreatmentId = '[Treatment] Set current treatment id',
   clean = '[Treatment] Clean'
 }
 
@@ -104,9 +103,5 @@ export const treatmentHistorySuccess = createAction(
   props<{ history: ITreatmentAll[] }>(),
 );
 
-export const setCurrentTreatmentId = createAction(
-  TreatmentActionTypes.setCurrentTreatmentId,
-  props<{ treatmentId: string }>(),
-);
 
 export const cleanTreatment = createAction(TreatmentActionTypes.clean);

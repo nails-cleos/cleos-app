@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
@@ -14,9 +13,6 @@ describe('CurrencyComponent', () => {
   let fixture: ComponentFixture<CurrencyComponent>;
 
   let storeSpy: jasmine.SpyObj<Store<CurrencyState>>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-
-  let currencyId$: BehaviorSubject<any>;
   let selectedCurrency$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
 
@@ -28,26 +24,18 @@ describe('CurrencyComponent', () => {
   };
 
   beforeEach(async () => {
-    currencyId$ = new BehaviorSubject<any>(null);
     selectedCurrency$ = new BehaviorSubject<any>(undefined);
     subErrors$ = new BehaviorSubject<any>(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return currencyId$.asObservable();
-        case 2:
           return selectedCurrency$.asObservable();
-        case 3:
+        case 2:
           return subErrors$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -58,7 +46,6 @@ describe('CurrencyComponent', () => {
       imports: [CurrencyComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
     }).compileComponents();
 
@@ -75,11 +62,8 @@ describe('CurrencyComponent', () => {
   });
 
   it('should dispatch getCurrency when currencyId emits a value', () => {
-    // reset calls
     storeSpy.dispatch.calls.reset();
-
-    // emit an id (simulate edit mode)
-    currencyId$.next('123');
+    fixture.componentRef.setInput('id', '123');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getCurrency({ id: '123' }));
@@ -149,8 +133,7 @@ describe('CurrencyComponent', () => {
   it('should dispatch updateCurrency when in edit mode and form valid', () => {
     storeSpy.dispatch.calls.reset();
 
-    // simulate edit mode
-    currencyId$.next('abc-123');
+    fixture.componentRef.setInput('id', 'abc-123');
     fixture.detectChanges();
     selectedCurrency$.next({ name: 'Old', code: 'old', icon: 'Old' });
     fixture.detectChanges();

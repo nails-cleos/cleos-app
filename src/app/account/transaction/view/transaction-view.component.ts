@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
@@ -11,7 +11,7 @@ import { getTransactionsByAccountId } from '../../../store/account.actions';
 import { newDateTimestamp } from '../../../util/dates';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { BalanceComponent } from '../../balance/balance.component';
-import { getAccountTransactionPipe, getCurrentAccountIdPipe } from '../../../store/selectors/account.selectors';
+import { getAccountTransactionPipe } from '../../../store/selectors/account.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AccountState } from '../../../store/reducers/account.reducers';
 import {
@@ -48,12 +48,13 @@ import { RouterLink } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransactionViewComponent {
+  id = input<string>();
+
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly store: Store<AccountState> = inject(Store<AccountState>);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
 
-  private accountId$ = this.store.pipe(getCurrentAccountIdPipe);
   private accountTransaction$ = this.store.pipe(getAccountTransactionPipe);
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
@@ -61,7 +62,6 @@ export class TransactionViewComponent {
   private sort = viewChild(MatSort);
   private tableState = createMatTableState(this.paginator, this.sort, 'timestamp', 'desc');
 
-  private accountIdSignal = toSignal(this.accountId$);
   private accountTransactionSignal = toSignal(this.accountTransaction$);
   private authUserSignal = this.authUserService.authUser;
   private breakpointsSignal = toSignal(
@@ -97,7 +97,7 @@ export class TransactionViewComponent {
 
   constructor() {
     effect(() => {
-      const accountId = this.accountIdSignal();
+      const accountId = this.id();
 
       if (accountId) {
         this.getTransactions();
@@ -106,7 +106,7 @@ export class TransactionViewComponent {
   }
 
   private getTransactions = (): void => {
-    const accountId = this.accountIdSignal();
+    const accountId = this.id();
     if (accountId) {
       const request = this.tableState.baseRequest();
       this.store.dispatch(

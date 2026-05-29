@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Color, IColor } from '../interfaces/color';
 import { createColor, getColor, updateColor } from '../store/color.actions';
 import { fieldChange, valueChange } from '../util/validators';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import { getCurrentColorIdPipe, getSelectedColorPipe, getSubErrorsPipe } from '../store/selectors/color.selectors';
+import { getSelectedColorPipe, getSubErrorsPipe } from '../store/selectors/color.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../interfaces/common';
 import { ColorState } from '../store/reducers/color.reducers';
@@ -28,18 +28,18 @@ type ColorForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ColorComponent {
+  id = input<string>();
+
   private readonly store: Store<ColorState> = inject(Store<ColorState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  private colorId$ = this.store.pipe(getCurrentColorIdPipe);
   private selectedColor$ = this.store.pipe(getSelectedColorPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
-  private colorIdSignal = toSignal(this.colorId$);
   private subErrorsSignal = toSignal(this.subErrors$);
 
   colorSignal = toSignal(this.selectedColor$);
-  isAddModeSignal = computed(() => !this.colorIdSignal());
+  isAddModeSignal = computed(() => !this.id());
   errors = signal<Record<string, unknown>>({});
 
   form: FormGroup<ColorForm> = this.formBuilder.group<ColorForm>({
@@ -74,7 +74,7 @@ export class ColorComponent {
     });
 
     effect(() => {
-      const id = this.colorIdSignal();
+      const id = this.id();
       if (id) {
         this.store.dispatch(getColor({ id }));
       }
@@ -95,7 +95,7 @@ export class ColorComponent {
     color.name = fieldChange(this.getForm.name, colorSignal?.name);
     color.description = valueChange(this.getForm.description.value, colorSignal?.description);
 
-    const id = this.colorIdSignal();
+    const id = this.id();
     if (!id) {
       this.store.dispatch(createColor({ color }));
     } else {

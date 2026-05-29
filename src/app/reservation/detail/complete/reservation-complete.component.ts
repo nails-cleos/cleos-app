@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, WritableSignal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { Store } from '@ngrx/store';
 import {
@@ -40,8 +40,7 @@ import { PricePreviewComponent } from '../../../shared/price-preview/price-previ
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import {
-  getAdditionalListPipe,
-  getCurrentCompleteReservationPipe,
+  getAdditionalListPipe, getNavigationParamsPipe,
   getPaymentsPipe,
   getSelectedReservationPipe,
   getTreatmentDiscountPipe,
@@ -82,19 +81,23 @@ type ReservationCompleteForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationCompleteComponent {
+  id = input<string>();
+  roomId = input<string>();
+  customerId = input<string>();
+
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  private completeReservation$ = this.store.pipe(getCurrentCompleteReservationPipe);
+  private reservationParams$ = this.store.pipe(getNavigationParamsPipe);
   private selectedReservation$ = this.store.pipe(getSelectedReservationPipe);
   private treatmentDiscount$ = this.store.pipe(getTreatmentDiscountPipe);
   private additionalList$ = this.store.pipe(getAdditionalListPipe);
   private payments$ = this.store.pipe(getPaymentsPipe);
   private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
-  private readonly completeReservationSignal = toSignal(this.completeReservation$);
+  private readonly reservationParamsSignal = toSignal(this.reservationParams$);
   private readonly treatmentDiscountSignal = toSignal(this.treatmentDiscount$);
   private readonly paymentsSignal = toSignal(this.payments$);
   private readonly paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
@@ -102,10 +105,7 @@ export class ReservationCompleteComponent {
   readonly selectedReservationSignal = toSignal(this.selectedReservation$);
   readonly additionalListSignal = toSignal(this.additionalList$);
 
-  private readonly isDashboard = computed(() => this.completeReservationSignal()?.isDashboard ?? false);
-  private readonly reservationId = computed(() => this.completeReservationSignal()?.reservationId);
-  private readonly roomId = computed(() => this.completeReservationSignal()?.roomId);
-  private readonly customerId = computed(() => this.completeReservationSignal()?.customerId);
+  private readonly isDashboard = computed(() => this.reservationParamsSignal()?.isDashboard ?? false);
 
   startDate: Date = getNowTimeZone();
   endDate: Date = getNowTimeZone();
@@ -225,7 +225,7 @@ export class ReservationCompleteComponent {
     });
 
     effect(() => {
-      const id = this.reservationId();
+      const id = this.id();
       if (!id) {
         return;
       }

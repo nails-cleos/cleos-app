@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, Signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, Signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { combineLatestWith } from 'rxjs';
@@ -15,7 +15,6 @@ import { BalanceComponent } from '../balance/balance.component';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import {
   getAccountResponsePipe,
-  getCurrentCustomerIdPipe,
   getSelectedAccountPipe,
   getSubErrorsPipe,
 } from '../../store/selectors/account.selectors';
@@ -43,18 +42,18 @@ type BalanceForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountComponent {
+  customerId = input<string>();
+
   private readonly store: Store<AccountState> = inject(Store<AccountState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private customerId$ = this.store.pipe(getCurrentCustomerIdPipe);
   private selectedAccount$ = this.store.pipe(getSelectedAccountPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
   private response$ = this.store.pipe(getAccountResponsePipe);
 
-  private customerIdSignal = toSignal(this.customerId$);
   private selectedAccountSignal = toSignal(this.selectedAccount$);
   private subErrorsSignal = toSignal(this.subErrors$);
   private responseSignal = toSignal(this.response$);
@@ -94,7 +93,7 @@ export class AccountComponent {
   );
   userId = computed(() => this.authUserSignal()?.customerId);
   errors = signal<Record<string, unknown>>({});
-  showAdd = computed(() => this.hasAdminRole() && this.customerIdSignal() !== this.userId());
+  showAdd = computed(() => this.hasAdminRole() && this.customerId() !== this.userId());
 
   language: string = getLocale(this.translate.getCurrentLang()).language;
 
@@ -118,7 +117,7 @@ export class AccountComponent {
     effect(() => {
       if (this.responseSignal()) {
         if (this.hasAdminRole()) {
-          this.router.navigate([this.language, 'users', this.customerIdSignal(), 'overview']);
+          this.router.navigate([this.language, 'users', this.customerId(), 'overview']);
         } else {
           this.router.navigate([this.language, 'me', 'overview']);
         }
@@ -126,7 +125,7 @@ export class AccountComponent {
     });
 
     effect(() => {
-      const customerId = this.customerIdSignal();
+      const customerId = this.customerId();
       if (customerId) {
         this.store.dispatch(getAccountByCustomerId({ customerId }));
       }
@@ -139,7 +138,7 @@ export class AccountComponent {
 
   submit(): void {
     const id = this.accountSignal()?.id;
-    const customerId = this.customerIdSignal();
+    const customerId = this.customerId();
     if (this.form.invalid || !id || !customerId) {
       return;
     }

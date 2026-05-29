@@ -13,14 +13,8 @@ enum ColorActionTypes {
   colorSelected = '[Color] Selected',
   getColor = '[Color] Find color by id',
   deleteColor = '[Color] Delete color by id',
-  setCurrentColorId = '[Color] Set current color id',
   clean = '[Color] Clean'
 }
-
-export const setCurrentColorId = createAction(
-  ColorActionTypes.setCurrentColorId,
-  props<{ colorId: string }>(),
-);
 
 export const getColorsPage = createAction(
   ColorActionTypes.getColorsPage,

@@ -10,7 +10,6 @@ import {
   noteSaveSuccess,
   noteSelected,
   noteSuccess,
-  setCurrentNoteId,
   setNoteNavigationParams,
   updateNote,
 } from '../note.actions';
@@ -28,7 +27,6 @@ export interface NoteState {
   error?: IError;
   subErrors?: IError[];
   selected?: INote;
-  currentNoteId?: string;
   noteNavigationParams?: { professional?: IUserAll, date?: Date };
   isLoading: boolean;
 }
@@ -40,7 +38,6 @@ export const initialState: NoteState = {
   error: undefined,
   subErrors: undefined,
   selected: undefined,
-  currentNoteId: undefined,
   noteNavigationParams: undefined,
   isLoading: false,
 };
@@ -91,10 +88,6 @@ export const noteReducer = createReducer(
     subErrors: undefined,
     response: undefined,
     isLoading: true,
-  })),
-  on(setCurrentNoteId, (state, { noteId }) => ({
-    ...state,
-    currentNoteId: noteId,
   })),
   on(setNoteNavigationParams, (state, { date, professional }) => ({
     ...state,

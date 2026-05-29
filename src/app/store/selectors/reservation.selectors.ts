@@ -19,7 +19,6 @@ import { IPaymentAll } from '../../interfaces/payment';
 import { IReview } from '../../interfaces/review';
 import { IColorAll } from '../../interfaces/color';
 import {
-  CurrentCompleteReservationParams,
   DetailReservationParams,
   MeReservationParams,
   ReservationParams,
@@ -40,15 +39,6 @@ const selectCustomerReservationData = createSelector(
 export const getCustomerReservationPipe = pipe(
   select(selectCustomerReservationData),
   filter((val): val is ICustomerReservation => val !== undefined),
-);
-
-const selectCurrentReservationId = createSelector(
-  selectReservationState,
-  (state: ReservationState) => state?.currentReservationId,
-);
-export const getCurrentReservationIdPipe = pipe(
-  select(selectCurrentReservationId),
-  filter((val): val is string => val !== undefined),
 );
 
 const selectMeNavigationParams = createSelector(
@@ -132,15 +122,6 @@ const selectPayments = createSelector(
 export const getPaymentsPipe = pipe(
   select(selectPayments),
   filter((val): val is IPaymentAll[] => val !== undefined),
-);
-
-const selectCurrentCompleteReservation = createSelector(
-  selectReservationState,
-  (state: ReservationState) => state?.currentCompleteReservation,
-);
-export const getCurrentCompleteReservationPipe = pipe(
-  select(selectCurrentCompleteReservation),
-  filter((val): val is CurrentCompleteReservationParams => val !== undefined),
 );
 
 const selectTracking = createSelector(

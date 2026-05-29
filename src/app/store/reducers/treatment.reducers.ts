@@ -11,7 +11,6 @@ import {
   getAllTreatmentsHistory,
   getTreatmentGroup,
   getTreatmentsPage,
-  setCurrentTreatmentId,
   sortTreatment,
   treatmentFailure,
   treatmentHistorySuccess,
@@ -39,7 +38,6 @@ export interface TreatmentState {
   error?: IError;
   subErrors?: IError[];
   selected?: ITreatmentGroupAll;
-  currentTreatmentId?: string;
   isLoading: boolean;
 }
 
@@ -51,7 +49,6 @@ export const initialState: TreatmentState = {
   subErrors: undefined,
   selected: undefined,
   response: undefined,
-  currentTreatmentId: undefined,
   isLoading: false,
 };
 
@@ -146,10 +143,6 @@ export const treatmentReducer = createReducer(
     selected: undefined,
     subErrors: undefined,
     response: undefined,
-  })),
-  on(setCurrentTreatmentId, (state, { treatmentId }) => ({
-    ...state,
-    currentTreatmentId: treatmentId,
   })),
   on(cleanTreatment, () => initialState),
 

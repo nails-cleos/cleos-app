@@ -5,6 +5,7 @@ import {
   effect,
   ElementRef,
   inject,
+  input,
   Signal,
   signal,
   viewChild,
@@ -31,13 +32,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { TreatmentState } from '../store/reducers/treatment.reducers';
 import { toSignal } from '@angular/core/rxjs-interop';
-import {
-  getColorsPipe,
-  getCurrentTreatmentIdPipe,
-  getHistoriesPipe,
-  getSelectedTreatmentPipe,
-  getSubErrorsPipe,
-} from '../store/selectors/treatment.selectors';
+import { getColorsPipe, getHistoriesPipe, getSelectedTreatmentPipe, getSubErrorsPipe } from '../store/selectors/treatment.selectors';
 import { IError, isString } from '../interfaces/common';
 import { DurationTimePipe } from '../pipes/durationTime.pipe';
 import { TreatmentTableComponent } from './table/treatment-table.component';
@@ -72,18 +67,18 @@ type TreatmentForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreatmentComponent {
+  id = input<string>();
+
   private readonly store: Store<TreatmentState> = inject(Store<TreatmentState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly route: ActivatedRoute = inject(ActivatedRoute);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private treatmentId$ = this.store.pipe(getCurrentTreatmentIdPipe);
   private selectedTreatment$ = this.store.pipe(getSelectedTreatmentPipe);
   private allColors$ = this.store.pipe(getColorsPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
   private histories$ = this.store.pipe(getHistoriesPipe);
 
-  private treatmentIdSignal = toSignal(this.treatmentId$);
   private selectedTreatmentSignal = toSignal(this.selectedTreatment$);
   private allColorsSignal = toSignal(this.allColors$);
   private subErrorsSignal = toSignal(this.subErrors$);
@@ -93,14 +88,13 @@ export class TreatmentComponent {
     { initialValue: this.route.snapshot.url.at(-1)?.path ?? 'add' },
   );
 
-  private treatmentId = computed(() => this.treatmentIdSignal());
   private selectedHistoryTreatmentId = signal<string | undefined>(undefined);
 
   mode = computed<TreatmentMode>(() => {
     if (this.routeModeSignal() === 'view') {
       return 'view';
     }
-    return this.treatmentId() ? 'edit' : 'add';
+    return this.id() ? 'edit' : 'add';
   });
   treatmentSignal = computed(() => this.selectedTreatmentSignal());
   viewTreatmentSignal = computed(() => {
@@ -180,7 +174,7 @@ export class TreatmentComponent {
     });
 
     effect(() => {
-      const id = this.treatmentId();
+      const id = this.id();
       const mode = this.mode();
       if (id) {
         this.store.dispatch(getTreatmentGroup({ id, path: mode }));
@@ -271,7 +265,7 @@ export class TreatmentComponent {
       treatmentGroup.colorIds = newColorIds;
     }
 
-    const id = this.treatmentId();
+    const id = this.id();
     if (!id) {
       this.store.dispatch(createTreatment({ treatmentGroup }));
     } else {

@@ -4,6 +4,7 @@ import {
   computed,
   effect,
   inject,
+  input,
   signal,
   untracked,
   viewChildren,
@@ -111,7 +112,6 @@ import { ReservationState } from '../store/reducers/reservation.reducers';
 import {
   getAdditionalListPipe,
   getCalendarPipe,
-  getCurrentReservationIdPipe,
   getCustomerInfoPipe,
   getCustomersPipe,
   getNavigationParamsPipe,
@@ -183,6 +183,8 @@ const RESERVATION_ERROR_FIELDS = [
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationComponent {
+  id = input<string>();
+
   private readonly dialog = inject(MatDialog);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly translate: TranslateService = inject(TranslateService);
@@ -195,7 +197,6 @@ export class ReservationComponent {
   private readonly reservationCalendarService = inject(ReservationCalendarService);
 
   private navigationParams$ = this.store.pipe(getNavigationParamsPipe);
-  private reservationId$ = this.store.pipe(getCurrentReservationIdPipe);
   private customers$ = this.store.pipe(getCustomersPipe);
   private customerInfo$ = this.store.pipe(getCustomerInfoPipe);
   private rooms$ = this.store.pipe(getRoomsPipe);
@@ -208,7 +209,6 @@ export class ReservationComponent {
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
   private readonly navigationParams = toSignal(this.navigationParams$);
-  private readonly reservationIdSignal = toSignal(this.reservationId$);
   private readonly roomsSignal = toSignal(this.rooms$);
   private readonly treatmentDiscountSignal = toSignal(this.treatmentDiscount$);
   private readonly customerInfoSignal = toSignal(this.customerInfo$);
@@ -511,7 +511,7 @@ export class ReservationComponent {
     });
 
     effect(() => {
-      const id = this.reservationIdSignal();
+      const id = this.id();
       if (id) {
         this.reservationId = id;
         this.isEditing.set(true);

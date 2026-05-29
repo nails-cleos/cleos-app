@@ -7,18 +7,15 @@ import {
   cleanReservation,
   getAllRooms,
   getUpcomingReservation,
-  setCurrentReservationId,
   setMeReservationParams,
 } from '../store/reservation.actions';
 import { Router } from '@angular/router';
 import {
   cleanPayment,
   getOptions,
-  setCurrentPathId,
-  setCurrentPaymentId,
   setPaymentResultParams,
 } from '../store/payment.actions';
-import { cleanUser, setCurrentUserId } from '../store/user.actions';
+import { cleanUser } from '../store/user.actions';
 
 @Injectable()
 export class MeNavigationEffects {
@@ -48,17 +45,16 @@ export class MeNavigationEffects {
         // 3) /me/:path/:id/payment?accountId=:accountId
         const pathMatch = url.match(/\/me\/([^/]+)\/([^/]+)\/payment(?:\?.*)?$/);
         if (pathMatch) {
-          const [, path, id] = pathMatch;
-          const queryParams = action.payload.routerState.root.queryParams;
+          const [, path] = pathMatch;
           if (path === 'reservation' || path === 'transaction') {
-            return [cleanPayment(), setCurrentPathId({ path, id, accountId: queryParams?.['accountId'] })];
+            return [cleanPayment()];
           }
         }
 
         // 4) /me/payment/:id
         const paymentIdMatch = url.match(/\/me\/payment\/([^\/]+)$/);
         if (paymentIdMatch) {
-          return [cleanPayment(), getOptions(), setCurrentPaymentId({ paymentId: paymentIdMatch[1] })];
+          return [cleanPayment(), getOptions()];
         }
 
         // 5) /me/reservation/:id/payment/option
@@ -68,7 +64,6 @@ export class MeNavigationEffects {
             cleanPayment(),
             cleanReservation(),
             getOptions(),
-            setCurrentReservationId({ reservationId: paymentReservationIdMatch[1] }),
           ];
         }
 
@@ -104,7 +99,6 @@ export class MeNavigationEffects {
           return [
             cleanReservation(),
             getOptions(),
-            setCurrentReservationId({ reservationId: reservationIdMatch[1] }),
             getUpcomingReservation(),
           ];
         }
@@ -141,7 +135,7 @@ export class MeNavigationEffects {
         // 10) /me/overview
         const overviewMatch = url.match(/\/me\/overview$/);
         if (overviewMatch) {
-          return [cleanUser(), setCurrentUserId({ userId: 'me' })];
+          return [cleanUser()];
         }
 
         return [];

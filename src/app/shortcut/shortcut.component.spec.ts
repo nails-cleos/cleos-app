@@ -2,9 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ShortcutComponent } from './shortcut.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Subject } from 'rxjs';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { NavigationService } from '../services/navigation.service';
 import { signal } from '@angular/core';
 
@@ -12,32 +11,21 @@ describe('ShortcutComponent', () => {
   let component: ShortcutComponent;
   let fixture: ComponentFixture<ShortcutComponent>;
 
-  let paramMap$: Subject<ParamMap>;
-
   let navigateServiceSpy: jasmine.SpyObj<NavigationService>;
   let navigateSpy: jasmine.Spy;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
-  let paramMapSpy: jasmine.SpyObj<ParamMap>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   beforeEach(async () => {
-    paramMap$ = new Subject();
-
-    paramMapSpy = jasmine.createSpyObj('ParamMap', ['get']);
     navigateServiceSpy = jasmine.createSpyObj('NavigationService', ['reload']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
-    });
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      paramMap: paramMap$.asObservable(),
     });
 
     await TestBed.configureTestingModule({
       imports: [ShortcutComponent, TranslateModule.forRoot()],
       providers: [
         { provide: AuthUserService, useValue: authUserServiceSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: NavigationService, useValue: navigateServiceSpy },
       ],
     }).compileComponents();
@@ -54,18 +42,17 @@ describe('ShortcutComponent', () => {
     fixture.detectChanges();
   });
 
-  afterEach(async () => {
-  });
+  const setShortcut = (key: 'calendar' | 'dashboard' | 'reservation') => {
+    fixture.componentRef.setInput('key', key);
+    fixture.detectChanges();
+  };
 
   it('should create', () => {
-    paramMapSpy.get.and.returnValue('calendar');
-
     expect(component).toBeTruthy();
   });
 
   it('should navigate to /en-GB/events if user is room admin and shortcut calendar', () => {
-    paramMapSpy.get.and.returnValue('calendar');
-    paramMap$.next(paramMapSpy);
+    setShortcut('calendar');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -83,8 +70,7 @@ describe('ShortcutComponent', () => {
   });
 
   it('should navigate to /en-GB/reservation/calendar if user is admin', () => {
-    paramMapSpy.get.and.returnValue('calendar');
-    paramMap$.next(paramMapSpy);
+    setShortcut('calendar');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -102,8 +88,7 @@ describe('ShortcutComponent', () => {
   });
 
   it('should navigate to /en-GB/reservation/calendar if user is manager', () => {
-    paramMapSpy.get.and.returnValue('calendar');
-    paramMap$.next(paramMapSpy);
+    setShortcut('calendar');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -121,8 +106,7 @@ describe('ShortcutComponent', () => {
   });
 
   it('should navigate to /en-GB/reservation/calendar if user is professional', () => {
-    paramMapSpy.get.and.returnValue('calendar');
-    paramMap$.next(paramMapSpy);
+    setShortcut('calendar');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -140,8 +124,7 @@ describe('ShortcutComponent', () => {
   });
 
   it('should navigate to /en-GB/me/reservations if user is customer', () => {
-    paramMapSpy.get.and.returnValue('calendar');
-    paramMap$.next(paramMapSpy);
+    setShortcut('calendar');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -159,8 +142,7 @@ describe('ShortcutComponent', () => {
   });
 
   it('should navigate to /en-GB/events if user is room admin', () => {
-    paramMapSpy.get.and.returnValue('dashboard');
-    paramMap$.next(paramMapSpy);
+    setShortcut('dashboard');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -178,8 +160,7 @@ describe('ShortcutComponent', () => {
   });
 
   it('should navigate to /en-GB/dashboard if user is admin', () => {
-    paramMapSpy.get.and.returnValue('dashboard');
-    paramMap$.next(paramMapSpy);
+    setShortcut('dashboard');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -197,8 +178,7 @@ describe('ShortcutComponent', () => {
   });
 
   it('should navigate to /en-GB/dashboard if user is manager', () => {
-    paramMapSpy.get.and.returnValue('dashboard');
-    paramMap$.next(paramMapSpy);
+    setShortcut('dashboard');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -216,8 +196,7 @@ describe('ShortcutComponent', () => {
   });
 
   it('should navigate to /en-GB/dashboard if user is professional', () => {
-    paramMapSpy.get.and.returnValue('dashboard');
-    paramMap$.next(paramMapSpy);
+    setShortcut('dashboard');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -235,8 +214,7 @@ describe('ShortcutComponent', () => {
   });
 
   it('should navigate to /en-GB/me/overview if user is customer', () => {
-    paramMapSpy.get.and.returnValue('dashboard');
-    paramMap$.next(paramMapSpy);
+    setShortcut('dashboard');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -254,8 +232,7 @@ describe('ShortcutComponent', () => {
   });
 
   it('should navigate to /en-GB/reservation if user is not customer', () => {
-    paramMapSpy.get.and.returnValue('reservation');
-    paramMap$.next(paramMapSpy);
+    setShortcut('reservation');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -273,8 +250,7 @@ describe('ShortcutComponent', () => {
   });
 
   it('should navigate to /en-GB/me/reservation if user is customer', () => {
-    paramMapSpy.get.and.returnValue('reservation');
-    paramMap$.next(paramMapSpy);
+    setShortcut('reservation');
 
     authUserSignal.update(prev => ({
       ...prev,

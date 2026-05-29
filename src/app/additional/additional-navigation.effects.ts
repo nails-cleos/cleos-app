@@ -6,7 +6,6 @@ import {
   cleanAdditional,
   getAdditionalList,
   getAllTreatmentsGroup,
-  setCurrentAdditionalId,
 } from '../store/additional.actions';
 
 @Injectable()
@@ -34,11 +33,7 @@ export class AdditionalNavigationEffects {
         // 3) /additional/:id
         const detailMatch = url.match(/\/additional\/([^\/]+)$/);
         if (detailMatch) {
-          return [
-            cleanAdditional(),
-            getAllTreatmentsGroup(),
-            setCurrentAdditionalId({ additionalId: detailMatch[1] }),
-          ];
+          return [cleanAdditional(), getAllTreatmentsGroup()];
         }
 
         // 4) /additional

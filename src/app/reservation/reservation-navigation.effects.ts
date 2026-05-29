@@ -6,8 +6,6 @@ import {
   cleanReservation,
   getAllRooms,
   getCustomers,
-  setCurrentCompleteReservation,
-  setCurrentReservationId,
   setDetailReservationParams,
   setReservationParams,
 } from '../store/reservation.actions';
@@ -40,11 +38,8 @@ export class ReservationNavigationEffects {
           return [
             cleanReservation(),
             getOptions(),
-            setCurrentCompleteReservation({
-              reservationId: completeDetailMatch[1],
-              roomId: completeDetailMatch[2],
-              customerId: completeDetailMatch[3],
-              isDashboard: navigationState?.['isDashboard'] ?? false,
+            setReservationParams({
+              isDashboard: navigationState?.['isDashboard'],
             }),
           ];
         }
@@ -52,7 +47,7 @@ export class ReservationNavigationEffects {
         // 3) /reservation/:id/more-info
         const moreInfoDetailMatch = url.match(/\/reservation\/([^\/]+)\/more-info$/);
         if (moreInfoDetailMatch) {
-          return [cleanReservation(), setCurrentReservationId({ reservationId: moreInfoDetailMatch[1] })];
+          return [cleanReservation()];
         }
 
         // 4) /reservation/search
@@ -70,7 +65,6 @@ export class ReservationNavigationEffects {
             return [
               cleanReservation(),
               getOptions(),
-              setCurrentReservationId({ reservationId: editMatch[1] }),
               setReservationParams({
                 customerId: navigationState['customerId'],
                 isDashboard: navigationState['isDashboard'],
@@ -84,7 +78,7 @@ export class ReservationNavigationEffects {
               }),
             ];
           }
-          return [cleanReservation(), getOptions(), setCurrentReservationId({ reservationId: editMatch[1] })];
+          return [cleanReservation(), getOptions()];
         }
 
         // 7) /reservation/:id
@@ -93,7 +87,6 @@ export class ReservationNavigationEffects {
           return [
             cleanReservation(),
             getOptions(),
-            setCurrentReservationId({ reservationId: detailMatch[1] }),
             setDetailReservationParams({ step: navigationState?.['step'] }),
           ];
         }

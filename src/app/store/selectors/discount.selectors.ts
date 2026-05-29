@@ -37,15 +37,6 @@ export const getReferralsPipe = pipe(
   filter((val): val is IReferral[] => val !== undefined),
 );
 
-const selectCurrentDiscountId = createSelector(
-  selectDiscountState,
-  (state: DiscountState) => state?.currentDiscountId,
-);
-export const getCurrentDiscountIdPipe = pipe(
-  select(selectCurrentDiscountId),
-  filter((val): val is string => val !== undefined),
-);
-
 const selectedDiscount = createSelector(
   selectDiscountState,
   (state: DiscountState) => state?.selected,

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
@@ -10,7 +10,6 @@ import { map, startWith } from 'rxjs/operators';
 import { SortByPipe } from '../pipes/sort-by.pipe';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import {
-  getCurrentCatalogueIdPipe,
   getGroupPipe,
   getSelectedCataloguePipe,
   getSubErrorsPipe,
@@ -45,19 +44,17 @@ type CatalogueForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueComponent {
+  id = input<string>();
+
   private readonly store: Store<CatalogueState> = inject(Store<CatalogueState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  private catalogueId$ = this.store.pipe(getCurrentCatalogueIdPipe);
   private selectedCatalogue$ = this.store.pipe(getSelectedCataloguePipe);
   private allGroups$ = this.store.pipe(getGroupPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
-  private catalogueIdSignal = toSignal(this.catalogueId$, { initialValue: null });
   private selectedCatalogueSignal = toSignal(this.selectedCatalogue$);
   private subErrorsSignal = toSignal(this.subErrors$);
-
-  private catalogueId = computed(() => this.catalogueIdSignal());
 
   form: FormGroup<CatalogueForm> = this.formBuilder.group<CatalogueForm>({
     name: this.formBuilder.control('', {
@@ -87,7 +84,7 @@ export class CatalogueComponent {
       }),
     ),
   );
-  isAddModeSignal = computed(() => !this.catalogueId());
+  isAddModeSignal = computed(() => !this.id());
   errors = signal<Record<string, unknown>>({});
   file = signal<UploadFile | undefined>(undefined);
   image = signal<string | undefined>(undefined);
@@ -112,7 +109,7 @@ export class CatalogueComponent {
     });
 
     effect(() => {
-      const id = this.catalogueId();
+      const id = this.id();
       if (id) {
         this.store.dispatch(getCatalogue({ id }));
       }
@@ -160,7 +157,7 @@ export class CatalogueComponent {
     catalogue.catalog = fieldChange(this.getForm.catalog, catalogueSignal?.catalog);
     catalogue.groupId = this.getForm.group.value?.id;
 
-    const id = this.catalogueId();
+    const id = this.id();
     if (!id) {
       this.store.dispatch(createCatalogue({ catalogue, resizedImageDataUrl }));
     } else {

@@ -15,15 +15,6 @@ export const getCurrentLangPipe = pipe(
   filter((val): val is string => val !== undefined),
 );
 
-const selectCurrentTreatmentId = createSelector(
-  selectMainState,
-  (state: MainState) => state?.currentTreatmentId,
-);
-export const getCurrentTreatmentIdPipe = pipe(
-  select(selectCurrentTreatmentId),
-  filter((val): val is string => val !== undefined),
-);
-
 const selectCatalogue = createSelector(
   selectMainState,
   (state: MainState) => state?.catalogue,

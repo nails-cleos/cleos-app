@@ -35,15 +35,6 @@ export const getAllUsersPipe = pipe(
   filter((val): val is IUserAll[] => val !== undefined),
 );
 
-const selectCurrentUserId = createSelector(
-  selectUserState,
-  (state: UserState) => state?.currentUserId,
-);
-export const getCurrentUserIdPipe = pipe(
-  select(selectCurrentUserId),
-  filter((val): val is string => val !== undefined),
-);
-
 const selectUserPaginationData = createSelector(
   selectUserState,
   (state: UserState) => state?.data,

@@ -15,7 +15,6 @@ import {
   getAllCatalogues,
   getAllTreatmentsGroup,
   getCatalogue,
-  setCurrentCatalogueId,
   updateCatalogue,
   updateCatalogueOrder,
 } from '../catalogue.actions';
@@ -31,7 +30,6 @@ export interface CatalogueState {
   subErrors?: IError[];
   selected?: ICatalogueAll;
   isLoading: boolean;
-  currentCatalogueId?: string;
 }
 
 export const initialState: CatalogueState = {
@@ -42,7 +40,6 @@ export const initialState: CatalogueState = {
   subErrors: undefined,
   selected: undefined,
   isLoading: false,
-  currentCatalogueId: undefined,
 };
 
 export const catalogueReducer = createReducer(
@@ -120,11 +117,6 @@ export const catalogueReducer = createReducer(
     groups,
     response: undefined,
     subErrors: undefined,
-  })),
-
-  on(setCurrentCatalogueId, (state, { catalogueId }) => ({
-    ...state,
-    currentCatalogueId: catalogueId,
   })),
   on(cleanCatalogue, () => initialState),
 

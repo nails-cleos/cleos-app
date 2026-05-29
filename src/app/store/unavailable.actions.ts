@@ -20,7 +20,6 @@ enum UnavailableActionTypes {
   unavailableSelected = '[Unavailable] Selected',
   getUnavailable = '[Unavailable] Find unavailable by id',
   deleteUnavailable = '[Unavailable] Delete unavailable by id',
-  setCurrentUnavailableId = '[Unavailable] Set current unavailable id',
   setUnavailableParams = '[Unavailable] Set unavailable params',
   clean = '[Unavailable] Clean'
 }
@@ -92,11 +91,6 @@ export const getUnavailable = createAction(
 export const deleteUnavailable = createAction(
   UnavailableActionTypes.deleteUnavailable,
   props<{ id: string; timestamp: number; timeZone?: string }>(),
-);
-
-export const setCurrentUnavailableId = createAction(
-  UnavailableActionTypes.setCurrentUnavailableId,
-  props<{ unavailableId: string }>(),
 );
 
 export const setUnavailableParams = createAction(

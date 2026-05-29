@@ -56,7 +56,7 @@ import { accountReducer } from './app/store/reducers/account.reducers';
 import { i18nReducer } from './app/store/reducers/i18n.reducers';
 import { I18NEffects } from './app/store/effects/i18n.effects';
 import { provideEffects } from '@ngrx/effects';
-import { provideRouter, withInMemoryScrolling } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 import { routes } from './app/app.routes';
 import { I18nBridgeService } from './app/services/i18n-bridge.service';
 import { provideAppIcons } from './app/util/app-icons.provider';
@@ -131,7 +131,11 @@ const providers = [
     accounts: accountReducer,
     i18n: i18nReducer,
   }, { metaReducers }),
-  provideRouter(routes, withInMemoryScrolling({ anchorScrolling: 'enabled' })),
+  provideRouter(
+    routes,
+    withComponentInputBinding(),
+    withInMemoryScrolling({ anchorScrolling: 'enabled' }),
+  ),
   provideRouterStore(),
   importProvidersFrom(
     BrowserModule,

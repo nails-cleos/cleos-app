@@ -28,24 +28,6 @@ export const getResultParamsPipe = pipe(
   } => val !== undefined),
 );
 
-const selectCurrentPaymentId = createSelector(
-  selectPaymentState,
-  (state: PaymentState) => state?.currentPaymentId,
-);
-export const getCurrentPaymentIdPipe = pipe(
-  select(selectCurrentPaymentId),
-  filter((val): val is string => val !== undefined),
-);
-
-const selectCurrentPathId = createSelector(
-  selectPaymentState,
-  (state: PaymentState) => state?.currentPathId,
-);
-export const getCurrentPathIdPipe = pipe(
-  select(selectCurrentPathId),
-  filter((val): val is { path: 'reservation' | 'transaction'; id: string; accountId?: string; } => val !== undefined),
-);
-
 const selectedPayment = createSelector(
   selectPaymentState,
   (state: PaymentState) => state?.selected,

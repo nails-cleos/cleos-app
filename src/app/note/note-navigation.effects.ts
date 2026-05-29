@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 import { concatMap } from 'rxjs/operators';
-import { cleanNote, getAllProfessional, setCurrentNoteId, setNoteNavigationParams } from '../store/note.actions';
+import { cleanNote, getAllProfessional, setNoteNavigationParams } from '../store/note.actions';
 import { Router } from '@angular/router';
 
 @Injectable()
@@ -35,11 +35,7 @@ export class NoteNavigationEffects {
         // 2) /notes/:id
         const detailMatch = url.match(/\/notes\/([^\/]+)$/);
         if (detailMatch) {
-          return [
-            cleanNote(),
-            getAllProfessional(),
-            setCurrentNoteId({ noteId: detailMatch[1] }),
-          ];
+          return [cleanNote(), getAllProfessional()];
         }
 
         return [];

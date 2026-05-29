@@ -6,20 +6,13 @@ export interface MeReservationParams {
   discountId?: string;
 }
 
-export interface CurrentCompleteReservationParams {
-  reservationId: string;
-  roomId: string;
-  customerId: string;
-  isDashboard: boolean;
-}
-
 export interface DetailReservationParams {
   step?: number;
 }
 
 export interface ReservationParams {
-  isDashboard: boolean;
-  skip: boolean;
+  isDashboard?: boolean;
+  skip?: boolean;
   customerId?: string;
   roomId?: string;
   treatmentId?: string;

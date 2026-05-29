@@ -8,7 +8,6 @@ import {
   requestSuccess,
   sendMessage,
   setCurrentLang,
-  setCurrentTreatmentId,
   treatmentSuccess,
   updateMyUser,
 } from '../main.actions';
@@ -24,7 +23,6 @@ export interface MainState {
   catalogue?: ICatalogueAll[];
   groups?: ITreatmentGroup[];
   error?: IError;
-  currentTreatmentId?: string;
   currentLang?: string;
   isLoading: boolean;
 }
@@ -34,7 +32,6 @@ export const initialState: MainState = {
   groups: undefined,
   error: undefined,
   response: undefined,
-  currentTreatmentId: undefined,
   currentLang: undefined,
   isLoading: false,
 };
@@ -85,10 +82,6 @@ export const mainReducer = createReducer(
     error: error,
     response: undefined,
     isLoading: false,
-  })),
-  on(setCurrentTreatmentId, (state, { treatmentId }) => ({
-    ...state,
-    currentTreatmentId: treatmentId,
   })),
   on(setCurrentLang, (state, { lang }) => ({
     ...state,

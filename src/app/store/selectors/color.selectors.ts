@@ -12,15 +12,6 @@ const selectColorPaginationData = createSelector(
 );
 export const getColorPaginationPipe = pipe(select(selectColorPaginationData));
 
-const selectCurrentColorId = createSelector(
-  selectColorState,
-  (state: ColorState) => state?.currentColorId,
-);
-export const getCurrentColorIdPipe = pipe(
-  select(selectCurrentColorId),
-  filter((val): val is string => val !== undefined),
-);
-
 const selectedColor = createSelector(
   selectColorState,
   (state: ColorState) => state?.selected,

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, Signal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, Signal, signal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
@@ -41,7 +41,6 @@ import { AuthUserService } from '../services/auth-user.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { UnavailableState } from '../store/reducers/unavailable.reducers';
 import {
-  getCurrentUnavailableIdPipe,
   getProfessionalsPipe,
   getRoomsPipe,
   getSelectedUnavailablePipe,
@@ -83,6 +82,8 @@ type UnavailableForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UnavailableComponent {
+  id = input<string>();
+
   private readonly store: Store<UnavailableState> = inject(Store<UnavailableState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly translate: TranslateService = inject(TranslateService);
@@ -90,20 +91,18 @@ export class UnavailableComponent {
   private readonly dialog: MatDialog = inject(MatDialog);
 
   private navigationParams$ = this.store.pipe(getUnavailableParamsPipe);
-  private unavailableId$ = this.store.pipe(getCurrentUnavailableIdPipe);
   private selectedUnavailable$ = this.store.pipe(getSelectedUnavailablePipe);
   private allProfessionals$ = this.store.pipe(getProfessionalsPipe);
   private allRooms$ = this.store.pipe(getRoomsPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
   private navigationParams = toSignal(this.navigationParams$);
-  private unavailableIdSignal = toSignal(this.unavailableId$);
   private allRoomsSignal = toSignal(this.allRooms$);
   private subErrorsSignal = toSignal(this.subErrors$);
 
   unavailableSignal = toSignal(this.selectedUnavailable$);
   allProfessionalsSignal = toSignal(this.allProfessionals$);
-  isAddModeSignal = computed(() => !this.unavailableIdSignal());
+  isAddModeSignal = computed(() => !this.id());
   errors = signal<Record<string, unknown>>({});
   private authUserSignal = this.authUserService.authUser;
 
@@ -224,7 +223,7 @@ export class UnavailableComponent {
     });
 
     effect(() => {
-      const id = this.unavailableIdSignal();
+      const id = this.id();
       if (id) {
         this.store.dispatch(getUnavailable({ id }));
       }
@@ -324,7 +323,7 @@ export class UnavailableComponent {
     }
 
     const isRoomAdmin = this.isRoomAdmin();
-    const id = this.unavailableIdSignal();
+    const id = this.id();
     if (!id) {
       this.store.dispatch(createUnavailable({ unavailable, isRoomAdmin }));
     } else {

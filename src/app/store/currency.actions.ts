@@ -13,14 +13,8 @@ enum CurrencyActionTypes {
   currencySelected = '[Currency] Selected',
   getCurrency = '[Currency] Find currency by id',
   deleteCurrency = '[Currency] Delete currency by id',
-  setCurrentCurrencyId = '[Currency] Set current currency id',
   clean = '[Currency] Clean'
 }
-
-export const setCurrentCurrencyId = createAction(
-  CurrencyActionTypes.setCurrentCurrencyId,
-  props<{ currencyId: string }>(),
-);
 
 export const getCurrenciesPage = createAction(
   CurrencyActionTypes.getCurrenciesPage,

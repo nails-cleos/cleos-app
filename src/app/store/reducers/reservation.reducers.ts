@@ -45,8 +45,6 @@ import {
   reservationSelected,
   reservationTreatmentsSuccess,
   searchAvailability,
-  setCurrentCompleteReservation,
-  setCurrentReservationId,
   setDetailReservationParams,
   setMeReservationParams,
   setReservationParams,
@@ -83,7 +81,6 @@ import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
 import { clearGlobalError, clearGlobalResponse } from '../global.actions';
 import {
-  CurrentCompleteReservationParams,
   DetailReservationParams,
   MeReservationParams,
   ReservationParams,
@@ -113,8 +110,6 @@ export interface ReservationState {
   subErrors?: IError[];
   selected?: IUpcomingAll;
   meReservationParams?: MeReservationParams;
-  currentReservationId?: string;
-  currentCompleteReservation?: CurrentCompleteReservationParams;
   detailReservationParams?: DetailReservationParams;
   reservationParams?: ReservationParams;
   isLoading: boolean;
@@ -142,8 +137,6 @@ export const initialState: ReservationState = {
   subErrors: undefined,
   selected: undefined,
   meReservationParams: undefined,
-  currentReservationId: undefined,
-  currentCompleteReservation: undefined,
   detailReservationParams: undefined,
   reservationParams: undefined,
   isLoading: false,
@@ -497,14 +490,6 @@ export const reservationReducer = createReducer(
   on(setMeReservationParams, (state, { treatmentId, roomId, professionalId, date, discountId }) => ({
     ...state,
     meReservationParams: { treatmentId, roomId, professionalId, date, discountId },
-  })),
-  on(setCurrentReservationId, (state, { reservationId }) => ({
-    ...state,
-    currentReservationId: reservationId,
-  })),
-  on(setCurrentCompleteReservation, (state, { reservationId, roomId, customerId, isDashboard }) => ({
-    ...state,
-    currentCompleteReservation: { reservationId, roomId, customerId, isDashboard },
   })),
   on(setDetailReservationParams, (state, { step }) => ({
     ...state,

@@ -12,7 +12,6 @@ import {
   getAdditionalList,
   getAdditionalPage,
   getAllTreatmentsGroup,
-  setCurrentAdditionalId,
   sortAdditional,
   updateAdditional,
 } from '../additional.actions';
@@ -36,7 +35,6 @@ export interface AdditionalState {
   subErrors?: IError[];
   selected?: IAdditional;
   isLoading: boolean;
-  currentAdditionalId?: string;
 }
 
 export const initialState: AdditionalState = {
@@ -47,7 +45,6 @@ export const initialState: AdditionalState = {
   subErrors: undefined,
   selected: undefined,
   isLoading: false,
-  currentAdditionalId: undefined,
 };
 
 export const additionalReducer = createReducer(
@@ -130,11 +127,6 @@ export const additionalReducer = createReducer(
     subErrors: undefined,
     isLoading: true,
     data: undefined,
-  })),
-
-  on(setCurrentAdditionalId, (state, { additionalId }) => ({
-    ...state,
-    currentAdditionalId: additionalId,
   })),
 
   on(cleanAdditional, () => initialState),

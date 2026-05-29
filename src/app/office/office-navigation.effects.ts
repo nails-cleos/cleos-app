@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 import { concatMap } from 'rxjs/operators';
-import { cleanOffice, getAllManager, setCurrentOfficeId } from '../store/office.actions';
+import { cleanOffice, getAllManager } from '../store/office.actions';
 
 @Injectable()
 export class OfficeNavigationEffects {
@@ -23,10 +23,7 @@ export class OfficeNavigationEffects {
         // 2) /offices/:id
         const detailMatch = url.match(/\/offices\/([^\/]+)$/);
         if (detailMatch) {
-          return [
-            cleanOffice(),
-            setCurrentOfficeId({ officeId: detailMatch[1] }),
-          ];
+          return [cleanOffice()];
         }
 
         // 3) /offices

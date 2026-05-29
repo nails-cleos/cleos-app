@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, Signal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, Signal, signal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IUser } from '../interfaces/user';
@@ -12,12 +12,7 @@ import { map, startWith } from 'rxjs/operators';
 import { IOffice, Office } from '../interfaces/office';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { OfficeState } from '../store/reducers/office.reducers';
-import {
-  getCurrentOfficeIdPipe,
-  getManagersPipe,
-  getSelectedOfficePipe,
-  getSubErrorsPipe,
-} from '../store/selectors/office.selectors';
+import { getManagersPipe, getSelectedOfficePipe, getSubErrorsPipe } from '../store/selectors/office.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../interfaces/common';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
@@ -46,22 +41,22 @@ type OfficeForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OfficeComponent {
+  id = input<string>();
+
   private readonly store: Store<OfficeState> = inject(Store<OfficeState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private officeId$ = this.store.pipe(getCurrentOfficeIdPipe);
   private selectedOffice$ = this.store.pipe(getSelectedOfficePipe);
   private allManagers$ = this.store.pipe(getManagersPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
-  private officeIdSignal = toSignal(this.officeId$, { initialValue: null });
   private subErrorsSignal = toSignal(this.subErrors$);
 
   allManagersSignal = toSignal(this.allManagers$);
   officeSignal = toSignal(this.selectedOffice$);
-  isAddModeSignal = computed(() => !this.officeIdSignal());
+  isAddModeSignal = computed(() => !this.id());
   errors = signal<Record<string, unknown>>({});
 
   form: FormGroup<OfficeForm> = this.formBuilder.group<OfficeForm>({
@@ -120,7 +115,7 @@ export class OfficeComponent {
     });
 
     effect(() => {
-      const id = this.officeIdSignal();
+      const id = this.id();
       if (id) {
         this.store.dispatch(getOffice({ id }));
       }
@@ -151,7 +146,7 @@ export class OfficeComponent {
     office.billingAddress = fieldChange(this.getForm.billingAddress, officeSignal?.billingAddress);
     office.driveFolder = fieldChange(this.getForm.driveFolder, officeSignal?.driveFolder);
 
-    const id = this.officeIdSignal();
+    const id = this.id();
     if (!id) {
       office.managerId = this.getForm.manager.value?.id;
       this.store.dispatch(createOffice({ office }));
@@ -170,4 +165,3 @@ export class OfficeComponent {
   private filter = (name: string, managers: IUser[]): IUser[] | undefined => managers?.filter(
     option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 }
-

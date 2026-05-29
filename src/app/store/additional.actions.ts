@@ -19,14 +19,8 @@ enum AdditionalActionTypes {
   deleteAdditional = '[Additional] Delete additional by id',
   getAllTreatmentsGroup = '[Additional] Get all treatments group',
   findGroupsSuccess = '[Additional] Find treatment groups success',
-  setCurrentAdditionalId = '[Additional] Set current additional id',
   clean = '[Additional] Clean'
 }
-
-export const setCurrentAdditionalId = createAction(
-  AdditionalActionTypes.setCurrentAdditionalId,
-  props<{ additionalId: string }>(),
-);
 
 export const getAdditionalPage = createAction(
   AdditionalActionTypes.getAdditionalPage,

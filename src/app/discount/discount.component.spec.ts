@@ -3,7 +3,7 @@ import { DiscountComponent } from './discount.component';
 import { BehaviorSubject, of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { ToastService } from '../services/toast.service';
 import { DiscountType, IDiscountAll } from '../interfaces/discount';
 import { ICurrency } from '../interfaces/currency';
@@ -14,7 +14,6 @@ describe('DiscountComponent', () => {
   let component: DiscountComponent;
   let fixture: ComponentFixture<DiscountComponent>;
 
-  let discountId$: BehaviorSubject<string | null>;
   let selectedDiscount$: BehaviorSubject<IDiscountAll | undefined>;
   let subErrors$: BehaviorSubject<any>;
   let allCurrencies$: BehaviorSubject<ICurrency[]>;
@@ -22,7 +21,6 @@ describe('DiscountComponent', () => {
 
   let storeSpy: jasmine.SpyObj<Store<DiscountState>>;
   let routerSpy: jasmine.SpyObj<Router>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
 
   const mockCurrency: ICurrency = {
@@ -42,7 +40,6 @@ describe('DiscountComponent', () => {
   };
 
   beforeEach(async () => {
-    discountId$ = new BehaviorSubject<string | null>(null);
     selectedDiscount$ = new BehaviorSubject<IDiscountAll | undefined>(undefined);
     subErrors$ = new BehaviorSubject<any>([]);
     allCurrencies$ = new BehaviorSubject<ICurrency[]>([]);
@@ -51,11 +48,6 @@ describe('DiscountComponent', () => {
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
 
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
@@ -64,12 +56,10 @@ describe('DiscountComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return discountId$.asObservable();
-        case 2:
           return selectedDiscount$.asObservable();
-        case 3:
+        case 2:
           return allCurrencies$.asObservable();
-        case 4:
+        case 3:
           return subErrors$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -86,7 +76,6 @@ describe('DiscountComponent', () => {
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
       ],
@@ -105,14 +94,11 @@ describe('DiscountComponent', () => {
   });
 
   it('should be in add mode when discountId is null', () => {
-    discountId$.next(null);
-    fixture.detectChanges();
-
     expect(component.isAddModeSignal()).toBeTrue();
   });
 
   it('should be in edit mode when discountId is set', () => {
-    discountId$.next('123');
+    fixture.componentRef.setInput('id', '123');
     fixture.detectChanges();
 
     expect(component.isAddModeSignal()).toBeFalse();

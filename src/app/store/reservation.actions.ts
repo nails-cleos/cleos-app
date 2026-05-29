@@ -22,12 +22,7 @@ import { Role } from '../interfaces/token';
 import { IReview } from '../interfaces/review';
 import { IColorAll } from '../interfaces/color';
 import { ToastType } from '../shared/toast/toast.model';
-import {
-  CurrentCompleteReservationParams,
-  DetailReservationParams,
-  MeReservationParams,
-  ReservationParams,
-} from './reservation.models';
+import { DetailReservationParams, MeReservationParams, ReservationParams } from './reservation.models';
 
 enum ReservationActionTypes {
   getPage = '[Reservation] Find paged',
@@ -86,8 +81,6 @@ enum ReservationActionTypes {
   updateReservationDiscount = '[Reservation] Update discount by reservation id',
   updateReservationTimestamp = '[Reservation] Update timestamp by reservation id',
   setMeReservationParams = '[Reservation] Set me reservation params',
-  setCurrentReservationId = '[Reservation] Set current reservation id',
-  setCurrentCompleteReservation = '[Reservation] Set current complete reservation',
   setDetailReservationParams = '[Reservation] Set detail reservation params',
   setReservationParams = '[Reservation] Set reservation params',
   clean = '[Reservation] Clean'
@@ -453,16 +446,6 @@ export const updateReservationTimestamp = createAction(
 export const setMeReservationParams = createAction(
   ReservationActionTypes.setMeReservationParams,
   props<MeReservationParams>(),
-);
-
-export const setCurrentReservationId = createAction(
-  ReservationActionTypes.setCurrentReservationId,
-  props<{ reservationId: string; }>(),
-);
-
-export const setCurrentCompleteReservation = createAction(
-  ReservationActionTypes.setCurrentCompleteReservation,
-  props<CurrentCompleteReservationParams>(),
 );
 
 export const setDetailReservationParams = createAction(

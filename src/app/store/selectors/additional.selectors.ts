@@ -28,15 +28,6 @@ export const getAdditionalPaginationPipe = pipe(
   map((val) => val?.value),
 );
 
-const selectCurrentAdditionalId = createSelector(
-  selectAdditionalState,
-  (state: AdditionalState) => state?.currentAdditionalId,
-);
-export const getCurrentAdditionalIdPipe = pipe(
-  select(selectCurrentAdditionalId),
-  filter((val): val is string => val !== undefined),
-);
-
 const selectedAdditional = createSelector(
   selectAdditionalState,
   (state: AdditionalState) => state?.selected,

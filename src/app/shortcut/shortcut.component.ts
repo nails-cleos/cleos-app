@@ -1,6 +1,5 @@
-import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthUserService } from '../services/auth-user.service';
 
@@ -17,25 +16,26 @@ enum ShortcutEnum {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShortcutComponent {
+  key = input<keyof typeof ShortcutEnum>();
+
   private readonly translate = inject(TranslateService);
   private readonly authUserService = inject(AuthUserService);
-  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-
-  private readonly paramMapSignal = toSignal(this.route.paramMap);
   private readonly authUserSignal = this.authUserService.authUser;
 
   constructor() {
     effect(() => {
-      const paramMap = this.paramMapSignal();
+      const key = this.key();
       const user = this.authUserSignal();
 
-      if (!paramMap || !user) {
+      if (!key || !user) {
         return;
       }
 
-      const key = paramMap.get('key') as keyof typeof ShortcutEnum;
       const shortcut = ShortcutEnum[key];
+      if (shortcut === undefined) {
+        return;
+      }
 
       let redirect: string[] = [];
 

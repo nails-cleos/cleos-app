@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 import { concatMap } from 'rxjs/operators';
-import { cleanUser, setCurrentUserId, setUserNavigationParams } from '../store/user.actions';
+import { cleanUser, setUserNavigationParams } from '../store/user.actions';
 import { Router } from '@angular/router';
 
 @Injectable()
@@ -30,19 +30,13 @@ export class UserNavigationEffects {
         // 2) /users/:id/overview
         const overviewMatch = url.match(/\/users\/([^\/]+)\/overview$/);
         if (overviewMatch) {
-          return [
-            cleanUser(),
-            setCurrentUserId({ userId: overviewMatch[1] }),
-          ];
+          return [cleanUser()];
         }
 
         // 3) /users/:id
         const detailMatch = url.match(/\/users\/([^\/]+)$/);
         if (detailMatch) {
-          return [
-            cleanUser(),
-            setCurrentUserId({ userId: detailMatch[1] }),
-          ];
+          return [cleanUser()];
         }
 
         // 4) /users

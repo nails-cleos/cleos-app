@@ -17,14 +17,8 @@ enum CatalogueActionTypes {
   deleteCatalogue = '[Catalogue] Delete catalogue by id',
   getAllTreatmentsGroup = '[Catalogue] Get all treatments group',
   findGroupsSuccess = '[Catalogue] Find treatment groups success',
-  setCurrentCatalogueId = '[Catalogue] Set current catalogue id',
   clean = '[Catalogue] Clean'
 }
-
-export const setCurrentCatalogueId = createAction(
-  CatalogueActionTypes.setCurrentCatalogueId,
-  props<{ catalogueId: string }>(),
-);
 
 export const getAllCatalogues = createAction(CatalogueActionTypes.getAllCatalogues);
 

@@ -16,15 +16,6 @@ export const getCatalogueListPipe = pipe(
   filter((val): val is ICatalogueAll[] => val !== undefined),
 );
 
-const selectCurrentCatalogueId = createSelector(
-  selectCatalogueState,
-  (state: CatalogueState) => state?.currentCatalogueId,
-);
-export const getCurrentCatalogueIdPipe = pipe(
-  select(selectCurrentCatalogueId),
-  filter((val): val is string => val !== undefined),
-);
-
 const selectedCatalogue = createSelector(
   selectCatalogueState,
   (state: CatalogueState) => state?.selected,

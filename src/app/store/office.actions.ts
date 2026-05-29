@@ -17,7 +17,6 @@ enum OfficeActionTypes {
   officeSelected = '[Office] Selected',
   getOffice = '[Office] Find office by id',
   deleteOffice = '[Office] Delete office by id',
-  setCurrentOfficeId = '[Office] set current office id',
   clean = '[Office] Clean',
 }
 
@@ -77,11 +76,6 @@ export const getOffice = createAction(
 export const deleteOffice = createAction(
   OfficeActionTypes.deleteOffice,
   props<{ id: string; name: string }>(),
-);
-
-export const setCurrentOfficeId = createAction(
-  OfficeActionTypes.setCurrentOfficeId,
-  props<{ officeId: string }>(),
 );
 
 export const cleanOffice = createAction(OfficeActionTypes.clean);

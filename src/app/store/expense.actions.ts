@@ -15,7 +15,6 @@ enum ExpenseActionTypes {
   expenseSelected = '[Expense] Selected',
   getExpense = '[Expense] Find expense by id',
   deleteExpense = '[Expense] Delete expense by id',
-  setCurrentExpenseId = '[Expense] Set current expense id',
   clean = '[Expense] Clean',
 }
 
@@ -76,11 +75,6 @@ export const getExpense = createAction(
 export const deleteExpense = createAction(
   ExpenseActionTypes.deleteExpense,
   props<{ roomId: string; id: string; invoice: string }>(),
-);
-
-export const setCurrentExpenseId = createAction(
-  ExpenseActionTypes.setCurrentExpenseId,
-  props<{ expenseId: string }>(),
 );
 
 export const cleanExpense = createAction(ExpenseActionTypes.clean);

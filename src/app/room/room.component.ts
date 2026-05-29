@@ -5,6 +5,7 @@ import {
   effect,
   ElementRef,
   inject,
+  input,
   Signal,
   signal,
   viewChild,
@@ -51,7 +52,6 @@ import { BackButtonDirective } from '../directives/back-button.directive';
 import { RoomState } from '../store/reducers/room.reducers';
 import {
   getCurrenciesPipe,
-  getCurrentRoomIdPipe,
   getOfficesPipe,
   getProfessionalsPipe,
   getSelectedRoomPipe,
@@ -110,12 +110,13 @@ type RoomForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RoomComponent {
+  id = input<string>();
+
   private readonly store: Store<RoomState | PaymentState> = inject(Store<RoomState | PaymentState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private roomId$ = this.store.pipe(getCurrentRoomIdPipe);
   private selectedRoom$ = this.store.pipe(getSelectedRoomPipe);
   private professionals$ = this.store.pipe(getProfessionalsPipe);
   private currencies$ = this.store.pipe(getCurrenciesPipe);
@@ -123,13 +124,12 @@ export class RoomComponent {
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
   private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
-  private roomIdSignal = toSignal(this.roomId$);
   private professionalsSignal = toSignal(this.professionals$);
   private subErrorsSignal = toSignal(this.subErrors$);
   private paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
 
   roomSignal = toSignal(this.selectedRoom$);
-  isAddModeSignal = computed(() => !this.roomIdSignal());
+  isAddModeSignal = computed(() => !this.id());
   errors = signal<Record<string, unknown>>({});
 
   timeZoneList = timezones;
@@ -327,7 +327,7 @@ export class RoomComponent {
     });
 
     effect(() => {
-      const id = this.roomIdSignal();
+      const id = this.id();
       if (id) {
         this.store.dispatch(getRoom({ id, redirect: true }));
       }
@@ -393,7 +393,7 @@ export class RoomComponent {
       room.closeDateString = createNewDate(this.getForm.closeDate.value).toLocaleString(API_LOCALE);
     }
 
-    const id = this.roomIdSignal();
+    const id = this.id();
     if (!id) {
       this.store.dispatch(createRoom({ room }));
     } else {

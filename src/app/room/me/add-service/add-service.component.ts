@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Store } from '@ngrx/store';
 import { MatDialog } from '@angular/material/dialog';
@@ -11,7 +11,7 @@ import { createTreatmentGroupService, executeDialogNoWidth } from '../../../util
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { PriceDialogComponent } from './price-dialog.component';
-import { getCurrentRoomIdPipe, getRoomResponsePipe, getServicesPipe } from '../../../store/selectors/room.selectors';
+import { getRoomResponsePipe, getServicesPipe } from '../../../store/selectors/room.selectors';
 import { RoomState } from '../../../store/reducers/room.reducers';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
@@ -27,10 +27,11 @@ import { KeyValuePipe } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddServiceComponent {
+  id = input<string>();
+
   private readonly store = inject(Store<RoomState>);
   private readonly dialog = inject(MatDialog);
 
-  private roomIdSignal = toSignal(this.store.pipe(getCurrentRoomIdPipe));
   private servicesSignal = toSignal(this.store.pipe(getServicesPipe));
   private responseSignal = toSignal(this.store.pipe(getRoomResponsePipe));
 
@@ -40,7 +41,7 @@ export class AddServiceComponent {
 
   constructor() {
     effect(() => {
-      const id = this.roomIdSignal();
+      const id = this.id();
       if (id) {
         this.store.dispatch(getServices({ id }));
       }
@@ -84,7 +85,7 @@ export class AddServiceComponent {
 
     effect(() => {
       const response = this.responseSignal();
-      const id = this.roomIdSignal();
+      const id = this.id();
       if (response && id) {
         this.store.dispatch(getServices({ id }));
       }
@@ -92,7 +93,7 @@ export class AddServiceComponent {
   }
 
   save() {
-    const id = this.roomIdSignal();
+    const id = this.id();
     if (!id) {
       return;
     }

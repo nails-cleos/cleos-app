@@ -10,8 +10,6 @@ import {
   cleanReservation,
   getAllRooms,
   getCustomers,
-  setCurrentCompleteReservation,
-  setCurrentReservationId,
   setDetailReservationParams,
   setReservationParams,
 } from '../store/reservation.actions';
@@ -60,7 +58,7 @@ describe('ReservationNavigationEffects', () => {
     ]);
   });
 
-  it('should set current complete reservation and preserve dashboard flag from navigation state', async () => {
+  it('should clean reservation and load payment options for reservation complete route', async () => {
     routerSpy.currentNavigation.and.returnValue({
       extras: {
         state: {
@@ -72,18 +70,12 @@ describe('ReservationNavigationEffects', () => {
     actions$.next(routerNavigation('/en-GB/reservation/res-1/rooms/room-1/customer/customer-1/complete'));
 
     const result = await firstValueFrom(
-      effects.handleReservationNavigation$.pipe(take(3), toArray()),
+      effects.handleReservationNavigation$.pipe(take(2), toArray()),
     );
 
     expect(result).toEqual([
       cleanReservation(),
       getOptions(),
-      setCurrentCompleteReservation({
-        reservationId: 'res-1',
-        roomId: 'room-1',
-        customerId: 'customer-1',
-        isDashboard: true,
-      }),
     ]);
   });
 
@@ -143,13 +135,12 @@ describe('ReservationNavigationEffects', () => {
     actions$.next(routerNavigation('/en-GB/reservation/res-2'));
 
     const result = await firstValueFrom(
-      effects.handleReservationNavigation$.pipe(take(4), toArray()),
+      effects.handleReservationNavigation$.pipe(take(3), toArray()),
     );
 
     expect(result).toEqual([
       cleanReservation(),
       getOptions(),
-      setCurrentReservationId({ reservationId: 'res-2' }),
       setDetailReservationParams({ step: 3 }),
     ]);
   });

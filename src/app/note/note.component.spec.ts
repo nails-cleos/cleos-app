@@ -21,7 +21,6 @@ describe('NoteComponent', () => {
   let routerSpy: jasmine.SpyObj<Router>;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
 
-  let noteId$: BehaviorSubject<any>;
   let navigationParams$: BehaviorSubject<any>;
   let selectedNote$: BehaviorSubject<any>;
   let allProfessionals$: BehaviorSubject<any>;
@@ -47,7 +46,6 @@ describe('NoteComponent', () => {
   };
 
   beforeEach(async () => {
-    noteId$ = new BehaviorSubject(undefined);
     navigationParams$ = new BehaviorSubject(undefined);
     selectedNote$ = new BehaviorSubject(undefined);
     allProfessionals$ = new BehaviorSubject(undefined);
@@ -59,14 +57,12 @@ describe('NoteComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return noteId$.asObservable();
-        case 2:
           return navigationParams$.asObservable();
-        case 3:
+        case 2:
           return selectedNote$.asObservable();
-        case 4:
+        case 3:
           return allProfessionals$.asObservable();
-        case 5:
+        case 4:
           return subErrors$.asObservable();
         default:
           return of(undefined);
@@ -102,7 +98,6 @@ describe('NoteComponent', () => {
   });
 
   it('should initialize in add mode when no noteId', () => {
-    noteId$.next(null);
     expect(component.isAddModeSignal()).toBeTrue();
   });
 
@@ -164,7 +159,7 @@ describe('NoteComponent', () => {
       timeZone: '',
       authorities: [],
     };
-    noteId$.next('note1');
+    fixture.componentRef.setInput('id', 'note1');
     selectedNote$.next(mockNote);
     fixture.detectChanges();
 

@@ -134,7 +134,7 @@
           <ng-container matColumnDef="actions">
             <th *matHeaderCellDef mat-header-cell>
               <span class="app-surface-hide-mobile">{{ 'COMMON.COLUMN.ACTIONS' | translate }}</span>
-              <button [routerLink]="['/', language, 'rooms', roomIdSignal(), 'expenses', 'add']" mat-icon-button
+              <button [routerLink]="['/', language, 'rooms', id(), 'expenses', 'add']" mat-icon-button
                       id="add-button"
                       matTooltip="{{ 'EXPENSE.TITLE' | translate }}" matTooltipPosition="right" type="button">
                 <mat-icon color="primary">add_shopping_cart</mat-icon>
@@ -143,7 +143,7 @@
             <td *matCellDef="let expense" class="app-surface-hide-mobile" mat-cell>
               @if (expense.id) {
                 @if (!expense.deleted) {
-                  <button [routerLink]="['/', language, 'rooms', roomIdSignal(), 'expenses', expense.id]"
+                  <button [routerLink]="['/', language, 'rooms', id(), 'expenses', expense.id]"
                           mat-icon-button
                           matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
                     <mat-icon color="primary">edit</mat-icon>

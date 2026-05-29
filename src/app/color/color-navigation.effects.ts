@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 import { concatMap } from 'rxjs/operators';
-import { cleanColor, setCurrentColorId } from '../store/color.actions';
+import { cleanColor } from '../store/color.actions';
 
 @Injectable()
 export class ColorNavigationEffects {
@@ -23,10 +23,7 @@ export class ColorNavigationEffects {
         // 2) /colors/:id
         const detailMatch = url.match(/\/colors\/([^\/]+)$/);
         if (detailMatch) {
-          return [
-            cleanColor(),
-            setCurrentColorId({ colorId: detailMatch[1] }),
-          ];
+          return [cleanColor()];
         }
 
         // 3) /colors

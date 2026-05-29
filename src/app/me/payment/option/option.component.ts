@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { createPaymentLinkByReservationId, getPaymentByResourceId } from '../../../store/payment.actions';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -13,7 +13,6 @@ import { PaymentPreviewComponent } from '../../../shared/payment-preview/payment
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
-import { getCurrentReservationIdPipe } from '../../../store/selectors/reservation.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getPaymentOptionsPipe, getPaymentsPipe } from '../../../store/selectors/payment.selectors';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
@@ -32,16 +31,16 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OptionComponent {
+  id = input<string>();
+
   private readonly store: Store<PaymentState | ReservationState> = inject(Store<PaymentState | ReservationState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private reservationId$ = this.store.pipe(getCurrentReservationIdPipe);
   private payments$ = this.store.pipe(getPaymentsPipe);
   private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
-  private readonly reservationIdSignal = toSignal(this.reservationId$);
   private readonly paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
   private paymentsSignal = toSignal(this.payments$);
 
@@ -61,15 +60,13 @@ export class OptionComponent {
   first = true;
   currentStepIndex = signal(0);
 
-  private reservationId?: string;
   private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect(() => {
-      const id = this.reservationIdSignal();
+      const id = this.id();
       if (id) {
         this.store.dispatch(getPaymentByResourceId({ id, path: 'reservation' }));
-        this.reservationId = id;
       }
     });
 
@@ -116,7 +113,10 @@ export class OptionComponent {
     const type = option.type;
     const percentage = this.getForm.percentage?.value || PaymentPercentage.total;
     const payment: IReservationPayment = { type, percentage };
-    const reservationId = this.reservationId!;
+    const reservationId = this.id();
+    if (!reservationId) {
+      return;
+    }
     this.store.dispatch(createPaymentLinkByReservationId({ reservationId, payment }));
   }
 

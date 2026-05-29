@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { ITreatmentAll } from '../../interfaces/treatment';
 import { getTreatmentGroup, sortTreatment } from '../../store/treatment.actions';
@@ -9,7 +9,6 @@ import {
 } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
 import { TreatmentState } from '../../store/reducers/treatment.reducers';
 import {
-  getCurrentTreatmentIdPipe,
   getSelectedTreatmentPipe,
   getTreatmentResponsePipe,
 } from '../../store/selectors/treatment.selectors';
@@ -24,13 +23,13 @@ import { TranslatePipe } from '@ngx-translate/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreatmentSortingComponent {
+  id = input<string>();
+
   private readonly store: Store<TreatmentState> = inject(Store<TreatmentState>);
 
-  private treatmentId$ = this.store.pipe(getCurrentTreatmentIdPipe);
   private treatmentGroup$ = this.store.pipe(getSelectedTreatmentPipe);
   private response$ = this.store.pipe(getTreatmentResponsePipe);
 
-  private treatmentIdSignal = toSignal(this.treatmentId$);
   private treatmentGroupSignal = toSignal(this.treatmentGroup$);
   private responseSignal = toSignal(this.response$);
 
@@ -39,7 +38,7 @@ export class TreatmentSortingComponent {
 
   constructor() {
     effect(() => {
-      const id = this.treatmentIdSignal();
+      const id = this.id();
       this.responseSignal();
       if (id) {
         this.store.dispatch(getTreatmentGroup({ id, path: 'sorting' }));

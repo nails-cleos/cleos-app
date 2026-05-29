@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { getPayment, updatePaymentById } from '../../../store/payment.actions';
@@ -9,11 +9,7 @@ import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
 import { IReservationPayment } from '../../../interfaces/reservation';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
-import {
-  getCurrentPaymentIdPipe,
-  getPaymentOptionsPipe,
-  getSelectedPaymentPipe,
-} from '../../../store/selectors/payment.selectors';
+import { getPaymentOptionsPipe, getSelectedPaymentPipe } from '../../../store/selectors/payment.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FirebaseService } from '../../../services/firebase.service';
 import { MatIcon } from '@angular/material/icon';
@@ -40,16 +36,16 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MePaymentComponent {
+  id = input<string>();
+
   private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly firebaseService = inject(FirebaseService);
 
-  private paymentId$ = this.store.pipe(getCurrentPaymentIdPipe);
   private payment$ = this.store.pipe(getSelectedPaymentPipe);
   private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
-  private paymentIdSignal = toSignal(this.paymentId$);
   private paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
   paymentSignal = toSignal(this.payment$);
 
@@ -67,7 +63,7 @@ export class MePaymentComponent {
 
   constructor() {
     effect(() => {
-      const id = this.paymentIdSignal();
+      const id = this.id();
       if (id) {
         this.firebaseService.logEvent('screen_view', {
           // eslint-disable-next-line camelcase

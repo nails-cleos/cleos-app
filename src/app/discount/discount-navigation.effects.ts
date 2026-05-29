@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 import { concatMap } from 'rxjs/operators';
-import { cleanDiscount, getAllCurrency, setCurrentDiscountId } from '../store/discount.actions';
+import { cleanDiscount, getAllCurrency } from '../store/discount.actions';
 
 @Injectable()
 export class DiscountNavigationEffects {
@@ -23,10 +23,7 @@ export class DiscountNavigationEffects {
         // 2) /discounts/:id
         const detailMatch = url.match(/\/discounts\/([^\/]+)$/);
         if (detailMatch) {
-          return [
-            cleanDiscount(),
-            setCurrentDiscountId({ discountId: detailMatch[1] }),
-          ];
+          return [cleanDiscount()];
         }
 
         // 3) /discounts

@@ -3,7 +3,7 @@ import { CatalogueComponent } from './catalogue.component';
 import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { ICatalogueAll } from '../interfaces/catalogue';
 import { ITreatmentGroup, ITreatmentGroupAll } from '../interfaces/treatment';
 import { CatalogueState } from '../store/reducers/catalogue.reducers';
@@ -13,14 +13,12 @@ describe('CatalogueComponent', () => {
   let component: CatalogueComponent;
   let fixture: ComponentFixture<CatalogueComponent>;
 
-  let catalogueId$: BehaviorSubject<string | null>;
   let selectedCatalogue$: BehaviorSubject<ICatalogueAll | undefined>;
   let subErrors$: BehaviorSubject<any>;
   let allGroups$: BehaviorSubject<ITreatmentGroupAll[]>;
 
   let storeSpy: jasmine.SpyObj<Store<CatalogueState>>;
   let routerSpy: jasmine.SpyObj<Router>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
 
   const mockCatalogue: ICatalogueAll = {
     blob: undefined,
@@ -37,18 +35,12 @@ describe('CatalogueComponent', () => {
   const mockGroup: ITreatmentGroupAll = { id: 'group1', name: 'Test Group' };
 
   beforeEach(async () => {
-    catalogueId$ = new BehaviorSubject<string | null>(null);
     selectedCatalogue$ = new BehaviorSubject<ICatalogueAll | undefined>(undefined);
     subErrors$ = new BehaviorSubject<any>([]);
     allGroups$ = new BehaviorSubject<ITreatmentGroupAll[]>([]);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
 
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
@@ -57,12 +49,10 @@ describe('CatalogueComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return catalogueId$.asObservable();
-        case 2:
           return selectedCatalogue$.asObservable();
-        case 3:
+        case 2:
           return allGroups$.asObservable();
-        case 4:
+        case 3:
           return subErrors$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -74,7 +64,6 @@ describe('CatalogueComponent', () => {
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
@@ -89,14 +78,11 @@ describe('CatalogueComponent', () => {
   });
 
   it('should be in add mode when catalogueId is null', () => {
-    catalogueId$.next(null);
-    fixture.detectChanges();
-
     expect(component.isAddModeSignal()).toBeTrue();
   });
 
   it('should be in edit mode when catalogueId is set', () => {
-    catalogueId$.next('123');
+    fixture.componentRef.setInput('id', '123');
     fixture.detectChanges();
 
     expect(component.isAddModeSignal()).toBeFalse();

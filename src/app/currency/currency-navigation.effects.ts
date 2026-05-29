@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 import { concatMap } from 'rxjs/operators';
-import { clean, setCurrentCurrencyId } from '../store/currency.actions';
+import { clean } from '../store/currency.actions';
 
 @Injectable()
 export class CurrencyNavigationEffects {
@@ -23,10 +23,7 @@ export class CurrencyNavigationEffects {
         // 2) /currency/:id
         const detailMatch = url.match(/\/currency\/([^\/]+)$/);
         if (detailMatch) {
-          return [
-            clean(),
-            setCurrentCurrencyId({ currencyId: detailMatch[1] }),
-          ];
+          return [clean()];
         }
 
         // 3) /currency

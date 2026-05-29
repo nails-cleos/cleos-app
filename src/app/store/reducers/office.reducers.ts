@@ -13,7 +13,6 @@ import {
   officeSaveSuccess,
   officeSelected,
   officeSuccess,
-  setCurrentOfficeId,
   updateOffice,
 } from '../office.actions';
 import { IOffice, IOfficeAll } from '../../interfaces/office';
@@ -34,7 +33,6 @@ export interface OfficeState {
   error?: IError;
   subErrors?: IError[];
   selected?: IOffice;
-  currentOfficeId?: string;
   isLoading: boolean;
 }
 
@@ -45,7 +43,6 @@ export const initialState: OfficeState = {
   subErrors: undefined,
   selected: undefined,
   response: undefined,
-  currentOfficeId: undefined,
   isLoading: false,
 };
 
@@ -116,10 +113,6 @@ export const officeReducer = createReducer(
     subErrors: undefined,
     response: undefined,
     isLoading: true,
-  })),
-  on(setCurrentOfficeId, (state, { officeId }) => ({
-    ...state,
-    currentOfficeId: officeId,
   })),
   on(getAllMyOffices, (state) => ({
     ...state,

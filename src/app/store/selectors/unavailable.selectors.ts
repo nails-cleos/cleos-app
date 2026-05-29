@@ -14,15 +14,6 @@ const selectUnavailablePaginationData = createSelector(
 );
 export const getUnavailablePaginationPipe = pipe(select(selectUnavailablePaginationData));
 
-const selectCurrentUnavailableId = createSelector(
-  selectUnavailableState,
-  (state: UnavailableState) => state?.currentUnavailableId,
-);
-export const getCurrentUnavailableIdPipe = pipe(
-  select(selectCurrentUnavailableId),
-  filter((val): val is string => val !== undefined),
-);
-
 const selectedUnavailable = createSelector(
   selectUnavailableState,
   (state: UnavailableState) => state?.selected,

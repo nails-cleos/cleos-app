@@ -16,7 +16,6 @@ import {
   getUserDiscountByCustomerId,
   referralSuccess,
   sendDiscountToCustomers,
-  setCurrentDiscountId,
   updateDiscount,
 } from '../discount.actions';
 import { IDiscount, IDiscountAll, IReferral, IUserDiscount } from '../../interfaces/discount';
@@ -41,7 +40,6 @@ export interface DiscountState {
   subErrors?: IError[];
   selected?: IDiscount;
   isLoading: boolean;
-  currentDiscountId?: string;
 }
 
 export const initialState: DiscountState = {
@@ -53,7 +51,6 @@ export const initialState: DiscountState = {
   selected: undefined,
   response: undefined,
   isLoading: false,
-  currentDiscountId: undefined,
 };
 
 export const discountReducer = createReducer(
@@ -152,10 +149,6 @@ export const discountReducer = createReducer(
     response: undefined,
     isLoading: true,
     selected: undefined,
-  })),
-  on(setCurrentDiscountId, (state, { discountId }) => ({
-    ...state,
-    currentDiscountId: discountId,
   })),
   on(cleanDiscount, () => initialState),
 

@@ -18,8 +18,6 @@ enum PaymentActionTypes {
   getPayment = '[Payment] Find payment by ID',
   createPaymentLinkByReservationId = '[Payment] Create payment link',
   setPaymentResultParams = '[Payment] Set payment result params',
-  setCurrentPaymentId = '[Payment] Set current payment id',
-  setCurrentPathId = '[Payment] Set current path id',
   options = '[Payment] Get options',
   optionsSuccess = '[Payment] Options success',
   clean = '[Payment] Clean',
@@ -112,16 +110,6 @@ export const setPaymentResultParams = createAction(
     paymentType?: string;
     accountId?: string;
   }>(),
-);
-
-export const setCurrentPaymentId = createAction(
-  PaymentActionTypes.setCurrentPaymentId,
-  props<{ paymentId: string; }>(),
-);
-
-export const setCurrentPathId = createAction(
-  PaymentActionTypes.setCurrentPathId,
-  props<{ path: 'reservation' | 'transaction'; id: string; accountId?: string; }>(),
 );
 
 export const getOptions = createAction(PaymentActionTypes.options);

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, viewChild } from '@angular/core';
 import {
   FormArray,
   FormControl,
@@ -22,13 +22,11 @@ import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { ExpenseState } from '../../../store/reducers/expense.reducers';
 import { RoomState } from '../../../store/reducers/room.reducers';
 import {
-  getCurrentExpenseIdPipe,
   getExpenseResponsePipe,
   getInfoPipe,
   getSelectedExpensePipe,
   getSubErrorsPipe,
 } from '../../../store/selectors/expense.selectors';
-import { getCurrentRoomIdPipe } from '../../../store/selectors/room.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../../../interfaces/common';
 import { FileDropComponent, UploadFile } from '../../../shared/file-drop/file-drop.component';
@@ -79,6 +77,9 @@ type ExpenseForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExpenseComponent {
+  id = input<string>();
+  expenseId = input<string>();
+
   private readonly env: EnvService = inject(EnvService);
   private readonly store: Store<ExpenseState | RoomState | AwsState | AuthState> = inject(
     Store<ExpenseState | RoomState | AwsState | AuthState>);
@@ -90,8 +91,6 @@ export class ExpenseComponent {
   private readonly tokenService: TokenService = inject(TokenService);
   private readonly formDirective = viewChild(FormGroupDirective);
 
-  private roomId$ = this.store.pipe(getCurrentRoomIdPipe);
-  private expenseId$ = this.store.pipe(getCurrentExpenseIdPipe);
   private selectedExpense$ = this.store.pipe(getSelectedExpensePipe);
   private info$ = this.store.pipe(getInfoPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
@@ -101,14 +100,12 @@ export class ExpenseComponent {
   private awsSignal = toSignal(this.aws$);
   private userId = computed(() => this.authUserService.authUser().userId);
 
-  private expenseIdSignal = toSignal(this.expenseId$);
-  private roomIdSignal = toSignal(this.roomId$);
   private infoSignal = toSignal(this.info$);
   private subErrorsSignal = toSignal(this.subErrors$);
   private responseSignal = toSignal(this.response$);
 
   expenseSignal = toSignal(this.selectedExpense$);
-  isAddModeSignal = computed(() => !this.expenseIdSignal());
+  isAddModeSignal = computed(() => !this.expenseId());
   errors = signal<Record<string, unknown>>({});
 
   form: FormGroup<ExpenseForm> = this.formBuilder.group<ExpenseForm>({
@@ -192,7 +189,7 @@ export class ExpenseComponent {
     });
 
     effect(() => {
-      const roomId = this.roomIdSignal();
+      const roomId = this.id();
       if (this.responseSignal()) {
         if (this.isAddModeSignal() && this.createAnother) {
           this.file.set(undefined);
@@ -203,15 +200,15 @@ export class ExpenseComponent {
     });
 
     effect(() => {
-      const id = this.expenseIdSignal();
-      const roomId = this.roomIdSignal();
+      const id = this.expenseId();
+      const roomId = this.id();
       if (roomId && id) {
         this.store.dispatch(getExpense({ roomId, id }));
       }
     });
 
     effect(() => {
-      const roomId = this.roomIdSignal();
+      const roomId = this.id();
       if (roomId) {
         this.store.dispatch(getAllExpensesInfo({ roomId }));
       }
@@ -310,7 +307,7 @@ export class ExpenseComponent {
 
   submit() {
     const date = this.getForm.date.value;
-    const roomId = this.roomIdSignal();
+    const roomId = this.id();
     const uploadFile = this.file();
     if (this.form.invalid || !roomId || !date || !uploadFile) {
       return;
@@ -324,7 +321,7 @@ export class ExpenseComponent {
     expense.expenseTotals = this.totals.getRawValue() as unknown as ITotalExpense[];
     expense.date = createNewDateZonedTime(date, expenseSignal?.room?.timeZone).toLocaleString(API_LOCALE);
 
-    const id = this.expenseIdSignal();
+    const id = this.expenseId();
     const file = uploadFile.raw;
     if (!id) {
       if (file) {

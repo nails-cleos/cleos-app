@@ -15,8 +15,6 @@ import {
   paymentSelected,
   paymentSend,
   recreate,
-  setCurrentPathId,
-  setCurrentPaymentId,
   setPaymentResultParams,
   updatePaymentById,
 } from '../payment.actions';
@@ -49,12 +47,6 @@ export interface PaymentState {
     paymentType?: string;
     accountId?: string;
   };
-  currentPaymentId?: string;
-  currentPathId?: {
-    path: 'reservation' | 'transaction';
-    id: string;
-    accountId?: string;
-  };
   isLoading: boolean;
 }
 
@@ -67,8 +59,6 @@ export const initialState: PaymentState = {
   selected: undefined,
   paths: undefined,
   paymentResultParams: undefined,
-  currentPaymentId: undefined,
-  currentPathId: undefined,
   isLoading: false,
 };
 
@@ -158,14 +148,6 @@ export const paymentReducer = createReducer(
         accountId,
       },
     })),
-  on(setCurrentPaymentId, (state, { paymentId }) => ({
-    ...state,
-    currentPaymentId: paymentId,
-  })),
-  on(setCurrentPathId, (state, { id, path, accountId }) => ({
-    ...state,
-    currentPathId: { id, path, accountId },
-  })),
   on(cleanPayment, () => initialState),
 
   on(clearGlobalResponse, (state) => ({

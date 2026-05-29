@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import {
   approveReservation,
@@ -74,7 +74,6 @@ import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { PaymentState } from '../../store/reducers/payment.reducers';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
-  getCurrentReservationIdPipe,
   getDetailNavigationParamsPipe,
   getHistoriesPipe,
   getPaymentsPipe,
@@ -146,6 +145,8 @@ type DetailForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationDetailComponent {
+  id = input<string>();
+
   private static readonly PROFESSIONAL_PAYMENT_TYPES = ['CASH', 'TRANSFER', 'MOLLIE'];
 
   private readonly translate: TranslateService = inject(TranslateService);
@@ -159,7 +160,6 @@ export class ReservationDetailComponent {
   private paginator = viewChild(MatPaginator);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private reservationId$ = this.store.pipe(getCurrentReservationIdPipe);
   private navigationParams$ = this.store.pipe(getDetailNavigationParamsPipe);
   private reservationSelected$ = this.store.pipe(getSelectedReservationPipe);
   private payments$ = this.store.pipe(getPaymentsPipe);
@@ -167,7 +167,6 @@ export class ReservationDetailComponent {
   private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
   private readonly authUserSignal = this.authUserService.authUser;
-  private readonly reservationIdSignal = toSignal(this.reservationId$);
   private readonly navigationParams = toSignal(this.navigationParams$);
   private readonly paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
   private readonly breakpointsSignal = toSignal(
@@ -309,7 +308,7 @@ export class ReservationDetailComponent {
     });
 
     effect(() => {
-      const id = this.reservationIdSignal();
+      const id = this.id();
       if (id) {
         this.store.dispatch(getReservation({ id }));
         this.store.dispatch(reservationFindPayments({ id }));

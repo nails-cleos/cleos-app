@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
@@ -17,7 +17,6 @@ import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular
 import { TimeDetailPipe } from '../../../../pipes/time-detail.pipe';
 import { RoomState } from '../../../../store/reducers/room.reducers';
 import { ExpenseState } from '../../../../store/reducers/expense.reducers';
-import { getCurrentRoomIdPipe } from '../../../../store/selectors/room.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getExpensePaginationPipe, getExpenseResponsePipe } from '../../../../store/selectors/expense.selectors';
 import { provideYearMonthDateAdapter } from '../../../../util/adapter/app-date.provider';
@@ -71,6 +70,8 @@ type ExpensesForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExpensesComponent {
+  id = input<string>();
+
   private readonly env: EnvService = inject(EnvService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly store: Store<RoomState | ExpenseState | DocumentState> = inject(
@@ -81,7 +82,6 @@ export class ExpensesComponent {
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private roomId$ = this.store.pipe(getCurrentRoomIdPipe);
   private expenseList$ = this.store.pipe(getExpensePaginationPipe);
   private response$ = this.store.pipe(getExpenseResponsePipe);
 
@@ -102,8 +102,6 @@ export class ExpensesComponent {
       },
     },
   );
-
-  roomIdSignal = toSignal(this.roomId$);
 
   paginatorPageIndex = this.tableState.pageIndex;
 
@@ -128,7 +126,7 @@ export class ExpensesComponent {
 
   constructor() {
     effect(() => {
-      const roomId = this.roomIdSignal();
+      const roomId = this.id();
       if (!roomId) {
         return;
       }
@@ -185,7 +183,7 @@ export class ExpensesComponent {
   edit = (selected: IExpenseAll): void => this.store.dispatch(expenseSelected({ selected }));
 
   delete = (expense: IExpenseAll): void => {
-    const roomId = this.roomIdSignal();
+    const roomId = this.id();
     if (!roomId) {
       return;
     }

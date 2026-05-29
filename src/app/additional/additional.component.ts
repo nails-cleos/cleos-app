@@ -5,6 +5,7 @@ import {
   effect,
   ElementRef,
   inject,
+  input,
   signal,
   Signal,
   viewChild,
@@ -24,7 +25,6 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
-  getCurrentAdditionalIdPipe,
   getGroupPipe,
   getSelectedAdditionalPipe,
   getSubErrorsPipe,
@@ -58,21 +58,19 @@ type AdditionalForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdditionalComponent {
+  id = input<string>();
+
   private readonly store: Store<AdditionalState> = inject(Store<AdditionalState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private additionalId$ = this.store.pipe(getCurrentAdditionalIdPipe);
   private selectedAdditional$ = this.store.pipe(getSelectedAdditionalPipe);
   private allGroups$ = this.store.pipe(getGroupPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
-  private additionalIdSignal = toSignal(this.additionalId$);
   private selectedAdditionalSignal = toSignal(this.selectedAdditional$);
   private allGroupsSignal = toSignal(this.allGroups$);
   private subErrorsSignal = toSignal(this.subErrors$);
-
-  private additionalId = computed(() => this.additionalIdSignal());
 
   additionalSignal = computed(() => this.selectedAdditionalSignal());
 
@@ -101,7 +99,7 @@ export class AdditionalComponent {
       }),
     ),
   );
-  isAddModeSignal = computed(() => !this.additionalId());
+  isAddModeSignal = computed(() => !this.id());
   groupsSignal = signal<ITreatmentGroupAll[]>([]);
   allGroupsWritableSignal = signal<ITreatmentGroupAll[] | undefined>(undefined);
   errors = signal<Record<string, unknown>>({});
@@ -141,7 +139,7 @@ export class AdditionalComponent {
     });
 
     effect(() => {
-      const id = this.additionalId();
+      const id = this.id();
       if (id) {
         this.store.dispatch(getAdditional({ id }));
       }
@@ -195,7 +193,7 @@ export class AdditionalComponent {
       additional.groupIds = newGroupIds;
     }
 
-    const id = this.additionalId();
+    const id = this.id();
     if (!id) {
       this.store.dispatch(createAdditional({ additional }));
     } else {

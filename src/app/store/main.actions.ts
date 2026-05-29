@@ -16,7 +16,6 @@ enum MainActionTypes {
   requestSuccess = '[Main] Success',
   requestFailure = '[Main] Failure',
   setCurrentLang = '[Main] Set current lang',
-  setCurrentTreatmentId = '[Main] Set current treatment id',
   clean = '[Main] Clean'
 }
 
@@ -59,11 +58,6 @@ export const requestFailure = createAction(
 export const setCurrentLang = createAction(
   MainActionTypes.setCurrentLang,
   props<{ lang: string }>(),
-);
-
-export const setCurrentTreatmentId = createAction(
-  MainActionTypes.setCurrentTreatmentId,
-  props<{ treatmentId: string }>(),
 );
 
 export const cleanMain = createAction(MainActionTypes.clean);

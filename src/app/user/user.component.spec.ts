@@ -20,7 +20,6 @@ describe('UserComponent', () => {
   let component: UserComponent;
   let fixture: ComponentFixture<UserComponent>;
 
-  let userId$: BehaviorSubject<any>;
   let selectedUser$: BehaviorSubject<any>;
   let navigationParams$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
@@ -31,7 +30,6 @@ describe('UserComponent', () => {
   let geocodeServiceSpy: jasmine.SpyObj<GeocodeService>;
 
   beforeEach(async () => {
-    userId$ = new BehaviorSubject(undefined);
     selectedUser$ = new BehaviorSubject(undefined);
     navigationParams$ = new BehaviorSubject(undefined);
     subErrors$ = new BehaviorSubject(undefined);
@@ -49,12 +47,10 @@ describe('UserComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return userId$.asObservable();
-        case 2:
           return selectedUser$.asObservable();
-        case 3:
+        case 2:
           return navigationParams$.asObservable();
-        case 4:
+        case 3:
           return subErrors$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -120,7 +116,7 @@ describe('UserComponent', () => {
       email: 'test@email.com',
     };
 
-    userId$.next(mockUser.id);
+    fixture.componentRef.setInput('id', mockUser.id);
     selectedUser$.next(mockUser);
     fixture.detectChanges();
 
@@ -169,11 +165,8 @@ describe('UserComponent', () => {
   });
 
   it('should dispatch getUser when userId emits a value', () => {
-    // reset calls
     storeSpy.dispatch.calls.reset();
-
-    // emit an id (simulate edit mode)
-    userId$.next('123');
+    fixture.componentRef.setInput('id', '123');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getUser({ id: '123' }));

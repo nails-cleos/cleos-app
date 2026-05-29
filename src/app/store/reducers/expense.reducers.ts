@@ -11,7 +11,6 @@ import {
   getAllExpensesInfo,
   getExpense,
   getExpensesPage,
-  setCurrentExpenseId,
   updateExpense,
 } from '../expense.actions';
 import { Pagination } from '../../interfaces/pagination';
@@ -28,8 +27,6 @@ export interface ExpenseState {
   error?: IError;
   subErrors?: IError[];
   selected?: IExpenseAll;
-  currentRoomId?: string;
-  currentExpenseId?: string;
   isLoading: boolean;
 }
 
@@ -40,8 +37,6 @@ export const initialState: ExpenseState = {
   error: undefined,
   subErrors: undefined,
   selected: undefined,
-  currentRoomId: undefined,
-  currentExpenseId: undefined,
   isLoading: false,
 };
 
@@ -111,10 +106,6 @@ export const expenseReducer = createReducer(
       isLoading: true,
     }),
   ),
-  on(setCurrentExpenseId, (state, { expenseId }) => ({
-    ...state,
-    currentExpenseId: expenseId,
-  })),
   on(cleanExpense, () => initialState),
 
   on(clearGlobalResponse, (state) => ({

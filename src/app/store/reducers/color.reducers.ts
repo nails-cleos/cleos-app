@@ -9,7 +9,6 @@ import {
   deleteColor,
   getColor,
   getColorsPage,
-  setCurrentColorId,
   updateColor,
 } from '../color.actions';
 import { IColor } from '../../interfaces/color';
@@ -25,7 +24,6 @@ export interface ColorState {
   error?: IError;
   subErrors?: IError[];
   selected?: IColor;
-  currentColorId?: string;
   isLoading: boolean;
 }
 
@@ -35,7 +33,6 @@ export const initialState: ColorState = {
   error: undefined,
   subErrors: undefined,
   selected: undefined,
-  currentColorId: undefined,
   isLoading: false,
 };
 
@@ -86,10 +83,6 @@ export const colorReducer = createReducer(
     response: undefined,
     isLoading: true,
     selected: undefined,
-  })),
-  on(setCurrentColorId, (state, { colorId }) => ({
-    ...state,
-    currentColorId: colorId,
   })),
   on(cleanColor, () => initialState),
 

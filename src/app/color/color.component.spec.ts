@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
@@ -14,9 +13,6 @@ describe('ColorComponent', () => {
   let fixture: ComponentFixture<ColorComponent>;
 
   let storeSpy: jasmine.SpyObj<Store<ColorState>>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-
-  let colorId$: BehaviorSubject<any>;
   let selectedColor$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
 
@@ -27,26 +23,18 @@ describe('ColorComponent', () => {
   };
 
   beforeEach(async () => {
-    colorId$ = new BehaviorSubject<any>(null);
     selectedColor$ = new BehaviorSubject<any>(undefined);
     subErrors$ = new BehaviorSubject<any>(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return colorId$.asObservable();
-        case 2:
           return selectedColor$.asObservable();
-        case 3:
+        case 2:
           return subErrors$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -56,7 +44,6 @@ describe('ColorComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ColorComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Store, useValue: storeSpy },
       ],
     }).compileComponents();
@@ -74,11 +61,8 @@ describe('ColorComponent', () => {
   });
 
   it('should dispatch getColor when colorId emits a value', () => {
-    // reset calls
     storeSpy.dispatch.calls.reset();
-
-    // emit an id (simulate edit mode)
-    colorId$.next('123');
+    fixture.componentRef.setInput('id', '123');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getColor({ id: '123' }));
@@ -143,8 +127,7 @@ describe('ColorComponent', () => {
   it('should dispatch updateColor when in edit mode and form valid', () => {
     storeSpy.dispatch.calls.reset();
 
-    // simulate edit mode
-    colorId$.next('abc-123');
+    fixture.componentRef.setInput('id', 'abc-123');
     fixture.detectChanges();
     selectedColor$.next({ name: 'Old', description: 'old' });
     fixture.detectChanges();

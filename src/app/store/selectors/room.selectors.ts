@@ -15,15 +15,6 @@ const selectRoomPaginationData = createSelector(
 );
 export const getRoomPaginationPipe = pipe(select(selectRoomPaginationData));
 
-const selectCurrentRoomId = createSelector(
-  selectRoomState,
-  (state: RoomState) => state?.currentRoomId,
-);
-export const getCurrentRoomIdPipe = pipe(
-  select(selectCurrentRoomId),
-  filter((val): val is string => val !== undefined),
-);
-
 const selectedRoom = createSelector(
   selectRoomState,
   (state: RoomState) => state?.selected,

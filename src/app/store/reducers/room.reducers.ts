@@ -15,7 +15,6 @@ import {
   roomSelected,
   roomServiceSelected,
   roomSuccess,
-  setCurrentRoomId,
   updateRoom,
   updateServices,
 } from '../room.actions';
@@ -41,7 +40,6 @@ export interface RoomState {
   error?: IError;
   subErrors?: IError[];
   selected?: IRoom;
-  currentRoomId?: string;
   isLoading: boolean;
 }
 
@@ -56,7 +54,6 @@ export const initialState: RoomState = {
   subErrors: undefined,
   selected: undefined,
   response: undefined,
-  currentRoomId: undefined,
   isLoading: false,
 };
 
@@ -157,10 +154,6 @@ export const roomReducer = createReducer(
     subErrors: undefined,
     response: undefined,
   })),
-  on(setCurrentRoomId, (state, { roomId }) => ({
-    ...state,
-    currentRoomId: roomId,
-  })),
   on(cleanRoom, () => initialState),
 
   on(clearGlobalResponse, (state) => ({
@@ -174,4 +167,3 @@ export const roomReducer = createReducer(
     subErrors: undefined,
   })),
 );
-

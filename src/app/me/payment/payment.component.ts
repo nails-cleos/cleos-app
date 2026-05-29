@@ -1,15 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { IPayment, IPaymentAll } from '../../interfaces/payment';
 import { cleanPayment, getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/payment.actions';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import {
-  getCurrentPathIdPipe,
-  getPaymentResponsePipe,
-  getPaymentsPipe,
-  getSubErrorsPipe,
-} from '../../store/selectors/payment.selectors';
+import { getPaymentResponsePipe, getPaymentsPipe, getSubErrorsPipe } from '../../store/selectors/payment.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { PaymentState } from '../../store/reducers/payment.reducers';
 import { MatPrefix } from '@angular/material/input';
@@ -44,16 +39,18 @@ import { MatTooltip } from '@angular/material/tooltip';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentComponent {
+  path = input<'reservation' | 'transaction'>();
+  id = input<string>();
+  accountId = input<string>();
+
   private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private currentPath$ = this.store.pipe(getCurrentPathIdPipe);
   private paymentList$ = this.store.pipe(getPaymentsPipe);
   private response$ = this.store.pipe(getPaymentResponsePipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
-  private currentPath = toSignal(this.currentPath$);
   private paymentListSignal = toSignal(this.paymentList$);
   private subErrorsSignal = toSignal(this.subErrors$);
   private responseSignal = toSignal(this.response$);
@@ -70,19 +67,11 @@ export class PaymentComponent {
   showError = false;
   language: string = this.translate.getCurrentLang();
 
-  private id?: string;
-  private path?: 'reservation' | 'transaction';
-  private accountId?: string;
-
   constructor() {
     effect(() => {
-      const currentPath = this.currentPath();
-      if (currentPath) {
-        const path = currentPath.path;
-        const id = currentPath.id;
-        this.path = path;
-        this.id = id;
-        this.accountId = currentPath.accountId;
+      const path = this.path();
+      const id = this.id();
+      if (path && id) {
         this.store.dispatch(getPaymentByResourceId({ id, path }));
       }
     });
@@ -122,8 +111,8 @@ export class PaymentComponent {
     this.store.dispatch(
       notifyPayment({
         id: payment.id!,
-        path: this.path!,
-        resourceId: this.id!,
+        path: this.path()!,
+        resourceId: this.id()!,
         preferenceId: payment.preferenceId!,
         paymentType: payment.type!,
       }),
@@ -141,12 +130,15 @@ export class PaymentComponent {
   };
 
   goBack() {
-    if (this.path && this.id) {
+    const path = this.path();
+    const id = this.id();
+    const accountId = this.accountId();
+    if (path && id) {
       let navigate: string[] = [this.language];
-      if (this.accountId) {
-        navigate = [...navigate, 'accounts', this.accountId, 'transactions', this.id];
+      if (accountId) {
+        navigate = [...navigate, 'accounts', accountId, 'transactions', id];
       } else {
-        navigate = [...navigate, this.path, this.id];
+        navigate = [...navigate, path, id];
       }
       this.router.navigate(navigate);
     }

@@ -12,7 +12,6 @@ import {
   resendToken,
   restore,
   saveUser,
-  setCurrentUserId,
   setRole,
   setUserNavigationParams,
   updateMyPhoto,
@@ -43,7 +42,6 @@ export interface UserState {
   error?: IError;
   subErrors?: IError[];
   selected?: IUserAll;
-  currentUserId?: string;
   userNavigationParams?: { role?: Role };
   isLoading: boolean;
 }
@@ -55,7 +53,6 @@ export const initialState: UserState = {
   subErrors: undefined,
   selected: undefined,
   response: undefined,
-  currentUserId: undefined,
   userNavigationParams: undefined,
   isLoading: false,
 };
@@ -145,10 +142,6 @@ export const userReducer = createReducer(
     users: users,
     subErrors: undefined,
     response: undefined,
-  })),
-  on(setCurrentUserId, (state, { userId }) => ({
-    ...state,
-    currentUserId: userId,
   })),
   on(setUserNavigationParams, (state, { role }) => ({
     ...state,

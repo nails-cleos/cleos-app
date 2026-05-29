@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Store } from '@ngrx/store';
 import { getDisplayNameInitials, getUserImage } from '../../util/helper';
@@ -18,7 +18,7 @@ import { GoogleMapComponent } from '../../shared/google-map/google-map.component
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { UserState } from '../../store/reducers/user.reducers';
-import { getCurrentUserIdPipe, getOverviewPipe, getUserErrorPipe } from '../../store/selectors/user.selectors';
+import { getOverviewPipe, getUserErrorPipe } from '../../store/selectors/user.selectors';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatMiniFabButton } from '@angular/material/button';
 import { CurrencyPipe } from '@angular/common';
@@ -36,6 +36,8 @@ import { MatGridList, MatGridTile } from '@angular/material/grid-list';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OverviewComponent {
+  id = input<string>();
+
   private breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private store: Store<UserState> = inject(Store<UserState>);
   private translate: TranslateService = inject(TranslateService);
@@ -43,12 +45,10 @@ export class OverviewComponent {
   private authUserService: AuthUserService = inject(AuthUserService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private userId$ = this.store.pipe(getCurrentUserIdPipe);
   private overview$ = this.store.pipe(getOverviewPipe);
   private error$ = this.store.pipe(getUserErrorPipe);
 
   private authUserSignal = this.authUserService.authUser;
-  private userIdSignal = toSignal(this.userId$);
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -62,7 +62,7 @@ export class OverviewComponent {
   );
 
   private hasAdminRole = computed(() => this.authUserSignal()?.hasAdminRole ?? false);
-  private userId = computed(() => this.userIdSignal());
+  private userId = computed(() => this.id() ?? 'me');
 
   overviewSignal = toSignal(this.overview$);
   errorSignal = toSignal(this.error$);

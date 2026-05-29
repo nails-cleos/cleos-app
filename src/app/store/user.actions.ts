@@ -24,7 +24,6 @@ enum UserActionTypes {
   getAllDisableUsers = '[User] Find all disable users',
   disableUsersSuccess = '[User] Disable users success',
   mergeUsers = '[User] Merge users',
-  setCurrentUserId = '[User] Set current user id',
   setUserNavigationParams = '[User] Set user navigation params',
   clean = '[User] Clean'
 }
@@ -113,11 +112,6 @@ export const disableUsersSuccess = createAction(
 export const mergeUsers = createAction(
   UserActionTypes.mergeUsers,
   props<{ oldUserId: string; newUserId: string }>(),
-);
-
-export const setCurrentUserId = createAction(
-  UserActionTypes.setCurrentUserId,
-  props<{ userId: string }>(),
 );
 
 export const setUserNavigationParams = createAction(

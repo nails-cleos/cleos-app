@@ -15,33 +15,6 @@ export const getAccountTransactionPipe = pipe(
   filter((val): val is IAccountTransaction => val !== undefined),
 );
 
-const selectCurrentAccountId = createSelector(
-  selectAccountState,
-  (state: AccountState) => state?.currentAccountId,
-);
-export const getCurrentAccountIdPipe = pipe(
-  select(selectCurrentAccountId),
-  filter((val): val is string => val !== undefined),
-);
-
-const selectCurrentTransactionId = createSelector(
-  selectAccountState,
-  (state: AccountState) => state?.currentTransactionId,
-);
-export const getCurrentTransactionIdPipe = pipe(
-  select(selectCurrentTransactionId),
-  filter((val): val is string => val !== undefined),
-);
-
-export const selectCurrentCustomerId = createSelector(
-  selectAccountState,
-  (state: AccountState) => state?.currentCustomerId,
-);
-export const getCurrentCustomerIdPipe = pipe(
-  select(selectCurrentCustomerId),
-  filter((val): val is string => val !== undefined),
-);
-
 const selectedAccount = createSelector(
   selectAccountState,
   (state: AccountState) => state?.selected,

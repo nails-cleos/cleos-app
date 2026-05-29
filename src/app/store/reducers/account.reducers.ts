@@ -11,9 +11,6 @@ import {
   getTransaction,
   getTransactionsByAccountId,
   paymentSend,
-  setCurrentAccountId,
-  setCurrentCustomerId,
-  setCurrentTransactionId,
   updateAccount,
 } from '../account.actions';
 
@@ -30,9 +27,6 @@ export interface AccountState {
   error?: IError;
   subErrors?: IError[];
   selected?: IAccountAll | ITransaction;
-  currentAccountId?: string;
-  currentTransactionId?: string;
-  currentCustomerId?: string;
   isLoading: boolean;
 }
 
@@ -42,9 +36,6 @@ export const initialState: AccountState = {
   error: undefined,
   subErrors: undefined,
   selected: undefined,
-  currentAccountId: undefined,
-  currentTransactionId: undefined,
-  currentCustomerId: undefined,
   isLoading: false,
 };
 
@@ -104,28 +95,7 @@ export const accountReducer = createReducer(
     subErrors: undefined,
     isLoading: true,
   })),
-
-  on(setCurrentAccountId, (state, { accountId }) => ({
-    ...state,
-    currentAccountId: accountId,
-  })),
-
-  on(setCurrentTransactionId, (state, { transactionId }) => ({
-    ...state,
-    currentTransactionId: transactionId,
-  })),
-
-  on(setCurrentCustomerId, (state, { customerId }) => ({
-    ...state,
-    currentCustomerId: customerId,
-  })),
-
-  on(clean, (state) => ({
-    ...initialState,
-    currentAccountId: state.currentAccountId,
-    currentTransactionId: state.currentTransactionId,
-    currentCustomerId: state.currentCustomerId,
-  })),
+  on(clean, () => initialState),
 
   on(clearGlobalResponse, (state) => ({
     ...state,

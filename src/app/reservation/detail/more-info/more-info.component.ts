@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { IPaymentAll } from '../../../interfaces/payment';
 import {
@@ -22,7 +22,6 @@ import { ToastService } from '../../../services/toast.service';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 import {
-  getCurrentReservationIdPipe,
   getPaymentsPipe,
   getReviewPipe,
   getTrackingPipe,
@@ -60,18 +59,17 @@ import { MatTooltip } from '@angular/material/tooltip';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MoreInfoComponent {
+  id = input<string>();
+
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly clipboard: Clipboard = inject(Clipboard);
   private readonly toastService: ToastService = inject(ToastService);
 
-  private reservationId$ = this.store.pipe(getCurrentReservationIdPipe);
   private payments$ = this.store.pipe(getPaymentsPipe);
   private tracking$ = this.store.pipe(getTrackingPipe);
   private review$ = this.store.pipe(getReviewPipe);
-
-  private reservationIdSignal = toSignal(this.reservationId$);
 
   paymentsSignal = toSignal(this.payments$);
   trackingSignal = toSignal(this.tracking$);
@@ -92,7 +90,7 @@ export class MoreInfoComponent {
 
   constructor() {
     effect(() => {
-      const id = this.reservationIdSignal();
+      const id = this.id();
       if (id) {
         this.store.dispatch(getTrackingByReservationId({ id }));
         this.store.dispatch(reservationFindPayments({ id }));
@@ -102,14 +100,14 @@ export class MoreInfoComponent {
   }
 
   execute() {
-    const id = this.reservationIdSignal();
+    const id = this.id();
     if (id) {
       this.store.dispatch(executeTrackingByReservationId({ id }));
     }
   }
 
   update() {
-    const id = this.reservationIdSignal();
+    const id = this.id();
     if (id) {
       const tracking = this.trackingSignal();
       executeDialog(this.dialog, UpdateTrackingDialogComponent, {

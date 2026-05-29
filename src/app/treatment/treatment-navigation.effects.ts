@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 import { concatMap } from 'rxjs/operators';
-import { cleanTreatment, getAllColors, getAllTreatmentsGroup, setCurrentTreatmentId } from '../store/treatment.actions';
+import { cleanTreatment, getAllColors, getAllTreatmentsGroup } from '../store/treatment.actions';
 
 @Injectable()
 export class TreatmentNavigationEffects {
@@ -29,29 +29,19 @@ export class TreatmentNavigationEffects {
         // 3) /treatments/:id/edit
         const detailMatch = url.match(/\/treatments\/([^\/]+)\/edit$/);
         if (detailMatch) {
-          return [
-            cleanTreatment(),
-            getAllColors(),
-            setCurrentTreatmentId({ treatmentId: detailMatch[1] }),
-          ];
+          return [cleanTreatment(), getAllColors()];
         }
 
         // 4) /treatments/:id/view
         const viewMatch = url.match(/\/treatments\/([^\/]+)\/view$/);
         if (viewMatch) {
-          return [
-            cleanTreatment(),
-            setCurrentTreatmentId({ treatmentId: viewMatch[1] }),
-          ];
+          return [cleanTreatment()];
         }
 
         // 5) /treatments/:id/sorting
         const sortingMatch = url.match(/\/treatments\/([^\/]+)\/sorting$/);
         if (sortingMatch) {
-          return [
-            cleanTreatment(),
-            setCurrentTreatmentId({ treatmentId: sortingMatch[1] }),
-          ];
+          return [cleanTreatment()];
         }
 
         // 6) /treatments

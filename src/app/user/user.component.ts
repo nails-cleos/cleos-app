@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { getUser, saveUser } from '../store/user.actions';
@@ -17,7 +17,6 @@ import { NgIcon } from '@ng-icons/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { UserState } from '../store/reducers/user.reducers';
 import {
-  getCurrentUserIdPipe,
   getNavigationParamsPipe,
   getSelectedUserPipe,
   getSubErrorsPipe,
@@ -55,21 +54,21 @@ type UserForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserComponent {
+  id = input<string>();
+
   private readonly store: Store<UserState> = inject(Store<UserState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private userId$ = this.store.pipe(getCurrentUserIdPipe);
   private selectedUser$ = this.store.pipe(getSelectedUserPipe);
   private navigationParams$ = this.store.pipe(getNavigationParamsPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
   private navigationParams = toSignal(this.navigationParams$);
-  private userIdSignal = toSignal(this.userId$);
   private subErrorsSignal = toSignal(this.subErrors$);
   private langChangeSignal = toSignal<LangChangeEvent>(this.translate.onLangChange);
 
-  isAddModeSignal = computed(() => !this.userIdSignal());
+  isAddModeSignal = computed(() => !this.id());
   userSignal = toSignal(this.selectedUser$);
 
   googleMapForm: FormGroup<GoogleMapForm> = this.formBuilder.group<GoogleMapForm>({
@@ -162,7 +161,7 @@ export class UserComponent {
     });
 
     effect(() => {
-      const id = this.userIdSignal();
+      const id = this.id();
       if (id) {
         this.store.dispatch(getUser({ id }));
       }
@@ -222,7 +221,7 @@ export class UserComponent {
 
     user.address = createAddress(this.formattedAddress, this.geometry?.location, userSignal?.address);
 
-    const id = this.userIdSignal();
+    const id = this.id();
     if (!id) {
       this.store.dispatch(
         saveUser({ user, role: this.getForm.role.value }),

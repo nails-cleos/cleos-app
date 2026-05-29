@@ -7,15 +7,6 @@ import { IUserAll } from '../../interfaces/user';
 
 const selectNoteState = createFeatureSelector<NoteState>(NOTE_FEATURE_KEY);
 
-const selectCurrentNoteId = createSelector(
-  selectNoteState,
-  (state: NoteState) => state?.currentNoteId,
-);
-export const getCurrentNoteIdPipe = pipe(
-  select(selectCurrentNoteId),
-  filter((val): val is string => val !== undefined),
-);
-
 const selectedNote = createSelector(
   selectNoteState,
   (state: NoteState) => state?.selected,

@@ -5,7 +5,6 @@ import { concatMap } from 'rxjs/operators';
 import {
   cleanUnavailable,
   getAllProfessional,
-  setCurrentUnavailableId,
   setUnavailableParams,
 } from '../store/unavailable.actions';
 import { Router } from '@angular/router';
@@ -39,11 +38,7 @@ export class UnavailableNavigationEffects {
         // 2) /unavailable/block-agenda/:id
         const blockAgendaDetailMatch = url.match(/\/unavailable\/block-agenda\/([^\/]+)$/);
         if (blockAgendaDetailMatch) {
-          return [
-            cleanUnavailable(),
-            getAllProfessional(),
-            setCurrentUnavailableId({ unavailableId: blockAgendaDetailMatch[1] }),
-          ];
+          return [cleanUnavailable(), getAllProfessional()];
         }
 
         // 3) /unavailable/add
@@ -55,11 +50,7 @@ export class UnavailableNavigationEffects {
         // 4) /unavailable/:id
         const detailMatch = url.match(/\/unavailable\/([^\/]+)$/);
         if (detailMatch) {
-          return [
-            cleanUnavailable(),
-            getAllProfessional(),
-            setCurrentUnavailableId({ unavailableId: detailMatch[1] }),
-          ];
+          return [cleanUnavailable(), getAllProfessional()];
         }
 
         // 5) /unavailable

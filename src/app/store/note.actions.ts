@@ -14,7 +14,6 @@ enum NoteActionTypes {
   getNote = '[Note] Find note by id',
   deleteNote = '[Note] Delete note by id',
   completeNote = '[Note] Complete',
-  setCurrentNoteId = '[Note] Set current note id',
   setNoteNavigationParams = '[Note] Set note navigation params',
   clean = '[Note] Clean'
 }
@@ -66,11 +65,6 @@ export const deleteNote = createAction(
 export const completeNote = createAction(
   NoteActionTypes.completeNote,
   props<{ id: string }>(),
-);
-
-export const setCurrentNoteId = createAction(
-  NoteActionTypes.setCurrentNoteId,
-  props<{ noteId: string }>(),
 );
 
 export const setNoteNavigationParams = createAction(

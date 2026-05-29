@@ -18,15 +18,6 @@ export const getTreatmentPaginationPipe = pipe(
   map((val) => val.value),
 );
 
-const selectCurrentTreatmentId = createSelector(
-  selectTreatmentState,
-  (state: TreatmentState) => state?.currentTreatmentId,
-);
-export const getCurrentTreatmentIdPipe = pipe(
-  select(selectCurrentTreatmentId),
-  filter((val): val is string => val !== undefined),
-);
-
 const selectTreatmentGroupList = createSelector(
   selectTreatmentState,
   (state: TreatmentState) => state?.data,

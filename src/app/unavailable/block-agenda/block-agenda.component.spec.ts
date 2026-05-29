@@ -21,7 +21,6 @@ describe('BlockAgendaComponent', () => {
   let fixture: ComponentFixture<BlockAgendaComponent>;
 
   let navigationParams$: BehaviorSubject<any>;
-  let unavailableId$: BehaviorSubject<any>;
   let selectedUnavailable$: BehaviorSubject<any>;
   let allProfessionals$: BehaviorSubject<any>;
   let allRooms$: BehaviorSubject<any>;
@@ -94,7 +93,6 @@ describe('BlockAgendaComponent', () => {
 
   beforeEach(async () => {
     navigationParams$ = new BehaviorSubject(undefined);
-    unavailableId$ = new BehaviorSubject(undefined);
     selectedUnavailable$ = new BehaviorSubject(undefined);
     allProfessionals$ = new BehaviorSubject(undefined);
     allRooms$ = new BehaviorSubject(undefined);
@@ -114,14 +112,12 @@ describe('BlockAgendaComponent', () => {
         case 1:
           return navigationParams$.asObservable();
         case 2:
-          return unavailableId$.asObservable();
-        case 3:
           return selectedUnavailable$.asObservable();
-        case 4:
+        case 3:
           return allProfessionals$.asObservable();
-        case 5:
+        case 4:
           return allRooms$.asObservable();
-        case 6:
+        case 5:
           return subErrors$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -153,21 +149,21 @@ describe('BlockAgendaComponent', () => {
   });
 
   it('should initialize in add mode when no id is provided', () => {
-    unavailableId$.next(undefined);
+    fixture.componentRef.setInput('id', undefined);
     fixture.detectChanges();
 
     expect(component.isAddModeSignal()).toBeTrue();
-    expect(component['unavailableIdSignal']()).toBeUndefined();
+    expect(component.id()).toBeUndefined();
   });
 
   it('should initialize in edit mode when id is provided', () => {
     const testId = '123';
-    unavailableId$.next(testId);
+    fixture.componentRef.setInput('id', testId);
 
     fixture.detectChanges();
 
     expect(component.isAddModeSignal()).toBeFalse();
-    expect(component['unavailableIdSignal']()).toBe(testId);
+    expect(component.id()).toBe(testId);
   });
 
   it('should create form with required name field', () => {
@@ -184,7 +180,7 @@ describe('BlockAgendaComponent', () => {
 
   it('should dispatch GetUnavailable action when in edit mode', () => {
     const testId = '123';
-    unavailableId$.next(testId);
+    fixture.componentRef.setInput('id', testId);
 
     fixture.detectChanges();
 
@@ -292,7 +288,7 @@ describe('BlockAgendaComponent', () => {
 
   it('should dispatch UpdateBlockAgenda action when in edit mode and form is valid', () => {
     const testId = '123';
-    unavailableId$.next(testId);
+    fixture.componentRef.setInput('id', testId);
     selectedUnavailable$.next(mockUnavailable);
 
     fixture.detectChanges();
@@ -335,7 +331,7 @@ describe('BlockAgendaComponent', () => {
 
   it('should handle undefined unavailable in edit mode', () => {
     const testId = '123';
-    unavailableId$.next(testId);
+    fixture.componentRef.setInput('id', testId);
     selectedUnavailable$.next(undefined);
 
     fixture.detectChanges();

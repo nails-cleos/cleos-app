@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { getAllCustomersInfo } from '../../../store/room.actions';
 import { MatPaginator } from '@angular/material/paginator';
@@ -27,7 +27,7 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
 import { RoomState } from '../../../store/reducers/room.reducers';
-import { getCurrentRoomIdPipe, getCustomersPipe } from '../../../store/selectors/room.selectors';
+import { getCustomersPipe } from '../../../store/selectors/room.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -47,15 +47,15 @@ import { MatTooltip } from '@angular/material/tooltip';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomersComponent {
+  id = input<string>();
+
   private readonly store: Store<RoomState> = inject(Store<RoomState>);
   private readonly translate = inject(TranslateService);
   private readonly breakpointObserver = inject(BreakpointObserver);
 
-  private roomId$ = this.store.pipe(getCurrentRoomIdPipe);
   private customers$ = this.store.pipe(getCustomersPipe);
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
-  private roomIdSignal = toSignal(this.roomId$);
   private customersSignal = toSignal(this.customers$);
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
@@ -95,7 +95,7 @@ export class CustomersComponent {
     });
 
     effect(() => {
-      const id = this.roomIdSignal();
+      const id = this.id();
       if (id) {
         this.store.dispatch(getAllCustomersInfo({ id }));
       }

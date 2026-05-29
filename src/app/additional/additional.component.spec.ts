@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
@@ -15,9 +14,6 @@ describe('AdditionalComponent', () => {
   let fixture: ComponentFixture<AdditionalComponent>;
 
   let storeSpy: jasmine.SpyObj<Store<AdditionalState>>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-
-  let additionalId$: BehaviorSubject<any>;
   let selectedAdditional$: BehaviorSubject<any>;
   let allGroups$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
@@ -38,29 +34,21 @@ describe('AdditionalComponent', () => {
   };
 
   beforeEach(async () => {
-    additionalId$ = new BehaviorSubject<any>(null);
     selectedAdditional$ = new BehaviorSubject<any>(undefined);
     allGroups$ = new BehaviorSubject<any>(undefined);
     subErrors$ = new BehaviorSubject<any>(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return additionalId$.asObservable();
-        case 2:
           return selectedAdditional$.asObservable();
-        case 3:
+        case 2:
           return allGroups$.asObservable();
-        case 4:
+        case 3:
           return subErrors$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -70,7 +58,6 @@ describe('AdditionalComponent', () => {
     await TestBed.configureTestingModule({
       imports: [AdditionalComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Store, useValue: storeSpy },
       ],
     }).compileComponents();
@@ -91,11 +78,8 @@ describe('AdditionalComponent', () => {
   });
 
   it('should dispatch getAdditional when additionalId emits a value', () => {
-    // reset calls
     storeSpy.dispatch.calls.reset();
-
-    // emit an id (simulate edit mode)
-    additionalId$.next('123');
+    fixture.componentRef.setInput('id', '123');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getAdditional({ id: '123' }));
@@ -174,8 +158,7 @@ describe('AdditionalComponent', () => {
   it('should dispatch updateAdditional when in edit mode and form valid', () => {
     storeSpy.dispatch.calls.reset();
 
-    // simulate edit mode
-    additionalId$.next('abc-123');
+    fixture.componentRef.setInput('id', 'abc-123');
     fixture.detectChanges();
     selectedAdditional$.next({ name: 'Old', description: 'old', duration: 'PT15M' });
     fixture.detectChanges();

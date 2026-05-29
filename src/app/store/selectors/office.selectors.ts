@@ -18,15 +18,6 @@ export const getOfficePaginationPipe = pipe(
   map((val) => val.value),
 );
 
-const selectCurrentOfficeId = createSelector(
-  selectOfficeState,
-  (state: OfficeState) => state?.currentOfficeId,
-);
-export const getCurrentOfficeIdPipe = pipe(
-  select(selectCurrentOfficeId),
-  filter((val): val is string => val !== undefined),
-);
-
 const selectedOffice = createSelector(
   selectOfficeState,
   (state: OfficeState) => state?.selected,

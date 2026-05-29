@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router, RouterLink } from '@angular/router';
 import { getTransaction } from '../../../store/account.actions';
@@ -8,8 +8,6 @@ import { newDateTimestamp } from '../../../util/dates';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import {
   getAccountResponsePipe,
-  getCurrentAccountIdPipe,
-  getCurrentTransactionIdPipe,
   getSelectedTransactionPipe,
   getSubErrorsPipe,
 } from '../../../store/selectors/account.selectors';
@@ -29,18 +27,17 @@ import { DatePipe, DecimalPipe } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransactionDetailComponent {
+  id = input<string>();
+  transactionId = input<string>();
+
   private readonly store: Store<AccountState | PaymentState> = inject(Store<AccountState | PaymentState>);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly router: Router = inject(Router);
 
-  private accountId$ = this.store.pipe(getCurrentAccountIdPipe);
-  private transactionId$ = this.store.pipe(getCurrentTransactionIdPipe);
   private selectedTransaction$ = this.store.pipe(getSelectedTransactionPipe);
   private response$ = this.store.pipe(getAccountResponsePipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
-  private accountIdSignal = toSignal(this.accountId$);
-  private transactionIdSignal = toSignal(this.transactionId$);
   private selectedTransactionSignal = toSignal(this.selectedTransaction$);
   private responseSignal = toSignal(this.response$);
   private subErrorsSignal = toSignal(this.subErrors$);
@@ -61,8 +58,8 @@ export class TransactionDetailComponent {
 
   constructor() {
     effect(() => {
-      const id = this.accountIdSignal();
-      const transactionId = this.transactionIdSignal();
+      const id = this.id();
+      const transactionId = this.transactionId();
       if (id && transactionId) {
         this.store.dispatch(getTransaction({ id, transactionId }));
       }
@@ -73,7 +70,7 @@ export class TransactionDetailComponent {
       if (path) {
         this.router.navigate([`${ this.language }/${ path }`]);
       } else if (this.subErrorsSignal()?.[0]?.message) {
-        this.router.navigate([this.language, 'me', 'transaction', this.transactionIdSignal(), 'payment']);
+        this.router.navigate([this.language, 'me', 'transaction', this.transactionId(), 'payment']);
       }
     });
   }

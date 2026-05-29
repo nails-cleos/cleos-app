@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
@@ -16,10 +16,8 @@ describe('OfficeComponent', () => {
   let fixture: ComponentFixture<OfficeComponent>;
 
   let storeSpy: jasmine.SpyObj<Store<OfficeState>>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let navigateSpy: jasmine.Spy;
 
-  let officeId$: BehaviorSubject<any>;
   let selectedOffice$: BehaviorSubject<any>;
   let allManagers$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
@@ -35,29 +33,21 @@ describe('OfficeComponent', () => {
   };
 
   beforeEach(async () => {
-    officeId$ = new BehaviorSubject<any>(null);
     selectedOffice$ = new BehaviorSubject<any>(undefined);
     allManagers$ = new BehaviorSubject<any>(undefined);
     subErrors$ = new BehaviorSubject<any>(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return officeId$.asObservable();
-        case 2:
           return selectedOffice$.asObservable();
-        case 3:
+        case 2:
           return allManagers$.asObservable();
-        case 4:
+        case 3:
           return subErrors$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -67,7 +57,6 @@ describe('OfficeComponent', () => {
     await TestBed.configureTestingModule({
       imports: [OfficeComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Store, useValue: storeSpy },
       ],
     }).compileComponents();
@@ -89,11 +78,8 @@ describe('OfficeComponent', () => {
   });
 
   it('should dispatch getOffice when officeId emits a value', () => {
-    // reset calls
     storeSpy.dispatch.calls.reset();
-
-    // emit an id (simulate edit mode)
-    officeId$.next('123');
+    fixture.componentRef.setInput('id', '123');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getOffice({ id: '123' }));
@@ -158,8 +144,7 @@ describe('OfficeComponent', () => {
   it('should dispatch updateOffice when in edit mode and form valid', () => {
     storeSpy.dispatch.calls.reset();
 
-    // simulate edit mode
-    officeId$.next('abc-123');
+    fixture.componentRef.setInput('id', 'abc-123');
     fixture.detectChanges();
     selectedOffice$.next(mockOffice);
     fixture.detectChanges();

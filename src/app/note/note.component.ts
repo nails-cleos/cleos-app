@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, Signal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, Signal, signal } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { combineLatestWith } from 'rxjs';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -16,7 +16,6 @@ import { BackButtonDirective } from '../directives/back-button.directive';
 import { NoteState } from '../store/reducers/note.reducers';
 import {
   getAllProfessionalsPipe,
-  getCurrentNoteIdPipe,
   getNavigationParamsPipe,
   getSelectedNotePipe,
   getSubErrorsPipe,
@@ -49,24 +48,24 @@ type NoteForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NoteComponent {
+  id = input<string>();
+
   private readonly store: Store<NoteState> = inject(Store<NoteState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
 
-  private noteId$ = this.store.pipe(getCurrentNoteIdPipe);
   private navigationParams$ = this.store.pipe(getNavigationParamsPipe);
   private selectedNote$ = this.store.pipe(getSelectedNotePipe);
   private allProfessionals$ = this.store.pipe(getAllProfessionalsPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
-  private noteIdSignal = toSignal(this.noteId$, { initialValue: null });
   private navigationParams = toSignal(this.navigationParams$);
   private subErrorsSignal = toSignal(this.subErrors$);
 
   allProfessionalsSignal = toSignal(this.allProfessionals$);
   noteSignal = toSignal(this.selectedNote$);
-  isAddModeSignal = computed(() => !this.noteIdSignal());
+  isAddModeSignal = computed(() => !this.id());
   errors = signal<Record<string, unknown>>({});
 
   form: FormGroup<NoteForm> = this.formBuilder.group<NoteForm>({
@@ -140,7 +139,7 @@ export class NoteComponent {
     });
 
     effect(() => {
-      const id = this.noteIdSignal();
+      const id = this.id();
       if (id) {
         this.store.dispatch(getNote({ id }));
       }
@@ -163,7 +162,7 @@ export class NoteComponent {
     note.repeat = fieldChange(this.getForm.repeat, noteSignal?.repeat);
     note.date = backendFormatDate(this.getForm.date.value);
 
-    const id = this.noteIdSignal();
+    const id = this.id();
     if (!id) {
       this.store.dispatch(createNote({ note }));
     } else {
