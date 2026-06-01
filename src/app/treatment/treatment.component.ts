@@ -68,6 +68,7 @@ type TreatmentForm = {
 })
 export class TreatmentComponent {
   id = input<string>();
+  mode = input<TreatmentMode>();
 
   private readonly store: Store<TreatmentState> = inject(Store<TreatmentState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
@@ -90,7 +91,11 @@ export class TreatmentComponent {
 
   private selectedHistoryTreatmentId = signal<string | undefined>(undefined);
 
-  mode = computed<TreatmentMode>(() => {
+  resolvedMode = computed<TreatmentMode>(() => {
+    const mode = this.mode();
+    if (mode) {
+      return mode;
+    }
     if (this.routeModeSignal() === 'view') {
       return 'view';
     }
@@ -140,8 +145,8 @@ export class TreatmentComponent {
       }),
     ),
   );
-  isAddModeSignal = computed(() => this.mode() === 'add');
-  isViewModeSignal = computed(() => this.mode() === 'view');
+  isAddModeSignal = computed(() => this.resolvedMode() === 'add');
+  isViewModeSignal = computed(() => this.resolvedMode() === 'view');
   colorsSignal = signal<IColorAll[]>([]);
   allColorsWritableSignal = signal<IColorAll[] | undefined>(undefined);
   errors = signal<Record<string, unknown>>({});
@@ -175,7 +180,7 @@ export class TreatmentComponent {
 
     effect(() => {
       const id = this.id();
-      const mode = this.mode();
+      const mode = this.resolvedMode();
       if (id) {
         this.store.dispatch(getTreatmentGroup({ id, path: mode }));
       }

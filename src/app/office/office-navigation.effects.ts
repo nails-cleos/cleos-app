@@ -1,38 +1,37 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
-import { concatMap } from 'rxjs/operators';
+import { ROUTER_NAVIGATED } from '@ngrx/router-store';
 import { cleanOffice, getAllManager } from '../store/office.actions';
+import { navigation } from '../store/router-navigation.operator';
+import { OfficeListComponent } from './list/office-list.component';
+import { OfficeCreatePageComponent } from './office-create-page.component';
+import { OfficeDetailsPageComponent } from './office-details-page.component';
 
 @Injectable()
 export class OfficeNavigationEffects {
   private readonly actions$: Actions = inject(Actions);
 
-  handleOfficeNavigation$ = createEffect(() =>
+  loadOfficeListPage$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ROUTER_NAVIGATION),
-      concatMap((action: RouterNavigationAction) => {
-        const url = action.payload.routerState.url;
+      ofType(ROUTER_NAVIGATED),
+      navigation(OfficeListComponent, {
+        run: () => cleanOffice(),
+      }),
+    ));
 
-        // 1) /offices/add
-        const addMatch = url.match(/\/offices\/add$/);
-        if (addMatch) {
-          return [cleanOffice(), getAllManager()];
-        }
+  loadOfficeAddPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(OfficeCreatePageComponent, {
+        run: () => [cleanOffice(), getAllManager()],
+      }),
+    ));
 
-        // 2) /offices/:id
-        const detailMatch = url.match(/\/offices\/([^\/]+)$/);
-        if (detailMatch) {
-          return [cleanOffice()];
-        }
-
-        // 3) /offices
-        const viewMatch = url.match(/\/offices\/?$/);
-        if (viewMatch) {
-          return [cleanOffice()];
-        }
-
-        return [];
+  loadOfficeDetailsPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(OfficeDetailsPageComponent, {
+        run: () => cleanOffice(),
       }),
     ));
 }

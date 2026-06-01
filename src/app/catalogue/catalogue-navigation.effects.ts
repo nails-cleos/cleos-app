@@ -1,38 +1,37 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
-import { concatMap } from 'rxjs/operators';
+import { ROUTER_NAVIGATED } from '@ngrx/router-store';
 import { cleanCatalogue, getAllCatalogues, getAllTreatmentsGroup } from '../store/catalogue.actions';
+import { navigation } from '../store/router-navigation.operator';
+import { CatalogueListComponent } from './list/catalogue-list.component';
+import { CatalogueCreatePageComponent } from './catalogue-create-page.component';
+import { CatalogueDetailsPageComponent } from './catalogue-details-page.component';
 
 @Injectable()
 export class CatalogueNavigationEffects {
   private readonly actions$: Actions = inject(Actions);
 
-  handleCatalogueNavigation$ = createEffect(() =>
+  loadCataloguesPage$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ROUTER_NAVIGATION),
-      concatMap((action: RouterNavigationAction) => {
-        const url = action.payload.routerState.url;
+      ofType(ROUTER_NAVIGATED),
+      navigation(CatalogueListComponent, {
+        run: () => [cleanCatalogue(), getAllCatalogues()],
+      }),
+    ));
 
-        // 1) /catalogues/add
-        const addMatch = url.match(/\/catalogues\/add$/);
-        if (addMatch) {
-          return [cleanCatalogue(), getAllTreatmentsGroup()];
-        }
+  loadCatalogueAddPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(CatalogueCreatePageComponent, {
+        run: () => [cleanCatalogue(), getAllTreatmentsGroup()],
+      }),
+    ));
 
-        // 2) /catalogues/:id
-        const detailMatch = url.match(/\/catalogues\/([^\/]+)$/);
-        if (detailMatch) {
-          return [cleanCatalogue(), getAllTreatmentsGroup()];
-        }
-
-        // 3) /catalogues
-        const viewMatch = url.match(/\/catalogues\/?$/);
-        if (viewMatch) {
-          return [cleanCatalogue(), getAllCatalogues()];
-        }
-
-        return [];
+  loadCatalogueDetailsPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(CatalogueDetailsPageComponent, {
+        run: () => [cleanCatalogue(), getAllTreatmentsGroup()],
       }),
     ));
 }

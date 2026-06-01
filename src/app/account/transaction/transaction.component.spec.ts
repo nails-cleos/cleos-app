@@ -18,7 +18,6 @@ describe('TransactionComponent', () => {
   let component: TransactionComponent;
   let fixture: ComponentFixture<TransactionComponent>;
 
-  let accountId$: BehaviorSubject<string | null>;
   let selectedAccount$: BehaviorSubject<IAccountAll | undefined>;
   let subErrors$: BehaviorSubject<any>;
   let response$: BehaviorSubject<any>;
@@ -26,7 +25,6 @@ describe('TransactionComponent', () => {
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   let storeSpy: jasmine.SpyObj<Store<AccountState>>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let routerSpy: jasmine.SpyObj<Router>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
@@ -51,7 +49,6 @@ describe('TransactionComponent', () => {
 
   beforeEach(async () => {
     authUserSignal.set(initialAuthUser);
-    accountId$ = new BehaviorSubject<any>(null);
     selectedAccount$ = new BehaviorSubject<any>(undefined);
     subErrors$ = new BehaviorSubject<any>(undefined);
     response$ = new BehaviorSubject<any>(undefined);
@@ -92,11 +89,6 @@ describe('TransactionComponent', () => {
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
     });
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
 
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
@@ -105,14 +97,12 @@ describe('TransactionComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return accountId$.asObservable();
-        case 2:
           return selectedAccount$.asObservable();
-        case 3:
+        case 2:
           return subErrors$.asObservable();
-        case 4:
+        case 3:
           return response$.asObservable();
-        case 5:
+        case 4:
           return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -123,7 +113,7 @@ describe('TransactionComponent', () => {
       imports: [TransactionComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: Router, useValue: routerSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
@@ -141,7 +131,6 @@ describe('TransactionComponent', () => {
   });
 
   afterEach(() => {
-    accountId$.complete();
     selectedAccount$.complete();
     subErrors$.complete();
     response$.complete();
@@ -182,7 +171,7 @@ describe('TransactionComponent', () => {
 
   it('should dispatch getAccount when accountId signal emits an id', () => {
     storeSpy.dispatch.calls.reset();
-    accountId$.next('account-123');
+    fixture.componentRef.setInput('id', 'account-123');
 
     fixture.detectChanges();
 
@@ -256,8 +245,9 @@ describe('TransactionComponent', () => {
   });
 
   it('should dispatch createTransaction for selected payment option', () => {
-    accountId$.next('account-123');
+    fixture.componentRef.setInput('id', 'account-123');
     selectedAccount$.next(mockAccount);
+    fixture.detectChanges();
 
     component.bankForm.patchValue({
       option: { type: 'CASH', icon: 'cash' } as IPaymentOption,
@@ -286,8 +276,9 @@ describe('TransactionComponent', () => {
   });
 
   it('should dispatch createTransaction for another payment option', () => {
-    accountId$.next('account-123');
+    fixture.componentRef.setInput('id', 'account-123');
     selectedAccount$.next(mockAccount);
+    fixture.detectChanges();
 
     const paymentOption = { label: 'Test Payment', type: 'PAYPAL' } as IPaymentOption;
 

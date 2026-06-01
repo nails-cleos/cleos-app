@@ -45,6 +45,7 @@ describe('ShortcutComponent', () => {
   const setShortcut = (key: 'calendar' | 'dashboard' | 'reservation') => {
     fixture.componentRef.setInput('key', key);
     fixture.detectChanges();
+    navigateSpy.calls.reset();
   };
 
   it('should create', () => {

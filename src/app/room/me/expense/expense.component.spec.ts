@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
@@ -22,13 +22,10 @@ describe('ExpenseComponent', () => {
   let fixture: ComponentFixture<ExpenseComponent>;
 
   let storeSpy: jasmine.SpyObj<Store<ExpenseState | RoomState>>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let navigateSpy: jasmine.Spy;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
 
-  let roomId$: BehaviorSubject<any>;
-  let expenseId$: BehaviorSubject<any>;
   let selectedExpense$: BehaviorSubject<any>;
   let info$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
@@ -62,8 +59,6 @@ describe('ExpenseComponent', () => {
   };
 
   beforeEach(async () => {
-    roomId$ = new BehaviorSubject<any>(undefined);
-    expenseId$ = new BehaviorSubject<any>(undefined);
     selectedExpense$ = new BehaviorSubject<any>(undefined);
     info$ = new BehaviorSubject<any>(undefined);
     subErrors$ = new BehaviorSubject<any>(undefined);
@@ -77,11 +72,6 @@ describe('ExpenseComponent', () => {
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     driveAccessServiceSpy = jasmine.createSpyObj<DriveAccessService>('DriveAccessService', ['requestAccessIfNeeded']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
     });
@@ -91,18 +81,14 @@ describe('ExpenseComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return roomId$.asObservable();
-        case 2:
-          return expenseId$.asObservable();
-        case 3:
           return selectedExpense$.asObservable();
-        case 4:
+        case 2:
           return info$.asObservable();
-        case 5:
+        case 3:
           return subErrors$.asObservable();
-        case 6:
+        case 4:
           return response$.asObservable();
-        case 7:
+        case 5:
           return aws$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -112,7 +98,6 @@ describe('ExpenseComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ExpenseComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
@@ -151,12 +136,9 @@ describe('ExpenseComponent', () => {
   });
 
   it('should dispatch getExpense when expenseId emits a value', () => {
-    // reset calls
     storeSpy.dispatch.calls.reset();
-
-    // emit an id (simulate edit mode)
-    expenseId$.next('123');
-    roomId$.next('room-1');
+    fixture.componentRef.setInput('id', 'room-1');
+    fixture.componentRef.setInput('expenseId', '123');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getExpense({ id: '123', roomId: 'room-1' }));
@@ -184,7 +166,7 @@ describe('ExpenseComponent', () => {
   });
 
   it('should navigate to expense list when response emits', () => {
-    roomId$.next('room-1');
+    fixture.componentRef.setInput('id', 'room-1');
     response$.next(true);
     fixture.detectChanges();
 
@@ -204,7 +186,7 @@ describe('ExpenseComponent', () => {
   });
 
   it('should dispatch createExpense when in add mode and form valid', () => {
-    roomId$.next('room-123');
+    fixture.componentRef.setInput('id', 'room-123');
     component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: mockFile });
     fixture.detectChanges();
     storeSpy.dispatch.calls.reset();
@@ -233,7 +215,7 @@ describe('ExpenseComponent', () => {
   });
 
   it('should not dispatch createExpense when in add mode and form valid but raw is undefined', () => {
-    roomId$.next('room-123');
+    fixture.componentRef.setInput('id', 'room-123');
     component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: undefined });
     fixture.detectChanges();
     storeSpy.dispatch.calls.reset();
@@ -255,7 +237,7 @@ describe('ExpenseComponent', () => {
   });
 
   it('should create expense and clean the form when createAnother is tick', () => {
-    roomId$.next('room-123');
+    fixture.componentRef.setInput('id', 'room-123');
     component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: mockFile });
     fixture.detectChanges();
     storeSpy.dispatch.calls.reset();
@@ -309,9 +291,8 @@ describe('ExpenseComponent', () => {
 
   it('should dispatch updateExpense when in edit mode and form valid', () => {
     storeSpy.dispatch.calls.reset();
-
-    expenseId$.next('abc-123');
-    roomId$.next('room-123');
+    fixture.componentRef.setInput('id', 'room-123');
+    fixture.componentRef.setInput('expenseId', 'abc-123');
     selectedExpense$.next({ ...mockExpense, document: { name: 'invoice.pdf' } });
     fixture.detectChanges();
 
@@ -390,8 +371,8 @@ describe('ExpenseComponent', () => {
       TAX: '€ 21',
     };
 
-    aws$.next(awsData);
     info$.next({ supplyStores: mockSuppliers });
+    aws$.next(awsData);
     fixture.detectChanges();
 
     expect(component.getForm.supplyStore.value).toEqual(mockSuppliers[0]);

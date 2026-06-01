@@ -17,12 +17,9 @@ describe('TransactionDetailComponent', () => {
 
   let storeSpy: jasmine.SpyObj<Store<AccountState>>;
   let routerSpy: jasmine.SpyObj<Router>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
 
   let translateService: TranslateService;
 
-  let accountId$: BehaviorSubject<string | undefined>;
-  let transactionId$: BehaviorSubject<string | undefined>;
   let selectedTransaction$: BehaviorSubject<ITransaction | undefined>;
   let response$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any[]>;
@@ -41,36 +38,24 @@ describe('TransactionDetailComponent', () => {
   };
 
   beforeEach(async () => {
-    accountId$ = new BehaviorSubject<string | undefined>('account-123');
-    transactionId$ = new BehaviorSubject<string | undefined>('transaction-123');
     selectedTransaction$ = new BehaviorSubject<ITransaction | undefined>(undefined);
     response$ = new BehaviorSubject<any>(undefined);
     subErrors$ = new BehaviorSubject<any[]>([]);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
 
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
-    // Return observables in order for toSignal
     let callIndex = 0;
     storeSpy.pipe.and.callFake(() => {
       callIndex++;
       switch (callIndex) {
         case 1:
-          return accountId$.asObservable();
-        case 2:
-          return transactionId$.asObservable();
-        case 3:
           return selectedTransaction$.asObservable();
-        case 4:
+        case 2:
           return response$.asObservable();
-        case 5:
+        case 3:
           return subErrors$.asObservable();
         default:
           return of(undefined);
@@ -83,7 +68,7 @@ describe('TransactionDetailComponent', () => {
       imports: [TransactionDetailComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: Router, useValue: routerSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
@@ -94,6 +79,8 @@ describe('TransactionDetailComponent', () => {
 
     fixture = TestBed.createComponent(TransactionDetailComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('id', 'account-123');
+    fixture.componentRef.setInput('transactionId', 'transaction-123');
     fixture.detectChanges();
   });
 

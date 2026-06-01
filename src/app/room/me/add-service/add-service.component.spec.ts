@@ -8,6 +8,7 @@ import { IService, ServicePrice, ServiceType } from '../../../interfaces/room';
 import { TranslateModule } from '@ngx-translate/core';
 import { ITreatmentAll } from '../../../interfaces/treatment';
 import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
 
 describe('AddServiceComponent', () => {
   let component: AddServiceComponent;
@@ -15,12 +16,10 @@ describe('AddServiceComponent', () => {
   let storeSpy: jasmine.SpyObj<Store>;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
 
-  let roomId$: BehaviorSubject<any>;
   let services$: BehaviorSubject<any>;
   let response$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    roomId$ = new BehaviorSubject(undefined);
     services$ = new BehaviorSubject(undefined);
     response$ = new BehaviorSubject(undefined);
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
@@ -31,10 +30,8 @@ describe('AddServiceComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return roomId$.asObservable();
-        case 2:
           return services$.asObservable();
-        case 3:
+        case 2:
           return response$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -44,6 +41,7 @@ describe('AddServiceComponent', () => {
     await TestBed.configureTestingModule({
       imports: [AddServiceComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: Store, useValue: storeSpy },
         { provide: MatDialog, useValue: dialogSpy },
       ],
@@ -56,14 +54,14 @@ describe('AddServiceComponent', () => {
   });
 
   it('should dispatch getServices when roomId is emitted', () => {
-    roomId$.next('10');
+    fixture.componentRef.setInput('id', '10');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getServices({ id: '10' }));
   });
 
   it('should dispatch updateServices with collected prices', () => {
-    roomId$.next('5');
+    fixture.componentRef.setInput('id', '5');
     fixture.detectChanges();
 
     component.selectedAdditional.set([
@@ -112,7 +110,7 @@ describe('AddServiceComponent', () => {
   });
 
   it('should not dispatch save if roomId is null', () => {
-    roomId$.next(undefined);
+    fixture.componentRef.setInput('id', undefined);
     fixture.detectChanges();
 
     component.save();

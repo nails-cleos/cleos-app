@@ -1,38 +1,37 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
-import { concatMap } from 'rxjs/operators';
+import { ROUTER_NAVIGATED } from '@ngrx/router-store';
 import { cleanColor } from '../store/color.actions';
+import { navigation } from '../store/router-navigation.operator';
+import { ColorDetailsPageComponent } from './color-details-page.component';
+import { ColorListComponent } from './list/color-list.component';
+import { ColorCreatePageComponent } from './color-create-page.component';
 
 @Injectable()
 export class ColorNavigationEffects {
   private readonly actions$: Actions = inject(Actions);
 
-  handleColorNavigation$ = createEffect(() =>
+  loadColorListPage$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ROUTER_NAVIGATION),
-      concatMap((action: RouterNavigationAction) => {
-        const url = action.payload.routerState.url;
+      ofType(ROUTER_NAVIGATED),
+      navigation(ColorListComponent, {
+        run: () => cleanColor(),
+      }),
+    ));
 
-        // 1) /colors/add
-        const addMatch = url.match(/\/colors\/add$/);
-        if (addMatch) {
-          return [cleanColor()];
-        }
+  loadColorAddPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(ColorCreatePageComponent, {
+        run: () => cleanColor(),
+      }),
+    ));
 
-        // 2) /colors/:id
-        const detailMatch = url.match(/\/colors\/([^\/]+)$/);
-        if (detailMatch) {
-          return [cleanColor()];
-        }
-
-        // 3) /colors
-        const viewMatch = url.match(/\/colors\/?$/);
-        if (viewMatch) {
-          return [cleanColor()];
-        }
-
-        return [];
+  loadColorDetailsPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(ColorDetailsPageComponent, {
+        run: () => cleanColor(),
       }),
     ));
 }

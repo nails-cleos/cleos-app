@@ -20,7 +20,7 @@ type ColorForm = {
 }
 
 @Component({
-  selector: 'app-colors',
+  selector: 'app-color',
   templateUrl: './color.component.html',
   styleUrls: ['./color.component.scss'],
   imports: [MatFormField, MatLabel, MatInput, MatIcon, MatButton, ReactiveFormsModule, TranslatePipe, MatError,

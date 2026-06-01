@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MePaymentComponent } from './me-payment.component';
 import { Store } from '@ngrx/store';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 import { getPayment, updatePaymentById } from '../../../store/payment.actions';
 import { PaymentPercentage } from '../../../interfaces/payment';
-import { ActivatedRoute } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideAppIcons } from '../../../util/app-icons.provider';
 
@@ -15,15 +15,12 @@ describe('MePaymentComponent', () => {
   let fixture: ComponentFixture<MePaymentComponent>;
 
   let storeSpy: jasmine.SpyObj<Store<PaymentState>>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
 
   // streams returned by store.pipe()
-  let paymentId$: Subject<string | null>;
   let payment$: Subject<any>;
   let paymentOptions$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    paymentId$ = new Subject();
     payment$ = new Subject();
     paymentOptions$ = new BehaviorSubject([
       {
@@ -49,21 +46,14 @@ describe('MePaymentComponent', () => {
     ]);
 
     storeSpy = jasmine.createSpyObj<Store<PaymentState>>('Store', ['dispatch', 'pipe']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return paymentId$.asObservable();
-        case 2:
           return payment$.asObservable();
-        case 3:
+        case 2:
           return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -74,7 +64,7 @@ describe('MePaymentComponent', () => {
       imports: [MePaymentComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         provideHttpClient(),
         provideAppIcons(),
       ],
@@ -85,7 +75,6 @@ describe('MePaymentComponent', () => {
   });
 
   afterEach(() => {
-    paymentId$.complete();
     payment$.complete();
     paymentOptions$.complete();
   });
@@ -95,8 +84,7 @@ describe('MePaymentComponent', () => {
   });
 
   it('should dispatch getPayment when paymentId is emitted', () => {
-    paymentId$.next('payment-123');
-
+    fixture.componentRef.setInput('id', 'payment-123');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(

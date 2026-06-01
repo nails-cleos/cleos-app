@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormArray } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { BehaviorSubject, of } from 'rxjs';
@@ -34,7 +34,6 @@ describe('ReservationComponent', () => {
 
   let matches$: BehaviorSubject<any>;
   let navigationParams$: BehaviorSubject<any>;
-  let reservationId$: BehaviorSubject<any>;
   let customers$: BehaviorSubject<any>;
   let customerInfo$: BehaviorSubject<any>;
   let rooms$: BehaviorSubject<any>;
@@ -48,7 +47,6 @@ describe('ReservationComponent', () => {
   let storeSpy: jasmine.SpyObj<Store>;
   let routerSpy: jasmine.SpyObj<Router>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let snackBarSpy: jasmine.SpyObj<MatSnackBar>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
@@ -140,7 +138,6 @@ describe('ReservationComponent', () => {
   beforeEach(async () => {
     authUserSignal.set({ ...initialAuthUser, isDarkMode: true, professionalId: 'prof-123' });
     navigationParams$ = new BehaviorSubject(undefined);
-    reservationId$ = new BehaviorSubject(undefined);
     customers$ = new BehaviorSubject(undefined);
     customerInfo$ = new BehaviorSubject(undefined);
     rooms$ = new BehaviorSubject(undefined);
@@ -170,11 +167,6 @@ describe('ReservationComponent', () => {
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe'], {
       observe: () => matches$.asObservable(),
     });
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
     snackBarSpy = jasmine.createSpyObj('MatSnackBar', ['openFromComponent']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
@@ -194,31 +186,27 @@ describe('ReservationComponent', () => {
         case 1:
           return navigationParams$.asObservable();
         case 2:
-          return reservationId$.asObservable();
-        case 3:
           return customers$.asObservable();
-        case 4:
+        case 3:
           return customerInfo$.asObservable();
-        case 5:
+        case 4:
           return rooms$.asObservable();
-        case 6:
+        case 5:
           return treatmentDiscount$.asObservable();
-        case 7:
+        case 6:
           return additionalList$.asObservable();
-        case 8:
+        case 7:
           return selectedReservation$.asObservable();
-        case 9:
+        case 8:
           return calendar$.asObservable();
-        case 10:
+        case 9:
           return subErrors$.asObservable();
-        case 11:
+        case 10:
           return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
     });
-
-    reservationId$.next('test-reservation-id');
 
     routerSpy.currentNavigation.and.returnValue(null);
 
@@ -226,7 +214,6 @@ describe('ReservationComponent', () => {
       imports: [ReservationComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
@@ -272,7 +259,7 @@ describe('ReservationComponent', () => {
     });
 
     it('should initialize with signals', () => {
-      reservationId$.next(undefined);
+      fixture.componentRef.setInput('id', undefined);
       fixture.detectChanges();
       expect(component.isEditing()).toBeFalse();
       expect(component.isAdmin()).toBeFalse();

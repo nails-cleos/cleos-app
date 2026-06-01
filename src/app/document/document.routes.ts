@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
-import { DocumentComponent } from './document.component';
+import { DocumentListComponent } from './list/document-list.component';
 import { provideEffects } from '@ngrx/effects';
 import { provideState } from '@ngrx/store';
 import { DocumentService } from '../services/document.service';
@@ -20,7 +20,7 @@ const providers = [
 ];
 
 const children: Routes = [
-  { path: '', component: DocumentComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
+  { path: '', component: DocumentListComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
 ];
 
 export const DOCUMENT_ROUTES: Routes = [{ path: '', providers, children }];

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { OptionComponent } from './option.component';
 import { Store } from '@ngrx/store';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver } from '@angular/cdk/layout';
@@ -20,13 +20,11 @@ describe('OptionComponent', () => {
   let routerSpy: jasmine.SpyObj<Router>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
 
-  let reservationId$: BehaviorSubject<any>;
   let payments$: BehaviorSubject<any>;
   let paymentOptions$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    reservationId$ = new BehaviorSubject(undefined);
     payments$ = new BehaviorSubject(undefined);
     paymentOptions$ = new BehaviorSubject([
       {
@@ -87,10 +85,8 @@ describe('OptionComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return reservationId$.asObservable();
-        case 2:
           return payments$.asObservable();
-        case 3:
+        case 2:
           return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -100,6 +96,7 @@ describe('OptionComponent', () => {
     await TestBed.configureTestingModule({
       imports: [OptionComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: Store, useValue: storeSpy },
         { provide: Router, useValue: routerSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
@@ -115,7 +112,6 @@ describe('OptionComponent', () => {
   });
 
   afterEach(() => {
-    reservationId$.complete();
     payments$.complete();
   });
 
@@ -124,7 +120,7 @@ describe('OptionComponent', () => {
   });
 
   it('should dispatch getPaymentByResourceId when reservationId is emitted', () => {
-    reservationId$.next('res-123');
+    fixture.componentRef.setInput('id', 'res-123');
     fixture.detectChanges();
     expect(storeSpy.dispatch).toHaveBeenCalledWith(
       getPaymentByResourceId({ id: 'res-123', path: 'reservation' }),
@@ -169,7 +165,7 @@ describe('OptionComponent', () => {
   });
 
   it('should dispatch createPaymentLinkByReservationId on pay()', () => {
-    reservationId$.next('res-123');
+    fixture.componentRef.setInput('id', 'res-123');
     payments$.next([{
       reservation: {
         id: 'res-123',
@@ -203,7 +199,7 @@ describe('OptionComponent', () => {
   });
 
   it('should not dispatch createPaymentLinkByReservationId if form type is undefined', () => {
-    reservationId$.next('res-123');
+    fixture.componentRef.setInput('id', 'res-123');
 
     component.form.controls.option.setValue(undefined);
     component.pay();

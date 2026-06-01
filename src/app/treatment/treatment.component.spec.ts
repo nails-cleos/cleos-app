@@ -92,15 +92,15 @@ describe('TreatmentComponent', () => {
   });
 
   it('should derive mode from route and treatment id', () => {
-    expect(component.mode()).toBe('add');
+    expect(component.resolvedMode()).toBe('add');
 
     fixture.componentRef.setInput('id', '123');
     fixture.detectChanges();
-    expect(component.mode()).toBe('edit');
+    expect(component.resolvedMode()).toBe('edit');
 
     routeUrl$.next([{ path: 'view' }]);
     fixture.detectChanges();
-    expect(component.mode()).toBe('view');
+    expect(component.resolvedMode()).toBe('view');
   });
 
   it('should dispatch getTreatment when treatmentId emits a value', () => {

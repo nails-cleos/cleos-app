@@ -13,47 +13,28 @@ describe('CustomersComponent', () => {
   let component: CustomersComponent;
   let fixture: ComponentFixture<CustomersComponent>;
 
-  let roomId$: BehaviorSubject<any>;
   let customers$: BehaviorSubject<any>;
   let breakpointObserver$: Subject<BreakpointState>;
 
   let storeSpy: jasmine.SpyObj<Store<RoomState>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
 
   beforeEach(async () => {
-    roomId$ = new BehaviorSubject(undefined);
-    customers$ = new BehaviorSubject(undefined);
+    customers$ = new BehaviorSubject<IRoomCustomer[]>([]);
     breakpointObserver$ = new Subject<BreakpointState>();
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
 
     breakpointObserverSpy.observe.and.returnValue(breakpointObserver$.asObservable());
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return roomId$.asObservable();
-        case 2:
-          return customers$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
+    storeSpy.pipe.and.returnValue(customers$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [CustomersComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
       ],
     }).compileComponents();
@@ -66,7 +47,6 @@ describe('CustomersComponent', () => {
 
   afterEach(() => {
     customers$.complete();
-    roomId$.complete();
     breakpointObserver$.complete();
   });
 
@@ -75,7 +55,7 @@ describe('CustomersComponent', () => {
   });
 
   it('should dispatch GetAllCustomersInfo when route param changes', () => {
-    roomId$.next('room-1');
+    fixture.componentRef.setInput('id', 'room-1');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllCustomersInfo({ id: 'room-1' }));

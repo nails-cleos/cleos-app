@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { OverviewComponent } from './overview.component';
-import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
@@ -18,7 +17,6 @@ describe('OverviewComponent', () => {
   let component: OverviewComponent;
   let fixture: ComponentFixture<OverviewComponent>;
 
-  let userId$: BehaviorSubject<any>;
   let overview$: BehaviorSubject<any>;
   let error$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
@@ -26,11 +24,9 @@ describe('OverviewComponent', () => {
 
   let storeSpy: jasmine.SpyObj<Store<UserState>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
   beforeEach(async () => {
-    userId$ = new BehaviorSubject(undefined);
     overview$ = new BehaviorSubject(undefined);
     error$ = new BehaviorSubject(undefined);
     breakpoint$ = new BehaviorSubject<any>({
@@ -42,11 +38,6 @@ describe('OverviewComponent', () => {
     });
 
     storeSpy = jasmine.createSpyObj<Store<UserState>>('Store', ['pipe', 'dispatch']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['authUser'], {
       authUser: authUserSignal.asReadonly(),
     });
@@ -59,10 +50,8 @@ describe('OverviewComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return userId$.asObservable();
-        case 2:
           return overview$.asObservable();
-        case 3:
+        case 2:
           return error$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -72,7 +61,6 @@ describe('OverviewComponent', () => {
     await TestBed.configureTestingModule({
       imports: [OverviewComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
@@ -134,11 +122,8 @@ describe('OverviewComponent', () => {
   });
 
   it('should dispatch getCustomerOverview when userId emits a value', () => {
-    // reset calls
     storeSpy.dispatch.calls.reset();
-
-    // emit an id (simulate edit mode)
-    userId$.next('123');
+    fixture.componentRef.setInput('id', '123');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getCustomerOverview({ id: '123' }));

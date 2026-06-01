@@ -13,7 +13,6 @@ describe('TreatmentSortingComponent', () => {
   let component: TreatmentSortingComponent;
   let fixture: ComponentFixture<TreatmentSortingComponent>;
 
-  let treatmentId$: BehaviorSubject<string | undefined>;
   let treatmentGroup$: BehaviorSubject<ITreatmentGroupAll | undefined>;
   let response$: BehaviorSubject<any>;
 
@@ -51,7 +50,6 @@ describe('TreatmentSortingComponent', () => {
   ];
 
   beforeEach(async () => {
-    treatmentId$ = new BehaviorSubject<string | undefined>(undefined);
     treatmentGroup$ = new BehaviorSubject<ITreatmentGroupAll | undefined>(undefined);
     response$ = new BehaviorSubject(undefined);
 
@@ -62,10 +60,8 @@ describe('TreatmentSortingComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return treatmentId$.asObservable();
-        case 2:
           return treatmentGroup$.asObservable();
-        case 3:
+        case 2:
           return response$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -79,6 +75,7 @@ describe('TreatmentSortingComponent', () => {
 
     fixture = TestBed.createComponent(TreatmentSortingComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('id', 'g1');
     fixture.detectChanges();
   });
 
@@ -122,7 +119,6 @@ describe('TreatmentSortingComponent', () => {
   it('should dispatch getTreatmentList when responseSignal emits', () => {
     storeSpy.dispatch.calls.reset();
 
-    treatmentId$.next('g1');
     response$.next({ success: true });
     fixture.detectChanges();
 

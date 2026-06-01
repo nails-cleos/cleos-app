@@ -22,7 +22,7 @@ describe('ReservationCompleteComponent', () => {
 
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
 
-  let completeReservation$: BehaviorSubject<any>;
+  let navigationParams$: BehaviorSubject<any>;
   let selectedReservation$: BehaviorSubject<any>;
   let treatmentDiscount$: BehaviorSubject<any>;
   let additionalList$: BehaviorSubject<any>;
@@ -64,13 +64,6 @@ describe('ReservationCompleteComponent', () => {
       { key: 'additional-1', name: 'Additional 1', price: 20 },
     ],
     balance: 50,
-  };
-
-  const mockCompleteReservation = {
-    isDashboard: false,
-    reservationId: 'reservation-1',
-    roomId: 'room-1',
-    customerId: 'customer-1',
   };
 
   const mockTreatmentDiscount = {
@@ -132,7 +125,7 @@ describe('ReservationCompleteComponent', () => {
   ];
 
   beforeEach(async () => {
-    completeReservation$ = new BehaviorSubject(mockCompleteReservation);
+    navigationParams$ = new BehaviorSubject(undefined);
     selectedReservation$ = new BehaviorSubject(undefined);
     treatmentDiscount$ = new BehaviorSubject(mockTreatmentDiscount);
     additionalList$ = new BehaviorSubject(mockAdditionalList);
@@ -146,7 +139,7 @@ describe('ReservationCompleteComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return completeReservation$.asObservable();
+          return navigationParams$.asObservable();
         case 2:
           return selectedReservation$.asObservable();
         case 3:
@@ -180,7 +173,7 @@ describe('ReservationCompleteComponent', () => {
   });
 
   afterEach(() => {
-    completeReservation$.complete();
+    navigationParams$.complete();
     selectedReservation$.complete();
     treatmentDiscount$.complete();
     additionalList$.complete();
@@ -466,58 +459,52 @@ describe('ReservationCompleteComponent', () => {
 
     it('should complete reservation directly when isValid is true', () => {
       component.isValid = true;
-      component.getForm.treatment.setValue({ key: 'treatment-1', name: 'Treatment 1' } as any);
+      selectedReservation$.next(mockReservation);
+      fixture.detectChanges();
 
       component.complete();
 
-      expect(storeSpy.dispatch).toHaveBeenCalled();
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(
+        jasmine.objectContaining({
+          type: completeReservation.type,
+        }),
+      );
     });
   });
 
   describe('Store Dispatching', () => {
     it('should dispatch reservationFindPayments when reservationId changes', () => {
-      completeReservation$.next({
-        ...mockCompleteReservation,
-        reservationId: 'new-reservation-id',
-      });
+      storeSpy.dispatch.calls.reset();
+      fixture.componentRef.setInput('id', 'new-reservation-id');
       fixture.detectChanges();
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          type: reservationFindPayments.type,
-        }),
-      );
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(reservationFindPayments({ id: 'new-reservation-id' }));
     });
 
     it('should dispatch getReservation when reservationId changes', () => {
-      completeReservation$.next({
-        ...mockCompleteReservation,
-        reservationId: 'new-reservation-id',
-      });
+      storeSpy.dispatch.calls.reset();
+      fixture.componentRef.setInput('id', 'new-reservation-id');
       fixture.detectChanges();
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          type: getReservation.type,
-        }),
-      );
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(getReservation({ id: 'new-reservation-id' }));
     });
 
     it('should dispatch getAllTreatments when roomId changes', () => {
-      completeReservation$.next({
-        ...mockCompleteReservation,
-        roomId: 'new-room-id',
-      });
+      storeSpy.dispatch.calls.reset();
+      fixture.componentRef.setInput('roomId', 'new-room-id');
+      fixture.componentRef.setInput('customerId', 'customer-1');
       fixture.detectChanges();
 
       expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          type: getAllTreatments.type,
-        }),
+        getAllTreatments({ roomId: 'new-room-id', customerId: 'customer-1' }),
       );
     });
 
     it('should dispatch getAllAdditionalByGroupId when group is selected', () => {
+      storeSpy.dispatch.calls.reset();
+      fixture.componentRef.setInput('roomId', 'room-1');
+      fixture.detectChanges();
+
       const group = {
         id: 'group-1',
         name: 'Group 1',
@@ -529,9 +516,7 @@ describe('ReservationCompleteComponent', () => {
       fixture.detectChanges();
 
       expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          type: getAllAdditionalByGroupId.type,
-        }),
+        getAllAdditionalByGroupId({ roomId: 'room-1', groupId: 'group-1' }),
       );
     });
   });

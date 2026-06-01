@@ -61,6 +61,7 @@ import { routes } from './app/app.routes';
 import { I18nBridgeService } from './app/services/i18n-bridge.service';
 import { provideAppIcons } from './app/util/app-icons.provider';
 import { provideAppDateAdapter, provideAppCalendar } from './app/util/adapter/app-date.provider';
+import { AppRouterStateSerializer } from './app/store/router-state.serializer';
 
 export interface ISendMessage {
   name: string;
@@ -136,7 +137,7 @@ const providers = [
     withComponentInputBinding(),
     withInMemoryScrolling({ anchorScrolling: 'enabled' }),
   ),
-  provideRouterStore(),
+  provideRouterStore({ serializer: AppRouterStateSerializer }),
   importProvidersFrom(
     BrowserModule,
     TranslateModule.forRoot({

@@ -1,70 +1,93 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
-import { concatMap } from 'rxjs/operators';
+import { ROUTER_NAVIGATED } from '@ngrx/router-store';
 import { cleanRoom, getAllRoomsInfo } from '../store/room.actions';
 import { cleanExpense } from '../store/expense.actions';
 import { getOptions } from '../store/payment.actions';
+import { navigation } from '../store/router-navigation.operator';
+import { RoomListComponent } from './list/room-list.component';
+import { AddServiceComponent } from './me/add-service/add-service.component';
+import { CustomersComponent } from './me/customers/customers.component';
+import { RoomCreatePageComponent } from './room-create-page.component';
+import { RoomDetailsPageComponent } from './room-details-page.component';
+import { ExpenseCreatePageComponent } from './me/expense/expense-create-page.component';
+import { ExpenseDetailsPageComponent } from './me/expense/expense-details-page.component';
+import { RoomMeDetailsPageComponent } from './room-me-details-page.component';
+import { ExpenseListComponent } from './me/expense/list/expense-list.component';
 
 @Injectable()
 export class RoomNavigationEffects {
   private readonly actions$: Actions = inject(Actions);
 
-  handleRoomNavigation$ = createEffect(() =>
+  loadRoomListPage$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ROUTER_NAVIGATION),
-      concatMap((action: RouterNavigationAction) => {
-        const url = action.payload.routerState.url;
+      ofType(ROUTER_NAVIGATED),
+      navigation(RoomListComponent, {
+        run: () => [cleanRoom()],
+      }),
+    ));
 
-        // 1) /rooms/add
-        const addMatch = url.match(/\/rooms\/add$/);
-        if (addMatch) {
-          return [cleanRoom(), getOptions(), getAllRoomsInfo()];
-        }
+  loadRoomCreatePage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(RoomCreatePageComponent, {
+        run: () => [cleanRoom(), getOptions(), getAllRoomsInfo()],
+      }),
+    ));
 
-        // 2) /rooms/:id
-        const detailMatch = url.match(/\/rooms\/([^\/]+)$/);
-        if (detailMatch) {
-          return [cleanRoom(), getOptions(), getAllRoomsInfo()];
-        }
+  loadRoomDetailsPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(RoomDetailsPageComponent, {
+        run: () => [cleanRoom(), getOptions(), getAllRoomsInfo()],
+      }),
+    ));
 
-        // 3) /rooms/me/:id
-        const meMatch = url.match(/\/rooms\/me\/([^\/]+)$/);
-        if (meMatch) {
-          return [cleanRoom(), getOptions(), getAllRoomsInfo()];
-        }
+  loadRoomMeDetailsPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(RoomMeDetailsPageComponent, {
+        run: () => [cleanRoom(), getOptions(), getAllRoomsInfo()],
+      }),
+    ));
 
-        // 4) /rooms
-        const viewMatch = url.match(/\/rooms\/?$/);
-        if (viewMatch) {
-          return [cleanRoom()];
-        }
+  loadExpenseCreatePage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(ExpenseCreatePageComponent, {
+        run: () => [cleanExpense()],
+      }),
+    ));
 
-        // 5) /rooms/:id/expenses/add
-        const addExpenseMatch = url.match(/\/rooms\/([^\/]+)\/expenses\/add$/);
-        if (addExpenseMatch) {
-          return [cleanExpense()];
-        }
+  loadExpenseDetailsPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(ExpenseDetailsPageComponent, {
+        run: () => [cleanExpense(), getOptions()],
+      }),
+    ));
 
-        // 6) /rooms/:id
-        const detailExpenseMatch = url.match(/\/rooms\/([^\/]+)\/expenses\/([^\/]+)$/);
-        if (detailExpenseMatch) {
-          return [cleanExpense(), getOptions()];
-        }
+  loadExpensesPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(ExpenseListComponent, {
+        run: () => [cleanExpense()],
+      }),
+    ));
 
-        // 7) /rooms/:id/expenses
-        const viewExpenseMatch = url.match(/\/rooms\/([^\/]+)\/expenses\/?$/);
-        if (viewExpenseMatch) {
-          return [cleanExpense()];
-        }
+  loadRoomServicesPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(AddServiceComponent, {
+        run: () => [cleanExpense()],
+      }),
+    ));
 
-        // 8) /rooms/:id/services
-        const addServicesMatch = url.match(/\/rooms\/([^\/]+)\/services\/?$/);
-        if (addServicesMatch) {
-          return [cleanExpense()];
-        }
-
-        return [];
+  loadRoomCustomersPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(CustomersComponent, {
+        run: () => [],
       }),
     ));
 }

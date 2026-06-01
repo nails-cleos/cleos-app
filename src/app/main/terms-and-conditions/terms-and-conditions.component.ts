@@ -2,10 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   HostListener,
-  inject,
   OnInit,
+  inject,
 } from '@angular/core';
-import { MainContentService } from '../../services/main-content.service';
 import { TranslateService } from '@ngx-translate/core';
 import { SeoService } from '../../services/seo.service';
 import { LegalPageBase } from '../legal-page-base';
@@ -17,7 +16,6 @@ import { LegalPageBase } from '../legal-page-base';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TermsAndConditionsComponent extends LegalPageBase implements OnInit {
-  private readonly mainContent: MainContentService = inject(MainContentService);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly seoService: SeoService = inject(SeoService);
   termsContent = this.legalContent;
@@ -28,7 +26,6 @@ export class TermsAndConditionsComponent extends LegalPageBase implements OnInit
       unavailableHtml: '<h1>Terms and Conditions</h1><p>Terms and conditions content is unavailable.</p>',
       fileName: 'terms',
     });
-    this.mainContent.configure(false, 'open');
   }
 
   ngOnInit(): void {

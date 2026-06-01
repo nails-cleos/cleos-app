@@ -1,45 +1,52 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
-import { concatMap } from 'rxjs/operators';
+import { ROUTER_NAVIGATED } from '@ngrx/router-store';
 import { cleanUser, getMyUser } from '../store/user.actions';
 import { cleanAuth, setCurrentCode } from '../store/auth.actions';
+import { navigation } from '../store/router-navigation.operator';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { ProfileComponent } from './profile/profile.component';
+import { Router } from '@angular/router';
+import { AuthComponent } from './auth.component';
+import { RedirectComponent } from './redirect/redirect.component';
 
 @Injectable()
 export class AuthNavigationEffects {
   private readonly actions$: Actions = inject(Actions);
+  private readonly router: Router = inject(Router);
 
-  handleAuthNavigation$ = createEffect(() =>
+  loadCForgotPasswordPage$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ROUTER_NAVIGATION),
-      concatMap((action: RouterNavigationAction) => {
-        const url = action.payload.routerState.url;
-
-        // 1) /auth/forgot-password
-        if (url.match(/\/auth\/forgot-password$/)) {
-          return [cleanAuth()];
-        }
-
-        // 2) /auth/profile
-        if (url.match(/\/auth\/profile$/)) {
-          return [cleanUser(), getMyUser()];
-        }
-
-        // 3) /auth/redirect
-        if (url.match(/\/auth\/redirect$/)) {
-          return [];
-        }
-
-        // 4) /auth
-        if (url.match(/\/auth\/?$/)) {
-          const queryParams = action.payload.routerState.root.queryParams;
-          const code = queryParams?.['code'] || undefined;
-
-          return [cleanAuth(), setCurrentCode({ code })];
-        }
-
-        return [];
+      ofType(ROUTER_NAVIGATED),
+      navigation(ForgotPasswordComponent, {
+        run: () => cleanAuth(),
       }),
-    ),
-  );
+    ));
+
+  loadProfilePage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(ProfileComponent, {
+        run: () => [cleanUser(), getMyUser()],
+      }),
+    ));
+
+  loadAuthPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(AuthComponent, {
+        run: (_action, routerState) => {
+          const code = routerState.root.queryParams['code'] || undefined;
+          return [cleanAuth(), setCurrentCode({ code })];
+        },
+      }),
+    ));
+
+  loadRedirectPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(RedirectComponent, {
+        run: () => null,
+      }),
+    ));
 }

@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject, of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { MainState } from '../../store/reducers/main.reducers';
-import { MainContentService } from '../../services/main-content.service';
 import { MainTreatmentComponent } from './main-treatment.component';
 import { IBiabTreatmentTranslations, IMainTreatmentContent } from '../../util/MainTreatment';
 import { TranslateLoaderFactory } from '../../shared/translate-loader.factory';
@@ -11,11 +10,9 @@ describe('MainTreatmentComponent', () => {
   let component: MainTreatmentComponent;
   let fixture: ComponentFixture<MainTreatmentComponent>;
 
-  let treatmentId$: BehaviorSubject<string | undefined>;
   let lang$: BehaviorSubject<string | undefined>;
 
   let storeSpy: jasmine.SpyObj<Store<MainState>>;
-  let mainContentSpy: jasmine.SpyObj<MainContentService>;
 
   const createTranslations = (overrides: Partial<IBiabTreatmentTranslations> = {}): IBiabTreatmentTranslations => {
     const defaults: IBiabTreatmentTranslations = {
@@ -94,21 +91,16 @@ describe('MainTreatmentComponent', () => {
   const createComponent = (): void => {
     fixture = TestBed.createComponent(MainTreatmentComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('id', 'biab-treatment');
     fixture.detectChanges();
   };
 
   beforeEach(async () => {
-    treatmentId$ = new BehaviorSubject<string | undefined>('biab-treatment');
     lang$ = new BehaviorSubject<string | undefined>('en-GB');
 
     storeSpy = jasmine.createSpyObj<Store<MainState>>('Store', ['pipe', 'dispatch']);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (storeSpy.pipe as any).and.callFake((..._: any[]) => {
-      const count = (storeSpy.pipe as any).calls.count();
-      return count === 1 ? treatmentId$.asObservable() : lang$.asObservable();
-    });
+    (storeSpy.pipe as any).and.returnValue(lang$.asObservable());
 
-    mainContentSpy = jasmine.createSpyObj<MainContentService>('MainContentService', ['configure']);
     spyOn(TranslateLoaderFactory, 'loadJson').and.returnValue(of({
       treatments: [],
     }) as any);
@@ -117,16 +109,14 @@ describe('MainTreatmentComponent', () => {
       imports: [MainTreatmentComponent],
       providers: [
         { provide: Store, useValue: storeSpy },
-        { provide: MainContentService, useValue: mainContentSpy },
       ],
     }).compileComponents();
   });
 
-  it('should create and configure main content', () => {
+  it('should create', () => {
     createComponent();
 
     expect(component).toBeTruthy();
-    expect(mainContentSpy.configure).toHaveBeenCalledWith(false, 'open');
     expect(storeSpy.pipe).toHaveBeenCalled();
     expect(TranslateLoaderFactory.loadJson).toHaveBeenCalledWith('treatment/main', 'en-GB');
   });
@@ -137,7 +127,6 @@ describe('MainTreatmentComponent', () => {
     }) as any);
 
     createComponent();
-    treatmentId$.next('biab-treatment');
     fixture.detectChanges();
 
     expect(component.sections()).toBeDefined();
@@ -160,7 +149,7 @@ describe('MainTreatmentComponent', () => {
     }) as any);
 
     createComponent();
-    treatmentId$.next('unknown');
+    fixture.componentRef.setInput('id', 'unknown');
     fixture.detectChanges();
 
     expect(component.sections()).toBeUndefined();

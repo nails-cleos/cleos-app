@@ -1,27 +1,20 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
-import { concatMap } from 'rxjs/operators';
+import { ROUTER_NAVIGATED } from '@ngrx/router-store';
 import { cleanDocument } from '../store/document.actions';
 import { getAllMyOffices } from '../store/office.actions';
+import { navigation } from '../store/router-navigation.operator';
+import { DocumentListComponent } from './list/document-list.component';
 
 @Injectable()
 export class DocumentNavigationEffects {
   private readonly actions$: Actions = inject(Actions);
 
-  handleDocumentNavigation$ = createEffect(() =>
+  loadDocumentListPage$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ROUTER_NAVIGATION),
-      concatMap((action: RouterNavigationAction) => {
-        const url = action.payload.routerState.url;
-
-        // 1) /documents
-        const documentsMatch = url.match(/\/documents\/?$/);
-        if (documentsMatch) {
-          return [cleanDocument(), getAllMyOffices()];
-        }
-
-        return [];
+      ofType(ROUTER_NAVIGATED),
+      navigation(DocumentListComponent, {
+        run: () => [cleanDocument(), getAllMyOffices()],
       }),
     ));
 }

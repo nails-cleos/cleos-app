@@ -22,7 +22,6 @@ describe('ReservationTableComponent', () => {
 
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let translate: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
@@ -77,11 +76,6 @@ describe('ReservationTableComponent', () => {
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),
     });
@@ -106,7 +100,7 @@ describe('ReservationTableComponent', () => {
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: MatDialog, useValue: dialogSpy },
       ],

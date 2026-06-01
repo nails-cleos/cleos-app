@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
-import { MainContentService } from '../../services/main-content.service';
 import { IMainTreatmentContent, IMainTreatmentContentFile, sections } from '../../util/MainTreatment';
 import { NgClass, NgOptimizedImage } from '@angular/common';
 import { getCurrentLangPipe } from '../../store/selectors/main.selectors';
@@ -21,7 +20,6 @@ export class MainTreatmentComponent {
   id = input<string>();
 
   private readonly store: Store<MainState> = inject(Store<MainState>);
-  private readonly mainContent: MainContentService = inject(MainContentService);
 
   private lang$ = this.store.pipe(getCurrentLangPipe);
 
@@ -43,10 +41,6 @@ export class MainTreatmentComponent {
   );
 
   sections = toSignal(this.sections$, { initialValue: undefined });
-
-  constructor() {
-    this.mainContent.configure(false, 'open');
-  }
 
   private resolveTreatment(
     treatmentId: string,

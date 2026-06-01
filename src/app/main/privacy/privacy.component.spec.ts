@@ -4,7 +4,6 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { EnvService } from '../../services/env.service';
-import { MainContentService } from '../../services/main-content.service';
 import { PrivacyComponent } from './privacy.component';
 
 describe('PrivacyComponent', () => {
@@ -18,7 +17,6 @@ describe('PrivacyComponent', () => {
     navigate: jasmine.Spy;
     parseUrl: jasmine.Spy;
   };
-  let mainContentMock: jasmine.SpyObj<MainContentService>;
 
   const envMock: Pick<EnvService, 'appServer' | 'title' | 'appDomain'> = {
     appServer: 'https://www.nailscleos.test',
@@ -44,7 +42,6 @@ describe('PrivacyComponent', () => {
 
   beforeEach(async () => {
     routerEvents = new Subject<unknown>();
-    mainContentMock = jasmine.createSpyObj<MainContentService>('MainContentService', ['configure']);
 
     routerMock = {
       events: routerEvents,
@@ -62,7 +59,6 @@ describe('PrivacyComponent', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: Router, useValue: routerMock },
-        { provide: MainContentService, useValue: mainContentMock },
         { provide: EnvService, useValue: envMock },
       ],
     }).compileComponents();
@@ -74,7 +70,7 @@ describe('PrivacyComponent', () => {
     httpMock?.verify();
   });
 
-  it('should create and configure the main page chrome', fakeAsync(() => {
+  it('should create', fakeAsync(() => {
     createComponent();
 
     flushPrivacyFile(
@@ -83,7 +79,6 @@ describe('PrivacyComponent', () => {
     );
 
     expect(component).toBeTruthy();
-    expect(mainContentMock.configure).toHaveBeenCalledWith(false, 'open');
   }));
 
   it('should replace environment placeholders in loaded html', fakeAsync(() => {

@@ -1,10 +1,12 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
-import { TreatmentsComponent } from './list/treatments.component';
+import { TreatmentListComponent } from './list/treatment-list.component';
 import { TreatmentGroupSortingComponent } from './sorting/treatment-group-sorting.component';
 import { TreatmentSortingComponent } from './sorting/treatment-sorting.component';
-import { TreatmentComponent } from './treatment.component';
+import { TreatmentCreatePageComponent } from './treatment-create-page.component';
+import { TreatmentEditPageComponent } from './treatment-edit-page.component';
+import { TreatmentViewPageComponent } from './treatment-view-page.component';
 import { provideEffects } from '@ngrx/effects';
 import { provideState } from '@ngrx/store';
 import { ColorService } from '../services/color.service';
@@ -23,11 +25,11 @@ const providers = [
 ];
 
 const children: Routes = [
-  { path: '', component: TreatmentsComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
+  { path: '', component: TreatmentListComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
   { path: 'sorting', component: TreatmentGroupSortingComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
-  { path: 'add', component: TreatmentComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
-  { path: ':id/edit', component: TreatmentComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
-  { path: ':id/view', component: TreatmentComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
+  { path: 'add', component: TreatmentCreatePageComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
+  { path: ':id/edit', component: TreatmentEditPageComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
+  { path: ':id/view', component: TreatmentViewPageComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
   { path: ':id/sorting', component: TreatmentSortingComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
 ];
 

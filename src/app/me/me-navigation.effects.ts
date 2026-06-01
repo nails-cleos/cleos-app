@@ -1,7 +1,9 @@
 import { inject, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
-import { concatMap } from 'rxjs/operators';
+import { ROUTER_NAVIGATED } from '@ngrx/router-store';
+import { Action } from '@ngrx/store';
+import { OverviewComponent } from '../user/overview/overview.component';
 import { cleanDiscount, getMyReferrals } from '../store/discount.actions';
 import {
   cleanReservation,
@@ -9,109 +11,113 @@ import {
   getUpcomingReservation,
   setMeReservationParams,
 } from '../store/reservation.actions';
-import { Router } from '@angular/router';
 import {
   cleanPayment,
   getOptions,
   setPaymentResultParams,
 } from '../store/payment.actions';
+import { getRouteParams } from '../store/router-state.utils';
 import { cleanUser } from '../store/user.actions';
+import { navigation } from '../store/router-navigation.operator';
+import { MeDiscountComponent } from './discount/me/me-discount.component';
+import { MeReservationCreatePageComponent } from './me-reservation-create-page.component';
+import { MeReservationDetailsPageComponent } from './me-reservation-details-page.component';
+import { PaymentCompleteComponent } from './payment/complete/payment-complete.component';
+import { MePaymentComponent } from './payment/me/me-payment.component';
+import { OptionComponent } from './payment/option/option.component';
+import { PaymentComponent } from './payment/payment.component';
+import { ReferralsComponent } from './referrals/referrals.component';
+import { ReservationListComponent } from './reservation/list/reservation-list.component';
 
 @Injectable()
 export class MeNavigationEffects {
   private readonly actions$: Actions = inject(Actions);
   private readonly router: Router = inject(Router);
 
-  handleMeNavigation$ = createEffect(() =>
+  loadDiscountsPage$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ROUTER_NAVIGATION),
-      concatMap((action: RouterNavigationAction) => {
-        const url = action.payload.routerState.url;
-        const navigation = this.router.currentNavigation();
-        const navigationState = navigation?.extras.state;
+      ofType(ROUTER_NAVIGATED),
+      navigation(MeDiscountComponent, {
+        run: () => [cleanDiscount()],
+      }),
+    ));
 
-        // 1) /me/discounts
-        const discountsMatch = url.match(/\/me\/discounts$/);
-        if (discountsMatch) {
-          return [cleanDiscount()];
-        }
+  loadReferralsPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(ReferralsComponent, {
+        run: () => [cleanDiscount(), getMyReferrals()],
+      }),
+    ));
 
-        // 2) /me/referrals
-        const referralsMatch = url.match(/\/me\/referrals$/);
-        if (referralsMatch) {
-          return [cleanDiscount(), getMyReferrals()];
-        }
+  loadPaymentPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(PaymentComponent, {
+        run: () => cleanPayment(),
+      }),
+    ));
 
-        // 3) /me/:path/:id/payment?accountId=:accountId
-        const pathMatch = url.match(/\/me\/([^/]+)\/([^/]+)\/payment(?:\?.*)?$/);
-        if (pathMatch) {
-          const [, path] = pathMatch;
-          if (path === 'reservation' || path === 'transaction') {
-            return [cleanPayment()];
+  loadDirectPaymentPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(MePaymentComponent, {
+        run: () => [cleanPayment(), getOptions()],
+      }),
+    ));
+
+  loadPaymentOptionPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(OptionComponent, {
+        run: () => [cleanPayment(), cleanReservation(), getOptions()],
+      }),
+    ));
+
+  loadPaymentCompletePage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(PaymentCompleteComponent, {
+        run: ({ payload }, routerState) => {
+          const params = getRouteParams(routerState);
+          const queryParams = payload.routerState.root.queryParams;
+          const path = params['path'];
+
+          if (path !== 'reservation' && path !== 'transaction') {
+            return [];
           }
-        }
 
-        // 4) /me/payment/:id
-        const paymentIdMatch = url.match(/\/me\/payment\/([^\/]+)$/);
-        if (paymentIdMatch) {
-          return [cleanPayment(), getOptions()];
-        }
-
-        // 5) /me/reservation/:id/payment/option
-        const paymentReservationIdMatch = url.match(/\/me\/reservation\/([^\/]+)\/payment\/option$/);
-        if (paymentReservationIdMatch) {
           return [
             cleanPayment(),
-            cleanReservation(),
-            getOptions(),
+            setPaymentResultParams({
+              path,
+              id: params['id'],
+              status: params['status'],
+              paymentId: queryParams?.['payment_id'] ?? queryParams?.['paymentId'],
+              preferenceId: queryParams?.['preference_id'],
+              payerId: queryParams?.['PayerID'],
+              token: queryParams?.['token'],
+              reason: queryParams?.['reason'] ?? queryParams?.['errorcode'],
+              orderId: queryParams?.['order_id'] ?? queryParams?.['orderId'],
+              orderStatusId: queryParams?.['orderStatusId'],
+              paymentType: queryParams?.['payment_type'],
+              accountId: queryParams?.['account_id'],
+            }),
           ];
-        }
+        },
+      }),
+    ));
 
-        // 6) /me/:path/:id/payment/:status
-        const match = url.match(/\/me\/([^/]+)\/([^/]+)\/payment\/([^/?]+)/);
-        if (match) {
-          const [, path, id, status] = match;
-          if (path === 'reservation' || path === 'transaction') {
-            const queryParams = action.payload.routerState.root.queryParams;
-            return [
-              cleanPayment(),
-              setPaymentResultParams({
-                path,
-                id,
-                status,
-                paymentId: queryParams?.['payment_id'] ?? queryParams?.['paymentId'],
-                preferenceId: queryParams?.['preference_id'],
-                payerId: queryParams?.['PayerID'],
-                token: queryParams?.['token'],
-                reason: queryParams?.['reason'] ?? queryParams?.['errorcode'],
-                orderId: queryParams?.['order_id'] ?? queryParams?.['orderId'],
-                orderStatusId: queryParams?.['orderStatusId'],
-                paymentType: queryParams?.['payment_type'],
-                accountId: queryParams?.['account_id'],
-              }),
-            ];
-          }
-        }
+  loadReservationCreatePage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(MeReservationCreatePageComponent, {
+        run: () => {
+          const navigationState = this.router.currentNavigation()?.extras.state;
+          const actions: Action[] = [cleanReservation(), getOptions()];
 
-        // 7) /me/reservation/:id
-        const reservationIdMatch = url.match(/\/me\/reservation\/([^\/]+)$/);
-        if (reservationIdMatch) {
-          return [
-            cleanReservation(),
-            getOptions(),
-            getUpcomingReservation(),
-          ];
-        }
-
-        // 8) /me/reservation
-        const reservationMatch = url.match(/\/me\/reservation$/);
-        if (reservationMatch) {
-          if (navigationState && (navigationState['treatment'] !== undefined || navigationState['room'] !== undefined ||
-            navigationState['professional'] !== undefined || navigationState['date'] !== undefined ||
-            navigationState['discount'] !== undefined)) {
-            return [
-              cleanReservation(),
-              getOptions(),
+          if (this.hasReservationParams(navigationState)) {
+            actions.push(
               setMeReservationParams({
                 treatmentId: navigationState['treatmentId'],
                 roomId: navigationState['roomId'],
@@ -119,26 +125,54 @@ export class MeNavigationEffects {
                 date: navigationState['date'],
                 discountId: navigationState['discountId'],
               }),
-              getAllRooms({}),
-              getUpcomingReservation(),
-            ];
+            );
           }
-          return [cleanReservation(), getOptions(), getUpcomingReservation(), getAllRooms({})];
-        }
 
-        // 9) /me/reservations
-        const reservationsMatch = url.match(/\/me\/reservations$/);
-        if (reservationsMatch) {
-          return [cleanReservation()];
-        }
-
-        // 10) /me/overview
-        const overviewMatch = url.match(/\/me\/overview$/);
-        if (overviewMatch) {
-          return [cleanUser()];
-        }
-
-        return [];
+          actions.push(getAllRooms({}), getUpcomingReservation());
+          return actions;
+        },
       }),
     ));
+
+  loadReservationDetailsPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(MeReservationDetailsPageComponent, {
+        run: () => [cleanReservation(), getOptions(), getUpcomingReservation()],
+      }),
+    ));
+
+  loadReservationsPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(ReservationListComponent, {
+        run: () => [cleanReservation()],
+      }),
+    ));
+
+  loadOverviewPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(OverviewComponent, {
+        run: () => [cleanUser()],
+      }),
+    ));
+
+  private hasReservationParams(navigationState: Record<string, unknown> | undefined): navigationState is {
+    treatmentId?: string;
+    roomId?: string;
+    professionalId?: string;
+    date?: Date;
+    discountId?: string;
+  } {
+    if (!navigationState) {
+      return false;
+    }
+
+    return navigationState['treatmentId'] !== undefined
+      || navigationState['roomId'] !== undefined
+      || navigationState['professionalId'] !== undefined
+      || navigationState['date'] !== undefined
+      || navigationState['discountId'] !== undefined;
+  }
 }

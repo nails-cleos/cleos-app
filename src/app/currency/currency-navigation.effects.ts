@@ -1,38 +1,37 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
-import { concatMap } from 'rxjs/operators';
-import { clean } from '../store/currency.actions';
+import { ROUTER_NAVIGATED } from '@ngrx/router-store';
+import { navigation } from '../store/router-navigation.operator';
+import { CurrencyListComponent } from './list/currency-list.component';
+import { cleanCurrency } from '../store/currency.actions';
+import { CurrencyCreatePageComponent } from './currency-create-page.component';
+import { CurrencyDetailsPageComponent } from './currency-details-page.component';
 
 @Injectable()
 export class CurrencyNavigationEffects {
   private readonly actions$: Actions = inject(Actions);
 
-  handleCurrencyNavigation$ = createEffect(() =>
+  loadCurrencyListPage$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ROUTER_NAVIGATION),
-      concatMap((action: RouterNavigationAction) => {
-        const url = action.payload.routerState.url;
+      ofType(ROUTER_NAVIGATED),
+      navigation(CurrencyListComponent, {
+        run: () => cleanCurrency(),
+      }),
+    ));
 
-        // 1) /currency/add
-        const addMatch = url.match(/\/currency\/add$/);
-        if (addMatch) {
-          return [clean()];
-        }
+  loadCurrencyAddPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(CurrencyCreatePageComponent, {
+        run: () => cleanCurrency(),
+      }),
+    ));
 
-        // 2) /currency/:id
-        const detailMatch = url.match(/\/currency\/([^\/]+)$/);
-        if (detailMatch) {
-          return [clean()];
-        }
-
-        // 3) /currency
-        const viewMatch = url.match(/\/currency\/?$/);
-        if (viewMatch) {
-          return [clean()];
-        }
-
-        return [];
+  loadCurrencyDetailsPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(CurrencyDetailsPageComponent, {
+        run: () => cleanCurrency(),
       }),
     ));
 }

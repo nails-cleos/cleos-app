@@ -61,6 +61,6 @@ export const deleteCurrency = createAction(
   props<{ id: string; code: string }>(),
 );
 
-export const clean = createAction(
+export const cleanCurrency = createAction(
   CurrencyActionTypes.clean,
 );

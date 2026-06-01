@@ -1,7 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { ICatalogueAll } from '../../interfaces/catalogue';
 import { Store } from '@ngrx/store';
-import { MainContentService } from '../../services/main-content.service';
 import { getImage } from '../../util/file';
 import { getCatalogueListPipe } from '../../store/selectors/catalogue.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -27,7 +26,6 @@ import {
 })
 export class CatalogComponent {
   private readonly store: Store<CatalogueState> = inject(Store<CatalogueState>);
-  private readonly mainContent: MainContentService = inject(MainContentService);
 
   private catalogues$ = this.store.pipe(getCatalogueListPipe);
 
@@ -44,13 +42,4 @@ export class CatalogComponent {
 
     return catalogues;
   });
-
-  constructor() {
-    effect(() => {
-      if (this.catalogues().length) {
-        this.mainContent.configure(false, 'open');
-      }
-    });
-  }
 }
-

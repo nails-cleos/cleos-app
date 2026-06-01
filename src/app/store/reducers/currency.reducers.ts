@@ -1,6 +1,6 @@
 import { Pagination } from '../../interfaces/pagination';
 import {
-  clean,
+  cleanCurrency,
   createCurrency,
   currencyFailure,
   currencySaveSuccess,
@@ -84,7 +84,7 @@ export const currencyReducer = createReducer(
     isLoading: true,
     selected: undefined,
   })),
-  on(clean, () => initialState),
+  on(cleanCurrency, () => initialState),
 
   on(clearGlobalResponse, (state) => ({
     ...state,

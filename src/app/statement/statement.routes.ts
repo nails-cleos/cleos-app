@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
-import { StatementComponent } from './statement.component';
+import { StatementListComponent } from './list/statement-list.component';
 import { provideEffects } from '@ngrx/effects';
 import { provideState } from '@ngrx/store';
 import { OfficeService } from '../services/office.service';
@@ -20,7 +20,7 @@ const providers = [
 ];
 
 const children: Routes = [
-  { path: '', component: StatementComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
+  { path: '', component: StatementListComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
 ];
 
 export const STATEMENT_ROUTES: Routes = [{ path: '', providers, children }];

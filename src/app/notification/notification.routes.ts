@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { NotificationsComponent } from './notifications.component';
+import { NotificationListComponent } from './list/notification-list.component';
 import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { provideEffects } from '@ngrx/effects';
@@ -19,7 +19,7 @@ const providers = [
 
 const children: Routes = [
   {
-    path: '', component: NotificationsComponent, canActivate: [authGuard], data: {
+    path: '', component: NotificationListComponent, canActivate: [authGuard], data: {
       roles: [Role.admin, Role.professional, Role.customer],
     },
   },

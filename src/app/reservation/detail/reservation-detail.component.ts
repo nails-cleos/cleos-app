@@ -382,7 +382,7 @@ export class ReservationDetailComponent {
 
     effect(() => {
       const payments = this.paymentsSignal();
-      if (payments && payments[0].id) {
+      if (payments?.length && payments[0]?.id) {
         if (this.isCustomer()) {
           this.paymentPaid.set(payments.map((p) => {
             if (p.status &&

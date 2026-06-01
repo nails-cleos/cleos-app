@@ -3,26 +3,25 @@ import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { BehaviorSubject } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 import { TransactionViewComponent } from './transaction-view.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
 import { IAccountAll, ITransaction } from '../../../interfaces/account';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
-import { ActivatedRoute, ParamMap } from '@angular/router';
 import { AccountState } from '../../../store/reducers/account.reducers';
 import { signal } from '@angular/core';
+import { getTransactionsByAccountId } from '../../../store/account.actions';
 
 describe('TransactionViewComponent', () => {
   let component: TransactionViewComponent;
   let fixture: ComponentFixture<TransactionViewComponent>;
 
-  let accountId$: BehaviorSubject<string | undefined>;
   let accountTransaction$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   let storeSpy: jasmine.SpyObj<Store<AccountState>>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
 
@@ -71,18 +70,12 @@ describe('TransactionViewComponent', () => {
   ];
 
   beforeEach(async () => {
-    accountId$ = new BehaviorSubject<string | undefined>(undefined);
     accountTransaction$ = new BehaviorSubject<any>(undefined);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
         [Breakpoints.XSmall]: false,
         [Breakpoints.Small]: false,
-      },
-    });
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj<ParamMap>('ParamMap', ['get']),
       },
     });
     authUserSignal.update(prev => ({ ...prev, hasAdminRole: false, customerId: 'user-1' }));
@@ -97,9 +90,6 @@ describe('TransactionViewComponent', () => {
     storeSpy.pipe.and.callFake(() => {
       pipeCallCount++;
       if (pipeCallCount === 1) {
-        return accountId$.asObservable();
-      }
-      if (pipeCallCount === 2) {
         return accountTransaction$.asObservable();
       }
       return new BehaviorSubject(undefined).asObservable();
@@ -110,7 +100,7 @@ describe('TransactionViewComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TransactionViewComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
@@ -180,10 +170,17 @@ describe('TransactionViewComponent', () => {
   it('should dispatch getTransactionsByAccountId when accountId changes', () => {
     (storeSpy.dispatch as jasmine.Spy).calls.reset();
 
-    accountId$.next('account-123');
+    fixture.componentRef.setInput('id', 'account-123');
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalled();
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
+      type: getTransactionsByAccountId({ id: 'account-123', page: 0, sort: 'timestamp', direction: 'desc', size: PAGE_SIZE }).type,
+      id: 'account-123',
+      page: 0,
+      sort: 'timestamp',
+      direction: 'desc',
+      size: PAGE_SIZE,
+    }));
   });
 
   it('should update account and transactions from accountTransactionSignal', () => {

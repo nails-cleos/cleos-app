@@ -1,56 +1,64 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
-import { concatMap } from 'rxjs/operators';
+import { ROUTER_NAVIGATED } from '@ngrx/router-store';
 import { cleanTreatment, getAllColors, getAllTreatmentsGroup } from '../store/treatment.actions';
+import { navigation } from '../store/router-navigation.operator';
+import { TreatmentListComponent } from './list/treatment-list.component';
+import { TreatmentGroupSortingComponent } from './sorting/treatment-group-sorting.component';
+import { TreatmentSortingComponent } from './sorting/treatment-sorting.component';
+import { TreatmentCreatePageComponent } from './treatment-create-page.component';
+import { TreatmentEditPageComponent } from './treatment-edit-page.component';
+import { TreatmentViewPageComponent } from './treatment-view-page.component';
 
 @Injectable()
 export class TreatmentNavigationEffects {
   private readonly actions$: Actions = inject(Actions);
 
-  handleTreatmentNavigation$ = createEffect(() =>
+  loadTreatmentListPage$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ROUTER_NAVIGATION),
-      concatMap((action: RouterNavigationAction) => {
-        const url = action.payload.routerState.url;
+      ofType(ROUTER_NAVIGATED),
+      navigation(TreatmentListComponent, {
+        run: () => [cleanTreatment()],
+      }),
+    ));
 
-        // 1) /treatments/sorting
-        const groupSortingMatch = url.match(/\/treatments\/sorting$/);
-        if (groupSortingMatch) {
-          return [cleanTreatment(), getAllTreatmentsGroup()];
-        }
+  loadTreatmentGroupSortingPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(TreatmentGroupSortingComponent, {
+        run: () => [cleanTreatment(), getAllTreatmentsGroup()],
+      }),
+    ));
 
-        // 2) /treatments/add
-        const addMatch = url.match(/\/treatments\/add$/);
-        if (addMatch) {
-          return [cleanTreatment(), getAllColors()];
-        }
+  loadTreatmentCreatePage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(TreatmentCreatePageComponent, {
+        run: () => [cleanTreatment(), getAllColors()],
+      }),
+    ));
 
-        // 3) /treatments/:id/edit
-        const detailMatch = url.match(/\/treatments\/([^\/]+)\/edit$/);
-        if (detailMatch) {
-          return [cleanTreatment(), getAllColors()];
-        }
+  loadTreatmentEditPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(TreatmentEditPageComponent, {
+        run: () => [cleanTreatment(), getAllColors()],
+      }),
+    ));
 
-        // 4) /treatments/:id/view
-        const viewMatch = url.match(/\/treatments\/([^\/]+)\/view$/);
-        if (viewMatch) {
-          return [cleanTreatment()];
-        }
+  loadTreatmentViewPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(TreatmentViewPageComponent, {
+        run: () => [cleanTreatment()],
+      }),
+    ));
 
-        // 5) /treatments/:id/sorting
-        const sortingMatch = url.match(/\/treatments\/([^\/]+)\/sorting$/);
-        if (sortingMatch) {
-          return [cleanTreatment()];
-        }
-
-        // 6) /treatments
-        const allMatch = url.match(/\/treatments\/?$/);
-        if (allMatch) {
-          return [cleanTreatment()];
-        }
-
-        return [];
+  loadTreatmentSortingPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(TreatmentSortingComponent, {
+        run: () => [cleanTreatment()],
       }),
     ));
 }

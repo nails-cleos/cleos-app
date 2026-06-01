@@ -18,7 +18,6 @@ import { AuthUserService } from '../../services/auth-user.service';
 import { goTo, observeElementSignal } from '../../util/animation';
 import { isMobile } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { MainContentService } from '../../services/main-content.service';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Router } from '@angular/router';
 import { ToastService } from '../../services/toast.service';
@@ -57,7 +56,6 @@ export class MainContentComponent {
   private readonly toastService: ToastService = inject(ToastService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
-  private readonly mainContent: MainContentService = inject(MainContentService);
   private readonly bottomSheet: MatBottomSheet = inject(MatBottomSheet);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly router: Router = inject(Router);
@@ -338,8 +336,6 @@ export class MainContentComponent {
           onCleanup(() => obs?.disconnect());
         }
       });
-
-      this.mainContent.configure(false, 'close', true);
     });
 
     effect((onCleanup) => {

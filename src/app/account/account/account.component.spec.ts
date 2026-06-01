@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, provideRouter, Router } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
@@ -16,11 +16,9 @@ describe('AccountComponent', () => {
   let fixture: ComponentFixture<AccountComponent>;
 
   let storeSpy: jasmine.SpyObj<Store<AccountState>>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let navigateSpy: jasmine.Spy;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
-  let customerId$: BehaviorSubject<any>;
   let selectedAccount$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
   let response$: BehaviorSubject<any>;
@@ -48,7 +46,6 @@ describe('AccountComponent', () => {
   };
 
   beforeEach(async () => {
-    customerId$ = new BehaviorSubject<any>(null);
     selectedAccount$ = new BehaviorSubject<any>(undefined);
     subErrors$ = new BehaviorSubject<any>(undefined);
     response$ = new BehaviorSubject<any>(undefined);
@@ -57,23 +54,16 @@ describe('AccountComponent', () => {
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
     });
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return customerId$.asObservable();
-        case 2:
           return selectedAccount$.asObservable();
-        case 3:
+        case 2:
           return subErrors$.asObservable();
-        case 4:
+        case 3:
           return response$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -83,7 +73,6 @@ describe('AccountComponent', () => {
     await TestBed.configureTestingModule({
       imports: [AccountComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         provideRouter([]),
@@ -109,7 +98,7 @@ describe('AccountComponent', () => {
   });
 
   it('should dispatch getAccountByCustomerId when customerIdSignal emits', () => {
-    customerId$.next('customer-123');
+    fixture.componentRef.setInput('customerId', 'customer-123');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getAccountByCustomerId({ customerId: 'customer-123' }));
@@ -117,11 +106,13 @@ describe('AccountComponent', () => {
 
   it('should update showAdd correctly based on admin role and customerId', () => {
     authUserSignal.update(prev => ({ ...prev, customerId: 'user-1', hasAdminRole: true }));
-    customerId$.next('customer-2');
+    fixture.componentRef.setInput('customerId', 'customer-2');
+    fixture.detectChanges();
 
     expect(component.showAdd()).toBeTrue();
 
     authUserSignal.update(prev => ({ ...prev, customerId: 'user-1', hasAdminRole: false }));
+    fixture.detectChanges();
     expect(component.showAdd()).toBeFalse();
   });
 
@@ -153,7 +144,7 @@ describe('AccountComponent', () => {
   it('should navigate after responseSignal emits', () => {
     authUserSignal.update(prev => ({ ...prev, customerId: 'user-1', hasAdminRole: true }));
     component.language = 'en';
-    customerId$.next('user-1');
+    fixture.componentRef.setInput('customerId', 'user-1');
     response$.next({ success: true });
     fixture.detectChanges();
     expect(navigateSpy).toHaveBeenCalledWith(['en', 'users', 'user-1', 'overview']);
@@ -166,7 +157,7 @@ describe('AccountComponent', () => {
 
   it('should dispatch updateAccount on valid submit', () => {
     selectedAccount$.next(mockAccount);
-    customerId$.next('user-1');
+    fixture.componentRef.setInput('customerId', 'user-1');
     fixture.detectChanges();
 
     component.form.patchValue({ currency: mockCurrency, gift: 10 });

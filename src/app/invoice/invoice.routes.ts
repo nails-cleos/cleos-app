@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
-import { InvoiceComponent } from './invoice.component';
+import { InvoiceListComponent } from './list/invoice-list.component';
 import { provideEffects } from '@ngrx/effects';
 import { provideState } from '@ngrx/store';
 import { InvoiceService } from '../services/invoice.service';
@@ -20,7 +20,7 @@ const providers = [
 ];
 
 const children: Routes = [
-  { path: '', component: InvoiceComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
+  { path: '', component: InvoiceListComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
 ];
 
 export const INVOICE_ROUTES: Routes = [{ path: '', providers, children }];

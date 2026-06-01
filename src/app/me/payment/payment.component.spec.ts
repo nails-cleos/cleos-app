@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PaymentComponent } from './payment.component';
 import { Store } from '@ngrx/store';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/payment.actions';
@@ -16,13 +16,11 @@ describe('PaymentComponent', () => {
   let storeSpy: jasmine.SpyObj<Store<PaymentState>>;
   let routerSpy: jasmine.SpyObj<Router>;
 
-  let currentPath$: Subject<any>;
   let paymentList$: Subject<any[]>;
   let response$: Subject<any>;
   let subErrors$: Subject<any[]>;
 
   beforeEach(async () => {
-    currentPath$ = new Subject();
     paymentList$ = new Subject();
     response$ = new Subject();
     subErrors$ = new Subject();
@@ -35,12 +33,10 @@ describe('PaymentComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return currentPath$.asObservable();
-        case 2:
           return paymentList$.asObservable();
-        case 3:
+        case 2:
           return response$.asObservable();
-        case 4:
+        case 3:
           return subErrors$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -50,6 +46,7 @@ describe('PaymentComponent', () => {
     await TestBed.configureTestingModule({
       imports: [PaymentComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: Store, useValue: storeSpy },
         { provide: Router, useValue: routerSpy },
       ],
@@ -64,7 +61,6 @@ describe('PaymentComponent', () => {
   });
 
   afterEach(() => {
-    currentPath$.complete();
     paymentList$.complete();
     response$.complete();
     subErrors$.complete();
@@ -75,8 +71,8 @@ describe('PaymentComponent', () => {
   });
 
   it('should dispatch getPaymentByResourceId when currentPath is emitted', () => {
-    currentPath$.next({ id: '123', path: 'reservation' });
-
+    fixture.componentRef.setInput('id', '123');
+    fixture.componentRef.setInput('path', 'reservation');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(
@@ -85,7 +81,9 @@ describe('PaymentComponent', () => {
   });
 
   it('should keep accountId from currentPath for back navigation', () => {
-    currentPath$.next({ id: '123', path: 'transaction', accountId: 'account-1' });
+    fixture.componentRef.setInput('id', '123');
+    fixture.componentRef.setInput('path', 'transaction');
+    fixture.componentRef.setInput('accountId', 'account-1');
     fixture.detectChanges();
 
     component.goBack();
@@ -94,7 +92,8 @@ describe('PaymentComponent', () => {
   });
 
   it('should navigate back to the resource page when accountId is missing', () => {
-    currentPath$.next({ id: '123', path: 'reservation' });
+    fixture.componentRef.setInput('id', '123');
+    fixture.componentRef.setInput('path', 'reservation');
     fixture.detectChanges();
 
     component.goBack();
@@ -154,7 +153,8 @@ describe('PaymentComponent', () => {
   });
 
   it('should call store.dispatch(notifyPayment) when notify() is called', () => {
-    currentPath$.next({ id: '123', path: 'reservation' });
+    fixture.componentRef.setInput('id', '123');
+    fixture.componentRef.setInput('path', 'reservation');
     fixture.detectChanges();
 
     const payment: any = {

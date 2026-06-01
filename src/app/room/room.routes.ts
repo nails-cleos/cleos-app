@@ -3,10 +3,13 @@ import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { CustomersComponent } from './me/customers/customers.component';
 import { AddServiceComponent } from './me/add-service/add-service.component';
-import { ExpenseComponent } from './me/expense/expense.component';
-import { ExpensesComponent } from './me/expense/list/expenses.component';
-import { RoomsComponent } from './list/rooms.component';
-import { RoomComponent } from './room.component';
+import { ExpenseListComponent } from './me/expense/list/expense-list.component';
+import { RoomListComponent } from './list/room-list.component';
+import { RoomCreatePageComponent } from './room-create-page.component';
+import { RoomDetailsPageComponent } from './room-details-page.component';
+import { ExpenseCreatePageComponent } from './me/expense/expense-create-page.component';
+import { ExpenseDetailsPageComponent } from './me/expense/expense-details-page.component';
+import { RoomMeDetailsPageComponent } from './room-me-details-page.component';
 import { provideEffects } from '@ngrx/effects';
 import { provideState } from '@ngrx/store';
 import { AwsLambdaService } from '../services/aws-lambda.service';
@@ -35,15 +38,55 @@ const providers = [
 ];
 
 const children: Routes = [
-  { path: '', component: RoomsComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager] } },
-  { path: 'add', component: RoomComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager] } },
-  { path: ':id/services', component: AddServiceComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager] } },
-  { path: ':id/expenses', component: ExpensesComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager] } },
-  { path: ':id/expenses/add', component: ExpenseComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager] } },
-  { path: ':id/expenses/:expenseId', component: ExpenseComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager] } },
-  { path: 'me/:id', component: RoomComponent, canActivate: [authGuard], data: { roles: [Role.professional, Role.manager] } },
-  { path: ':id', component: RoomComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager] } },
-  { path: ':id/customers', component: CustomersComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager] } },
+  { path: '', component: RoomListComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager] } },
+  {
+    path: 'add',
+    component: RoomCreatePageComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin, Role.manager] },
+  },
+  {
+    path: ':id/services',
+    component: AddServiceComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin, Role.manager] },
+  },
+  {
+    path: ':id/expenses',
+    component: ExpenseListComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin, Role.manager] },
+  },
+  {
+    path: ':id/expenses/add',
+    component: ExpenseCreatePageComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin, Role.manager] },
+  },
+  {
+    path: ':id/expenses/:expenseId',
+    component: ExpenseDetailsPageComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin, Role.manager] },
+  },
+  {
+    path: 'me/:id',
+    component: RoomMeDetailsPageComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.professional, Role.manager] },
+  },
+  {
+    path: ':id',
+    component: RoomDetailsPageComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin, Role.manager] },
+  },
+  {
+    path: ':id/customers',
+    component: CustomersComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin, Role.manager] },
+  },
 ];
 
 export const ROOM_ROUTES: Routes = [{ path: '', providers, children }];

@@ -1,48 +1,46 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
-import { concatMap } from 'rxjs/operators';
-import {
-  cleanAdditional,
-  getAdditionalList,
-  getAllTreatmentsGroup,
-} from '../store/additional.actions';
+import { ROUTER_NAVIGATED } from '@ngrx/router-store';
+import { cleanAdditional, getAdditionalList, getAllTreatmentsGroup } from '../store/additional.actions';
+import { navigation } from '../store/router-navigation.operator';
+import { AdditionalListComponent } from './list/additional-list.component';
+import { AdditionalCreatePageComponent } from './additional-create-page.component';
+import { AdditionalDetailsPageComponent } from './additional-details-page.component';
+import { AdditionalSortingComponent } from './sorting/additional-sorting.component';
 
 @Injectable()
 export class AdditionalNavigationEffects {
   private readonly actions$: Actions = inject(Actions);
 
-  handleAdditionalNavigation$ = createEffect(() =>
+  loadAdditionalListPage$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ROUTER_NAVIGATION),
-      concatMap((action: RouterNavigationAction) => {
-        const url = action.payload.routerState.url;
+      ofType(ROUTER_NAVIGATED),
+      navigation(AdditionalListComponent, {
+        run: () => cleanAdditional(),
+      }),
+    ));
 
-        // 1) /additional/sorting
-        const sortingMatch = url.match(/\/additional\/sorting$/);
-        if (sortingMatch) {
-          return [cleanAdditional(), getAdditionalList()];
-        }
+  loadAdditionalAddPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(AdditionalCreatePageComponent, {
+        run: () => [cleanAdditional(), getAllTreatmentsGroup()],
+      }),
+    ));
 
-        // 2) /additional/add
-        const addMatch = url.match(/\/additional\/add$/);
-        if (addMatch) {
-          return [cleanAdditional(), getAllTreatmentsGroup()];
-        }
+  loadAdditionalDetailsPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(AdditionalDetailsPageComponent, {
+        run: () => [cleanAdditional(), getAllTreatmentsGroup()],
+      }),
+    ));
 
-        // 3) /additional/:id
-        const detailMatch = url.match(/\/additional\/([^\/]+)$/);
-        if (detailMatch) {
-          return [cleanAdditional(), getAllTreatmentsGroup()];
-        }
-
-        // 4) /additional
-        const viewMatch = url.match(/\/additional\/?$/);
-        if (viewMatch) {
-          return [cleanAdditional()];
-        }
-
-        return [];
+  loadAdditionalSortingPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(AdditionalSortingComponent, {
+        run: () => [cleanAdditional(), getAdditionalList()],
       }),
     ));
 }

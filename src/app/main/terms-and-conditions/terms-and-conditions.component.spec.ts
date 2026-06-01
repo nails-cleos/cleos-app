@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { EnvService } from '../../services/env.service';
-import { MainContentService } from '../../services/main-content.service';
 import { SeoService } from '../../services/seo.service';
 import { TermsAndConditionsComponent } from './terms-and-conditions.component';
 
@@ -20,7 +19,6 @@ describe('TermsAndConditionsComponent', () => {
     navigate: jasmine.Spy;
     parseUrl: jasmine.Spy;
   };
-  let mainContentMock: jasmine.SpyObj<MainContentService>;
   let seoServiceMock: jasmine.SpyObj<SeoService>;
   let translateMock: jasmine.SpyObj<TranslateService>;
 
@@ -48,7 +46,6 @@ describe('TermsAndConditionsComponent', () => {
 
   beforeEach(async () => {
     routerEvents = new Subject<unknown>();
-    mainContentMock = jasmine.createSpyObj<MainContentService>('MainContentService', ['configure']);
     seoServiceMock = jasmine.createSpyObj<SeoService>('SeoService', ['setMetaDescription', 'setMetaTitle']);
     translateMock = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant']);
 
@@ -75,7 +72,6 @@ describe('TermsAndConditionsComponent', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: Router, useValue: routerMock },
-        { provide: MainContentService, useValue: mainContentMock },
         { provide: SeoService, useValue: seoServiceMock },
         { provide: TranslateService, useValue: translateMock },
         { provide: EnvService, useValue: envMock },
@@ -89,7 +85,7 @@ describe('TermsAndConditionsComponent', () => {
     httpMock?.verify();
   });
 
-  it('should create and configure page chrome + meta tags', fakeAsync(() => {
+  it('should create and configure meta tags', fakeAsync(() => {
     createComponent();
 
     flushTermsFile(
@@ -98,7 +94,6 @@ describe('TermsAndConditionsComponent', () => {
     );
 
     expect(component).toBeTruthy();
-    expect(mainContentMock.configure).toHaveBeenCalledWith(false, 'open');
     expect(seoServiceMock.setMetaDescription).toHaveBeenCalledWith('meta-content');
     expect(seoServiceMock.setMetaTitle).toHaveBeenCalledWith('meta-title');
   }));

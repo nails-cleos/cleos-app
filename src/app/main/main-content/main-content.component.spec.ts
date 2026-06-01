@@ -5,7 +5,6 @@ import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Router } from '@angular/router';
-import { MainContentService } from '../../services/main-content.service';
 import { ToastService } from '../../services/toast.service';
 import { sendMessage } from '../../store/main.actions';
 import { ISendMessage } from '../../../main';
@@ -31,7 +30,6 @@ describe('MainContentComponent', () => {
   let routerSpy: jasmine.SpyObj<Router>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
   let bottomSheetSpy: jasmine.SpyObj<MatBottomSheet>;
-  let mainContentServiceSpy: jasmine.SpyObj<MainContentService>;
 
   let translateService: TranslateService;
 
@@ -46,7 +44,6 @@ describe('MainContentComponent', () => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
     bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
-    mainContentServiceSpy = jasmine.createSpyObj('MainContentService', ['configure']);
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
@@ -68,7 +65,6 @@ describe('MainContentComponent', () => {
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: MatBottomSheet, useValue: bottomSheetSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: MainContentService, useValue: mainContentServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
         provideHttpClient(),
         provideHttpClientTesting(),

@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, ParamMap } from '@angular/router';
 import { ChangeDetectorRef, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -26,7 +25,6 @@ describe('RoomComponent', () => {
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let roomId$: BehaviorSubject<any>;
   let selectedRoom$: BehaviorSubject<any>;
   let professionals$: BehaviorSubject<any>;
   let currencies$: BehaviorSubject<any>;
@@ -35,7 +33,6 @@ describe('RoomComponent', () => {
   let paymentOptions$: BehaviorSubject<any>;
 
   let storeSpy: jasmine.SpyObj<Store>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
   let geocodeServiceSpy: jasmine.SpyObj<GeocodeService>;
   let authUserService: jasmine.SpyObj<AuthUserService>;
@@ -126,7 +123,6 @@ describe('RoomComponent', () => {
   ];
 
   beforeEach(async () => {
-    roomId$ = new BehaviorSubject(undefined);
     selectedRoom$ = new BehaviorSubject(undefined);
     professionals$ = new BehaviorSubject(undefined);
     currencies$ = new BehaviorSubject(undefined);
@@ -145,11 +141,6 @@ describe('RoomComponent', () => {
     geocodeServiceSpy = jasmine.createSpyObj('GeocodeService', ['getCoordinates']);
     paymentServiceSpy = jasmine.createSpyObj('PaymentService', ['getPaymentOptions']);
     paymentServiceSpy.getPaymentOptions.and.returnValue(new BehaviorSubject(paymentOptions).asObservable());
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj<ParamMap>('ParamMap', ['get']),
-      },
-    });
     authUserService = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
     });
@@ -159,18 +150,16 @@ describe('RoomComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return roomId$.asObservable();
-        case 2:
           return selectedRoom$.asObservable();
-        case 3:
+        case 2:
           return professionals$.asObservable();
-        case 4:
+        case 3:
           return currencies$.asObservable();
-        case 5:
+        case 4:
           return offices$.asObservable();
-        case 6:
+        case 5:
           return subErrors$.asObservable();
-        case 7:
+        case 6:
           return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -181,7 +170,6 @@ describe('RoomComponent', () => {
       imports: [RoomComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
         { provide: GeocodeService, useValue: geocodeServiceSpy },
         { provide: PaymentService, useValue: paymentServiceSpy },
@@ -212,7 +200,7 @@ describe('RoomComponent', () => {
   it('should dispatch getRoom when roomId emits a value', () => {
     storeSpy.dispatch.calls.reset();
 
-    roomId$.next('123');
+    fixture.componentRef.setInput('id', '123');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getRoom({ id: '123', redirect: true }));
@@ -310,7 +298,7 @@ describe('RoomComponent', () => {
   it('should dispatch updateRoom when in edit mode and form valid', () => {
     storeSpy.dispatch.calls.reset();
 
-    roomId$.next('abc-123');
+    fixture.componentRef.setInput('id', 'abc-123');
     fixture.detectChanges();
     selectedRoom$.next({
       id: 'abc-123',

@@ -8,8 +8,9 @@ import { MePaymentComponent } from './payment/me/me-payment.component';
 import { OptionComponent } from './payment/option/option.component';
 import { PaymentComponent } from './payment/payment.component';
 import { ReferralsComponent } from './referrals/referrals.component';
-import { ReservationsComponent } from './reservation/list/reservations.component';
-import { MeReservationComponent } from './reservation/me/me-reservation.component';
+import { ReservationListComponent } from './reservation/list/reservation-list.component';
+import { MeReservationCreatePageComponent } from './me-reservation-create-page.component';
+import { MeReservationDetailsPageComponent } from './me-reservation-details-page.component';
 import { provideEffects } from '@ngrx/effects';
 import { provideState } from '@ngrx/store';
 import { AdditionalService } from '../services/additional.service';
@@ -47,9 +48,9 @@ const providers = [
 ];
 
 const children: Routes = [
-  { path: 'reservations', component: ReservationsComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
-  { path: 'reservation', component: MeReservationComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
-  { path: 'reservation/:id', component: MeReservationComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
+  { path: 'reservations', component: ReservationListComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
+  { path: 'reservation', component: MeReservationCreatePageComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
+  { path: 'reservation/:id', component: MeReservationDetailsPageComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
   { path: 'reservation/:id/payment/option', component: OptionComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
   { path: ':path/:id/payment', component: PaymentComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
   { path: ':path/:id/payment/:status', component: PaymentCompleteComponent },

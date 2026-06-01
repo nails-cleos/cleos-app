@@ -1,8 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
-import { CatalogueComponent } from './catalogue.component';
-import { CataloguesComponent } from './list/catalogues.component';
+import { CatalogueListComponent } from './list/catalogue-list.component';
 import { provideEffects } from '@ngrx/effects';
 import { provideState } from '@ngrx/store';
 import { CatalogueService } from '../services/catalogue.service';
@@ -11,6 +10,8 @@ import { provideFeatureTranslations } from '../shared/feature-providers';
 import { CatalogueEffects } from '../store/effects/catalogue.effects';
 import { CATALOGUE_FEATURE_KEY, catalogueReducer } from '../store/reducers/catalogue.reducers';
 import { CatalogueNavigationEffects } from './catalogue-navigation.effects';
+import { CatalogueCreatePageComponent } from './catalogue-create-page.component';
+import { CatalogueDetailsPageComponent } from './catalogue-details-page.component';
 
 const providers = [
   provideFeatureTranslations('catalogue'),
@@ -21,9 +22,9 @@ const providers = [
 ];
 
 const children: Routes = [
-  { path: '', component: CataloguesComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
-  { path: 'add', component: CatalogueComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
-  { path: ':id', component: CatalogueComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
+  { path: '', component: CatalogueListComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
+  { path: 'add', component: CatalogueCreatePageComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
+  { path: ':id', component: CatalogueDetailsPageComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
 ];
 
 export const CATALOGUE_ROUTES: Routes = [{ path: '', providers, children }];

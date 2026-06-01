@@ -1,8 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
-import { DiscountComponent } from './discount.component';
-import { DiscountsComponent } from './list/discounts.component';
+import { DiscountListComponent } from './list/discount-list.component';
 import { provideEffects } from '@ngrx/effects';
 import { provideState } from '@ngrx/store';
 import { CurrencyService } from '../services/currency.service';
@@ -13,6 +12,8 @@ import { DiscountEffects } from '../store/effects/discount.effects';
 import { UserEffects } from '../store/effects/user.effects';
 import { DISCOUNT_FEATURE_KEY, discountReducer } from '../store/reducers/discount.reducers';
 import { DiscountNavigationEffects } from './discount-navigation.effects';
+import { DiscountCreatePageComponent } from './discount-create-page.component';
+import { DiscountDetailsPageComponent } from './discount-details-page.component';
 
 const providers = [
   provideFeatureTranslations('discount'),
@@ -24,9 +25,9 @@ const providers = [
 ];
 
 const children: Routes = [
-  { path: '', component: DiscountsComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
-  { path: 'add', component: DiscountComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
-  { path: ':id', component: DiscountComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
+  { path: '', component: DiscountListComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
+  { path: 'add', component: DiscountCreatePageComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
+  { path: ':id', component: DiscountDetailsPageComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
 ];
 
 export const DISCOUNT_ROUTES: Routes = [{ path: '', providers, children }];

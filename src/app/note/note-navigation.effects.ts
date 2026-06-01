@@ -1,44 +1,39 @@
 import { inject, Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
-import { concatMap } from 'rxjs/operators';
-import { cleanNote, getAllProfessional, setNoteNavigationParams } from '../store/note.actions';
 import { Router } from '@angular/router';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { ROUTER_NAVIGATED } from '@ngrx/router-store';
+import { cleanNote, getAllProfessional, setNoteNavigationParams } from '../store/note.actions';
+import { navigation } from '../store/router-navigation.operator';
+import { NoteCreatePageComponent } from './note-create-page.component';
+import { NoteDetailsPageComponent } from './note-details-page.component';
 
 @Injectable()
 export class NoteNavigationEffects {
   private readonly actions$: Actions = inject(Actions);
   private readonly router: Router = inject(Router);
 
-  handleNoteNavigation$ = createEffect(() =>
+  loadNoteAddPage$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ROUTER_NAVIGATION),
-      concatMap((action: RouterNavigationAction) => {
-        const url = action.payload.routerState.url;
-        const navigation = this.router.currentNavigation();
-        const navigationState = navigation?.extras.state;
+      ofType(ROUTER_NAVIGATED),
+      navigation(NoteCreatePageComponent, {
+        run: () => {
+          const navigation = this.router.currentNavigation();
 
-        // 1) /notes/add
-        const addMatch = url.match(/\/notes\/add$/);
-        if (addMatch) {
-          if (navigationState &&
-            (navigationState['professional'] !== undefined || navigationState['date'] !== undefined)) {
-            return [
-              cleanNote(),
-              getAllProfessional(),
-              setNoteNavigationParams({ professional: navigationState['professional'], date: navigationState['date'] }),
-            ];
-          }
-          return [cleanNote(), getAllProfessional()];
-        }
+          const navigationState = navigation?.extras.state;
+          const params = navigationState ? [
+            setNoteNavigationParams({ professional: navigationState['professional'], date: navigationState['date'] }),
+          ] : [];
 
-        // 2) /notes/:id
-        const detailMatch = url.match(/\/notes\/([^\/]+)$/);
-        if (detailMatch) {
-          return [cleanNote(), getAllProfessional()];
-        }
+          return [cleanNote(), getAllProfessional(), ...params];
+        },
+      }),
+    ));
 
-        return [];
+  loadNoteDetailsPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(NoteDetailsPageComponent, {
+        run: () => [cleanNote(), getAllProfessional()],
       }),
     ));
 }

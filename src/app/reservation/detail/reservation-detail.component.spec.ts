@@ -33,7 +33,6 @@ describe('ReservationDetailComponent', () => {
   let component: ReservationDetailComponent;
   let fixture: ComponentFixture<ReservationDetailComponent>;
 
-  let reservationId$: BehaviorSubject<any>;
   let navigationParams$: BehaviorSubject<any>;
   let reservationSelected$: BehaviorSubject<any>;
   let payments$: BehaviorSubject<any>;
@@ -43,7 +42,6 @@ describe('ReservationDetailComponent', () => {
 
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
   let navigateSpy: jasmine.Spy;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let dialogSpy: jasmine.Spy<any>;
 
@@ -138,7 +136,6 @@ describe('ReservationDetailComponent', () => {
   };
 
   beforeEach(async () => {
-    reservationId$ = new BehaviorSubject(undefined);
     navigationParams$ = new BehaviorSubject(undefined);
     reservationSelected$ = new BehaviorSubject(undefined);
     payments$ = new BehaviorSubject(undefined);
@@ -171,11 +168,6 @@ describe('ReservationDetailComponent', () => {
     ]);
 
     storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),
     });
@@ -185,16 +177,14 @@ describe('ReservationDetailComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return reservationId$.asObservable();
-        case 2:
           return navigationParams$.asObservable();
-        case 3:
+        case 2:
           return reservationSelected$.asObservable();
-        case 4:
+        case 3:
           return payments$.asObservable();
-        case 5:
+        case 4:
           return histories$.asObservable();
-        case 6:
+        case 5:
           return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -204,9 +194,9 @@ describe('ReservationDetailComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ReservationDetailComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
       ],
     }).compileComponents();
 
@@ -223,7 +213,6 @@ describe('ReservationDetailComponent', () => {
   });
 
   afterEach(() => {
-    reservationId$.complete();
     navigationParams$.complete();
     reservationSelected$.complete();
     payments$.complete();
@@ -260,7 +249,7 @@ describe('ReservationDetailComponent', () => {
   });
 
   it('should dispatch getReservation actions on init', () => {
-    reservationId$.next('reservation-123');
+    fixture.componentRef.setInput('id', 'reservation-123');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getReservation({ id: 'reservation-123' }));

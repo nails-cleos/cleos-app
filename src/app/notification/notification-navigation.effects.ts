@@ -1,26 +1,19 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
-import { concatMap } from 'rxjs/operators';
+import { ROUTER_NAVIGATED } from '@ngrx/router-store';
 import { cleanNotification } from '../store/notification.actions';
+import { navigation } from '../store/router-navigation.operator';
+import { NotificationListComponent } from './list/notification-list.component';
 
 @Injectable()
 export class NotificationNavigationEffects {
   private readonly actions$: Actions = inject(Actions);
 
-  handleNotificationNavigation$ = createEffect(() =>
+  loadNotificationListPage$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ROUTER_NAVIGATION),
-      concatMap((action: RouterNavigationAction) => {
-        const url = action.payload.routerState.url;
-
-        // 1) /notifications
-        const notificationsMatch = url.match(/\/notifications$/);
-        if (notificationsMatch) {
-          return [cleanNotification()];
-        }
-
-        return [];
+      ofType(ROUTER_NAVIGATED),
+      navigation(NotificationListComponent, {
+        run: () => cleanNotification(),
       }),
     ));
 }

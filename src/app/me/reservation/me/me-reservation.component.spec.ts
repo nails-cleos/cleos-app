@@ -1,10 +1,9 @@
 /* eslint-disable camelcase */
-import { BehaviorSubject, of, Subject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MeReservationComponent } from './me-reservation.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
-import { ActivatedRoute } from '@angular/router';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { signal } from '@angular/core';
@@ -23,7 +22,6 @@ describe('MeReservationComponent', () => {
   let translate: TranslateService;
 
   let navigationParams$: BehaviorSubject<any>;
-  let reservationId$: BehaviorSubject<any>;
   let additionalList$: BehaviorSubject<any>;
   let treatmentDiscount$: BehaviorSubject<any>;
   let rooms$: BehaviorSubject<any>;
@@ -32,7 +30,6 @@ describe('MeReservationComponent', () => {
   let availableList$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
   let paymentOptions$: BehaviorSubject<any>;
-  let params$: Subject<any>;
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
   const mockCurrency = { id: 'eur', code: 'EUR', name: 'Euro', icon: '€' };
@@ -162,14 +159,12 @@ describe('MeReservationComponent', () => {
   };
 
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let firebaseServiceSpy: jasmine.SpyObj<FirebaseService>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
 
   beforeEach(async () => {
     navigationParams$ = new BehaviorSubject(undefined);
-    reservationId$ = new BehaviorSubject(undefined);
     additionalList$ = new BehaviorSubject(undefined);
     treatmentDiscount$ = new BehaviorSubject(undefined);
     rooms$ = new BehaviorSubject(undefined);
@@ -178,15 +173,8 @@ describe('MeReservationComponent', () => {
     availableList$ = new BehaviorSubject(undefined);
     subErrors$ = new BehaviorSubject(undefined);
     paymentOptions$ = new BehaviorSubject(paymentOptions);
-    params$ = new Subject<any>();
 
     storeSpy = jasmine.createSpyObj<Store<ReservationState>>('Store', ['pipe', 'dispatch']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-      params: params$.asObservable(),
-    });
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
     });
@@ -199,7 +187,6 @@ describe('MeReservationComponent', () => {
 
     const storeStreams = [
       navigationParams$,
-      reservationId$,
       additionalList$,
       treatmentDiscount$,
       rooms$,
@@ -217,7 +204,6 @@ describe('MeReservationComponent', () => {
       imports: [MeReservationComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: FirebaseService, useValue: firebaseServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
@@ -235,7 +221,6 @@ describe('MeReservationComponent', () => {
 
   afterEach(() => {
     navigationParams$.complete();
-    reservationId$.complete();
     additionalList$.complete();
     treatmentDiscount$.complete();
     rooms$.complete();
@@ -244,7 +229,6 @@ describe('MeReservationComponent', () => {
     availableList$.complete();
     subErrors$.complete();
     paymentOptions$.complete();
-    params$.complete();
   });
 
   it('should create', () => {
@@ -252,7 +236,7 @@ describe('MeReservationComponent', () => {
   });
 
   it('should log and load the reservation when reservationId is available', () => {
-    reservationId$.next('reservation-1');
+    fixture.componentRef.setInput('id', 'reservation-1');
     fixture.detectChanges();
 
     expect(firebaseServiceSpy.logEvent).toHaveBeenCalledWith('screen_view', jasmine.objectContaining({

@@ -1,7 +1,8 @@
 import { inject, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
-import { concatMap } from 'rxjs/operators';
+import { ROUTER_NAVIGATED } from '@ngrx/router-store';
+import { Action } from '@ngrx/store';
 import {
   cleanReservation,
   getAllRooms,
@@ -9,32 +10,36 @@ import {
   setDetailReservationParams,
   setReservationParams,
 } from '../store/reservation.actions';
-import { Router } from '@angular/router';
 import { getOptions } from '../store/payment.actions';
+import { navigation } from '../store/router-navigation.operator';
+import { CalendarComponent } from './calendar/calendar.component';
+import { ReservationCompleteComponent } from './detail/complete/reservation-complete.component';
+import { MoreInfoComponent } from './detail/more-info/more-info.component';
+import { ReservationDetailComponent } from './detail/reservation-detail.component';
+import { ReservationCreatePageComponent } from './reservation-create-page.component';
+import { ReservationEditPageComponent } from './reservation-edit-page.component';
+import { SearchComponent } from './search/search.component';
 
 @Injectable()
 export class ReservationNavigationEffects {
   private readonly actions$: Actions = inject(Actions);
   private readonly router: Router = inject(Router);
 
-  handleReservationNavigation$ = createEffect(() =>
+  loadCalendarPage$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ROUTER_NAVIGATION),
-      concatMap((action: RouterNavigationAction) => {
-        const url = action.payload.routerState.url;
-        const navigation = this.router.currentNavigation();
-        const navigationState = navigation?.extras.state;
+      ofType(ROUTER_NAVIGATED),
+      navigation(CalendarComponent, {
+        run: () => [cleanReservation(), getAllRooms({})],
+      }),
+    ));
 
-        // 1) /reservation/calendar
-        const calendarMatch = url.match(/\/reservation\/calendar$/);
-        if (calendarMatch) {
-          return [cleanReservation(), getAllRooms({})];
-        }
+  loadCompletePage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(ReservationCompleteComponent, {
+        run: () => {
+          const navigationState = this.router.currentNavigation()?.extras.state;
 
-        // 2) /reservation/:id/rooms/:roomId/customer/:customerId/complete
-        const completeDetailMatch = url.match(
-          /\/reservation\/([^\/]+)\/rooms\/([^\/]+)\/customer\/([^\/]+)\/complete$/);
-        if (completeDetailMatch) {
           return [
             cleanReservation(),
             getOptions(),
@@ -42,81 +47,86 @@ export class ReservationNavigationEffects {
               isDashboard: navigationState?.['isDashboard'],
             }),
           ];
-        }
+        },
+      }),
+    ));
 
-        // 3) /reservation/:id/more-info
-        const moreInfoDetailMatch = url.match(/\/reservation\/([^\/]+)\/more-info$/);
-        if (moreInfoDetailMatch) {
-          return [cleanReservation()];
-        }
+  loadMoreInfoPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(MoreInfoComponent, {
+        run: () => [cleanReservation()],
+      }),
+    ));
 
-        // 4) /reservation/search
-        const searchMatch = url.match(/\/reservation\/search$/);
-        if (searchMatch) {
-          return [cleanReservation(), getCustomers()];
-        }
+  loadSearchPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(SearchComponent, {
+        run: () => [cleanReservation(), getCustomers()],
+      }),
+    ));
 
-        // 5) /reservation/invoices
-
-        // 6) /reservation/:id/edit
-        const editMatch = url.match(/\/reservation\/([^\/]+)\/edit$/);
-        if (editMatch) {
+  loadReservationCreatePage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(ReservationCreatePageComponent, {
+        run: () => {
+          const navigationState = this.router.currentNavigation()?.extras.state;
+          const actions: Action[] = [cleanReservation(), getCustomers(), getOptions()];
           if (navigationState) {
-            return [
-              cleanReservation(),
-              getOptions(),
-              setReservationParams({
-                customerId: navigationState['customerId'],
-                isDashboard: navigationState['isDashboard'],
-                treatmentId: navigationState['treatmentId'],
-                groupId: navigationState['groupId'],
-                roomId: navigationState['roomId'],
-                professionalId: navigationState['professionalId'],
-                skip: navigationState['skip'],
-                date: navigationState['date'],
-                additionalIds: navigationState['additionalIds'],
-              }),
-            ];
+            actions.push(this.toReservationParamsAction(navigationState));
           }
-          return [cleanReservation(), getOptions()];
-        }
+          return actions;
+        },
+      }),
+    ));
 
-        // 7) /reservation/:id
-        const detailMatch = url.match(/\/reservation\/([^\/]+)$/);
-        if (detailMatch) {
+  loadReservationEditPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(ReservationEditPageComponent, {
+        run: () => {
+          const navigationState = this.router.currentNavigation()?.extras.state;
+
+          const actions: Action[] = [cleanReservation(), getOptions()];
+          if (navigationState) {
+            actions.push(this.toReservationParamsAction(navigationState));
+          }
+
+          return actions;
+        },
+      }),
+    ));
+
+  loadReservationDetailsPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(ReservationDetailComponent, {
+        run: () => {
+          const navigationState = this.router.currentNavigation()?.extras.state;
+
           return [
             cleanReservation(),
             getOptions(),
             setDetailReservationParams({ step: navigationState?.['step'] }),
           ];
-        }
-
-        // 8) /reservation
-        const baseMatch = url.match(/\/reservation$/);
-        if (baseMatch) {
-          if (navigationState) {
-            return [
-              cleanReservation(),
-              getCustomers(),
-              getOptions(),
-              setReservationParams({
-                isDashboard: navigationState['isDashboard'],
-                skip: navigationState['skip'],
-                customerId: navigationState['customerId'],
-                treatmentId: navigationState['treatmentId'],
-                groupId: navigationState['groupId'],
-                roomId: navigationState['roomId'],
-                professionalId: navigationState['professionalId'],
-                additionalIds: navigationState['additionalIds'],
-                date: navigationState['date'],
-                discountId: navigationState['discountId'],
-              }),
-            ];
-          }
-          return [cleanReservation(), getCustomers(), getOptions()];
-        }
-
-        return [];
+        },
       }),
     ));
+
+  private toReservationParamsAction(navigationState: Record<string, unknown>) {
+    return setReservationParams({
+      customerId: navigationState['customerId'] as string | undefined,
+      isDashboard: navigationState['isDashboard'] as boolean | undefined,
+      treatmentId: navigationState['treatmentId'] as string | undefined,
+      groupId: navigationState['groupId'] as string | undefined,
+      roomId: navigationState['roomId'] as string | undefined,
+      professionalId: navigationState['professionalId'] as string | undefined,
+      skip: navigationState['skip'] as boolean | undefined,
+      date: navigationState['date'] as Date | undefined,
+      additionalIds: navigationState['additionalIds'] as string[] | undefined,
+      discountId: navigationState['discountId'] as string | undefined,
+    });
+  }
 }

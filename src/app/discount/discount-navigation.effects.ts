@@ -1,38 +1,37 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
-import { concatMap } from 'rxjs/operators';
+import { ROUTER_NAVIGATED } from '@ngrx/router-store';
+import { navigation } from '../store/router-navigation.operator';
+import { DiscountListComponent } from './list/discount-list.component';
 import { cleanDiscount, getAllCurrency } from '../store/discount.actions';
+import { DiscountCreatePageComponent } from './discount-create-page.component';
+import { DiscountDetailsPageComponent } from './discount-details-page.component';
 
 @Injectable()
 export class DiscountNavigationEffects {
   private readonly actions$: Actions = inject(Actions);
 
-  handleDiscountNavigation$ = createEffect(() =>
+  loadDiscountListPage$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(ROUTER_NAVIGATION),
-      concatMap((action: RouterNavigationAction) => {
-        const url = action.payload.routerState.url;
+      ofType(ROUTER_NAVIGATED),
+      navigation(DiscountListComponent, {
+        run: () => cleanDiscount(),
+      }),
+    ));
 
-        // 1) /discounts/add
-        const addMatch = url.match(/\/discounts\/add$/);
-        if (addMatch) {
-          return [cleanDiscount(), getAllCurrency()];
-        }
+  loadDiscountAddPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(DiscountCreatePageComponent, {
+        run: () => [cleanDiscount(), getAllCurrency()],
+      }),
+    ));
 
-        // 2) /discounts/:id
-        const detailMatch = url.match(/\/discounts\/([^\/]+)$/);
-        if (detailMatch) {
-          return [cleanDiscount()];
-        }
-
-        // 3) /discounts
-        const viewMatch = url.match(/\/discounts\/?$/);
-        if (viewMatch) {
-          return [cleanDiscount()];
-        }
-
-        return [];
+  loadDiscountDetailsPage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROUTER_NAVIGATED),
+      navigation(DiscountDetailsPageComponent, {
+        run: () => cleanDiscount(),
       }),
     ));
 }

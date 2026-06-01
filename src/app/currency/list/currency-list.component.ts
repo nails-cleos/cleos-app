@@ -7,7 +7,7 @@ import { ICurrency } from '../../interfaces/currency';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { clean, currencySelected, deleteCurrency, getCurrenciesPage } from '../../store/currency.actions';
+import { cleanCurrency, currencySelected, deleteCurrency, getCurrenciesPage } from '../../store/currency.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { executeDialogNoWidth } from '../../util/helper';
@@ -100,7 +100,7 @@ export class CurrencyListComponent {
         }),
       );
     });
-    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(clean()));
+    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanCurrency()));
   }
 
   edit = (selected: ICurrency): void => this.store.dispatch(currencySelected({ selected }));
