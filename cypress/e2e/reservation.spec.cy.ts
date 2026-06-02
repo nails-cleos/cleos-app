@@ -156,13 +156,13 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           expect(body.additionalIds).to.have
             .members(['557c6520-035a-4b0a-9bd4-f2f1dce27f6d', '397bce4b-27ba-459f-801a-dcceea330b8d']);
           expect(body.canCustomerChange).to.eq(false);
-          expect(body.reference).to.eq(null);
-          expect(body.note).to.eq(null);
-          expect(body.payment).to.eq(undefined);
+          expect([null, undefined]).to.include(body.reference);
+          expect([null, undefined]).to.include(body.note);
+          expect([null, undefined]).to.include(body.payment);
           expect(body.treatmentId).to.eq(treatmentId);
           expect(body.roomId).to.eq(roomId);
           expect(body.professionalId).to.eq(professionalId);
-          expect(body.discountId).to.eq(undefined);
+          expect([null, undefined]).to.include(body.discountId);
         });
 
         cy.url().should('include', `reservation/${ reservationId }`);

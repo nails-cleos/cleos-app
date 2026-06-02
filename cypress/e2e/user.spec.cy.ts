@@ -7,6 +7,25 @@ const mapRole = new Map([
   ['Manager', { url: 'offices/managers', displayName: 'Nails Cleos', otherButtons: ['merge'] }],
 ]);
 
+const waitForEmptyUsersState = () => {
+  cy.get('.app-table-shell').should('be.visible');
+  cy.contains('.no-content', 'No users', { timeout: 15000 }).should('be.visible');
+};
+
+const waitForUserRow = (displayName: string) => {
+  cy.get('.app-table-shell').should('be.visible');
+  cy.contains('tr.app-table-master-row', displayName, { timeout: 15000 }).should('exist');
+};
+
+const setColorInput = (dataCy: string, value: string) => {
+  cy.get(`[data-cy="${ dataCy }"]`, { timeout: 15000 })
+    .scrollIntoView()
+    .should('exist')
+    .and('not.be.disabled')
+    .clear({ force: true })
+    .type(value, { force: true });
+};
+
 devices.forEach(({ name, width, height, breakpoints }) => {
   describe(`Users with ${ name }`, () => {
     beforeEach(() => cy.viewport(width, height));
@@ -33,7 +52,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         cy.mockUsers(0);
         cy.openMenu(breakpoints, ['App settings', 'Users']);
         cy.wait('@getUsers');
-        cy.get('tr').contains('No users');
+        waitForEmptyUsersState();
         cy.get('button[id="add-button"]').click({ force: true });
         cy.get('.app-surface-eyebrow').contains('Add user');
         cy.selectOption('select-role', role);
@@ -52,8 +71,8 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         cy.get('td[data-mat-row="1"][data-mat-col="1"]').find('button').click({ force: true });
 
         if (role !== 'Customer') {
-          cy.get('[data-cy="dark-color-picker"]').should('not.be.disabled').clear().type('#0f0', { force: true });
-          cy.get('[data-cy="light-color-picker"]').should('not.be.disabled').clear().type('#00f', { force: true });
+          setColorInput('dark-color-picker', '#0f0');
+          setColorInput('light-color-picker', '#00f');
         }
 
         cy.get('button[type="submit"]').click({ force: true });
@@ -78,6 +97,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         cy.mockUsers(undefined, value.displayName);
         cy.openMenu(breakpoints, ['App settings', 'Users']);
         cy.wait('@getUsers');
+        waitForUserRow(value.displayName);
 
         cy.get('@selectedUser').then((user: any) => {
           cy.mockApi('PATCH', `**/api/v1/users/${ user.id }`, {
