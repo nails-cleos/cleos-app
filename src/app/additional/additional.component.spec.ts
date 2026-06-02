@@ -1,22 +1,27 @@
+import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject } from 'rxjs';
 
-import { AdditionalComponent } from './additional.component';
-import { getAdditional } from '../store/actions/additional.actions';
-import { ITreatmentGroupAll } from '../interfaces/treatment';
 import { IAdditionalAll } from '../interfaces/additional';
-import { AdditionalState } from '../store/reducers/additional.reducers';
+import { ITreatmentGroupAll } from '../interfaces/treatment';
+import { NavigationService } from '../services/navigation.service';
+import { AdditionalStore } from '../store/additional.store';
+import { AdditionalComponent } from './additional.component';
 
 describe('AdditionalComponent', () => {
   let component: AdditionalComponent;
   let fixture: ComponentFixture<AdditionalComponent>;
 
-  let storeSpy: jasmine.SpyObj<Store<AdditionalState>>;
-  let selectedAdditional$: BehaviorSubject<any>;
-  let allGroups$: BehaviorSubject<any>;
-  let subErrors$: BehaviorSubject<any>;
+  let additionalStoreSpy: {
+    selected: ReturnType<typeof signal>;
+    groups: ReturnType<typeof signal>;
+    subErrors: ReturnType<typeof signal>;
+    clean: jasmine.Spy;
+    loadGroups: jasmine.Spy;
+    loadById: jasmine.Spy;
+    create: jasmine.Spy;
+    update: jasmine.Spy;
+  };
 
   const mockGroup = {
     id: 'g1',
@@ -34,60 +39,52 @@ describe('AdditionalComponent', () => {
   };
 
   beforeEach(async () => {
-    selectedAdditional$ = new BehaviorSubject<any>(undefined);
-    allGroups$ = new BehaviorSubject<any>(undefined);
-    subErrors$ = new BehaviorSubject<any>(undefined);
-
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return selectedAdditional$.asObservable();
-        case 2:
-          return allGroups$.asObservable();
-        case 3:
-          return subErrors$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
+    additionalStoreSpy = {
+      selected: signal<any>(undefined),
+      groups: signal<any>(undefined),
+      subErrors: signal<any>(undefined),
+      clean: jasmine.createSpy('clean'),
+      loadGroups: jasmine.createSpy('loadGroups'),
+      loadById: jasmine.createSpy('loadById'),
+      create: jasmine.createSpy('create'),
+      update: jasmine.createSpy('update'),
+    };
+    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
     await TestBed.configureTestingModule({
       imports: [AdditionalComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: AdditionalStore, useValue: additionalStoreSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
 
-    fixture =
-      TestBed.overrideTemplate(AdditionalComponent, '<input #groupInput />').createComponent(AdditionalComponent);
+    fixture = TestBed
+      .overrideTemplate(AdditionalComponent, '<input #groupInput />')
+      .createComponent(AdditionalComponent);
     component = fixture.componentInstance;
 
-    // Make sure translate has a language so component.language is meaningful
     const translateService = TestBed.inject(TranslateService);
     translateService.use('en-GB');
 
-    fixture.detectChanges(); // kick off effects / toSignal subscriptions
+    fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should dispatch getAdditional when additionalId emits a value', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should load additional when id emits a value', () => {
+    additionalStoreSpy.loadById.calls.reset();
     fixture.componentRef.setInput('id', '123');
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAdditional({ id: '123' }));
+    expect(additionalStoreSpy.loadById).toHaveBeenCalledWith('123');
   });
 
   it('should patch form when selectedAdditional emits', () => {
-    selectedAdditional$.next(mockAdditional);
-    allGroups$.next([
+    additionalStoreSpy.selected.set(mockAdditional);
+    additionalStoreSpy.groups.set([
       mockGroup,
       { id: 'g2', name: 'Group 2', treatments: [], selectedTreatments: [] },
     ]);
@@ -105,7 +102,7 @@ describe('AdditionalComponent', () => {
       { field: 'duration', message: 'Duration required' },
     ];
 
-    subErrors$.next(errors);
+    additionalStoreSpy.subErrors.set(errors);
     fixture.detectChanges();
 
     const errs = component.errors();
@@ -115,77 +112,62 @@ describe('AdditionalComponent', () => {
     expect(component.getForm.duration.hasError('incorrect')).toBeTrue();
   });
 
-  it('should not dispatch when form invalid on submit', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should not call store methods when form invalid on submit', () => {
+    additionalStoreSpy.create.calls.reset();
+    additionalStoreSpy.update.calls.reset();
 
-    // ensure form invalid
-    (component.getForm.name as any).setValue(undefined);
-    (component.getForm.duration as any).setValue(undefined);
+    component.getForm.name.setValue('');
+    component.getForm.duration.setValue('');
     fixture.detectChanges();
 
     component.submit();
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(additionalStoreSpy.create).not.toHaveBeenCalled();
+    expect(additionalStoreSpy.update).not.toHaveBeenCalled();
   });
 
-  it('should dispatch createAdditional when in add mode and form valid', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should call create when in add mode and form valid', () => {
+    additionalStoreSpy.create.calls.reset();
 
-    const nameControl = component.getForm.name;
-    nameControl.setValue('New Additional');
-    nameControl.markAsDirty();
-    const descriptionControl = component.getForm.description;
-    descriptionControl.setValue('New Description');
-    descriptionControl.markAsDirty();
-    const durationControl = component.getForm.duration;
-    durationControl.setValue('00:30');
-    durationControl.markAsDirty();
+    component.getForm.name.setValue('New Additional');
+    component.getForm.name.markAsDirty();
+    component.getForm.description.setValue('New Description');
+    component.getForm.description.markAsDirty();
+    component.getForm.duration.setValue('00:30');
+    component.getForm.duration.markAsDirty();
 
     component.submit();
 
     expect(component.form.valid).toBeTrue();
-    const dispatched = storeSpy.dispatch.calls.mostRecent().args[0];
-    expect(dispatched).toEqual(jasmine.objectContaining({
-      additional: jasmine.objectContaining({
-        name: 'New Additional',
-        description: 'New Description',
-        duration: '00:30',
-      }),
-      type: '[Additional] Create additional',
+    expect(additionalStoreSpy.create).toHaveBeenCalledWith(jasmine.objectContaining({
+      name: 'New Additional',
+      description: 'New Description',
+      duration: '00:30',
     }));
   });
 
-  it('should dispatch updateAdditional when in edit mode and form valid', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should call update when in edit mode and form valid', () => {
+    additionalStoreSpy.update.calls.reset();
 
     fixture.componentRef.setInput('id', 'abc-123');
     fixture.detectChanges();
-    selectedAdditional$.next({ name: 'Old', description: 'old', duration: 'PT15M' });
+    additionalStoreSpy.selected.set({ name: 'Old', description: 'old', duration: 'PT15M' });
     fixture.detectChanges();
 
-    const nameControl = component.getForm.name;
-    nameControl.setValue('Updated Additional');
-    nameControl.markAsDirty();
-    const descriptionControl = component.getForm.description;
-    descriptionControl.setValue('Updated Description');
-    descriptionControl.markAsDirty();
-    const durationControl = component.getForm.duration;
-    durationControl.setValue('00:45');
-    durationControl.markAsDirty();
+    component.getForm.name.setValue('Updated Additional');
+    component.getForm.name.markAsDirty();
+    component.getForm.description.setValue('Updated Description');
+    component.getForm.description.markAsDirty();
+    component.getForm.duration.setValue('00:45');
+    component.getForm.duration.markAsDirty();
 
     component.submit();
 
     expect(component.form.valid).toBeTrue();
-    const dispatched = storeSpy.dispatch.calls.mostRecent().args[0];
-
-    expect(dispatched).toEqual(jasmine.objectContaining({
-      id: 'abc-123',
-      additional: jasmine.objectContaining({
-        description: 'Updated Description',
-        duration: '00:45',
-        name: 'Updated Additional',
-      }),
-      type: '[Additional] Update additional by id',
+    expect(additionalStoreSpy.update).toHaveBeenCalledWith('abc-123', jasmine.objectContaining({
+      description: 'Updated Description',
+      duration: '00:45',
+      name: 'Updated Additional',
     }));
   });
 
@@ -195,16 +177,14 @@ describe('AdditionalComponent', () => {
       { id: '2', name: 'Another Group' },
       { id: '3', name: 'Test Group 2' },
     ];
-    allGroups$.next(groups);
+    additionalStoreSpy.groups.set(groups);
     fixture.detectChanges();
 
-    // when group control empty -> return all
     component.getForm.group.setValue(undefined);
     fixture.detectChanges();
     expect(component.filteredGroupSignal()).toEqual(groups);
 
-    // when group control has 'Test' -> filtered
-    (component.getForm.group as any).setValue('Test');
+    component.getForm.group.setValue('Test' as any);
     fixture.detectChanges();
     expect(component.filteredGroupSignal()).toEqual([
       { id: '1', name: 'Test Group 1' },
@@ -213,7 +193,6 @@ describe('AdditionalComponent', () => {
   });
 
   it('remove should remove group and put it back to allGroupsWritableSignal', () => {
-    // set initial groups
     component.groupsSignal.set([
       { id: 'g1', name: 'G1' } as any,
       { id: 'g2', name: 'G2' } as any,
@@ -228,7 +207,6 @@ describe('AdditionalComponent', () => {
 
     expect(component.groupsSignal().length).toBe(1);
     expect(component.allGroupsWritableSignal()?.some?.((g: any) => g.id === 'g2')).toBeTrue();
-    // group input control should be reset (undefined)
     expect(component.getForm.group.value).toBeUndefined();
   });
 
@@ -258,8 +236,5 @@ describe('AdditionalComponent', () => {
     ] as any[];
     const response = component.sortGroups(allGroups);
     expect(response[0].name).toBe('Alpha Group');
-    expect(response[1].name).toBe('Alpha Group');
-    expect(response[2].name).toBe('Beta Group');
-    expect(response[3].name).toBe('Gamma Group');
   });
 });

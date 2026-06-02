@@ -12,7 +12,6 @@ import { ReservationListComponent } from './reservation/list/reservation-list.co
 import { MeReservationCreatePageComponent } from './me-reservation-create-page.component';
 import { MeReservationDetailsPageComponent } from './me-reservation-details-page.component';
 import { provideEffects } from '@ngrx/effects';
-import { provideState } from '@ngrx/store';
 import { AdditionalService } from '../services/additional.service';
 import { ColorService } from '../services/color.service';
 import { CurrencyService } from '../services/currency.service';
@@ -24,10 +23,8 @@ import { TrackingService } from '../services/tracking.service';
 import { TreatmentService } from '../services/treatment.service';
 import { UserService } from '../services/user.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
-import { DiscountEffects } from '../store/effects/discount.effects';
 import { PaymentEffects } from '../store/effects/payment.effects';
 import { ReservationEffects } from '../store/effects/reservation.effects';
-import { DISCOUNT_FEATURE_KEY, discountReducer } from '../store/reducers/discount.reducers';
 import { MeNavigationEffects } from './me-navigation.effects';
 
 const providers = [
@@ -42,8 +39,7 @@ const providers = [
   DiscountService,
   CurrencyService,
   ColorService,
-  provideState(DISCOUNT_FEATURE_KEY, discountReducer),
-  provideEffects(ReservationEffects, PaymentEffects, DiscountEffects, MeNavigationEffects),
+  provideEffects(ReservationEffects, PaymentEffects, MeNavigationEffects),
 ];
 
 const children: Routes = [

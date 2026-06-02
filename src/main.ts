@@ -40,12 +40,9 @@ import { roomReducer } from './app/store/reducers/room.reducers';
 import { reservationReducer } from './app/store/reducers/reservation.reducers';
 import { notificationReducer } from './app/store/reducers/notification.reducers';
 import { unavailableReducer } from './app/store/reducers/unavailable.reducers';
-import { discountReducer } from './app/store/reducers/discount.reducers';
 import { mainReducer } from './app/store/reducers/main.reducers';
 import { paymentReducer } from './app/store/reducers/payment.reducers';
 import { dashboardReducer } from './app/store/reducers/dashboard.reducers';
-import { additionalReducer } from './app/store/reducers/additional.reducers';
-import { officeReducer } from './app/store/reducers/office.reducers';
 import { invoiceReducer } from './app/store/reducers/invoice.reducers';
 import { expenseReducer } from './app/store/reducers/expense.reducers';
 import { noteReducer } from './app/store/reducers/note.reducers';
@@ -114,12 +111,9 @@ const providers = [
     reservation: reservationReducer,
     notification: notificationReducer,
     unavailable: unavailableReducer,
-    discount: discountReducer,
     main: mainReducer,
     payment: paymentReducer,
     dashboard: dashboardReducer,
-    additional: additionalReducer,
-    office: officeReducer,
     invoice: invoiceReducer,
     expense: expenseReducer,
     note: noteReducer,

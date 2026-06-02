@@ -1,33 +1,36 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReferralsComponent } from './referrals.component';
-import { Store } from '@ngrx/store';
-import { BehaviorSubject } from 'rxjs';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { TranslateModule } from '@ngx-translate/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { ToastService } from '../../services/toast.service';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { provideHttpClient } from '@angular/common/http';
-import { DiscountState } from '../../store/reducers/discount.reducers';
 import { signal } from '@angular/core';
+import { DiscountStore } from '../../store/discount.store';
 
 describe('ReferralsComponent', () => {
   let component: ReferralsComponent;
   let fixture: ComponentFixture<ReferralsComponent>;
 
-  let referrals$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let storeSpy: jasmine.SpyObj<Store<DiscountState>>;
+  let discountStoreSpy: {
+    referrals: ReturnType<typeof signal>;
+    clean: jasmine.Spy;
+    loadReferrals: jasmine.Spy;
+  };
   let clipboardSpy: jasmine.SpyObj<Clipboard>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
   let bottomSheetSpy: jasmine.SpyObj<MatBottomSheet>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
   beforeEach(async () => {
-    referrals$ = new BehaviorSubject<any>(undefined);
-
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    discountStoreSpy = {
+      referrals: signal<any>(undefined),
+      clean: jasmine.createSpy('clean'),
+      loadReferrals: jasmine.createSpy('loadReferrals'),
+    };
     clipboardSpy = jasmine.createSpyObj('Clipboard', ['copy']);
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
     bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
@@ -35,21 +38,10 @@ describe('ReferralsComponent', () => {
       authUser: authUserSignal.asReadonly(),
     });
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return referrals$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-
     await TestBed.configureTestingModule({
       imports: [ReferralsComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: DiscountStore, useValue: discountStoreSpy },
         { provide: Clipboard, useValue: clipboardSpy },
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: MatBottomSheet, useValue: bottomSheetSpy },
@@ -63,10 +55,6 @@ describe('ReferralsComponent', () => {
     fixture = TestBed.createComponent(ReferralsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
-
-  afterEach(() => {
-    referrals$.complete();
   });
 
   it('should create', () => {

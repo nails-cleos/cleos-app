@@ -30,12 +30,9 @@ import {
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../../../interfaces/common';
 import { FileDropComponent, UploadFile } from '../../../shared/file-drop/file-drop.component';
-import { AwsState } from '../../../store/reducers/aws.reducers';
 import { AuthState } from '../../../store/reducers/auth.reducers';
-import { getAwsPipe } from '../../../store/selectors/aws.selectors';
 import { awsExtractToNumberFormat } from '../../../interfaces/aws';
 import { calculateBTW, calculateNet } from '../../../util/numbers';
-import { callAwsLambda } from '../../../store/actions/aws.actions';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { DriveAccessService } from '../../../services/drive-access.service';
 import { EnvService } from '../../../services/env.service';
@@ -50,6 +47,7 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import { DecimalPipe, KeyValuePipe } from '@angular/common';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatCheckbox } from '@angular/material/checkbox';
+import { AwsStore } from '../../../store/aws.store';
 
 type TotalsForm = {
   type: FormControl<string>;
@@ -81,8 +79,9 @@ export class ExpenseComponent {
   expenseId = input<string>();
 
   private readonly env: EnvService = inject(EnvService);
-  private readonly store: Store<ExpenseState | RoomState | AwsState | AuthState> = inject(
-    Store<ExpenseState | RoomState | AwsState | AuthState>);
+  private readonly store: Store<ExpenseState | RoomState | AuthState> = inject(
+    Store<ExpenseState | RoomState | AuthState>);
+  private readonly awsStore = inject(AwsStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
@@ -95,9 +94,7 @@ export class ExpenseComponent {
   private info$ = this.store.pipe(getInfoPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
   private response$ = this.store.pipe(getExpenseResponsePipe);
-  private aws$ = this.store.pipe(getAwsPipe);
-
-  private awsSignal = toSignal(this.aws$);
+  private awsSignal = this.awsStore.data;
   private userId = computed(() => this.authUserService.authUser().userId);
 
   private infoSignal = toSignal(this.info$);
@@ -225,7 +222,7 @@ export class ExpenseComponent {
       }
       const token = this.tokenService.token();
       if (token && this.env.awsExtractEnable) {
-        this.store.dispatch(callAwsLambda({ token, file, userId: this.userId() }));
+        this.awsStore.processPdf(token, file, this.userId());
       }
     });
 

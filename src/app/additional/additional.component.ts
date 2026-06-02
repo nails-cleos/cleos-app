@@ -11,10 +11,8 @@ import {
   viewChild,
 } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Additional, IAdditional } from '../interfaces/additional';
-import { createAdditional, getAdditional, updateAdditional } from '../store/actions/additional.actions';
+import { Additional, IAdditional, IAdditionalAll } from '../interfaces/additional';
 import { ITreatmentGroupAll } from '../interfaces/treatment';
 import { fieldChange, valueChange } from '../util/validators';
 import { map, startWith } from 'rxjs/operators';
@@ -23,14 +21,8 @@ import { areEquals } from '../util/helper';
 import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import { toSignal } from '@angular/core/rxjs-interop';
-import {
-  getGroupPipe,
-  getSelectedAdditionalPipe,
-  getSubErrorsPipe,
-} from '../store/selectors/additional.selectors';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { IError, isString } from '../interfaces/common';
-import { AdditionalState } from '../store/reducers/additional.reducers';
 import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
@@ -39,6 +31,7 @@ import { MatOption } from '@angular/material/core';
 import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
 import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
 import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/material/chips';
+import { AdditionalStore } from '../store/additional.store';
 
 type AdditionalForm = {
   name: FormControl<string>;
@@ -60,17 +53,13 @@ type AdditionalForm = {
 export class AdditionalComponent {
   id = input<string>();
 
-  private readonly store: Store<AdditionalState> = inject(Store<AdditionalState>);
+  private readonly additionalStore = inject(AdditionalStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private selectedAdditional$ = this.store.pipe(getSelectedAdditionalPipe);
-  private allGroups$ = this.store.pipe(getGroupPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-
-  private selectedAdditionalSignal = toSignal(this.selectedAdditional$);
-  private allGroupsSignal = toSignal(this.allGroups$);
-  private subErrorsSignal = toSignal(this.subErrors$);
+  private selectedAdditionalSignal = this.additionalStore.selected;
+  private allGroupsSignal = this.additionalStore.groups;
+  private subErrorsSignal = this.additionalStore.subErrors;
 
   additionalSignal = computed(() => this.selectedAdditionalSignal());
 
@@ -89,10 +78,10 @@ export class AdditionalComponent {
     this.getForm.group.valueChanges.pipe(
       startWith(''),
       map((value: any) => !value || typeof value === 'string' ? value : value.name),
-      combineLatestWith(this.allGroups$),
+      combineLatestWith(toObservable(this.allGroupsSignal)),
       map(([name, groups]) => {
         if (name) {
-          return this.filterGroup(name, groups);
+          return this.filterGroup(name, groups ?? []);
         } else {
           return groups ? groups.slice() : groups;
         }
@@ -111,9 +100,12 @@ export class AdditionalComponent {
   private currentGroupIds: string[] = [];
 
   constructor() {
+    this.additionalStore.clean();
+    this.additionalStore.loadGroups();
+
     effect(() => {
       const selected = this.selectedAdditionalSignal();
-      if (selected?.id) {
+      if (selected?.id && selected.duration) {
         const duration = formatDuration(selected.duration);
         const additional = Object.assign({}, selected, { duration });
         this.form.patchValue(additional);
@@ -141,12 +133,12 @@ export class AdditionalComponent {
     effect(() => {
       const id = this.id();
       if (id) {
-        this.store.dispatch(getAdditional({ id }));
+        this.additionalStore.loadById(id);
       }
     });
 
     effect(() => {
-      const additional = this.selectedAdditionalSignal();
+      const additional = this.selectedAdditionalSignal() as IAdditionalAll | undefined;
       const allGroups = this.allGroupsSignal();
 
       // Update allGroups from store
@@ -195,9 +187,9 @@ export class AdditionalComponent {
 
     const id = this.id();
     if (!id) {
-      this.store.dispatch(createAdditional({ additional }));
+      this.additionalStore.create(additional);
     } else {
-      this.store.dispatch(updateAdditional({ id, additional }));
+      this.additionalStore.update(id, additional);
     }
     return;
   }

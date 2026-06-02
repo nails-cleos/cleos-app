@@ -4,22 +4,19 @@ import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Va
 import { IUser } from '../interfaces/user';
 import { fieldChange, requireMatch } from '../util/validators';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
-import { createOffice, getOffice, updateOffice } from '../store/actions/office.actions';
 import { Role } from '../interfaces/token';
 import { map, startWith } from 'rxjs/operators';
 import { IOffice, Office } from '../interfaces/office';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import { OfficeState } from '../store/reducers/office.reducers';
-import { getManagersPipe, getSelectedOfficePipe, getSubErrorsPipe } from '../store/selectors/office.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../interfaces/common';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { OfficeStore } from '../store/office.store';
 
 type OfficeForm = {
   name: FormControl<string>;
@@ -43,19 +40,15 @@ type OfficeForm = {
 export class OfficeComponent {
   id = input<string>();
 
-  private readonly store: Store<OfficeState> = inject(Store<OfficeState>);
+  private readonly officeStore = inject(OfficeStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private selectedOffice$ = this.store.pipe(getSelectedOfficePipe);
-  private allManagers$ = this.store.pipe(getManagersPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
+  private subErrorsSignal = this.officeStore.subErrors;
 
-  private subErrorsSignal = toSignal(this.subErrors$);
-
-  allManagersSignal = toSignal(this.allManagers$);
-  officeSignal = toSignal(this.selectedOffice$);
+  allManagersSignal = this.officeStore.managers;
+  officeSignal = this.officeStore.selected;
   isAddModeSignal = computed(() => !this.id());
   errors = signal<Record<string, unknown>>({});
 
@@ -78,7 +71,7 @@ export class OfficeComponent {
     this.getForm.manager.valueChanges.pipe(
       startWith(undefined),
       map((value?: IUser | string) => !value || typeof value === 'string' ? value : value.displayName),
-      combineLatestWith(this.allManagers$),
+      combineLatestWith(toObservable(this.allManagersSignal)),
       map(([name, managers]) => {
         if (!managers) {
           return [];
@@ -91,6 +84,9 @@ export class OfficeComponent {
   private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
+    this.officeStore.clean();
+    this.officeStore.loadManagers();
+
     effect(() => {
       const selected = this.officeSignal();
       if (selected?.id) {
@@ -117,7 +113,7 @@ export class OfficeComponent {
     effect(() => {
       const id = this.id();
       if (id) {
-        this.store.dispatch(getOffice({ id }));
+        this.officeStore.loadById(id);
       }
     });
   }
@@ -128,7 +124,7 @@ export class OfficeComponent {
 
   get managerName(): string | undefined {
     const office = this.officeSignal();
-    return office?.manager.displayName;
+    return office?.manager?.displayName;
   }
 
   submit(): void {
@@ -149,9 +145,9 @@ export class OfficeComponent {
     const id = this.id();
     if (!id) {
       office.managerId = this.getForm.manager.value?.id;
-      this.store.dispatch(createOffice({ office }));
+      this.officeStore.create(office);
     } else {
-      this.store.dispatch(updateOffice({ id, office }));
+      this.officeStore.update(id, office);
     }
     return;
   }

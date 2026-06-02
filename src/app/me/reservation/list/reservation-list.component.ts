@@ -26,9 +26,9 @@ import {
   getReservationResponsePipe,
 } from '../../../store/selectors/reservation.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { cleanDiscount } from '../../../store/actions/discount.actions';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { FirebaseService } from '../../../services/firebase.service';
+import { DiscountStore } from '../../../store/discount.store';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import {
@@ -70,6 +70,7 @@ export class ReservationListComponent {
   private readonly router: Router = inject(Router);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly firebaseService = inject(FirebaseService);
+  private readonly discountStore = inject(DiscountStore);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
   private customerReservation$ = this.store.pipe(getCustomerReservationPipe);
@@ -130,7 +131,7 @@ export class ReservationListComponent {
         }),
       );
     });
-    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanDiscount()));
+    this.tableState.resetOn(this.responseSignal, () => this.discountStore.clean());
 
     effect(() => {
       const upcoming = this.upcomingSignal();

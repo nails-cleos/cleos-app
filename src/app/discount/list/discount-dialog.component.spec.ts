@@ -8,7 +8,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { DiscountState } from '../../store/reducers/discount.reducers';
 
 describe('DiscountDialogComponent', () => {
   let component: DiscountDialogComponent;
@@ -16,7 +15,7 @@ describe('DiscountDialogComponent', () => {
 
   let allCustomers$: BehaviorSubject<IUserAll[] | undefined>;
 
-  let storeSpy: jasmine.SpyObj<Store<DiscountState>>;
+  let storeSpy: jasmine.SpyObj<Store>;
   let dialogRefSpy: jasmine.SpyObj<MatDialogRef<DiscountDialogComponent>>;
 
   let mockDiscount: IDiscountAll;

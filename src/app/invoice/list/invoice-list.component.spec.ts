@@ -21,6 +21,8 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { PaymentService } from '../../services/payment.service';
 import { provideAppDateAdapter } from '../../util/adapter/app-date.provider';
 import { NavigationService } from '../../services/navigation.service';
+import { signal } from '@angular/core';
+import { OfficeStore } from '../../store/office.store';
 
 describe('InvoiceListComponent', () => {
   let component: InvoiceListComponent;
@@ -31,6 +33,10 @@ describe('InvoiceListComponent', () => {
   let routerSpy: jasmine.SpyObj<Router>;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
   let paymentServiceSpy: jasmine.SpyObj<PaymentService>;
+  let officeStoreSpy: {
+    data: ReturnType<typeof signal>;
+    loadMyOffices: jasmine.Spy;
+  };
   let translate: TranslateService;
 
   const mockOffice: IOfficeAll = {
@@ -151,13 +157,11 @@ describe('InvoiceListComponent', () => {
     },
   ];
 
-  let officeList$: BehaviorSubject<any>;
   let invoiceList$: BehaviorSubject<any>;
   let paymentOptions$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    officeList$ = new BehaviorSubject(undefined);
     invoiceList$ = new BehaviorSubject(undefined);
     paymentOptions$ = new BehaviorSubject(paymentOptions);
     breakpoint$ = new BehaviorSubject<any>({
@@ -174,6 +178,10 @@ describe('InvoiceListComponent', () => {
     driveAccessServiceSpy = jasmine.createSpyObj('DriveAccessService', ['requestAccessIfNeeded']);
     paymentServiceSpy = jasmine.createSpyObj('PaymentService', ['getPaymentOptions']);
     paymentServiceSpy.getPaymentOptions.and.returnValue(new BehaviorSubject(paymentOptions).asObservable());
+    officeStoreSpy = {
+      data: signal<any>(undefined),
+      loadMyOffices: jasmine.createSpy('loadMyOffices'),
+    };
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
@@ -187,10 +195,8 @@ describe('InvoiceListComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return officeList$.asObservable();
-        case 2:
           return invoiceList$.asObservable();
-        case 3:
+        case 2:
           return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -203,6 +209,7 @@ describe('InvoiceListComponent', () => {
       imports: [InvoiceListComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
+        { provide: OfficeStore, useValue: officeStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Router, useValue: routerSpy },
@@ -240,7 +247,6 @@ describe('InvoiceListComponent', () => {
   });
 
   afterEach(() => {
-    officeList$.complete();
     invoiceList$.complete();
     paymentOptions$.complete();
     breakpoint$.complete();
@@ -484,7 +490,7 @@ describe('InvoiceListComponent', () => {
 
   it('should auto-select office when only one office is available', () => {
     const singleOffice = [mockOffice];
-    officeList$.next(singleOffice);
+    officeStoreSpy.data.set({ kind: 'list', value: singleOffice });
     fixture.detectChanges();
 
     expect(component.getForm.office.value).toBe(mockOffice);
@@ -499,7 +505,10 @@ describe('InvoiceListComponent', () => {
   });
 
   it('should filter office correctly using filteredOfficeSignal', () => {
-    officeList$.next([mockOffice, { id: '2', name: 'Another Office', manager: { id: '1', displayName: 'Officer' } }]);
+    officeStoreSpy.data.set({
+      kind: 'list',
+      value: [mockOffice, { id: '2', name: 'Another Office', manager: { id: '1', displayName: 'Officer' } }],
+    });
     (component.getForm.office as any).setValue('A');
     fixture.detectChanges();
 

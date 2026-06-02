@@ -1,16 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AddDiscountDialogComponent } from './add-discount-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MockStore, provideMockStore } from '@ngrx/store/testing';
-import { cleanDiscount, getUserDiscountByCustomerId } from '../../store/actions/discount.actions';
-import { DiscountState } from '../../store/reducers/discount.reducers';
 import { TranslateModule } from '@ngx-translate/core';
+import { signal } from '@angular/core';
+import { DiscountStore } from '../../store/discount.store';
 
 describe('AddDiscountDialogComponent', () => {
   let component: AddDiscountDialogComponent;
   let fixture: ComponentFixture<AddDiscountDialogComponent>;
-  let store: MockStore<DiscountState>;
   let dialogRef: jasmine.SpyObj<MatDialogRef<AddDiscountDialogComponent>>;
+  let discountStoreSpy: {
+    data: ReturnType<typeof signal>;
+    clean: jasmine.Spy;
+    loadUserDiscounts: jasmine.Spy;
+  };
 
   const dialogData = {
     customerId: 'customer-123',
@@ -18,6 +21,11 @@ describe('AddDiscountDialogComponent', () => {
 
   beforeEach(async () => {
     dialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
+    discountStoreSpy = {
+      data: signal<any>(undefined),
+      clean: jasmine.createSpy('clean'),
+      loadUserDiscounts: jasmine.createSpy('loadUserDiscounts'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [
@@ -25,7 +33,7 @@ describe('AddDiscountDialogComponent', () => {
         TranslateModule.forRoot(),
       ],
       providers: [
-        provideMockStore(),
+        { provide: DiscountStore, useValue: discountStoreSpy },
         {
           provide: MAT_DIALOG_DATA,
           useValue: dialogData,
@@ -36,9 +44,6 @@ describe('AddDiscountDialogComponent', () => {
         },
       ],
     }).compileComponents();
-
-    store = TestBed.inject(MockStore);
-    spyOn(store, 'dispatch');
 
     fixture = TestBed.createComponent(AddDiscountDialogComponent);
     component = fixture.componentInstance;
@@ -60,9 +65,9 @@ describe('AddDiscountDialogComponent', () => {
     expect(component.customerId()).toBe('customer-123');
   });
 
-  it('should dispatch cleanDiscount and getUserDiscountByCustomerId on init', () => {
-    expect(store.dispatch).toHaveBeenCalledWith(cleanDiscount());
-    expect(store.dispatch).toHaveBeenCalledWith(getUserDiscountByCustomerId({ customerId: 'customer-123' }));
+  it('should load user discounts on init', () => {
+    expect(discountStoreSpy.clean).toHaveBeenCalled();
+    expect(discountStoreSpy.loadUserDiscounts).toHaveBeenCalledWith('customer-123');
   });
 
   it('onNoClick should close the dialog without data', () => {

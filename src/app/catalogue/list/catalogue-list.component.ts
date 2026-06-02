@@ -56,7 +56,7 @@ export class CatalogueListComponent {
   }
 
   finish(): void {
-    this.catalogueStore.updateOrder(this.catalogues());
+    this.catalogueStore.sort(this.catalogues());
   }
 
   edit(selected: ICatalogueAll): void {

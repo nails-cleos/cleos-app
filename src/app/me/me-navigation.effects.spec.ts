@@ -8,7 +8,6 @@ import { Action } from '@ngrx/store';
 import { ReplaySubject, firstValueFrom } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
 import { OverviewComponent } from '../user/overview/overview.component';
-import { cleanDiscount, getMyReferrals } from '../store/actions/discount.actions';
 import { cleanPayment, getOptions, setPaymentResultParams } from '../store/actions/payment.actions';
 import {
   cleanReservation,
@@ -69,13 +68,10 @@ describe('MeNavigationEffects', () => {
     actions$.next(routerNavigated(ReferralsComponent));
 
     const result = await firstValueFrom(
-      effects.loadReferralsPage$.pipe(take(2), toArray()),
+      effects.loadReferralsPage$.pipe(take(0), toArray()),
     );
 
-    expect(result).toEqual([
-      cleanDiscount(),
-      getMyReferrals(),
-    ]);
+    expect(result).toEqual([]);
   });
 
   it('should clean payments on the me resource payment page', async () => {
@@ -205,10 +201,10 @@ describe('MeNavigationEffects', () => {
     actions$.next(routerNavigated(MeDiscountComponent));
 
     const result = await firstValueFrom(
-      effects.loadDiscountsPage$.pipe(take(1), toArray()),
+      effects.loadDiscountsPage$.pipe(take(0), toArray()),
     );
 
-    expect(result).toEqual([cleanDiscount()]);
+    expect(result).toEqual([]);
   });
 
   it('should load options for the direct me payment page', async () => {

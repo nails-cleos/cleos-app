@@ -1,26 +1,30 @@
+import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject } from 'rxjs';
 
-import { OfficeComponent } from './office.component';
-import { getOffice } from '../store/actions/office.actions';
 import { IOfficeAll } from '../interfaces/office';
-import { IUser, IUserAll } from '../interfaces/user';
 import { Role } from '../interfaces/token';
-import { OfficeState } from '../store/reducers/office.reducers';
+import { IUser, IUserAll } from '../interfaces/user';
+import { NavigationService } from '../services/navigation.service';
+import { OfficeStore } from '../store/office.store';
+import { OfficeComponent } from './office.component';
 
 describe('OfficeComponent', () => {
   let component: OfficeComponent;
   let fixture: ComponentFixture<OfficeComponent>;
 
-  let storeSpy: jasmine.SpyObj<Store<OfficeState>>;
+  let officeStoreSpy: {
+    selected: ReturnType<typeof signal>;
+    managers: ReturnType<typeof signal>;
+    subErrors: ReturnType<typeof signal>;
+    clean: jasmine.Spy;
+    loadManagers: jasmine.Spy;
+    loadById: jasmine.Spy;
+    create: jasmine.Spy;
+    update: jasmine.Spy;
+  };
   let navigateSpy: jasmine.Spy;
-
-  let selectedOffice$: BehaviorSubject<any>;
-  let allManagers$: BehaviorSubject<any>;
-  let subErrors$: BehaviorSubject<any>;
 
   const mockManager: Partial<IUser> = {
     id: 'mgr-1',
@@ -33,35 +37,25 @@ describe('OfficeComponent', () => {
   };
 
   beforeEach(async () => {
-    selectedOffice$ = new BehaviorSubject<any>(undefined);
-    allManagers$ = new BehaviorSubject<any>(undefined);
-    subErrors$ = new BehaviorSubject<any>(undefined);
-
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return selectedOffice$.asObservable();
-        case 2:
-          return allManagers$.asObservable();
-        case 3:
-          return subErrors$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
+    officeStoreSpy = {
+      selected: signal<any>(undefined),
+      managers: signal<any>(undefined),
+      subErrors: signal<any>(undefined),
+      clean: jasmine.createSpy('clean'),
+      loadManagers: jasmine.createSpy('loadManagers'),
+      loadById: jasmine.createSpy('loadById'),
+      create: jasmine.createSpy('create'),
+      update: jasmine.createSpy('update'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [OfficeComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: OfficeStore, useValue: officeStoreSpy },
+        { provide: NavigationService, useValue: jasmine.createSpyObj('NavigationService', ['back']) },
       ],
     }).compileComponents();
 
-    // Spy router.navigate
     const router = TestBed.inject(Router);
     navigateSpy = spyOn(router, 'navigate');
 
@@ -77,16 +71,16 @@ describe('OfficeComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should dispatch getOffice when officeId emits a value', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should load office when officeId emits a value', () => {
+    officeStoreSpy.loadById.calls.reset();
     fixture.componentRef.setInput('id', '123');
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getOffice({ id: '123' }));
+    expect(officeStoreSpy.loadById).toHaveBeenCalledWith('123');
   });
 
   it('should patch form when selectedOffice emits', () => {
-    selectedOffice$.next(mockOffice);
+    officeStoreSpy.selected.set(mockOffice);
     fixture.detectChanges();
 
     const officeSignalValue: any = component.officeSignal();
@@ -98,7 +92,7 @@ describe('OfficeComponent', () => {
       { field: 'name', message: 'Name required' },
     ];
 
-    subErrors$.next(errors);
+    officeStoreSpy.subErrors.set(errors);
     fixture.detectChanges();
 
     const errs = component.errors();
@@ -106,68 +100,55 @@ describe('OfficeComponent', () => {
     expect(component.getForm.name.hasError('incorrect')).toBeTrue();
   });
 
-  it('should not dispatch when form invalid on submit', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should not call store when form invalid on submit', () => {
+    officeStoreSpy.create.calls.reset();
+    officeStoreSpy.update.calls.reset();
 
-    // ensure form invalid
-    (component.getForm.name as any).setValue(undefined);
+    component.getForm.name.setValue('');
     fixture.detectChanges();
 
     component.submit();
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(officeStoreSpy.create).not.toHaveBeenCalled();
+    expect(officeStoreSpy.update).not.toHaveBeenCalled();
   });
 
-  it('should dispatch createOffice when in add mode and form valid', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should call create when in add mode and form valid', () => {
+    officeStoreSpy.create.calls.reset();
 
-    const nameControl = component.getForm.name;
-    nameControl.setValue('New Office');
-    nameControl.markAsDirty();
-    const managerControl = component.getForm.manager;
-    managerControl.setValue(mockManager);
-    managerControl.markAsDirty();
+    component.getForm.name.setValue('New Office');
+    component.getForm.name.markAsDirty();
+    component.getForm.manager.setValue(mockManager as IUser);
+    component.getForm.manager.markAsDirty();
 
     component.submit();
 
     expect(component.form.valid).toBeTrue();
-    const dispatched = storeSpy.dispatch.calls.mostRecent().args[0];
-    expect(dispatched).toEqual(jasmine.objectContaining({
-      office: jasmine.objectContaining({
-        name: 'New Office',
-        managerId: mockManager.id,
-      }),
-      type: '[Office] Create office',
+    expect(officeStoreSpy.create).toHaveBeenCalledWith(jasmine.objectContaining({
+      name: 'New Office',
+      managerId: mockManager.id,
     }));
   });
 
-  it('should dispatch updateOffice when in edit mode and form valid', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should call update when in edit mode and form valid', () => {
+    officeStoreSpy.update.calls.reset();
 
     fixture.componentRef.setInput('id', 'abc-123');
     fixture.detectChanges();
-    selectedOffice$.next(mockOffice);
+    officeStoreSpy.selected.set(mockOffice);
     fixture.detectChanges();
 
-    const nameControl = component.getForm.name;
-    nameControl.setValue('Updated Office');
-    nameControl.markAsDirty();
-    const subjectControl = component.getForm.subject;
-    subjectControl.setValue('Updated subject');
-    subjectControl.markAsDirty();
+    component.getForm.name.setValue('Updated Office');
+    component.getForm.name.markAsDirty();
+    component.getForm.subject.setValue('Updated subject');
+    component.getForm.subject.markAsDirty();
 
     component.submit();
 
     expect(component.form.valid).toBeTrue();
-    const dispatched = storeSpy.dispatch.calls.mostRecent().args[0];
-
-    expect(dispatched).toEqual(jasmine.objectContaining({
-      id: 'abc-123',
-      office: jasmine.objectContaining({
-        subject: 'Updated subject',
-        name: 'Updated Office',
-      }),
-      type: '[Office] Update office by id',
+    expect(officeStoreSpy.update).toHaveBeenCalledWith('abc-123', jasmine.objectContaining({
+      subject: 'Updated subject',
+      name: 'Updated Office',
     }));
   });
 

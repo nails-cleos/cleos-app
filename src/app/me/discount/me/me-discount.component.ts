@@ -5,14 +5,10 @@ import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { Store } from '@ngrx/store';
-import { cleanDiscount, getMyDiscountsPage } from '../../../store/actions/discount.actions';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { currencySymbol } from '../../../util/helper';
-import { getDiscountResponsePipe, getMyDiscountPaginationPipe } from '../../../store/selectors/discount.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { DiscountState } from '../../../store/reducers/discount.reducers';
 import { FirebaseService } from '../../../services/firebase.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatIconButton } from '@angular/material/button';
@@ -35,6 +31,7 @@ import {
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatSuffix } from '@angular/material/input';
+import { DiscountStore } from '../../../store/discount.store';
 
 @Component({
   selector: 'app-me-discount',
@@ -48,21 +45,22 @@ import { MatSuffix } from '@angular/material/input';
 })
 export class MeDiscountComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<DiscountState> = inject(Store<DiscountState>);
+  private readonly discountStore = inject(DiscountStore);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly router: Router = inject(Router);
   private readonly firebaseService = inject(FirebaseService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private discountList$ = this.store.pipe(getMyDiscountPaginationPipe);
-  private response$ = this.store.pipe(getDiscountResponsePipe);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
   private tableState = createMatTableState(this.paginator, this.sort, 'discountCustomer.name', 'asc');
 
-  private discountListSignal = toSignal(this.discountList$);
-  private responseSignal = toSignal(this.response$);
+  private discountListSignal = computed(() => {
+    const data = this.discountStore.data();
+    return data?.kind === 'pagination' ? data.value : undefined;
+  });
+  private responseSignal = this.discountStore.response;
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -105,16 +103,28 @@ export class MeDiscountComponent {
       // eslint-disable-next-line camelcase
       firebase_screen_class: 'ReferralsComponent',
     });
+    this.discountStore.clean();
     effect(() => {
       const request = this.tableState.baseRequest();
-      this.store.dispatch(
-        getMyDiscountsPage({
-          ...request,
-          size: this.pageSizeSignal(),
-        }),
-      );
+      this.discountStore.loadMyPage({ ...request, size: this.pageSizeSignal() });
     });
-    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanDiscount()));
+    effect(() => {
+      const response = this.responseSignal();
+      if (!response) {
+        return;
+      }
+
+      const currentPage = this.paginatorPageIndex();
+      this.discountStore.clearResponse();
+
+      if (currentPage === 0) {
+        const request = this.tableState.baseRequest();
+        this.discountStore.loadMyPage({ ...request, page: 0, size: this.pageSizeSignal() });
+        return;
+      }
+
+      this.tableState.resetPage();
+    });
   }
 
   useDiscount = (discount: IUserDiscount): void => {

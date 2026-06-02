@@ -204,7 +204,7 @@ export const CatalogueStore = signalStore(
       });
     },
 
-    updateOrder(catalogues: ICatalogueAll[]): void {
+    sort(catalogues: ICatalogueAll[]): void {
       patchState(store, {
         data: [{} as ICatalogueAll, {} as ICatalogueAll, {} as ICatalogueAll],
         response: undefined,

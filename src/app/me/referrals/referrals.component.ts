@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal, WritableSignal } from '@angular/core';
-import { Store } from '@ngrx/store';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
@@ -7,12 +6,10 @@ import { AuthUserService } from '../../services/auth-user.service';
 import { ToastService } from '../../services/toast.service';
 import { BottomSheetShareComponent } from './bottom-sheet-share.component';
 import { BottomSheetReferralComponent } from './bottom-sheet-referral.component';
-import { getReferralsPipe } from '../../store/selectors/discount.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { DiscountState } from '../../store/reducers/discount.reducers';
 import { FirebaseService } from '../../services/firebase.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
+import { DiscountStore } from '../../store/discount.store';
 
 @Component({
   selector: 'app-referrals',
@@ -22,7 +19,7 @@ import { MatButton } from '@angular/material/button';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReferralsComponent {
-  private readonly store: Store<DiscountState> = inject(Store<DiscountState>);
+  private readonly discountStore = inject(DiscountStore);
   private readonly clipboard: Clipboard = inject(Clipboard);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly translate: TranslateService = inject(TranslateService);
@@ -30,9 +27,7 @@ export class ReferralsComponent {
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly firebaseService = inject(FirebaseService);
 
-  private referrals$ = this.store.pipe(getReferralsPipe);
-
-  private referralsSignal = toSignal(this.referrals$);
+  private referralsSignal = this.discountStore.referrals;
   private authUserSignal = this.authUserService.authUser;
 
   private referralMax: WritableSignal<number | undefined> = signal(undefined);
@@ -51,6 +46,8 @@ export class ReferralsComponent {
       // eslint-disable-next-line camelcase
       firebase_screen_class: 'ReferralsComponent',
     });
+    this.discountStore.clean();
+    this.discountStore.loadReferrals();
 
     effect(() => {
       const referrals = this.referralsSignal();

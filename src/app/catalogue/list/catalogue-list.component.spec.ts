@@ -24,7 +24,7 @@ describe('CatalogueListComponent', () => {
     clean: jasmine.Spy;
     clearResponse: jasmine.Spy;
     loadAllCatalogues: jasmine.Spy;
-    updateOrder: jasmine.Spy;
+    sort: jasmine.Spy;
     delete: jasmine.Spy;
   };
 
@@ -63,7 +63,7 @@ describe('CatalogueListComponent', () => {
       clean: jasmine.createSpy('clean'),
       clearResponse: jasmine.createSpy('clearResponse'),
       loadAllCatalogues: jasmine.createSpy('loadAllCatalogues'),
-      updateOrder: jasmine.createSpy('updateOrder'),
+      sort: jasmine.createSpy('sort'),
       delete: jasmine.createSpy('delete'),
     };
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -123,7 +123,7 @@ describe('CatalogueListComponent', () => {
     fixture.detectChanges();
 
     component.finish();
-    expect(catalogueStoreSpy.updateOrder).toHaveBeenCalledWith(component.catalogues());
+    expect(catalogueStoreSpy.sort).toHaveBeenCalledWith(component.catalogues());
   });
 
   it('should handle drag and drop correctly', () => {

@@ -11,11 +11,11 @@ import { getExpense } from '../../../store/actions/expense.actions';
 import { getNowTimeZone } from '../../../util/dates';
 import { computed, signal } from '@angular/core';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
-import { callAwsLambda } from '../../../store/actions/aws.actions';
 import { DriveAccessService } from '../../../services/drive-access.service';
 import { EnvService } from '../../../services/env.service';
 import { TokenService } from '../../../services/token.service';
 import { provideAppDateAdapter } from '../../../util/adapter/app-date.provider';
+import { AwsStore } from '../../../store/aws.store';
 
 describe('ExpenseComponent', () => {
   let component: ExpenseComponent;
@@ -25,12 +25,12 @@ describe('ExpenseComponent', () => {
   let navigateSpy: jasmine.Spy;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
+  let awsStoreSpy: { data: ReturnType<typeof signal>; processPdf: jasmine.Spy };
 
   let selectedExpense$: BehaviorSubject<any>;
   let info$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
   let response$: BehaviorSubject<any>;
-  let aws$: BehaviorSubject<any>;
 
   let env: EnvService;
 
@@ -63,7 +63,6 @@ describe('ExpenseComponent', () => {
     info$ = new BehaviorSubject<any>(undefined);
     subErrors$ = new BehaviorSubject<any>(undefined);
     response$ = new BehaviorSubject<any>(undefined);
-    aws$ = new BehaviorSubject<any>(undefined);
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -72,6 +71,7 @@ describe('ExpenseComponent', () => {
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     driveAccessServiceSpy = jasmine.createSpyObj<DriveAccessService>('DriveAccessService', ['requestAccessIfNeeded']);
+    awsStoreSpy = { data: signal<any>(undefined), processPdf: jasmine.createSpy('processPdf') };
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
     });
@@ -88,8 +88,6 @@ describe('ExpenseComponent', () => {
           return subErrors$.asObservable();
         case 4:
           return response$.asObservable();
-        case 5:
-          return aws$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -102,6 +100,7 @@ describe('ExpenseComponent', () => {
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
         { provide: TokenService, useValue: tokenServiceMock },
+        { provide: AwsStore, useValue: awsStoreSpy },
         provideAppDateAdapter(),
       ],
     }).compileComponents();
@@ -327,8 +326,8 @@ describe('ExpenseComponent', () => {
     component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: mockFile });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch)
-      .toHaveBeenCalledWith(callAwsLambda({ token: 'token', file: mockFile, userId: 'user-123' }));
+    expect(awsStoreSpy.processPdf)
+      .toHaveBeenCalledWith('token', mockFile, 'user-123');
   });
 
 
@@ -338,8 +337,7 @@ describe('ExpenseComponent', () => {
     component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: mockFile });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).not
-      .toHaveBeenCalledWith(callAwsLambda({ token: 'token', file: mockFile, userId: 'user-123' }));
+    expect(awsStoreSpy.processPdf).not.toHaveBeenCalled();
   });
 
   it('should set full aws data', () => {
@@ -351,7 +349,7 @@ describe('ExpenseComponent', () => {
       SUBTOTAL: '€ 100.00',
       TAX: '€ 21',
     };
-    aws$.next(awsData);
+    awsStoreSpy.data.set(awsData);
     fixture.detectChanges();
 
     expect(component.getForm.supplyStore.value).toEqual({ id: '', name: awsData.VENDOR_NAME });
@@ -372,7 +370,7 @@ describe('ExpenseComponent', () => {
     };
 
     info$.next({ supplyStores: mockSuppliers });
-    aws$.next(awsData);
+    awsStoreSpy.data.set(awsData);
     fixture.detectChanges();
 
     expect(component.getForm.supplyStore.value).toEqual(mockSuppliers[0]);

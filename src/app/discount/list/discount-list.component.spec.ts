@@ -1,25 +1,33 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject, of } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { IDiscount } from '../../interfaces/discount';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { deleteDiscount, discountSelected, getDiscountsPage } from '../../store/actions/discount.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { DiscountListComponent } from './discount-list.component';
-import { DiscountState } from '../../store/reducers/discount.reducers';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { DiscountStore } from '../../store/discount.store';
 
 describe('DiscountListComponent', () => {
   let component: DiscountListComponent;
   let fixture: ComponentFixture<DiscountListComponent>;
-  let storeSpy: jasmine.SpyObj<Store<DiscountState>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let routerSpy: jasmine.SpyObj<Router>;
   let translate: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let discountStoreSpy: {
+    data: ReturnType<typeof signal>;
+    response: ReturnType<typeof signal>;
+    clean: jasmine.Spy;
+    clearResponse: jasmine.Spy;
+    loadPage: jasmine.Spy;
+    delete: jasmine.Spy;
+    sendToCustomers: jasmine.Spy;
+  };
 
   const mockDiscount: IDiscount[] = [
     { id: '1', name: 'Discount 1', description: 'Desc 1' },
@@ -31,13 +39,9 @@ describe('DiscountListComponent', () => {
     totalElements: 2,
   };
 
-  let discountList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    discountList$ = new BehaviorSubject(mockPagination);
-    response$ = new BehaviorSubject<any>(undefined);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -46,9 +50,18 @@ describe('DiscountListComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    discountStoreSpy = {
+      data: signal<any>({ kind: 'paginationDiscount', value: mockPagination }),
+      response: signal<any>(undefined),
+      clean: jasmine.createSpy('clean'),
+      clearResponse: jasmine.createSpy('clearResponse'),
+      loadPage: jasmine.createSpy('loadPage'),
+      delete: jasmine.createSpy('delete'),
+      sendToCustomers: jasmine.createSpy('sendToCustomers'),
+    };
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
@@ -56,44 +69,29 @@ describe('DiscountListComponent', () => {
       },
     });
 
-    // Define order of .pipe() calls
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return discountList$.asObservable();
-        case 2:
-          return response$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [DiscountListComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: DiscountStore, useValue: discountStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MatDialog, useValue: dialogSpy },
+        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(DiscountListComponent);
-    component = fixture.componentInstance;
-
     translate = TestBed.inject(TranslateService);
     translate.use('en-GB');
+
+    fixture = TestBed.createComponent(DiscountListComponent);
+    component = fixture.componentInstance;
 
     fixture.detectChanges();
   });
 
   afterEach(() => {
-    discountList$.complete();
-    response$.complete();
     breakpoint$.complete();
   });
 
@@ -102,7 +100,7 @@ describe('DiscountListComponent', () => {
   });
 
   it('should compute dataSourceSignal correctly', () => {
-    discountList$.next(mockPagination);
+    discountStoreSpy.data.set({ kind: 'paginationDiscount', value: mockPagination });
     fixture.detectChanges();
 
     const data = component.dataSourceSignal() as any;
@@ -110,7 +108,7 @@ describe('DiscountListComponent', () => {
   });
 
   it('should compute resultsLengthSignal correctly', () => {
-    discountList$.next(mockPagination);
+    discountStoreSpy.data.set({ kind: 'paginationDiscount', value: mockPagination });
     fixture.detectChanges();
 
     expect(component.resultsLengthSignal()).toBe(2);
@@ -143,46 +141,46 @@ describe('DiscountListComponent', () => {
   });
 
   it('should dispatch getDiscountPage when paginatorPageIndex changes', () => {
+    discountStoreSpy.loadPage.calls.reset();
     const paginator = component['paginator']();
 
     paginator!.pageIndex = 1;
     paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getDiscountsPage({
-        page: 1,
-        sort: 'name',
-        direction: 'asc',
-        size: PAGE_SIZE,
-      }),
-    );
+    expect(discountStoreSpy.loadPage).toHaveBeenCalledWith({
+      page: 1,
+      sort: 'name',
+      direction: 'asc',
+      size: PAGE_SIZE,
+    });
   });
 
   it('should dispatch clean and reset paginator when responseSignal emits', () => {
     const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
 
     component['paginator'] = signal(paginatorMock);
+    discountStoreSpy.clearResponse.calls.reset();
+    discountStoreSpy.loadPage.calls.reset();
 
-    response$.next({ success: true });
+    discountStoreSpy.response.set({ success: true });
 
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getDiscountsPage({
-        page: 0,
-        sort: 'name',
-        direction: 'asc',
-        size: PAGE_SIZE,
-      }),
-    );
+    expect(discountStoreSpy.clearResponse).toHaveBeenCalled();
+    expect(discountStoreSpy.loadPage).toHaveBeenCalledWith({
+      page: 0,
+      sort: 'name',
+      direction: 'asc',
+      size: PAGE_SIZE,
+    });
   });
 
   it('should dispatch discountSelected when edit is called', () => {
     const item = mockDiscount[0];
     component.edit(item);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(discountSelected({ selected: item }));
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'discounts', item.id]);
   });
 
   it('should dispatch deleteDiscount when dialog returns a result', () => {
@@ -193,6 +191,6 @@ describe('DiscountListComponent', () => {
 
     component.delete(item);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteDiscount({ id: item.id!, name: item.name! }));
+    expect(discountStoreSpy.delete).toHaveBeenCalledWith(item.id!, item.name!);
   });
 });

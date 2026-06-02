@@ -9,6 +9,7 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatDialog } from '@angular/material/dialog';
 import { Price } from '../../../interfaces/treatment';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
+import { DiscountStore } from '../../../store/discount.store';
 
 describe('ReservationListComponent', () => {
   let component: ReservationListComponent;
@@ -18,6 +19,7 @@ describe('ReservationListComponent', () => {
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let discountStoreSpy: { clean: jasmine.Spy };
 
   let customerReservation$: BehaviorSubject<any>;
   let response$: BehaviorSubject<any>;
@@ -41,6 +43,7 @@ describe('ReservationListComponent', () => {
     });
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
+    discountStoreSpy = { clean: jasmine.createSpy('clean') };
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
@@ -66,6 +69,7 @@ describe('ReservationListComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: MatDialog, useValue: dialogSpy },
+        { provide: DiscountStore, useValue: discountStoreSpy },
         provideRouter([]),
       ],
     }).compileComponents();
@@ -210,17 +214,11 @@ describe('ReservationListComponent', () => {
     expect(component.noContent()).toBe(false);
   });
 
-  it('should dispatch cleanDiscount when response emits', () => {
-    storeSpy.dispatch.calls.reset();
-
+  it('should reset discount store when response emits', () => {
     response$.next({ success: true });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      jasmine.objectContaining({
-        type: '[Discount] Clean',
-      }),
-    );
+    expect(discountStoreSpy.clean).toHaveBeenCalled();
   });
 
   it('should show error when errorSignal emits', () => {

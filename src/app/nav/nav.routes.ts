@@ -6,12 +6,9 @@ import { NotificationEffects } from '../store/effects/notification.effects';
 import { UserEffects } from '../store/effects/user.effects';
 import { RoomEffects } from '../store/effects/room.effects';
 import { TreatmentEffects } from '../store/effects/treatment.effects';
-import { DiscountEffects } from '../store/effects/discount.effects';
 import { UnavailableEffects } from '../store/effects/unavailable.effects';
 import { ReservationEffects } from '../store/effects/reservation.effects';
 import { PaymentEffects } from '../store/effects/payment.effects';
-import { AdditionalEffects } from '../store/effects/additional.effects';
-import { OfficeEffects } from '../store/effects/office.effects';
 import { ExpenseEffects } from '../store/effects/expense.effects';
 import { NoteEffects } from '../store/effects/note.effects';
 import { AccountEffects } from '../store/effects/account.effects';
@@ -24,12 +21,9 @@ import { NOTIFICATION_FEATURE_KEY, notificationReducer } from '../store/reducers
 import { USER_FEATURE_KEY, userReducer } from '../store/reducers/user.reducers';
 import { ROOM_FEATURE_KEY, roomReducer } from '../store/reducers/room.reducers';
 import { TREATMENT_FEATURE_KEY, treatmentReducer } from '../store/reducers/treatment.reducers';
-import { DISCOUNT_FEATURE_KEY, discountReducer } from '../store/reducers/discount.reducers';
 import { UNAVAILABLE_FEATURE_KEY, unavailableReducer } from '../store/reducers/unavailable.reducers';
 import { RESERVATION_FEATURE_KEY, reservationReducer } from '../store/reducers/reservation.reducers';
 import { PAYMENT_FEATURE_KEY, paymentReducer } from '../store/reducers/payment.reducers';
-import { ADDITIONAL_FEATURE_KEY, additionalReducer } from '../store/reducers/additional.reducers';
-import { OFFICE_FEATURE_KEY, officeReducer } from '../store/reducers/office.reducers';
 import { EXPENSE_FEATURE_KEY, expenseReducer } from '../store/reducers/expense.reducers';
 import { NOTE_FEATURE_KEY, noteReducer } from '../store/reducers/note.reducers';
 import { ACCOUNT_FEATURE_KEY, accountReducer } from '../store/reducers/account.reducers';
@@ -48,19 +42,21 @@ import { ExpenseService } from '../services/expense.service';
 import { NoteService } from '../services/note.service';
 import { AccountService } from '../services/account.service';
 import { TrackingService } from '../services/tracking.service';
-import { AWS_FEATURE_KEY, awsReducer } from '../store/reducers/aws.reducers';
 import { AwsLambdaService } from '../services/aws-lambda.service';
 import { INVOICE_FEATURE_KEY, invoiceReducer } from '../store/reducers/invoice.reducers';
 import { DocumentService } from '../services/document.service';
 import { StatementService } from '../services/statement.service';
 import { InvoiceService } from '../services/invoice.service';
 import { InvoiceEffects } from '../store/effects/invoice.effects';
-import { AwsEffects } from '../store/effects/aws.effects';
 import { CatalogueStore } from '../store/catalogue.store';
 import { ColorStore } from '../store/color.store';
 import { CurrencyStore } from '../store/currency.store';
 import { DocumentStore } from '../store/document.store';
 import { StatementStore } from '../store/statement.store';
+import { DiscountStore } from '../store/discount.store';
+import { AwsStore } from '../store/aws.store';
+import { AdditionalStore } from '../store/additional.store';
+import { OfficeStore } from '../store/office.store';
 import { provideGlobalFeedbackSource } from '../store/global-feedback-source';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
@@ -88,11 +84,18 @@ const providers = [
   CurrencyStore,
   DocumentStore,
   StatementStore,
+  DiscountStore,
+  AwsStore,
+  AdditionalStore,
+  OfficeStore,
   provideGlobalFeedbackSource(CatalogueStore),
   provideGlobalFeedbackSource(ColorStore),
   provideGlobalFeedbackSource(CurrencyStore),
   provideGlobalFeedbackSource(DocumentStore),
   provideGlobalFeedbackSource(StatementStore),
+  provideGlobalFeedbackSource(DiscountStore),
+  provideGlobalFeedbackSource(AdditionalStore),
+  provideGlobalFeedbackSource(OfficeStore),
   TrackingService,
   AwsLambdaService,
   DocumentService,
@@ -103,16 +106,12 @@ const providers = [
   provideState(USER_FEATURE_KEY, userReducer),
   provideState(ROOM_FEATURE_KEY, roomReducer),
   provideState(TREATMENT_FEATURE_KEY, treatmentReducer),
-  provideState(DISCOUNT_FEATURE_KEY, discountReducer),
   provideState(UNAVAILABLE_FEATURE_KEY, unavailableReducer),
   provideState(RESERVATION_FEATURE_KEY, reservationReducer),
   provideState(PAYMENT_FEATURE_KEY, paymentReducer),
-  provideState(ADDITIONAL_FEATURE_KEY, additionalReducer),
-  provideState(OFFICE_FEATURE_KEY, officeReducer),
   provideState(EXPENSE_FEATURE_KEY, expenseReducer),
   provideState(NOTE_FEATURE_KEY, noteReducer),
   provideState(ACCOUNT_FEATURE_KEY, accountReducer),
-  provideState(AWS_FEATURE_KEY, awsReducer),
   provideState(INVOICE_FEATURE_KEY, invoiceReducer),
   provideEffects(
     LoginEffects,
@@ -120,16 +119,12 @@ const providers = [
     UserEffects,
     RoomEffects,
     TreatmentEffects,
-    DiscountEffects,
     UnavailableEffects,
     ReservationEffects,
     PaymentEffects,
-    AdditionalEffects,
-    OfficeEffects,
     ExpenseEffects,
     NoteEffects,
     AccountEffects,
-    AwsEffects,
     InvoiceEffects,
   ),
 ];

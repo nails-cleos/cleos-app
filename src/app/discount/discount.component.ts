@@ -1,23 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
 import { Discount, DiscountType, IDiscount } from '../interfaces/discount';
-import { createDiscount, getDiscount, updateDiscount } from '../store/actions/discount.actions';
 import { Router } from '@angular/router';
 import { ICurrency } from '../interfaces/currency';
 import { fieldChange, requireMatch, valueChange } from '../util/validators';
 import { map, startWith } from 'rxjs/operators';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import {
-  getCurrenciesPipe,
-  getSelectedDiscountPipe,
-  getSubErrorsPipe,
-} from '../store/selectors/discount.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../interfaces/common';
-import { DiscountState } from '../store/reducers/discount.reducers';
 import { MatError, MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
 import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
@@ -25,6 +17,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { KeyValuePipe } from '@angular/common';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { DiscountStore } from '../store/discount.store';
 
 type DiscountForm = {
   name: FormControl<string>;
@@ -45,17 +38,14 @@ type DiscountForm = {
 export class DiscountComponent {
   id = input<string>();
 
-  private readonly store: Store<DiscountState> = inject(Store<DiscountState>);
+  private readonly discountStore = inject(DiscountStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private selectedDiscount$ = this.store.pipe(getSelectedDiscountPipe);
-  private allCurrencies$ = this.store.pipe(getCurrenciesPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-
-  private selectedDiscountSignal = toSignal(this.selectedDiscount$);
-  private subErrorsSignal = toSignal(this.subErrors$);
+  private selectedDiscountSignal = this.discountStore.selected;
+  private subErrorsSignal = this.discountStore.subErrors;
+  private allCurrenciesSignal = this.discountStore.currencies;
 
   form: FormGroup<DiscountForm> = this.formBuilder.group<DiscountForm>({
     name: this.formBuilder.control('', {
@@ -78,12 +68,13 @@ export class DiscountComponent {
     this.getForm.currency.valueChanges.pipe(
       startWith(''),
       map((value: any) => !value || typeof value === 'string' ? value : value.code),
-      combineLatestWith(this.allCurrencies$),
+      combineLatestWith(toObservable(this.allCurrenciesSignal)),
       map(([name, currencies]) => {
+        const allCurrencies = currencies ?? [];
         if (name) {
-          return this.filterCurrency(name, currencies);
+          return this.filterCurrency(name, allCurrencies);
         } else {
-          return currencies ? currencies.slice() : currencies;
+          return allCurrencies.slice();
         }
       }),
     ),
@@ -97,10 +88,19 @@ export class DiscountComponent {
   types = DiscountType;
 
   constructor() {
+    this.discountStore.clean();
+    this.discountStore.loadCurrencies();
+
     effect(() => {
       const selected = this.selectedDiscountSignal();
       if (selected?.id) {
-        this.form.patchValue(selected);
+        this.form.patchValue({
+          name: selected.name,
+          description: selected.description,
+          amount: selected.amount,
+          type: selected.type as DiscountType | undefined,
+          currency: selected.currency,
+        });
       }
     });
 
@@ -123,7 +123,7 @@ export class DiscountComponent {
     effect(() => {
       const id = this.id();
       if (id) {
-        this.store.dispatch(getDiscount({ id }));
+        this.discountStore.loadById(id);
       }
     });
   }
@@ -147,9 +147,9 @@ export class DiscountComponent {
     const id = this.id();
     if (!id) {
       discount.currencyId = this.getForm.currency.value?.id;
-      this.store.dispatch(createDiscount({ discount }));
+      this.discountStore.create(discount);
     } else {
-      this.store.dispatch(updateDiscount({ id, discount }));
+      this.discountStore.update(id, discount);
     }
   }
 

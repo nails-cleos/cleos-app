@@ -22,7 +22,6 @@ import { TrackingService } from '../services/tracking.service';
 import { TreatmentService } from '../services/treatment.service';
 import { UserService } from '../services/user.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
-import { DiscountEffects } from '../store/effects/discount.effects';
 import { PaymentEffects } from '../store/effects/payment.effects';
 import { ReservationEffects } from '../store/effects/reservation.effects';
 import { RESERVATION_FEATURE_KEY, reservationReducer } from '../store/reducers/reservation.reducers';
@@ -41,7 +40,7 @@ const providers = [
   DiscountService,
   CurrencyService,
   provideState(RESERVATION_FEATURE_KEY, reservationReducer),
-  provideEffects(ReservationEffects, PaymentEffects, DiscountEffects, ReservationNavigationEffects),
+  provideEffects(ReservationEffects, PaymentEffects, ReservationNavigationEffects),
 ];
 
 const children: Routes = [

@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
@@ -12,13 +11,12 @@ import { IOfficeAll } from '../../interfaces/office';
 import { DocumentTypeEnum, IDocument } from '../../interfaces/document';
 import { getDateQuarter, getNowTimeZone, monthViewTitle } from '../../util/dates';
 import { MatDatepicker } from '@angular/material/datepicker';
-import { getAllMyOffices } from '../../store/actions/office.actions';
 import { DocumentStore } from '../../store/document.store';
+import { OfficeStore } from '../../store/office.store';
 
 describe('DocumentListComponent', () => {
   let component: DocumentListComponent;
   let fixture: ComponentFixture<DocumentListComponent>;
-  let storeSpy: jasmine.SpyObj<Store>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
@@ -30,6 +28,10 @@ describe('DocumentListComponent', () => {
     loadPage: jasmine.Spy;
     download: jasmine.Spy;
     downloadZip: jasmine.Spy;
+  };
+  let officeStoreSpy: {
+    data: ReturnType<typeof signal>;
+    loadMyOffices: jasmine.Spy;
   };
 
   const mockOffice: IOfficeAll = {
@@ -48,15 +50,9 @@ describe('DocumentListComponent', () => {
     totalElements: 2,
   };
 
-  let documentList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
-  let officeList$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    documentList$ = new BehaviorSubject(mockPagination);
-    response$ = new BehaviorSubject<any>(undefined);
-    officeList$ = new BehaviorSubject(undefined);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -65,7 +61,6 @@ describe('DocumentListComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     driveAccessServiceSpy = jasmine.createSpyObj('DriveAccessService', ['requestAccessIfNeeded']);
     documentStoreSpy = {
@@ -77,6 +72,10 @@ describe('DocumentListComponent', () => {
       download: jasmine.createSpy('download'),
       downloadZip: jasmine.createSpy('downloadZip'),
     };
+    officeStoreSpy = {
+      data: signal<any>(undefined),
+      loadMyOffices: jasmine.createSpy('loadMyOffices'),
+    };
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
@@ -84,23 +83,12 @@ describe('DocumentListComponent', () => {
       },
     });
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return officeList$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [DocumentListComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: OfficeStore, useValue: officeStoreSpy },
         { provide: DocumentStore, useValue: documentStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
@@ -115,12 +103,9 @@ describe('DocumentListComponent', () => {
     translate.use('en-GB');
 
     fixture.detectChanges();
-    storeSpy.dispatch.calls.reset();
   });
 
   afterEach(() => {
-    documentList$.complete();
-    response$.complete();
     breakpoint$.complete();
   });
 
@@ -133,12 +118,12 @@ describe('DocumentListComponent', () => {
     freshFixture.detectChanges();
 
     expect(documentStoreSpy.clean).toHaveBeenCalled();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllMyOffices());
+    expect(officeStoreSpy.loadMyOffices).toHaveBeenCalled();
   });
 
   it('should compute dataSourceSignal correctly', () => {
-    officeList$.next([mockOffice]);
-    documentList$.next(mockPagination);
+    officeStoreSpy.data.set({ kind: 'list', value: [mockOffice] });
+    documentStoreSpy.data.set(mockPagination as any);
     fixture.detectChanges();
 
     const data = component.dataSourceSignal() as any;
@@ -146,8 +131,8 @@ describe('DocumentListComponent', () => {
   });
 
   it('should compute resultsLengthSignal correctly', () => {
-    officeList$.next([mockOffice]);
-    documentList$.next(mockPagination);
+    officeStoreSpy.data.set({ kind: 'list', value: [mockOffice] });
+    documentStoreSpy.data.set(mockPagination as any);
     fixture.detectChanges();
 
     expect(component.resultsLengthSignal()).toBe(2);
@@ -182,7 +167,7 @@ describe('DocumentListComponent', () => {
   it('should dispatch getDocumentPage when paginatorPageIndex changes', () => {
     const date = getNowTimeZone();
     component.getForm.date.setValue(date);
-    officeList$.next([mockOffice]);
+    officeStoreSpy.data.set({ kind: 'list', value: [mockOffice] });
     fixture.detectChanges();
     const paginator = component['paginator']();
 
@@ -203,7 +188,7 @@ describe('DocumentListComponent', () => {
   it('should dispatch clean and reset paginator when responseSignal emits', () => {
     const date = getNowTimeZone();
     component.getForm.date.setValue(date);
-    officeList$.next([mockOffice]);
+    officeStoreSpy.data.set({ kind: 'list', value: [mockOffice] });
     fixture.detectChanges();
     const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
 
@@ -233,7 +218,7 @@ describe('DocumentListComponent', () => {
 
   it('should auto-select office when only one office is available', () => {
     const singleOffice = [mockOffice];
-    officeList$.next(singleOffice);
+    officeStoreSpy.data.set({ kind: 'list', value: singleOffice });
     fixture.detectChanges();
 
     expect(component.getForm.office.value).toBe(mockOffice);
@@ -248,7 +233,10 @@ describe('DocumentListComponent', () => {
   });
 
   it('should filter office correctly using filteredOfficeSignal', () => {
-    officeList$.next([mockOffice, { id: '2', name: 'Another Office', manager: { id: '1', displayName: 'Officer' } }]);
+    officeStoreSpy.data.set({
+      kind: 'list',
+      value: [mockOffice, { id: '2', name: 'Another Office', manager: { id: '1', displayName: 'Officer' } }],
+    });
     (component.getForm.office as any).setValue('A');
     fixture.detectChanges();
 
@@ -303,7 +291,7 @@ describe('DocumentListComponent', () => {
     it('should dispatch download zip action', () => {
       const date = new Date(2024, 0, 1);
       component.getForm.date.setValue(date);
-      officeList$.next([mockOffice]);
+      officeStoreSpy.data.set({ kind: 'list', value: [mockOffice] });
       fixture.detectChanges();
 
       component.downloadZip();
@@ -318,7 +306,10 @@ describe('DocumentListComponent', () => {
     it('should not dispatch download zip action if office is not selected', () => {
       const date = new Date(2024, 0, 1);
       component.getForm.date.setValue(date);
-      officeList$.next([mockOffice, { id: '2', name: 'Another Office', manager: { id: '1', displayName: 'Officer' } }]);
+      officeStoreSpy.data.set({
+        kind: 'list',
+        value: [mockOffice, { id: '2', name: 'Another Office', manager: { id: '1', displayName: 'Officer' } }],
+      });
       fixture.detectChanges();
 
       component.downloadZip();
@@ -328,7 +319,7 @@ describe('DocumentListComponent', () => {
 
     it('should not dispatch download zip action if date is not set', () => {
       component.getForm.date.setValue(undefined);
-      officeList$.next([mockOffice]);
+      officeStoreSpy.data.set({ kind: 'list', value: [mockOffice] });
       fixture.detectChanges();
 
       component.downloadZip();

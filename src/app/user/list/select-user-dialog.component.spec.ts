@@ -5,7 +5,6 @@ import { IUserAll } from '../../interfaces/user';
 import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { DiscountState } from '../../store/reducers/discount.reducers';
 import { SelectUserDialogComponent } from './select-user-dialog.component';
 import { Role } from '../../interfaces/token';
 
@@ -15,7 +14,7 @@ describe('SelectUserDialogComponent', () => {
 
   let allUsers$: BehaviorSubject<IUserAll[] | undefined>;
 
-  let storeSpy: jasmine.SpyObj<Store<DiscountState>>;
+  let storeSpy: jasmine.SpyObj<Store>;
   let dialogRefSpy: jasmine.SpyObj<MatDialogRef<SelectUserDialogComponent>>;
 
   const mockUser: IUserAll = {

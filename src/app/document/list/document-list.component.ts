@@ -1,11 +1,10 @@
 import { Component, computed, effect, inject, viewChild } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Store } from '@ngrx/store';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { DriveAccessService } from '../../services/drive-access.service';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -14,10 +13,8 @@ import { IOfficeAll } from '../../interfaces/office';
 import { map, startWith } from 'rxjs/operators';
 import { combineLatestWith } from 'rxjs';
 import { IDocument } from '../../interfaces/document';
-import { OfficeState } from '../../store/reducers/office.reducers';
-import { getAllMyOffices } from '../../store/actions/office.actions';
-import { getMyOfficesPipe } from '../../store/selectors/office.selectors';
 import { DocumentStore } from '../../store/document.store';
+import { OfficeStore } from '../../store/office.store';
 import { MatOption } from '@angular/material/core';
 import { provideYearMonthDateAdapter } from '../../util/adapter/app-date.provider';
 import { getDateQuarter, getNowTimeZone, monthViewTitle } from '../../util/dates';
@@ -69,19 +66,21 @@ export class DocumentListComponent {
   private readonly env: EnvService = inject(EnvService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<OfficeState> = inject(Store<OfficeState>);
+  private readonly officeStore = inject(OfficeStore);
   private readonly documentStore = inject(DocumentStore);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private allOffices$ = this.store.pipe(getMyOfficesPipe);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
   private tableState = createMatTableState(this.paginator, this.sort, 'date', 'desc');
 
-  private allOfficesSignal = toSignal(this.allOffices$);
+  private allOfficesSignal = computed(() => {
+    const data = this.officeStore.data();
+    return data?.kind === 'list' ? data.value : undefined;
+  });
   private dataSignal = this.documentStore.data;
   private responseSignal = this.documentStore.response;
   private breakpointsSignal = toSignal(
@@ -120,10 +119,10 @@ export class DocumentListComponent {
     this.getForm.office.valueChanges.pipe(
       startWith(''),
       map((value: any) => !value || typeof value === 'string' ? value : value.code),
-      combineLatestWith(this.allOffices$),
+      combineLatestWith(toObservable(this.allOfficesSignal)),
       map(([name, offices]) => {
         if (name) {
-          return this.filterOffice(name, offices);
+          return this.filterOffice(name, offices ?? []);
         } else {
           return offices ? offices.slice() : offices;
         }
@@ -136,7 +135,7 @@ export class DocumentListComponent {
 
   constructor() {
     this.documentStore.clean();
-    this.store.dispatch(getAllMyOffices());
+    this.officeStore.loadMyOffices();
 
     effect(() => {
       const officeId = this.selectedOffice()?.id;

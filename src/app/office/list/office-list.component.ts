@@ -6,12 +6,8 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { IOffice } from '../../interfaces/office';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { cleanOffice, deleteOffice, getOfficesPage, officeSelected } from '../../store/actions/office.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
-import { OfficeState } from '../../store/reducers/office.reducers';
-import { getOfficePaginationPipe, getOfficeResponsePipe } from '../../store/selectors/office.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatIcon } from '@angular/material/icon';
 import { MatIconButton } from '@angular/material/button';
@@ -33,7 +29,8 @@ import {
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { OfficeStore } from '../../store/office.store';
 
 @Component({
   selector: 'app-office-list',
@@ -47,20 +44,22 @@ import { RouterLink } from '@angular/router';
 })
 export class OfficeListComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<OfficeState> = inject(Store<OfficeState>);
+  private readonly officeStore = inject(OfficeStore);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
+  private readonly router = inject(Router);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private officeList$ = this.store.pipe(getOfficePaginationPipe);
-  private response$ = this.store.pipe(getOfficeResponsePipe);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
   private tableState = createMatTableState(this.paginator, this.sort, 'name', 'asc');
 
-  private officeListSignal = toSignal(this.officeList$);
-  private responseSignal = toSignal(this.response$);
+  private officeListSignal = computed(() => {
+    const data = this.officeStore.data();
+    return data?.kind === 'pagination' ? data.value : undefined;
+  });
+  private responseSignal = this.officeStore.response;
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -84,19 +83,20 @@ export class OfficeListComponent {
   language: string = this.translate.getCurrentLang();
 
   constructor() {
+    this.officeStore.clean();
     effect(() => {
       const request = this.tableState.baseRequest();
-      this.store.dispatch(
-        getOfficesPage({
-          ...request,
-          size: this.pageSizeSignal(),
-        }),
-      );
+      this.officeStore.loadPage({
+        ...request,
+        size: this.pageSizeSignal(),
+      });
     });
-    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanOffice()));
+    this.tableState.resetOn(this.responseSignal, () => this.officeStore.clearResponse());
   }
 
-  edit = (selected: IOffice): void => this.store.dispatch(officeSelected({ selected }));
+  edit = (selected: IOffice): void => {
+    void this.router.navigate([this.language, 'offices', selected.id]);
+  };
 
   delete = (office: IOffice): void => {
     const title = this.translate.instant('OFFICE.DELETED.TITLE');
@@ -107,7 +107,7 @@ export class OfficeListComponent {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.store.dispatch(deleteOffice({ id: result.id, name: result.name }));
+        this.officeStore.delete(result.id, result.name);
       }
     });
   };

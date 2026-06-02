@@ -4,7 +4,6 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATED } from '@ngrx/router-store';
 import { Action } from '@ngrx/store';
 import { OverviewComponent } from '../user/overview/overview.component';
-import { cleanDiscount, getMyReferrals } from '../store/actions/discount.actions';
 import {
   cleanReservation,
   getAllRooms,
@@ -38,7 +37,7 @@ export class MeNavigationEffects {
     this.actions$.pipe(
       ofType(ROUTER_NAVIGATED),
       navigation(MeDiscountComponent, {
-        run: () => [cleanDiscount()],
+        run: () => [],
       }),
     ));
 
@@ -46,7 +45,7 @@ export class MeNavigationEffects {
     this.actions$.pipe(
       ofType(ROUTER_NAVIGATED),
       navigation(ReferralsComponent, {
-        run: () => [cleanDiscount(), getMyReferrals()],
+        run: () => [],
       }),
     ));
 

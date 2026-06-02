@@ -9,7 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { combineLatestWith } from 'rxjs';
+import { combineLatestWith, Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { getOfficeToInvoice, updateOfficeById, uploadInvoices } from '../../store/actions/invoice.actions';
 import { backendFormatDate, datesInSameWeek, invoiceFormat, newDateTimestamp } from '../../util/dates';
@@ -39,8 +39,6 @@ import {
 import { provideMonthPeriodAdapter } from '../../util/adapter/app-date.provider';
 import { DriveAccessService } from '../../services/drive-access.service';
 import { BackButtonDirective } from '../../directives/back-button.directive';
-import { getMyOfficesPipe } from '../../store/selectors/office.selectors';
-import { OfficeState } from '../../store/reducers/office.reducers';
 import { EnvService } from '../../services/env.service';
 import { getPaymentOptionsPipe } from '../../store/selectors/payment.selectors';
 import { PaymentState } from '../../store/reducers/payment.reducers';
@@ -70,6 +68,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/material/chips';
 import { MatSuffix } from '@angular/material/form-field';
+import { OfficeStore } from '../../store/office.store';
 
 // Set up VFS fonts for pdfMake (provides fallback Roboto fonts)
 (pdfMake as any).vfs = (pdfFonts as any).pdfMake?.vfs || pdfFonts;
@@ -104,20 +103,22 @@ export class InvoiceListComponent {
   private readonly env: EnvService = inject(EnvService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<InvoiceState | OfficeState | PaymentState> = inject(
-    Store<InvoiceState | OfficeState | PaymentState>);
+  private readonly store: Store<InvoiceState | PaymentState> = inject(Store<InvoiceState | PaymentState>);
+  private readonly officeStore = inject(OfficeStore);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly router: Router = inject(Router);
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
 
-  private allOffices$ = this.store.pipe(getMyOfficesPipe);
-  private invoiceList$ = this.store.pipe(getInvoicesPipe);
+  private invoiceList$ = this.store.pipe(getInvoicesPipe) as Observable<IInvoice[]>;
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private readonly paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
+  private readonly paymentOptions$ = this.store.pipe(getPaymentOptionsPipe) as Observable<IPaymentOption[]>;
 
-  private allOfficesSignal = toSignal(this.allOffices$);
-  private paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
-  private invoiceListSignal = toSignal(this.invoiceList$);
+  private allOfficesSignal = computed(() => {
+    const data = this.officeStore.data();
+    return data?.kind === 'list' ? data.value : undefined;
+  });
+  private paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] as IPaymentOption[] });
+  private invoiceListSignal = toSignal<IInvoice[] | undefined>(this.invoiceList$, { initialValue: undefined });
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -156,10 +157,10 @@ export class InvoiceListComponent {
     this.getForm.office.valueChanges.pipe(
       startWith(''),
       map((value: any) => !value || typeof value === 'string' ? value : value.code),
-      combineLatestWith(this.allOffices$),
+      combineLatestWith(toObservable(this.allOfficesSignal)),
       map(([name, offices]) => {
         if (name) {
-          return this.filterOffice(name, offices);
+          return this.filterOffice(name, offices ?? []);
         } else {
           return offices ? offices.slice() : offices;
         }
@@ -210,6 +211,8 @@ export class InvoiceListComponent {
   language: string = this.translate.getCurrentLang();
 
   constructor() {
+    this.officeStore.loadMyOffices();
+
     effect(() => {
       const paymentOptions = this.paymentOptionsSignal();
       if (!paymentOptions.length) {

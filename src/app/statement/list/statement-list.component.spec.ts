@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { StatementListComponent } from './statement-list.component';
@@ -8,13 +7,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IOfficeAll } from '../../interfaces/office';
 import { DriveAccessService } from '../../services/drive-access.service';
 import { NavigationService } from '../../services/navigation.service';
-import { getAllMyOffices } from '../../store/actions/office.actions';
 import { StatementStore } from '../../store/statement.store';
+import { signal } from '@angular/core';
+import { OfficeStore } from '../../store/office.store';
 
 describe('StatementListComponent', () => {
   let component: StatementListComponent;
   let fixture: ComponentFixture<StatementListComponent>;
-  let storeSpy: jasmine.SpyObj<Store>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let routerSpy: jasmine.SpyObj<Router>;
@@ -22,6 +21,10 @@ describe('StatementListComponent', () => {
   let statementStoreSpy: {
     clean: jasmine.Spy;
     upload: jasmine.Spy;
+  };
+  let officeStoreSpy: {
+    data: ReturnType<typeof signal>;
+    loadMyOffices: jasmine.Spy;
   };
   let translate: TranslateService;
 
@@ -37,13 +40,9 @@ describe('StatementListComponent', () => {
     { type: 'application/pdf' },
   );
 
-  let officeList$: BehaviorSubject<any>;
-  let statementList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    officeList$ = new BehaviorSubject(undefined);
-    statementList$ = new BehaviorSubject(undefined);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -52,13 +51,16 @@ describe('StatementListComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     driveAccessServiceSpy = jasmine.createSpyObj('DriveAccessService', ['requestAccessIfNeeded']);
     statementStoreSpy = {
       clean: jasmine.createSpy('clean'),
       upload: jasmine.createSpy('upload'),
+    };
+    officeStoreSpy = {
+      data: signal<any>(undefined),
+      loadMyOffices: jasmine.createSpy('loadMyOffices'),
     };
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
@@ -68,25 +70,12 @@ describe('StatementListComponent', () => {
 
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return officeList$.asObservable();
-        case 2:
-          return statementList$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [StatementListComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: OfficeStore, useValue: officeStoreSpy },
         { provide: StatementStore, useValue: statementStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
@@ -103,12 +92,9 @@ describe('StatementListComponent', () => {
     translate.use('en-GB');
 
     fixture.detectChanges();
-    storeSpy.dispatch.calls.reset();
   });
 
   afterEach(() => {
-    officeList$.complete();
-    statementList$.complete();
     breakpoint$.complete();
   });
 
@@ -121,7 +107,7 @@ describe('StatementListComponent', () => {
     freshFixture.detectChanges();
 
     expect(statementStoreSpy.clean).toHaveBeenCalled();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllMyOffices());
+    expect(officeStoreSpy.loadMyOffices).toHaveBeenCalled();
   });
 
   it('should display office name with displayFnOffice', () => {
@@ -150,7 +136,7 @@ describe('StatementListComponent', () => {
 
   it('should auto-select office when only one office is available', () => {
     const singleOffice = [mockOffice];
-    officeList$.next(singleOffice);
+    officeStoreSpy.data.set({ kind: 'list', value: singleOffice });
     fixture.detectChanges();
 
     expect(component.getForm.office.value).toBe(mockOffice);
@@ -165,7 +151,10 @@ describe('StatementListComponent', () => {
   });
 
   it('should filter office correctly using filteredOfficeSignal', () => {
-    officeList$.next([mockOffice, { id: '2', name: 'Another Office', manager: { id: '1', displayName: 'Officer' } }]);
+    officeStoreSpy.data.set({
+      kind: 'list',
+      value: [mockOffice, { id: '2', name: 'Another Office', manager: { id: '1', displayName: 'Officer' } }],
+    });
     (component.getForm.office as any).setValue('A');
     fixture.detectChanges();
 
@@ -181,7 +170,7 @@ describe('StatementListComponent', () => {
   });
 
   it('should submit statement when all required fields are set', () => {
-    officeList$.next([mockOffice]);
+    officeStoreSpy.data.set({ kind: 'list', value: [mockOffice] });
     fixture.detectChanges();
     component.getForm.date.setValue(new Date(2026, 0, 1));
     component.onSelectedFile({ raw: mockFile, name: 'testName', size: mockFile.size, progress: 100 });

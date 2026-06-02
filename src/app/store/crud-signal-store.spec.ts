@@ -21,12 +21,18 @@ type TestDeleteArgs = {
   name: string;
 };
 
+type TestSortArgs = {
+  order: number;
+  key: string;
+}[];
+
 class TestCrudApi {
   loadPage = jasmine.createSpy('loadPage');
   loadById = jasmine.createSpy('loadById');
   create = jasmine.createSpy('create');
   update = jasmine.createSpy('update');
   delete = jasmine.createSpy('delete');
+  sort = jasmine.createSpy('sort');
 }
 
 const TestCrudStore = signalStore(
@@ -41,6 +47,7 @@ const TestCrudStore = signalStore(
       create: (entity) => api.create(entity),
       update: (id, entity) => api.update(id, entity),
       delete: (args) => api.delete(args),
+      sort: (items) => api.sort(items),
       createResponse: (response) => ({
         message: `created:${ response.name }`,
         path: `items/${ response.id }`,
@@ -53,6 +60,10 @@ const TestCrudStore = signalStore(
         message: `deleted:${ args.name }`,
         reload: true,
         toastType: 'warning',
+      }),
+      sortResponse: () => ({
+        message: 'sorted',
+        reload: true,
       }),
     };
   }),
@@ -150,6 +161,20 @@ describe('crud-signal-store', () => {
     expect(store.data()).toBeUndefined();
     expect(store.selected()).toBeUndefined();
     expect(store.response()).toBeUndefined();
+    expect(store.isLoading()).toBeFalse();
+  });
+
+  it('should patch a sort response on sort success', () => {
+    const items: TestSortArgs = [{ order: 1, key: 'a' }];
+    api.sort.and.returnValue(of(void 0));
+
+    store.sort(items);
+
+    expect(api.sort).toHaveBeenCalledWith(items);
+    expect(store.response()).toEqual({
+      message: 'sorted',
+      reload: true,
+    });
     expect(store.isLoading()).toBeFalse();
   });
 });

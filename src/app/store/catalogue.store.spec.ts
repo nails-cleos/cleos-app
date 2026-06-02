@@ -50,11 +50,11 @@ describe('CatalogueStore', () => {
     expect(store.error()).toBeUndefined();
   });
 
-  it('should expose a bulk update response after updateOrder succeeds', () => {
+  it('should expose a bulk update response after sort succeeds', () => {
     const catalogues = [{ id: '1', name: 'A', order: 0 }, { id: '2', name: 'B', order: 1 }] as any;
     catalogueServiceSpy.updateCatalogueOrder.and.returnValue(of(void 0));
 
-    store.updateOrder(catalogues);
+    store.sort(catalogues);
 
     expect(catalogueServiceSpy.updateCatalogueOrder).toHaveBeenCalledWith(catalogues);
     expect(store.response()).toEqual({

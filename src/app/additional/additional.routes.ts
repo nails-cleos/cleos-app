@@ -3,14 +3,9 @@ import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { AdditionalListComponent } from './list/additional-list.component';
 import { AdditionalSortingComponent } from './sorting/additional-sorting.component';
-import { provideEffects } from '@ngrx/effects';
-import { provideState } from '@ngrx/store';
 import { AdditionalService } from '../services/additional.service';
 import { TreatmentService } from '../services/treatment.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
-import { AdditionalEffects } from '../store/effects/additional.effects';
-import { ADDITIONAL_FEATURE_KEY, additionalReducer } from '../store/reducers/additional.reducers';
-import { AdditionalNavigationEffects } from './additional-navigation.effects';
 import { AdditionalCreatePageComponent } from './additional-create-page.component';
 import { AdditionalDetailsPageComponent } from './additional-details-page.component';
 
@@ -18,8 +13,6 @@ const providers = [
   provideFeatureTranslations('additional'),
   AdditionalService,
   TreatmentService,
-  provideState(ADDITIONAL_FEATURE_KEY, additionalReducer),
-  provideEffects(AdditionalEffects, AdditionalNavigationEffects),
 ];
 
 const children: Routes = [

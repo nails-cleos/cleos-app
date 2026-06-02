@@ -1,21 +1,18 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { combineLatestWith } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { getNowTimeZone, invoiceFormat } from '../../util/dates';
 import { map, startWith } from 'rxjs/operators';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { IOfficeAll } from '../../interfaces/office';
 import { requireMatch } from '../../util/validators';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { DriveAccessService } from '../../services/drive-access.service';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { FileDropComponent, UploadFile } from '../../shared/file-drop/file-drop.component';
-import { getMyOfficesPipe } from '../../store/selectors/office.selectors';
-import { OfficeState } from '../../store/reducers/office.reducers';
-import { getAllMyOffices } from '../../store/actions/office.actions';
 import { StatementStore } from '../../store/statement.store';
+import { OfficeStore } from '../../store/office.store';
 import { MatOption } from '@angular/material/core';
 import { provideYearMonthDateAdapter } from '../../util/adapter/app-date.provider';
 import { EnvService } from '../../services/env.service';
@@ -44,14 +41,12 @@ type StatementForm = {
 export class StatementListComponent {
   private readonly env: EnvService = inject(EnvService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly store: Store<OfficeState> = inject(Store<OfficeState>);
+  private readonly officeStore = inject(OfficeStore);
   private readonly statementStore = inject(StatementStore);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
 
-  private allOffices$ = this.store.pipe(getMyOfficesPipe);
-
-  private allOfficesSignal = toSignal(this.allOffices$);
+  private allOfficesSignal = signal<IOfficeAll[] | undefined>(undefined);
 
   blob = signal<Blob | undefined>(undefined);
   fileName = signal<string | undefined>(undefined);
@@ -69,10 +64,10 @@ export class StatementListComponent {
     this.getForm.office.valueChanges.pipe(
       startWith(''),
       map((value: any) => !value || typeof value === 'string' ? value : value.code),
-      combineLatestWith(this.allOffices$),
+      combineLatestWith(toObservable(this.allOfficesSignal)),
       map(([name, offices]) => {
         if (name) {
-          return this.filterOffice(name, offices);
+          return this.filterOffice(name, offices ?? []);
         } else {
           return offices ? offices.slice() : offices;
         }
@@ -86,7 +81,12 @@ export class StatementListComponent {
 
   constructor() {
     this.statementStore.clean();
-    this.store.dispatch(getAllMyOffices());
+    this.officeStore.loadMyOffices();
+
+    effect(() => {
+      const data = this.officeStore.data();
+      this.allOfficesSignal.set(data?.kind === 'list' ? data.value : undefined);
+    });
 
     effect(() => {
       const offices = this.allOfficesSignal();

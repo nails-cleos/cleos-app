@@ -44,6 +44,8 @@ type CrudStoreConfig<TEntity, TCreateResponse, TUpdateResponse, TDeleteArgs> = {
   placeholder?: TEntity;
   update?: (id: string, entity: TEntity) => Observable<TUpdateResponse>;
   updateResponse?: (response: TUpdateResponse, id: string, entity: TEntity) => IResponseSuccess;
+  sort?: (items: unknown) => Observable<unknown>;
+  sortResponse?: (items: unknown) => IResponseSuccess;
 };
 
 export const withCrudStoreMethods =
@@ -192,6 +194,32 @@ export const withCrudStoreMethods =
               patchState(store, {
                 response: deleteResponse(args),
                 selected: undefined,
+                subErrors: undefined,
+                isLoading: false,
+              });
+            },
+            error: patchError,
+          });
+        },
+
+        sort(items: unknown): void {
+          if (!config.sort || !config.sortResponse) {
+            return;
+          }
+          const sort = config.sort;
+          const sortResponse = config.sortResponse;
+
+          patchState(store, {
+            subErrors: undefined,
+            response: undefined,
+            isLoading: true,
+            selected: undefined,
+          });
+
+          sort(items).subscribe({
+            next: () => {
+              patchState(store, {
+                response: sortResponse(items),
                 subErrors: undefined,
                 isLoading: false,
               });

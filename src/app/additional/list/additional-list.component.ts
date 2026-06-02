@@ -6,20 +6,11 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { IAdditional } from '../../interfaces/additional';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { convertDuration } from '../../util/dates';
 import { executeDialogNoWidth } from '../../util/helper';
-import {
-  additionalSelected,
-  cleanAdditional,
-  deleteAdditional,
-  getAdditionalPage,
-} from '../../store/actions/additional.actions';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { getAdditionalPaginationPipe, getAdditionalResponsePipe } from '../../store/selectors/additional.selectors';
-import { AdditionalState } from '../../store/reducers/additional.reducers';
 import {
   MatCell,
   MatCellDef,
@@ -42,7 +33,8 @@ import { MatIconButton } from '@angular/material/button';
 import { MatPrefix } from '@angular/material/input';
 import { MatList, MatListItem, MatListItemIcon } from '@angular/material/list';
 import { DecimalPipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { AdditionalStore } from '../../store/additional.store';
 
 @Component({
   selector: 'app-additional-list',
@@ -56,20 +48,22 @@ import { RouterLink } from '@angular/router';
 })
 export class AdditionalListComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<AdditionalState> = inject(Store<AdditionalState>);
+  private readonly additionalStore = inject(AdditionalStore);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
+  private readonly router = inject(Router);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private additionalList$ = this.store.pipe(getAdditionalPaginationPipe);
-  private response$ = this.store.pipe(getAdditionalResponsePipe);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
   private tableState = createMatTableState(this.paginator, this.sort, 'order', 'asc');
 
-  private additionalListSignal = toSignal(this.additionalList$);
-  private responseSignal = toSignal(this.response$);
+  private additionalListSignal = computed(() => {
+    const data = this.additionalStore.data();
+    return data?.kind === 'pagination' ? data.value : undefined;
+  });
+  private responseSignal = this.additionalStore.response;
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -101,21 +95,20 @@ export class AdditionalListComponent {
   language: string = this.translate.getCurrentLang();
 
   constructor() {
+    this.additionalStore.clean();
     effect(() => {
       const request = this.tableState.baseRequest();
-      this.store.dispatch(
-        getAdditionalPage({
-          ...request,
-          size: this.pageSizeSignal(),
-        }),
-      );
+      this.additionalStore.loadPage({
+        ...request,
+        size: this.pageSizeSignal(),
+      });
     });
-    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanAdditional()));
+    this.tableState.resetOn(this.responseSignal, () => this.additionalStore.clearResponse());
   }
 
-  edit = (selected: IAdditional): void => this.store.dispatch(
-    additionalSelected({ selected }),
-  );
+  edit = (selected: IAdditional): void => {
+    void this.router.navigate([this.language, 'additional', selected.id]);
+  };
 
   delete = (additional: IAdditional): void => {
     const title = this.translate.instant('ADDITIONAL.DELETED.TITLE');
@@ -124,9 +117,7 @@ export class AdditionalListComponent {
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: additional, variant: 'warning' },
       result => {
         if (result) {
-          this.store.dispatch(
-            deleteAdditional({ id: result.id, name: result.name }),
-          );
+          this.additionalStore.delete(result.id, result.name);
         }
       });
   };
