@@ -13,7 +13,7 @@ import {
   updateReservationCustomer,
   updateReservationDiscount,
   updateReservationNote,
-} from '../../store/reservation.actions';
+} from '../../store/actions/reservation.actions';
 import { CancelOption, IFabMenu, IReservationAll, IUpcomingAll, States } from '../../interfaces/reservation';
 import { Router, RouterLink } from '@angular/router';
 import {
@@ -54,7 +54,7 @@ import { isToday, isTomorrow } from 'date-fns';
 import { ReservationIconName } from '../../util/icon';
 import { FormArray, FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { startWith } from 'rxjs/operators';
-import { adjustPayments, notifyPayment, paymentSend } from '../../store/payment.actions';
+import { adjustPayments, notifyPayment, paymentSend } from '../../store/actions/payment.actions';
 import { ChangeCustomerDialogComponent } from './change-customer-dialog.component';
 import { ChangeColorDialogComponent } from './change-color-dialog.component';
 import { AddNoteDialogComponent } from './add-note-dialog.component';

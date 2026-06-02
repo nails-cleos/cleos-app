@@ -6,8 +6,8 @@ import { BehaviorSubject, Subject } from 'rxjs';
 
 import { NavigationService } from './navigation.service';
 import { IUser, User } from '../interfaces/user';
-import { updateMyUser } from '../store/user.actions';
-import { setLanguage } from '../store/i18n.actions';
+import { updateMyUser } from '../store/actions/user.actions';
+import { setLanguage } from '../store/actions/i18n.actions';
 import { I18NState } from '../store/reducers/i18n.reducers';
 
 describe('NavigationService', () => {

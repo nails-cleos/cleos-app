@@ -6,7 +6,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { IPaymentOption } from '../../../interfaces/payment';
-import { getPaymentByResourceId } from '../../../store/payment.actions';
+import { getPaymentByResourceId } from '../../../store/actions/payment.actions';
 import { IReservationAll } from '../../../interfaces/reservation';
 import { provideHttpClient } from '@angular/common/http';
 import { NavigationService } from '../../../services/navigation.service';

@@ -3,7 +3,7 @@ import { HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
 import { Observable, retry, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { reLogin } from '../store/auth.actions';
+import { reLogin } from '../store/actions/auth.actions';
 
 import { genericRetryStrategy } from '../util/rxjs';
 import { AuthUserService } from '../services/auth-user.service';

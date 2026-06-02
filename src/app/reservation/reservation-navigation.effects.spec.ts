@@ -5,14 +5,14 @@ import { ROUTER_NAVIGATED, RouterNavigatedAction } from '@ngrx/router-store';
 import { Action } from '@ngrx/store';
 import { ReplaySubject, firstValueFrom } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
-import { getOptions } from '../store/payment.actions';
+import { getOptions } from '../store/actions/payment.actions';
 import {
   cleanReservation,
   getAllRooms,
   getCustomers,
   setDetailReservationParams,
   setReservationParams,
-} from '../store/reservation.actions';
+} from '../store/actions/reservation.actions';
 import { CalendarComponent } from './calendar/calendar.component';
 import { ReservationCompleteComponent } from './detail/complete/reservation-complete.component';
 import { ReservationDetailComponent } from './detail/reservation-detail.component';

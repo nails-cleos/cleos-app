@@ -8,7 +8,7 @@ import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/a
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { signal } from '@angular/core';
 import { FirebaseService } from '../../../services/firebase.service';
-import { createReservation } from '../../../store/reservation.actions';
+import { createReservation } from '../../../store/actions/reservation.actions';
 import { IPaymentOption, PaymentPercentage } from '../../../interfaces/payment';
 import { Role } from '../../../interfaces/token';
 import { IGroupService, ITreatmentAll, Price } from '../../../interfaces/treatment';

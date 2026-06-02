@@ -7,7 +7,7 @@ import { AuthUserService, initialAuthUser } from '../services/auth-user.service'
 import { ActivatedRoute, Router } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { MainContentService } from '../services/main-content.service';
-import { redirect } from '../store/auth.actions';
+import { redirect } from '../store/actions/auth.actions';
 import { TokenService } from '../services/token.service';
 import { NavigationService } from '../services/navigation.service';
 import { MainState } from '../store/reducers/main.reducers';
@@ -15,7 +15,7 @@ import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.com
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { FirebaseService } from '../services/firebase.service';
-import { updateMyUser } from '../store/main.actions';
+import { updateMyUser } from '../store/actions/main.actions';
 import { provideAppIcons } from '../util/app-icons.provider';
 
 describe('MainComponent', () => {

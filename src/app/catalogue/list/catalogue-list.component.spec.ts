@@ -1,31 +1,32 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { TranslateModule } from '@ngx-translate/core';
-import { BehaviorSubject, of } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { of } from 'rxjs';
 import { ICatalogueAll } from '../../interfaces/catalogue';
-import {
-  catalogueSelected,
-  cleanCatalogue,
-  deleteCatalogue,
-  getAllCatalogues,
-  updateCatalogueOrder,
-} from '../../store/catalogue.actions';
 import { CatalogueListComponent } from './catalogue-list.component';
 import { ActivatedRoute } from '@angular/router';
-import { CatalogueState } from '../../store/reducers/catalogue.reducers';
 import { MatDialog } from '@angular/material/dialog';
+import { signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { CatalogueStore } from '../../store/catalogue.store';
 
-describe('CataloguesComponent', () => {
+describe('CatalogueListComponent', () => {
   let component: CatalogueListComponent;
   let fixture: ComponentFixture<CatalogueListComponent>;
 
-  let response$: BehaviorSubject<any>;
-  let catalogues$: BehaviorSubject<any>;
-
-  let storeSpy: jasmine.SpyObj<Store<CatalogueState>>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let translate: TranslateService;
+  let catalogueStoreSpy: {
+    data: ReturnType<typeof signal>;
+    response: ReturnType<typeof signal>;
+    clean: jasmine.Spy;
+    clearResponse: jasmine.Spy;
+    loadAllCatalogues: jasmine.Spy;
+    updateOrder: jasmine.Spy;
+    delete: jasmine.Spy;
+  };
 
   const mockCatalogues: ICatalogueAll[] = [
     {
@@ -54,83 +55,81 @@ describe('CataloguesComponent', () => {
   ];
 
   beforeEach(async () => {
-    response$ = new BehaviorSubject(undefined);
-    catalogues$ = new BehaviorSubject(undefined);
-
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    catalogueStoreSpy = {
+      data: signal<any>(undefined),
+      response: signal<any>(undefined),
+      clean: jasmine.createSpy('clean'),
+      clearResponse: jasmine.createSpy('clearResponse'),
+      loadAllCatalogues: jasmine.createSpy('loadAllCatalogues'),
+      updateOrder: jasmine.createSpy('updateOrder'),
+      delete: jasmine.createSpy('delete'),
+    };
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
       },
     });
 
-    // Simulate the selectors using pipe
-    let callIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      callIndex++;
-      switch (callIndex) {
-        case 1:
-          return response$.asObservable();
-        case 2:
-          return catalogues$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-
     await TestBed.configureTestingModule({
       imports: [CatalogueListComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: CatalogueStore, useValue: catalogueStoreSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MatDialog, useValue: dialogSpy },
+        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
+
+    translate = TestBed.inject(TranslateService);
+    translate.use('en-GB');
 
     fixture = TestBed.createComponent(CatalogueListComponent);
     component = fixture.componentInstance;
   });
-
-  afterEach(() => {
-    response$.complete();
-    catalogues$.complete();
-  });
-
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
   it('should filter out empty objects and map blob to image', () => {
-    catalogues$.next(mockCatalogues);
+    catalogueStoreSpy.data.set(mockCatalogues);
+    fixture.detectChanges();
+
     const list = component.catalogues();
     expect(list.length).toBe(2);
     expect(list[0].image).toBe('data:image/jpeg;base64,base64-blob-data');
     expect(list[1].image).toBe('data:image/jpeg;base64,base64-blob-data-2');
   });
 
-  it('should dispatch clean and getAllCatalogues on response', () => {
-    response$.next(true);
+  it('should clear response and reload catalogues on response', () => {
+    catalogueStoreSpy.clearResponse.calls.reset();
+    catalogueStoreSpy.loadAllCatalogues.calls.reset();
+    catalogueStoreSpy.response.set(true);
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(cleanCatalogue());
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllCatalogues());
+    expect(catalogueStoreSpy.clearResponse).toHaveBeenCalled();
+    expect(catalogueStoreSpy.loadAllCatalogues).toHaveBeenCalled();
   });
 
-  it('should dispatch catalogueSelected when edit is called', () => {
+  it('should navigate when edit is called', () => {
     const catalogue = mockCatalogues[0];
     component.edit(catalogue);
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(catalogueSelected({ selected: catalogue }));
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'catalogues', catalogue.id]);
   });
 
-  it('should dispatch updateCatalogueOrder when finish is called', () => {
-    catalogues$.next(mockCatalogues);
+  it('should update catalogue order when finish is called', () => {
+    catalogueStoreSpy.data.set(mockCatalogues);
+    fixture.detectChanges();
+
     component.finish();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(updateCatalogueOrder({ catalogues: component.catalogues() }));
+    expect(catalogueStoreSpy.updateOrder).toHaveBeenCalledWith(component.catalogues());
   });
 
   it('should handle drag and drop correctly', () => {
-    catalogues$.next(mockCatalogues);
+    catalogueStoreSpy.data.set(mockCatalogues);
+    fixture.detectChanges();
+
     const event: CdkDragDrop<ICatalogueAll[]> = { previousIndex: 0, currentIndex: 1 } as any;
     const listBefore = [...component.catalogues()];
     component.drop(event);
@@ -157,8 +156,6 @@ describe('CataloguesComponent', () => {
         },
       }));
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteCatalogue(
-      { id: testCatalogue.id!, name: testCatalogue.name! },
-    ));
+    expect(catalogueStoreSpy.delete).toHaveBeenCalledWith(testCatalogue.id!, testCatalogue.name!);
   });
 });

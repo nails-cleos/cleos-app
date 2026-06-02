@@ -4,21 +4,21 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATED } from '@ngrx/router-store';
 import { Action } from '@ngrx/store';
 import { OverviewComponent } from '../user/overview/overview.component';
-import { cleanDiscount, getMyReferrals } from '../store/discount.actions';
+import { cleanDiscount, getMyReferrals } from '../store/actions/discount.actions';
 import {
   cleanReservation,
   getAllRooms,
   getUpcomingReservation,
   setMeReservationParams,
-} from '../store/reservation.actions';
+} from '../store/actions/reservation.actions';
 import {
   cleanPayment,
   getOptions,
   setPaymentResultParams,
-} from '../store/payment.actions';
-import { getRouteParams } from '../store/router-state.utils';
-import { cleanUser } from '../store/user.actions';
-import { navigation } from '../store/router-navigation.operator';
+} from '../store/actions/payment.actions';
+import { getRouteParams } from '../util/router-state.utils';
+import { cleanUser } from '../store/actions/user.actions';
+import { navigation } from '../util/router-navigation.operator';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { MeReservationCreatePageComponent } from './me-reservation-create-page.component';
 import { MeReservationDetailsPageComponent } from './me-reservation-details-page.component';

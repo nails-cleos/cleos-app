@@ -13,7 +13,7 @@ import {
   discountSelected,
   getDiscountsPage,
   sendDiscountToCustomers,
-} from '../../store/discount.actions';
+} from '../../store/actions/discount.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { executeDialog } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';

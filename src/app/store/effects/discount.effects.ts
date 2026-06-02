@@ -19,7 +19,7 @@ import {
   referralSuccess,
   sendDiscountToCustomers,
   updateDiscount,
-} from '../discount.actions';
+} from '../actions/discount.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { DiscountService } from '../../services/discount.service';
 import { Router } from '@angular/router';

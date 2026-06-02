@@ -19,7 +19,7 @@ import {
   officeSelected,
   officeSuccess,
   updateOffice,
-} from '../office.actions';
+} from '../actions/office.actions';
 import { IOffice, IOfficeAll } from '../../interfaces/office';
 import { IUserAll } from '../../interfaces/user';
 import { IApiResponse, successResponse } from '../../interfaces/common';

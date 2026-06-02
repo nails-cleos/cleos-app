@@ -8,7 +8,7 @@ import { TransactionComponent } from './transaction.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { IAccountAll, ITransaction } from '../../interfaces/account';
 import { IPaymentOption } from '../../interfaces/payment';
-import { createTransaction, getAccount } from '../../store/account.actions';
+import { createTransaction, getAccount } from '../../store/actions/account.actions';
 import { AccountState } from '../../store/reducers/account.reducers';
 import { signal } from '@angular/core';
 import { NavigationService } from '../../services/navigation.service';

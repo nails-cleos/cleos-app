@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATED } from '@ngrx/router-store';
-import { clean } from '../store/account.actions';
-import { getOptions } from '../store/payment.actions';
-import { navigation } from '../store/router-navigation.operator';
+import { clean } from '../store/actions/account.actions';
+import { getOptions } from '../store/actions/payment.actions';
+import { navigation } from '../util/router-navigation.operator';
 import { AccountComponent } from './account/account.component';
 import { TransactionComponent } from './transaction/transaction.component';
 import { TransactionViewComponent } from './transaction/view/transaction-view.component';

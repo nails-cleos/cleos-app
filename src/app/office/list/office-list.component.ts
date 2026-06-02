@@ -8,7 +8,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { cleanOffice, deleteOffice, getOfficesPage, officeSelected } from '../../store/office.actions';
+import { cleanOffice, deleteOffice, getOfficesPage, officeSelected } from '../../store/actions/office.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { OfficeState } from '../../store/reducers/office.reducers';
 import { getOfficePaginationPipe, getOfficeResponsePipe } from '../../store/selectors/office.selectors';

@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AddDiscountDialogComponent } from './add-discount-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
-import { cleanDiscount, getUserDiscountByCustomerId } from '../../store/discount.actions';
+import { cleanDiscount, getUserDiscountByCustomerId } from '../../store/actions/discount.actions';
 import { DiscountState } from '../../store/reducers/discount.reducers';
 import { TranslateModule } from '@ngx-translate/core';
 

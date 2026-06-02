@@ -4,24 +4,33 @@ import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { documentDownloadZip, documentView, getDocumentsPage } from '../../store/document.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { DocumentState } from '../../store/reducers/document.reducers';
 import { DocumentListComponent } from './document-list.component';
 import { DriveAccessService } from '../../services/drive-access.service';
 import { IOfficeAll } from '../../interfaces/office';
 import { DocumentTypeEnum, IDocument } from '../../interfaces/document';
-import { getDateFormat, getDateQuarter, getNowTimeZone, monthViewTitle } from '../../util/dates';
+import { getDateQuarter, getNowTimeZone, monthViewTitle } from '../../util/dates';
 import { MatDatepicker } from '@angular/material/datepicker';
+import { getAllMyOffices } from '../../store/actions/office.actions';
+import { DocumentStore } from '../../store/document.store';
 
-describe('DocumentsComponent', () => {
+describe('DocumentListComponent', () => {
   let component: DocumentListComponent;
   let fixture: ComponentFixture<DocumentListComponent>;
-  let storeSpy: jasmine.SpyObj<Store<DocumentState>>;
+  let storeSpy: jasmine.SpyObj<Store>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
+  let documentStoreSpy: {
+    data: ReturnType<typeof signal>;
+    response: ReturnType<typeof signal>;
+    clean: jasmine.Spy;
+    clearResponse: jasmine.Spy;
+    loadPage: jasmine.Spy;
+    download: jasmine.Spy;
+    downloadZip: jasmine.Spy;
+  };
 
   const mockOffice: IOfficeAll = {
     id: '1',
@@ -59,6 +68,15 @@ describe('DocumentsComponent', () => {
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     driveAccessServiceSpy = jasmine.createSpyObj('DriveAccessService', ['requestAccessIfNeeded']);
+    documentStoreSpy = {
+      data: signal<any>(mockPagination),
+      response: signal<any>(undefined),
+      clean: jasmine.createSpy('clean'),
+      clearResponse: jasmine.createSpy('clearResponse'),
+      loadPage: jasmine.createSpy('loadPage'),
+      download: jasmine.createSpy('download'),
+      downloadZip: jasmine.createSpy('downloadZip'),
+    };
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
@@ -71,10 +89,6 @@ describe('DocumentsComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return documentList$.asObservable();
-        case 2:
-          return response$.asObservable();
-        case 3:
           return officeList$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -87,6 +101,7 @@ describe('DocumentsComponent', () => {
       imports: [DocumentListComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
+        { provide: DocumentStore, useValue: documentStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
@@ -100,6 +115,7 @@ describe('DocumentsComponent', () => {
     translate.use('en-GB');
 
     fixture.detectChanges();
+    storeSpy.dispatch.calls.reset();
   });
 
   afterEach(() => {
@@ -110,6 +126,14 @@ describe('DocumentsComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should bootstrap document page state on init', () => {
+    const freshFixture = TestBed.createComponent(DocumentListComponent);
+    freshFixture.detectChanges();
+
+    expect(documentStoreSpy.clean).toHaveBeenCalled();
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllMyOffices());
   });
 
   it('should compute dataSourceSignal correctly', () => {
@@ -166,49 +190,45 @@ describe('DocumentsComponent', () => {
     paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getDocumentsPage({
-        officeId: mockOffice.id,
-        date: getDateFormat(date),
-        page: 1,
-        sort: 'date',
-        direction: 'desc',
-        size: PAGE_SIZE,
-      }),
-    );
+    expect(documentStoreSpy.loadPage).toHaveBeenCalledWith({
+      officeId: mockOffice.id,
+      date,
+      page: 1,
+      sort: 'date',
+      direction: 'desc',
+      size: PAGE_SIZE,
+    });
   });
 
   it('should dispatch clean and reset paginator when responseSignal emits', () => {
     const date = getNowTimeZone();
     component.getForm.date.setValue(date);
-    component.getForm.date.setValue(getNowTimeZone());
     officeList$.next([mockOffice]);
     fixture.detectChanges();
     const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
 
     component['paginator'] = signal(paginatorMock);
 
-    response$.next({ success: true });
+    documentStoreSpy.response.set({ success: true });
 
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getDocumentsPage({
-        officeId: mockOffice.id,
-        date: getDateFormat(date),
-        page: 0,
-        sort: 'date',
-        direction: 'desc',
-        size: PAGE_SIZE,
-      }),
-    );
+    expect(documentStoreSpy.clearResponse).toHaveBeenCalled();
+    expect(documentStoreSpy.loadPage).toHaveBeenCalledWith(jasmine.objectContaining({
+      officeId: mockOffice.id,
+      date,
+      page: 0,
+      sort: 'date',
+      direction: 'desc',
+      size: PAGE_SIZE,
+    }));
   });
 
   it('should dispatch documentSelected when edit is called', () => {
     const item = mockDocument[0];
     component.download(item);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(documentView({ id: item.id, fileName: item.name }));
+    expect(documentStoreSpy.download).toHaveBeenCalledWith({ id: item.id, fileName: item.name });
   });
 
   it('should auto-select office when only one office is available', () => {
@@ -288,11 +308,11 @@ describe('DocumentsComponent', () => {
 
       component.downloadZip();
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(documentDownloadZip({
+      expect(documentStoreSpy.downloadZip).toHaveBeenCalledWith({
         officeId: mockOffice.id,
-        date: getDateFormat(date),
+        date,
         fileName: `${mockOffice.name} Q${getDateQuarter(date)} ${monthViewTitle(date)}.zip`,
-      }));
+      });
     });
 
     it('should not dispatch download zip action if office is not selected', () => {
@@ -303,9 +323,7 @@ describe('DocumentsComponent', () => {
 
       component.downloadZip();
 
-      expect(storeSpy.dispatch).not.toHaveBeenCalledWith(jasmine.objectContaining({
-        type: documentDownloadZip.type,
-      }));
+      expect(documentStoreSpy.downloadZip).not.toHaveBeenCalled();
     });
 
     it('should not dispatch download zip action if date is not set', () => {
@@ -315,9 +333,7 @@ describe('DocumentsComponent', () => {
 
       component.downloadZip();
 
-      expect(storeSpy.dispatch).not.toHaveBeenCalledWith(jasmine.objectContaining({
-        type: documentDownloadZip.type,
-      }));
+      expect(documentStoreSpy.downloadZip).not.toHaveBeenCalled();
     });
   });
 });

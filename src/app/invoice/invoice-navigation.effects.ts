@@ -1,10 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATED } from '@ngrx/router-store';
-import { cleanInvoice } from '../store/invoice.actions';
-import { getAllMyOffices } from '../store/office.actions';
-import { getOptions } from '../store/payment.actions';
-import { navigation } from '../store/router-navigation.operator';
+import { cleanInvoice } from '../store/actions/invoice.actions';
+import { getAllMyOffices } from '../store/actions/office.actions';
+import { getOptions } from '../store/actions/payment.actions';
+import { navigation } from '../util/router-navigation.operator';
 import { InvoiceListComponent } from './list/invoice-list.component';
 
 @Injectable()

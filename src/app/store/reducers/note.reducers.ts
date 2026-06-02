@@ -12,11 +12,11 @@ import {
   noteSuccess,
   setNoteNavigationParams,
   updateNote,
-} from '../note.actions';
+} from '../actions/note.actions';
 import { INote } from '../../interfaces/note';
 import { IUserAll } from '../../interfaces/user';
 import { IError, IResponseSuccess } from '../../interfaces/common';
-import { clearGlobalError, clearGlobalResponse } from '../global.actions';
+import { clearGlobalError, clearGlobalResponse } from '../actions/global.actions';
 
 export const NOTE_FEATURE_KEY = 'note';
 

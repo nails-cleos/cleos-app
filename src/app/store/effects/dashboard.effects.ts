@@ -20,7 +20,7 @@ import {
   updateMonthlySummary,
   yearExportSuccess,
   yearSummarySuccess,
-} from '../dashboard.actions';
+} from '../actions/dashboard.actions';
 import { DashboardService } from '../../services/dashboard.service';
 import { Router } from '@angular/router';
 import { NavigationService } from '../../services/navigation.service';

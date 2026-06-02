@@ -12,7 +12,7 @@ import {
 } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { map, startWith } from 'rxjs/operators';
-import { cleanUser, getAllCustomers } from '../../store/user.actions';
+import { cleanUser, getAllCustomers } from '../../store/actions/user.actions';
 import { TranslatePipe } from '@ngx-translate/core';
 import { UserState } from '../../store/reducers/user.reducers';
 import { toSignal } from '@angular/core/rxjs-interop';

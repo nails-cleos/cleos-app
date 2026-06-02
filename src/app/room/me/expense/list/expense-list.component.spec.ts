@@ -13,13 +13,13 @@ import { IRoomAll } from '../../../../interfaces/room';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { ExpenseState } from '../../../../store/reducers/expense.reducers';
 import { RoomState } from '../../../../store/reducers/room.reducers';
-import { deleteExpense, expenseSelected, getExpensesPage } from '../../../../store/expense.actions';
+import { deleteExpense, expenseSelected, getExpensesPage } from '../../../../store/actions/expense.actions';
 import { signal } from '@angular/core';
 import { DriveAccessService } from '../../../../services/drive-access.service';
-import { documentView } from '../../../../store/document.actions';
+import { DocumentStore } from '../../../../store/document.store';
 import { DocumentTypeEnum } from '../../../../interfaces/document';
 
-describe('ExpensesComponent', () => {
+describe('ExpenseListComponent', () => {
   let component: ExpenseListComponent;
   let fixture: ComponentFixture<ExpenseListComponent>;
 
@@ -29,6 +29,7 @@ describe('ExpensesComponent', () => {
   let dialogSpy: jasmine.Spy<any>;
   let translate: TranslateService;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
+  let documentStoreSpy: { download: jasmine.Spy };
 
   let expenseList$: BehaviorSubject<any>;
   let response$: BehaviorSubject<any>;
@@ -134,6 +135,7 @@ describe('ExpensesComponent', () => {
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     datepickerSpy = jasmine.createSpyObj('MatDatepicker', ['close']);
     driveAccessServiceSpy = jasmine.createSpyObj<DriveAccessService>('DriveAccessService', ['requestAccessIfNeeded']);
+    documentStoreSpy = { download: jasmine.createSpy('download') };
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
@@ -154,6 +156,7 @@ describe('ExpensesComponent', () => {
       imports: [ExpenseListComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
+        { provide: DocumentStore, useValue: documentStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
@@ -386,6 +389,6 @@ describe('ExpensesComponent', () => {
     const item = { id: '1', name: 'Document 1', date: new Date(2024, 2, 1), type: DocumentTypeEnum.expense };
     component.download(item);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(documentView({ id: item.id, fileName: item.name }));
+    expect(documentStoreSpy.download).toHaveBeenCalledWith({ id: item.id, fileName: item.name });
   });
 });

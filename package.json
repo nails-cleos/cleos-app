@@ -52,6 +52,7 @@
     "@ng-icons/flag-icons": "^33.1.0",
     "@ngrx/effects": "^21.0.1",
     "@ngrx/router-store": "^21.0.1",
+    "@ngrx/signals": "^21.1.0",
     "@ngrx/store": "^21.0.1",
     "@ngx-translate/core": "^17.0.0",
     "@ngx-translate/http-loader": "^17.0.0",

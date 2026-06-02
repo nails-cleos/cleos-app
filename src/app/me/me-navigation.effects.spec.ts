@@ -8,15 +8,15 @@ import { Action } from '@ngrx/store';
 import { ReplaySubject, firstValueFrom } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
 import { OverviewComponent } from '../user/overview/overview.component';
-import { cleanDiscount, getMyReferrals } from '../store/discount.actions';
-import { cleanPayment, getOptions, setPaymentResultParams } from '../store/payment.actions';
+import { cleanDiscount, getMyReferrals } from '../store/actions/discount.actions';
+import { cleanPayment, getOptions, setPaymentResultParams } from '../store/actions/payment.actions';
 import {
   cleanReservation,
   getAllRooms,
   getUpcomingReservation,
   setMeReservationParams,
-} from '../store/reservation.actions';
-import { cleanUser } from '../store/user.actions';
+} from '../store/actions/reservation.actions';
+import { cleanUser } from '../store/actions/user.actions';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { MeReservationCreatePageComponent } from './me-reservation-create-page.component';
 import { MeReservationDetailsPageComponent } from './me-reservation-details-page.component';

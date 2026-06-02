@@ -8,12 +8,12 @@ import {
   invoiceSuccess,
   updateOfficeById,
   uploadInvoices,
-} from '../invoice.actions';
+} from '../actions/invoice.actions';
 import { IInvoice, IInvoiceData } from '../../interfaces/invoice';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
 import { Pagination } from '../../interfaces/pagination';
-import { clearGlobalError, clearGlobalResponse } from '../global.actions';
+import { clearGlobalError, clearGlobalResponse } from '../actions/global.actions';
 
 export const INVOICE_FEATURE_KEY = 'invoice';
 

@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../../services/navigation.service';
 import { zoneDateToDate } from '../../util/dates';
-import { deleteNotification, getNotificationsPage, readNotification } from '../../store/notification.actions';
+import { deleteNotification, getNotificationsPage, readNotification } from '../../store/actions/notification.actions';
 import { PAGE_SIZE } from '../../interfaces/pagination';
 import { getNotificationsPipe } from '../../store/selectors/notification.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';

@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { GoogleAuthProvider } from 'firebase/auth';
 import { Store } from '@ngrx/store';
-import { setDriveToken } from '../store/auth.actions';
+import { setDriveToken } from '../store/actions/auth.actions';
 import { getDriveTokenPipe } from '../store/selectors/auth.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FirebaseService } from './firebase.service';

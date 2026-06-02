@@ -13,7 +13,7 @@ import {
 } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { map, startWith } from 'rxjs/operators';
-import { cleanUser, getAllDisableUsers } from '../../store/user.actions';
+import { cleanUser, getAllDisableUsers } from '../../store/actions/user.actions';
 import { UserState } from '../../store/reducers/user.reducers';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getAllUsersPipe } from '../../store/selectors/user.selectors';

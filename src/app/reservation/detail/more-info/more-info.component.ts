@@ -7,8 +7,8 @@ import {
   getTrackingByReservationId,
   reservationFindPayments,
   updateTrackingByReservationId,
-} from '../../../store/reservation.actions';
-import { recreate } from '../../../store/payment.actions';
+} from '../../../store/actions/reservation.actions';
+import { recreate } from '../../../store/actions/payment.actions';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { getDiffTime, newDateTimestamp } from '../../../util/dates';
 import { Clipboard } from '@angular/cdk/clipboard';

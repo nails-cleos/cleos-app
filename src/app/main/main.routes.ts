@@ -8,9 +8,7 @@ import { MainTreatmentComponent } from './treatment/main-treatment.component';
 import { provideEffects } from '@ngrx/effects';
 import { MainEffects } from '../store/effects/main.effects';
 import { MainService } from '../services/main.service';
-import { CatalogueService } from '../services/catalogue.service';
 import { TreatmentService } from '../services/treatment.service';
-import { CatalogueEffects } from '../store/effects/catalogue.effects';
 import { UserEffects } from '../store/effects/user.effects';
 import { UserService } from '../services/user.service';
 import { LoginEffects } from '../store/effects/auth.effects';
@@ -24,7 +22,6 @@ import { provideFeatureTranslations } from '../shared/feature-providers';
 const providers = [
   provideFeatureTranslations('main'),
   MainService,
-  CatalogueService,
   TreatmentService,
   UserService,
   AuthService,
@@ -33,7 +30,7 @@ const providers = [
     useClass: HashLocationStrategy,
   },
   provideState(MAIN_FEATURE_KEY, mainReducer),
-  provideEffects(MainEffects, CatalogueEffects, UserEffects, LoginEffects, MainNavigationEffects),
+  provideEffects(MainEffects, UserEffects, LoginEffects, MainNavigationEffects),
 ];
 
 const children: Routes = [

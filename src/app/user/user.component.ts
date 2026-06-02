@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { getUser, saveUser } from '../store/user.actions';
+import { getUser, saveUser } from '../store/actions/user.actions';
 import { IUser, User } from '../interfaces/user';
 import { flags, IFlag } from '../util/flags';
 import { randomColor } from '../util/color';

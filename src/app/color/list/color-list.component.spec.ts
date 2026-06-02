@@ -1,25 +1,30 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject, of } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ColorListComponent } from './color-list.component';
 import { IColor } from '../../interfaces/color';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { colorSelected, deleteColor, getColorsPage } from '../../store/color.actions';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { signal } from '@angular/core';
-import { ColorState } from '../../store/reducers/color.reducers';
 import { MatDialog } from '@angular/material/dialog';
+import { ColorStore } from '../../store/color.store';
 
 describe('ColorListComponent', () => {
   let component: ColorListComponent;
   let fixture: ComponentFixture<ColorListComponent>;
-  let storeSpy: jasmine.SpyObj<Store<ColorState>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let routerSpy: jasmine.SpyObj<Router>;
   let translate: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let colorStoreSpy: {
+    data: ReturnType<typeof signal>;
+    response: ReturnType<typeof signal>;
+    loadPage: jasmine.Spy;
+    clearResponse: jasmine.Spy;
+    delete: jasmine.Spy;
+  };
 
   const mockColor: IColor[] = [
     { id: '1', name: 'Color 1', description: 'Desc 1' },
@@ -31,13 +36,9 @@ describe('ColorListComponent', () => {
     totalElements: 2,
   };
 
-  let colorList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    colorList$ = new BehaviorSubject(mockPagination);
-    response$ = new BehaviorSubject<any>(undefined);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -46,9 +47,16 @@ describe('ColorListComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    colorStoreSpy = {
+      data: signal(mockPagination),
+      response: signal<any>(undefined),
+      loadPage: jasmine.createSpy('loadPage'),
+      clearResponse: jasmine.createSpy('clearResponse'),
+      delete: jasmine.createSpy('delete'),
+    };
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
@@ -56,43 +64,29 @@ describe('ColorListComponent', () => {
       },
     });
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return colorList$.asObservable();
-        case 2:
-          return response$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [ColorListComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: ColorStore, useValue: colorStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MatDialog, useValue: dialogSpy },
+        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ColorListComponent);
-    component = fixture.componentInstance;
-
     translate = TestBed.inject(TranslateService);
     translate.use('en-GB');
+
+    fixture = TestBed.createComponent(ColorListComponent);
+    component = fixture.componentInstance;
 
     fixture.detectChanges();
   });
 
   afterEach(() => {
-    colorList$.complete();
-    response$.complete();
     breakpoint$.complete();
   });
 
@@ -101,7 +95,7 @@ describe('ColorListComponent', () => {
   });
 
   it('should compute dataSourceSignal correctly', () => {
-    colorList$.next(mockPagination);
+    colorStoreSpy.data.set(mockPagination);
     fixture.detectChanges();
 
     const data = component.dataSourceSignal() as any;
@@ -109,7 +103,7 @@ describe('ColorListComponent', () => {
   });
 
   it('should compute resultsLengthSignal correctly', () => {
-    colorList$.next(mockPagination);
+    colorStoreSpy.data.set(mockPagination);
     fixture.detectChanges();
 
     expect(component.resultsLengthSignal()).toBe(2);
@@ -142,46 +136,45 @@ describe('ColorListComponent', () => {
   });
 
   it('should dispatch getColorPage when paginatorPageIndex changes', () => {
+    colorStoreSpy.loadPage.calls.reset();
     const paginator = component['paginator']();
 
     paginator!.pageIndex = 1;
     paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getColorsPage({
-        page: 1,
-        sort: 'name',
-        direction: 'asc',
-        size: PAGE_SIZE,
-      }),
-    );
+    expect(colorStoreSpy.loadPage).toHaveBeenCalledWith({
+      page: 1,
+      sort: 'name',
+      direction: 'asc',
+      size: PAGE_SIZE,
+    });
   });
 
   it('should dispatch clean and reset paginator when responseSignal emits', () => {
     const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
 
     component['paginator'] = signal(paginatorMock);
+    colorStoreSpy.clearResponse.calls.reset();
+    colorStoreSpy.loadPage.calls.reset();
 
-    response$.next({ success: true });
-
+    colorStoreSpy.response.set({ success: true } as any);
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getColorsPage({
-        page: 0,
-        sort: 'name',
-        direction: 'asc',
-        size: PAGE_SIZE,
-      }),
-    );
+    expect(colorStoreSpy.clearResponse).toHaveBeenCalled();
+    expect(colorStoreSpy.loadPage).toHaveBeenCalledWith({
+      page: 0,
+      sort: 'name',
+      direction: 'asc',
+      size: PAGE_SIZE,
+    });
   });
 
   it('should dispatch colorSelected when edit is called', () => {
     const item = mockColor[0];
     component.edit(item);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(colorSelected({ selected: item }));
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'colors', item.id]);
   });
 
   it('should dispatch deleteColor when dialog returns a result', () => {
@@ -203,6 +196,6 @@ describe('ColorListComponent', () => {
         },
       }));
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteColor({ id: item.id!, name: item.name! }));
+    expect(colorStoreSpy.delete).toHaveBeenCalledWith({ id: item.id!, name: item.name! });
   });
 });

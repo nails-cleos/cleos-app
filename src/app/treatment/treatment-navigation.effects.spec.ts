@@ -4,7 +4,7 @@ import { ROUTER_NAVIGATED, RouterNavigatedAction } from '@ngrx/router-store';
 import { Action } from '@ngrx/store';
 import { ReplaySubject, firstValueFrom } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
-import { cleanTreatment, getAllColors, getAllTreatmentsGroup } from '../store/treatment.actions';
+import { cleanTreatment, getAllColors, getAllTreatmentsGroup } from '../store/actions/treatment.actions';
 import { TreatmentListComponent } from './list/treatment-list.component';
 import { TreatmentGroupSortingComponent } from './sorting/treatment-group-sorting.component';
 import { TreatmentSortingComponent } from './sorting/treatment-sorting.component';

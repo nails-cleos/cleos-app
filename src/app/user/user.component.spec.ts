@@ -8,7 +8,7 @@ import { GeocodeService, MapStatus } from '../services/geocode.service';
 import { UserState } from '../store/reducers/user.reducers';
 import { UserComponent } from './user.component';
 import { Role } from '../interfaces/token';
-import { getUser } from '../store/user.actions';
+import { getUser } from '../store/actions/user.actions';
 import { GoogleMapComponent } from '../shared/google-map/google-map.component';
 import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';

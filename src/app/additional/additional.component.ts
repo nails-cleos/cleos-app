@@ -14,7 +14,7 @@ import { combineLatestWith } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Additional, IAdditional } from '../interfaces/additional';
-import { createAdditional, getAdditional, updateAdditional } from '../store/additional.actions';
+import { createAdditional, getAdditional, updateAdditional } from '../store/actions/additional.actions';
 import { ITreatmentGroupAll } from '../interfaces/treatment';
 import { fieldChange, valueChange } from '../util/validators';
 import { map, startWith } from 'rxjs/operators';

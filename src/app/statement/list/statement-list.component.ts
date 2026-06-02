@@ -8,14 +8,14 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { IOfficeAll } from '../../interfaces/office';
 import { requireMatch } from '../../util/validators';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { StatementState } from '../../store/reducers/statement.reducers';
 import { DriveAccessService } from '../../services/drive-access.service';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { FileDropComponent, UploadFile } from '../../shared/file-drop/file-drop.component';
-import { uploadStatement } from '../../store/statement.actions';
 import { getMyOfficesPipe } from '../../store/selectors/office.selectors';
 import { OfficeState } from '../../store/reducers/office.reducers';
+import { getAllMyOffices } from '../../store/actions/office.actions';
+import { StatementStore } from '../../store/statement.store';
 import { MatOption } from '@angular/material/core';
 import { provideYearMonthDateAdapter } from '../../util/adapter/app-date.provider';
 import { EnvService } from '../../services/env.service';
@@ -44,7 +44,8 @@ type StatementForm = {
 export class StatementListComponent {
   private readonly env: EnvService = inject(EnvService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly store: Store<StatementState | OfficeState> = inject(Store<StatementState | OfficeState>);
+  private readonly store: Store<OfficeState> = inject(Store<OfficeState>);
+  private readonly statementStore = inject(StatementStore);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
 
@@ -84,6 +85,9 @@ export class StatementListComponent {
   language: string = this.translate.getCurrentLang();
 
   constructor() {
+    this.statementStore.clean();
+    this.store.dispatch(getAllMyOffices());
+
     effect(() => {
       const offices = this.allOfficesSignal();
       if (offices?.length === 1) {
@@ -107,7 +111,7 @@ export class StatementListComponent {
     if (!blob || !officeId || !fileName) {
       return;
     }
-    this.store.dispatch(uploadStatement({ blob, officeId, fileName }));
+    this.statementStore.upload(officeId, blob, fileName);
   }
 
   keyDownHandler = (event: KeyboardEvent): void => {

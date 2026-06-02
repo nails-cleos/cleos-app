@@ -20,7 +20,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { createRoom, getRoom, updateRoom } from '../store/room.actions';
+import { createRoom, getRoom, updateRoom } from '../store/actions/room.actions';
 import { AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, Room } from '../interfaces/room';
 import { IUser, IUserAll } from '../interfaces/user';
 import { map, startWith } from 'rxjs/operators';

@@ -8,7 +8,7 @@ import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { getAllGroupingByRoom, updateReservationTimestamp } from '../../store/reservation.actions';
+import { getAllGroupingByRoom, updateReservationTimestamp } from '../../store/actions/reservation.actions';
 import { CalendarEvent } from 'angular-calendar';
 import { addDays, addMonths } from 'date-fns';
 import { ReservationState } from '../../store/reducers/reservation.reducers';

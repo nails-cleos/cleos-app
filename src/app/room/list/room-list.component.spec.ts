@@ -5,7 +5,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { IAddress, IRoomAll } from '../../interfaces/room';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { deleteRoom, getRoomsPage, roomSelected } from '../../store/room.actions';
+import { deleteRoom, getRoomsPage, roomSelected } from '../../store/actions/room.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { RoomState } from '../../store/reducers/room.reducers';
@@ -14,7 +14,7 @@ import { ICurrencyAll } from '../../interfaces/currency';
 import { getCurrentTimeZone } from '../../util/dates';
 import { MatDialog } from '@angular/material/dialog';
 
-describe('RoomsComponent', () => {
+describe('RoomListComponent', () => {
   let component: RoomListComponent;
   let fixture: ComponentFixture<RoomListComponent>;
   let storeSpy: jasmine.SpyObj<Store<RoomState>>;

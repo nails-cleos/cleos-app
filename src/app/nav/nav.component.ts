@@ -3,9 +3,9 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ActivatedRoute, NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { IUser, User } from '../interfaces/user';
-import { logOut, redirect } from '../store/auth.actions';
-import { getNotificationsPage, readNotification } from '../store/notification.actions';
-import { updateMyUser } from '../store/user.actions';
+import { logOut, redirect } from '../store/actions/auth.actions';
+import { getNotificationsPage, readNotification } from '../store/actions/notification.actions';
+import { updateMyUser } from '../store/actions/user.actions';
 import { INotification } from '../interfaces/notification';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessagingService } from '../services/messaging.service';
@@ -32,7 +32,8 @@ import { ToastOptions } from '../shared/toast/toast.model';
 import { IResponseSuccess } from '../interfaces/common';
 import { EnvService } from '../services/env.service';
 import { LoadingOverlayService } from '../services/loading-overlay.service';
-import { clearGlobalError, clearGlobalResponse } from '../store/global.actions';
+import { clearGlobalError, clearGlobalResponse } from '../store/actions/global.actions';
+import { GLOBAL_FEEDBACK_SOURCE, GlobalFeedbackSource } from '../store/global-feedback-source';
 import { MatIcon } from '@angular/material/icon';
 import { MatDivider, MatListItem, MatListItemIcon, MatNavList } from '@angular/material/list';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -72,6 +73,7 @@ export class NavComponent {
   private readonly seoService: SeoService = inject(SeoService);
   private readonly route: ActivatedRoute = inject(ActivatedRoute);
   private readonly loadingService = inject(LoadingOverlayService);
+  private readonly feedbackSources = inject(GLOBAL_FEEDBACK_SOURCE, { optional: true }) ?? [];
 
   private breakpointObserver$ = this.breakpointObserver.observe(
     [Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium]);
@@ -107,12 +109,13 @@ export class NavComponent {
   private messageSignal = toSignal(this.messagingService.message$ ?? of(undefined));
   private globalResponseSignal = toSignal(this.store.select(selectGlobalResponse));
   private globalErrorSignal = toSignal(this.store.select(selectGlobalError));
+  private readonly feedbackResponse = computed(() => this.findFeedbackSource(source => source.response()));
+  private readonly feedbackError = computed(() => this.findFeedbackSource(source => source.error()));
 
   currentUserSignal = toSignal(this.user$);
 
   private authUserSignal = this.authUserService.authUser;
   private isAuthorized = computed(() => this.isAuthenticatedSignal() ?? false);
-  private readonly response = computed(() => this.globalResponseSignal());
   private readonly isBlockingPageError = (error?: { status?: string }) =>
     ['NOT_FOUND', 'SERVER_ERROR'].includes(error?.status || '');
 
@@ -132,7 +135,7 @@ export class NavComponent {
 
   isDarkMode = signal(this.authUserSignal().isDarkMode || isDarkMode(this.cookieService.get(THEME) as Theme));
   pageError = computed(() => {
-    const error = this.globalErrorSignal();
+    const error = this.globalErrorSignal() ?? this.feedbackError()?.value;
     return this.isBlockingPageError(error) ? error : undefined;
   });
   notifications = signal<INotification[]>([]);
@@ -154,8 +157,15 @@ export class NavComponent {
   constructor() {
     this.authUserService.cookieConsent(this.translate);
     this.router.events.subscribe(event => {
-      if (event instanceof NavigationStart && this.isBlockingPageError(this.globalErrorSignal())) {
-        this.store.dispatch(clearGlobalError());
+      if (event instanceof NavigationStart) {
+        const globalError = this.globalErrorSignal();
+        const feedbackError = this.findFeedbackSource(source => source.error());
+
+        if (this.isBlockingPageError(globalError)) {
+          this.store.dispatch(clearGlobalError());
+        } else if (this.isBlockingPageError(feedbackError?.value)) {
+          feedbackError?.source.clearError();
+        }
       }
     });
 
@@ -164,7 +174,9 @@ export class NavComponent {
     this.seoService.setMetaTitle(meta.TITLE);
 
     effect(() => {
-      const response = this.response();
+      const globalResponse = this.globalResponseSignal();
+      const feedbackResponse = this.feedbackResponse();
+      const response = globalResponse ?? feedbackResponse?.value;
       if (!response) {
         return;
       }
@@ -193,11 +205,17 @@ export class NavComponent {
         }
       }
 
-      this.store.dispatch(clearGlobalResponse());
+      if (globalResponse) {
+        this.store.dispatch(clearGlobalResponse());
+      } else {
+        feedbackResponse?.source.clearResponse();
+      }
     });
 
     effect(() => {
-      const err = this.globalErrorSignal();
+      const globalError = this.globalErrorSignal();
+      const feedbackError = this.feedbackError();
+      const err = globalError ?? feedbackError?.value;
       if (!err?.message) {
         return;
       }
@@ -205,7 +223,11 @@ export class NavComponent {
       this.toastService.show(err.message, 'error');
 
       if (!this.isBlockingPageError(err)) {
-        this.store.dispatch(clearGlobalError());
+        if (globalError) {
+          this.store.dispatch(clearGlobalError());
+        } else {
+          feedbackError?.source.clearError();
+        }
       }
     });
 
@@ -413,6 +435,19 @@ export class NavComponent {
       return { actionType: 'link', action: `/${ this.language() }/${ res.path }` };
     }
     return { actionType: 'none' };
+  };
+
+  private findFeedbackSource = <T>(
+    read: (source: GlobalFeedbackSource) => T | undefined,
+  ): { source: GlobalFeedbackSource; value: T } | undefined => {
+    for (const source of this.feedbackSources) {
+      const value = read(source);
+      if (value !== undefined) {
+        return { source, value };
+      }
+    }
+
+    return undefined;
   };
 
   toggleMenu = (menu: 'notifications' | 'workday' | 'settings'): void => {

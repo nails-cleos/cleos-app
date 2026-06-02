@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATED } from '@ngrx/router-store';
-import { cleanOffice, getAllManager } from '../store/office.actions';
-import { navigation } from '../store/router-navigation.operator';
+import { cleanOffice, getAllManager } from '../store/actions/office.actions';
+import { navigation } from '../util/router-navigation.operator';
 import { OfficeListComponent } from './list/office-list.component';
 import { OfficeCreatePageComponent } from './office-create-page.component';
 import { OfficeDetailsPageComponent } from './office-details-page.component';

@@ -1,0 +1,39 @@
+import { inject } from '@angular/core';
+import { signalStore } from '@ngrx/signals';
+import { TranslateService } from '@ngx-translate/core';
+import { IApiResponse } from '../interfaces/common';
+import { IColor } from '../interfaces/color';
+import { ColorService } from '../services/color.service';
+import { withCrudStoreMethods, withCrudStoreState } from './crud-signal-store';
+
+export const ColorStore = signalStore(
+  withCrudStoreState<IColor>(),
+  withCrudStoreMethods<IColor, IApiResponse, IApiResponse, { id: string; name: string }>(() => {
+    const colorService = inject(ColorService);
+    const translate = inject(TranslateService);
+
+    return {
+      placeholder: {} as IColor,
+      loadPage: ({ page, sort, direction, size }) => colorService.getColorsPage(page, sort, direction, size),
+      loadById: (id) => colorService.getColor(id),
+      create: (color) => colorService.createColor(color),
+      update: (id, color) => colorService.updateColor(id, color),
+      delete: ({ id }) => colorService.deleteColor(id),
+      createResponse: (response) => ({
+        message: translate.instant('COLOR.CREATED', { name: response.name }),
+        path: `colors/${ response.id }`,
+        redirect: 'colors',
+      }),
+      updateResponse: (response) => ({
+        message: translate.instant('COLOR.UPDATED.MESSAGE', { name: response.name }),
+        path: `colors/${ response.id }`,
+        redirect: 'colors',
+      }),
+      deleteResponse: ({ name }) => ({
+        message: translate.instant('COLOR.DELETED.MESSAGE', { name }),
+        reload: true,
+        toastType: 'warning',
+      }),
+    };
+  }),
+);

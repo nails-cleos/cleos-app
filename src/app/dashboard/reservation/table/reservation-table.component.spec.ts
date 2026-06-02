@@ -5,7 +5,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { IReservation } from '../../../interfaces/reservation';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
-import { deleteReservation, getPage } from '../../../store/reservation.actions';
+import { deleteReservation, getPage } from '../../../store/actions/reservation.actions';
 import { ActivatedRoute } from '@angular/router';
 import { ReservationTableComponent } from './reservation-table.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';

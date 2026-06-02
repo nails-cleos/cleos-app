@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { IAdditionalAll } from '../../interfaces/additional';
 import { ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
-import { getAdditionalList, sortAdditional } from '../../store/additional.actions';
+import { getAdditionalList, sortAdditional } from '../../store/actions/additional.actions';
 import { ServiceType } from '../../interfaces/room';
 import { TranslateModule } from '@ngx-translate/core';
 import { AdditionalState } from '../../store/reducers/additional.reducers';

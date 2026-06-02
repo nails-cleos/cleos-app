@@ -6,7 +6,7 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
-import { cleanDiscount, getMyDiscountsPage } from '../../../store/discount.actions';
+import { cleanDiscount, getMyDiscountsPage } from '../../../store/actions/discount.actions';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { currencySymbol } from '../../../util/helper';
 import { getDiscountResponsePipe, getMyDiscountPaginationPipe } from '../../../store/selectors/discount.selectors';

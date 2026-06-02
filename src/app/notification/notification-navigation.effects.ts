@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATED } from '@ngrx/router-store';
-import { cleanNotification } from '../store/notification.actions';
-import { navigation } from '../store/router-navigation.operator';
+import { cleanNotification } from '../store/actions/notification.actions';
+import { navigation } from '../util/router-navigation.operator';
 import { NotificationListComponent } from './list/notification-list.component';
 
 @Injectable()

@@ -24,7 +24,7 @@ import {
 import { Store } from '@ngrx/store';
 import { map, startWith } from 'rxjs/operators';
 import { currencySymbol } from '../../util/helper';
-import { cleanUser, getAllCustomers } from '../../store/user.actions';
+import { cleanUser, getAllCustomers } from '../../store/actions/user.actions';
 import { getAllCustomersPipe } from '../../store/selectors/user.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { UserState } from '../../store/reducers/user.reducers';

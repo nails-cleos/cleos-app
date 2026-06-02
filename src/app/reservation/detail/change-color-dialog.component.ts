@@ -12,7 +12,7 @@ import {
 } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { map, startWith } from 'rxjs/operators';
-import { getColorsByTreatmentId } from '../../store/reservation.actions';
+import { getColorsByTreatmentId } from '../../store/actions/reservation.actions';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { toSignal } from '@angular/core/rxjs-interop';

@@ -12,12 +12,12 @@ import {
   getTransactionsByAccountId,
   paymentSend,
   updateAccount,
-} from '../account.actions';
+} from '../actions/account.actions';
 
 import { Pagination } from '../../interfaces/pagination';
 import { IAccount, IAccountAll, IAccountTransaction, ITransaction } from '../../interfaces/account';
 import { IError, IResponseSuccess } from '../../interfaces/common';
-import { clearGlobalError, clearGlobalResponse } from '../global.actions';
+import { clearGlobalError, clearGlobalResponse } from '../actions/global.actions';
 
 export const ACCOUNT_FEATURE_KEY = 'accounts';
 

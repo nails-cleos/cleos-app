@@ -18,7 +18,7 @@ import {
   paymentSend,
   recreate,
   updatePaymentById,
-} from '../payment.actions';
+} from '../actions/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { PaymentService } from '../../services/payment.service';
 import { Router } from '@angular/router';

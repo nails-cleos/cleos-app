@@ -10,7 +10,7 @@ import {
   setCurrentLang,
   treatmentSuccess,
   updateMyUser,
-} from '../main.actions';
+} from '../actions/main.actions';
 import { ICatalogueAll } from '../../interfaces/catalogue';
 import { ITreatmentGroup } from '../../interfaces/treatment';
 import { IError, IResponseSuccess } from '../../interfaces/common';

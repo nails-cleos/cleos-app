@@ -20,7 +20,7 @@ import {
   updateMonthlySummary,
   yearExportSuccess,
   yearSummarySuccess,
-} from '../dashboard.actions';
+} from '../actions/dashboard.actions';
 import {
   IDashboard,
   IMonthlyExport,

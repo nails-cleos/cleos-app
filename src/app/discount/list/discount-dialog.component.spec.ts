@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DiscountDialogComponent } from './discount-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { cleanUser, getAllCustomers } from '../../store/user.actions';
+import { cleanUser, getAllCustomers } from '../../store/actions/user.actions';
 import { DiscountType, IDiscountAll } from '../../interfaces/discount';
 import { IUserAll } from '../../interfaces/user';
 import { TranslateModule } from '@ngx-translate/core';

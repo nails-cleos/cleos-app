@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATED } from '@ngrx/router-store';
-import { navigation } from '../store/router-navigation.operator';
+import { navigation } from '../util/router-navigation.operator';
 import { DiscountListComponent } from './list/discount-list.component';
-import { cleanDiscount, getAllCurrency } from '../store/discount.actions';
+import { cleanDiscount, getAllCurrency } from '../store/actions/discount.actions';
 import { DiscountCreatePageComponent } from './discount-create-page.component';
 import { DiscountDetailsPageComponent } from './discount-details-page.component';
 

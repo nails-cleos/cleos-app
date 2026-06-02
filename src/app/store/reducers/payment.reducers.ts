@@ -17,11 +17,11 @@ import {
   recreate,
   setPaymentResultParams,
   updatePaymentById,
-} from '../payment.actions';
+} from '../actions/payment.actions';
 import { IPayment, IPaymentOption } from '../../interfaces/payment';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
-import { clearGlobalError, clearGlobalResponse } from '../global.actions';
+import { clearGlobalError, clearGlobalResponse } from '../actions/global.actions';
 
 export const PAYMENT_FEATURE_KEY = 'payment';
 

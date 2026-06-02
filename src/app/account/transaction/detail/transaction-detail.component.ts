@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router, RouterLink } from '@angular/router';
-import { getTransaction } from '../../../store/account.actions';
+import { getTransaction } from '../../../store/actions/account.actions';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { notifyPayment, paymentSend } from '../../../store/payment.actions';
+import { notifyPayment, paymentSend } from '../../../store/actions/payment.actions';
 import { newDateTimestamp } from '../../../util/dates';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import {

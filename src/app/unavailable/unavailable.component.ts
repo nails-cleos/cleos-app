@@ -9,7 +9,7 @@ import {
   getAllRoomsByProfessionalId,
   getUnavailable,
   updateUnavailable,
-} from '../store/unavailable.actions';
+} from '../store/actions/unavailable.actions';
 import { IUser, IUserAll } from '../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
 import {

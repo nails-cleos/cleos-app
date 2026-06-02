@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { ChangeDetectorRef, signal } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { API_LOCALE, createNewDate, formatDuration, getTime, zoneDateToDate } from '../../util/dates';
-import { deleteUnavailable, getUnavailable } from '../../store/unavailable.actions';
+import { deleteUnavailable, getUnavailable } from '../../store/actions/unavailable.actions';
 import { IUnavailableAll } from '../../interfaces/unavailable';
 import { IUserAll } from '../../interfaces/user';
 import { IAvailability, IRoomAll } from '../../interfaces/room';

@@ -11,7 +11,7 @@ import { resetTheme, Theme } from './util/theme';
 import { getLocale } from './util/helper';
 import { AuthUserService } from './services/auth-user.service';
 import { SeoService } from './services/seo.service';
-import { setLanguage } from './store/i18n.actions';
+import { setLanguage } from './store/actions/i18n.actions';
 import { I18NState } from './store/reducers/i18n.reducers';
 
 @Component({

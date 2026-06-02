@@ -6,7 +6,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { UnavailableListComponent } from './unavailable-list.component';
 import { IUnavailableAll } from '../../interfaces/unavailable';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { deleteUnavailable, getUnavailablePage, unavailableSelected } from '../../store/unavailable.actions';
+import { deleteUnavailable, getUnavailablePage, unavailableSelected } from '../../store/actions/unavailable.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { UnavailableState } from '../../store/reducers/unavailable.reducers';

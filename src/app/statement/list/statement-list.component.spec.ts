@@ -6,19 +6,23 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { StatementListComponent } from './statement-list.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IOfficeAll } from '../../interfaces/office';
-import { StatementState } from '../../store/reducers/statement.reducers';
 import { DriveAccessService } from '../../services/drive-access.service';
-import { uploadStatement } from '../../store/statement.actions';
 import { NavigationService } from '../../services/navigation.service';
+import { getAllMyOffices } from '../../store/actions/office.actions';
+import { StatementStore } from '../../store/statement.store';
 
-describe('StatementComponent', () => {
+describe('StatementListComponent', () => {
   let component: StatementListComponent;
   let fixture: ComponentFixture<StatementListComponent>;
-  let storeSpy: jasmine.SpyObj<Store<StatementState>>;
+  let storeSpy: jasmine.SpyObj<Store>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let routerSpy: jasmine.SpyObj<Router>;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
+  let statementStoreSpy: {
+    clean: jasmine.Spy;
+    upload: jasmine.Spy;
+  };
   let translate: TranslateService;
 
   const mockOffice: IOfficeAll = {
@@ -52,6 +56,10 @@ describe('StatementComponent', () => {
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     driveAccessServiceSpy = jasmine.createSpyObj('DriveAccessService', ['requestAccessIfNeeded']);
+    statementStoreSpy = {
+      clean: jasmine.createSpy('clean'),
+      upload: jasmine.createSpy('upload'),
+    };
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
@@ -79,6 +87,7 @@ describe('StatementComponent', () => {
       imports: [StatementListComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
+        { provide: StatementStore, useValue: statementStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Router, useValue: routerSpy },
@@ -94,6 +103,7 @@ describe('StatementComponent', () => {
     translate.use('en-GB');
 
     fixture.detectChanges();
+    storeSpy.dispatch.calls.reset();
   });
 
   afterEach(() => {
@@ -104,6 +114,14 @@ describe('StatementComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should bootstrap statement page state on init', () => {
+    const freshFixture = TestBed.createComponent(StatementListComponent);
+    freshFixture.detectChanges();
+
+    expect(statementStoreSpy.clean).toHaveBeenCalled();
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllMyOffices());
   });
 
   it('should display office name with displayFnOffice', () => {
@@ -176,15 +194,11 @@ describe('StatementComponent', () => {
     expect(component.form.valid).toBeTrue();
     expect(component.fileName()).toBe(fileName);
     expect(component.blob()).toEqual(blob);
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(uploadStatement({
-      blob,
-      officeId: mockOffice.id,
-      fileName: fileName,
-    }));
+    expect(statementStoreSpy.upload).toHaveBeenCalledWith(mockOffice.id, blob, fileName);
   });
 
   it('should not submit statement when required fields are missing', () => {
     component.submit();
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(statementStoreSpy.upload).not.toHaveBeenCalled();
   });
 });

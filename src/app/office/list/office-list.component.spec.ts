@@ -6,7 +6,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { OfficeListComponent } from './office-list.component';
 import { IOffice } from '../../interfaces/office';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { deleteOffice, getOfficesPage, officeSelected } from '../../store/office.actions';
+import { deleteOffice, getOfficesPage, officeSelected } from '../../store/actions/office.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { OfficeState } from '../../store/reducers/office.reducers';

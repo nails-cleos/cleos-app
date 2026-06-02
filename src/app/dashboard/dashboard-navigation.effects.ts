@@ -8,8 +8,8 @@ import {
   setMonthlyNavigationParams,
   setQuarterNavigationParams,
   setYearNavigationParams,
-} from '../store/dashboard.actions';
-import { navigation } from '../store/router-navigation.operator';
+} from '../store/actions/dashboard.actions';
+import { navigation } from '../util/router-navigation.operator';
 import { DashboardComponent } from './dashboard.component';
 import { DashboardEventComponent } from './events/dashboard-event.component';
 import { MonthSummaryComponent } from './month-summary/month-summary.component';

@@ -22,7 +22,7 @@ import {
   userSaveSuccess,
   userSelected,
   userSuccess,
-} from '../user.actions';
+} from '../actions/user.actions';
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -32,7 +32,7 @@ import { Pagination } from '../../interfaces/pagination';
 import { IOverview, IUserAll } from '../../interfaces/user';
 import { IApiResponse, success, successResponse } from '../../interfaces/common';
 import { ToastType } from '../../shared/toast/toast.model';
-import { loginSuccess } from '../auth.actions';
+import { loginSuccess } from '../actions/auth.actions';
 import { effectRequest } from '../../util/rxjs';
 
 @Injectable()

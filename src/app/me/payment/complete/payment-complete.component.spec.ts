@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { paymentNotComplete } from '../../../store/payment.actions';
+import { paymentNotComplete } from '../../../store/actions/payment.actions';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 
 describe('PaymentCompleteComponent', () => {

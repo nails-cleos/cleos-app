@@ -6,7 +6,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AdditionalListComponent } from './additional-list.component';
 import { IAdditional } from '../../interfaces/additional';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { additionalSelected, deleteAdditional, getAdditionalPage } from '../../store/additional.actions';
+import { additionalSelected, deleteAdditional, getAdditionalPage } from '../../store/actions/additional.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { AdditionalState } from '../../store/reducers/additional.reducers';

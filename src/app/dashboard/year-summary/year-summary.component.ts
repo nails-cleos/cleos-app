@@ -15,7 +15,7 @@ import {
   SummaryTotals,
   Total,
 } from '../../interfaces/dashboard';
-import { exportYearSummary, getYearSummary } from '../../store/dashboard.actions';
+import { exportYearSummary, getYearSummary } from '../../store/actions/dashboard.actions';
 import { AuthUserService } from '../../services/auth-user.service';
 import {
   allElementsHaveSameKeyFilterValue,

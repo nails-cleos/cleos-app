@@ -8,7 +8,7 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { cleanDiscount, getUserDiscountByCustomerId } from '../../store/discount.actions';
+import { cleanDiscount, getUserDiscountByCustomerId } from '../../store/actions/discount.actions';
 import { TranslatePipe } from '@ngx-translate/core';
 import { DiscountState } from '../../store/reducers/discount.reducers';
 import { getUserDiscountsPipe } from '../../store/selectors/discount.selectors';

@@ -18,7 +18,7 @@ import {
   treatmentSelected,
   treatmentSuccess,
   updateTreatmentGroup,
-} from '../treatment.actions';
+} from '../actions/treatment.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { TreatmentService } from '../../services/treatment.service';
 import { Router } from '@angular/router';

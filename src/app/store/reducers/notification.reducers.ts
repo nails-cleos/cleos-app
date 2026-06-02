@@ -8,7 +8,7 @@ import {
   notificationReadSuccess,
   notificationSuccess,
   readNotification,
-} from '../notification.actions';
+} from '../actions/notification.actions';
 import { INotification, INotificationDTO } from '../../interfaces/notification';
 import { Pagination } from '../../interfaces/pagination';
 import { IError } from '../../interfaces/common';

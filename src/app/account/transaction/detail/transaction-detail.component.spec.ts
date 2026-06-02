@@ -6,8 +6,8 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { TransactionDetailComponent } from './transaction-detail.component';
 import { ITransaction } from '../../../interfaces/account';
-import { getTransaction } from '../../../store/account.actions';
-import { notifyPayment, paymentSend } from '../../../store/payment.actions';
+import { getTransaction } from '../../../store/actions/account.actions';
+import { notifyPayment, paymentSend } from '../../../store/actions/payment.actions';
 import { AccountState } from '../../../store/reducers/account.reducers';
 import { NavigationService } from '../../../services/navigation.service';
 

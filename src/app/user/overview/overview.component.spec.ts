@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { getCustomerOverview } from '../../store/user.actions';
+import { getCustomerOverview } from '../../store/actions/user.actions';
 import { IOverview } from '../../interfaces/user';
 import { IReservationOverview } from '../../interfaces/reservation';
 import { IChart } from '../../interfaces/dashboard';

@@ -1,20 +1,16 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
 import { Currency, ICurrency } from '../interfaces/currency';
-import { createCurrency, getCurrency, updateCurrency } from '../store/currency.actions';
 import { fieldChange } from '../util/validators';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import { getSelectedCurrencyPipe, getSubErrorsPipe } from '../store/selectors/currency.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../interfaces/common';
-import { CurrencyState } from '../store/reducers/currency.reducers';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatSelect, MatSelectTrigger } from '@angular/material/select';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatOption } from '@angular/material/core';
+import { CurrencyStore } from '../store/currency.store';
 
 type CurrencyForm = {
   code: FormControl<string>;
@@ -33,14 +29,11 @@ type CurrencyForm = {
 export class CurrencyComponent {
   id = input<string>();
 
-  private readonly store: Store<CurrencyState> = inject(Store<CurrencyState>);
+  private readonly currencyStore = inject(CurrencyStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  private selectedCurrency$ = this.store.pipe(getSelectedCurrencyPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-
-  private selectedCurrencySignal = toSignal(this.selectedCurrency$);
-  private subErrorsSignal = toSignal(this.subErrors$);
+  private selectedCurrencySignal = this.currencyStore.selected;
+  private subErrorsSignal = this.currencyStore.subErrors;
 
   currencySignal = computed(() => this.selectedCurrencySignal());
 
@@ -85,7 +78,9 @@ export class CurrencyComponent {
     effect(() => {
       const id = this.id();
       if (id) {
-        this.store.dispatch(getCurrency({ id }));
+        this.currencyStore.loadById(id);
+      } else {
+        this.currencyStore.clean();
       }
     });
   }
@@ -107,9 +102,9 @@ export class CurrencyComponent {
 
     const id = this.id();
     if (!id) {
-      this.store.dispatch(createCurrency({ currency }));
+      this.currencyStore.create(currency);
     } else {
-      this.store.dispatch(updateCurrency({ id, currency }));
+      this.currencyStore.update(id, currency);
     }
     return;
   }

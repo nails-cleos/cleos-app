@@ -5,14 +5,14 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { IDiscount } from '../../interfaces/discount';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { deleteDiscount, discountSelected, getDiscountsPage } from '../../store/discount.actions';
+import { deleteDiscount, discountSelected, getDiscountsPage } from '../../store/actions/discount.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { DiscountListComponent } from './discount-list.component';
 import { DiscountState } from '../../store/reducers/discount.reducers';
 import { MatDialog } from '@angular/material/dialog';
 
-describe('DiscountsComponent', () => {
+describe('DiscountListComponent', () => {
   let component: DiscountListComponent;
   let fixture: ComponentFixture<DiscountListComponent>;
   let storeSpy: jasmine.SpyObj<Store<DiscountState>>;

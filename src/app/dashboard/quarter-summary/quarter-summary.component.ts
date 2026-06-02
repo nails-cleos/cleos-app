@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { getQuarterSummary } from '../../store/dashboard.actions';
+import { getQuarterSummary } from '../../store/actions/dashboard.actions';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import {
   IMonthSummary,

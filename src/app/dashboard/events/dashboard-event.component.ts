@@ -22,8 +22,8 @@ import {
 import { Store } from '@ngrx/store';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ICalendarNote, ICalendarReservations, IProfessionalEvent } from '../../interfaces/dashboard';
-import { getMyEvent, updateEvent } from '../../store/dashboard.actions';
-import { approveReservation, startReservation } from '../../store/reservation.actions';
+import { getMyEvent, updateEvent } from '../../store/actions/dashboard.actions';
+import { approveReservation, startReservation } from '../../store/actions/reservation.actions';
 import {
   DayViewSchedulerCalendarUtils,
   DayViewSchedulerComponent,

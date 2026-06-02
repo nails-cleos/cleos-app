@@ -10,7 +10,7 @@ import {
   notificationSuccess,
   readNotification,
   subscribeNotification,
-} from '../notification.actions';
+} from '../actions/notification.actions';
 import { NotificationService } from '../../services/notification.service';
 import { Router } from '@angular/router';
 import { Pagination } from '../../interfaces/pagination';

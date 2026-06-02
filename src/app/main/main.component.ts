@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } 
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { redirect } from '../store/auth.actions';
+import { redirect } from '../store/actions/auth.actions';
 import { IUser, User } from '../interfaces/user';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CookieService } from 'ngx-cookie-service';
@@ -12,7 +12,7 @@ import { ThemeService } from 'ng2-charts';
 import { goTo, observeElementSignal } from '../util/animation';
 import { AuthUserService } from '../services/auth-user.service';
 import { MainContentService } from '../services/main-content.service';
-import { updateMyUser } from '../store/main.actions';
+import { updateMyUser } from '../store/actions/main.actions';
 import { NavigationService } from '../services/navigation.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { getCurrentLangPipe } from '../store/selectors/main.selectors';

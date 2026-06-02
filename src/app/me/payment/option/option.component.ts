@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
-import { createPaymentLinkByReservationId, getPaymentByResourceId } from '../../../store/payment.actions';
+import { createPaymentLinkByReservationId, getPaymentByResourceId } from '../../../store/actions/payment.actions';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';

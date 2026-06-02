@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Store } from '@ngrx/store';
-import { getCards, getEvents } from '../store/dashboard.actions';
+import { getCards, getEvents } from '../store/actions/dashboard.actions';
 import { IReservationSummary, States } from '../interfaces/reservation';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {

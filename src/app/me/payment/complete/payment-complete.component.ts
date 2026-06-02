@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { paymentNotComplete, paymentSave } from '../../../store/payment.actions';
+import { paymentNotComplete, paymentSave } from '../../../store/actions/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { PaymentStatus } from '../../../interfaces/payment';
 import { PaymentState } from '../../../store/reducers/payment.reducers';

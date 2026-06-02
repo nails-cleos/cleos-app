@@ -7,7 +7,7 @@ import { createMatTableState } from 'src/app/util/mat-table-state';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { cleanTreatment, deleteTreatmentGroup, getTreatmentsPage } from '../../store/treatment.actions';
+import { cleanTreatment, deleteTreatmentGroup, getTreatmentsPage } from '../../store/actions/treatment.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';

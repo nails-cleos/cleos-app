@@ -10,7 +10,7 @@ import {
   getAllTreatments,
   getReservation,
   reservationFindPayments,
-} from '../../../store/reservation.actions';
+} from '../../../store/actions/reservation.actions';
 import { IExtras } from '../../../interfaces/reservation';
 import { MatListOption } from '@angular/material/list';
 import { ServiceType } from '../../../interfaces/room';

@@ -7,25 +7,15 @@ import {
   CdkDropList,
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
-import { Store } from '@ngrx/store';
-import {
-  catalogueSelected,
-  cleanCatalogue,
-  deleteCatalogue,
-  getAllCatalogues,
-  updateCatalogueOrder,
-} from '../../store/catalogue.actions';
 import { ICatalogueAll } from '../../interfaces/catalogue';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { executeDialogNoWidth } from '../../util/helper';
-import { getCatalogueListPipe, getCatalogueResponsePipe } from '../../store/selectors/catalogue.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { CatalogueState } from '../../store/reducers/catalogue.reducers';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { CatalogueStore } from '../../store/catalogue.store';
 
 @Component({
   selector: 'app-catalogue-list',
@@ -37,13 +27,10 @@ import { RouterLink } from '@angular/router';
 export class CatalogueListComponent {
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly store: Store<CatalogueState> = inject(Store<CatalogueState>);
-
-  private response$ = this.store.pipe(getCatalogueResponsePipe);
-  private catalogues$ = this.store.pipe(getCatalogueListPipe);
-
-  private responseSignal = toSignal(this.response$);
-  private cataloguesSignal = toSignal(this.catalogues$);
+  private readonly router: Router = inject(Router);
+  private readonly catalogueStore = inject(CatalogueStore);
+  private readonly responseSignal = this.catalogueStore.response;
+  private readonly cataloguesSignal = this.catalogueStore.data;
 
   catalogues = computed(() => {
     const list = this.cataloguesSignal() || [];
@@ -53,10 +40,13 @@ export class CatalogueListComponent {
   language: string = this.translate.getCurrentLang();
 
   constructor() {
+    this.catalogueStore.clean();
+    this.catalogueStore.loadAllCatalogues();
+
     effect(() => {
       if (this.responseSignal()) {
-        this.store.dispatch(cleanCatalogue());
-        this.store.dispatch(getAllCatalogues());
+        this.catalogueStore.clearResponse();
+        this.catalogueStore.loadAllCatalogues();
       }
     });
   }
@@ -66,11 +56,11 @@ export class CatalogueListComponent {
   }
 
   finish(): void {
-    this.store.dispatch(updateCatalogueOrder({ catalogues: this.catalogues() }));
+    this.catalogueStore.updateOrder(this.catalogues());
   }
 
   edit(selected: ICatalogueAll): void {
-    this.store.dispatch(catalogueSelected({ selected }));
+    void this.router.navigate([this.language, 'catalogues', selected.id]);
   }
 
   delete(catalogue: ICatalogueAll): void {
@@ -78,7 +68,7 @@ export class CatalogueListComponent {
     const content = this.translate.instant('CATALOGUE.DELETED.CONTENT', { name: catalogue.name });
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: catalogue, variant: 'warning' }, result => {
       if (result) {
-        this.store.dispatch(deleteCatalogue({ id: result.id, name: result.name }));
+        this.catalogueStore.delete(result.id, result.name);
       }
     });
   }

@@ -1,4 +1,4 @@
-import { getLanguage, setLanguage } from '../i18n.actions';
+import { getLanguage, setLanguage } from '../actions/i18n.actions';
 import { createReducer, on } from '@ngrx/store';
 
 export const I18N_FEATURE_KEY = 'i18n';

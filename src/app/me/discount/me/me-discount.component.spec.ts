@@ -5,7 +5,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
-import { getMyDiscountsPage } from '../../../store/discount.actions';
+import { getMyDiscountsPage } from '../../../store/actions/discount.actions';
 import { ActivatedRoute, Router } from '@angular/router';
 import { signal } from '@angular/core';
 import { MeDiscountComponent } from './me-discount.component';

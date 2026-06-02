@@ -17,7 +17,7 @@ import {
   getTreatmentGroup,
   treatmentSelected,
   updateTreatmentGroup,
-} from '../store/treatment.actions';
+} from '../store/actions/treatment.actions';
 import { Store } from '@ngrx/store';
 import { combineLatestWith } from 'rxjs';
 import { ITreatment, ITreatmentGroup, Treatment, TreatmentGroup } from '../interfaces/treatment';

@@ -16,7 +16,7 @@ import {
   getExpense,
   getExpensesPage,
   updateExpense,
-} from '../expense.actions';
+} from '../actions/expense.actions';
 import { IExpenseAll, IExpenseInfo } from '../../interfaces/expense';
 import { IApiResponse, success } from '../../interfaces/common';
 import { Pagination } from '../../interfaces/pagination';

@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { firstValueFrom, throwError } from 'rxjs';
 
 import { AuthUserService } from '../services/auth-user.service';
-import { reLogin } from '../store/auth.actions';
+import { reLogin } from '../store/actions/auth.actions';
 import { errorInterceptor } from './error-interceptor';
 
 describe('errorInterceptor', () => {

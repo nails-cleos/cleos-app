@@ -6,7 +6,7 @@ import { fieldChange, requireMatch } from '../util/validators';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
-import { createOffice, getOffice, updateOffice } from '../store/office.actions';
+import { createOffice, getOffice, updateOffice } from '../store/actions/office.actions';
 import { Role } from '../interfaces/token';
 import { map, startWith } from 'rxjs/operators';
 import { IOffice, Office } from '../interfaces/office';

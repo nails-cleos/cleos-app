@@ -4,10 +4,10 @@ import { Store } from '@ngrx/store';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/payment.actions';
+import { getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/actions/payment.actions';
 import { IPaymentAll } from '../../interfaces/payment';
 import { PaymentState } from '../../store/reducers/payment.reducers';
-import { cleanPayment } from '../../store/payment.actions';
+import { cleanPayment } from '../../store/actions/payment.actions';
 
 describe('PaymentComponent', () => {
   let component: PaymentComponent;

@@ -16,7 +16,7 @@ import {
   cleanAdditional,
   deleteAdditional,
   getAdditionalPage,
-} from '../../store/additional.actions';
+} from '../../store/actions/additional.actions';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getAdditionalPaginationPipe, getAdditionalResponsePipe } from '../../store/selectors/additional.selectors';
 import { AdditionalState } from '../../store/reducers/additional.reducers';

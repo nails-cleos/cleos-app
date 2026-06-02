@@ -1,25 +1,30 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject, of } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CurrencyListComponent } from './currency-list.component';
 import { ICurrency } from '../../interfaces/currency';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import { currencySelected, deleteCurrency, getCurrenciesPage } from '../../store/currency.actions';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { signal } from '@angular/core';
-import { CurrencyState } from '../../store/reducers/currency.reducers';
 import { MatDialog } from '@angular/material/dialog';
+import { CurrencyStore } from '../../store/currency.store';
 
 describe('CurrencyListComponent', () => {
   let component: CurrencyListComponent;
   let fixture: ComponentFixture<CurrencyListComponent>;
 
-  let storeSpy: jasmine.SpyObj<Store<CurrencyState>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let currencyStoreSpy: {
+    data: ReturnType<typeof signal>;
+    response: ReturnType<typeof signal>;
+    loadPage: jasmine.Spy;
+    clearResponse: jasmine.Spy;
+    delete: jasmine.Spy;
+  };
 
   let translate: TranslateService;
 
@@ -36,13 +41,9 @@ describe('CurrencyListComponent', () => {
     number: 0,
   };
 
-  let currencyList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    currencyList$ = new BehaviorSubject(mockPagination);
-    response$ = new BehaviorSubject<any>(undefined);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -51,9 +52,16 @@ describe('CurrencyListComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    currencyStoreSpy = {
+      data: signal(mockPagination),
+      response: signal<any>(undefined),
+      loadPage: jasmine.createSpy('loadPage'),
+      clearResponse: jasmine.createSpy('clearResponse'),
+      delete: jasmine.createSpy('delete'),
+    };
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
@@ -61,43 +69,29 @@ describe('CurrencyListComponent', () => {
       },
     });
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return currencyList$.asObservable();
-        case 2:
-          return response$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [CurrencyListComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: CurrencyStore, useValue: currencyStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MatDialog, useValue: dialogSpy },
+        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(CurrencyListComponent);
-    component = fixture.componentInstance;
-
     translate = TestBed.inject(TranslateService);
     translate.use('en-GB');
+
+    fixture = TestBed.createComponent(CurrencyListComponent);
+    component = fixture.componentInstance;
 
     fixture.detectChanges();
   });
 
   afterEach(() => {
-    currencyList$.complete();
-    response$.complete();
     breakpoint$.complete();
   });
 
@@ -106,7 +100,7 @@ describe('CurrencyListComponent', () => {
   });
 
   it('should compute dataSourceSignal correctly', () => {
-    currencyList$.next(mockPagination);
+    currencyStoreSpy.data.set(mockPagination);
     fixture.detectChanges();
 
     const data = component.dataSourceSignal() as any;
@@ -114,7 +108,7 @@ describe('CurrencyListComponent', () => {
   });
 
   it('should compute resultsLengthSignal correctly', () => {
-    currencyList$.next(mockPagination);
+    currencyStoreSpy.data.set(mockPagination);
     fixture.detectChanges();
 
     expect(component.resultsLengthSignal()).toBe(3);
@@ -147,46 +141,46 @@ describe('CurrencyListComponent', () => {
   });
 
   it('should dispatch getCurrencyPage when paginatorPageIndex changes', () => {
+    currencyStoreSpy.loadPage.calls.reset();
     const paginator = component['paginator']();
 
     paginator!.pageIndex = 1;
     paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getCurrenciesPage({
-        page: 1,
-        sort: 'code',
-        direction: 'asc',
-        size: PAGE_SIZE,
-      }),
-    );
+    expect(currencyStoreSpy.loadPage).toHaveBeenCalledWith({
+      page: 1,
+      sort: 'code',
+      direction: 'asc',
+      size: PAGE_SIZE,
+    });
   });
 
   it('should dispatch clean and reset paginator when responseSignal emits', () => {
     const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
 
     component['paginator'] = signal(paginatorMock);
+    currencyStoreSpy.clearResponse.calls.reset();
+    currencyStoreSpy.loadPage.calls.reset();
 
-    response$.next({ success: true });
+    currencyStoreSpy.response.set({ success: true } as any);
 
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getCurrenciesPage({
-        page: 0,
-        sort: 'code',
-        direction: 'asc',
-        size: PAGE_SIZE,
-      }),
-    );
+    expect(currencyStoreSpy.clearResponse).toHaveBeenCalled();
+    expect(currencyStoreSpy.loadPage).toHaveBeenCalledWith({
+      page: 0,
+      sort: 'code',
+      direction: 'asc',
+      size: PAGE_SIZE,
+    });
   });
 
   it('should dispatch currencySelected when edit is called', () => {
     const item = mockCurrencyList[0];
     component.edit(item);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(currencySelected({ selected: item }));
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'currency', item.id]);
   });
 
   it('should dispatch deleteCurrency when dialog returns a result', () => {
@@ -197,6 +191,6 @@ describe('CurrencyListComponent', () => {
 
     component.delete(item);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteCurrency({ id: item.id!, code: item.code! }));
+    expect(currencyStoreSpy.delete).toHaveBeenCalledWith({ id: item.id!, code: item.code! });
   });
 });

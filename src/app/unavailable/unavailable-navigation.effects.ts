@@ -6,8 +6,8 @@ import {
   cleanUnavailable,
   getAllProfessional,
   setUnavailableParams,
-} from '../store/unavailable.actions';
-import { navigation } from '../store/router-navigation.operator';
+} from '../store/actions/unavailable.actions';
+import { navigation } from '../util/router-navigation.operator';
 import { BlockAgendaCreatePageComponent } from './block-agenda/block-agenda-create-page.component';
 import { BlockAgendaDetailsPageComponent } from './block-agenda/block-agenda-details-page.component';
 import { UnavailableListComponent } from './list/unavailable-list.component';

@@ -12,11 +12,11 @@ import {
   getExpense,
   getExpensesPage,
   updateExpense,
-} from '../expense.actions';
+} from '../actions/expense.actions';
 import { Pagination } from '../../interfaces/pagination';
 import { IExpenseAll, IExpenseInfo } from '../../interfaces/expense';
 import { IError, IResponseSuccess } from '../../interfaces/common';
-import { clearGlobalError, clearGlobalResponse } from '../global.actions';
+import { clearGlobalError, clearGlobalResponse } from '../actions/global.actions';
 
 export const EXPENSE_FEATURE_KEY = 'expense';
 

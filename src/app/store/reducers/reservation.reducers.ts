@@ -58,7 +58,7 @@ import {
   updateReservationNote,
   updateReservationTimestamp,
   updateTrackingByReservationId,
-} from '../reservation.actions';
+} from '../actions/reservation.actions';
 import {
   IAvailableDTO,
   ICustomerLastReservation,
@@ -79,12 +79,12 @@ import { IColorAll } from '../../interfaces/color';
 import { IReview } from '../../interfaces/review';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
-import { clearGlobalError, clearGlobalResponse } from '../global.actions';
+import { clearGlobalError, clearGlobalResponse } from '../actions/global.actions';
 import {
   DetailReservationParams,
   MeReservationParams,
   ReservationParams,
-} from '../reservation.models';
+} from '../../util/models/reservation.models';
 
 export const RESERVATION_FEATURE_KEY = 'reservation';
 

@@ -22,7 +22,7 @@ import {
   DetailReservationParams,
   MeReservationParams,
   ReservationParams,
-} from '../reservation.models';
+} from '../../util/models/reservation.models';
 
 const selectReservationState = createFeatureSelector<ReservationState>(RESERVATION_FEATURE_KEY);
 

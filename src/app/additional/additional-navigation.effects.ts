@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATED } from '@ngrx/router-store';
-import { cleanAdditional, getAdditionalList, getAllTreatmentsGroup } from '../store/additional.actions';
-import { navigation } from '../store/router-navigation.operator';
+import { cleanAdditional, getAdditionalList, getAllTreatmentsGroup } from '../store/actions/additional.actions';
+import { navigation } from '../util/router-navigation.operator';
 import { AdditionalListComponent } from './list/additional-list.component';
 import { AdditionalCreatePageComponent } from './additional-create-page.component';
 import { AdditionalDetailsPageComponent } from './additional-details-page.component';

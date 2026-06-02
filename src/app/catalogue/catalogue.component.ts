@@ -1,22 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { createCatalogue, getCatalogue, updateCatalogue } from '../store/catalogue.actions';
 import { Catalogue, ICatalogue } from '../interfaces/catalogue';
 import { fieldChange, requireMatch, valueChange } from '../util/validators';
 import { ITreatmentGroup, ITreatmentGroupAll } from '../interfaces/treatment';
 import { map, startWith } from 'rxjs/operators';
 import { SortByPipe } from '../pipes/sort-by.pipe';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import {
-  getGroupPipe,
-  getSelectedCataloguePipe,
-  getSubErrorsPipe,
-} from '../store/selectors/catalogue.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../interfaces/common';
-import { CatalogueState } from '../store/reducers/catalogue.reducers';
 import { FileDropComponent, UploadFile } from '../shared/file-drop/file-drop.component';
 import { MatError, MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
@@ -25,6 +17,7 @@ import { MatButton } from '@angular/material/button';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatOption } from '@angular/material/core';
 import { MatCheckbox } from '@angular/material/checkbox';
+import { CatalogueStore } from '../store/catalogue.store';
 
 type CatalogueForm = {
   name: FormControl<string>;
@@ -46,15 +39,11 @@ type CatalogueForm = {
 export class CatalogueComponent {
   id = input<string>();
 
-  private readonly store: Store<CatalogueState> = inject(Store<CatalogueState>);
+  private readonly catalogueStore = inject(CatalogueStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-
-  private selectedCatalogue$ = this.store.pipe(getSelectedCataloguePipe);
-  private allGroups$ = this.store.pipe(getGroupPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-
-  private selectedCatalogueSignal = toSignal(this.selectedCatalogue$);
-  private subErrorsSignal = toSignal(this.subErrors$);
+  private readonly allGroups$ = toObservable(this.catalogueStore.groups);
+  private readonly selectedCatalogueSignal = this.catalogueStore.selected;
+  private readonly subErrorsSignal = this.catalogueStore.subErrors;
 
   form: FormGroup<CatalogueForm> = this.formBuilder.group<CatalogueForm>({
     name: this.formBuilder.control('', {
@@ -77,7 +66,7 @@ export class CatalogueComponent {
       combineLatestWith(this.allGroups$),
       map(([name, groups]) => {
         if (name) {
-          return this.filterGroup(name, groups);
+          return groups ? this.filterGroup(name, groups) : groups;
         } else {
           return groups ? groups.slice() : groups;
         }
@@ -92,6 +81,9 @@ export class CatalogueComponent {
   private selectedHome = toSignal(this.getForm.home.valueChanges);
 
   constructor() {
+    this.catalogueStore.clean();
+    this.catalogueStore.loadGroups();
+
     effect(() => {
       const subErrors = this.subErrorsSignal();
       if (subErrors) {
@@ -111,7 +103,7 @@ export class CatalogueComponent {
     effect(() => {
       const id = this.id();
       if (id) {
-        this.store.dispatch(getCatalogue({ id }));
+        this.catalogueStore.loadById(id);
       }
     });
 
@@ -159,9 +151,9 @@ export class CatalogueComponent {
 
     const id = this.id();
     if (!id) {
-      this.store.dispatch(createCatalogue({ catalogue, resizedImageDataUrl }));
+      this.catalogueStore.create(catalogue, resizedImageDataUrl);
     } else {
-      this.store.dispatch(updateCatalogue({ id, catalogue, resizedImageDataUrl }));
+      this.catalogueStore.update(id, catalogue, resizedImageDataUrl);
     }
   }
 

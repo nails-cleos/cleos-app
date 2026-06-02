@@ -18,11 +18,11 @@ import {
   treatmentSelected,
   treatmentSuccess,
   updateTreatmentGroup,
-} from '../treatment.actions';
+} from '../actions/treatment.actions';
 import { ITreatmentAll, ITreatmentGroupAll } from '../../interfaces/treatment';
 import { IColorAll } from '../../interfaces/color';
 import { IError, IResponseSuccess } from '../../interfaces/common';
-import { clearGlobalError, clearGlobalResponse } from '../global.actions';
+import { clearGlobalError, clearGlobalResponse } from '../actions/global.actions';
 
 export const TREATMENT_FEATURE_KEY = 'treatment';
 

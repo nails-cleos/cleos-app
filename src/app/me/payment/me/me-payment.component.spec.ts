@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
-import { getPayment, updatePaymentById } from '../../../store/payment.actions';
+import { getPayment, updatePaymentById } from '../../../store/actions/payment.actions';
 import { PaymentPercentage } from '../../../interfaces/payment';
 import { provideHttpClient } from '@angular/common/http';
 import { provideAppIcons } from '../../../util/app-icons.provider';

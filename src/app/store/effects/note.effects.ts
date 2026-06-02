@@ -12,7 +12,7 @@ import {
   noteSelected,
   noteSuccess,
   updateNote,
-} from '../note.actions';
+} from '../actions/note.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { NoteService } from '../../services/note.service';
 import { Router } from '@angular/router';

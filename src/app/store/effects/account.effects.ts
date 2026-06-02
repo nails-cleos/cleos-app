@@ -14,7 +14,7 @@ import {
   getTransactionsByAccountId,
   paymentSend,
   updateAccount,
-} from '../account.actions';
+} from '../actions/account.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { AccountService } from '../../services/account.service';
 import { IAccountAll, ITransaction } from '../../interfaces/account';

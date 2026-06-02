@@ -4,8 +4,7 @@ import { RouterNavigatedAction, ROUTER_NAVIGATED } from '@ngrx/router-store';
 import { Action } from '@ngrx/store';
 import { ReplaySubject, firstValueFrom } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
-import { cleanCatalogue, getAllCatalogs } from '../store/catalogue.actions';
-import { cleanMain, getAllCatalogue, setCurrentLang } from '../store/main.actions';
+import { cleanMain, getAllCatalogue, setCurrentLang } from '../store/actions/main.actions';
 import { MainContentService } from '../services/main-content.service';
 import { CatalogComponent } from './catalog/catalog.component';
 import { MainContentComponent } from './main-content/main-content.component';
@@ -60,13 +59,11 @@ describe('MainNavigationEffects', () => {
     actions$.next(routerNavigated('/nl/home/catalogs', CatalogComponent));
 
     const result = await firstValueFrom(
-      effects.loadCatalogPage$.pipe(take(3), toArray()),
+      effects.loadCatalogPage$.pipe(take(1), toArray()),
     );
 
     expect(result).toEqual([
       setCurrentLang({ lang: 'nl' }),
-      cleanCatalogue(),
-      getAllCatalogs(),
     ]);
     expect(mainContentSpy.configure).toHaveBeenCalledWith(false, 'open');
   });

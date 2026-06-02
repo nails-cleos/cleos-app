@@ -11,7 +11,7 @@ import {
   deleteUnavailable,
   getUnavailablePage,
   unavailableSelected,
-} from '../../store/unavailable.actions';
+} from '../../store/actions/unavailable.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { getCurrentTimeZone, isSameTimeZone, newDateTimestamp } from '../../util/dates';
 import { IUnavailable, IUnavailableAll } from '../../interfaces/unavailable';
@@ -19,7 +19,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { createDialog } from '../../util/helper';
 import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
 import { DurationTimePipe } from '../../pipes/durationTime.pipe';
-import { ColorState } from '../../store/reducers/color.reducers';
+import { UnavailableState } from '../../store/reducers/unavailable.reducers';
 import { getUnavailablePaginationPipe, getUnavailableResponsePipe } from '../../store/selectors/unavailable.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatIcon } from '@angular/material/icon';
@@ -59,7 +59,7 @@ import { RouterLink } from '@angular/router';
 })
 export class UnavailableListComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<ColorState> = inject(Store<ColorState>);
+  private readonly store: Store<UnavailableState> = inject(Store<UnavailableState>);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
 

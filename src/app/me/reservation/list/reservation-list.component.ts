@@ -8,7 +8,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { createReview, getCustomerReservations } from '../../../store/reservation.actions';
+import { createReview, getCustomerReservations } from '../../../store/actions/reservation.actions';
 import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
 import { executeDialogNoWidth, openDialog } from '../../../util/helper';
 import { IReview, Review } from '../../../interfaces/review';
@@ -26,7 +26,7 @@ import {
   getReservationResponsePipe,
 } from '../../../store/selectors/reservation.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { cleanDiscount } from '../../../store/discount.actions';
+import { cleanDiscount } from '../../../store/actions/discount.actions';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { FirebaseService } from '../../../services/firebase.service';
 import { MatIcon } from '@angular/material/icon';

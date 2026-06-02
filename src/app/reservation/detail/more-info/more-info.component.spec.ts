@@ -17,9 +17,9 @@ import {
   getTrackingByReservationId,
   reservationFindPayments,
   updateTrackingByReservationId,
-} from '../../../store/reservation.actions';
+} from '../../../store/actions/reservation.actions';
 import { IPaymentAll } from '../../../interfaces/payment';
-import { recreate } from '../../../store/payment.actions';
+import { recreate } from '../../../store/actions/payment.actions';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { ToastService } from '../../../services/toast.service';
 

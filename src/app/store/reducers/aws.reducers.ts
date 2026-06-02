@@ -1,5 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
-import { awsLambdaFailure, awsLambdaSuccess, callAwsLambda, cleanAws } from '../aws.actions';
+import { awsLambdaFailure, awsLambdaSuccess, callAwsLambda, cleanAws } from '../actions/aws.actions';
 import { IError } from '../../interfaces/common';
 import { IAwsExtract } from '../../interfaces/aws';
 

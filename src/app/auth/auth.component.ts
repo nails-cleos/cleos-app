@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal, untracked } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { cleanAuth, login, redirect, setCurrentCode, signupSuccess } from '../store/auth.actions';
+import { cleanAuth, login, redirect, setCurrentCode, signupSuccess } from '../store/actions/auth.actions';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { VERIFICATION_EMAIL } from '../util/helper';

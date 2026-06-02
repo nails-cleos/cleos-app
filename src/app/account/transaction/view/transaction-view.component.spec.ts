@@ -11,7 +11,7 @@ import { IAccountAll, ITransaction } from '../../../interfaces/account';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { AccountState } from '../../../store/reducers/account.reducers';
 import { signal } from '@angular/core';
-import { getTransactionsByAccountId } from '../../../store/account.actions';
+import { getTransactionsByAccountId } from '../../../store/actions/account.actions';
 
 describe('TransactionViewComponent', () => {
   let component: TransactionViewComponent;

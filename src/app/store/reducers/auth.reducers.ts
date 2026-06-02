@@ -11,11 +11,11 @@ import {
   setDriveToken,
   signupFailure,
   signupSuccess,
-} from '../auth.actions';
+} from '../actions/auth.actions';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { Params } from '@angular/router';
 import { createReducer, on } from '@ngrx/store';
-import { clearGlobalError, clearGlobalResponse } from '../global.actions';
+import { clearGlobalError, clearGlobalResponse } from '../actions/global.actions';
 
 export const AUTH_FEATURE_KEY = 'auth';
 

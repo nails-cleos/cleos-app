@@ -1,39 +1,31 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CatalogComponent } from './catalog.component';
-import { Store } from '@ngrx/store';
-import { BehaviorSubject } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { CatalogueState } from '../../store/reducers/catalogue.reducers';
+import { signal } from '@angular/core';
+import { CatalogueStore } from '../../store/catalogue.store';
 
 describe('CatalogComponent', () => {
   let component: CatalogComponent;
   let fixture: ComponentFixture<CatalogComponent>;
   let translateService: TranslateService;
 
-  let catalogues$: BehaviorSubject<any>;
-
-  let storeSpy: jasmine.SpyObj<Store<CatalogueState>>;
+  let catalogueStoreSpy: {
+    data: ReturnType<typeof signal>;
+    clean: jasmine.Spy;
+    loadCatalogs: jasmine.Spy;
+  };
 
   beforeEach(async () => {
-    catalogues$ = new BehaviorSubject<any>(undefined);
-
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return catalogues$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
+    catalogueStoreSpy = {
+      data: signal<any>(undefined),
+      clean: jasmine.createSpy('clean'),
+      loadCatalogs: jasmine.createSpy('loadCatalogs'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [CatalogComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: CatalogueStore, useValue: catalogueStoreSpy },
       ],
     }).compileComponents();
 
@@ -41,10 +33,7 @@ describe('CatalogComponent', () => {
     component = fixture.componentInstance;
     translateService = TestBed.inject(TranslateService);
     translateService.use('en-GB');
-  });
-
-  afterEach(() => {
-    catalogues$.complete();
+    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -57,7 +46,7 @@ describe('CatalogComponent', () => {
 
     const fakeBase64 = 'ZmFrZUJhc2U2NA==';
     const fakeItem = { blob: fakeBase64, contentType: 'text/plain' };
-    catalogues$.next([fakeItem]);
+    catalogueStoreSpy.data.set([fakeItem]);
     fixture.detectChanges();
 
     expect(component.catalogues().length).toBe(1);

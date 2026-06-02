@@ -3,7 +3,7 @@ import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } fr
 import { IUser } from '../interfaces/user';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
-import { redirect } from '../store/auth.actions';
+import { redirect } from '../store/actions/auth.actions';
 import { ToastService } from './toast.service';
 import { getUserPipe } from '../store/selectors/auth.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';

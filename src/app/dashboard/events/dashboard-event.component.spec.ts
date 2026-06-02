@@ -13,7 +13,7 @@ import { FrequencyEnum } from '../../util/helper';
 import { daysOfWeek } from '../../util/dates';
 import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { signal } from '@angular/core';
-import { approveReservation, startReservation } from '../../store/reservation.actions';
+import { approveReservation, startReservation } from '../../store/actions/reservation.actions';
 import { provideAppCalendar, provideAppDateAdapter } from '../../util/adapter/app-date.provider';
 
 describe('DashboardEventComponent', () => {

@@ -8,7 +8,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { cleanExpense, deleteExpense, expenseSelected, getExpensesPage } from '../../../../store/expense.actions';
+import { cleanExpense, deleteExpense, expenseSelected, getExpensesPage } from '../../../../store/actions/expense.actions';
 import { DialogComponent } from '../../../../shared/dialog/generic/dialog.component';
 import { getDateFormat, getNowTimeZone, isSameTimeZone, newDateTimestamp } from '../../../../util/dates';
 import { openDialog } from '../../../../util/helper';
@@ -23,8 +23,7 @@ import { provideYearMonthDateAdapter } from '../../../../util/adapter/app-date.p
 import { EnvService } from '../../../../services/env.service';
 import { DriveAccessService } from '../../../../services/drive-access.service';
 import { IDocument } from '../../../../interfaces/document';
-import { documentView } from '../../../../store/document.actions';
-import { DocumentState } from '../../../../store/reducers/document.reducers';
+import { DocumentStore } from '../../../../store/document.store';
 import { CurrencySymbolPipe } from '../../../../pipes/currency-symbol.pipe';
 import { MatIcon } from '@angular/material/icon';
 import { MatIconButton } from '@angular/material/button';
@@ -74,8 +73,8 @@ export class ExpenseListComponent {
 
   private readonly env: EnvService = inject(EnvService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<RoomState | ExpenseState | DocumentState> = inject(
-    Store<RoomState | ExpenseState | DocumentState>);
+  private readonly store: Store<RoomState | ExpenseState> = inject(Store<RoomState | ExpenseState>);
+  private readonly documentStore = inject(DocumentStore);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
@@ -200,7 +199,5 @@ export class ExpenseListComponent {
     });
   };
 
-  download = (document: IDocument): void => this.store.dispatch(
-    documentView({ id: document.id, fileName: document.name }),
-  );
+  download = (document: IDocument): void => this.documentStore.download({ id: document.id, fileName: document.name });
 }

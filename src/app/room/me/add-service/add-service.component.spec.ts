@@ -3,7 +3,7 @@ import { AddServiceComponent } from './add-service.component';
 import { Store } from '@ngrx/store';
 import { BehaviorSubject, of } from 'rxjs';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { getServices, updateServices } from '../../../store/room.actions';
+import { getServices, updateServices } from '../../../store/actions/room.actions';
 import { IService, ServicePrice, ServiceType } from '../../../interfaces/room';
 import { TranslateModule } from '@ngx-translate/core';
 import { ITreatmentAll } from '../../../interfaces/treatment';

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input, si
 import { Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { combineLatestWith } from 'rxjs';
-import { getAccountByCustomerId, updateAccount } from '../../store/account.actions';
+import { getAccountByCustomerId, updateAccount } from '../../store/actions/account.actions';
 import { IAccountAll, ITransaction, Transaction } from '../../interfaces/account';
 import { ICurrency, ICurrencyAll } from '../../interfaces/currency';
 import { map, startWith } from 'rxjs/operators';

@@ -6,13 +6,13 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TreatmentListComponent } from './treatment-list.component';
 import { ITreatmentGroupAll } from '../../interfaces/treatment';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import { deleteTreatmentGroup, getTreatmentsPage } from '../../store/treatment.actions';
+import { deleteTreatmentGroup, getTreatmentsPage } from '../../store/actions/treatment.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { TreatmentState } from '../../store/reducers/treatment.reducers';
 import { MatDialog } from '@angular/material/dialog';
 
-describe('TreatmentsComponent', () => {
+describe('TreatmentListComponent', () => {
   let component: TreatmentListComponent;
   let fixture: ComponentFixture<TreatmentListComponent>;
   let storeSpy: jasmine.SpyObj<Store<TreatmentState>>;

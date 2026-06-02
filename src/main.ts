@@ -36,7 +36,6 @@ import { localStorageSync } from 'ngrx-store-localstorage';
 import { AUTH_FEATURE_KEY, authReducer } from './app/store/reducers/auth.reducers';
 import { userReducer } from './app/store/reducers/user.reducers';
 import { treatmentReducer } from './app/store/reducers/treatment.reducers';
-import { catalogueReducer } from './app/store/reducers/catalogue.reducers';
 import { roomReducer } from './app/store/reducers/room.reducers';
 import { reservationReducer } from './app/store/reducers/reservation.reducers';
 import { notificationReducer } from './app/store/reducers/notification.reducers';
@@ -46,10 +45,8 @@ import { mainReducer } from './app/store/reducers/main.reducers';
 import { paymentReducer } from './app/store/reducers/payment.reducers';
 import { dashboardReducer } from './app/store/reducers/dashboard.reducers';
 import { additionalReducer } from './app/store/reducers/additional.reducers';
-import { currencyReducer } from './app/store/reducers/currency.reducers';
 import { officeReducer } from './app/store/reducers/office.reducers';
 import { invoiceReducer } from './app/store/reducers/invoice.reducers';
-import { colorReducer } from './app/store/reducers/color.reducers';
 import { expenseReducer } from './app/store/reducers/expense.reducers';
 import { noteReducer } from './app/store/reducers/note.reducers';
 import { accountReducer } from './app/store/reducers/account.reducers';
@@ -61,7 +58,7 @@ import { routes } from './app/app.routes';
 import { I18nBridgeService } from './app/services/i18n-bridge.service';
 import { provideAppIcons } from './app/util/app-icons.provider';
 import { provideAppDateAdapter, provideAppCalendar } from './app/util/adapter/app-date.provider';
-import { AppRouterStateSerializer } from './app/store/router-state.serializer';
+import { AppRouterStateSerializer } from './app/util/router-state.serializer';
 
 export interface ISendMessage {
   name: string;
@@ -113,7 +110,6 @@ const providers = [
     auth: authReducer,
     user: userReducer,
     treatment: treatmentReducer,
-    catalogue: catalogueReducer,
     room: roomReducer,
     reservation: reservationReducer,
     notification: notificationReducer,
@@ -123,10 +119,8 @@ const providers = [
     payment: paymentReducer,
     dashboard: dashboardReducer,
     additional: additionalReducer,
-    currency: currencyReducer,
     office: officeReducer,
     invoice: invoiceReducer,
-    color: colorReducer,
     expense: expenseReducer,
     note: noteReducer,
     accounts: accountReducer,

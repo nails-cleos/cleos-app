@@ -3,7 +3,7 @@ import { combineLatestWith } from 'rxjs';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Discount, DiscountType, IDiscount } from '../interfaces/discount';
-import { createDiscount, getDiscount, updateDiscount } from '../store/discount.actions';
+import { createDiscount, getDiscount, updateDiscount } from '../store/actions/discount.actions';
 import { Router } from '@angular/router';
 import { ICurrency } from '../interfaces/currency';
 import { fieldChange, requireMatch, valueChange } from '../util/validators';

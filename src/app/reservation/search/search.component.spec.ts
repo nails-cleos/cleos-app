@@ -5,7 +5,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CancelOption, IReservationAll, States } from '../../interfaces/reservation';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { getAllFilterReservations } from '../../store/reservation.actions';
+import { getAllFilterReservations } from '../../store/actions/reservation.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { SearchComponent } from './search.component';

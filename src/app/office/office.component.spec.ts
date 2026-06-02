@@ -5,7 +5,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 
 import { OfficeComponent } from './office.component';
-import { getOffice } from '../store/office.actions';
+import { getOffice } from '../store/actions/office.actions';
 import { IOfficeAll } from '../interfaces/office';
 import { IUser, IUserAll } from '../interfaces/user';
 import { Role } from '../interfaces/token';

@@ -28,7 +28,7 @@ import {
   getAllRoomsByProfessionalId,
   getUnavailable,
   updateUnavailable,
-} from '../../store/unavailable.actions';
+} from '../../store/actions/unavailable.actions';
 import { executeDialogNoWidth } from '../../util/helper';
 import { map, startWith } from 'rxjs/operators';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';

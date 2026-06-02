@@ -14,12 +14,12 @@ import {
   getAllTreatmentsGroup,
   sortAdditional,
   updateAdditional,
-} from '../additional.actions';
+} from '../actions/additional.actions';
 import { IAdditional, IAdditionalAll } from '../../interfaces/additional';
 import { ITreatmentGroupAll } from '../../interfaces/treatment';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
-import { clearGlobalError, clearGlobalResponse } from '../global.actions';
+import { clearGlobalError, clearGlobalResponse } from '../actions/global.actions';
 
 export const ADDITIONAL_FEATURE_KEY = 'additional';
 

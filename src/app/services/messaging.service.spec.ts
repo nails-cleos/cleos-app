@@ -3,7 +3,7 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { MessagingService } from './messaging.service';
 import { Store } from '@ngrx/store';
-import { subscribeNotification } from '../store/notification.actions';
+import { subscribeNotification } from '../store/actions/notification.actions';
 import { NotificationState } from '../store/reducers/notification.reducers';
 import { FirebaseService } from './firebase.service';
 import { EnvService } from './env.service';

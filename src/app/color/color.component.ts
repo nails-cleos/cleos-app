@@ -1,18 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
 import { Color, IColor } from '../interfaces/color';
-import { createColor, getColor, updateColor } from '../store/color.actions';
 import { fieldChange, valueChange } from '../util/validators';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import { getSelectedColorPipe, getSubErrorsPipe } from '../store/selectors/color.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../interfaces/common';
-import { ColorState } from '../store/reducers/color.reducers';
 import { MatError, MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { TranslatePipe } from '@ngx-translate/core';
+import { ColorStore } from '../store/color.store';
 
 type ColorForm = {
   name: FormControl<string>;
@@ -30,15 +26,11 @@ type ColorForm = {
 export class ColorComponent {
   id = input<string>();
 
-  private readonly store: Store<ColorState> = inject(Store<ColorState>);
+  private readonly colorStore = inject(ColorStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  private selectedColor$ = this.store.pipe(getSelectedColorPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-
-  private subErrorsSignal = toSignal(this.subErrors$);
-
-  colorSignal = toSignal(this.selectedColor$);
+  private subErrorsSignal = this.colorStore.subErrors;
+  colorSignal = this.colorStore.selected;
   isAddModeSignal = computed(() => !this.id());
   errors = signal<Record<string, unknown>>({});
 
@@ -76,7 +68,9 @@ export class ColorComponent {
     effect(() => {
       const id = this.id();
       if (id) {
-        this.store.dispatch(getColor({ id }));
+        this.colorStore.loadById(id);
+      } else {
+        this.colorStore.clean();
       }
     });
   }
@@ -97,9 +91,9 @@ export class ColorComponent {
 
     const id = this.id();
     if (!id) {
-      this.store.dispatch(createColor({ color }));
+      this.colorStore.create(color);
     } else {
-      this.store.dispatch(updateColor({ id, color }));
+      this.colorStore.update(id, color);
     }
     return;
   }

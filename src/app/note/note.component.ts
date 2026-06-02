@@ -5,7 +5,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { backendFormatDate, createDateFromString } from '../util/dates';
 import { fieldChange, requireMatch, valueChange } from '../util/validators';
-import { createNote, deleteNote, getNote, updateNote } from '../store/note.actions';
+import { createNote, deleteNote, getNote, updateNote } from '../store/actions/note.actions';
 import { INote, Note } from '../interfaces/note';
 import { IUser, IUserAll } from '../interfaces/user';
 import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';

@@ -21,8 +21,8 @@ import {
   unavailableSelected,
   unavailableSuccess,
   updateUnavailable,
-} from '../unavailable.actions';
-import { clearGlobalError, clearGlobalResponse } from '../global.actions';
+} from '../actions/unavailable.actions';
+import { clearGlobalError, clearGlobalResponse } from '../actions/global.actions';
 
 export const UNAVAILABLE_FEATURE_KEY = 'unavailable';
 

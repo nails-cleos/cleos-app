@@ -20,13 +20,13 @@ import {
   userSaveSuccess,
   userSelected,
   userSuccess,
-} from '../user.actions';
+} from '../actions/user.actions';
 import { IOverview, IUserAll } from '../../interfaces/user';
 import { Pagination } from '../../interfaces/pagination';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
 import { Role } from '../../interfaces/token';
-import { clearGlobalError, clearGlobalResponse } from '../global.actions';
+import { clearGlobalError, clearGlobalResponse } from '../actions/global.actions';
 
 export const USER_FEATURE_KEY = 'user';
 

@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { map, switchMap } from 'rxjs/operators';
-import { awsLambdaFailure, awsLambdaSuccess, callAwsLambda } from '../aws.actions';
+import { awsLambdaFailure, awsLambdaSuccess, callAwsLambda } from '../actions/aws.actions';
 import { AwsLambdaService } from '../../services/aws-lambda.service';
 import { IAwsExtract } from '../../interfaces/aws';
 import { effectRequest } from '../../util/rxjs';

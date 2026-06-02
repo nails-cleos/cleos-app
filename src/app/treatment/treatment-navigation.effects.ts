@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATED } from '@ngrx/router-store';
-import { cleanTreatment, getAllColors, getAllTreatmentsGroup } from '../store/treatment.actions';
-import { navigation } from '../store/router-navigation.operator';
+import { cleanTreatment, getAllColors, getAllTreatmentsGroup } from '../store/actions/treatment.actions';
+import { navigation } from '../util/router-navigation.operator';
 import { TreatmentListComponent } from './list/treatment-list.component';
 import { TreatmentGroupSortingComponent } from './sorting/treatment-group-sorting.component';
 import { TreatmentSortingComponent } from './sorting/treatment-sorting.component';

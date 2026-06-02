@@ -9,7 +9,7 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IOfficeAll } from '../../interfaces/office';
 import { backendFormatDate, getNowTimeZone } from '../../util/dates';
-import { getOfficeToInvoice } from '../../store/invoice.actions';
+import { getOfficeToInvoice } from '../../store/actions/invoice.actions';
 import { IUserAll } from '../../interfaces/user';
 import { addDays } from 'date-fns';
 import { IPaymentOption } from '../../interfaces/payment';
@@ -22,7 +22,7 @@ import { PaymentService } from '../../services/payment.service';
 import { provideAppDateAdapter } from '../../util/adapter/app-date.provider';
 import { NavigationService } from '../../services/navigation.service';
 
-describe('InvoiceComponent', () => {
+describe('InvoiceListComponent', () => {
   let component: InvoiceListComponent;
   let fixture: ComponentFixture<InvoiceListComponent>;
   let storeSpy: jasmine.SpyObj<Store<InvoiceState>>;

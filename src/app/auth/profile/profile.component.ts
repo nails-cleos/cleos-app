@@ -11,7 +11,7 @@ import {
 import { Store } from '@ngrx/store';
 import { IUser, User } from '../../interfaces/user';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { cleanUser, getMyUser, updateMyPhoto, updateMyUser } from '../../store/user.actions';
+import { cleanUser, getMyUser, updateMyPhoto, updateMyUser } from '../../store/actions/user.actions';
 import { fieldChange, validColorValidator, valueChange } from '../../util/validators';
 import { flags, IFlag } from '../../util/flags';
 import { createAddress, getDisplayNameInitials, getLocale, getUserImage } from '../../util/helper';

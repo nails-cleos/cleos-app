@@ -7,7 +7,7 @@ import {
   getAllTreatments,
   getReservation,
   reservationFindPayments,
-} from '../../../store/reservation.actions';
+} from '../../../store/actions/reservation.actions';
 import { IExtras } from '../../../interfaces/reservation';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';

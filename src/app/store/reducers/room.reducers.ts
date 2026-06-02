@@ -17,7 +17,7 @@ import {
   roomSuccess,
   updateRoom,
   updateServices,
-} from '../room.actions';
+} from '../actions/room.actions';
 import { IRoom, IRoomCustomer, IRoomService } from '../../interfaces/room';
 import { IUserAll } from '../../interfaces/user';
 import { ICurrencyAll } from '../../interfaces/currency';
@@ -25,7 +25,7 @@ import { IError, IResponseSuccess } from '../../interfaces/common';
 
 import { createReducer, on } from '@ngrx/store';
 import { IOfficeAll } from '../../interfaces/office';
-import { clearGlobalError, clearGlobalResponse } from '../global.actions';
+import { clearGlobalError, clearGlobalResponse } from '../actions/global.actions';
 
 export const ROOM_FEATURE_KEY = 'room';
 

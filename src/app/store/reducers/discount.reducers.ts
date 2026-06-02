@@ -17,12 +17,12 @@ import {
   referralSuccess,
   sendDiscountToCustomers,
   updateDiscount,
-} from '../discount.actions';
+} from '../actions/discount.actions';
 import { IDiscount, IDiscountAll, IReferral, IUserDiscount } from '../../interfaces/discount';
 import { ICurrency } from '../../interfaces/currency';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
-import { clearGlobalError, clearGlobalResponse } from '../global.actions';
+import { clearGlobalError, clearGlobalResponse } from '../actions/global.actions';
 
 export const DISCOUNT_FEATURE_KEY = 'discount';
 

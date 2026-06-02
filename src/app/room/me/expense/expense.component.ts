@@ -13,7 +13,7 @@ import { Expense, IExpense, ISupplyStore, ITotalExpense } from '../../../interfa
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { combineLatestWith } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { createExpense, getAllExpensesInfo, getExpense, updateExpense } from '../../../store/expense.actions';
+import { createExpense, getAllExpensesInfo, getExpense, updateExpense } from '../../../store/actions/expense.actions';
 import { API_LOCALE, createNewDateZonedTime, getNowTimeZone } from '../../../util/dates';
 import { fieldChange, noDuplicateDatesValidator } from '../../../util/validators';
 import { map, startWith } from 'rxjs/operators';
@@ -35,7 +35,7 @@ import { AuthState } from '../../../store/reducers/auth.reducers';
 import { getAwsPipe } from '../../../store/selectors/aws.selectors';
 import { awsExtractToNumberFormat } from '../../../interfaces/aws';
 import { calculateBTW, calculateNet } from '../../../util/numbers';
-import { callAwsLambda } from '../../../store/aws.actions';
+import { callAwsLambda } from '../../../store/actions/aws.actions';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { DriveAccessService } from '../../../services/drive-access.service';
 import { EnvService } from '../../../services/env.service';

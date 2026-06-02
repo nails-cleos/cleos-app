@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input } f
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { IPayment, IPaymentAll } from '../../interfaces/payment';
-import { cleanPayment, getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/payment.actions';
+import { cleanPayment, getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/actions/payment.actions';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { getPaymentResponsePipe, getPaymentsPipe, getSubErrorsPipe } from '../../store/selectors/payment.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';

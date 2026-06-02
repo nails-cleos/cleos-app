@@ -10,7 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Price } from '../../../interfaces/treatment';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 
-describe('ReservationsComponent', () => {
+describe('ReservationListComponent', () => {
   let component: ReservationListComponent;
   let fixture: ComponentFixture<ReservationListComponent>;
 

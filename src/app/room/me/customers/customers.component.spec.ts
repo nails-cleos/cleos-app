@@ -4,7 +4,7 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
-import { getAllCustomersInfo } from '../../../store/room.actions';
+import { getAllCustomersInfo } from '../../../store/actions/room.actions';
 import { IRoomCustomer } from '../../../interfaces/room';
 import { ActivatedRoute } from '@angular/router';
 import { RoomState } from '../../../store/reducers/room.reducers';

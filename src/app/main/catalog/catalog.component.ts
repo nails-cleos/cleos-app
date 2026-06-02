@@ -1,11 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { ICatalogueAll } from '../../interfaces/catalogue';
-import { Store } from '@ngrx/store';
 import { getImage } from '../../util/file';
-import { getCatalogueListPipe } from '../../store/selectors/catalogue.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { TranslatePipe } from '@ngx-translate/core';
-import { CatalogueState } from '../../store/reducers/catalogue.reducers';
 import { MatIcon } from '@angular/material/icon';
 import {
   MatCard,
@@ -15,6 +11,7 @@ import {
   MatCardSubtitle,
   MatCardTitle,
 } from '@angular/material/card';
+import { CatalogueStore } from '../../store/catalogue.store';
 
 @Component({
   selector: 'app-catalog',
@@ -25,11 +22,8 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogComponent {
-  private readonly store: Store<CatalogueState> = inject(Store<CatalogueState>);
-
-  private catalogues$ = this.store.pipe(getCatalogueListPipe);
-
-  private cataloguesSignal = toSignal(this.catalogues$);
+  private readonly catalogueStore = inject(CatalogueStore);
+  private readonly cataloguesSignal = this.catalogueStore.data;
 
   catalogues = computed(() => {
     const catalogues: ICatalogueAll[] = [];
@@ -42,4 +36,9 @@ export class CatalogComponent {
 
     return catalogues;
   });
+
+  constructor() {
+    this.catalogueStore.clean();
+    this.catalogueStore.loadCatalogs();
+  }
 }

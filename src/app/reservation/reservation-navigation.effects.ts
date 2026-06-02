@@ -9,9 +9,9 @@ import {
   getCustomers,
   setDetailReservationParams,
   setReservationParams,
-} from '../store/reservation.actions';
-import { getOptions } from '../store/payment.actions';
-import { navigation } from '../store/router-navigation.operator';
+} from '../store/actions/reservation.actions';
+import { getOptions } from '../store/actions/payment.actions';
+import { navigation } from '../util/router-navigation.operator';
 import { CalendarComponent } from './calendar/calendar.component';
 import { ReservationCompleteComponent } from './detail/complete/reservation-complete.component';
 import { MoreInfoComponent } from './detail/more-info/more-info.component';

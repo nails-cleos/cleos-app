@@ -18,7 +18,7 @@ import {
   isDashboardLoadingPipe,
 } from '../../store/selectors/dashboard.selectors';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { getMonthlySummary, updateMonthlySummary } from '../../store/dashboard.actions';
+import { getMonthlySummary, updateMonthlySummary } from '../../store/actions/dashboard.actions';
 import {
   AmountFormat,
   ExpenseType,

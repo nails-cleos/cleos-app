@@ -1,10 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATED } from '@ngrx/router-store';
-import { cleanRoom, getAllRoomsInfo } from '../store/room.actions';
-import { cleanExpense } from '../store/expense.actions';
-import { getOptions } from '../store/payment.actions';
-import { navigation } from '../store/router-navigation.operator';
+import { cleanRoom, getAllRoomsInfo } from '../store/actions/room.actions';
+import { cleanExpense } from '../store/actions/expense.actions';
+import { getOptions } from '../store/actions/payment.actions';
+import { navigation } from '../util/router-navigation.operator';
 import { RoomListComponent } from './list/room-list.component';
 import { AddServiceComponent } from './me/add-service/add-service.component';
 import { CustomersComponent } from './me/customers/customers.component';

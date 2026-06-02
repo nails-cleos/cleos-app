@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { subscribeNotification } from '../store/notification.actions';
+import { subscribeNotification } from '../store/actions/notification.actions';
 import { NotificationState } from '../store/reducers/notification.reducers';
 import { EnvService } from './env.service';
 import { FirebaseService } from './firebase.service';

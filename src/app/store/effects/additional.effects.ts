@@ -15,7 +15,7 @@ import {
   getAllTreatmentsGroup,
   sortAdditional,
   updateAdditional,
-} from '../additional.actions';
+} from '../actions/additional.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { AdditionalService } from '../../services/additional.service';
 import { Router } from '@angular/router';

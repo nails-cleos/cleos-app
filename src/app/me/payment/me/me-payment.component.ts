@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { getPayment, updatePaymentById } from '../../../store/payment.actions';
+import { getPayment, updatePaymentById } from '../../../store/actions/payment.actions';
 import { IPaymentOption, PaymentPercentage } from '../../../interfaces/payment';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BankComponent, BankForm } from '../../../shared/bank/bank.component';

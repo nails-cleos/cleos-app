@@ -8,7 +8,7 @@ import { TreatmentComponent } from './treatment.component';
 import { IColorAll } from '../interfaces/color';
 import { ITreatmentGroupAll } from '../interfaces/treatment';
 import { TreatmentState } from '../store/reducers/treatment.reducers';
-import { getTreatmentGroup } from '../store/treatment.actions';
+import { getTreatmentGroup } from '../store/actions/treatment.actions';
 
 describe('TreatmentComponent', () => {
   let component: TreatmentComponent;

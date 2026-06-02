@@ -7,7 +7,7 @@ import { createMatTableState } from 'src/app/util/mat-table-state';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { cleanRoom, deleteRoom, getRoomsPage, roomSelected } from '../../store/room.actions';
+import { cleanRoom, deleteRoom, getRoomsPage, roomSelected } from '../../store/actions/room.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { findDayOfWeek, getTimeZone, ITimeZone } from '../../util/dates';

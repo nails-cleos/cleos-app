@@ -5,7 +5,7 @@ import {
   ItemSorting,
 } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
 import { Store } from '@ngrx/store';
-import { getAllTreatmentsGroup, sortGroupTreatment } from '../../store/treatment.actions';
+import { getAllTreatmentsGroup, sortGroupTreatment } from '../../store/actions/treatment.actions';
 import { ITreatmentGroupAll } from '../../interfaces/treatment';
 import { getTreatmentGroupListPipe, getTreatmentResponsePipe } from '../../store/selectors/treatment.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';

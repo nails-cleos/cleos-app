@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { MatDialog } from '@angular/material/dialog';
 import { toSignal } from '@angular/core/rxjs-interop';
 
-import { getServices, updateServices } from '../../../store/room.actions';
+import { getServices, updateServices } from '../../../store/actions/room.actions';
 import { IService, IServicePrice, ServicePrice, ServiceType } from '../../../interfaces/room';
 import { IGroupService } from '../../../interfaces/treatment';
 import { createTreatmentGroupService, executeDialogNoWidth } from '../../../util/helper';

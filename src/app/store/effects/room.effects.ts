@@ -18,7 +18,7 @@ import {
   roomSuccess,
   updateRoom,
   updateServices,
-} from '../room.actions';
+} from '../actions/room.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { RoomService } from '../../services/room.service';
 import { Router } from '@angular/router';

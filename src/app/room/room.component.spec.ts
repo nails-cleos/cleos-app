@@ -11,7 +11,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
 import { IUserAll } from '../interfaces/user';
 import { Role } from '../interfaces/token';
-import { getRoom } from '../store/room.actions';
+import { getRoom } from '../store/actions/room.actions';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { GoogleMapComponent } from '../shared/google-map/google-map.component';
 import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.component';

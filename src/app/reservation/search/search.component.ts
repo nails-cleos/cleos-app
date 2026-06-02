@@ -18,7 +18,7 @@ import { createMatTableState } from 'src/app/util/mat-table-state';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { cancelReservation, cleanReservation, getAllFilterReservations } from '../../store/reservation.actions';
+import { cancelReservation, cleanReservation, getAllFilterReservations } from '../../store/actions/reservation.actions';
 import { getNowTimeZone, isSameTimeZone, newDateTimestamp } from '../../util/dates';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { map, startWith } from 'rxjs/operators';

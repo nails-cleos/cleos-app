@@ -8,7 +8,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatDatepicker } from '@angular/material/datepicker';
-import { getQuarterSummary } from '../../store/dashboard.actions';
+import { getQuarterSummary } from '../../store/actions/dashboard.actions';
 import {
   IMonthSummary,
   ISummaryRoom,

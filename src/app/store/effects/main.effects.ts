@@ -12,7 +12,7 @@ import {
   sendMessage,
   treatmentSuccess,
   updateMyUser,
-} from '../main.actions';
+} from '../actions/main.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { CatalogueService } from '../../services/catalogue.service';
 import { TreatmentService } from '../../services/treatment.service';
@@ -22,7 +22,7 @@ import { Token } from '../../interfaces/token';
 import { ICatalogueAll } from '../../interfaces/catalogue';
 import { ITreatmentGroup } from '../../interfaces/treatment';
 import { success } from '../../interfaces/common';
-import { loginSuccess } from '../auth.actions';
+import { loginSuccess } from '../actions/auth.actions';
 import { effectRequest } from '../../util/rxjs';
 
 @Injectable()

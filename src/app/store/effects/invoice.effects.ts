@@ -12,7 +12,7 @@ import {
   invoiceUpdateOfficeSuccess,
   updateOfficeById,
   uploadInvoices,
-} from '../invoice.actions';
+} from '../actions/invoice.actions';
 import { InvoiceService } from '../../services/invoice.service';
 import { OfficeService } from '../../services/office.service';
 import { IInvoice, IInvoiceData } from '../../interfaces/invoice';

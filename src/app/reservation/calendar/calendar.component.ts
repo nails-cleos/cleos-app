@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatestWith, Subject } from 'rxjs';
-import { getAllGroupingByRoom, updateReservationTimestamp } from '../../store/reservation.actions';
+import { getAllGroupingByRoom, updateReservationTimestamp } from '../../store/actions/reservation.actions';
 import { Day, IDay, IRoomReservation, MAX_RESERVATION_MONTH, States } from '../../interfaces/reservation';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';

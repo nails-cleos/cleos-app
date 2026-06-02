@@ -1,10 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATED } from '@ngrx/router-store';
-import { cleanMain, getAllCatalogue, setCurrentLang } from '../store/main.actions';
-import { cleanCatalogue, getAllCatalogs } from '../store/catalogue.actions';
+import { cleanMain, getAllCatalogue, setCurrentLang } from '../store/actions/main.actions';
 import { MainContentService } from '../services/main-content.service';
-import { navigation } from '../store/router-navigation.operator';
+import { navigation } from '../util/router-navigation.operator';
 import { CatalogComponent } from './catalog/catalog.component';
 import { MainContentComponent } from './main-content/main-content.component';
 import { PrivacyComponent } from './privacy/privacy.component';
@@ -37,11 +36,7 @@ export class MainNavigationEffects {
       navigation(CatalogComponent, {
         run: ({ payload }) => {
           this.mainContent.configure(false, 'open');
-          return [
-            setCurrentLang({ lang: this.getLangFromUrl(payload.routerState.url) }),
-            cleanCatalogue(),
-            getAllCatalogs(),
-          ];
+          return [setCurrentLang({ lang: this.getLangFromUrl(payload.routerState.url) })];
         },
       }),
     ));

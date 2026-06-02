@@ -15,7 +15,7 @@ import {
   unavailableSaveSuccess,
   unavailableSelected,
   unavailableSuccess,
-  updateUnavailable } from '../unavailable.actions';
+  updateUnavailable } from '../actions/unavailable.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { UnavailableService } from '../../services/unavailable.service';
 import { Router } from '@angular/router';

@@ -7,7 +7,7 @@ import { ITransaction } from '../../../interfaces/account';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { getTransactionsByAccountId } from '../../../store/account.actions';
+import { getTransactionsByAccountId } from '../../../store/actions/account.actions';
 import { newDateTimestamp } from '../../../util/dates';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { BalanceComponent } from '../../balance/balance.component';

@@ -59,7 +59,7 @@ import {
   updateReservationNote,
   updateReservationTimestamp,
   updateTrackingByReservationId,
-} from '../reservation.actions';
+} from '../actions/reservation.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { ReservationService } from '../../services/reservation.service';
 import { Router } from '@angular/router';
@@ -94,7 +94,7 @@ import { IReview } from '../../interfaces/review';
 import { IColorAll } from '../../interfaces/color';
 import { ToastType } from '../../shared/toast/toast.model';
 import { effectRequest } from '../../util/rxjs';
-import { getMyEvent } from '../dashboard.actions';
+import { getMyEvent } from '../actions/dashboard.actions';
 
 @Injectable()
 export class ReservationEffects {

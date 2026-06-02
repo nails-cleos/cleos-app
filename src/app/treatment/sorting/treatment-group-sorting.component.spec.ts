@@ -6,7 +6,7 @@ import { ITreatmentGroupAll } from '../../interfaces/treatment';
 import { ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { TreatmentState } from '../../store/reducers/treatment.reducers';
-import { getAllTreatmentsGroup, sortGroupTreatment } from '../../store/treatment.actions';
+import { getAllTreatmentsGroup, sortGroupTreatment } from '../../store/actions/treatment.actions';
 
 describe('TreatmentGroupSortingComponent', () => {
   let component: TreatmentGroupSortingComponent;

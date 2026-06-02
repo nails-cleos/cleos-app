@@ -6,7 +6,7 @@ import {
 } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
 import { Store } from '@ngrx/store';
 import { IAdditionalAll } from '../../interfaces/additional';
-import { getAdditionalList, sortAdditional } from '../../store/additional.actions';
+import { getAdditionalList, sortAdditional } from '../../store/actions/additional.actions';
 import { getAdditionalListPipe, getAdditionalResponsePipe } from '../../store/selectors/additional.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AdditionalState } from '../../store/reducers/additional.reducers';

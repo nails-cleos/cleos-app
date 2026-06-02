@@ -7,7 +7,7 @@ import { BehaviorSubject } from 'rxjs';
 import { AccountComponent } from './account.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { IAccountAll, ITransaction } from '../../interfaces/account';
-import { getAccountByCustomerId } from '../../store/account.actions';
+import { getAccountByCustomerId } from '../../store/actions/account.actions';
 import { AccountState } from '../../store/reducers/account.reducers';
 import { signal } from '@angular/core';
 

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input } f
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Store } from '@ngrx/store';
 import { getDisplayNameInitials, getUserImage } from '../../util/helper';
-import { getCustomerOverview } from '../../store/user.actions';
+import { getCustomerOverview } from '../../store/actions/user.actions';
 import { Router } from '@angular/router';
 import { IReservationOverview } from '../../interfaces/reservation';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';

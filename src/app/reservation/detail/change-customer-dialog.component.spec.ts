@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { ChangeCustomerDialogComponent } from './change-customer-dialog.component';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { IUserAll } from '../../interfaces/user';
-import { getAllCustomers } from '../../store/user.actions';
+import { getAllCustomers } from '../../store/actions/user.actions';
 
 describe('ChangeCustomerDialogComponent', () => {
   let component: ChangeCustomerDialogComponent;

@@ -19,8 +19,8 @@ import {
   startReservation,
   updateReservationColor,
   updateReservationCustomer,
-} from '../../store/reservation.actions';
-import { notifyPayment, paymentSend } from '../../store/payment.actions';
+} from '../../store/actions/reservation.actions';
+import { notifyPayment, paymentSend } from '../../store/actions/payment.actions';
 import { ServiceType } from '../../interfaces/room';
 import { IUserAll } from '../../interfaces/user';
 import { getNowTimeZone } from '../../util/dates';

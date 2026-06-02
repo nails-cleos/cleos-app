@@ -7,8 +7,6 @@ import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { DocumentState } from '../../store/reducers/document.reducers';
-import { cleanDocument, documentDownloadZip, documentView, getDocumentsPage } from '../../store/document.actions';
 import { DriveAccessService } from '../../services/drive-access.service';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { requireMatch } from '../../util/validators';
@@ -17,11 +15,12 @@ import { map, startWith } from 'rxjs/operators';
 import { combineLatestWith } from 'rxjs';
 import { IDocument } from '../../interfaces/document';
 import { OfficeState } from '../../store/reducers/office.reducers';
+import { getAllMyOffices } from '../../store/actions/office.actions';
 import { getMyOfficesPipe } from '../../store/selectors/office.selectors';
-import { getDocumentResponsePipe, getDocumentsPagePipe } from '../../store/selectors/document.selectors';
+import { DocumentStore } from '../../store/document.store';
 import { MatOption } from '@angular/material/core';
 import { provideYearMonthDateAdapter } from '../../util/adapter/app-date.provider';
-import { getDateFormat, getDateQuarter, getNowTimeZone, monthViewTitle } from '../../util/dates';
+import { getDateQuarter, getNowTimeZone, monthViewTitle } from '../../util/dates';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { EnvService } from '../../services/env.service';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
@@ -70,13 +69,12 @@ export class DocumentListComponent {
   private readonly env: EnvService = inject(EnvService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<DocumentState | OfficeState> = inject(Store<DocumentState | OfficeState>);
+  private readonly store: Store<OfficeState> = inject(Store<OfficeState>);
+  private readonly documentStore = inject(DocumentStore);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private documentList$ = this.store.pipe(getDocumentsPagePipe);
-  private response$ = this.store.pipe(getDocumentResponsePipe);
   private allOffices$ = this.store.pipe(getMyOfficesPipe);
 
   private paginator = viewChild(MatPaginator);
@@ -84,8 +82,8 @@ export class DocumentListComponent {
   private tableState = createMatTableState(this.paginator, this.sort, 'date', 'desc');
 
   private allOfficesSignal = toSignal(this.allOffices$);
-  private documentListSignal = toSignal(this.documentList$);
-  private responseSignal = toSignal(this.response$);
+  private dataSignal = this.documentStore.data;
+  private responseSignal = this.documentStore.response;
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -99,8 +97,8 @@ export class DocumentListComponent {
   );
 
   paginatorPageIndex = this.tableState.pageIndex;
-  dataSourceSignal = computed(() => this.documentListSignal()?.content ?? []);
-  resultsLengthSignal = computed(() => this.documentListSignal()?.totalElements || 0);
+  dataSourceSignal = computed(() => this.dataSignal()?.content ?? []);
+  resultsLengthSignal = computed(() => this.dataSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
   displayedColumns: string[] = ['position', 'name', 'date', 'type', 'actions'];
@@ -137,6 +135,9 @@ export class DocumentListComponent {
   private selectedDate = toSignal(this.getForm.date.valueChanges);
 
   constructor() {
+    this.documentStore.clean();
+    this.store.dispatch(getAllMyOffices());
+
     effect(() => {
       const officeId = this.selectedOffice()?.id;
       const date = this.selectedDate();
@@ -144,16 +145,10 @@ export class DocumentListComponent {
         return;
       }
       const request = this.tableState.baseRequest();
-      this.store.dispatch(
-        getDocumentsPage({
-          ...request,
-          officeId,
-          date: getDateFormat(date),
-          size: this.pageSizeSignal(),
-        }),
-      );
+      const size = this.pageSizeSignal();
+      this.documentStore.loadPage({ ...request, officeId, date, size });
     });
-    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanDocument()));
+    this.tableState.resetOn(this.responseSignal, () => this.documentStore.clearResponse());
 
     effect(() => {
       const data = this.dataSourceSignal()?.[0]?.id;
@@ -189,9 +184,7 @@ export class DocumentListComponent {
     datepicker.close();
   };
 
-  download = (document: IDocument): void => this.store.dispatch(
-    documentView({ id: document.id, fileName: document.name }),
-  );
+  download = (document: IDocument): void => this.documentStore.download({ id: document.id, fileName: document.name });
 
   downloadZip = (): void => {
     const office = this.selectedOffice();
@@ -200,7 +193,7 @@ export class DocumentListComponent {
       return;
     }
     const fileName = `${ office.name } Q${ getDateQuarter(date) } ${ monthViewTitle(date) }.zip`;
-    this.store.dispatch(documentDownloadZip({ officeId: office.id, date: getDateFormat(date), fileName }));
+    this.documentStore.downloadZip({ officeId: office.id, date, fileName });
   };
 
   keyDownHandler = (event: KeyboardEvent): void => {

@@ -2,8 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATED } from '@ngrx/router-store';
-import { cleanNote, getAllProfessional, setNoteNavigationParams } from '../store/note.actions';
-import { navigation } from '../store/router-navigation.operator';
+import { cleanNote, getAllProfessional, setNoteNavigationParams } from '../store/actions/note.actions';
+import { navigation } from '../util/router-navigation.operator';
 import { NoteCreatePageComponent } from './note-create-page.component';
 import { NoteDetailsPageComponent } from './note-details-page.component';
 

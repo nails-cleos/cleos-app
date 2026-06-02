@@ -55,7 +55,7 @@ import {
   getAllTreatments,
   getEditReservation,
   updateReservationById,
-} from '../../../store/reservation.actions';
+} from '../../../store/actions/reservation.actions';
 import { map, startWith } from 'rxjs/operators';
 import {
   createRoomOffice,

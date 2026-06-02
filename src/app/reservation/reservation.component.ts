@@ -30,7 +30,7 @@ import {
   getReservation,
   searchAvailability,
   updateReservationById,
-} from '../store/reservation.actions';
+} from '../store/actions/reservation.actions';
 import { noDuplicateDatesValidator, requireMatch, valueChange } from '../util/validators';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../interfaces/treatment';
 import { IRoom, IRoomAll, IService } from '../interfaces/room';

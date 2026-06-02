@@ -14,11 +14,11 @@ import {
   officeSelected,
   officeSuccess,
   updateOffice,
-} from '../office.actions';
+} from '../actions/office.actions';
 import { IOffice, IOfficeAll } from '../../interfaces/office';
 import { IUserAll } from '../../interfaces/user';
 import { IError, IResponseSuccess } from '../../interfaces/common';
-import { clearGlobalError, clearGlobalResponse } from '../global.actions';
+import { clearGlobalError, clearGlobalResponse } from '../actions/global.actions';
 
 export const OFFICE_FEATURE_KEY = 'office';
 

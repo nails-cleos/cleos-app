@@ -5,7 +5,7 @@ import { ROUTER_NAVIGATED, RouterNavigatedAction } from '@ngrx/router-store';
 import { Action } from '@ngrx/store';
 import { ReplaySubject, firstValueFrom } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
-import { cleanUser, setUserNavigationParams } from '../store/user.actions';
+import { cleanUser, setUserNavigationParams } from '../store/actions/user.actions';
 import { UserListComponent } from './list/user-list.component';
 import { OverviewComponent } from './overview/overview.component';
 import { UserCreatePageComponent } from './user-create-page.component';

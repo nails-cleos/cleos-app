@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { ITreatmentAll } from '../../interfaces/treatment';
-import { getTreatmentGroup, sortTreatment } from '../../store/treatment.actions';
+import { getTreatmentGroup, sortTreatment } from '../../store/actions/treatment.actions';
 import {
   DragDropSortingComponent,
   ISorted,

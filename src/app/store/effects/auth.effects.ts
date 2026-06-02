@@ -3,7 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { map, switchMap, tap } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
-import { login, loginFailure, loginSuccess, logOut, redirect, reLogin } from '../auth.actions';
+import { login, loginFailure, loginSuccess, logOut, redirect, reLogin } from '../actions/auth.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../../services/navigation.service';
 import { AuthUserService } from '../../services/auth-user.service';

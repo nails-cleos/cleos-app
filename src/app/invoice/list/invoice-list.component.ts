@@ -11,7 +11,7 @@ import {
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { combineLatestWith } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { getOfficeToInvoice, updateOfficeById, uploadInvoices } from '../../store/invoice.actions';
+import { getOfficeToInvoice, updateOfficeById, uploadInvoices } from '../../store/actions/invoice.actions';
 import { backendFormatDate, datesInSameWeek, invoiceFormat, newDateTimestamp } from '../../util/dates';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { IPaymentOption } from '../../interfaces/payment';

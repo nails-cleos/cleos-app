@@ -10,7 +10,7 @@ import {
   restore,
   setRole,
   userSelected,
-} from '../../store/user.actions';
+} from '../../store/actions/user.actions';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';

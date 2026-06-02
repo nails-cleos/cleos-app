@@ -13,7 +13,7 @@ import { IExperience, ISlide, ISocialLink, IStory, IWork } from '../../interface
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { sendMessage } from '../../store/main.actions';
+import { sendMessage } from '../../store/actions/main.actions';
 import { AuthUserService } from '../../services/auth-user.service';
 import { goTo, observeElementSignal } from '../../util/animation';
 import { isMobile } from '../../util/helper';

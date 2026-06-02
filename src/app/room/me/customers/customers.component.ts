@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, viewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { getAllCustomersInfo } from '../../../store/room.actions';
+import { getAllCustomersInfo } from '../../../store/actions/room.actions';
 import { MatPaginator } from '@angular/material/paginator';
 import {
   MatCell,

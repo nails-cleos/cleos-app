@@ -4,7 +4,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 
 import { AdditionalComponent } from './additional.component';
-import { getAdditional } from '../store/additional.actions';
+import { getAdditional } from '../store/actions/additional.actions';
 import { ITreatmentGroupAll } from '../interfaces/treatment';
 import { IAdditionalAll } from '../interfaces/additional';
 import { AdditionalState } from '../store/reducers/additional.reducers';

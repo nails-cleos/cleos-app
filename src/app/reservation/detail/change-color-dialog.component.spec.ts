@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { ChangeColorDialogComponent } from './change-color-dialog.component';
 import { IColorAll } from '../../interfaces/color';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
-import { getColorsByTreatmentId } from '../../store/reservation.actions';
+import { getColorsByTreatmentId } from '../../store/actions/reservation.actions';
 
 describe('ChangeColorDialogComponent', () => {
   let component: ChangeColorDialogComponent;

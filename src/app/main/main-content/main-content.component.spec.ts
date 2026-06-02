@@ -6,7 +6,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Router } from '@angular/router';
 import { ToastService } from '../../services/toast.service';
-import { sendMessage } from '../../store/main.actions';
+import { sendMessage } from '../../store/actions/main.actions';
 import { ISendMessage } from '../../../main';
 import { ISocialLink } from '../../interfaces/main';
 import { BehaviorSubject } from 'rxjs';
