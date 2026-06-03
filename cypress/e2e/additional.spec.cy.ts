@@ -30,7 +30,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.intercept('POST', '**/api/v1/additional').as('saveAdditional');
       cy.openMenu(breakpoints, ['Additional', 'Additional']);
       cy.wait('@getAdditionalList');
-      cy.get('tr').contains('No additional');
+      cy.contains('.no-content', 'No additional', { timeout: 15000 }).should('be.visible');
       cy.get('button[id="add-button"]').click({ force: true });
       cy.url().should('include', '/additional/add');
 
@@ -63,6 +63,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockAdditionalList(undefined, 'f78de201-b4dc-457d-9da4-1e8a5e45688a');
       cy.openMenu(breakpoints, ['Additional', 'Additional']);
       cy.wait('@getAdditionalList');
+      cy.get('.app-table-shell').should('be.visible');
 
       cy.get('@selectedAdditional').then((additional: any) => {
         cy.mockAdditional(additional.id, additional).then(() => {

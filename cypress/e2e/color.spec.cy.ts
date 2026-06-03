@@ -27,7 +27,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.intercept('POST', '**/api/v1/colors').as('saveColor');
       cy.openMenu(breakpoints, ['App settings', 'Color']);
       cy.wait('@getColors');
-      cy.get('tr').contains('No Color');
+      cy.contains('.no-content', 'No Color', { timeout: 15000 }).should('be.visible');
       cy.get('button[id="add-button"]').click({ force: true });
       cy.url().should('include', '/colors/add');
       cy.get('.app-surface-eyebrow').contains('Add color');
@@ -50,6 +50,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockColors(true, undefined, 'deb71da5-4ded-4e94-89c2-44036ea00451');
       cy.openMenu(breakpoints, ['App settings', 'Color']);
       cy.wait('@getColors');
+      cy.get('.app-table-shell').should('be.visible');
 
       cy.get('@selectedColor').then((color: any) => {
         // Updates

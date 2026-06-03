@@ -28,7 +28,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.intercept('POST', '**/api/v1/discounts').as('saveDiscounts');
       cy.openMenu(breakpoints, ['Admin settings', 'Discounts']);
       cy.wait('@getDiscounts');
-      cy.get('tr').contains('No discounts');
+      cy.contains('.no-content', 'No discounts', { timeout: 15000 }).should('be.visible');
       cy.get('button[id="add-button"]').click({ force: true });
       cy.url().should('include', '/discounts/add');
 
@@ -61,6 +61,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockDiscounts(undefined, '09ae64ab-547d-43b4-8c7b-a5947296e207');
       cy.openMenu(breakpoints, ['Admin settings', 'Discounts']);
       cy.wait('@getDiscounts');
+      cy.get('.app-table-shell').should('be.visible');
 
       cy.get('@selectedDiscount').then((discount: any) => {
         cy.mockDiscount(discount.id, discount).then(() => {

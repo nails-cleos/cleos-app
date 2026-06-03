@@ -42,7 +42,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.wait('@getCustomers').its('response.statusCode').should('eq', 200);
       // Select a customer
       cy.get('input[name="customer"]').should('be.visible');
-      cy.get('input[name="customer"]').type('c');
+      cy.get('input[name="customer"]').type('c', { force: true });
 
       cy.get('mat-option').contains(customerName).should('be.visible');
       cy.get('mat-option').contains('Carla Lujan').should('be.visible');

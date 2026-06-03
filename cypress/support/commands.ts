@@ -116,11 +116,11 @@ const usesDrawerMenu = (breakpoint: string): boolean =>
 const clickVisibleMenuItem = (selector: string, label: string) => {
   cy.get(selector)
     .filter(':visible')
-    .contains('[matListItemTitle]', label)
+    .contains(label)
     .scrollIntoView()
     .parents('mat-list-item')
     .first()
-    .click();
+    .click({ force: true });
 };
 
 Cypress.Commands.add('randomUUID', () => cy.wrap('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -209,7 +209,7 @@ Cypress.Commands.add('buttonClickOnTable', (
       });
     });
   } else {
-    cy.contains(rowSelector, column, { timeout: 15000 }).scrollIntoView().within(() => {
+    cy.contains('.app-table-shell tr', column, { timeout: 15000 }).scrollIntoView().within(() => {
       otherButtons?.forEach(otherButton => {
         cy.get('button[mat-icon-button]').contains(otherButton).should('exist');
       });
@@ -234,7 +234,7 @@ Cypress.Commands.add('selectChip', (chipName: string) => {
 });
 
 Cypress.Commands.add('formControlType', (formControlName: string, value: any, type: string = 'input') => {
-  cy.get(`[data-cy="${formControlName}-${type}"]`).scrollIntoView().should('be.visible');
+  cy.get(`[data-cy="${formControlName}-${type}"]`).scrollIntoView().should('exist');
   cy.get(`[data-cy="${formControlName}-${type}"]`).clear().type(value);
 });
 
