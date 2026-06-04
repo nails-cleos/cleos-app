@@ -8,20 +8,14 @@ import { ICurrency } from '../interfaces/currency';
 import { NavigationService } from '../services/navigation.service';
 import { signal } from '@angular/core';
 import { DiscountStore } from '../store/discount.store';
+import { ICommon } from '../interfaces/common';
 
 describe('DiscountComponent', () => {
   let component: DiscountComponent;
   let fixture: ComponentFixture<DiscountComponent>;
 
   let discountStoreSpy: {
-    selected: ReturnType<typeof signal>;
-    currencies: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadCurrencies: jasmine.Spy;
-    loadById: jasmine.Spy;
-    create: jasmine.Spy;
-    update: jasmine.Spy;
   };
   let routerSpy: jasmine.SpyObj<Router>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
@@ -42,16 +36,14 @@ describe('DiscountComponent', () => {
     description: 'Test Description',
   };
 
+  const config: ICommon = {
+    title: 'DISCOUNT.TITLE',
+    button: { icon: 'add', label: 'COMMON.BUTTON.CREATE' },
+  };
+
   beforeEach(async () => {
     discountStoreSpy = {
-      selected: signal<IDiscountAll | undefined>(undefined),
-      currencies: signal<ICurrency[] | undefined>([]),
       subErrors: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadCurrencies: jasmine.createSpy('loadCurrencies'),
-      loadById: jasmine.createSpy('loadById'),
-      create: jasmine.createSpy('create'),
-      update: jasmine.createSpy('update'),
     };
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
@@ -73,6 +65,8 @@ describe('DiscountComponent', () => {
 
     fixture = TestBed.createComponent(DiscountComponent);
     component = fixture.componentInstance;
+
+    fixture.componentRef.setInput('config', config);
     fixture.detectChanges();
   });
 
@@ -80,25 +74,12 @@ describe('DiscountComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should be in add mode when discountId is null', () => {
-    expect(component.isAddModeSignal()).toBeTrue();
-  });
-
-  it('should be in edit mode when discountId is set', () => {
-    discountStoreSpy.loadById.calls.reset();
-    fixture.componentRef.setInput('id', '123');
+  it('should patch form when selectedDiscount emits', () => {
+    fixture.componentRef.setInput('discount', mockDiscount);
     fixture.detectChanges();
 
-    expect(component.isAddModeSignal()).toBeFalse();
-    expect(discountStoreSpy.loadById).toHaveBeenCalledWith('123');
-  });
-
-  it('should patch form when selectedDiscount emits a value', () => {
-    discountStoreSpy.selected.set(mockDiscount);
-    fixture.detectChanges();
-
-    expect(component.getForm.name.value).toBe(mockDiscount.name!);
-    expect(component.getForm.description.value).toBe(mockDiscount.description);
+    expect(component.discount()?.id).toBe('1');
+    expect(component.getForm.name.value).toBe('Test Discount');
   });
 
   it('should set form errors when subErrors emits values', () => {
@@ -119,7 +100,7 @@ describe('DiscountComponent', () => {
   });
 
   it('should filter groups correctly using filteredCurrencySignal', () => {
-    discountStoreSpy.currencies.set([mockCurrency, { id: '2', name: 'USD', code: 'USD', icon: 'dollar' }]);
+    fixture.componentRef.setInput('currencies', [mockCurrency, { id: '2', name: 'USD', code: 'USD', icon: 'dollar' }]);
     (component.getForm.currency as any).setValue('U');
     fixture.detectChanges();
 
@@ -128,7 +109,23 @@ describe('DiscountComponent', () => {
     expect(filtered?.[0].name).toBe('USD');
   });
 
+  it('should not dispatch when form invalid on submit', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
+
+    // ensure form invalid
+    (component.getForm.name as any).setValue(undefined);
+    fixture.detectChanges();
+
+    component.submit();
+
+    expect(emitSpy).not.toHaveBeenCalled();
+  });
+
   it('should update form values correctly on submit', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
+
     const nameControl = component.getForm.name;
     nameControl.setValue('New Name');
     nameControl.markAsDirty();
@@ -149,7 +146,7 @@ describe('DiscountComponent', () => {
 
     component.submit();
 
-    expect(discountStoreSpy.create).toHaveBeenCalledWith(jasmine.objectContaining({
+    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
       name: 'New Name',
       description: 'New Description',
       type: DiscountType.percentage,

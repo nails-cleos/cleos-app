@@ -6,24 +6,19 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../../interfaces/pagination';
 import { IExpenseAll } from '../../../../interfaces/expense';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { cleanExpense, deleteExpense, expenseSelected, getExpensesPage } from '../../../../store/actions/expense.actions';
 import { DialogComponent } from '../../../../shared/dialog/generic/dialog.component';
 import { getDateFormat, getNowTimeZone, isSameTimeZone, newDateTimestamp } from '../../../../util/dates';
 import { openDialog } from '../../../../util/helper';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { TimeDetailPipe } from '../../../../pipes/time-detail.pipe';
-import { RoomState } from '../../../../store/reducers/room.reducers';
-import { ExpenseState } from '../../../../store/reducers/expense.reducers';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { getExpensePaginationPipe, getExpenseResponsePipe } from '../../../../store/selectors/expense.selectors';
 import { provideYearMonthDateAdapter } from '../../../../util/adapter/app-date.provider';
 import { EnvService } from '../../../../services/env.service';
 import { DriveAccessService } from '../../../../services/drive-access.service';
 import { IDocument } from '../../../../interfaces/document';
 import { DocumentStore } from '../../../../store/document.store';
+import { Router } from '@angular/router';
 import { CurrencySymbolPipe } from '../../../../pipes/currency-symbol.pipe';
 import { MatIcon } from '@angular/material/icon';
 import { MatIconButton } from '@angular/material/button';
@@ -49,6 +44,8 @@ import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ExpenseStore } from '../../../../store/expense.store';
 
 type ExpensesForm = {
   date: FormControl<Date | undefined>;
@@ -73,23 +70,22 @@ export class ExpenseListComponent {
 
   private readonly env: EnvService = inject(EnvService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<RoomState | ExpenseState> = inject(Store<RoomState | ExpenseState>);
+  private readonly expenseStore = inject(ExpenseStore);
   private readonly documentStore = inject(DocumentStore);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
+  private readonly router: Router = inject(Router);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private expenseList$ = this.store.pipe(getExpensePaginationPipe);
-  private response$ = this.store.pipe(getExpenseResponsePipe);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
   private tableState = createMatTableState(this.paginator, this.sort, 'timestamp', 'desc');
 
-  private expenseListSignal = toSignal(this.expenseList$);
-  private responseSignal = toSignal(this.response$);
+  private expenseListSignal = this.expenseStore.data;
+  private responseSignal = this.expenseStore.response;
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -124,6 +120,8 @@ export class ExpenseListComponent {
   private selectedFilter = toSignal(this.getForm.filter.valueChanges);
 
   constructor() {
+    this.expenseStore.clean();
+
     effect(() => {
       const roomId = this.id();
       if (!roomId) {
@@ -132,17 +130,15 @@ export class ExpenseListComponent {
       const request = this.tableState.baseRequest();
       const date = this.selectedDate();
       const filter = this.selectedFilter();
-      this.store.dispatch(
-        getExpensesPage({
-          roomId: roomId,
-          ...request,
-          size: this.pageSizeSignal(),
-          filter: filter?.trim()?.toLowerCase(),
-          dateFilter: getDateFormat(date),
-        }),
-      );
+      this.expenseStore.loadPage({
+        roomId,
+        ...request,
+        size: this.pageSizeSignal(),
+        filter: filter?.trim()?.toLowerCase(),
+        dateFilter: getDateFormat(date),
+      });
     });
-    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanExpense()));
+    this.tableState.resetOn(this.responseSignal, () => this.expenseStore.clearResponse());
 
     effect(() => {
       this.driveAccessService.requestAccessIfNeeded(this.googleDriveUploadFile);
@@ -179,7 +175,15 @@ export class ExpenseListComponent {
     expense.room, this.dateFormat, this.translate, this.dialog, newDateTimestamp(expense.timestamp),
   );
 
-  edit = (selected: IExpenseAll): void => this.store.dispatch(expenseSelected({ selected }));
+  edit = (selected: IExpenseAll): void => {
+    this.router.navigate([
+      this.language,
+      'rooms',
+      selected.room.id,
+      'expenses',
+      selected.id,
+    ]);
+  };
 
   delete = (expense: IExpenseAll): void => {
     const roomId = this.id();
@@ -194,7 +198,7 @@ export class ExpenseListComponent {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.store.dispatch(deleteExpense({ roomId, id: result.id, invoice: result.invoice }));
+        this.expenseStore.delete(roomId, result.id, result.invoice);
       }
     });
   };

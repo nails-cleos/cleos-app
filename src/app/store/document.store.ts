@@ -1,27 +1,16 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { IError, IResponseSuccess } from '../interfaces/common';
 import { IDocument } from '../interfaces/document';
 import { Pagination } from '../interfaces/pagination';
 import { DocumentService } from '../services/document.service';
 import { getDateFormat } from '../util/dates';
-import { mapCrudHttpError } from './crud-signal-store';
+import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';
 import { SortDirection } from '@angular/material/sort';
 
-type DocumentStoreState = {
-  response: IResponseSuccess | undefined;
-  data: Pagination<IDocument> | undefined;
-  error: IError | undefined;
-  subErrors: IError[] | undefined;
-  isLoading: boolean;
-};
+type DocumentStoreState = StoreState<Pagination<IDocument>>;
 
 const initialState: DocumentStoreState = {
-  response: undefined,
-  data: undefined,
-  error: undefined,
-  subErrors: undefined,
-  isLoading: false,
+  ...createStoreInitialState<Pagination<IDocument>, never>(),
 };
 
 export type DocumentPageRequest = {

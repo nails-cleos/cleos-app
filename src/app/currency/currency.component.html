@@ -1,19 +1,12 @@
-@let isAddMode = isAddModeSignal();
-@let currency = currencySignal();
-
 <div class="app-surface-canvas app-surface-shell app-surface-stack">
   <section class="app-surface-section">
     <div class="app-detail-section-header">
       <div>
         <span class="app-surface-eyebrow">
-          {{ (isAddMode ? 'CURRENCY.TITLE' : 'CURRENCY.DETAIL') | translate }}
+        {{ getConfig.title | translate }}
         </span>
-        @if (!isAddMode) {
-          @if (currency) {
-            <h2 class="app-crud-title">{{ currency.code }}</h2>
-          } @else {
-            <div class="ssc-line app-skeleton-title"></div>
-          }
+        @if (currency(); as currency) {
+          <h2 class="app-crud-title">{{ currency.code }}</h2>
         }
       </div>
     </div>
@@ -23,61 +16,54 @@
           novalidate
           (keydown.enter)="$event.preventDefault()"
           class="app-crud-form">
-      @if (isAddMode || currency) {
-        <div class="app-crud-form-grid app-crud-form-grid--triple">
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'CURRENCY.CODE.FIELD' | translate }}</mat-label>
-            <input [formControl]="getForm.code" matInput required data-cy="code-input">
-            @if (getForm.code.hasError('required')) {
-              <mat-error [innerHTML]="'CURRENCY.CODE.REQUIRED' | translate"></mat-error>
-            } @else if (errors()['code']) {
-              <mat-error>{{ errors()['code'] }}</mat-error>
+      <div class="app-crud-form-grid app-crud-form-grid--triple">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'CURRENCY.CODE.FIELD' | translate }}</mat-label>
+          <input [formControl]="getForm.code" matInput required data-cy="code-input">
+          @if (getForm.code.hasError('required')) {
+            <mat-error [innerHTML]="'CURRENCY.CODE.REQUIRED' | translate"></mat-error>
+          } @else if (errors()['code']) {
+            <mat-error>{{ errors()['code'] }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'CURRENCY.NAME.FIELD' | translate }}</mat-label>
+          <input [formControl]="getForm.name" matInput data-cy="name-input">
+          @let nameError = errors()['name'];
+          @if (nameError) {
+            <mat-error>{{ nameError }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'CURRENCY.ICON.FIELD' | translate }}</mat-label>
+          <mat-select [formControl]="getForm.icon" id="select-icon" data-cy="icon-input">
+            <mat-select-trigger>
+              <mat-icon>{{ getForm.icon.value }}</mat-icon>
+            </mat-select-trigger>
+            <mat-option>--</mat-option>
+            @for (ic of icons; track ic) {
+              <mat-option [value]="ic">
+                <mat-icon>{{ ic }}</mat-icon>
+              </mat-option>
             }
-          </mat-form-field>
+          </mat-select>
+        </mat-form-field>
+      </div>
 
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'CURRENCY.NAME.FIELD' | translate }}</mat-label>
-            <input [formControl]="getForm.name" matInput data-cy="name-input">
-            @let nameError = errors()['name'];
-            @if (nameError) {
-              <mat-error>{{ nameError }}</mat-error>
-            }
-          </mat-form-field>
+      <div class="app-detail-actions">
+        <button appBackButton mat-stroked-button type="button">
+          <mat-icon>keyboard_return</mat-icon>
+          <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+        </button>
 
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'CURRENCY.ICON.FIELD' | translate }}</mat-label>
-            <mat-select [formControl]="getForm.icon" id="select-icon" data-cy="icon-input">
-              <mat-select-trigger>
-                <mat-icon>{{ getForm.icon.value }}</mat-icon>
-              </mat-select-trigger>
-              <mat-option>--</mat-option>
-              @for (ic of icons; track ic) {
-                <mat-option [value]="ic">
-                  <mat-icon>{{ ic }}</mat-icon>
-                </mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-        </div>
+        <button [disabled]="form.invalid" mat-stroked-button type="submit">
+          <mat-icon>{{ getConfig.button.icon }}</mat-icon>
+          <span>{{ getConfig.button.label | translate }}</span>
+        </button>
+      </div>
 
-        <div class="app-detail-actions">
-          <button appBackButton mat-stroked-button type="button">
-            <mat-icon>keyboard_return</mat-icon>
-            <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
-          </button>
-
-          <button [disabled]="form.invalid" mat-stroked-button type="submit">
-            <mat-icon>{{ isAddMode ? 'add' : 'published_with_changes' }}</mat-icon>
-            <span>{{ (isAddMode ? 'COMMON.BUTTON.CREATE' : 'COMMON.BUTTON.UPDATE') | translate }}</span>
-          </button>
-        </div>
-      } @else {
-        <div class="app-crud-loading">
-          <div class="app-surface-skeleton-spacer"></div>
-          <div class="ssc-square app-crud-loading__block"></div>
-          <div class="app-surface-skeleton-spacer"></div>
-        </div>
-      }
     </form>
   </section>
 </div>

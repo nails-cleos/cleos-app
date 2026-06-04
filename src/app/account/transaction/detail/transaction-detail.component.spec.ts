@@ -1,26 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { TransactionDetailComponent } from './transaction-detail.component';
 import { ITransaction } from '../../../interfaces/account';
-import { getTransaction } from '../../../store/actions/account.actions';
 import { notifyPayment, paymentSend } from '../../../store/actions/payment.actions';
-import { AccountState } from '../../../store/reducers/account.reducers';
 import { NavigationService } from '../../../services/navigation.service';
+import { AccountStore } from '../../../store/account.store';
+import { signal } from '@angular/core';
 
 describe('TransactionDetailComponent', () => {
   let component: TransactionDetailComponent;
   let fixture: ComponentFixture<TransactionDetailComponent>;
 
-  let storeSpy: jasmine.SpyObj<Store<AccountState>>;
+  let storeSpy: jasmine.SpyObj<Store<any>>;
+  let accountStoreSpy: jasmine.SpyObj<any>;
   let routerSpy: jasmine.SpyObj<Router>;
 
-  let translateService: TranslateService;
-
-  let selectedTransaction$: BehaviorSubject<ITransaction | undefined>;
+  let selectedTransactionSignal: ReturnType<typeof signal<ITransaction | undefined>>;
   let response$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any[]>;
 
@@ -38,10 +37,13 @@ describe('TransactionDetailComponent', () => {
   };
 
   beforeEach(async () => {
-    selectedTransaction$ = new BehaviorSubject<ITransaction | undefined>(undefined);
+    selectedTransactionSignal = signal<ITransaction | undefined>(undefined);
     response$ = new BehaviorSubject<any>(undefined);
     subErrors$ = new BehaviorSubject<any[]>([]);
 
+    accountStoreSpy = jasmine.createSpyObj('AccountStore', ['clean', 'loadTransaction'], {
+      selectedTransaction: selectedTransactionSignal.asReadonly(),
+    });
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
 
@@ -52,13 +54,11 @@ describe('TransactionDetailComponent', () => {
       callIndex++;
       switch (callIndex) {
         case 1:
-          return selectedTransaction$.asObservable();
-        case 2:
           return response$.asObservable();
-        case 3:
+        case 2:
           return subErrors$.asObservable();
         default:
-          return of(undefined);
+          return response$.asObservable();
       }
     });
 
@@ -67,6 +67,7 @@ describe('TransactionDetailComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TransactionDetailComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: AccountStore, useValue: accountStoreSpy },
         { provide: Store, useValue: storeSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: Router, useValue: routerSpy },
@@ -74,7 +75,7 @@ describe('TransactionDetailComponent', () => {
       ],
     }).compileComponents();
 
-    translateService = TestBed.inject(TranslateService);
+    const translateService = TestBed.inject(TranslateService);
     translateService.use('en-GB');
 
     fixture = TestBed.createComponent(TransactionDetailComponent);
@@ -88,14 +89,13 @@ describe('TransactionDetailComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should dispatch getTransaction when accountId and transactionId signals emit', () => {
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getTransaction({ id: 'account-123', transactionId: 'transaction-123' }),
-    );
+  it('should load the transaction when accountId and transactionId signals emit', () => {
+    expect(accountStoreSpy.clean).toHaveBeenCalled();
+    expect(accountStoreSpy.loadTransaction).toHaveBeenCalledWith('account-123', 'transaction-123');
   });
 
   it('should update transactionSignal when selectedTransaction emits', () => {
-    selectedTransaction$.next(mockTransaction);
+    selectedTransactionSignal.set(mockTransaction);
     fixture.detectChanges();
 
     const transaction = component.transactionSignal();
@@ -105,7 +105,7 @@ describe('TransactionDetailComponent', () => {
   });
 
   it('should dispatch paymentSend when pay() is called', () => {
-    selectedTransaction$.next(mockTransaction);
+    selectedTransactionSignal.set(mockTransaction);
     fixture.detectChanges();
 
     component.pay();
@@ -113,7 +113,7 @@ describe('TransactionDetailComponent', () => {
   });
 
   it('should dispatch notifyPayment when notify() is called', () => {
-    selectedTransaction$.next(mockTransaction);
+    selectedTransactionSignal.set(mockTransaction);
     fixture.detectChanges();
 
     component.notify();
@@ -126,14 +126,14 @@ describe('TransactionDetailComponent', () => {
     }));
   });
 
-  it('should navigate when responseSignal emits a path', () => {
+  it('should navigate when payment response emits a path', () => {
     response$.next({ path: 'some/path' });
     fixture.detectChanges();
 
     expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB/some/path']);
   });
 
-  it('should navigate to payment page when subErrorsSignal emits', () => {
+  it('should navigate to payment page when payment subErrors emit', () => {
     subErrors$.next([{ message: 'Payment failed' }]);
     fixture.detectChanges();
 
@@ -141,7 +141,7 @@ describe('TransactionDetailComponent', () => {
   });
 
   it('should handle undefined selectedTransaction gracefully', () => {
-    selectedTransaction$.next(undefined);
+    selectedTransactionSignal.set(undefined);
     fixture.detectChanges();
 
     expect(component.transactionSignal()).toBeUndefined();

@@ -11,7 +11,6 @@ import {
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { combineLatestWith, Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { getOfficeToInvoice, updateOfficeById, uploadInvoices } from '../../store/actions/invoice.actions';
 import { backendFormatDate, datesInSameWeek, invoiceFormat, newDateTimestamp } from '../../util/dates';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { IPaymentOption } from '../../interfaces/payment';
@@ -26,11 +25,9 @@ import { IOffice, IOfficeAll, Office } from '../../interfaces/office';
 import { pdf } from '../../util/invoice';
 import { requireMatch } from '../../util/validators';
 import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
-import { getInvoicesPipe } from '../../store/selectors/invoice.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { InvoiceState } from '../../store/reducers/invoice.reducers';
 import {
   MatEndDate,
   MatDatepickerToggle,
@@ -40,6 +37,7 @@ import { provideMonthPeriodAdapter } from '../../util/adapter/app-date.provider'
 import { DriveAccessService } from '../../services/drive-access.service';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { EnvService } from '../../services/env.service';
+import { getOptions } from '../../store/actions/payment.actions';
 import { getPaymentOptionsPipe } from '../../store/selectors/payment.selectors';
 import { PaymentState } from '../../store/reducers/payment.reducers';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
@@ -69,6 +67,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/material/chips';
 import { MatSuffix } from '@angular/material/form-field';
 import { OfficeStore } from '../../store/office.store';
+import { InvoiceStore } from '../../store/invoice.store';
 
 // Set up VFS fonts for pdfMake (provides fallback Roboto fonts)
 (pdfMake as any).vfs = (pdfFonts as any).pdfMake?.vfs || pdfFonts;
@@ -103,13 +102,13 @@ export class InvoiceListComponent {
   private readonly env: EnvService = inject(EnvService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<InvoiceState | PaymentState> = inject(Store<InvoiceState | PaymentState>);
+  private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
   private readonly officeStore = inject(OfficeStore);
+  private readonly invoiceStore = inject(InvoiceStore);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly router: Router = inject(Router);
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
 
-  private invoiceList$ = this.store.pipe(getInvoicesPipe) as Observable<IInvoice[]>;
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
   private readonly paymentOptions$ = this.store.pipe(getPaymentOptionsPipe) as Observable<IPaymentOption[]>;
 
@@ -118,7 +117,6 @@ export class InvoiceListComponent {
     return data?.kind === 'list' ? data.value : undefined;
   });
   private paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] as IPaymentOption[] });
-  private invoiceListSignal = toSignal<IInvoice[] | undefined>(this.invoiceList$, { initialValue: undefined });
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -170,7 +168,7 @@ export class InvoiceListComponent {
   selectedPaymentOptionsSignal = signal<IPaymentOption[]>([]);
   allPaymentOptionsWritableSignal = signal<IPaymentOption[] | undefined>(undefined);
   dataSourceSignal = computed(() => {
-    const invoiceList = this.invoiceListSignal();
+    const invoiceList = this.invoiceStore.data();
     return invoiceList?.map((invoice: IInvoice, position: number) => {
       if (invoice.id) {
         const date1 = newDateTimestamp(invoice.timestamp, invoice.room.timeZone);
@@ -211,6 +209,8 @@ export class InvoiceListComponent {
   language: string = this.translate.getCurrentLang();
 
   constructor() {
+    this.invoiceStore.clean();
+    this.store.dispatch(getOptions());
     this.officeStore.loadMyOffices();
 
     effect(() => {
@@ -247,7 +247,7 @@ export class InvoiceListComponent {
       const end = backendFormatDate(this.endDateSignal());
       if (start && end) {
         const types = this.selectedPaymentOptionsSignal().map((option: IPaymentOption) => option.type);
-        this.store.dispatch(getOfficeToInvoice({ officeId, start, end, types }));
+        this.invoiceStore.loadOfficeToInvoice(officeId, start, end, types);
       }
     });
 
@@ -276,16 +276,15 @@ export class InvoiceListComponent {
       const office: IOffice = new Office();
       office.lastInvoiceNumber = start + this.selectionSignal().selected.length;
 
-      this.store.dispatch(updateOfficeById({ id: selectedOffice.id, office }));
+      this.invoiceStore.updateOffice(selectedOffice.id, office);
     }
     await this.loadFonts();
     const fileName = `Sales ${ invoiceFormat(this.getDateRangeForm.startDate.value!) }.pdf`;
     const createPDF = pdf(this.selectionSignal().selected, selectedOffice, start, fileName, this.env);
     const printPdf: any = pdfMake.createPdf(createPDF);
 
-    printPdf.getBlob().then((blob: Blob) => this.store.dispatch(
-      uploadInvoices({ officeId: selectedOffice.id, blob, fileName, upload: allSelected }),
-    ));
+    printPdf.getBlob().then((blob: Blob) =>
+      this.invoiceStore.uploadInvoices(selectedOffice.id, blob, fileName, allSelected));
   }
 
   keyDownHandler = (event: KeyboardEvent): void => {

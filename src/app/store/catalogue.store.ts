@@ -2,30 +2,19 @@ import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
 import { ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
-import { IApiResponse, IResponseSuccess } from '../interfaces/common';
+import { IApiResponse } from '../interfaces/common';
 import { ITreatmentGroupAll } from '../interfaces/treatment';
 import { CatalogueService } from '../services/catalogue.service';
 import { TreatmentService } from '../services/treatment.service';
-import { mapCrudHttpError } from './crud-signal-store';
+import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';
 
-type CatalogueStoreState = {
-  response: IResponseSuccess | undefined;
-  data: ICatalogueAll[] | undefined;
+type CatalogueStoreState = StoreState<ICatalogueAll[], ICatalogueAll> & {
   groups: ITreatmentGroupAll[] | undefined;
-  error: any;
-  subErrors: any;
-  selected: ICatalogueAll | undefined;
-  isLoading: boolean;
 };
 
 const initialState: CatalogueStoreState = {
-  response: undefined,
-  data: undefined,
+  ...createStoreInitialState<ICatalogueAll[], ICatalogueAll>(),
   groups: undefined,
-  error: undefined,
-  subErrors: undefined,
-  selected: undefined,
-  isLoading: false,
 };
 
 export const CatalogueStore = signalStore(
@@ -98,7 +87,7 @@ export const CatalogueStore = signalStore(
 
     loadById(id: string): void {
       patchState(store, {
-        selected: {} as ICatalogueAll,
+        selected: undefined,
         response: undefined,
         subErrors: undefined,
       });

@@ -15,7 +15,7 @@ export class AuthNavigationEffects {
   private readonly actions$: Actions = inject(Actions);
   private readonly router: Router = inject(Router);
 
-  loadCForgotPasswordPage$ = createEffect(() =>
+  loadForgotPasswordPage$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ROUTER_NAVIGATED),
       navigation(ForgotPasswordComponent, {

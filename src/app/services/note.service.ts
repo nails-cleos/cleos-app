@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { INote } from '../interfaces/note';
+import { INote, INoteAll } from '../interfaces/note';
 import { toUrl } from '../util/helper';
 import { IApiResponse } from '../interfaces/common';
 
@@ -15,7 +15,7 @@ export class NoteService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getNote = (id: string): Observable<INote | undefined> => this.http.get<INote>(toUrl(this.urlV1, id));
+  getNote = (id: string): Observable<INoteAll | undefined> => this.http.get<INoteAll>(toUrl(this.urlV1, id));
 
   createNote = (note: INote): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1, note);
 

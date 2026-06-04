@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ActivatedRoute } from '@angular/router';
@@ -11,29 +10,42 @@ import { IExpenseAll } from '../../../../interfaces/expense';
 import { dateToTimestamp, getCurrentTimeZone, getDateFormat, getNowTimeZone } from '../../../../util/dates';
 import { IRoomAll } from '../../../../interfaces/room';
 import { MatDatepicker } from '@angular/material/datepicker';
-import { ExpenseState } from '../../../../store/reducers/expense.reducers';
-import { RoomState } from '../../../../store/reducers/room.reducers';
-import { deleteExpense, expenseSelected, getExpensesPage } from '../../../../store/actions/expense.actions';
 import { signal } from '@angular/core';
 import { DriveAccessService } from '../../../../services/drive-access.service';
 import { DocumentStore } from '../../../../store/document.store';
 import { DocumentTypeEnum } from '../../../../interfaces/document';
+import { ExpenseStore } from '../../../../store/expense.store';
+import { Router } from '@angular/router';
 
 describe('ExpenseListComponent', () => {
   let component: ExpenseListComponent;
   let fixture: ComponentFixture<ExpenseListComponent>;
 
-  let storeSpy: jasmine.SpyObj<Store<ExpenseState | RoomState>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let datepickerSpy: jasmine.SpyObj<MatDatepicker<Date>>;
   let dialogSpy: jasmine.Spy<any>;
+  let navigateSpy: jasmine.Spy;
   let translate: TranslateService;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
   let documentStoreSpy: { download: jasmine.Spy };
-
-  let expenseList$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
+  let expenseStoreSpy: {
+    data: ReturnType<typeof expenseListSignal.asReadonly>;
+    response: ReturnType<typeof responseSignal.asReadonly>;
+    clean: jasmine.Spy;
+    clearResponse: jasmine.Spy;
+    loadPage: jasmine.Spy;
+    delete: jasmine.Spy;
+  };
+  const expenseListSignal = signal<any>(undefined);
+  const responseSignal = signal<any>(undefined);
   let breakpoint$: BehaviorSubject<any>;
+  const defaultBreakpoint = {
+    matches: false,
+    breakpoints: {
+      [Breakpoints.XSmall]: false,
+      [Breakpoints.Small]: false,
+    },
+  };
 
   const room: IRoomAll = {
     id: 'room-id',
@@ -121,41 +133,29 @@ describe('ExpenseListComponent', () => {
   };
 
   beforeEach(async () => {
-    expenseList$ = new BehaviorSubject(mockPagination);
-    response$ = new BehaviorSubject(undefined);
-    breakpoint$ = new BehaviorSubject({
-      matches: false,
-      breakpoints: {
-        [Breakpoints.XSmall]: false,
-        [Breakpoints.Small]: false,
-      },
-    });
+    expenseListSignal.set(mockPagination);
+    responseSignal.set(undefined);
+    breakpoint$ = new BehaviorSubject(defaultBreakpoint);
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     datepickerSpy = jasmine.createSpyObj('MatDatepicker', ['close']);
     driveAccessServiceSpy = jasmine.createSpyObj<DriveAccessService>('DriveAccessService', ['requestAccessIfNeeded']);
     documentStoreSpy = { download: jasmine.createSpy('download') };
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return expenseList$.asObservable();
-        case 2:
-          return response$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
+    expenseStoreSpy = {
+      data: expenseListSignal.asReadonly(),
+      response: responseSignal.asReadonly(),
+      clean: jasmine.createSpy('clean'),
+      clearResponse: jasmine.createSpy('clearResponse'),
+      loadPage: jasmine.createSpy('loadPage'),
+      delete: jasmine.createSpy('delete'),
+    };
 
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [ExpenseListComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: ExpenseStore, useValue: expenseStoreSpy },
         { provide: DocumentStore, useValue: documentStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
@@ -163,21 +163,16 @@ describe('ExpenseListComponent', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ExpenseListComponent);
-    component = fixture.componentInstance;
-
     translate = TestBed.inject(TranslateService);
     translate.use('en-GB');
+
+    fixture = TestBed.createComponent(ExpenseListComponent);
+    component = fixture.componentInstance;
+    navigateSpy = spyOn(TestBed.inject(Router), 'navigate');
 
     fixture.detectChanges();
 
     dialogSpy = spyOn(component['dialog'], 'open');
-  });
-
-  afterEach(() => {
-    expenseList$.complete();
-    response$.complete();
-    breakpoint$.complete();
   });
 
   it('should create', () => {
@@ -185,7 +180,7 @@ describe('ExpenseListComponent', () => {
   });
 
   it('should compute dataSourceSignal correctly', () => {
-    expenseList$.next(mockPagination);
+    expenseListSignal.set(mockPagination);
     fixture.detectChanges();
 
     const data = component.dataSourceSignal();
@@ -193,7 +188,7 @@ describe('ExpenseListComponent', () => {
   });
 
   it('should compute resultsLengthSignal correctly', () => {
-    expenseList$.next(mockPagination);
+    expenseListSignal.set(mockPagination);
     fixture.detectChanges();
 
     expect(component.resultsLengthSignal()).toBe(3);
@@ -225,7 +220,7 @@ describe('ExpenseListComponent', () => {
     expect(component.pageSizeSignal()).toBe(PAGE_SIZE);
   });
 
-  it('should dispatch getExpensePage when paginatorPageIndex changes', () => {
+  it('should load expense page when paginatorPageIndex changes', () => {
     fixture.componentRef.setInput('id', room.id);
     fixture.detectChanges();
     const paginator = component['paginator']();
@@ -234,66 +229,49 @@ describe('ExpenseListComponent', () => {
     paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getExpensesPage({
-        roomId: room.id,
-        page: 1,
-        sort: 'timestamp',
-        direction: 'desc',
-        size: PAGE_SIZE,
-        filter: undefined,
-        dateFilter: '',
-      }),
-    );
+    expect(expenseStoreSpy.loadPage).toHaveBeenCalledWith({
+      roomId: room.id,
+      page: 1,
+      sort: 'timestamp',
+      direction: 'desc',
+      size: PAGE_SIZE,
+      filter: undefined,
+      dateFilter: '',
+    });
   });
 
-  it('should dispatch getExpensePage when filters changes', () => {
+  it('should load expense page when filters change', () => {
     const date = getNowTimeZone();
     component.getForm.date.setValue(date);
     component.getForm.filter.setValue('filter');
     fixture.componentRef.setInput('id', room.id);
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getExpensesPage({
-        roomId: room.id,
-        page: 0,
-        sort: 'timestamp',
-        direction: 'desc',
-        size: PAGE_SIZE,
-        filter: 'filter',
-        dateFilter: getDateFormat(date),
-      }),
-    );
+    expect(expenseStoreSpy.loadPage).toHaveBeenCalledWith({
+      roomId: room.id,
+      page: 0,
+      sort: 'timestamp',
+      direction: 'desc',
+      size: PAGE_SIZE,
+      filter: 'filter',
+      dateFilter: getDateFormat(date),
+    });
   });
 
-  it('should dispatch clean and reset paginator when responseSignal emits', () => {
-    const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
-
-    component['paginator'] = signal(paginatorMock);
+  it('should clear response and reset paginator when responseSignal emits', () => {
     fixture.componentRef.setInput('id', room.id);
-    response$.next({ success: true });
+    responseSignal.set({ success: true });
 
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getExpensesPage({
-        roomId: room.id,
-        page: 0,
-        sort: 'timestamp',
-        direction: 'desc',
-        size: PAGE_SIZE,
-        filter: undefined,
-        dateFilter: '',
-      }),
-    );
+    expect(expenseStoreSpy.clearResponse).toHaveBeenCalled();
   });
 
-  it('should dispatch expenseSelected when edit is called', () => {
+  it('should navigate when edit is called', () => {
     const item = mockExpenses[0];
     component.edit(item);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(expenseSelected({ selected: item }));
+    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'rooms', room.id, 'expenses', item.id]);
   });
 
   it('should call delete method without errors', () => {
@@ -318,9 +296,7 @@ describe('ExpenseListComponent', () => {
         },
       }));
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteExpense(
-      { roomId: room.id, id: testExpense.id!, invoice: testExpense.invoice! },
-    ));
+    expect(expenseStoreSpy.delete).toHaveBeenCalledWith(room.id, testExpense.id!, testExpense.invoice!);
   });
 
   it('should call openDialog method without errors', () => {

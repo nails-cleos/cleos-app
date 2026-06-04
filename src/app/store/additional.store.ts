@@ -2,36 +2,25 @@ import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
 import { IAdditional, IAdditionalAll } from '../interfaces/additional';
-import { IApiResponse, IError, IResponseSuccess, PageRequest } from '../interfaces/common';
+import { IApiResponse, PageRequest } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
 import { ITreatmentGroupAll } from '../interfaces/treatment';
 import { AdditionalService } from '../services/additional.service';
 import { TreatmentService } from '../services/treatment.service';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
-import { mapCrudHttpError } from './crud-signal-store';
+import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';
 
 export type AdditionalData =
   | { kind: 'pagination'; value?: Pagination<IAdditionalAll> }
   | { kind: 'list'; value?: IAdditionalAll[] };
 
-type AdditionalStoreState = {
-  response: IResponseSuccess | undefined;
-  data: AdditionalData | undefined;
+type AdditionalStoreState = StoreState<AdditionalData, IAdditionalAll> & {
   groups: ITreatmentGroupAll[] | undefined;
-  error: IError | undefined;
-  subErrors: IError[] | undefined;
-  selected: IAdditional | undefined;
-  isLoading: boolean;
 };
 
 const initialState: AdditionalStoreState = {
-  response: undefined,
-  data: undefined,
+  ...createStoreInitialState<AdditionalData, IAdditionalAll>(),
   groups: undefined,
-  error: undefined,
-  subErrors: undefined,
-  selected: undefined,
-  isLoading: false,
 };
 
 export const AdditionalStore = signalStore(
@@ -103,7 +92,7 @@ export const AdditionalStore = signalStore(
 
       loadById(id: string): void {
         patchState(store, {
-          selected: {} as IAdditional,
+          selected: undefined,
           subErrors: undefined,
           response: undefined,
         });

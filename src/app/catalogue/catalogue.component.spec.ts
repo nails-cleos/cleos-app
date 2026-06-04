@@ -3,6 +3,7 @@ import { CatalogueComponent } from './catalogue.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { signal } from '@angular/core';
 import { ICatalogueAll } from '../interfaces/catalogue';
+import { ICommon } from '../interfaces/common';
 import { ITreatmentGroup, ITreatmentGroupAll } from '../interfaces/treatment';
 import { NavigationService } from '../services/navigation.service';
 import { CatalogueStore } from '../store/catalogue.store';
@@ -12,14 +13,9 @@ describe('CatalogueComponent', () => {
   let fixture: ComponentFixture<CatalogueComponent>;
 
   let catalogueStoreSpy: {
-    selected: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
     groups: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
     loadGroups: jasmine.Spy;
-    loadById: jasmine.Spy;
-    create: jasmine.Spy;
-    update: jasmine.Spy;
   };
 
   const mockCatalogue: ICatalogueAll = {
@@ -35,17 +31,16 @@ describe('CatalogueComponent', () => {
   };
 
   const mockGroup: ITreatmentGroupAll = { id: 'group1', name: 'Test Group' };
+  const config: ICommon = {
+    title: 'CATALOGUE.TITLE',
+    button: { icon: 'add', label: 'COMMON.BUTTON.CREATE' },
+  };
 
   beforeEach(async () => {
     catalogueStoreSpy = {
-      selected: signal<ICatalogueAll | undefined>(undefined),
       subErrors: signal<any>(undefined),
       groups: signal<ITreatmentGroupAll[] | undefined>([]),
-      clean: jasmine.createSpy('clean'),
       loadGroups: jasmine.createSpy('loadGroups'),
-      loadById: jasmine.createSpy('loadById'),
-      create: jasmine.createSpy('create'),
-      update: jasmine.createSpy('update'),
     };
 
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
@@ -60,6 +55,8 @@ describe('CatalogueComponent', () => {
 
     fixture = TestBed.createComponent(CatalogueComponent);
     component = fixture.componentInstance;
+
+    fixture.componentRef.setInput('config', config);
     fixture.detectChanges();
   });
 
@@ -67,21 +64,8 @@ describe('CatalogueComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should be in add mode when catalogueId is null', () => {
-    expect(component.isAddModeSignal()).toBeTrue();
-  });
-
-  it('should be in edit mode when catalogueId is set', () => {
-    catalogueStoreSpy.loadById.calls.reset();
-    fixture.componentRef.setInput('id', '123');
-    fixture.detectChanges();
-
-    expect(component.isAddModeSignal()).toBeFalse();
-    expect(catalogueStoreSpy.loadById).toHaveBeenCalledWith('123');
-  });
-
   it('should patch form when selectedCatalogue emits a value', () => {
-    catalogueStoreSpy.selected.set(mockCatalogue);
+    fixture.componentRef.setInput('catalogue', mockCatalogue);
     fixture.detectChanges();
 
     expect(component.getForm.name.value).toBe(mockCatalogue.name!);
@@ -113,7 +97,8 @@ describe('CatalogueComponent', () => {
   });
 
   it('should update form values correctly on submit', () => {
-    catalogueStoreSpy.create.calls.reset();
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
     const nameControl = component.getForm.name;
     nameControl.setValue('New Name');
     nameControl.markAsDirty();
@@ -133,29 +118,30 @@ describe('CatalogueComponent', () => {
     expect(component.form.valid).toBeTrue();
     component.submit();
 
-    expect(catalogueStoreSpy.create).toHaveBeenCalledWith(
-      jasmine.objectContaining({
-        name: 'New Name',
-        home: true,
-        catalog: true,
-      }),
-      'data:image/jpeg;base64,AAA',
+    expect(emitSpy).toHaveBeenCalledWith(
+      {
+        catalogue: jasmine.objectContaining({
+          name: 'New Name',
+          home: true,
+          catalog: true,
+        }),
+        resizedImageDataUrl: 'data:image/jpeg;base64,AAA',
+      },
     );
   });
 
   it('should not submit when form is invalid', () => {
-    catalogueStoreSpy.create.calls.reset();
-    catalogueStoreSpy.update.calls.reset();
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
     expect(component.form.valid).toBeFalse();
     component.submit();
 
-    expect(catalogueStoreSpy.create).not.toHaveBeenCalled();
-    expect(catalogueStoreSpy.update).not.toHaveBeenCalled();
+    expect(emitSpy).not.toHaveBeenCalled();
   });
 
   it('should not submit when image is missing', () => {
-    catalogueStoreSpy.create.calls.reset();
-    catalogueStoreSpy.update.calls.reset();
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
     expect(component.form.valid).toBeFalse();
 
     const nameControl = component.getForm.name;
@@ -175,8 +161,7 @@ describe('CatalogueComponent', () => {
     expect(component.form.valid).toBeTrue();
     component.submit();
 
-    expect(catalogueStoreSpy.create).not.toHaveBeenCalled();
-    expect(catalogueStoreSpy.update).not.toHaveBeenCalled();
+    expect(emitSpy).not.toHaveBeenCalled();
   });
 
   it('displayFnGroup should return group name', () => {

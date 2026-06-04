@@ -43,10 +43,6 @@ import { unavailableReducer } from './app/store/reducers/unavailable.reducers';
 import { mainReducer } from './app/store/reducers/main.reducers';
 import { paymentReducer } from './app/store/reducers/payment.reducers';
 import { dashboardReducer } from './app/store/reducers/dashboard.reducers';
-import { invoiceReducer } from './app/store/reducers/invoice.reducers';
-import { expenseReducer } from './app/store/reducers/expense.reducers';
-import { noteReducer } from './app/store/reducers/note.reducers';
-import { accountReducer } from './app/store/reducers/account.reducers';
 import { i18nReducer } from './app/store/reducers/i18n.reducers';
 import { I18NEffects } from './app/store/effects/i18n.effects';
 import { provideEffects } from '@ngrx/effects';
@@ -114,10 +110,6 @@ const providers = [
     main: mainReducer,
     payment: paymentReducer,
     dashboard: dashboardReducer,
-    invoice: invoiceReducer,
-    expense: expenseReducer,
-    note: noteReducer,
-    accounts: accountReducer,
     i18n: i18nReducer,
   }, { metaReducers }),
   provideRouter(

@@ -1,11 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   effect,
   ElementRef,
-  inject,
-  input,
+  inject, input,
+  output,
   signal,
   Signal,
   viewChild,
@@ -16,11 +15,9 @@ import { Additional, IAdditional, IAdditionalAll } from '../interfaces/additiona
 import { ITreatmentGroupAll } from '../interfaces/treatment';
 import { fieldChange, valueChange } from '../util/validators';
 import { map, startWith } from 'rxjs/operators';
-import { formatDuration } from '../util/dates';
 import { areEquals } from '../util/helper';
 import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { BackButtonDirective } from '../directives/back-button.directive';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { IError, isString } from '../interfaces/common';
 import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
@@ -32,6 +29,8 @@ import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.direc
 import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
 import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/material/chips';
 import { AdditionalStore } from '../store/additional.store';
+import { BackButtonDirective } from '../directives/back-button.directive';
+import { ICommon } from '../interfaces/common';
 
 type AdditionalForm = {
   name: FormControl<string>;
@@ -45,23 +44,22 @@ type AdditionalForm = {
   templateUrl: './additional.component.html',
   styleUrls: ['./additional.component.scss'],
   imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, TranslatePipe,
-    RouterLink, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix, BackButtonDirective, BackButtonDirective,
+    RouterLink, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix,
     ReactiveFormsModule, TimepickerDirective, TimepickerComponent, MatHint, MatChipGrid, MatChipRow, MatChipInput,
-    MatChipRemove],
+    MatChipRemove, BackButtonDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdditionalComponent {
-  id = input<string>();
+  config = input.required<ICommon>();
+  additional = input<IAdditionalAll | undefined>();
+  submitData = output<IAdditional>();
 
   private readonly additionalStore = inject(AdditionalStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private selectedAdditionalSignal = this.additionalStore.selected;
   private allGroupsSignal = this.additionalStore.groups;
   private subErrorsSignal = this.additionalStore.subErrors;
-
-  additionalSignal = computed(() => this.selectedAdditionalSignal());
 
   form: FormGroup<AdditionalForm> = this.formBuilder.group<AdditionalForm>({
     name: this.formBuilder.control('', {
@@ -88,9 +86,8 @@ export class AdditionalComponent {
       }),
     ),
   );
-  isAddModeSignal = computed(() => !this.id());
   groupsSignal = signal<ITreatmentGroupAll[]>([]);
-  allGroupsWritableSignal = signal<ITreatmentGroupAll[] | undefined>(undefined);
+  allGroupsWritableSignal = signal<ITreatmentGroupAll[] | undefined>(this.allGroupsSignal());
   errors = signal<Record<string, unknown>>({});
 
   groupInput = viewChild.required<ElementRef<HTMLInputElement>>('groupInput');
@@ -100,18 +97,13 @@ export class AdditionalComponent {
   private currentGroupIds: string[] = [];
 
   constructor() {
-    this.additionalStore.clean();
     this.additionalStore.loadGroups();
 
     effect(() => {
-      const selected = this.selectedAdditionalSignal();
-      if (selected?.id && selected.duration) {
-        const duration = formatDuration(selected.duration);
-        const additional = Object.assign({}, selected, { duration });
-        this.form.patchValue(additional);
-        return additional;
+      const selected = this.additional();
+      if (selected) {
+        this.form.patchValue(selected);
       }
-      return selected;
     });
 
     effect(() => {
@@ -131,14 +123,7 @@ export class AdditionalComponent {
     });
 
     effect(() => {
-      const id = this.id();
-      if (id) {
-        this.additionalStore.loadById(id);
-      }
-    });
-
-    effect(() => {
-      const additional = this.selectedAdditionalSignal() as IAdditionalAll | undefined;
+      const additional = this.additional();
       const allGroups = this.allGroupsSignal();
 
       // Update allGroups from store
@@ -169,12 +154,16 @@ export class AdditionalComponent {
     return this.form.controls;
   }
 
+  get getConfig(): ICommon {
+    return this.config();
+  }
+
   submit(): void {
     if (this.form.invalid) {
       return;
     }
 
-    const additionalSignal = this.additionalSignal();
+    const additionalSignal = this.additional();
     const additional: IAdditional = new Additional();
     additional.name = fieldChange(this.getForm.name, additionalSignal?.name);
     additional.description = valueChange(this.getForm.description.value, additionalSignal?.description);
@@ -185,13 +174,7 @@ export class AdditionalComponent {
       additional.groupIds = newGroupIds;
     }
 
-    const id = this.id();
-    if (!id) {
-      this.additionalStore.create(additional);
-    } else {
-      this.additionalStore.update(id, additional);
-    }
-    return;
+    this.submitData.emit(additional);
   }
 
   remove = (group: ITreatmentGroupAll): void => {

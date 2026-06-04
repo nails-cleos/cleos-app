@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, Signal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, Signal, signal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IUser } from '../interfaces/user';
@@ -7,10 +7,10 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { Role } from '../interfaces/token';
 import { map, startWith } from 'rxjs/operators';
-import { IOffice, Office } from '../interfaces/office';
+import { IOffice, IOfficeAll, Office } from '../interfaces/office';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { IError } from '../interfaces/common';
+import { ICommon, IError } from '../interfaces/common';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
@@ -38,7 +38,11 @@ type OfficeForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OfficeComponent {
-  id = input<string>();
+  config = input.required<ICommon>();
+  office = input<IOfficeAll | undefined>();
+  managers = input<IUser[] | undefined>();
+
+  submitData = output<IOffice>();
 
   private readonly officeStore = inject(OfficeStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
@@ -47,9 +51,6 @@ export class OfficeComponent {
 
   private subErrorsSignal = this.officeStore.subErrors;
 
-  allManagersSignal = this.officeStore.managers;
-  officeSignal = this.officeStore.selected;
-  isAddModeSignal = computed(() => !this.id());
   errors = signal<Record<string, unknown>>({});
 
   form: FormGroup<OfficeForm> = this.formBuilder.group<OfficeForm>({
@@ -71,7 +72,7 @@ export class OfficeComponent {
     this.getForm.manager.valueChanges.pipe(
       startWith(undefined),
       map((value?: IUser | string) => !value || typeof value === 'string' ? value : value.displayName),
-      combineLatestWith(toObservable(this.allManagersSignal)),
+      combineLatestWith(toObservable(this.managers)),
       map(([name, managers]) => {
         if (!managers) {
           return [];
@@ -84,12 +85,9 @@ export class OfficeComponent {
   private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
-    this.officeStore.clean();
-    this.officeStore.loadManagers();
-
     effect(() => {
-      const selected = this.officeSignal();
-      if (selected?.id) {
+      const selected = this.office();
+      if (selected) {
         this.form.patchValue(selected);
       }
     });
@@ -109,13 +107,10 @@ export class OfficeComponent {
         this.errors.set(errorMap);
       }
     });
+  }
 
-    effect(() => {
-      const id = this.id();
-      if (id) {
-        this.officeStore.loadById(id);
-      }
-    });
+  get getConfig(): ICommon {
+    return this.config();
   }
 
   get getForm(): OfficeForm {
@@ -123,7 +118,7 @@ export class OfficeComponent {
   }
 
   get managerName(): string | undefined {
-    const office = this.officeSignal();
+    const office = this.office();
     return office?.manager?.displayName;
   }
 
@@ -132,7 +127,7 @@ export class OfficeComponent {
       return;
     }
 
-    const officeSignal = this.officeSignal();
+    const officeSignal = this.office();
     const office: IOffice = new Office();
     office.name = fieldChange(this.getForm.name, officeSignal?.name);
     office.subject = fieldChange(this.getForm.subject, officeSignal?.subject);
@@ -141,15 +136,9 @@ export class OfficeComponent {
     office.btw = fieldChange(this.getForm.btw, officeSignal?.btw);
     office.billingAddress = fieldChange(this.getForm.billingAddress, officeSignal?.billingAddress);
     office.driveFolder = fieldChange(this.getForm.driveFolder, officeSignal?.driveFolder);
+    office.managerId = this.getForm.manager?.value?.id;
 
-    const id = this.id();
-    if (!id) {
-      office.managerId = this.getForm.manager.value?.id;
-      this.officeStore.create(office);
-    } else {
-      this.officeStore.update(id, office);
-    }
-    return;
+    this.submitData.emit(office);
   }
 
   addManager() {

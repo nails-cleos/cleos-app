@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { IAdditionalAll } from '../interfaces/additional';
+import { ICommon } from '../interfaces/common';
 import { ITreatmentGroupAll } from '../interfaces/treatment';
 import { NavigationService } from '../services/navigation.service';
 import { AdditionalStore } from '../store/additional.store';
@@ -13,14 +14,10 @@ describe('AdditionalComponent', () => {
   let fixture: ComponentFixture<AdditionalComponent>;
 
   let additionalStoreSpy: {
-    selected: ReturnType<typeof signal>;
     groups: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
     clean: jasmine.Spy;
     loadGroups: jasmine.Spy;
-    loadById: jasmine.Spy;
-    create: jasmine.Spy;
-    update: jasmine.Spy;
   };
 
   const mockGroup = {
@@ -38,16 +35,17 @@ describe('AdditionalComponent', () => {
     groups: [mockGroup],
   };
 
+  const config: ICommon = {
+    title: 'ADDITIONAL.TITLE',
+    button: { icon: 'add', label: 'COMMON.BUTTON.CREATE' },
+  };
+
   beforeEach(async () => {
     additionalStoreSpy = {
-      selected: signal<any>(undefined),
       groups: signal<any>(undefined),
       subErrors: signal<any>(undefined),
       clean: jasmine.createSpy('clean'),
       loadGroups: jasmine.createSpy('loadGroups'),
-      loadById: jasmine.createSpy('loadById'),
-      create: jasmine.createSpy('create'),
-      update: jasmine.createSpy('update'),
     };
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
@@ -66,7 +64,7 @@ describe('AdditionalComponent', () => {
 
     const translateService = TestBed.inject(TranslateService);
     translateService.use('en-GB');
-
+    fixture.componentRef.setInput('config', config);
     fixture.detectChanges();
   });
 
@@ -74,24 +72,15 @@ describe('AdditionalComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should load additional when id emits a value', () => {
-    additionalStoreSpy.loadById.calls.reset();
-    fixture.componentRef.setInput('id', '123');
-    fixture.detectChanges();
-
-    expect(additionalStoreSpy.loadById).toHaveBeenCalledWith('123');
-  });
-
   it('should patch form when selectedAdditional emits', () => {
-    additionalStoreSpy.selected.set(mockAdditional);
+    fixture.componentRef.setInput('additional', mockAdditional);
     additionalStoreSpy.groups.set([
       mockGroup,
       { id: 'g2', name: 'Group 2', treatments: [], selectedTreatments: [] },
     ]);
     fixture.detectChanges();
 
-    const additionalSignalValue: any = component.additionalSignal();
-    expect(additionalSignalValue.id).toBe('1');
+    expect(component.additional()?.id).toBe('1');
     expect(component.groupsSignal().length).toBe(1);
     expect(component.allGroupsWritableSignal()?.some?.((g: ITreatmentGroupAll) => g.id === 'g2')).toBeTrue();
   });
@@ -112,9 +101,9 @@ describe('AdditionalComponent', () => {
     expect(component.getForm.duration.hasError('incorrect')).toBeTrue();
   });
 
-  it('should not call store methods when form invalid on submit', () => {
-    additionalStoreSpy.create.calls.reset();
-    additionalStoreSpy.update.calls.reset();
+  it('should not emit submitData when form invalid on submit', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
     component.getForm.name.setValue('');
     component.getForm.duration.setValue('');
@@ -122,12 +111,12 @@ describe('AdditionalComponent', () => {
 
     component.submit();
 
-    expect(additionalStoreSpy.create).not.toHaveBeenCalled();
-    expect(additionalStoreSpy.update).not.toHaveBeenCalled();
+    expect(emitSpy).not.toHaveBeenCalled();
   });
 
-  it('should call create when in add mode and form valid', () => {
-    additionalStoreSpy.create.calls.reset();
+  it('should emit submitData when form is valid', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
     component.getForm.name.setValue('New Additional');
     component.getForm.name.markAsDirty();
@@ -139,19 +128,18 @@ describe('AdditionalComponent', () => {
     component.submit();
 
     expect(component.form.valid).toBeTrue();
-    expect(additionalStoreSpy.create).toHaveBeenCalledWith(jasmine.objectContaining({
+    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
       name: 'New Additional',
       description: 'New Description',
       duration: '00:30',
     }));
   });
 
-  it('should call update when in edit mode and form valid', () => {
-    additionalStoreSpy.update.calls.reset();
+  it('should emit changed fields when editing an existing additional', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
-    fixture.componentRef.setInput('id', 'abc-123');
-    fixture.detectChanges();
-    additionalStoreSpy.selected.set({ name: 'Old', description: 'old', duration: 'PT15M' });
+    fixture.componentRef.setInput('additional', { name: 'Old', description: 'old', duration: 'PT15M' } as any);
     fixture.detectChanges();
 
     component.getForm.name.setValue('Updated Additional');
@@ -164,7 +152,7 @@ describe('AdditionalComponent', () => {
     component.submit();
 
     expect(component.form.valid).toBeTrue();
-    expect(additionalStoreSpy.update).toHaveBeenCalledWith('abc-123', jasmine.objectContaining({
+    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
       description: 'Updated Description',
       duration: '00:45',
       name: 'Updated Additional',

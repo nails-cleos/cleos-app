@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import {
   FormArray,
   FormControl,
@@ -9,28 +19,17 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Expense, IExpense, ISupplyStore, ITotalExpense } from '../../../interfaces/expense';
+import { Expense, IExpense, IExpenseAll, ISupplyStore, ITotalExpense } from '../../../interfaces/expense';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { combineLatestWith } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { createExpense, getAllExpensesInfo, getExpense, updateExpense } from '../../../store/actions/expense.actions';
 import { API_LOCALE, createNewDateZonedTime, getNowTimeZone } from '../../../util/dates';
 import { fieldChange, noDuplicateDatesValidator } from '../../../util/validators';
 import { map, startWith } from 'rxjs/operators';
 import { TwoDigitsDirective } from '../../../directives/two-digits.directive';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
-import { ExpenseState } from '../../../store/reducers/expense.reducers';
-import { RoomState } from '../../../store/reducers/room.reducers';
-import {
-  getExpenseResponsePipe,
-  getInfoPipe,
-  getSelectedExpensePipe,
-  getSubErrorsPipe,
-} from '../../../store/selectors/expense.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { IError } from '../../../interfaces/common';
+import { ICommon, IError } from '../../../interfaces/common';
 import { FileDropComponent, UploadFile } from '../../../shared/file-drop/file-drop.component';
-import { AuthState } from '../../../store/reducers/auth.reducers';
 import { awsExtractToNumberFormat } from '../../../interfaces/aws';
 import { calculateBTW, calculateNet } from '../../../util/numbers';
 import { AuthUserService } from '../../../services/auth-user.service';
@@ -48,6 +47,7 @@ import { DecimalPipe, KeyValuePipe } from '@angular/common';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { AwsStore } from '../../../store/aws.store';
+import { ExpenseStore } from '../../../store/expense.store';
 
 type TotalsForm = {
   type: FormControl<string>;
@@ -76,11 +76,12 @@ type ExpenseForm = {
 })
 export class ExpenseComponent {
   id = input<string>();
-  expenseId = input<string>();
+  config = input.required<ICommon>();
+  expense = input<IExpenseAll | undefined>();
+  submitData = output<{ expense: IExpense, file?: File }>();
 
   private readonly env: EnvService = inject(EnvService);
-  private readonly store: Store<ExpenseState | RoomState | AuthState> = inject(
-    Store<ExpenseState | RoomState | AuthState>);
+  private readonly expenseStore = inject(ExpenseStore);
   private readonly awsStore = inject(AwsStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly router: Router = inject(Router);
@@ -90,19 +91,13 @@ export class ExpenseComponent {
   private readonly tokenService: TokenService = inject(TokenService);
   private readonly formDirective = viewChild(FormGroupDirective);
 
-  private selectedExpense$ = this.store.pipe(getSelectedExpensePipe);
-  private info$ = this.store.pipe(getInfoPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getExpenseResponsePipe);
   private awsSignal = this.awsStore.data;
   private userId = computed(() => this.authUserService.authUser().userId);
 
-  private infoSignal = toSignal(this.info$);
-  private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
+  private infoSignal = this.expenseStore.info;
+  private subErrorsSignal = this.expenseStore.subErrors;
+  private responseSignal = this.expenseStore.response;
 
-  expenseSignal = toSignal(this.selectedExpense$);
-  isAddModeSignal = computed(() => !this.expenseId());
   errors = signal<Record<string, unknown>>({});
 
   form: FormGroup<ExpenseForm> = this.formBuilder.group<ExpenseForm>({
@@ -124,7 +119,7 @@ export class ExpenseComponent {
   roomName = computed(() => this.infoSignal()?.roomName || '');
   supplyStores = computed(() => this.infoSignal()?.supplyStores || []);
   today = computed(() => getNowTimeZone(this.timeZone()));
-  readonly fileName = computed(() => this.expenseSignal()?.document?.name);
+  readonly fileName = computed(() => this.expense()?.document?.name);
 
   filteredSupplyStore = toSignal(
     this.getForm.supplyStore.valueChanges.pipe(
@@ -141,8 +136,6 @@ export class ExpenseComponent {
     ),
   );
 
-  readonly submitLabel = computed(() => `COMMON.BUTTON.${this.isAddModeSignal() ? 'CREATE' : 'UPDATE'}`);
-
   totalMap: Map<number, { btwValue: string, net: string }> = new Map();
 
   file = signal<UploadFile | undefined>(undefined);
@@ -153,11 +146,11 @@ export class ExpenseComponent {
 
   constructor() {
     effect(() => {
-      const selected = this.expenseSignal();
+      const selected = this.expense();
       if (selected?.document) {
         this.file.set({ name: selected.document.name, progress: 100, size: 0 });
       }
-      if (selected?.id) {
+      if (selected) {
         queueMicrotask(() => {
           this.form.patchValue(selected);
           this.getForm.date.setValue(createNewDateZonedTime(selected.timestamp, selected.room?.timeZone));
@@ -188,7 +181,7 @@ export class ExpenseComponent {
     effect(() => {
       const roomId = this.id();
       if (this.responseSignal()) {
-        if (this.isAddModeSignal() && this.createAnother) {
+        if (!this.expense() && this.createAnother) {
           this.file.set(undefined);
         } else {
           this.router.navigate([this.language, 'rooms', roomId, 'expenses']);
@@ -197,24 +190,16 @@ export class ExpenseComponent {
     });
 
     effect(() => {
-      const id = this.expenseId();
-      const roomId = this.id();
-      if (roomId && id) {
-        this.store.dispatch(getExpense({ roomId, id }));
-      }
-    });
-
-    effect(() => {
       const roomId = this.id();
       if (roomId) {
-        this.store.dispatch(getAllExpensesInfo({ roomId }));
+        this.expenseStore.loadInfo(roomId);
       }
     });
 
     effect(() => {
       const file = this.file()?.raw;
       if (!file) {
-        if (!this.isAddModeSignal()) {
+        if (this.expense()) {
           return;
         }
         this.resetCreateAnotherForm();
@@ -266,6 +251,10 @@ export class ExpenseComponent {
     });
   }
 
+  get getConfig(): ICommon {
+    return this.config();
+  }
+
   get getForm(): ExpenseForm {
     return this.form.controls;
   }
@@ -310,7 +299,7 @@ export class ExpenseComponent {
       return;
     }
 
-    const expenseSignal = this.expenseSignal();
+    const expenseSignal = this.expense();
     const expense: IExpense = new Expense();
     const supplyStore = fieldChange(this.getForm.supplyStore, expenseSignal?.supplyStore);
     expense.invoice = fieldChange(this.getForm.invoice, expenseSignal?.invoice);
@@ -318,15 +307,8 @@ export class ExpenseComponent {
     expense.expenseTotals = this.totals.getRawValue() as unknown as ITotalExpense[];
     expense.date = createNewDateZonedTime(date, expenseSignal?.room?.timeZone).toLocaleString(API_LOCALE);
 
-    const id = this.expenseId();
     const file = uploadFile.raw;
-    if (!id) {
-      if (file) {
-        this.store.dispatch(createExpense({ roomId, expense, file }));
-      }
-    } else {
-      this.store.dispatch(updateExpense({ id, roomId, expense, file }));
-    }
+    this.submitData.emit({ expense, file });
   }
 
   removeSupplyStore() {
@@ -351,10 +333,10 @@ export class ExpenseComponent {
       .reduce((acc, btw) => acc + btw, 0);
   }
 
-  displayFnSupplyStore = (supplyStore: ISupplyStore): string => supplyStore ? `${supplyStore.name}` : '';
+  displayFnSupplyStore = (supplyStore: ISupplyStore): string => supplyStore ? `${ supplyStore.name }` : '';
 
   validateInputValue = (input: HTMLInputElement, index: number, min?: number, max?: number): void => {
-    const id = input.id.replace(`${index}`, '');
+    const id = input.id.replace(`${ index }`, '');
     const expense = this.totals.at(index)?.get(id);
     if (input.value) {
       this.errors.update(prev => {

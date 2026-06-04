@@ -1,8 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, Signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { Store } from '@ngrx/store';
 import { combineLatestWith } from 'rxjs';
-import { getAccountByCustomerId, updateAccount } from '../../store/actions/account.actions';
 import { IAccountAll, ITransaction, Transaction } from '../../interfaces/account';
 import { ICurrency, ICurrencyAll } from '../../interfaces/currency';
 import { map, startWith } from 'rxjs/operators';
@@ -13,14 +11,9 @@ import { getLocale } from '../../util/helper';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BalanceComponent } from '../balance/balance.component';
 import { BackButtonDirective } from '../../directives/back-button.directive';
-import {
-  getAccountResponsePipe,
-  getSelectedAccountPipe,
-  getSubErrorsPipe,
-} from '../../store/selectors/account.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../../interfaces/common';
-import { AccountState } from '../../store/reducers/account.reducers';
+import { AccountStore } from '../../store/account.store';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatIcon } from '@angular/material/icon';
@@ -44,19 +37,12 @@ type BalanceForm = {
 export class AccountComponent {
   customerId = input<string>();
 
-  private readonly store: Store<AccountState> = inject(Store<AccountState>);
+  private readonly accountStore = inject(AccountStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private selectedAccount$ = this.store.pipe(getSelectedAccountPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getAccountResponsePipe);
-
-  private selectedAccountSignal = toSignal(this.selectedAccount$);
-  private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
   private authUserSignal = this.authUserService.authUser;
   private hasAdminRole = computed(() => this.authUserSignal()?.hasAdminRole ?? false);
 
@@ -70,7 +56,7 @@ export class AccountComponent {
   });
 
   accountSignal = computed(() => {
-    const account = this.selectedAccountSignal();
+    const account = this.accountStore.selected();
     if (account) {
       this.form.patchValue(account);
     }
@@ -81,7 +67,7 @@ export class AccountComponent {
     this.getForm.currency.valueChanges.pipe(
       startWith(''),
       map((value: any) => !value || typeof value === 'string' ? value : value.code),
-      combineLatestWith(this.selectedAccount$),
+      combineLatestWith(toObservable(this.accountStore.selected)),
       map(([name, account]) => {
         if (name) {
           return this.filterCurrency(name, account);
@@ -99,7 +85,7 @@ export class AccountComponent {
 
   constructor() {
     effect(() => {
-      const subErrors = this.subErrorsSignal();
+      const subErrors = this.accountStore.subErrors();
       if (subErrors) {
         const errorMap: Record<string, unknown> = {};
         subErrors.forEach((error: IError) => {
@@ -115,7 +101,7 @@ export class AccountComponent {
     });
 
     effect(() => {
-      if (this.responseSignal()) {
+      if (this.accountStore.response()) {
         if (this.hasAdminRole()) {
           this.router.navigate([this.language, 'users', this.customerId(), 'overview']);
         } else {
@@ -127,7 +113,8 @@ export class AccountComponent {
     effect(() => {
       const customerId = this.customerId();
       if (customerId) {
-        this.store.dispatch(getAccountByCustomerId({ customerId }));
+        this.accountStore.clean();
+        this.accountStore.loadAccountByCustomerId(customerId);
       }
     });
   }
@@ -146,7 +133,7 @@ export class AccountComponent {
     transaction.customerId = customerId;
     transaction.currencyId = valueChange(this.getForm.currency.value, this.accountSignal()?.currency)?.id;
     transaction.gift = this.getForm.gift.value;
-    this.store.dispatch(updateAccount({ id, transaction, customerId }));
+    this.accountStore.updateAccount(id, transaction, customerId);
     return;
   }
 

@@ -1,42 +1,60 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject } from 'rxjs';
 import { ExpenseComponent } from './expense.component';
-import { ExpenseState } from '../../../store/reducers/expense.reducers';
-import { RoomState } from '../../../store/reducers/room.reducers';
 import { IExpenseAll, ISupplyStore } from '../../../interfaces/expense';
-import { getExpense } from '../../../store/actions/expense.actions';
+import { ICommon } from '../../../interfaces/common';
 import { getNowTimeZone } from '../../../util/dates';
 import { computed, signal } from '@angular/core';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
 import { DriveAccessService } from '../../../services/drive-access.service';
 import { EnvService } from '../../../services/env.service';
+import { NavigationService } from '../../../services/navigation.service';
 import { TokenService } from '../../../services/token.service';
 import { provideAppDateAdapter } from '../../../util/adapter/app-date.provider';
 import { AwsStore } from '../../../store/aws.store';
+import { ExpenseStore } from '../../../store/expense.store';
 
 describe('ExpenseComponent', () => {
   let component: ExpenseComponent;
   let fixture: ComponentFixture<ExpenseComponent>;
 
-  let storeSpy: jasmine.SpyObj<Store<ExpenseState | RoomState>>;
   let navigateSpy: jasmine.Spy;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
   let awsStoreSpy: { data: ReturnType<typeof signal>; processPdf: jasmine.Spy };
-
-  let selectedExpense$: BehaviorSubject<any>;
-  let info$: BehaviorSubject<any>;
-  let subErrors$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
+  let expenseStoreSpy: {
+    info: ReturnType<typeof infoSignal.asReadonly>;
+    subErrors: ReturnType<typeof subErrorsSignal.asReadonly>;
+    response: ReturnType<typeof responseSignal.asReadonly>;
+    loadInfo: jasmine.Spy;
+  };
+  const infoSignal = signal<any>(undefined);
+  const subErrorsSignal = signal<any>(undefined);
+  const responseSignal = signal<any>(undefined);
 
   let env: EnvService;
 
   const mockExpense: Partial<IExpenseAll> = {
     id: '1',
     invoice: 'Test Invoice',
+    supplyStore: 'Store 1',
+    type: 'expense',
+    timestamp: 1717430400,
+    gross: 100,
+    room: {
+      id: 'room-1',
+      availabilities: [{ day: 'MONDAY', start: '09:00', end: '17:00' }],
+      address: { id: 1, name: 'Main Location', location: { x: 0, y: 0 } },
+      currency: { id: 'eur', code: 'EUR', name: 'Euro', icon: '€' },
+      office: { id: 'office-1', name: 'Main Office', manager: { id: 'manager-1' } },
+      timeZone: 'Europe/Amsterdam',
+      paymentTypes: ['TRANSFER'],
+      primary: true,
+    },
+    totalNet: 100,
+    totalGross: 100,
+    deleted: false,
     expenseTotals: [
       { type: 'expense', gross: 100, btw: 21, description: 'expense total 1' },
       { type: 'expense', gross: 200, btw: 0, description: 'expense total 2' },
@@ -50,6 +68,10 @@ describe('ExpenseComponent', () => {
   );
 
   const mockSuppliers: ISupplyStore[] = [{ id: '1', name: 'vendor_name' }];
+  const config: ICommon = {
+    title: 'EXPENSE.TITLE',
+    button: { icon: 'add_shopping_cart', label: 'COMMON.BUTTON.CREATE' },
+  };
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
   const tokenSignal = signal<string | null>('token');
@@ -59,56 +81,41 @@ describe('ExpenseComponent', () => {
   };
 
   beforeEach(async () => {
-    selectedExpense$ = new BehaviorSubject<any>(undefined);
-    info$ = new BehaviorSubject<any>(undefined);
-    subErrors$ = new BehaviorSubject<any>(undefined);
-    response$ = new BehaviorSubject<any>(undefined);
+    authUserSignal.set(initialAuthUser);
+    tokenSignal.set('token');
+    infoSignal.set(undefined);
+    subErrorsSignal.set(undefined);
+    responseSignal.set(undefined);
 
     authUserSignal.update(prev => ({
       ...prev,
       userId: 'user-123',
     }));
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     driveAccessServiceSpy = jasmine.createSpyObj<DriveAccessService>('DriveAccessService', ['requestAccessIfNeeded']);
     awsStoreSpy = { data: signal<any>(undefined), processPdf: jasmine.createSpy('processPdf') };
+    expenseStoreSpy = {
+      info: infoSignal.asReadonly(),
+      subErrors: subErrorsSignal.asReadonly(),
+      response: responseSignal.asReadonly(),
+      loadInfo: jasmine.createSpy('loadInfo'),
+    };
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
-    });
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return selectedExpense$.asObservable();
-        case 2:
-          return info$.asObservable();
-        case 3:
-          return subErrors$.asObservable();
-        case 4:
-          return response$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
     });
 
     await TestBed.configureTestingModule({
       imports: [ExpenseComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: ExpenseStore, useValue: expenseStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
+        { provide: NavigationService, useValue: { back: jasmine.createSpy('back') } },
         { provide: TokenService, useValue: tokenServiceMock },
         { provide: AwsStore, useValue: awsStoreSpy },
         provideAppDateAdapter(),
       ],
     }).compileComponents();
-
-    const router = TestBed.inject(Router);
-    navigateSpy = spyOn(router, 'navigate');
-
-    env = TestBed.inject(EnvService);
 
     const translateService = TestBed.inject(TranslateService);
     translateService.use('en-GB');
@@ -125,8 +132,14 @@ describe('ExpenseComponent', () => {
       },
     });
 
+    const router = TestBed.inject(Router);
+    navigateSpy = spyOn(router, 'navigate');
+
+    env = TestBed.inject(EnvService);
+
     fixture = TestBed.createComponent(ExpenseComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('config', config);
     fixture.detectChanges();
   });
 
@@ -134,21 +147,22 @@ describe('ExpenseComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should dispatch getExpense when expenseId emits a value', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should load room expense info when id emits a value', () => {
     fixture.componentRef.setInput('id', 'room-1');
-    fixture.componentRef.setInput('expenseId', '123');
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getExpense({ id: '123', roomId: 'room-1' }));
+    expect(expenseStoreSpy.loadInfo).toHaveBeenCalledWith('room-1');
   });
 
-  it('should patch form when selectedExpense emits', () => {
-    selectedExpense$.next(mockExpense);
+  it('should patch form when selectedExpense emits', async () => {
+    fixture.componentRef.setInput('expense', mockExpense as IExpenseAll);
+    fixture.detectChanges();
+    await fixture.whenStable();
     fixture.detectChanges();
 
-    const expenseSignalValue = component.expenseSignal();
-    expect(expenseSignalValue?.id).toBe('1');
+    const expenseValue = component.expense();
+    expect(expenseValue?.id).toBe('1');
+    expect(component.getForm.invoice.value).toBe('Test Invoice');
   });
 
   it('should handle form errors from subErrorsSignal', () => {
@@ -156,7 +170,7 @@ describe('ExpenseComponent', () => {
       { field: 'supplyStore', message: 'Supply store required' },
     ];
 
-    subErrors$.next(errors);
+    subErrorsSignal.set(errors);
     fixture.detectChanges();
 
     const errs = component.errors();
@@ -166,14 +180,15 @@ describe('ExpenseComponent', () => {
 
   it('should navigate to expense list when response emits', () => {
     fixture.componentRef.setInput('id', 'room-1');
-    response$.next(true);
+    responseSignal.set(true);
     fixture.detectChanges();
 
     expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'rooms', 'room-1', 'expenses']);
   });
 
-  it('should not dispatch when form invalid on submit', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should not emit submitData when form invalid on submit', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
     // ensure form invalid
     (component.getForm.supplyStore as any).setValue(undefined);
@@ -181,14 +196,15 @@ describe('ExpenseComponent', () => {
 
     component.submit();
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(emitSpy).not.toHaveBeenCalled();
   });
 
-  it('should dispatch createExpense when in add mode and form valid', () => {
+  it('should emit submitData when form valid in add mode', () => {
     fixture.componentRef.setInput('id', 'room-123');
     component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: mockFile });
     fixture.detectChanges();
-    storeSpy.dispatch.calls.reset();
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
     const supplyStoreControl = component.getForm.supplyStore;
     supplyStoreControl.setValue({ id: '', name: 'New Expense' });
@@ -199,28 +215,29 @@ describe('ExpenseComponent', () => {
     const dateControl = component.getForm.date;
     dateControl.setValue(getNowTimeZone());
     dateControl.markAsDirty();
+    prepareSingleTotal();
 
     component.submit();
 
     expect(component.form.valid).toBeTrue();
-    const dispatched = storeSpy.dispatch.calls.mostRecent().args[0];
-    expect(dispatched).toEqual(jasmine.objectContaining({
+    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
       expense: jasmine.objectContaining({
         supplyStoreString: 'New Expense',
         invoice: 'New Description',
       }),
-      type: '[Expense] Create expense',
+      file: mockFile,
     }));
   });
 
-  it('should not dispatch createExpense when in add mode and form valid but raw is undefined', () => {
+  it('should emit submitData with undefined file when raw file is undefined', () => {
     fixture.componentRef.setInput('id', 'room-123');
     component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: undefined });
     fixture.detectChanges();
-    storeSpy.dispatch.calls.reset();
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
     const supplyStoreControl = component.getForm.supplyStore;
-    supplyStoreControl.setValue('New Expense');
+    supplyStoreControl.setValue({ id: '', name: 'New Expense' });
     supplyStoreControl.markAsDirty();
     const invoiceControl = component.getForm.invoice;
     invoiceControl.setValue('New Description');
@@ -228,18 +245,24 @@ describe('ExpenseComponent', () => {
     const dateControl = component.getForm.date;
     dateControl.setValue(getNowTimeZone());
     dateControl.markAsDirty();
+    prepareSingleTotal();
 
     component.submit();
 
     expect(component.form.valid).toBeTrue();
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
+      expense: jasmine.objectContaining({
+        supplyStoreString: 'New Expense',
+        invoice: 'New Description',
+      }),
+      file: undefined,
+    }));
   });
 
   it('should create expense and clean the form when createAnother is tick', () => {
     fixture.componentRef.setInput('id', 'room-123');
     component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: mockFile });
     fixture.detectChanges();
-    storeSpy.dispatch.calls.reset();
 
     const supplyStoreControl = component.getForm.supplyStore;
     supplyStoreControl.setValue('New Expense');
@@ -255,7 +278,7 @@ describe('ExpenseComponent', () => {
     component.createAnother = true;
     expect(component.totals.length).toBe(1);
 
-    response$.next({ success: true });
+    responseSignal.set({ success: true });
     fixture.detectChanges();
 
     expect(supplyStoreControl.value).toBe('');
@@ -288,11 +311,11 @@ describe('ExpenseComponent', () => {
     expect(component.totals.length).toBe(0);
   });
 
-  it('should dispatch updateExpense when in edit mode and form valid', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should emit submitData when in edit mode and form valid', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
     fixture.componentRef.setInput('id', 'room-123');
-    fixture.componentRef.setInput('expenseId', 'abc-123');
-    selectedExpense$.next({ ...mockExpense, document: { name: 'invoice.pdf' } });
+    fixture.componentRef.setInput('expense', { ...mockExpense, document: { name: 'invoice.pdf' } } as IExpenseAll);
     fixture.detectChanges();
 
     const supplyStoreControl = component.getForm.supplyStore;
@@ -304,19 +327,16 @@ describe('ExpenseComponent', () => {
     const dateControl = component.getForm.date;
     dateControl.setValue(getNowTimeZone());
     dateControl.markAsDirty();
+    prepareSingleTotal();
 
     component.submit();
 
     expect(component.form.valid).toBeTrue();
-    const dispatched = storeSpy.dispatch.calls.mostRecent().args[0];
-
-    expect(dispatched).toEqual(jasmine.objectContaining({
-      id: 'abc-123',
+    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
       expense: jasmine.objectContaining({
         invoice: 'Updated Description',
         supplyStoreString: '123',
       }),
-      type: '[Expense] Update expense by id',
     }));
   });
 
@@ -369,7 +389,7 @@ describe('ExpenseComponent', () => {
       TAX: '€ 21',
     };
 
-    info$.next({ supplyStores: mockSuppliers });
+    infoSignal.set({ supplyStores: mockSuppliers });
     awsStoreSpy.data.set(awsData);
     fixture.detectChanges();
 
@@ -382,7 +402,7 @@ describe('ExpenseComponent', () => {
   });
 
   it('should remove supplier', () => {
-    info$.next({ supplyStores: mockSuppliers });
+    infoSignal.set({ supplyStores: mockSuppliers });
     fixture.detectChanges();
 
     component.getForm.supplyStore.setValue(mockSuppliers[0]);

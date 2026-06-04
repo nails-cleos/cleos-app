@@ -4,16 +4,16 @@ import { Observable } from 'rxjs';
 import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
 
-export type CrudStoreState<TEntity> = {
+export type StoreState<TData = never, TSelected = never> = {
   response: IResponseSuccess | undefined;
-  data: Pagination<TEntity> | undefined;
+  data: TData | undefined;
   error: IError | undefined;
   subErrors: IError[] | undefined;
-  selected: TEntity | undefined;
+  selected: TSelected | undefined;
   isLoading: boolean;
 };
 
-export const createCrudInitialState = <TEntity>(): CrudStoreState<TEntity> => ({
+export const createStoreInitialState = <TData, TSelected>(): StoreState<TData, TSelected> => ({
   response: undefined,
   data: undefined,
   error: undefined,
@@ -21,6 +21,11 @@ export const createCrudInitialState = <TEntity>(): CrudStoreState<TEntity> => ({
   selected: undefined,
   isLoading: false,
 });
+
+export type CrudStoreState<TEntity, TData = Pagination<TEntity>, TSelected = TEntity> = StoreState<TData, TSelected>;
+
+export const createCrudInitialState = <TEntity, TData = Pagination<TEntity>, TSelected = TEntity>():
+CrudStoreState<TEntity, TData, TSelected> => createStoreInitialState<TData, TSelected>();
 
 export const mapCrudHttpError = (err: HttpErrorResponse): IError => ({
   ...err.error,
@@ -32,7 +37,8 @@ export const mapCrudHttpError = (err: HttpErrorResponse): IError => ({
   message: err.status === 0 || err.status >= 500 ? 'COMMON.ERROR.TRY_LATER' : err.error?.message,
 });
 
-export const withCrudStoreState = <TEntity>() => withState(createCrudInitialState<TEntity>());
+export const withCrudStoreState = <TEntity, TData = Pagination<TEntity>, TSelected = TEntity>() =>
+  withState(createCrudInitialState<TEntity, TData, TSelected>());
 
 type CrudStoreConfig<TEntity, TCreateResponse, TUpdateResponse, TDeleteArgs> = {
   create?: (entity: TEntity) => Observable<TCreateResponse>;

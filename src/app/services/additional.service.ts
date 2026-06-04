@@ -13,7 +13,7 @@ import { IApiResponse } from '../interfaces/common';
 export class AdditionalService {
 
   private url = 'additional';
-  private urlV1 = `v1/${this.url}`;
+  private urlV1 = `v1/${ this.url }`;
 
   private http: HttpClient = inject(HttpClient);
 
@@ -33,7 +33,7 @@ export class AdditionalService {
 
   getAdditionalList = (): Observable<IAdditionalAll[]> => this.http.get<IAdditionalAll[]>(this.urlV1);
 
-  getAdditional = (id: string): Observable<IAdditional | undefined> => this.http.get<IAdditional>(
+  getAdditional = (id: string): Observable<IAdditionalAll | undefined> => this.http.get<IAdditionalAll>(
     toUrl(this.urlV1, id));
 
   createAdditional = (additional: IAdditional): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1,

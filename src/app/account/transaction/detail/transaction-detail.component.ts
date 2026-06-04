@@ -1,19 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router, RouterLink } from '@angular/router';
-import { getTransaction } from '../../../store/actions/account.actions';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { notifyPayment, paymentSend } from '../../../store/actions/payment.actions';
 import { newDateTimestamp } from '../../../util/dates';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
-import {
-  getAccountResponsePipe,
-  getSelectedTransactionPipe,
-  getSubErrorsPipe,
-} from '../../../store/selectors/account.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { AccountState } from '../../../store/reducers/account.reducers';
+import { AccountStore } from '../../../store/account.store';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
+import { getPaymentResponsePipe, getSubErrorsPipe } from '../../../store/selectors/payment.selectors';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { DatePipe, DecimalPipe } from '@angular/common';
@@ -30,20 +25,19 @@ export class TransactionDetailComponent {
   id = input<string>();
   transactionId = input<string>();
 
-  private readonly store: Store<AccountState | PaymentState> = inject(Store<AccountState | PaymentState>);
+  private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
+  private readonly accountStore = inject(AccountStore);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly router: Router = inject(Router);
 
-  private selectedTransaction$ = this.store.pipe(getSelectedTransactionPipe);
-  private response$ = this.store.pipe(getAccountResponsePipe);
+  private response$ = this.store.pipe(getPaymentResponsePipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
-  private selectedTransactionSignal = toSignal(this.selectedTransaction$);
   private responseSignal = toSignal(this.response$);
   private subErrorsSignal = toSignal(this.subErrors$);
 
   transactionSignal = computed(() => {
-    const transaction = this.selectedTransactionSignal();
+    const transaction = this.accountStore.selectedTransaction();
     if (transaction) {
       return Object.assign(
         {}, transaction, { date: newDateTimestamp(transaction.payment?.timestamp) },
@@ -61,7 +55,8 @@ export class TransactionDetailComponent {
       const id = this.id();
       const transactionId = this.transactionId();
       if (id && transactionId) {
-        this.store.dispatch(getTransaction({ id, transactionId }));
+        this.accountStore.clean();
+        this.accountStore.loadTransaction(id, transactionId);
       }
     });
 

@@ -9,20 +9,14 @@ import { IUser, IUserAll } from '../interfaces/user';
 import { NavigationService } from '../services/navigation.service';
 import { OfficeStore } from '../store/office.store';
 import { OfficeComponent } from './office.component';
+import { ICommon } from '../interfaces/common';
 
 describe('OfficeComponent', () => {
   let component: OfficeComponent;
   let fixture: ComponentFixture<OfficeComponent>;
 
   let officeStoreSpy: {
-    selected: ReturnType<typeof signal>;
-    managers: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadManagers: jasmine.Spy;
-    loadById: jasmine.Spy;
-    create: jasmine.Spy;
-    update: jasmine.Spy;
   };
   let navigateSpy: jasmine.Spy;
 
@@ -36,16 +30,14 @@ describe('OfficeComponent', () => {
     manager: mockManager,
   };
 
+  const config: ICommon = {
+    title: 'OFFICE.TITLE',
+    button: { icon: 'add_business', label: 'COMMON.BUTTON.CREATE' },
+  };
+
   beforeEach(async () => {
     officeStoreSpy = {
-      selected: signal<any>(undefined),
-      managers: signal<any>(undefined),
       subErrors: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadManagers: jasmine.createSpy('loadManagers'),
-      loadById: jasmine.createSpy('loadById'),
-      create: jasmine.createSpy('create'),
-      update: jasmine.createSpy('update'),
     };
 
     await TestBed.configureTestingModule({
@@ -64,6 +56,8 @@ describe('OfficeComponent', () => {
 
     fixture = TestBed.createComponent(OfficeComponent);
     component = fixture.componentInstance;
+
+    fixture.componentRef.setInput('config', config);
     fixture.detectChanges();
   });
 
@@ -71,20 +65,11 @@ describe('OfficeComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should load office when officeId emits a value', () => {
-    officeStoreSpy.loadById.calls.reset();
-    fixture.componentRef.setInput('id', '123');
-    fixture.detectChanges();
-
-    expect(officeStoreSpy.loadById).toHaveBeenCalledWith('123');
-  });
-
   it('should patch form when selectedOffice emits', () => {
-    officeStoreSpy.selected.set(mockOffice);
+    fixture.componentRef.setInput('office', mockOffice);
     fixture.detectChanges();
 
-    const officeSignalValue: any = component.officeSignal();
-    expect(officeSignalValue.id).toBe('1');
+    expect(component.office()?.id).toBe('1');
   });
 
   it('should handle form errors from subErrorsSignal', () => {
@@ -101,20 +86,20 @@ describe('OfficeComponent', () => {
   });
 
   it('should not call store when form invalid on submit', () => {
-    officeStoreSpy.create.calls.reset();
-    officeStoreSpy.update.calls.reset();
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
     component.getForm.name.setValue('');
     fixture.detectChanges();
 
     component.submit();
 
-    expect(officeStoreSpy.create).not.toHaveBeenCalled();
-    expect(officeStoreSpy.update).not.toHaveBeenCalled();
+    expect(emitSpy).not.toHaveBeenCalled();
   });
 
   it('should call create when in add mode and form valid', () => {
-    officeStoreSpy.create.calls.reset();
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
     component.getForm.name.setValue('New Office');
     component.getForm.name.markAsDirty();
@@ -124,18 +109,19 @@ describe('OfficeComponent', () => {
     component.submit();
 
     expect(component.form.valid).toBeTrue();
-    expect(officeStoreSpy.create).toHaveBeenCalledWith(jasmine.objectContaining({
+    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
       name: 'New Office',
       managerId: mockManager.id,
     }));
   });
 
   it('should call update when in edit mode and form valid', () => {
-    officeStoreSpy.update.calls.reset();
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
     fixture.componentRef.setInput('id', 'abc-123');
     fixture.detectChanges();
-    officeStoreSpy.selected.set(mockOffice);
+    fixture.componentRef.setInput('office', mockOffice);
     fixture.detectChanges();
 
     component.getForm.name.setValue('Updated Office');
@@ -146,7 +132,7 @@ describe('OfficeComponent', () => {
     component.submit();
 
     expect(component.form.valid).toBeTrue();
-    expect(officeStoreSpy.update).toHaveBeenCalledWith('abc-123', jasmine.objectContaining({
+    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
       subject: 'Updated subject',
       name: 'Updated Office',
     }));

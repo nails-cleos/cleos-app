@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { MeReservationComponent } from './reservation/me/me-reservation.component';
+import { MeReservationComponent } from './me-reservation.component';
 
 @Component({
   selector: 'app-me-reservation-details-page',

@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Currency, ICurrency } from '../interfaces/currency';
+import { Currency, ICurrency, ICurrencyAll } from '../interfaces/currency';
 import { fieldChange } from '../util/validators';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import { IError } from '../interfaces/common';
+import { ICommon, IError } from '../interfaces/common';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
@@ -27,17 +27,16 @@ type CurrencyForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CurrencyComponent {
-  id = input<string>();
+  config = input.required<ICommon>();
+  currency = input<ICurrencyAll | undefined>();
+
+  submitData = output<ICurrency>();
 
   private readonly currencyStore = inject(CurrencyStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  private selectedCurrencySignal = this.currencyStore.selected;
   private subErrorsSignal = this.currencyStore.subErrors;
 
-  currencySignal = computed(() => this.selectedCurrencySignal());
-
-  isAddModeSignal = computed(() => !this.id());
   errors = signal<Record<string, unknown>>({});
 
   form: FormGroup<CurrencyForm> = this.formBuilder.group<CurrencyForm>({
@@ -52,8 +51,8 @@ export class CurrencyComponent {
 
   constructor() {
     effect(() => {
-      const selected = this.selectedCurrencySignal();
-      if (selected?.id) {
+      const selected = this.currency();
+      if (selected) {
         this.form.patchValue(selected);
       }
     });
@@ -74,15 +73,10 @@ export class CurrencyComponent {
         this.errors.set(errorMap);
       }
     });
+  }
 
-    effect(() => {
-      const id = this.id();
-      if (id) {
-        this.currencyStore.loadById(id);
-      } else {
-        this.currencyStore.clean();
-      }
-    });
+  get getConfig(): ICommon {
+    return this.config();
   }
 
   get getForm(): CurrencyForm {
@@ -94,18 +88,12 @@ export class CurrencyComponent {
       return;
     }
 
-    const currencySignal = this.currencySignal();
+    const currencySignal = this.currency();
     const currency: ICurrency = new Currency();
     currency.code = fieldChange(this.getForm.code, currencySignal?.code);
     currency.name = fieldChange(this.getForm.name, currencySignal?.name);
     currency.icon = fieldChange(this.getForm.icon, currencySignal?.icon);
 
-    const id = this.id();
-    if (!id) {
-      this.currencyStore.create(currency);
-    } else {
-      this.currencyStore.update(id, currency);
-    }
-    return;
+    this.submitData.emit(currency);
   }
 }

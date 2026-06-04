@@ -9,12 +9,10 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IOfficeAll } from '../../interfaces/office';
 import { backendFormatDate, getNowTimeZone } from '../../util/dates';
-import { getOfficeToInvoice } from '../../store/actions/invoice.actions';
 import { IUserAll } from '../../interfaces/user';
 import { addDays } from 'date-fns';
 import { IPaymentOption } from '../../interfaces/payment';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { InvoiceState } from '../../store/reducers/invoice.reducers';
 import { DriveAccessService } from '../../services/drive-access.service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -23,11 +21,12 @@ import { provideAppDateAdapter } from '../../util/adapter/app-date.provider';
 import { NavigationService } from '../../services/navigation.service';
 import { signal } from '@angular/core';
 import { OfficeStore } from '../../store/office.store';
+import { InvoiceStore } from '../../store/invoice.store';
 
 describe('InvoiceListComponent', () => {
   let component: InvoiceListComponent;
   let fixture: ComponentFixture<InvoiceListComponent>;
-  let storeSpy: jasmine.SpyObj<Store<InvoiceState>>;
+  let storeSpy: jasmine.SpyObj<Store>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let routerSpy: jasmine.SpyObj<Router>;
@@ -36,6 +35,13 @@ describe('InvoiceListComponent', () => {
   let officeStoreSpy: {
     data: ReturnType<typeof signal>;
     loadMyOffices: jasmine.Spy;
+  };
+  let invoiceStoreSpy: {
+    data: ReturnType<typeof signal>;
+    clean: jasmine.Spy;
+    loadOfficeToInvoice: jasmine.Spy;
+    updateOffice: jasmine.Spy;
+    uploadInvoices: jasmine.Spy;
   };
   let translate: TranslateService;
 
@@ -156,13 +162,10 @@ describe('InvoiceListComponent', () => {
       show: false,
     },
   ];
-
-  let invoiceList$: BehaviorSubject<any>;
   let paymentOptions$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    invoiceList$ = new BehaviorSubject(undefined);
     paymentOptions$ = new BehaviorSubject(paymentOptions);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
@@ -182,6 +185,13 @@ describe('InvoiceListComponent', () => {
       data: signal<any>(undefined),
       loadMyOffices: jasmine.createSpy('loadMyOffices'),
     };
+    invoiceStoreSpy = {
+      data: signal<any>(undefined),
+      clean: jasmine.createSpy('clean'),
+      loadOfficeToInvoice: jasmine.createSpy('loadOfficeToInvoice'),
+      updateOffice: jasmine.createSpy('updateOffice'),
+      uploadInvoices: jasmine.createSpy('uploadInvoices'),
+    };
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
@@ -190,18 +200,7 @@ describe('InvoiceListComponent', () => {
 
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return invoiceList$.asObservable();
-        case 2:
-          return paymentOptions$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
+    storeSpy.pipe.and.returnValue(paymentOptions$.asObservable());
 
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
@@ -210,6 +209,7 @@ describe('InvoiceListComponent', () => {
       providers: [
         { provide: Store, useValue: storeSpy },
         { provide: OfficeStore, useValue: officeStoreSpy },
+        { provide: InvoiceStore, useValue: invoiceStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: Router, useValue: routerSpy },
@@ -236,6 +236,7 @@ describe('InvoiceListComponent', () => {
     } as any);
 
     fixture.detectChanges();
+    storeSpy.dispatch.calls.reset();
   });
 
   it('should filter payment types by label or type', () => {
@@ -247,7 +248,6 @@ describe('InvoiceListComponent', () => {
   });
 
   afterEach(() => {
-    invoiceList$.complete();
     paymentOptions$.complete();
     breakpoint$.complete();
   });
@@ -257,7 +257,7 @@ describe('InvoiceListComponent', () => {
   });
 
   it('should compute dataSourceSignal correctly', () => {
-    invoiceList$.next(mockInvoice);
+    invoiceStoreSpy.data.set(mockInvoice);
     fixture.detectChanges();
 
     const data = component.dataSourceSignal() as any;
@@ -265,7 +265,7 @@ describe('InvoiceListComponent', () => {
   });
 
   it('should compute resultsLengthSignal correctly', () => {
-    invoiceList$.next(mockInvoice);
+    invoiceStoreSpy.data.set(mockInvoice);
     fixture.detectChanges();
 
     expect(component.resultsLengthSignal()).toBe(2);
@@ -297,7 +297,7 @@ describe('InvoiceListComponent', () => {
     expect(component.pageSizeSignal()).toBe(PAGE_SIZE);
   });
 
-  it('should dispatch getInvoice when office, start and endDate is set', () => {
+  it('should load invoices when office, start and endDate is set', () => {
     const date = getNowTimeZone();
     const start = addDays(date, -10);
     const end = date;
@@ -306,13 +306,11 @@ describe('InvoiceListComponent', () => {
     component.getDateRangeForm.endDate.setValue(end);
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getOfficeToInvoice({
-        officeId: mockOffice.id,
-        start: backendFormatDate(start)!,
-        end: backendFormatDate(end)!,
-        types: ['TRANSFER', 'MOLLIE'],
-      }),
+    expect(invoiceStoreSpy.loadOfficeToInvoice).toHaveBeenCalledWith(
+      mockOffice.id,
+      backendFormatDate(start)!,
+      backendFormatDate(end)!,
+      ['TRANSFER', 'MOLLIE'],
     );
   });
 
@@ -395,7 +393,7 @@ describe('InvoiceListComponent', () => {
   });
 
   it('should return true when all rows are selected', () => {
-    invoiceList$.next(mockInvoice);
+    invoiceStoreSpy.data.set(mockInvoice);
     fixture.detectChanges();
     component.toggleAllRows();
 
@@ -403,7 +401,7 @@ describe('InvoiceListComponent', () => {
   });
 
   it('should return false when not all rows are selected', () => {
-    invoiceList$.next(mockInvoice);
+    invoiceStoreSpy.data.set(mockInvoice);
     fixture.detectChanges();
     component.selectionSignal().select(mockInvoice[0]);
 
@@ -411,7 +409,7 @@ describe('InvoiceListComponent', () => {
   });
 
   it('should select all rows when toggleAllRows is called and not all selected', () => {
-    invoiceList$.next(mockInvoice);
+    invoiceStoreSpy.data.set(mockInvoice);
     fixture.detectChanges();
 
     component.toggleAllRows();
@@ -420,7 +418,7 @@ describe('InvoiceListComponent', () => {
   });
 
   it('should clear selection when toggleAllRows is called and all selected', () => {
-    invoiceList$.next(mockInvoice);
+    invoiceStoreSpy.data.set(mockInvoice);
     fixture.detectChanges();
     component.selectionSignal().select(...mockInvoice);
 
@@ -430,7 +428,7 @@ describe('InvoiceListComponent', () => {
   });
 
   it('should toggle selection of a row when toggleRow is called', () => {
-    invoiceList$.next(mockInvoice);
+    invoiceStoreSpy.data.set(mockInvoice);
     fixture.detectChanges();
 
     component.toggleRow(mockInvoice[0]);
@@ -443,7 +441,7 @@ describe('InvoiceListComponent', () => {
   });
 
   it('should return "select all" label when no row provided and not all selected', () => {
-    invoiceList$.next(mockInvoice);
+    invoiceStoreSpy.data.set(mockInvoice);
     fixture.detectChanges();
 
     const label = component.checkboxLabel();
@@ -452,7 +450,7 @@ describe('InvoiceListComponent', () => {
   });
 
   it('should return "deselect all" label when no row provided and all selected', () => {
-    invoiceList$.next(mockInvoice);
+    invoiceStoreSpy.data.set(mockInvoice);
     fixture.detectChanges();
 
     component.toggleAllRows();
@@ -464,7 +462,7 @@ describe('InvoiceListComponent', () => {
   });
 
   it('should return "select row X" label when row provided and not selected', () => {
-    invoiceList$.next(mockInvoice);
+    invoiceStoreSpy.data.set(mockInvoice);
     fixture.detectChanges();
 
     const label = component.checkboxLabel(mockInvoice[0]);
@@ -473,7 +471,7 @@ describe('InvoiceListComponent', () => {
   });
 
   it('should return "deselect row X" label when row provided and selected', () => {
-    invoiceList$.next(mockInvoice);
+    invoiceStoreSpy.data.set(mockInvoice);
     fixture.detectChanges();
     component.selectionSignal().select(mockInvoice[0]);
 
@@ -538,7 +536,7 @@ describe('InvoiceListComponent', () => {
   it('should generate PDF and upload invoices when print is called', async () => {
     // Arrange
     const startDate = new Date(2024, 0, 1);
-    invoiceList$.next(mockInvoice);
+    invoiceStoreSpy.data.set(mockInvoice);
     fixture.detectChanges();
 
     component.getForm.office.setValue(mockOffice);
@@ -551,21 +549,18 @@ describe('InvoiceListComponent', () => {
     // Act
     await component.print();
 
-    // Assert: updateOfficeById dispatched
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
+    expect(invoiceStoreSpy.updateOffice).toHaveBeenCalledWith(
+      mockOffice.id,
       jasmine.objectContaining({
-        type: '[Invoice] Update office by id',
+        lastInvoiceNumber: 12,
       }),
     );
 
-    // Assert: uploadInvoices dispatched
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      jasmine.objectContaining({
-        type: '[Invoice] Upload invoices',
-        officeId: mockOffice.id,
-        blob: fakeBlob,
-        fileName: jasmine.stringMatching(/Sales .*\.pdf/),
-      }),
+    expect(invoiceStoreSpy.uploadInvoices).toHaveBeenCalledWith(
+      mockOffice.id,
+      fakeBlob,
+      jasmine.stringMatching(/Sales .*\.pdf/),
+      true,
     );
 
     // Assert: pdfMake used
@@ -578,12 +573,13 @@ describe('InvoiceListComponent', () => {
     await component.print();
 
     expect(pdfMake.createPdf).not.toHaveBeenCalled();
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(invoiceStoreSpy.updateOffice).not.toHaveBeenCalled();
+    expect(invoiceStoreSpy.uploadInvoices).not.toHaveBeenCalled();
   });
 
   it('should NOT update office when not all invoices are selected', async () => {
     const startDate = new Date(2024, 0, 1);
-    invoiceList$.next(mockInvoice);
+    invoiceStoreSpy.data.set(mockInvoice);
     fixture.detectChanges();
 
     component.getForm.office.setValue(mockOffice);
@@ -593,10 +589,12 @@ describe('InvoiceListComponent', () => {
 
     await component.print();
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(
-      jasmine.objectContaining({
-        type: '[Invoice] Update Office By Id',
-      }),
+    expect(invoiceStoreSpy.updateOffice).not.toHaveBeenCalled();
+    expect(invoiceStoreSpy.uploadInvoices).toHaveBeenCalledWith(
+      mockOffice.id,
+      fakeBlob,
+      jasmine.stringMatching(/Sales .*\.pdf/),
+      false,
     );
   });
 });

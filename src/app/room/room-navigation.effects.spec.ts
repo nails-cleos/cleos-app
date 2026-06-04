@@ -2,9 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { ROUTER_NAVIGATED, RouterNavigatedAction } from '@ngrx/router-store';
 import { Action } from '@ngrx/store';
-import { ReplaySubject, firstValueFrom } from 'rxjs';
-import { take, toArray } from 'rxjs/operators';
-import { cleanExpense } from '../store/actions/expense.actions';
+import { ReplaySubject, firstValueFrom, timer } from 'rxjs';
+import { take, takeUntil, toArray } from 'rxjs/operators';
 import { getOptions } from '../store/actions/payment.actions';
 import { cleanRoom, getAllRoomsInfo } from '../store/actions/room.actions';
 import { RoomListComponent } from './list/room-list.component';
@@ -86,43 +85,43 @@ describe('RoomNavigationEffects', () => {
     expect(result).toEqual([cleanRoom(), getOptions(), getAllRoomsInfo()]);
   });
 
-  it('should clean expense state on expense create page', async () => {
+  it('should not dispatch anything on expense create page', async () => {
     actions$.next(routerNavigated(ExpenseCreatePageComponent));
 
     const result = await firstValueFrom(
-      effects.loadExpenseCreatePage$.pipe(take(1), toArray()),
+      effects.loadExpenseCreatePage$.pipe(takeUntil(timer(0)), toArray()),
     );
 
-    expect(result).toEqual([cleanExpense()]);
+    expect(result).toEqual([]);
   });
 
-  it('should clean expense state and load options on expense details page', async () => {
+  it('should load options on expense details page', async () => {
     actions$.next(routerNavigated(ExpenseDetailsPageComponent));
 
     const result = await firstValueFrom(
-      effects.loadExpenseDetailsPage$.pipe(take(2), toArray()),
+      effects.loadExpenseDetailsPage$.pipe(take(1), toArray()),
     );
 
-    expect(result).toEqual([cleanExpense(), getOptions()]);
+    expect(result).toEqual([getOptions()]);
   });
 
-  it('should clean expense state on expenses list page', async () => {
+  it('should not dispatch anything on expenses list page', async () => {
     actions$.next(routerNavigated(ExpenseListComponent));
 
     const result = await firstValueFrom(
-      effects.loadExpensesPage$.pipe(take(1), toArray()),
+      effects.loadExpensesPage$.pipe(takeUntil(timer(0)), toArray()),
     );
 
-    expect(result).toEqual([cleanExpense()]);
+    expect(result).toEqual([]);
   });
 
-  it('should clean expense state on room services page', async () => {
+  it('should not dispatch anything on room services page', async () => {
     actions$.next(routerNavigated(AddServiceComponent));
 
     const result = await firstValueFrom(
-      effects.loadRoomServicesPage$.pipe(take(1), toArray()),
+      effects.loadRoomServicesPage$.pipe(takeUntil(timer(0)), toArray()),
     );
 
-    expect(result).toEqual([cleanExpense()]);
+    expect(result).toEqual([]);
   });
 });

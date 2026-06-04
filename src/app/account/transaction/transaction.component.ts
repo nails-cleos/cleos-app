@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
-import { createTransaction, getAccount } from '../../store/actions/account.actions';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -12,14 +11,10 @@ import { BackButtonDirective } from '../../directives/back-button.directive';
 import { BankComponent, BankForm } from '../../shared/bank/bank.component';
 import { IError } from '../../interfaces/common';
 import { toSignal } from '@angular/core/rxjs-interop';
-import {
-  getAccountResponsePipe,
-  getSelectedAccountPipe,
-  getSubErrorsPipe,
-} from '../../store/selectors/account.selectors';
-import { AccountState } from '../../store/reducers/account.reducers';
+import { AccountStore } from '../../store/account.store';
 import { PaymentState } from '../../store/reducers/payment.reducers';
 import { getPaymentOptionsPipe } from '../../store/selectors/payment.selectors';
+import { getOptions } from '../../store/actions/payment.actions';
 import { PaymentOptionSelectComponent } from '../../shared/payment-option-select/payment-option-select.component';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
@@ -43,26 +38,21 @@ export type TransactionForm = {
 export class TransactionComponent {
   id = input<string>();
 
-  private readonly store: Store<AccountState | PaymentState> = inject(Store<AccountState | PaymentState>);
+  private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
+  private readonly accountStore = inject(AccountStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private readonly selectedAccount$ = this.store.pipe(getSelectedAccountPipe);
-  private readonly subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private readonly response$ = this.store.pipe(getAccountResponsePipe);
   private readonly paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
-  private selectedAccountSignal = toSignal(this.selectedAccount$);
-  private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
   private authUserSignal = this.authUserService.authUser;
   private accountId = computed(() => this.id());
   private paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
 
   errors = signal<Record<string, unknown>>({});
-  accountSignal = computed(() => this.selectedAccountSignal());
+  accountSignal = computed(() => this.accountStore.selected());
   types = computed(() => this.paymentOptionsSignal()
     .filter(option => option.enabled)
     .filter(option => ['cash', 'transfer'].includes(option.type.toLowerCase())));
@@ -95,7 +85,7 @@ export class TransactionComponent {
 
   constructor() {
     effect(() => {
-      const subErrors = this.subErrorsSignal();
+      const subErrors = this.accountStore.subErrors();
       if (subErrors) {
         const errorMap: Record<string, unknown> = {};
         subErrors.forEach((error: IError) => {
@@ -117,7 +107,7 @@ export class TransactionComponent {
     });
 
     effect(() => {
-      if (this.responseSignal()) {
+      if (this.accountStore.response()) {
         if (this.hasAdminRole()) {
           this.router.navigate([this.language, 'users', this.accountSignal()?.customer?.id, 'overview']);
         } else {
@@ -129,7 +119,9 @@ export class TransactionComponent {
     effect(() => {
       const id = this.accountId();
       if (id) {
-        this.store.dispatch(getAccount({ id }));
+        this.accountStore.clean();
+        this.accountStore.loadAccount(id);
+        this.store.dispatch(getOptions());
       }
     });
   }
@@ -165,7 +157,7 @@ export class TransactionComponent {
       paymentRequest: { type, transfer },
     };
     const id = this.id()!;
-    this.store.dispatch(createTransaction({ id, transaction }));
+    this.accountStore.createTransaction(id, transaction);
     return;
   }
 }

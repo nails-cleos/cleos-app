@@ -1,23 +1,24 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Catalogue, ICatalogue } from '../interfaces/catalogue';
+import { Catalogue, ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
 import { fieldChange, requireMatch, valueChange } from '../util/validators';
 import { ITreatmentGroup, ITreatmentGroupAll } from '../interfaces/treatment';
 import { map, startWith } from 'rxjs/operators';
 import { SortByPipe } from '../pipes/sort-by.pipe';
-import { BackButtonDirective } from '../directives/back-button.directive';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../interfaces/common';
 import { FileDropComponent, UploadFile } from '../shared/file-drop/file-drop.component';
 import { MatError, MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { MatIcon } from '@angular/material/icon';
-import { MatButton } from '@angular/material/button';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatOption } from '@angular/material/core';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { CatalogueStore } from '../store/catalogue.store';
+import { BackButtonDirective } from '../directives/back-button.directive';
+import { ICommon } from '../interfaces/common';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 
 type CatalogueForm = {
   name: FormControl<string>;
@@ -31,18 +32,23 @@ type CatalogueForm = {
   selector: 'app-catalogue',
   templateUrl: './catalogue.component.html',
   styleUrls: ['./catalogue.component.scss'],
-  imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, TranslatePipe,
-    MatAutocomplete, MatError, MatAutocompleteTrigger, BackButtonDirective, SortByPipe, BackButtonDirective,
-    FileDropComponent, ReactiveFormsModule, MatHint, MatCheckbox],
+  imports: [MatFormField, MatLabel, MatInput, MatOption, TranslatePipe,
+    MatAutocomplete, MatError, MatAutocompleteTrigger, SortByPipe, FileDropComponent, ReactiveFormsModule, MatHint,
+    MatCheckbox, BackButtonDirective, MatButton, MatIcon],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueComponent {
-  id = input<string>();
+  config = input.required<ICommon>();
+  undoImage = input(false);
+  catalogue = input<ICatalogueAll | undefined>();
+  submitData = output<{
+    catalogue: ICatalogue;
+    resizedImageDataUrl: string;
+  }>();
 
   private readonly catalogueStore = inject(CatalogueStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly allGroups$ = toObservable(this.catalogueStore.groups);
-  private readonly selectedCatalogueSignal = this.catalogueStore.selected;
   private readonly subErrorsSignal = this.catalogueStore.subErrors;
 
   form: FormGroup<CatalogueForm> = this.formBuilder.group<CatalogueForm>({
@@ -57,7 +63,7 @@ export class CatalogueComponent {
     }),
   });
 
-  catalogueSignal = computed(() => this.selectedCatalogueSignal());
+  catalogueSignal = computed(() => this.catalogue());
 
   filteredGroupSignal = toSignal(
     this.getForm.group.valueChanges.pipe(
@@ -73,7 +79,6 @@ export class CatalogueComponent {
       }),
     ),
   );
-  isAddModeSignal = computed(() => !this.id());
   errors = signal<Record<string, unknown>>({});
   file = signal<UploadFile | undefined>(undefined);
   image = signal<string | undefined>(undefined);
@@ -81,7 +86,6 @@ export class CatalogueComponent {
   private selectedHome = toSignal(this.getForm.home.valueChanges);
 
   constructor() {
-    this.catalogueStore.clean();
     this.catalogueStore.loadGroups();
 
     effect(() => {
@@ -101,15 +105,8 @@ export class CatalogueComponent {
     });
 
     effect(() => {
-      const id = this.id();
-      if (id) {
-        this.catalogueStore.loadById(id);
-      }
-    });
-
-    effect(() => {
-      const catalogue = this.selectedCatalogueSignal();
-      if (catalogue?.id) {
+      const catalogue = this.catalogue();
+      if (catalogue) {
         this.form.patchValue(catalogue);
         this.file.set({
           name: catalogue.name,
@@ -131,6 +128,10 @@ export class CatalogueComponent {
     return this.form.controls;
   }
 
+  get getConfig(): ICommon {
+    return this.config();
+  }
+
   submit(): void {
     if (this.form.invalid) {
       return;
@@ -149,12 +150,7 @@ export class CatalogueComponent {
     catalogue.catalog = fieldChange(this.getForm.catalog, catalogueSignal?.catalog);
     catalogue.groupId = this.getForm.group.value?.id;
 
-    const id = this.id();
-    if (!id) {
-      this.catalogueStore.create(catalogue, resizedImageDataUrl);
-    } else {
-      this.catalogueStore.update(id, catalogue, resizedImageDataUrl);
-    }
+    this.submitData.emit({ catalogue, resizedImageDataUrl });
   }
 
   onImageSelected(image?: string) {

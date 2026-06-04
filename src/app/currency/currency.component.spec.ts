@@ -4,6 +4,7 @@ import { signal } from '@angular/core';
 
 import { CurrencyComponent } from './currency.component';
 import { ICurrencyAll } from '../interfaces/currency';
+import { ICommon } from '../interfaces/common';
 import { CurrencyStore } from '../store/currency.store';
 import { NavigationService } from '../services/navigation.service';
 
@@ -15,9 +16,6 @@ describe('CurrencyComponent', () => {
     selected: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
     clean: jasmine.Spy;
-    loadById: jasmine.Spy;
-    create: jasmine.Spy;
-    update: jasmine.Spy;
   };
 
   const mockCurrency: ICurrencyAll = {
@@ -26,15 +24,16 @@ describe('CurrencyComponent', () => {
     code: 'EUR',
     icon: 'euro',
   };
+  const config: ICommon = {
+    title: 'CURRENCY.TITLE',
+    button: { icon: 'add', label: 'COMMON.BUTTON.CREATE' },
+  };
 
   beforeEach(async () => {
     currencyStoreSpy = {
       selected: signal<any>(undefined),
       subErrors: signal<any>(undefined),
       clean: jasmine.createSpy('clean'),
-      loadById: jasmine.createSpy('loadById'),
-      create: jasmine.createSpy('create'),
-      update: jasmine.createSpy('update'),
     };
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
@@ -51,6 +50,8 @@ describe('CurrencyComponent', () => {
 
     fixture = TestBed.createComponent(CurrencyComponent);
     component = fixture.componentInstance;
+
+    fixture.componentRef.setInput('config', config);
     fixture.detectChanges();
   });
 
@@ -58,16 +59,8 @@ describe('CurrencyComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should dispatch getCurrency when currencyId emits a value', () => {
-    currencyStoreSpy.loadById.calls.reset();
-    fixture.componentRef.setInput('id', '123');
-    fixture.detectChanges();
-
-    expect(currencyStoreSpy.loadById).toHaveBeenCalledWith('123');
-  });
-
   it('should patch form when selectedCurrency emits', () => {
-    currencyStoreSpy.selected.set(mockCurrency);
+    fixture.componentRef.setInput('currency', mockCurrency);
     fixture.detectChanges();
 
     expect(component.getForm.code.value).toBe(mockCurrency.code);
@@ -89,8 +82,8 @@ describe('CurrencyComponent', () => {
   });
 
   it('should not dispatch when form invalid on submit', () => {
-    currencyStoreSpy.create.calls.reset();
-    currencyStoreSpy.update.calls.reset();
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
     // ensure form invalid
     (component.getForm.code as any).setValue(undefined);
@@ -98,12 +91,12 @@ describe('CurrencyComponent', () => {
 
     component.submit();
 
-    expect(currencyStoreSpy.create).not.toHaveBeenCalled();
-    expect(currencyStoreSpy.update).not.toHaveBeenCalled();
+    expect(emitSpy).not.toHaveBeenCalled();
   });
 
   it('should dispatch createCurrency when in add mode and form valid', () => {
-    currencyStoreSpy.create.calls.reset();
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
     const nameControl = component.getForm.name;
     nameControl.setValue('New Currency');
@@ -118,7 +111,7 @@ describe('CurrencyComponent', () => {
     component.submit();
 
     expect(component.form.valid).toBeTrue();
-    expect(currencyStoreSpy.create).toHaveBeenCalledWith(jasmine.objectContaining({
+    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
       name: 'New Currency',
       code: 'New Code',
       icon: 'New Icon',
@@ -126,11 +119,10 @@ describe('CurrencyComponent', () => {
   });
 
   it('should dispatch updateCurrency when in edit mode and form valid', () => {
-    currencyStoreSpy.update.calls.reset();
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
-    fixture.componentRef.setInput('id', 'abc-123');
-    fixture.detectChanges();
-    currencyStoreSpy.selected.set({ name: 'Old', code: 'old', icon: 'Old' });
+    fixture.componentRef.setInput('currency', { id: '1', name: 'Old', code: 'old', icon: 'Old' });
     fixture.detectChanges();
 
     const nameControl = component.getForm.name;
@@ -146,7 +138,7 @@ describe('CurrencyComponent', () => {
     component.submit();
 
     expect(component.form.valid).toBeTrue();
-    expect(currencyStoreSpy.update).toHaveBeenCalledWith('abc-123', jasmine.objectContaining({
+    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
       code: 'Updated Code',
       name: 'Updated Currency',
       icon: 'Updated Icon',

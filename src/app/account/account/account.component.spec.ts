@@ -1,27 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
-import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
-import { BehaviorSubject } from 'rxjs';
 
 import { AccountComponent } from './account.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { IAccountAll, ITransaction } from '../../interfaces/account';
-import { getAccountByCustomerId } from '../../store/actions/account.actions';
-import { AccountState } from '../../store/reducers/account.reducers';
+import { AccountStore } from '../../store/account.store';
 import { signal } from '@angular/core';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('AccountComponent', () => {
   let component: AccountComponent;
   let fixture: ComponentFixture<AccountComponent>;
 
-  let storeSpy: jasmine.SpyObj<Store<AccountState>>;
+  let accountStoreSpy: jasmine.SpyObj<any>;
   let navigateSpy: jasmine.Spy;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
-  let selectedAccount$: BehaviorSubject<any>;
-  let subErrors$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
+  let selectedAccountSignal: ReturnType<typeof signal<any>>;
+  let subErrorsSignal: ReturnType<typeof signal<any>>;
+  let responseSignal: ReturnType<typeof signal<any>>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   const mockCurrency = {
@@ -46,35 +44,26 @@ describe('AccountComponent', () => {
   };
 
   beforeEach(async () => {
-    selectedAccount$ = new BehaviorSubject<any>(undefined);
-    subErrors$ = new BehaviorSubject<any>(undefined);
-    response$ = new BehaviorSubject<any>(undefined);
+    authUserSignal.set(initialAuthUser);
+    selectedAccountSignal = signal<any>(undefined);
+    subErrorsSignal = signal<any>(undefined);
+    responseSignal = signal<any>(undefined);
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    accountStoreSpy = jasmine.createSpyObj('AccountStore', ['clean', 'loadAccountByCustomerId', 'updateAccount'], {
+      selected: selectedAccountSignal.asReadonly(),
+      subErrors: subErrorsSignal.asReadonly(),
+      response: responseSignal.asReadonly(),
+    });
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
-    });
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return selectedAccount$.asObservable();
-        case 2:
-          return subErrors$.asObservable();
-        case 3:
-          return response$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
     });
 
     await TestBed.configureTestingModule({
       imports: [AccountComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: AccountStore, useValue: accountStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
+        { provide: NavigationService, useValue: { back: jasmine.createSpy('back') } },
         provideRouter([]),
       ],
     }).compileComponents();
@@ -101,7 +90,8 @@ describe('AccountComponent', () => {
     fixture.componentRef.setInput('customerId', 'customer-123');
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAccountByCustomerId({ customerId: 'customer-123' }));
+    expect(accountStoreSpy.clean).toHaveBeenCalled();
+    expect(accountStoreSpy.loadAccountByCustomerId).toHaveBeenCalledWith('customer-123');
   });
 
   it('should update showAdd correctly based on admin role and customerId', () => {
@@ -119,7 +109,7 @@ describe('AccountComponent', () => {
   it('should patch form when selectedAccountSignal emits', () => {
     spyOn(component.form, 'patchValue');
 
-    selectedAccount$.next(mockAccount);
+    selectedAccountSignal.set(mockAccount);
     fixture.detectChanges();
 
     expect(component.form.patchValue).toHaveBeenCalledWith(mockAccount);
@@ -132,7 +122,7 @@ describe('AccountComponent', () => {
       { field: 'gift', message: 'Required' },
     ];
 
-    subErrors$.next(errors);
+    subErrorsSignal.set(errors);
     fixture.detectChanges();
 
     expect(component.errors().currency).toBe('Required');
@@ -145,46 +135,45 @@ describe('AccountComponent', () => {
     authUserSignal.update(prev => ({ ...prev, customerId: 'user-1', hasAdminRole: true }));
     component.language = 'en';
     fixture.componentRef.setInput('customerId', 'user-1');
-    response$.next({ success: true });
+    responseSignal.set({ success: true });
     fixture.detectChanges();
     expect(navigateSpy).toHaveBeenCalledWith(['en', 'users', 'user-1', 'overview']);
 
     authUserSignal.update(prev => ({ ...prev, customerId: 'user-1', hasAdminRole: false }));
-    response$.next({ success: true });
+    responseSignal.set({ success: true });
     fixture.detectChanges();
     expect(navigateSpy).toHaveBeenCalledWith(['en', 'me', 'overview']);
   });
 
   it('should dispatch updateAccount on valid submit', () => {
-    selectedAccount$.next(mockAccount);
+    selectedAccountSignal.set(mockAccount);
     fixture.componentRef.setInput('customerId', 'user-1');
     fixture.detectChanges();
 
     component.form.patchValue({ currency: mockCurrency, gift: 10 });
     component.submit();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
+    expect(accountStoreSpy.updateAccount).toHaveBeenCalledWith(
+      'account-123',
       jasmine.objectContaining({
-        id: 'account-123',
-        transaction: jasmine.objectContaining({
-          customerId: 'user-1',
-          gift: 10,
-        } as ITransaction),
-      }),
+        customerId: 'user-1',
+        gift: 10,
+      } as ITransaction),
+      'user-1',
     );
   });
 
   it('should not dispatch updateAccount if form is invalid', () => {
-    selectedAccount$.next(mockAccount);
+    selectedAccountSignal.set(mockAccount);
     authUserSignal.update(prev => ({ ...prev, customerId: 'user-1', hasAdminRole: true }));
     fixture.detectChanges();
 
     component.form.patchValue({ currency: undefined, gift: undefined });
-    storeSpy.dispatch.calls.reset();
+    accountStoreSpy.updateAccount.calls.reset();
 
     component.submit();
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(accountStoreSpy.updateAccount).not.toHaveBeenCalled();
   });
 
   it('should filter currencies correctly in filteredCurrencyOptionsSignal', () => {
@@ -193,7 +182,7 @@ describe('AccountComponent', () => {
       { id: '2', code: 'EUR', name: 'Euro', icon: '€' },
     ];
 
-    selectedAccount$.next({ ...mockAccount, currencies });
+    selectedAccountSignal.set({ ...mockAccount, currencies });
     fixture.detectChanges();
 
     (component.getForm.currency as any).setValue('U');

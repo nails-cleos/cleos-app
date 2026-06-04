@@ -1,20 +1,13 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { IAwsExtract } from '../interfaces/aws';
-import { IError } from '../interfaces/common';
 import { AwsLambdaService } from '../services/aws-lambda.service';
-import { mapCrudHttpError } from './crud-signal-store';
+import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';
 
-type AwsStoreState = {
-  data: IAwsExtract | undefined;
-  error: IError | undefined;
-  isLoading: boolean;
-};
+type AwsStoreState = Pick<StoreState<IAwsExtract>, 'data' | 'error' | 'isLoading'>;
 
 const initialState: AwsStoreState = {
-  data: undefined,
-  error: undefined,
-  isLoading: false,
+  ...createStoreInitialState<IAwsExtract, never>(),
 };
 
 export const AwsStore = signalStore(

@@ -2,18 +2,18 @@ import { inject } from '@angular/core';
 import { signalStore } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
 import { IApiResponse } from '../interfaces/common';
-import { ICurrency } from '../interfaces/currency';
+import { ICurrency, ICurrencyAll } from '../interfaces/currency';
 import { CurrencyService } from '../services/currency.service';
 import { withCrudStoreMethods, withCrudStoreState } from './crud-signal-store';
 
 export const CurrencyStore = signalStore(
-  withCrudStoreState<ICurrency>(),
+  withCrudStoreState<ICurrencyAll>(),
   withCrudStoreMethods<ICurrency, IApiResponse, IApiResponse, { id: string; code: string }>(() => {
     const currencyService = inject(CurrencyService);
     const translate = inject(TranslateService);
 
     return {
-      placeholder: {} as ICurrency,
+      placeholder: undefined,
       loadPage: ({ page, sort, direction, size }) => currencyService.getCurrenciesPage(page, sort, direction, size),
       loadById: (id) => currencyService.getCurrency(id),
       create: (currency) => currencyService.createCurrency(currency),

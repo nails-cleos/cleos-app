@@ -1,20 +1,12 @@
-@let isAddMode = isAddModeSignal();
-@let discount = discountSignal();
-
 <div class="app-surface-canvas app-surface-shell app-surface-stack">
   <section class="app-surface-section">
     <div class="app-detail-section-header">
       <div>
-
-        @if (isAddMode) {
-          <span class="app-surface-eyebrow">{{ 'DISCOUNT.TITLE' | translate }}</span>
-        } @else {
-          <span class="app-surface-eyebrow">{{ 'DISCOUNT.DETAIL' | translate }}</span>
-          @if (discount) {
-            <h2 class="app-crud-title">{{ discount.name }}</h2>
-          } @else {
-            <div class="ssc-line"></div>
-          }
+        <span class="app-surface-eyebrow">
+          {{ getConfig.title | translate }}
+        </span>
+        @if (discount(); as discount) {
+          <h2 class="app-crud-title">{{ discount.name }}</h2>
         }
       </div>
     </div>
@@ -24,7 +16,6 @@
           novalidate
           (keydown.enter)="$event.preventDefault()"
           class="app-crud-form">
-      @if (isAddMode || discount) {
         <div class="app-crud-form-grid">
           <mat-form-field appearance="outline">
             <mat-label>{{ 'DISCOUNT.NAME.FIELD' | translate }}</mat-label>
@@ -36,7 +27,7 @@
             }
           </mat-form-field>
 
-          @if (isAddMode) {
+          @if (currencies()) {
             @if (filteredCurrencySignal(); as currencies) {
               <div class="app-inline-field-action">
                 <mat-form-field appearance="outline">
@@ -73,8 +64,8 @@
           } @else {
             <mat-form-field appearance="outline">
               <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
-              <mat-icon matPrefix>{{ discount?.currency?.icon }}</mat-icon>
-              <input [value]="discount?.currency?.code" disabled matInput>
+              <mat-icon matPrefix>{{ discount()?.currency?.icon }}</mat-icon>
+              <input [value]="discount()?.currency?.code" disabled matInput>
             </mat-form-field>
           }
 
@@ -118,17 +109,10 @@
           </button>
 
           <button [disabled]="form.invalid" mat-stroked-button type="submit">
-            <mat-icon>{{ isAddMode ? 'add' : 'published_with_changes' }}</mat-icon>
-            <span>{{ (isAddMode ? 'COMMON.BUTTON.CREATE' : 'COMMON.BUTTON.UPDATE') | translate }}</span>
+            <mat-icon>{{ getConfig.button.icon }}</mat-icon>
+            <span>{{ getConfig.button.label | translate }}</span>
           </button>
         </div>
-      } @else {
-        <div class="app-crud-loading">
-          <div class="app-surface-skeleton-spacer"></div>
-          <div class="ssc-square app-crud-loading__block"></div>
-          <div class="app-surface-skeleton-spacer"></div>
-        </div>
-      }
     </form>
   </section>
 </div>

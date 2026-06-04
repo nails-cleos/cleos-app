@@ -102,10 +102,10 @@ describe('AdditionalService', () => {
   });
 
   it('should fetch single additional by id', () => {
-    httpSpy.get.and.returnValue(of(mockAdditional));
+    httpSpy.get.and.returnValue(of(mockAdditionalAll));
 
     service.getAdditional('1').subscribe((result) => {
-      expect(result).toEqual(mockAdditional);
+      expect(result).toEqual(mockAdditionalAll);
     });
 
     expect(httpSpy.get).toHaveBeenCalledWith('v1/additional/1');

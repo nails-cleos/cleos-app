@@ -2,18 +2,18 @@ import { inject } from '@angular/core';
 import { signalStore } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
 import { IApiResponse } from '../interfaces/common';
-import { IColor } from '../interfaces/color';
+import { IColor, IColorAll } from '../interfaces/color';
 import { ColorService } from '../services/color.service';
 import { withCrudStoreMethods, withCrudStoreState } from './crud-signal-store';
 
 export const ColorStore = signalStore(
-  withCrudStoreState<IColor>(),
+  withCrudStoreState<IColorAll>(),
   withCrudStoreMethods<IColor, IApiResponse, IApiResponse, { id: string; name: string }>(() => {
     const colorService = inject(ColorService);
     const translate = inject(TranslateService);
 
     return {
-      placeholder: {} as IColor,
+      placeholder: undefined,
       loadPage: ({ page, sort, direction, size }) => colorService.getColorsPage(page, sort, direction, size),
       loadById: (id) => colorService.getColor(id),
       create: (color) => colorService.createColor(color),

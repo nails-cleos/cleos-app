@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Discount, DiscountType, IDiscount } from '../interfaces/discount';
+import { Discount, DiscountType, IDiscount, IDiscountAll } from '../interfaces/discount';
 import { Router } from '@angular/router';
 import { ICurrency } from '../interfaces/currency';
 import { fieldChange, requireMatch, valueChange } from '../util/validators';
@@ -9,7 +9,7 @@ import { map, startWith } from 'rxjs/operators';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { IError } from '../interfaces/common';
+import { ICommon, IError } from '../interfaces/common';
 import { MatError, MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
 import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
@@ -36,16 +36,18 @@ type DiscountForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DiscountComponent {
-  id = input<string>();
+  config = input.required<ICommon>();
+  discount = input<IDiscountAll | undefined>();
+  currencies = input<ICurrency[] | undefined>();
+
+  submitData = output<IDiscount>();
 
   private readonly discountStore = inject(DiscountStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private selectedDiscountSignal = this.discountStore.selected;
   private subErrorsSignal = this.discountStore.subErrors;
-  private allCurrenciesSignal = this.discountStore.currencies;
 
   form: FormGroup<DiscountForm> = this.formBuilder.group<DiscountForm>({
     name: this.formBuilder.control('', {
@@ -63,12 +65,11 @@ export class DiscountComponent {
     }),
   });
 
-  discountSignal = computed(() => this.selectedDiscountSignal());
   filteredCurrencySignal = toSignal(
     this.getForm.currency.valueChanges.pipe(
       startWith(''),
       map((value: any) => !value || typeof value === 'string' ? value : value.code),
-      combineLatestWith(toObservable(this.allCurrenciesSignal)),
+      combineLatestWith(toObservable(this.currencies)),
       map(([name, currencies]) => {
         const allCurrencies = currencies ?? [];
         if (name) {
@@ -80,7 +81,6 @@ export class DiscountComponent {
     ),
   );
 
-  isAddModeSignal = computed(() => !this.id());
   errors = signal<Record<string, unknown>>({});
 
   private readonly language: string = this.translate.getCurrentLang();
@@ -88,19 +88,10 @@ export class DiscountComponent {
   types = DiscountType;
 
   constructor() {
-    this.discountStore.clean();
-    this.discountStore.loadCurrencies();
-
     effect(() => {
-      const selected = this.selectedDiscountSignal();
-      if (selected?.id) {
-        this.form.patchValue({
-          name: selected.name,
-          description: selected.description,
-          amount: selected.amount,
-          type: selected.type as DiscountType | undefined,
-          currency: selected.currency,
-        });
+      const selected = this.discount();
+      if (selected) {
+        this.form.patchValue(selected);
       }
     });
 
@@ -119,13 +110,10 @@ export class DiscountComponent {
         this.errors.set(errorMap);
       }
     });
+  }
 
-    effect(() => {
-      const id = this.id();
-      if (id) {
-        this.discountStore.loadById(id);
-      }
-    });
+  get getConfig(): ICommon {
+    return this.config();
   }
 
   get getForm(): DiscountForm {
@@ -137,20 +125,14 @@ export class DiscountComponent {
       return;
     }
 
-    const discountSignal = this.discountSignal();
+    const discountSignal = this.discount();
     const discount: IDiscount = new Discount();
     discount.name = fieldChange(this.getForm.name, discountSignal?.name);
     discount.description = valueChange(this.getForm.description.value, discountSignal?.description);
     discount.type = fieldChange(this.getForm.type, discountSignal?.type);
     discount.amount = fieldChange(this.getForm.amount, discountSignal?.amount);
-
-    const id = this.id();
-    if (!id) {
-      discount.currencyId = this.getForm.currency.value?.id;
-      this.discountStore.create(discount);
-    } else {
-      this.discountStore.update(id, discount);
-    }
+    discount.currencyId = this.getForm.currency?.value?.id;
+    this.submitData.emit(discount);
   }
 
   addCurrency(): void {

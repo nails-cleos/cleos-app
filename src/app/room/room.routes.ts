@@ -18,7 +18,6 @@ import { RoomService } from '../services/room.service';
 import { TokenService } from '../services/token.service';
 import { UserService } from '../services/user.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
-import { ExpenseEffects } from '../store/effects/expense.effects';
 import { RoomEffects } from '../store/effects/room.effects';
 import { ROOM_FEATURE_KEY, roomReducer } from '../store/reducers/room.reducers';
 import { RoomNavigationEffects } from './room-navigation.effects';
@@ -31,7 +30,7 @@ const providers = [
   TokenService,
   AwsLambdaService,
   provideState(ROOM_FEATURE_KEY, roomReducer),
-  provideEffects(RoomEffects, ExpenseEffects, RoomNavigationEffects),
+  provideEffects(RoomEffects, RoomNavigationEffects),
 ];
 
 const children: Routes = [

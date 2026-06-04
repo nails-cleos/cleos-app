@@ -3,6 +3,15 @@ import { Observable, of } from 'rxjs';
 import { ToastType } from '../shared/toast/toast.model';
 import { PAGE_SIZE } from './pagination';
 
+export interface ICommon {
+  title: string;
+  button: {
+    icon: string;
+    label: string;
+    showDelete?: boolean;
+  }
+}
+
 export interface IApiResponse {
   id: string;
   name?: string;

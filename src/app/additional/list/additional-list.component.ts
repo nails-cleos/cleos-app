@@ -90,7 +90,7 @@ export class AdditionalListComponent {
 
   displayedColumns: string[] = ['order', 'name', 'description', 'duration', 'actions'];
 
-  expandedAdditional: IAdditional | undefined;
+  expandedAdditional?: IAdditional;
 
   language: string = this.translate.getCurrentLang();
 

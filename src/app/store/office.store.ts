@@ -1,36 +1,25 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
-import { IApiResponse, IError, IResponseSuccess, PageRequest } from '../interfaces/common';
+import { IApiResponse, PageRequest } from '../interfaces/common';
 import { IOffice, IOfficeAll } from '../interfaces/office';
 import { Pagination } from '../interfaces/pagination';
 import { IUserAll } from '../interfaces/user';
 import { OfficeService } from '../services/office.service';
 import { UserService } from '../services/user.service';
-import { mapCrudHttpError } from './crud-signal-store';
+import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';
 
 export type OfficeData =
   | { kind: 'pagination'; value: Pagination<IOfficeAll> }
   | { kind: 'list'; value: IOfficeAll[] };
 
-type OfficeStoreState = {
-  response: IResponseSuccess | undefined;
-  data: OfficeData | undefined;
+type OfficeStoreState = StoreState<OfficeData, IOfficeAll> & {
   managers: IUserAll[] | undefined;
-  error: IError | undefined;
-  subErrors: IError[] | undefined;
-  selected: IOffice | undefined;
-  isLoading: boolean;
 };
 
 const initialState: OfficeStoreState = {
-  response: undefined,
-  data: undefined,
+  ...createStoreInitialState<OfficeData, IOfficeAll>(),
   managers: undefined,
-  error: undefined,
-  subErrors: undefined,
-  selected: undefined,
-  isLoading: false,
 };
 
 export const OfficeStore = signalStore(
@@ -123,7 +112,7 @@ export const OfficeStore = signalStore(
       loadById(id: string): void {
         patchState(store, {
           subErrors: undefined,
-          selected: {} as IOffice,
+          selected: undefined,
           response: undefined,
         });
 

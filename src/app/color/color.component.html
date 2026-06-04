@@ -1,19 +1,12 @@
-@let isAddMode = isAddModeSignal();
-@let color = colorSignal();
-
 <div class="app-surface-canvas app-surface-shell app-surface-stack">
   <section class="app-surface-section">
     <div class="app-detail-section-header">
       <div>
         <span class="app-surface-eyebrow">
-          {{ (isAddMode ? 'COLOR.TITLE' : 'COLOR.DETAIL') | translate }}
+          {{ getConfig.title | translate }}
         </span>
-        @if (!isAddMode) {
-          @if (color) {
-            <h2 class="app-crud-title">{{ color.name }}</h2>
-          } @else {
-            <div class="ssc-line app-skeleton-title"></div>
-          }
+        @if (color(); as color) {
+          <h2 class="app-crud-title">{{ color.name }}</h2>
         }
       </div>
     </div>
@@ -23,52 +16,37 @@
           novalidate
           (keydown.enter)="$event.preventDefault()"
           class="app-crud-form">
-      @if (isAddMode || color) {
-        <div class="app-crud-form-grid app-crud-form-grid--single">
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'COLOR.NAME.FIELD' | translate }}</mat-label>
-            <input [formControl]="getForm.name" matInput required data-cy="name-input">
-            @if (getForm.name.hasError('required')) {
-              <mat-error [innerHTML]="'COLOR.NAME.REQUIRED' | translate"></mat-error>
-            } @else if (errors()['name']) {
-              <mat-error>{{ errors()['name'] }}</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="app-crud-form-grid__full">
-            <mat-label>{{ 'COLOR.DESCRIPTION.FIELD' | translate }}</mat-label>
-            <textarea #message [formControl]="getForm.description"
-                      matInput
-                      maxlength="256"
-                      data-cy="description-textarea"></textarea>
-            <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
-          </mat-form-field>
-        </div>
-
-        <div class="app-detail-actions">
-          <button appBackButton mat-stroked-button type="button">
-            <mat-icon>keyboard_return</mat-icon>
-            <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
-          </button>
-          @if (isAddMode) {
-            <button [disabled]="form.invalid" mat-stroked-button type="submit">
-              <mat-icon>add</mat-icon>
-              <span>{{ 'COMMON.BUTTON.CREATE' | translate }}</span>
-            </button>
-          } @else {
-            <button [disabled]="form.invalid" mat-stroked-button type="submit">
-              <mat-icon>published_with_changes</mat-icon>
-              <span>{{ 'COMMON.BUTTON.UPDATE' | translate }}</span>
-            </button>
+      <div class="app-crud-form-grid app-crud-form-grid--single">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'COLOR.NAME.FIELD' | translate }}</mat-label>
+          <input [formControl]="getForm.name" matInput required data-cy="name-input">
+          @if (getForm.name.hasError('required')) {
+            <mat-error [innerHTML]="'COLOR.NAME.REQUIRED' | translate"></mat-error>
+          } @else if (errors()['name']) {
+            <mat-error>{{ errors()['name'] }}</mat-error>
           }
-        </div>
-      } @else {
-        <div class="app-crud-loading">
-          <div class="app-surface-skeleton-spacer"></div>
-          <div class="ssc-square app-crud-loading__block"></div>
-          <div class="app-surface-skeleton-spacer"></div>
-        </div>
-      }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="app-crud-form-grid__full">
+          <mat-label>{{ 'COLOR.DESCRIPTION.FIELD' | translate }}</mat-label>
+          <textarea #message [formControl]="getForm.description"
+                    matInput
+                    maxlength="256"
+                    data-cy="description-textarea"></textarea>
+          <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <div class="app-detail-actions">
+        <button appBackButton mat-stroked-button type="button">
+          <mat-icon>keyboard_return</mat-icon>
+          <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+        </button>
+        <button [disabled]="form.invalid" mat-stroked-button type="submit">
+          <mat-icon>{{ getConfig.button.icon }}</mat-icon>
+          <span>{{ getConfig.button.label | translate }}</span>
+        </button>
+      </div>
     </form>
   </section>
 </div>

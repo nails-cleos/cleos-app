@@ -30,7 +30,7 @@ export class OfficeService {
     { ...paginated(), params: createFilter(page, size, sort, direction) },
   );
 
-  getOffice = (id: string): Observable<IOffice | undefined> => this.http.get<IOffice>(toUrl(this.urlV1, id));
+  getOffice = (id: string): Observable<IOfficeAll | undefined> => this.http.get<IOfficeAll>(toUrl(this.urlV1, id));
 
   createOffice = (office: IOffice): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1, office);
 

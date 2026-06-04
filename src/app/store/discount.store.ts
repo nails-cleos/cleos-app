@@ -4,36 +4,25 @@ import { TranslateService } from '@ngx-translate/core';
 import { Pagination } from '../interfaces/pagination';
 import { DiscountType, IDiscount, IDiscountAll, IReferral, IUserDiscount } from '../interfaces/discount';
 import { ICurrency } from '../interfaces/currency';
-import { IApiResponse, IError, IResponseSuccess, PageRequest } from '../interfaces/common';
+import { IApiResponse, PageRequest } from '../interfaces/common';
 import { DiscountService } from '../services/discount.service';
 import { CurrencyService } from '../services/currency.service';
-import { mapCrudHttpError } from './crud-signal-store';
+import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';
 
 export type DiscountData =
   | { kind: 'paginationDiscount'; value: Pagination<IDiscountAll> }
   | { kind: 'pagination'; value: Pagination<IUserDiscount> }
   | { kind: 'list'; value: IUserDiscount[] };
 
-type DiscountStoreState = {
-  response: IResponseSuccess | undefined;
-  data: DiscountData | undefined;
+type DiscountStoreState = StoreState<DiscountData, IDiscountAll> & {
   referrals: IReferral[] | undefined;
   currencies: ICurrency[] | undefined;
-  error: IError | undefined;
-  subErrors: IError[] | undefined;
-  selected: IDiscount | undefined;
-  isLoading: boolean;
 };
 
 const initialState: DiscountStoreState = {
-  data: undefined,
+  ...createStoreInitialState<DiscountData, IDiscountAll>(),
   referrals: undefined,
   currencies: undefined,
-  error: undefined,
-  subErrors: undefined,
-  selected: undefined,
-  response: undefined,
-  isLoading: false,
 };
 
 export const DiscountStore = signalStore(

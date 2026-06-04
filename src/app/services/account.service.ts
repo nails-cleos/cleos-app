@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IAccountAll, ITransaction } from '../interfaces/account';
+import { IAccountAll, IAccountTransaction, ITransaction } from '../interfaces/account';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
 import { SortDirection } from '@angular/material/sort';
@@ -22,7 +22,7 @@ export class AccountService {
     sort: string,
     direction: SortDirection,
     size: number,
-  ): Observable<ITransaction[]> => this.http.get<ITransaction[]>(
+  ): Observable<IAccountTransaction> => this.http.get<IAccountTransaction>(
     toUrl(this.urlV1, id, 'transactions'),
     { params: createFilter(page, size, sort, direction) },
   );

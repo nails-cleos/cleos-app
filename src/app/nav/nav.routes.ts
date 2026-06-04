@@ -9,9 +9,6 @@ import { TreatmentEffects } from '../store/effects/treatment.effects';
 import { UnavailableEffects } from '../store/effects/unavailable.effects';
 import { ReservationEffects } from '../store/effects/reservation.effects';
 import { PaymentEffects } from '../store/effects/payment.effects';
-import { ExpenseEffects } from '../store/effects/expense.effects';
-import { NoteEffects } from '../store/effects/note.effects';
-import { AccountEffects } from '../store/effects/account.effects';
 import { AuthService } from '../services/auth.service';
 import { NotificationService } from '../services/notification.service';
 import { UserService } from '../services/user.service';
@@ -24,9 +21,6 @@ import { TREATMENT_FEATURE_KEY, treatmentReducer } from '../store/reducers/treat
 import { UNAVAILABLE_FEATURE_KEY, unavailableReducer } from '../store/reducers/unavailable.reducers';
 import { RESERVATION_FEATURE_KEY, reservationReducer } from '../store/reducers/reservation.reducers';
 import { PAYMENT_FEATURE_KEY, paymentReducer } from '../store/reducers/payment.reducers';
-import { EXPENSE_FEATURE_KEY, expenseReducer } from '../store/reducers/expense.reducers';
-import { NOTE_FEATURE_KEY, noteReducer } from '../store/reducers/note.reducers';
-import { ACCOUNT_FEATURE_KEY, accountReducer } from '../store/reducers/account.reducers';
 import { RoomService } from '../services/room.service';
 import { TreatmentService } from '../services/treatment.service';
 import { CatalogueService } from '../services/catalogue.service';
@@ -43,11 +37,9 @@ import { NoteService } from '../services/note.service';
 import { AccountService } from '../services/account.service';
 import { TrackingService } from '../services/tracking.service';
 import { AwsLambdaService } from '../services/aws-lambda.service';
-import { INVOICE_FEATURE_KEY, invoiceReducer } from '../store/reducers/invoice.reducers';
 import { DocumentService } from '../services/document.service';
 import { StatementService } from '../services/statement.service';
 import { InvoiceService } from '../services/invoice.service';
-import { InvoiceEffects } from '../store/effects/invoice.effects';
 import { CatalogueStore } from '../store/catalogue.store';
 import { ColorStore } from '../store/color.store';
 import { CurrencyStore } from '../store/currency.store';
@@ -57,6 +49,10 @@ import { DiscountStore } from '../store/discount.store';
 import { AwsStore } from '../store/aws.store';
 import { AdditionalStore } from '../store/additional.store';
 import { OfficeStore } from '../store/office.store';
+import { AccountStore } from '../store/account.store';
+import { ExpenseStore } from '../store/expense.store';
+import { NoteStore } from '../store/note.store';
+import { InvoiceStore } from '../store/invoice.store';
 import { provideGlobalFeedbackSource } from '../store/global-feedback-source';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
@@ -88,6 +84,10 @@ const providers = [
   AwsStore,
   AdditionalStore,
   OfficeStore,
+  AccountStore,
+  ExpenseStore,
+  NoteStore,
+  InvoiceStore,
   provideGlobalFeedbackSource(CatalogueStore),
   provideGlobalFeedbackSource(ColorStore),
   provideGlobalFeedbackSource(CurrencyStore),
@@ -96,6 +96,10 @@ const providers = [
   provideGlobalFeedbackSource(DiscountStore),
   provideGlobalFeedbackSource(AdditionalStore),
   provideGlobalFeedbackSource(OfficeStore),
+  provideGlobalFeedbackSource(AccountStore),
+  provideGlobalFeedbackSource(ExpenseStore),
+  provideGlobalFeedbackSource(NoteStore),
+  provideGlobalFeedbackSource(InvoiceStore),
   TrackingService,
   AwsLambdaService,
   DocumentService,
@@ -109,10 +113,6 @@ const providers = [
   provideState(UNAVAILABLE_FEATURE_KEY, unavailableReducer),
   provideState(RESERVATION_FEATURE_KEY, reservationReducer),
   provideState(PAYMENT_FEATURE_KEY, paymentReducer),
-  provideState(EXPENSE_FEATURE_KEY, expenseReducer),
-  provideState(NOTE_FEATURE_KEY, noteReducer),
-  provideState(ACCOUNT_FEATURE_KEY, accountReducer),
-  provideState(INVOICE_FEATURE_KEY, invoiceReducer),
   provideEffects(
     LoginEffects,
     NotificationEffects,
@@ -122,10 +122,6 @@ const providers = [
     UnavailableEffects,
     ReservationEffects,
     PaymentEffects,
-    ExpenseEffects,
-    NoteEffects,
-    AccountEffects,
-    InvoiceEffects,
   ),
 ];
 

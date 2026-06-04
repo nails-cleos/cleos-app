@@ -1,24 +1,16 @@
-@let catalogue = catalogueSignal();
-@let isAddMode = isAddModeSignal();
-
 <div class="app-surface-canvas app-surface-shell app-surface-stack">
-  <section class="app-surface-section app-crud-form">
+  <section class="app-surface-section">
     <div class="app-detail-section-header">
       <div>
-        @if (isAddMode) {
-          <span class="app-surface-eyebrow">{{ 'CATALOGUE.TITLE' | translate }}</span>
-        } @else {
-          <span class="app-surface-eyebrow">{{ 'CATALOGUE.DETAIL' | translate }}</span>
-          @if (catalogue) {
-            <p>{{ catalogue.name }}</p>
-          } @else {
-            <div class="ssc-line"></div>
-          }
+        <span class="app-surface-eyebrow">{{ getConfig.title | translate }}</span>
+        @if (catalogue(); as catalogue) {
+          <h2 class="app-crud-title">{{ catalogue.name }}</h2>
         }
       </div>
     </div>
 
-    <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+    <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()"
+          class="app-crud-form">
       <div class="app-crud-form-grid">
         <mat-form-field appearance="outline">
           <mat-label>{{ 'CATALOGUE.NAME.FIELD' | translate }}</mat-label>
@@ -79,7 +71,7 @@
         <div class="app-surface-item catalogue-upload">
           <span class="app-surface-item__label">{{ 'CATALOGUE.TITLE' | translate }}</span>
           <app-file-drop accept="image/*" (image)="onImageSelected($event)"
-                         [currentFile]="file()" [undo]="!isAddModeSignal()"></app-file-drop>
+                         [currentFile]="file()" [undo]="undoImage()"></app-file-drop>
         </div>
       </div>
 
@@ -88,17 +80,10 @@
           <mat-icon>keyboard_return</mat-icon>
           <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
         </button>
-        @if (isAddMode) {
-          <button [disabled]="form.invalid || !image()" mat-stroked-button type="submit">
-            <span>{{ 'COMMON.BUTTON.CREATE' | translate }}</span>
-            <mat-icon>add_photo_alternate</mat-icon>
-          </button>
-        } @else {
-          <button [disabled]="form.invalid" mat-stroked-button type="submit">
-            <span>{{ 'COMMON.BUTTON.UPDATE' | translate }}</span>
-            <mat-icon>published_with_changes</mat-icon>
-          </button>
-        }
+        <button [disabled]="form.invalid" mat-stroked-button type="submit">
+          <mat-icon>{{ getConfig.button.icon }}</mat-icon>
+          <span>{{ getConfig.button.label | translate }}</span>
+        </button>
       </div>
     </form>
   </section>

@@ -4,6 +4,7 @@ import { signal } from '@angular/core';
 
 import { ColorComponent } from './color.component';
 import { IColorAll } from '../interfaces/color';
+import { ICommon } from '../interfaces/common';
 import { ColorStore } from '../store/color.store';
 import { NavigationService } from '../services/navigation.service';
 
@@ -14,10 +15,11 @@ describe('ColorComponent', () => {
   let colorStoreSpy: {
     selected: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadById: jasmine.Spy;
-    create: jasmine.Spy;
-    update: jasmine.Spy;
+  };
+
+  const config: ICommon = {
+    title: 'COLOR.TITLE',
+    button: { icon: 'add', label: 'COMMON.BUTTON.CREATE' },
   };
 
   const mockColor: Partial<IColorAll> = {
@@ -30,10 +32,6 @@ describe('ColorComponent', () => {
     colorStoreSpy = {
       selected: signal<any>(undefined),
       subErrors: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadById: jasmine.createSpy('loadById'),
-      create: jasmine.createSpy('create'),
-      update: jasmine.createSpy('update'),
     };
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
@@ -50,6 +48,8 @@ describe('ColorComponent', () => {
 
     fixture = TestBed.createComponent(ColorComponent);
     component = fixture.componentInstance;
+
+    fixture.componentRef.setInput('config', config);
     fixture.detectChanges();
   });
 
@@ -57,20 +57,12 @@ describe('ColorComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should dispatch getColor when colorId emits a value', () => {
-    colorStoreSpy.loadById.calls.reset();
-    fixture.componentRef.setInput('id', '123');
-    fixture.detectChanges();
-
-    expect(colorStoreSpy.loadById).toHaveBeenCalledWith('123');
-  });
-
   it('should patch form when selectedColor emits', () => {
-    colorStoreSpy.selected.set(mockColor);
+    fixture.componentRef.setInput('color', mockColor);
     fixture.detectChanges();
 
-    const colorSignalValue: any = component.colorSignal();
-    expect(colorSignalValue.id).toBe('1');
+    expect(component.color()?.id).toBe('1');
+    expect(component.getForm.name.value).toBe('Test Color');
   });
 
   it('should handle form errors from subErrorsSignal', () => {
@@ -87,8 +79,8 @@ describe('ColorComponent', () => {
   });
 
   it('should not dispatch when form invalid on submit', () => {
-    colorStoreSpy.create.calls.reset();
-    colorStoreSpy.update.calls.reset();
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
     // ensure form invalid
     (component.getForm.name as any).setValue(undefined);
@@ -96,12 +88,12 @@ describe('ColorComponent', () => {
 
     component.submit();
 
-    expect(colorStoreSpy.create).not.toHaveBeenCalled();
-    expect(colorStoreSpy.update).not.toHaveBeenCalled();
+    expect(emitSpy).not.toHaveBeenCalled();
   });
 
-  it('should dispatch createColor when in add mode and form valid', () => {
-    colorStoreSpy.create.calls.reset();
+  it('should emit submitData when form valid', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
     const nameControl = component.getForm.name;
     nameControl.setValue('New Color');
@@ -113,18 +105,17 @@ describe('ColorComponent', () => {
     component.submit();
 
     expect(component.form.valid).toBeTrue();
-    expect(colorStoreSpy.create).toHaveBeenCalledWith(jasmine.objectContaining({
+    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
       name: 'New Color',
       description: 'New Description',
     }));
   });
 
-  it('should dispatch updateColor when in edit mode and form valid', () => {
-    colorStoreSpy.update.calls.reset();
+  it('should emit changed fields when editing an existing color', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
-    fixture.componentRef.setInput('id', 'abc-123');
-    fixture.detectChanges();
-    colorStoreSpy.selected.set({ name: 'Old', description: 'old' });
+    fixture.componentRef.setInput('color', { id: 'abc-123', name: 'Old', description: 'old' });
     fixture.detectChanges();
 
     const nameControl = component.getForm.name;
@@ -137,7 +128,7 @@ describe('ColorComponent', () => {
     component.submit();
 
     expect(component.form.valid).toBeTrue();
-    expect(colorStoreSpy.update).toHaveBeenCalledWith('abc-123', jasmine.objectContaining({
+    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
       description: 'Updated Description',
       name: 'Updated Color',
     }));

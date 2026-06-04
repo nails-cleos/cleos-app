@@ -2,7 +2,6 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATED } from '@ngrx/router-store';
 import { cleanRoom, getAllRoomsInfo } from '../store/actions/room.actions';
-import { cleanExpense } from '../store/actions/expense.actions';
 import { getOptions } from '../store/actions/payment.actions';
 import { navigation } from '../util/router-navigation.operator';
 import { RoomListComponent } from './list/room-list.component';
@@ -55,7 +54,7 @@ export class RoomNavigationEffects {
     this.actions$.pipe(
       ofType(ROUTER_NAVIGATED),
       navigation(ExpenseCreatePageComponent, {
-        run: () => [cleanExpense()],
+        run: () => [],
       }),
     ));
 
@@ -63,7 +62,7 @@ export class RoomNavigationEffects {
     this.actions$.pipe(
       ofType(ROUTER_NAVIGATED),
       navigation(ExpenseDetailsPageComponent, {
-        run: () => [cleanExpense(), getOptions()],
+        run: () => [getOptions()],
       }),
     ));
 
@@ -71,7 +70,7 @@ export class RoomNavigationEffects {
     this.actions$.pipe(
       ofType(ROUTER_NAVIGATED),
       navigation(ExpenseListComponent, {
-        run: () => [cleanExpense()],
+        run: () => [],
       }),
     ));
 
@@ -79,7 +78,7 @@ export class RoomNavigationEffects {
     this.actions$.pipe(
       ofType(ROUTER_NAVIGATED),
       navigation(AddServiceComponent, {
-        run: () => [cleanExpense()],
+        run: () => [],
       }),
     ));
 

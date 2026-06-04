@@ -17,8 +17,8 @@ import {
 } from '../store/actions/reservation.actions';
 import { cleanUser } from '../store/actions/user.actions';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
-import { MeReservationCreatePageComponent } from './me-reservation-create-page.component';
-import { MeReservationDetailsPageComponent } from './me-reservation-details-page.component';
+import { MeReservationCreatePageComponent } from './reservation/me/me-reservation-create-page.component';
+import { MeReservationDetailsPageComponent } from './reservation/me/me-reservation-details-page.component';
 import { PaymentCompleteComponent } from './payment/complete/payment-complete.component';
 import { MePaymentComponent } from './payment/me/me-payment.component';
 import { OptionComponent } from './payment/option/option.component';
