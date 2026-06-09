@@ -1,19 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ITreatmentAll } from '../../interfaces/treatment';
-import { getTreatmentGroup, sortTreatment } from '../../store/actions/treatment.actions';
+import { TreatmentStore } from '../../store/treatment.store';
 import {
   DragDropSortingComponent,
   ISorted,
   ItemSorting,
 } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
-import { TreatmentState } from '../../store/reducers/treatment.reducers';
-import {
-  getSelectedTreatmentPipe,
-  getTreatmentResponsePipe,
-} from '../../store/selectors/treatment.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-treatment-sorting',
@@ -23,31 +16,21 @@ import { TranslatePipe } from '@ngx-translate/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreatmentSortingComponent {
-  id = input<string>();
+  id = input.required<string>();
 
-  private readonly store: Store<TreatmentState> = inject(Store<TreatmentState>);
+  private readonly treatmentStore = inject(TreatmentStore);
 
-  private treatmentGroup$ = this.store.pipe(getSelectedTreatmentPipe);
-  private response$ = this.store.pipe(getTreatmentResponsePipe);
-
-  private treatmentGroupSignal = toSignal(this.treatmentGroup$);
-  private responseSignal = toSignal(this.response$);
-
-  itemsSignal = computed(() => this.treatmentGroupSignal()?.treatments?.map(
+  itemsSignal = computed(() => this.treatmentStore.selected()?.treatments?.map(
     (treatment: ITreatmentAll) => new ItemSorting(treatment.id, treatment.name, treatment.order)));
 
   constructor() {
+    this.treatmentStore.clean();
+
     effect(() => {
-      const id = this.id();
-      this.responseSignal();
-      if (id) {
-        this.store.dispatch(getTreatmentGroup({ id, path: 'sorting' }));
-      }
+      this.treatmentStore.response();
+      this.treatmentStore.loadById(this.id());
     });
   }
 
-  sorted = (treatments: ISorted[]): void => {
-    this.store.dispatch(sortTreatment({ treatments }));
-  };
-
+  sorted = (treatments: ISorted[]): void => this.treatmentStore.sortTreatments(treatments);
 }

@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Currency, ICurrency, ICurrencyAll } from '../interfaces/currency';
-import { fieldChange } from '../util/validators';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Currency, CurrencyForm, ICurrency, ICurrencyAll } from '../interfaces/currency';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { ICommon, IError } from '../interfaces/common';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
@@ -11,12 +10,6 @@ import { MatSelect, MatSelectTrigger } from '@angular/material/select';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatOption } from '@angular/material/core';
 import { CurrencyStore } from '../store/currency.store';
-
-type CurrencyForm = {
-  code: FormControl<string>;
-  name: FormControl<string | undefined>;
-  icon: FormControl<string | undefined>;
-}
 
 @Component({
   selector: 'app-currency',
@@ -88,12 +81,6 @@ export class CurrencyComponent {
       return;
     }
 
-    const currencySignal = this.currency();
-    const currency: ICurrency = new Currency();
-    currency.code = fieldChange(this.getForm.code, currencySignal?.code);
-    currency.name = fieldChange(this.getForm.name, currencySignal?.name);
-    currency.icon = fieldChange(this.getForm.icon, currencySignal?.icon);
-
-    this.submitData.emit(currency);
+    this.submitData.emit(Currency.fromForm(this.getForm, this.currency()));
   }
 }

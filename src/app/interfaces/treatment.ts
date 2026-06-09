@@ -1,7 +1,17 @@
+import { FormControl } from '@angular/forms';
 import { IDiscount, IUserDiscount } from './discount';
 import { IService } from './room';
 import { IColorAll } from './color';
 import { PENALTY } from './payment';
+import { areEquals } from '../util/helper';
+import { fieldChange } from '../util/validators';
+
+export type TreatmentForm = {
+  name: FormControl<string>;
+  description: FormControl<string | undefined>;
+  priceFrom: FormControl<string | undefined>;
+  color: FormControl<IColorAll | undefined>;
+};
 
 export interface ITreatmentGroup {
   id?: string;
@@ -192,7 +202,36 @@ export class Treatment implements ITreatment {
 }
 
 export class TreatmentGroup implements ITreatmentGroup {
-  constructor() {
+  name?: string;
+  description?: string;
+  priceFrom?: string;
+  colorIds?: string[];
+  treatments?: ITreatment[];
+
+  private constructor(treatmentForm: TreatmentForm) {
+    this.name = treatmentForm.name.value;
+    this.description = treatmentForm.description.value;
+    this.priceFrom = treatmentForm.priceFrom.value;
+  }
+
+  static fromForm(
+    treatmentForm: TreatmentForm,
+    currentGroup?: ITreatmentGroupAll,
+    treatments: ITreatment[] = [],
+    newColorIds: string[] = [],
+    currentColorIds: string[] = [],
+  ): ITreatmentGroup {
+    const treatmentGroup = new TreatmentGroup(treatmentForm);
+    treatmentGroup.name = fieldChange(treatmentForm.name, currentGroup?.name);
+    treatmentGroup.description = fieldChange(treatmentForm.description, currentGroup?.description);
+    treatmentGroup.priceFrom = fieldChange(treatmentForm.priceFrom, currentGroup?.priceFrom);
+    treatmentGroup.treatments = treatments;
+
+    if (!areEquals(newColorIds, currentColorIds)) {
+      treatmentGroup.colorIds = newColorIds;
+    }
+
+    return treatmentGroup;
   }
 }
 

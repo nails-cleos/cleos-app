@@ -10,12 +10,10 @@ import {
   viewChild,
 } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Additional, IAdditional, IAdditionalAll } from '../interfaces/additional';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Additional, AdditionalForm, IAdditional, IAdditionalAll } from '../interfaces/additional';
 import { ITreatmentGroupAll } from '../interfaces/treatment';
-import { fieldChange, valueChange } from '../util/validators';
 import { map, startWith } from 'rxjs/operators';
-import { areEquals } from '../util/helper';
 import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -31,13 +29,6 @@ import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/m
 import { AdditionalStore } from '../store/additional.store';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { ICommon } from '../interfaces/common';
-
-type AdditionalForm = {
-  name: FormControl<string>;
-  description: FormControl<string | undefined>;
-  duration: FormControl<string>;
-  group: FormControl<ITreatmentGroupAll | undefined>;
-};
 
 @Component({
   selector: 'app-additional',
@@ -163,18 +154,8 @@ export class AdditionalComponent {
       return;
     }
 
-    const additionalSignal = this.additional();
-    const additional: IAdditional = new Additional();
-    additional.name = fieldChange(this.getForm.name, additionalSignal?.name);
-    additional.description = valueChange(this.getForm.description.value, additionalSignal?.description);
-    additional.duration = fieldChange(this.getForm.duration, additionalSignal?.duration);
-
     const newGroupIds: string[] = this.groupsSignal().map(({ id }) => id).filter(isString);
-    if (!areEquals(newGroupIds, this.currentGroupIds)) {
-      additional.groupIds = newGroupIds;
-    }
-
-    this.submitData.emit(additional);
+    this.submitData.emit(Additional.fromForm(this.getForm, this.additional(), newGroupIds, this.currentGroupIds));
   }
 
   remove = (group: ITreatmentGroupAll): void => {

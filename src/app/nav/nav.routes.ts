@@ -5,8 +5,6 @@ import { LoginEffects } from '../store/effects/auth.effects';
 import { NotificationEffects } from '../store/effects/notification.effects';
 import { UserEffects } from '../store/effects/user.effects';
 import { RoomEffects } from '../store/effects/room.effects';
-import { TreatmentEffects } from '../store/effects/treatment.effects';
-import { UnavailableEffects } from '../store/effects/unavailable.effects';
 import { ReservationEffects } from '../store/effects/reservation.effects';
 import { PaymentEffects } from '../store/effects/payment.effects';
 import { AuthService } from '../services/auth.service';
@@ -17,8 +15,6 @@ import { AUTH_FEATURE_KEY, authReducer } from '../store/reducers/auth.reducers';
 import { NOTIFICATION_FEATURE_KEY, notificationReducer } from '../store/reducers/notification.reducers';
 import { USER_FEATURE_KEY, userReducer } from '../store/reducers/user.reducers';
 import { ROOM_FEATURE_KEY, roomReducer } from '../store/reducers/room.reducers';
-import { TREATMENT_FEATURE_KEY, treatmentReducer } from '../store/reducers/treatment.reducers';
-import { UNAVAILABLE_FEATURE_KEY, unavailableReducer } from '../store/reducers/unavailable.reducers';
 import { RESERVATION_FEATURE_KEY, reservationReducer } from '../store/reducers/reservation.reducers';
 import { PAYMENT_FEATURE_KEY, paymentReducer } from '../store/reducers/payment.reducers';
 import { RoomService } from '../services/room.service';
@@ -53,6 +49,8 @@ import { AccountStore } from '../store/account.store';
 import { ExpenseStore } from '../store/expense.store';
 import { NoteStore } from '../store/note.store';
 import { InvoiceStore } from '../store/invoice.store';
+import { UnavailableStore } from '../store/unavailable.store';
+import { TreatmentStore } from '../store/treatment.store';
 import { provideGlobalFeedbackSource } from '../store/global-feedback-source';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
@@ -88,6 +86,8 @@ const providers = [
   ExpenseStore,
   NoteStore,
   InvoiceStore,
+  UnavailableStore,
+  TreatmentStore,
   provideGlobalFeedbackSource(CatalogueStore),
   provideGlobalFeedbackSource(ColorStore),
   provideGlobalFeedbackSource(CurrencyStore),
@@ -100,6 +100,8 @@ const providers = [
   provideGlobalFeedbackSource(ExpenseStore),
   provideGlobalFeedbackSource(NoteStore),
   provideGlobalFeedbackSource(InvoiceStore),
+  provideGlobalFeedbackSource(UnavailableStore),
+  provideGlobalFeedbackSource(TreatmentStore),
   TrackingService,
   AwsLambdaService,
   DocumentService,
@@ -109,8 +111,6 @@ const providers = [
   provideState(NOTIFICATION_FEATURE_KEY, notificationReducer),
   provideState(USER_FEATURE_KEY, userReducer),
   provideState(ROOM_FEATURE_KEY, roomReducer),
-  provideState(TREATMENT_FEATURE_KEY, treatmentReducer),
-  provideState(UNAVAILABLE_FEATURE_KEY, unavailableReducer),
   provideState(RESERVATION_FEATURE_KEY, reservationReducer),
   provideState(PAYMENT_FEATURE_KEY, paymentReducer),
   provideEffects(
@@ -118,8 +118,6 @@ const providers = [
     NotificationEffects,
     UserEffects,
     RoomEffects,
-    TreatmentEffects,
-    UnavailableEffects,
     ReservationEffects,
     PaymentEffects,
   ),

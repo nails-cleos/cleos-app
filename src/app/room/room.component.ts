@@ -6,6 +6,7 @@ import {
   ElementRef,
   inject,
   input,
+  output,
   Signal,
   signal,
   viewChild,
@@ -20,8 +21,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { createRoom, getRoom, updateRoom } from '../store/actions/room.actions';
-import { AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, Room } from '../interfaces/room';
+import { AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, IRoomAll, Room } from '../interfaces/room';
 import { IUser, IUserAll } from '../interfaces/user';
 import { map, startWith } from 'rxjs/operators';
 import { requireMatch, valueChange } from '../util/validators';
@@ -50,15 +50,9 @@ import { AvailabilityComponent } from './availability/availability.component';
 import { GoogleMapComponent, GoogleMapForm } from '../shared/google-map/google-map.component';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { RoomState } from '../store/reducers/room.reducers';
-import {
-  getCurrenciesPipe,
-  getOfficesPipe,
-  getProfessionalsPipe,
-  getSelectedRoomPipe,
-  getSubErrorsPipe,
-} from '../store/selectors/room.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { IError, isString } from '../interfaces/common';
+import { getProfessionalsPipe, getSubErrorsPipe } from '../store/selectors/room.selectors';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { ICommon, IError, isString } from '../interfaces/common';
 import { PaymentState } from '../store/reducers/payment.reducers';
 import { getPaymentOptionsPipe } from '../store/selectors/payment.selectors';
 import { RoomNamePipe } from '../pipes/room-name.pipe';
@@ -110,17 +104,19 @@ type RoomForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RoomComponent {
-  id = input<string>();
+  config = input.required<ICommon>();
+  room = input<IRoomAll | undefined>();
+  currencies = input<ICurrencyAll[] | undefined>();
+  offices = input<IOfficeAll[] | undefined>();
+
+  submitData = output<IRoom>();
 
   private readonly store: Store<RoomState | PaymentState> = inject(Store<RoomState | PaymentState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private selectedRoom$ = this.store.pipe(getSelectedRoomPipe);
   private professionals$ = this.store.pipe(getProfessionalsPipe);
-  private currencies$ = this.store.pipe(getCurrenciesPipe);
-  private offices$ = this.store.pipe(getOfficesPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
   private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
@@ -128,11 +124,7 @@ export class RoomComponent {
   private subErrorsSignal = toSignal(this.subErrors$);
   private paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
 
-  roomSignal = toSignal(this.selectedRoom$);
-  isAddModeSignal = computed(() => !this.id());
   errors = signal<Record<string, unknown>>({});
-
-  timeZoneList = timezones;
 
   googleMapForm: FormGroup<GoogleMapForm> = this.formBuilder.group<GoogleMapForm>({
     address: this.formBuilder.control('', {
@@ -151,7 +143,7 @@ export class RoomComponent {
     office: this.formBuilder.control(undefined, {
       validators: [Validators.required, requireMatch],
     }),
-    timeZone: this.formBuilder.control(this.timeZoneList.find(
+    timeZone: this.formBuilder.control(timezones.find(
       timeZone => timeZone.label.toLowerCase().indexOf(getCurrentTimeZone().toLowerCase()) === 0), {
       validators: [Validators.required, requireMatch],
     }),
@@ -204,7 +196,7 @@ export class RoomComponent {
     this.getForm.currency.valueChanges.pipe(
       startWith(''),
       map((value) => !value || typeof value === 'string' ? value : value.code),
-      combineLatestWith(this.currencies$),
+      combineLatestWith(toObservable(this.currencies)),
       map(([name, currencies]) => {
         if (!currencies) {
           return [];
@@ -218,7 +210,7 @@ export class RoomComponent {
     this.getForm.office.valueChanges.pipe(
       startWith(''),
       map((value) => !value || typeof value === 'string' ? value : value.name),
-      combineLatestWith(this.offices$),
+      combineLatestWith(toObservable(this.offices)),
       map(([name, offices]) => {
         if (!offices) {
           return [];
@@ -233,8 +225,8 @@ export class RoomComponent {
       startWith(''),
       map(value => typeof value === 'string' ? value : value?.label),
       map(
-        name => name ? this.filterTimeZone(name, this.timeZoneList) :
-          this.timeZoneList ? this.timeZoneList.slice() : this.timeZoneList,
+        name => name ? this.filterTimeZone(name, timezones) :
+          timezones ? timezones.slice() : timezones,
       )),
   );
 
@@ -251,7 +243,7 @@ export class RoomComponent {
   constructor() {
     effect(() => {
       const paymentOptions = this.paymentOptions();
-      if (!paymentOptions.length || !this.isAddModeSignal() || this.paymentTypes.length) {
+      if (!paymentOptions.length || this.room() || this.paymentTypes.length) {
         return;
       }
 
@@ -261,9 +253,9 @@ export class RoomComponent {
     });
 
     effect(() => {
-      const selected = this.roomSignal();
-      if (selected?.id) {
-        const timeZone = this.timeZoneList.find(
+      const selected = this.room();
+      if (selected) {
+        const timeZone = timezones.find(
           timeZone => timeZone.label.toLowerCase().indexOf(getTimeZone(selected.timeZone).tzCode.toLowerCase()) === 0);
         const room = {
           currency: selected.currency,
@@ -284,7 +276,7 @@ export class RoomComponent {
     });
 
     effect(() => {
-      const room = this.roomSignal();
+      const room = this.room();
       const professionals = this.professionalsSignal();
 
       // Update allGroups from store
@@ -326,13 +318,6 @@ export class RoomComponent {
       }
     });
 
-    effect(() => {
-      const id = this.id();
-      if (id) {
-        this.store.dispatch(getRoom({ id, redirect: true }));
-      }
-    });
-
     const initial = this.professionalsSignal();
     this.professionalsWritableSignal.set(initial ? [...initial] : []);
 
@@ -344,6 +329,10 @@ export class RoomComponent {
 
       this.professionalsWritableSignal.set(customers);
     });
+  }
+
+  get getConfig(): ICommon {
+    return this.config();
   }
 
   get getForm(): RoomForm {
@@ -367,7 +356,7 @@ export class RoomComponent {
       return;
     }
 
-    const roomSignal = this.roomSignal();
+    const roomSignal = this.room();
     const room: IRoom = new Room();
     room.officeId = valueChange(this.getForm.office.value, roomSignal?.office)?.id;
     room.currencyId = valueChange(this.getForm.currency.value, roomSignal?.currency)?.id;
@@ -393,13 +382,7 @@ export class RoomComponent {
       room.closeDateString = createNewDate(this.getForm.closeDate.value).toLocaleString(API_LOCALE);
     }
 
-    const id = this.id();
-    if (!id) {
-      this.store.dispatch(createRoom({ room }));
-    } else {
-      this.store.dispatch(updateRoom({ id, room }));
-    }
-    return;
+    this.submitData.emit(room);
   }
 
   addProfessional(): void {

@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Discount, DiscountType, IDiscount, IDiscountAll } from '../interfaces/discount';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Discount, DiscountForm, DiscountType, IDiscount, IDiscountAll } from '../interfaces/discount';
 import { Router } from '@angular/router';
 import { ICurrency } from '../interfaces/currency';
-import { fieldChange, requireMatch, valueChange } from '../util/validators';
+import { requireMatch } from '../util/validators';
 import { map, startWith } from 'rxjs/operators';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BackButtonDirective } from '../directives/back-button.directive';
@@ -18,14 +18,6 @@ import { MatButton } from '@angular/material/button';
 import { KeyValuePipe } from '@angular/common';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { DiscountStore } from '../store/discount.store';
-
-type DiscountForm = {
-  name: FormControl<string>;
-  description: FormControl<string | undefined>;
-  amount: FormControl<number>;
-  type: FormControl<DiscountType | undefined>;
-  currency: FormControl<ICurrency | undefined>;
-}
 
 @Component({
   selector: 'app-discount',
@@ -125,14 +117,7 @@ export class DiscountComponent {
       return;
     }
 
-    const discountSignal = this.discount();
-    const discount: IDiscount = new Discount();
-    discount.name = fieldChange(this.getForm.name, discountSignal?.name);
-    discount.description = valueChange(this.getForm.description.value, discountSignal?.description);
-    discount.type = fieldChange(this.getForm.type, discountSignal?.type);
-    discount.amount = fieldChange(this.getForm.amount, discountSignal?.amount);
-    discount.currencyId = this.getForm.currency?.value?.id;
-    this.submitData.emit(discount);
+    this.submitData.emit(Discount.fromForm(this.getForm, this.discount()));
   }
 
   addCurrency(): void {

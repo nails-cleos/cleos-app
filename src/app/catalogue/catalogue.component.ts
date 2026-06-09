@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Catalogue, ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
-import { fieldChange, requireMatch, valueChange } from '../util/validators';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Catalogue, CatalogueForm, ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
+import { requireMatch } from '../util/validators';
 import { ITreatmentGroup, ITreatmentGroupAll } from '../interfaces/treatment';
 import { map, startWith } from 'rxjs/operators';
 import { SortByPipe } from '../pipes/sort-by.pipe';
@@ -19,14 +19,6 @@ import { BackButtonDirective } from '../directives/back-button.directive';
 import { ICommon } from '../interfaces/common';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
-
-type CatalogueForm = {
-  name: FormControl<string>;
-  description: FormControl<string | undefined>;
-  home: FormControl<boolean>;
-  catalog: FormControl<boolean>;
-  group: FormControl<ITreatmentGroupAll | undefined>;
-};
 
 @Component({
   selector: 'app-catalogue',
@@ -142,15 +134,10 @@ export class CatalogueComponent {
       return;
     }
 
-    const catalogueSignal = this.catalogueSignal();
-    const catalogue: ICatalogue = new Catalogue();
-    catalogue.name = fieldChange(this.getForm.name, catalogueSignal?.name);
-    catalogue.description = valueChange(this.getForm.description.value, catalogueSignal?.description);
-    catalogue.home = fieldChange(this.getForm.home, catalogueSignal?.home);
-    catalogue.catalog = fieldChange(this.getForm.catalog, catalogueSignal?.catalog);
-    catalogue.groupId = this.getForm.group.value?.id;
-
-    this.submitData.emit({ catalogue, resizedImageDataUrl });
+    this.submitData.emit({
+      catalogue: Catalogue.fromForm(this.getForm, this.catalogueSignal()),
+      resizedImageDataUrl,
+    });
   }
 
   onImageSelected(image?: string) {

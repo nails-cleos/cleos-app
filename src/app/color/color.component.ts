@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Color, IColor, IColorAll } from '../interfaces/color';
-import { fieldChange, valueChange } from '../util/validators';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Color, ColorForm, IColor, IColorAll } from '../interfaces/color';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { ICommon, IError } from '../interfaces/common';
 import { MatError, MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
@@ -9,11 +8,6 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ColorStore } from '../store/color.store';
-
-type ColorForm = {
-  name: FormControl<string>;
-  description: FormControl<string | undefined>;
-}
 
 @Component({
   selector: 'app-color',
@@ -79,11 +73,6 @@ export class ColorComponent {
       return;
     }
 
-    const colorInput = this.color();
-    const color: IColor = new Color();
-    color.name = fieldChange(this.getForm.name, color?.name);
-    color.description = valueChange(this.getForm.description.value, colorInput?.description);
-
-    this.submitData.emit(color);
+    this.submitData.emit(Color.fromForm(this.getForm, this.color()));
   }
 }

@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { RoomComponent } from './room.component';
+import { RoomDetailsPageComponent } from './room-details-page.component';
 
 @Component({
   selector: 'app-room-me-details-page',
-  template: '<app-room [id]="id()" />',
-  imports: [RoomComponent],
+  template: '<app-room-details-page [id]="id()" />',
+  imports: [RoomDetailsPageComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RoomMeDetailsPageComponent {
-  id = input<string>();
+  id = input.required<string>();
 }

@@ -35,11 +35,9 @@ import { provideRouterStore } from '@ngrx/router-store';
 import { localStorageSync } from 'ngrx-store-localstorage';
 import { AUTH_FEATURE_KEY, authReducer } from './app/store/reducers/auth.reducers';
 import { userReducer } from './app/store/reducers/user.reducers';
-import { treatmentReducer } from './app/store/reducers/treatment.reducers';
 import { roomReducer } from './app/store/reducers/room.reducers';
 import { reservationReducer } from './app/store/reducers/reservation.reducers';
 import { notificationReducer } from './app/store/reducers/notification.reducers';
-import { unavailableReducer } from './app/store/reducers/unavailable.reducers';
 import { mainReducer } from './app/store/reducers/main.reducers';
 import { paymentReducer } from './app/store/reducers/payment.reducers';
 import { dashboardReducer } from './app/store/reducers/dashboard.reducers';
@@ -102,11 +100,9 @@ const providers = [
   provideStore({
     auth: authReducer,
     user: userReducer,
-    treatment: treatmentReducer,
     room: roomReducer,
     reservation: reservationReducer,
     notification: notificationReducer,
-    unavailable: unavailableReducer,
     main: mainReducer,
     payment: paymentReducer,
     dashboard: dashboardReducer,

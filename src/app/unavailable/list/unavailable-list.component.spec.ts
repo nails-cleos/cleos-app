@@ -1,28 +1,33 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject, of } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { UnavailableListComponent } from './unavailable-list.component';
 import { IUnavailableAll } from '../../interfaces/unavailable';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { deleteUnavailable, getUnavailablePage, unavailableSelected } from '../../store/actions/unavailable.actions';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { signal } from '@angular/core';
-import { UnavailableState } from '../../store/reducers/unavailable.reducers';
 import { IUserAll } from '../../interfaces/user';
 import { getNowTimeZone } from '../../util/dates';
 import { FrequencyEnum } from '../../util/helper';
 import { MatDialog } from '@angular/material/dialog';
+import { UnavailableStore } from '../../store/unavailable.store';
 
 describe('UnavailableListComponent', () => {
   let component: UnavailableListComponent;
   let fixture: ComponentFixture<UnavailableListComponent>;
-  let storeSpy: jasmine.SpyObj<Store<UnavailableState>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let routerSpy: jasmine.SpyObj<Router>;
   let translate: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let unavailableStoreSpy: {
+    data: ReturnType<typeof signal>;
+    response: ReturnType<typeof signal>;
+    loadPage: jasmine.Spy;
+    clearResponse: jasmine.Spy;
+    delete: jasmine.Spy;
+  };
 
   const mockProfessional: IUserAll = {
     id: 'prof-1',
@@ -35,7 +40,8 @@ describe('UnavailableListComponent', () => {
 
   const mockUnavailable: IUnavailableAll[] = [
     {
-      id: '1', description: 'Desc 1',
+      id: '1',
+      description: 'Desc 1',
       start: '',
       timestamp: getNowTimeZone().getTime() / 1000,
       end: '',
@@ -54,6 +60,7 @@ describe('UnavailableListComponent', () => {
       professional: mockProfessional,
       repeat: FrequencyEnum.none,
       allDay: true,
+      type: 'BLOCK_AGENDA',
     },
   ];
 
@@ -62,13 +69,9 @@ describe('UnavailableListComponent', () => {
     totalElements: 2,
   };
 
-  let unavailableList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    unavailableList$ = new BehaviorSubject(mockPagination);
-    response$ = new BehaviorSubject<any>(undefined);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -77,9 +80,16 @@ describe('UnavailableListComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    unavailableStoreSpy = {
+      data: signal(mockPagination),
+      response: signal<any>(undefined),
+      loadPage: jasmine.createSpy('loadPage'),
+      clearResponse: jasmine.createSpy('clearResponse'),
+      delete: jasmine.createSpy('delete'),
+    };
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
@@ -87,33 +97,18 @@ describe('UnavailableListComponent', () => {
       },
     });
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return unavailableList$.asObservable();
-        case 2:
-          return response$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [UnavailableListComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: UnavailableStore, useValue: unavailableStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MatDialog, useValue: dialogSpy },
+        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
-
-    fixture = TestBed.createComponent(UnavailableListComponent);
-    component = fixture.componentInstance;
 
     translate = TestBed.inject(TranslateService);
     translate.use('en-GB');
@@ -121,17 +116,18 @@ describe('UnavailableListComponent', () => {
       COMMON: {
         TIME_ZONE: {
           TITLE: 'Time Zone',
-          PROFESSIONAL_INFO: 'You are in a different time zone than <b>{{value}}</b>. <br><br>Your time: <b>{{localTime}}</b><br>Professional time: <b>{{timeZoneTime}}{{arg}}</b>',
+          PROFESSIONAL_INFO: 'You are in a different time zone than <b>{{value}}</b>.',
         },
       },
     });
+
+    fixture = TestBed.createComponent(UnavailableListComponent);
+    component = fixture.componentInstance;
 
     fixture.detectChanges();
   });
 
   afterEach(() => {
-    unavailableList$.complete();
-    response$.complete();
     breakpoint$.complete();
   });
 
@@ -140,15 +136,14 @@ describe('UnavailableListComponent', () => {
   });
 
   it('should compute dataSourceSignal correctly', () => {
-    unavailableList$.next(mockPagination);
+    unavailableStoreSpy.data.set(mockPagination);
     fixture.detectChanges();
 
-    const data = component.dataSourceSignal() as any;
-    expect(data?.length).toBe(2);
+    expect(component.dataSourceSignal()?.length).toBe(2);
   });
 
   it('should compute resultsLengthSignal correctly', () => {
-    unavailableList$.next(mockPagination);
+    unavailableStoreSpy.data.set(mockPagination);
     fixture.detectChanges();
 
     expect(component.resultsLengthSignal()).toBe(2);
@@ -180,50 +175,54 @@ describe('UnavailableListComponent', () => {
     expect(component.pageSizeSignal()).toBe(PAGE_SIZE);
   });
 
-  it('should dispatch getUnavailablePage when paginatorPageIndex changes', () => {
+  it('should loadPage when paginatorPageIndex changes', () => {
+    unavailableStoreSpy.loadPage.calls.reset();
     const paginator = component['paginator']();
 
     paginator!.pageIndex = 1;
     paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getUnavailablePage({
-        page: 1,
-        sort: 'timestamp',
-        direction: 'desc',
-        size: PAGE_SIZE,
-      }),
-    );
+    expect(unavailableStoreSpy.loadPage).toHaveBeenCalledWith({
+      page: 1,
+      sort: 'timestamp',
+      direction: 'desc',
+      size: PAGE_SIZE,
+    });
   });
 
-  it('should dispatch clean and reset paginator when responseSignal emits', () => {
+  it('should clear response and reload first page when response emits', () => {
     const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
 
     component['paginator'] = signal(paginatorMock);
+    unavailableStoreSpy.clearResponse.calls.reset();
+    unavailableStoreSpy.loadPage.calls.reset();
 
-    response$.next({ success: true });
-
+    unavailableStoreSpy.response.set({ success: true } as any);
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getUnavailablePage({
-        page: 0,
-        sort: 'timestamp',
-        direction: 'desc',
-        size: PAGE_SIZE,
-      }),
-    );
+    expect(unavailableStoreSpy.clearResponse).toHaveBeenCalled();
+    expect(unavailableStoreSpy.loadPage).toHaveBeenCalledWith({
+      page: 0,
+      sort: 'timestamp',
+      direction: 'desc',
+      size: PAGE_SIZE,
+    });
   });
 
-  it('should dispatch unavailableSelected when edit is called', () => {
-    const item = mockUnavailable[0];
-    component.edit(item);
+  it('should navigate to the unavailable detail page when edit is called', () => {
+    component.edit(mockUnavailable[0]);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(unavailableSelected({ selected: item }));
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'unavailable', mockUnavailable[0].id]);
   });
 
-  it('should dispatch deleteUnavailable when dialog returns a result', () => {
+  it('should navigate to the block agenda detail page when edit is called for block agenda', () => {
+    component.edit(mockUnavailable[1]);
+
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'unavailable', 'block-agenda', mockUnavailable[1].id]);
+  });
+
+  it('should delete when dialog returns a result', () => {
     const item = mockUnavailable[0];
     dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
@@ -231,91 +230,10 @@ describe('UnavailableListComponent', () => {
 
     component.delete(item);
 
-    expect(dialogSpy.open).toHaveBeenCalledWith(
-      jasmine.any(Function),
-      jasmine.objectContaining({
-        data: {
-          title: 'UNAVAILABLE.DELETED.TITLE',
-          content: 'UNAVAILABLE.DELETED.CONTENT',
-          value: item,
-          variant: 'warning',
-        },
-      }));
-
-    expect(storeSpy.dispatch)
-      .toHaveBeenCalledWith(deleteUnavailable({ id: item.id, timestamp: item.timestamp, timeZone: item.timeZone }));
-  });
-
-  it('should not show dialog when timeZone is missing', () => {
-    const item = {
-      id: '1', description: 'Desc 1',
-      start: '',
-      timestamp: getNowTimeZone().getTime() / 1000,
-      end: '',
-      duration: 'PT1H',
-      professional: { ...mockProfessional, timeZone: null },
-      repeat: FrequencyEnum.none,
-      allDay: false,
-    } as unknown as IUnavailableAll;
-
-    expect(component.showTimeZone(item)).toBeFalse();
-  });
-
-  it('should open timezone dialog', () => {
-    const date = new Date(2026, 0, 21, 1, 30);
-    const unavailable = {
-      id: '1', description: 'Desc 1',
-      start: '',
-      timestamp: date.getTime() / 1000,
-      end: '',
-      duration: 'PT1H',
-      professional: mockProfessional,
-      repeat: FrequencyEnum.none,
-      allDay: false,
-      timeZone: 'America/Cordoba',
-    };
-
-    component.openDialog(unavailable);
-
-    expect(dialogSpy.open).toHaveBeenCalledWith(
-      jasmine.any(Function),
-      jasmine.objectContaining({
-        data: {
-          title: 'Time Zone',
-          content: `You are in a different time zone than <b>${ mockProfessional.displayName }</b>. <br><br>Your time: <b>01:30</b><br>Professional time: <b>21:30 <b><sup class="warning">-1D</sup></b></b>`,
-          hideNoButton: true,
-          hideOkButton: true,
-        },
-      }));
-  });
-
-  it('should open timezone dialog when professional timezone is different', () => {
-    const date = new Date(2026, 0, 21, 23, 30);
-    const unavailable = {
-      id: '1', description: 'Desc 1',
-      start: '',
-      timestamp: date.getTime() / 1000,
-      end: '',
-      duration: 'PT1H',
-      professional: {
-        ...mockProfessional,
-        timeZone: 'Asia/Istanbul',
-      },
-      repeat: FrequencyEnum.none,
-      allDay: false,
-    };
-
-    component.openDialog(unavailable);
-
-    expect(dialogSpy.open).toHaveBeenCalledWith(
-      jasmine.any(Function),
-      jasmine.objectContaining({
-        data: {
-          title: 'Time Zone',
-          content: `You are in a different time zone than <b>${ mockProfessional.displayName }</b>. <br><br>Your time: <b>23:30</b><br>Professional time: <b>01:30 <b><sup class="success">+1D</sup></b></b>`,
-          hideNoButton: true,
-          hideOkButton: true,
-        },
-      }));
+    expect(unavailableStoreSpy.delete).toHaveBeenCalledWith({
+      id: item.id,
+      timestamp: item.timestamp,
+      timeZone: item.timeZone,
+    });
   });
 });

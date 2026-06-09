@@ -6,21 +6,10 @@ import { BlockAgendaCreatePageComponent } from './block-agenda/block-agenda-crea
 import { BlockAgendaDetailsPageComponent } from './block-agenda/block-agenda-details-page.component';
 import { UnavailableCreatePageComponent } from './unavailable-create-page.component';
 import { UnavailableDetailsPageComponent } from './unavailable-details-page.component';
-import { provideEffects } from '@ngrx/effects';
-import { provideState } from '@ngrx/store';
-import { UnavailableService } from '../services/unavailable.service';
-import { UserService } from '../services/user.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
-import { UnavailableEffects } from '../store/effects/unavailable.effects';
-import { UNAVAILABLE_FEATURE_KEY, unavailableReducer } from '../store/reducers/unavailable.reducers';
-import { UnavailableNavigationEffects } from './unavailable-navigation.effects';
 
 const providers = [
   provideFeatureTranslations('unavailable'),
-  UnavailableService,
-  UserService,
-  provideState(UNAVAILABLE_FEATURE_KEY, unavailableReducer),
-  provideEffects(UnavailableEffects, UnavailableNavigationEffects),
 ];
 
 const children: Routes = [

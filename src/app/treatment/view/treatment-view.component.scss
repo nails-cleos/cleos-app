@@ -1,0 +1,66 @@
+.treatment-builder {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+}
+
+.app-detail-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.treatment-view-colors {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.treatment-view-treatments__header {
+  margin-bottom: 0;
+}
+
+.treatment-view-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.treatment-view-card__header h3 {
+  margin: 4px 0 0;
+  color: var(--app-detail-title);
+  font-size: 1.2rem;
+  line-height: 1.2;
+}
+
+.treatment-view-card__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 0.35fr);
+  gap: 16px;
+}
+
+.treatment-view-history {
+  width: 100%;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  gap: 12px;
+}
+
+@media (max-width: 960px) {
+  .treatment-view-card__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .treatment-builder {
+    padding: 16px;
+  }
+
+  .treatment-view-card__header {
+    flex-direction: column;
+  }
+}

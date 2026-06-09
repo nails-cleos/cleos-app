@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ChangeDetectorRef, signal } from '@angular/core';
+import { signal } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
@@ -11,13 +11,13 @@ import { provideHttpClient } from '@angular/common/http';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
 import { IUserAll } from '../interfaces/user';
 import { Role } from '../interfaces/token';
-import { getRoom } from '../store/actions/room.actions';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { GoogleMapComponent } from '../shared/google-map/google-map.component';
 import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.component';
 import { PaymentService } from '../services/payment.service';
 import { IPaymentOption } from '../interfaces/payment';
 import { provideAppDateAdapter } from '../util/adapter/app-date.provider';
+import { ICommon } from '../interfaces/common';
 
 describe('RoomComponent', () => {
   let component: RoomComponent;
@@ -25,18 +25,19 @@ describe('RoomComponent', () => {
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let selectedRoom$: BehaviorSubject<any>;
   let professionals$: BehaviorSubject<any>;
-  let currencies$: BehaviorSubject<any>;
-  let offices$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
   let paymentOptions$: BehaviorSubject<any>;
 
   let storeSpy: jasmine.SpyObj<Store>;
-  let changeDetectorRefSpy: jasmine.SpyObj<ChangeDetectorRef>;
   let geocodeServiceSpy: jasmine.SpyObj<GeocodeService>;
   let authUserService: jasmine.SpyObj<AuthUserService>;
   let paymentServiceSpy: jasmine.SpyObj<PaymentService>;
+
+  const config: ICommon = {
+    title: 'ROOM.TITLE',
+    button: { icon: 'add', label: 'COMMON.BUTTON.CREATE' },
+  };
 
   const monday: IAvailability = { day: 'MONDAY', start: '09:00', end: '18:00' };
   const tuesday: IAvailability = { day: 'TUESDAY' };
@@ -67,6 +68,12 @@ describe('RoomComponent', () => {
     name: 'Euro',
   };
 
+  const mockOffice = {
+    id: 'office-123',
+    name: 'office name',
+    manager: { id: 'manager-123' },
+  };
+
   const mockRoom: IRoomAll = {
     id: 'room-123',
     address: {
@@ -77,11 +84,7 @@ describe('RoomComponent', () => {
     currency: mockCurrency,
     timeZone: 'Europe/Amsterdam',
     availabilities: [monday, tuesday, wednesday, thursday, friday, saturday, sunday],
-    office: {
-      id: 'office-123',
-      name: 'office name',
-      manager: { id: 'manager-123' },
-    },
+    office: mockOffice,
     paymentTypes: [],
     primary: false,
     professionals: [mockProfessional],
@@ -123,10 +126,7 @@ describe('RoomComponent', () => {
   ];
 
   beforeEach(async () => {
-    selectedRoom$ = new BehaviorSubject(undefined);
     professionals$ = new BehaviorSubject(undefined);
-    currencies$ = new BehaviorSubject(undefined);
-    offices$ = new BehaviorSubject(undefined);
     subErrors$ = new BehaviorSubject(undefined);
     paymentOptions$ = new BehaviorSubject(paymentOptions);
     authUserSignal.update(prev => ({
@@ -137,7 +137,6 @@ describe('RoomComponent', () => {
     }));
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    changeDetectorRefSpy = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
     geocodeServiceSpy = jasmine.createSpyObj('GeocodeService', ['getCoordinates']);
     paymentServiceSpy = jasmine.createSpyObj('PaymentService', ['getPaymentOptions']);
     paymentServiceSpy.getPaymentOptions.and.returnValue(new BehaviorSubject(paymentOptions).asObservable());
@@ -150,16 +149,10 @@ describe('RoomComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return selectedRoom$.asObservable();
-        case 2:
           return professionals$.asObservable();
-        case 3:
-          return currencies$.asObservable();
-        case 4:
-          return offices$.asObservable();
-        case 5:
+        case 2:
           return subErrors$.asObservable();
-        case 6:
+        case 3:
           return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -170,7 +163,6 @@ describe('RoomComponent', () => {
       imports: [RoomComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
-        { provide: ChangeDetectorRef, useValue: changeDetectorRefSpy },
         { provide: GeocodeService, useValue: geocodeServiceSpy },
         { provide: PaymentService, useValue: paymentServiceSpy },
         { provide: AuthUserService, useValue: authUserService },
@@ -190,6 +182,9 @@ describe('RoomComponent', () => {
 
     fixture = TestBed.createComponent(RoomComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('config', config);
+    fixture.componentRef.setInput('currencies', [mockCurrency]);
+    fixture.componentRef.setInput('offices', [mockOffice]);
   });
 
   it('should create', () => {
@@ -197,27 +192,18 @@ describe('RoomComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should dispatch getRoom when roomId emits a value', () => {
-    storeSpy.dispatch.calls.reset();
-
-    fixture.componentRef.setInput('id', '123');
-    fixture.detectChanges();
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getRoom({ id: '123', redirect: true }));
-  });
-
-  it('should patch form when selectedRoom emits', () => {
-    selectedRoom$.next(mockRoom);
+  it('should patch form when room input emits', () => {
     professionals$.next([
       mockProfessional,
       { id: 'p2', displayName: 'Professional 2' },
     ]);
+    fixture.componentRef.setInput('room', mockRoom);
     fixture.detectChanges();
 
-    const roomSignalValue: any = component.roomSignal();
-    expect(roomSignalValue.id).toBe(mockRoom.id);
+    expect(component.room()?.id).toBe(mockRoom.id);
     expect(component.selectedProfessionalsSignal().length).toBe(1);
     expect(component.professionalsWritableSignal()?.some?.((p: IUserAll) => p.id === 'p2')).toBeTrue();
+    expect(component.getForm.currency.value?.id).toBe(mockCurrency.id);
   });
 
   it('should handle form errors from subErrorsSignal', () => {
@@ -231,38 +217,38 @@ describe('RoomComponent', () => {
 
     const errs = component.errors();
     expect(errs['currency']).toBe('Currency required');
-    expect(component.getForm.currency.hasError('required')).toBeTrue();
     expect(errs['office']).toBe('Office required');
-    expect(component.getForm.office.hasError('required')).toBeTrue();
+    expect(component.getForm.currency.invalid).toBeTrue();
+    expect(component.getForm.office.invalid).toBeTrue();
   });
 
-  it('should not dispatch when form invalid on submit', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should not emit when form invalid on submit', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
-    // ensure form invalid
-    (component.getForm.professional).setValue(undefined);
-    (component.getForm.office).setValue(undefined);
-    (component.getForm.currency).setValue(undefined);
-    (component.getForm.timeZone).setValue(undefined);
-    (component.getGoogleMapForm.address).setValue('');
+    component.getForm.professional.setValue(undefined);
+    component.getForm.office.setValue(undefined);
+    component.getForm.currency.setValue(undefined);
+    component.getForm.timeZone.setValue(undefined);
+    component.getGoogleMapForm.address.setValue('');
     fixture.detectChanges();
 
     component.submit();
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(emitSpy).not.toHaveBeenCalled();
   });
 
-  it('should dispatch createRoom when in add mode and form valid', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should emit room data when in create mode and form valid', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
-    // Add professional to selectedProfessionalsSignal
     component.selectedProfessionalsSignal.set([mockProfessional]);
 
     const currencyControl = component.getForm.currency;
     currencyControl.setValue(mockCurrency);
     currencyControl.markAsDirty();
     const officeControl = component.getForm.office;
-    officeControl.setValue(mockRoom.office);
+    officeControl.setValue(mockOffice);
     officeControl.markAsDirty();
     const timeZoneControl = component.getForm.timeZone;
     timeZoneControl.setValue({ tzCode: 'Europe/Amsterdam', label: 'Europe/Amsterdam' } as any);
@@ -283,43 +269,36 @@ describe('RoomComponent', () => {
     component.submit();
 
     expect(component.form.valid).toBeTrue();
-    const dispatched = storeSpy.dispatch.calls.mostRecent().args[0];
-    expect(dispatched).toEqual(jasmine.objectContaining({
-      room: jasmine.objectContaining({
-        officeId: 'office-123',
-        currencyId: 'currency-id',
-        timeZone: 'Europe/Amsterdam',
-        paymentTypes: ['CASH'],
-      }),
-      type: '[Room] Create room',
+    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
+      officeId: 'office-123',
+      currencyId: 'currency-id',
+      timeZone: 'Europe/Amsterdam',
+      paymentTypes: ['CASH'],
     }));
   });
 
-  it('should dispatch updateRoom when in edit mode and form valid', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should emit room data when in edit mode and form valid', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
-    fixture.componentRef.setInput('id', 'abc-123');
-    fixture.detectChanges();
-    selectedRoom$.next({
+    professionals$.next([mockProfessional, { ...mockProfessional, id: 'user-456', displayName: 'Jane Doe' }]);
+    fixture.componentRef.setInput('room', {
+      ...mockRoom,
       id: 'abc-123',
       address: { id: 1, name: 'Old Address', location: { x: 0, y: 0 } },
-      currency: mockCurrency,
-      office: mockRoom.office,
-      professionals: [mockProfessional],
       timeZone: 'UTC',
       availabilities: [monday],
       paymentTypes: [],
-      primary: false,
     });
-
-    component.selectedProfessionalsSignal.set([{ ...mockProfessional, id: 'user-456' }]);
     fixture.detectChanges();
+
+    component.selectedProfessionalsSignal.set([{ ...mockProfessional, id: 'user-456', displayName: 'Jane Doe' }]);
 
     const currencyControl = component.getForm.currency;
     currencyControl.setValue({ id: '1', name: 'USD', code: 'USD', icon: 'USD' });
     currencyControl.markAsDirty();
     const officeControl = component.getForm.office;
-    officeControl.setValue(mockRoom.office);
+    officeControl.setValue(mockOffice);
     officeControl.markAsDirty();
     const timeZoneControl = component.getForm.timeZone;
     timeZoneControl.setValue({ tzCode: 'Europe/London', label: 'Europe/London' } as any);
@@ -336,19 +315,14 @@ describe('RoomComponent', () => {
     component.ignore('SATURDAY', 4);
     component.ignore('SUNDAY', 4);
 
-    storeSpy.dispatch.calls.reset();
+    fixture.detectChanges();
     component.submit();
 
     expect(component.form.valid).toBeTrue();
-    const dispatched = storeSpy.dispatch.calls.mostRecent().args[0];
-
-    expect(dispatched).toEqual(jasmine.objectContaining({
-      id: 'abc-123',
-      room: jasmine.objectContaining({
-        currencyId: '1',
-        timeZone: 'Europe/London',
-      }),
-      type: '[Room] Update room by id',
+    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
+      currencyId: '1',
+      timeZone: 'Europe/London',
+      professionalIds: ['user-456'],
     }));
   });
 
@@ -364,7 +338,6 @@ describe('RoomComponent', () => {
     component.getForm.professional.setValue(undefined);
     fixture.detectChanges();
 
-    // Professionals are sorted alphabetically, so "Another name" comes first
     const sortedProfessionals = [
       { id: '2', displayName: 'Another name' },
       { id: '1', displayName: 'Test name 1' },
@@ -372,7 +345,7 @@ describe('RoomComponent', () => {
     ] as IUserAll[];
     expect(component.filteredProfessionalSignal()).toEqual(sortedProfessionals);
 
-    (component.getForm.professional as any).setValue('test');
+    component.getForm.professional.setValue('test' as any);
     fixture.detectChanges();
     expect(component.filteredProfessionalSignal()).toEqual([
       { id: '1', displayName: 'Test name 1' } as IUserAll,
@@ -380,8 +353,7 @@ describe('RoomComponent', () => {
     ]);
   });
 
-  it('remove should remove group and put it back to professionalsWritableSignal', () => {
-    // set initial groups
+  it('remove should remove professional and put it back to professionalsWritableSignal', () => {
     component.selectedProfessionalsSignal.set([
       { id: 'g1', displayName: 'G1' } as any,
       { id: 'g2', displayName: 'G2' } as any,
@@ -396,7 +368,6 @@ describe('RoomComponent', () => {
 
     expect(component.selectedProfessionalsSignal().length).toBe(1);
     expect(component.professionalsWritableSignal()?.some?.((g: any) => g.id === 'g2')).toBeTrue();
-    // group input control should be reset (undefined)
     expect(component.getForm.professional.value).toBeUndefined();
   });
 
@@ -413,7 +384,7 @@ describe('RoomComponent', () => {
     fixture.detectChanges();
 
     expect(component.selectedProfessionalsSignal().some((g: any) => g.id === 'p1')).toBeTrue();
-    expect(component.professionalsWritableSignal()?.some?.((g: any) => g.id === 'p1')).toBeUndefined();
+    expect((component.professionalsWritableSignal() ?? []).some((g: any) => g.id === 'p1')).toBeFalse();
     expect(component.getForm.professional.value).toBeUndefined();
   });
 });

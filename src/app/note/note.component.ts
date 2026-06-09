@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, Signal, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { combineLatestWith } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
-import { backendFormatDate, createDateFromString } from '../util/dates';
-import { fieldChange, requireMatch, valueChange } from '../util/validators';
-import { INote, INoteAll, Note } from '../interfaces/note';
+import { createDateFromString } from '../util/dates';
+import { requireMatch } from '../util/validators';
+import { INote, INoteAll, Note, NoteForm } from '../interfaces/note';
 import { IUser, IUserAll } from '../interfaces/user';
 import { FrequencyEnum } from '../util/helper';
 import { map, startWith } from 'rxjs/operators';
@@ -20,13 +20,6 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import { KeyValuePipe } from '@angular/common';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { NoteStore } from '../store/note.store';
-
-type NoteForm = {
-  description: FormControl<string>;
-  professional: FormControl<IUserAll | undefined>;
-  date: FormControl<Date | undefined>;
-  repeat: FormControl<FrequencyEnum | undefined>;
-}
 
 @Component({
   selector: 'app-note',
@@ -134,14 +127,7 @@ export class NoteComponent {
       return;
     }
 
-    const noteSignal = this.note();
-    const note: INote = new Note();
-    note.description = fieldChange(this.getForm.description, noteSignal?.description);
-    note.professionalId = valueChange(this.getForm.professional.value, noteSignal?.professional)?.id;
-    note.repeat = fieldChange(this.getForm.repeat, noteSignal?.repeat);
-    note.date = backendFormatDate(this.getForm.date.value);
-
-    this.submitData.emit(note);
+    this.submitData.emit(Note.fromForm(this.getForm, this.note()));
   }
 
   delete() {

@@ -1,59 +1,44 @@
 import {
   ChangeDetectionStrategy,
-  Component,
-  computed,
+  Component, computed,
   effect,
   ElementRef,
   inject,
   input,
+  output,
   Signal,
   signal,
   viewChild,
 } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import {
-  createTreatment,
-  getAllTreatmentsHistory,
-  getTreatmentGroup,
-  treatmentSelected,
-  updateTreatmentGroup,
-} from '../store/actions/treatment.actions';
-import { Store } from '@ngrx/store';
-import { combineLatestWith } from 'rxjs';
-import { ITreatment, ITreatmentGroup, Treatment, TreatmentGroup } from '../interfaces/treatment';
-import { createNewDate, formatDuration, getNowTimeZone, getTime, getTimeNumber } from '../util/dates';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { IColorAll } from '../interfaces/color';
+import { RouterLink } from '@angular/router';
 import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { map, startWith } from 'rxjs/operators';
-import { fieldChange } from '../util/validators';
-import { areEquals } from '../util/helper';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { BackButtonDirective } from '../directives/back-button.directive';
-import { TreatmentState } from '../store/reducers/treatment.reducers';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { getColorsPipe, getHistoriesPipe, getSelectedTreatmentPipe, getSubErrorsPipe } from '../store/selectors/treatment.selectors';
-import { IError, isString } from '../interfaces/common';
-import { DurationTimePipe } from '../pipes/durationTime.pipe';
-import { TreatmentTableComponent } from './table/treatment-table.component';
-import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
-import { MatSuffix } from '@angular/material/form-field';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/material/chips';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
-import { MatButton, MatIconButton } from '@angular/material/button';
-import { MatChip, MatChipGrid, MatChipInput, MatChipListbox, MatChipRemove, MatChipRow } from '@angular/material/chips';
+import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatSuffix } from '@angular/material/form-field';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { combineLatestWith } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
+import { IColorAll } from '../interfaces/color';
+import { ICommon, IError, isString } from '../interfaces/common';
+import {
+  ITreatment,
+  ITreatmentGroup,
+  ITreatmentGroupAll,
+  Treatment,
+  TreatmentForm,
+  TreatmentGroup,
+} from '../interfaces/treatment';
+import { createNewDate, formatDuration, getNowTimeZone, getTime, getTimeNumber } from '../util/dates';
+import { BackButtonDirective } from '../directives/back-button.directive';
+import { TreatmentStore } from '../store/treatment.store';
 import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
 import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
-
-type TreatmentMode = 'add' | 'edit' | 'view';
-
-type TreatmentForm = {
-  name: FormControl<string>;
-  description: FormControl<string | undefined>;
-  priceFrom: FormControl<string | undefined>;
-  color: FormControl<IColorAll | undefined>;
-};
 
 @Component({
   selector: 'app-treatment',
@@ -61,66 +46,21 @@ type TreatmentForm = {
   styleUrls: ['./treatment.component.scss'],
   imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatIconButton, MatButton, ReactiveFormsModule,
     TranslatePipe, RouterLink, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix, BackButtonDirective,
-    BackButtonDirective, DurationTimePipe, TreatmentTableComponent, MatHint, MatChipGrid, MatChipRow, MatChipInput,
-    MatTabGroup, MatTab, TimepickerDirective, TimepickerComponent, MatChipListbox, MatChip, MatChipRemove,
-    MatSuffix],
+    BackButtonDirective, MatHint, MatChipGrid, MatChipRow, MatChipInput, MatTabGroup, MatTab, TimepickerDirective,
+    TimepickerComponent, MatChipRemove, MatSuffix],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreatmentComponent {
-  id = input<string>();
-  mode = input<TreatmentMode>();
+  config = input.required<ICommon>();
+  treatment = input<ITreatmentGroupAll>();
 
-  private readonly store: Store<TreatmentState> = inject(Store<TreatmentState>);
+  submitData = output<ITreatmentGroup>();
+
+  private readonly treatmentStore = inject(TreatmentStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly route: ActivatedRoute = inject(ActivatedRoute);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private selectedTreatment$ = this.store.pipe(getSelectedTreatmentPipe);
-  private allColors$ = this.store.pipe(getColorsPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private histories$ = this.store.pipe(getHistoriesPipe);
-
-  private selectedTreatmentSignal = toSignal(this.selectedTreatment$);
-  private allColorsSignal = toSignal(this.allColors$);
-  private subErrorsSignal = toSignal(this.subErrors$);
-  private historiesSignal = toSignal(this.histories$);
-  private routeModeSignal = toSignal(
-    this.route.url.pipe(map(segments => segments.at(-1)?.path ?? 'add')),
-    { initialValue: this.route.snapshot.url.at(-1)?.path ?? 'add' },
-  );
-
-  private selectedHistoryTreatmentId = signal<string | undefined>(undefined);
-
-  resolvedMode = computed<TreatmentMode>(() => {
-    const mode = this.mode();
-    if (mode) {
-      return mode;
-    }
-    if (this.routeModeSignal() === 'view') {
-      return 'view';
-    }
-    return this.id() ? 'edit' : 'add';
-  });
-  treatmentSignal = computed(() => this.selectedTreatmentSignal());
-  viewTreatmentSignal = computed(() => {
-    const group = this.selectedTreatmentSignal();
-    const histories = this.historiesSignal();
-    const selectedHistoryTreatmentId = this.selectedHistoryTreatmentId();
-
-    if (!group) {
-      return group;
-    }
-
-    return {
-      ...group,
-      treatments: group.treatments?.map(treatment => {
-        if (treatment.id === selectedHistoryTreatmentId) {
-          return { ...treatment, showHistory: true, history: histories };
-        }
-        return treatment;
-      }),
-    };
-  });
+  private subErrorsSignal = this.treatmentStore.subErrors;
 
   form: FormGroup<TreatmentForm> = this.formBuilder.group<TreatmentForm>({
     name: this.formBuilder.control('', {
@@ -131,11 +71,14 @@ export class TreatmentComponent {
     color: this.formBuilder.control(undefined),
   });
 
+  colors = computed(() => this.treatmentStore.colors());
+  colorsSignal = signal<IColorAll[]>([]);
+  allColorsWritableSignal = signal<IColorAll[] | undefined>(undefined);
   filteredColorSignal: Signal<IColorAll[] | undefined> = toSignal(
     this.getForm.color.valueChanges.pipe(
       startWith(''),
       map((value: any) => !value || typeof value === 'string' ? value : value.name),
-      combineLatestWith(this.allColors$),
+      combineLatestWith(toObservable(this.allColorsWritableSignal)),
       map(([name, colors]) => {
         if (name) {
           return this.filter(name, colors);
@@ -145,10 +88,6 @@ export class TreatmentComponent {
       }),
     ),
   );
-  isAddModeSignal = computed(() => this.resolvedMode() === 'add');
-  isViewModeSignal = computed(() => this.resolvedMode() === 'view');
-  colorsSignal = signal<IColorAll[]>([]);
-  allColorsWritableSignal = signal<IColorAll[] | undefined>(undefined);
   errors = signal<Record<string, unknown>>({});
 
   colorInput = viewChild<ElementRef<HTMLInputElement>>('colorInput');
@@ -159,12 +98,13 @@ export class TreatmentComponent {
   treatmentsSignal = signal<ITreatment[]>([]);
 
   language: string = this.translate.getCurrentLang();
-
   private currentColorIds: string[] = [];
 
   constructor() {
+    this.treatmentStore.loadColors();
+
     effect(() => {
-      const treatment = this.selectedTreatmentSignal();
+      const treatment = this.treatment();
       if (treatment?.id) {
         this.form.patchValue(treatment);
         this.treatmentsSignal.set(
@@ -174,15 +114,6 @@ export class TreatmentComponent {
             primary: t.primary ?? false,
           })) || [],
         );
-      }
-      return treatment;
-    });
-
-    effect(() => {
-      const id = this.id();
-      const mode = this.resolvedMode();
-      if (id) {
-        this.store.dispatch(getTreatmentGroup({ id, path: mode }));
       }
     });
 
@@ -203,38 +134,34 @@ export class TreatmentComponent {
     });
 
     effect(() => {
-      const treatment = this.selectedTreatmentSignal();
-      const allColors = this.allColorsSignal();
-
-      // Update allColors from store
-      this.allColorsWritableSignal.set(allColors);
+      const treatment = this.treatment();
+      const allColors = this.colors();
 
       if (treatment) {
-        // Reset treatments
-        this.colorsSignal.set([]);
-
-        // Create a fresh copy of allColors to filter
-        let filteredColors = allColors ? [...allColors] : undefined;
-
-        // Process selected treatments
         const selectedColors: IColorAll[] = [];
         treatment.colors?.forEach((color: IColorAll) => {
           selectedColors.push(color);
-          filteredColors = filteredColors?.filter(c => c.id !== color.id);
         });
 
         this.colorsSignal.set(selectedColors);
-        this.allColorsWritableSignal.set(filteredColors);
+        this.allColorsWritableSignal.set(this.excludeSelectedColors(allColors, selectedColors));
         this.currentColorIds = selectedColors.map(({ id }) => id).filter(isString);
+        return;
       }
+
+      this.allColorsWritableSignal.set(this.excludeSelectedColors(allColors, this.colorsSignal()));
     });
+  }
+
+  get getConfig(): ICommon {
+    return this.config();
   }
 
   get getForm(): TreatmentForm {
     return this.form.controls;
   }
 
-  submit() {
+  submit(): void {
     let hasError = false;
     const treatments = this.treatmentsSignal();
     if (!treatments.length) {
@@ -258,27 +185,19 @@ export class TreatmentComponent {
       return;
     }
 
-    const groupSignal = this.treatmentSignal();
-    const treatmentGroup: ITreatmentGroup = new TreatmentGroup();
-    treatmentGroup.name = fieldChange(this.getForm.name, groupSignal?.name);
-    treatmentGroup.description = fieldChange(this.getForm.description, groupSignal?.description);
-    treatmentGroup.priceFrom = fieldChange(this.getForm.priceFrom, groupSignal?.priceFrom);
-    treatmentGroup.treatments = this.treatmentsSignal();
-
     const newColorIds = this.colorsSignal().map(({ id }) => id);
-    if (!areEquals(newColorIds, this.currentColorIds)) {
-      treatmentGroup.colorIds = newColorIds;
-    }
+    const treatmentGroup: ITreatmentGroup = TreatmentGroup.fromForm(
+      this.getForm,
+      this.treatment(),
+      this.treatmentsSignal(),
+      newColorIds,
+      this.currentColorIds,
+    );
 
-    const id = this.id();
-    if (!id) {
-      this.store.dispatch(createTreatment({ treatmentGroup }));
-    } else {
-      this.store.dispatch(updateTreatmentGroup({ id, treatmentGroup }));
-    }
+    this.submitData.emit(treatmentGroup);
   }
 
-  addTab() {
+  addTab(): void {
     const input = this.nameInput();
     if (input) {
       const treatment: ITreatment = new Treatment(input.nativeElement.value, !this.treatmentsSignal().length);
@@ -306,37 +225,23 @@ export class TreatmentComponent {
 
   remove = (color: IColorAll): void => {
     const colors = this.colorsSignal();
-    const index = colors.indexOf(color);
+    const index = colors.findIndex(({ id }) => id === color.id);
     if (index >= 0) {
       this.colorsSignal.update(current => current.filter((_, i) => i !== index));
-      this.allColorsWritableSignal.update(current => current ? [...current, color] : [color]);
+      this.allColorsWritableSignal.update(current => this.addAvailableColor(current, color));
       this.getForm.color.setValue(undefined);
     }
   };
 
   selectedColor = (event: MatAutocompleteSelectedEvent): void => {
     const color = event.option.value;
-    this.colorsSignal.update(current => [...current, color]);
+    this.colorsSignal.update(current => current.some(({ id }) => id === color.id) ? current : [...current, color]);
     this.allColorsWritableSignal.update(current => current?.filter(c => c.id !== color.id));
     const input = this.colorInput();
     if (input) {
       input.nativeElement.value = '';
     }
     this.getForm.color.setValue(undefined);
-  };
-
-  edit = (): void => {
-    this.store.dispatch(treatmentSelected({ selected: this.selectedTreatmentSignal(), path: 'edit' }));
-  };
-
-  getHistory = (treatmentId?: string): void => {
-    const id = this.selectedTreatmentSignal()?.id;
-    if (!id || !treatmentId) {
-      return;
-    }
-
-    this.selectedHistoryTreatmentId.set(treatmentId);
-    this.store.dispatch(getAllTreatmentsHistory({ id, treatmentId }));
   };
 
   sortColors = (data?: IColorAll[]): IColorAll[] | undefined => data?.sort((a: any, b: any) => {
@@ -347,4 +252,17 @@ export class TreatmentComponent {
 
   private filter = (name: string, allColors?: IColorAll[]): IColorAll[] | undefined => allColors?.filter(
     option => option?.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+
+  private excludeSelectedColors(
+    allColors: IColorAll[] | undefined,
+    selectedColors: IColorAll[],
+  ): IColorAll[] | undefined {
+    const selectedIds = new Set(selectedColors.map(({ id }) => id).filter(isString));
+    return allColors?.filter(({ id }) => !id || !selectedIds.has(id));
+  }
+
+  private addAvailableColor(current: IColorAll[] | undefined, color: IColorAll): IColorAll[] {
+    const colors = current ?? [];
+    return colors.some(({ id }) => id === color.id) ? colors : [...colors, color];
+  }
 }
