@@ -224,9 +224,9 @@
       <div class="expense-footer">
         <div class="expense-footer__end">
           @if (!expense()) {
-            <mat-checkbox (change)="createAnother = !createAnother" [checked]="createAnother"
+            <mat-checkbox (change)="createAnother = $event.checked" [checked]="createAnother"
                           class="expense-create-another">
-              Create another
+              {{ 'EXPENSE.CREATE_ANOTHER' | translate }}
             </mat-checkbox>
           }
 

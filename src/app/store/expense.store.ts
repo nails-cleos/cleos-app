@@ -74,7 +74,6 @@ export const ExpenseStore = signalStore(
           response: undefined,
           error: undefined,
           subErrors: undefined,
-          selected: undefined,
         });
 
         expenseService.getAllExpensesInfo(roomId).subscribe({

@@ -6,7 +6,7 @@ import { ICommon } from '../../../interfaces/common';
 
 @Component({
   selector: 'app-expense-create-page',
-  template: '<app-expense [config]="config" (submitData)="submit($event)"/>',
+  template: '<app-expense [roomId]="id()" [config]="config" (submitData)="submit($event)"/>',
   imports: [ExpenseComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -14,7 +14,7 @@ export class ExpenseCreatePageComponent {
   id = input.required<string>();
   private readonly expenseStore = inject(ExpenseStore);
   config: ICommon = {
-    title: 'COLOR.TITLE',
+    title: 'EXPENSE.TITLE',
     button: { icon: 'add_shopping_cart', label: 'COMMON.BUTTON.CREATE' },
   };
 

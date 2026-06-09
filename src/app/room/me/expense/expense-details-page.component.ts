@@ -9,7 +9,7 @@ import { SkeletonComponent } from '../../../shared/skeleton.component';
   selector: 'app-expense-details-page',
   template: `
     @if (expense(); as expense) {
-      <app-expense [expense]="expense" [config]="config" (submitData)="submit($event)"/>
+      <app-expense [roomId]="id()" [expense]="expense" [config]="config" (submitData)="submit($event)"/>
     } @else {
       <app-skeleton/>
     }

@@ -118,6 +118,14 @@ export class AccountComponent {
     return this.form.controls;
   }
 
+  get navigation(): string[] {
+    const account = this.accountSignal();
+    if (account && this.userId() !== account.customer.id) {
+      return ['/', this.language, 'users', account.customer.id, 'overview'];
+    }
+    return ['/', this.language, 'me', 'overview'];
+  }
+
   submit(): void {
     const id = this.accountSignal()?.id;
     const customerId = this.customerId();

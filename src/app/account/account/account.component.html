@@ -7,18 +7,11 @@
       <section class="app-surface-section">
         <div class="app-detail-section-header">
           <div>
-            <span class="app-surface-eyebrow">{{ 'ACCOUNT.TITLE' | translate }}</span>
             @if (account.customer) {
               <h2 class="account-title">
-                @if (userId() === account.customer.id) {
-                  <a [routerLink]="['/', language, 'me', 'overview']" class="app-detail-link">
-                    {{ account.customer.displayName }}
-                  </a>
-                } @else {
-                  <a [routerLink]="['/', language, 'users', account.customer.id, 'overview']" class="app-detail-link">
-                    {{ account.customer.displayName }}
-                  </a>
-                }
+                <a [routerLink]="navigation" class="app-detail-link">
+                  {{ account.customer.displayName }}
+                </a>
               </h2>
             } @else {
               <div class="ssc-line app-skeleton-title"></div>

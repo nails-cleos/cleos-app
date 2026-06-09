@@ -68,7 +68,7 @@ type TotalsForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExpenseComponent {
-  id = input<string>();
+  roomId = input.required<string>();
   config = input.required<ICommon>();
   expense = input<IExpenseAll | undefined>();
   submitData = output<{ expense: IExpense, file?: File }>();
@@ -90,8 +90,13 @@ export class ExpenseComponent {
   private infoSignal = this.expenseStore.info;
   private subErrorsSignal = this.expenseStore.subErrors;
   private responseSignal = this.expenseStore.response;
+  private errorSignal = this.expenseStore.error;
+  private isLoadingSignal = this.expenseStore.isLoading;
 
   errors = signal<Record<string, unknown>>({});
+  private readonly createAnotherState = signal(false);
+  private readonly pendingCreateAnotherReset = signal(false);
+  private readonly createAnotherRequestStarted = signal(false);
 
   form: FormGroup<ExpenseForm> = this.formBuilder.group<ExpenseForm>({
     invoice: this.formBuilder.control('', {
@@ -106,7 +111,6 @@ export class ExpenseComponent {
     totals: this.formBuilder.array<FormGroup<TotalsForm>>([], { validators: [noDuplicateDatesValidator('btw')] }),
   });
 
-  createAnother: boolean = false;
   types = computed(() => this.infoSignal()?.types || []);
   currencyIcon = computed(() => this.infoSignal()?.currency?.icon || '');
   roomName = computed(() => this.infoSignal()?.roomName || '');
@@ -172,21 +176,43 @@ export class ExpenseComponent {
     });
 
     effect(() => {
-      const roomId = this.id();
       if (this.responseSignal()) {
         if (!this.expense() && this.createAnother) {
-          this.file.set(undefined);
-        } else {
-          this.router.navigate([this.language, 'rooms', roomId, 'expenses']);
+          return;
         }
+
+        this.router.navigate([this.language, 'rooms', this.roomId(), 'expenses']);
       }
     });
 
     effect(() => {
-      const roomId = this.id();
-      if (roomId) {
-        this.expenseStore.loadInfo(roomId);
+      if (!this.pendingCreateAnotherReset()) {
+        return;
       }
+
+      if (this.isLoadingSignal()) {
+        this.createAnotherRequestStarted.set(true);
+        return;
+      }
+
+      if (!this.createAnotherRequestStarted()) {
+        return;
+      }
+
+      this.pendingCreateAnotherReset.set(false);
+      this.createAnotherRequestStarted.set(false);
+
+      if (this.errorSignal() || this.subErrorsSignal()) {
+        return;
+      }
+
+      this.awsStore.clean();
+      this.file.set(undefined);
+      this.resetCreateAnotherForm();
+    });
+
+    effect(() => {
+      this.expenseStore.loadInfo(this.roomId());
     });
 
     effect(() => {
@@ -206,29 +232,32 @@ export class ExpenseComponent {
 
     effect(() => {
       const aws = this.awsSignal();
-      if (aws) {
-        this.setSupplierOrName(aws.VENDOR_NAME);
-        if (aws.INVOICE_RECEIPT_DATE) {
-          const date = new Date(aws.INVOICE_RECEIPT_DATE);
-          if (!isNaN(date.getTime())) {
-            this.getForm.date.setValue(date);
-          }
-        }
-        if (aws.INVOICE_RECEIPT_ID) {
-          this.getForm.invoice.setValue(aws.INVOICE_RECEIPT_ID);
-        }
-        let total = awsExtractToNumberFormat(aws.TOTAL);
-        const btwValue = awsExtractToNumberFormat(aws.TAX);
-        const subtotal = awsExtractToNumberFormat(aws.SUBTOTAL);
+      const file = this.file()?.raw;
+      if (!aws || !file) {
+        return;
+      }
 
-        let btwPercentage = 0;
-        if (!total && subtotal && btwValue) {
-          total = subtotal + btwValue;
+      this.setSupplierOrName(aws.VENDOR_NAME);
+      if (aws.INVOICE_RECEIPT_DATE) {
+        const date = new Date(aws.INVOICE_RECEIPT_DATE);
+        if (!isNaN(date.getTime())) {
+          this.getForm.date.setValue(date);
         }
-        if (total) {
-          btwPercentage = subtotal ? calculateBTW(total, subtotal) : 0;
-          this.addTotal(true, 0, total, btwPercentage);
-        }
+      }
+      if (aws.INVOICE_RECEIPT_ID) {
+        this.getForm.invoice.setValue(aws.INVOICE_RECEIPT_ID);
+      }
+      let total = awsExtractToNumberFormat(aws.TOTAL);
+      const btwValue = awsExtractToNumberFormat(aws.TAX);
+      const subtotal = awsExtractToNumberFormat(aws.SUBTOTAL);
+
+      let btwPercentage = 0;
+      if (!total && subtotal && btwValue) {
+        total = subtotal + btwValue;
+      }
+      if (total) {
+        btwPercentage = subtotal ? calculateBTW(total, subtotal) : 0;
+        this.addTotal(true, 0, total, btwPercentage);
       }
     });
 
@@ -268,33 +297,36 @@ export class ExpenseComponent {
 
   private resetCreateAnotherForm(): void {
     const formDirective = this.formDirective();
+    this.totals.clear();
+    this.totalMap = new Map();
     if (formDirective?.form) {
+      formDirective.resetForm();
       (formDirective as FormGroupDirective & { submitted: boolean }).submitted = false;
     }
 
-    this.form.reset();
+    this.getForm.invoice.reset('', { emitEvent: false });
+    this.getForm.supplyStore.reset('', { emitEvent: false });
+    this.getForm.date.reset(undefined, { emitEvent: false });
     this.errors.set({});
-    this.totals.clear();
-    this.totals.controls.forEach(control => {
-      control.markAsPristine({ emitEvent: false });
-      control.markAsUntouched({ emitEvent: false });
-    });
     this.form.markAsPristine({ emitEvent: false });
     this.form.markAsUntouched({ emitEvent: false });
-    this.totalMap = new Map();
+    this.form.updateValueAndValidity({ emitEvent: false });
   }
 
   submit() {
     const date = this.getForm.date.value;
-    const roomId = this.id();
     const uploadFile = this.file();
-    if (this.form.invalid || !roomId || !date || !uploadFile) {
+    if (this.form.invalid || !date || !uploadFile) {
       return;
     }
 
     const expense: IExpense = Expense.fromForm(this.getForm, date, this.expense(),
       this.totals.getRawValue() as unknown as ITotalExpense[]);
     const file = uploadFile.raw;
+    if (!this.expense() && this.createAnother) {
+      this.pendingCreateAnotherReset.set(true);
+      this.createAnotherRequestStarted.set(false);
+    }
     this.submitData.emit({ expense, file });
   }
 
@@ -393,6 +425,14 @@ export class ExpenseComponent {
 
   onSelectedFile(currentFile?: UploadFile) {
     this.file.set(currentFile);
+  }
+
+  get createAnother(): boolean {
+    return this.createAnotherState();
+  }
+
+  set createAnother(value: boolean) {
+    this.createAnotherState.set(value);
   }
 
   private setSupplierOrName(supplyStore: string = '') {

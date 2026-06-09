@@ -138,6 +138,7 @@
     "TITLE": "Add expense",
     "CREATED": "Expense {{invoice}} created",
     "DETAIL": "Update expense",
+    "CREATE_ANOTHER": "Create another",
     "LIST": {
       "COLUMN": {
         "INVOICE": "Invoice",

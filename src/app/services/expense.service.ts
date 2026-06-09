@@ -36,7 +36,10 @@ export class ExpenseService {
     this.updatePathVariable(roomId, ['info']),
   );
 
-  getExpense = (roomId: string, id: string): Observable<IExpenseAll | undefined> => this.http.get<IExpenseAll>(
+  getExpense = (
+    roomId: string,
+    id: string,
+  ): Observable<IExpenseAll | undefined> => this.http.get<IExpenseAll | undefined>(
     this.updatePathVariable(roomId, [id]),
   );
 
@@ -79,7 +82,7 @@ export class ExpenseService {
   private updatePathVariable(roomId: string, args?: (string | null | undefined)[]): string {
     let url = this.urlV1;
     if (args && args.length) {
-      url = `${this.urlV1}/${args.join('/')}`;
+      url = `${ this.urlV1 }/${ args.join('/') }`;
     }
     return url.replace('{roomId}', roomId);
   }

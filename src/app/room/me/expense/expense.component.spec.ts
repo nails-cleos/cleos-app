@@ -27,11 +27,15 @@ describe('ExpenseComponent', () => {
     info: ReturnType<typeof infoSignal.asReadonly>;
     subErrors: ReturnType<typeof subErrorsSignal.asReadonly>;
     response: ReturnType<typeof responseSignal.asReadonly>;
+    error: ReturnType<typeof errorSignal.asReadonly>;
+    isLoading: ReturnType<typeof isLoadingSignal.asReadonly>;
     loadInfo: jasmine.Spy;
   };
   const infoSignal = signal<any>(undefined);
   const subErrorsSignal = signal<any>(undefined);
   const responseSignal = signal<any>(undefined);
+  const errorSignal = signal<any>(undefined);
+  const isLoadingSignal = signal(false);
 
   let env: EnvService;
 
@@ -86,6 +90,8 @@ describe('ExpenseComponent', () => {
     infoSignal.set(undefined);
     subErrorsSignal.set(undefined);
     responseSignal.set(undefined);
+    errorSignal.set(undefined);
+    isLoadingSignal.set(false);
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -98,6 +104,8 @@ describe('ExpenseComponent', () => {
       info: infoSignal.asReadonly(),
       subErrors: subErrorsSignal.asReadonly(),
       response: responseSignal.asReadonly(),
+      error: errorSignal.asReadonly(),
+      isLoading: isLoadingSignal.asReadonly(),
       loadInfo: jasmine.createSpy('loadInfo'),
     };
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
@@ -260,9 +268,12 @@ describe('ExpenseComponent', () => {
   });
 
   it('should create expense and clean the form when createAnother is tick', () => {
-    fixture.componentRef.setInput('id', 'room-123');
+    fixture.componentRef.setInput('roomId', 'room-123');
     component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: mockFile });
     fixture.detectChanges();
+
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
     const supplyStoreControl = component.getForm.supplyStore;
     supplyStoreControl.setValue('New Expense');
@@ -278,7 +289,13 @@ describe('ExpenseComponent', () => {
     component.createAnother = true;
     expect(component.totals.length).toBe(1);
 
-    responseSignal.set({ success: true });
+    component.submit();
+    expect(emitSpy).toHaveBeenCalled();
+
+    isLoadingSignal.set(true);
+    fixture.detectChanges();
+
+    isLoadingSignal.set(false);
     fixture.detectChanges();
 
     expect(supplyStoreControl.value).toBe('');
