@@ -2,7 +2,7 @@ import '../support/commands';
 import { breakpointToButtons, devices } from '../support/utils';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
-  describe(`Additional with ${name}`, () => {
+  describe(`Discount with ${name}`, () => {
     beforeEach(() => cy.viewport(width, height));
 
     beforeEach(() => {

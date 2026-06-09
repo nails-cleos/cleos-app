@@ -13,7 +13,7 @@ import { ICommon } from '../interfaces/common';
 export class DiscountCreatePageComponent {
   private readonly discountStore = inject(DiscountStore);
   config: ICommon = {
-    title: 'COLOR.TITLE',
+    title: 'DISCOUNT.TITLE',
     button: { icon: 'add', label: 'COMMON.BUTTON.CREATE' },
   };
 
