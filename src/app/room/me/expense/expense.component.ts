@@ -206,7 +206,7 @@ export class ExpenseComponent {
         return;
       }
 
-      this.awsStore.clean();
+      this.awsStore.clean?.();
       this.file.set(undefined);
       this.resetCreateAnotherForm();
     });
@@ -263,7 +263,7 @@ export class ExpenseComponent {
 
     effect(() => {
       const supplyStore = this.selectedSupplyStore();
-      if (supplyStore && typeof supplyStore === 'string') {
+      if (supplyStore && typeof supplyStore === 'string' && this.getForm.supplyStore.value === supplyStore) {
         this.getForm.supplyStore.setValue({ id: '', name: supplyStore });
       }
     });

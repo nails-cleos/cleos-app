@@ -22,7 +22,7 @@ describe('ExpenseComponent', () => {
   let navigateSpy: jasmine.Spy;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
-  let awsStoreSpy: { data: ReturnType<typeof signal>; processPdf: jasmine.Spy };
+  let awsStoreSpy: { data: ReturnType<typeof signal>; processPdf: jasmine.Spy; clean: jasmine.Spy };
   let expenseStoreSpy: {
     info: ReturnType<typeof infoSignal.asReadonly>;
     subErrors: ReturnType<typeof subErrorsSignal.asReadonly>;
@@ -99,7 +99,11 @@ describe('ExpenseComponent', () => {
     }));
 
     driveAccessServiceSpy = jasmine.createSpyObj<DriveAccessService>('DriveAccessService', ['requestAccessIfNeeded']);
-    awsStoreSpy = { data: signal<any>(undefined), processPdf: jasmine.createSpy('processPdf') };
+    awsStoreSpy = {
+      data: signal<any>(undefined),
+      processPdf: jasmine.createSpy('processPdf'),
+      clean: jasmine.createSpy('clean'),
+    };
     expenseStoreSpy = {
       info: infoSignal.asReadonly(),
       subErrors: subErrorsSignal.asReadonly(),
@@ -148,6 +152,7 @@ describe('ExpenseComponent', () => {
     fixture = TestBed.createComponent(ExpenseComponent);
     component = fixture.componentInstance;
     fixture.componentRef.setInput('config', config);
+    fixture.componentRef.setInput('roomId', 'room-123');
     fixture.detectChanges();
   });
 
@@ -156,7 +161,7 @@ describe('ExpenseComponent', () => {
   });
 
   it('should load room expense info when id emits a value', () => {
-    fixture.componentRef.setInput('id', 'room-1');
+    fixture.componentRef.setInput('roomId', 'room-1');
     fixture.detectChanges();
 
     expect(expenseStoreSpy.loadInfo).toHaveBeenCalledWith('room-1');
@@ -187,7 +192,7 @@ describe('ExpenseComponent', () => {
   });
 
   it('should navigate to expense list when response emits', () => {
-    fixture.componentRef.setInput('id', 'room-1');
+    fixture.componentRef.setInput('roomId', 'room-1');
     responseSignal.set(true);
     fixture.detectChanges();
 
@@ -208,7 +213,6 @@ describe('ExpenseComponent', () => {
   });
 
   it('should emit submitData when form valid in add mode', () => {
-    fixture.componentRef.setInput('id', 'room-123');
     component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: mockFile });
     fixture.detectChanges();
     const emitSpy = jasmine.createSpy('emit');
@@ -238,7 +242,6 @@ describe('ExpenseComponent', () => {
   });
 
   it('should emit submitData with undefined file when raw file is undefined', () => {
-    fixture.componentRef.setInput('id', 'room-123');
     component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: undefined });
     fixture.detectChanges();
     const emitSpy = jasmine.createSpy('emit');
@@ -268,7 +271,6 @@ describe('ExpenseComponent', () => {
   });
 
   it('should create expense and clean the form when createAnother is tick', () => {
-    fixture.componentRef.setInput('roomId', 'room-123');
     component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: mockFile });
     fixture.detectChanges();
 
@@ -331,7 +333,6 @@ describe('ExpenseComponent', () => {
   it('should emit submitData when in edit mode and form valid', () => {
     const emitSpy = jasmine.createSpy('emit');
     component.submitData.subscribe(emitSpy);
-    fixture.componentRef.setInput('id', 'room-123');
     fixture.componentRef.setInput('expense', { ...mockExpense, document: { name: 'invoice.pdf' } } as IExpenseAll);
     fixture.detectChanges();
 
@@ -386,6 +387,7 @@ describe('ExpenseComponent', () => {
       SUBTOTAL: '€ 100.00',
       TAX: '€ 21',
     };
+    component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: mockFile });
     awsStoreSpy.data.set(awsData);
     fixture.detectChanges();
 
@@ -401,12 +403,13 @@ describe('ExpenseComponent', () => {
 
   it('should set correct data when receive partial aws data', () => {
     const awsData = {
-      VENDOR_NAME: 'VENDOR_NAME',
+      VENDOR_NAME: 'vendor_name',
       SUBTOTAL: '€ 100.00',
       TAX: '€ 21',
     };
 
     infoSignal.set({ supplyStores: mockSuppliers });
+    component['file'].set({ name: 'invoice.pdf', size: 1000, progress: 100, raw: mockFile });
     awsStoreSpy.data.set(awsData);
     fixture.detectChanges();
 

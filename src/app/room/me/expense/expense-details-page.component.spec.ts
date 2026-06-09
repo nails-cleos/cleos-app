@@ -21,6 +21,8 @@ describe('ExpenseDetailsPageComponent', () => {
     info: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
+    error: ReturnType<typeof signal>;
+    isLoading: ReturnType<typeof signal>;
     clean: jasmine.Spy;
     loadInfo: jasmine.Spy;
     loadById: jasmine.Spy;
@@ -42,6 +44,8 @@ describe('ExpenseDetailsPageComponent', () => {
       info: signal<any>(undefined),
       subErrors: signal<any>(undefined),
       response: signal<any>(undefined),
+      error: signal<any>(undefined),
+      isLoading: signal(false),
       clean: jasmine.createSpy('clean'),
       loadInfo: jasmine.createSpy('loadInfo'),
       loadById: jasmine.createSpy('loadById'),
@@ -52,7 +56,10 @@ describe('ExpenseDetailsPageComponent', () => {
       imports: [ExpenseDetailsPageComponent, TranslateModule.forRoot()],
       providers: [
         { provide: ExpenseStore, useValue: expenseStoreSpy },
-        { provide: AwsStore, useValue: { data: signal(undefined), processPdf: jasmine.createSpy('processPdf') } },
+        {
+          provide: AwsStore,
+          useValue: { data: signal(undefined), processPdf: jasmine.createSpy('processPdf'), clean: jasmine.createSpy('clean') },
+        },
         { provide: AuthUserService, useValue: { authUser: signal({ userId: 'user-1' }) } },
         { provide: DriveAccessService, useValue: { requestAccessIfNeeded: jasmine.createSpy('requestAccessIfNeeded') } },
         { provide: NavigationService, useValue: { back: jasmine.createSpy('back') } },
@@ -62,7 +69,7 @@ describe('ExpenseDetailsPageComponent', () => {
     }).overrideTemplate(ExpenseComponent, '')
       .overrideTemplate(ExpenseDetailsPageComponent, `
         @if (expense(); as expense) {
-          <app-expense [expense]="expense" [config]="config" />
+          <app-expense [roomId]="id()" [expense]="expense" [config]="config" />
         }
       `)
       .compileComponents();
