@@ -8,9 +8,9 @@ import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth
 import { NavigationService } from '../../services/navigation.service';
 import { ICommon } from '../../interfaces/common';
 import { FrequencyEnum } from '../../util/helper';
-import { IAvailability, IRoomAll } from '../../interfaces/room';
-import { IUnavailableAll } from '../../interfaces/unavailable';
-import { IUserAll } from '../../interfaces/user';
+import { IAvailability, IRoomAll } from '../../room/room';
+import { IUnavailableAll } from '../unavailable';
+import { IUserAll } from '../../user/user';
 import { API_LOCALE, createNewDate, formatDuration, getTime, zoneDateToDate } from '../../util/dates';
 import { UnavailableStore } from '../../store/unavailable.store';
 import { BlockAgendaComponent } from './block-agenda.component';

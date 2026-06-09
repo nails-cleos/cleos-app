@@ -7,7 +7,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BankComponent, BankForm } from '../../../shared/bank/bank.component';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
-import { IReservationPayment } from '../../../interfaces/reservation';
+import { IReservationPayment } from '../../../reservation/reservation';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 import { getPaymentOptionsPipe, getSelectedPaymentPipe } from '../../../store/selectors/payment.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';

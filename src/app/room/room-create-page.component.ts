@@ -1,12 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RoomComponent } from './room.component';
 import { ICommon } from '../interfaces/common';
+import { IRoom } from './room';
+import { RoomStore } from '../store/room.store';
 import { Store } from '@ngrx/store';
-import { RoomState } from '../store/reducers/room.reducers';
-import { createRoom } from '../store/actions/room.actions';
-import { IRoom } from '../interfaces/room';
-import { getCurrenciesPipe, getOfficesPipe } from '../store/selectors/room.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { PaymentState } from '../store/reducers/payment.reducers';
+import { getOptions } from '../store/actions/payment.actions';
 
 @Component({
   selector: 'app-room-create-page',
@@ -20,12 +19,19 @@ export class RoomCreatePageComponent {
     button: { icon: 'add', label: 'COMMON.BUTTON.CREATE' },
   };
 
-  private readonly store: Store<RoomState> = inject(Store<RoomState>);
+  private readonly roomStore = inject(RoomStore);
+  private readonly paymentStore: Store<PaymentState> = inject(Store<PaymentState>);
 
-  currencies = toSignal(this.store.pipe(getCurrenciesPipe));
-  offices = toSignal(this.store.pipe(getOfficesPipe));
+  currencies = this.roomStore.currencies;
+  offices = this.roomStore.offices;
+
+  constructor() {
+    this.roomStore.clean();
+    this.roomStore.loadInfo();
+    this.paymentStore.dispatch(getOptions());
+  }
 
   submit(room: IRoom) {
-    this.store.dispatch(createRoom({ room }));
+    this.roomStore.create(room);
   }
 }

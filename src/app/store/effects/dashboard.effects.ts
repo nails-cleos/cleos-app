@@ -33,7 +33,7 @@ import {
   IRoomEvents,
   IYearRoomExport,
   IYearRoomSummary,
-} from '../../interfaces/dashboard';
+} from '../../dashboard/dashboard';
 
 @Injectable()
 export class DashboardEffects {

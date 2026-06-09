@@ -21,20 +21,20 @@ import {
   snakeToCamel,
 } from './helper';
 import { Role } from '../interfaces/token';
-import { IUser, IUserAll } from '../interfaces/user';
-import { IAddress, IRoomAll, ServiceType } from '../interfaces/room';
-import { ICurrency, ICurrencyAll } from '../interfaces/currency';
-import { GroupService, IPrice, ITreatmentAll, Price } from '../interfaces/treatment';
-import { IExtras, IReservationAll } from '../interfaces/reservation';
+import { IUser, IUserAll } from '../user/user';
+import { IAddress, IRoomAll, ServiceType } from '../room/room';
+import { ICurrency, ICurrencyAll } from '../currency/currency';
+import { GroupService, IPrice, ITreatmentAll, Price } from '../treatment/treatment';
+import { IExtras, IReservationAll } from '../reservation/reservation';
 import { getCurrentTimeZone } from './dates';
 import { IPayment } from '../interfaces/payment';
-import { DiscountType, IDiscount } from '../interfaces/discount';
-import { IAdditionalAll } from '../interfaces/additional';
+import { DiscountType, IDiscount } from '../discount/discount';
+import { IAdditionalAll } from '../additional/additional';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
-import { IOffice } from '../interfaces/office';
-import { IColorAll } from '../interfaces/color';
+import { IOffice } from '../office/office';
+import { IColorAll } from '../color/color';
 
 describe('Helper Utils', () => {
   const userAll: IUserAll = {

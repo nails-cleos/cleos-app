@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { IAccountAll } from '../../interfaces/account';
+import { IAccountAll } from '../account';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CurrencyPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';

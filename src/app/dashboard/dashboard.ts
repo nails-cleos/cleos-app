@@ -1,9 +1,9 @@
 import { ThemePalette } from '@angular/material/core';
 import { ChartType } from 'chart.js';
 import { EventColor } from 'calendar-utils';
-import { IAvailability } from './room';
-import { ICurrency, ICurrencyAll } from './currency';
-import { States } from './reservation';
+import { IAvailability } from '../room/room';
+import { ICurrency, ICurrencyAll } from '../currency/currency';
+import { States } from '../reservation/reservation';
 import { FrequencyEnum } from '../util/helper';
 
 export interface IDashboard {

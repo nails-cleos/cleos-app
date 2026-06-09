@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
-import { IAuthority } from '../../interfaces/user';
+import { IAuthority } from '../../user/user';
 import { Role } from '../../interfaces/token';
 import { Store } from '@ngrx/store';
 import { TokenService } from '../../services/token.service';

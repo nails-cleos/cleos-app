@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TreatmentTableComponent } from './treatment-table.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { ITreatmentAll } from '../../interfaces/treatment';
-import { ServiceType } from '../../interfaces/room';
+import { ITreatmentAll } from '../treatment';
+import { ServiceType } from '../../room/room';
 import { convertDuration } from '../../util/dates';
 
 describe('TreatmentTableComponent', () => {

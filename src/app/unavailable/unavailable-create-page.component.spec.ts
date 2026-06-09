@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { UnavailableCreatePageComponent } from './unavailable-create-page.component';
 import { UnavailableStore } from '../store/unavailable.store';
-import { IUnavailableAll } from '../interfaces/unavailable';
+import { IUnavailableAll } from './unavailable';
 import { AuthUserService } from '../services/auth-user.service';
 
 describe('UnavailableCreatePageComponent', () => {

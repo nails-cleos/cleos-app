@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ITreatmentAll } from '../../interfaces/treatment';
+import { ITreatmentAll } from '../treatment';
 import { TreatmentStore } from '../../store/treatment.store';
 import {
   DragDropSortingComponent,

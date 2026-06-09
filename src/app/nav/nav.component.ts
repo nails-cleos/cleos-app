@@ -2,11 +2,11 @@ import { Component, computed, effect, ElementRef, HostListener, inject, signal, 
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ActivatedRoute, NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { IUser, User } from '../interfaces/user';
+import { IUser, User } from '../user/user';
 import { logOut, redirect } from '../store/actions/auth.actions';
 import { getNotificationsPage, readNotification } from '../store/actions/notification.actions';
 import { updateMyUser } from '../store/actions/user.actions';
-import { INotification } from '../interfaces/notification';
+import { INotification } from '../notification/notification';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessagingService } from '../services/messaging.service';
 import { getDisplayNameInitials, getLocale, getUserImage } from '../util/helper';

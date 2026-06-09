@@ -1,11 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { CalendarEvent } from 'angular-calendar';
-import { IAdditionalAll } from '../interfaces/additional';
-import { IUnavailableAll } from '../interfaces/unavailable';
-import { IUserAll } from '../interfaces/user';
-import { IRoomAll, IService } from '../interfaces/room';
-import { Day, IReservationAll } from '../interfaces/reservation';
+import { IAdditionalAll } from '../additional/additional';
+import { IUnavailableAll } from '../unavailable/unavailable';
+import { IUserAll } from '../user/user';
+import { IRoomAll, IService } from '../room/room';
+import { Day, IReservationAll } from './reservation';
 import {
   createNewDate,
   dateToTimestamp,

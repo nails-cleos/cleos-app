@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { OfficeCreatePageComponent } from './office-create-page.component';
 import { OfficeStore } from '../store/office.store';
-import { IOfficeAll } from '../interfaces/office';
+import { IOfficeAll } from './office';
 
 describe('OfficeCreatePageComponent', () => {
   let component: OfficeCreatePageComponent;

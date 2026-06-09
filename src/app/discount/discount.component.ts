@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Discount, DiscountForm, DiscountType, IDiscount, IDiscountAll } from '../interfaces/discount';
+import { Discount, DiscountForm, DiscountType, IDiscount, IDiscountAll } from './discount';
 import { Router } from '@angular/router';
-import { ICurrency } from '../interfaces/currency';
+import { ICurrency } from '../currency/currency';
 import { requireMatch } from '../util/validators';
 import { map, startWith } from 'rxjs/operators';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';

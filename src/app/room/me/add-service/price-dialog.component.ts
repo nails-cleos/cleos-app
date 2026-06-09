@@ -8,7 +8,7 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { ServiceType } from '../../../interfaces/room';
+import { ServiceType } from '../../room';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';

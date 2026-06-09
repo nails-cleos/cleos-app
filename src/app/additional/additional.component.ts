@@ -11,8 +11,8 @@ import {
 } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Additional, AdditionalForm, IAdditional, IAdditionalAll } from '../interfaces/additional';
-import { ITreatmentGroupAll } from '../interfaces/treatment';
+import { Additional, AdditionalForm, IAdditional, IAdditionalAll } from './additional';
+import { ITreatmentGroupAll } from '../treatment/treatment';
 import { map, startWith } from 'rxjs/operators';
 import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';

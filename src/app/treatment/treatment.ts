@@ -1,8 +1,8 @@
 import { FormControl } from '@angular/forms';
-import { IDiscount, IUserDiscount } from './discount';
-import { IService } from './room';
-import { IColorAll } from './color';
-import { PENALTY } from './payment';
+import { IDiscount, IUserDiscount } from '../discount/discount';
+import { IService } from '../room/room';
+import { IColorAll } from '../color/color';
+import { PENALTY } from '../interfaces/payment';
 import { areEquals } from '../util/helper';
 import { fieldChange } from '../util/validators';
 
@@ -201,19 +201,7 @@ export class Treatment implements ITreatment {
   }
 }
 
-export class TreatmentGroup implements ITreatmentGroup {
-  name?: string;
-  description?: string;
-  priceFrom?: string;
-  colorIds?: string[];
-  treatments?: ITreatment[];
-
-  private constructor(treatmentForm: TreatmentForm) {
-    this.name = treatmentForm.name.value;
-    this.description = treatmentForm.description.value;
-    this.priceFrom = treatmentForm.priceFrom.value;
-  }
-
+export class TreatmentGroup {
   static fromForm(
     treatmentForm: TreatmentForm,
     currentGroup?: ITreatmentGroupAll,
@@ -221,17 +209,15 @@ export class TreatmentGroup implements ITreatmentGroup {
     newColorIds: string[] = [],
     currentColorIds: string[] = [],
   ): ITreatmentGroup {
-    const treatmentGroup = new TreatmentGroup(treatmentForm);
-    treatmentGroup.name = fieldChange(treatmentForm.name, currentGroup?.name);
-    treatmentGroup.description = fieldChange(treatmentForm.description, currentGroup?.description);
-    treatmentGroup.priceFrom = fieldChange(treatmentForm.priceFrom, currentGroup?.priceFrom);
-    treatmentGroup.treatments = treatments;
-
-    if (!areEquals(newColorIds, currentColorIds)) {
-      treatmentGroup.colorIds = newColorIds;
-    }
-
-    return treatmentGroup;
+    return {
+      name: fieldChange(treatmentForm.name, currentGroup?.name),
+      description: fieldChange(treatmentForm.description, currentGroup?.description),
+      priceFrom: fieldChange(treatmentForm.priceFrom, currentGroup?.priceFrom),
+      treatments,
+      ...(!areEquals(newColorIds, currentColorIds) && {
+        colorIds: newColorIds,
+      }),
+    };
   }
 }
 

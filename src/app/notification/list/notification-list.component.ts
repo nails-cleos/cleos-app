@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { INotification } from '../../interfaces/notification';
+import { INotification } from '../notification';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../../services/navigation.service';

@@ -2,7 +2,7 @@ import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { USER_FEATURE_KEY, UserState } from '../reducers/user.reducers';
-import { IUserAll } from '../../interfaces/user';
+import { IUserAll } from '../../user/user';
 import { Role } from '../../interfaces/token';
 import { map } from 'rxjs/operators';
 

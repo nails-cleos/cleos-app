@@ -11,7 +11,7 @@ import {
   IPaymentStatus,
   PaymentPercentage,
 } from '../interfaces/payment';
-import { IReservationPayment } from '../interfaces/reservation';
+import { IReservationPayment } from '../reservation/reservation';
 import { IApiResponse } from '../interfaces/common';
 
 describe('PaymentService', () => {

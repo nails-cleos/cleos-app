@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
 import { IApiResponse, PageRequest } from '../interfaces/common';
-import { IExpense, IExpenseAll, IExpenseInfo } from '../interfaces/expense';
+import { IExpense, IExpenseAll, IExpenseInfo } from '../room/me/expense/expense';
 import { Pagination } from '../interfaces/pagination';
 import { ExpenseService } from '../services/expense.service';
 import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';

@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { paginated, Pagination } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
-import { IAdditional, IAdditionalAll } from '../interfaces/additional';
+import { IAdditional, IAdditionalAll } from '../additional/additional';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';

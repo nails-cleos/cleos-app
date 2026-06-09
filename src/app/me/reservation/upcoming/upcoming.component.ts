@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { IUpcomingAll } from '../../../interfaces/reservation';
+import { IUpcomingAll } from '../../../reservation/reservation';
 import { customerEditDialog, getPrice, openDialog } from '../../../util/helper';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { createNewDate, isSameTimeZone, newDateTimestamp, reservationDuration } from '../../../util/dates';

@@ -12,19 +12,17 @@ import {
 } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { requireMatch, valueChange } from '../../../util/validators';
-import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
-import { IRoom, IRoomAll, IService } from '../../../interfaces/room';
+import { requireMatch } from '../../../util/validators';
+import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../treatment/treatment';
+import { IRoom, IRoomAll, IService } from '../../../room/room';
 import {
   IAvailableDTO,
-  IReservation,
   IReservationAll,
   IUpcomingAll,
   MAX_RESERVATION_CUSTOMER_MONTH,
   Reservation,
-} from '../../../interfaces/reservation';
+} from '../../../reservation/reservation';
 import {
-  API_LOCALE,
   createNewDate,
   Duration,
   filterDateRoom,
@@ -32,7 +30,6 @@ import {
   formatDateTwoDigit,
   formatFullDateTime,
   formatTime,
-  getCurrentTimeZone,
   getNowTimeZone,
   getTime,
   IDuration,
@@ -72,19 +69,18 @@ import {
   roomDetail,
   round,
 } from '../../../util/helper';
-import { DiscountType, IDiscount, IUserDiscount } from '../../../interfaces/discount';
+import { DiscountType, IDiscount, IUserDiscount } from '../../../discount/discount';
 import { isEqual } from 'date-fns';
-import { IAdditionalAll } from '../../../interfaces/additional';
+import { IAdditionalAll } from '../../../additional/additional';
 import { MatDivider, MatListOption, MatSelectionList } from '@angular/material/list';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
-import { IOffice, IOfficeAll } from '../../../interfaces/office';
-import { IStep, Step } from '../../../interfaces/step';
+import { IOffice, IOfficeAll } from '../../../office/office';
 import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../../interfaces/token';
-import { IUser, IUserAll } from '../../../interfaces/user';
+import { IUser, IUserAll } from '../../../user/user';
 import { IPaymentOption, PaymentPercentage, PENALTY } from '../../../interfaces/payment';
 import { AuthUserService } from '../../../services/auth-user.service';
-import { enableStep, getBackIndex, getIndex } from '../../../util/step';
+import { enableStep, getBackIndex, getIndex, IStep, Step } from '../../../util/step';
 import { RoomNamePipe } from '../../../pipes/room-name.pipe';
 import { SortByPipe } from '../../../pipes/sort-by.pipe';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
@@ -110,7 +106,16 @@ import { IError } from '../../../interfaces/common';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { BankForm } from '../../../shared/bank/bank.component';
 import { FirebaseService } from '../../../services/firebase.service';
-import { OfficeForm } from '../../../reservation/reservation-form.types';
+import {
+  createMeReservationErrors,
+  MeReservationAcceptForm,
+  MeReservationErrors,
+  MeReservationEventForm,
+  MeReservationFormField,
+  MeReservationForms,
+  MeReservationTreatmentForm,
+  OfficeForm,
+} from '../../../reservation/reservation-form.types';
 import { ReservationFormErrorService } from '../../../reservation/reservation-form-error.service';
 import { getPaymentOptionsPipe } from '../../../store/selectors/payment.selectors';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
@@ -127,25 +132,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 
 const MAX_UPCOMING_RESERVATION = 10;
 
-type TreatmentForm = {
-  treatment: FormControl<IService | undefined>;
-  discount: FormControl<string | undefined>;
-  startDate: FormControl<Date | undefined>;
-  group: FormControl<IGroupService | undefined>;
-};
-
-type EventForm = {
-  event: FormControl<Date | undefined>;
-};
-
-type AcceptForm = {
-  accept: FormControl<boolean>;
-  phone: FormControl<string | undefined>;
-};
-
 type AvailabilityData = { time: string; date: Date }
-
-type MeReservationField = keyof TreatmentForm | keyof EventForm | keyof BankForm | keyof AcceptForm | keyof OfficeForm;
 
 const ME_RESERVATION_ERROR_FIELDS = [
   'room',
@@ -160,7 +147,7 @@ const ME_RESERVATION_ERROR_FIELDS = [
   'percentage',
   'accept',
   'phone',
-] as const satisfies readonly MeReservationField[];
+] as const satisfies readonly MeReservationFormField[];
 
 @Component({
   selector: 'app-me-reservation',
@@ -248,9 +235,9 @@ export class MeReservationComponent {
   private picker = viewChild<MatDatepicker<Date>>('picker');
   private additionalLists = viewChildren<MatSelectionList>('additional');
 
-  errors = signal<Partial<Record<MeReservationField, string>> & { schedule?: boolean }>({});
+  errors = signal<MeReservationErrors>(createMeReservationErrors());
 
-  treatmentForm: FormGroup<TreatmentForm> = this.formBuilder.group<TreatmentForm>({
+  treatmentForm: FormGroup<MeReservationTreatmentForm> = this.formBuilder.group<MeReservationTreatmentForm>({
     treatment: this.formBuilder.control(undefined, {
       validators: [Validators.required, requireMatch],
     }),
@@ -263,7 +250,7 @@ export class MeReservationComponent {
     }),
   });
 
-  eventGroup: FormGroup<EventForm> = this.formBuilder.group<EventForm>({
+  eventGroup: FormGroup<MeReservationEventForm> = this.formBuilder.group<MeReservationEventForm>({
     event: this.formBuilder.control(undefined, {
       validators: [Validators.required],
     }),
@@ -286,7 +273,7 @@ export class MeReservationComponent {
     percentage: this.formBuilder.control(undefined),
   });
 
-  acceptForm: FormGroup<AcceptForm> = this.formBuilder.group<AcceptForm>({
+  acceptForm: FormGroup<MeReservationAcceptForm> = this.formBuilder.group<MeReservationAcceptForm>({
     accept: this.formBuilder.control(false, {
       validators: [Validators.required],
     }),
@@ -295,7 +282,7 @@ export class MeReservationComponent {
     }),
   });
 
-  form = this.formBuilder.group({
+  form: FormGroup<MeReservationForms> = this.formBuilder.group<MeReservationForms>({
     officeForm: this.officeForm,
     treatmentForm: this.treatmentForm,
     eventGroup: this.eventGroup,
@@ -848,24 +835,28 @@ export class MeReservationComponent {
     return createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
   }
 
-  get getTreatmentForm(): TreatmentForm {
-    return this.treatmentForm.controls;
+  private get getForm(): MeReservationForms {
+    return this.form.controls;
+  }
+
+  get getTreatmentForm(): MeReservationTreatmentForm {
+    return this.getForm.treatmentForm.controls;
   }
 
   get getOfficeForm(): OfficeForm {
-    return this.officeForm.controls;
+    return this.getForm.officeForm.controls;
   }
 
-  get getEventForm(): EventForm {
-    return this.eventGroup.controls;
+  get getEventForm(): MeReservationEventForm {
+    return this.getForm.eventGroup.controls;
   }
 
-  get getAcceptForm(): AcceptForm {
-    return this.acceptForm.controls;
+  get getAcceptForm(): MeReservationAcceptForm {
+    return this.getForm.acceptForm.controls;
   }
 
   get getTypeForm(): BankForm {
-    return this.typeForm.controls;
+    return this.getForm.typeForm.controls;
   }
 
   get paymentToPay(): number {
@@ -953,32 +944,25 @@ export class MeReservationComponent {
     if (this.acceptForm.invalid) {
       return;
     }
-    const reservation: IReservation = new Reservation();
-    reservation.customerId = this.customerId();
-    reservation.roomId = this.getOfficeForm.room.value?.id;
-    reservation.professionalId = this.getOfficeForm.professional.value?.id;
-    if (this.date) {
-      reservation.start = this.date.toLocaleString(API_LOCALE);
-      reservation.timeZone = getCurrentTimeZone();
-    }
-    reservation.additionalIds = this.additionalSelected()?.map(value => value.id);
-    reservation.phone = this.getAcceptForm.phone.value;
-
     const role = Role.customer;
     const option = this.getTypeForm.option?.value;
+    let payment = undefined;
     if (option && option.type.toLowerCase() !== 'account') {
       const percentage = this.getTypeForm.percentage?.value || PaymentPercentage.total;
 
-      reservation.payment = { type: option.type, percentage };
+      payment = { type: option.type, percentage };
     }
+    const reservation = Reservation.fromMeForm(
+      this.getForm,
+      this.customerId(),
+      this.date,
+      this.additionalSelected()?.map(value => value.id),
+      payment,
+      this.isEditing ? this.reservation : undefined,
+    );
     if (this.isEditing && this.reservation) {
-      reservation.id = this.reservation.id;
-      reservation.treatmentId = valueChange(this.getTreatmentForm.treatment.value?.id, this.reservation.treatment.id);
-
       this.store.dispatch(updateReservationById({ id: this.reservation.id, reservation, role }));
     } else {
-      reservation.treatmentId = this.getTreatmentForm.treatment.value?.id;
-      reservation.discountId = this.getTreatmentForm.discount.value;
       this.store.dispatch(createReservation({ reservation, role }));
     }
   }
@@ -1386,7 +1370,7 @@ export class MeReservationComponent {
   private applySubErrors = (subErrors: IError[]): void => {
     const state = this.formErrorService.createErrorState(subErrors, {
       allowedFields: ME_RESERVATION_ERROR_FIELDS,
-      createErrors: () => ({} as Partial<Record<MeReservationField, string>> & { schedule?: boolean }),
+      createErrors: createMeReservationErrors,
       defaultStepIndex: 0,
       stepByField: { startDate: 1 },
     });
@@ -1400,16 +1384,16 @@ export class MeReservationComponent {
         this.getOfficeForm[field as keyof OfficeForm]?.setErrors({ incorrect: true });
       }
       if (field in this.getTreatmentForm) {
-        this.getTreatmentForm[field as keyof TreatmentForm]?.setErrors({ incorrect: true });
+        this.getTreatmentForm[field as keyof MeReservationTreatmentForm]?.setErrors({ incorrect: true });
       }
       if (field in this.getEventForm) {
-        this.getEventForm[field as keyof EventForm]?.setErrors({ incorrect: true });
+        this.getEventForm[field as keyof MeReservationEventForm]?.setErrors({ incorrect: true });
       }
       if (field in this.getTypeForm) {
         this.getTypeForm[field as keyof BankForm]?.setErrors({ incorrect: true });
       }
       if (field in this.getAcceptForm) {
-        this.getAcceptForm[field as keyof AcceptForm]?.setErrors({ incorrect: true });
+        this.getAcceptForm[field as keyof MeReservationAcceptForm]?.setErrors({ incorrect: true });
       }
     });
 

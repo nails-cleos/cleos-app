@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TreatmentComponent } from './treatment.component';
-import { IColorAll } from '../interfaces/color';
-import { ITreatmentGroupAll } from '../interfaces/treatment';
+import { IColorAll } from '../color/color';
+import { ITreatmentGroupAll } from './treatment';
 import { TreatmentStore } from '../store/treatment.store';
 
 describe('TreatmentComponent', () => {

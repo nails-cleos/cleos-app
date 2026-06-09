@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { ExpenseService } from './expense.service';
 import { SortDirection } from '@angular/material/sort';
-import { IExpense } from '../interfaces/expense';
+import { IExpense } from '../room/me/expense/expense';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { of } from 'rxjs';
 

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ICommon } from '../interfaces/common';
-import { ITreatmentGroup } from '../interfaces/treatment';
+import { ITreatmentGroup } from './treatment';
 import { TreatmentStore } from '../store/treatment.store';
 import { TreatmentComponent } from './treatment.component';
 

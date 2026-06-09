@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoteCreatePageComponent } from './note-create-page.component';
 import { NoteStore } from '../store/note.store';
-import { INoteAll } from '../interfaces/note';
-import { IUserAll } from '../interfaces/user';
+import { INoteAll } from './note';
+import { IUserAll } from '../user/user';
 import { FrequencyEnum } from '../util/helper';
 
 describe('NoteCreatePageComponent', () => {

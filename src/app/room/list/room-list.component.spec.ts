@@ -1,27 +1,32 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject, of } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { IAddress, IRoomAll } from '../../interfaces/room';
+import { IAddress, IRoomAll } from '../room';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { deleteRoom, getRoomsPage, roomSelected } from '../../store/actions/room.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { RoomState } from '../../store/reducers/room.reducers';
 import { RoomListComponent } from './room-list.component';
-import { ICurrencyAll } from '../../interfaces/currency';
+import { ICurrencyAll } from '../../currency/currency';
 import { getCurrentTimeZone } from '../../util/dates';
 import { MatDialog } from '@angular/material/dialog';
+import { RoomStore } from '../../store/room.store';
 
 describe('RoomListComponent', () => {
   let component: RoomListComponent;
   let fixture: ComponentFixture<RoomListComponent>;
-  let storeSpy: jasmine.SpyObj<Store<RoomState>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let translate: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let roomStoreSpy: {
+    data: ReturnType<typeof signal<any>>;
+    response: ReturnType<typeof signal<any>>;
+    clean: jasmine.Spy;
+    loadPage: jasmine.Spy;
+    selectAndNavigate: jasmine.Spy;
+    delete: jasmine.Spy;
+  };
 
   const address: IAddress = {
     id: 1,
@@ -63,13 +68,9 @@ describe('RoomListComponent', () => {
     totalElements: 2,
   };
 
-  let roomList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    roomList$ = new BehaviorSubject(mockPagination);
-    response$ = new BehaviorSubject<any>(undefined);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -78,9 +79,16 @@ describe('RoomListComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    roomStoreSpy = {
+      data: signal(mockPagination),
+      response: signal(undefined),
+      clean: jasmine.createSpy('clean'),
+      loadPage: jasmine.createSpy('loadPage'),
+      selectAndNavigate: jasmine.createSpy('selectAndNavigate'),
+      delete: jasmine.createSpy('delete'),
+    };
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
@@ -88,25 +96,12 @@ describe('RoomListComponent', () => {
       },
     });
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return roomList$.asObservable();
-        case 2:
-          return response$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [RoomListComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: RoomStore, useValue: roomStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MatDialog, useValue: dialogSpy },
@@ -123,8 +118,6 @@ describe('RoomListComponent', () => {
   });
 
   afterEach(() => {
-    roomList$.complete();
-    response$.complete();
     breakpoint$.complete();
   });
 
@@ -133,7 +126,7 @@ describe('RoomListComponent', () => {
   });
 
   it('should compute dataSourceSignal correctly', () => {
-    roomList$.next(mockPagination);
+    roomStoreSpy.data.set(mockPagination);
     fixture.detectChanges();
 
     const data = component.dataSourceSignal() as any;
@@ -141,7 +134,7 @@ describe('RoomListComponent', () => {
   });
 
   it('should compute resultsLengthSignal correctly', () => {
-    roomList$.next(mockPagination);
+    roomStoreSpy.data.set(mockPagination);
     fixture.detectChanges();
 
     expect(component.resultsLengthSignal()).toBe(2);
@@ -173,50 +166,41 @@ describe('RoomListComponent', () => {
     expect(component.pageSizeSignal()).toBe(PAGE_SIZE);
   });
 
-  it('should dispatch getRoomPage when paginatorPageIndex changes', () => {
+  it('should load room page when paginatorPageIndex changes', () => {
     const paginator = component['paginator']();
 
     paginator!.pageIndex = 1;
     paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getRoomsPage({
-        page: 1,
-        sort: 'office',
-        direction: 'asc',
-        size: PAGE_SIZE,
-      }),
-    );
+    expect(roomStoreSpy.loadPage).toHaveBeenCalledWith({
+      page: 1,
+      sort: 'office',
+      direction: 'asc',
+      size: PAGE_SIZE,
+    });
   });
 
-  it('should dispatch clean and reset paginator when responseSignal emits', () => {
+  it('should clear response and reset paginator when response emits', () => {
     const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
 
     component['paginator'] = signal(paginatorMock);
 
-    response$.next({ success: true });
+    roomStoreSpy.response.set({ success: true });
 
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getRoomsPage({
-        page: 0,
-        sort: 'office',
-        direction: 'asc',
-        size: PAGE_SIZE,
-      }),
-    );
+    expect(roomStoreSpy.clean).toHaveBeenCalled();
   });
 
-  it('should dispatch roomSelected when edit is called', () => {
+  it('should select and navigate when edit is called', () => {
     const item = mockRooms[0];
     component.edit(item);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(roomSelected({ selected: item, redirect: true }));
+    expect(roomStoreSpy.selectAndNavigate).toHaveBeenCalledWith(item);
   });
 
-  it('should dispatch deleteRoom when dialog returns a result', () => {
+  it('should call delete when dialog returns a result', () => {
     const item = mockRooms[0];
     dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
@@ -224,6 +208,6 @@ describe('RoomListComponent', () => {
 
     component.delete(item);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteRoom({ id: item.id!, room: item }));
+    expect(roomStoreSpy.delete).toHaveBeenCalledWith(item);
   });
 });

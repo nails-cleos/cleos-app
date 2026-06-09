@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Currency, CurrencyForm, ICurrency, ICurrencyAll } from '../interfaces/currency';
+import { Currency, CurrencyForm, ICurrency, ICurrencyAll } from './currency';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { ICommon, IError } from '../interfaces/common';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';

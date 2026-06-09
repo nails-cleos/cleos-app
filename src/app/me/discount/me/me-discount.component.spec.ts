@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
+import { DiscountType, IUserDiscount } from '../../../discount/discount';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { ActivatedRoute, Router } from '@angular/router';
 import { signal } from '@angular/core';

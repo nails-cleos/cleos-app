@@ -1,9 +1,9 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
-import { ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
+import { ICatalogue, ICatalogueAll } from '../catalogue/catalogue';
 import { IApiResponse } from '../interfaces/common';
-import { ITreatmentGroupAll } from '../interfaces/treatment';
+import { ITreatmentGroupAll } from '../treatment/treatment';
 import { CatalogueService } from '../services/catalogue.service';
 import { TreatmentService } from '../services/treatment.service';
 import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';

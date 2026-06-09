@@ -7,8 +7,8 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { IPrice } from '../../../interfaces/treatment';
-import { ICurrency } from '../../../interfaces/currency';
+import { IPrice } from '../../../treatment/treatment';
+import { ICurrency } from '../../../currency/currency';
 import { IPaymentOption, PENALTY } from '../../../interfaces/payment';
 import { PriceComponent } from '../../price/price.component';
 import { TranslatePipe } from '@ngx-translate/core';

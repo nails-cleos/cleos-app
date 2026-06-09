@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { createNewDate, newDateTimestamp, reservationDuration } from '../../../util/dates';
 import { getPrice } from '../../../util/helper';
-import { IReview } from '../../../interfaces/review';
-import { IReservationAll } from '../../../interfaces/reservation';
-import { IPrice } from '../../../interfaces/treatment';
+import { IReview } from '../list/review';
+import { IReservationAll } from '../../../reservation/reservation';
+import { IPrice } from '../../../treatment/treatment';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,

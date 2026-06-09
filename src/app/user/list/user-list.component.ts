@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
-import { IUser, IUserAll, User } from '../../interfaces/user';
+import { IUser, IUserAll, User } from '../user';
 import { Store } from '@ngrx/store';
 import {
   cleanUser,

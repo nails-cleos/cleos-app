@@ -1,4 +1,4 @@
-import { Pagination } from './pagination';
+import { Pagination } from '../interfaces/pagination';
 
 export interface INotification {
   id: string;

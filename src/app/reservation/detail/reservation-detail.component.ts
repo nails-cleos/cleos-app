@@ -14,7 +14,7 @@ import {
   updateReservationDiscount,
   updateReservationNote,
 } from '../../store/actions/reservation.actions';
-import { CancelOption, IFabMenu, IReservationAll, IUpcomingAll, States } from '../../interfaces/reservation';
+import { CancelOption, IFabMenu, IReservationAll, IUpcomingAll, States } from '../reservation';
 import { Router, RouterLink } from '@angular/router';
 import {
   createNewDate,
@@ -47,7 +47,7 @@ import {
   snakeToCamel,
   totalPaid,
 } from '../../util/helper';
-import { IPrice, Price } from '../../interfaces/treatment';
+import { IPrice, Price } from '../../treatment/treatment';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { IPayment, IPaymentAll, IPaymentOption, IPaymentRequest, PENALTY } from '../../interfaces/payment';
 import { isToday, isTomorrow } from 'date-fns';

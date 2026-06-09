@@ -1,19 +1,18 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
 import { RoomComponent } from './room.component';
 import { Store } from '@ngrx/store';
-import { RoomState } from '../store/reducers/room.reducers';
 import { ICommon } from '../interfaces/common';
-import { getSelectedRoomPipe } from '../store/selectors/room.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { cleanRoom, getRoom, updateRoom } from '../store/actions/room.actions';
 import { SkeletonComponent } from '../shared/skeleton.component';
-import { IRoom } from '../interfaces/room';
+import { IRoom } from './room';
+import { RoomStore } from '../store/room.store';
+import { PaymentState } from '../store/reducers/payment.reducers';
+import { getOptions } from '../store/actions/payment.actions';
 
 @Component({
   selector: 'app-room-details-page',
   template: `
     @if (room(); as room) {
-      <app-room [room]="room" [config]="config" (submitData)="submit($event)"/>
+      <app-room [room]="room" [config]="config" [currencies]="currencies()" [offices]="offices()" (submitData)="submit($event)"/>
     } @else {
       <app-skeleton/>
     }
@@ -29,21 +28,26 @@ export class RoomDetailsPageComponent {
     button: { icon: 'published_with_changes', label: 'COMMON.BUTTON.UPDATE' },
   };
 
-  private readonly store: Store<RoomState> = inject(Store<RoomState>);
+  private readonly roomStore = inject(RoomStore);
+  private readonly paymentStore: Store<PaymentState> = inject(Store<PaymentState>);
 
-  room = toSignal(this.store.pipe(getSelectedRoomPipe));
+  room = this.roomStore.selected;
+  currencies = this.roomStore.currencies;
+  offices = this.roomStore.offices;
 
   constructor() {
-    this.store.dispatch(cleanRoom());
+    this.roomStore.clean();
+    this.roomStore.loadInfo();
+    this.paymentStore.dispatch(getOptions());
 
     effect(() => {
       const id = this.id();
-      this.store.dispatch(getRoom({ id, redirect: true }));
+      this.roomStore.loadById(id);
     });
   }
 
   submit(room: IRoom) {
     const id = this.id();
-    this.store.dispatch(updateRoom({ id, room }));
+    this.roomStore.update(id, room);
   }
 }

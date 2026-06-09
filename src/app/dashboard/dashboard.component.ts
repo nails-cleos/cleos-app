@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, u
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Store } from '@ngrx/store';
 import { getCards, getEvents } from '../store/actions/dashboard.actions';
-import { IReservationSummary, States } from '../interfaces/reservation';
+import { IReservationSummary, States } from '../reservation/reservation';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   getDurationOrUndefined,
@@ -27,14 +27,14 @@ import { findStateColor, getStateOrder } from '../util/theme';
 import { allDayEvent, DataEvent, IDataEvent, IMeta, Meta, monthEvent } from '../util/event';
 import { Router } from '@angular/router';
 import { isSameDay, isSameMonth, startOfMonth } from 'date-fns';
-import { ICalendarNote, ICalendarSummary, IChart } from '../interfaces/dashboard';
+import { ICalendarNote, ICalendarSummary, IChart } from './dashboard';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { IRoom } from '../interfaces/room';
+import { IRoom } from '../room/room';
 import { CalendarDialogComponent } from '../shared/dialog/calendar/calendar-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { numberFormat } from '../util/numbers';
-import { ICurrency } from '../interfaces/currency';
+import { ICurrency } from '../currency/currency';
 import { AuthUserService } from '../services/auth-user.service';
 import { MiniCardComponent } from './mini-card/mini-card.component';
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';

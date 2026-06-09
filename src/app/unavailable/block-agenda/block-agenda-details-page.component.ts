@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { AuthUserService } from '../../services/auth-user.service';
 import { ICommon } from '../../interfaces/common';
-import { IUnavailable } from '../../interfaces/unavailable';
+import { IUnavailable } from '../unavailable';
 import { UnavailableStore } from '../../store/unavailable.store';
 import { SkeletonComponent } from '../../shared/skeleton.component';
 import { BlockAgendaComponent } from './block-agenda.component';

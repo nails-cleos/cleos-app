@@ -2,8 +2,8 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TranslateModule } from '@ngx-translate/core';
 
-import { IAdditionalAll } from '../../interfaces/additional';
-import { ServiceType } from '../../interfaces/room';
+import { IAdditionalAll } from '../additional';
+import { ServiceType } from '../../room/room';
 import { NavigationService } from '../../services/navigation.service';
 import { AdditionalStore } from '../../store/additional.store';
 import { ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';

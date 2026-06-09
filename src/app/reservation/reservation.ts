@@ -1,15 +1,17 @@
-import { IUser, IUserAll } from './user';
-import { IPrice, ITreatment, ITreatmentAll } from './treatment';
-import { IRoom, IRoomAll } from './room';
+import { IUser, IUserAll } from '../user/user';
+import { IPrice, ITreatment, ITreatmentAll } from '../treatment/treatment';
+import { IRoom, IRoomAll } from '../room/room';
 import { ThemePalette } from '@angular/material/core';
-import { IUnavailableAll } from './unavailable';
-import { Pagination } from './pagination';
-import { IPayment, PaymentPercentage } from './payment';
-import { IReview } from './review';
-import { IAdditionalAll } from './additional';
+import { IUnavailableAll } from '../unavailable/unavailable';
+import { Pagination } from '../interfaces/pagination';
+import { IPayment, PaymentPercentage } from '../interfaces/payment';
+import { IReview } from '../me/reservation/list/review';
+import { IAdditionalAll } from '../additional/additional';
 import { addHours, isSameDay } from 'date-fns';
-import { createNewDate, getNowTimeZone } from '../util/dates';
-import { INoteAll } from './note';
+import { API_LOCALE, createNewDate, getCurrentTimeZone, getNowTimeZone } from '../util/dates';
+import { INoteAll } from '../note/note';
+import { valueChange } from '../util/validators';
+import { MeReservationForms, ReservationForms } from './reservation-form.types';
 
 export interface IFabMenu {
   name: string;
@@ -178,11 +180,6 @@ export interface ICustomerLastReservation {
   professionalId: string;
 }
 
-export class Reservation implements IReservation {
-  constructor() {
-  }
-}
-
 export class Day implements IDay {
   dayStartHour: number;
   dayStartMinute: number;
@@ -239,3 +236,75 @@ export enum CancelOption {
 
 export const MAX_RESERVATION_MONTH = 12;
 export const MAX_RESERVATION_CUSTOMER_MONTH = 2;
+
+export class Reservation {
+  static fromForm(
+    form: ReservationForms,
+    dates: string[],
+    additionalIds?: string[],
+    payment?: IReservationPayment,
+    currentReservation?: IReservationAll,
+  ): IReservation {
+    const [start, ...moreStart] = dates;
+    const customerForm = form.customerForm.controls;
+    const officeForm = form.officeForm.controls;
+    const treatmentForm = form.treatmentForm.controls;
+    const configurationForm = form.configurationForm.controls;
+
+    return {
+      ...(currentReservation && { id: currentReservation.id }),
+      customerId: customerForm.customer.value?.id,
+      treatmentId: currentReservation
+        ? valueChange(treatmentForm.treatment.value?.id, currentReservation.treatment.id)
+        : treatmentForm.treatment.value?.id,
+      roomId: currentReservation
+        ? valueChange(officeForm.room.value?.id, currentReservation.room.id)
+        : officeForm.room.value?.id,
+      professionalId: currentReservation
+        ? valueChange(officeForm.professional.value?.id, currentReservation.professional.id)
+        : officeForm.professional.value?.id,
+      ...(!currentReservation && { discountId: treatmentForm.discount.value }),
+      ...(start && {
+        start,
+        timeZone: getCurrentTimeZone(),
+      }),
+      ...(moreStart.length && { moreStart }),
+      additionalIds,
+      canCustomerChange: configurationForm.customerChange.value,
+      reference: configurationForm.reference.value,
+      note: configurationForm.note.value,
+      payment,
+    };
+  }
+
+  static fromMeForm(
+    form: MeReservationForms,
+    customerId?: string,
+    date?: Date,
+    additionalIds?: string[],
+    payment?: IReservationPayment,
+    currentReservation?: IReservationAll,
+  ): IReservation {
+    const officeForm = form.officeForm.controls;
+    const treatmentForm = form.treatmentForm.controls;
+    const acceptForm = form.acceptForm.controls;
+
+    return {
+      ...(currentReservation && { id: currentReservation.id }),
+      customerId,
+      treatmentId: currentReservation
+        ? valueChange(treatmentForm.treatment.value?.id, currentReservation.treatment.id)
+        : treatmentForm.treatment.value?.id,
+      roomId: officeForm.room.value?.id,
+      professionalId: officeForm.professional.value?.id,
+      ...(!currentReservation && { discountId: treatmentForm.discount.value }),
+      ...(date && {
+        start: date.toLocaleString(API_LOCALE),
+        timeZone: getCurrentTimeZone(),
+      }),
+      additionalIds,
+      phone: acceptForm.phone.value,
+      payment,
+    };
+  }
+}

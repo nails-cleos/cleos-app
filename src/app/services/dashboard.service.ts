@@ -11,8 +11,8 @@ import {
   ITotal,
   IYearRoomExport,
   IYearRoomSummary,
-} from '../interfaces/dashboard';
-import { IReservation } from '../interfaces/reservation';
+} from '../dashboard/dashboard';
+import { IReservation } from '../reservation/reservation';
 import { toUrl } from '../util/helper';
 
 @Injectable()

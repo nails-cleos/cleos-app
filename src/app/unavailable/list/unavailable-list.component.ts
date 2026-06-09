@@ -7,7 +7,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { getCurrentTimeZone, isSameTimeZone, newDateTimestamp } from '../../util/dates';
-import { IUnavailable, IUnavailableAll } from '../../interfaces/unavailable';
+import { IUnavailable, IUnavailableAll } from '../unavailable';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { createDialog, executeDialogNoWidth } from '../../util/helper';
 import { TimeDetailPipe } from '../../pipes/time-detail.pipe';

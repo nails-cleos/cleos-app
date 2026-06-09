@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CancelDialogComponent } from './cancel-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
-import { CancelOption } from '../../../interfaces/reservation';
+import { CancelOption } from '../../../reservation/reservation';
 import { provideAppIcons } from '../../../util/app-icons.provider';
 
 describe('CancelDialogComponent', () => {

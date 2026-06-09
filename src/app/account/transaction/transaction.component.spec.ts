@@ -6,7 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 
 import { TransactionComponent } from './transaction.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { IAccountAll, ITransaction } from '../../interfaces/account';
+import { IAccountAll, ITransaction } from '../account';
 import { IPaymentOption } from '../../interfaces/payment';
 import { getOptions } from '../../store/actions/payment.actions';
 import { signal } from '@angular/core';

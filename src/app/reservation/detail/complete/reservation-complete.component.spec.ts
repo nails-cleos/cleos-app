@@ -11,9 +11,9 @@ import {
   getReservation,
   reservationFindPayments,
 } from '../../../store/actions/reservation.actions';
-import { IExtras } from '../../../interfaces/reservation';
+import { IExtras } from '../../reservation';
 import { MatListOption } from '@angular/material/list';
-import { ServiceType } from '../../../interfaces/room';
+import { ServiceType } from '../../../room/room';
 import { getNowTimeZone } from '../../../util/dates';
 
 describe('ReservationCompleteComponent', () => {

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CurrencyCreatePageComponent } from './currency-create-page.component';
 import { CurrencyStore } from '../store/currency.store';
-import { ICurrencyAll } from '../interfaces/currency';
+import { ICurrencyAll } from './currency';
 
 describe('CurrencyCreatePageComponent', () => {
   let component: CurrencyCreatePageComponent;

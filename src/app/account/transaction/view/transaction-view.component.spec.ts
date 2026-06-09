@@ -6,7 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 
 import { TransactionViewComponent } from './transaction-view.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
-import { IAccountAll, IAccountTransaction, ITransaction } from '../../../interfaces/account';
+import { IAccountAll, IAccountTransaction, ITransaction } from '../../account';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { signal } from '@angular/core';
 import { AccountStore } from '../../../store/account.store';

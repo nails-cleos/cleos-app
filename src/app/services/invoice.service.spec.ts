@@ -3,8 +3,8 @@ import { TestBed } from '@angular/core/testing';
 import { InvoiceService } from './invoice.service';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { of } from 'rxjs';
-import { IOfficeAll } from '../interfaces/office';
-import { IInvoice, IInvoiceData } from '../interfaces/invoice';
+import { IOfficeAll } from '../office/office';
+import { IInvoice, IInvoiceData } from '../invoice/invoice';
 import { Pagination } from '../interfaces/pagination';
 
 describe('InvoiceService', () => {

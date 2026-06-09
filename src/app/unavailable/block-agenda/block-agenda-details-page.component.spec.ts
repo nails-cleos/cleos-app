@@ -4,7 +4,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BlockAgendaDetailsPageComponent } from './block-agenda-details-page.component';
 import { UnavailableStore } from '../../store/unavailable.store';
-import { IUnavailableAll } from '../../interfaces/unavailable';
+import { IUnavailableAll } from '../unavailable';
 import { BlockAgendaComponent } from './block-agenda.component';
 import { AuthUserService } from '../../services/auth-user.service';
 

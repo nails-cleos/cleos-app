@@ -6,14 +6,14 @@ import { BehaviorSubject, of } from 'rxjs';
 
 import { ExpenseListComponent } from './expense-list.component';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../../interfaces/pagination';
-import { IExpenseAll } from '../../../../interfaces/expense';
+import { IExpenseAll } from '../expense';
 import { dateToTimestamp, getCurrentTimeZone, getDateFormat, getNowTimeZone } from '../../../../util/dates';
-import { IRoomAll } from '../../../../interfaces/room';
+import { IRoomAll } from '../../../room';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { signal } from '@angular/core';
 import { DriveAccessService } from '../../../../services/drive-access.service';
 import { DocumentStore } from '../../../../store/document.store';
-import { DocumentTypeEnum } from '../../../../interfaces/document';
+import { DocumentTypeEnum } from '../../../../document/document';
 import { ExpenseStore } from '../../../../store/expense.store';
 import { Router } from '@angular/router';
 

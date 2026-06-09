@@ -1,10 +1,11 @@
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { CalendarEvent } from 'angular-calendar';
-import { IRoomAll, IService } from '../interfaces/room';
-import { IUserAll } from '../interfaces/user';
-import { IOfficeAll } from '../interfaces/office';
-import { IGroupService } from '../interfaces/treatment';
+import { IRoomAll, IService } from '../room/room';
+import { IUserAll } from '../user/user';
+import { IOfficeAll } from '../office/office';
+import { IGroupService } from '../treatment/treatment';
 import { IPaymentOption } from '../interfaces/payment';
+import { BankForm } from '../shared/bank/bank.component';
 
 export type CustomerForm = {
   customer: FormControl<IUserAll | undefined>;
@@ -53,6 +54,30 @@ export type ReservationForms = {
   eventGroup: FormGroup<EventGroupForm>;
 };
 
+export type MeReservationTreatmentForm = {
+  treatment: FormControl<IService | undefined>;
+  discount: FormControl<string | undefined>;
+  startDate: FormControl<Date | undefined>;
+  group: FormControl<IGroupService | undefined>;
+};
+
+export type MeReservationEventForm = {
+  event: FormControl<Date | undefined>;
+};
+
+export type MeReservationAcceptForm = {
+  accept: FormControl<boolean>;
+  phone: FormControl<string | undefined>;
+};
+
+export type MeReservationForms = {
+  officeForm: FormGroup<OfficeForm>;
+  treatmentForm: FormGroup<MeReservationTreatmentForm>;
+  eventGroup: FormGroup<MeReservationEventForm>;
+  typeForm: FormGroup<BankForm>;
+  acceptForm: FormGroup<MeReservationAcceptForm>;
+};
+
 export type ReservationFormField =
   keyof CustomerForm |
   keyof OfficeForm |
@@ -66,9 +91,23 @@ export type ReservationErrors = Partial<Record<ReservationFormField, string>> & 
   overlapping: boolean;
 };
 
+export type MeReservationFormField =
+  keyof OfficeForm |
+  keyof MeReservationTreatmentForm |
+  keyof MeReservationEventForm |
+  keyof BankForm |
+  keyof MeReservationAcceptForm;
+
+export type MeReservationErrors = Partial<Record<MeReservationFormField, string>> & {
+  schedule?: boolean;
+};
+
 export const createReservationErrors = (): ReservationErrors => ({
   schedule: [],
   dateTimeList: [],
   events: [],
   overlapping: false,
+});
+
+export const createMeReservationErrors = (): MeReservationErrors => ({
 });

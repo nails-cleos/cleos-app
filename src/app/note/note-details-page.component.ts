@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { NoteComponent } from './note.component';
 import { NoteStore } from '../store/note.store';
-import { INote } from '../interfaces/note';
+import { INote } from './note';
 import { ICommon } from '../interfaces/common';
 import { SkeletonComponent } from '../shared/skeleton.component';
 import { executeDialogNoWidth } from '../util/helper';

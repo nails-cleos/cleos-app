@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { ICurrencyAll } from '../../interfaces/currency';
+import { ICurrencyAll } from '../../currency/currency';
 import { TotalSummaryItemComponent } from '../total-summary-item/total-summary-item.component';
-import { ISummaryTotals } from '../../interfaces/dashboard';
+import { ISummaryTotals } from '../dashboard';
 import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({

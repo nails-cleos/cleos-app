@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { TokenService } from './token.service';
 import { AuthState } from '../store/reducers/auth.reducers';
 import { FirebaseService } from './firebase.service';
-import { IUserAll } from '../interfaces/user';
+import { IUserAll } from '../user/user';
 
 describe('TokenService', () => {
   let service: TokenService;

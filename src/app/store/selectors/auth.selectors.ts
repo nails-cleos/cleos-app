@@ -1,7 +1,7 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import { AUTH_FEATURE_KEY, AuthState } from '../reducers/auth.reducers';
-import { IMenu, IUserAll } from '../../interfaces/user';
+import { IMenu, IUserAll } from '../../user/user';
 import { Params } from '@angular/router';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 

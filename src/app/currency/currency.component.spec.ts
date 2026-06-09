@@ -3,7 +3,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { signal } from '@angular/core';
 
 import { CurrencyComponent } from './currency.component';
-import { ICurrencyAll } from '../interfaces/currency';
+import { ICurrencyAll } from './currency';
 import { ICommon } from '../interfaces/common';
 import { CurrencyStore } from '../store/currency.store';
 import { NavigationService } from '../services/navigation.service';

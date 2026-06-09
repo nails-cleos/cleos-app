@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { ICommon } from '../interfaces/common';
-import { ITreatmentGroup } from '../interfaces/treatment';
+import { ITreatmentGroup } from './treatment';
 import { TreatmentStore } from '../store/treatment.store';
 import { SkeletonComponent } from '../shared/skeleton.component';
 import { TreatmentComponent } from './treatment.component';

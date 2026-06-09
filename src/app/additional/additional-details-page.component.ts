@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { AdditionalComponent } from './additional.component';
 import { AdditionalStore } from '../store/additional.store';
-import { IAdditional } from '../interfaces/additional';
+import { IAdditional } from './additional';
 import { ICommon } from '../interfaces/common';
 import { SkeletonComponent } from '../shared/skeleton.component';
 import { formatDuration } from '../util/dates';

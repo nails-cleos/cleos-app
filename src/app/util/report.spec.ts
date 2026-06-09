@@ -1,8 +1,8 @@
 import { createYearlyWorkbook } from './report';
 import { EnvService } from '../services/env.service';
 import { TranslateService } from '@ngx-translate/core';
-import { IMonthlyExport, IMonthlySummaryExpense, IMonthlySummarySale, ISummaryTotal } from '../interfaces/dashboard';
-import { States } from '../interfaces/reservation';
+import { IMonthlyExport, IMonthlySummaryExpense, IMonthlySummarySale, ISummaryTotal } from '../dashboard/dashboard';
+import { States } from '../reservation/reservation';
 import { monthViewTitle } from './dates';
 
 const buildSummaryTotal = (

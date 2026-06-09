@@ -7,7 +7,7 @@ import {
   IMonthlySummarySale,
   IQuarterSummary,
   ISummaryRoom, IDashboard, IRoomEvents,
-} from '../../interfaces/dashboard';
+} from '../../dashboard/dashboard';
 import { IError } from '../../interfaces/common';
 
 const selectDashboardState = createFeatureSelector<DashboardState>(DASHBOARD_FEATURE_KEY);

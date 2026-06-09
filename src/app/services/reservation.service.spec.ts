@@ -9,12 +9,12 @@ import {
   IReservationAll,
   IRoomReservation,
   IUpcomingAll,
-} from '../interfaces/reservation';
+} from '../reservation/reservation';
 import { Pagination } from '../interfaces/pagination';
-import { IReview } from '../interfaces/review';
+import { IReview } from '../me/reservation/list/review';
 import { IApiResponse } from '../interfaces/common';
-import { ICurrencyAll } from '../interfaces/currency';
-import { ServiceType } from '../interfaces/room';
+import { ICurrencyAll } from '../currency/currency';
+import { ServiceType } from '../room/room';
 import { dateToTimestamp, getNowTimeZone } from '../util/dates';
 
 describe('ReservationService', () => {

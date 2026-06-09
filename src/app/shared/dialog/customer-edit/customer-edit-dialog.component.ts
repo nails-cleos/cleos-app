@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { IPrice } from '../../../interfaces/treatment';
-import { ICurrencyAll } from '../../../interfaces/currency';
+import { IPrice } from '../../../treatment/treatment';
+import { ICurrencyAll } from '../../../currency/currency';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,

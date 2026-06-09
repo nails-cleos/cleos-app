@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, v
 import { Store } from '@ngrx/store';
 import { combineLatestWith, Subject } from 'rxjs';
 import { getAllGroupingByRoom, updateReservationTimestamp } from '../../store/actions/reservation.actions';
-import { Day, IDay, IRoomReservation, MAX_RESERVATION_MONTH, States } from '../../interfaces/reservation';
+import { Day, IDay, IRoomReservation, MAX_RESERVATION_MONTH, States } from '../reservation';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import {
@@ -23,7 +23,7 @@ import {
   searchDates,
   subPeriod,
 } from '../../util/dates';
-import { IRoom, IRoomAll } from '../../interfaces/room';
+import { IRoom, IRoomAll } from '../../room/room';
 import {
   allDayEvent,
   calendarEvent,
@@ -38,18 +38,18 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarWeekViewComponent } from 'angular-calendar';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { IUser, IUserAll } from '../../interfaces/user';
-import { IUnavailableAll } from '../../interfaces/unavailable';
+import { IUser, IUserAll } from '../../user/user';
+import { IUnavailableAll } from '../../unavailable/unavailable';
 import { createRoomOffice, executeDialogNoWidth, FrequencyEnum, getList } from '../../util/helper';
 import { addDays, addMonths, isEqual } from 'date-fns';
 import { findStateColor } from '../../util/theme';
 import { map, startWith } from 'rxjs/operators';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IOffice, IOfficeAll } from '../../interfaces/office';
+import { IOffice, IOfficeAll } from '../../office/office';
 import { requireMatch } from '../../util/validators';
 import { CalendarDialogComponent } from '../../shared/dialog/calendar/calendar-dialog.component';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
-import { INoteAll } from '../../interfaces/note';
+import { INoteAll } from '../../note/note';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Role } from '../../interfaces/token';
 import { RoomNamePipe } from '../../pipes/room-name.pipe';

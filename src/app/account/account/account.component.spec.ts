@@ -4,7 +4,7 @@ import { TranslateModule } from '@ngx-translate/core';
 
 import { AccountComponent } from './account.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { IAccountAll, ITransaction } from '../../interfaces/account';
+import { IAccountAll, ITransaction } from '../account';
 import { AccountStore } from '../../store/account.store';
 import { signal } from '@angular/core';
 import { NavigationService } from '../../services/navigation.service';
@@ -159,7 +159,6 @@ describe('AccountComponent', () => {
         customerId: 'user-1',
         gift: 10,
       } as ITransaction),
-      'user-1',
     );
   });
 

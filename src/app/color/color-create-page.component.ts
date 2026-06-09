@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ColorComponent } from './color.component';
 import { ColorStore } from '../store/color.store';
-import { IColor } from '../interfaces/color';
+import { IColor } from './color';
 import { ICommon } from '../interfaces/common';
 
 @Component({

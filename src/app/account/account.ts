@@ -1,18 +1,14 @@
-import { IUser, IUserAll } from './user';
-import { ICurrency, ICurrencyAll } from './currency';
-import { IPayment } from './payment';
-import { Pagination } from './pagination';
+import { IUserAll } from '../user/user';
+import { ICurrencyAll } from '../currency/currency';
+import { IPayment } from '../interfaces/payment';
+import { Pagination } from '../interfaces/pagination';
+import { valueChange } from '../util/validators';
+import { FormControl } from '@angular/forms';
 
-export interface IAccount {
-  id?: string;
-  balance?: number;
-  deleted?: boolean;
-  customer?: IUser;
-  customerId?: string;
-  currency?: ICurrency;
-  currencyId?: string;
-  gift?: number;
-}
+export type BalanceForm = {
+  currency: FormControl<ICurrencyAll | undefined>;
+  gift: FormControl<number>;
+};
 
 export interface IAccountAll {
   id: string;
@@ -57,7 +53,16 @@ export interface ITransaction {
 
 }
 
-export class Transaction implements ITransaction {
-  constructor() {
+export class Transaction {
+  static fromForm(
+    transactionForm: BalanceForm,
+    customerId: string,
+    currentAccount?: IAccountAll,
+  ): ITransaction {
+    return {
+      customerId: customerId,
+      currencyId: valueChange(transactionForm.currency.value, currentAccount?.currency)?.id,
+      gift: transactionForm.gift.value,
+    };
   }
 }

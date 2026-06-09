@@ -2,12 +2,12 @@ import { TestBed } from '@angular/core/testing';
 
 import { AccountService } from './account.service';
 import { HttpClient } from '@angular/common/http';
-import { IAccountAll, IAccountTransaction, ITransaction } from '../interfaces/account';
+import { IAccountAll, IAccountTransaction, ITransaction } from '../account/account';
 import { of } from 'rxjs';
 import { IApiResponse } from '../interfaces/common';
 import { createFilter } from '../util/service-helper';
-import { IUserAll } from '../interfaces/user';
-import { ICurrencyAll } from '../interfaces/currency';
+import { IUserAll } from '../user/user';
+import { ICurrencyAll } from '../currency/currency';
 
 describe('AccountService', () => {
   let service: AccountService;

@@ -3,7 +3,7 @@ import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Va
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AuthUserService } from '../../services/auth-user.service';
-import { ITransaction } from '../../interfaces/account';
+import { ITransaction } from '../account';
 import { currencySymbol } from '../../util/helper';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BalanceComponent } from '../balance/balance.component';

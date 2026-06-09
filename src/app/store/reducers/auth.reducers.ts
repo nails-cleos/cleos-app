@@ -1,4 +1,4 @@
-import { IMenu, IUserAll } from '../../interfaces/user';
+import { IMenu, IUserAll } from '../../user/user';
 import {
   cleanAuth,
   login,

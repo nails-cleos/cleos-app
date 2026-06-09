@@ -6,7 +6,7 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { IDialog } from '../../../interfaces/dialog';
+import { IDialog } from '../dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';

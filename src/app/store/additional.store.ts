@@ -1,10 +1,10 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
-import { IAdditional, IAdditionalAll } from '../interfaces/additional';
+import { IAdditional, IAdditionalAll } from '../additional/additional';
 import { IApiResponse, PageRequest } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
-import { ITreatmentGroupAll } from '../interfaces/treatment';
+import { ITreatmentGroupAll } from '../treatment/treatment';
 import { AdditionalService } from '../services/additional.service';
 import { TreatmentService } from '../services/treatment.service';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';

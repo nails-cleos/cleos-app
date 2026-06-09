@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IExpense, IExpenseAll, IExpenseInfo } from '../interfaces/expense';
+import { IExpense, IExpenseAll, IExpenseInfo } from '../room/me/expense/expense';
 import { createFilter } from '../util/service-helper';
 import { SortDirection } from '@angular/material/sort';
 import { IApiResponse } from '../interfaces/common';

@@ -1,5 +1,5 @@
 import { API_LOCALE } from './dates';
-import { ICurrency } from '../interfaces/currency';
+import { ICurrency } from '../currency/currency';
 
 export const numberFormat = (
   value: number | string,

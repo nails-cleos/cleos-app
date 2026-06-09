@@ -7,8 +7,8 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { IExtras } from '../../interfaces/reservation';
-import { ICurrencyAll } from '../../interfaces/currency';
+import { IExtras } from '../../reservation/reservation';
+import { ICurrencyAll } from '../../currency/currency';
 import { IPaymentOption } from '../../interfaces/payment';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CurrencyPipe } from '@angular/common';

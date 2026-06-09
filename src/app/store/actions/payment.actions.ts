@@ -1,7 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { IPayment, IPaymentOption, IPaymentRequest, PaymentStatus } from '../../interfaces/payment';
-import { IReservationPayment } from '../../interfaces/reservation';
+import { IReservationPayment } from '../../reservation/reservation';
 
 enum PaymentActionTypes {
   paymentSave = '[Payment] Save',

@@ -1,5 +1,4 @@
 import { AbstractControl, FormArray, FormControl, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { Observable, of } from 'rxjs';
 
 export const fieldChange = (formControl: FormControl, value?: any): any | undefined =>
   formControl && formControl.dirty && value !== formControl.value ? formControl.value : null;
@@ -14,10 +13,6 @@ export const requireMatch = (control: AbstractControl): any => {
   }
   return null;
 };
-
-// TODO: remove Observable when migration to async validators is complete
-export const requireMatchAsync = (control: AbstractControl): Observable<ValidationErrors | null> => of(
-  requireMatch(control));
 
 export const noDuplicateDatesValidator = (key: string = 'date'): ValidatorFn => {
   return (formArray: AbstractControl): { [key: string]: any } | null => {

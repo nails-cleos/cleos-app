@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ColorCreatePageComponent } from './color-create-page.component';
 import { ColorStore } from '../store/color.store';
-import { IColorAll } from '../interfaces/color';
+import { IColorAll } from './color';
 
 describe('ColorCreatePageComponent', () => {
   let component: ColorCreatePageComponent;

@@ -6,11 +6,11 @@ import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
 import { signal } from '@angular/core';
-import { IDashboard } from '../interfaces/dashboard';
-import { ICurrencyAll } from '../interfaces/currency';
+import { IDashboard } from './dashboard';
+import { ICurrencyAll } from '../currency/currency';
 import { getNowTimeZone } from '../util/dates';
 import { endOfMonth, startOfMonth } from 'date-fns';
-import { States } from '../interfaces/reservation';
+import { States } from '../reservation/reservation';
 import { FrequencyEnum } from '../util/helper';
 import { provideAppCalendar } from '../util/adapter/app-date.provider';
 

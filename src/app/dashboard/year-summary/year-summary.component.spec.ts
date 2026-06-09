@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { ActivatedRoute } from '@angular/router';
-import { IMonthlyExport, IMonthlySummaryExpense, IMonthlySummarySale, ISummaryTotal } from '../../interfaces/dashboard';
+import { IMonthlyExport, IMonthlySummaryExpense, IMonthlySummarySale, ISummaryTotal } from '../dashboard';
 import fs from 'file-saver';
 import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { signal } from '@angular/core';

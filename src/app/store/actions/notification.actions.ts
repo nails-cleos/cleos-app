@@ -1,7 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 import { IError, PageRequest } from '../../interfaces/common';
 import { Pagination } from '../../interfaces/pagination';
-import { INotification } from '../../interfaces/notification';
+import { INotification } from '../../notification/notification';
 
 enum NotificationActionTypes {
   getNotificationsPage = '[Notification] Get notifications page',

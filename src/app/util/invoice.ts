@@ -1,8 +1,8 @@
-import { IUserAll } from '../interfaces/user';
+import { IUserAll } from '../user/user';
 import { currencySymbol } from './helper';
-import { IInvoice, IItem, IRoomInvoice, ITotals } from '../interfaces/invoice';
+import { IInvoice, IItem, IRoomInvoice, ITotals } from '../invoice/invoice';
 import { API_LOCALE, dayViewTitle, newDateTimestamp } from './dates';
-import { IOfficeAll } from '../interfaces/office';
+import { IOfficeAll } from '../office/office';
 import { EnvService } from '../services/env.service';
 
 const createHeader = (

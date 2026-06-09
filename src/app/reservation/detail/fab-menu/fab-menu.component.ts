@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, ElementRef, HostListener, inject, input, output } from '@angular/core';
-import { IFabMenu } from '../../../interfaces/reservation';
+import { IFabMenu } from '../../reservation';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 

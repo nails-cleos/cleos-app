@@ -1,11 +1,11 @@
 import { inject, Injectable } from '@angular/core';
-import { IOverview, IUser, IUserAll } from '../interfaces/user';
+import { IOverview, IUser, IUserAll } from '../user/user';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Role, Token } from '../interfaces/token';
-import { IRoomAll } from '../interfaces/room';
+import { IRoomAll } from '../room/room';
 import { paginated, Pagination } from '../interfaces/pagination';
-import { ICustomerLastReservation } from '../interfaces/reservation';
+import { ICustomerLastReservation } from '../reservation/reservation';
 import { createFilter } from '../util/service-helper';
 import { dataURLToBlob } from '../util/file';
 import { toUrl } from '../util/helper';

@@ -1,9 +1,9 @@
 import { createAction, props } from '@ngrx/store';
 import { IError, IResponseSuccess } from '../../interfaces/common';
-import { ICatalogueAll } from '../../interfaces/catalogue';
-import { ITreatmentGroup } from '../../interfaces/treatment';
+import { ICatalogueAll } from '../../catalogue/catalogue';
+import { ITreatmentGroup } from '../../treatment/treatment';
 import { ISendMessage } from '../../../main';
-import { IUser } from '../../interfaces/user';
+import { IUser } from '../../user/user';
 
 enum MainActionTypes {
   getAllCatalogue = '[Main] Get all',

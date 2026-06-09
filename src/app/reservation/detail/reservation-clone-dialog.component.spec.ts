@@ -3,8 +3,8 @@ import { ReservationCloneDialogComponent } from './reservation-clone-dialog.comp
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { addMonths } from 'date-fns';
 import { getCurrentTimeZone, getNowTimeZone } from '../../util/dates';
-import { MAX_RESERVATION_MONTH } from '../../interfaces/reservation';
-import { IRoomAll } from '../../interfaces/room';
+import { MAX_RESERVATION_MONTH } from '../reservation';
+import { IRoomAll } from '../../room/room';
 import { TranslateModule } from '@ngx-translate/core';
 import { provideAppDateAdapter } from '../../util/adapter/app-date.provider';
 

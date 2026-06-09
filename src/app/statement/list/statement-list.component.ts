@@ -4,7 +4,7 @@ import { combineLatestWith } from 'rxjs';
 import { getNowTimeZone, invoiceFormat } from '../../util/dates';
 import { map, startWith } from 'rxjs/operators';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { IOfficeAll } from '../../interfaces/office';
+import { IOfficeAll } from '../../office/office';
 import { requireMatch } from '../../util/validators';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { DriveAccessService } from '../../services/drive-access.service';

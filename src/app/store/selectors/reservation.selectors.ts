@@ -8,16 +8,16 @@ import {
   IRoomReservation,
   ITracking,
   IUpcomingAll,
-} from '../../interfaces/reservation';
+} from '../../reservation/reservation';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { RESERVATION_FEATURE_KEY, ReservationState } from '../reducers/reservation.reducers';
-import { ITreatmentDiscountDTO } from '../../interfaces/treatment';
-import { IRoomAll } from '../../interfaces/room';
-import { IUserAll } from '../../interfaces/user';
-import { IAdditionalAll } from '../../interfaces/additional';
+import { ITreatmentDiscountDTO } from '../../treatment/treatment';
+import { IRoomAll } from '../../room/room';
+import { IUserAll } from '../../user/user';
+import { IAdditionalAll } from '../../additional/additional';
 import { IPaymentAll } from '../../interfaces/payment';
-import { IReview } from '../../interfaces/review';
-import { IColorAll } from '../../interfaces/color';
+import { IReview } from '../../me/reservation/list/review';
+import { IColorAll } from '../../color/color';
 import {
   DetailReservationParams,
   MeReservationParams,

@@ -6,7 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, of } from 'rxjs';
 
 import { UserListComponent } from './user-list.component';
-import { IUser, IUserAll, User } from '../../interfaces/user';
+import { IUser, IUserAll, User } from '../user';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
 import { UserState } from '../../store/reducers/user.reducers';
 import { deleteUser, getUsersPage, mergeUsers, resendToken, restore, userSelected } from '../../store/actions/user.actions';

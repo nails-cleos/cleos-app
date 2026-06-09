@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { ICatalogueAll } from '../../interfaces/catalogue';
+import { ICatalogueAll } from '../../catalogue/catalogue';
 import { getImage } from '../../util/file';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatIcon } from '@angular/material/icon';

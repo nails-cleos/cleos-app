@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { INote, INoteAll } from '../interfaces/note';
+import { INote, INoteAll } from '../note/note';
 import { toUrl } from '../util/helper';
 import { IApiResponse } from '../interfaces/common';
 

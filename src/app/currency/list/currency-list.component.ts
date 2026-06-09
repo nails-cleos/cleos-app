@@ -3,7 +3,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { ICurrency } from '../../interfaces/currency';
+import { ICurrency } from '../currency';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';

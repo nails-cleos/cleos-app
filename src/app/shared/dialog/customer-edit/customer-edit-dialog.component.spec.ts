@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CustomerEditDialogComponent } from './customer-edit-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
-import { Price } from '../../../interfaces/treatment';
+import { Price } from '../../../treatment/treatment';
 
 describe('CustomerEditReservationDialogComponent', () => {
   let component: CustomerEditDialogComponent;

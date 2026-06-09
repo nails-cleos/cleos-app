@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, Signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { combineLatestWith } from 'rxjs';
-import { IAccountAll, ITransaction, Transaction } from '../../interfaces/account';
-import { ICurrency, ICurrencyAll } from '../../interfaces/currency';
+import { BalanceForm, IAccountAll, Transaction } from '../account';
+import { ICurrency, ICurrencyAll } from '../../currency/currency';
 import { map, startWith } from 'rxjs/operators';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { requireMatch, valueChange } from '../../util/validators';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { requireMatch } from '../../util/validators';
 import { AuthUserService } from '../../services/auth-user.service';
 import { getLocale } from '../../util/helper';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -19,11 +19,6 @@ import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autoc
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatOption } from '@angular/material/core';
-
-type BalanceForm = {
-  currency: FormControl<ICurrencyAll | undefined>;
-  gift: FormControl<number>;
-};
 
 @Component({
   selector: 'app-account',
@@ -129,12 +124,7 @@ export class AccountComponent {
     if (this.form.invalid || !id || !customerId) {
       return;
     }
-    const transaction: ITransaction = new Transaction();
-    transaction.customerId = customerId;
-    transaction.currencyId = valueChange(this.getForm.currency.value, this.accountSignal()?.currency)?.id;
-    transaction.gift = this.getForm.gift.value;
-    this.accountStore.updateAccount(id, transaction, customerId);
-    return;
+    this.accountStore.updateAccount(id, Transaction.fromForm(this.getForm, customerId, this.accountSignal()));
   }
 
   displayCurrencyFn = (currency: ICurrencyAll): string => currency ? currency.code : '';

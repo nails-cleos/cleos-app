@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { YearComponent } from './year.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
-import { IQuarterSummary } from '../../../interfaces/dashboard';
+import { IQuarterSummary } from '../../dashboard';
 
 describe('YearComponent', () => {
   let component: YearComponent;

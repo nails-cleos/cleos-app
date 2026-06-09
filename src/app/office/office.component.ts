@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, Signal, signal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IUser } from '../interfaces/user';
-import { fieldChange, requireMatch } from '../util/validators';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { IUser } from '../user/user';
+import { requireMatch } from '../util/validators';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { Role } from '../interfaces/token';
 import { map, startWith } from 'rxjs/operators';
-import { IOffice, IOfficeAll, Office } from '../interfaces/office';
+import { IOffice, IOfficeAll, Office, OfficeForm } from './office';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ICommon, IError } from '../interfaces/common';
@@ -17,17 +17,6 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { OfficeStore } from '../store/office.store';
-
-type OfficeForm = {
-  name: FormControl<string>;
-  manager: FormControl<IUser | undefined>;
-  subject: FormControl<string | undefined>,
-  kvk: FormControl<string | undefined>,
-  account: FormControl<string | undefined>,
-  btw: FormControl<string | undefined>,
-  billingAddress: FormControl<string | undefined>,
-  driveFolder: FormControl<string | undefined>,
-}
 
 @Component({
   selector: 'app-office',
@@ -97,11 +86,12 @@ export class OfficeComponent {
       if (subErrors) {
         const errorMap: Record<string, unknown> = {};
         subErrors.forEach((error: IError) => {
-          const field = error.field as keyof OfficeForm | undefined;
+          const field = error.field as string | undefined;
 
           if (field && field in this.form.controls) {
+            const officeField = field as keyof OfficeForm;
             errorMap[field] = error.message;
-            this.form.controls[field].setErrors({ incorrect: true });
+            this.form.controls[officeField].setErrors({ incorrect: true });
           }
         });
         this.errors.set(errorMap);
@@ -127,18 +117,7 @@ export class OfficeComponent {
       return;
     }
 
-    const officeSignal = this.office();
-    const office: IOffice = new Office();
-    office.name = fieldChange(this.getForm.name, officeSignal?.name);
-    office.subject = fieldChange(this.getForm.subject, officeSignal?.subject);
-    office.kvk = fieldChange(this.getForm.kvk, officeSignal?.kvk);
-    office.account = fieldChange(this.getForm.account, officeSignal?.account);
-    office.btw = fieldChange(this.getForm.btw, officeSignal?.btw);
-    office.billingAddress = fieldChange(this.getForm.billingAddress, officeSignal?.billingAddress);
-    office.driveFolder = fieldChange(this.getForm.driveFolder, officeSignal?.driveFolder);
-    office.managerId = this.getForm.manager?.value?.id;
-
-    this.submitData.emit(office);
+    this.submitData.emit(Office.fromForm(this.getForm, this.office()));
   }
 
   addManager() {

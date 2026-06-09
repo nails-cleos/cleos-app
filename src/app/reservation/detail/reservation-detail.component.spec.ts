@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { BehaviorSubject, of } from 'rxjs';
 import { ReservationDetailComponent } from './reservation-detail.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { CancelOption, IReservationAll, States } from '../../interfaces/reservation';
+import { CancelOption, IReservationAll, States } from '../reservation';
 import { IPaymentAll } from '../../interfaces/payment';
 import {
   approveReservation,
@@ -21,11 +21,11 @@ import {
   updateReservationCustomer,
 } from '../../store/actions/reservation.actions';
 import { notifyPayment, paymentSend } from '../../store/actions/payment.actions';
-import { ServiceType } from '../../interfaces/room';
-import { IUserAll } from '../../interfaces/user';
+import { ServiceType } from '../../room/room';
+import { IUserAll } from '../../user/user';
 import { getNowTimeZone } from '../../util/dates';
-import { ICurrencyAll } from '../../interfaces/currency';
-import { IAdditionalAll } from '../../interfaces/additional';
+import { ICurrencyAll } from '../../currency/currency';
+import { IAdditionalAll } from '../../additional/additional';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { signal } from '@angular/core';
 

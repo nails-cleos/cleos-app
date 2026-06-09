@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Catalogue, CatalogueForm, ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
+import { Catalogue, CatalogueForm, ICatalogue, ICatalogueAll } from './catalogue';
 import { requireMatch } from '../util/validators';
-import { ITreatmentGroup, ITreatmentGroupAll } from '../interfaces/treatment';
+import { ITreatmentGroup, ITreatmentGroupAll } from '../treatment/treatment';
 import { map, startWith } from 'rxjs/operators';
 import { SortByPipe } from '../pipes/sort-by.pipe';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -134,10 +134,8 @@ export class CatalogueComponent {
       return;
     }
 
-    this.submitData.emit({
-      catalogue: Catalogue.fromForm(this.getForm, this.catalogueSignal()),
-      resizedImageDataUrl,
-    });
+    const catalogue = Catalogue.fromForm(this.getForm, this.catalogueSignal());
+    this.submitData.emit({ catalogue, resizedImageDataUrl });
   }
 
   onImageSelected(image?: string) {

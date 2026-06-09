@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ICommon } from '../interfaces/common';
-import { IUnavailable } from '../interfaces/unavailable';
+import { IUnavailable } from './unavailable';
 import { UnavailableStore } from '../store/unavailable.store';
 import { UnavailableComponent } from './unavailable.component';
 import { AuthUserService } from '../services/auth-user.service';

@@ -1,4 +1,4 @@
-import { ColorEvent } from '../interfaces/dashboard';
+import { ColorEvent } from '../dashboard/dashboard';
 
 export const getProfessionalColor = (isDark: boolean, darkColor?: string, lightColor?: string): ColorEvent =>
   isDark ? getDarkColor(darkColor) : getLightColor(lightColor);

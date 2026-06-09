@@ -37,7 +37,7 @@ import {
   IYearRoomSummary,
   MonthSummary,
   QuarterSummary,
-} from '../../interfaces/dashboard';
+} from '../../dashboard/dashboard';
 import { getMonth } from '../../util/dates';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';

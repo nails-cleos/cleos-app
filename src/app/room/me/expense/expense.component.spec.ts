@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ExpenseComponent } from './expense.component';
-import { IExpenseAll, ISupplyStore } from '../../../interfaces/expense';
+import { IExpenseAll, ISupplyStore } from './expense';
 import { ICommon } from '../../../interfaces/common';
 import { getNowTimeZone } from '../../../util/dates';
 import { computed, signal } from '@angular/core';

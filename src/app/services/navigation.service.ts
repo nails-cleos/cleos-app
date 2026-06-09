@@ -2,7 +2,7 @@ import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { getLocale } from '../util/helper';
-import { IUser, User } from '../interfaces/user';
+import { IUser, User } from '../user/user';
 import { updateMyUser } from '../store/actions/user.actions';
 import { Store } from '@ngrx/store';
 import { setLanguage } from '../store/actions/i18n.actions';

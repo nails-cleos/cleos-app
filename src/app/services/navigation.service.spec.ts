@@ -5,7 +5,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 
 import { NavigationService } from './navigation.service';
-import { IUser, User } from '../interfaces/user';
+import { IUser, User } from '../user/user';
 import { updateMyUser } from '../store/actions/user.actions';
 import { setLanguage } from '../store/actions/i18n.actions';
 import { I18NState } from '../store/reducers/i18n.reducers';

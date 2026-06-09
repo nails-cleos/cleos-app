@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, effect, inject, input, output, Sign
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { combineLatestWith } from 'rxjs';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IUnavailable, IUnavailableAll, Unavailable, UnavailableForm } from '../interfaces/unavailable';
-import { IUser, IUserAll } from '../interfaces/user';
+import { IUnavailable, IUnavailableAll, Unavailable, UnavailableForm } from './unavailable';
+import { IUser, IUserAll } from '../user/user';
 import { map, startWith } from 'rxjs/operators';
 import {
   createEndDate,
@@ -20,7 +20,7 @@ import {
   newDate,
   zoneDateToDate,
 } from '../util/dates';
-import { IRoomAll } from '../interfaces/room';
+import { IRoomAll } from '../room/room';
 import { FrequencyEnum } from '../util/helper';
 import { requireMatch } from '../util/validators';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -247,7 +247,7 @@ export class UnavailableComponent {
       return;
     }
 
-    this.submitData.emit(Unavailable.fromForm(this.getForm, this.unavailable(), this.timeZone));
+    this.submitData.emit(Unavailable.fromForm(this.getForm, this.timeZone, this.unavailable()));
   }
 
   delete() {

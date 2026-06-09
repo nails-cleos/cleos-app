@@ -2,7 +2,7 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CurrencyDetailsPageComponent } from './currency-details-page.component';
 import { CurrencyStore } from '../store/currency.store';
-import { ICurrencyAll } from '../interfaces/currency';
+import { ICurrencyAll } from './currency';
 
 describe('CurrencyDetailsPageComponent', () => {
   let component: CurrencyDetailsPageComponent;

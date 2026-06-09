@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { NoteComponent } from './note.component';
 import { NoteStore } from '../store/note.store';
-import { INote } from '../interfaces/note';
+import { INote } from './note';
 import { ICommon } from '../interfaces/common';
 
 @Component({

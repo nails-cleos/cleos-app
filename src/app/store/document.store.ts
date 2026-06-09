@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { IDocument } from '../interfaces/document';
+import { IDocument } from '../document/document';
 import { Pagination } from '../interfaces/pagination';
 import { DocumentService } from '../services/document.service';
 import { getDateFormat } from '../util/dates';

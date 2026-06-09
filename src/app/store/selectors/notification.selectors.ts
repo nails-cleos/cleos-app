@@ -1,7 +1,7 @@
 import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import { NOTIFICATION_FEATURE_KEY, NotificationState } from '../reducers/notification.reducers';
-import { INotification, INotificationDTO } from '../../interfaces/notification';
+import { INotification, INotificationDTO } from '../../notification/notification';
 
 const selectNotificationState = createFeatureSelector<NotificationState>(NOTIFICATION_FEATURE_KEY);
 

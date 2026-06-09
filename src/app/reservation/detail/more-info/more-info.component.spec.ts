@@ -5,11 +5,11 @@ import { BehaviorSubject, of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
-import { IReservationAll, ITracking } from '../../../interfaces/reservation';
+import { IReservationAll, ITracking } from '../../reservation';
 import { getCurrentTimeZone, getNowTimeZone } from '../../../util/dates';
-import { IRoomAll } from '../../../interfaces/room';
-import { ICurrencyAll } from '../../../interfaces/currency';
-import { IReview } from '../../../interfaces/review';
+import { IRoomAll } from '../../../room/room';
+import { ICurrencyAll } from '../../../currency/currency';
+import { IReview } from '../../../me/reservation/list/review';
 import { addHours } from 'date-fns';
 import {
   executeTrackingByReservationId,

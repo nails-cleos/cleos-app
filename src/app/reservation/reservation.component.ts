@@ -18,7 +18,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { map, startWith } from 'rxjs/operators';
-import { IUser, IUserAll } from '../interfaces/user';
+import { IUser, IUserAll } from '../user/user';
 import { combineLatestWith, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import {
@@ -31,20 +31,19 @@ import {
   searchAvailability,
   updateReservationById,
 } from '../store/actions/reservation.actions';
-import { noDuplicateDatesValidator, requireMatch, valueChange } from '../util/validators';
-import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../interfaces/treatment';
-import { IRoom, IRoomAll, IService } from '../interfaces/room';
+import { noDuplicateDatesValidator, requireMatch } from '../util/validators';
+import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../treatment/treatment';
+import { IRoom, IRoomAll, IService } from '../room/room';
 import {
   Day,
   ICustomerLastReservation,
   IDay,
-  IReservation,
   IReservationAll,
   IReservationPayment,
   IUpcomingAll,
   MAX_RESERVATION_MONTH,
   Reservation,
-} from '../interfaces/reservation';
+} from './reservation';
 import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarWeekViewComponent } from 'angular-calendar';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -76,8 +75,8 @@ import {
 import { DataEvent, IDataEvent } from '../util/event';
 import { Router } from '@angular/router';
 import { Role } from '../interfaces/token';
-import { IUnavailableAll } from '../interfaces/unavailable';
-import { DiscountType, IDiscount, IUserDiscount } from '../interfaces/discount';
+import { IUnavailableAll } from '../unavailable/unavailable';
+import { DiscountType, IDiscount, IUserDiscount } from '../discount/discount';
 import {
   createRoomOffice,
   createTreatmentGroupService,
@@ -93,14 +92,13 @@ import {
   roomDetail,
 } from '../util/helper';
 import { addDays, addMonths, isEqual } from 'date-fns';
-import { IAdditionalAll } from '../interfaces/additional';
+import { IAdditionalAll } from '../additional/additional';
 import { MatDivider, MatListOption, MatSelectionList } from '@angular/material/list';
-import { IOffice, IOfficeAll } from '../interfaces/office';
-import { IStep, Step } from '../interfaces/step';
+import { IOffice, IOfficeAll } from '../office/office';
 import { SelectProfessionalDialogComponent } from './select-professional-dialog.component';
 import { ToastService } from '../services/toast.service';
 import { AuthUserService } from '../services/auth-user.service';
-import { enableStep, getBackIndex, getIndex, getStepCall, getStepName } from '../util/step';
+import { enableStep, getBackIndex, getIndex, getStepCall, getStepName, IStep, Step } from '../util/step';
 import { RoomNamePipe } from '../pipes/room-name.pipe';
 import { SortByPipe } from '../pipes/sort-by.pipe';
 import { CurrencySymbolPipe } from '../pipes/currency-symbol.pipe';
@@ -149,10 +147,10 @@ import { MatButton, MatFabButton, MatIconButton } from '@angular/material/button
 import { DatePipe, DecimalPipe, KeyValuePipe, NgClass, NgTemplateOutlet } from '@angular/common';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatCard, MatCardContent } from '@angular/material/card';
-import PlaceResult = google.maps.places.PlaceResult;
 import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
 import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
 import { MatCheckbox } from '@angular/material/checkbox';
+import PlaceResult = google.maps.places.PlaceResult;
 
 const RESERVATION_ERROR_FIELDS = [
   'customer',
@@ -1082,40 +1080,30 @@ export class ReservationComponent {
   getFormDateTimeControls = (index: number): DateTimeForm => this.getFormDateTime(index).controls;
 
   create(): void {
-    const reservation: IReservation = new Reservation();
-    reservation.customerId = this.getCustomerForm.customer.value?.id;
     const dates: string[] = this.events.value?.map(
       (calendarEvent: any) => calendarEvent.event.start.toLocaleString(API_LOCALE)) ?? [];
     if (dates.length) {
-      reservation.start = dates.shift();
-      reservation.moreStart = dates;
-      reservation.timeZone = getCurrentTimeZone();
-      reservation.additionalIds = this.additionalSelected()?.map(value => value.id);
-      reservation.canCustomerChange = this.getConfigurationForm.customerChange.value;
-      reservation.reference = this.getConfigurationForm.reference.value;
-      reservation.note = this.getConfigurationForm.note.value;
       const amount = this.getConfigurationForm.amount.value;
       const type = this.getConfigurationForm.option.value?.type;
       const transfer = this.getConfigurationForm.transfer.value;
+      let payment: IReservationPayment | undefined;
       if (amount && type) {
-        reservation.payment = { type, amount, transfer, pointOfSale: true } as IReservationPayment;
+        payment = { type, amount, transfer, pointOfSale: true } as IReservationPayment;
       }
 
       const role = this.isDashboard ? Role.roomAdmin : Role.professional;
       const reservationSignal = this.selectedReservationSignal();
+      const reservation = Reservation.fromForm(
+        this.getForm,
+        dates,
+        this.additionalSelected()?.map(value => value.id),
+        payment,
+        this.isEditing() ? reservationSignal : undefined,
+      );
+
       if (this.isEditing() && reservationSignal) {
-        reservation.id = reservationSignal.id;
-        reservation.treatmentId =
-          valueChange(this.getTreatmentForm.treatment.value?.id, reservationSignal.treatment.id);
-        reservation.roomId = valueChange(this.getOfficeForm.room.value?.id, reservationSignal.room.id);
-        reservation.professionalId =
-          valueChange(this.getOfficeForm.professional.value?.id, reservationSignal.professional.id);
         this.store.dispatch(updateReservationById({ id: reservationSignal.id, reservation, role }));
       } else {
-        reservation.treatmentId = this.getTreatmentForm.treatment.value?.id;
-        reservation.roomId = this.getOfficeForm.room.value?.id;
-        reservation.professionalId = this.getOfficeForm.professional.value?.id;
-        reservation.discountId = this.getTreatmentForm.discount.value;
         this.store.dispatch(
           createReservation({ reservation, role }),
         );

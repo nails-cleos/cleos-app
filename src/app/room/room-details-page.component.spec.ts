@@ -2,12 +2,13 @@ import { Component, input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TranslateModule } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
-import { BehaviorSubject } from 'rxjs';
 import { RoomComponent } from './room.component';
 import { RoomDetailsPageComponent } from './room-details-page.component';
-import { cleanRoom, getRoom, updateRoom } from '../store/actions/room.actions';
-import { IRoomAll } from '../interfaces/room';
+import { IRoomAll } from './room';
 import { ICommon } from '../interfaces/common';
+import { RoomStore } from '../store/room.store';
+import { signal } from '@angular/core';
+import { getOptions } from '../store/actions/payment.actions';
 
 @Component({
   selector: 'app-room',
@@ -16,6 +17,8 @@ import { ICommon } from '../interfaces/common';
 class RoomComponentStub {
   room = input<Partial<IRoomAll> | undefined>();
   config = input<ICommon | undefined>();
+  currencies = input<any>();
+  offices = input<any>();
 }
 
 describe('RoomDetailsPageComponent', () => {
@@ -23,7 +26,15 @@ describe('RoomDetailsPageComponent', () => {
   let fixture: ComponentFixture<RoomDetailsPageComponent>;
 
   let storeSpy: jasmine.SpyObj<Store>;
-  let selectedRoom$: BehaviorSubject<any>;
+  let roomStoreSpy: {
+    selected: ReturnType<typeof signal<any>>;
+    currencies: ReturnType<typeof signal<any>>;
+    offices: ReturnType<typeof signal<any>>;
+    clean: jasmine.Spy;
+    loadInfo: jasmine.Spy;
+    loadById: jasmine.Spy;
+    update: jasmine.Spy;
+  };
 
   const id = '123';
 
@@ -40,14 +51,22 @@ describe('RoomDetailsPageComponent', () => {
   };
 
   beforeEach(async () => {
-    selectedRoom$ = new BehaviorSubject(undefined);
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    storeSpy.pipe.and.returnValue(selectedRoom$.asObservable());
+    roomStoreSpy = {
+      selected: signal(undefined),
+      currencies: signal(undefined),
+      offices: signal(undefined),
+      clean: jasmine.createSpy('clean'),
+      loadInfo: jasmine.createSpy('loadInfo'),
+      loadById: jasmine.createSpy('loadById'),
+      update: jasmine.createSpy('update'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [RoomDetailsPageComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
+        { provide: RoomStore, useValue: roomStoreSpy },
       ],
     }).overrideComponent(RoomDetailsPageComponent, {
       remove: { imports: [RoomComponent] },
@@ -69,15 +88,17 @@ describe('RoomDetailsPageComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should clean and load room when id emits a value', () => {
+  it('should clean, load room info, load payment options, and load room when id emits a value', () => {
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch.calls.argsFor(0)[0]).toEqual(cleanRoom());
-    expect(storeSpy.dispatch.calls.argsFor(1)[0]).toEqual(getRoom({ id: id, redirect: true }));
+    expect(roomStoreSpy.clean).toHaveBeenCalled();
+    expect(roomStoreSpy.loadInfo).toHaveBeenCalled();
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(getOptions());
+    expect(roomStoreSpy.loadById).toHaveBeenCalledWith(id);
   });
 
   it('should pass selected room to the shared form', () => {
-    selectedRoom$.next(mockRoom);
+    roomStoreSpy.selected.set(mockRoom);
     fixture.detectChanges();
 
     const roomComponent = fixture.debugElement.children[0].componentInstance as RoomComponentStub;
@@ -88,16 +109,12 @@ describe('RoomDetailsPageComponent', () => {
     }));
   });
 
-  it('should dispatch update when room is received', () => {
+  it('should call update when room is received', () => {
     fixture.detectChanges();
 
     component.submit(mockRoom);
 
-    const dispatched = storeSpy.dispatch.calls.mostRecent().args[0] as any;
-
-    expect(dispatched.type).toBe(updateRoom.type);
-    expect(dispatched.id).toBe(id);
-    expect(dispatched.room).toEqual(jasmine.objectContaining({
+    expect(roomStoreSpy.update).toHaveBeenCalledWith(id, jasmine.objectContaining({
       timeZone: 'Europe/Amsterdam',
     }));
   });

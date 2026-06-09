@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, of } from 'rxjs';
 
-import { IOffice } from '../../interfaces/office';
+import { IOffice } from '../office';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { OfficeStore } from '../../store/office.store';
 import { OfficeListComponent } from './office-list.component';

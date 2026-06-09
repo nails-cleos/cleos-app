@@ -2,7 +2,7 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { OfficeDetailsPageComponent } from './office-details-page.component';
 import { OfficeStore } from '../store/office.store';
-import { IOfficeAll } from '../interfaces/office';
+import { IOfficeAll } from './office';
 import { OfficeComponent } from './office.component';
 import { TranslateModule } from '@ngx-translate/core';
 

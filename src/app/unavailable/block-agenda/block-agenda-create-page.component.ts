@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { Router } from '@angular/router';
 import { AuthUserService } from '../../services/auth-user.service';
 import { ICommon } from '../../interfaces/common';
-import { IUnavailable } from '../../interfaces/unavailable';
+import { IUnavailable } from '../unavailable';
 import { UnavailableStore } from '../../store/unavailable.store';
 import { BlockAgendaComponent } from './block-agenda.component';
 import { getTimeNumber } from '../../util/dates';

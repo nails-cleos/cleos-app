@@ -83,15 +83,15 @@ import {
   States,
   ITracking,
   IUpcomingAll,
-} from '../../interfaces/reservation';
-import { IUserAll } from '../../interfaces/user';
-import { ITreatmentDiscountDTO } from '../../interfaces/treatment';
-import { IRoomAll } from '../../interfaces/room';
-import { IAdditionalAll } from '../../interfaces/additional';
+} from '../../reservation/reservation';
+import { IUserAll } from '../../user/user';
+import { ITreatmentDiscountDTO } from '../../treatment/treatment';
+import { IRoomAll } from '../../room/room';
+import { IAdditionalAll } from '../../additional/additional';
 import { IPaymentAll } from '../../interfaces/payment';
 import { IApiResponse } from '../../interfaces/common';
-import { IReview } from '../../interfaces/review';
-import { IColorAll } from '../../interfaces/color';
+import { IReview } from '../../me/reservation/list/review';
+import { IColorAll } from '../../color/color';
 import { ToastType } from '../../shared/toast/toast.model';
 import { effectRequest } from '../../util/rxjs';
 import { getMyEvent } from '../actions/dashboard.actions';

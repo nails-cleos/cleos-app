@@ -35,7 +35,6 @@ import { provideRouterStore } from '@ngrx/router-store';
 import { localStorageSync } from 'ngrx-store-localstorage';
 import { AUTH_FEATURE_KEY, authReducer } from './app/store/reducers/auth.reducers';
 import { userReducer } from './app/store/reducers/user.reducers';
-import { roomReducer } from './app/store/reducers/room.reducers';
 import { reservationReducer } from './app/store/reducers/reservation.reducers';
 import { notificationReducer } from './app/store/reducers/notification.reducers';
 import { mainReducer } from './app/store/reducers/main.reducers';
@@ -100,7 +99,6 @@ const providers = [
   provideStore({
     auth: authReducer,
     user: userReducer,
-    room: roomReducer,
     reservation: reservationReducer,
     notification: notificationReducer,
     main: mainReducer,

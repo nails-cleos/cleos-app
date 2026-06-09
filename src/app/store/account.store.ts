@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
-import { IAccountAll, IAccountTransaction, ITransaction } from '../interfaces/account';
+import { IAccountAll, IAccountTransaction, ITransaction } from '../account/account';
 import { PageRequest } from '../interfaces/common';
 import { AccountService } from '../services/account.service';
 import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';
@@ -134,7 +134,7 @@ export const AccountStore = signalStore(
         });
       },
 
-      updateAccount(id: string, transaction: ITransaction, customerId: string): void {
+      updateAccount(id: string, transaction: ITransaction): void {
         patchState(store, {
           response: undefined,
           subErrors: undefined,
@@ -146,7 +146,7 @@ export const AccountStore = signalStore(
           next: (response) => patchState(store, {
             response: {
               message: translate.instant('ACCOUNT.UPDATED', { id: response.id }),
-              path: `accounts/customers/${ customerId }`,
+              path: `accounts/customers/${ transaction.customerId }`,
             },
             selected: undefined,
             subErrors: undefined,

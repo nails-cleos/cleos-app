@@ -2,11 +2,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UpcomingComponent } from './upcoming.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
-import { IUpcomingAll } from '../../../interfaces/reservation';
-import { Price } from '../../../interfaces/treatment';
-import { ServiceType } from '../../../interfaces/room';
+import { IUpcomingAll } from '../../../reservation/reservation';
+import { Price } from '../../../treatment/treatment';
+import { ServiceType } from '../../../room/room';
 import { Role } from '../../../interfaces/token';
-import { ICurrencyAll } from '../../../interfaces/currency';
+import { ICurrencyAll } from '../../../currency/currency';
 
 describe('UpcomingComponent', () => {
   let component: UpcomingComponent;

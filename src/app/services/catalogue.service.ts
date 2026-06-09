@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
+import { ICatalogue, ICatalogueAll } from '../catalogue/catalogue';
 import { dataURLToBlob } from '../util/file';
 import { toUrl } from '../util/helper';
 import { IApiResponse } from '../interfaces/common';

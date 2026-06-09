@@ -12,8 +12,8 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { combineLatestWith } from 'rxjs';
-import { IUserAll } from '../../interfaces/user';
-import { DiscountType, IDiscountAll } from '../../interfaces/discount';
+import { IUserAll } from '../../user/user';
+import { DiscountType, IDiscountAll } from '../discount';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,

@@ -32,7 +32,7 @@ import {
   ITotalType,
   SummaryType,
   TotalType,
-} from '../../interfaces/dashboard';
+} from '../dashboard';
 import {
   allElementsHaveSameKeyFilterValue,
   currencySymbol,

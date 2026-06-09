@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { CurrencyComponent } from './currency.component';
 import { CurrencyStore } from '../store/currency.store';
-import { ICurrency } from '../interfaces/currency';
+import { ICurrency } from './currency';
 import { ICommon } from '../interfaces/common';
 import { SkeletonComponent } from '../shared/skeleton.component';
 

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { ExpenseComponent } from './expense.component';
 import { ExpenseStore } from '../../../store/expense.store';
-import { IExpense } from '../../../interfaces/expense';
+import { IExpense } from './expense';
 import { ICommon } from '../../../interfaces/common';
 
 @Component({

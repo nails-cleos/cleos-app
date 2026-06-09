@@ -20,8 +20,8 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-import { IInvoice } from '../../interfaces/invoice';
-import { IOffice, IOfficeAll, Office } from '../../interfaces/office';
+import { IInvoice } from '../invoice';
+import { IOfficeAll } from '../../office/office';
 import { pdf } from '../../util/invoice';
 import { requireMatch } from '../../util/validators';
 import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
@@ -29,9 +29,11 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import {
-  MatEndDate,
   MatDatepickerToggle,
-  MatDateRangeInput, MatDateRangePicker, MatStartDate,
+  MatDateRangeInput,
+  MatDateRangePicker,
+  MatEndDate,
+  MatStartDate,
 } from '@angular/material/datepicker';
 import { provideMonthPeriodAdapter } from '../../util/adapter/app-date.provider';
 import { DriveAccessService } from '../../services/drive-access.service';
@@ -273,10 +275,10 @@ export class InvoiceListComponent {
     }
     const allSelected = this.selectionSignal().selected.length === this.resultsLengthSignal();
     if (allSelected) {
-      const office: IOffice = new Office();
-      office.lastInvoiceNumber = start + this.selectionSignal().selected.length;
-
-      this.invoiceStore.updateOffice(selectedOffice.id, office);
+      this.invoiceStore.updateOffice(
+        selectedOffice.id,
+        { lastInvoiceNumber: start + this.selectionSignal().selected.length },
+      );
     }
     await this.loadFonts();
     const fileName = `Sales ${ invoiceFormat(this.getDateRangeForm.startDate.value!) }.pdf`;

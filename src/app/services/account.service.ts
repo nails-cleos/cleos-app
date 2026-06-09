@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IAccountAll, IAccountTransaction, ITransaction } from '../interfaces/account';
+import { IAccountAll, IAccountTransaction, ITransaction } from '../account/account';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
 import { SortDirection } from '@angular/material/sort';

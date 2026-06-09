@@ -5,8 +5,8 @@ import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth
 import { NavigationService } from '../../services/navigation.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { signal } from '@angular/core';
-import { IChart } from '../../interfaces/dashboard';
-import { ICurrency } from '../../interfaces/currency';
+import { IChart } from '../../dashboard/dashboard';
+import { ICurrency } from '../../currency/currency';
 import { createChart } from '../../util/chart';
 
 describe('ChartComponent', () => {

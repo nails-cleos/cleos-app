@@ -7,7 +7,7 @@ import {
   CdkDropList,
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
-import { ICatalogueAll } from '../../interfaces/catalogue';
+import { ICatalogueAll } from '../catalogue';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';

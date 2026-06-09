@@ -4,7 +4,7 @@ import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { Store } from '@ngrx/store';
 import { deleteReservation, getPage } from '../../../store/actions/reservation.actions';
-import { IReservation, IReservationAll } from '../../../interfaces/reservation';
+import { IReservation, IReservationAll } from '../../../reservation/reservation';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { DialogComponent } from '../../../shared/dialog/generic/dialog.component';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';

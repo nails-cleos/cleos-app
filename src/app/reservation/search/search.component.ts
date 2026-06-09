@@ -12,7 +12,7 @@ import {
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
-import { CancelOption, IReservation, IReservationAll, States } from '../../interfaces/reservation';
+import { CancelOption, IReservation, IReservationAll, States } from '../reservation';
 import { combineLatestWith } from 'rxjs';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -22,7 +22,7 @@ import { cancelReservation, cleanReservation, getAllFilterReservations } from '.
 import { getNowTimeZone, isSameTimeZone, newDateTimestamp } from '../../util/dates';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { map, startWith } from 'rxjs/operators';
-import { IUser, IUserAll } from '../../interfaces/user';
+import { IUser, IUserAll } from '../../user/user';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { openCancel, openDialog } from '../../util/helper';

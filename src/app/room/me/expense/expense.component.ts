@@ -19,11 +19,11 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Expense, IExpense, IExpenseAll, ISupplyStore, ITotalExpense } from '../../../interfaces/expense';
+import { Expense, ExpenseForm, IExpense, IExpenseAll, ISupplyStore, ITotalExpense } from './expense';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { combineLatestWith } from 'rxjs';
-import { API_LOCALE, createNewDateZonedTime, getNowTimeZone } from '../../../util/dates';
-import { fieldChange, noDuplicateDatesValidator } from '../../../util/validators';
+import { createNewDateZonedTime, getNowTimeZone } from '../../../util/dates';
+import { noDuplicateDatesValidator } from '../../../util/validators';
 import { map, startWith } from 'rxjs/operators';
 import { TwoDigitsDirective } from '../../../directives/two-digits.directive';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
@@ -54,13 +54,6 @@ type TotalsForm = {
   gross: FormControl<string>;
   btw: FormControl<string>;
   description: FormControl<string>;
-}
-
-type ExpenseForm = {
-  invoice: FormControl<string>;
-  supplyStore: FormControl<string | ISupplyStore>;
-  date: FormControl<Date | undefined>;
-  totals: FormArray;
 }
 
 @Component({
@@ -299,14 +292,8 @@ export class ExpenseComponent {
       return;
     }
 
-    const expenseSignal = this.expense();
-    const expense: IExpense = new Expense();
-    const supplyStore = fieldChange(this.getForm.supplyStore, expenseSignal?.supplyStore);
-    expense.invoice = fieldChange(this.getForm.invoice, expenseSignal?.invoice);
-    expense.supplyStoreString = supplyStore?.id ? supplyStore.id : supplyStore.name;
-    expense.expenseTotals = this.totals.getRawValue() as unknown as ITotalExpense[];
-    expense.date = createNewDateZonedTime(date, expenseSignal?.room?.timeZone).toLocaleString(API_LOCALE);
-
+    const expense: IExpense = Expense.fromForm(this.getForm, date, this.expense(),
+      this.totals.getRawValue() as unknown as ITotalExpense[]);
     const file = uploadFile.raw;
     this.submitData.emit({ expense, file });
   }

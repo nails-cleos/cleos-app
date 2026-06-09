@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CurrencyComponent } from './currency.component';
 import { CurrencyStore } from '../store/currency.store';
-import { ICurrency } from '../interfaces/currency';
+import { ICurrency } from './currency';
 import { ICommon } from '../interfaces/common';
 
 @Component({

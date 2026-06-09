@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IUser, IUserAll } from '../../interfaces/user';
+import { IUser, IUserAll } from '../../user/user';
 import { combineLatestWith } from 'rxjs';
 import { requireMatch } from '../../util/validators';
 import {

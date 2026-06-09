@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { TransactionDetailComponent } from './transaction-detail.component';
-import { ITransaction } from '../../../interfaces/account';
+import { ITransaction } from '../../account';
 import { notifyPayment, paymentSend } from '../../../store/actions/payment.actions';
 import { NavigationService } from '../../../services/navigation.service';
 import { AccountStore } from '../../../store/account.store';

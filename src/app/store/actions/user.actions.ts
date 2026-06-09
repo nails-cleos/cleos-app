@@ -1,6 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 import { IError, IResponseSuccess, PageRequest } from '../../interfaces/common';
-import { IUser, IUserAll } from '../../interfaces/user';
+import { IUser, IUserAll } from '../../user/user';
 import { Role } from '../../interfaces/token';
 import { UserData } from '../reducers/user.reducers';
 

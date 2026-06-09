@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CatalogueCreatePageComponent } from './catalogue-create-page.component';
 import { CatalogueStore } from '../store/catalogue.store';
-import { ICatalogueAll } from '../interfaces/catalogue';
+import { ICatalogueAll } from './catalogue';
 
 describe('CatalogueCreatePageComponent', () => {
   let component: CatalogueCreatePageComponent;

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
-import { IMonthSummary, ISummaryTotal, Total } from '../../../interfaces/dashboard';
-import { ICurrencyAll } from '../../../interfaces/currency';
+import { IMonthSummary, ISummaryTotal, Total } from '../../dashboard';
+import { ICurrencyAll } from '../../../currency/currency';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CurrencyPipe } from '@angular/common';

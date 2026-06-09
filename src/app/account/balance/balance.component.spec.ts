@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BalanceComponent } from './balance.component';
-import { IAccountAll } from '../../interfaces/account';
+import { IAccountAll } from '../account';
 
 describe('BalanceComponent', () => {
   let component: BalanceComponent;

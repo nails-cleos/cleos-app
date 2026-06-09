@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 import { createFilter } from '../util/service-helper';
 import { paginated, Pagination } from '../interfaces/pagination';
-import { INotification } from '../interfaces/notification';
+import { INotification } from '../notification/notification';
 
 describe('NotificationService', () => {
   let service: NotificationService;

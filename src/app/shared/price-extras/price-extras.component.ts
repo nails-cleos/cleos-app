@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { IAdditionalAll } from '../../interfaces/additional';
-import { IExtras } from '../../interfaces/reservation';
-import { ICurrencyAll } from '../../interfaces/currency';
+import { IAdditionalAll } from '../../additional/additional';
+import { IExtras } from '../../reservation/reservation';
+import { ICurrencyAll } from '../../currency/currency';
 import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
 import { TranslatePipe } from '@ngx-translate/core';
 import { DecimalPipe } from '@angular/common';

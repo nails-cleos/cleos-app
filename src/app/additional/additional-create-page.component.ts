@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AdditionalComponent } from './additional.component';
-import { IAdditional } from '../interfaces/additional';
+import { IAdditional } from './additional';
 import { AdditionalStore } from '../store/additional.store';
 import { ICommon } from '../interfaces/common';
 

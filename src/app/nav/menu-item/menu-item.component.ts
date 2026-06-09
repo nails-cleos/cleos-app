@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { IMenu } from '../../interfaces/user';
+import { IMenu } from '../../user/user';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateService } from '@ngx-translate/core';

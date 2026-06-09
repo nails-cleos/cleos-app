@@ -2,9 +2,9 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
-import { IAdditionalAll } from '../interfaces/additional';
+import { IAdditionalAll } from './additional';
 import { ICommon } from '../interfaces/common';
-import { ITreatmentGroupAll } from '../interfaces/treatment';
+import { ITreatmentGroupAll } from '../treatment/treatment';
 import { NavigationService } from '../services/navigation.service';
 import { AdditionalStore } from '../store/additional.store';
 import { AdditionalComponent } from './additional.component';

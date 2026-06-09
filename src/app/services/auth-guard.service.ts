@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
-import { IUser } from '../interfaces/user';
+import { IUser } from '../user/user';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { redirect } from '../store/actions/auth.actions';

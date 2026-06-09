@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TranslateModule } from '@ngx-translate/core';
 import { AdditionalDetailsPageComponent } from './additional-details-page.component';
 import { AdditionalStore } from '../store/additional.store';
-import { IAdditionalAll } from '../interfaces/additional';
+import { IAdditionalAll } from './additional';
 import { AdditionalComponent } from './additional.component';
 
 describe('AdditionalDetailsPageComponent', () => {

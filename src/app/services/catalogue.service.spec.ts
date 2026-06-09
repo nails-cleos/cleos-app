@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { CatalogueService } from './catalogue.service';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { of } from 'rxjs';
-import { ICatalogue, ICatalogueAll } from '../interfaces/catalogue';
+import { ICatalogue, ICatalogueAll } from '../catalogue/catalogue';
 
 describe('CatalogueService', () => {
   let service: CatalogueService;

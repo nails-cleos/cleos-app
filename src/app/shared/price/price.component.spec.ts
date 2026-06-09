@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup } from '@angular/forms';
 
 import { PriceComponent } from './price.component';
-import { ICurrency } from '../../interfaces/currency';
-import { Price } from '../../interfaces/treatment';
+import { ICurrency } from '../../currency/currency';
+import { Price } from '../../treatment/treatment';
 import { TranslateModule } from '@ngx-translate/core';
 import { BankForm } from '../bank/bank.component';
 

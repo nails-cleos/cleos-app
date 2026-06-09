@@ -2,11 +2,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReviewDialogComponent } from './review-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { IReservationAll } from '../../../interfaces/reservation';
-import { IAddress, IRoomAll, ServiceType } from '../../../interfaces/room';
-import { IUserAll } from '../../../interfaces/user';
-import { ICurrencyAll } from '../../../interfaces/currency';
-import { ITreatmentAll } from '../../../interfaces/treatment';
+import { IReservationAll } from '../../../reservation/reservation';
+import { IAddress, IRoomAll, ServiceType } from '../../../room/room';
+import { IUserAll } from '../../../user/user';
+import { ICurrencyAll } from '../../../currency/currency';
+import { ITreatmentAll } from '../../../treatment/treatment';
 import { getCurrentTimeZone } from '../../../util/dates';
 
 describe('ReviewDialogComponent', () => {

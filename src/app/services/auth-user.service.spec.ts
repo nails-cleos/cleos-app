@@ -3,7 +3,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NgcCookieConsentService } from 'ngx-cookieconsent';
 
 import { AuthUserService } from './auth-user.service';
-import { IUserAll } from '../interfaces/user';
+import { IUserAll } from '../user/user';
 import { Role } from '../interfaces/token';
 
 describe('AuthUserService', () => {

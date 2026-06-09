@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
-import { ITreatmentGroupAll } from '../../interfaces/treatment';
+import { ITreatmentGroupAll } from '../treatment';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
 import { TreatmentStore } from '../../store/treatment.store';
 import { TreatmentListComponent } from './treatment-list.component';

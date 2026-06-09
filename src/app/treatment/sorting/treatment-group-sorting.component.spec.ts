@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
-import { ITreatmentGroupAll } from '../../interfaces/treatment';
+import { ITreatmentGroupAll } from '../treatment';
 import { ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
 import { TreatmentStore } from '../../store/treatment.store';
 import { TreatmentGroupSortingComponent } from './treatment-group-sorting.component';

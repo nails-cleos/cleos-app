@@ -3,7 +3,7 @@ import { BehaviorSubject, of } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ColorListComponent } from './color-list.component';
-import { IColor } from '../../interfaces/color';
+import { IColor } from '../color';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { ActivatedRoute, Router } from '@angular/router';
 import { signal } from '@angular/core';

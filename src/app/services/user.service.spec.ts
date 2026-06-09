@@ -3,11 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 
 import { UserService } from './user.service';
-import { IOverview, IUserAll } from '../interfaces/user';
+import { IOverview, IUserAll } from '../user/user';
 import { Role, Token } from '../interfaces/token';
 import { Pagination } from '../interfaces/pagination';
-import { IRoomAll } from '../interfaces/room';
-import { ICustomerLastReservation } from '../interfaces/reservation';
+import { IRoomAll } from '../room/room';
+import { ICustomerLastReservation } from '../reservation/reservation';
 import { IApiResponse } from '../interfaces/common';
 
 describe('UserService', () => {

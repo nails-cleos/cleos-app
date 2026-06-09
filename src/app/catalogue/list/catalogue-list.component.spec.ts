@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
-import { ICatalogueAll } from '../../interfaces/catalogue';
+import { ICatalogueAll } from '../catalogue';
 import { CatalogueListComponent } from './catalogue-list.component';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';

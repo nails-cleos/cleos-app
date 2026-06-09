@@ -14,7 +14,7 @@ import {
   QuarterSummary,
   SummaryTotals,
   Total,
-} from '../../interfaces/dashboard';
+} from '../dashboard';
 import { exportYearSummary, getYearSummary } from '../../store/actions/dashboard.actions';
 import { AuthUserService } from '../../services/auth-user.service';
 import {

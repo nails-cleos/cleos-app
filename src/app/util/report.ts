@@ -15,7 +15,7 @@ import {
   ISummaryTotal,
   ISummaryTotals,
   SummaryType,
-} from '../interfaces/dashboard';
+} from '../dashboard/dashboard';
 import { TranslateService } from '@ngx-translate/core';
 import { titleCase } from './helper';
 import { EnvService } from '../services/env.service';

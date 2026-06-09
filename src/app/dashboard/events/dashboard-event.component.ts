@@ -21,7 +21,7 @@ import {
 } from '../../util/dates';
 import { Store } from '@ngrx/store';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { ICalendarNote, ICalendarReservations, IProfessionalEvent } from '../../interfaces/dashboard';
+import { ICalendarNote, ICalendarReservations, IProfessionalEvent } from '../dashboard';
 import { getMyEvent, updateEvent } from '../../store/actions/dashboard.actions';
 import { approveReservation, startReservation } from '../../store/actions/reservation.actions';
 import {
@@ -31,7 +31,7 @@ import {
   Professional,
 } from './day-view-scheduler.component';
 import { EventColor } from 'calendar-utils';
-import { Day, IReservation, MAX_RESERVATION_MONTH, States } from '../../interfaces/reservation';
+import { Day, IReservation, MAX_RESERVATION_MONTH, States } from '../../reservation/reservation';
 import { addMonths, isSameDay, isToday } from 'date-fns';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';

@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IPay, IPayment, IPaymentAll, IPaymentOption, IPaymentRequest, IPaymentStatus } from '../interfaces/payment';
-import { IReservationPayment } from '../interfaces/reservation';
+import { IReservationPayment } from '../reservation/reservation';
 import { toUrl } from '../util/helper';
 import { IApiResponse } from '../interfaces/common';
 

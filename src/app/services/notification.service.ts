@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { INotification } from '../interfaces/notification';
+import { INotification } from '../notification/notification';
 import { HttpClient } from '@angular/common/http';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';

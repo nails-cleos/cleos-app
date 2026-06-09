@@ -1,20 +1,16 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { IAvailability, IRoom } from '../../interfaces/room';
+import { IAvailability, IRoom, IRoomAll } from '../room';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
-import { cleanRoom, deleteRoom, getRoomsPage, roomSelected } from '../../store/actions/room.actions';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { findDayOfWeek, getTimeZone, ITimeZone } from '../../util/dates';
 import { executeDialogNoWidth } from '../../util/helper';
 import { SortByPipe } from '../../pipes/sort-by.pipe';
-import { RoomState } from '../../store/reducers/room.reducers';
-import { getRoomPaginationPipe, getRoomResponsePipe } from '../../store/selectors/room.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatIcon } from '@angular/material/icon';
 import { MatIconButton } from '@angular/material/button';
@@ -37,6 +33,7 @@ import {
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';
 import { RouterLink } from '@angular/router';
+import { RoomStore } from '../../store/room.store';
 
 @Component({
   selector: 'app-room-list',
@@ -50,20 +47,16 @@ import { RouterLink } from '@angular/router';
 })
 export class RoomListComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<RoomState> = inject(Store<RoomState>);
+  private readonly roomStore = inject(RoomStore);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private roomList$ = this.store.pipe(getRoomPaginationPipe);
-  private response$ = this.store.pipe(getRoomResponsePipe);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
   private tableState = createMatTableState(this.paginator, this.sort, 'office', 'asc');
 
-  private roomListSignal = toSignal(this.roomList$);
-  private responseSignal = toSignal(this.response$);
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -77,7 +70,7 @@ export class RoomListComponent {
   );
 
   paginatorPageIndex = this.tableState.pageIndex;
-  dataSourceSignal = computed(() => this.roomListSignal()?.content?.map((room: IRoom) => {
+  dataSourceSignal = computed(() => this.roomStore.data()?.content?.map((room: IRoom) => {
     if (room && room.availabilities && room.availabilities.length) {
       const availabilities = room.availabilities.map((i: IAvailability) =>
         Object.assign({}, i, { order: findDayOfWeek(i.day) }));
@@ -85,7 +78,7 @@ export class RoomListComponent {
     }
     return room;
   }));
-  resultsLengthSignal = computed(() => this.roomListSignal()?.totalElements || 0);
+  resultsLengthSignal = computed(() => this.roomStore.data()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
   displayedColumns: string[] = ['position', 'currency', 'office', 'address', 'timeZone', 'availability', 'actions'];
@@ -94,30 +87,30 @@ export class RoomListComponent {
   language: string = this.translate.getCurrentLang();
 
   constructor() {
+    this.roomStore.clean();
+
     effect(() => {
       const request = this.tableState.baseRequest();
-      this.store.dispatch(
-        getRoomsPage({
-          ...request,
-          size: this.pageSizeSignal(),
-        }),
-      );
+      this.roomStore.loadPage({
+        ...request,
+        size: this.pageSizeSignal(),
+      });
     });
-    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanRoom()));
+    this.tableState.resetOn(this.roomStore.response, () => this.roomStore.clean());
   }
 
   getTimeZone = (timeZone?: string): ITimeZone => getTimeZone(timeZone);
 
   getGMT = (timeZone?: string): string => this.getTimeZone(timeZone).gmt;
 
-  edit = (selected: IRoom): void => this.store.dispatch(roomSelected({ selected, redirect: true }));
+  edit = (selected: IRoomAll): void => this.roomStore.selectAndNavigate(selected);
 
   delete = (room: IRoom): void => {
     const title = this.translate.instant('ROOM.DELETED.TITLE');
     const content = this.translate.instant('ROOM.DELETED.CONTENT', { name: room.address?.name });
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: room, variant: 'warning' }, result => {
       if (result) {
-        this.store.dispatch(deleteRoom({ id: result.id, room: result }));
+        this.roomStore.delete(result);
       }
     });
   };

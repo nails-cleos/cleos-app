@@ -3,7 +3,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { signal } from '@angular/core';
 
 import { ColorComponent } from './color.component';
-import { IColorAll } from '../interfaces/color';
+import { IColorAll } from './color';
 import { ICommon } from '../interfaces/common';
 import { ColorStore } from '../store/color.store';
 import { NavigationService } from '../services/navigation.service';

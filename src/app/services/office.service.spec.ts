@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { OfficeService } from './office.service';
 import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
-import { IOfficeAll } from '../interfaces/office';
+import { IOfficeAll } from '../office/office';
 import { createFilter } from '../util/service-helper';
 import { paginated, Pagination } from '../interfaces/pagination';
 

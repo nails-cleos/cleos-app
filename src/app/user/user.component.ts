@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { getUser, saveUser } from '../store/actions/user.actions';
-import { IUser, User } from '../interfaces/user';
+import { User } from './user';
 import { flags, IFlag } from '../util/flags';
 import { randomColor } from '../util/color';
-import { backendFormatDate, createDateFromString, newDate } from '../util/dates';
-import { fieldChange, validColorValidator, valueChange } from '../util/validators';
-import { createAddress } from '../util/helper';
+import { createDateFromString } from '../util/dates';
+import { validColorValidator } from '../util/validators';
 import { LangChangeEvent, TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Role } from '../interfaces/token';
 import { GoogleMapComponent, GoogleMapForm } from '../shared/google-map/google-map.component';
@@ -29,20 +28,9 @@ import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
-import PlaceGeometry = google.maps.places.PlaceGeometry;
 import PlaceResult = google.maps.places.PlaceResult;
-
-type UserForm = {
-  role: FormControl<Role | undefined>,
-  displayName: FormControl<string>,
-  email: FormControl<string>,
-  lang: FormControl<string | undefined>;
-  phone: FormControl<string | undefined>,
-  dob: FormControl<Date | undefined>,
-  darkColor: FormControl<string>,
-  lightColor: FormControl<string>,
-  addressForm: FormGroup<GoogleMapForm>;
-}
+import PlaceGeometry = google.maps.places.PlaceGeometry;
+import { UserForm } from './user-form.types';
 
 @Component({
   selector: 'app-user',
@@ -201,25 +189,14 @@ export class UserComponent {
       return;
     }
     const userSignal = this.userSignal();
-    const user: IUser = new User();
-    user.locale = valueChange(this.getForm.lang.value, userSignal?.locale) || this.translate.getCurrentLang();
-    user.email = fieldChange(this.getForm.email, userSignal?.email);
-    user.displayName = fieldChange(this.getForm.displayName, userSignal?.displayName);
-    user.phone = fieldChange(this.getForm.phone, userSignal?.phone);
-    user.dob = fieldChange(this.getForm.dob, userSignal?.dob);
-    user.dob = user.dob ? backendFormatDate(newDate(user.dob)) : user.dob;
-
-    if (this.isProfessionalOrManager) {
-      if (this.getForm.lightColor.value) {
-        user.lightColor = this.getForm.lightColor.value;
-      }
-
-      if (this.getForm.darkColor.value) {
-        user.darkColor = this.getForm.darkColor.value;
-      }
-    }
-
-    user.address = createAddress(this.formattedAddress, this.geometry?.location, userSignal?.address);
+    const user = User.fromForm(
+      this.getForm,
+      userSignal,
+      this.translate.getCurrentLang(),
+      this.isProfessionalOrManager,
+      this.formattedAddress,
+      this.geometry?.location,
+    );
 
     const id = this.id();
     if (!id) {

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { DiscountComponent } from './discount.component';
 import { DiscountStore } from '../store/discount.store';
-import { IDiscount } from '../interfaces/discount';
+import { IDiscount } from './discount';
 import { ICommon } from '../interfaces/common';
 
 @Component({

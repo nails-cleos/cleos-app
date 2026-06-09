@@ -1,4 +1,4 @@
-import { IUserAll } from './user';
+import { IUserAll } from '../user/user';
 
 export interface IItem {
   key?: string;

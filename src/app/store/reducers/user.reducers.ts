@@ -21,7 +21,7 @@ import {
   userSelected,
   userSuccess,
 } from '../actions/user.actions';
-import { IOverview, IUserAll } from '../../interfaces/user';
+import { IOverview, IUserAll } from '../../user/user';
 import { Pagination } from '../../interfaces/pagination';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';

@@ -4,7 +4,7 @@ import { of, throwError } from 'rxjs';
 
 import { DocumentStore } from './document.store';
 import { DocumentService } from '../services/document.service';
-import { DocumentTypeEnum, IDocument } from '../interfaces/document';
+import { DocumentTypeEnum, IDocument } from '../document/document';
 
 describe('DocumentStore', () => {
   let store: InstanceType<typeof DocumentStore>;

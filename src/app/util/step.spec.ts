@@ -2,7 +2,6 @@
 
 import { MatStepper } from '@angular/material/stepper';
 
-import { Step } from '../interfaces/step';
 import {
   completeAndNext,
   enableStep,
@@ -14,6 +13,7 @@ import {
   getStepName,
   getStepOptional,
   goNextStep,
+  Step,
 } from './step';
 import { FirebaseService } from '../services/firebase.service';
 

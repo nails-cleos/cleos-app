@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IOfficeAll } from '../interfaces/office';
-import { IInvoice, IInvoiceData } from '../interfaces/invoice';
+import { IOfficeAll } from '../office/office';
+import { IInvoice, IInvoiceData } from '../invoice/invoice';
 import { toUrl } from '../util/helper';
 import { paginated, Pagination } from '../interfaces/pagination';
 import { SortDirection } from '@angular/material/sort';

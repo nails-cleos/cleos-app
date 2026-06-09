@@ -7,9 +7,9 @@ import { TranslateModule } from '@ngx-translate/core';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { getCustomerOverview } from '../../store/actions/user.actions';
-import { IOverview } from '../../interfaces/user';
-import { IReservationOverview } from '../../interfaces/reservation';
-import { IChart } from '../../interfaces/dashboard';
+import { IOverview } from '../user';
+import { IReservationOverview } from '../../reservation/reservation';
+import { IChart } from '../../dashboard/dashboard';
 import { signal } from '@angular/core';
 import { UserState } from '../../store/reducers/user.reducers';
 

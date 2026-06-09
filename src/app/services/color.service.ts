@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { paginated, Pagination } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
-import { IColor, IColorAll } from '../interfaces/color';
+import { IColor, IColorAll } from '../color/color';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
 import { SortDirection } from '@angular/material/sort';

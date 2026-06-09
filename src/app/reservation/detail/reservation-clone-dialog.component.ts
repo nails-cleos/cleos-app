@@ -9,9 +9,9 @@ import {
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { filterDateRoom, getAvailability, getNowTimeZone, getStartEndDay, getTime } from '../../util/dates';
 import { addMonths } from 'date-fns';
-import { MAX_RESERVATION_MONTH } from '../../interfaces/reservation';
+import { MAX_RESERVATION_MONTH } from '../reservation';
 import { TranslatePipe } from '@ngx-translate/core';
-import { IRoomAll } from '../../interfaces/room';
+import { IRoomAll } from '../../room/room';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { MatIcon } from '@angular/material/icon';

@@ -10,17 +10,12 @@ import { RoomDetailsPageComponent } from './room-details-page.component';
 import { ExpenseCreatePageComponent } from './me/expense/expense-create-page.component';
 import { ExpenseDetailsPageComponent } from './me/expense/expense-details-page.component';
 import { RoomMeDetailsPageComponent } from './room-me-details-page.component';
-import { provideEffects } from '@ngrx/effects';
-import { provideState } from '@ngrx/store';
 import { AwsLambdaService } from '../services/aws-lambda.service';
 import { ExpenseService } from '../services/expense.service';
 import { RoomService } from '../services/room.service';
 import { TokenService } from '../services/token.service';
 import { UserService } from '../services/user.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
-import { RoomEffects } from '../store/effects/room.effects';
-import { ROOM_FEATURE_KEY, roomReducer } from '../store/reducers/room.reducers';
-import { RoomNavigationEffects } from './room-navigation.effects';
 
 const providers = [
   provideFeatureTranslations('room'),
@@ -29,8 +24,6 @@ const providers = [
   ExpenseService,
   TokenService,
   AwsLambdaService,
-  provideState(ROOM_FEATURE_KEY, roomReducer),
-  provideEffects(RoomEffects, RoomNavigationEffects),
 ];
 
 const children: Routes = [

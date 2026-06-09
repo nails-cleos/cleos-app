@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CatalogueDetailsPageComponent } from './catalogue-details-page.component';
 import { CatalogueStore } from '../store/catalogue.store';
-import { ICatalogueAll } from '../interfaces/catalogue';
+import { ICatalogueAll } from './catalogue';
 import { signal } from '@angular/core';
 import { CatalogueComponent } from './catalogue.component';
 

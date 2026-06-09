@@ -4,7 +4,7 @@ import {
   ISorted,
   ItemSorting,
 } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
-import { IAdditionalAll } from '../../interfaces/additional';
+import { IAdditionalAll } from '../additional';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AdditionalStore } from '../../store/additional.store';
 

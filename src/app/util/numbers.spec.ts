@@ -1,5 +1,5 @@
 import { closest, numberFormat } from './numbers';
-import { ICurrency } from '../interfaces/currency';
+import { ICurrency } from '../currency/currency';
 import { API_LOCALE } from './dates';
 
 describe('Number Utils', () => {

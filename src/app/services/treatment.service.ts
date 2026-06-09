@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ITreatmentAll, ITreatmentDiscountDTO, ITreatmentGroup, ITreatmentGroupAll } from '../interfaces/treatment';
+import { ITreatmentAll, ITreatmentDiscountDTO, ITreatmentGroup, ITreatmentGroupAll } from '../treatment/treatment';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';

@@ -11,8 +11,8 @@ import {
   treatmentSuccess,
   updateMyUser,
 } from '../actions/main.actions';
-import { ICatalogueAll } from '../../interfaces/catalogue';
-import { ITreatmentGroup } from '../../interfaces/treatment';
+import { ICatalogueAll } from '../../catalogue/catalogue';
+import { ITreatmentGroup } from '../../treatment/treatment';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
 

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IColorAll } from '../../interfaces/color';
+import { IColorAll } from '../../color/color';
 import { combineLatestWith } from 'rxjs';
 import { requireMatch } from '../../util/validators';
 import {

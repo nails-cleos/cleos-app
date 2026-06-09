@@ -16,8 +16,8 @@ import {
   MonthSummary,
   SummaryTotals,
   Total,
-} from '../../interfaces/dashboard';
-import { ICurrencyAll } from '../../interfaces/currency';
+} from '../dashboard';
+import { ICurrencyAll } from '../../currency/currency';
 import fs from 'file-saver';
 import { signal } from '@angular/core';
 

@@ -29,7 +29,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Role, Token } from '../../interfaces/token';
 import { getLocale } from '../../util/helper';
 import { Pagination } from '../../interfaces/pagination';
-import { IOverview, IUserAll } from '../../interfaces/user';
+import { IOverview, IUserAll } from '../../user/user';
 import { IApiResponse, success, successResponse } from '../../interfaces/common';
 import { ToastType } from '../../shared/toast/toast.model';
 import { loginSuccess } from '../actions/auth.actions';

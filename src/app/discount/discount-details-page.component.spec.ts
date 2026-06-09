@@ -2,7 +2,7 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DiscountDetailsPageComponent } from './discount-details-page.component';
 import { DiscountStore } from '../store/discount.store';
-import { IDiscountAll } from '../interfaces/discount';
+import { IDiscountAll } from './discount';
 import { DiscountComponent } from './discount.component';
 import { TranslateModule } from '@ngx-translate/core';
 

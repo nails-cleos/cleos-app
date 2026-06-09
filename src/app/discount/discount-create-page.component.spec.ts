@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DiscountCreatePageComponent } from './discount-create-page.component';
 import { DiscountStore } from '../store/discount.store';
-import { IDiscountAll } from '../interfaces/discount';
+import { IDiscountAll } from './discount';
 import { TranslateModule } from '@ngx-translate/core';
 
 describe('DiscountCreatePageComponent', () => {

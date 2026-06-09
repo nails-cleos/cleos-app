@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AdditionalCreatePageComponent } from './additional-create-page.component';
 import { AdditionalStore } from '../store/additional.store';
-import { IAdditionalAll } from '../interfaces/additional';
+import { IAdditionalAll } from './additional';
 
 describe('AdditionalCreatePageComponent', () => {
   let component: AdditionalCreatePageComponent;

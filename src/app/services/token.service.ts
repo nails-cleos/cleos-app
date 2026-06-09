@@ -2,7 +2,7 @@ import { computed, DestroyRef, effect, inject, Injectable, signal } from '@angul
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Subscription, timer } from 'rxjs';
 
-import { IUserAll } from '../interfaces/user';
+import { IUserAll } from '../user/user';
 import { getNowTimeZone, newDate, plusMinutes } from '../util/dates';
 import { getDriveTokenPipe } from '../store/selectors/auth.selectors';
 import { AuthState } from '../store/reducers/auth.reducers';

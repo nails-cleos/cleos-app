@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { of } from 'rxjs';
 
 import { AdditionalService } from './additional.service';
-import { IAdditional, IAdditionalAll } from '../interfaces/additional';
+import { IAdditional, IAdditionalAll } from '../additional/additional';
 import { paginated, Pagination } from '../interfaces/pagination';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { IApiResponse } from '../interfaces/common';

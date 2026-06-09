@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, Signal } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
-import { IUser, IUserAll } from '../../interfaces/user';
+import { IUser, IUserAll } from '../user';
 import { combineLatestWith } from 'rxjs';
 import { requireMatch } from '../../util/validators';
 import {

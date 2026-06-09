@@ -9,7 +9,7 @@ import {
   MonthSummary,
   SummaryTotals,
   Total,
-} from '../../interfaces/dashboard';
+} from '../dashboard';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
@@ -18,7 +18,7 @@ import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular
 import { dateMonthYear, getDateQuarter, getNowTimeZone } from '../../util/dates';
 import { AuthUserService } from '../../services/auth-user.service';
 import { allElementsHaveSameKeyFilterValue, currencySymbol, getCurrencyFromRoom } from '../../util/helper';
-import { ICurrencyAll } from '../../interfaces/currency';
+import { ICurrencyAll } from '../../currency/currency';
 import { createQuarterSummary } from '../../util/report';
 import fs from 'file-saver';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';

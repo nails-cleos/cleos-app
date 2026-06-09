@@ -19,7 +19,7 @@ import {
   MatTableDataSource,
 } from '@angular/material/table';
 import { createMatTableState } from 'src/app/util/mat-table-state';
-import { ITreatmentAll } from '../../interfaces/treatment';
+import { ITreatmentAll } from '../treatment';
 import { convertDuration } from '../../util/dates';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PAGE_SIZE } from '../../interfaces/pagination';

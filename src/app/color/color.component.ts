@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Color, ColorForm, IColor, IColorAll } from '../interfaces/color';
+import { Color, ColorForm, IColor, IColorAll } from './color';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { ICommon, IError } from '../interfaces/common';
 import { MatError, MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';

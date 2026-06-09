@@ -7,7 +7,7 @@ import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatDialog } from '@angular/material/dialog';
-import { Price } from '../../../interfaces/treatment';
+import { Price } from '../../../treatment/treatment';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { DiscountStore } from '../../../store/discount.store';
 

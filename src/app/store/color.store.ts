@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { signalStore } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
 import { IApiResponse } from '../interfaces/common';
-import { IColor, IColorAll } from '../interfaces/color';
+import { IColor, IColorAll } from '../color/color';
 import { ColorService } from '../services/color.service';
 import { withCrudStoreMethods, withCrudStoreState } from './crud-signal-store';
 

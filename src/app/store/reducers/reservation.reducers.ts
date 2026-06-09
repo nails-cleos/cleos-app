@@ -67,16 +67,16 @@ import {
   IRoomReservation,
   ITracking,
   IUpcomingAll,
-} from '../../interfaces/reservation';
-import { IUserAll } from '../../interfaces/user';
-import { ITreatmentDiscountDTO } from '../../interfaces/treatment';
-import { IRoomAll } from '../../interfaces/room';
+} from '../../reservation/reservation';
+import { IUserAll } from '../../user/user';
+import { ITreatmentDiscountDTO } from '../../treatment/treatment';
+import { IRoomAll } from '../../room/room';
 import { Pagination } from '../../interfaces/pagination';
 import { IPaymentAll } from '../../interfaces/payment';
-import { IAdditionalAll } from '../../interfaces/additional';
-import { IOffice } from '../../interfaces/office';
-import { IColorAll } from '../../interfaces/color';
-import { IReview } from '../../interfaces/review';
+import { IAdditionalAll } from '../../additional/additional';
+import { IOffice } from '../../office/office';
+import { IColorAll } from '../../color/color';
+import { IReview } from '../../me/reservation/list/review';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
 import { clearGlobalError, clearGlobalResponse } from '../actions/global.actions';

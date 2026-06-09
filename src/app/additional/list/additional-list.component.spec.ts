@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, of } from 'rxjs';
 
-import { IAdditional } from '../../interfaces/additional';
+import { IAdditional } from '../additional';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { AdditionalStore } from '../../store/additional.store';
 import { AdditionalListComponent } from './additional-list.component';

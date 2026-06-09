@@ -1,39 +1,40 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CustomersComponent } from './customers.component';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { Subject } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
-import { getAllCustomersInfo } from '../../../store/actions/room.actions';
-import { IRoomCustomer } from '../../../interfaces/room';
+import { IRoomCustomer } from '../../room';
 import { ActivatedRoute } from '@angular/router';
-import { RoomState } from '../../../store/reducers/room.reducers';
+import { RoomStore } from '../../../store/room.store';
+import { signal } from '@angular/core';
 
 describe('CustomersComponent', () => {
   let component: CustomersComponent;
   let fixture: ComponentFixture<CustomersComponent>;
 
-  let customers$: BehaviorSubject<any>;
   let breakpointObserver$: Subject<BreakpointState>;
 
-  let storeSpy: jasmine.SpyObj<Store<RoomState>>;
+  let roomStoreSpy: {
+    customers: ReturnType<typeof signal<any>>;
+    loadCustomers: jasmine.Spy;
+  };
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
 
   beforeEach(async () => {
-    customers$ = new BehaviorSubject<IRoomCustomer[]>([]);
     breakpointObserver$ = new Subject<BreakpointState>();
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    roomStoreSpy = {
+      customers: signal<IRoomCustomer[]>([]),
+      loadCustomers: jasmine.createSpy('loadCustomers'),
+    };
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
 
     breakpointObserverSpy.observe.and.returnValue(breakpointObserver$.asObservable());
 
-    storeSpy.pipe.and.returnValue(customers$.asObservable());
-
     await TestBed.configureTestingModule({
       imports: [CustomersComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: RoomStore, useValue: roomStoreSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
       ],
@@ -46,7 +47,6 @@ describe('CustomersComponent', () => {
   });
 
   afterEach(() => {
-    customers$.complete();
     breakpointObserver$.complete();
   });
 
@@ -54,11 +54,11 @@ describe('CustomersComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should dispatch GetAllCustomersInfo when route param changes', () => {
+  it('should load customers when route param changes', () => {
     fixture.componentRef.setInput('id', 'room-1');
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllCustomersInfo({ id: 'room-1' }));
+    expect(roomStoreSpy.loadCustomers).toHaveBeenCalledWith('room-1');
   });
 
   it('should update datasource when customers change', () => {
@@ -66,7 +66,7 @@ describe('CustomersComponent', () => {
       { customerId: '1', customerName: 'Lucas', days: 3, lastTime: new Date().getTime(), reservationId: '123' },
     ];
 
-    customers$.next(customersMock);
+    roomStoreSpy.customers.set(customersMock);
     fixture.detectChanges();
 
     expect(component.dataSource().data).toEqual(customersMock);

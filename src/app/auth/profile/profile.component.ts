@@ -9,13 +9,13 @@ import {
   viewChild,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { IUser, User } from '../../interfaces/user';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { User } from '../../user/user';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { cleanUser, getMyUser, updateMyPhoto, updateMyUser } from '../../store/actions/user.actions';
-import { fieldChange, validColorValidator, valueChange } from '../../util/validators';
+import { validColorValidator, valueChange } from '../../util/validators';
 import { flags, IFlag } from '../../util/flags';
-import { createAddress, getDisplayNameInitials, getLocale, getUserImage } from '../../util/helper';
-import { backendFormatDate, createDateFromString, newDate } from '../../util/dates';
+import { getDisplayNameInitials, getLocale, getUserImage } from '../../util/helper';
+import { createDateFromString } from '../../util/dates';
 import { Role } from '../../interfaces/token';
 import { LangChangeEvent, TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { resizeImage } from '../../util/file';
@@ -35,19 +35,10 @@ import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker'
 import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
 import { MatButton, MatIconButton } from '@angular/material/button';
-import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
+import PlaceResult = google.maps.places.PlaceResult;
 import { MatCheckbox } from '@angular/material/checkbox';
-
-type ProfileForm = {
-  lang: FormControl<string | undefined>;
-  displayName: FormControl<string>;
-  phone: FormControl<string>;
-  dob: FormControl<Date | undefined>;
-  darkColor: FormControl<string>;
-  lightColor: FormControl<string>;
-  addressForm: FormGroup<GoogleMapForm>;
-};
+import { ProfileForm } from '../../user/user-form.types';
 
 @Component({
   selector: 'app-profile',
@@ -230,25 +221,15 @@ export class ProfileComponent {
       return;
     }
     const selectedUser = this.selectedUserSignal();
-
     const lang = valueChange(this.getForm.lang.value, selectedUser?.locale) || this.translate.getCurrentLang();
-    const user: IUser = new User();
-    user.locale = lang;
-    user.displayName = fieldChange(this.getForm.displayName, selectedUser?.displayName);
-    user.phone = fieldChange(this.getForm.phone, selectedUser?.phone);
-    user.dob = fieldChange(this.getForm.dob, selectedUser?.dob);
-    user.dob = user.dob ? backendFormatDate(newDate(user.dob)) : user.dob;
-    user.showCash = this.showCashSignal();
-
-    if (this.getForm.lightColor.value) {
-      user.lightColor = this.getForm.lightColor.value;
-    }
-
-    if (this.getForm.darkColor.value) {
-      user.darkColor = this.getForm.darkColor.value;
-    }
-
-    user.address = createAddress(this.formattedAddress, this.geometry?.location, selectedUser?.address);
+    const user = User.fromProfileForm(
+      this.getForm,
+      this.showCashSignal(),
+      selectedUser,
+      this.translate.getCurrentLang(),
+      this.formattedAddress,
+      this.geometry?.location,
+    );
 
     this.store.dispatch(updateMyUser({ user, redirectUrl: `/${getLocale(lang).language}/auth/profile` }));
     return;

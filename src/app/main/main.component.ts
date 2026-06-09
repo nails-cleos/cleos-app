@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { redirect } from '../store/actions/auth.actions';
-import { IUser, User } from '../interfaces/user';
+import { IUser, User } from '../user/user';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CookieService } from 'ngx-cookie-service';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';

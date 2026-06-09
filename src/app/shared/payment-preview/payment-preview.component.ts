@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { IPaymentOption } from '../../interfaces/payment';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
-import { IPrice } from '../../interfaces/treatment';
+import { IPrice } from '../../treatment/treatment';
 import { PricePreviewComponent } from '../price-preview/price-preview.component';
 import { MatIcon } from '@angular/material/icon';
 import { MatDivider, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';

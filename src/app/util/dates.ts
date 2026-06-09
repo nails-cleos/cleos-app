@@ -1,4 +1,4 @@
-import { IAvailability, IAvailabilityAll, IRoom, IRoomAll, IService } from '../interfaces/room';
+import { IAvailability, IAvailabilityAll, IRoom, IRoomAll, IService } from '../room/room';
 import {
   addDays,
   addMinutes,
@@ -17,9 +17,9 @@ import {
   subWeeks,
 } from 'date-fns';
 import { RRule, Weekday } from 'rrule';
-import { IReservation, IReservationAll } from '../interfaces/reservation';
-import { ITreatmentAll } from '../interfaces/treatment';
-import { IAdditionalAll } from '../interfaces/additional';
+import { IReservation, IReservationAll } from '../reservation/reservation';
+import { ITreatmentAll } from '../treatment/treatment';
+import { IAdditionalAll } from '../additional/additional';
 import { fromZonedTime, toZonedTime } from 'date-fns-tz';
 
 export const API_LOCALE = 'en-GB';

@@ -4,7 +4,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { StatementListComponent } from './statement-list.component';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IOfficeAll } from '../../interfaces/office';
+import { IOfficeAll } from '../../office/office';
 import { DriveAccessService } from '../../services/drive-access.service';
 import { NavigationService } from '../../services/navigation.service';
 import { StatementStore } from '../../store/statement.store';

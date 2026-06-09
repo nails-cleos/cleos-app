@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { cleanUser, getAllDisableUsers } from '../../store/actions/user.actions';
-import { IUserAll } from '../../interfaces/user';
+import { IUserAll } from '../user';
 import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';

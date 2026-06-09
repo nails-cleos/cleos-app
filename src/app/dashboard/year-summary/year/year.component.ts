@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { IMonthSummary, IQuarterSummary } from '../../../interfaces/dashboard';
-import { ICurrencyAll } from '../../../interfaces/currency';
+import { IMonthSummary, IQuarterSummary } from '../../dashboard';
+import { ICurrencyAll } from '../../../currency/currency';
 import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { dateMonthYear, monthTitle } from '../../../util/dates';

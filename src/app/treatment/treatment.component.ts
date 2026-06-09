@@ -24,7 +24,7 @@ import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { combineLatestWith } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
-import { IColorAll } from '../interfaces/color';
+import { IColorAll } from '../color/color';
 import { ICommon, IError, isString } from '../interfaces/common';
 import {
   ITreatment,
@@ -33,7 +33,7 @@ import {
   Treatment,
   TreatmentForm,
   TreatmentGroup,
-} from '../interfaces/treatment';
+} from './treatment';
 import { createNewDate, formatDuration, getNowTimeZone, getTime, getTimeNumber } from '../util/dates';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { TreatmentStore } from '../store/treatment.store';

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CatalogueComponent } from './catalogue.component';
 import { CatalogueStore } from '../store/catalogue.store';
-import { ICatalogue } from '../interfaces/catalogue';
+import { ICatalogue } from './catalogue';
 import { ICommon } from '../interfaces/common';
 
 @Component({

@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { signalStore } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
 import { IApiResponse } from '../interfaces/common';
-import { ICurrency, ICurrencyAll } from '../interfaces/currency';
+import { ICurrency, ICurrencyAll } from '../currency/currency';
 import { CurrencyService } from '../services/currency.service';
 import { withCrudStoreMethods, withCrudStoreState } from './crud-signal-store';
 

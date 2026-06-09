@@ -8,8 +8,8 @@ import {
   getReservation,
   reservationFindPayments,
 } from '../../../store/actions/reservation.actions';
-import { IExtras } from '../../../interfaces/reservation';
-import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
+import { IExtras } from '../../reservation';
+import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../treatment/treatment';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IPaymentOption } from '../../../interfaces/payment';
@@ -25,10 +25,10 @@ import {
 import { API_LOCALE, getDiffTime, getNowTimeZone, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
-import { IAdditionalAll } from '../../../interfaces/additional';
+import { IAdditionalAll } from '../../../additional/additional';
 import { MatListOption, MatSelectionList } from '@angular/material/list';
-import { IService } from '../../../interfaces/room';
-import { IColorAll } from '../../../interfaces/color';
+import { IService } from '../../../room/room';
+import { IColorAll } from '../../../color/color';
 import { DialogComponent } from '../../../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';

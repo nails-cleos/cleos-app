@@ -8,8 +8,8 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { ITreatmentGroupAll } from '../../interfaces/treatment';
-import { IExperience, ISlide, ISocialLink, IStory, IWork } from '../../interfaces/main';
+import { ITreatmentGroupAll } from '../../treatment/treatment';
+import { IExperience, ISlide, ISocialLink, IStory, IWork } from '../main';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -27,7 +27,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ISendMessage } from '../../../main';
 import { MainState } from '../../store/reducers/main.reducers';
 import { EnvService } from '../../services/env.service';
-import { ICatalogueAll } from '../../interfaces/catalogue';
+import { ICatalogueAll } from '../../catalogue/catalogue';
 import { getImage } from '../../util/file';
 import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';

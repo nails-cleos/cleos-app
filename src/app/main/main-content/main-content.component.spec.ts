@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { ToastService } from '../../services/toast.service';
 import { sendMessage } from '../../store/actions/main.actions';
 import { ISendMessage } from '../../../main';
-import { ISocialLink } from '../../interfaces/main';
+import { ISocialLink } from '../main';
 import { BehaviorSubject } from 'rxjs';
 import { provideHttpClient } from '@angular/common/http';
 import { MainState } from '../../store/reducers/main.reducers';

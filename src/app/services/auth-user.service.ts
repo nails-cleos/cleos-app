@@ -1,5 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { IUserAll } from '../interfaces/user';
+import { IUserAll } from '../user/user';
 import { isDarkMode, Theme } from '../util/theme';
 import { hasRoomAdmin } from '../util/helper';
 import { Role } from '../interfaces/token';

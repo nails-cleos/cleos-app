@@ -11,9 +11,9 @@ import { FirebaseService } from '../../../services/firebase.service';
 import { createReservation } from '../../../store/actions/reservation.actions';
 import { IPaymentOption, PaymentPercentage } from '../../../interfaces/payment';
 import { Role } from '../../../interfaces/token';
-import { IGroupService, ITreatmentAll, Price } from '../../../interfaces/treatment';
-import { IRoomAll, ServiceType } from '../../../interfaces/room';
-import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
+import { IGroupService, ITreatmentAll, Price } from '../../../treatment/treatment';
+import { IRoomAll, ServiceType } from '../../../room/room';
+import { DiscountType, IUserDiscount } from '../../../discount/discount';
 import { ToastService } from '../../../services/toast.service';
 
 describe('MeReservationComponent', () => {

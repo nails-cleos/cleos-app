@@ -8,9 +8,9 @@ import {
   IReservationAll,
   IRoomReservation,
   IUpcomingAll,
-} from '../interfaces/reservation';
+} from '../reservation/reservation';
 import { paginated, Pagination } from '../interfaces/pagination';
-import { IReview } from '../interfaces/review';
+import { IReview } from '../me/reservation/list/review';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
 import { SortDirection } from '@angular/material/sort';

@@ -9,7 +9,7 @@ import {
   notificationSuccess,
   readNotification,
 } from '../actions/notification.actions';
-import { INotification, INotificationDTO } from '../../interfaces/notification';
+import { INotification, INotificationDTO } from '../../notification/notification';
 import { Pagination } from '../../interfaces/pagination';
 import { IError } from '../../interfaces/common';
 

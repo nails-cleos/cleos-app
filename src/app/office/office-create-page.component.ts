@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { OfficeComponent } from './office.component';
 import { OfficeStore } from '../store/office.store';
-import { IOffice } from '../interfaces/office';
+import { IOffice } from './office';
 import { ICommon } from '../interfaces/common';
 
 @Component({

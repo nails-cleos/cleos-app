@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MonthComponent } from './month.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { IMonthSummary, ISummaryTotal } from '../../../interfaces/dashboard';
+import { IMonthSummary, ISummaryTotal } from '../../dashboard';
 import { Router } from '@angular/router';
 
 describe('MonthComponent', () => {

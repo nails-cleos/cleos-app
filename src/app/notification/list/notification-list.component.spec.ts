@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../../services/navigation.service';
 import { BehaviorSubject } from 'rxjs';
-import { INotification } from '../../interfaces/notification';
+import { INotification } from '../notification';
 import { deleteNotification, getNotificationsPage, readNotification } from '../../store/actions/notification.actions';
 import { getNowTimeZone } from '../../util/dates';
 

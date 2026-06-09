@@ -2,7 +2,7 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ColorDetailsPageComponent } from './color-details-page.component';
 import { ColorStore } from '../store/color.store';
-import { IColorAll } from '../interfaces/color';
+import { IColorAll } from './color';
 import { ColorComponent } from './color.component';
 
 describe('ColorDetailsPageComponent', () => {

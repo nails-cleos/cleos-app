@@ -1,49 +1,43 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AddServiceComponent } from './add-service.component';
-import { Store } from '@ngrx/store';
-import { BehaviorSubject, of } from 'rxjs';
+import { of } from 'rxjs';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { getServices, updateServices } from '../../../store/actions/room.actions';
-import { IService, ServicePrice, ServiceType } from '../../../interfaces/room';
+import { IService, ServicePrice, ServiceType } from '../../room';
 import { TranslateModule } from '@ngx-translate/core';
-import { ITreatmentAll } from '../../../interfaces/treatment';
+import { ITreatmentAll } from '../../../treatment/treatment';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
+import { signal } from '@angular/core';
+import { RoomStore } from '../../../store/room.store';
+import { NavigationService } from '../../../services/navigation.service';
 
 describe('AddServiceComponent', () => {
   let component: AddServiceComponent;
   let fixture: ComponentFixture<AddServiceComponent>;
-  let storeSpy: jasmine.SpyObj<Store>;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
-
-  let services$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
+  let roomStoreSpy: {
+    services: ReturnType<typeof signal<any>>;
+    response: ReturnType<typeof signal<any>>;
+    loadServices: jasmine.Spy;
+    updateServices: jasmine.Spy;
+  };
 
   beforeEach(async () => {
-    services$ = new BehaviorSubject(undefined);
-    response$ = new BehaviorSubject(undefined);
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return services$.asObservable();
-        case 2:
-          return response$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
+    roomStoreSpy = {
+      services: signal(undefined),
+      response: signal(undefined),
+      loadServices: jasmine.createSpy('loadServices'),
+      updateServices: jasmine.createSpy('updateServices'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [AddServiceComponent, TranslateModule.forRoot()],
       providers: [
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
-        { provide: Store, useValue: storeSpy },
+        { provide: RoomStore, useValue: roomStoreSpy },
         { provide: MatDialog, useValue: dialogSpy },
+        { provide: NavigationService, useValue: { back: jasmine.createSpy('back') } },
       ],
     }).compileComponents();
 
@@ -53,14 +47,14 @@ describe('AddServiceComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should dispatch getServices when roomId is emitted', () => {
+  it('should load services when roomId is emitted', () => {
     fixture.componentRef.setInput('id', '10');
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getServices({ id: '10' }));
+    expect(roomStoreSpy.loadServices).toHaveBeenCalledWith('10');
   });
 
-  it('should dispatch updateServices with collected prices', () => {
+  it('should update services with collected prices', () => {
     fixture.componentRef.setInput('id', '5');
     fixture.detectChanges();
 
@@ -98,24 +92,19 @@ describe('AddServiceComponent', () => {
 
     component.save();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      updateServices({
-        id: '5',
-        prices: [
-          new ServicePrice('1', 20, ServiceType.additional),
-          new ServicePrice('2', 30, ServiceType.treatment),
-        ],
-      }),
-    );
+    expect(roomStoreSpy.updateServices).toHaveBeenCalledWith('5', [
+      new ServicePrice('1', 20, ServiceType.additional),
+      new ServicePrice('2', 30, ServiceType.treatment),
+    ]);
   });
 
-  it('should not dispatch save if roomId is null', () => {
+  it('should not save if roomId is null', () => {
     fixture.componentRef.setInput('id', undefined);
     fixture.detectChanges();
 
     component.save();
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(roomStoreSpy.updateServices).not.toHaveBeenCalled();
   });
 
 

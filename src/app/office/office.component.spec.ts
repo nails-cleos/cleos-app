@@ -3,9 +3,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
-import { IOfficeAll } from '../interfaces/office';
+import { IOfficeAll } from './office';
 import { Role } from '../interfaces/token';
-import { IUser, IUserAll } from '../interfaces/user';
+import { IUser, IUserAll } from '../user/user';
 import { NavigationService } from '../services/navigation.service';
 import { OfficeStore } from '../store/office.store';
 import { OfficeComponent } from './office.component';

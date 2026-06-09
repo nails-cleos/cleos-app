@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { ChangeCustomerDialogComponent } from './change-customer-dialog.component';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
-import { IUserAll } from '../../interfaces/user';
+import { IUserAll } from '../../user/user';
 import { getAllCustomers } from '../../store/actions/user.actions';
 
 describe('ChangeCustomerDialogComponent', () => {

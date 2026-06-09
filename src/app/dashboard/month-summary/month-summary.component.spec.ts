@@ -14,7 +14,7 @@ import {
   ISummaryRoom,
   SummaryType,
   TotalType,
-} from '../../interfaces/dashboard';
+} from '../dashboard';
 import { MatDatepicker } from '@angular/material/datepicker';
 import fs from 'file-saver';
 import { DashboardState } from '../../store/reducers/dashboard.reducers';

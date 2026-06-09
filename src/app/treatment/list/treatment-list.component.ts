@@ -27,7 +27,7 @@ import {
 import { MatTooltip } from '@angular/material/tooltip';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { ITreatmentGroup, ITreatmentGroupAll } from '../../interfaces/treatment';
+import { ITreatmentGroup, ITreatmentGroupAll } from '../treatment';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';

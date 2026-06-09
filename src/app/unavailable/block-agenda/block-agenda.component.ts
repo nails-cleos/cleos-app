@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, Signal, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IUser, IUserAll } from '../../interfaces/user';
-import { IRoomAll } from '../../interfaces/room';
+import { IUser, IUserAll } from '../../user/user';
+import { IRoomAll } from '../../room/room';
 import { combineLatestWith } from 'rxjs';
 import { requireMatch } from '../../util/validators';
-import { BlockAgendaForm, IUnavailable, IUnavailableAll, Unavailable } from '../../interfaces/unavailable';
+import { BlockAgendaForm, IUnavailable, IUnavailableAll, Unavailable } from '../unavailable';
 import {
   createNewDate,
   diffTime,
@@ -202,7 +202,7 @@ export class BlockAgendaComponent {
       return;
     }
 
-    this.submitData.emit(Unavailable.fromBlockAgendaForm(this.getForm, this.unavailable(), this.timeZone));
+    this.submitData.emit(Unavailable.fromBlockAgendaForm(this.getForm, this.timeZone, this.unavailable()));
   }
 
   focusin() {

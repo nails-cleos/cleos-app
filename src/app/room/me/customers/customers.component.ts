@@ -1,6 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, viewChild } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { getAllCustomersInfo } from '../../../store/actions/room.actions';
 import { MatPaginator } from '@angular/material/paginator';
 import {
   MatCell,
@@ -20,14 +18,12 @@ import {
   MatTableDataSource,
 } from '@angular/material/table';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
-import { IRoomCustomer } from '../../../interfaces/room';
+import { IRoomCustomer } from '../../room';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
-import { RoomState } from '../../../store/reducers/room.reducers';
-import { getCustomersPipe } from '../../../store/selectors/room.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -35,6 +31,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatList, MatListItem, MatListSubheaderCssMatStyler } from '@angular/material/list';
 import { MatIconButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
+import { RoomStore } from '../../../store/room.store';
 
 @Component({
   selector: 'app-customers',
@@ -49,14 +46,13 @@ import { MatTooltip } from '@angular/material/tooltip';
 export class CustomersComponent {
   id = input<string>();
 
-  private readonly store: Store<RoomState> = inject(Store<RoomState>);
+  private readonly roomStore = inject(RoomStore);
   private readonly translate = inject(TranslateService);
   private readonly breakpointObserver = inject(BreakpointObserver);
 
-  private customers$ = this.store.pipe(getCustomersPipe);
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
-  private customersSignal = toSignal(this.customers$);
+  private customersSignal = this.roomStore.customers;
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -97,7 +93,7 @@ export class CustomersComponent {
     effect(() => {
       const id = this.id();
       if (id) {
-        this.store.dispatch(getAllCustomersInfo({ id }));
+        this.roomStore.loadCustomers(id);
       }
     });
   }

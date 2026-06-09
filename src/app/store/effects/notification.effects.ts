@@ -14,7 +14,7 @@ import {
 import { NotificationService } from '../../services/notification.service';
 import { Router } from '@angular/router';
 import { Pagination } from '../../interfaces/pagination';
-import { INotification } from '../../interfaces/notification';
+import { INotification } from '../../notification/notification';
 import { effectRequest } from '../../util/rxjs';
 
 @Injectable()
