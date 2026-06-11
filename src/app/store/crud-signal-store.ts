@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { patchState, withMethods, withState } from '@ngrx/signals';
-import { Observable } from 'rxjs';
+import { Observable, type Subscription } from 'rxjs';
 import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
 
@@ -59,6 +59,21 @@ export const withCrudStoreMethods =
   ) => withMethods(
     (store) => {
       const config = configFactory();
+      let loadPageSubscription: Subscription | undefined;
+      let loadByIdSubscription: Subscription | undefined;
+      let createSubscription: Subscription | undefined;
+      let updateSubscription: Subscription | undefined;
+      let deleteSubscription: Subscription | undefined;
+      let sortSubscription: Subscription | undefined;
+
+      const cancelAllRequests = (): void => {
+        loadPageSubscription?.unsubscribe();
+        loadByIdSubscription?.unsubscribe();
+        createSubscription?.unsubscribe();
+        updateSubscription?.unsubscribe();
+        deleteSubscription?.unsubscribe();
+        sortSubscription?.unsubscribe();
+      };
 
       const patchError = (err: HttpErrorResponse): void => {
         const error = mapCrudHttpError(err);
@@ -72,6 +87,7 @@ export const withCrudStoreMethods =
 
       return {
         clean(): void {
+          cancelAllRequests();
           patchState(store, createCrudInitialState<TEntity>());
         },
 
@@ -88,6 +104,8 @@ export const withCrudStoreMethods =
             return;
           }
 
+          loadPageSubscription?.unsubscribe();
+
           patchState(store, {
             data: undefined,
             subErrors: undefined,
@@ -97,7 +115,7 @@ export const withCrudStoreMethods =
             isLoading: true,
           });
 
-          config.loadPage(request).subscribe({
+          loadPageSubscription = config.loadPage(request).subscribe({
             next: (data) => {
               patchState(store, {
                 data,
@@ -116,6 +134,8 @@ export const withCrudStoreMethods =
             return;
           }
 
+          loadByIdSubscription?.unsubscribe();
+
           patchState(store, {
             subErrors: undefined,
             selected: undefined,
@@ -123,7 +143,7 @@ export const withCrudStoreMethods =
             isLoading: true,
           });
 
-          config.loadById(id).subscribe({
+          loadByIdSubscription = config.loadById(id).subscribe({
             next: (selected) => {
               patchState(store, { selected, isLoading: false });
             },
@@ -137,6 +157,7 @@ export const withCrudStoreMethods =
           }
           const create = config.create;
           const createResponse = config.createResponse;
+          createSubscription?.unsubscribe();
 
           patchState(store, {
             subErrors: undefined,
@@ -145,7 +166,7 @@ export const withCrudStoreMethods =
             selected: undefined,
           });
 
-          create(entity).subscribe({
+          createSubscription = create(entity).subscribe({
             next: (response) => {
               patchState(store, {
                 response: createResponse(response, entity),
@@ -164,6 +185,7 @@ export const withCrudStoreMethods =
           }
           const update = config.update;
           const updateResponse = config.updateResponse;
+          updateSubscription?.unsubscribe();
 
           patchState(store, {
             subErrors: undefined,
@@ -172,7 +194,7 @@ export const withCrudStoreMethods =
             selected: undefined,
           });
 
-          update(id, entity).subscribe({
+          updateSubscription = update(id, entity).subscribe({
             next: (response) => {
               patchState(store, {
                 response: updateResponse(response, id, entity),
@@ -191,6 +213,7 @@ export const withCrudStoreMethods =
           }
           const remove = config.delete;
           const deleteResponse = config.deleteResponse;
+          deleteSubscription?.unsubscribe();
 
           patchState(store, {
             subErrors: undefined,
@@ -199,7 +222,7 @@ export const withCrudStoreMethods =
             selected: undefined,
           });
 
-          remove(args).subscribe({
+          deleteSubscription = remove(args).subscribe({
             next: () => {
               patchState(store, {
                 response: deleteResponse(args),
@@ -218,6 +241,7 @@ export const withCrudStoreMethods =
           }
           const sort = config.sort;
           const sortResponse = config.sortResponse;
+          sortSubscription?.unsubscribe();
 
           patchState(store, {
             subErrors: undefined,
@@ -226,7 +250,7 @@ export const withCrudStoreMethods =
             selected: undefined,
           });
 
-          sort(items).subscribe({
+          sortSubscription = sort(items).subscribe({
             next: () => {
               patchState(store, {
                 response: sortResponse(items),

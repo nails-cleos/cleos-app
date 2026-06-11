@@ -99,6 +99,46 @@ describe('crud-signal-store', () => {
     expect(store.selected()).toEqual({ name: 'loaded' });
   });
 
+  it('should ignore stale loadPage responses after a newer request starts', () => {
+    const firstPage$ = new Subject<Pagination<TestEntity>>();
+    const secondPage$ = new Subject<Pagination<TestEntity>>();
+    const firstPage = { content: [{ name: 'first' }], totalElements: 1, totalPages: 1, number: 0 };
+    const secondPage = { content: [{ name: 'second' }], totalElements: 1, totalPages: 1, number: 1 };
+
+    api.loadPage.and.returnValues(firstPage$.asObservable(), secondPage$.asObservable());
+
+    store.loadPage({ page: 0, sort: 'name', direction: 'asc', size: 10 });
+    store.loadPage({ page: 1, sort: 'name', direction: 'asc', size: 10 });
+
+    firstPage$.next(firstPage);
+    firstPage$.complete();
+    expect(store.data()).toBeUndefined();
+
+    secondPage$.next(secondPage);
+    secondPage$.complete();
+    expect(store.data()).toEqual(secondPage);
+    expect(store.isLoading()).toBeFalse();
+  });
+
+  it('should ignore stale loadById responses after a newer request starts', () => {
+    const firstSelected$ = new Subject<TestEntity | undefined>();
+    const secondSelected$ = new Subject<TestEntity | undefined>();
+
+    api.loadById.and.returnValues(firstSelected$.asObservable(), secondSelected$.asObservable());
+
+    store.loadById('first');
+    store.loadById('second');
+
+    firstSelected$.next({ name: 'first' });
+    firstSelected$.complete();
+    expect(store.selected()).toBeUndefined();
+
+    secondSelected$.next({ name: 'second' });
+    secondSelected$.complete();
+    expect(store.selected()).toEqual({ name: 'second' });
+    expect(store.isLoading()).toBeFalse();
+  });
+
   it('should patch response and clear loading on create success', () => {
     api.create.and.returnValue(of({ id: '1', name: 'Blue' }));
 
