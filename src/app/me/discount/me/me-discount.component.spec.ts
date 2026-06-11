@@ -18,6 +18,7 @@ describe('MeDiscountComponent', () => {
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let translateService: TranslateService;
   let discountStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
     clean: jasmine.Spy;
@@ -71,6 +72,7 @@ describe('MeDiscountComponent', () => {
 
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     discountStoreSpy = {
+      isLoading: signal(false),
       data: signal<any>({ kind: 'pagination', value: mockPagination }),
       response: signal<any>(undefined),
       clean: jasmine.createSpy('clean'),

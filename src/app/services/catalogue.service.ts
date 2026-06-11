@@ -5,23 +5,25 @@ import { ICatalogue, ICatalogueAll } from '../catalogue/catalogue';
 import { dataURLToBlob } from '../util/file';
 import { toUrl } from '../util/helper';
 import { IApiResponse } from '../interfaces/common';
+import { skipLoadingOverlay } from '../interfaces/pagination';
 
 @Injectable()
 export class CatalogueService {
 
   private url = 'catalogues';
-  private urlV1 = `v1/${this.url}`;
+  private urlV1 = `v1/${ this.url }`;
 
   private http: HttpClient = inject(HttpClient);
 
-  getAllCatalogues = (): Observable<ICatalogueAll[]> => this.http.get<ICatalogueAll[]>(this.urlV1);
+  getAllCatalogues = (): Observable<ICatalogueAll[]> => this.http.get<ICatalogueAll[]>(this.urlV1,
+    { ...skipLoadingOverlay() });
 
   getAllCatalogs = (): Observable<ICatalogueAll[]> => this.findCatalogue('catalog');
 
   getAllHome = (): Observable<ICatalogueAll[]> => this.findCatalogue('home');
 
   getCatalogue = (id: string): Observable<ICatalogueAll | undefined> => this.http.get<ICatalogueAll>(
-    toUrl(this.urlV1, id),
+    toUrl(this.urlV1, id), { ...skipLoadingOverlay() },
   );
 
   createCatalogue = (catalogue: ICatalogue, resizedImageDataUrl: string): Observable<IApiResponse> => {
@@ -38,7 +40,7 @@ export class CatalogueService {
   deleteCatalogue = (id: string): Observable<ICatalogue> => this.http.delete<ICatalogue>(toUrl(this.urlV1, id));
 
   updateCatalogue = (id: string, catalogue: ICatalogue, resizedImageDataUrl: string): Observable<IApiResponse> => {
-    const url = `${this.urlV1}/${id}`;
+    const url = `${ this.urlV1 }/${ id }`;
     const fileBlob = dataURLToBlob(resizedImageDataUrl);
     const formData = new FormData();
     formData.append('file', fileBlob, 'resized-image.jpg');
@@ -59,7 +61,7 @@ export class CatalogueService {
       data = [...data, catalogue];
     });
 
-    return this.http.put<void>(`${this.urlV1}/orders`, data);
+    return this.http.put<void>(`${ this.urlV1 }/orders`, data);
   };
 
   private findCatalogue = (key: string) => this.http.get<ICatalogueAll[]>(

@@ -24,23 +24,26 @@ describe('ReservationListComponent', () => {
   let customerReservation$: BehaviorSubject<any>;
   let response$: BehaviorSubject<any>;
   let error$: BehaviorSubject<any>;
+  let isLoading$: BehaviorSubject<boolean>;
   let breakpoints$: BehaviorSubject<any>;
 
   beforeEach(async () => {
     customerReservation$ = new BehaviorSubject<any>(undefined);
     response$ = new BehaviorSubject<any>(undefined);
     error$ = new BehaviorSubject<any>(undefined);
+    isLoading$ = new BehaviorSubject<boolean>(false);
     breakpoints$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {},
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch', 'select']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
       },
     });
+    storeSpy.select.and.returnValue(isLoading$.asObservable());
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     discountStoreSpy = { clean: jasmine.createSpy('clean') };
@@ -134,6 +137,13 @@ describe('ReservationListComponent', () => {
 
     expect(component.pageSizeSignal()).toBe(5); // MOBILE_PAGE_SIZE
     expect(component.small()).toBe(true);
+  });
+
+  it('should expose loading state from the store', () => {
+    isLoading$.next(true);
+    fixture.detectChanges();
+
+    expect(component.isLoading()).toBeTrue();
   });
 
   it('should update dataSource when customerReservation emits', () => {

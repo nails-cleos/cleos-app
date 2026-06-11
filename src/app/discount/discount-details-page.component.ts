@@ -3,7 +3,7 @@ import { DiscountComponent } from './discount.component';
 import { DiscountStore } from '../store/discount.store';
 import { IDiscount } from './discount';
 import { ICommon } from '../interfaces/common';
-import { SkeletonComponent } from '../shared/skeleton.component';
+import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
 
 @Component({
   selector: 'app-discount-details-page',

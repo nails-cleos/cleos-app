@@ -1,7 +1,9 @@
 @let catalogueList = catalogues();
 
-<div class="app-surface-canvas app-surface-shell app-surface-stack">
-  @if (catalogueList.length) {
+@if (isLoading()) {
+  <app-card-list-skeleton></app-card-list-skeleton>
+} @else if (catalogueList.length) {
+  <div class="app-surface-canvas app-surface-shell app-surface-stack">
     <section class="app-surface-section app-crud-form">
 
       <div class="catalogue-drop-shell" cdkDropList (cdkDropListDropped)="drop($event)">
@@ -18,7 +20,7 @@
                   <div>
                     <span class="app-surface-item__label">{{ catalogue.name }}</span>
                     <p class="catalogue-card__description">
-                      {{ catalogue.group?.name}}
+                      {{ catalogue.group?.name }}
                     </p>
                   </div>
                   <div class="catalogue-card__flags">
@@ -40,17 +42,16 @@
             </div>
 
             <div class="catalogue-card__actions">
-              <button type="button" cdkDragHandle class="catalogue-handle" [attr.aria-label]="'COMMON.BUTTON.SORT' | translate">
+              <button type="button" cdkDragHandle class="catalogue-handle"
+                      [attr.aria-label]="'COMMON.BUTTON.SORT' | translate">
                 <mat-icon>drag_indicator</mat-icon>
               </button>
-              @if (catalogue.id) {
-                <button type="button" class="catalogue-action" (click)="edit(catalogue)">
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button type="button" class="catalogue-action catalogue-action--warn" (click)="delete(catalogue)">
-                  <mat-icon>delete</mat-icon>
-                </button>
-              }
+              <button type="button" class="catalogue-action" (click)="edit(catalogue)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button type="button" class="catalogue-action catalogue-action--warn" (click)="delete(catalogue)">
+                <mat-icon>delete</mat-icon>
+              </button>
             </div>
           </article>
         }
@@ -67,7 +68,9 @@
         </button>
       </div>
     </section>
-  } @else {
+  </div>
+} @else {
+  <div class="app-surface-canvas app-surface-shell app-surface-stack">
     <section class="app-surface-section app-crud-form catalogue-list-section--empty">
       <div class="app-detail-section-header">
         <div>
@@ -83,5 +86,5 @@
         </button>
       </div>
     </section>
-  }
-</div>
+  </div>
+}

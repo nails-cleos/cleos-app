@@ -20,6 +20,7 @@ describe('CatalogueListComponent', () => {
   let translate: TranslateService;
   let catalogueStoreSpy: {
     data: ReturnType<typeof signal>;
+    isLoading: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
     clean: jasmine.Spy;
     clearResponse: jasmine.Spy;
@@ -51,7 +52,6 @@ describe('CatalogueListComponent', () => {
       catalog: true,
       image: undefined,
     },
-    {} as ICatalogueAll, // empty object to test filter
   ];
 
   beforeEach(async () => {
@@ -59,6 +59,7 @@ describe('CatalogueListComponent', () => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     catalogueStoreSpy = {
       data: signal<any>(undefined),
+      isLoading: signal(false),
       response: signal<any>(undefined),
       clean: jasmine.createSpy('clean'),
       clearResponse: jasmine.createSpy('clearResponse'),
@@ -92,7 +93,7 @@ describe('CatalogueListComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should filter out empty objects and map blob to image', () => {
+  it('should map blob to image', () => {
     catalogueStoreSpy.data.set(mockCatalogues);
     fixture.detectChanges();
 

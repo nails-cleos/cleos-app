@@ -2,18 +2,18 @@ import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { USER_FEATURE_KEY, UserState } from '../reducers/user.reducers';
-import { IUserAll } from '../../user/user';
+import { IOverview, IUserAll } from '../../user/user';
 import { Role } from '../../interfaces/token';
 import { map } from 'rxjs/operators';
 
 const selectUserState = createFeatureSelector<UserState>(USER_FEATURE_KEY);
 
-const selectedUser = createSelector(
+export const selectSelectedUser = createSelector(
   selectUserState,
   (state: UserState) => state?.selected,
 );
 export const getSelectedUserPipe = pipe(
-  select(selectedUser),
+  select(selectSelectedUser),
   filter((val): val is IUserAll => val !== undefined),
 );
 const selectAllCustomers = createSelector(
@@ -45,14 +45,13 @@ export const getUserPaginationPipe = pipe(
   map((val) => val.value),
 );
 
-const selectOverview = createSelector(
+export const selectOverviewData = createSelector(
   selectUserState,
-  (state: UserState) => state?.data,
+  (state: UserState) => state?.data?.kind === 'overview' ? state.data.value : undefined,
 );
 export const getOverviewPipe = pipe(
-  select(selectOverview),
-  filter((val) => val?.kind === 'overview'),
-  map((val) => val.value),
+  select(selectOverviewData),
+  filter((val): val is IOverview => val !== undefined),
 );
 
 const selectNavigationParams = createSelector(

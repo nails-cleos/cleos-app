@@ -19,6 +19,7 @@ describe('CurrencyListComponent', () => {
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let routerSpy: jasmine.SpyObj<Router>;
   let currencyStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
     loadPage: jasmine.Spy;
@@ -56,6 +57,7 @@ describe('CurrencyListComponent', () => {
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     currencyStoreSpy = {
+      isLoading: signal(false),
       data: signal(mockPagination),
       response: signal<any>(undefined),
       loadPage: jasmine.createSpy('loadPage'),

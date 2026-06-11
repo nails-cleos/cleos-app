@@ -1,14 +1,12 @@
 import { Component, input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TranslateModule } from '@ngx-translate/core';
-import { Store } from '@ngrx/store';
 import { RoomComponent } from './room.component';
 import { RoomDetailsPageComponent } from './room-details-page.component';
 import { IRoomAll } from './room';
 import { ICommon } from '../interfaces/common';
 import { RoomStore } from '../store/room.store';
 import { signal } from '@angular/core';
-import { getOptions } from '../store/actions/payment.actions';
 
 @Component({
   selector: 'app-room',
@@ -25,7 +23,6 @@ describe('RoomDetailsPageComponent', () => {
   let component: RoomDetailsPageComponent;
   let fixture: ComponentFixture<RoomDetailsPageComponent>;
 
-  let storeSpy: jasmine.SpyObj<Store>;
   let roomStoreSpy: {
     selected: ReturnType<typeof signal<any>>;
     currencies: ReturnType<typeof signal<any>>;
@@ -51,7 +48,6 @@ describe('RoomDetailsPageComponent', () => {
   };
 
   beforeEach(async () => {
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     roomStoreSpy = {
       selected: signal(undefined),
       currencies: signal(undefined),
@@ -65,7 +61,6 @@ describe('RoomDetailsPageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [RoomDetailsPageComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
         { provide: RoomStore, useValue: roomStoreSpy },
       ],
     }).overrideComponent(RoomDetailsPageComponent, {
@@ -88,12 +83,10 @@ describe('RoomDetailsPageComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should clean, load room info, load payment options, and load room when id emits a value', () => {
+  it('should clean and load room when id emits a value', () => {
     fixture.detectChanges();
 
     expect(roomStoreSpy.clean).toHaveBeenCalled();
-    expect(roomStoreSpy.loadInfo).toHaveBeenCalled();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getOptions());
     expect(roomStoreSpy.loadById).toHaveBeenCalledWith(id);
   });
 

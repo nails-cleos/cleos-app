@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { paginated, Pagination } from '../interfaces/pagination';
+import { paginated, Pagination, skipLoadingOverlay } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { IOffice, IOfficeAll } from '../office/office';
 import { createFilter } from '../util/service-helper';
@@ -14,11 +14,12 @@ import { IApiResponse } from '../interfaces/common';
 export class OfficeService {
 
   private url = 'offices';
-  private urlV1 = `v1/${this.url}`;
+  private urlV1 = `v1/${ this.url }`;
 
   private http: HttpClient = inject(HttpClient);
 
-  getAllMyOffices = (): Observable<IOfficeAll[]> => this.http.get<IOfficeAll[]>(toUrl(this.urlV1, 'me'));
+  getAllMyOffices = (): Observable<IOfficeAll[]> => this.http.get<IOfficeAll[]>(toUrl(this.urlV1, 'me'),
+    { ...skipLoadingOverlay() });
 
   getOfficesPage = (
     page: number,
@@ -30,7 +31,8 @@ export class OfficeService {
     { ...paginated(), params: createFilter(page, size, sort, direction) },
   );
 
-  getOffice = (id: string): Observable<IOfficeAll | undefined> => this.http.get<IOfficeAll>(toUrl(this.urlV1, id));
+  getOffice = (id: string): Observable<IOfficeAll | undefined> => this.http.get<IOfficeAll>(toUrl(this.urlV1, id),
+    { ...skipLoadingOverlay() });
 
   createOffice = (office: IOffice): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1, office);
 

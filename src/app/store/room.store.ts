@@ -78,11 +78,12 @@ export const RoomStore = signalStore(
 
       loadPage({ page, sort, direction, size }: PageRequest): void {
         patchState(store, {
-          data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IRoom>,
+          data: undefined,
           subErrors: undefined,
           selected: undefined,
           response: undefined,
           error: undefined,
+          isLoading: true,
         });
 
         roomService.getRoomsPage(page, sort, direction, size).subscribe({
@@ -91,6 +92,7 @@ export const RoomStore = signalStore(
             subErrors: undefined,
             response: undefined,
             error: undefined,
+            isLoading: false,
           }),
           error: patchError,
         });
@@ -104,6 +106,7 @@ export const RoomStore = signalStore(
           subErrors: undefined,
           response: undefined,
           error: undefined,
+          isLoading: true,
         });
 
         roomService.getAllRoomsInfo().subscribe({
@@ -111,9 +114,7 @@ export const RoomStore = signalStore(
             professionals: roomInfo?.professionals,
             offices: roomInfo?.offices,
             currencies: roomInfo?.currencies,
-            subErrors: undefined,
-            response: undefined,
-            error: undefined,
+            isLoading: false,
           }),
           error: patchError,
         });
@@ -125,10 +126,11 @@ export const RoomStore = signalStore(
           selected: undefined,
           response: undefined,
           error: undefined,
+          isLoading: true,
         });
 
         roomService.getRoom(id).subscribe({
-          next: (selected) => patchState(store, { selected, subErrors: undefined, response: undefined }),
+          next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },
@@ -178,15 +180,16 @@ export const RoomStore = signalStore(
 
       loadServices(id: string): void {
         patchState(store, {
-          services: {} as IRoomService,
+          services: undefined,
           subErrors: undefined,
           response: undefined,
           error: undefined,
+          isLoading: true,
         });
 
         roomService.getServices(id).subscribe({
           next: (services) => patchState(store,
-            { services, subErrors: undefined, response: undefined, error: undefined }),
+            { services, isLoading: false }),
           error: patchError,
         });
       },
@@ -197,7 +200,6 @@ export const RoomStore = signalStore(
         roomService.updateServices(id, prices).subscribe({
           next: () => patchState(store, {
             response: { message: 'ROOM.ME.SERVICES.UPDATE.MESSAGE' },
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -206,21 +208,22 @@ export const RoomStore = signalStore(
 
       loadCustomers(id: string): void {
         patchState(store, {
-          customers: [{}, {}, {}],
+          customers: undefined,
           subErrors: undefined,
           response: undefined,
           error: undefined,
+          isLoading: true,
         });
 
         roomService.getAllCustomersInfo(id).subscribe({
           next: (customers) => patchState(store,
-            { customers, subErrors: undefined, response: undefined, error: undefined }),
+            { customers, isLoading: false }),
           error: patchError,
         });
       },
 
       selectAndNavigate(selected: IRoomAll): void {
-        patchState(store, { selected, subErrors: undefined, response: undefined });
+        patchState(store, { selected });
         router.navigate([translate.getCurrentLang(), 'rooms', selected?.id]);
       },
     };

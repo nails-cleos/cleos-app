@@ -229,12 +229,14 @@
       </button>
     </div>
   } @else {
-    <section class="app-surface-section">
-      <div class="complete-skeleton">
-        <div class="app-surface-skeleton-spacer"></div>
-        <div class="ssc-square mb"></div>
-        <div class="app-surface-skeleton-spacer"></div>
-      </div>
-    </section>
+    <app-reservation-detail-skeleton
+      [showGhostChip]="false"
+      [showFab]="false"
+      [showHeroSummary]="false"
+      [showNoteSection]="false"
+      [showPaymentSection]="false"
+      [showHistorySection]="false"
+      [footerButtonCount]="2"
+    />
   }
 </form>

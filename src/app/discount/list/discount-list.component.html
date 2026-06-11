@@ -3,69 +3,51 @@
     <div class="mat-elevation-z8 app-table-shell">
       @let resultsLength = resultsLengthSignal();
       @let pageSize = pageSizeSignal();
-      @if (dataSourceSignal(); as dataSource) {
+      @if (isLoading()) {
+        <app-table-skeleton [columns]="tableColumns"></app-table-skeleton>
+      } @else if (dataSourceSignal(); as dataSource) {
         <table [dataSource]="dataSource" mat-table matSort matSortActive="name" matSortDirection="asc"
                matSortDisableClear
                multiTemplateDataRows>
           <ng-container matColumnDef="position">
             <th *matHeaderCellDef mat-header-cell>#</th>
             <td *matCellDef="let discount; let i = dataIndex;" mat-cell>
-              @if (discount.id) {
-                <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
-              } @else {
-                <div class="ssc-line"></div>
-              }
+              <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="name">
             <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
             <td *matCellDef="let discount" mat-cell>
-              @if (discount.id) {
-                <div>{{ discount.name }}</div>
-              } @else {
-                <div class="ssc-line"></div>
-              }
+              <div>{{ discount.name }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="description">
             <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
             <td *matCellDef="let discount" class="app-surface-hide-mobile" mat-cell>
-              @if (discount.id) {
-                <div>{{ discount.description }}</div>
-              } @else {
-                <div class="ssc-line"></div>
-              }
+              <div>{{ discount.description }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="type">
             <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
             <td *matCellDef="let discount" class="app-surface-hide-mobile" mat-cell>
-              @if (discount.id) {
-                <div>{{ 'COMMON.DISCOUNT.' + discount.type | translate }}</div>
-              } @else {
-                <div class="ssc-line"></div>
-              }
+              <div>{{ 'COMMON.DISCOUNT.' + discount.type | translate }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="amount">
             <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
             <td *matCellDef="let discount" class="app-surface-hide-mobile" mat-cell>
-              @if (discount.id) {
-                @if (discount.type === 'PERCENTAGE') {
-                  <span>{{ discount.amount | number:'1.2-2' }}</span>
-                  <mat-icon class="icon-text" matSuffix>percent</mat-icon>&nbsp;
-                } @else {
-                  @if (discount.currency) {
-                    <mat-icon class="icon-text" matPrefix>{{ discount.currency.icon }}</mat-icon>&nbsp;
-                  }
-                  <span class="icon-text">{{ discount.amount| number:'1.2-2' }}</span>
-                }
+              @if (discount.type === 'PERCENTAGE') {
+                <span>{{ discount.amount | number:'1.2-2' }}</span>
+                <mat-icon class="icon-text" matSuffix>percent</mat-icon>&nbsp;
               } @else {
-                <div class="ssc-line"></div>
+                @if (discount.currency) {
+                  <mat-icon class="icon-text" matPrefix>{{ discount.currency.icon }}</mat-icon>&nbsp;
+                }
+                <span class="icon-text">{{ discount.amount| number:'1.2-2' }}</span>
               }
             </td>
           </ng-container>
@@ -79,27 +61,23 @@
               </button>
             </th>
             <td *matCellDef="let discount" class="app-surface-hide-mobile" mat-cell>
-              @if (discount.id) {
-                @if (!discount.deleted) {
-                  <button (click)="edit(discount)" mat-icon-button
-                          matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
-                    <mat-icon color="primary">edit</mat-icon>
-                  </button>
-                }
-                @if (!discount.referral) {
-                  <button (click)="sentToUsers(discount)" mat-icon-button
-                          matTooltip="{{ 'COMMON.BUTTON.DISCOUNT.SEND' | translate }}" matTooltipPosition="right">
-                    <mat-icon color="primary">switch_access_shortcut_add</mat-icon>
-                  </button>
-                }
-                @if (!discount.referral) {
-                  <button (click)="delete(discount)" mat-icon-button
-                          matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
-                    <mat-icon color="warn">delete</mat-icon>
-                  </button>
-                }
-              } @else {
-                <div class="ssc-line"></div>
+              @if (!discount.deleted) {
+                <button (click)="edit(discount)" mat-icon-button
+                        matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+                  <mat-icon color="primary">edit</mat-icon>
+                </button>
+              }
+              @if (!discount.referral) {
+                <button (click)="sentToUsers(discount)" mat-icon-button
+                        matTooltip="{{ 'COMMON.BUTTON.DISCOUNT.SEND' | translate }}" matTooltipPosition="right">
+                  <mat-icon color="primary">switch_access_shortcut_add</mat-icon>
+                </button>
+              }
+              @if (!discount.referral) {
+                <button (click)="delete(discount)" mat-icon-button
+                        matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
+                  <mat-icon color="warn">delete</mat-icon>
+                </button>
               }
             </td>
           </ng-container>

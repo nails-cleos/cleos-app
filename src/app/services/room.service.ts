@@ -5,7 +5,7 @@ import { IRoom, IRoomAll, IRoomCustomer, IRoomInfo, IRoomService, IServicePrice 
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
 import { SortDirection } from '@angular/material/sort';
-import { paginated, Pagination } from '../interfaces/pagination';
+import { paginated, Pagination, skipLoadingOverlay } from '../interfaces/pagination';
 import { IApiResponse } from '../interfaces/common';
 
 @Injectable()
@@ -31,16 +31,19 @@ export class RoomService {
     if (customerId) {
       params = new HttpParams().set('customerId', customerId);
     }
-    return this.http.get<IRoomAll[]>(this.urlV1, { params });
+    return this.http.get<IRoomAll[]>(this.urlV1, { params, ...skipLoadingOverlay() });
   };
 
   getServices = (
     id: string,
-  ): Observable<IRoomService> => this.http.get<IRoomService>(toUrl(this.urlV1, id, 'services'));
+  ): Observable<IRoomService> => this.http.get<IRoomService>(toUrl(this.urlV1, id, 'services'),
+    { ...skipLoadingOverlay() });
 
-  getAllRoomsInfo = (): Observable<IRoomInfo> => this.http.get<IRoomInfo>(toUrl(this.urlV1, 'info'));
+  getAllRoomsInfo = (): Observable<IRoomInfo> => this.http.get<IRoomInfo>(toUrl(this.urlV1, 'info'),
+    { ...skipLoadingOverlay() });
 
-  getRoom = (id: string): Observable<IRoomAll | undefined> => this.http.get<IRoomAll>(toUrl(this.urlV1, id));
+  getRoom = (id: string): Observable<IRoomAll | undefined> => this.http.get<IRoomAll>(toUrl(this.urlV1, id),
+    { ...skipLoadingOverlay() });
 
   createRoom = (room: IRoom): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1, room);
 
@@ -56,5 +59,8 @@ export class RoomService {
 
   getAllCustomersInfo = (
     id: string,
-  ): Observable<IRoomCustomer[]> => this.http.get<IRoomCustomer[]>(toUrl(this.urlV1, id, 'customers', 'info'));
+  ): Observable<IRoomCustomer[]> => this.http.get<IRoomCustomer[]>(
+    toUrl(this.urlV1, id, 'customers', 'info'),
+    skipLoadingOverlay(),
+  );
 }

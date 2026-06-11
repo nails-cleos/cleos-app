@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { paginated, Pagination } from '../interfaces/pagination';
+import { paginated, Pagination, skipLoadingOverlay } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { IColor, IColorAll } from '../color/color';
 import { createFilter } from '../util/service-helper';
@@ -12,7 +12,7 @@ import { IApiResponse } from '../interfaces/common';
 export class ColorService {
 
   private url = 'colors';
-  private urlV1 = `v1/${this.url}`;
+  private urlV1 = `v1/${ this.url }`;
 
   private http: HttpClient = inject(HttpClient);
 
@@ -29,9 +29,10 @@ export class ColorService {
     toUrl(this.urlV1, 'treatments', treatmentId),
   );
 
-  getAllColors = (): Observable<IColorAll[]> => this.http.get<IColorAll[]>(this.urlV1);
+  getAllColors = (): Observable<IColorAll[]> => this.http.get<IColorAll[]>(this.urlV1, { ...skipLoadingOverlay() });
 
-  getColor = (id: string): Observable<IColor | undefined> => this.http.get<IColor>(toUrl(this.urlV1, id));
+  getColor = (id: string): Observable<IColorAll | undefined> => this.http.get<IColorAll | undefined>(
+    toUrl(this.urlV1, id), { ...skipLoadingOverlay() });
 
   createColor = (color: IColor): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1, color);
 

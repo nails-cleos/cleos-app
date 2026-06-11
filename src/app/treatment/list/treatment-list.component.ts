@@ -33,6 +33,7 @@ import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { TreatmentStore } from '../../store/treatment.store';
 import { createMatTableState } from 'src/app/util/mat-table-state';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 
 @Component({
   selector: 'app-treatment-list',
@@ -41,7 +42,8 @@ import { createMatTableState } from 'src/app/util/mat-table-state';
   imports: [MatIcon, MatList, MatListItem, MatListSubheaderCssMatStyler, MatIconButton,
     TranslatePipe, RouterLink, DatePipe, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef,
     MatCell, MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow,
-    MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, CurrencySymbolPipe, CurrencySymbolPipe],
+    MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, CurrencySymbolPipe, CurrencySymbolPipe,
+    TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreatmentListComponent {
@@ -68,6 +70,7 @@ export class TreatmentListComponent {
   );
 
   paginatorPageIndex = this.tableState.pageIndex;
+  isLoading = this.treatmentStore.isLoading;
   dataSourceSignal = computed(() => {
     const data = this.treatmentStore.data();
     return data?.kind === 'pagination' ? data.value.content : undefined;
@@ -78,7 +81,13 @@ export class TreatmentListComponent {
   });
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['order', 'name', 'priceFrom', 'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'order' },
+    { key: 'name' },
+    { key: 'priceFrom', hideOnMobile: true },
+    { key: 'actions', hideOnMobile: true },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
   expanded?: ITreatmentGroup;
 

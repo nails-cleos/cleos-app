@@ -177,11 +177,10 @@ export class DashboardComponent {
   all = false;
   thisMonthTotal: string = numberFormat(0, this.currency, this.dateFormat);
 
-  miniCardData: IReservationSummary[] = [{} as IReservationSummary, {} as IReservationSummary,
-    {} as IReservationSummary, {} as IReservationSummary];
-
-  charts: IChart[] = [{} as IChart, {} as IChart, {} as IChart,
-    {} as IChart, {} as IChart, {} as IChart, {} as IChart, {} as IChart];
+  miniCardData: IReservationSummary[] = [];
+  charts: IChart[] = [];
+  readonly miniCardSkeletons = Array.from({ length: 4 }, (_, index) => index);
+  readonly chartSkeletons = Array.from({ length: 8 }, (_, index) => index);
 
   private readonly language: string = this.translate.getCurrentLang();
 
@@ -224,15 +223,13 @@ export class DashboardComponent {
         this.thisMonthTotal = numberFormat(dashboard.thisMonthTotal || 0, this.currency, this.dateFormat);
         this.createEvents(isDarkMode);
         if (!dashboard.chartSummaries && !dashboard.miniCardSummaries) {
-          this.charts = [{} as IChart, {} as IChart, {} as IChart,
-            {} as IChart, {} as IChart, {} as IChart, {} as IChart, {} as IChart];
+          this.charts = [];
           this.miniCardError('NO_CONTENT');
         } else {
           if (dashboard.chartSummaries && dashboard.chartSummaries.length) {
             this.charts = dashboard.chartSummaries;
           } else {
-            this.charts = [{} as IChart, {} as IChart, {} as IChart,
-              {} as IChart, {} as IChart, {} as IChart, {} as IChart, {} as IChart];
+            this.charts = [];
           }
           if (dashboard.miniCardSummaries && dashboard.miniCardSummaries.length) {
             this.miniCardData = dashboard.miniCardSummaries.map(miniCard => {

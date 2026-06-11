@@ -5,7 +5,7 @@ import { IExpense, IExpenseAll, IExpenseInfo } from '../room/me/expense/expense'
 import { createFilter } from '../util/service-helper';
 import { SortDirection } from '@angular/material/sort';
 import { IApiResponse } from '../interfaces/common';
-import { paginated, Pagination } from '../interfaces/pagination';
+import { paginated, Pagination, skipLoadingOverlay } from '../interfaces/pagination';
 
 @Injectable()
 export class ExpenseService {
@@ -33,14 +33,14 @@ export class ExpenseService {
   };
 
   getAllExpensesInfo = (roomId: string): Observable<IExpenseInfo> => this.http.get<IExpenseInfo>(
-    this.updatePathVariable(roomId, ['info']),
+    this.updatePathVariable(roomId, ['info']), { ...skipLoadingOverlay() },
   );
 
   getExpense = (
     roomId: string,
     id: string,
   ): Observable<IExpenseAll | undefined> => this.http.get<IExpenseAll | undefined>(
-    this.updatePathVariable(roomId, [id]),
+    this.updatePathVariable(roomId, [id]), { ...skipLoadingOverlay() },
   );
 
   createExpense = (

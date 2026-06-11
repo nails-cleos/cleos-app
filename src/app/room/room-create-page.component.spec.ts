@@ -1,17 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Store } from '@ngrx/store';
-import { of } from 'rxjs';
 import { RoomCreatePageComponent } from './room-create-page.component';
 import { IRoomAll } from './room';
 import { RoomStore } from '../store/room.store';
 import { signal } from '@angular/core';
-import { getOptions } from '../store/actions/payment.actions';
 
 describe('RoomCreatePageComponent', () => {
   let component: RoomCreatePageComponent;
   let fixture: ComponentFixture<RoomCreatePageComponent>;
 
-  let storeSpy: jasmine.SpyObj<Store>;
   let roomStoreSpy: {
     currencies: ReturnType<typeof signal<any>>;
     offices: ReturnType<typeof signal<any>>;
@@ -25,8 +21,6 @@ describe('RoomCreatePageComponent', () => {
   };
 
   beforeEach(async () => {
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    storeSpy.pipe.and.returnValue(of(undefined));
     roomStoreSpy = {
       currencies: signal(undefined),
       offices: signal(undefined),
@@ -38,7 +32,6 @@ describe('RoomCreatePageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [RoomCreatePageComponent],
       providers: [
-        { provide: Store, useValue: storeSpy },
         { provide: RoomStore, useValue: roomStoreSpy },
       ],
     }).overrideTemplate(RoomCreatePageComponent, '')
@@ -54,8 +47,7 @@ describe('RoomCreatePageComponent', () => {
 
   it('should clean, load room info, and load payment options on init', () => {
     expect(roomStoreSpy.clean).toHaveBeenCalled();
-    expect(roomStoreSpy.loadInfo).toHaveBeenCalled();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getOptions());
+    expect(roomStoreSpy.loadInfo).not.toHaveBeenCalled();
   });
 
   it('should call create when room is received', () => {

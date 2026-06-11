@@ -60,11 +60,13 @@ describe('ReservationTableComponent', () => {
   let reservationList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
   let response$: BehaviorSubject<any>;
+  let isLoading$: BehaviorSubject<boolean>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   beforeEach(async () => {
     reservationList$ = new BehaviorSubject(mockPagination);
     response$ = new BehaviorSubject<any>(undefined);
+    isLoading$ = new BehaviorSubject<boolean>(false);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -73,7 +75,7 @@ describe('ReservationTableComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch', 'select']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
@@ -92,6 +94,7 @@ describe('ReservationTableComponent', () => {
           return new BehaviorSubject(undefined).asObservable();
       }
     });
+    storeSpy.select.and.returnValue(isLoading$.asObservable());
 
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
@@ -118,6 +121,7 @@ describe('ReservationTableComponent', () => {
   afterEach(() => {
     reservationList$.complete();
     response$.complete();
+    isLoading$.complete();
     breakpoint$.complete();
   });
 

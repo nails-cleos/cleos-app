@@ -51,21 +51,18 @@ export const OfficeStore = signalStore(
 
       loadPage({ page, sort, direction, size }: PageRequest): void {
         patchState(store, {
-          data: {
-            kind: 'pagination',
-            value: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IOfficeAll>,
-          },
+          data: undefined,
           subErrors: undefined,
           selected: undefined,
           response: undefined,
+          error: undefined,
+          isLoading: true,
         });
 
         officeService.getOfficesPage(page, sort, direction, size).subscribe({
           next: (value) => patchState(store, {
             data: { kind: 'pagination', value },
-            error: undefined,
-            subErrors: undefined,
-            response: undefined,
+            isLoading: false,
           }),
           error: patchError,
         });
@@ -77,14 +74,13 @@ export const OfficeStore = signalStore(
           subErrors: undefined,
           selected: undefined,
           response: undefined,
+          isLoading: true,
         });
 
         userService.getManagers().subscribe({
           next: (managers) => patchState(store, {
             managers: managers ?? [],
-            error: undefined,
-            subErrors: undefined,
-            response: undefined,
+            isLoading: false,
           }),
           error: patchError,
         });
@@ -96,14 +92,13 @@ export const OfficeStore = signalStore(
           error: undefined,
           subErrors: undefined,
           response: undefined,
+          isLoading: true,
         });
 
         officeService.getAllMyOffices().subscribe({
           next: (value) => patchState(store, {
             data: { kind: 'list', value: value ?? [] },
-            error: undefined,
-            subErrors: undefined,
-            response: undefined,
+            isLoading: false,
           }),
           error: patchError,
         });
@@ -114,15 +109,11 @@ export const OfficeStore = signalStore(
           subErrors: undefined,
           selected: undefined,
           response: undefined,
+          isLoading: true,
         });
 
         officeService.getOffice(id).subscribe({
-          next: (selected) => patchState(store, {
-            selected,
-            error: undefined,
-            subErrors: undefined,
-            response: undefined,
-          }),
+          next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },
@@ -142,8 +133,6 @@ export const OfficeStore = signalStore(
               path: `offices/${ response.id }`,
               redirect: 'offices',
             },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -165,8 +154,6 @@ export const OfficeStore = signalStore(
               path: `offices/${ response.id }`,
               redirect: 'offices',
             },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -189,8 +176,6 @@ export const OfficeStore = signalStore(
               reload: true,
               toastType: 'warning',
             },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,

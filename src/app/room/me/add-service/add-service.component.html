@@ -6,7 +6,9 @@
       </div>
     </div>
 
-    @if ((selectedAdditional().length && !additional().length) || (!selectedAdditional().length && additional().length) || (selectedAdditional().length && additional().length)) {
+    @if (isLoading()) {
+      <div class="ssc-square add-service-skeleton"></div>
+    } @else if (servicesLoaded()) {
       <div class="app-crud-form-grid">
         <div class="app-surface-item service-column">
           <div class="service-column__header">
@@ -49,8 +51,6 @@
           </div>
         </div>
       </div>
-    } @else {
-      <div class="ssc-square add-service-skeleton"></div>
     }
   </section>
 
@@ -61,7 +61,9 @@
       </div>
     </div>
 
-    @if (groups(); as groups) {
+    @if (isLoading()) {
+      <div class="ssc-square add-service-skeleton"></div>
+    } @else if (groups(); as groups) {
       <div class="app-crud-view-grid">
         @for (group of groups | keyvalue; track group) {
           <div class="app-crud-form-grid">
@@ -110,8 +112,6 @@
           </div>
         }
       </div>
-    } @else {
-      <div class="ssc-square add-service-skeleton"></div>
     }
   </section>
 

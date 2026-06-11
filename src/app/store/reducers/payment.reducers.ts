@@ -67,16 +67,19 @@ export const paymentReducer = createReducer(
   on(getPaymentByResourceId, (state) => ({
     ...state,
     subErrors: undefined,
-    selected: [{}, {}, {}] as IPayment[],
+    selected: undefined,
     response: undefined,
+    isLoading: true,
   })),
   on(getOptions, (state) => ({
     ...state,
+    isLoading: true,
     options: undefined,
   })),
   on(getOptionsSuccess, (state, { options }) => ({
     ...state,
     options: options,
+    isLoading: false,
   })),
   on(createPaymentLinkByReservationId, getPayment, (state) => ({
     ...state,
@@ -103,6 +106,7 @@ export const paymentReducer = createReducer(
     selected,
     subErrors: undefined,
     response: undefined,
+    isLoading: false,
   })),
   on(paymentFailure, (state, { error }) => ({
     ...state,

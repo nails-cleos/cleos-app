@@ -6,14 +6,14 @@ import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
 import { SortDirection } from '@angular/material/sort';
-import { paginated, Pagination } from '../interfaces/pagination';
+import { paginated, Pagination, skipLoadingOverlay } from '../interfaces/pagination';
 import { IApiResponse } from '../interfaces/common';
 
 @Injectable()
 export class TreatmentService {
 
   private url = 'treatments';
-  private urlV1 = `v1/${this.url}`;
+  private urlV1 = `v1/${ this.url }`;
 
   private http: HttpClient = inject(HttpClient);
 
@@ -28,7 +28,7 @@ export class TreatmentService {
   );
 
   getAllTreatmentsGroup = (): Observable<ITreatmentGroupAll[]> => this.http.get<ITreatmentGroupAll[]>(
-    toUrl(this.urlV1, 'groups'),
+    toUrl(this.urlV1, 'groups'), { ...skipLoadingOverlay() },
   );
 
   getAllTreatments = (roomId: string, customerId?: string): Observable<ITreatmentDiscountDTO> => {
@@ -36,7 +36,7 @@ export class TreatmentService {
     if (customerId) {
       params = params.append('customerId', customerId);
     }
-    return this.http.get<ITreatmentDiscountDTO>(this.urlV1, { params });
+    return this.http.get<ITreatmentDiscountDTO>(this.urlV1, { params, ...skipLoadingOverlay() });
   };
 
   getListTreatmentsGroup = (): Observable<ITreatmentGroup[]> => this.http.get<ITreatmentGroup[]>(
@@ -44,7 +44,8 @@ export class TreatmentService {
 
   getTreatmentGroup = (
     id: string,
-  ): Observable<ITreatmentGroupAll | undefined> => this.http.get<ITreatmentGroupAll>(toUrl(this.urlV1, id));
+  ): Observable<ITreatmentGroupAll | undefined> => this.http.get<ITreatmentGroupAll>(toUrl(this.urlV1, id),
+    { ...skipLoadingOverlay() });
 
   createTreatment = (
     treatmentGroup: ITreatmentGroup,
@@ -71,6 +72,6 @@ export class TreatmentService {
     groupId: string,
     treatmentId: string,
   ): Observable<ITreatmentAll[]> => this.http.get<ITreatmentAll[]>(
-    toUrl(this.urlV1, groupId, 'treatments', treatmentId, 'histories'),
+    toUrl(this.urlV1, groupId, 'treatments', treatmentId, 'histories'), { ...skipLoadingOverlay() },
   );
 }

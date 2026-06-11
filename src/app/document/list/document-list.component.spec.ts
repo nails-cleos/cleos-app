@@ -21,6 +21,7 @@ describe('DocumentListComponent', () => {
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
   let documentStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
     clean: jasmine.Spy;
@@ -30,6 +31,7 @@ describe('DocumentListComponent', () => {
     downloadZip: jasmine.Spy;
   };
   let officeStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
     loadMyOffices: jasmine.Spy;
   };
@@ -64,6 +66,7 @@ describe('DocumentListComponent', () => {
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     driveAccessServiceSpy = jasmine.createSpyObj('DriveAccessService', ['requestAccessIfNeeded']);
     documentStoreSpy = {
+      isLoading: signal(false),
       data: signal<any>(mockPagination),
       response: signal<any>(undefined),
       clean: jasmine.createSpy('clean'),
@@ -73,6 +76,7 @@ describe('DocumentListComponent', () => {
       downloadZip: jasmine.createSpy('downloadZip'),
     };
     officeStoreSpy = {
+      isLoading: signal(false),
       data: signal<any>(undefined),
       loadMyOffices: jasmine.createSpy('loadMyOffices'),
     };

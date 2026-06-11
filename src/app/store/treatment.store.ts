@@ -69,25 +69,18 @@ export const TreatmentStore = signalStore(
 
       loadPage(request: PageRequest): void {
         patchState(store, {
-          data: {
-            kind: 'pagination',
-            value: {
-              content: [{}, {}, {}],
-              totalElements: 3,
-            } as Pagination<ITreatmentGroupAll>,
-          },
+          data: undefined,
           subErrors: undefined,
           selected: undefined,
           response: undefined,
           error: undefined,
+          isLoading: true,
         });
 
         treatmentService.getTreatmentsPage(request.page, request.sort, request.direction, request.size).subscribe({
           next: (value) => patchState(store, {
             data: { kind: 'pagination', value },
-            subErrors: undefined,
-            response: undefined,
-            error: undefined,
+            isLoading: false,
           }),
           error: patchError,
         });
@@ -100,14 +93,13 @@ export const TreatmentStore = signalStore(
           selected: undefined,
           response: undefined,
           error: undefined,
+          isLoading: true,
         });
 
         treatmentService.getAllTreatmentsGroup().subscribe({
           next: (value) => patchState(store, {
             data: { kind: 'list', value },
-            subErrors: undefined,
-            response: undefined,
-            error: undefined,
+            isLoading: false,
           }),
           error: patchError,
         });
@@ -119,14 +111,13 @@ export const TreatmentStore = signalStore(
           subErrors: undefined,
           response: undefined,
           error: undefined,
+          isLoading: true,
         });
 
         colorService.getAllColors().subscribe({
           next: (colors) => patchState(store, {
             colors: colors || [],
-            subErrors: undefined,
-            response: undefined,
-            error: undefined,
+            isLoading: false,
           }),
           error: patchError,
         });
@@ -139,10 +130,11 @@ export const TreatmentStore = signalStore(
           subErrors: undefined,
           response: undefined,
           error: undefined,
+          isLoading: true,
         });
 
         treatmentService.getTreatmentGroup(id).subscribe({
-          next: (selected) => patchState(store, { selected }),
+          next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },
@@ -156,8 +148,6 @@ export const TreatmentStore = signalStore(
               translate.instant('TREATMENT.CREATED', { name: response.name }),
               response,
             ),
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -173,8 +163,6 @@ export const TreatmentStore = signalStore(
               translate.instant('TREATMENT.UPDATED.MESSAGE', { name: response.name }),
               response,
             ),
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -187,8 +175,6 @@ export const TreatmentStore = signalStore(
         treatmentService.sortTreatment(treatments).subscribe({
           next: () => patchState(store, {
             response: { message: translate.instant('TREATMENT.SORTED.MESSAGE') },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -201,8 +187,6 @@ export const TreatmentStore = signalStore(
         treatmentService.sortGroupTreatment(groups).subscribe({
           next: () => patchState(store, {
             response: { message: translate.instant('TREATMENT.SORTED.MESSAGE') },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -219,8 +203,6 @@ export const TreatmentStore = signalStore(
               reload: true,
               toastType: 'warning',
             },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -229,18 +211,17 @@ export const TreatmentStore = signalStore(
 
       loadHistory(id: string, treatmentId: string): void {
         patchState(store, {
-          history: [{} as ITreatmentAll, {} as ITreatmentAll, {} as ITreatmentAll],
+          history: undefined,
           subErrors: undefined,
           response: undefined,
           error: undefined,
+          isLoading: true,
         });
 
         treatmentService.getAllTreatmentsHistory(id, treatmentId).subscribe({
           next: (history) => patchState(store, {
             history,
-            subErrors: undefined,
-            response: undefined,
-            error: undefined,
+            isLoading: false,
           }),
           error: patchError,
         });

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Store } from '@ngrx/store';
 import { getDisplayNameInitials, getUserImage } from '../../util/helper';
@@ -18,7 +18,7 @@ import { GoogleMapComponent } from '../../shared/google-map/google-map.component
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { UserState } from '../../store/reducers/user.reducers';
-import { getOverviewPipe, getUserErrorPipe } from '../../store/selectors/user.selectors';
+import { getUserErrorPipe, selectOverviewData, selectUserIsLoading } from '../../store/selectors/user.selectors';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatMiniFabButton } from '@angular/material/button';
 import { CurrencyPipe } from '@angular/common';
@@ -45,8 +45,9 @@ export class OverviewComponent {
   private authUserService: AuthUserService = inject(AuthUserService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private overview$ = this.store.pipe(getOverviewPipe);
+  private overview$ = this.store.select(selectOverviewData);
   private error$ = this.store.pipe(getUserErrorPipe);
+  private isLoading$ = this.store.select(selectUserIsLoading);
 
   private authUserSignal = this.authUserService.authUser;
   private breakpointsSignal = toSignal(
@@ -66,12 +67,15 @@ export class OverviewComponent {
 
   overviewSignal = toSignal(this.overview$);
   errorSignal = toSignal(this.error$);
+  isLoadingSignal = toSignal(this.isLoading$, { initialValue: false });
 
   image: any;
   initials?: string;
 
-  miniCardData: IReservationOverview[] = [{} as IReservationOverview, {} as IReservationOverview];
-  charts: IChart[] = [{} as IChart, {} as IChart];
+  miniCardData = signal<IReservationOverview[]>([]);
+  charts = signal<IChart[]>([]);
+  readonly miniCardSkeletons = Array.from({ length: 4 }, (_, index) => index);
+  readonly chartSkeletons = Array.from({ length: 2 }, (_, index) => index);
 
   upcoming: number[] = [];
   language: string = this.translate.getCurrentLang();
@@ -115,7 +119,7 @@ export class OverviewComponent {
           this.upcoming = overview.upcomingList;
         }
         if (overview.miniCardOverview) {
-          this.miniCardData = overview.miniCardOverview?.map((ro: IReservationOverview) => {
+          this.miniCardData.set(overview.miniCardOverview?.map((ro: IReservationOverview) => {
             if (ro.primaryId || ro.secondaryId) {
               return Object.assign({}, ro, {
                 link: (id: string | undefined) => !id ||
@@ -123,10 +127,14 @@ export class OverviewComponent {
               });
             }
             return ro;
-          });
+          }));
+        } else {
+          this.miniCardData.set([]);
         }
         if (overview.chartOverview?.length) {
-          this.charts = overview.chartOverview;
+          this.charts.set(overview.chartOverview);
+        } else {
+          this.charts.set([]);
         }
       }
     });

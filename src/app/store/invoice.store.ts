@@ -47,10 +47,12 @@ export const InvoiceStore = signalStore(
 
       loadPage({ sort, direction, page, size, officeId }: PageRequest & { officeId: string }): void {
         patchState(store, {
-          page: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IInvoiceData>,
+          page: undefined,
           data: undefined,
           response: undefined,
           subErrors: undefined,
+          error: undefined,
+          isLoading: true,
         });
 
         invoiceService.getInvoicesPage(officeId, page, sort, direction, size).subscribe({
@@ -58,6 +60,7 @@ export const InvoiceStore = signalStore(
             page: value,
             response: undefined,
             subErrors: undefined,
+            error: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -66,10 +69,12 @@ export const InvoiceStore = signalStore(
 
       loadOfficeToInvoice(officeId: string, start: string, end: string, types?: string[]): void {
         patchState(store, {
-          data: [{} as IInvoice, {} as IInvoice, {} as IInvoice],
+          data: undefined,
           page: undefined,
           response: undefined,
           subErrors: undefined,
+          error: undefined,
+          isLoading: true,
         });
 
         invoiceService.getOfficeToInvoice(officeId, start, end, types).subscribe({

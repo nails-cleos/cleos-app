@@ -23,6 +23,7 @@ describe('NoteDetailsPageComponent', () => {
     delete: jasmine.Spy;
     clean: jasmine.Spy;
     loadById: jasmine.Spy;
+    loadProfessionals: jasmine.Spy;
     update: jasmine.Spy;
   };
 
@@ -54,6 +55,7 @@ describe('NoteDetailsPageComponent', () => {
       delete: jasmine.createSpy('delete'),
       clean: jasmine.createSpy('clean'),
       loadById: jasmine.createSpy('loadById'),
+      loadProfessionals: jasmine.createSpy('loadProfessionals'),
       update: jasmine.createSpy('update'),
     };
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);

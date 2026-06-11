@@ -26,6 +26,7 @@ describe('UserListComponent', () => {
   let userList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
   let response$: BehaviorSubject<any>;
+  let isLoading$: BehaviorSubject<boolean>;
 
   const mockUsers = [
     { id: '1', displayName: 'User 1', email: 'user1@test.com' },
@@ -43,6 +44,7 @@ describe('UserListComponent', () => {
   beforeEach(async () => {
     userList$ = new BehaviorSubject(mockPagination);
     response$ = new BehaviorSubject<any>(undefined);
+    isLoading$ = new BehaviorSubject<boolean>(false);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -51,7 +53,7 @@ describe('UserListComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch', 'select']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
 
@@ -73,6 +75,7 @@ describe('UserListComponent', () => {
           return new BehaviorSubject(undefined).asObservable();
       }
     });
+    storeSpy.select.and.returnValue(isLoading$.asObservable());
 
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
@@ -98,6 +101,7 @@ describe('UserListComponent', () => {
   afterEach(() => {
     userList$.complete();
     response$.complete();
+    isLoading$.complete();
     breakpoint$.complete();
   });
 

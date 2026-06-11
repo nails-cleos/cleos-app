@@ -38,6 +38,7 @@ import {
   MatListSubheaderCssMatStyler,
 } from '@angular/material/list';
 import { CurrencyStore } from '../../store/currency.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 
 @Component({
   selector: 'app-currency-list',
@@ -46,7 +47,7 @@ import { CurrencyStore } from '../../store/currency.store';
   imports: [MatIcon, MatList, MatListItem, MatListSubheaderCssMatStyler, MatIconButton,
     TranslatePipe, RouterLink, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
     MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow,
-    MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, MatListItemTitle],
+    MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, MatListItemTitle, TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CurrencyListComponent {
@@ -77,11 +78,18 @@ export class CurrencyListComponent {
   );
 
   paginatorPageIndex = this.tableState.pageIndex;
+  isLoading = this.currencyStore.isLoading;
   dataSourceSignal = computed(() => this.currencyListSignal()?.content);
   resultsLengthSignal = computed(() => this.currencyListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'code', 'name', 'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'code' },
+    { key: 'name', hideOnMobile: true },
+    { key: 'actions', hideOnMobile: true },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
   expanded?: ICurrency;
 
   language: string = this.translate.getCurrentLang();

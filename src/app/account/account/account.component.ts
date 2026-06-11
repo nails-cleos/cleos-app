@@ -19,6 +19,7 @@ import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autoc
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatOption } from '@angular/material/core';
+import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
 
 @Component({
   selector: 'app-account',
@@ -26,7 +27,7 @@ import { MatOption } from '@angular/material/core';
   styleUrls: ['./account.component.scss'],
   imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, ReactiveFormsModule, TranslatePipe,
     RouterLink, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix, BackButtonDirective, BalanceComponent,
-    BackButtonDirective],
+    BackButtonDirective, SkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountComponent {
@@ -75,6 +76,7 @@ export class AccountComponent {
   userId = computed(() => this.authUserSignal()?.customerId);
   errors = signal<Record<string, unknown>>({});
   showAdd = computed(() => this.hasAdminRole() && this.customerId() !== this.userId());
+  isLoading = computed(() => this.accountStore.isLoading());
 
   language: string = getLocale(this.translate.getCurrentLang()).language;
 

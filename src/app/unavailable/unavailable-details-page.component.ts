@@ -3,7 +3,7 @@ import { AuthUserService } from '../services/auth-user.service';
 import { ICommon } from '../interfaces/common';
 import { IUnavailable } from './unavailable';
 import { UnavailableStore } from '../store/unavailable.store';
-import { SkeletonComponent } from '../shared/skeleton.component';
+import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
 import { UnavailableComponent } from './unavailable.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -21,7 +21,7 @@ import { DialogComponent } from '../shared/dialog/generic/dialog.component';
         (deleteData)="delete()"
       />
     } @else {
-      <app-skeleton/>
+      <app-skeleton [buttons]="3"/>
     }
   `,
   imports: [UnavailableComponent, SkeletonComponent],

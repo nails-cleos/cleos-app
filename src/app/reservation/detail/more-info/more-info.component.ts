@@ -47,6 +47,7 @@ import {
   MatTable,
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
 
 @Component({
   selector: 'app-more-info',
@@ -55,7 +56,7 @@ import { MatTooltip } from '@angular/material/tooltip';
   imports: [TimeDetailPipe, MatIcon, MatIconButton, MatButton, TranslatePipe, DecimalPipe, NgClass,
     DatePipe, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatTooltip,
     MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef,
-    BackButtonDirective, TimeDetailPipe, RatingComponent, BackButtonDirective],
+    BackButtonDirective, TimeDetailPipe, RatingComponent, BackButtonDirective, TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MoreInfoComponent {
@@ -74,8 +75,17 @@ export class MoreInfoComponent {
   paymentsSignal = toSignal(this.payments$);
   trackingSignal = toSignal(this.tracking$);
   reviewSignal = toSignal(this.review$);
+  paymentsLoading = computed(() => this.paymentsSignal() === undefined);
 
-  displayedColumns: string[] = ['position', 'description', 'amount', 'type', 'status', 'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'description' },
+    { key: 'amount' },
+    { key: 'type', hideOnMobile: true },
+    { key: 'status', hideOnMobile: true },
+    { key: 'actions' },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
   dateFormat: string = this.translate.getCurrentLang();
 

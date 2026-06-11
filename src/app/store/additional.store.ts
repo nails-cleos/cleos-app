@@ -52,18 +52,18 @@ export const AdditionalStore = signalStore(
 
       loadPage({ sort, direction, page, size }: PageRequest): void {
         patchState(store, {
-          data: {
-            kind: 'pagination',
-            value: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IAdditionalAll>,
-          },
+          data: undefined,
           subErrors: undefined,
           selected: undefined,
           response: undefined,
+          error: undefined,
+          isLoading: true,
         });
 
         additionalService.getAdditionalPage(sort, direction, page, size).subscribe({
           next: (value) => patchState(store, {
             data: { kind: 'pagination', value },
+            error: undefined,
             subErrors: undefined,
             response: undefined,
             isLoading: false,
@@ -75,6 +75,7 @@ export const AdditionalStore = signalStore(
       loadList(): void {
         patchState(store, {
           data: { kind: 'list', value: [] },
+          isLoading: true,
           subErrors: undefined,
           response: undefined,
         });
@@ -95,10 +96,11 @@ export const AdditionalStore = signalStore(
           selected: undefined,
           subErrors: undefined,
           response: undefined,
+          isLoading: true,
         });
 
         additionalService.getAdditional(id).subscribe({
-          next: (selected) => patchState(store, { selected }),
+          next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },
@@ -108,6 +110,7 @@ export const AdditionalStore = signalStore(
           groups: undefined,
           subErrors: undefined,
           response: undefined,
+          isLoading: true,
         });
 
         treatmentService.getAllTreatmentsGroup().subscribe({
@@ -115,6 +118,7 @@ export const AdditionalStore = signalStore(
             groups,
             subErrors: undefined,
             response: undefined,
+            isLoading: false,
           }),
           error: patchError,
         });

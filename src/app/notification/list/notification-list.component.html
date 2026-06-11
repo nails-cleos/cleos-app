@@ -4,7 +4,7 @@
     <div class="app-detail-section-header">
       <div>
         <span class="app-surface-eyebrow">{{ 'COMMON.NOTIFICATION.TITLE' | translate }}</span>
-        @if (!currentNotifications.length && !loadingNotifications?.length) {
+        @if (!currentNotifications.length && !pageLoading()) {
           <p class="notifications-subtitle">{{ 'COMMON.NOTIFICATION.NO' | translate }}</p>
         }
       </div>
@@ -37,8 +37,8 @@
           </div>
         }
 
-        @if (loadingNotifications; as loading) {
-          @for (n of loading; track n) {
+        @if (pageLoading()) {
+          @for (card of skeletonNotificationCards; track card) {
             <div class="app-surface-item app-inline-field-action notification-card--loading">
               <div class="ssc-line notification-card__skeleton-title"></div>
               <div class="ssc-line notification-card__skeleton-date"></div>
@@ -55,9 +55,9 @@
           </button>
         </div>
       }
-    } @else if (loadingNotifications?.length) {
+    } @else if (pageLoading()) {
       <div class="notifications-list">
-        @for (n of loadingNotifications; track n) {
+        @for (card of skeletonNotificationCards; track card) {
           <div class="app-surface-item app-inline-field-action notification-card--loading">
             <div class="ssc-line notification-card__skeleton-title"></div>
             <div class="ssc-line notification-card__skeleton-date"></div>

@@ -3,29 +3,23 @@
     <div class="app-table-shell">
       @let resultsLength = resultsLengthSignal();
       @let pageSize = pageSizeSignal();
-      @if (dataSourceSignal(); as dataSource) {
+      @if (isLoading()) {
+        <app-table-skeleton [columns]="tableColumns" [showPaginator]="true"></app-table-skeleton>
+      } @else if (dataSourceSignal(); as dataSource) {
         <table [dataSource]="dataSource" mat-table matSort matSortActive="name" matSortDirection="asc"
                matSortDisableClear
                multiTemplateDataRows>
           <ng-container matColumnDef="position">
             <th *matHeaderCellDef mat-header-cell>#</th>
             <td *matCellDef="let color; let i = dataIndex;" mat-cell>
-              @if (color.id) {
-                <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
-              } @else {
-                <div class="ssc-line"></div>
-              }
+              <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="name">
             <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
             <td *matCellDef="let color" mat-cell>
-              @if (color.id) {
-                <div>{{ color.name }}</div>
-              } @else {
-                <div class="ssc-line"></div>
-              }
+              <div>{{ color.name }}</div>
             </td>
           </ng-container>
 
@@ -34,11 +28,7 @@
                 mat-sort-header>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}
             </th>
             <td *matCellDef="let color" class="app-surface-hide-mobile" mat-cell>
-              @if (color.id) {
-                <div>{{ color.description }}</div>
-              } @else {
-                <div class="ssc-line"></div>
-              }
+              <div>{{ color.description }}</div>
             </td>
           </ng-container>
 
@@ -51,19 +41,15 @@
               </button>
             </th>
             <td *matCellDef="let color" class="app-surface-hide-mobile" mat-cell>
-              @if (color.id) {
-                @if (!color.deleted) {
-                  <button (click)="edit(color)" mat-icon-button
-                          matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
-                    <mat-icon color="primary">edit</mat-icon>
-                  </button>
-                  <button (click)="delete(color)" mat-icon-button
-                          matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
-                    <mat-icon color="warn">delete</mat-icon>
-                  </button>
-                }
-              } @else {
-                <div class="ssc-line"></div>
+              @if (!color.deleted) {
+                <button (click)="edit(color)" mat-icon-button
+                        matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+                  <mat-icon color="primary">edit</mat-icon>
+                </button>
+                <button (click)="delete(color)" mat-icon-button
+                        matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
+                  <mat-icon color="warn">delete</mat-icon>
+                </button>
               }
             </td>
           </ng-container>

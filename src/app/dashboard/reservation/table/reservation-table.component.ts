@@ -16,7 +16,11 @@ import { AuthUserService } from '../../../services/auth-user.service';
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
 import { ReservationIconPipe } from '../../../pipes/reservation-icon.pipe';
 import { ErrorComponent } from '../../../shared/error/error.component';
-import { getReservationErrorPipe, getReservationPaginationPipe } from '../../../store/selectors/reservation.selectors';
+import {
+  getReservationErrorPipe,
+  getReservationPaginationPipe,
+  selectReservationIsLoading,
+} from '../../../store/selectors/reservation.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { MatPrefix } from '@angular/material/input';
@@ -42,6 +46,7 @@ import {
   MatTable,
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
 
 @Component({
   selector: 'app-reservation-table',
@@ -51,7 +56,7 @@ import { MatTooltip } from '@angular/material/tooltip';
     MatIconButton, ReactiveFormsModule, TranslatePipe, RouterLink, DatePipe, MatTable, MatSort, MatHeaderCell,
     MatCellDef, MatHeaderCellDef, MatColumnDef, MatCell, MatPrefix, MatTooltip, MatListItemIcon, MatFooterCell,
     MatHeaderRow, MatRow, MatFooterRow, MatPaginator, MatHeaderRowDef, MatRowDef, MatFooterRowDef, MatSortHeader,
-    MatFooterCellDef],
+    MatFooterCellDef, TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationTableComponent {
@@ -74,6 +79,7 @@ export class ReservationTableComponent {
   private tableState = createMatTableState(this.paginator, this.sort, 'timestamp', 'desc');
 
   private reservationListSignal = toSignal(this.reservationList$);
+  private loadingSignal = toSignal(this.store.select(selectReservationIsLoading), { initialValue: false });
   private authUserSignal = this.authUserService.authUser;
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
@@ -90,11 +96,21 @@ export class ReservationTableComponent {
   paginatorPageIndex = this.tableState.pageIndex;
 
   hasAdminRole = computed(() => this.authUserSignal().hasAdminRole);
+  isLoading = computed(() => this.loadingSignal());
   dataSourceSignal = computed(() => this.reservationListSignal()?.content);
   resultsLengthSignal = computed(() => this.reservationListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'customer', 'professional', 'timestamp', 'treatment', 'state', 'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'customer' },
+    { key: 'professional', hideOnMobile: true },
+    { key: 'timestamp', hideOnMobile: true },
+    { key: 'treatment', hideOnMobile: true },
+    { key: 'state', hideOnMobile: true },
+    { key: 'actions', hideOnMobile: true },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
   expanded?: IReservationAll;
 
   dateFormat: string = this.translate.getCurrentLang();

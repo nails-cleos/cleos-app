@@ -7,7 +7,7 @@ import { ITreatmentGroup, ITreatmentGroupAll } from '../treatment/treatment';
 import { map, startWith } from 'rxjs/operators';
 import { SortByPipe } from '../pipes/sort-by.pipe';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { IError } from '../interfaces/common';
+import { ICommon, IError } from '../interfaces/common';
 import { FileDropComponent, UploadFile } from '../shared/file-drop/file-drop.component';
 import { MatError, MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
@@ -16,17 +16,17 @@ import { MatOption } from '@angular/material/core';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { CatalogueStore } from '../store/catalogue.store';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import { ICommon } from '../interfaces/common';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
+import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
 
 @Component({
   selector: 'app-catalogue',
   templateUrl: './catalogue.component.html',
   styleUrls: ['./catalogue.component.scss'],
-  imports: [MatFormField, MatLabel, MatInput, MatOption, TranslatePipe,
-    MatAutocomplete, MatError, MatAutocompleteTrigger, SortByPipe, FileDropComponent, ReactiveFormsModule, MatHint,
-    MatCheckbox, BackButtonDirective, MatButton, MatIcon],
+  imports: [MatFormField, MatLabel, MatInput, MatOption, TranslatePipe, MatAutocomplete, MatError,
+    MatAutocompleteTrigger, SortByPipe, FileDropComponent, ReactiveFormsModule, MatHint, MatCheckbox,
+    BackButtonDirective, MatButton, MatIcon, SkeletonComponent, SkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueComponent {

@@ -20,10 +20,12 @@ import { UpcomingComponent } from '../upcoming/upcoming.component';
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
 import { ReservationIconPipe } from '../../../pipes/reservation-icon.pipe';
 import { ErrorComponent } from '../../../shared/error/error.component';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
 import {
   getCustomerReservationPipe,
   getReservationErrorPipe,
   getReservationResponsePipe,
+  selectReservationIsLoading,
 } from '../../../store/selectors/reservation.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
@@ -51,6 +53,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MatPrefix } from '@angular/material/input';
 import { DatePipe } from '@angular/common';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
+import { UpcomingSkeletonComponent } from '../../../shared/skeleton/upcoming-skeleton.component';
 
 @Component({
   selector: 'app-reservation-list',
@@ -59,8 +62,8 @@ import { MatTab, MatTabGroup } from '@angular/material/tabs';
   imports: [TimeDetailPipe, MatIcon, MatIconButton, MatButton, TranslatePipe, RouterLink, DatePipe,
     MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatTooltip,
     MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef,
-    MatPaginator, MatPrefix, UpcomingComponent, TimeDetailPipe, ReservationIconPipe, ErrorComponent, MatTabGroup,
-    MatTab],
+    MatPaginator, MatPrefix, UpcomingComponent, TimeDetailPipe, ReservationIconPipe, ErrorComponent,
+    TableSkeletonComponent, MatTabGroup, MatTab, UpcomingSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationListComponent {
@@ -76,6 +79,7 @@ export class ReservationListComponent {
   private customerReservation$ = this.store.pipe(getCustomerReservationPipe);
   private response$ = this.store.pipe(getReservationResponsePipe);
   private error$ = this.store.pipe(getReservationErrorPipe);
+  private isLoading$ = this.store.select(selectReservationIsLoading);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
@@ -83,6 +87,7 @@ export class ReservationListComponent {
 
   private customerReservationSignal = toSignal(this.customerReservation$);
   private responseSignal = toSignal(this.response$);
+  private isLoadingSignal = toSignal(this.isLoading$, { initialValue: false });
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -97,8 +102,17 @@ export class ReservationListComponent {
 
   noContent = signal(true);
   paginatorPageIndex = this.tableState.pageIndex;
+  readonly tableColumns: TableSkeletonColumn[] = [
+    { key: 'position', hideOnMobile: true },
+    { key: 'professional', hideOnMobile: true },
+    { key: 'timestamp' },
+    { key: 'treatment', hideOnMobile: true },
+    { key: 'state' },
+    { key: 'actions' },
+  ];
 
   errorSignal = toSignal(this.error$);
+  isLoading = computed(() => this.isLoadingSignal());
   reservationSignal = computed(() => this.customerReservationSignal()?.reservations);
   upcomingSignal = computed(() => this.customerReservationSignal()?.upcoming);
   dataSourceSignal = computed(() => this.reservationSignal()?.content?.map((reservation: IReservationAll) => {
@@ -114,7 +128,7 @@ export class ReservationListComponent {
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
   small = computed(() => this.breakpointsSignal()?.matches);
 
-  displayedColumns: string[] = ['position', 'professional', 'timestamp', 'treatment', 'state', 'actions'];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
   dateFormat: string = this.translate.getCurrentLang();
   language: string = this.translate.getCurrentLang();
@@ -134,6 +148,9 @@ export class ReservationListComponent {
     this.tableState.resetOn(this.responseSignal, () => this.discountStore.clean());
 
     effect(() => {
+      if (this.isLoading()) {
+        return;
+      }
       const upcoming = this.upcomingSignal();
       this.noContent.set(!upcoming || !upcoming.length);
       upcoming?.forEach(u => {

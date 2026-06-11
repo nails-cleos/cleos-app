@@ -74,7 +74,16 @@
                   </div>
                 </div>
 
-                @if (tab.history && tab.showHistory) {
+                @if (tab.showHistory && historyLoading()) {
+                  <div class="treatment-view-history app-table-panel">
+                    <div class="app-table-panel__header">
+                      <h3>{{ 'COMMON.COLUMN.LAST_UPDATE' | translate }}</h3>
+                    </div>
+                    <div class="app-table-shell">
+                      <app-table-skeleton [columns]="historyTableColumns"></app-table-skeleton>
+                    </div>
+                  </div>
+                } @else if (tab.history && tab.showHistory) {
                   <div class="treatment-view-history app-table-panel">
                     <div class="app-table-panel__header">
                       <h3>{{ 'COMMON.COLUMN.LAST_UPDATE' | translate }}</h3>
@@ -104,5 +113,5 @@
     </section>
   </div>
 } @else {
-  <app-skeleton/>
+  <app-skeleton [boxes]="1"/>
 }

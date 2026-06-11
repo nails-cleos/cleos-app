@@ -16,6 +16,7 @@ describe('AdditionalSortingComponent', () => {
   let additionalStoreSpy: {
     data: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
+    isLoading: ReturnType<typeof signal>;
     clean: jasmine.Spy;
     loadList: jasmine.Spy;
     clearResponse: jasmine.Spy;
@@ -49,6 +50,7 @@ describe('AdditionalSortingComponent', () => {
     additionalStoreSpy = {
       data: signal<any>(undefined),
       response: signal<any>(undefined),
+      isLoading: signal(false),
       clean: jasmine.createSpy('clean'),
       loadList: jasmine.createSpy('loadList'),
       clearResponse: jasmine.createSpy('clearResponse'),

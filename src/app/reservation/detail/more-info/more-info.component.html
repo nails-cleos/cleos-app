@@ -104,7 +104,11 @@
     </section>
   }
 
-  @if (paymentsSignal(); as payments) {
+  @if (paymentsLoading()) {
+    <section class="app-surface-section">
+      <app-table-skeleton [columns]="tableColumns"></app-table-skeleton>
+    </section>
+  } @else if (paymentsSignal(); as payments) {
     <section class="app-surface-section">
       <div class="app-surface-stack">
         <div class="app-detail-section-header">
@@ -118,80 +122,56 @@
             <ng-container matColumnDef="position">
               <th *matHeaderCellDef mat-header-cell>#</th>
               <td *matCellDef="let payment; let i = index;" mat-cell>
-                @if (payment.id) {
-                  {{ i + 1 }}
-                } @else {
-                  <div class="ssc-line"></div>
-                }
+                {{ i + 1 }}
               </td>
             </ng-container>
 
             <ng-container matColumnDef="description">
               <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
               <td *matCellDef="let payment" mat-cell>
-                @if (payment.id) {
-                  {{ payment.description }}
-                } @else {
-                  <div class="ssc-line"></div>
-                }
+                {{ payment.description }}
               </td>
             </ng-container>
 
             <ng-container matColumnDef="type">
               <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
               <td *matCellDef="let payment" class="app-surface-hide-mobile" mat-cell>
-                @if (payment.id) {
-                  {{ payment.type }}
-                } @else {
-                  <div class="ssc-line"></div>
-                }
+                {{ payment.type }}
               </td>
             </ng-container>
 
             <ng-container matColumnDef="amount">
               <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
               <td *matCellDef="let payment" mat-cell>
-                @if (payment.id) {
-                  <span class="app-detail-summary-value">
-                    <mat-icon>{{ payment.reservation.room.currency.icon }}</mat-icon>
-                    <span>{{ payment.transactionAmount | number:'1.2-2' }}</span>
-                  </span>
-                } @else {
-                  <div class="ssc-line"></div>
-                }
+                <span class="app-detail-summary-value">
+                  <mat-icon>{{ payment.reservation.room.currency.icon }}</mat-icon>
+                  <span>{{ payment.transactionAmount | number:'1.2-2' }}</span>
+                </span>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="status">
               <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
               <td *matCellDef="let payment" class="app-surface-hide-mobile" mat-cell>
-                @if (payment.id) {
-                  {{ 'COMMON.STATUS.PAYMENT.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate }}
-                } @else {
-                  <div class="ssc-line"></div>
-                }
+                {{ 'COMMON.STATUS.PAYMENT.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate }}
               </td>
             </ng-container>
 
             <ng-container matColumnDef="actions">
               <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
               <td *matCellDef="let payment" mat-cell>
-                @if (payment.id) {
-                  @if (payment.status !== 'APPROVED') {
-                    <div class="more-info-table-actions">
-                      <button (click)="resend(payment)" mat-icon-button
-                              matTooltip="{{ 'COMMON.BUTTON.RESEND' | translate }}"
-                              matTooltipPosition="above">
-                        <mat-icon color="primary">autorenew</mat-icon>
-                      </button>
-                      <button (click)="copy(payment)" mat-icon-button
-                              matTooltip="{{ 'COMMON.BUTTON.COPY' | translate }}" matTooltipPosition="above">
-                        <mat-icon color="primary">content_copy</mat-icon>
-                      </button>
-                    </div>
-                  }
-                } @else {
-                  <div class="ssc-line"></div>
+                @if (payment.status !== 'APPROVED') {
+                  <div class="more-info-table-actions">
+                    <button (click)="resend(payment)" mat-icon-button
+                            matTooltip="{{ 'COMMON.BUTTON.RESEND' | translate }}"
+                            matTooltipPosition="above">
+                      <mat-icon color="primary">autorenew</mat-icon>
+                    </button>
+                    <button (click)="copy(payment)" mat-icon-button
+                            matTooltip="{{ 'COMMON.BUTTON.COPY' | translate }}" matTooltipPosition="above">
+                      <mat-icon color="primary">content_copy</mat-icon>
+                    </button>
+                  </div>
                 }
               </td>
             </ng-container>

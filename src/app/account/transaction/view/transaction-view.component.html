@@ -12,88 +12,62 @@
     <div class="app-surface-item transaction-table-card">
       @let resultsLength = resultsLengthSignal();
       @let pageSize = pageSizeSignal();
-      @if (dataSourceSignal(); as dataSource) {
+      @if (isLoading()) {
+        <app-table-skeleton [columns]="tableColumns"></app-table-skeleton>
+      } @else if (dataSourceSignal(); as dataSource) {
         <table [dataSource]="dataSource" mat-table matSort matSortActive="timestamp" matSortDirection="desc"
                matSortDisableClear multiTemplateDataRows>
           <ng-container matColumnDef="position">
             <th *matHeaderCellDef mat-header-cell>#</th>
             <td *matCellDef="let transaction; let i = dataIndex;" mat-cell>
-              @if (transaction.id) {
-                <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
-              } @else {
-                <div class="ssc-line"></div>
-              }
+              <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="timestamp">
             <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'ACCOUNT.TRANSACTION.LIST.COLUMN.DATE' | translate }}</th>
             <td *matCellDef="let transaction" mat-cell>
-              @if (transaction.id) {
-                <div>{{ transaction.date | date:'short':undefined:dateFormat }}</div>
-              } @else {
-                <div class="ssc-line"></div>
-              }
+              <div>{{ transaction.date | date:'short':undefined:dateFormat }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="amount">
             <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
             <td *matCellDef="let transaction" class="app-surface-hide-mobile" mat-cell>
-              @if (transaction.id) {
-                <div>{{ transaction.amount | number:'1.2-2'| currency: account?.currency?.code }}</div>
-              } @else {
-                <div class="ssc-line"></div>
-              }
+              <div>{{ transaction.amount | number:'1.2-2'| currency: account?.currency?.code }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="amountGifted">
             <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell mat-sort-header>{{ 'ACCOUNT.TRANSACTION.LIST.COLUMN.AMOUNT_GIFTED' | translate }}</th>
             <td *matCellDef="let transaction" class="app-surface-hide-mobile" mat-cell>
-              @if (transaction.id) {
-                <div>{{ transaction.amountGifted | number:'1.2-2'| currency: account?.currency?.code }}</div>
-              } @else {
-                <div class="ssc-line"></div>
-              }
+              <div>{{ transaction.amountGifted | number:'1.2-2'| currency: account?.currency?.code }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="payment.status">
             <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
             <td *matCellDef="let transaction" class="app-surface-hide-mobile" mat-cell>
-              @if (transaction.id) {
-                <div>{{ 'COMMON.STATUS.PAYMENT.' + (transaction.payment?.status || 'NONE') | translate }}</div>
-              } @else {
-                <div class="ssc-line"></div>
-              }
+              <div>{{ 'COMMON.STATUS.PAYMENT.' + (transaction.payment?.status || 'NONE') | translate }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="payment.type">
             <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
             <td *matCellDef="let transaction" class="app-surface-hide-mobile" mat-cell>
-              @if (transaction.id) {
-                <div>{{ transaction.payment?.type }}</div>
-              } @else {
-                <div class="ssc-line"></div>
-              }
+              <div>{{ transaction.payment?.type }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="actions">
             <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
             <td *matCellDef="let transaction" class="app-surface-hide-mobile" mat-cell>
-              @if (transaction.id) {
-                @if (!transaction.deleted) {
-                  <button mat-icon-button
-                          [routerLink]="['/', language, 'accounts', account?.id, 'transactions', transaction.id]"
-                          matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
-                    <mat-icon color="primary">receipt</mat-icon>
-                  </button>
-                }
-              } @else {
-                <div class="ssc-line"></div>
+              @if (!transaction.deleted) {
+                <button mat-icon-button
+                        [routerLink]="['/', language, 'accounts', account?.id, 'transactions', transaction.id]"
+                        matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
+                  <mat-icon color="primary">receipt</mat-icon>
+                </button>
               }
             </td>
           </ng-container>

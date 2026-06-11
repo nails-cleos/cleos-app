@@ -80,6 +80,7 @@ describe('TransactionViewComponent', () => {
 
     accountStoreSpy = jasmine.createSpyObj('AccountStore', ['clean', 'loadTransactions'], {
       data: accountTransactionSignal.asReadonly(),
+      isLoading: signal(false).asReadonly(),
     });
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),

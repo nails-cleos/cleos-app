@@ -22,6 +22,7 @@ describe('UnavailableListComponent', () => {
   let translate: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let unavailableStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
     loadPage: jasmine.Spy;
@@ -84,6 +85,7 @@ describe('UnavailableListComponent', () => {
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     unavailableStoreSpy = {
+      isLoading: signal(false),
       data: signal(mockPagination),
       response: signal<any>(undefined),
       loadPage: jasmine.createSpy('loadPage'),

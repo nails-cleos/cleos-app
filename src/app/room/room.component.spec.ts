@@ -32,6 +32,7 @@ describe('RoomComponent', () => {
   let roomStoreSpy: {
     professionals: ReturnType<typeof signal<any>>;
     subErrors: ReturnType<typeof signal<any>>;
+    loadInfo: jasmine.Spy;
   };
   let geocodeServiceSpy: jasmine.SpyObj<GeocodeService>;
   let authUserService: jasmine.SpyObj<AuthUserService>;
@@ -141,6 +142,7 @@ describe('RoomComponent', () => {
     roomStoreSpy = {
       professionals: signal(undefined),
       subErrors: signal(undefined),
+      loadInfo: jasmine.createSpy('loadInfo'),
     };
     geocodeServiceSpy = jasmine.createSpyObj('GeocodeService', ['getCoordinates']);
     paymentServiceSpy = jasmine.createSpyObj('PaymentService', ['getPaymentOptions']);

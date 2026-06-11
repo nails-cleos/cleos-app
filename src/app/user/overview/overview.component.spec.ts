@@ -19,6 +19,7 @@ describe('OverviewComponent', () => {
 
   let overview$: BehaviorSubject<any>;
   let error$: BehaviorSubject<any>;
+  let isLoading$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
@@ -29,6 +30,7 @@ describe('OverviewComponent', () => {
   beforeEach(async () => {
     overview$ = new BehaviorSubject(undefined);
     error$ = new BehaviorSubject(undefined);
+    isLoading$ = new BehaviorSubject(false);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -37,7 +39,7 @@ describe('OverviewComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj<Store<UserState>>('Store', ['pipe', 'dispatch']);
+    storeSpy = jasmine.createSpyObj<Store<UserState>>('Store', ['pipe', 'select', 'dispatch']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['authUser'], {
       authUser: authUserSignal.asReadonly(),
     });
@@ -53,6 +55,18 @@ describe('OverviewComponent', () => {
           return overview$.asObservable();
         case 2:
           return error$.asObservable();
+        default:
+          return new BehaviorSubject(undefined).asObservable();
+      }
+    });
+    let selectCallIndex = 0;
+    storeSpy.select.and.callFake(() => {
+      selectCallIndex++;
+      switch (selectCallIndex) {
+        case 1:
+          return overview$.asObservable();
+        case 2:
+          return isLoading$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -170,8 +184,8 @@ describe('OverviewComponent', () => {
     expect(component.image).toBe('http://example.com/image.jpg');
     expect(component.initials).toBe('UT');
     expect(component.upcoming).toEqual([1, 2, 3]);
-    expect(component.miniCardData).toEqual(miniCardOverview);
-    expect(component.charts).toEqual(chartOverview);
+    expect(component.miniCardData()).toEqual(jasmine.arrayContaining(miniCardOverview));
+    expect(component.charts()).toEqual(chartOverview);
     expect(component.customer).toEqual(mockOverview.account.customer);
   });
 });

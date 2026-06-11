@@ -47,7 +47,6 @@ type CrudStoreConfig<TEntity, TCreateResponse, TUpdateResponse, TDeleteArgs> = {
   deleteResponse?: (args: TDeleteArgs) => IResponseSuccess;
   loadById?: (id: string) => Observable<TEntity | undefined>;
   loadPage?: (request: PageRequest) => Observable<Pagination<TEntity>>;
-  placeholder?: TEntity;
   update?: (id: string, entity: TEntity) => Observable<TUpdateResponse>;
   updateResponse?: (response: TUpdateResponse, id: string, entity: TEntity) => IResponseSuccess;
   sort?: (items: unknown) => Observable<unknown>;
@@ -90,18 +89,22 @@ export const withCrudStoreMethods =
           }
 
           patchState(store, {
-            data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<TEntity>,
+            data: undefined,
             subErrors: undefined,
             selected: undefined,
             response: undefined,
+            error: undefined,
+            isLoading: true,
           });
 
           config.loadPage(request).subscribe({
             next: (data) => {
               patchState(store, {
                 data,
+                error: undefined,
                 subErrors: undefined,
                 response: undefined,
+                isLoading: false,
               });
             },
             error: patchError,
@@ -115,13 +118,14 @@ export const withCrudStoreMethods =
 
           patchState(store, {
             subErrors: undefined,
-            selected: config.placeholder,
+            selected: undefined,
             response: undefined,
+            isLoading: true,
           });
 
           config.loadById(id).subscribe({
             next: (selected) => {
-              patchState(store, { selected });
+              patchState(store, { selected, isLoading: false });
             },
             error: patchError,
           });

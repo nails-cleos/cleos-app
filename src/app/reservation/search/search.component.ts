@@ -33,6 +33,7 @@ import {
   getCustomersPipe,
   getFilteredReservationsPipe,
   getReservationResponsePipe,
+  selectReservationIsLoading,
 } from '../../store/selectors/reservation.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
@@ -62,7 +63,7 @@ import {
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/material/chips';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 
 type SearchForm = {
   customer: FormControl<IUserAll | undefined>;
@@ -78,7 +79,7 @@ type SearchForm = {
     MatAutocomplete, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
     MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow,
     MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, MatAutocompleteTrigger, MatPrefix, TimeDetailPipe,
-    ReservationIconPipe, MatChipGrid, MatChipRow, MatChipInput, MatChipRemove, MatProgressSpinner],
+    ReservationIconPipe, MatChipGrid, MatChipRow, MatChipInput, MatChipRemove, TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchComponent {
@@ -112,6 +113,7 @@ export class SearchComponent {
   );
 
   paginatorPageIndex = this.tableState.pageIndex;
+  isLoading = toSignal(this.store.select(selectReservationIsLoading), { initialValue: false });
   dataSourceSignal = computed(() => {
     const now = getNowTimeZone();
     return this.reservationListSignal()?.content?.map((reservation: IReservationAll) => {
@@ -128,7 +130,15 @@ export class SearchComponent {
 
   private smallSignal = computed(() => this.breakpointsSignal()?.matches ?? false);
 
-  displayedColumns: string[] = ['position', 'customer', 'timestamp', 'state', 'treatment', 'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'customer' },
+    { key: 'timestamp' },
+    { key: 'state', hideOnMobile: true },
+    { key: 'treatment', hideOnMobile: true },
+    { key: 'actions', hideOnMobile: true },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
   expandedReservation?: IReservation;
 
   dateFormat: string = this.translate.getCurrentLang();

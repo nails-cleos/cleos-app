@@ -20,6 +20,7 @@ describe('RoomListComponent', () => {
   let translate: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let roomStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal<any>>;
     response: ReturnType<typeof signal<any>>;
     clean: jasmine.Spy;
@@ -82,6 +83,7 @@ describe('RoomListComponent', () => {
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     roomStoreSpy = {
+      isLoading: signal(false),
       data: signal(mockPagination),
       response: signal(undefined),
       clean: jasmine.createSpy('clean'),

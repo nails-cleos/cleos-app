@@ -1,8 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { getUser, saveUser } from '../store/actions/user.actions';
-import { User } from './user';
+import { IUser, IUserAll, User } from './user';
 import { flags, IFlag } from '../util/flags';
 import { randomColor } from '../util/color';
 import { createDateFromString } from '../util/dates';
@@ -15,12 +14,8 @@ import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
 import { NgIcon } from '@ng-icons/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { UserState } from '../store/reducers/user.reducers';
-import {
-  getNavigationParamsPipe,
-  getSelectedUserPipe,
-  getSubErrorsPipe,
-} from '../store/selectors/user.selectors';
-import { IError } from '../interfaces/common';
+import { getNavigationParamsPipe, getSubErrorsPipe } from '../store/selectors/user.selectors';
+import { ICommon, IError } from '../interfaces/common';
 import { ColorPickerComponent } from '../shared/color-picker/color-picker.component';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
@@ -28,9 +23,9 @@ import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
+import { UserForm } from './user-form.types';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
-import { UserForm } from './user-form.types';
 
 @Component({
   selector: 'app-user',
@@ -42,22 +37,21 @@ import { UserForm } from './user-form.types';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserComponent {
-  id = input<string>();
+  config = input.required<ICommon>();
+  user = input<IUserAll>();
+
+  submitData = output<{ user: IUser; role?: Role }>();
 
   private readonly store: Store<UserState> = inject(Store<UserState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private selectedUser$ = this.store.pipe(getSelectedUserPipe);
   private navigationParams$ = this.store.pipe(getNavigationParamsPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
   private navigationParams = toSignal(this.navigationParams$);
   private subErrorsSignal = toSignal(this.subErrors$);
   private langChangeSignal = toSignal<LangChangeEvent>(this.translate.onLangChange);
-
-  isAddModeSignal = computed(() => !this.id());
-  userSignal = toSignal(this.selectedUser$);
 
   googleMapForm: FormGroup<GoogleMapForm> = this.formBuilder.group<GoogleMapForm>({
     address: this.formBuilder.control(undefined),
@@ -111,16 +105,12 @@ export class UserComponent {
     });
 
     effect(() => {
-      const user = this.userSignal();
+      const user = this.user();
       if (user) {
         this.form.patchValue({
+          ...user,
           lang: user.locale,
-          displayName: user.displayName,
-          email: user.email,
-          phone: user.phone,
           dob: user.dob ? createDateFromString(user.dob) : undefined,
-          darkColor: user.darkColor,
-          lightColor: user.lightColor,
         });
         this.googleMapForm.patchValue({
           address: user.address?.name,
@@ -149,13 +139,6 @@ export class UserComponent {
     });
 
     effect(() => {
-      const id = this.id();
-      if (id) {
-        this.store.dispatch(getUser({ id }));
-      }
-    });
-
-    effect(() => {
       const role = this.selectedRole();
       if (role) {
         this.isProfessionalOrManager = [Role.manager, Role.professional].indexOf(role) > -1;
@@ -180,6 +163,10 @@ export class UserComponent {
     });
   }
 
+  get getConfig(): ICommon {
+    return this.config();
+  }
+
   get getForm(): UserForm {
     return this.form.controls;
   }
@@ -188,25 +175,16 @@ export class UserComponent {
     if (this.form.invalid) {
       return;
     }
-    const userSignal = this.userSignal();
     const user = User.fromForm(
       this.getForm,
-      userSignal,
+      this.user(),
       this.translate.getCurrentLang(),
       this.isProfessionalOrManager,
       this.formattedAddress,
       this.geometry?.location,
     );
 
-    const id = this.id();
-    if (!id) {
-      this.store.dispatch(
-        saveUser({ user, role: this.getForm.role.value }),
-      );
-    } else {
-      user.id = id;
-      this.store.dispatch(saveUser({ user }));
-    }
+    this.submitData.emit({ user, role: this.getForm.role.value });
   }
 
   getAddress = (placeResult: PlaceResult): void => {

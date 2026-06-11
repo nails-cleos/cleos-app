@@ -18,27 +18,29 @@
       }
 
       <div class="app-crud-form-grid">
-        @if (allProfessionalsSignal()) {
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'NOTE.PROFESSIONAL.FIELD' | translate }}</mat-label>
-            <input (keydown)="keyDownHandler($event)" [formControl]="getForm.professional" [matAutocomplete]="auto"
-                   matInput required type="text">
-            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-              @for (professional of filteredProfessionalSignal(); track professional.id) {
-                <mat-option [value]="professional">{{ professional.displayName }}</mat-option>
+        <div class="divider">
+          @if (allProfessionalsSignal()) {
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'NOTE.PROFESSIONAL.FIELD' | translate }}</mat-label>
+              <input (keydown)="keyDownHandler($event)" [formControl]="getForm.professional" [matAutocomplete]="auto"
+                     matInput required type="text">
+              <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+                @for (professional of filteredProfessionalSignal(); track professional.id) {
+                  <mat-option [value]="professional">{{ professional.displayName }}</mat-option>
+                }
+              </mat-autocomplete>
+              @if (getForm.professional.hasError('required')) {
+                <mat-error [innerHTML]="'NOTE.PROFESSIONAL.REQUIRED' | translate"></mat-error>
+              } @else if (getForm.professional.hasError('requireMatch')) {
+                <mat-error [innerHTML]="'NOTE.PROFESSIONAL.INVALID' | translate"></mat-error>
+              } @else if (errors()['professional']) {
+                <mat-error>{{ errors()['professional'] }}</mat-error>
               }
-            </mat-autocomplete>
-            @if (getForm.professional.hasError('required')) {
-              <mat-error [innerHTML]="'NOTE.PROFESSIONAL.REQUIRED' | translate"></mat-error>
-            } @else if (getForm.professional.hasError('requireMatch')) {
-              <mat-error [innerHTML]="'NOTE.PROFESSIONAL.INVALID' | translate"></mat-error>
-            } @else if (errors()['professional']) {
-              <mat-error>{{ errors()['professional'] }}</mat-error>
-            }
-          </mat-form-field>
-        } @else {
-          <div class="ssc-line"></div>
-        }
+            </mat-form-field>
+          } @else {
+            <div class="ssc-line"></div>
+          }
+        </div>
 
         <mat-form-field appearance="outline" class="app-crud-form-grid__full">
           <mat-label>{{ 'NOTE.DESCRIPTION.FIELD' | translate }}</mat-label>

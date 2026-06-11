@@ -12,100 +12,90 @@
       </span>
     }
 
-    @if (currentUpcoming.id) {
-      <div class="app-detail-section-header">
-        <div>
-          <span class="app-surface-eyebrow">{{ currentUpcoming.id }}</span>
-        </div>
+    <div class="app-detail-section-header">
+      <div>
+        <span class="app-surface-eyebrow">{{ currentUpcoming.id }}</span>
       </div>
-    } @else {
-      <div class="ssc-head-line"></div>
-    }
+    </div>
 
     <div class="upcoming-grid">
-      @if (currentUpcoming.id) {
+      <div class="app-surface-item">
+        <span class="app-surface-item__label">{{ 'ME.RESERVATION.UPCOMING.START' | translate }}</span>
+        <strong class="app-surface-item__value">
+          {{ currentUpcoming.start | date:'short':currentUpcoming.room.timeZone:dateFormat }}
+        </strong>
+        @if (showTimeZone()) {
+          <button (click)="openDialog(currentUpcoming.start)" mat-icon-button type="button" class="upcoming-info-button">
+            <mat-icon>info_outline</mat-icon>
+          </button>
+        }
+      </div>
+
+      @if (currentUpcoming.end) {
         <div class="app-surface-item">
-          <span class="app-surface-item__label">{{ 'ME.RESERVATION.UPCOMING.START' | translate }}</span>
+          <span class="app-surface-item__label">{{ 'ME.RESERVATION.UPCOMING.END' | translate }}</span>
           <strong class="app-surface-item__value">
-            {{ currentUpcoming.start | date:'short':currentUpcoming.room.timeZone:dateFormat }}
+            {{ currentUpcoming.end | date:'short':currentUpcoming.room.timeZone:dateFormat }}
           </strong>
           @if (showTimeZone()) {
-            <button (click)="openDialog(currentUpcoming.start)" mat-icon-button type="button" class="upcoming-info-button">
+            <button (click)="openDialog(currentUpcoming.end)" mat-icon-button type="button" class="upcoming-info-button">
               <mat-icon>info_outline</mat-icon>
             </button>
           }
         </div>
+      }
 
-        @if (currentUpcoming.end) {
-          <div class="app-surface-item">
-            <span class="app-surface-item__label">{{ 'ME.RESERVATION.UPCOMING.END' | translate }}</span>
-            <strong class="app-surface-item__value">
-              {{ currentUpcoming.end | date:'short':currentUpcoming.room.timeZone:dateFormat }}
-            </strong>
-            @if (showTimeZone()) {
-              <button (click)="openDialog(currentUpcoming.end)" mat-icon-button type="button" class="upcoming-info-button">
-                <mat-icon>info_outline</mat-icon>
-              </button>
-            }
+      <div class="app-surface-item">
+        <span class="app-surface-item__label">{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</span>
+        <strong class="app-surface-item__value">{{ currentUpcoming.professional.displayName }}</strong>
+      </div>
+
+      <div class="app-surface-item">
+        <span class="app-surface-item__label">{{ 'COMMON.ADDRESS.FIELD' | translate }}</span>
+        <a class="app-detail-link app-surface-item__value"
+           [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + currentUpcoming.room.address.name"
+           rel="noreferrer"
+           target="_blank">
+          {{ currentUpcoming.room.address.name }}
+        </a>
+      </div>
+
+      @if (currentUpcoming.price) {
+        <div class="app-surface-item upcoming-breakdown-card">
+          <div class="upcoming-breakdown-card__header">
+            <mat-icon>{{ currentUpcoming.room.currency.icon }}</mat-icon>
+            <div>
+              <span class="app-surface-item__label">{{ 'ME.RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</span>
+              <p class="upcoming-breakdown-card__subtitle">{{ 'ME.RESERVATION.FLOW.SUMMARY.BREAKDOWN' | translate }}</p>
+            </div>
           </div>
-        }
 
-        <div class="app-surface-item">
-          <span class="app-surface-item__label">{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</span>
-          <strong class="app-surface-item__value">{{ currentUpcoming.professional.displayName }}</strong>
-        </div>
-
-        <div class="app-surface-item">
-          <span class="app-surface-item__label">{{ 'COMMON.ADDRESS.FIELD' | translate }}</span>
-          <a class="app-detail-link app-surface-item__value"
-             [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + currentUpcoming.room.address.name"
-             rel="noreferrer"
-             target="_blank">
-            {{ currentUpcoming.room.address.name }}
-          </a>
-        </div>
-
-        @if (currentUpcoming.price) {
-          <div class="app-surface-item upcoming-breakdown-card">
-            <div class="upcoming-breakdown-card__header">
-              <mat-icon>{{ currentUpcoming.room.currency.icon }}</mat-icon>
-              <div>
-                <span class="app-surface-item__label">{{ 'ME.RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</span>
-                <p class="upcoming-breakdown-card__subtitle">{{ 'ME.RESERVATION.FLOW.SUMMARY.BREAKDOWN' | translate }}</p>
-              </div>
+          <div class="price-breakdown">
+            <div class="price-row">
+              <span>{{ currentUpcoming.treatment.name }}</span>
+              <strong>{{ currentUpcoming.room.currency | currencySymbol }} {{ currentUpcoming.price.amount | number:'1.2-2' }}</strong>
             </div>
 
-            <div class="price-breakdown">
+            @for (additional of currentUpcoming.additional; track additional) {
               <div class="price-row">
-                <span>{{ currentUpcoming.treatment.name }}</span>
-                <strong>{{ currentUpcoming.room.currency | currencySymbol }} {{ currentUpcoming.price.amount | number:'1.2-2' }}</strong>
+                <span>{{ additional.name }}</span>
+                <strong>{{ currentUpcoming.room.currency | currencySymbol }} {{ additional.price | number:'1.2-2' }}</strong>
               </div>
+            }
 
-              @for (additional of currentUpcoming.additional; track additional) {
-                <div class="price-row">
-                  <span>{{ additional.name }}</span>
-                  <strong>{{ currentUpcoming.room.currency | currencySymbol }} {{ additional.price | number:'1.2-2' }}</strong>
-                </div>
-              }
-
-              @if (currentUpcoming.price.discount > 0) {
-                <div class="price-row price-row--discount">
-                  <span>{{ 'ME.RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</span>
-                  <strong>- {{ currentUpcoming.room.currency | currencySymbol }} {{ currentUpcoming.price.discount | number:'1.2-2' }}</strong>
-                </div>
-              }
-
-              <div class="price-row price-row--total">
-                <span>{{ 'ME.RESERVATION.FLOW.SUMMARY.TOTAL' | translate }}</span>
-                <strong>{{ currentUpcoming.room.currency | currencySymbol }} {{ currentUpcoming.price.total | number:'1.2-2' }}</strong>
+            @if (currentUpcoming.price.discount > 0) {
+              <div class="price-row price-row--discount">
+                <span>{{ 'ME.RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</span>
+                <strong>- {{ currentUpcoming.room.currency | currencySymbol }} {{ currentUpcoming.price.discount | number:'1.2-2' }}</strong>
               </div>
+            }
+
+            <div class="price-row price-row--total">
+              <span>{{ 'ME.RESERVATION.FLOW.SUMMARY.TOTAL' | translate }}</span>
+              <strong>{{ currentUpcoming.room.currency | currencySymbol }} {{ currentUpcoming.price.total | number:'1.2-2' }}</strong>
             </div>
           </div>
-        }
-      } @else {
-        <div class="ssc-square app-detail-skeleton-card"></div>
-        <div class="ssc-square app-detail-skeleton-card"></div>
-        <div class="ssc-square app-detail-skeleton-card"></div>
+        </div>
       }
     </div>
 
@@ -129,35 +119,31 @@
       </div>
     }
 
-    @if (currentUpcoming.id) {
-      <div class="app-detail-actions upcoming-actions">
-        @if (!['CANCELLED_PAYMENT_REQUIRED', 'PAID'].includes(currentUpcoming.state) && currentUpcoming.room.paymentTypes.length > 1) {
-          <button [routerLink]="['/', language, 'me', 'reservation', currentUpcoming.id, 'payment', 'option']"
-                  mat-stroked-button
-                  type="button">
-            <mat-icon>payment</mat-icon>
-            <span>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</span>
-          </button>
-        }
-        @if (currentUpcoming.state === 'CANCELLED_PAYMENT_REQUIRED' && currentUpcoming.room.paymentTypes.length > 1) {
-          <button [routerLink]="['/', language, 'me', 'reservation', currentUpcoming.id, 'payment']"
-                  mat-stroked-button
-                  type="button">
-            <mat-icon>payment</mat-icon>
-            <span>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</span>
-          </button>
-        }
-        <button (click)="edit()" mat-stroked-button type="button">
-          <mat-icon>edit_calendar</mat-icon>
-          <span>{{ 'COMMON.BUTTON.EDIT' | translate }}</span>
+    <div class="app-detail-actions upcoming-actions">
+      @if (!['CANCELLED_PAYMENT_REQUIRED', 'PAID'].includes(currentUpcoming.state) && currentUpcoming.room.paymentTypes.length > 1) {
+        <button [routerLink]="['/', language, 'me', 'reservation', currentUpcoming.id, 'payment', 'option']"
+                mat-stroked-button
+                type="button">
+          <mat-icon>payment</mat-icon>
+          <span>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</span>
         </button>
-        <button [routerLink]="['/', language, 'reservation', currentUpcoming.id]" mat-stroked-button type="button">
-          <mat-icon>visibility</mat-icon>
-          <span>{{ 'COMMON.BUTTON.VIEW' | translate }}</span>
+      }
+      @if (currentUpcoming.state === 'CANCELLED_PAYMENT_REQUIRED' && currentUpcoming.room.paymentTypes.length > 1) {
+        <button [routerLink]="['/', language, 'me', 'reservation', currentUpcoming.id, 'payment']"
+                mat-stroked-button
+                type="button">
+          <mat-icon>payment</mat-icon>
+          <span>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</span>
         </button>
-      </div>
-    } @else {
-      <div class="ssc-head-line"></div>
-    }
+      }
+      <button (click)="edit()" mat-stroked-button type="button">
+        <mat-icon>edit_calendar</mat-icon>
+        <span>{{ 'COMMON.BUTTON.EDIT' | translate }}</span>
+      </button>
+      <button [routerLink]="['/', language, 'reservation', currentUpcoming.id]" mat-stroked-button type="button">
+        <mat-icon>visibility</mat-icon>
+        <span>{{ 'COMMON.BUTTON.VIEW' | translate }}</span>
+      </button>
+    </div>
   </section>
 }

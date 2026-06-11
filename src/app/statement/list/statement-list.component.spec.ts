@@ -23,6 +23,7 @@ describe('StatementListComponent', () => {
     upload: jasmine.Spy;
   };
   let officeStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
     loadMyOffices: jasmine.Spy;
   };
@@ -59,6 +60,7 @@ describe('StatementListComponent', () => {
       upload: jasmine.createSpy('upload'),
     };
     officeStoreSpy = {
+      isLoading: signal(false),
       data: signal<any>(undefined),
       loadMyOffices: jasmine.createSpy('loadMyOffices'),
     };

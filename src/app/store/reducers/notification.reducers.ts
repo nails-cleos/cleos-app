@@ -37,15 +37,17 @@ export const notificationReducer = createReducer(
   initialState,
   on(getNotificationsPage, (state): NotificationState => ({
     ...state,
-    data: { page: { content: [{}, {}, {}] } as Pagination<INotification>, unread: -1, workDay: [] },
+    data: undefined,
     dataDeleted: undefined,
     dataRead: undefined,
     subErrors: undefined,
+    isLoading: true,
   })),
   on(notificationSuccess, (state, { data }): NotificationState => ({
     ...state,
     data,
     subErrors: undefined,
+    isLoading: false,
   })),
   on(notificationReadSuccess, (state, { data }): NotificationState => ({
     ...state,

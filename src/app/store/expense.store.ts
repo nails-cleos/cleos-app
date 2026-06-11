@@ -50,19 +50,18 @@ export const ExpenseStore = signalStore(
 
       loadPage({ roomId, sort, direction, page, size, filter, dateFilter }: ExpensePageRequest): void {
         patchState(store, {
-          data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IExpenseAll>,
+          data: undefined,
           response: undefined,
           error: undefined,
           subErrors: undefined,
           selected: undefined,
+          isLoading: true,
         });
 
         expenseService.getExpensesPage(roomId, sort, direction, page, size, filter, dateFilter).subscribe({
           next: (data) => patchState(store, {
             data,
-            response: undefined,
-            error: undefined,
-            subErrors: undefined,
+            isLoading: false,
           }),
           error: patchError,
         });
@@ -74,14 +73,13 @@ export const ExpenseStore = signalStore(
           response: undefined,
           error: undefined,
           subErrors: undefined,
+          isLoading: true,
         });
 
         expenseService.getAllExpensesInfo(roomId).subscribe({
           next: (info) => patchState(store, {
             info,
-            response: undefined,
-            error: undefined,
-            subErrors: undefined,
+            isLoading: false,
           }),
           error: patchError,
         });
@@ -93,10 +91,11 @@ export const ExpenseStore = signalStore(
           response: undefined,
           error: undefined,
           subErrors: undefined,
+          isLoading: false,
         });
 
         expenseService.getExpense(roomId, id).subscribe({
-          next: (selected) => patchState(store, { selected }),
+          next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },
@@ -116,7 +115,6 @@ export const ExpenseStore = signalStore(
               message: translate.instant('EXPENSE.CREATED', { invoice: response.name }),
               path: `rooms/${ roomId }/expenses/${ response.id }`,
             },
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -138,7 +136,6 @@ export const ExpenseStore = signalStore(
               message: translate.instant('EXPENSE.UPDATED.MESSAGE', { invoice: response.name }),
               path: `rooms/${ roomId }/expenses/${ response.id }`,
             },
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -161,7 +158,6 @@ export const ExpenseStore = signalStore(
               reload: true,
               toastType: 'warning',
             },
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,

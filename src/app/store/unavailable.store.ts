@@ -85,19 +85,18 @@ export const UnavailableStore = signalStore(
 
       loadPage(request: PageRequest): void {
         patchState(store, {
-          data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IUnavailableAll>,
+          data: undefined,
           subErrors: undefined,
           selected: undefined,
           response: undefined,
           error: undefined,
+          isLoading: true,
         });
 
         unavailableService.getUnavailablePage(request.page, request.sort, request.direction, request.size).subscribe({
           next: (data) => patchState(store, {
             data,
-            subErrors: undefined,
-            response: undefined,
-            error: undefined,
+            isLoading: false,
           }),
           error: patchError,
         });
@@ -109,14 +108,13 @@ export const UnavailableStore = signalStore(
           subErrors: undefined,
           response: undefined,
           error: undefined,
+          isLoading: true,
         });
 
         userService.getProfessionals().subscribe({
           next: (professionals) => patchState(store, {
             professionals,
-            subErrors: undefined,
-            response: undefined,
-            error: undefined,
+            isLoading: false,
           }),
           error: patchError,
         });
@@ -128,14 +126,13 @@ export const UnavailableStore = signalStore(
           subErrors: undefined,
           response: undefined,
           error: undefined,
+          isLoading: true,
         });
 
         userService.getAllRoomsByProfessionalId(professionalId).subscribe({
           next: (rooms) => patchState(store, {
             rooms,
-            subErrors: undefined,
-            response: undefined,
-            error: undefined,
+            isLoading: false,
           }),
           error: patchError,
         });
@@ -147,10 +144,11 @@ export const UnavailableStore = signalStore(
           subErrors: undefined,
           response: undefined,
           error: undefined,
+          isLoading: true,
         });
 
         unavailableService.getUnavailable(id).subscribe({
-          next: (selected) => patchState(store, { selected }),
+          next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },

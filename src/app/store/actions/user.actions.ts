@@ -64,7 +64,7 @@ export const getMyUser = createAction(UserActionTypes.getMyUser);
 
 export const saveUser = createAction(
   UserActionTypes.saveUser,
-  props<{ user: IUser; role?: Role }>(),
+  props<{ user: IUser; id?: string; role?: Role }>(),
 );
 
 export const setRole = createAction(

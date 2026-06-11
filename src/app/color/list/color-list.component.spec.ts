@@ -21,6 +21,7 @@ describe('ColorListComponent', () => {
   let colorStoreSpy: {
     data: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
+    isLoading: ReturnType<typeof signal>;
     loadPage: jasmine.Spy;
     clearResponse: jasmine.Spy;
     delete: jasmine.Spy;
@@ -53,6 +54,7 @@ describe('ColorListComponent', () => {
     colorStoreSpy = {
       data: signal(mockPagination),
       response: signal<any>(undefined),
+      isLoading: signal(false),
       loadPage: jasmine.createSpy('loadPage'),
       clearResponse: jasmine.createSpy('clearResponse'),
       delete: jasmine.createSpy('delete'),

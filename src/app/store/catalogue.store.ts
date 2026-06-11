@@ -35,10 +35,12 @@ export const CatalogueStore = signalStore(
 
     loadAllCatalogues(): void {
       patchState(store, {
-        data: [{} as ICatalogueAll, {} as ICatalogueAll, {} as ICatalogueAll],
+        data: undefined,
         response: undefined,
         subErrors: undefined,
         selected: undefined,
+        error: undefined,
+        isLoading: true,
       });
 
       catalogueService.getAllCatalogues().subscribe({
@@ -46,6 +48,7 @@ export const CatalogueStore = signalStore(
           data: data ?? [],
           response: undefined,
           subErrors: undefined,
+          isLoading: false,
         }),
         error: (err) => {
           const error = mapCrudHttpError(err);
@@ -61,10 +64,12 @@ export const CatalogueStore = signalStore(
 
     loadCatalogs(): void {
       patchState(store, {
-        data: [{} as ICatalogueAll, {} as ICatalogueAll, {} as ICatalogueAll],
+        data: undefined,
         response: undefined,
         subErrors: undefined,
         selected: undefined,
+        error: undefined,
+        isLoading: true,
       });
 
       catalogueService.getAllCatalogs().subscribe({
@@ -72,6 +77,7 @@ export const CatalogueStore = signalStore(
           data: data ?? [],
           response: undefined,
           subErrors: undefined,
+          isLoading: false,
         }),
         error: (err) => {
           const error = mapCrudHttpError(err);
@@ -90,6 +96,7 @@ export const CatalogueStore = signalStore(
         selected: undefined,
         response: undefined,
         subErrors: undefined,
+        isLoading: true,
       });
 
       catalogueService.getCatalogue(id).subscribe({
@@ -195,9 +202,11 @@ export const CatalogueStore = signalStore(
 
     sort(catalogues: ICatalogueAll[]): void {
       patchState(store, {
-        data: [{} as ICatalogueAll, {} as ICatalogueAll, {} as ICatalogueAll],
+        data: undefined,
         response: undefined,
         subErrors: undefined,
+        error: undefined,
+        isLoading: true,
       });
 
       catalogueService.updateCatalogueOrder(catalogues).subscribe({

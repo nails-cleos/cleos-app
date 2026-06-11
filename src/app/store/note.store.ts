@@ -60,15 +60,14 @@ export const NoteStore = signalStore(
           professionals: undefined,
           subErrors: undefined,
           response: undefined,
+          isLoading: true,
           error: undefined,
         });
 
         userService.getProfessionals().subscribe({
           next: (professionals) => patchState(store, {
             professionals,
-            subErrors: undefined,
-            response: undefined,
-            error: undefined,
+            isLoading: false,
           }),
           error: patchError,
         });
@@ -79,11 +78,12 @@ export const NoteStore = signalStore(
           selected: undefined,
           subErrors: undefined,
           response: undefined,
+          isLoading: true,
           error: undefined,
         });
 
         noteService.getNote(id).subscribe({
-          next: (selected) => patchState(store, { selected: selected }),
+          next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },

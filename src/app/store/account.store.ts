@@ -43,49 +43,55 @@ export const AccountStore = signalStore(
 
       loadAccount(id: string): void {
         patchState(store, {
-          selected: {} as IAccountAll,
+          selected: undefined,
           selectedTransaction: undefined,
           response: undefined,
           subErrors: undefined,
           error: undefined,
+          isLoading: true,
         });
 
         accountService.getAccount(id).subscribe({
-          next: (selected) => patchState(store, { selected }),
+          next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },
 
       loadAccountByCustomerId(customerId: string): void {
         patchState(store, {
-          selected: {} as IAccountAll,
+          selected: undefined,
           selectedTransaction: undefined,
           response: undefined,
           subErrors: undefined,
           error: undefined,
+          isLoading: true,
         });
 
         accountService.getAccountByCustomerId(customerId).subscribe({
-          next: (selected) => patchState(store, { selected }),
+          next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },
 
       loadTransactions(id: string, request: PageRequest): void {
         patchState(store, {
-          data: {
-            account: undefined,
-            transactions: { content: [{}, {}, {}], totalElements: 3, totalPages: 1, number: 0 },
-          },
+          data: undefined,
           selectedTransaction: undefined,
           response: undefined,
           subErrors: undefined,
           error: undefined,
+          isLoading: true,
         });
 
         accountService.getTransactionsByAccountId(id, request.page, request.sort, request.direction, request.size)
           .subscribe({
-            next: (data) => patchState(store, { data, response: undefined, subErrors: undefined, error: undefined }),
+            next: (data) => patchState(store, {
+              data,
+              response: undefined,
+              subErrors: undefined,
+              error: undefined,
+              isLoading: false,
+            }),
             error: patchError,
           });
       },

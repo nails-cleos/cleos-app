@@ -85,13 +85,13 @@ describe('crud-signal-store', () => {
     api = TestBed.inject(TestCrudApi);
   });
 
-  it('should expose placeholder while loadById request is pending', () => {
+  it('should keep selected undefined while loadById request is pending', () => {
     const selected$ = new Subject<TestEntity | undefined>();
     api.loadById.and.returnValue(selected$.asObservable());
 
     store.loadById('123');
 
-    expect(store.selected()).toEqual({ name: 'placeholder' });
+    expect(store.selected()).toBeUndefined();
 
     selected$.next({ name: 'loaded' });
     selected$.complete();

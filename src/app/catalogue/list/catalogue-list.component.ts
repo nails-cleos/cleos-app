@@ -16,12 +16,14 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { Router, RouterLink } from '@angular/router';
 import { CatalogueStore } from '../../store/catalogue.store';
+import { CardListSkeletonComponent } from '../../shared/skeleton/card-list-skeleton.component';
 
 @Component({
   selector: 'app-catalogue-list',
   templateUrl: './catalogue-list.component.html',
   styleUrls: ['./catalogue-list.component.scss'],
-  imports: [MatIcon, MatButton, TranslatePipe, RouterLink, CdkDropList, CdkDrag, CdkDragHandle, CdkDragPreview],
+  imports: [MatIcon, MatButton, TranslatePipe, RouterLink, CdkDropList, CdkDrag, CdkDragHandle, CdkDragPreview,
+    CardListSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueListComponent {
@@ -31,11 +33,13 @@ export class CatalogueListComponent {
   private readonly catalogueStore = inject(CatalogueStore);
   private readonly responseSignal = this.catalogueStore.response;
   private readonly cataloguesSignal = this.catalogueStore.data;
+  private readonly isLoadingSignal = this.catalogueStore.isLoading;
 
   catalogues = computed(() => {
     const list = this.cataloguesSignal() || [];
-    return list.filter(it => it?.id).map(it => it.blob ? { ...it, image: `data:image/jpeg;base64,${it.blob}` } : it);
+    return list.map(it => it.blob ? { ...it, image: `data:image/jpeg;base64,${it.blob}` } : it);
   });
+  isLoading = computed(() => this.isLoadingSignal());
 
   language: string = this.translate.getCurrentLang();
 

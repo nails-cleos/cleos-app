@@ -61,16 +61,11 @@ export const userReducer = createReducer(
   initialState,
   on(getUsersPage, (state) => ({
     ...state,
-    data: {
-      kind: 'pagination',
-      value: {
-        content: [{}, {}, {}],
-        totalElements: 3,
-      } as Pagination<IUserAll>,
-    },
+    data: undefined,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
+    isLoading: true,
   })),
   on(getAllCustomers, (state) => ({
     ...state,
@@ -84,25 +79,25 @@ export const userReducer = createReducer(
   })),
   on(getCustomerOverview, (state) => ({
     ...state,
-    data: {
-      kind: 'overview',
-      value: {} as IOverview,
-    },
+    data: undefined,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
+    isLoading: true,
   })),
   on(getMyUser, getUser, (state) => ({
     ...state,
-    selected: {} as IUserAll,
+    selected: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: true,
   })),
   on(userSuccess, (state, { data }) => ({
     ...state,
     data,
     subErrors: undefined,
     response: undefined,
+    isLoading: false,
   })),
   on(userSelected, (state, { selected }) => ({
     ...state,

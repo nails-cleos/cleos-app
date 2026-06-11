@@ -40,6 +40,7 @@ export class OfficeComponent {
 
   private subErrorsSignal = this.officeStore.subErrors;
 
+  isLoading = this.officeStore.isLoading;
   errors = signal<Record<string, unknown>>({});
 
   form: FormGroup<OfficeForm> = this.formBuilder.group<OfficeForm>({

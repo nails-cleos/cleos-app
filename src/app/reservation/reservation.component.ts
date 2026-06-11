@@ -5,6 +5,7 @@ import {
   effect,
   inject,
   input,
+  output,
   signal,
   untracked,
   viewChildren,
@@ -22,14 +23,11 @@ import { IUser, IUserAll } from '../user/user';
 import { combineLatestWith, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import {
-  createReservation,
   getAllAdditionalByGroupId,
   getAllRooms,
   getAllTreatments,
   getCustomerInformation,
-  getReservation,
   searchAvailability,
-  updateReservationById,
 } from '../store/actions/reservation.actions';
 import { noDuplicateDatesValidator, requireMatch } from '../util/validators';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../treatment/treatment';
@@ -38,6 +36,7 @@ import {
   Day,
   ICustomerLastReservation,
   IDay,
+  IReservation,
   IReservationAll,
   IReservationPayment,
   IUpcomingAll,
@@ -114,9 +113,9 @@ import {
   getCustomersPipe,
   getNavigationParamsPipe,
   getRoomsPipe,
-  getSelectedReservationPipe,
   getSubErrorsPipe,
   getTreatmentDiscountPipe,
+  selectReservationIsLoading,
 } from '../store/selectors/reservation.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../interfaces/common';
@@ -150,6 +149,8 @@ import { MatCard, MatCardContent } from '@angular/material/card';
 import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
 import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
 import { MatCheckbox } from '@angular/material/checkbox';
+import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
+import { CardListSkeletonComponent } from '../shared/skeleton/card-list-skeleton.component';
 import PlaceResult = google.maps.places.PlaceResult;
 
 const RESERVATION_ERROR_FIELDS = [
@@ -177,11 +178,16 @@ const RESERVATION_ERROR_FIELDS = [
     NgClass, NgTemplateOutlet, DatePipe, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix, MatFabButton,
     BackButtonDirective, CurrencySymbolPipe, MatCard, MatCardContent, RoomNamePipe, SortByPipe, CurrencySymbolPipe,
     DurationTimePipe, BackButtonDirective, GoogleMapComponent, PaymentOptionSelectComponent, CalendarWeekViewComponent,
-    TimepickerDirective, TimepickerComponent, MatSelectionList, MatListOption, MatDivider, MatCheckbox, MatSuffix],
+    TimepickerDirective, TimepickerComponent, MatSelectionList, MatListOption, MatDivider, MatCheckbox, MatSuffix,
+    SkeletonComponent, CardListSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationComponent {
-  id = input<string>();
+  reservation = input<IUpcomingAll>();
+  isEditing = input<boolean>(false);
+  isAdmin = input<boolean>(false);
+
+  submitData = output<{ reservation: IReservation; role: Role }>();
 
   private readonly dialog = inject(MatDialog);
   private readonly toastService: ToastService = inject(ToastService);
@@ -200,7 +206,6 @@ export class ReservationComponent {
   private rooms$ = this.store.pipe(getRoomsPipe);
   private treatmentDiscount$ = this.store.pipe(getTreatmentDiscountPipe);
   private additionalList$ = this.store.pipe(getAdditionalListPipe);
-  private selectedReservation$ = this.store.pipe(getSelectedReservationPipe);
   private calendar$ = this.store.pipe(getCalendarPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
   private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
@@ -210,7 +215,6 @@ export class ReservationComponent {
   private readonly roomsSignal = toSignal(this.rooms$);
   private readonly treatmentDiscountSignal = toSignal(this.treatmentDiscount$);
   private readonly customerInfoSignal = toSignal(this.customerInfo$);
-  private readonly selectedReservationSignal = toSignal(this.selectedReservation$);
   private readonly calendarSignal = toSignal(this.calendar$);
   private readonly subErrorsSignal = toSignal(this.subErrors$);
   private readonly authUserSignal = this.authUserService.authUser;
@@ -229,6 +233,7 @@ export class ReservationComponent {
 
   additionalListSignal = toSignal(this.additionalList$);
   additionalSelected = signal<IAdditionalAll[]>([]);
+  isLoading = toSignal(this.store.select(selectReservationIsLoading), { initialValue: false });
 
   dataEvents: Map<string, IDataEvent> = new Map();
   private additionalLists = viewChildren<MatSelectionList>('additional');
@@ -437,9 +442,7 @@ export class ReservationComponent {
   isPreview = false;
   totalDurationFormatted?: string;
 
-  isEditing = signal(false);
   currentStepIndex = signal(0);
-  isAdmin = computed(() => this.authUserSignal().isAdmin);
   maxCalendarDate: Date = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
 
   screenConfig = computed(() => {
@@ -509,10 +512,9 @@ export class ReservationComponent {
     });
 
     effect(() => {
-      const id = this.id();
-      if (id) {
-        this.reservationId = id;
-        this.isEditing.set(true);
+      const reservation = this.reservation();
+      if (reservation) {
+        this.reservationId = reservation.id;
         this.currentStepIndex.set(this.isAdmin() ? 1 : 2);
         this.steps = this.steps.map(value => {
           switch (value.order) {
@@ -527,18 +529,6 @@ export class ReservationComponent {
               return value;
           }
         });
-        this.store.dispatch(getReservation({ id }));
-      }
-    });
-
-    effect(() => {
-      if (this.isEditing()) {
-        const customerId = this.customerId;
-        if (this.isAdmin()) {
-          this.getRoomList(customerId);
-        } else {
-          this.getTreatmentList(this.roomId(), customerId);
-        }
       }
     });
 
@@ -766,7 +756,7 @@ export class ReservationComponent {
 
     effect(() => {
       const additionalList = this.additionalListSignal();
-      const reservation = this.selectedReservationSignal();
+      const reservation = this.reservation();
       if (additionalList?.length) {
         const additionalIndex = enableStep(this.steps, 'post_add');
         if (this.customerAdditionalIds?.length && !this.additionalSelected().length &&
@@ -826,7 +816,7 @@ export class ReservationComponent {
     });
 
     effect(() => {
-      const reservation = this.selectedReservationSignal();
+      const reservation = this.reservation();
       const stepper = untracked(() => this.currentStepIndex());
       if (reservation && stepper) {
         this.setData(reservation);
@@ -835,7 +825,7 @@ export class ReservationComponent {
 
     effect(() => {
       const calendar = this.calendarSignal();
-      const reservation = this.selectedReservationSignal();
+      const reservation = this.reservation();
       if (calendar) {
         calendar.forEach((data) => {
           const dataEvent = this.dataEvents.get(data.date);
@@ -935,25 +925,25 @@ export class ReservationComponent {
   }
 
   get summaryCustomer() {
-    return this.getCustomerForm.customer.value || this.selectedReservationSignal()?.customer;
+    return this.getCustomerForm.customer.value || this.reservation()?.customer;
   }
 
   get summaryRoom() {
-    return this.getOfficeForm.room.value || this.selectedReservationSignal()?.room;
+    return this.getOfficeForm.room.value || this.reservation()?.room;
   }
 
   get summaryProfessional() {
-    return this.getOfficeForm.professional.value || this.selectedReservationSignal()?.professional;
+    return this.getOfficeForm.professional.value || this.reservation()?.professional;
   }
 
   get summaryTreatment() {
-    return this.getTreatmentForm.treatment.value || this.selectedReservationSignal()?.treatment;
+    return this.getTreatmentForm.treatment.value || this.reservation()?.treatment;
   }
 
   get summaryAdditionals(): IAdditionalAll[] {
     return this.additionalSelected().length
       ? this.additionalSelected()
-      : this.selectedReservationSignal()?.additional || [];
+      : this.reservation()?.additional || [];
   }
 
   get summaryDateTimes(): Array<{ date: Date; start?: string }> {
@@ -962,7 +952,7 @@ export class ReservationComponent {
       return current;
     }
 
-    const reservation = this.selectedReservationSignal();
+    const reservation = this.reservation();
     if (!reservation) {
       return [];
     }
@@ -972,7 +962,7 @@ export class ReservationComponent {
   }
 
   private get summaryPriceSource(): IPrice {
-    const reservation = this.selectedReservationSignal();
+    const reservation = this.reservation();
     return reservation ? getPrice(reservation, reservation.payments) : new Price();
   }
 
@@ -1092,7 +1082,7 @@ export class ReservationComponent {
       }
 
       const role = this.isDashboard ? Role.roomAdmin : Role.professional;
-      const reservationSignal = this.selectedReservationSignal();
+      const reservationSignal = this.reservation();
       const reservation = Reservation.fromForm(
         this.getForm,
         dates,
@@ -1101,13 +1091,7 @@ export class ReservationComponent {
         this.isEditing() ? reservationSignal : undefined,
       );
 
-      if (this.isEditing() && reservationSignal) {
-        this.store.dispatch(updateReservationById({ id: reservationSignal.id, reservation, role }));
-      } else {
-        this.store.dispatch(
-          createReservation({ reservation, role }),
-        );
-      }
+      this.submitData.emit({ reservation, role });
     }
     return;
   }

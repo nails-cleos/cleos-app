@@ -1,8 +1,10 @@
 @let account = accountSignal();
-@if (account) {
-  <div class="app-surface-canvas app-surface-shell app-surface-stack">
-    <app-balance [account]="account" [showAdd]="showAdd()" [showView]="true" [language]="language"></app-balance>
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <app-balance [account]="account" [showAdd]="showAdd()" [showView]="true" [language]="language"></app-balance>
 
+  @if (isLoading()) {
+    <app-skeleton />
+  } @else if (account) {
     <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
       <section class="app-surface-section">
         <div class="app-detail-section-header">
@@ -83,5 +85,5 @@
         </div>
       </section>
     </form>
-  </div>
-}
+  }
+</div>

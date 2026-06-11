@@ -225,7 +225,9 @@
           }
         </div>
 
-        @if (customerInfo(); as customerInfo) {
+        @if (isLoading()) {
+          <app-skeleton [lines]="2" [buttons]="0"/>
+        } @else if (customerInfo(); as customerInfo) {
           <div class="support-card app-surface-section">
             <div class="support-card__header">
               <mat-icon>history</mat-icon>
@@ -275,8 +277,13 @@
         description: 'RESERVATION.FLOW.STEPS.ROOM'
       }"></ng-container>
 
-      @let currentOffices = offices();
-      @if (!currentOffices?.length) {
+      @if (isLoading()) {
+        <app-skeleton [showTitle]="false" [lines]="1" [buttons]="0"/>
+        <div class="field-grid field-grid--triple">
+          <app-skeleton [showTitle]="false" [lines]="0" [boxes]="1" [buttons]="0"/>
+          <app-skeleton [showTitle]="false" [lines]="0" [boxes]="1" [buttons]="0"/>
+        </div>
+      } @else if (!offices().length) {
         <div class="empty-state">
           <mat-icon>storefront</mat-icon>
           <div class="empty-state__title">{{ 'RESERVATION.ROOM.NO_CONTENT' | translate }}</div>
@@ -284,7 +291,7 @@
       } @else {
         <div class="app-surface-section">
           <div class="field-grid field-grid--triple">
-            @if (currentOffices) {
+            @if (offices()) {
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
                 <input (keydown)="keyDownOffice($event)" [formControl]="getOfficeForm.office"
@@ -416,8 +423,10 @@
         description: 'RESERVATION.FLOW.STEPS.TREATMENT'
       }"></ng-container>
 
-      @let currentGroups = groups();
-      @if (!currentGroups?.length) {
+      @if (isLoading()) {
+        <app-skeleton [showTitle]="false" [lines]="0" [buttons]="0" [boxes]="1"/>
+        <app-skeleton [showTitle]="false" [lines]="1" [buttons]="0"/>
+      } @else if (!groups()?.length) {
         <div class="empty-state">
           <mat-icon>spa</mat-icon>
           <div class="empty-state__title">{{ 'RESERVATION.TREATMENT.NO_CONTENT' | translate }}</div>
@@ -473,7 +482,7 @@
 
         <div class="app-surface-section">
           <div class="field-grid field-grid--double">
-            @if (currentGroups) {
+            @if (groups()) {
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
                 <input (keydown)="keyDownGroup($event)" [formControl]="getTreatmentForm.group"
@@ -634,9 +643,8 @@
           </div>
         }
       } @else {
-        <div class="loading-card">
-          <div class="ssc-line"></div>
-        </div>
+        <app-card-list-skeleton [badgeCount]="0" [actionCount]="0" [descriptionLines]="1"
+                                [showMedia]="false"></app-card-list-skeleton>
       }
     </div>
   </ng-template>

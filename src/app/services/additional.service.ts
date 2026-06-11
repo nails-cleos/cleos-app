@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { paginated, Pagination } from '../interfaces/pagination';
+import { paginated, Pagination, skipLoadingOverlay } from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { IAdditional, IAdditionalAll } from '../additional/additional';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
@@ -28,13 +28,14 @@ export class AdditionalService {
 
   getAllAdditionalByGroupId = (roomId: string, groupId: string): Observable<IAdditionalAll[]> =>
     this.http.get<IAdditionalAll[]>(toUrl(this.urlV1, 'groups'),
-      { params: new HttpParams().set('roomId', roomId).set('groupId', groupId) },
+      { params: new HttpParams().set('roomId', roomId).set('groupId', groupId), ...skipLoadingOverlay() },
     );
 
-  getAdditionalList = (): Observable<IAdditionalAll[]> => this.http.get<IAdditionalAll[]>(this.urlV1);
+  getAdditionalList = (): Observable<IAdditionalAll[]> => this.http.get<IAdditionalAll[]>(this.urlV1,
+    { ...skipLoadingOverlay() });
 
   getAdditional = (id: string): Observable<IAdditionalAll | undefined> => this.http.get<IAdditionalAll>(
-    toUrl(this.urlV1, id));
+    toUrl(this.urlV1, id), { ...skipLoadingOverlay() });
 
   createAdditional = (additional: IAdditional): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1,
     additional);

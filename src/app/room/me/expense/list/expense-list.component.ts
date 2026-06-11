@@ -46,6 +46,7 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ExpenseStore } from '../../../../store/expense.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../../../shared/skeleton/table-skeleton.component';
 
 type ExpensesForm = {
   date: FormControl<Date | undefined>;
@@ -61,7 +62,7 @@ type ExpensesForm = {
     DecimalPipe, RouterLink, DatePipe, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef,
     MatCell, MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow,
     MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, CurrencySymbolPipe, TimeDetailPipe, MatSuffix,
-    CurrencySymbolPipe],
+    CurrencySymbolPipe, TableSkeletonComponent],
   providers: [...provideYearMonthDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -99,13 +100,24 @@ export class ExpenseListComponent {
   );
 
   paginatorPageIndex = this.tableState.pageIndex;
+  isLoading = this.expenseStore.isLoading;
 
   dataSourceSignal = computed(() => this.expenseListSignal()?.content?.map((expense: IExpenseAll) => Object.assign({},
     expense, { totalBtw: expense.totalGross - expense.totalNet })));
   resultsLengthSignal = computed(() => this.expenseListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'invoice', 'supplyStore.name', 'timestamp', 'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'timestamp' },
+    { key: 'invoice', hideOnMobile: true },
+    { key: 'supplyStore.name', hideOnMobile: true },
+    { key: 'totalGross', hideOnMobile: true },
+    { key: 'totalBtw', hideOnMobile: true },
+    { key: 'totalNet' },
+    { key: 'actions', hideOnMobile: true },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
   expanded?: IExpenseAll;
 
   dateFormat: string = this.translate.getCurrentLang();

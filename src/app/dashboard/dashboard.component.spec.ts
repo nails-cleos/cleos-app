@@ -21,6 +21,7 @@ describe('DashComponent', () => {
   let navigationParams$: BehaviorSubject<any>;
   let dashboardMap$: BehaviorSubject<any>;
   let error$: BehaviorSubject<any>;
+  let isLoading$: BehaviorSubject<boolean>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   const mockMiniCardSummaries = [
@@ -63,8 +64,9 @@ describe('DashComponent', () => {
     navigationParams$ = new BehaviorSubject(undefined);
     dashboardMap$ = new BehaviorSubject(undefined);
     error$ = new BehaviorSubject(undefined);
+    isLoading$ = new BehaviorSubject(false);
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch', 'select']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),
     });
@@ -83,6 +85,7 @@ describe('DashComponent', () => {
           return new BehaviorSubject(undefined).asObservable();
       }
     });
+    storeSpy.select.and.returnValue(isLoading$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [DashboardComponent, TranslateModule.forRoot()],
@@ -257,10 +260,10 @@ describe('DashComponent', () => {
     dashboardMap$.next(record);
     fixture.detectChanges();
 
-    expect(component.charts.length).toBe(8);
-
-    component.charts.forEach(chart => {
-      expect(Object.keys(chart).length).toBe(0);
+    expect(component.charts.length).toBe(0);
+    expect(component.miniCardData.length).toBe(4);
+    component.miniCardData.forEach(card => {
+      expect(card.error?.status).toBe('NO_CONTENT');
     });
 
     expect(component.miniCardData.length).toBe(4);

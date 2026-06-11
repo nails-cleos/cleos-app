@@ -44,6 +44,8 @@ import {
   MatTable,
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
 
 type DocumentsForm = {
   office: FormControl<IOfficeAll | undefined>;
@@ -57,7 +59,7 @@ type DocumentsForm = {
     TranslatePipe, DatePipe, MatAutocomplete, MatError, MatTable, MatSort, MatColumnDef, MatHeaderCellDef,
     MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell,
     MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, MatSuffix,
-    MatAutocompleteTrigger],
+    MatAutocompleteTrigger, TableSkeletonComponent, SkeletonComponent],
   templateUrl: './document-list.component.html',
   styleUrl: './document-list.component.scss',
   providers: [...provideYearMonthDateAdapter()],
@@ -96,11 +98,20 @@ export class DocumentListComponent {
   );
 
   paginatorPageIndex = this.tableState.pageIndex;
+  isLoading = this.documentStore.isLoading;
+  isOfficeLoading = this.officeStore.isLoading;
   dataSourceSignal = computed(() => this.dataSignal()?.content ?? []);
   resultsLengthSignal = computed(() => this.dataSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'name', 'date', 'type', 'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'name' },
+    { key: 'date', hideOnMobile: true },
+    { key: 'type' },
+    { key: 'actions', hideOnMobile: true },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
   expandedDocument?: IDocument;
 
@@ -110,7 +121,7 @@ export class DocumentListComponent {
     office: this.formBuilder.control(undefined, {
       validators: [Validators.required, requireMatch],
     }),
-    date: this.formBuilder.control(undefined, {
+    date: this.formBuilder.control(getNowTimeZone(), {
       validators: [Validators.required],
     }),
   });

@@ -4,7 +4,12 @@ import { Store } from '@ngrx/store';
 import { IPayment, IPaymentAll } from '../../interfaces/payment';
 import { cleanPayment, getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/actions/payment.actions';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { getPaymentResponsePipe, getPaymentsPipe, getSubErrorsPipe } from '../../store/selectors/payment.selectors';
+import {
+  getPaymentResponsePipe,
+  getPaymentsPipe,
+  getSubErrorsPipe,
+  selectPaymentIsLoading,
+} from '../../store/selectors/payment.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { PaymentState } from '../../store/reducers/payment.reducers';
 import { MatPrefix } from '@angular/material/input';
@@ -28,6 +33,7 @@ import {
   MatTable,
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 
 @Component({
   selector: 'app-payment',
@@ -35,7 +41,7 @@ import { MatTooltip } from '@angular/material/tooltip';
   styleUrls: ['./payment.component.scss'],
   imports: [MatIcon, MatIconButton, TranslatePipe, DecimalPipe, MatTable, MatColumnDef,
     MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatTooltip, MatFooterCellDef, MatFooterCell, MatHeaderRowDef,
-    MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPrefix, MatFabButton],
+    MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPrefix, MatFabButton, TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentComponent {
@@ -51,17 +57,27 @@ export class PaymentComponent {
   private response$ = this.store.pipe(getPaymentResponsePipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
 
+  private loadingSignal = toSignal(this.store.select(selectPaymentIsLoading), { initialValue: false });
   private paymentListSignal = toSignal(this.paymentList$);
   private subErrorsSignal = toSignal(this.subErrors$);
   private responseSignal = toSignal(this.response$);
 
   dataSourceSignal = computed(() => this.paymentListSignal());
+  isLoading = computed(() => this.loadingSignal());
   hiddenSignal = computed(() => {
     const list = this.paymentListSignal();
     return !!list?.length;
   });
 
-  displayedColumns: string[] = ['position', 'description', 'type', 'amount', 'status', 'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'description' },
+    { key: 'type' },
+    { key: 'amount' },
+    { key: 'status', hideOnMobile: true },
+    { key: 'actions' },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
   errorMessage?: string;
   showError = false;

@@ -1,12 +1,9 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
 import { RoomComponent } from './room.component';
-import { Store } from '@ngrx/store';
 import { ICommon } from '../interfaces/common';
-import { SkeletonComponent } from '../shared/skeleton.component';
+import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
 import { IRoom } from './room';
 import { RoomStore } from '../store/room.store';
-import { PaymentState } from '../store/reducers/payment.reducers';
-import { getOptions } from '../store/actions/payment.actions';
 
 @Component({
   selector: 'app-room-details-page',
@@ -14,7 +11,7 @@ import { getOptions } from '../store/actions/payment.actions';
     @if (room(); as room) {
       <app-room [room]="room" [config]="config" [currencies]="currencies()" [offices]="offices()" (submitData)="submit($event)"/>
     } @else {
-      <app-skeleton/>
+      <app-skeleton [lines]="0" [boxes]="3"/>
     }
   `,
   imports: [RoomComponent, SkeletonComponent],
@@ -29,7 +26,6 @@ export class RoomDetailsPageComponent {
   };
 
   private readonly roomStore = inject(RoomStore);
-  private readonly paymentStore: Store<PaymentState> = inject(Store<PaymentState>);
 
   room = this.roomStore.selected;
   currencies = this.roomStore.currencies;
@@ -37,8 +33,6 @@ export class RoomDetailsPageComponent {
 
   constructor() {
     this.roomStore.clean();
-    this.roomStore.loadInfo();
-    this.paymentStore.dispatch(getOptions());
 
     effect(() => {
       const id = this.id();

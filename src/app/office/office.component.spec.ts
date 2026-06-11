@@ -17,6 +17,7 @@ describe('OfficeComponent', () => {
 
   let officeStoreSpy: {
     subErrors: ReturnType<typeof signal>;
+    isLoading: ReturnType<typeof signal>;
   };
   let navigateSpy: jasmine.Spy;
 
@@ -38,6 +39,7 @@ describe('OfficeComponent', () => {
   beforeEach(async () => {
     officeStoreSpy = {
       subErrors: signal<any>(undefined),
+      isLoading: signal(false),
     };
 
     await TestBed.configureTestingModule({

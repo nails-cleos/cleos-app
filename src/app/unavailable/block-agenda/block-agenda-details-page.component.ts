@@ -3,7 +3,7 @@ import { AuthUserService } from '../../services/auth-user.service';
 import { ICommon } from '../../interfaces/common';
 import { IUnavailable } from '../unavailable';
 import { UnavailableStore } from '../../store/unavailable.store';
-import { SkeletonComponent } from '../../shared/skeleton.component';
+import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
 import { BlockAgendaComponent } from './block-agenda.component';
 import { executeDialogNoWidth } from '../../util/helper';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';

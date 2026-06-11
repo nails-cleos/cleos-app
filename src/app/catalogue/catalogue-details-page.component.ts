@@ -3,7 +3,7 @@ import { CatalogueComponent } from './catalogue.component';
 import { CatalogueStore } from '../store/catalogue.store';
 import { ICatalogue } from './catalogue';
 import { ICommon } from '../interfaces/common';
-import { SkeletonComponent } from '../shared/skeleton.component';
+import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
 
 @Component({
   selector: 'app-catalogue-details-page',

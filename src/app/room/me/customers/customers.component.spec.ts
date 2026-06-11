@@ -15,6 +15,7 @@ describe('CustomersComponent', () => {
   let breakpointObserver$: Subject<BreakpointState>;
 
   let roomStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
     customers: ReturnType<typeof signal<any>>;
     loadCustomers: jasmine.Spy;
   };
@@ -24,6 +25,7 @@ describe('CustomersComponent', () => {
     breakpointObserver$ = new Subject<BreakpointState>();
 
     roomStoreSpy = {
+      isLoading: signal(false),
       customers: signal<IRoomCustomer[]>([]),
       loadCustomers: jasmine.createSpy('loadCustomers'),
     };

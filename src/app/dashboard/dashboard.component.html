@@ -139,6 +139,13 @@
     </div>
 
     <mat-grid-list class="dashboard-grid" [cols]="cardLayout.columns" [rowHeight]="cardLayout.rowHeight">
+      @if (isLoading()) {
+        @for (skeleton of miniCardSkeletons; track skeleton) {
+          <mat-grid-tile [colspan]="cardLayout.miniCard.cols" [rowspan]="cardLayout.miniCard.rows">
+            <app-mini-card [title]="''" [isLoading]="true"></app-mini-card>
+          </mat-grid-tile>
+        }
+      } @else {
       @for (mc of miniCardData; track mc.title) {
         <mat-grid-tile [colspan]="cardLayout.miniCard.cols" [rowspan]="cardLayout.miniCard.rows">
           <app-mini-card [color]="mc.color" [error]="mc.error" [icon]="mc.icon" [isInfinity]="mc.isInfinity"
@@ -151,7 +158,15 @@
           </app-mini-card>
         </mat-grid-tile>
       }
+      }
 
+      @if (isLoading()) {
+        @for (skeleton of chartSkeletons; track skeleton) {
+          <mat-grid-tile [colspan]="cardLayout.chart.cols" [rowspan]="cardLayout.chart.rows">
+            <app-card></app-card>
+          </mat-grid-tile>
+        }
+      } @else {
       @for (chart of charts; track chart.title) {
         <mat-grid-tile [colspan]="cardLayout.chart.cols" [rowspan]="cardLayout.chart.rows">
           <app-card [chart]="chart" [title]="chart.title" [timeZone]="timeZone">
@@ -159,6 +174,7 @@
                        [locale]="dateFormat" [timeZone]="timeZone"></app-chart>
           </app-card>
         </mat-grid-tile>
+      }
       }
 
       @if (roomId || professionalId) {

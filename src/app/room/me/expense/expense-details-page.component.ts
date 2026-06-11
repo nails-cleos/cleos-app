@@ -3,7 +3,7 @@ import { ExpenseComponent } from './expense.component';
 import { ExpenseStore } from '../../../store/expense.store';
 import { IExpense } from './expense';
 import { ICommon } from '../../../interfaces/common';
-import { SkeletonComponent } from '../../../shared/skeleton.component';
+import { SkeletonComponent } from '../../../shared/skeleton/skeleton.component';
 
 @Component({
   selector: 'app-expense-details-page',
@@ -11,7 +11,7 @@ import { SkeletonComponent } from '../../../shared/skeleton.component';
     @if (expense(); as expense) {
       <app-expense [roomId]="id()" [expense]="expense" [config]="config" (submitData)="submit($event)"/>
     } @else {
-      <app-skeleton/>
+      <app-skeleton [lines]="0" [boxes]="3"/>
     }
   `,
   imports: [ExpenseComponent, SkeletonComponent],

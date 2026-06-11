@@ -32,6 +32,7 @@ import { MatList, MatListItem, MatListSubheaderCssMatStyler } from '@angular/mat
 import { MatIconButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
 import { RoomStore } from '../../../store/room.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
 
 @Component({
   selector: 'app-customers',
@@ -40,7 +41,7 @@ import { RoomStore } from '../../../store/room.store';
   imports: [TimeDetailPipe, MatIcon, MatList, MatListItem, MatListSubheaderCssMatStyler, MatIconButton, TranslatePipe,
     RouterLink, DatePipe, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
     MatSortHeader, MatTooltip, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow,
-    MatFooterRow, MatFooterRowDef, MatPaginator],
+    MatFooterRow, MatFooterRowDef, MatPaginator, TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomersComponent {
@@ -70,11 +71,19 @@ export class CustomersComponent {
   private tableState = createMatTableState(this.paginator, this.sort, 'days', 'asc');
 
   paginatorPageIndex = this.tableState.pageIndex;
+  isLoading = this.roomStore.isLoading;
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
   dataSource = computed(() => new MatTableDataSource(this.customersSignal()));
 
-  displayedColumns: string[] = ['position', 'customer', 'days', 'lastTime', 'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'customer' },
+    { key: 'days', hideOnMobile: true },
+    { key: 'lastTime', hideOnMobile: true },
+    { key: 'actions', hideOnMobile: true },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
   expanded?: IRoomCustomer;
 
   language: string = this.translate.getCurrentLang();

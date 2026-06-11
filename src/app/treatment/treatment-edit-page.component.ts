@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input } f
 import { ICommon } from '../interfaces/common';
 import { ITreatmentGroup } from './treatment';
 import { TreatmentStore } from '../store/treatment.store';
-import { SkeletonComponent } from '../shared/skeleton.component';
+import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
 import { TreatmentComponent } from './treatment.component';
 
 @Component({
@@ -11,7 +11,7 @@ import { TreatmentComponent } from './treatment.component';
     @if (treatment(); as treatment) {
       <app-treatment [config]="config" [treatment]="treatment" (submitData)="submit($event)"/>
     } @else {
-      <app-skeleton/>
+      <app-skeleton [boxes]="1"/>
     }
   `,
   imports: [TreatmentComponent, SkeletonComponent],

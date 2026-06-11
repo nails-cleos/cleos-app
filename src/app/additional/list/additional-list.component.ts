@@ -35,6 +35,7 @@ import { MatList, MatListItem, MatListItemIcon } from '@angular/material/list';
 import { DecimalPipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AdditionalStore } from '../../store/additional.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 
 @Component({
   selector: 'app-additional-list',
@@ -43,7 +44,7 @@ import { AdditionalStore } from '../../store/additional.store';
   imports: [MatIcon, MatList, MatListItem, MatIconButton, TranslatePipe, DecimalPipe, RouterLink,
     MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatTooltip,
     MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow,
-    MatFooterRowDef, MatPaginator, MatPrefix],
+    MatFooterRowDef, MatPaginator, MatPrefix, TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdditionalListComponent {
@@ -77,6 +78,7 @@ export class AdditionalListComponent {
   );
 
   paginatorPageIndex = this.tableState.pageIndex;
+  isLoading = this.additionalStore.isLoading;
   dataSourceSignal = computed(() => this.additionalListSignal()?.content?.map((additional: IAdditional) => {
     if (additional.duration) {
       const duration = convertDuration(additional.duration);
@@ -88,7 +90,14 @@ export class AdditionalListComponent {
   resultsLengthSignal = computed(() => this.additionalListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['order', 'name', 'description', 'duration', 'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'order' },
+    { key: 'name' },
+    { key: 'description', hideOnMobile: true },
+    { key: 'duration', hideOnMobile: true },
+    { key: 'actions', hideOnMobile: true },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
   expandedAdditional?: IAdditional;
 

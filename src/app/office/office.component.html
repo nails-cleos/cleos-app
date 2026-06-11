@@ -27,7 +27,9 @@
           }
         </mat-form-field>
 
-        @if (managers()) {
+        @if (isLoading()) {
+          <div class="ssc-line"></div>
+        } @else if (managers()) {
           <div class="app-inline-field-action">
             <mat-form-field appearance="outline">
               <mat-label>{{ 'OFFICE.MANAGER.FIELD' | translate }}</mat-label>

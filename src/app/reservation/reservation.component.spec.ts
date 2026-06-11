@@ -39,10 +39,10 @@ describe('ReservationComponent', () => {
   let rooms$: BehaviorSubject<any>;
   let treatmentDiscount$: BehaviorSubject<any>;
   let additionalList$: BehaviorSubject<any>;
-  let selectedReservation$: BehaviorSubject<any>;
   let calendar$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
   let paymentOptions$: BehaviorSubject<any>;
+  let isLoading$: BehaviorSubject<boolean>;
 
   let storeSpy: jasmine.SpyObj<Store>;
   let routerSpy: jasmine.SpyObj<Router>;
@@ -143,9 +143,9 @@ describe('ReservationComponent', () => {
     rooms$ = new BehaviorSubject(undefined);
     treatmentDiscount$ = new BehaviorSubject(undefined);
     additionalList$ = new BehaviorSubject(undefined);
-    selectedReservation$ = new BehaviorSubject(undefined);
     calendar$ = new BehaviorSubject(undefined);
     subErrors$ = new BehaviorSubject(undefined);
+    isLoading$ = new BehaviorSubject<boolean>(false);
     paymentOptions$ = new BehaviorSubject([
       {
         type: 'CASH',
@@ -161,7 +161,7 @@ describe('ReservationComponent', () => {
     ]);
     matches$ = new BehaviorSubject(undefined);
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch', 'select']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe'], {
@@ -196,17 +196,16 @@ describe('ReservationComponent', () => {
         case 6:
           return additionalList$.asObservable();
         case 7:
-          return selectedReservation$.asObservable();
-        case 8:
           return calendar$.asObservable();
-        case 9:
+        case 8:
           return subErrors$.asObservable();
-        case 10:
+        case 9:
           return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
     });
+    storeSpy.select.and.returnValue(isLoading$.asObservable());
 
     routerSpy.currentNavigation.and.returnValue(null);
 
@@ -479,60 +478,75 @@ describe('ReservationComponent', () => {
     });
 
     it('should dispatch CreateReservation action when creating a new reservation', () => {
+      const emitSpy = jasmine.createSpy('emit');
+      component.submitData.subscribe(emitSpy);
+
       component.create();
-      expect(storeSpy.dispatch).toHaveBeenCalled();
+      expect(emitSpy).toHaveBeenCalled();
     });
 
     it('should include customer ID in reservation', () => {
+      const emitSpy = jasmine.createSpy('emit');
+      component.submitData.subscribe(emitSpy);
+
       component.create();
-      const dispatchCall = storeSpy.dispatch.calls.mostRecent();
-      expect(dispatchCall).toBeDefined();
+      expect(emitSpy.calls.mostRecent().args[0].reservation.customerId).toBe(mockCustomer.id);
     });
 
     it('should include additional services in reservation', () => {
       const mockAdditional: IAdditionalAll[] = [
         { key: 'add-1', id: 'add-1', name: 'Additional 1', price: 20, duration: '30M', type: ServiceType.additional },
       ];
+      const emitSpy = jasmine.createSpy('emit');
+      component.submitData.subscribe(emitSpy);
       component.additionalSelected.set(mockAdditional);
       component.create();
-      expect(storeSpy.dispatch).toHaveBeenCalled();
+      expect(emitSpy).toHaveBeenCalled();
     });
 
     it('should include payment information when amount and type are provided', () => {
+      const emitSpy = jasmine.createSpy('emit');
+      component.submitData.subscribe(emitSpy);
       component.getConfigurationForm.amount.setValue(150);
       component.getConfigurationForm.option.setValue(cashPaymentOption);
       component.getConfigurationForm.transfer.setValue('REF123');
       component.create();
-      expect(storeSpy.dispatch).toHaveBeenCalled();
+      expect(emitSpy).toHaveBeenCalled();
     });
 
     it('should include customer change flag in reservation', () => {
+      const emitSpy = jasmine.createSpy('emit');
+      component.submitData.subscribe(emitSpy);
       component.getConfigurationForm.customerChange.setValue(true);
       component.getConfigurationForm.reference.setValue('Test reference');
       component.create();
-      expect(storeSpy.dispatch).toHaveBeenCalled();
+      expect(emitSpy).toHaveBeenCalled();
     });
 
     it('should include note in reservation', () => {
+      const emitSpy = jasmine.createSpy('emit');
+      component.submitData.subscribe(emitSpy);
       component.getConfigurationForm.note.setValue('Test note');
       component.create();
-      expect(storeSpy.dispatch).toHaveBeenCalled();
+      expect(emitSpy).toHaveBeenCalled();
     });
 
     it('should dispatch UpdateReservationById when editing existing reservation', () => {
-      component.isEditing.set(true);
-      selectedReservation$.next({
+      fixture.componentRef.setInput('isEditing', true);
+      fixture.componentRef.setInput('reservation', {
         id: 'reservation-1',
         customer: mockCustomer,
         treatment: mockTreatment,
         room: mockRoom,
         professional: mockRoom.professionals![0],
         timestamp: new Date('2026-04-16T08:00:00Z').getTime() / 1000,
-      });
+      } as any);
       fixture.detectChanges();
 
+      const emitSpy = jasmine.createSpy('emit');
+      component.submitData.subscribe(emitSpy);
       component.create();
-      expect(storeSpy.dispatch).toHaveBeenCalled();
+      expect(emitSpy).toHaveBeenCalled();
     });
 
     it('should not dispatch action if no dates are provided', () => {
@@ -629,7 +643,7 @@ describe('ReservationComponent', () => {
 
     it('should use the selected reservation as summary fallback and derive summary totals', () => {
       const reservation = createEditReservation();
-      selectedReservation$.next(reservation);
+      fixture.componentRef.setInput('reservation', reservation as any);
       fixture.detectChanges();
 
       component.price.set(new Price());
@@ -736,7 +750,7 @@ describe('ReservationComponent', () => {
 
     it('should use the editing default step for unmapped sub errors when the user is not admin', () => {
       component.currentStepIndex.set(0);
-      component.isEditing.set(true);
+      fixture.componentRef.setInput('isEditing', true);
       spyOn(document, 'querySelector').and.returnValue(null);
 
       component['applySubErrors']([{ field: 'customer', message: 'Customer is invalid' }] as any);
@@ -747,8 +761,8 @@ describe('ReservationComponent', () => {
 
     it('should use the admin editing default step for unmapped sub errors', () => {
       component.currentStepIndex.set(0);
-      component.isEditing.set(true);
-      authUserSignal.update(prev => ({ ...prev, isAdmin: true }));
+      fixture.componentRef.setInput('isEditing', true);
+      fixture.componentRef.setInput('isAdmin', true);
       spyOn(document, 'querySelector').and.returnValue(null);
 
       component['applySubErrors']([{ field: 'customer', message: 'Customer is invalid' }] as any);
@@ -839,7 +853,7 @@ describe('ReservationComponent', () => {
   describe('Edit Hydration', () => {
     it('should hydrate the edit reservation into the form state', async () => {
       const reservation = createEditReservation();
-      component.isEditing.set(true);
+      fixture.componentRef.setInput('isEditing', true);
 
       component['setData'](reservation as any);
       await Promise.resolve();
@@ -860,7 +874,7 @@ describe('ReservationComponent', () => {
 
     it('should reuse the first date-time control when hydrating edit data', async () => {
       const reservation = createEditReservation();
-      component.isEditing.set(true);
+      fixture.componentRef.setInput('isEditing', true);
       const expectedDate = newDateTimestamp(reservation.timestamp, reservation.room.timeZone);
       const expectedStart = getTime(expectedDate, component['dateFormat']);
 
@@ -1390,7 +1404,7 @@ describe('ReservationComponent', () => {
     it('should fallback to selected reservation (customer)', () => {
       component.getCustomerForm.customer.setValue(undefined);
       const reservation = createEditReservation();
-      selectedReservation$.next({
+      fixture.componentRef.setInput('reservation', {
         ...reservation,
         customer: { ...reservation.customer, id: 'c2' },
       } as any);
@@ -1433,7 +1447,7 @@ describe('ReservationComponent', () => {
     it('should fallback to reservation additionals', () => {
       component.additionalSelected.set([]);
       const reservation = createEditReservation();
-      selectedReservation$.next(reservation);
+      fixture.componentRef.setInput('reservation', reservation as any);
       fixture.detectChanges();
 
       expect(component.summaryAdditionals).toEqual(reservation.additional);
@@ -1441,7 +1455,7 @@ describe('ReservationComponent', () => {
 
     it('should return empty array when nothing exists', () => {
       component.additionalSelected.set([]);
-      selectedReservation$.next(undefined);
+      fixture.componentRef.setInput('reservation', undefined);
       fixture.detectChanges();
 
       expect(component.summaryAdditionals).toEqual([]);
@@ -1457,7 +1471,7 @@ describe('ReservationComponent', () => {
     });
 
     it('should return empty array if no reservation', () => {
-      selectedReservation$.next(undefined);
+      fixture.componentRef.setInput('reservation', undefined);
       fixture.detectChanges();
 
       expect(component.summaryDateTimes).toEqual([]);
@@ -1466,11 +1480,11 @@ describe('ReservationComponent', () => {
     it('should build date from reservation timestamp when no current dates', () => {
       const reservation = createEditReservation();
 
-      selectedReservation$.next({
+      fixture.componentRef.setInput('reservation', {
         ...reservation,
         timestamp: 1700000000,
         room: { timeZone: 'Europe/Amsterdam' },
-      });
+      } as any);
       fixture.detectChanges();
 
       const result = component.summaryDateTimes;

@@ -32,7 +32,7 @@ export class UpcomingComponent {
 
   upcomingComputed = computed(() => {
     const upcoming = this.upcoming();
-    if (!upcoming || !upcoming.id) {
+    if (!upcoming) {
       return undefined;
     }
     let rowSpan = 0;

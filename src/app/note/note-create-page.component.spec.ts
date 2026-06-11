@@ -12,6 +12,7 @@ describe('NoteCreatePageComponent', () => {
   let noteStoreSpy: {
     clean: jasmine.Spy;
     create: jasmine.Spy;
+    setNavigationParams: jasmine.Spy;
   };
 
   const mockProfessional: IUserAll = {
@@ -34,6 +35,7 @@ describe('NoteCreatePageComponent', () => {
     noteStoreSpy = {
       clean: jasmine.createSpy('clean'),
       create: jasmine.createSpy('create'),
+      setNavigationParams: jasmine.createSpy('setNavigationParams'),
     };
 
     await TestBed.configureTestingModule({

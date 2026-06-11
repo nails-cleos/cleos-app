@@ -13,6 +13,7 @@ import {
 } from '../interfaces/payment';
 import { IReservationPayment } from '../reservation/reservation';
 import { IApiResponse } from '../interfaces/common';
+import { skipLoadingOverlay } from '../interfaces/pagination';
 
 describe('PaymentService', () => {
   let service: PaymentService;
@@ -106,7 +107,7 @@ describe('PaymentService', () => {
         expect(result).toEqual(mockPaymentOptions);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/payments/options');
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/payments/options', { ...skipLoadingOverlay() });
     });
   });
 
@@ -203,7 +204,7 @@ describe('PaymentService', () => {
         expect(result).toEqual(payments);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123/payments');
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123/payments', { ...skipLoadingOverlay() });
     });
 
     it('should get payments by transaction id', () => {
@@ -214,7 +215,7 @@ describe('PaymentService', () => {
         expect(result).toEqual(payments);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/accounts/transactions/trans-123/payments');
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/accounts/transactions/trans-123/payments', { ...skipLoadingOverlay() });
     });
   });
 
@@ -264,7 +265,7 @@ describe('PaymentService', () => {
 
       service.getPaymentByResourceId('res-123', 'reservation').subscribe();
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123/payments');
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123/payments', { ...skipLoadingOverlay() });
     });
 
     it('should use transaction URL for transaction path', () => {
@@ -272,7 +273,7 @@ describe('PaymentService', () => {
 
       service.getPaymentByResourceId('trans-123', 'transaction').subscribe();
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/accounts/transactions/trans-123/payments');
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/accounts/transactions/trans-123/payments', { ...skipLoadingOverlay() });
     });
   });
 

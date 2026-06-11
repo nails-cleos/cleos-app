@@ -105,7 +105,20 @@
 <!-- End Story -->
 
 <!-- Works -->
-@if (allWorks().length) {
+@if (isCatalogueLoading()) {
+  <section id="work" class="works">
+    <div class="work-container">
+      <div class="section-title text-center">
+        <h2>{{ 'MAIN.SECTION.WORK' | translate }}</h2>
+        <div class="home-divider">
+          <mat-icon color="warn" class="material-icons">favorite</mat-icon>
+        </div>
+      </div>
+
+      <app-card-list-skeleton [badgeCount]="0" [actionCount]="0" [descriptionLines]="1"></app-card-list-skeleton>
+    </div>
+  </section>
+} @else if (allWorks().length) {
   <section id="work" class="works">
     <div class="work-container">
       <div class="section-title text-center">

@@ -53,6 +53,7 @@ describe('AccountComponent', () => {
       selected: selectedAccountSignal.asReadonly(),
       subErrors: subErrorsSignal.asReadonly(),
       response: responseSignal.asReadonly(),
+      isLoading: signal(false).asReadonly(),
     });
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),

@@ -37,6 +37,7 @@ import { DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { DurationTimePipe } from '../../pipes/durationTime.pipe';
 import { UnavailableStore } from '../../store/unavailable.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 
 @Component({
   selector: 'app-unavailable-list',
@@ -46,7 +47,7 @@ import { UnavailableStore } from '../../store/unavailable.store';
     TranslatePipe, RouterLink, DatePipe, MatTable, MatSort, MatColumnDef, MatHeaderCellDef,
     MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell,
     MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, MatPrefix,
-    TimeDetailPipe, DurationTimePipe],
+    TimeDetailPipe, DurationTimePipe, TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UnavailableListComponent {
@@ -77,12 +78,21 @@ export class UnavailableListComponent {
   );
 
   paginatorPageIndex = this.tableState.pageIndex;
+  isLoading = this.unavailableStore.isLoading;
   dataSourceSignal = computed(() => this.unavailableListSignal()?.content);
   resultsLengthSignal = computed(() => this.unavailableListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'professional', 'description', 'timestamp', 'duration', 'repeat',
-    'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'professional', hideOnMobile: true },
+    { key: 'description', hideOnMobile: true },
+    { key: 'timestamp' },
+    { key: 'duration', hideOnMobile: true },
+    { key: 'repeat', hideOnMobile: true },
+    { key: 'actions', hideOnMobile: true },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
   expandedUnavailable?: IUnavailable;
 

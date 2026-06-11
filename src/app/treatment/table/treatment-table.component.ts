@@ -26,6 +26,7 @@ import { PAGE_SIZE } from '../../interfaces/pagination';
 import { MatPrefix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { DatePipe, DecimalPipe } from '@angular/common';
+import { TableSkeletonColumn } from '../../shared/skeleton/table-skeleton.component';
 
 @Component({
   selector: 'app-treatment-table',
@@ -45,7 +46,12 @@ export class TreatmentTableComponent {
   private sort = viewChild(MatSort);
   private tableState = createMatTableState(this.paginator, this.sort, 'date', 'asc');
 
-  displayedColumns: string[] = ['date', 'price', 'duration'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'date' },
+    { key: 'price' },
+    { key: 'duration', hideOnMobile: true },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
   paginatorPageIndex = this.tableState.pageIndex;
 

@@ -79,6 +79,7 @@ export class NoteComponent {
   repeats = [FrequencyEnum.none, FrequencyEnum.onceAWeek, FrequencyEnum.onceAMonth, FrequencyEnum.onceAYear];
 
   constructor() {
+    this.noteStore.loadProfessionals();
     effect(() => {
       const params = this.navigationParams();
       if (params) {

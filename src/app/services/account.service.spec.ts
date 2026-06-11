@@ -8,6 +8,7 @@ import { IApiResponse } from '../interfaces/common';
 import { createFilter } from '../util/service-helper';
 import { IUserAll } from '../user/user';
 import { ICurrencyAll } from '../currency/currency';
+import { skipLoadingOverlay } from '../interfaces/pagination';
 
 describe('AccountService', () => {
   let service: AccountService;
@@ -77,7 +78,7 @@ describe('AccountService', () => {
       });
 
       expect(httpSpy.get).toHaveBeenCalledWith('v1/accounts/1/transactions', {
-        params: createFilter(0, 5, 'name', 'asc'),
+        params: createFilter(0, 5, 'name', 'asc'), ...skipLoadingOverlay(),
       });
     });
   });
@@ -99,7 +100,7 @@ describe('AccountService', () => {
       expect(result).toEqual(mockTransaction);
     });
 
-    expect(httpSpy.get).toHaveBeenCalledWith('v1/accounts/ac-1/transactions/tr-1');
+    expect(httpSpy.get).toHaveBeenCalledWith('v1/accounts/ac-1/transactions/tr-1', { ...skipLoadingOverlay() });
   });
 
   it('should fetch account by customer id', () => {
@@ -109,7 +110,7 @@ describe('AccountService', () => {
       expect(result).toEqual(mockAccount);
     });
 
-    expect(httpSpy.get).toHaveBeenCalledWith('v1/accounts/customers/c-1');
+    expect(httpSpy.get).toHaveBeenCalledWith('v1/accounts/customers/c-1', { ...skipLoadingOverlay() });
   });
 
   it('should create new transaction', () => {

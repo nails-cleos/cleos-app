@@ -4,6 +4,7 @@ import { CatalogueService } from './catalogue.service';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { of } from 'rxjs';
 import { ICatalogue, ICatalogueAll } from '../catalogue/catalogue';
+import { skipLoadingOverlay } from '../interfaces/pagination';
 
 describe('CatalogueService', () => {
   let service: CatalogueService;
@@ -44,7 +45,7 @@ describe('CatalogueService', () => {
         expect(result).toEqual([mockCatalogue]);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/catalogues');
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/catalogues', { ...skipLoadingOverlay() });
     });
   });
 
@@ -81,7 +82,7 @@ describe('CatalogueService', () => {
       expect(result).toEqual(mockCatalogue);
     });
 
-    expect(httpSpy.get).toHaveBeenCalledWith('v1/catalogues/1');
+    expect(httpSpy.get).toHaveBeenCalledWith('v1/catalogues/1', { ...skipLoadingOverlay() });
   });
 
   describe('createCatalogue', () => {

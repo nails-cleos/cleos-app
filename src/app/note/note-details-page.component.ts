@@ -3,7 +3,7 @@ import { NoteComponent } from './note.component';
 import { NoteStore } from '../store/note.store';
 import { INote } from './note';
 import { ICommon } from '../interfaces/common';
-import { SkeletonComponent } from '../shared/skeleton.component';
+import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
 import { executeDialogNoWidth } from '../util/helper';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
@@ -15,7 +15,7 @@ import { MatDialog } from '@angular/material/dialog';
     @if (note(); as note) {
       <app-note [note]="note" [config]="config" (submitData)="submit($event)" (deleteData)="delete()"/>
     } @else {
-      <app-skeleton/>
+      <app-skeleton [buttons]="3"/>
     }
   `,
   imports: [NoteComponent, SkeletonComponent],

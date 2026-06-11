@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { INote, INoteAll } from '../note/note';
 import { toUrl } from '../util/helper';
 import { IApiResponse } from '../interfaces/common';
+import { skipLoadingOverlay } from '../interfaces/pagination';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +16,8 @@ export class NoteService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getNote = (id: string): Observable<INoteAll | undefined> => this.http.get<INoteAll>(toUrl(this.urlV1, id));
+  getNote = (id: string): Observable<INoteAll | undefined> => this.http.get<INoteAll>(toUrl(this.urlV1, id),
+    { ...skipLoadingOverlay() });
 
   createNote = (note: INote): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1, note);
 

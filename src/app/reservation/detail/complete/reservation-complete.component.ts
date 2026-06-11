@@ -58,6 +58,7 @@ import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autoc
 import { TimepickerDirective } from '../../../shared/clock-timepicker/timepicker.directive';
 import { TimepickerComponent } from '../../../shared/clock-timepicker/timepicker.component';
 import { MatCheckbox } from '@angular/material/checkbox';
+import { ReservationDetailSkeletonComponent } from '../reservation-detail-skeleton.component';
 
 type ReservationCompleteForm = {
   group: FormControl<IGroupService | undefined>;
@@ -77,7 +78,8 @@ type ReservationCompleteForm = {
     TranslatePipe, DecimalPipe, NgClass, DatePipe, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix,
     BackButtonDirective, CurrencySymbolPipe, TimeDetailPipe, CurrencySymbolPipe, DurationTimePipe,
     FormFieldAdderComponent, PaymentOptionSelectComponent, PricePreviewComponent, BackButtonDirective,
-    TimepickerDirective, TimepickerComponent, MatSelectionList, MatListOption, MatCheckbox, MatSuffix],
+    TimepickerDirective, TimepickerComponent, MatSelectionList, MatListOption, MatCheckbox, MatSuffix,
+    ReservationDetailSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationCompleteComponent {

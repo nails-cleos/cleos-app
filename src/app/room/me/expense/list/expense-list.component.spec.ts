@@ -31,6 +31,7 @@ describe('ExpenseListComponent', () => {
   let expenseStoreSpy: {
     data: ReturnType<typeof expenseListSignal.asReadonly>;
     response: ReturnType<typeof responseSignal.asReadonly>;
+    isLoading: ReturnType<typeof signal<boolean>>;
     clean: jasmine.Spy;
     clearResponse: jasmine.Spy;
     loadPage: jasmine.Spy;
@@ -144,6 +145,7 @@ describe('ExpenseListComponent', () => {
     expenseStoreSpy = {
       data: expenseListSignal.asReadonly(),
       response: responseSignal.asReadonly(),
+      isLoading: signal(false),
       clean: jasmine.createSpy('clean'),
       clearResponse: jasmine.createSpy('clearResponse'),
       loadPage: jasmine.createSpy('loadPage'),
@@ -325,7 +327,16 @@ describe('ExpenseListComponent', () => {
   });
 
   it('should maintain correct displayedColumns order', () => {
-    const expectedColumns = ['position', 'invoice', 'supplyStore.name', 'timestamp', 'actions'];
+    const expectedColumns = [
+      'position',
+      'timestamp',
+      'invoice',
+      'supplyStore.name',
+      'totalGross',
+      'totalBtw',
+      'totalNet',
+      'actions',
+    ];
     expect(component.displayedColumns).toEqual(expectedColumns);
   });
 

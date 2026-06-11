@@ -17,6 +17,7 @@ describe('TreatmentListComponent', () => {
   let translate: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let treatmentStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal<any>>;
     response: ReturnType<typeof signal<any>>;
     clean: jasmine.Spy;
@@ -41,6 +42,7 @@ describe('TreatmentListComponent', () => {
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     treatmentStoreSpy = {
+      isLoading: signal(false),
       data: signal({ kind: 'pagination', value: mockPagination }),
       response: signal(undefined),
       clean: jasmine.createSpy('clean'),

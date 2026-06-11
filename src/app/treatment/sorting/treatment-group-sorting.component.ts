@@ -7,12 +7,13 @@ import {
   ISorted,
   ItemSorting,
 } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
+import { CardListSkeletonComponent } from '../../shared/skeleton/card-list-skeleton.component';
 
 @Component({
   selector: 'app-treatment-group-sorting',
   templateUrl: './treatment-sorting.component.html',
   styleUrls: ['./treatment-group-sorting.component.scss'],
-  imports: [TranslatePipe, DragDropSortingComponent],
+  imports: [TranslatePipe, DragDropSortingComponent, CardListSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreatmentGroupSortingComponent {

@@ -1,19 +1,12 @@
-@let isAddMode = isAddModeSignal();
-@let user = userSignal();
-
 <div class="app-surface-canvas app-surface-shell app-surface-stack">
   <section class="app-surface-section">
     <div class="app-detail-section-header">
       <div>
         <span class="app-surface-eyebrow">
-          {{ (isAddMode ? 'USER.TITLE' : 'USER.DETAIL') | translate }}
+          {{ getConfig.title | translate }}
         </span>
-        @if (!isAddMode) {
-          @if (user) {
-            <h2 class="app-crud-title">{{ user.displayName }}</h2>
-          } @else {
-            <div class="ssc-line app-skeleton-title"></div>
-          }
+        @if (user(); as user) {
+          <h2 class="app-crud-title">{{ user.displayName }}</h2>
         }
       </div>
     </div>
@@ -23,149 +16,135 @@
           novalidate
           (keydown.enter)="$event.preventDefault()"
           class="app-crud-form">
-      @if (isAddMode || user) {
-        <div class="app-crud-form-grid">
-          @if (isAddMode) {
-            <mat-form-field appearance="outline">
-              <mat-label>{{ 'USER.ROLE.FIELD' | translate }}</mat-label>
-              <mat-select [formControl]="getForm.role" required id="select-role">
-                <mat-option value="ROLE_CUSTOMER">{{ 'COMMON.ROLES.ROLE_CUSTOMER' | translate }}</mat-option>
-                <mat-option value="ROLE_PROFESSIONAL">{{ 'COMMON.ROLES.ROLE_PROFESSIONAL' | translate }}</mat-option>
-                <mat-option value="ROLE_MANAGER">{{ 'COMMON.ROLES.ROLE_MANAGER' | translate }}</mat-option>
-              </mat-select>
-              <mat-error [innerHTML]="'USER.ROLE.REQUIRED' | translate"></mat-error>
-            </mat-form-field>
-          }
-
+      <div class="app-crud-form-grid">
+        @if (!user()) {
           <mat-form-field appearance="outline">
-            <mat-label>{{ 'COMMON.USER.EMAIL.FIELD' | translate }}</mat-label>
-            <input [formControl]="getForm.email" autocomplete="email" matInput required data-cy="email-input">
-            @if (getForm.email.hasError('email')) {
-              <mat-error [innerHTML]="'COMMON.USER.EMAIL.VALID' | translate"></mat-error>
-            } @else if (getForm.email.hasError('required')) {
-              <mat-error [innerHTML]="'COMMON.USER.EMAIL.REQUIRED' | translate"></mat-error>
-            } @else if (errors()['email']) {
-              <mat-error>{{ errors()['email'] }}</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'COMMON.USER.LANG.FIELD' | translate }}</mat-label>
-            @if (select.value) {
-              <ng-icon [svg]="selectedFlag()" class="icon-margin" matPrefix/>
-            }
-            <mat-select #select [formControl]="getForm.lang" required id="select-lang">
-              @for (lang of flagList; track lang) {
-                <mat-option [value]="lang.value">
-                  <ng-icon [svg]="lang.flag" class="icon-margin"/>
-                  {{ 'COMMON.LANG.' + lang.text | translate }}
-                </mat-option>
-              }
+            <mat-label>{{ 'USER.ROLE.FIELD' | translate }}</mat-label>
+            <mat-select [formControl]="getForm.role" required id="select-role">
+              <mat-option value="ROLE_CUSTOMER">{{ 'COMMON.ROLES.ROLE_CUSTOMER' | translate }}</mat-option>
+              <mat-option value="ROLE_PROFESSIONAL">{{ 'COMMON.ROLES.ROLE_PROFESSIONAL' | translate }}</mat-option>
+              <mat-option value="ROLE_MANAGER">{{ 'COMMON.ROLES.ROLE_MANAGER' | translate }}</mat-option>
             </mat-select>
-            <mat-error [innerHTML]="'COMMON.USER.LANG.REQUIRED' | translate"></mat-error>
+            <mat-error [innerHTML]="'USER.ROLE.REQUIRED' | translate"></mat-error>
           </mat-form-field>
+        }
 
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'COMMON.USER.DISPLAY_NAME.FIELD' | translate }}</mat-label>
-            <input [formControl]="getForm.displayName"
-                   autocomplete="given-name"
-                   matInput
-                   required
-                   data-cy="displayName-input">
-            @if (getForm.displayName.hasError('required')) {
-              <mat-error [innerHTML]="'COMMON.USER.DISPLAY_NAME.REQUIRED' | translate"></mat-error>
-            } @else if (errors()['displayName']) {
-              <mat-error>{{ errors()['displayName'] }}</mat-error>
-            }
-          </mat-form-field>
-
-          <div class="user-phone-field">
-            <ngx-material-intl-tel-input id="phone"
-                                         [includeDialCode]="true"
-                                         [emojiFlags]="true"
-                                         [enablePlaceholder]="true"
-                                         [enableSearch]="true"
-                                         [required]="true"
-                                         [preferredCountries]="['nl']"
-                                         fieldControlName="phone"
-                                         [appearance]="'outline'"
-                                         [textLabels]="labels()"
-                                         [autoSelectCountry]="false">
-            </ngx-material-intl-tel-input>
-          </div>
-
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'COMMON.USER.DOB.FIELD' | translate }}</mat-label>
-            <button (click)="picker.open()" mat-icon-button matPrefix type="button">
-              <mat-icon>today</mat-icon>
-            </button>
-            <input (focus)="picker.open()" [formControl]="getForm.dob" [matDatepicker]="picker" matInput data-cy="dob-picker">
-            <mat-datepicker #picker startView="multi-year" touchUi></mat-datepicker>
-            @let dobError = errors()['dob'];
-            @if (dobError) {
-              <mat-error>{{ dobError }}</mat-error>
-            }
-          </mat-form-field>
-
-          <div class="app-crud-form-grid__full app-crud-fields">
-            <app-google-map [addressFormGroup]="googleMapForm"
-                            (addressEmitter)="getAddress($event)"
-                            [latitudeMarker]="geometry?.location?.lat() || user?.address?.location?.y"
-                            [longitudeMarker]="geometry?.location?.lng() || user?.address?.location?.x"
-                            [markInfo]="'<b>' + (formattedAddress || user?.address?.name) + '</b>'">
-            </app-google-map>
-          </div>
-
-          @if (isProfessionalOrManager) {
-            <div class="color-picker-row app-crud-form-grid__full">
-              <app-color-picker
-                [label]="'COMMON.PROFESSIONAL.COLOR.DARK.FIELD' | translate"
-                [control]="getForm.darkColor"
-                [invalidText]="'COMMON.PROFESSIONAL.COLOR.INVALID' | translate"
-                [previewMode]="'dark'"
-                [previewTitle]="'COMMON.PROFESSIONAL.COLOR.DARK.RESERVATION' | translate"
-                [previewText]="'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate"
-                [dataCy]="'dark-color-picker'"
-                [triggerId]="'darkColorIcon'">
-              </app-color-picker>
-              <app-color-picker
-                [label]="'COMMON.PROFESSIONAL.COLOR.LIGHT.FIELD' | translate"
-                [control]="getForm.lightColor"
-                [invalidText]="'COMMON.PROFESSIONAL.COLOR.INVALID' | translate"
-                [previewMode]="'light'"
-                [previewTitle]="'COMMON.PROFESSIONAL.COLOR.LIGHT.RESERVATION' | translate"
-                [previewText]="'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate"
-                [dataCy]="'light-color-picker'"
-                [triggerId]="'lightColorIcon'">
-              </app-color-picker>
-            </div>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'COMMON.USER.EMAIL.FIELD' | translate }}</mat-label>
+          <input [formControl]="getForm.email" autocomplete="email" matInput required data-cy="email-input">
+          @if (getForm.email.hasError('email')) {
+            <mat-error [innerHTML]="'COMMON.USER.EMAIL.VALID' | translate"></mat-error>
+          } @else if (getForm.email.hasError('required')) {
+            <mat-error [innerHTML]="'COMMON.USER.EMAIL.REQUIRED' | translate"></mat-error>
+          } @else if (errors()['email']) {
+            <mat-error>{{ errors()['email'] }}</mat-error>
           }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'COMMON.USER.LANG.FIELD' | translate }}</mat-label>
+          @if (select.value) {
+            <ng-icon [svg]="selectedFlag()" class="icon-margin" matPrefix/>
+          }
+          <mat-select #select [formControl]="getForm.lang" required id="select-lang">
+            @for (lang of flagList; track lang) {
+              <mat-option [value]="lang.value">
+                <ng-icon [svg]="lang.flag" class="icon-margin"/>
+                {{ 'COMMON.LANG.' + lang.text | translate }}
+              </mat-option>
+            }
+          </mat-select>
+          <mat-error [innerHTML]="'COMMON.USER.LANG.REQUIRED' | translate"></mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'COMMON.USER.DISPLAY_NAME.FIELD' | translate }}</mat-label>
+          <input [formControl]="getForm.displayName"
+                 autocomplete="given-name"
+                 matInput
+                 required
+                 data-cy="displayName-input">
+          @if (getForm.displayName.hasError('required')) {
+            <mat-error [innerHTML]="'COMMON.USER.DISPLAY_NAME.REQUIRED' | translate"></mat-error>
+          } @else if (errors()['displayName']) {
+            <mat-error>{{ errors()['displayName'] }}</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="user-phone-field">
+          <ngx-material-intl-tel-input id="phone"
+                                       [includeDialCode]="true"
+                                       [emojiFlags]="true"
+                                       [enablePlaceholder]="true"
+                                       [enableSearch]="true"
+                                       [required]="true"
+                                       [preferredCountries]="['nl']"
+                                       fieldControlName="phone"
+                                       [appearance]="'outline'"
+                                       [textLabels]="labels()"
+                                       [autoSelectCountry]="false">
+          </ngx-material-intl-tel-input>
         </div>
 
-        <div class="app-detail-actions">
-          <button appBackButton mat-stroked-button type="button">
-            <mat-icon>keyboard_return</mat-icon>
-            <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'COMMON.USER.DOB.FIELD' | translate }}</mat-label>
+          <button (click)="picker.open()" mat-icon-button matPrefix type="button">
+            <mat-icon>today</mat-icon>
           </button>
-          @if (isAddMode) {
-            <button [disabled]="form.invalid" mat-stroked-button type="submit">
-              <mat-icon>person_add</mat-icon>
-              <span>{{ 'COMMON.BUTTON.CREATE' | translate }}</span>
-            </button>
-          } @else {
-            <button [disabled]="form.invalid || !(!form.pristine || addressUpdated)" mat-stroked-button type="submit">
-              <mat-icon>published_with_changes</mat-icon>
-              <span>{{ 'COMMON.BUTTON.UPDATE' | translate }}</span>
-            </button>
+          <input (focus)="picker.open()" [formControl]="getForm.dob" [matDatepicker]="picker" matInput
+                 data-cy="dob-picker">
+          <mat-datepicker #picker startView="multi-year" touchUi></mat-datepicker>
+          @let dobError = errors()['dob'];
+          @if (dobError) {
+            <mat-error>{{ dobError }}</mat-error>
           }
+        </mat-form-field>
+
+        <div class="app-crud-form-grid__full app-crud-fields">
+          <app-google-map [addressFormGroup]="googleMapForm"
+                          (addressEmitter)="getAddress($event)"
+                          [latitudeMarker]="geometry?.location?.lat() || user()?.address?.location?.y"
+                          [longitudeMarker]="geometry?.location?.lng() || user()?.address?.location?.x"
+                          [markInfo]="'<b>' + (formattedAddress || user()?.address?.name) + '</b>'">
+          </app-google-map>
         </div>
-      } @else {
-        <div class="app-crud-loading">
-          <div class="app-surface-skeleton-spacer"></div>
-          <div class="ssc-square app-crud-loading__block"></div>
-          <div class="app-surface-skeleton-spacer"></div>
-        </div>
-      }
+
+        @if (isProfessionalOrManager) {
+          <div class="color-picker-row app-crud-form-grid__full">
+            <app-color-picker
+              [label]="'COMMON.PROFESSIONAL.COLOR.DARK.FIELD' | translate"
+              [control]="getForm.darkColor"
+              [invalidText]="'COMMON.PROFESSIONAL.COLOR.INVALID' | translate"
+              [previewMode]="'dark'"
+              [previewTitle]="'COMMON.PROFESSIONAL.COLOR.DARK.RESERVATION' | translate"
+              [previewText]="'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate"
+              [dataCy]="'dark-color-picker'"
+              [triggerId]="'darkColorIcon'">
+            </app-color-picker>
+            <app-color-picker
+              [label]="'COMMON.PROFESSIONAL.COLOR.LIGHT.FIELD' | translate"
+              [control]="getForm.lightColor"
+              [invalidText]="'COMMON.PROFESSIONAL.COLOR.INVALID' | translate"
+              [previewMode]="'light'"
+              [previewTitle]="'COMMON.PROFESSIONAL.COLOR.LIGHT.RESERVATION' | translate"
+              [previewText]="'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate"
+              [dataCy]="'light-color-picker'"
+              [triggerId]="'lightColorIcon'">
+            </app-color-picker>
+          </div>
+        }
+      </div>
+
+      <div class="app-detail-actions">
+        <button appBackButton mat-stroked-button type="button">
+          <mat-icon>keyboard_return</mat-icon>
+          <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+        </button>
+        <button [disabled]="form.invalid || !(!form.pristine || addressUpdated)" mat-stroked-button type="submit">
+          <mat-icon>{{ getConfig.button.icon }}</mat-icon>
+          <span>{{ getConfig.button.label | translate }}</span>
+        </button>
+      </div>
     </form>
   </section>
 </div>

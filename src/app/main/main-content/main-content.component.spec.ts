@@ -24,6 +24,8 @@ describe('MainContentComponent', () => {
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
   let response$: BehaviorSubject<any>;
   let error$: BehaviorSubject<any>;
+  let catalogue$: BehaviorSubject<any>;
+  let isLoading$: BehaviorSubject<boolean>;
 
   let storeSpy: jasmine.SpyObj<Store<MainState>>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
@@ -36,8 +38,10 @@ describe('MainContentComponent', () => {
   beforeEach(async () => {
     response$ = new BehaviorSubject(undefined);
     error$ = new BehaviorSubject(undefined);
+    catalogue$ = new BehaviorSubject([]);
+    isLoading$ = new BehaviorSubject<boolean>(false);
 
-    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
+    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe', 'select']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
     });
@@ -56,6 +60,10 @@ describe('MainContentComponent', () => {
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
+    });
+    storeSpy.select.and.callFake(() => {
+      const callIndex = storeSpy.select.calls.count();
+      return callIndex === 1 ? catalogue$.asObservable() : isLoading$.asObservable();
     });
 
     await TestBed.configureTestingModule({

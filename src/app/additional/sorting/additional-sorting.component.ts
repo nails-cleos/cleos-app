@@ -7,12 +7,13 @@ import {
 import { IAdditionalAll } from '../additional';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AdditionalStore } from '../../store/additional.store';
+import { CardListSkeletonComponent } from '../../shared/skeleton/card-list-skeleton.component';
 
 @Component({
   selector: 'app-sorting',
   templateUrl: './additional-sorting.component.html',
   styleUrls: ['./additional-sorting.component.scss'],
-  imports: [DragDropSortingComponent, TranslatePipe],
+  imports: [DragDropSortingComponent, TranslatePipe, CardListSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdditionalSortingComponent {
@@ -26,6 +27,7 @@ export class AdditionalSortingComponent {
 
   itemsSignal = computed(() => this.additionalListSignal()?.map(
     (iAdditionalAll: IAdditionalAll) => new ItemSorting(iAdditionalAll.id, iAdditionalAll.name, iAdditionalAll.order)));
+  isLoading = this.additionalStore.isLoading;
 
   constructor() {
     this.additionalStore.clean();

@@ -20,6 +20,7 @@ describe('OfficeListComponent', () => {
   let translate: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let officeStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
     clean: jasmine.Spy;
@@ -53,6 +54,7 @@ describe('OfficeListComponent', () => {
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     officeStoreSpy = {
+      isLoading: signal(false),
       data: signal<any>({ kind: 'pagination', value: mockPagination }),
       response: signal<any>(undefined),
       clean: jasmine.createSpy('clean'),

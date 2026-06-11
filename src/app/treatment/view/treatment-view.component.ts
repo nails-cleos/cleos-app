@@ -7,7 +7,8 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { DurationTimePipe } from '../../pipes/durationTime.pipe';
 import { TreatmentStore } from '../../store/treatment.store';
-import { SkeletonComponent } from '../../shared/skeleton.component';
+import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 import { TreatmentTableComponent } from '../table/treatment-table.component';
 
 @Component({
@@ -15,7 +16,7 @@ import { TreatmentTableComponent } from '../table/treatment-table.component';
   templateUrl: './treatment-view.component.html',
   styleUrls: ['./treatment-view.component.scss'],
   imports: [TranslatePipe, BackButtonDirective, MatButton, MatIcon, MatChipListbox, MatChip, DurationTimePipe,
-    TreatmentTableComponent, SkeletonComponent],
+    TreatmentTableComponent, SkeletonComponent, TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreatmentViewComponent {
@@ -26,8 +27,14 @@ export class TreatmentViewComponent {
   private readonly router = inject(Router);
 
   private selectedHistoryTreatmentId = signal<string | undefined>(undefined);
+  readonly historyTableColumns: TableSkeletonColumn[] = [
+    { key: 'date' },
+    { key: 'price' },
+    { key: 'duration', hideOnMobile: true },
+  ];
 
   language: string = this.translate.getCurrentLang();
+  historyLoading = computed(() => !!this.selectedHistoryTreatmentId() && this.treatmentStore.isLoading());
 
   treatment = computed(() => {
     const group = this.treatmentStore.selected();

@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
-import { InvoiceListComponent } from '../invoice/list/invoice-list.component';
 import { CalendarComponent } from './calendar/calendar.component';
 import { ReservationCompleteComponent } from './detail/complete/reservation-complete.component';
 import { MoreInfoComponent } from './detail/more-info/more-info.component';
@@ -45,7 +44,6 @@ const providers = [
 
 const children: Routes = [
   { path: 'search', component: SearchComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager, Role.professional] } },
-  { path: 'invoices', component: InvoiceListComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager, Role.professional] } },
   { path: 'calendar', component: CalendarComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager, Role.professional] } },
   { path: '', component: ReservationCreatePageComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] } },
   { path: ':id/edit', component: ReservationEditPageComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] } },

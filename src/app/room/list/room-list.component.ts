@@ -34,6 +34,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';
 import { RouterLink } from '@angular/router';
 import { RoomStore } from '../../store/room.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 
 @Component({
   selector: 'app-room-list',
@@ -42,7 +43,7 @@ import { RoomStore } from '../../store/room.store';
   imports: [MatIcon, MatList, MatListItem, MatListSubheaderCssMatStyler, MatIconButton,
     TranslatePipe, RouterLink, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
     MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow,
-    MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, SortByPipe],
+    MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, SortByPipe, TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RoomListComponent {
@@ -70,6 +71,7 @@ export class RoomListComponent {
   );
 
   paginatorPageIndex = this.tableState.pageIndex;
+  isLoading = this.roomStore.isLoading;
   dataSourceSignal = computed(() => this.roomStore.data()?.content?.map((room: IRoom) => {
     if (room && room.availabilities && room.availabilities.length) {
       const availabilities = room.availabilities.map((i: IAvailability) =>
@@ -81,7 +83,16 @@ export class RoomListComponent {
   resultsLengthSignal = computed(() => this.roomStore.data()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'currency', 'office', 'address', 'timeZone', 'availability', 'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'currency', hideOnMobile: true },
+    { key: 'office', hideOnMobile: true },
+    { key: 'address' },
+    { key: 'timeZone', hideOnMobile: true },
+    { key: 'availability', hideOnMobile: true },
+    { key: 'actions', hideOnMobile: true },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
   expanded?: IRoom;
 
   language: string = this.translate.getCurrentLang();

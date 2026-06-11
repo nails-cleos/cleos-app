@@ -34,6 +34,7 @@ import {
   MatRowDef,
   MatTable,
 } from '@angular/material/table';
+import { TableSkeletonColumn } from '../skeleton/table-skeleton.component';
 
 export type ExtraForm = {
   description: FormControl<string>;
@@ -83,13 +84,13 @@ export class FormFieldAdderComponent {
   extras = signal<IExtras[]>([]);
   total = computed(() => this.extras().reduce((acc, item) => acc + item.price, 0));
 
-  displayedColumns = computed(() => {
-    const base = ['description', 'price'];
-
+  tableColumns = computed<TableSkeletonColumn[]>(() => {
+    const base: TableSkeletonColumn[] = [{ key: 'description' }, { key: 'price' }];
     return this.split()
-      ? [...base, 'paymentType', 'actions']
-      : [...base, 'actions'];
+      ? [...base, { key: 'paymentType' }, { key: 'actions' }]
+      : [...base, { key: 'actions' }];
   });
+  displayedColumns = computed(() => this.tableColumns().map((column) => column.key));
   remainsToBeSplit = computed(() => this.split() ? this.toPaid() - this.total() : null);
 
   constructor() {

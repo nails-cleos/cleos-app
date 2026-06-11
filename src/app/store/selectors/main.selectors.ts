@@ -15,12 +15,12 @@ export const getCurrentLangPipe = pipe(
   filter((val): val is string => val !== undefined),
 );
 
-const selectCatalogue = createSelector(
+export const selectCatalogueData = createSelector(
   selectMainState,
   (state: MainState) => state?.catalogue,
 );
 export const getCataloguePipe = pipe(
-  select(selectCatalogue),
+  select(selectCatalogueData),
   filter((val): val is ICatalogueAll[] => val !== undefined),
 );
 
@@ -40,4 +40,9 @@ const selectResponse = createSelector(
 export const getResponsePipe = pipe(
   select(selectResponse),
   filter((val): val is IResponseSuccess => val !== undefined),
+);
+
+export const selectMainIsLoading = createSelector(
+  selectMainState,
+  (state: MainState) => state?.isLoading,
 );

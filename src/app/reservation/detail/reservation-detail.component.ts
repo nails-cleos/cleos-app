@@ -114,12 +114,10 @@ import { MatSort } from '@angular/material/sort';
 import { MatTooltip } from '@angular/material/tooltip';
 import {
   MatCard,
-  MatCardActions,
   MatCardContent,
-  MatCardHeader,
-  MatCardSubtitle,
-  MatCardTitle,
 } from '@angular/material/card';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { ReservationDetailSkeletonComponent } from './reservation-detail-skeleton.component';
 
 type PaymentForm = {
   amount: FormControl<string>;
@@ -138,10 +136,10 @@ type DetailForm = {
     MatListSubheaderCssMatStyler, MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe, DecimalPipe, NgClass,
     RouterLink, DatePipe, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
     MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow,
-    MatFooterRow, MatFooterRowDef, MatPaginator, MatPrefix, BackButtonDirective, MatCard, MatCardHeader, MatCardTitle,
-    MatCardSubtitle, MatCardContent, MatCardActions, RoomNamePipe, ReservationIconPipe, PriceExtrasComponent,
+    MatFooterRow, MatFooterRowDef, MatPaginator, MatPrefix, BackButtonDirective, MatCard,
+    MatCardContent, RoomNamePipe, ReservationIconPipe, PriceExtrasComponent,
     PaymentOptionSelectComponent, TwoDigitsDirective, TimeDetailPipe, BackButtonDirective, FabMenuComponent,
-    DurationTimePipe, MatDivider],
+    DurationTimePipe, MatDivider, TableSkeletonComponent, ReservationDetailSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationDetailComponent {
@@ -183,6 +181,8 @@ export class ReservationDetailComponent {
 
   historiesSignal = toSignal(this.histories$);
   paymentsSignal = toSignal(this.payments$);
+  paymentsLoading = computed(() => !!this.reservation() && this.paymentsSignal() === undefined);
+  historyLoading = computed(() => !!this.reservation() && this.historiesSignal() === undefined);
 
   paginatorPageIndex = signal(0);
 
@@ -194,8 +194,22 @@ export class ReservationDetailComponent {
   dateFormat: string = this.translate.getCurrentLang();
   changeState: IFabMenu[] = [];
 
-  displayedColumns: string[] = ['position', 'professional', 'start', 'treatment', 'state'];
-  dataSource = computed(() => new MatTableDataSource(this.historiesSignal()));
+  historyTableColumns: TableSkeletonColumn[] = [
+    { key: 'position', hideOnMobile: true },
+    { key: 'professional', hideOnMobile: true },
+    { key: 'start' },
+    { key: 'treatment' },
+    { key: 'state', hideOnMobile: true },
+  ];
+  paymentTableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'description' },
+    { key: 'status', hideOnMobile: true },
+    { key: 'type', hideOnMobile: true },
+    { key: 'amount' },
+  ];
+  displayedColumns: string[] = this.historyTableColumns.map((column) => column.key);
+  dataSource = computed(() => new MatTableDataSource(this.historiesSignal() ?? []));
 
   expanded?: IReservationAll;
   pageSize = 5;
@@ -209,7 +223,7 @@ export class ReservationDetailComponent {
   showFireworks = false;
 
   paymentPaid = signal<IPaymentAll[]>([]);
-  paymentDisplayedColumns: string[] = ['position', 'description', 'status', 'type', 'amount'];
+  paymentDisplayedColumns: string[] = this.paymentTableColumns.map((column) => column.key);
   paymentExpanded?: IPayment;
 
   professionalId = computed(() => this.authUserSignal()?.professionalId);
@@ -382,43 +396,38 @@ export class ReservationDetailComponent {
 
     effect(() => {
       const payments = this.paymentsSignal();
-      if (payments?.length && payments[0]?.id) {
-        if (this.isCustomer()) {
-          this.paymentPaid.set(payments.map((p) => {
-            if (p.status &&
-              !['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND'].includes(p.status)) {
-              this.addActions();
-            }
-            return p;
-          }).sort((a, b) => a.status.localeCompare(b.status)));
-        } else {
-          if (!this.payments.length) {
-            let arr: any[] = [];
-            this.paymentPaid.set(payments.map((p: IPaymentAll) => {
-              if (p.id) {
-                const amount = (p.transactionAmount || 0).toFixed(2);
-                const paymentForm = this.formBuilder.group({
-                  amount: [amount],
-                  type: [p.type],
-                });
-                arr = [...arr, { amount: amount, type: p.type }];
-                this.payments.push(paymentForm);
-              }
-              return p;
-            }));
-          } else {
-            this.paymentPaid.set(payments);
-          }
-        }
-      } else {
+      if (!payments?.length) {
         this.paymentPaid.set([]);
+        return;
+      }
+
+      if (this.isCustomer()) {
+        this.paymentPaid.set(payments.map((p) => {
+          if (p.status &&
+            !['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND'].includes(p.status)) {
+            this.addActions();
+          }
+          return p;
+        }).sort((a, b) => a.status.localeCompare(b.status)));
+      } else if (!this.payments.length) {
+        this.paymentPaid.set(payments.map((p: IPaymentAll) => {
+          const amount = (p.transactionAmount || 0).toFixed(2);
+          const paymentForm = this.formBuilder.group({
+            amount: [amount],
+            type: [p.type],
+          });
+          this.payments.push(paymentForm);
+          return p;
+        }));
+      } else {
+        this.paymentPaid.set(payments);
       }
     });
     effect(() => {
       const history = this.historiesSignal();
       const reservation = this.reservation();
 
-      if (!history?.length || !history[0]?.id || !reservation) {
+      if (!history || !reservation) {
         return;
       }
 
@@ -1109,8 +1118,9 @@ export class ReservationDetailComponent {
   };
 
   private addActions = (): void => {
-    if (!this.paymentDisplayedColumns.includes('actions')) {
-      this.paymentDisplayedColumns.splice(this.paymentDisplayedColumns.length - 1, 0, 'actions');
+    if (!this.paymentTableColumns.some((column) => column.key === 'actions')) {
+      this.paymentTableColumns.splice(this.paymentTableColumns.length - 1, 0, { key: 'actions', hideOnMobile: true });
+      this.paymentDisplayedColumns = this.paymentTableColumns.map((column) => column.key);
     }
   };
 

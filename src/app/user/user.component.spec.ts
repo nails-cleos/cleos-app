@@ -15,12 +15,12 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { signal } from '@angular/core';
 import { provideAppDateAdapter } from '../util/adapter/app-date.provider';
+import { ICommon } from '../interfaces/common';
 
 describe('UserComponent', () => {
   let component: UserComponent;
   let fixture: ComponentFixture<UserComponent>;
 
-  let selectedUser$: BehaviorSubject<any>;
   let navigationParams$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
@@ -28,9 +28,12 @@ describe('UserComponent', () => {
   let storeSpy: jasmine.SpyObj<Store<UserState>>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let geocodeServiceSpy: jasmine.SpyObj<GeocodeService>;
+  const config: ICommon = {
+    title: 'USER.TITLE',
+    button: { icon: 'save', label: 'COMMON.BUTTON.SAVE' },
+  };
 
   beforeEach(async () => {
-    selectedUser$ = new BehaviorSubject(undefined);
     navigationParams$ = new BehaviorSubject(undefined);
     subErrors$ = new BehaviorSubject(undefined);
 
@@ -47,10 +50,8 @@ describe('UserComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return selectedUser$.asObservable();
-        case 2:
           return navigationParams$.asObservable();
-        case 3:
+        case 2:
           return subErrors$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -79,6 +80,7 @@ describe('UserComponent', () => {
 
     fixture = TestBed.createComponent(UserComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('config', config);
     fixture.detectChanges();
   });
 
@@ -97,7 +99,7 @@ describe('UserComponent', () => {
       address: { name: 'Amsterdam' },
     };
 
-    selectedUser$.next(mockUser);
+    fixture.componentRef.setInput('user', mockUser as any);
     fixture.detectChanges();
 
     expect(component.getForm.displayName.value).toBe(mockUser.displayName);
@@ -105,8 +107,9 @@ describe('UserComponent', () => {
     expect(component.getForm.lang.value).toEqual(mockUser.locale);
   });
 
-  it('update() should dispatch updateMyUser with correct payload', () => {
-    storeSpy.dispatch.calls.reset();
+  it('update() should emit updated user payload', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
     const mockUser = {
       id: 'userId',
       displayName: 'User',
@@ -116,8 +119,7 @@ describe('UserComponent', () => {
       email: 'test@email.com',
     };
 
-    fixture.componentRef.setInput('id', mockUser.id);
-    selectedUser$.next(mockUser);
+    fixture.componentRef.setInput('user', mockUser as any);
     fixture.detectChanges();
 
     // fill form
@@ -138,14 +140,13 @@ describe('UserComponent', () => {
     component.submit();
 
     expect(component.form.valid).toBeTrue();
-    const dispatched = storeSpy.dispatch.calls.mostRecent().args[0];
-    expect(dispatched).toEqual({
+    expect(emitSpy).toHaveBeenCalledWith({
       user: jasmine.objectContaining({
         displayName: 'New user',
         phone: '+31 23 456 7890',
         locale: 'es',
       }),
-      type: '[User] Save',
+      role: Role.customer,
     });
   });
 
@@ -157,19 +158,21 @@ describe('UserComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.getForm.displayName.errors).toEqual({ incorrect: true });
-    expect(component.getForm.phone.errors).toEqual({ incorrect: true });
+    expect(component.getForm.displayName.errors).toEqual(jasmine.objectContaining({ incorrect: true }));
+    expect(component.getForm.phone.errors).toEqual(jasmine.objectContaining({ incorrect: true }));
 
-    expect(component.errors().displayName).toBe('Invalid name');
-    expect(component.errors().phone).toBe('Bad phone');
+    expect(component.errors()).toEqual(jasmine.objectContaining({
+      displayName: 'Invalid name',
+      phone: 'Bad phone',
+    }));
   });
 
-  it('should dispatch getUser when userId emits a value', () => {
+  it('should accept user input without dispatching store actions', () => {
     storeSpy.dispatch.calls.reset();
-    fixture.componentRef.setInput('id', '123');
+    fixture.componentRef.setInput('user', { id: '123', displayName: 'User 123' } as any);
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getUser({ id: '123' }));
+    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(getUser({ id: '123' }));
   });
 
   it('should not dispatch when form invalid on submit', () => {
@@ -184,8 +187,9 @@ describe('UserComponent', () => {
     expect(storeSpy.dispatch).not.toHaveBeenCalled();
   });
 
-  it('should dispatch createUser when in add mode and form valid', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should emit createUser payload when in add mode and form valid', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
     const roleControl = component.getForm.role;
     roleControl.setValue(Role.customer);
@@ -206,8 +210,7 @@ describe('UserComponent', () => {
     component.submit();
 
     expect(component.form.valid).toBeTrue();
-    const dispatched = storeSpy.dispatch.calls.mostRecent().args[0];
-    expect(dispatched).toEqual({
+    expect(emitSpy).toHaveBeenCalledWith({
       user: jasmine.objectContaining({
         displayName: 'New name',
         email: 'email@test.com',
@@ -215,7 +218,6 @@ describe('UserComponent', () => {
         locale: 'es',
       }),
       role: Role.customer,
-      type: '[User] Save',
     });
   });
 });

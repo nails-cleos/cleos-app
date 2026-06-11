@@ -33,10 +33,12 @@ describe('InvoiceListComponent', () => {
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
   let paymentServiceSpy: jasmine.SpyObj<PaymentService>;
   let officeStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
     loadMyOffices: jasmine.Spy;
   };
   let invoiceStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
     clean: jasmine.Spy;
     loadOfficeToInvoice: jasmine.Spy;
@@ -182,10 +184,12 @@ describe('InvoiceListComponent', () => {
     paymentServiceSpy = jasmine.createSpyObj('PaymentService', ['getPaymentOptions']);
     paymentServiceSpy.getPaymentOptions.and.returnValue(new BehaviorSubject(paymentOptions).asObservable());
     officeStoreSpy = {
+      isLoading: signal(false),
       data: signal<any>(undefined),
       loadMyOffices: jasmine.createSpy('loadMyOffices'),
     };
     invoiceStoreSpy = {
+      isLoading: signal(false),
       data: signal<any>(undefined),
       clean: jasmine.createSpy('clean'),
       loadOfficeToInvoice: jasmine.createSpy('loadOfficeToInvoice'),

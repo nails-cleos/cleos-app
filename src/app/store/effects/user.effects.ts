@@ -94,8 +94,8 @@ export class UserEffects {
 
   save$ = createEffect(() => this.actions.pipe(
     ofType(saveUser),
-    switchMap(({ user, role }) => effectRequest(
-      this.userService.saveUser(user, role).pipe(switchMap((response: { response: IApiResponse, key: string }) => {
+    switchMap(({ user, id, role }) => effectRequest(
+      this.userService.saveUser(user, id, role).pipe(switchMap((response: { response: IApiResponse, key: string }) => {
         const message = this.translate.instant(response.key, { displayName: response.response.name });
         const path = `users/${ response.response.id }`;
         return successResponse(userSaveSuccess, message, path, 'users');

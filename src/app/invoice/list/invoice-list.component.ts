@@ -70,6 +70,8 @@ import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/m
 import { MatSuffix } from '@angular/material/form-field';
 import { OfficeStore } from '../../store/office.store';
 import { InvoiceStore } from '../../store/invoice.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
 
 // Set up VFS fonts for pdfMake (provides fallback Roboto fonts)
 (pdfMake as any).vfs = (pdfFonts as any).pdfMake?.vfs || pdfFonts;
@@ -96,7 +98,7 @@ type DateRangeForm = {
     MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow,
     MatFooterRow, MatFooterRowDef, MatAutocompleteTrigger, TimeDetailPipe, BackButtonDirective, MatCheckbox,
     MatChipGrid, MatChipRow, MatChipInput, MatChipRemove, MatDateRangeInput, MatDateRangePicker, MatStartDate,
-    MatEndDate, MatSuffix],
+    MatEndDate, MatSuffix, TableSkeletonComponent, SkeletonComponent],
   providers: [...provideMonthPeriodAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -169,6 +171,8 @@ export class InvoiceListComponent {
 
   selectedPaymentOptionsSignal = signal<IPaymentOption[]>([]);
   allPaymentOptionsWritableSignal = signal<IPaymentOption[] | undefined>(undefined);
+  isLoading = this.invoiceStore.isLoading;
+  isOfficeLoading = this.officeStore.isLoading;
   dataSourceSignal = computed(() => {
     const invoiceList = this.invoiceStore.data();
     return invoiceList?.map((invoice: IInvoice, position: number) => {
@@ -187,6 +191,7 @@ export class InvoiceListComponent {
       return invoice;
     });
   });
+  showResultsSignal = computed(() => this.isLoading() || this.dataSourceSignal() !== undefined);
   resultsLengthSignal = computed(() => this.dataSourceSignal()?.length || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
@@ -200,7 +205,15 @@ export class InvoiceListComponent {
 
   typeInput = viewChild.required<ElementRef<HTMLInputElement>>('typeInput');
 
-  displayedColumns: string[] = ['select', 'position', 'customer', 'timestamp', 'description', 'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'select' },
+    { key: 'position', hideOnMobile: true },
+    { key: 'customer' },
+    { key: 'timestamp' },
+    { key: 'description', hideOnMobile: true },
+    { key: 'actions', hideOnMobile: true },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
   expandedInvoice?: IInvoice;
 
   selectionSignal = signal<SelectionModel<IInvoice>>(new SelectionModel<IInvoice>(true, []));

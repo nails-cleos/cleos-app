@@ -53,8 +53,8 @@
           <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
         </mat-form-field>
 
-        @if (allGroupsWritableSignal(); as allGroups) {
-          <div class="app-inline-field-action app-crud-form-grid__full" id="groups">
+        <div class="app-inline-field-action app-crud-form-grid__full" id="groups">
+          @if (allGroupsWritableSignal(); as allGroups) {
             @if (allGroups.length || groupsSignal().length) {
               <mat-form-field class="chip-list" appearance="outline">
                 <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
@@ -86,14 +86,10 @@
                 <span>{{ 'COMMON.TREATMENT.GROUP.ADD_BUTTON' | translate }}</span>
               </button>
             }
-          </div>
-        } @else {
-          <div class="app-crud-loading">
-            <div class="app-surface-skeleton-spacer"></div>
-            <div class="ssc-square app-crud-loading__block"></div>
-            <div class="app-surface-skeleton-spacer"></div>
-          </div>
-        }
+          } @else {
+            <app-skeleton [showTitle]="false"></app-skeleton>
+          }
+        </div>
       </div>
 
       <div class="app-detail-actions">
@@ -105,7 +101,7 @@
         <button [disabled]="form.invalid" mat-stroked-button type="submit">
           <mat-icon>{{ getConfig.button.icon }}</mat-icon>
           <span>{{ getConfig.button.label | translate }}</span>
-          </button>
+        </button>
       </div>
     </form>
   </section>

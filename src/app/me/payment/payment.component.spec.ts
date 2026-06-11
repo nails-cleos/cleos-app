@@ -19,14 +19,17 @@ describe('PaymentComponent', () => {
   let paymentList$: Subject<any[]>;
   let response$: Subject<any>;
   let subErrors$: Subject<any[]>;
+  let isLoading$: BehaviorSubject<boolean>;
 
   beforeEach(async () => {
     paymentList$ = new Subject();
     response$ = new Subject();
     subErrors$ = new Subject();
+    isLoading$ = new BehaviorSubject<boolean>(false);
 
-    storeSpy = jasmine.createSpyObj<Store<PaymentState>>('Store', ['dispatch', 'pipe']);
+    storeSpy = jasmine.createSpyObj<Store<PaymentState>>('Store', ['dispatch', 'pipe', 'select']);
     routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate']);
+    storeSpy.select.and.returnValue(isLoading$.asObservable());
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
@@ -64,6 +67,7 @@ describe('PaymentComponent', () => {
     paymentList$.complete();
     response$.complete();
     subErrors$.complete();
+    isLoading$.complete();
   });
 
   it('should create', () => {

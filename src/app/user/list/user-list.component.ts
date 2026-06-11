@@ -24,6 +24,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { RoleIconKey, RoleIconName } from '../../util/icon';
 import { Router, RouterLink } from '@angular/router';
 import { getUserPaginationPipe, getUserResponsePipe } from '../../store/selectors/user.selectors';
+import { selectUserIsLoading } from '../../store/selectors/user.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { UserState } from '../../store/reducers/user.reducers';
 import { SelectUserDialogComponent } from './select-user-dialog.component';
@@ -56,6 +57,7 @@ import {
 } from '@angular/material/list';
 import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { LowerCasePipe, NgClass } from '@angular/common';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 
 type UsersForm = {
   filter: FormControl<string | undefined>;
@@ -69,7 +71,7 @@ type UsersForm = {
     MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe, NgClass, RouterLink, MatTable, MatSort, MatColumnDef,
     MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef,
     MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator,
-    MatDivider, LowerCasePipe, MatListItemTitle],
+    MatDivider, LowerCasePipe, MatListItemTitle, TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserListComponent {
@@ -90,6 +92,7 @@ export class UserListComponent {
 
   private userListSignal = toSignal(this.userList$);
   private responseSignal = toSignal(this.response$);
+  private loadingSignal = toSignal(this.store.select(selectUserIsLoading), { initialValue: false });
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -103,6 +106,7 @@ export class UserListComponent {
   );
 
   paginatorPageIndex = this.tableState.pageIndex;
+  isLoading = computed(() => this.loadingSignal());
   dataSourceSignal = computed(() => this.userListSignal()?.content?.map((user: IUserAll) => {
     if (user.authorities) {
       const missing = this.allRole.filter(au => !user.authorities.some(u => u.authority === au));
@@ -115,7 +119,14 @@ export class UserListComponent {
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
   smallScreen = computed(() => this.breakpointsSignal()?.matches ?? false);
 
-  displayedColumns: string[] = ['position', 'displayName', 'email', 'status', 'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'displayName' },
+    { key: 'email', hideOnMobile: true },
+    { key: 'status' },
+    { key: 'actions', hideOnMobile: true },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
   expandedUser?: IUserAll;
 

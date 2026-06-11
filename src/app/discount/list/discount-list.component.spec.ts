@@ -20,6 +20,7 @@ describe('DiscountListComponent', () => {
   let translate: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let discountStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
     clean: jasmine.Spy;
@@ -54,6 +55,7 @@ describe('DiscountListComponent', () => {
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     discountStoreSpy = {
+      isLoading: signal(false),
       data: signal<any>({ kind: 'paginationDiscount', value: mockPagination }),
       response: signal<any>(undefined),
       clean: jasmine.createSpy('clean'),

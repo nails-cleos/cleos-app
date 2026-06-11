@@ -96,11 +96,13 @@ describe('SearchComponent', () => {
   let customerList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
   let response$: BehaviorSubject<any>;
+  let isLoading$: BehaviorSubject<boolean>;
 
   beforeEach(async () => {
     reservationList$ = new BehaviorSubject(mockPagination);
     customerList$ = new BehaviorSubject(undefined);
     response$ = new BehaviorSubject<any>(undefined);
+    isLoading$ = new BehaviorSubject<boolean>(false);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -109,7 +111,7 @@ describe('SearchComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch', 'select']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -132,6 +134,7 @@ describe('SearchComponent', () => {
           return new BehaviorSubject(undefined).asObservable();
       }
     });
+    storeSpy.select.and.returnValue(isLoading$.asObservable());
 
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
@@ -157,6 +160,7 @@ describe('SearchComponent', () => {
     reservationList$.complete();
     customerList$.complete();
     response$.complete();
+    isLoading$.complete();
     breakpoint$.complete();
   });
 

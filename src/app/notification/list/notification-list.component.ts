@@ -25,6 +25,7 @@ const NOTIFICATION_LEAVE_ANIMATION_MS = 260;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationListComponent {
+  readonly skeletonNotificationCards = Array.from({ length: 3 }, (_, index) => index);
   private readonly router: Router = inject(Router);
   private readonly store: Store<NotificationState> = inject(Store<NotificationState>);
   private readonly translate: TranslateService = inject(TranslateService);
@@ -37,32 +38,34 @@ export class NotificationListComponent {
   notifications = signal<INotification[]>([]);
   dateFormat: string = this.translate.getCurrentLang();
   showMore = false;
-  loadingNotifications?: Array<INotification>;
   badge = 0;
+  pageLoading = signal(false);
 
   private page = signal(0);
 
   constructor() {
     effect(() => {
       const page = this.page();
+      this.pageLoading.set(true);
       this.store.dispatch(getNotificationsPage({ page: page, sort: 'date', direction: 'desc', size: PAGE_SIZE }));
     });
 
     effect(() => {
       const notifications = this.notificationsSignal();
       if (notifications) {
+        this.pageLoading.set(false);
         if (notifications.page?.content?.length) {
-          if (notifications.page?.content[0]?.id) {
-            this.loadingNotifications = undefined;
-            this.notifications.update(currents => currents.concat(notifications.page.content
-              .map((not: any) => Object.assign({}, not, { date: zoneDateToDate(not.date) }))));
-            this.showMore = !notifications.page.last;
-            this.badge = notifications.unread;
-          } else {
-            this.loadingNotifications = notifications.page.content;
-          }
+          const page = this.page();
+          const pageNotifications = notifications.page.content
+            .map((not: any) => Object.assign({}, not, { date: zoneDateToDate(not.date) }));
+          this.notifications.update(currents => page === 0 ? pageNotifications : currents.concat(pageNotifications));
+          this.showMore = !notifications.page.last;
+          this.badge = notifications.unread;
         } else {
-          this.loadingNotifications = undefined;
+          if (this.page() === 0) {
+            this.notifications.set([]);
+          }
+          this.showMore = false;
         }
       }
     });

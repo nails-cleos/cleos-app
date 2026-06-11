@@ -48,6 +48,7 @@ export class StatementListComponent {
 
   private allOfficesSignal = signal<IOfficeAll[] | undefined>(undefined);
 
+  isLoading = this.officeStore.isLoading;
   blob = signal<Blob | undefined>(undefined);
   fileName = signal<string | undefined>(undefined);
 

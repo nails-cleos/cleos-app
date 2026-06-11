@@ -4,7 +4,7 @@ import { of } from 'rxjs';
 
 import { AdditionalService } from './additional.service';
 import { IAdditional, IAdditionalAll } from '../additional/additional';
-import { paginated, Pagination } from '../interfaces/pagination';
+import { paginated, Pagination, skipLoadingOverlay } from '../interfaces/pagination';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { IApiResponse } from '../interfaces/common';
 import { createFilter } from '../util/service-helper';
@@ -86,7 +86,7 @@ describe('AdditionalService', () => {
     });
 
     expect(httpSpy.get).toHaveBeenCalledWith('v1/additional/groups', {
-      params: new HttpParams().set('roomId', roomId).set('groupId', groupId),
+      params: new HttpParams().set('roomId', roomId).set('groupId', groupId), ...skipLoadingOverlay(),
     });
   });
 
@@ -98,7 +98,7 @@ describe('AdditionalService', () => {
       expect(result).toEqual(mockAdditionalList);
     });
 
-    expect(httpSpy.get).toHaveBeenCalledWith('v1/additional');
+    expect(httpSpy.get).toHaveBeenCalledWith('v1/additional', { ...skipLoadingOverlay() });
   });
 
   it('should fetch single additional by id', () => {
@@ -108,7 +108,7 @@ describe('AdditionalService', () => {
       expect(result).toEqual(mockAdditionalAll);
     });
 
-    expect(httpSpy.get).toHaveBeenCalledWith('v1/additional/1');
+    expect(httpSpy.get).toHaveBeenCalledWith('v1/additional/1', { ...skipLoadingOverlay() });
   });
 
   it('should create new additional', () => {

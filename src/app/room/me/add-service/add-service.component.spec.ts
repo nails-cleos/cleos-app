@@ -18,6 +18,7 @@ describe('AddServiceComponent', () => {
   let roomStoreSpy: {
     services: ReturnType<typeof signal<any>>;
     response: ReturnType<typeof signal<any>>;
+    isLoading: ReturnType<typeof signal<boolean>>;
     loadServices: jasmine.Spy;
     updateServices: jasmine.Spy;
   };
@@ -27,6 +28,7 @@ describe('AddServiceComponent', () => {
     roomStoreSpy = {
       services: signal(undefined),
       response: signal(undefined),
+      isLoading: signal(false),
       loadServices: jasmine.createSpy('loadServices'),
       updateServices: jasmine.createSpy('updateServices'),
     };

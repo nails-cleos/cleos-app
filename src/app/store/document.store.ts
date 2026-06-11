@@ -50,10 +50,11 @@ export const DocumentStore = signalStore(
 
     loadPage({ officeId, date, page, sort, direction, size }: DocumentPageRequest): void {
       patchState(store, {
-        data: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IDocument>,
+        data: undefined,
         response: undefined,
         error: undefined,
         subErrors: undefined,
+        isLoading: true,
       });
 
       documentService.getDocumentsPage(officeId, getDateFormat(date), page, sort, direction, size).subscribe({
@@ -62,6 +63,7 @@ export const DocumentStore = signalStore(
           response: undefined,
           error: undefined,
           subErrors: undefined,
+          isLoading: false,
         }),
         error: (err) => {
           const error = mapCrudHttpError(err);

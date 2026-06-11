@@ -3,7 +3,7 @@ import { ColorComponent } from './color.component';
 import { ColorStore } from '../store/color.store';
 import { IColor } from './color';
 import { ICommon } from '../interfaces/common';
-import { SkeletonComponent } from '../shared/skeleton.component';
+import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
 
 @Component({
   selector: 'app-color-details-page',

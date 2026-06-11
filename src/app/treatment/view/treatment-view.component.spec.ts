@@ -11,6 +11,7 @@ describe('TreatmentViewComponent', () => {
   let fixture: ComponentFixture<TreatmentViewComponent>;
   let routerSpy: jasmine.SpyObj<Router>;
   let treatmentStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
     selected: ReturnType<typeof signal<any>>;
     history: ReturnType<typeof signal<any>>;
     clean: jasmine.Spy;
@@ -21,6 +22,7 @@ describe('TreatmentViewComponent', () => {
   beforeEach(async () => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     treatmentStoreSpy = {
+      isLoading: signal(false),
       selected: signal({ id: '123', name: 'Deep Tissue', treatments: [] }),
       history: signal(undefined),
       clean: jasmine.createSpy('clean'),

@@ -3,18 +3,16 @@
     <div class="app-table-shell">
       @let resultsLength = resultsLengthSignal();
       @let pageSize = pageSizeSignal();
-      @if (dataSourceSignal(); as dataSource) {
+      @if (isLoading()) {
+        <app-table-skeleton [columns]="tableColumns"></app-table-skeleton>
+      } @else if (dataSourceSignal(); as dataSource) {
         <table [dataSource]="dataSource" mat-table matSort matSortActive="timestamp" matSortDirection="desc"
                matSortDisableClear
                multiTemplateDataRows>
           <ng-container matColumnDef="position">
             <th *matHeaderCellDef mat-header-cell>#</th>
             <td *matCellDef="let unavailable; let i = dataIndex;" mat-cell>
-              @if (unavailable.id) {
-                <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
-              } @else {
-                <div class="ssc-line"></div>
-              }
+              <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
             </td>
           </ng-container>
 
@@ -23,11 +21,7 @@
                 mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.PROFESSIONAL' | translate }}
             </th>
             <td *matCellDef="let unavailable" class="app-surface-hide-mobile" mat-cell>
-              @if (unavailable.id) {
-                <div>{{ unavailable.professional?.displayName }}</div>
-              } @else {
-                <div class="ssc-line"></div>
-              }
+              <div>{{ unavailable.professional?.displayName }}</div>
             </td>
           </ng-container>
 
@@ -36,11 +30,7 @@
                 mat-sort-header>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}
             </th>
             <td *matCellDef="let unavailable" class="app-surface-hide-mobile" mat-cell>
-              @if (unavailable.id) {
-                <div>{{ unavailable.description }}</div>
-              } @else {
-                <div class="ssc-line"></div>
-              }
+              <div>{{ unavailable.description }}</div>
             </td>
           </ng-container>
 
@@ -49,17 +39,13 @@
                 mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.START' | translate }}
             </th>
             <td *matCellDef="let unavailable" mat-cell>
-              @if (unavailable.id) {
-                <div>{{ unavailable.timestamp | timeDetail | date:'short':unavailable.timeZone:dateFormat }}
-                  @if (showTimeZone(unavailable)) {
-                    <button (click)="openDialog(unavailable)" mat-icon-button type="button">
-                      <mat-icon>info_outline</mat-icon>
-                    </button>
-                  }
-                </div>
-              } @else {
-                <div class="ssc-line"></div>
-              }
+              <div>{{ unavailable.timestamp | timeDetail | date:'short':unavailable.timeZone:dateFormat }}
+                @if (showTimeZone(unavailable)) {
+                  <button (click)="openDialog(unavailable)" mat-icon-button type="button">
+                    <mat-icon>info_outline</mat-icon>
+                  </button>
+                }
+              </div>
             </td>
           </ng-container>
 
@@ -68,14 +54,10 @@
                 mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.DURATION' | translate }}
             </th>
             <td *matCellDef="let unavailable" class="app-surface-cell-wrap app-surface-hide-mobile" mat-cell>
-              @if (unavailable.id) {
-                @if (!unavailable.allDay) {
-                  <mat-icon matPrefix>timer</mat-icon>&nbsp;{{ unavailable.duration | durationTime }}
-                } @else {
-                  <mat-icon matPrefix>timer</mat-icon>&nbsp;{{ 'COMMON.ALL_DAY.CHECK' | translate }}
-                }
+              @if (!unavailable.allDay) {
+                <mat-icon matPrefix>timer</mat-icon>&nbsp;{{ unavailable.duration | durationTime }}
               } @else {
-                <div class="ssc-line"></div>
+                <mat-icon matPrefix>timer</mat-icon>&nbsp;{{ 'COMMON.ALL_DAY.CHECK' | translate }}
               }
             </td>
           </ng-container>
@@ -85,11 +67,7 @@
                 mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.REPEAT' | translate }}
             </th>
             <td *matCellDef="let unavailable" class="app-surface-cell-wrap app-surface-hide-mobile" mat-cell>
-              @if (unavailable.id) {
-                {{ 'COMMON.REPEAT.' + unavailable.repeat | translate }}
-              } @else {
-                <div class="ssc-line"></div>
-              }
+              {{ 'COMMON.REPEAT.' + unavailable.repeat | translate }}
             </td>
           </ng-container>
 
@@ -102,21 +80,17 @@
               </button>
             </th>
             <td *matCellDef="let unavailable" class="app-surface-hide-mobile" mat-cell>
-              @if (unavailable.id) {
-                @if (!unavailable.deleted) {
-                  <button (click)="edit(unavailable)" mat-icon-button
-                          matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}"
-                          matTooltipPosition="left">
-                    <mat-icon color="primary">edit</mat-icon>
-                  </button>
-                  <button (click)="delete(unavailable)" mat-icon-button
-                          matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}"
-                          matTooltipPosition="right">
-                    <mat-icon color="warn">delete</mat-icon>
-                  </button>
-                }
-              } @else {
-                <div class="ssc-line"></div>
+              @if (!unavailable.deleted) {
+                <button (click)="edit(unavailable)" mat-icon-button
+                        matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}"
+                        matTooltipPosition="left">
+                  <mat-icon color="primary">edit</mat-icon>
+                </button>
+                <button (click)="delete(unavailable)" mat-icon-button
+                        matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}"
+                        matTooltipPosition="right">
+                  <mat-icon color="warn">delete</mat-icon>
+                </button>
               }
             </td>
           </ng-container>

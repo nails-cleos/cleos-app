@@ -1,0 +1,124 @@
+.app-card-list-skeleton-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--app-surface-card-border);
+  border-radius: 24px;
+  background: var(--app-surface-card-bg);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38);
+}
+
+.app-card-list-skeleton-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 18px 20px;
+  pointer-events: none;
+}
+
+.app-card-list-skeleton-card__main {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  min-width: 0;
+}
+
+.app-card-list-skeleton-card__visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+}
+
+.app-card-list-skeleton-card__image {
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+}
+
+.app-card-list-skeleton-card__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.app-card-list-skeleton-card__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.app-card-list-skeleton-card__text {
+  min-width: 0;
+  flex: 1;
+}
+
+.app-card-list-skeleton-card__title {
+  max-width: 220px;
+}
+
+.app-card-list-skeleton-card__subtitle {
+  max-width: 160px;
+}
+
+.app-card-list-skeleton-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.app-card-list-skeleton-card__badge {
+  width: 110px;
+  height: 36px;
+  border-radius: 999px;
+}
+
+.app-card-list-skeleton-card__description {
+  max-width: 100%;
+}
+
+.app-card-list-skeleton-card__description--short {
+  max-width: 72%;
+}
+
+.app-card-list-skeleton-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-card-list-skeleton-card__action {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+}
+
+@media (max-width: 880px) {
+  .app-card-list-skeleton-shell {
+    padding: 16px;
+  }
+
+  .app-card-list-skeleton-card,
+  .app-card-list-skeleton-card__main {
+    grid-template-columns: 1fr;
+  }
+
+  .app-card-list-skeleton-card__visual {
+    max-width: 180px;
+  }
+
+  .app-card-list-skeleton-card__badges {
+    justify-content: flex-start;
+  }
+
+  .app-card-list-skeleton-card__actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

@@ -35,6 +35,7 @@ import { MatPrefix, MatSuffix } from '@angular/material/input';
 import { DecimalPipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { discountIcon, DiscountStore } from '../../store/discount.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 
 @Component({
   selector: 'app-discount-list',
@@ -43,7 +44,8 @@ import { discountIcon, DiscountStore } from '../../store/discount.store';
   imports: [MatIcon, MatList, MatListItem, MatListSubheaderCssMatStyler, MatIconButton,
     TranslatePipe, DecimalPipe, RouterLink, MatIcon, MatTooltip, MatTable, MatSort, MatColumnDef, MatHeaderCellDef,
     MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatSuffix, MatPrefix, MatFooterCellDef, MatFooterCell,
-    MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRowDef, MatFooterRow, MatPaginator],
+    MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRowDef, MatFooterRow, MatPaginator,
+    TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DiscountListComponent {
@@ -77,13 +79,22 @@ export class DiscountListComponent {
   );
 
   paginatorPageIndex = this.tableState.pageIndex;
+  isLoading = this.discountStore.isLoading;
   dataSourceSignal = computed(() => this.discountListSignal()?.content?.map((it: IDiscount) => {
     return Object.assign({}, it, { icon: discountIcon(it as IDiscountAll) });
   }));
   resultsLengthSignal = computed(() => this.discountListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'name', 'description', 'type', 'amount', 'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'name' },
+    { key: 'description', hideOnMobile: true },
+    { key: 'type', hideOnMobile: true },
+    { key: 'amount', hideOnMobile: true },
+    { key: 'actions', hideOnMobile: true },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
   expanded?: IDiscount;
 
   language: string = this.translate.getCurrentLang();

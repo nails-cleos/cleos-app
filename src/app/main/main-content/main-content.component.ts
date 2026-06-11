@@ -22,7 +22,12 @@ import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Router } from '@angular/router';
 import { ToastService } from '../../services/toast.service';
 import { BottomSheetBookAppointmentComponent } from './bottom-sheet-book-appointment';
-import { getCataloguePipe, getMainErrorPipe, getResponsePipe } from '../../store/selectors/main.selectors';
+import {
+  getMainErrorPipe,
+  getResponsePipe,
+  selectCatalogueData,
+  selectMainIsLoading,
+} from '../../store/selectors/main.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ISendMessage } from '../../../main';
 import { MainState } from '../../store/reducers/main.reducers';
@@ -33,6 +38,7 @@ import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatFabButton, MatIconButton } from '@angular/material/button';
 import { NgClass, NgStyle } from '@angular/common';
+import { CardListSkeletonComponent } from '../../shared/skeleton/card-list-skeleton.component';
 
 type MainForm = {
   name: FormControl<string>;
@@ -46,7 +52,7 @@ type MainForm = {
   templateUrl: './main-content.component.html',
   styleUrls: ['./main-content.component.scss'],
   imports: [MatFormField, MatLabel, MatInput, MatIcon, MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe,
-    NgClass, MatError, NgStyle, MatPrefix, MatHint, MatFabButton],
+    NgClass, MatError, NgStyle, MatPrefix, MatHint, MatFabButton, CardListSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainContentComponent {
@@ -78,13 +84,15 @@ export class MainContentComponent {
 
   private response$ = this.store.pipe(getResponsePipe);
   private error$ = this.store.pipe(getMainErrorPipe);
-  private catalogue$ = this.store.pipe(getCataloguePipe);
+  private catalogue$ = this.store.select(selectCatalogueData);
+  private isLoading$ = this.store.select(selectMainIsLoading);
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
   private authUserSignal = this.authUserService.authUser;
   private responseSignal = toSignal(this.response$);
   private errorSignal = toSignal(this.error$);
   private catalogueSignal = toSignal(this.catalogue$);
+  private isLoadingSignal = toSignal(this.isLoading$, { initialValue: false });
   private breakpointsSignal = toSignal(this.breakpointObserver$, {
     initialValue: {
       matches: false,
@@ -97,6 +105,7 @@ export class MainContentComponent {
 
   isSmall = computed(() => this.breakpointsSignal()?.matches ?? isMobile());
   isDarkMode = computed(() => this.authUserSignal()?.isDarkMode ?? false);
+  isCatalogueLoading = computed(() => this.isLoadingSignal());
 
   treatmentItemState = signal<'open' | 'close'>('open');
   treatmentTitleState = signal<'open' | 'close'>('open');

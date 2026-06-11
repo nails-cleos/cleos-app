@@ -3,7 +3,7 @@ import { OfficeComponent } from './office.component';
 import { OfficeStore } from '../store/office.store';
 import { IOffice } from './office';
 import { ICommon } from '../interfaces/common';
-import { SkeletonComponent } from '../shared/skeleton.component';
+import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
 
 @Component({
   selector: 'app-office-details-page',
@@ -11,7 +11,7 @@ import { SkeletonComponent } from '../shared/skeleton.component';
     @if (office(); as office) {
       <app-office [office]="office" [config]="config" (submitData)="submit($event)"/>
     } @else {
-      <app-skeleton/>
+      <app-skeleton [lines]="5"/>
     }
   `,
   imports: [OfficeComponent, SkeletonComponent],

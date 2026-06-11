@@ -1,0 +1,45 @@
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <section class="app-surface-section app-crud-form">
+    @for (card of cards(); track card) {
+      <article class="app-surface-item app-card-list-skeleton-card">
+        <div class="app-card-list-skeleton-card__main">
+          @if (showMedia()) {
+            <div class="app-card-list-skeleton-card__visual">
+              <div class="ssc-square app-card-list-skeleton-card__image"></div>
+            </div>
+          }
+
+          <div class="app-card-list-skeleton-card__copy">
+            <div class="app-card-list-skeleton-card__top">
+              <div class="app-card-list-skeleton-card__text">
+                <div class="ssc-line app-card-list-skeleton-card__title"></div>
+                <div class="ssc-line app-card-list-skeleton-card__subtitle"></div>
+              </div>
+
+              @if (badgeCount()) {
+                <div class="app-card-list-skeleton-card__badges">
+                  @for (badge of badges(); track badge) {
+                    <div class="ssc-head-line app-card-list-skeleton-card__badge"></div>
+                  }
+                </div>
+              }
+            </div>
+
+            @for (line of lines(); track line) {
+              <div class="ssc-line app-card-list-skeleton-card__description"
+                   [class.app-card-list-skeleton-card__description--short]="line === descriptionLines() - 1"></div>
+            }
+          </div>
+        </div>
+
+        @if (actionCount()) {
+          <div class="app-card-list-skeleton-card__actions">
+            @for (action of actions(); track action) {
+              <div class="ssc-square app-card-list-skeleton-card__action"></div>
+            }
+          </div>
+        }
+      </article>
+    }
+  </section>
+</div>

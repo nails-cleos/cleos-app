@@ -32,6 +32,7 @@ import {
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatSuffix } from '@angular/material/input';
 import { DiscountStore } from '../../../store/discount.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
 
 @Component({
   selector: 'app-me-discount',
@@ -40,7 +41,7 @@ import { DiscountStore } from '../../../store/discount.store';
   imports: [MatIcon, MatIconButton, TranslatePipe, DecimalPipe, NgClass, MatTable, MatSort,
     MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatTooltip, MatFooterCellDef,
     MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator,
-    MatSuffix],
+    MatSuffix, TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MeDiscountComponent {
@@ -74,6 +75,7 @@ export class MeDiscountComponent {
   );
 
   paginatorPageIndex = this.tableState.pageIndex;
+  isLoading = this.discountStore.isLoading;
   dataSourceSignal = computed(() => this.discountListSignal()?.content?.map((ud: IUserDiscount) => {
     if (ud && ud.discountCustomer) {
       let symbol;
@@ -92,7 +94,14 @@ export class MeDiscountComponent {
   resultsLengthSignal = computed(() => this.discountListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'discountCustomer.name', 'discountCustomer.amount', 'used', 'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'discountCustomer.name' },
+    { key: 'discountCustomer.amount' },
+    { key: 'used', hideOnMobile: true },
+    { key: 'actions' },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
   private readonly language: string = this.translate.getCurrentLang();
 

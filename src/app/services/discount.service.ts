@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IDiscount, IDiscountAll, IReferral, IUserDiscount } from '../discount/discount';
-import { paginated, Pagination } from '../interfaces/pagination';
+import { paginated, Pagination, skipLoadingOverlay } from '../interfaces/pagination';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
 import { SortDirection } from '@angular/material/sort';
@@ -41,7 +41,7 @@ export class DiscountService {
   );
 
   getDiscount = (id: string): Observable<IDiscountAll | undefined> => this.http.get<IDiscountAll>(
-    toUrl(this.urlV1, id));
+    toUrl(this.urlV1, id), { ...skipLoadingOverlay() });
 
   createDiscount = (discount: IDiscount): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1,
     discount);

@@ -40,7 +40,7 @@ export const mainReducer = createReducer(
   initialState,
   on(getAllCatalogue, (state) => ({
     ...state,
-    catalogue: [{} as ICatalogueAll, {} as ICatalogueAll, {} as ICatalogueAll],
+    catalogue: undefined,
     response: undefined,
     isLoading: true,
   })),

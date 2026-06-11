@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ITracking } from '../reservation/reservation';
 import { toUrl } from '../util/helper';
+import { skipLoadingOverlay } from '../interfaces/pagination';
 
 @Injectable()
 export class TrackingService {
@@ -14,7 +15,10 @@ export class TrackingService {
 
   getTrackingByReservationId = (
     reservationId: string,
-  ): Observable<ITracking> => this.http.get<ITracking>(toUrl(this.urlV1, 'reservations', reservationId));
+  ): Observable<ITracking> => this.http.get<ITracking>(
+    toUrl(this.urlV1, 'reservations', reservationId),
+    skipLoadingOverlay(),
+  );
 
   executeTrackingByReservationId = (
     reservationId: string,

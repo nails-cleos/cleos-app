@@ -33,6 +33,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MatList, MatListItem, MatListItemIcon, MatListItemTitle } from '@angular/material/list';
 import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
 
 @Component({
   selector: 'app-transaction-view',
@@ -41,7 +42,8 @@ import { RouterLink } from '@angular/router';
   imports: [MatIcon, MatList, MatListItem, MatIconButton, TranslatePipe, CurrencyPipe, DecimalPipe,
     RouterLink, DatePipe, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
     MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow,
-    MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, BalanceComponent, MatListItemTitle],
+    MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, BalanceComponent, MatListItemTitle,
+    TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransactionViewComponent {
@@ -74,6 +76,7 @@ export class TransactionViewComponent {
   private transactionsSignal = computed(() => this.accountStore.data()?.transactions);
 
   paginatorPageIndex = this.tableState.pageIndex;
+  isLoading = this.accountStore.isLoading;
   dataSourceSignal = computed(() => this.transactionsSignal()?.content?.map((it: ITransaction) =>
     Object.assign({}, it, { date: newDateTimestamp(it.timestamp ?? it.payment?.timestamp) }),
   ));
@@ -82,9 +85,16 @@ export class TransactionViewComponent {
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
   hasAdminRole = computed(() => this.authUserSignal()?.hasAdminRole ?? false);
 
-  displayedColumns: string[] = [
-    'position', 'timestamp', 'amount', 'amountGifted', 'payment.status', 'payment.type', 'actions',
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'timestamp' },
+    { key: 'amount', hideOnMobile: true },
+    { key: 'amountGifted', hideOnMobile: true },
+    { key: 'payment.status', hideOnMobile: true },
+    { key: 'payment.type', hideOnMobile: true },
+    { key: 'actions', hideOnMobile: true },
   ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
   expandedTransaction?: ITransaction;
   dateFormat = this.translate.getCurrentLang();

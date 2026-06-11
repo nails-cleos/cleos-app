@@ -56,6 +56,7 @@ import { RoomStore } from '../store/room.store';
 import { RoomForm } from './room-form.types';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
+import { getOptions } from '../store/actions/payment.actions';
 
 export interface IIcon {
   monday: RoomIconName;
@@ -214,6 +215,8 @@ export class RoomComponent {
   private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
+    this.roomStore.loadInfo();
+    this.paymentStore.dispatch(getOptions());
     effect(() => {
       const paymentOptions = this.paymentOptions();
       if (!paymentOptions.length || this.room() || this.paymentTypes.length) {

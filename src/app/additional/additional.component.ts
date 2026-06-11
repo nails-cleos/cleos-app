@@ -29,6 +29,7 @@ import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/m
 import { AdditionalStore } from '../store/additional.store';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { ICommon } from '../interfaces/common';
+import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
 
 @Component({
   selector: 'app-additional',
@@ -37,7 +38,7 @@ import { ICommon } from '../interfaces/common';
   imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, TranslatePipe,
     RouterLink, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix,
     ReactiveFormsModule, TimepickerDirective, TimepickerComponent, MatHint, MatChipGrid, MatChipRow, MatChipInput,
-    MatChipRemove, BackButtonDirective],
+    MatChipRemove, BackButtonDirective, SkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdditionalComponent {

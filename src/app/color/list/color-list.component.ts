@@ -32,6 +32,7 @@ import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } f
 import { Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ColorStore } from '../../store/color.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 
 @Component({
   selector: 'app-color-list',
@@ -40,7 +41,7 @@ import { ColorStore } from '../../store/color.store';
   imports: [MatIcon, MatList, MatListItem, MatListSubheaderCssMatStyler, MatIconButton,
     TranslatePipe, RouterLink, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
     MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow,
-    MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator],
+    MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ColorListComponent {
@@ -71,11 +72,18 @@ export class ColorListComponent {
   );
 
   paginatorPageIndex = this.tableState.pageIndex;
+  isLoading = this.colorStore.isLoading;
   dataSourceSignal = computed(() => this.colorListSignal()?.content);
   resultsLengthSignal = computed(() => this.colorListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'name', 'description', 'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'name' },
+    { key: 'description', hideOnMobile: true },
+    { key: 'actions', hideOnMobile: true },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
   expandedColor?: IColor;
 

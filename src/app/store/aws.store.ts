@@ -23,7 +23,7 @@ export const AwsStore = signalStore(
 
     processPdf(token: string, file: File, userId?: string): void {
       patchState(store, {
-        data: {} as IAwsExtract,
+        data: undefined,
         error: undefined,
         isLoading: true,
       });

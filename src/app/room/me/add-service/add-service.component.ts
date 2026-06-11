@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -30,10 +30,13 @@ export class AddServiceComponent {
 
   private servicesSignal = this.roomStore.services;
   private responseSignal = this.roomStore.response;
+  private isLoadingSignal = this.roomStore.isLoading;
 
   additional = signal<IService[]>([]);
   selectedAdditional = signal<IService[]>([]);
   groups = signal<Map<string, IGroupService>>(new Map());
+  isLoading = computed(() => this.isLoadingSignal());
+  servicesLoaded = computed(() => !!this.servicesSignal()?.currency);
 
   constructor() {
     effect(() => {

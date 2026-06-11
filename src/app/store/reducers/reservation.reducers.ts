@@ -146,30 +146,30 @@ export const reservationReducer = createReducer(
   initialState,
   on(getCustomerReservations, (state) => ({
     ...state,
-    customerReservation: {
-      reservations: { content: [{}, {}, {}], totalElements: 3 },
-      upcoming: [{}],
-    } as ICustomerReservation,
+    customerReservation: undefined,
     error: undefined,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
+    isLoading: true,
   })),
   on(getAllFilterReservations, (state) => ({
     ...state,
-    filter: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IReservationAll>,
+    filter: undefined,
     error: undefined,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
+    isLoading: true,
   })),
   on(getPage, (state) => ({
     ...state,
-    page: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IReservationAll>,
+    page: undefined,
     error: undefined,
     subErrors: undefined,
     selected: undefined,
     response: undefined,
+    isLoading: true,
   })),
   on(getAllGroupingByRoom, (state) => ({
     ...state,
@@ -210,6 +210,7 @@ export const reservationReducer = createReducer(
     subErrors: undefined,
     selected: undefined,
     response: undefined,
+    isLoading: true,
   })),
   on(getCustomerInformation, (state) => ({
     ...state,
@@ -218,6 +219,7 @@ export const reservationReducer = createReducer(
     subErrors: undefined,
     selected: undefined,
     response: undefined,
+    isLoading: true,
   })),
   on(getAllRooms, (state) => ({
     ...state,
@@ -234,6 +236,7 @@ export const reservationReducer = createReducer(
     error: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: true,
   })),
   on(getAllTreatments, (state) => ({
     ...state,
@@ -241,6 +244,7 @@ export const reservationReducer = createReducer(
     error: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: true,
   })),
   on(updateReservationNote, (state) => ({
     ...state,
@@ -263,16 +267,17 @@ export const reservationReducer = createReducer(
   })),
   on(reservationFindPayments, (state) => ({
     ...state,
-    payments: [{}, {}, {}] as IPaymentAll[],
+    payments: undefined,
     page: undefined,
     filter: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: true,
   })),
   on(getReservationHistory, (state) => ({
     ...state,
-    history: [{}, {}, {}] as IUpcomingAll[],
+    history: undefined,
     page: undefined,
     filter: undefined,
     error: undefined,
@@ -312,6 +317,7 @@ export const reservationReducer = createReducer(
     subErrors: undefined,
     selected: undefined,
     response: undefined,
+    isLoading: true,
   })),
   on(reservationPageSuccess, (state, { page }) => ({
     ...state,
@@ -319,6 +325,7 @@ export const reservationReducer = createReducer(
     error: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: false,
   })),
   on(reservationFilterPageSuccess, (state, { filter }) => ({
     ...state,
@@ -326,6 +333,7 @@ export const reservationReducer = createReducer(
     error: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: false,
   })),
   on(reservationsCustomerSuccess, (state, { customerReservation }) => ({
     ...state,
@@ -333,6 +341,7 @@ export const reservationReducer = createReducer(
     error: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: false,
   })),
   on(reservationGroupingByRoomSuccess, (state, { groupedRooms }) => ({
     ...state,
@@ -356,6 +365,7 @@ export const reservationReducer = createReducer(
     error: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: false,
   })),
   on(customerSuccess, (state, { customer }) => ({
     ...state,
@@ -363,6 +373,7 @@ export const reservationReducer = createReducer(
     error: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: false,
   })),
   on(reservationRoomsSuccess, (state, { rooms }) => ({
     ...state,
@@ -378,6 +389,7 @@ export const reservationReducer = createReducer(
     error: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: false,
   })),
   on(reservationAdditionalSuccess, (state, { additional }) => ({
     ...state,
@@ -385,6 +397,7 @@ export const reservationReducer = createReducer(
     error: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: false,
   })),
   on(stateSuccess, reservationSaveSuccess, (state, action) => ({
     ...state,
@@ -430,6 +443,7 @@ export const reservationReducer = createReducer(
     subErrors: undefined,
     selected: undefined,
     response: undefined,
+    isLoading: true,
   })),
   on(trackingSuccess, (state, { tracking }) => ({
     ...state,
@@ -437,6 +451,7 @@ export const reservationReducer = createReducer(
     error: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: false,
   })),
   on(reservationPaymentsSuccess, (state, { payments }) => ({
     ...state,
@@ -444,6 +459,7 @@ export const reservationReducer = createReducer(
     error: undefined,
     subErrors: undefined,
     response: undefined,
+    isLoading: false,
   })),
   on(reservationHistorySuccess, (state, { history }) => ({
     ...state,
@@ -465,7 +481,7 @@ export const reservationReducer = createReducer(
     error: undefined,
     subErrors: undefined,
     response: undefined,
-    isLoading: false,
+    isLoading: true,
   })),
   on(reservationReviewSuccess, (state, { review }) => ({
     ...state,

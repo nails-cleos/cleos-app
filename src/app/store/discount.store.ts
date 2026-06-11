@@ -54,20 +54,21 @@ export const DiscountStore = signalStore(
 
       loadPage(request: PageRequest): void {
         patchState(store, {
-          data: {
-            kind: 'paginationDiscount',
-            value: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IDiscountAll>,
-          },
+          data: undefined,
           subErrors: undefined,
           selected: undefined,
           response: undefined,
+          error: undefined,
+          isLoading: true,
         });
 
         discountService.getDiscountsPage(request.page, request.sort, request.direction, request.size).subscribe({
           next: (value) => patchState(store, {
             data: { kind: 'paginationDiscount', value },
+            error: undefined,
             subErrors: undefined,
             response: undefined,
+            isLoading: false,
           }),
           error: patchError,
         });
@@ -75,20 +76,21 @@ export const DiscountStore = signalStore(
 
       loadMyPage(request: PageRequest): void {
         patchState(store, {
-          data: {
-            kind: 'pagination',
-            value: { content: [{}, {}, {}], totalElements: 3 } as Pagination<IUserDiscount>,
-          },
+          data: undefined,
           subErrors: undefined,
           selected: undefined,
           response: undefined,
+          error: undefined,
+          isLoading: true,
         });
 
         discountService.getMyDiscountsPage(request.page, request.sort, request.direction, request.size).subscribe({
           next: (value) => patchState(store, {
             data: { kind: 'pagination', value },
+            error: undefined,
             subErrors: undefined,
             response: undefined,
+            isLoading: false,
           }),
           error: patchError,
         });
@@ -134,10 +136,11 @@ export const DiscountStore = signalStore(
           subErrors: undefined,
           selected: undefined,
           response: undefined,
+          isLoading: true,
         });
 
         discountService.getDiscount(id).subscribe({
-          next: (selected) => patchState(store, { selected }),
+          next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },
