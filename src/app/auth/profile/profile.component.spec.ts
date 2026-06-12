@@ -1,38 +1,48 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ProfileComponent } from './profile.component';
-import { BehaviorSubject, of } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { of } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
 import { provideHttpClient } from '@angular/common/http';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { GeocodeService, MapStatus } from '../../services/geocode.service';
-import { UserState } from '../../store/reducers/user.reducers';
 import { GoogleMapComponent } from '../../shared/google-map/google-map.component';
 import { GoogleMapStubComponent } from '../../shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { signal } from '@angular/core';
+import { signal, WritableSignal } from '@angular/core';
 import { provideAppDateAdapter } from '../../util/adapter/app-date.provider';
+import { UserStore } from '../../store/user.store';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('ProfileComponent', () => {
   let component: ProfileComponent;
   let fixture: ComponentFixture<ProfileComponent>;
 
-  let selectedUser$: BehaviorSubject<any>;
-  let subErrors$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
+  let selectedUserSignal: WritableSignal<any>;
+  let subErrorsSignal: WritableSignal<any>;
+  let responseSignal: WritableSignal<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let storeSpy: jasmine.SpyObj<Store<UserState>>;
+  let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let geocodeServiceSpy: jasmine.SpyObj<GeocodeService>;
 
   beforeEach(async () => {
-    selectedUser$ = new BehaviorSubject(undefined);
-    subErrors$ = new BehaviorSubject(undefined);
-    response$ = new BehaviorSubject(undefined);
+    selectedUserSignal = signal(undefined);
+    subErrorsSignal = signal(undefined);
+    responseSignal = signal(undefined);
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', [
+      'clean',
+      'loadMyUser',
+      'updateMyUser',
+      'updateMyPhoto',
+    ]);
+    Object.assign(userStoreSpy, {
+      selected: selectedUserSignal.asReadonly(),
+      subErrors: subErrorsSignal.asReadonly(),
+      response: responseSignal.asReadonly(),
+    });
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),
     });
@@ -40,25 +50,16 @@ describe('ProfileComponent', () => {
       createMap: () => of(MapStatus.ready),
     });
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return selectedUser$.asObservable();
-        case 2:
-          return subErrors$.asObservable();
-        case 3:
-          return response$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
+    const navigationServiceSpy = jasmine.createSpyObj(
+      'NavigationService',
+      ['back', 'reload', 'reloadPage', 'attachLang'],
+    );
 
     await TestBed.configureTestingModule({
       imports: [ProfileComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: GeocodeService, useValue: geocodeServiceSpy },
         provideHttpClient(),
@@ -92,7 +93,7 @@ describe('ProfileComponent', () => {
       address: { name: 'Amsterdam' },
     };
 
-    selectedUser$.next(mockUser);
+    selectedUserSignal.set(mockUser);
     fixture.detectChanges();
 
     expect(component.getForm.displayName.value).toBe(mockUser.displayName);
@@ -103,7 +104,7 @@ describe('ProfileComponent', () => {
   it('imageSignal should update when user changes', () => {
     const mockUser = { image: 'AAA', imageUrl: 'image' };
 
-    selectedUser$.next(mockUser);
+    selectedUserSignal.set(mockUser);
     fixture.detectChanges();
 
     const image = component.imageSignal();
@@ -123,7 +124,7 @@ describe('ProfileComponent', () => {
   });
 
   it('update() should dispatch updateMyUser with correct payload', () => {
-    storeSpy.dispatch.calls.reset();
+    userStoreSpy.updateMyUser.calls.reset();
     const mockUser = {
       displayName: 'User',
       phone: '123',
@@ -131,7 +132,7 @@ describe('ProfileComponent', () => {
       locale: 'en',
     };
 
-    selectedUser$.next(mockUser);
+    selectedUserSignal.set(mockUser);
     fixture.detectChanges();
 
     // fill form
@@ -149,20 +150,18 @@ describe('ProfileComponent', () => {
     component.update();
 
     expect(component.form.valid).toBeTrue();
-    const dispatched = storeSpy.dispatch.calls.mostRecent().args[0];
-    expect(dispatched).toEqual({
-      user: jasmine.objectContaining({
+    expect(userStoreSpy.updateMyUser).toHaveBeenCalledWith(
+      jasmine.objectContaining({
         displayName: 'New user',
         phone: '+31 23 456 7890',
         locale: 'es',
       }),
-      redirectUrl: '/es/auth/profile',
-      type: '[User] Update me',
-    });
+      '/es/auth/profile',
+    );
   });
 
   it('should set form errors when backend returns subErrors', () => {
-    subErrors$.next([
+    subErrorsSignal.set([
       { field: 'displayName', message: 'Invalid name' },
       { field: 'phone', message: 'Bad phone' },
     ]);

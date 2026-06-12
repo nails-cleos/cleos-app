@@ -13,7 +13,9 @@ import { SortDirection } from '@angular/material/sort';
 import { map } from 'rxjs/operators';
 import { IApiResponse } from '../interfaces/common';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class UserService {
 
   private userUrl = 'users';

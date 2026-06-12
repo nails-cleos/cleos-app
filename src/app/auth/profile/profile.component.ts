@@ -8,10 +8,8 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { Store } from '@ngrx/store';
 import { User } from '../../user/user';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { cleanUser, getMyUser, updateMyPhoto, updateMyUser } from '../../store/actions/user.actions';
 import { validColorValidator, valueChange } from '../../util/validators';
 import { flags, IFlag } from '../../util/flags';
 import { getDisplayNameInitials, getLocale, getUserImage } from '../../util/helper';
@@ -24,9 +22,7 @@ import { BackButtonDirective } from '../../directives/back-button.directive';
 import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
 import { NgIcon } from '@ng-icons/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { getSelectedUserPipe, getSubErrorsPipe, getUserResponsePipe } from '../../store/selectors/user.selectors';
 import { IError } from '../../interfaces/common';
-import { UserState } from '../../store/reducers/user.reducers';
 import { ColorPickerComponent } from '../../shared/color-picker/color-picker.component';
 import { MatIcon } from '@angular/material/icon';
 import { NgClass, UpperCasePipe } from '@angular/common';
@@ -39,6 +35,7 @@ import PlaceGeometry = google.maps.places.PlaceGeometry;
 import PlaceResult = google.maps.places.PlaceResult;
 import { MatCheckbox } from '@angular/material/checkbox';
 import { ProfileForm } from '../../user/user-form.types';
+import { UserStore } from '../../store/user.store';
 
 @Component({
   selector: 'app-profile',
@@ -51,22 +48,15 @@ import { ProfileForm } from '../../user/user-form.types';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileComponent {
-  private readonly store: Store<UserState> = inject(Store<UserState>);
+  private readonly userStore = inject(UserStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly translate: TranslateService = inject(TranslateService);
-
-  private selectedUser$ = this.store.pipe(getSelectedUserPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getUserResponsePipe);
-
-  private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
   private langChangeSignal = toSignal<LangChangeEvent>(this.translate.onLangChange);
 
   canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
   resizedImage = viewChild<ElementRef<HTMLImageElement>>('resizedImage');
 
-  selectedUserSignal = toSignal(this.selectedUser$);
+  selectedUserSignal = this.userStore.selected;
 
   showCashSignal = signal(false);
   errors = signal<Record<string, unknown>>({});
@@ -134,13 +124,16 @@ export class ProfileComponent {
   private lastImageUrl?: string;
 
   constructor() {
+    this.userStore.clean();
+    this.userStore.loadMyUser();
+
     effect(() => {
       const lang = this.selectedLang();
       this.selectedFlag.set(this.flagList.find(l => l.value === lang)?.flag);
     });
 
     effect(() => {
-      const subErrors = this.subErrorsSignal();
+      const subErrors = this.userStore.subErrors();
       if (subErrors) {
         const errorMap: Record<string, unknown> = {};
         subErrors.forEach((error: IError) => {
@@ -156,9 +149,9 @@ export class ProfileComponent {
     });
 
     effect(() => {
-      if (this.responseSignal()) {
-        this.store.dispatch(cleanUser());
-        this.store.dispatch(getMyUser());
+      if (this.userStore.response()) {
+        this.userStore.clean();
+        this.userStore.loadMyUser();
       }
     });
 
@@ -231,7 +224,7 @@ export class ProfileComponent {
       this.geometry?.location,
     );
 
-    this.store.dispatch(updateMyUser({ user, redirectUrl: `/${getLocale(lang).language}/auth/profile` }));
+    this.userStore.updateMyUser(user, `/${getLocale(lang).language}/auth/profile`);
     return;
   }
 
@@ -249,7 +242,7 @@ export class ProfileComponent {
             if (resizedImage) {
               resizedImage.nativeElement.src = dataUrl;
             }
-            this.store.dispatch(updateMyPhoto({ file: dataUrl }));
+            this.userStore.updateMyPhoto(dataUrl);
           }
         };
         img.src = e.target.result;

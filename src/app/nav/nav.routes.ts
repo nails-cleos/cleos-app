@@ -3,7 +3,6 @@ import { NavComponent } from './nav.component';
 import { provideEffects } from '@ngrx/effects';
 import { LoginEffects } from '../store/effects/auth.effects';
 import { NotificationEffects } from '../store/effects/notification.effects';
-import { UserEffects } from '../store/effects/user.effects';
 import { ReservationEffects } from '../store/effects/reservation.effects';
 import { PaymentEffects } from '../store/effects/payment.effects';
 import { AuthService } from '../services/auth.service';
@@ -12,7 +11,6 @@ import { UserService } from '../services/user.service';
 import { provideState } from '@ngrx/store';
 import { AUTH_FEATURE_KEY, authReducer } from '../store/reducers/auth.reducers';
 import { NOTIFICATION_FEATURE_KEY, notificationReducer } from '../store/reducers/notification.reducers';
-import { USER_FEATURE_KEY, userReducer } from '../store/reducers/user.reducers';
 import { RESERVATION_FEATURE_KEY, reservationReducer } from '../store/reducers/reservation.reducers';
 import { PAYMENT_FEATURE_KEY, paymentReducer } from '../store/reducers/payment.reducers';
 import { RoomService } from '../services/room.service';
@@ -51,6 +49,7 @@ import { UnavailableStore } from '../store/unavailable.store';
 import { TreatmentStore } from '../store/treatment.store';
 import { RoomStore } from '../store/room.store';
 import { provideGlobalFeedbackSource } from '../store/global-feedback-source';
+import { UserStore } from '../store/user.store';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
 const providers = [
@@ -88,6 +87,7 @@ const providers = [
   UnavailableStore,
   TreatmentStore,
   RoomStore,
+  provideGlobalFeedbackSource(UserStore),
   provideGlobalFeedbackSource(CatalogueStore),
   provideGlobalFeedbackSource(ColorStore),
   provideGlobalFeedbackSource(CurrencyStore),
@@ -110,13 +110,11 @@ const providers = [
   InvoiceService,
   provideState(AUTH_FEATURE_KEY, authReducer),
   provideState(NOTIFICATION_FEATURE_KEY, notificationReducer),
-  provideState(USER_FEATURE_KEY, userReducer),
   provideState(RESERVATION_FEATURE_KEY, reservationReducer),
   provideState(PAYMENT_FEATURE_KEY, paymentReducer),
   provideEffects(
     LoginEffects,
     NotificationEffects,
-    UserEffects,
     ReservationEffects,
     PaymentEffects,
   ),

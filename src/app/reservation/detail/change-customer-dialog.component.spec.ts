@@ -1,20 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
-import { BehaviorSubject } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { ChangeCustomerDialogComponent } from './change-customer-dialog.component';
-import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { IUserAll } from '../../user/user';
-import { getAllCustomers } from '../../store/actions/user.actions';
+import { signal, WritableSignal } from '@angular/core';
+import { UserStore } from '../../store/user.store';
 
 describe('ChangeCustomerDialogComponent', () => {
   let component: ChangeCustomerDialogComponent;
   let fixture: ComponentFixture<ChangeCustomerDialogComponent>;
 
-  let customers$: BehaviorSubject<IUserAll[] | undefined>;
+  let customersSignal: WritableSignal<IUserAll[] | undefined>;
 
-  let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
+  let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
   let dialogRefSpy: jasmine.SpyObj<MatDialogRef<ChangeCustomerDialogComponent>>;
 
   const mockChangeCustomer = {
@@ -28,11 +26,13 @@ describe('ChangeCustomerDialogComponent', () => {
   ];
 
   beforeEach(async () => {
-    customers$ = new BehaviorSubject<IUserAll[] | undefined>(undefined);
+    customersSignal = signal<IUserAll[] | undefined>(undefined);
 
     dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    storeSpy.pipe.and.returnValue(customers$.asObservable());
+    userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', ['clean', 'loadCustomers']);
+    Object.assign(userStoreSpy, {
+      customers: customersSignal.asReadonly(),
+    });
 
     await TestBed.configureTestingModule({
       imports: [ChangeCustomerDialogComponent, TranslateModule.forRoot()],
@@ -42,7 +42,7 @@ describe('ChangeCustomerDialogComponent', () => {
           useFactory: () => (mockChangeCustomer),
         },
         { provide: MatDialogRef, useValue: dialogRefSpy },
-        { provide: Store, useValue: storeSpy },
+        { provide: UserStore, useValue: userStoreSpy },
       ],
     }).compileComponents();
 
@@ -50,20 +50,19 @@ describe('ChangeCustomerDialogComponent', () => {
     component = fixture.componentInstance;
   });
 
-  afterEach(() => customers$.complete());
-
   it('should create component', () => {
     fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 
-  it('should dispatch clean and getAllCustomers on init', () => {
+  it('should clean and load customers on init', () => {
     fixture.detectChanges();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllCustomers());
+    expect(userStoreSpy.clean).toHaveBeenCalled();
+    expect(userStoreSpy.loadCustomers).toHaveBeenCalled();
   });
 
   it('should update customersWritableSignal when store emits', () => {
-    customers$.next(mockCustomers);
+    customersSignal.set(mockCustomers);
     fixture.detectChanges();
 
     expect(component.customersSignal()).toEqual(mockCustomers);

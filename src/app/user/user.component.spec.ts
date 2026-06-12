@@ -1,31 +1,30 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BehaviorSubject, of } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { of } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
 import { GeocodeService, MapStatus } from '../services/geocode.service';
-import { UserState } from '../store/reducers/user.reducers';
 import { UserComponent } from './user.component';
 import { Role } from '../interfaces/token';
-import { getUser } from '../store/actions/user.actions';
 import { GoogleMapComponent } from '../shared/google-map/google-map.component';
 import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { signal } from '@angular/core';
+import { signal, WritableSignal } from '@angular/core';
 import { provideAppDateAdapter } from '../util/adapter/app-date.provider';
 import { ICommon } from '../interfaces/common';
+import { UserStore } from '../store/user.store';
+import { NavigationService } from '../services/navigation.service';
 
 describe('UserComponent', () => {
   let component: UserComponent;
   let fixture: ComponentFixture<UserComponent>;
 
-  let navigationParams$: BehaviorSubject<any>;
-  let subErrors$: BehaviorSubject<any>;
+  let navigationParamsSignal: WritableSignal<any>;
+  let subErrorsSignal: WritableSignal<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let storeSpy: jasmine.SpyObj<Store<UserState>>;
+  let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let geocodeServiceSpy: jasmine.SpyObj<GeocodeService>;
   const config: ICommon = {
@@ -34,10 +33,14 @@ describe('UserComponent', () => {
   };
 
   beforeEach(async () => {
-    navigationParams$ = new BehaviorSubject(undefined);
-    subErrors$ = new BehaviorSubject(undefined);
+    navigationParamsSignal = signal(undefined);
+    subErrorsSignal = signal(undefined);
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', ['loadOverview']);
+    Object.assign(userStoreSpy, {
+      userNavigationParams: navigationParamsSignal.asReadonly(),
+      subErrors: subErrorsSignal.asReadonly(),
+    });
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),
     });
@@ -45,23 +48,16 @@ describe('UserComponent', () => {
       createMap: () => of(MapStatus.ready),
     });
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return navigationParams$.asObservable();
-        case 2:
-          return subErrors$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
+    const navigationServiceSpy = jasmine.createSpyObj(
+      'NavigationService',
+      ['back', 'reload', 'reloadPage', 'attachLang'],
+    );
 
     await TestBed.configureTestingModule({
       imports: [UserComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: GeocodeService, useValue: geocodeServiceSpy },
         provideHttpClient(),
@@ -151,7 +147,7 @@ describe('UserComponent', () => {
   });
 
   it('should set form errors when backend returns subErrors', () => {
-    subErrors$.next([
+    subErrorsSignal.set([
       { field: 'displayName', message: 'Invalid name' },
       { field: 'phone', message: 'Bad phone' },
     ]);
@@ -167,16 +163,18 @@ describe('UserComponent', () => {
     }));
   });
 
-  it('should accept user input without dispatching store actions', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should accept user input without emitting submit data', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
     fixture.componentRef.setInput('user', { id: '123', displayName: 'User 123' } as any);
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(getUser({ id: '123' }));
+    expect(emitSpy).not.toHaveBeenCalled();
   });
 
-  it('should not dispatch when form invalid on submit', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should not emit when form invalid on submit', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
     // ensure form invalid
     (component.getForm.email).setValue('invalid-email');
@@ -184,7 +182,7 @@ describe('UserComponent', () => {
 
     component.submit();
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(emitSpy).not.toHaveBeenCalled();
   });
 
   it('should emit createUser payload when in add mode and form valid', () => {

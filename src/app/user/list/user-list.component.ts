@@ -1,16 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { IUser, IUserAll, User } from '../user';
-import { Store } from '@ngrx/store';
-import {
-  cleanUser,
-  deleteUser,
-  getUsersPage,
-  mergeUsers,
-  resendToken,
-  restore,
-  setRole,
-  userSelected,
-} from '../../store/actions/user.actions';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
@@ -23,10 +12,7 @@ import { executeDialogNoWidth, snakeToCamel } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { RoleIconKey, RoleIconName } from '../../util/icon';
 import { Router, RouterLink } from '@angular/router';
-import { getUserPaginationPipe, getUserResponsePipe } from '../../store/selectors/user.selectors';
-import { selectUserIsLoading } from '../../store/selectors/user.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { UserState } from '../../store/reducers/user.reducers';
 import { SelectUserDialogComponent } from './select-user-dialog.component';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
@@ -58,6 +44,7 @@ import {
 import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { LowerCasePipe, NgClass } from '@angular/common';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { UserStore } from '../../store/user.store';
 
 type UsersForm = {
   filter: FormControl<string | undefined>;
@@ -76,23 +63,18 @@ type UsersForm = {
 })
 export class UserListComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<UserState> = inject(Store<UserState>);
+  private readonly userStore = inject(UserStore);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly router: Router = inject(Router);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private userList$ = this.store.pipe(getUserPaginationPipe);
-  private response$ = this.store.pipe(getUserResponsePipe);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
   private tableState = createMatTableState(this.paginator, this.sort, 'displayName', 'asc');
 
-  private userListSignal = toSignal(this.userList$);
-  private responseSignal = toSignal(this.response$);
-  private loadingSignal = toSignal(this.store.select(selectUserIsLoading), { initialValue: false });
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -106,8 +88,8 @@ export class UserListComponent {
   );
 
   paginatorPageIndex = this.tableState.pageIndex;
-  isLoading = computed(() => this.loadingSignal());
-  dataSourceSignal = computed(() => this.userListSignal()?.content?.map((user: IUserAll) => {
+  isLoading = computed(() => this.userStore.isLoading());
+  dataSourceSignal = computed(() => this.userStore.pagination()?.content?.map((user: IUserAll) => {
     if (user.authorities) {
       const missing = this.allRole.filter(au => !user.authorities.some(u => u.authority === au));
       return Object.assign({}, user, { missing });
@@ -115,7 +97,7 @@ export class UserListComponent {
     return user;
   }));
 
-  resultsLengthSignal = computed(() => this.userListSignal()?.totalElements || 0);
+  resultsLengthSignal = computed(() => this.userStore.pagination()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
   smallScreen = computed(() => this.breakpointsSignal()?.matches ?? false);
 
@@ -141,25 +123,24 @@ export class UserListComponent {
   private allRole: Role[] = [Role.customer, Role.professional, Role.manager, Role.admin];
 
   constructor() {
+    this.userStore.clean();
     effect(() => {
       const request = this.tableState.baseRequest();
       const filter = this.selectedFilter()?.trim()?.toLowerCase();
-      this.store.dispatch(
-        getUsersPage({
-          ...request,
-          size: this.pageSizeSignal(),
-          filter,
-        }),
-      );
+      this.userStore.loadPage({
+        ...request,
+        size: this.pageSizeSignal(),
+        filter,
+      });
     });
-    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanUser()));
+    this.tableState.resetOn(this.userStore.response, () => this.userStore.clean());
   }
 
   get getForm(): UsersForm {
     return this.form.controls;
   }
 
-  edit = (selected: IUserAll): void => this.store.dispatch(userSelected({ selected }));
+  edit = (selected: IUserAll): void => this.userStore.selectAndNavigate(selected);
 
   delete = (user: IUserAll): void => {
     this.noExpanded(user);
@@ -171,7 +152,7 @@ export class UserListComponent {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.store.dispatch(deleteUser({ id: result.id, displayName: result.displayName }));
+        this.userStore.delete(result.id, result.displayName);
       }
     });
   };
@@ -186,9 +167,7 @@ export class UserListComponent {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.store.dispatch(
-          resendToken({ id: result.id }),
-        );
+        this.userStore.resendToken(result.id);
       }
     });
   };
@@ -206,9 +185,7 @@ export class UserListComponent {
         const restoreUser: IUser = new User();
         restoreUser.id = result.id;
         restoreUser.deleted = false;
-        this.store.dispatch(
-          restore({ id: restoreUser.id!, user: restoreUser }),
-        );
+        this.userStore.restore(restoreUser.id!, restoreUser);
       }
     });
   };
@@ -222,9 +199,7 @@ export class UserListComponent {
 
     executeDialogNoWidth(this.dialog, SelectUserDialogComponent, data, result => {
       if (result) {
-        this.store.dispatch(
-          mergeUsers({ oldUserId: result.id, newUserId: user.id }),
-        );
+        this.userStore.mergeUsers(result.id, user.id);
       }
     }, true);
   };
@@ -234,13 +209,11 @@ export class UserListComponent {
     return RoleIconName[iconName];
   };
 
-  addRole = (user: IUserAll, role: Role): void => this.store.dispatch(
-    setRole({ id: user.id, displayName: user.displayName, role, action: 'ADD' }),
-  );
+  addRole = (user: IUserAll, role: Role): void =>
+    this.userStore.setRole(user.id, user.displayName, role, 'ADD');
 
-  removeRole = (user: IUserAll, role: Role): void => this.store.dispatch(
-    setRole({ id: user.id, displayName: user.displayName, role, action: 'REMOVE' }),
-  );
+  removeRole = (user: IUserAll, role: Role): void =>
+    this.userStore.setRole(user.id, user.displayName, role, 'REMOVE');
 
   book = (customer: IUser): void => {
     const data = { customerId: customer.id };

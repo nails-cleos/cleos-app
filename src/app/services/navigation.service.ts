@@ -3,12 +3,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { getLocale } from '../util/helper';
 import { IUser, User } from '../user/user';
-import { updateMyUser } from '../store/actions/user.actions';
 import { Store } from '@ngrx/store';
 import { setLanguage } from '../store/actions/i18n.actions';
 import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { I18NState } from '../store/reducers/i18n.reducers';
+import { UserStore } from '../store/user.store';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +20,7 @@ export class NavigationService {
   private store: Store<I18NState> = inject(Store<I18NState>);
   private router: Router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly userStore = inject(UserStore);
 
   private readonly languageSignal = toSignal(this.store.pipe(getI18NLanguagePipe));
 
@@ -164,7 +165,7 @@ export class NavigationService {
       const user: IUser = new User();
       user.locale = language;
 
-      this.store.dispatch(updateMyUser({ user, redirectUrl: this.router.url }));
+      this.userStore.updateMyUser(user, this.router.url);
     }
 
     return language;

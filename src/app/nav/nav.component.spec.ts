@@ -10,7 +10,6 @@ import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-us
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { logOut, redirect } from '../store/actions/auth.actions';
 import { CookieService } from 'ngx-cookie-service';
-import { updateMyUser } from '../store/actions/user.actions';
 import { IUser, IUserAll, User } from '../user/user';
 import { NavigationService } from '../services/navigation.service';
 import { INotification } from '../notification/notification';
@@ -20,6 +19,7 @@ import { signal } from '@angular/core';
 import { getNowTimeZone } from '../util/dates';
 import { IResponseSuccess } from '../interfaces/common';
 import { ToastService } from '../services/toast.service';
+import { UserStore } from '../store/user.store';
 
 describe('NavComponent', () => {
   let component: NavComponent;
@@ -46,6 +46,7 @@ describe('NavComponent', () => {
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let messagingServiceSpy: jasmine.SpyObj<MessagingService>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
+  let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
 
   const authUserSignal = signal<IAuthUser>(
     {
@@ -96,6 +97,7 @@ describe('NavComponent', () => {
     cookieServiceSpy = jasmine.createSpyObj('CookieService', ['get', 'set']);
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['attachLang']);
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'select', 'dispatch']);
+    userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', ['updateMyUser']);
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['cookieConsent', 'reloadUser', 'updateMode'], {
       authUser: authUserSignal.asReadonly(),
@@ -162,6 +164,7 @@ describe('NavComponent', () => {
         { provide: CookieService, useValue: cookieServiceSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
+        { provide: UserStore, useValue: userStoreSpy },
       ],
     }).compileComponents();
 
@@ -204,7 +207,7 @@ describe('NavComponent', () => {
 
     expect(component.isDarkMode()).toBeTrue();
     expect(component['cssClass']).toBe('dark-theme');
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(updateMyUser({ user, message, redirectUrl: '/en-GB' }));
+    expect(userStoreSpy.updateMyUser).toHaveBeenCalledWith(user, '/en-GB', message);
   });
 
   it('should go to home when goHome is called', () => {

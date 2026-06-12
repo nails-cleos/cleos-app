@@ -1,14 +1,10 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
 import { UserComponent } from './user.component';
 import { Role } from '../interfaces/token';
-import { getUser, saveUser } from '../store/actions/user.actions';
-import { Store } from '@ngrx/store';
-import { UserState } from '../store/reducers/user.reducers';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { getSelectedUserPipe } from '../store/selectors/user.selectors';
 import { IUser } from './user';
 import { ICommon } from '../interfaces/common';
 import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
+import { UserStore } from '../store/user.store';
 
 @Component({
   selector: 'app-user-details-page',
@@ -29,19 +25,17 @@ export class UserDetailsPageComponent {
     button: { icon: 'published_with_changes', label: 'COMMON.BUTTON.UPDATE' },
   };
 
-  private readonly store: Store<UserState> = inject(Store<UserState>);
-  private selectedUser$ = this.store.pipe(getSelectedUserPipe);
-
-  user = toSignal(this.selectedUser$);
+  private readonly userStore = inject(UserStore);
+  user = this.userStore.selected;
 
   constructor() {
     effect(() => {
-      const id = this.id();
-      this.store.dispatch(getUser({ id }));
+      this.userStore.clean();
+      this.userStore.loadById(this.id());
     });
   }
 
   submit(data: { user: IUser; role?: Role }) {
-    this.store.dispatch(saveUser({ id: this.id(), user: data.user }));
+    this.userStore.save(data.user, this.id());
   }
 }

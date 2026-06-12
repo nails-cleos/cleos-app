@@ -10,18 +10,15 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
 import { map, startWith } from 'rxjs/operators';
-import { cleanUser, getAllCustomers } from '../../store/actions/user.actions';
 import { TranslatePipe } from '@ngx-translate/core';
-import { UserState } from '../../store/reducers/user.reducers';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { getAllCustomersPipe } from '../../store/selectors/user.selectors';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { UserStore } from '../../store/user.store';
 
 type ChangeCustomerForm = {
   customer: FormControl<IUserAll | undefined>,
@@ -40,13 +37,11 @@ type ChangeCustomerDialogData = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChangeCustomerDialogComponent {
-  private readonly store: Store<UserState> = inject(Store<UserState>);
+  private readonly userStore = inject(UserStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly dialogRef: MatDialogRef<ChangeCustomerDialogComponent> = inject(
     MatDialogRef<ChangeCustomerDialogComponent>);
   readonly data = inject<ChangeCustomerDialogData>(MAT_DIALOG_DATA);
-
-  private customers$ = this.store.pipe(getAllCustomersPipe);
 
   form: FormGroup<ChangeCustomerForm> = this.formBuilder.group<ChangeCustomerForm>({
     customer: this.formBuilder.control<IUserAll | undefined>(undefined, {
@@ -54,17 +49,20 @@ export class ChangeCustomerDialogComponent {
     }),
   });
 
-  customersSignal = toSignal(this.customers$);
+  customersSignal = this.userStore.customers;
   filteredCustomerSignal = toSignal(
     this.getForm.customer.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value?.displayName),
-      combineLatestWith(this.customers$),
+      combineLatestWith(toObservable(this.customersSignal)),
       map(([name, customerList]) => {
+        if (!customerList) {
+          return [];
+        }
         if (name) {
           return this.filterCustomer(name, customerList);
         } else {
-          return customerList ? customerList.slice() : customerList;
+          return customerList.slice();
         }
       }),
     ),
@@ -75,8 +73,8 @@ export class ChangeCustomerDialogComponent {
   constructor() {
     effect(() => {
       this.customerId();
-      this.store.dispatch(cleanUser());
-      this.store.dispatch(getAllCustomers());
+      this.userStore.clean();
+      this.userStore.loadCustomers();
     });
 
     effect(() => {

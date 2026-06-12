@@ -2,35 +2,34 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { OverviewComponent } from './overview.component';
 import { BehaviorSubject } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { getCustomerOverview } from '../../store/actions/user.actions';
 import { IOverview } from '../user';
 import { IReservationOverview } from '../../reservation/reservation';
 import { IChart } from '../../dashboard/dashboard';
-import { signal } from '@angular/core';
-import { UserState } from '../../store/reducers/user.reducers';
+import { signal, WritableSignal } from '@angular/core';
+import { UserStore } from '../../store/user.store';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('OverviewComponent', () => {
   let component: OverviewComponent;
   let fixture: ComponentFixture<OverviewComponent>;
 
-  let overview$: BehaviorSubject<any>;
-  let error$: BehaviorSubject<any>;
-  let isLoading$: BehaviorSubject<any>;
+  let overviewSignal: WritableSignal<IOverview | undefined>;
+  let errorSignal: WritableSignal<any>;
+  let isLoadingSignal: WritableSignal<boolean>;
   let breakpoint$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let storeSpy: jasmine.SpyObj<Store<UserState>>;
+  let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
   beforeEach(async () => {
-    overview$ = new BehaviorSubject(undefined);
-    error$ = new BehaviorSubject(undefined);
-    isLoading$ = new BehaviorSubject(false);
+    overviewSignal = signal<IOverview | undefined>(undefined);
+    errorSignal = signal(undefined);
+    isLoadingSignal = signal(false);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -39,43 +38,29 @@ describe('OverviewComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj<Store<UserState>>('Store', ['pipe', 'select', 'dispatch']);
+    userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', ['loadOverview']);
+    Object.assign(userStoreSpy, {
+      overview: overviewSignal.asReadonly(),
+      error: errorSignal.asReadonly(),
+      isLoading: isLoadingSignal.asReadonly(),
+      clean: jasmine.createSpy('clean'),
+    });
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['authUser'], {
       authUser: authUserSignal.asReadonly(),
     });
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return overview$.asObservable();
-        case 2:
-          return error$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-    let selectCallIndex = 0;
-    storeSpy.select.and.callFake(() => {
-      selectCallIndex++;
-      switch (selectCallIndex) {
-        case 1:
-          return overview$.asObservable();
-        case 2:
-          return isLoading$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
+    const navigationServiceSpy = jasmine.createSpyObj(
+      'NavigationService',
+      ['back', 'reload', 'reloadPage', 'attachLang'],
+    );
 
     await TestBed.configureTestingModule({
       imports: [OverviewComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
       ],
@@ -135,12 +120,12 @@ describe('OverviewComponent', () => {
     expect(component['hasAdminRole']()).toBe(true);
   });
 
-  it('should dispatch getCustomerOverview when userId emits a value', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should load overview when userId emits a value', () => {
+    userStoreSpy.loadOverview.calls.reset();
     fixture.componentRef.setInput('id', '123');
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getCustomerOverview({ id: '123' }));
+    expect(userStoreSpy.loadOverview).toHaveBeenCalledWith('123');
   });
 
   it('should fill the overview data when overview$ emits a value', () => {
@@ -178,7 +163,7 @@ describe('OverviewComponent', () => {
       upcomingList: [1, 2, 3],
     };
 
-    overview$.next(mockOverview);
+    overviewSignal.set(mockOverview);
     fixture.detectChanges();
 
     expect(component.image).toBe('http://example.com/image.jpg');

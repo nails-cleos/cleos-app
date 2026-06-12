@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
 import { IUser, IUserAll, User } from './user';
 import { flags, IFlag } from '../util/flags';
 import { randomColor } from '../util/color';
@@ -13,8 +12,6 @@ import { BackButtonDirective } from '../directives/back-button.directive';
 import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
 import { NgIcon } from '@ng-icons/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { UserState } from '../store/reducers/user.reducers';
-import { getNavigationParamsPipe, getSubErrorsPipe } from '../store/selectors/user.selectors';
 import { ICommon, IError } from '../interfaces/common';
 import { ColorPickerComponent } from '../shared/color-picker/color-picker.component';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
@@ -24,6 +21,7 @@ import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { UserForm } from './user-form.types';
+import { UserStore } from '../store/user.store';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 
@@ -42,15 +40,9 @@ export class UserComponent {
 
   submitData = output<{ user: IUser; role?: Role }>();
 
-  private readonly store: Store<UserState> = inject(Store<UserState>);
+  private readonly userStore = inject(UserStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly translate: TranslateService = inject(TranslateService);
-
-  private navigationParams$ = this.store.pipe(getNavigationParamsPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-
-  private navigationParams = toSignal(this.navigationParams$);
-  private subErrorsSignal = toSignal(this.subErrors$);
   private langChangeSignal = toSignal<LangChangeEvent>(this.translate.onLangChange);
 
   googleMapForm: FormGroup<GoogleMapForm> = this.formBuilder.group<GoogleMapForm>({
@@ -100,7 +92,7 @@ export class UserComponent {
 
   constructor() {
     effect(() => {
-      const params = this.navigationParams();
+      const params = this.userStore.userNavigationParams();
       this.getForm.role.setValue(params?.role);
     });
 
@@ -123,7 +115,7 @@ export class UserComponent {
     });
 
     effect(() => {
-      const subErrors = this.subErrorsSignal();
+      const subErrors = this.userStore.subErrors();
       if (subErrors) {
         const errorMap: Record<string, unknown> = {};
         subErrors.forEach((error: IError) => {

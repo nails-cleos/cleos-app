@@ -6,13 +6,14 @@ import { BehaviorSubject, Subject } from 'rxjs';
 
 import { NavigationService } from './navigation.service';
 import { IUser, User } from '../user/user';
-import { updateMyUser } from '../store/actions/user.actions';
 import { setLanguage } from '../store/actions/i18n.actions';
 import { I18NState } from '../store/reducers/i18n.reducers';
+import { UserStore } from '../store/user.store';
 
 describe('NavigationService', () => {
   let service: NavigationService;
   let storeSpy: jasmine.SpyObj<Store<I18NState>>;
+  let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
   let routerSpy: jasmine.SpyObj<Router>;
   let routerEventsSubject: Subject<any>;
 
@@ -31,6 +32,7 @@ describe('NavigationService', () => {
     routerEventsSubject = new Subject();
 
     storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
+    userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', ['updateMyUser']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl'], {
       events: routerEventsSubject.asObservable(),
       url: '/test/path',
@@ -46,6 +48,7 @@ describe('NavigationService', () => {
       providers: [
         NavigationService,
         { provide: Store, useValue: storeSpy },
+        { provide: UserStore, useValue: userStoreSpy },
         { provide: Router, useValue: routerSpy },
       ],
     });
@@ -313,9 +316,7 @@ describe('NavigationService', () => {
       updatedUser.locale = 'es';
 
       expect(storeSpy.dispatch).toHaveBeenCalledWith(setLanguage({ language: 'es' }));
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        updateMyUser({ user: updatedUser, redirectUrl: '/test/path' }),
-      );
+      expect(userStoreSpy.updateMyUser).toHaveBeenCalledWith(updatedUser, '/test/path');
     });
 
     it('should not update user when user locale matches new language', () => {
@@ -348,16 +349,13 @@ describe('NavigationService', () => {
       updatedUser.locale = 'es';
 
       expect(storeSpy.dispatch).toHaveBeenCalledWith(setLanguage({ language: 'es' }));
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        updateMyUser({ user: updatedUser, redirectUrl: '/test/path' }),
-      );
+      expect(userStoreSpy.updateMyUser).toHaveBeenCalledWith(updatedUser, '/test/path');
     });
 
     it('should create User object with correct language', () => {
       let capturedUser: IUser;
-      storeSpy.dispatch.and.callFake((action: any) => {
-        capturedUser = action.user;
-        return undefined as any;
+      userStoreSpy.updateMyUser.and.callFake((user: IUser) => {
+        capturedUser = user;
       });
 
       service.attachLang('es', mockUser);

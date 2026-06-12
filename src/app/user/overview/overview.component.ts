@@ -1,8 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Store } from '@ngrx/store';
 import { getDisplayNameInitials, getUserImage } from '../../util/helper';
-import { getCustomerOverview } from '../../store/actions/user.actions';
 import { Router } from '@angular/router';
 import { IReservationOverview } from '../../reservation/reservation';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -17,14 +15,13 @@ import { ChartComponent } from '../../shared/chart/chart.component';
 import { GoogleMapComponent } from '../../shared/google-map/google-map.component';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { UserState } from '../../store/reducers/user.reducers';
-import { getUserErrorPipe, selectOverviewData, selectUserIsLoading } from '../../store/selectors/user.selectors';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatMiniFabButton } from '@angular/material/button';
 import { CurrencyPipe } from '@angular/common';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
 import { MatGridList, MatGridTile } from '@angular/material/grid-list';
+import { UserStore } from '../../store/user.store';
 
 @Component({
   selector: 'app-overview',
@@ -39,16 +36,12 @@ export class OverviewComponent {
   id = input<string>();
 
   private breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private store: Store<UserState> = inject(Store<UserState>);
+  private userStore = inject(UserStore);
   private translate: TranslateService = inject(TranslateService);
   private router: Router = inject(Router);
   private authUserService: AuthUserService = inject(AuthUserService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private overview$ = this.store.select(selectOverviewData);
-  private error$ = this.store.pipe(getUserErrorPipe);
-  private isLoading$ = this.store.select(selectUserIsLoading);
-
   private authUserSignal = this.authUserService.authUser;
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
@@ -65,9 +58,9 @@ export class OverviewComponent {
   private hasAdminRole = computed(() => this.authUserSignal()?.hasAdminRole ?? false);
   private userId = computed(() => this.id() ?? 'me');
 
-  overviewSignal = toSignal(this.overview$);
-  errorSignal = toSignal(this.error$);
-  isLoadingSignal = toSignal(this.isLoading$, { initialValue: false });
+  overviewSignal = this.userStore.overview;
+  errorSignal = this.userStore.error;
+  isLoadingSignal = this.userStore.isLoading;
 
   image: any;
   initials?: string;
@@ -103,10 +96,11 @@ export class OverviewComponent {
   chartColumns = computed(() => this.breakpointsSignal().matches ? 1 : 2);
 
   constructor() {
+    this.userStore.clean();
     effect(() => {
       const id = this.userId();
       if (id) {
-        this.store.dispatch(getCustomerOverview({ id }));
+        this.userStore.loadOverview(id);
       }
     });
 

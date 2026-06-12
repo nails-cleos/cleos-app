@@ -6,19 +6,12 @@ import { OverviewComponent } from './overview/overview.component';
 import { UserListComponent } from './list/user-list.component';
 import { UserCreatePageComponent } from './user-create-page.component';
 import { UserDetailsPageComponent } from './user-details-page.component';
-import { provideEffects } from '@ngrx/effects';
-import { provideState } from '@ngrx/store';
 import { UserService } from '../services/user.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
-import { UserEffects } from '../store/effects/user.effects';
-import { USER_FEATURE_KEY, userReducer } from '../store/reducers/user.reducers';
-import { UserNavigationEffects } from './user-navigation.effects';
 
 const providers = [
   provideFeatureTranslations('user'),
   UserService,
-  provideState(USER_FEATURE_KEY, userReducer),
-  provideEffects(UserEffects, UserNavigationEffects),
 ];
 
 const children: Routes = [

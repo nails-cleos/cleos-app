@@ -15,7 +15,6 @@ import {
   getUpcomingReservation,
   setMeReservationParams,
 } from '../store/actions/reservation.actions';
-import { cleanUser } from '../store/actions/user.actions';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { MeReservationCreatePageComponent } from './reservation/me/me-reservation-create-page.component';
 import { MeReservationDetailsPageComponent } from './reservation/me/me-reservation-details-page.component';
@@ -187,14 +186,14 @@ describe('MeNavigationEffects', () => {
     expect(result).toEqual([cleanReservation()]);
   });
 
-  it('should clean the user overview state on the overview page', async () => {
+  it('should not dispatch store actions on the overview page', async () => {
     actions$.next(routerNavigated(OverviewComponent));
 
     const result = await firstValueFrom(
-      effects.loadOverviewPage$.pipe(take(1), toArray()),
+      effects.loadOverviewPage$.pipe(take(0), toArray()),
     );
 
-    expect(result).toEqual([cleanUser()]);
+    expect(result).toEqual([]);
   });
 
   it('should clean discounts on the discounts page', async () => {

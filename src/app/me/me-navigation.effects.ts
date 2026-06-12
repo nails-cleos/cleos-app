@@ -16,7 +16,6 @@ import {
   setPaymentResultParams,
 } from '../store/actions/payment.actions';
 import { getRouteParams } from '../util/router-state.utils';
-import { cleanUser } from '../store/actions/user.actions';
 import { navigation } from '../util/router-navigation.operator';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { MeReservationCreatePageComponent } from './reservation/me/me-reservation-create-page.component';
@@ -153,7 +152,7 @@ export class MeNavigationEffects {
     this.actions$.pipe(
       ofType(ROUTER_NAVIGATED),
       navigation(OverviewComponent, {
-        run: () => [cleanUser()],
+        run: () => [],
       }),
     ));
 

@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { UserComponent } from './user.component';
 import { ICommon } from '../interfaces/common';
 import { IUser } from './user';
 import { Role } from '../interfaces/token';
-import { saveUser } from '../store/actions/user.actions';
-import { Store } from '@ngrx/store';
-import { UserState } from '../store/reducers/user.reducers';
+import { UserStore } from '../store/user.store';
 
 @Component({
   selector: 'app-user-create-page',
@@ -19,9 +18,16 @@ export class UserCreatePageComponent {
     button: { icon: 'person_add', label: 'COMMON.BUTTON.CREATE' },
   };
 
-  private readonly store: Store<UserState> = inject(Store<UserState>);
+  private readonly userStore = inject(UserStore);
+  private readonly router = inject(Router);
+
+  constructor() {
+    this.userStore.clean();
+    const role = this.router.currentNavigation()?.extras.state?.['role'];
+    this.userStore.setNavigationParams({ role });
+  }
 
   submit(data: { user: IUser; role?: Role }) {
-    this.store.dispatch(saveUser(data));
+    this.userStore.save(data.user, undefined, data.role);
   }
 }

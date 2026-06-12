@@ -1,0 +1,396 @@
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
+import { Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
+import { type Subscription } from 'rxjs';
+import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
+import { Pagination } from '../interfaces/pagination';
+import { ToastType } from '../shared/toast/toast.model';
+import { Role, Token } from '../interfaces/token';
+import { IOverview, IUser, IUserAll } from '../user/user';
+import { UserService } from '../services/user.service';
+import { loginSuccess } from './actions/auth.actions';
+import { mapCrudHttpError } from './crud-signal-store';
+import { getLocale } from '../util/helper';
+
+type UserNavigationParams = {
+  role?: Role;
+};
+
+type UserStoreState = {
+  response: IResponseSuccess | undefined;
+  pagination: Pagination<IUserAll> | undefined;
+  customers: IUserAll[] | undefined;
+  users: IUserAll[] | undefined;
+  overview: IOverview | undefined;
+  error: IError | undefined;
+  subErrors: IError[] | undefined;
+  selected: IUserAll | undefined;
+  userNavigationParams: UserNavigationParams | undefined;
+  isLoading: boolean;
+};
+
+const initialState: UserStoreState = {
+  response: undefined,
+  pagination: undefined,
+  customers: undefined,
+  users: undefined,
+  overview: undefined,
+  error: undefined,
+  subErrors: undefined,
+  selected: undefined,
+  userNavigationParams: undefined,
+  isLoading: false,
+};
+
+export const UserStore = signalStore(
+  { providedIn: 'root' },
+  withState(initialState),
+  withMethods((store, userService = inject(UserService), translate = inject(TranslateService), router = inject(Router),
+    ngrxStore = inject(Store)) => {
+    let loadPageSubscription: Subscription | undefined;
+    let loadCustomersSubscription: Subscription | undefined;
+    let loadDisabledUsersSubscription: Subscription | undefined;
+    let loadByIdSubscription: Subscription | undefined;
+    let loadOverviewSubscription: Subscription | undefined;
+    let saveSubscription: Subscription | undefined;
+    let setRoleSubscription: Subscription | undefined;
+    let updateMyUserSubscription: Subscription | undefined;
+    let updateMyPhotoSubscription: Subscription | undefined;
+    let deleteSubscription: Subscription | undefined;
+    let restoreSubscription: Subscription | undefined;
+    let resendTokenSubscription: Subscription | undefined;
+    let mergeUsersSubscription: Subscription | undefined;
+
+    const cancelAll = (): void => {
+      loadPageSubscription?.unsubscribe();
+      loadCustomersSubscription?.unsubscribe();
+      loadDisabledUsersSubscription?.unsubscribe();
+      loadByIdSubscription?.unsubscribe();
+      loadOverviewSubscription?.unsubscribe();
+      saveSubscription?.unsubscribe();
+      setRoleSubscription?.unsubscribe();
+      updateMyUserSubscription?.unsubscribe();
+      updateMyPhotoSubscription?.unsubscribe();
+      deleteSubscription?.unsubscribe();
+      restoreSubscription?.unsubscribe();
+      resendTokenSubscription?.unsubscribe();
+      mergeUsersSubscription?.unsubscribe();
+    };
+
+    const patchError = (err: unknown): void => {
+      const error = mapCrudHttpError(err as any);
+      patchState(store, {
+        error,
+        subErrors: error.subErrors,
+        response: undefined,
+        isLoading: false,
+      });
+    };
+
+    const patchMutationStart = (): void => {
+      patchState(store, {
+        subErrors: undefined,
+        response: undefined,
+        error: undefined,
+        isLoading: true,
+      });
+    };
+
+    const requestSuccess = (
+      key: string,
+      displayName?: string,
+      path?: string,
+      role?: Role | string,
+      toastType: ToastType = 'success',
+      reload: boolean = false,
+      redirect?: string,
+    ): IResponseSuccess => ({
+      message: translate.instant(key, { role, displayName }),
+      path,
+      reload,
+      toastType,
+      redirect,
+    });
+
+    const dispatchLoginSuccess = (token: Token, returnUrl?: string, lang?: string): void => {
+      const state = lang === undefined ? { returnUrl } : { returnUrl, lang };
+
+      ngrxStore.dispatch(loginSuccess({
+        token,
+        queryParams: { state: btoa(JSON.stringify(state)) },
+      }));
+    };
+
+    return {
+      clean(): void {
+        cancelAll();
+        patchState(store, initialState);
+      },
+
+      clearResponse(): void {
+        patchState(store, { response: undefined });
+      },
+
+      clearError(): void {
+        patchState(store, { error: undefined, subErrors: undefined });
+      },
+
+      setNavigationParams(params: UserNavigationParams | undefined): void {
+        patchState(store, { userNavigationParams: params });
+      },
+
+      selectAndNavigate(selected: IUserAll): void {
+        patchState(store, {
+          selected,
+          subErrors: undefined,
+          response: undefined,
+        });
+        router.navigate([translate.getCurrentLang(), 'users', selected.id]);
+      },
+
+      loadPage(request: PageRequest & { filter?: string }): void {
+        loadPageSubscription?.unsubscribe();
+        patchState(store, {
+          pagination: undefined,
+          overview: undefined,
+          subErrors: undefined,
+          selected: undefined,
+          response: undefined,
+          error: undefined,
+          isLoading: true,
+        });
+
+        loadPageSubscription = userService
+          .getUsersPage(request.page, request.sort, request.direction, request.size, request.filter)
+          .subscribe({
+            next: (pagination) => patchState(store, {
+              pagination,
+              isLoading: false,
+            }),
+            error: patchError,
+          });
+      },
+
+      loadCustomers(): void {
+        loadCustomersSubscription?.unsubscribe();
+        patchState(store, {
+          customers: undefined,
+          subErrors: undefined,
+          selected: undefined,
+          response: undefined,
+          error: undefined,
+          isLoading: true,
+        });
+
+        loadCustomersSubscription = userService.getCustomers().subscribe({
+          next: (customers) => patchState(store, {
+            customers,
+            isLoading: false,
+          }),
+          error: patchError,
+        });
+      },
+
+      loadDisabledUsers(): void {
+        loadDisabledUsersSubscription?.unsubscribe();
+        patchState(store, {
+          users: undefined,
+          subErrors: undefined,
+          selected: undefined,
+          response: undefined,
+          error: undefined,
+          isLoading: true,
+        });
+
+        loadDisabledUsersSubscription = userService.getAllDisableUsers().subscribe({
+          next: (users) => patchState(store, {
+            users: users ?? [],
+            isLoading: false,
+          }),
+          error: patchError,
+        });
+      },
+
+      loadById(id: string): void {
+        loadByIdSubscription?.unsubscribe();
+        patchState(store, {
+          subErrors: undefined,
+          selected: undefined,
+          response: undefined,
+          error: undefined,
+          isLoading: true,
+        });
+
+        loadByIdSubscription = userService.getUser(id).subscribe({
+          next: (selected) => patchState(store, {
+            selected,
+            isLoading: false,
+          }),
+          error: patchError,
+        });
+      },
+
+      loadMyUser(): void {
+        loadByIdSubscription?.unsubscribe();
+        patchState(store, {
+          subErrors: undefined,
+          selected: undefined,
+          response: undefined,
+          error: undefined,
+          isLoading: true,
+        });
+
+        loadByIdSubscription = userService.getMyUser().subscribe({
+          next: (selected) => patchState(store, {
+            selected,
+            isLoading: false,
+          }),
+          error: patchError,
+        });
+      },
+
+      loadOverview(id: string): void {
+        loadOverviewSubscription?.unsubscribe();
+        patchState(store, {
+          overview: undefined,
+          pagination: undefined,
+          subErrors: undefined,
+          selected: undefined,
+          response: undefined,
+          error: undefined,
+          isLoading: true,
+        });
+
+        loadOverviewSubscription = userService.getCustomerOverview(id).subscribe({
+          next: (overview) => patchState(store, {
+            overview,
+            isLoading: false,
+          }),
+          error: patchError,
+        });
+      },
+
+      save(user: IUser, id?: string, role?: Role): void {
+        saveSubscription?.unsubscribe();
+        patchMutationStart();
+
+        saveSubscription = userService.saveUser(user, id, role).subscribe({
+          next: (response) => patchState(store, {
+            response: requestSuccess(response.key, response.response.name, `users/${ response.response.id }`, undefined,
+              'success', false, 'users'),
+            isLoading: false,
+          }),
+          error: patchError,
+        });
+      },
+
+      setRole(id: string, displayName: string, role: Role, action: 'ADD' | 'REMOVE'): void {
+        setRoleSubscription?.unsubscribe();
+        patchMutationStart();
+
+        setRoleSubscription = userService.setRole(id, role).subscribe({
+          next: () => patchState(store, {
+            response: requestSuccess(`USER.ROLES.${ action }`, displayName, `users/${ id }`,
+              translate.instant(`COMMON.ROLES.${ role }`)),
+            isLoading: false,
+          }),
+          error: patchError,
+        });
+      },
+
+      updateMyUser(user: IUser, redirectUrl?: string, message?: string): void {
+        updateMyUserSubscription?.unsubscribe();
+        patchMutationStart();
+
+        updateMyUserSubscription = userService.updateMyUser(user).subscribe({
+          next: (response) => {
+            patchState(store, {
+              response: {
+                message: message || translate.instant('COMMON.PROFILE.UPDATED.MESSAGE',
+                  { displayName: response.user.displayName }),
+                toastType: 'success',
+              },
+              isLoading: false,
+            });
+            dispatchLoginSuccess(response, redirectUrl, user.locale);
+          },
+          error: patchError,
+        });
+      },
+
+      updateMyPhoto(file: string): void {
+        updateMyPhotoSubscription?.unsubscribe();
+        patchMutationStart();
+
+        updateMyPhotoSubscription = userService.updateMyPhoto(file).subscribe({
+          next: (response) => {
+            patchState(store, {
+              response: {
+                message: 'COMMON.PROFILE.UPDATED.PHOTO',
+                toastType: 'success',
+              },
+              isLoading: false,
+            });
+            const lang = getLocale(translate.getCurrentLang()).language;
+            dispatchLoginSuccess(response, `/${ lang }/auth/profile`, lang);
+          },
+          error: patchError,
+        });
+      },
+
+      delete(id: string, displayName: string): void {
+        deleteSubscription?.unsubscribe();
+        patchMutationStart();
+
+        deleteSubscription = userService.deleteUser(id).subscribe({
+          next: () => patchState(store, {
+            response: requestSuccess('USER.DELETED.MESSAGE', displayName, undefined, undefined, 'warning', true),
+            isLoading: false,
+          }),
+          error: patchError,
+        });
+      },
+
+      restore(id: string, user: IUser): void {
+        restoreSubscription?.unsubscribe();
+        patchMutationStart();
+
+        restoreSubscription = userService.restore(id, user).subscribe({
+          next: (response) => patchState(store, {
+            response: requestSuccess('USER.RESTORE.MESSAGE', response.name),
+            isLoading: false,
+          }),
+          error: patchError,
+        });
+      },
+
+      resendToken(id: string): void {
+        resendTokenSubscription?.unsubscribe();
+        patchMutationStart();
+
+        resendTokenSubscription = userService.resendToken(id).subscribe({
+          next: () => patchState(store, {
+            response: requestSuccess('USER.ACTIVATION_RESEND.MESSAGE'),
+            isLoading: false,
+          }),
+          error: patchError,
+        });
+      },
+
+      mergeUsers(oldUserId: string, newUserId: string): void {
+        mergeUsersSubscription?.unsubscribe();
+        patchMutationStart();
+
+        mergeUsersSubscription = userService.mergeUsers(oldUserId, newUserId).subscribe({
+          next: () => patchState(store, {
+            response: requestSuccess('USER.MERGE.SUCCESS'),
+            isLoading: false,
+          }),
+          error: patchError,
+        });
+      },
+    };
+  }),
+);

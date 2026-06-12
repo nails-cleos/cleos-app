@@ -11,12 +11,8 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
 import { map, startWith } from 'rxjs/operators';
-import { cleanUser, getAllDisableUsers } from '../../store/actions/user.actions';
-import { UserState } from '../../store/reducers/user.reducers';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { getAllUsersPipe } from '../../store/selectors/user.selectors';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
@@ -24,6 +20,7 @@ import { MatList, MatListItem } from '@angular/material/list';
 import { MatButton } from '@angular/material/button';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
+import { UserStore } from '../../store/user.store';
 
 type SelectUserForm = {
   user: FormControl<IUserAll | undefined>;
@@ -43,15 +40,12 @@ export type SelectUserDialogData = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SelectUserDialogComponent {
-  private readonly store: Store<UserState> = inject(Store<UserState>);
+  private readonly userStore = inject(UserStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly dialogRef = inject(MatDialogRef<SelectUserDialogComponent>);
   readonly data = inject<SelectUserDialogData>(MAT_DIALOG_DATA);
 
-  private allUsers$ = this.store.pipe(getAllUsersPipe);
-  private allUsersSignal = toSignal(this.allUsers$);
-
-  users = computed(() => this.allUsersSignal()?.filter((it: IUser) => it.id !== this.newUser.id));
+  users = computed(() => this.userStore.users()?.filter((it: IUser) => it.id !== this.newUser.id));
 
   form: FormGroup<SelectUserForm> = this.formBuilder.group<SelectUserForm>({
     user: this.formBuilder.control(undefined, { validators: [Validators.required, requireMatch] }),
@@ -63,7 +57,7 @@ export class SelectUserDialogComponent {
     this.getForm.user.valueChanges.pipe(
       startWith('' as string),
       map((value: any) => !value || typeof value === 'string' ? value : value.name),
-      combineLatestWith(this.allUsers$),
+      combineLatestWith(toObservable(this.users)),
       map(([name, users]) => {
         if (!users) {
           return [];
@@ -74,8 +68,8 @@ export class SelectUserDialogComponent {
   );
 
   constructor() {
-    this.store.dispatch(cleanUser());
-    this.store.dispatch(getAllDisableUsers());
+    this.userStore.clean();
+    this.userStore.loadDisabledUsers();
   }
 
   get getForm(): SelectUserForm {

@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATED } from '@ngrx/router-store';
-import { cleanUser, getMyUser } from '../store/actions/user.actions';
 import { cleanAuth, setCurrentCode } from '../store/actions/auth.actions';
 import { navigation } from '../util/router-navigation.operator';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
@@ -27,7 +26,7 @@ export class AuthNavigationEffects {
     this.actions$.pipe(
       ofType(ROUTER_NAVIGATED),
       navigation(ProfileComponent, {
-        run: () => [cleanUser(), getMyUser()],
+        run: () => [],
       }),
     ));
 

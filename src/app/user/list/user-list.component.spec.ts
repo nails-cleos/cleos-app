@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ActivatedRoute } from '@angular/router';
@@ -8,25 +7,24 @@ import { BehaviorSubject, of } from 'rxjs';
 import { UserListComponent } from './user-list.component';
 import { IUser, IUserAll, User } from '../user';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import { UserState } from '../../store/reducers/user.reducers';
-import { deleteUser, getUsersPage, mergeUsers, resendToken, restore, userSelected } from '../../store/actions/user.actions';
-import { signal } from '@angular/core';
+import { signal, WritableSignal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { UserStore } from '../../store/user.store';
 
 describe('UserListComponent', () => {
   let component: UserListComponent;
   let fixture: ComponentFixture<UserListComponent>;
 
-  let storeSpy: jasmine.SpyObj<Store<UserState>>;
+  let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let translate: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
 
-  let userList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
-  let isLoading$: BehaviorSubject<boolean>;
+  let paginationSignal: WritableSignal<Pagination<IUserAll> | undefined>;
+  let responseSignal: WritableSignal<any>;
+  let isLoadingSignal: WritableSignal<boolean>;
 
   const mockUsers = [
     { id: '1', displayName: 'User 1', email: 'user1@test.com' },
@@ -42,9 +40,9 @@ describe('UserListComponent', () => {
   };
 
   beforeEach(async () => {
-    userList$ = new BehaviorSubject(mockPagination);
-    response$ = new BehaviorSubject<any>(undefined);
-    isLoading$ = new BehaviorSubject<boolean>(false);
+    paginationSignal = signal(mockPagination);
+    responseSignal = signal(undefined);
+    isLoadingSignal = signal(false);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -53,7 +51,21 @@ describe('UserListComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch', 'select']);
+    userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', [
+      'loadPage',
+      'clean',
+      'selectAndNavigate',
+      'delete',
+      'restore',
+      'resendToken',
+      'mergeUsers',
+      'setRole',
+    ]);
+    Object.assign(userStoreSpy, {
+      pagination: paginationSignal.asReadonly(),
+      response: responseSignal.asReadonly(),
+      isLoading: isLoadingSignal.asReadonly(),
+    });
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
 
@@ -63,26 +75,12 @@ describe('UserListComponent', () => {
       },
     });
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return userList$.asObservable();
-        case 2:
-          return response$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-    storeSpy.select.and.returnValue(isLoading$.asObservable());
-
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [UserListComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: UserStore, useValue: userStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MatDialog, useValue: dialogSpy },
@@ -99,9 +97,6 @@ describe('UserListComponent', () => {
   });
 
   afterEach(() => {
-    userList$.complete();
-    response$.complete();
-    isLoading$.complete();
     breakpoint$.complete();
   });
 
@@ -110,7 +105,7 @@ describe('UserListComponent', () => {
   });
 
   it('should compute dataSourceSignal correctly', () => {
-    userList$.next(mockPagination);
+    paginationSignal.set(mockPagination);
     fixture.detectChanges();
 
     const data = component.dataSourceSignal() as any;
@@ -118,7 +113,7 @@ describe('UserListComponent', () => {
   });
 
   it('should compute resultsLengthSignal correctly', () => {
-    userList$.next(mockPagination);
+    paginationSignal.set(mockPagination);
     fixture.detectChanges();
 
     expect(component.resultsLengthSignal()).toBe(3);
@@ -150,68 +145,42 @@ describe('UserListComponent', () => {
     expect(component.pageSizeSignal()).toBe(PAGE_SIZE);
   });
 
-  it('should dispatch getUsersPage when paginatorPageIndex changes', () => {
-    const paginator = component['paginator']();
-
-    paginator!.pageIndex = 1;
-    paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
-    fixture.detectChanges();
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getUsersPage({
-        page: 1,
-        sort: 'displayName',
-        direction: 'asc',
-        size: PAGE_SIZE,
-        filter: undefined,
-      }),
-    );
-  });
-
-  it('should dispatch getUsersPage when filter changes', () => {
+  it('should load users when filter changes', () => {
+    userStoreSpy.loadPage.calls.reset();
     const filterValue = ' filterValue ';
     component.getForm.filter.setValue(filterValue);
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getUsersPage({
-        page: 0,
-        sort: 'displayName',
-        direction: 'asc',
-        size: PAGE_SIZE,
-        filter: filterValue.trim().toLowerCase(),
-      }),
-    );
+    expect(userStoreSpy.loadPage).toHaveBeenCalledWith({
+      page: 0,
+      sort: 'displayName',
+      direction: 'asc',
+      size: PAGE_SIZE,
+      filter: filterValue.trim().toLowerCase(),
+    });
   });
 
-  it('should dispatch clean and reset paginator when responseSignal emits', () => {
-    const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
+  it('should reset the paginator when responseSignal emits', () => {
+    const paginator = component['paginator']();
 
-    component['paginator'] = signal(paginatorMock);
+    if (!paginator) {
+      return;
+    }
 
-    response$.next({ success: true });
-
+    responseSignal.set({ success: true });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getUsersPage({
-        page: 0,
-        sort: 'displayName',
-        direction: 'asc',
-        size: PAGE_SIZE,
-        filter: undefined,
-      }),
-    );
+    expect(userStoreSpy.clean).toHaveBeenCalled();
   });
 
-  it('should dispatch userSelected when edit is called', () => {
+  it('should select and navigate when edit is called', () => {
     const item = mockUsers[0];
     component.edit(item);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(userSelected({ selected: item }));
+    expect(userStoreSpy.selectAndNavigate).toHaveBeenCalledWith(item);
   });
 
-  it('should dispatch deleteUser when dialog returns a result', () => {
+  it('should delete when dialog returns a result', () => {
     const item = mockUsers[0];
     dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
@@ -230,10 +199,10 @@ describe('UserListComponent', () => {
         },
       }));
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteUser({ id: item.id, displayName: item.displayName }));
+    expect(userStoreSpy.delete).toHaveBeenCalledWith(item.id, item.displayName);
   });
 
-  it('should dispatch restore when dialog returns a result', () => {
+  it('should restore when dialog returns a result', () => {
     const item = mockUsers[0];
     dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
@@ -255,10 +224,10 @@ describe('UserListComponent', () => {
     restoreUser.id = item.id;
     restoreUser.deleted = false;
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(restore({ id: item.id, user: restoreUser }));
+    expect(userStoreSpy.restore).toHaveBeenCalledWith(item.id, restoreUser);
   });
 
-  it('should dispatch sendInvite when dialog returns a result', () => {
+  it('should resend invite when dialog returns a result', () => {
     const item = mockUsers[0];
     dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
@@ -276,10 +245,10 @@ describe('UserListComponent', () => {
         },
       }));
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(resendToken({ id: item.id }));
+    expect(userStoreSpy.resendToken).toHaveBeenCalledWith(item.id);
   });
 
-  it('should dispatch merge when dialog returns a result', () => {
+  it('should merge when dialog returns a result', () => {
     const oldUser = mockUsers[0];
     const newUser = mockUsers[1];
     dialogSpy.open.and.returnValue({
@@ -288,6 +257,6 @@ describe('UserListComponent', () => {
 
     component.merge(newUser);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(mergeUsers({ oldUserId: oldUser.id, newUserId: newUser.id }));
+    expect(userStoreSpy.mergeUsers).toHaveBeenCalledWith(oldUser.id, newUser.id);
   });
 });

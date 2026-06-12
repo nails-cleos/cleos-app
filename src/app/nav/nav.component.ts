@@ -5,7 +5,6 @@ import { Store } from '@ngrx/store';
 import { IUser, User } from '../user/user';
 import { logOut, redirect } from '../store/actions/auth.actions';
 import { getNotificationsPage, readNotification } from '../store/actions/notification.actions';
-import { updateMyUser } from '../store/actions/user.actions';
 import { INotification } from '../notification/notification';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessagingService } from '../services/messaging.service';
@@ -45,6 +44,7 @@ import { MatDrawer, MatDrawerContainer, MatDrawerContent } from '@angular/materi
 import { AvatarComponent } from '../shared/avatar/avatar.component';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatBadge } from '@angular/material/badge';
+import { UserStore } from '../store/user.store';
 
 @Component({
   selector: 'app-nav',
@@ -74,6 +74,7 @@ export class NavComponent {
   private readonly route: ActivatedRoute = inject(ActivatedRoute);
   private readonly loadingService = inject(LoadingOverlayService);
   private readonly feedbackSources = inject(GLOBAL_FEEDBACK_SOURCE, { optional: true }) ?? [];
+  private readonly userStore = inject(UserStore);
 
   private breakpointObserver$ = this.breakpointObserver.observe(
     [Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium]);
@@ -382,7 +383,7 @@ export class NavComponent {
     const redirectUrl = this.router.url;
     const message = this.translate.instant(
       `COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode().toString().toUpperCase() }`);
-    this.store.dispatch(updateMyUser({ user, redirectUrl, message }));
+    this.userStore.updateMyUser(user, redirectUrl, message);
   }
 
   notification = (notification: INotification): void => {

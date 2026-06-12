@@ -8,12 +8,10 @@ import { RedirectComponent } from './redirect/redirect.component';
 import { provideEffects } from '@ngrx/effects';
 import { LoginEffects } from '../store/effects/auth.effects';
 import { AuthService } from '../services/auth.service';
-import { UserEffects } from '../store/effects/user.effects';
 import { UserService } from '../services/user.service';
 import { provideState } from '@ngrx/store';
 import { AUTH_FEATURE_KEY, authReducer } from '../store/reducers/auth.reducers';
 import { AuthNavigationEffects } from './auth-navigation.effects';
-import { USER_FEATURE_KEY, userReducer } from '../store/reducers/user.reducers';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
 const providers = [
@@ -21,8 +19,7 @@ const providers = [
   AuthService,
   UserService,
   provideState(AUTH_FEATURE_KEY, authReducer),
-  provideState(USER_FEATURE_KEY, userReducer),
-  provideEffects(LoginEffects, UserEffects, AuthNavigationEffects),
+  provideEffects(LoginEffects, AuthNavigationEffects),
 ];
 
 const children: Routes = [

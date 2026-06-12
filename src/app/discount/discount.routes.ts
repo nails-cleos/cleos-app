@@ -6,8 +6,6 @@ import { CurrencyService } from '../services/currency.service';
 import { DiscountService } from '../services/discount.service';
 import { UserService } from '../services/user.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
-import { UserEffects } from '../store/effects/user.effects';
-import { provideEffects } from '@ngrx/effects';
 import { DiscountCreatePageComponent } from './discount-create-page.component';
 import { DiscountDetailsPageComponent } from './discount-details-page.component';
 
@@ -16,7 +14,6 @@ const providers = [
   DiscountService,
   UserService,
   CurrencyService,
-  provideEffects(UserEffects),
 ];
 
 const children: Routes = [
